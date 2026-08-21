@@ -48,7 +48,7 @@ public class NavigationBar extends BaseDetails {
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        final JBPanel<?> pathPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        final @NotNull JBPanel<?> pathPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pathPanel.setOpaque(false);
 
         final float navFontSize = Math.max(8.0f, FontSync.getBaseFontSize() - 1.0f);
@@ -56,10 +56,10 @@ public class NavigationBar extends BaseDetails {
         {
             for (int i = 0; i < currentPath.size(); i++) {
 
-                final String labelText = currentPath.get(i);
+                final @NotNull String labelText = currentPath.get(i);
                 final boolean isLast = (i == currentPath.size() - 1);
 
-                final JBLabel folderLabel = new JBLabel(labelText);
+                final @NotNull JBLabel folderLabel = new JBLabel(labelText);
                 folderLabel.setFont(JBUI.Fonts.label(navFontSize));
                 folderLabel.setForeground(DEFAULT_TEXT_COLOR);
                 folderLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -80,13 +80,13 @@ public class NavigationBar extends BaseDetails {
                     @Override
                     public void mouseClicked(final MouseEvent e) {
                         if (isLast) {
-                            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                             Path testSetPath = Services.getInstance(p, TestinRoot.class).getPath();
                             for (final String segment : currentPath) {
                                 testSetPath = testSetPath.resolve(segment);
                             }
 
-                            final TestSetDirectoryDto ts = indexer.getTestSetByPath(testSetPath);
+                            final @NotNull TestSetDirectoryDto ts = indexer.getTestSetByPath(testSetPath);
                             if (Services.getInstance(p, EditorUtil.class).isOpen(p, ts.getName())) return;
 
                             Services.getInstance(p, EditorUtil.class).open(p, ts);
@@ -96,7 +96,7 @@ public class NavigationBar extends BaseDetails {
 
                 pathPanel.add(folderLabel);
                 if (!isLast) {
-                    final JBLabel separator = new JBLabel(AllIcons.General.ArrowRight);
+                    final @NotNull JBLabel separator = new JBLabel(AllIcons.General.ArrowRight);
                     separator.setBorder(JBUI.Borders.empty(SEPARATOR_BORDER_V, SEPARATOR_BORDER_H));
                     pathPanel.add(separator);
                 }
@@ -117,8 +117,8 @@ public class NavigationBar extends BaseDetails {
     }
 
     private void setUnderline(final @NotNull JBLabel label, final boolean underline) {
-        final Font font = label.getFont();
-        final Map<TextAttribute, Object> attributes = new HashMap<>(font.getAttributes());
+        final @NotNull Font font = label.getFont();
+        final @NotNull Map<TextAttribute, Object> attributes = new HashMap<>(font.getAttributes());
         attributes.put(TextAttribute.UNDERLINE, underline ? TextAttribute.UNDERLINE_ON : -1);
         label.setFont(font.deriveFont(attributes));
     }

@@ -21,21 +21,21 @@ public class RenameJavaClass implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof Renamed renamed)) return;
 
-        final String newName = renamed.newName();
-        final List<String> fqcn = Fqcn.ofClass(p, renamed.dir());
+        final @NotNull String newName = renamed.newName();
+        final @NotNull List<String> fqcn = Fqcn.ofClass(p, renamed.dir());
         if (fqcn.isEmpty()) return;
-        final String path = String.join(".", fqcn);
+        final @NotNull String path = String.join(".", fqcn);
 
         WriteCommandAction.runWriteCommandAction(p, "Rename Test Class", null, () -> {
-            final Optional<PsiClass> found = Optional.ofNullable(
+            final @NotNull Optional<PsiClass> found = Optional.ofNullable(
                     JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)));
             if (found.isEmpty()) {
                 Logger.warn("RenameJavaClass: class not found: " + path);
                 return;
             }
 
-            final PsiClass targetClass = found.orElseThrow();
-            final String newClassName = NameSanitizer.className(newName);
+            final @NotNull PsiClass targetClass = found.orElseThrow();
+            final @NotNull String newClassName = NameSanitizer.className(newName);
             // Receiver is the non-null side: PsiClass#getName is null for anonymous classes.
             if (!newClassName.equals(targetClass.getName())) {
                 targetClass.setName(newClassName);

@@ -20,7 +20,7 @@ public class ExportCsv {
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
                              final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), StandardCharsets.UTF_8))) {
-            final List<String> headerNames = exportAction.exportAttributes.stream()
+            final @NotNull List<String> headerNames = exportAction.exportAttributes.stream()
                     .map(TestEditorAttributes::getName)
                     .toList();
 
@@ -29,7 +29,7 @@ public class ExportCsv {
 
             for (final Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
                 for (final TestCaseDto tc : entry.getValue()) {
-                    final List<String> rowValues = new ArrayList<>();
+                    final @NotNull List<String> rowValues = new ArrayList<>();
                     for (final TestEditorAttributes attr : exportAction.exportAttributes) {
                         rowValues.add(escapeCsvField(attr.getTestValueExtractor().execute(tc, p)));
                     }

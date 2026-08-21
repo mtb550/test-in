@@ -92,7 +92,7 @@ final class TestinConfigLoader {
         }
 
         try {
-            final TestinProjectConfig config = YAML.readValue(yaml, TestinProjectConfig.class);
+            final @NotNull TestinProjectConfig config = YAML.readValue(yaml, TestinProjectConfig.class);
             Logger.info("Read " + source + ": test project '" + config.testinProject() + "'");
             return config;
 
@@ -114,15 +114,15 @@ final class TestinConfigLoader {
      * its root, which is where a clone puts it.
      */
     static @NotNull Optional<Path> file(final @NotNull Project p) {
-        final Optional<String> basePath = Optional.ofNullable(p.getBasePath());
+        final @NotNull Optional<String> basePath = Optional.ofNullable(p.getBasePath());
         if (basePath.isEmpty()) {
             Logger.info("No base path for " + p.getName() + ", so there is no testin.yml to read or write");
             return Optional.empty();
         }
 
-        final Path root = Path.of(basePath.orElseThrow());
+        final @NotNull Path root = Path.of(basePath.orElseThrow());
         for (final String name : FILE_NAMES) {
-            final Path candidate = root.resolve(name);
+            final @NotNull Path candidate = root.resolve(name);
             if (Files.isRegularFile(candidate)) return Optional.of(candidate);
         }
 

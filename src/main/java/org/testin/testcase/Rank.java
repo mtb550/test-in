@@ -114,7 +114,7 @@ public final class Rank {
         }
 
         final long step = slots / (count + 1L);
-        final List<String> ranks = new ArrayList<>(count);
+        final @NotNull List<String> ranks = new ArrayList<>(count);
 
         for (int i = 0; i < count; i++) {
             ranks.add(digits((i + 1) * step, width));
@@ -151,7 +151,7 @@ public final class Rank {
      * this is also how a case is put above everything else.
      */
     private static @NotNull String midpoint(final @NotNull String before, final @NotNull String after) {
-        final StringBuilder rank = new StringBuilder();
+        final @NotNull StringBuilder rank = new StringBuilder();
 
         for (int i = 0; ; i++) {
             final char low = i < before.length() ? before.charAt(i) : BELOW_FIRST;

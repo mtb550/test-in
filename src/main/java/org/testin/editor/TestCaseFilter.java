@@ -44,7 +44,7 @@ public final class TestCaseFilter {
             return Collections.emptyList();
         }
 
-        final String normalizedQuery = query.trim().toLowerCase(Locale.ROOT);
+        final @NotNull String normalizedQuery = query.trim().toLowerCase(Locale.ROOT);
         return source.stream()
                 .filter(testCase -> matches(testCase, normalizedQuery, groups, priorities, modules, statuses, runItemProvider))
                 .collect(Collectors.toList());

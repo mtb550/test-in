@@ -66,7 +66,7 @@ public class ImportAction extends AbstractProjectTreeAction {
     private void executeImportWriteAction(final @NotNull Project p, final @NotNull DirectoryDto selectedDirDto,
                                           final @NotNull Map<String, List<TestCaseDto>> selectedCasesBySheet) {
 
-        final Path targetPath = selectedDirDto.getPath();
+        final @NotNull Path targetPath = selectedDirDto.getPath();
 
         // Checked once up front: without the Java plugin the import still runs,
         // only the test-method generation is skipped (with a one-time notice).
@@ -74,7 +74,7 @@ public class ImportAction extends AbstractProjectTreeAction {
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                final List<TestCaseDto> flatList = new ArrayList<>();
+                final @NotNull List<TestCaseDto> flatList = new ArrayList<>();
                 selectedCasesBySheet.values().forEach(flatList::addAll);
 
                 linkAndSaveTestCases(p, targetPath, flatList, rankOfTail(p, targetPath));
@@ -89,12 +89,12 @@ public class ImportAction extends AbstractProjectTreeAction {
             } else {
                 int totalImported = 0;
                 for (final Map.Entry<String, List<TestCaseDto>> entry : selectedCasesBySheet.entrySet()) {
-                    final List<TestCaseDto> sheetCases = entry.getValue();
+                    final @NotNull List<TestCaseDto> sheetCases = entry.getValue();
 
-                    final String cName = NameSanitizer.removeSpecialChars(entry.getKey());
-                    final Path newDirPath = targetPath.resolve(cName);
+                    final @NotNull String cName = NameSanitizer.removeSpecialChars(entry.getKey());
+                    final @NotNull Path newDirPath = targetPath.resolve(cName);
                     // A test set creator always answers with the set it made.
-                    final TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) new CreateTestSet(p)
+                    final @NotNull TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) new CreateTestSet(p)
                             .execute(cName, selectedDirDto, newDirPath)
                             .orElseThrow();
 
@@ -146,7 +146,7 @@ public class ImportAction extends AbstractProjectTreeAction {
     private void linkAndSaveTestCases(final @NotNull Project p, final @NotNull Path dirPath,
                                       final @NotNull List<TestCaseDto> testCases,
                                       final @NotNull String tailRank) {
-        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         // After what is already in the set, in the order the sheet listed them.
         // Nothing that was there is touched: an import used to rewrite the case
@@ -175,7 +175,7 @@ public class ImportAction extends AbstractProjectTreeAction {
     }
 
     private @NotNull Optional<TestCaseDto> findExistingTail(final @NotNull Project p, final @NotNull Path directory) {
-        final List<TestCaseDto> existing =
+        final @NotNull List<TestCaseDto> existing =
                 TestCaseOrder.ordered(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(directory));
 
         return existing.isEmpty() ? Optional.empty() : Optional.of(existing.getLast());

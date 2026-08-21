@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
+
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
@@ -56,7 +57,7 @@ public class UpdateTestProjectStatusAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final Optional<TestProjectDirectoryDto> tp = selectedTestProject();
+        final @NotNull Optional<TestProjectDirectoryDto> tp = selectedTestProject();
 
         e.getPresentation().setVisible(tp.isPresent());
         e.getPresentation().setEnabled(tp.filter(project -> project.getMarker().getStatus() != projectStatus).isPresent());

@@ -72,7 +72,7 @@ public final class TreeUndoService {
     public void undo() {
         if (!canUndo()) return;
 
-        final TreeOperation operation = undoStack.pop();
+        final @NotNull TreeOperation operation = undoStack.pop();
         operation.undo().run();
         redoStack.push(operation);
     }
@@ -80,7 +80,7 @@ public final class TreeUndoService {
     public void redo() {
         if (!canRedo()) return;
 
-        final TreeOperation operation = redoStack.pop();
+        final @NotNull TreeOperation operation = redoStack.pop();
         operation.redo().run();
         undoStack.push(operation);
     }

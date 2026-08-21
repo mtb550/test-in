@@ -69,7 +69,7 @@ public final class TestDataParser {
     public static @NotNull ZonedDateTime date(final @NotNull String value) {
         if (value.isBlank()) return Config.NOT_EXECUTED;
 
-        final String text = value.trim();
+        final @NotNull String text = value.trim();
         try {
             // The weekday is dropped before parsing, not matched. It is decoration
             // - derived from the date every time the plugin writes one - and

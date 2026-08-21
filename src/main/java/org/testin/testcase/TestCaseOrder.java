@@ -57,12 +57,12 @@ public final class TestCaseOrder {
      *         to save, and nothing more
      */
     public static @NotNull List<TestCaseDto> place(final @NotNull List<TestCaseDto> arranged) {
-        final List<TestCaseDto> moved = new ArrayList<>();
+        final @NotNull List<TestCaseDto> moved = new ArrayList<>();
         String previous = "";
         int i = 0;
 
         while (i < arranged.size()) {
-            final TestCaseDto testCase = arranged.get(i);
+            final @NotNull TestCaseDto testCase = arranged.get(i);
 
             if (!testCase.getOrder().isEmpty() && testCase.getOrder().compareTo(previous) > 0) {
                 previous = testCase.getOrder();
@@ -76,15 +76,15 @@ public final class TestCaseOrder {
             // however much of it moved, rather than once per case.
             int anchor = i + 1;
             while (anchor < arranged.size()) {
-                final String rank = arranged.get(anchor).getOrder();
+                final @NotNull String rank = arranged.get(anchor).getOrder();
                 if (!rank.isEmpty() && rank.compareTo(previous) > 0) break;
                 anchor++;
             }
 
-            final String upperBound = anchor < arranged.size() ? arranged.get(anchor).getOrder() : "";
+            final @NotNull String upperBound = anchor < arranged.size() ? arranged.get(anchor).getOrder() : "";
 
             for (int j = i; j < anchor; j++) {
-                final TestCaseDto placed = arranged.get(j);
+                final @NotNull TestCaseDto placed = arranged.get(j);
                 placed.setOrder(Rank.between(previous, upperBound));
                 previous = placed.getOrder();
                 moved.add(placed);
@@ -101,7 +101,7 @@ public final class TestCaseOrder {
      * placed for the first time.
      */
     public static void rankAll(final @NotNull List<TestCaseDto> ordered) {
-        final List<String> ranks = Rank.spread(ordered.size());
+        final @NotNull List<String> ranks = Rank.spread(ordered.size());
 
         for (int i = 0; i < ordered.size(); i++) {
             ordered.get(i).setOrder(ranks.get(i));

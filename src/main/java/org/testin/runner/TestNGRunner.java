@@ -70,7 +70,7 @@ public final class TestNGRunner {
             return;
         }
 
-        final TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
+        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         // Marked here, where the tester's gesture is. Everything below hops to a
         // pooled thread and back, and a card that only turned Running when the
@@ -95,13 +95,13 @@ public final class TestNGRunner {
      * launch back to the EDT.
      */
     private void prepare(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
-        final TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
+        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
-        final List<TestCaseDto> found = new ArrayList<>();
+        final @NotNull List<TestCaseDto> found = new ArrayList<>();
         Optional<Module> module = Optional.empty();
 
         for (final TestCaseDto tc : cases) {
-            final Optional<PsiClass> owner = generatedClassOf(p, tc);
+            final @NotNull Optional<PsiClass> owner = generatedClassOf(p, tc);
 
             if (owner.isEmpty()) {
                 execution.noGeneratedCode(tc);
@@ -116,7 +116,7 @@ public final class TestNGRunner {
 
         if (found.isEmpty()) return;
 
-        final Optional<Module> runModule = module;
+        final @NotNull Optional<Module> runModule = module;
         ApplicationManager.getApplication().invokeLater(() -> launch(p, found, runModule));
     }
 
@@ -126,32 +126,32 @@ public final class TestNGRunner {
      */
     private void launch(final @NotNull Project p, final @NotNull List<TestCaseDto> found,
                         final @NotNull Optional<Module> module) {
-        final TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
+        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         // Asked here rather than earlier: a case stopped while the run was being
         // prepared is left out of the pattern set instead of being started and
         // then killed a moment later.
-        final List<TestCaseDto> cases = execution.stillWanted(found);
+        final @NotNull List<TestCaseDto> cases = execution.stillWanted(found);
         if (cases.isEmpty()) {
             Logger.info("Not starting: every case in the run was stopped before it began");
             return;
         }
 
-        final LinkedHashSet<String> patterns = new LinkedHashSet<>(cases.stream().map(TestNGRunner::patternFor).toList());
-        final String name = configNameFor(cases);
+        final @NotNull LinkedHashSet<String> patterns = new LinkedHashSet<>(cases.stream().map(TestNGRunner::patternFor).toList());
+        final @NotNull String name = configNameFor(cases);
 
-        final RunManager runManager = RunManager.getInstance(p);
-        final TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
+        final @NotNull RunManager runManager = RunManager.getInstance(p);
+        final @NotNull TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
 
-        final RunnerAndConfigurationSettings settings = Optional.ofNullable(runManager.findConfigurationByName(name))
+        final @NotNull RunnerAndConfigurationSettings settings = Optional.ofNullable(runManager.findConfigurationByName(name))
                 .orElseGet(() -> {
-                    final RunnerAndConfigurationSettings created =
+                    final @NotNull RunnerAndConfigurationSettings created =
                             runManager.createConfiguration(name, configType.getConfigurationFactories()[0]);
                     runManager.addConfiguration(created);
                     return created;
                 });
 
-        final TestNGConfiguration configuration = (TestNGConfiguration) settings.getConfiguration();
+        final @NotNull TestNGConfiguration configuration = (TestNGConfiguration) settings.getConfiguration();
         configuration.getPersistantData().TEST_OBJECT = TestType.PATTERN.getType();
         configuration.getPersistantData().setPatterns(patterns);
         configuration.setAllowRunningInParallel(true);
@@ -175,11 +175,11 @@ public final class TestNGRunner {
      * report on that (#34).
      */
     private @NotNull Optional<PsiClass> generatedClassOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        final List<String> fqcn = Fqcn.ofMethod(tc);
+        final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
         if (fqcn.size() < 2) return Optional.empty();
 
-        final String classFqcn = String.join(".", fqcn.subList(0, fqcn.size() - 1));
-        final Optional<PsiClass> owner = Optional.ofNullable(
+        final @NotNull String classFqcn = String.join(".", fqcn.subList(0, fqcn.size() - 1));
+        final @NotNull Optional<PsiClass> owner = Optional.ofNullable(
                 JavaPsiFacade.getInstance(p).findClass(classFqcn, GlobalSearchScope.projectScope(p)));
 
         if (owner.isEmpty()) {
@@ -200,7 +200,7 @@ public final class TestNGRunner {
      * the TestNG plugin splits on a comma.
      */
     private static @NotNull String patternFor(final @NotNull TestCaseDto tc) {
-        final List<String> fqcn = Fqcn.ofMethod(tc);
+        final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
 
         return String.join(".", fqcn.subList(0, fqcn.size() - 1)) + "," + fqcn.getLast();
     }
@@ -213,7 +213,7 @@ public final class TestNGRunner {
      * classes says how many, since no one name is true of it.
      */
     private static @NotNull String configNameFor(final @NotNull List<TestCaseDto> cases) {
-        final List<String> classes = cases.stream().map(TestNGRunner::simpleClassOf).distinct().toList();
+        final @NotNull List<String> classes = cases.stream().map(TestNGRunner::simpleClassOf).distinct().toList();
 
         if (cases.size() == 1) return classes.getFirst() + "." + Fqcn.ofMethod(cases.getFirst()).getLast();
         if (classes.size() == 1) return classes.getFirst();
@@ -222,7 +222,7 @@ public final class TestNGRunner {
     }
 
     private static @NotNull String simpleClassOf(final @NotNull TestCaseDto tc) {
-        final List<String> fqcn = Fqcn.ofMethod(tc);
+        final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
 
         return fqcn.get(fqcn.size() - 2);
     }

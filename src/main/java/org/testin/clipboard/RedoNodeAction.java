@@ -27,7 +27,7 @@ public class RedoNodeAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final TreeUndoService redo = Services.getInstance(p, TreeUndoService.class);
+        final @NotNull TreeUndoService redo = Services.getInstance(p, TreeUndoService.class);
 
         // Asked before, not after: redo() returns silently on an empty stack, so
         // notifying unconditionally would claim a redo that never ran. The
@@ -40,7 +40,7 @@ public class RedoNodeAction extends AbstractProjectAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final TreeUndoService redo = Services.getInstance(p, TreeUndoService.class);
+        final @NotNull TreeUndoService redo = Services.getInstance(p, TreeUndoService.class);
         e.getPresentation().setEnabled(redo.canRedo());
         e.getPresentation().setText(("Redo " + redo.redoDescription()).trim());
     }

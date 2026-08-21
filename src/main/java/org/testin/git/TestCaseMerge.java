@@ -100,20 +100,20 @@ public final class TestCaseMerge {
      */
     public static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String base,
                                     final @NotNull String mine, final @NotNull String theirs) {
-        final ObjectNode baseNode = mapper.readTree(base);
-        final ObjectNode mineNode = mapper.readTree(mine);
-        final ObjectNode theirsNode = mapper.readTree(theirs);
+        final @NotNull ObjectNode baseNode = mapper.readTree(base);
+        final @NotNull ObjectNode mineNode = mapper.readTree(mine);
+        final @NotNull ObjectNode theirsNode = mapper.readTree(theirs);
 
-        final ObjectNode merged = mineNode.deepCopy();
-        final List<Question> questions = new ArrayList<>();
+        final @NotNull ObjectNode merged = mineNode.deepCopy();
+        final @NotNull List<Question> questions = new ArrayList<>();
 
         for (final String field : fields(mineNode, theirsNode)) {
             // path, not get: a field the JSON does not carry answers with
             // Jackson's own empty node rather than with null, so nothing below
             // has to ask whether it got one (#71).
-            final JsonNode was = baseNode.path(field);
-            final JsonNode ours = mineNode.path(field);
-            final JsonNode yours = theirsNode.path(field);
+            final @NotNull JsonNode was = baseNode.path(field);
+            final @NotNull JsonNode ours = mineNode.path(field);
+            final @NotNull JsonNode yours = theirsNode.path(field);
 
             if (same(ours, yours)) continue;
 
@@ -161,10 +161,10 @@ public final class TestCaseMerge {
      */
     private static void stampTheLaterEdit(final @NotNull ObjectNode merged, final @NotNull ObjectNode mine,
                                           final @NotNull ObjectNode theirs) {
-        final ZonedDateTime mineAt = TestDataParser.date(text(mine.path(UPDATED_AT)));
-        final ZonedDateTime theirsAt = TestDataParser.date(text(theirs.path(UPDATED_AT)));
+        final @NotNull ZonedDateTime mineAt = TestDataParser.date(text(mine.path(UPDATED_AT)));
+        final @NotNull ZonedDateTime theirsAt = TestDataParser.date(text(theirs.path(UPDATED_AT)));
 
-        final ObjectNode later = theirsAt.isAfter(mineAt) ? theirs : mine;
+        final @NotNull ObjectNode later = theirsAt.isAfter(mineAt) ? theirs : mine;
 
         set(merged, UPDATED_AT, later.path(UPDATED_AT));
         set(merged, UPDATED_BY, later.path(UPDATED_BY));
@@ -175,7 +175,7 @@ public final class TestCaseMerge {
      * question sequence reads like the file does.
      */
     private static @NotNull Set<String> fields(final @NotNull ObjectNode mine, final @NotNull ObjectNode theirs) {
-        final Set<String> names = new LinkedHashSet<>();
+        final @NotNull Set<String> names = new LinkedHashSet<>();
         mine.fieldNames().forEachRemaining(names::add);
         theirs.fieldNames().forEachRemaining(names::add);
 

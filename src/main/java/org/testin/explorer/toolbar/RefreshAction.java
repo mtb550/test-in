@@ -64,7 +64,7 @@ public class RefreshAction extends AbstractProjectAction {
             // project, and indexing is scoped to it.
             Services.getInstance(p, TestinConfigService.class).reload();
 
-            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             indexer.resetForReindex();
             indexer.indexWithProgress();
             indexer.awaitIndexing();

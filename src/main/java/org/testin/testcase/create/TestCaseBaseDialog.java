@@ -90,7 +90,7 @@ public abstract class TestCaseBaseDialog {
             open.pack(false, true);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                final Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+                final @NotNull Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
                 if (focusOwner instanceof JComponent jComp) {
                     jComp.scrollRectToVisible(new Rectangle(0, 0, jComp.getWidth(), jComp.getHeight()));
                 }
@@ -222,7 +222,7 @@ public abstract class TestCaseBaseDialog {
             // here rather than at the top of all eight applyTo methods.
             getAllSections().stream().filter(CreateTestCaseSection::isShown).forEach(section -> section.applyTo(dto));
 
-            final String title = dto.getDescription();
+            final @NotNull String title = dto.getDescription();
             if (!DescriptionSection.isShown() || !title.trim().isEmpty()) {
                 onSave.accept(dto);
 

@@ -15,12 +15,12 @@ public class UpdateTestGroup extends UpdateTestBase implements GenAction {
         if (!(obj instanceof TestCaseDto tc)) return;
 
         applyUpdate(p, tc, "Update Test Case Group", pm -> {
-            final List<String> activeGroups = tc.getGroup().stream()
+            final @NotNull List<String> activeGroups = tc.getGroup().stream()
                     .filter(g -> g != Group.UNASSIGNED)
                     .map(g -> "\"" + g.getName() + "\"")
                     .toList();
 
-            final String newValue = "{" + String.join(", ", activeGroups) + "}";
+            final @NotNull String newValue = "{" + String.join(", ", activeGroups) + "}";
             updateTestAnnotationAttribute(p, pm, "groups", newValue);
         });
     }

@@ -130,7 +130,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
      * every section shares, then its own.
      */
     public StatusBarItem @NotNull [] getStatusBarItems() {
-        final List<StatusBarItem> items = new ArrayList<>();
+        final @NotNull List<StatusBarItem> items = new ArrayList<>();
         items.add(SAVE);
         items.add(CANCEL);
         items.addAll(List.of(ownKeys));

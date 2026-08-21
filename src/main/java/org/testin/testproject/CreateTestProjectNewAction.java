@@ -36,14 +36,14 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
      */
     public void execute() {
 
-        final Path tpPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(tpName);
+        final @NotNull Path tpPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(tpName);
 
         if (Services.getInstance(p, ProjectIndexer.class).projectExists(tpPath)) {
             Services.getInstance(p, Notifier.class).softShowExists(p, tpName);
             return;
         }
 
-        final TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).setTestProjectNode(p, tpPath);
+        final @NotNull TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).setTestProjectNode(p, tpPath);
 
         Services.getInstance(p, ProjectIndexer.class).addTestProject(tp);
 

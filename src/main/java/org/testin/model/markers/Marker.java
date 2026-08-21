@@ -61,7 +61,7 @@ public interface Marker {
      * Fills the creation audit info; modified mirrors created at birth.
      */
     default void stampCreated(final @NotNull String tester) {
-        final ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        final @NotNull ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         setCreatedBy(tester);
         setCreatedAt(now);
         setModifiedBy(tester);

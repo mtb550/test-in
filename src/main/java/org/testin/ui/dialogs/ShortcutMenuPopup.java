@@ -53,13 +53,13 @@ public final class ShortcutMenuPopup<T> {
     }
 
     public void show() {
-        final JBList<T> list = new JBList<>(items);
+        final @NotNull JBList<T> list = new JBList<>(items);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
         list.setCellRenderer(new ShortcutMenuRenderer<>(icon, label, shortcutText));
 
         DialogStyle.styleContent(list);
-        final JBPopup popup = JBPopupFactory.getInstance()
+        final @NotNull JBPopup popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(new JBScrollPane(list), list)
                 .setTitle(title)
                 .setRequestFocus(true)
@@ -72,7 +72,7 @@ public final class ShortcutMenuPopup<T> {
     }
 
     private void registerShortcuts(final @NotNull JBList<T> list, final @NotNull JBPopup popup) {
-        final Runnable triggerSelection = () -> ListValue.selected(list).ifPresent(item -> select(item, popup));
+        final @NotNull Runnable triggerSelection = () -> ListValue.selected(list).ifPresent(item -> select(item, popup));
 
         for (final T item : items) {
             shortcutBinder.bind(item, list, () -> select(item, popup));

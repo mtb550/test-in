@@ -26,8 +26,8 @@ public class RenameJavaPackage implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof Renamed renamed)) return;
 
-        final List<String> fqcn = Fqcn.ofPackage(renamed.dir());
-        final String newName = renamed.newName();
+        final @NotNull List<String> fqcn = Fqcn.ofPackage(renamed.dir());
+        final @NotNull String newName = renamed.newName();
 
         JavaSourceRoot.find(p).ifPresentOrElse(
                 testSourceRoot -> renameUnder(p, testSourceRoot, fqcn, newName),
@@ -39,19 +39,19 @@ public class RenameJavaPackage implements GenAction {
      */
     private void renameUnder(final @NotNull Project p, final @NotNull VirtualFile testSourceRoot,
                              final @NotNull List<String> fqcn, final @NotNull String newName) {
-        final Optional<VirtualFile> found = JavaSourceRoot.under(testSourceRoot, String.join("/", fqcn))
+        final @NotNull Optional<VirtualFile> found = JavaSourceRoot.under(testSourceRoot, String.join("/", fqcn))
                 .filter(VirtualFile::isDirectory);
         if (found.isEmpty()) {
             Logger.info("Package not found for rename: " + String.join(".", fqcn));
             return;
         }
 
-        final VirtualFile pkgDir = found.orElseThrow();
-        final String newTop = NameSanitizer.packageName(newName);
+        final @NotNull VirtualFile pkgDir = found.orElseThrow();
+        final @NotNull String newTop = NameSanitizer.packageName(newName);
         // The package path of the directory that CONTAINS the renamed package, e.g. "muath"
         // for a package at "muath.pkgtu" -> "muath.pkg". Needed so the new package
         // declaration keeps the full prefix instead of just "pkg".
-        final String parentPackage = String.join(".", fqcn.subList(0, fqcn.size() - 1));
+        final @NotNull String parentPackage = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
         WriteCommandAction.runWriteCommandAction(p, "Rename Package", null, () -> {
             try {
@@ -76,9 +76,9 @@ public class RenameJavaPackage implements GenAction {
             if (child.isDirectory()) {
                 updatePackageDeclarationsRecursive(p, root, child, newTop, parentPackage);
             } else if ("java".equals(child.getExtension())) {
-                final PsiFile psiFile = PsiManager.getInstance(p).findFile(child);
+                final @NotNull PsiFile psiFile = PsiManager.getInstance(p).findFile(child);
                 if (psiFile instanceof PsiJavaFile javaFile) {
-                    final String newPackage = buildNewPackage(root, child.getParent(), newTop, parentPackage);
+                    final @NotNull String newPackage = buildNewPackage(root, child.getParent(), newTop, parentPackage);
                     if (!newPackage.equals(javaFile.getPackageName())) {
                         javaFile.setPackageName(newPackage);
                     }
@@ -91,8 +91,8 @@ public class RenameJavaPackage implements GenAction {
                                             final @NotNull String newTop, final @NotNull String parentPackage) {
         // The root itself is no path below the root, which VfsUtil says with a
         // null and which means the same as saying it with an empty string.
-        final String rel = Objects.requireNonNullElse(VfsUtil.getRelativePath(parentDir, root, '/'), "");
-        final String base = parentPackage.isEmpty() ? newTop : parentPackage + "." + newTop;
+        final @NotNull String rel = Objects.requireNonNullElse(VfsUtil.getRelativePath(parentDir, root, '/'), "");
+        final @NotNull String base = parentPackage.isEmpty() ? newTop : parentPackage + "." + newTop;
 
         if (rel.isEmpty()) return base;
         return base + "." + rel.replace('/', '.');

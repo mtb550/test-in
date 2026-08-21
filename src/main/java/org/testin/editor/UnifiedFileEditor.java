@@ -83,7 +83,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
 
     @Override
     public void selectNotify() {
-        final List<TestCaseDto> selected = editor.getSelectedTestCases();
+        final @NotNull List<TestCaseDto> selected = editor.getSelectedTestCases();
 
         ViewToolWindowFactory.toolWindow(p)
                 .flatMap(tw -> ViewToolWindowFactory.panel())

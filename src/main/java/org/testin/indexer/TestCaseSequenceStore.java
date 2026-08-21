@@ -36,7 +36,7 @@ final class TestCaseSequenceStore {
     }
 
     @NotNull List<TestCaseDto> getForTestSet(final @NotNull Path testSetPath) {
-        final List<UUID> ids = testSetCaseIds.getOrDefault(testSetPath.toString(), List.of());
+        final @NotNull List<UUID> ids = testSetCaseIds.getOrDefault(testSetPath.toString(), List.of());
         if (ids.isEmpty()) return List.of();
 
         // Every case in the set, in rank order. It used to be a walk from
@@ -44,8 +44,8 @@ final class TestCaseSequenceStore {
         // reached appended afterward - so a set whose head was lost came back in
         // an order nobody chose, and a case pointed at by nothing looked like it
         // belonged at the end.
-        final Set<UUID> seen = new HashSet<>(ids.size());
-        final List<TestCaseDto> cases = new ArrayList<>(ids.size());
+        final @NotNull Set<UUID> seen = new HashSet<>(ids.size());
+        final @NotNull List<TestCaseDto> cases = new ArrayList<>(ids.size());
 
         for (final UUID id : ids) {
             // An id the index has no case for is one the scanner could not read;
@@ -66,7 +66,7 @@ final class TestCaseSequenceStore {
         // Known to the index means the case already exists, whatever its fields
         // say - the one question that separates a creation from an update without
         // trusting a value a tester could have typed.
-        final String tester = Services.getInstance(project, AppSettingsState.class).testerName;
+        final @NotNull String tester = Services.getInstance(project, AppSettingsState.class).testerName;
         if (testCasesById.containsKey(testCase.getId())) testCase.touch(tester);
         else testCase.stampCreated(tester);
 
@@ -93,9 +93,9 @@ final class TestCaseSequenceStore {
     }
 
     private void store(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
-        final String path = testSetPath.toString();
+        final @NotNull String path = testSetPath.toString();
         testCasesById.put(testCase.getId(), testCase);
-        final List<UUID> ids = testSetCaseIds.computeIfAbsent(
+        final @NotNull List<UUID> ids = testSetCaseIds.computeIfAbsent(
                 path, ignored -> Collections.synchronizedList(new ArrayList<>()));
         if (!ids.contains(testCase.getId())) ids.add(testCase.getId());
 
@@ -108,7 +108,7 @@ final class TestCaseSequenceStore {
         Optional.ofNullable(testSetCaseIds.get(testSetPath.toString()))
                 .ifPresent(ids -> ids.remove(testCaseId));
 
-        final Path filePath = testSetPath.resolve(testCaseId + ".json");
+        final @NotNull Path filePath = testSetPath.resolve(testCaseId + ".json");
         try {
             Files.deleteIfExists(filePath);
         } catch (final Exception ex) {
@@ -126,11 +126,11 @@ final class TestCaseSequenceStore {
      */
     void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList,
                         final @NotNull List<TestCaseDto> moved) {
-        final String path = testSetPath.toString();
-        final List<UUID> ids = new ArrayList<>(orderedList.size());
-        final Set<UUID> newIds = new HashSet<>();
+        final @NotNull String path = testSetPath.toString();
+        final @NotNull List<UUID> ids = new ArrayList<>(orderedList.size());
+        final @NotNull Set<UUID> newIds = new HashSet<>();
 
-        final Set<UUID> movedIds = new HashSet<>();
+        final @NotNull Set<UUID> movedIds = new HashSet<>();
         for (final TestCaseDto testCase : moved) movedIds.add(testCase.getId());
 
         for (final TestCaseDto testCase : orderedList) {

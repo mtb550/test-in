@@ -91,7 +91,7 @@ final class BulkJsonEditors implements DialogComponent {
 
         // A scheme that defines no caret row color gets the one this dialog
         // would have drawn anyway, light or dark.
-        final Color caretRowColor = Optional
+        final @NotNull Color caretRowColor = Optional
                 .ofNullable(rightEditor.getColorsScheme().getColor(EditorColors.CARET_ROW_COLOR))
                 .orElseGet(() -> new JBColor(Gray._245, Gray._50));
         leftLineAttr.setBackgroundColor(caretRowColor);
@@ -144,7 +144,7 @@ final class BulkJsonEditors implements DialogComponent {
 
             int guardStart = 0;
             for (final int[] range : editableRanges) {
-                final RangeMarker marker = rightDoc.createRangeMarker(range[0], range[1]);
+                final @NotNull RangeMarker marker = rightDoc.createRangeMarker(range[0], range[1]);
                 marker.setGreedyToLeft(true);
                 marker.setGreedyToRight(true);
                 markers.add(marker);
@@ -177,7 +177,7 @@ final class BulkJsonEditors implements DialogComponent {
      * answer and an unreadable one is not (#71).
      */
     @NotNull Optional<String> valueAt(final int index) {
-        final RangeMarker marker = markers.get(index);
+        final @NotNull RangeMarker marker = markers.get(index);
         if (!marker.isValid()) return Optional.empty();
 
         return Optional.of(rightDoc.getText(new TextRange(marker.getStartOffset(), marker.getEndOffset())));
@@ -188,7 +188,7 @@ final class BulkJsonEditors implements DialogComponent {
      * caller mutating a list by index stays valid as it goes.
      */
     @NotNull List<Integer> indicesUnderCarets() {
-        final List<Integer> indices = new ArrayList<>();
+        final @NotNull List<Integer> indices = new ArrayList<>();
 
         for (final Caret caret : rightEditor.getCaretModel().getAllCarets()) {
             final int index = indexAt(caret.getOffset());
@@ -205,7 +205,7 @@ final class BulkJsonEditors implements DialogComponent {
     void focusValue(final int index) {
         if (index < 0 || index >= markers.size()) return;
 
-        final RangeMarker marker = markers.get(index);
+        final @NotNull RangeMarker marker = markers.get(index);
         if (marker.isValid()) rightEditor.getCaretModel().moveToOffset(marker.getEndOffset());
     }
 
@@ -257,7 +257,7 @@ final class BulkJsonEditors implements DialogComponent {
         rightEditor.getCaretModel().addCaretListener(new CaretListener() {
             @Override
             public void caretPositionChanged(final @NotNull CaretEvent event) {
-                final Caret caret = event.getCaret();
+                final @NotNull Caret caret = event.getCaret();
                 if (indexAt(caret.getOffset()) < 0) {
                     caret.moveToOffset(BulkJsonEditor.nearestValidOffset(caret.getOffset(), liveMarkers()));
                 }
@@ -292,12 +292,12 @@ final class BulkJsonEditors implements DialogComponent {
     private void refreshDiffHighlights() {
         if (rightEditor.isDisposed()) return;
 
-        final MarkupModel markup = rightEditor.getMarkupModel();
+        final @NotNull MarkupModel markup = rightEditor.getMarkupModel();
         for (final RangeHighlighter highlighter : markup.getAllHighlighters()) {
             if (highlighter.getLayer() == HighlighterLayer.SELECTION - 1) markup.removeHighlighter(highlighter);
         }
 
-        final TextAttributes diffAttr = new TextAttributes();
+        final @NotNull TextAttributes diffAttr = new TextAttributes();
         diffAttr.setBackgroundColor(new JBColor(new Color(228, 250, 228), new Color(43, 61, 44)));
 
         for (int i = 0; i < markers.size(); i++) {
@@ -305,7 +305,7 @@ final class BulkJsonEditors implements DialogComponent {
             valueAt(index)
                     .filter(current -> !current.equals(originalTextAt.apply(index)))
                     .ifPresent(current -> {
-                        final RangeMarker marker = markers.get(index);
+                        final @NotNull RangeMarker marker = markers.get(index);
                         markup.addRangeHighlighter(marker.getStartOffset(), marker.getEndOffset(),
                                 HighlighterLayer.SELECTION - 1, diffAttr, HighlighterTargetArea.EXACT_RANGE);
                     });
@@ -338,7 +338,7 @@ final class BulkJsonEditors implements DialogComponent {
         rightEditor.addEditorMouseListener(new EditorMouseListener() {
             @Override
             public void mousePressed(final @NotNull EditorMouseEvent event) {
-                final MouseEvent mouse = event.getMouseEvent();
+                final @NotNull MouseEvent mouse = event.getMouseEvent();
                 if (!mouse.isControlDown() && !mouse.isMetaDown()) return;
 
                 VisualPosition position = rightEditor.xyToVisualPosition(mouse.getPoint());
@@ -351,8 +351,8 @@ final class BulkJsonEditors implements DialogComponent {
 
                 // Clicking a spot that already has a caret takes it away, unless
                 // it is the last one; clicking anywhere else adds one.
-                final CaretModel caretModel = rightEditor.getCaretModel();
-                final VisualPosition clicked = position;
+                final @NotNull CaretModel caretModel = rightEditor.getCaretModel();
+                final @NotNull VisualPosition clicked = position;
                 Optional.ofNullable(caretModel.getCaretAt(clicked)).ifPresentOrElse(
                         existing -> {
                             if (caretModel.getCaretCount() > 1) caretModel.removeCaret(existing);
@@ -369,7 +369,7 @@ final class BulkJsonEditors implements DialogComponent {
     private void refreshRowHighlights() {
         if (leftEditor.isDisposed() || rightEditor.isDisposed()) return;
 
-        final MarkupModel leftMarkup = leftEditor.getMarkupModel();
+        final @NotNull MarkupModel leftMarkup = leftEditor.getMarkupModel();
         for (final RangeHighlighter highlighter : leftLineHighlighters) leftMarkup.removeHighlighter(highlighter);
         leftLineHighlighters.clear();
 
@@ -387,7 +387,7 @@ final class BulkJsonEditors implements DialogComponent {
      */
     private int indexAt(final int offset) {
         for (int i = 0; i < markers.size(); i++) {
-            final RangeMarker marker = markers.get(i);
+            final @NotNull RangeMarker marker = markers.get(i);
             if (marker.isValid() && offset >= marker.getStartOffset() && offset <= marker.getEndOffset()) return i;
         }
         return -1;
@@ -438,13 +438,13 @@ final class BulkJsonEditors implements DialogComponent {
      * one source - the status bar renders from it and this binds from it.
      */
     void bindKeysToEditor(final @NotNull List<StatusBarShortcut> shortcuts) {
-        final JComponent target = rightEditor.getContentComponent();
+        final @NotNull JComponent target = rightEditor.getContentComponent();
 
         for (final StatusBarShortcut shortcut : shortcuts) {
             if (!shortcut.isBindable()) continue;
 
-            final Shortcuts key = Objects.requireNonNull(shortcut.shortcut());
-            final Runnable action = Objects.requireNonNull(shortcut.action());
+            final @NotNull Shortcuts key = Objects.requireNonNull(shortcut.shortcut());
+            final @NotNull Runnable action = Objects.requireNonNull(shortcut.action());
             register(action, key.getKey(), target);
 
             // Shift+Enter saves as well. It is not advertised: it exists so the

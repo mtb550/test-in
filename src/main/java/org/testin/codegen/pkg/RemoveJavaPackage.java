@@ -15,9 +15,9 @@ public class RemoveJavaPackage implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof DirectoryDto dir)) return;
 
-        final List<String> fqcn = Fqcn.ofPackage(dir);
+        final @NotNull List<String> fqcn = Fqcn.ofPackage(dir);
         if (fqcn.isEmpty()) return;
-        final String packagePath = String.join("/", fqcn);
+        final @NotNull String packagePath = String.join("/", fqcn);
 
         JavaSourceRoot.writeInRoot(p, "removing package", testSourceRoot ->
                 JavaSourceRoot.deleteUnder(testSourceRoot, packagePath, this));

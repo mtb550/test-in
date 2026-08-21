@@ -31,8 +31,8 @@ public final class EditorUtil {
     private final @NotNull String OPEN_EDITORS_KEY = "testin.openEditors";
 
     public boolean isOpen(final @NotNull Project p, final @NotNull String s) {
-        final FileEditorManager fed = FileEditorManager.getInstance(p);
-        final VirtualFile[] openFiles = fed.getOpenFiles();
+        final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
+        final VirtualFile @NotNull[] openFiles = fed.getOpenFiles();
 
         for (final VirtualFile vf : openFiles) {
             if (s.equals(vf.getName())) {
@@ -45,8 +45,8 @@ public final class EditorUtil {
     }
 
     public void close(final @NotNull Project p, final @NotNull String s) {
-        final FileEditorManager fed = FileEditorManager.getInstance(p);
-        final VirtualFile[] openFiles = fed.getOpenFiles();
+        final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
+        final VirtualFile @NotNull[] openFiles = fed.getOpenFiles();
 
         for (final VirtualFile vf : openFiles) {
             if (s.equals(vf.getName())) {
@@ -73,7 +73,7 @@ public final class EditorUtil {
      * it would close every editor in the project.
      */
     public void refreshOpen(final @NotNull Project p) {
-        final FileEditorManager fed = FileEditorManager.getInstance(p);
+        final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
         for (final VirtualFile open : fed.getOpenFiles()) {
             if (!(open instanceof UnifiedVirtualFile testinFile)) continue;
@@ -104,7 +104,7 @@ public final class EditorUtil {
     }
 
     public void closeThenOpen(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        final FileEditorManager fed = FileEditorManager.getInstance(p);
+        final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             Optional<VirtualFile> targetVf = Optional.empty();
@@ -127,8 +127,8 @@ public final class EditorUtil {
     }
 
     public void open(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        final EditorType ft = dir instanceof TestRunDirectoryDto ? EditorType.TEST_RUN : EditorType.TEST_CASE;
-        final UnifiedVirtualFile newVf = new UnifiedVirtualFile(dir, ft);
+        final @NotNull EditorType ft = dir instanceof TestRunDirectoryDto ? EditorType.TEST_RUN : EditorType.TEST_CASE;
+        final @NotNull UnifiedVirtualFile newVf = new UnifiedVirtualFile(dir, ft);
 
         ApplicationManager.getApplication().invokeLater(() ->
                 Optional.ofNullable(FileEditorManager.getInstance(p))
@@ -147,8 +147,8 @@ public final class EditorUtil {
 
     public void saveOpen(final @NotNull Project p) {
         try {
-            final FileEditorManager fileEditorManager = FileEditorManager.getInstance(p);
-            final List<String> entries = getEntries(fileEditorManager);
+            final @NotNull FileEditorManager fileEditorManager = FileEditorManager.getInstance(p);
+            final @NotNull List<String> entries = getEntries(fileEditorManager);
 
             if (entries.isEmpty())
                 PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY, null);
@@ -170,7 +170,7 @@ public final class EditorUtil {
      * the path did not.
      */
     private @NotNull List<String> getEntries(final @NotNull FileEditorManager fed) {
-        final List<String> entries = new ArrayList<>();
+        final @NotNull List<String> entries = new ArrayList<>();
 
         for (final VirtualFile vf : fed.getOpenFiles()) {
             if (vf instanceof UnifiedVirtualFile uvf) {
@@ -182,7 +182,7 @@ public final class EditorUtil {
 
     public void restoreLastOpened(final @NotNull Project p) {
         try {
-            final String saved = Objects.requireNonNullElse(
+            final @NotNull String saved = Objects.requireNonNullElse(
                     PropertiesComponent.getInstance(p).getValue(OPEN_EDITORS_KEY), "");
 
             if (saved.isEmpty()) {
@@ -190,13 +190,13 @@ public final class EditorUtil {
                 return;
             }
 
-            final String[] entries = saved.split(";");
+            final String @NotNull[] entries = saved.split(";");
             if (entries.length == 0)
                 return;
 
             Logger.info("restoring " + entries.length + " open editors");
 
-            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             for (final String entry : entries) {
                 // A remembered editor whose node is not there any more is not

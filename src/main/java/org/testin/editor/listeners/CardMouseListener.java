@@ -58,8 +58,8 @@ public class CardMouseListener extends MouseAdapter {
             if (isClickOnItem && !list.getSelectionModel().isSelectedIndex(index))
                 list.getSelectionModel().setSelectionInterval(index, index);
 
-            final ActionManager actionManager = ActionManager.getInstance();
-            final String place = ActionPlaces.TOOLWINDOW_POPUP;
+            final @NotNull ActionManager actionManager = ActionManager.getInstance();
+            final @NotNull String place = ActionPlaces.TOOLWINDOW_POPUP;
             actionManager.createActionPopupMenu(place, cm).getComponent().show(e.getComponent(), e.getX(), e.getY());
         }
     }
@@ -71,11 +71,11 @@ public class CardMouseListener extends MouseAdapter {
         final int index = list.locationToIndex(e.getPoint());
         if (index == -1) return;
 
-        final Rectangle bounds = list.getCellBounds(index, index);
+        final @NotNull Rectangle bounds = list.getCellBounds(index, index);
         if (!bounds.contains(e.getPoint())) return;
 
         getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y).ifPresent(action -> {
-            final TestCaseDto tc = list.getModel().getElementAt(index);
+            final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
 
             Logger.trace(action.getTooltip() + ", tc: " + tc.getDescription());
             action.execute(p, tc);
@@ -87,7 +87,7 @@ public class CardMouseListener extends MouseAdapter {
     @Override
     public void mouseMoved(final MouseEvent e) {
         final int index = list.locationToIndex(e.getPoint());
-        final Optional<CardHoverAction> currentAction = actionUnder(e, index);
+        final @NotNull Optional<CardHoverAction> currentAction = actionUnder(e, index);
 
         list.setCursor(Cursor.getPredefinedCursor(currentAction.isPresent() ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
 
@@ -98,7 +98,7 @@ public class CardMouseListener extends MouseAdapter {
             needsRepaint = true;
         }
 
-        final String actionName = currentAction.map(Enum::name).orElse("");
+        final @NotNull String actionName = currentAction.map(Enum::name).orElse("");
 
         if (!actionName.equals(editor.getHoveredIconAction())) {
             editor.setHoveredIconAction(actionName);
@@ -134,7 +134,7 @@ public class CardMouseListener extends MouseAdapter {
     private @NotNull Optional<CardHoverAction> actionUnder(final @NotNull MouseEvent e, final int index) {
         if (index == -1) return Optional.empty();
 
-        final Rectangle bounds = list.getCellBounds(index, index);
+        final @NotNull Rectangle bounds = list.getCellBounds(index, index);
         if (!bounds.contains(e.getPoint())) return Optional.empty();
 
         return getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y);
@@ -146,13 +146,13 @@ public class CardMouseListener extends MouseAdapter {
         // Must match the font the card paints the title in, or the width is
         // measured against the wrong glyphs and every target shifts.
         final float baseSize = list.getFont().getSize2D();
-        final Font titleFont = list.getFont().deriveFont(Font.BOLD, baseSize + BaseCard.TITLE_FONT_DELTA);
+        final @NotNull Font titleFont = list.getFont().deriveFont(Font.BOLD, baseSize + BaseCard.TITLE_FONT_DELTA);
 
         // The title is asked of the editor, which owns what it reads, and where
         // the icons sit is asked of Shared, which paints them. Neither is worked
         // out here: both used to be, and both drifted.
-        final TestCaseDto tc = list.getModel().getElementAt(index);
-        final String title = editor.cardTitle(editor.globalIndex(index), tc);
+        final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
+        final @NotNull String title = editor.cardTitle(editor.globalIndex(index), tc);
         final int titleWidth = list.getFontMetrics(titleFont).stringWidth(title);
 
         // The card draws the run button or the stop button by the same rule, so

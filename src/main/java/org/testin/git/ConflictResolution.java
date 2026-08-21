@@ -70,11 +70,11 @@ public final class ConflictResolution {
     public static void resolve(final @NotNull Project p, final @NotNull Path repositoryPath,
                                final @NotNull List<String> conflicting, final @NotNull Runnable onResolved,
                                final @NotNull Consumer<List<String>> onLeftOver) {
-        final GitRepositoryService git = new GitRepositoryService(p);
-        final Mapper mapper = Services.getInstance(p, Mapper.class);
+        final @NotNull GitRepositoryService git = new GitRepositoryService(p);
+        final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
 
-        final List<String> leftOver = new ArrayList<>();
-        final List<Pending> pending = new ArrayList<>();
+        final @NotNull List<String> leftOver = new ArrayList<>();
+        final @NotNull List<Pending> pending = new ArrayList<>();
 
         for (final String relativePath : conflicting) {
             if (!isTestCase(relativePath)) {
@@ -82,9 +82,9 @@ public final class ConflictResolution {
                 continue;
             }
 
-            final String base = git.stageContent(repositoryPath, relativePath, BASE);
-            final String mine = git.stageContent(repositoryPath, relativePath, MINE);
-            final String theirs = git.stageContent(repositoryPath, relativePath, REMOTE);
+            final @NotNull String base = git.stageContent(repositoryPath, relativePath, BASE);
+            final @NotNull String mine = git.stageContent(repositoryPath, relativePath, MINE);
+            final @NotNull String theirs = git.stageContent(repositoryPath, relativePath, REMOTE);
 
             if (mine.isBlank() || theirs.isBlank()) {
                 // One side deleted the case and the other edited it. Which of
@@ -94,7 +94,7 @@ public final class ConflictResolution {
                 continue;
             }
 
-            final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper, base, mine, theirs);
+            final @NotNull TestCaseMerge.Merge merge = TestCaseMerge.of(mapper, base, mine, theirs);
 
             if (!merge.isSettled()) {
                 pending.add(new Pending(relativePath, name(mapper, mine, relativePath), merge.merged(),
@@ -128,8 +128,8 @@ public final class ConflictResolution {
             return;
         }
 
-        final Pending next = pending.getFirst();
-        final List<Pending> rest = pending.subList(1, pending.size());
+        final @NotNull Pending next = pending.getFirst();
+        final @NotNull List<Pending> rest = pending.subList(1, pending.size());
 
         new ResolveConflictDialog(p, next.name(), next.questions(), takeTheirs -> {
             for (final TestCaseMerge.Question question : next.questions()) {
@@ -139,7 +139,7 @@ public final class ConflictResolution {
 
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 final boolean written = keep(p, git, repositoryPath, next.relativePath(), next.merged());
-                final List<String> stillLeft = new ArrayList<>(leftOver);
+                final @NotNull List<String> stillLeft = new ArrayList<>(leftOver);
                 if (!written) stillLeft.add(next.relativePath());
 
                 ApplicationManager.getApplication().invokeLater(() ->
@@ -178,10 +178,10 @@ public final class ConflictResolution {
      */
     private static @NotNull String name(final @NotNull Mapper mapper, final @NotNull String json,
                                         final @NotNull String relativePath) {
-        final String description = mapper.readTree(json).path("description").asText("");
+        final @NotNull String description = mapper.readTree(json).path("description").asText("");
         if (!description.isBlank()) return description;
 
-        final Path path = Path.of(relativePath);
+        final @NotNull Path path = Path.of(relativePath);
         return path.getFileName().toString();
     }
 

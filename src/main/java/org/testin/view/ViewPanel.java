@@ -62,7 +62,7 @@ public class ViewPanel implements Disposable {
     }
 
     private @NotNull JBScrollPane createScrollPane(final @NotNull Component view) {
-        final JBScrollPane sp = new JBScrollPane(view);
+        final @NotNull JBScrollPane sp = new JBScrollPane(view);
         sp.setBorder(null);
         sp.setViewportBorder(null);
         sp.setFocusable(false);

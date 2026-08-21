@@ -47,14 +47,14 @@ final class VfsExecutor {
     // failure under is not a parameter: one caller, one word, and a second
     // operation would bring its own method rather than a second string.
     void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull VfsOperation operation) {
-        final String errorTitle = "Rename Failed";
+        final @NotNull String errorTitle = "Rename Failed";
 
         // The lookup runs off the EDT and the operation on it: refreshAndFindFile
         // refreshes synchronously and reads the VFS persistence, which the EDT is
         // not allowed to do, while the operation itself mutates the VFS and so
         // needs the write action.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final Optional<VirtualFile> vf = find(path);
+            final @NotNull Optional<VirtualFile> vf = find(path);
 
             ApplicationManager.getApplication().invokeLater(() -> vf.ifPresentOrElse(
                     file -> WriteAction.run(() -> {
@@ -76,8 +76,8 @@ final class VfsExecutor {
                           final @NotNull Runnable onSuccess, final @NotNull Runnable onFailure) {
         // Both lookups off the EDT, the operation on it - see the single-path form.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final Optional<VirtualFile> sourceVf = find(sourcePath);
-            final Optional<VirtualFile> targetVf = find(targetPath);
+            final @NotNull Optional<VirtualFile> sourceVf = find(sourcePath);
+            final @NotNull Optional<VirtualFile> targetVf = find(targetPath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (sourceVf.isEmpty() || targetVf.isEmpty()) {
@@ -117,10 +117,10 @@ final class VfsExecutor {
     void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path,
                   final @NotNull Consumer<@NotNull Boolean> onDeleted) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final Optional<VirtualFile> vf = find(path);
+            final @NotNull Optional<VirtualFile> vf = find(path);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                final AtomicBoolean deleted = new AtomicBoolean(true);
+                final @NotNull AtomicBoolean deleted = new AtomicBoolean(true);
 
                 WriteAction.run(() -> {
                     try {

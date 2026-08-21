@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
+
 import java.util.Optional;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -32,7 +33,7 @@ public final class RunTreeCellRenderer {
                 if (value instanceof CheckedTreeNode node) {
                     // instanceof is false for a node carrying nothing, so the kinds
                     // below answer for the empty node too.
-                    final Object userObj = node.getUserObject();
+                    final @NotNull Object userObj = node.getUserObject();
 
                     if (userObj instanceof DirectoryDto dir)
                         getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
@@ -41,7 +42,7 @@ public final class RunTreeCellRenderer {
                         // A case the run has no row for is drawn plainly: it is in the
                         // tree to be picked, not to report a verdict it never got.
                         Optional.ofNullable(resultsMap.get(tc.getId())).ifPresentOrElse(result -> {
-                            final TestStatus status = result.getStatus();
+                            final @NotNull TestStatus status = result.getStatus();
                             getTextRenderer().append(tc.getDescription(), status.getStyle());
                             getTextRenderer().append(status.getDisplayText(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
                         }, () -> getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES));

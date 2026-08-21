@@ -52,22 +52,22 @@ public final class GitRefs {
      * </ul>
      */
     public static @NotNull List<StatusEntry> parseStatus(final @NotNull List<String> porcelainLines) {
-        final List<StatusEntry> entries = new ArrayList<>();
+        final @NotNull List<StatusEntry> entries = new ArrayList<>();
 
         for (final String line : porcelainLines) {
             if (line.length() < 4) continue;
 
-            final String code = line.substring(0, 2);
-            final String rawPath = line.substring(3);
+            final @NotNull String code = line.substring(0, 2);
+            final @NotNull String rawPath = line.substring(3);
             if (code.charAt(0) == '!') continue;
 
             final int renameArrow = rawPath.indexOf(" -> ");
-            final String path = unquote(renameArrow < 0 ? rawPath : rawPath.substring(renameArrow + 4));
+            final @NotNull String path = unquote(renameArrow < 0 ? rawPath : rawPath.substring(renameArrow + 4));
             if (path.isEmpty()) continue;
 
             // The deletion first, so the move reads in the order it happened.
             if (renameArrow >= 0 && code.indexOf('R') >= 0) {
-                final String from = unquote(rawPath.substring(0, renameArrow));
+                final @NotNull String from = unquote(rawPath.substring(0, renameArrow));
                 if (!from.isEmpty()) entries.add(new StatusEntry(DiffType.DELETED, slashed(from)));
             }
 
@@ -147,8 +147,8 @@ public final class GitRefs {
         }
 
         final int shown = Math.min(unmergedPaths.size(), 3);
-        final String names = String.join(", ", unmergedPaths.subList(0, shown));
-        final String more = unmergedPaths.size() > shown ? " and " + (unmergedPaths.size() - shown) + " more" : "";
+        final @NotNull String names = String.join(", ", unmergedPaths.subList(0, shown));
+        final @NotNull String more = unmergedPaths.size() > shown ? " and " + (unmergedPaths.size() - shown) + " more" : "";
 
         return "Both sides changed " + names + more + ". Resolve the conflict, then continue - or abort to roll "
                 + "the pull back and keep what is here.";
@@ -175,8 +175,8 @@ public final class GitRefs {
     private static @NotNull String unquote(final @NotNull String rawPath) {
         if (rawPath.length() < 2 || rawPath.charAt(0) != '"' || !rawPath.endsWith("\"")) return rawPath;
 
-        final String body = rawPath.substring(1, rawPath.length() - 1);
-        final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        final @NotNull String body = rawPath.substring(1, rawPath.length() - 1);
+        final @NotNull ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 
         for (int i = 0; i < body.length(); i++) {
             final char c = body.charAt(i);
@@ -214,10 +214,10 @@ public final class GitRefs {
      * back to the branch checked out here, which is the one being pushed.
      */
     public static @NotNull String parseHeadBranch(final @NotNull String remoteShowOutput) {
-        final Matcher matcher = HEAD_BRANCH.matcher(remoteShowOutput);
+        final @NotNull Matcher matcher = HEAD_BRANCH.matcher(remoteShowOutput);
         if (!matcher.find()) return "";
 
-        final String branch = matcher.group(1);
+        final @NotNull String branch = matcher.group(1);
         return NO_HEAD_BRANCH.equals(branch) ? "" : branch;
     }
 
@@ -226,7 +226,7 @@ public final class GitRefs {
      * first remote, otherwise nothing at all.
      */
     public static @NotNull String chooseRemote(final @NotNull List<String> remotes) {
-        final List<String> names = remotes.stream()
+        final @NotNull List<String> names = remotes.stream()
                 .map(String::trim)
                 .filter(name -> !name.isEmpty())
                 .toList();
@@ -249,7 +249,7 @@ public final class GitRefs {
     // being clonable at all.
     @SuppressWarnings("HttpUrlsUsage")
     public static boolean isRepositoryUrl(final @NotNull String text) {
-        final String value = text.trim();
+        final @NotNull String value = text.trim();
         return value.startsWith("http://")
                 || value.startsWith("https://")
                 || value.startsWith("ssh://")
@@ -271,7 +271,7 @@ public final class GitRefs {
      * because a {@code .ts} sits beside it.
      */
     public static @NotNull Set<String> ancestorDirectories(final @NotNull Collection<String> relativePaths) {
-        final Set<String> directories = new LinkedHashSet<>();
+        final @NotNull Set<String> directories = new LinkedHashSet<>();
         directories.add("");
 
         for (final String path : relativePaths) {

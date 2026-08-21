@@ -49,7 +49,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         title = getPopupTitle();
 
         for (final List<String> values : extractOriginalValues(selectedItems)) {
-            final List<String> current = new ArrayList<>(Objects.requireNonNullElse(values, List.<String>of()));
+            final @NotNull List<String> current = new ArrayList<>(Objects.requireNonNullElse(values, List.<String>of()));
             // An empty list still needs one span, or there is nowhere to type.
             if (current.isEmpty()) current.add("");
 
@@ -144,7 +144,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
     private void addItemAtCarets() {
         readEditorIntoValues();
 
-        final List<Integer> spans = editors.indicesUnderCarets();
+        final @NotNull List<Integer> spans = editors.indicesUnderCarets();
         if (spans.isEmpty()) return;
 
         for (final int span : spans) {
@@ -166,7 +166,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
     private void removeItemAtCarets() {
         readEditorIntoValues();
 
-        final List<Integer> spans = editors.indicesUnderCarets();
+        final @NotNull List<Integer> spans = editors.indicesUnderCarets();
         if (spans.isEmpty()) return;
 
         final int focusTc = spanOwners.get(spans.getLast())[0];
@@ -174,7 +174,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
 
         for (final int span : spans) {
             final int[] owner = spanOwners.get(span);
-            final List<String> items = activeValues.get(owner[0]);
+            final @NotNull List<String> items = activeValues.get(owner[0]);
 
             if (items.size() > 1) {
                 items.remove(owner[1]);
@@ -211,15 +211,15 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
      * editable span belongs to.
      */
     private void render() {
-        final StringBuilder left = new StringBuilder("[\n");
-        final StringBuilder right = new StringBuilder("[\n");
-        final List<int[]> editableRanges = new ArrayList<>();
+        final @NotNull StringBuilder left = new StringBuilder("[\n");
+        final @NotNull StringBuilder right = new StringBuilder("[\n");
+        final @NotNull List<int[]> editableRanges = new ArrayList<>();
 
         spanOwners.clear();
 
         for (int i = 0; i < selectedItems.size(); i++) {
-            final TestCaseDto tc = selectedItems.get(i);
-            final String prefix = "  {\n    \"id\": \"" + BulkJsonEditor.escapeJson(tc.getId().toString())
+            final @NotNull TestCaseDto tc = selectedItems.get(i);
+            final @NotNull String prefix = "  {\n    \"id\": \"" + BulkJsonEditor.escapeJson(tc.getId().toString())
                     + "\",\n    \"description\": \"" + BulkJsonEditor.escapeJson(tc.getDescription())
                     + "\",\n    \"" + getArrayFieldName() + "\": [\n";
             left.append(prefix);
@@ -231,8 +231,8 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
                 spanOwners.add(new int[]{testCase, item});
             }, i);
 
-            final String suffix = "    ]\n  }";
-            final String comma = (i < selectedItems.size() - 1) ? ",\n" : "\n";
+            final @NotNull String suffix = "    ]\n  }";
+            final @NotNull String comma = (i < selectedItems.size() - 1) ? ",\n" : "\n";
             left.append(suffix).append(comma);
             right.append(suffix).append(comma);
         }
@@ -281,7 +281,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         if (span >= spanOwners.size()) return "";
 
         final int[] owner = spanOwners.get(span);
-        final List<String> original = originalValues.get(owner[0]);
+        final @NotNull List<String> original = originalValues.get(owner[0]);
 
         return owner[1] < original.size() ? BulkJsonEditor.escapeJson(original.get(owner[1])) : "";
     }

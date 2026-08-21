@@ -28,7 +28,7 @@ record SelectionCellBorder(@NotNull Insets insets) implements Border {
 
     @Override
     public void paintBorder(final Component component, final Graphics graphics, final int x, final int y, final int width, final int height) {
-        final Color previousColor = graphics.getColor();
+        final @NotNull Color previousColor = graphics.getColor();
         graphics.setColor(EditorColors.SELECTION_BORDER);
         graphics.drawRect(x, y, width - 1, height - 1);
         graphics.setColor(previousColor);

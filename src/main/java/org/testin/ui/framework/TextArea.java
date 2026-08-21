@@ -85,7 +85,7 @@ public final class TextArea implements DialogComponent {
             if (width <= 0 || height <= 0) return "";
 
             buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            final Graphics2D g = buffered.createGraphics();
+            final @NotNull Graphics2D g = buffered.createGraphics();
             try {
                 g.drawImage(image, 0, 0, null);
             } finally {
@@ -94,7 +94,7 @@ public final class TextArea implements DialogComponent {
         }
 
         try {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final @NotNull ByteArrayOutputStream out = new ByteArrayOutputStream();
             ImageIO.write(buffered, "png", out);
             return "data:image/png;base64," + Base64.getEncoder().encodeToString(out.toByteArray());
         } catch (final IOException ex) {
@@ -116,7 +116,7 @@ public final class TextArea implements DialogComponent {
 
     private boolean insertAsDataUri(final @NotNull Transferable contents) {
         try {
-            final String dataUri = toDataUri((Image) contents.getTransferData(DataFlavor.imageFlavor));
+            final @NotNull String dataUri = toDataUri((Image) contents.getTransferData(DataFlavor.imageFlavor));
             if (dataUri.isEmpty()) return false;
 
             area.insert(dataUri, area.getCaretPosition());
@@ -138,7 +138,7 @@ public final class TextArea implements DialogComponent {
         // A text area always has a paste action; one whose look and feel somehow
         // does not gets an action that inserts nothing, so the fallback below is
         // unconditional.
-        final Action defaultPaste = Objects.requireNonNullElse(
+        final @NotNull Action defaultPaste = Objects.requireNonNullElse(
                 area.getActionMap().get(DefaultEditorKit.pasteAction), NO_PASTE);
         area.getActionMap().put(DefaultEditorKit.pasteAction, new AbstractAction() {
             @Override

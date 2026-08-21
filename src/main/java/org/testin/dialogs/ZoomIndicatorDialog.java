@@ -43,7 +43,7 @@ public class ZoomIndicatorDialog {
 
         if (!parent.isShowing()) return;
 
-        final JBPanel<?> panel = new JBPanel<>();
+        final @NotNull JBPanel<?> panel = new JBPanel<>();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setBorder(JBUI.Borders.empty(6, 12));
         DialogStyle.styleContent(panel);
@@ -51,7 +51,7 @@ public class ZoomIndicatorDialog {
         panel.add(new JBLabel("Font size: " + (int) currentSize + "pt"));
         panel.add(Box.createHorizontalStrut(JBUI.scale(12)));
 
-        final JBLabel gearIcon = new JBLabel(AllIcons.General.GearPlain);
+        final @NotNull JBLabel gearIcon = new JBLabel(AllIcons.General.GearPlain);
         gearIcon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         gearIcon.addMouseListener(new MouseAdapter() {
             @Override
@@ -64,7 +64,7 @@ public class ZoomIndicatorDialog {
         });
         panel.add(gearIcon);
 
-        final JBPopup popup = JBPopupFactory.getInstance()
+        final @NotNull JBPopup popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(panel, null)
                 .setCancelOnClickOutside(false)
                 .setFocusable(false)
@@ -72,8 +72,8 @@ public class ZoomIndicatorDialog {
                 .createPopup();
         currentPopup = Optional.of(popup);
 
-        final Dimension popupSize = panel.getPreferredSize();
-        final Rectangle visibleRect = parent.getVisibleRect();
+        final @NotNull Dimension popupSize = panel.getPreferredSize();
+        final @NotNull Rectangle visibleRect = parent.getVisibleRect();
         final int x = visibleRect.x + (visibleRect.width - popupSize.width) / 2;
         final int y = visibleRect.y + visibleRect.height - popupSize.height - JBUI.scale(25);
 

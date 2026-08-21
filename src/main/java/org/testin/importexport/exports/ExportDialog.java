@@ -47,7 +47,7 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
         title = "Export Test Cases";
 
         // Offer only formats that actually have an export handler (PDF/Word are report-only).
-        final DestinationForm form = new DestinationForm(p,
+        final @NotNull DestinationForm form = new DestinationForm(p,
                 Arrays.stream(FileTypes.values()).filter(FileTypes::isExportable).toArray(FileTypes[]::new),
                 FileTypes.XLSX,
                 exportTarget.getName(),
@@ -71,7 +71,7 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
     @Override
     protected void submit() {
         component().resolve().ifPresent(destination -> {
-            final Map<String, List<TestCaseDto>> selected = preview.selected();
+            final @NotNull Map<String, List<TestCaseDto>> selected = preview.selected();
             if (selected.isEmpty()) {
                 Services.getInstance(p, Notifier.class).softShow(p, "Export Empty", "Select at least one test case to export.");
                 return;

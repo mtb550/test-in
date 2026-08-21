@@ -15,9 +15,9 @@ public final class NameSanitizer {
     private static final @NotNull Pattern INVALID_NAME = Pattern.compile("[^a-zA-Z0-9 _]");
 
     public static @NotNull String packageName(final @NotNull String value) {
-        final String cleanName = INVALID_NAME.matcher(value.replace("-test-cases", ""))
+        final @NotNull String cleanName = INVALID_NAME.matcher(value.replace("-test-cases", ""))
                 .replaceAll("").trim();
-        final StringBuilder result = new StringBuilder();
+        final @NotNull StringBuilder result = new StringBuilder();
         for (final String word : cleanName.split("[\\s_]+")) {
             if (word.isEmpty()) continue;
             if (result.isEmpty()) {
@@ -35,8 +35,8 @@ public final class NameSanitizer {
 
     public static @NotNull String className(final @NotNull String value) {
         if (value.trim().isEmpty()) return "DefaultTest";
-        final String cleanName = INVALID_NAME.matcher(value).replaceAll("").trim();
-        final StringBuilder result = new StringBuilder();
+        final @NotNull String cleanName = INVALID_NAME.matcher(value).replaceAll("").trim();
+        final @NotNull StringBuilder result = new StringBuilder();
         for (final String word : cleanName.split("[\\s_]+")) {
             if (!word.isEmpty()) {
                 result.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
@@ -49,13 +49,13 @@ public final class NameSanitizer {
 
     public static @NotNull String description(final @NotNull String rawDescription) {
         if (rawDescription.isBlank()) return "EMPTY_DESCRIPTION";
-        final String cleaned = INVALID_NAME.matcher(rawDescription).replaceAll("").trim();
+        final @NotNull String cleaned = INVALID_NAME.matcher(rawDescription).replaceAll("").trim();
         return cleaned.isEmpty() ? "EMPTY_DESCRIPTION" : cleaned;
     }
 
     public static @NotNull String methodName(final @NotNull String description) {
         if (description.isEmpty()) return "testMethod";
-        final StringBuilder result = new StringBuilder();
+        final @NotNull StringBuilder result = new StringBuilder();
         for (final String word : description.split("[^a-zA-Z0-9]+")) {
             if (word.isEmpty()) continue;
             if (result.isEmpty()) {

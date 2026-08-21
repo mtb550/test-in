@@ -16,10 +16,10 @@ public class UpdateTestDescription extends UpdateTestBase implements GenAction {
     }
 
     private void updateDescription(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
-        final String newValue = "\"" + tc.getDescription().replace("\"", "\\\"") + "\"";
+        final @NotNull String newValue = "\"" + tc.getDescription().replace("\"", "\\\"") + "\"";
         updateTestAnnotationAttribute(p, pm, "description", newValue);
 
-        final String newMethodName = NameSanitizer.methodName(tc.getDescription());
+        final @NotNull String newMethodName = NameSanitizer.methodName(tc.getDescription());
         if (!pm.getName().equals(newMethodName)) {
             pm.setName(newMethodName);
         }

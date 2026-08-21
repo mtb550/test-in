@@ -64,7 +64,7 @@ public class GridPanelBuilder {
     }
 
     public static void resizeToFont(final @NotNull JBTable table) {
-        final FontMetrics fm = table.getFontMetrics(table.getFont());
+        final @NotNull FontMetrics fm = table.getFontMetrics(table.getFont());
         table.setRowHeight(Math.max(fm.getHeight() + 4, 20));
         autoSizeColumns(table);
         updateRowHeights(table);
@@ -106,8 +106,8 @@ public class GridPanelBuilder {
                     wrapper.setBorder(column == 0 ? FIRST_CELL_SELECTION_BORDER : CELL_SELECTION_BORDER);
 
                 } else {
-                    final Border gridBorder = BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR);
-                    final Border invisiblePadding = BorderFactory.createEmptyBorder(1, column == 0 ? 1 : 0, 0, 0);
+                    final @NotNull Border gridBorder = BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR);
+                    final @NotNull Border invisiblePadding = BorderFactory.createEmptyBorder(1, column == 0 ? 1 : 0, 0, 0);
                     wrapper.setBorder(BorderFactory.createCompoundBorder(invisiblePadding, gridBorder));
                 }
 
@@ -127,8 +127,8 @@ public class GridPanelBuilder {
             for (int c = 0; c < table.getColumnCount(); c++) {
                 // Measure the normal cell layout. Selection is a visual state and must not
                 // change the row height when its blue border is applied.
-                final TableCellRenderer renderer = table.getCellRenderer(r, c);
-                final Component comp = renderer.getTableCellRendererComponent(
+                final @NotNull TableCellRenderer renderer = table.getCellRenderer(r, c);
+                final @NotNull Component comp = renderer.getTableCellRendererComponent(
                         table, table.getValueAt(r, c), false, false, r, c);
                 maxHeight = Math.max(maxHeight, comp.getPreferredSize().height);
             }
@@ -142,7 +142,7 @@ public class GridPanelBuilder {
      * Coalesced via invokeLater: a block paste triggers one re-measure, not one per cell.
      */
     private static void installAutoRowHeight(final @NotNull JBTable table, final @NotNull DefaultTableModel model) {
-        final AtomicBoolean pending = new AtomicBoolean();
+        final @NotNull AtomicBoolean pending = new AtomicBoolean();
         model.addTableModelListener(e -> {
             if (e.getType() != TableModelEvent.UPDATE) return;
             if (pending.compareAndSet(false, true)) {
@@ -230,10 +230,10 @@ public class GridPanelBuilder {
     }
 
     private static void autoSizeColumns(final @NotNull JBTable table) {
-        final FontMetrics fm = table.getFontMetrics(table.getFont());
+        final @NotNull FontMetrics fm = table.getFontMetrics(table.getFont());
         int tableTotalWidth = 0;
         for (int i = 0; i < table.getColumnCount(); i++) {
-            final TableColumn col = table.getColumnModel().getColumn(i);
+            final @NotNull TableColumn col = table.getColumnModel().getColumn(i);
 
             // A width the user set by dragging wins over auto-sizing,
             // so refreshes and page changes keep the chosen layout.
@@ -248,10 +248,10 @@ public class GridPanelBuilder {
 
             // A column with no renderer of its own is drawn by the header's, which
             // is what the table would have used anyway.
-            final TableCellRenderer headerRenderer = Optional.ofNullable(col.getHeaderRenderer())
+            final @NotNull TableCellRenderer headerRenderer = Optional.ofNullable(col.getHeaderRenderer())
                     .orElseGet(() -> table.getTableHeader().getDefaultRenderer());
 
-            final Component headerComp = headerRenderer.getTableCellRendererComponent(
+            final @NotNull Component headerComp = headerRenderer.getTableCellRendererComponent(
                     table, col.getHeaderValue(), false, false, 0, i);
             int maxWidth = headerComp.getPreferredSize().width;
 
@@ -271,7 +271,7 @@ public class GridPanelBuilder {
             tableTotalWidth += Math.min(maxWidth, MAX_COL_WIDTH);
         }
 
-        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        final @NotNull Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         table.setPreferredScrollableViewportSize(new Dimension(
                 Math.min(tableTotalWidth, (int) (screenSize.width * 0.85)),
                 Math.min(table.getRowHeight() * Math.max(3, table.getRowCount()), (int) (screenSize.height * 0.70))
@@ -279,8 +279,8 @@ public class GridPanelBuilder {
     }
 
     private static void installEnterToEdit(final @NotNull JBTable table) {
-        final KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-        final Action startEditing = new AbstractAction() {
+        final @NotNull KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+        final @NotNull Action startEditing = new AbstractAction() {
             @Override
             public void actionPerformed(final java.awt.event.ActionEvent event) {
                 final int row = table.getSelectedRow();
@@ -317,23 +317,23 @@ public class GridPanelBuilder {
 
     public @NotNull JBTable buildRunTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<RunEditorAttributes> attributes, final @NotNull Map<UUID, TestRunItems> resultsMap, final int firstItemIndex) {
         Logger.debug("[GridPanelBuilder] buildRunTable: testCases=" + testCases.size() + ", attributes=" + attributes);
-        final List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
+        final @NotNull List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
 
-        final String[] columns = buildColumns(ordered);
-        final List<String[]> rows = new ArrayList<>();
+        final String @NotNull[] columns = buildColumns(ordered);
+        final @NotNull List<String[]> rows = new ArrayList<>();
 
         int index = firstItemIndex + 1;
         for (final TestCaseDto tc : testCases) {
             // Never skip rows: callers map grid rows back to testCases by index,
             // so a dropped row would make every following row act on the wrong test case.
-            final TestRunItems runItem = Optional.ofNullable(resultsMap.get(tc.getId()))
+            final @NotNull TestRunItems runItem = Optional.ofNullable(resultsMap.get(tc.getId()))
                     .orElseGet(() -> TestRunItems.builder().id(tc.getId()).tc(tc).build());
 
-            final String[] row = new String[columns.length];
+            final String @NotNull[] row = new String[columns.length];
             final int rowNumber = index++;
 
             for (int c = 0; c < ordered.size(); c++) {
-                final RunEditorAttributes attr = ordered.get(c);
+                final @NotNull RunEditorAttributes attr = ordered.get(c);
 
                 // ORDER is the one value the model cannot answer - it is the row's
                 // position on the page, which no run item carries. Recognized by
@@ -347,25 +347,25 @@ public class GridPanelBuilder {
         }
 
         // Nothing in a run grid is editable yet; #74 is where that changes.
-        final JBTable table = buildTable(columns, rows, column -> false, "run");
+        final @NotNull JBTable table = buildTable(columns, rows, column -> false, "run");
         applyColumnVisibility(table, RunEditorAttributes.class, attributes);
         return table;
     }
 
     public @NotNull JBTable buildTestTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<TestEditorAttributes> attributes, final int firstItemIndex) {
         Logger.debug("[GridPanelBuilder] buildTestTable: testCases=" + testCases.size() + ", attributes=" + attributes);
-        final List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values()).toList();
+        final @NotNull List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values()).toList();
 
-        final String[] columns = buildColumns(ordered);
-        final List<String[]> rows = new ArrayList<>();
+        final String @NotNull[] columns = buildColumns(ordered);
+        final @NotNull List<String[]> rows = new ArrayList<>();
 
         int index = firstItemIndex + 1;
         for (final TestCaseDto tc : testCases) {
-            final String[] row = new String[columns.length];
+            final String @NotNull[] row = new String[columns.length];
             final int rowNumber = index++;
 
             for (int c = 0; c < ordered.size(); c++) {
-                final TestEditorAttributes attr = ordered.get(c);
+                final @NotNull TestEditorAttributes attr = ordered.get(c);
 
                 // ORDER is the one value the model cannot answer - it is the row's
                 // position on the page, which no test case carries. Recognized by
@@ -378,20 +378,20 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        final JBTable table = buildTable(columns, rows, column -> TestEditorAttributes.values()[column].can(Can.EDIT), "test");
+        final @NotNull JBTable table = buildTable(columns, rows, column -> TestEditorAttributes.values()[column].can(Can.EDIT), "test");
         applyColumnVisibility(table, TestEditorAttributes.class, attributes);
         return table;
     }
 
     public <E extends Enum<E> & ToolBarAttribute> void applyColumnVisibility(final @NotNull JBTable table, final @NotNull Class<E> attributes, final @NotNull Set<E> selected) {
-        final TableColumnModel cm = table.getColumnModel();
+        final @NotNull TableColumnModel cm = table.getColumnModel();
         while (cm.getColumnCount() > 0) {
             cm.removeColumn(cm.getColumn(cm.getColumnCount() - 1));
         }
 
-        final E[] allValues = attributes.getEnumConstants();
+        final E @NotNull[] allValues = attributes.getEnumConstants();
         for (int i = 0; i < allValues.length; i++) {
-            final E attr = allValues[i];
+            final @NotNull E attr = allValues[i];
             if (selected.contains(attr)) {
                 cm.addColumn(columnFor(i, attr.getName()));
             }
@@ -401,13 +401,13 @@ public class GridPanelBuilder {
     }
 
     private @NotNull TableColumn columnFor(final int modelIndex, final @NotNull String header) {
-        final TableColumn column = new TableColumn(modelIndex);
+        final @NotNull TableColumn column = new TableColumn(modelIndex);
         column.setHeaderValue(header);
         return column;
     }
 
     private @NotNull JBTable buildTable(final String @NotNull [] columns, final @NotNull List<String[]> rows, final @NotNull IntPredicate columnEditable, final @NotNull String kind) {
-        final DefaultTableModel model = new DefaultTableModel(columns, 0) {
+        final @NotNull DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(final int row, final int column) {
                 return columnEditable.test(column);
@@ -418,7 +418,7 @@ public class GridPanelBuilder {
             model.addRow(row);
         }
 
-        final JBTable table = new JBTable(model) {
+        final @NotNull JBTable table = new JBTable(model) {
             /**
              * The grid renderer owns every row color. JBTable tints the hovered
              * row after the renderer has run, so the color is restored here -
@@ -427,7 +427,7 @@ public class GridPanelBuilder {
              */
             @Override
             public @NotNull Component prepareRenderer(final @NotNull TableCellRenderer renderer, final int row, final int column) {
-                final Component component = super.prepareRenderer(renderer, row, column);
+                final @NotNull Component component = super.prepareRenderer(renderer, row, column);
                 component.setBackground(isCellSelected(row, column) ? SELECTION_BACKGROUND : rowColor(row));
                 return component;
             }

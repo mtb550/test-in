@@ -40,10 +40,10 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
      * Everything the action does once it knows which node it is creating under.
      */
     private void createUnder(final @NotNull DirectoryDto pDir) {
-        final BiConsumer<String, DirectoryType> onCreate = (s, dt) -> {
+        final @NotNull BiConsumer<String, DirectoryType> onCreate = (s, dt) -> {
 
             if (s.isEmpty()) return;
-            final Path newDirPath = pDir.getPath().resolve(s);
+            final @NotNull Path newDirPath = pDir.getPath().resolve(s);
 
             // Every node created from the tree passes through here - test set,
             // test set package, test run, test run package - so the name is
@@ -56,7 +56,7 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
                 return;
             }
 
-            final Optional<DirectoryDto> created = dt.getAction().apply(p).execute(s, pDir, newDirPath);
+            final @NotNull Optional<DirectoryDto> created = dt.getAction().apply(p).execute(s, pDir, newDirPath);
             Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
 
             // Asynchronous creators (test runs) answer with nothing and run their

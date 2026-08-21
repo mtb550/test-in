@@ -35,7 +35,7 @@ public class CopyTestCaseAction extends AbstractProjectAction {
     }
 
     private void copyDetailsOf(final @NotNull TestCaseDto tc) {
-        final String text = Arrays.stream(TestEditorAttributes.values())
+        final @NotNull String text = Arrays.stream(TestEditorAttributes.values())
                 .filter(a -> a.can(Can.COPY))
                 .map(attr -> attr.getName2() + " " + attr.getTestValueExtractor().execute(tc, p))
                 .collect(Collectors.joining("\n"));

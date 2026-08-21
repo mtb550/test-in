@@ -86,10 +86,10 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
 
         installNavigation();
 
-        final JBPanel<?> listWrapper = new JBPanel<>(new BorderLayout());
+        final @NotNull JBPanel<?> listWrapper = new JBPanel<>(new BorderLayout());
         listWrapper.add(list, BorderLayout.CENTER);
 
-        final JBScrollPane scrollPane = new JBScrollPane(listWrapper);
+        final @NotNull JBScrollPane scrollPane = new JBScrollPane(listWrapper);
         scrollPane.setBorder(JBUI.Borders.empty());
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);

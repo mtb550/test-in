@@ -22,7 +22,7 @@ public class ImportExcel {
     private final @NotNull ImportAction importAction;
 
     public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
-        final Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
+        final @NotNull Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         try {
             result.putAll(parseFile(p, file));
         } catch (final Exception ex) {
@@ -33,7 +33,7 @@ public class ImportExcel {
     }
 
     public @NotNull Map<String, List<TestCaseDto>> parseFile(final @NotNull Project p, final @NotNull File file) {
-        final Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
+        final @NotNull Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         try (InputStream fis = new FileInputStream(file);
              Workbook workbook = WorkbookFactory.create(fis)) {
             parseWorkbook(workbook, p, result);
@@ -47,13 +47,13 @@ public class ImportExcel {
 
     private void parseWorkbook(final @NotNull Workbook workbook, final @NotNull Project p,
                                final @NotNull Map<String, List<TestCaseDto>> result) {
-        final DataFormatter dataFormatter = new DataFormatter();
+        final @NotNull DataFormatter dataFormatter = new DataFormatter();
 
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             if (workbook.isSheetHidden(i) || workbook.isSheetVeryHidden(i)) continue;
 
-            final Sheet sheet = workbook.getSheetAt(i);
-            final List<TestCaseDto> sheetList = parseSheet(p, sheet, dataFormatter);
+            final @NotNull Sheet sheet = workbook.getSheetAt(i);
+            final @NotNull List<TestCaseDto> sheetList = parseSheet(p, sheet, dataFormatter);
 
             if (!sheetList.isEmpty()) {
                 result.put(sheet.getSheetName(), sheetList);
@@ -74,9 +74,9 @@ public class ImportExcel {
 
     private @NotNull List<TestCaseDto> readRows(final @NotNull Project p, final @NotNull Sheet sheet,
                                                 final @NotNull Row headerRow, final @NotNull DataFormatter dataFormatter) {
-        final Map<String, Integer> headerIndexMap = new HashMap<>();
+        final @NotNull Map<String, Integer> headerIndexMap = new HashMap<>();
         for (final Cell cell : headerRow) {
-            final String headerName = dataFormatter.formatCellValue(cell).trim();
+            final @NotNull String headerName = dataFormatter.formatCellValue(cell).trim();
             for (final TestEditorAttributes reqCol : importAction.importAttributes) {
                 if (reqCol.getName().equalsIgnoreCase(headerName)) {
                     headerIndexMap.put(reqCol.getName().toLowerCase(), cell.getColumnIndex());
@@ -84,20 +84,20 @@ public class ImportExcel {
             }
         }
 
-        final List<TestCaseDto> sheetList = new ArrayList<>();
+        final @NotNull List<TestCaseDto> sheetList = new ArrayList<>();
 
         // The sheet's own iterator visits the rows that exist, so a file with a
         // gap in the middle needs no test for the rows that are not there.
         for (final Row row : sheet) {
             if (row.getRowNum() == headerRow.getRowNum() || isEmpty(row, dataFormatter)) continue;
 
-            final TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
+            final @NotNull TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
 
             for (final TestEditorAttributes attr : TestEditorAttributes.values()) {
                 if (attr.can(Can.IMPORT)) {
                     // A column the file does not carry reads as blank, which is
                     // what an absent value means to every importer.
-                    final String rawValue = Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
+                    final @NotNull String rawValue = Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
                             .map(colIndex -> dataFormatter.formatCellValue(row.getCell(colIndex)).trim())
                             .orElse("");
                     attr.getImportSetter().execute(p, currentTestCase, rawValue);

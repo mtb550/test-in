@@ -58,10 +58,10 @@ public final class PackageDeclarations {
      */
     public static void retarget(final @NotNull Project p, final @NotNull VirtualFile sourceRoot,
                                 final @NotNull VirtualFile file, final @NotNull VirtualFile holder) {
-        final PsiFile psiFile = PsiManager.getInstance(p).findFile(file);
+        final @NotNull PsiFile psiFile = PsiManager.getInstance(p).findFile(file);
         if (!(psiFile instanceof PsiJavaFile javaFile)) return;
 
-        final String declared = packageOf(sourceRoot, holder);
+        final @NotNull String declared = packageOf(sourceRoot, holder);
         if (declared.equals(javaFile.getPackageName())) return;
 
         javaFile.setPackageName(declared);
@@ -73,7 +73,7 @@ public final class PackageDeclarations {
      * the default package for the root itself.
      */
     public static @NotNull String packageOf(final @NotNull VirtualFile sourceRoot, final @NotNull VirtualFile dir) {
-        final String relative = VfsUtil.getRelativePath(dir, sourceRoot, '/');
+        final @NotNull String relative = VfsUtil.getRelativePath(dir, sourceRoot, '/');
 
         // Null when the directory is not under the root at all, which is not a
         // package this plugin generated - the default package is the honest

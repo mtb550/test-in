@@ -37,8 +37,8 @@ public final class RunStatusService {
         final int executingIndex = editor.getCurrentlyExecutingIndex();
         if (executingIndex == -1) return;
 
-        final TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
-        final Optional<TestRunItems> item = editor.runItem(currentTc.getId());
+        final @NotNull TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
+        final @NotNull Optional<TestRunItems> item = editor.runItem(currentTc.getId());
         item.ifPresent(runItem ->
                 runItem.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName));
 
@@ -52,7 +52,7 @@ public final class RunStatusService {
         item.ifPresent(recorded -> confirmVerdict(p, status, 1));
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            final UUID currentId = currentTc.getId();
+            final @NotNull UUID currentId = currentTc.getId();
             final boolean stillInList = editor.getCurrentTestCases().stream()
                     .anyMatch(t -> t.getId().equals(currentId));
             final int nextIndex = stillInList ? executingIndex + 1 : executingIndex;
@@ -63,9 +63,9 @@ public final class RunStatusService {
     public void executeManual(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
-        final Optional<TestRunItems> found = editor.runItem(tc.getId());
+        final @NotNull Optional<TestRunItems> found = editor.runItem(tc.getId());
         if (found.isEmpty()) return;
-        final TestRunItems item = found.get();
+        final @NotNull TestRunItems item = found.get();
 
         final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
         if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
@@ -95,11 +95,11 @@ public final class RunStatusService {
     public void applyStatus(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
-        final List<TestCaseDto> selectedItems = list.getSelectedValuesList();
+        final @NotNull List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         if (selectedItems.size() == 1) {
-            final TestCaseDto tc = selectedItems.getFirst();
+            final @NotNull TestCaseDto tc = selectedItems.getFirst();
             if (editor.runItem(tc.getId()).filter(TestRunItems::isRemoved).isPresent()) {
                 refuseRemoved(p);
                 return;
@@ -115,7 +115,7 @@ public final class RunStatusService {
             int recorded = 0;
 
             for (final TestCaseDto tc : selectedItems) {
-                final Optional<TestRunItems> found = editor.runItem(tc.getId())
+                final @NotNull Optional<TestRunItems> found = editor.runItem(tc.getId())
                         .filter(item -> !item.isRemoved());
 
                 if (found.isPresent()) {
@@ -145,7 +145,7 @@ public final class RunStatusService {
     private void confirmVerdict(final @NotNull Project p, final @NotNull TestStatus status, final int count) {
         if (count == 0) return;
 
-        final String label = status.getLabel();
+        final @NotNull String label = status.getLabel();
         Services.getInstance(p, Notifier.class).softShow(p, count == 1 ? label : label + " " + count);
     }
 
@@ -175,9 +175,9 @@ public final class RunStatusService {
      */
     public void persistMarker(final @NotNull Project p, final @NotNull Path runPath,
                               final @NotNull TestRunStatus status) {
-        final TestRunDirectoryDto trd = Services.getInstance(p, ProjectIndexer.class).getTestRunDirByPath(runPath);
+        final @NotNull TestRunDirectoryDto trd = Services.getInstance(p, ProjectIndexer.class).getTestRunDirByPath(runPath);
 
-        final TestRunMarker marker = trd.getMarker();
+        final @NotNull TestRunMarker marker = trd.getMarker();
         marker.setStatus(status);
         marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
 
@@ -205,7 +205,7 @@ public final class RunStatusService {
      * the report's Executed By line. When the run closed is on the run's own marker.
      */
     private void finishRun(final @NotNull Project p, final @NotNull Path runPath) {
-        final TestRunDto tr = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(runPath);
+        final @NotNull TestRunDto tr = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(runPath);
 
         int closed = 0;
         for (final TestRunItems item : tr.getResults()) {

@@ -27,7 +27,7 @@ public class UndoNodeAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final TreeUndoService undo = Services.getInstance(p, TreeUndoService.class);
+        final @NotNull TreeUndoService undo = Services.getInstance(p, TreeUndoService.class);
 
         // Asked before, not after: undo() returns silently on an empty stack, so
         // notifying unconditionally would claim an undo that never ran. The
@@ -40,7 +40,7 @@ public class UndoNodeAction extends AbstractProjectAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final TreeUndoService undo = Services.getInstance(p, TreeUndoService.class);
+        final @NotNull TreeUndoService undo = Services.getInstance(p, TreeUndoService.class);
         e.getPresentation().setEnabled(undo.canUndo());
         e.getPresentation().setText(("Undo " + undo.undoDescription()).trim());
     }

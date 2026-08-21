@@ -30,7 +30,7 @@ public final class Display {
     public static @NotNull String format(final @NotNull String text) {
         if (text.isBlank()) return "";
 
-        final String s = text.trim();
+        final @NotNull String s = text.trim();
         return StringUtil.capitalize(s) + (endsClosed(s) ? "" : ".");
     }
 

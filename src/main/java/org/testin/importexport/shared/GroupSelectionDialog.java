@@ -37,7 +37,7 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
 
         title = "Select Groups";
 
-        final ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
+        final @NotNull ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
                 .column("Group", 260)
                 .build();
 
@@ -61,10 +61,10 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
      * holds is the value this dialog produced last time.
      */
     private @NotNull List<Integer> rowsOf(final @NotNull String currentSelection) {
-        final List<Integer> rows = new ArrayList<>();
+        final @NotNull List<Integer> rows = new ArrayList<>();
         if (currentSelection.isBlank()) return rows;
 
-        final List<String> selected = Arrays.stream(currentSelection.split(","))
+        final @NotNull List<String> selected = Arrays.stream(currentSelection.split(","))
                 .map(String::trim)
                 .toList();
 

@@ -122,7 +122,7 @@ public final class Mapper {
      */
     public @NotNull ObjectNode readTree(final @NotNull String content) {
         try {
-            final JsonNode node = mapper.readTree(content);
+            final @NotNull JsonNode node = mapper.readTree(content);
             return node instanceof ObjectNode object ? object : mapper.createObjectNode();
 
         } catch (final Exception ex) {

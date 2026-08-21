@@ -19,11 +19,11 @@ public class ImportCsv {
     private final @NotNull ImportAction importAction;
 
     public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
-        final Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
+        final @NotNull Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         try {
-            final List<TestCaseDto> testCases = parseFile(p, file);
+            final @NotNull List<TestCaseDto> testCases = parseFile(p, file);
             if (!testCases.isEmpty()) {
-                final String name = file.getName().replaceAll("\\.csv$", "").replaceAll("[\\\\/*?\\[\\]]", "_");
+                final @NotNull String name = file.getName().replaceAll("\\.csv$", "").replaceAll("[\\\\/*?\\[\\]]", "_");
                 result.put(name, testCases);
             }
         } catch (final Exception ex) {
@@ -38,16 +38,16 @@ public class ImportCsv {
     }
 
     private @NotNull List<TestCaseDto> parseCsvFile(final @NotNull File file, final @NotNull Project p) {
-        final List<TestCaseDto> result = new ArrayList<>();
-        final List<String[]> records = parseCsvRecords(file);
+        final @NotNull List<TestCaseDto> result = new ArrayList<>();
+        final @NotNull List<String[]> records = parseCsvRecords(file);
 
         if (records.isEmpty()) return result;
 
-        final String[] headers = records.getFirst();
-        final Map<String, Integer> headerIndexMap = new HashMap<>();
+        final String @NotNull[] headers = records.getFirst();
+        final @NotNull Map<String, Integer> headerIndexMap = new HashMap<>();
 
         for (int i = 0; i < headers.length; i++) {
-            final String headerName = headers[i].trim();
+            final @NotNull String headerName = headers[i].trim();
             for (final TestEditorAttributes reqCol : importAction.importAttributes) {
                 if (reqCol.getName().equalsIgnoreCase(headerName)) {
                     headerIndexMap.put(reqCol.getName().toLowerCase(), i);
@@ -56,19 +56,19 @@ public class ImportCsv {
         }
 
         for (int r = 1; r < records.size(); r++) {
-            final String[] values = records.get(r);
+            final String @NotNull[] values = records.get(r);
 
             // Every field comes from endRecord below, which builds them from a
             // StringBuilder - so a field is blank or it is text, never absent.
             if (Arrays.stream(values).allMatch(String::isBlank)) continue;
 
-            final TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
+            final @NotNull TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
 
             for (final TestEditorAttributes attr : TestEditorAttributes.values()) {
                 if (attr.can(Can.IMPORT)) {
                     // A column this file does not carry, or a short row that
                     // stops before it, both read as blank.
-                    final String rawValue = Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
+                    final @NotNull String rawValue = Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
                             .filter(colIndex -> colIndex < values.length)
                             .map(colIndex -> values[colIndex].trim())
                             .orElse("");
@@ -88,9 +88,9 @@ public class ImportCsv {
      * produces for multi-line steps), reads UTF-8 explicitly, and strips a BOM.
      */
     private @NotNull List<String[]> parseCsvRecords(final @NotNull File file) {
-        final List<String[]> records = new ArrayList<>();
-        final List<String> fields = new ArrayList<>();
-        final StringBuilder current = new StringBuilder();
+        final @NotNull List<String[]> records = new ArrayList<>();
+        final @NotNull List<String> fields = new ArrayList<>();
+        final @NotNull StringBuilder current = new StringBuilder();
 
         try (PushbackReader reader = new PushbackReader(
                 new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)))) {

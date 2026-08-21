@@ -36,10 +36,10 @@ public class Id extends BaseDetails {
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        final JBLabel idBadge = new JBLabel(dto.getId().toString()) {
+        final @NotNull JBLabel idBadge = new JBLabel(dto.getId().toString()) {
             @Override
             protected void paintComponent(final Graphics g) {
-                final Graphics2D g2 = (Graphics2D) g.create();
+                final @NotNull Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(BG_COLOR);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), BADGE_ARC_SIZE, BADGE_ARC_SIZE);
@@ -55,7 +55,7 @@ public class Id extends BaseDetails {
         idBadge.setBorder(JBUI.Borders.empty(BADGE_BORDER_V, BADGE_BORDER_H));
         idBadge.setOpaque(false);
 
-        final JBLabel copyIcon = new JBLabel(AllIcons.Actions.Copy);
+        final @NotNull JBLabel copyIcon = new JBLabel(AllIcons.Actions.Copy);
         copyIcon.setToolTipText(COPY_TOOLTIP);
         copyIcon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
@@ -64,13 +64,13 @@ public class Id extends BaseDetails {
             public void mouseClicked(final MouseEvent e) {
                 CopyPasteManager.getInstance().setContents(new StringSelection(dto.getId().toString()));
                 copyIcon.setIcon(AllIcons.General.InspectionsOK);
-                final Timer timer = new Timer(COPY_SUCCESS_DELAY_MS, evt -> copyIcon.setIcon(AllIcons.Actions.Copy));
+                final @NotNull Timer timer = new Timer(COPY_SUCCESS_DELAY_MS, evt -> copyIcon.setIcon(AllIcons.Actions.Copy));
                 timer.setRepeats(false);
                 timer.start();
             }
         });
 
-        final JBPanel<?> idContainer = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
+        final @NotNull JBPanel<?> idContainer = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
         idContainer.setOpaque(false);
         idContainer.add(idBadge);
         idContainer.add(copyIcon);

@@ -45,7 +45,7 @@ public abstract class DirectoryDto {
      * iterate or stream without asking whether anything is above it.
      */
     public @NotNull List<DirectoryDto> selfAndAncestors() {
-        final List<DirectoryDto> chain = new ArrayList<>();
+        final @NotNull List<DirectoryDto> chain = new ArrayList<>();
         for (DirectoryDto current = this; current != null; current = current.getParent()) {
             chain.add(current);
         }
@@ -61,7 +61,7 @@ public abstract class DirectoryDto {
      */
     public static @NotNull ArrayList<String> pathOf(final @NotNull List<String> parentPath,
                                                     final @NotNull String name) {
-        final ArrayList<String> path = new ArrayList<>(parentPath);
+        final @NotNull ArrayList<String> path = new ArrayList<>(parentPath);
         path.add(name);
 
         return path;

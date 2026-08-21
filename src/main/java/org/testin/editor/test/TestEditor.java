@@ -126,7 +126,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         this.p = p;
         this.parent = vf.getTestSet();
 
-        final Disposable projectDisposable = Disposer.newDisposable();
+        final @NotNull Disposable projectDisposable = Disposer.newDisposable();
         Disposer.register(p, projectDisposable);
         this.projectDisposable = projectDisposable;
 
@@ -140,7 +140,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         this.mainPanel.setOpaque(true);
 
         // Shared list-view construction (see ListPanelBuilder, the counterpart of GridPanelBuilder).
-        final ListView listView = ListPanelBuilder.build(p, projectDisposable);
+        final @NotNull ListView listView = ListPanelBuilder.build(p, projectDisposable);
         this.model = listView.model();
         this.list = listView.list();
         this.scrollPane = listView.scrollPane();
@@ -183,10 +183,10 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         final int generation = modelGeneration.incrementAndGet();
         loading = true;
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             indexer.awaitIndexing();
 
-            final List<TestCaseDto> items = indexer.getTestCasesForTestSet(parent.getPath());
+            final @NotNull List<TestCaseDto> items = indexer.getTestCasesForTestSet(parent.getPath());
 
             if (items.isEmpty()) {
                 ApplicationManager.getApplication().invokeLater(() -> {
@@ -204,7 +204,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
             Services.getInstance(p, TestCaseCacheService.class).load(items);
 
-            final List<TestCaseDto> ordered = TestCaseOrder.ordered(items);
+            final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(items);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (generation != modelGeneration.get()) return;
@@ -237,14 +237,14 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             snapshot = new ArrayList<>(this.allTestCases);
         }
 
-        final Path dirPath = parent.getPath();
+        final @NotNull Path dirPath = parent.getPath();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             // Ranked along the order on screen, which is the order the tester
             // just arranged. A case already sitting in the right place keeps the
             // rank it had, so a drag writes the case that moved and leaves the
             // rest of the set alone.
-            final List<TestCaseDto> moved = TestCaseOrder.place(snapshot);
+            final @NotNull List<TestCaseDto> moved = TestCaseOrder.place(snapshot);
 
             Services.getInstance(p, ProjectIndexer.class).updateSequence(dirPath, snapshot, moved);
 
@@ -417,7 +417,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public @NotNull String cardTitle(final int globalIndex, final @NotNull TestCaseDto tc) {
-        final Set<TestEditorAttributes> selected = getSelectedDetails();
+        final @NotNull Set<TestEditorAttributes> selected = getSelectedDetails();
 
         return BaseCard.titleText(globalIndex,
                 selected.contains(TestEditorAttributes.ORDER),
@@ -439,13 +439,13 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         currentTestCases.addAll(getFilteredList());
 
         final int totalItems = currentTestCases.size();
-        final PageWindow page = PageWindow.of(totalItems, currentPage, pageSize);
+        final @NotNull PageWindow page = PageWindow.of(totalItems, currentPage, pageSize);
         currentPage = page.page();
-        final List<TestCaseDto> pageItems = new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
+        final @NotNull List<TestCaseDto> pageItems = new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
 
         // What was selected before the reload, or what is selected right now.
         // Swing answers null for an empty selection, which is converted here.
-        final Optional<UUID> selectedId = selectionToRestore
+        final @NotNull Optional<UUID> selectedId = selectionToRestore
                 .or(() -> Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId));
 
         modelChangeNotifier.pause();
@@ -527,21 +527,21 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
     private @NotNull List<TestCaseDto> getCurrentPageItems() {
         final int totalItems = currentTestCases.size();
-        final PageWindow page = PageWindow.of(totalItems, currentPage, pageSize);
+        final @NotNull PageWindow page = PageWindow.of(totalItems, currentPage, pageSize);
         return new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
     }
 
     private void rebuildGrid() {
-        final List<TestCaseDto> pageItems = getCurrentPageItems();
-        final Set<TestEditorAttributes> attributes = getSelectedDetails();
+        final @NotNull List<TestCaseDto> pageItems = getCurrentPageItems();
+        final @NotNull Set<TestEditorAttributes> attributes = getSelectedDetails();
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
         try {
-            final JBTable table = gridPanelBuilder.buildTestTable(p, pageItems, attributes, (currentPage - 1) * pageSize);
+            final @NotNull JBTable table = gridPanelBuilder.buildTestTable(p, pageItems, attributes, (currentPage - 1) * pageSize);
 
             // The previous grid's subscription goes with the previous grid, so
             // they do not accumulate one per rebuild.
             grid.ifPresent(previous -> Disposer.dispose(previous.fontSync()));
-            final Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin.testEditor.gridFontSync");
+            final @NotNull Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin.testEditor.gridFontSync");
             FontSync.syncWithNativeEditor(p, table, fontSync);
 
             table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, pageItems));
@@ -597,7 +597,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         final int generation = modelGeneration.incrementAndGet();
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             if (generation != modelGeneration.get()) return;
-            final List<TestCaseDto> ordered = TestCaseOrder.ordered(snapshot);
+            final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(snapshot);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (generation != modelGeneration.get()) return;
@@ -614,10 +614,10 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public @NotNull Set<String> getAvailableModules() {
-        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        final Set<String> modules = new HashSet<>();
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull Set<String> modules = new HashSet<>();
         for (final TestCaseDto tc : indexer.getTestCasesForTestSet(parent.getPath())) {
-            final String module = tc.getModule();
+            final @NotNull String module = tc.getModule();
             if (!module.trim().isEmpty()) {
                 modules.add(module.trim());
             }
@@ -626,7 +626,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private @NotNull List<TestCaseDto> getFilteredList() {
-        final EditorFilters filters = EditorFilters.of(toolBar);
+        final @NotNull EditorFilters filters = EditorFilters.of(toolBar);
 
         synchronized (allTestCases) {
             return TestCaseFilter.filter(

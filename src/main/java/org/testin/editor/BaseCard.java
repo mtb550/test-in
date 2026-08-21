@@ -49,7 +49,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         badgePanel.setOpaque(false);
         badgePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        final JBPanel<?> titleLine = new JBPanel<>();
+        final @NotNull JBPanel<?> titleLine = new JBPanel<>();
         titleLine.setLayout(new BoxLayout(titleLine, BoxLayout.X_AXIS));
         titleLine.setOpaque(false);
         titleLine.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -79,7 +79,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * twice is how they drift.
      */
     public static @NotNull String titleText(final int index, final boolean showOrder, final @NotNull String description) {
-        final String order = showOrder ? String.format(Locale.ENGLISH, "%d.", index + 1) : "";
+        final @NotNull String order = showOrder ? String.format(Locale.ENGLISH, "%d.", index + 1) : "";
 
         return order.isEmpty() || description.isEmpty() ? order + description : order + " " + description;
     }
@@ -107,7 +107,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected void updateUI(final int index, final @NotNull String title, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details) {
         descriptionLabel.setText(title);
 
-        final Color currentRowColor = index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45);
+        final @NotNull Color currentRowColor = index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45);
         setBackground(currentRowColor);
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
 
@@ -122,8 +122,8 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
             // one place that decides it for every attribute.
             if (value.isBlank()) return;
 
-            final JBLabel lbl = attributeLabels.computeIfAbsent(attrName, k -> {
-                final JBLabel newLbl = createDetailLabel();
+            final @NotNull JBLabel lbl = attributeLabels.computeIfAbsent(attrName, k -> {
+                final @NotNull JBLabel newLbl = createDetailLabel();
                 content.add(newLbl);
                 return newLbl;
             });
@@ -163,7 +163,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     }
 
     private @NotNull JBLabel createDetailLabel() {
-        final JBLabel label = new JBLabel();
+        final @NotNull JBLabel label = new JBLabel();
         label.setForeground(UIUtil.getContextHelpForeground());
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
         return label;

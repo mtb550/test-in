@@ -20,13 +20,13 @@ public final class DialogDetails implements DialogComponent {
     private final @NotNull JBPanel<?> panel;
 
     DialogDetails(final @NotNull List<Row> rows) {
-        final JBPanel<?> stack = new JBPanel<>();
+        final @NotNull JBPanel<?> stack = new JBPanel<>();
         stack.setLayout(new BoxLayout(stack, BoxLayout.Y_AXIS));
         stack.setOpaque(false);
         stack.setBorder(JBUI.Borders.empty(4, 0));
 
         for (final Row row : rows) {
-            final JBPanel<?> rowPanel = new JBPanel<>(new BorderLayout());
+            final @NotNull JBPanel<?> rowPanel = new JBPanel<>(new BorderLayout());
             rowPanel.setOpaque(false);
             rowPanel.setBorder(JBUI.Borders.emptyTop(8));
             rowPanel.add(Captions.panel(row.caption()), BorderLayout.WEST);

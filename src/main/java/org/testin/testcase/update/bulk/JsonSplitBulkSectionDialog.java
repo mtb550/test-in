@@ -103,10 +103,10 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
         for (int i = 0; i < items.size(); i++) {
             // A row the tester did not touch arrives as nothing at all, and is
             // deliberately not the same as a row they emptied (see submit).
-            final Optional<String> raw = Optional.ofNullable(newValues.get(i));
+            final @NotNull Optional<String> raw = Optional.ofNullable(newValues.get(i));
             if (raw.isEmpty()) continue;
 
-            final String value = raw.orElseThrow().trim();
+            final @NotNull String value = raw.orElseThrow().trim();
             if (value.isEmpty() && !acceptsBlank()) continue;
 
             setValue(items.get(i), value);
@@ -134,7 +134,7 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
 
     @Override
     protected void submit() {
-        final List<String> newValues = new ArrayList<>();
+        final @NotNull List<String> newValues = new ArrayList<>();
 
         for (int i = 0; i < selectedItems.size(); i++) {
             // The editor shows newlines flattened to spaces, so writing an
@@ -160,25 +160,25 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
      * into. The two texts are identical up to the values themselves.
      */
     private void buildContent() {
-        final StringBuilder left = new StringBuilder("[\n");
-        final StringBuilder right = new StringBuilder("[\n");
-        final List<int[]> editableRanges = new ArrayList<>();
+        final @NotNull StringBuilder left = new StringBuilder("[\n");
+        final @NotNull StringBuilder right = new StringBuilder("[\n");
+        final @NotNull List<int[]> editableRanges = new ArrayList<>();
 
         for (int i = 0; i < selectedItems.size(); i++) {
-            final TestCaseDto tc = selectedItems.get(i);
-            final String escapedValue = BulkJsonEditor.escapeJson(getOriginalValue(tc));
+            final @NotNull TestCaseDto tc = selectedItems.get(i);
+            final @NotNull String escapedValue = BulkJsonEditor.escapeJson(getOriginalValue(tc));
             originalEscaped.add(escapedValue);
 
-            final StringBuilder prefixSb = new StringBuilder("  {\n    \"id\": \"")
+            final @NotNull StringBuilder prefixSb = new StringBuilder("  {\n    \"id\": \"")
                     .append(BulkJsonEditor.escapeJson(tc.getId().toString())).append("\",\n");
             if (showsDescriptionContext()) {
                 prefixSb.append("    \"description\": \"").append(BulkJsonEditor.escapeJson(tc.getDescription())).append("\",\n");
             }
             prefixSb.append("    \"").append(getJsonFieldName()).append("\": \"");
 
-            final String prefix = prefixSb.toString();
-            final String suffix = "\"\n  }";
-            final String comma = (i == selectedItems.size() - 1) ? "\n" : ",\n";
+            final @NotNull String prefix = prefixSb.toString();
+            final @NotNull String suffix = "\"\n  }";
+            final @NotNull String comma = (i == selectedItems.size() - 1) ? "\n" : ",\n";
 
             left.append(prefix).append(escapedValue).append(suffix).append(comma);
 

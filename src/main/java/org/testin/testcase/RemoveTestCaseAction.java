@@ -40,10 +40,10 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final List<TestCaseDto> selectedItems = list.getSelectedValuesList();
+        final @NotNull List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
-        final Runnable delete = () -> ApplicationManager.getApplication().runWriteAction(() -> performDeletion(selectedItems));
+        final @NotNull Runnable delete = () -> ApplicationManager.getApplication().runWriteAction(() -> performDeletion(selectedItems));
 
         // A pending cut removes its source as the second half of a move the
         // tester already asked for, so it is not confirmed again.
@@ -55,7 +55,7 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
             return;
         }
 
-        final String msg = selectedItems.size() == 1
+        final @NotNull String msg = selectedItems.size() == 1
                 ? "Remove '" + selectedItems.getFirst().getDescription() + "'?"
                 : "Remove these " + selectedItems.size() + " test cases?";
 

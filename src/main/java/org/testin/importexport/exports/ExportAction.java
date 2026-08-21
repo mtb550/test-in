@@ -49,15 +49,15 @@ public class ExportAction extends AbstractProjectTreeAction {
      * Everything the action does once it knows which node it is exporting from.
      */
     private void exportFrom(final @NotNull DirectoryDto dirDto) {
-        final Optional<VirtualFile> resolved = resolveTargetDir(dirDto);
+        final @NotNull Optional<VirtualFile> resolved = resolveTargetDir(dirDto);
         if (resolved.isEmpty()) return;
-        final VirtualFile targetDir = resolved.get();
+        final @NotNull VirtualFile targetDir = resolved.get();
 
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Exporting test cases", true) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                final Map<String, List<TestCaseDto>> sheets = gatherData(targetDir, dirDto);
+                final @NotNull Map<String, List<TestCaseDto>> sheets = gatherData(targetDir, dirDto);
                 if (sheets.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(p, Notifier.class).softShow(p, "Export Empty", "No test cases found."));
@@ -83,14 +83,14 @@ public class ExportAction extends AbstractProjectTreeAction {
 
     public @NotNull Map<String, List<TestCaseDto>> gatherData(final @NotNull VirtualFile targetDirectory,
                                                               final @NotNull DirectoryDto dirDto) {
-        final Map<String, List<TestCaseDto>> allSheets = new LinkedHashMap<>();
+        final @NotNull Map<String, List<TestCaseDto>> allSheets = new LinkedHashMap<>();
 
         if (dirDto instanceof TestSetDirectoryDto) {
             allSheets.put(targetDirectory.getName(), loadTestCasesInOrder(p, targetDirectory));
         } else {
             for (final VirtualFile child : childrenOf(targetDirectory)) {
                 if (child.isDirectory()) {
-                    final List<TestCaseDto> tcs = loadTestCasesInOrder(p, child);
+                    final @NotNull List<TestCaseDto> tcs = loadTestCasesInOrder(p, child);
                     if (!tcs.isEmpty()) {
                         allSheets.put(child.getName(), tcs);
                     }
@@ -118,7 +118,7 @@ public class ExportAction extends AbstractProjectTreeAction {
     }
 
     public @NotNull List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project p, final @NotNull VirtualFile dir) {
-        final List<TestCaseDto> loaded = new ArrayList<>();
+        final @NotNull List<TestCaseDto> loaded = new ArrayList<>();
 
         for (final VirtualFile file : childrenOf(dir)) {
             if (!file.isDirectory() && file.getName().endsWith(".json")) {

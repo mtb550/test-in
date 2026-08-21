@@ -59,14 +59,14 @@ public class ExplorerTree implements Disposable {
         mainTree.setDropMode(DropMode.ON);
         mainTree.setAutoscrolls(true);
 
-        final Set<DirectoryDto> sharedCutNodes = new HashSet<>();
+        final @NotNull Set<DirectoryDto> sharedCutNodes = new HashSet<>();
         mainTree.setCellRenderer(new TreeCellRenderer(sharedCutNodes));
 
-        final TreeTransferHandler transferHandler = new TreeTransferHandler(p, mainTree, sharedCutNodes, this::refresh);
+        final @NotNull TreeTransferHandler transferHandler = new TreeTransferHandler(p, mainTree, sharedCutNodes, this::refresh);
         mainTree.setTransferHandler(transferHandler);
         mainTree.setDragEnabled(true);
 
-        final TreeContextMenu treeContextMenu = new TreeContextMenu(p, pp, mainTree);
+        final @NotNull TreeContextMenu treeContextMenu = new TreeContextMenu(p, pp, mainTree);
         mainTree.addMouseListener(new TreeMouseListener(p, mainTree, treeContextMenu));
         treeContextMenu.registerShortcuts(mainTree, transferHandler);
     }
@@ -80,10 +80,10 @@ public class ExplorerTree implements Disposable {
         ApplicationManager.getApplication().invokeLater(() -> {
             try {
                 if (disposed) return;
-                final Optional<TestProjectDirectoryDto> boundProject = bound();
+                final @NotNull Optional<TestProjectDirectoryDto> boundProject = bound();
                 treeStructure.setSelectedProject(boundProject);
 
-                final String projectPath = boundProject.map(dir -> dir.getPath().toString()).orElse("");
+                final @NotNull String projectPath = boundProject.map(dir -> dir.getPath().toString()).orElse("");
                 final boolean projectChanged = !projectPath.isEmpty() && !projectPath.equals(expandedProjectPath);
                 expandedProjectPath = projectPath;
 

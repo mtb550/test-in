@@ -18,11 +18,11 @@ public final class DialogMessage implements DialogComponent {
     private final @NotNull JBPanel<?> panel;
 
     DialogMessage(final @NotNull String text, final @NotNull String from, final @NotNull String to) {
-        final JBPanel<?> content = new JBPanel<>();
+        final @NotNull JBPanel<?> content = new JBPanel<>();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setOpaque(false);
 
-        final JBLabel message = new JBLabel("<html>" + text.replace("\n", "<br>") + "</html>");
+        final @NotNull JBLabel message = new JBLabel("<html>" + text.replace("\n", "<br>") + "</html>");
         message.setAlignmentX(Component.LEFT_ALIGNMENT);
         content.add(message);
 
@@ -45,7 +45,7 @@ public final class DialogMessage implements DialogComponent {
                                    final @NotNull String path, final int topGap) {
         if (path.isEmpty()) return;
 
-        final JBLabel label = new JBLabel(caption + ":  " + path);
+        final @NotNull JBLabel label = new JBLabel(caption + ":  " + path);
         label.setFont(JBUI.Fonts.label());
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         label.setBorder(JBUI.Borders.emptyTop(topGap));

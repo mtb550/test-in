@@ -93,12 +93,12 @@ public class FilterPopupBtn extends AbstractButton implements ToolbarItem {
     }
 
     private @NotNull DefaultActionGroup buildActionGroup(final @NotNull Runnable onToolBarFilterSelectedChanged) {
-        final Runnable onChanged = () -> {
+        final @NotNull Runnable onChanged = () -> {
             updateToolBarFilterState();
             onToolBarFilterSelectedChanged.run();
         };
 
-        final DefaultActionGroup filterResetBtn = new DefaultActionGroup();
+        final @NotNull DefaultActionGroup filterResetBtn = new DefaultActionGroup();
 
         filterResetBtn.add(new DumbAwareAction("Reset Filters", "Clear active filters", AllIcons.Actions.Cancel) {
             @Override
@@ -121,14 +121,14 @@ public class FilterPopupBtn extends AbstractButton implements ToolbarItem {
         filterResetBtn.addSeparator();
 
         // priority menu
-        final DefaultActionGroup filterPriorityMenu = new DefaultActionGroup(TestEditorAttributes.PRIORITY.getName(), true);
+        final @NotNull DefaultActionGroup filterPriorityMenu = new DefaultActionGroup(TestEditorAttributes.PRIORITY.getName(), true);
         Arrays.stream(Priority.values()).forEach(p ->
                 filterPriorityMenu.add(new ToggleFilterAction<>(p.getName(), IconManager.createIcon(p.getColor()),
                         p, selectedPriority, FilterMembership.plain(), onChanged)));
         filterResetBtn.add(filterPriorityMenu);
 
         // group menu
-        final DefaultActionGroup filterGroupMenu = new DefaultActionGroup(TestEditorAttributes.GROUP.getName(), true);
+        final @NotNull DefaultActionGroup filterGroupMenu = new DefaultActionGroup(TestEditorAttributes.GROUP.getName(), true);
         Arrays.stream(Group.values()).forEach(g -> {
             if (g == Group.REGRESSION) {
                 filterGroupMenu.addSeparator();
@@ -139,13 +139,13 @@ public class FilterPopupBtn extends AbstractButton implements ToolbarItem {
         filterResetBtn.add(filterGroupMenu);
 
         // module menu is dynamic: modules come from the currently loaded test cases
-        final ActionGroup filterModuleMenu = new ActionGroup("Module", true) {
+        final @NotNull ActionGroup filterModuleMenu = new ActionGroup("Module", true) {
             @Override
             public AnAction @NotNull [] getChildren(final @Nullable AnActionEvent e) {
-                final List<String> orderedModules = new ArrayList<>(availableModulesSupplier.get());
+                final @NotNull List<String> orderedModules = new ArrayList<>(availableModulesSupplier.get());
                 Collections.sort(orderedModules);
 
-                final List<AnAction> actions = new ArrayList<>();
+                final @NotNull List<AnAction> actions = new ArrayList<>();
                 for (final String module : orderedModules) {
                     actions.add(new ToggleFilterAction<>(module, null,
                             module, selectedModule, FilterMembership.plain(), onChanged));
@@ -156,7 +156,7 @@ public class FilterPopupBtn extends AbstractButton implements ToolbarItem {
         filterResetBtn.add(filterModuleMenu);
 
         if (callbacks instanceof RunEditor) {
-            final DefaultActionGroup filterStatusMenu = new DefaultActionGroup("Status", true);
+            final @NotNull DefaultActionGroup filterStatusMenu = new DefaultActionGroup("Status", true);
             Arrays.stream(TestStatus.values()).forEach(s ->
                     filterStatusMenu.add(new ToggleFilterAction<>(s.name(), null,
                             s, selectedStatus, FilterMembership.plain(), onChanged)));

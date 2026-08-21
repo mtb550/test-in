@@ -48,7 +48,7 @@ public final class ChoiceInput implements DialogComponent {
      * different name to Git and the same one to the tester.
      */
     public @NotNull String getValue() {
-        final Object value = combo.getEditor().getItem();
+        final @NotNull Object value = combo.getEditor().getItem();
         return Objects.toString(value, "").trim();
     }
 
@@ -57,7 +57,7 @@ public final class ChoiceInput implements DialogComponent {
      * new value means — creating a branch is not the same as choosing one.
      */
     public boolean isNew() {
-        final String value = getValue();
+        final @NotNull String value = getValue();
 
         for (int i = 0; i < combo.getItemCount(); i++) {
             if (value.equals(combo.getItemAt(i))) return false;

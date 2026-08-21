@@ -44,7 +44,7 @@ public final class ConfirmDialog extends AbstractFrameworkDialog<DialogMessage> 
 
         components = List.of(ComponentDialogBase.message(message, from, to));
 
-        final List<StatusBarShortcut> keys = new ArrayList<>();
+        final @NotNull List<StatusBarShortcut> keys = new ArrayList<>();
         keys.add(StatusBarShortcut.build(Shortcuts.Enter, confirmName, this::submit));
 
         for (final Alternative alternative : alternatives) {

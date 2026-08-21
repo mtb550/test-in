@@ -21,7 +21,7 @@ public class CreateTestSet implements NodeCreator {
 
     @Override
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
-        final TestSetDirectoryDto ts = Services.getInstance(p, DirectoryMapper.class).getTestSetNode(p, newDirPath, parentDir);
+        final @NotNull TestSetDirectoryDto ts = Services.getInstance(p, DirectoryMapper.class).getTestSetNode(p, newDirPath, parentDir);
 
         Services.getInstance(p, ProjectIndexer.class).addTestSet(ts);
         ApplicationManager.getApplication().invokeLater(() -> {

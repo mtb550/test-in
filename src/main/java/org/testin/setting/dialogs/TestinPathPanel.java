@@ -80,13 +80,13 @@ public final class TestinPathPanel {
     }
 
     private void updateOpenButtonState() {
-        final String pathStr = pathField.getText();
+        final @NotNull String pathStr = pathField.getText();
         if (pathStr.trim().isEmpty()) {
             openFolderBtn.setEnabled(false);
             return;
         }
         try {
-            final Path path = Path.of(pathStr);
+            final @NotNull Path path = Path.of(pathStr);
             openFolderBtn.setEnabled(Files.exists(path) && Files.isDirectory(path));
         } catch (final Exception ex) {
             openFolderBtn.setEnabled(false);
@@ -94,7 +94,7 @@ public final class TestinPathPanel {
     }
 
     public @NotNull JBPanel<?> getComponent() {
-        final JBPanel<?> panel = new JBPanel<>(new BorderLayout(5, 0));
+        final @NotNull JBPanel<?> panel = new JBPanel<>(new BorderLayout(5, 0));
         panel.add(pathField, BorderLayout.CENTER);
         panel.add(openFolderBtn, BorderLayout.EAST);
         return panel;

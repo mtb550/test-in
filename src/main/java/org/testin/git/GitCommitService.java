@@ -3,7 +3,6 @@ package org.testin.git;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-
 import org.testin.model.DirectoryType;
 
 import java.nio.file.Files;
@@ -41,14 +40,14 @@ public final class GitCommitService {
      * or a container, and only one of them is there.
      */
     static @NotNull Set<String> markersAlongside(final @NotNull Path repositoryPath, final @NotNull Set<String> testCasePaths) {
-        final Set<String> markers = new LinkedHashSet<>();
+        final @NotNull Set<String> markers = new LinkedHashSet<>();
 
         for (final String directory : GitRefs.ancestorDirectories(testCasePaths)) {
             for (final DirectoryType type : DirectoryType.values()) {
-                final String marker = type.getMarker();
+                final @NotNull String marker = type.getMarker();
                 if (marker.isBlank()) continue;
 
-                final String relative = directory.isEmpty() ? marker : directory + "/" + marker;
+                final @NotNull String relative = directory.isEmpty() ? marker : directory + "/" + marker;
                 if (Files.exists(repositoryPath.resolve(relative))) markers.add(relative);
             }
         }
@@ -78,12 +77,12 @@ public final class GitCommitService {
             final @NotNull Path repositoryPath,
             final @NotNull String message,
             final @NotNull Collection<PendingChange> selectedChanges) {
-        final Set<String> paths = GitRefs.repoRelativePaths(selectedChanges);
+        final @NotNull Set<String> paths = GitRefs.repoRelativePaths(selectedChanges);
         if (paths.isEmpty()) throw new IllegalArgumentException("No Git changes were selected");
 
         paths.addAll(markersAlongside(repositoryPath, paths));
 
-        final Set<String> stageable = stageable(repositoryPath, paths);
+        final @NotNull Set<String> stageable = stageable(repositoryPath, paths);
         if (!stageable.isEmpty()) {
             GitCommandRunner.execute(project, repositoryPath, withPaths(stageable, "git", "add", "--"));
         }
@@ -141,7 +140,7 @@ public final class GitCommitService {
             final @NotNull String name,
             final @NotNull String email,
             final boolean global) {
-        final String scope = global ? "--global" : "--local";
+        final @NotNull String scope = global ? "--global" : "--local";
         GitCommandRunner.execute(project, repositoryPath, "git", "config", scope, "user.name", name);
         GitCommandRunner.execute(project, repositoryPath, "git", "config", scope, "user.email", email);
     }
@@ -158,7 +157,7 @@ public final class GitCommitService {
      * it does not.
      */
     public void pullAndPush(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
-        final String url = repositories.getRemoteUrl(repositoryPath, remote);
+        final @NotNull String url = repositories.getRemoteUrl(repositoryPath, remote);
 
         if (remoteHasBranch(repositoryPath, remote, branch)) {
             GitCommandRunner.executeRemote(project, repositoryPath, url, "git", "pull", "--rebase", "--autostash", remote, branch);
@@ -197,7 +196,7 @@ public final class GitCommitService {
      * {@code "--"} separator explicitly so the full command stays readable.
      */
     private @NotNull String[] withPaths(final @NotNull Set<String> paths, final @NotNull String... fixedArgs) {
-        final String[] result = Arrays.copyOf(fixedArgs, fixedArgs.length + paths.size());
+        final String @NotNull[] result = Arrays.copyOf(fixedArgs, fixedArgs.length + paths.size());
         int index = fixedArgs.length;
         for (final String path : paths) result[index++] = path;
         return result;

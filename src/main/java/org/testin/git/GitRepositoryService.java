@@ -49,11 +49,11 @@ public final class GitRepositoryService {
      * back to the branch checked out here.
      */
     public @NotNull String getDefaultBranch(final @NotNull Path path) {
-        final String currentBranch = getCurrentBranch(path);
-        final String remoteName = getRemoteName(path);
+        final @NotNull String currentBranch = getCurrentBranch(path);
+        final @NotNull String remoteName = getRemoteName(path);
         if (remoteName.isEmpty()) return currentBranch;
 
-        final String headBranch = runRemote(path, getRemoteUrl(path, remoteName), "git", "remote", "show", remoteName)
+        final @NotNull String headBranch = runRemote(path, getRemoteUrl(path, remoteName), "git", "remote", "show", remoteName)
                 .map(GitRefs::parseHeadBranch)
                 .orElse("");
 
@@ -61,7 +61,7 @@ public final class GitRepositoryService {
     }
 
     public void fetchRemoteBranches(final @NotNull Path path) {
-        final String remoteName = getRemoteName(path);
+        final @NotNull String remoteName = getRemoteName(path);
         if (remoteName.isEmpty()) return;
 
         runRemote(path, getRemoteUrl(path, remoteName), "git", "fetch", "--all", "--prune");
@@ -95,7 +95,7 @@ public final class GitRepositoryService {
      * (uncommitted changes) is the caller's to write.
      */
     public @NotNull String checkout(final @NotNull Path path, final @NotNull String branch) {
-        final String localName = GitRefs.localNameOf(branch);
+        final @NotNull String localName = GitRefs.localNameOf(branch);
         final boolean remoteBranch = !localName.equals(branch);
 
         // A remote branch checked out by its remote name detaches HEAD. Tracking
@@ -104,7 +104,7 @@ public final class GitRepositoryService {
             return run(path, "git", "checkout", "-b", localName, "--track", branch).isPresent() ? localName : "";
         }
 
-        final String target = remoteBranch ? localName : branch;
+        final @NotNull String target = remoteBranch ? localName : branch;
         return run(path, "git", "checkout", target).isPresent() ? target : "";
     }
 
@@ -205,7 +205,7 @@ public final class GitRepositoryService {
      * has never heard of has nothing to be ahead of.
      */
     public int unpushedCount(final @NotNull Path path) {
-        final String counted = run(path, "git", "rev-list", "--count", "@{upstream}..HEAD").orElse("").trim();
+        final @NotNull String counted = run(path, "git", "rev-list", "--count", "@{upstream}..HEAD").orElse("").trim();
         if (counted.isEmpty()) return 0;
 
         try {
@@ -222,7 +222,7 @@ public final class GitRepositoryService {
      * repository object.
      */
     private boolean isRebaseInProgress(final @NotNull Path path) {
-        final Path gitDir = path.resolve(".git");
+        final @NotNull Path gitDir = path.resolve(".git");
         return Files.isDirectory(gitDir.resolve("rebase-merge")) || Files.isDirectory(gitDir.resolve("rebase-apply"));
     }
 

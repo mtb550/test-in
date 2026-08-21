@@ -61,7 +61,7 @@ public final class BoundTestProject {
      * sent back to the picker rather than shown a wrong project.
      */
     public @NotNull Optional<TestProjectDirectoryDto> get() {
-        final String name = name();
+        final @NotNull String name = name();
         if (name.isEmpty()) return Optional.empty();
 
         return Services.getInstance(p, ProjectIndexer.class).getTestProjectsByPath().values().stream()
@@ -93,8 +93,8 @@ public final class BoundTestProject {
     public @NotNull String problem(final @NotNull Map<String, ProjectStatus> underRoot) {
         if (!isNamed() || get().isPresent()) return "";
 
-        final String name = name();
-        final Optional<ProjectStatus> status = Optional.ofNullable(underRoot.get(name));
+        final @NotNull String name = name();
+        final @NotNull Optional<ProjectStatus> status = Optional.ofNullable(underRoot.get(name));
 
         if (status.isEmpty()) return "testin.yml names " + name + ", which is not under the Testin root";
         if (status.orElseThrow() == ProjectStatus.ARCHIVED) return name + " is archived, so it is not opened";

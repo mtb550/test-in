@@ -86,8 +86,8 @@ public class StepsSection implements CreateTestCaseSection {
     }
 
     public void addStepField(final @NotNull String text, final @NotNull UIAction repackAction) {
-        final TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getSteps(), CreateTestCaseFields.STEPS.getIcon());
-        final EditorTextField stepField = SpellChecker.createCompletionField(p, provider, text);
+        final @NotNull TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getSteps(), CreateTestCaseFields.STEPS.getIcon());
+        final @NotNull EditorTextField stepField = SpellChecker.createCompletionField(p, provider, text);
 
         stepField.setOneLineMode(true);
         stepField.setFont(fieldFont);
@@ -95,11 +95,11 @@ public class StepsSection implements CreateTestCaseSection {
         stepField.setShowPlaceholderWhenFocused(true);
         stepField.setBorder(JBUI.Borders.empty(6, 10));
 
-        final JBPanel<?> stepRow = new JBPanel<>(new BorderLayout(JBUI.scale(8), 0));
+        final @NotNull JBPanel<?> stepRow = new JBPanel<>(new BorderLayout(JBUI.scale(8), 0));
         stepRow.setOpaque(false);
         stepRow.setBorder(JBUI.Borders.emptyBottom(6));
 
-        final JBLabel removeButton = new JBLabel(AllIcons.Actions.Cancel);
+        final @NotNull JBLabel removeButton = new JBLabel(AllIcons.Actions.Cancel);
         removeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         removeButton.setToolTipText("Remove step " + Shortcuts.CreateTestCaseRemoveStep.getShortcutText());
 
@@ -120,7 +120,7 @@ public class StepsSection implements CreateTestCaseSection {
             }
         });
 
-        final RemoveStepShortcutAction removeStepShortcut =
+        final @NotNull RemoveStepShortcutAction removeStepShortcut =
                 new RemoveStepShortcutAction(stepField, () -> removeStepAction(stepRow, stepField, repackAction));
 
         // Tied to the dialog's disposable: rows are recreated on every fillData,
@@ -128,7 +128,7 @@ public class StepsSection implements CreateTestCaseSection {
         removeStepShortcut.registerCustomShortcutSet(
                 Shortcuts.CreateTestCaseRemoveStep.getCustomShortcut(), stepField, parentDisposable);
 
-        final JBPanel<?> buttonWrapper = new JBPanel<>(new BorderLayout());
+        final @NotNull JBPanel<?> buttonWrapper = new JBPanel<>(new BorderLayout());
         buttonWrapper.setOpaque(false);
         buttonWrapper.setBorder(JBUI.Borders.emptyRight(4));
         buttonWrapper.add(removeButton, BorderLayout.CENTER);
@@ -161,7 +161,7 @@ public class StepsSection implements CreateTestCaseSection {
 
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        final List<String> finalSteps = new ArrayList<>();
+        final @NotNull List<String> finalSteps = new ArrayList<>();
         for (final EditorTextField sf : stepFields) {
             if (!sf.getText().trim().isEmpty()) {
                 finalSteps.add(sf.getText().trim());

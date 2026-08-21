@@ -41,7 +41,7 @@ public class CreateTestCaseAction extends AbstractProjectAction {
 
     public void openCreateDialog() {
         new CreateTestCaseDialog(p, tc -> {
-            final List<TestCaseDto> tcs = editor.getAllTestCases();
+            final @NotNull List<TestCaseDto> tcs = editor.getAllTestCases();
 
             // After the last one, and nothing else moves. The case that was last
             // used to be rewritten to point at this one, which is what made a
@@ -52,7 +52,7 @@ public class CreateTestCaseAction extends AbstractProjectAction {
             tc.setParent(dir);
             editor.appendNewTestCase(tc);
 
-            final List<TestCaseDto> affectedNodes = List.of(tc);
+            final @NotNull List<TestCaseDto> affectedNodes = List.of(tc);
             Services.getInstance(p, TestCaseCacheService.class).addNewItems(affectedNodes);
 
             Services.getInstance(p, TestCasePersistService.class).persist(dir.getPath(), affectedNodes);

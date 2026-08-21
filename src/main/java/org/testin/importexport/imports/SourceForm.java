@@ -100,7 +100,7 @@ public final class SourceForm implements DialogComponent {
         // Fired directly, not registered: addBrowseFolderListener above already
         // owns the button, and registering this one too opened the chooser a
         // second time as soon as the first closed.
-        final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener =
+        final @NotNull ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener =
                 new ComponentWithBrowseButton.BrowseFolderActionListener<>(fileField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
         ApplicationManager.getApplication().invokeLater(() ->
                 browseListener.actionPerformed(new ActionEvent(fileField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
@@ -112,13 +112,13 @@ public final class SourceForm implements DialogComponent {
      * when the checkbox is ticked.
      */
     public @NotNull Optional<File> resolve() {
-        final String filePath = fileField.getText().trim();
+        final @NotNull String filePath = fileField.getText().trim();
         if (filePath.isEmpty()) {
             fileField.getTextField().requestFocus();
             return Optional.empty();
         }
 
-        final File source = new File(filePath);
+        final @NotNull File source = new File(filePath);
 
         if (offersDefaultFolder && setDefaultCheckBox.isSelected()) {
             Optional.ofNullable(source.getParentFile()).ifPresent(folder ->
@@ -134,18 +134,18 @@ public final class SourceForm implements DialogComponent {
      * import would ignore.
      */
     private void showFormatHint(final @NotNull FileTypes format) {
-        final String message = format.getInfoMessage();
+        final @NotNull String message = format.getInfoMessage();
         if (message.isBlank()) {
             formatHint.setVisible(false);
             return;
         }
 
-        final String columns = importAttributes.stream()
+        final @NotNull String columns = importAttributes.stream()
                 .filter(a -> a.can(Can.IMPORT))
                 .map(TestEditorAttributes::getName)
                 .collect(Collectors.joining(", "));
 
-        final String escaped = StringUtil.escapeXmlEntities(message.formatted(columns)).replace("\n", "<br>");
+        final @NotNull String escaped = StringUtil.escapeXmlEntities(message.formatted(columns)).replace("\n", "<br>");
         formatHint.setText("<html>" + escaped + "</html>");
         formatHint.setVisible(true);
     }

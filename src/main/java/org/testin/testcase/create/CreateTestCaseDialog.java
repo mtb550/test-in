@@ -23,15 +23,15 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
     public CreateTestCaseDialog(final @NotNull Project p, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p);
 
-        final TestCaseDto dto = new TestCaseDto();
+        final @NotNull TestCaseDto dto = new TestCaseDto();
 
-        final UIAction repackPopup = this::repack;
+        final @NotNull UIAction repackPopup = this::repack;
 
-        final JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
+        final @NotNull JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
             @Override
             public @NotNull Dimension getPreferredSize() {
-                final Dimension pref = super.getPreferredSize();
-                final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                final @NotNull Dimension pref = super.getPreferredSize();
+                final @NotNull Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                 pref.width = Math.max(pref.width, screenSize.width / 2);
                 final int maxHeight = (int) (screenSize.height * 0.85);
                 pref.height = Math.min(pref.height, maxHeight);
@@ -46,12 +46,12 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
         initDynamicStatusBar(mainPanel);
 
-        final JBPanel<?> contentPanel = new JBPanel<>();
+        final @NotNull JBPanel<?> contentPanel = new JBPanel<>();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
 
         for (final CreateTestCaseSection section : getAllSections()) {
-            final JBPanel<?> slot = new JBPanel<>(new BorderLayout());
+            final @NotNull JBPanel<?> slot = new JBPanel<>(new BorderLayout());
             slot.setOpaque(false);
             contentPanel.add(slot);
 
@@ -62,11 +62,11 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
             }
         }
 
-        final JBPanel<?> anchorPanel = new JBPanel<>(new BorderLayout());
+        final @NotNull JBPanel<?> anchorPanel = new JBPanel<>(new BorderLayout());
         anchorPanel.setOpaque(false);
         anchorPanel.add(contentPanel, BorderLayout.NORTH);
 
-        final JBScrollPane scrollPane = new JBScrollPane(anchorPanel);
+        final @NotNull JBScrollPane scrollPane = new JBScrollPane(anchorPanel);
         scrollPane.setBorder(JBUI.Borders.empty());
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
@@ -93,7 +93,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(statusBarSection.getPanel(), BorderLayout.SOUTH);
 
-        final JBPopup dialogPopup = ownPopup(JBPopupFactory.getInstance()
+        final @NotNull JBPopup dialogPopup = ownPopup(JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, DescriptionSection.getFocusComponent())
                 .setTitle("Create Test Case")
                 .setRequestFocus(true)
@@ -109,7 +109,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
                 })
                 .createPopup());
 
-        final Runnable saveAction = save(dto, onSave, new JBPopup[]{dialogPopup});
+        final @NotNull Runnable saveAction = save(dto, onSave, new JBPopup[]{dialogPopup});
 
         // register enter shortcut
         registerShortcut(mainPanel, Shortcuts.Enter.getCustomShortcut(), saveAction::run);

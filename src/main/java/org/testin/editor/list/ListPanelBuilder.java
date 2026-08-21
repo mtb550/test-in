@@ -34,9 +34,9 @@ import java.util.function.Supplier;
 public final class ListPanelBuilder {
 
     public static @NotNull ListView build(final @NotNull Project p, final @NotNull Disposable fontSyncDisposable) {
-        final CollectionListModel<TestCaseDto> model = new CollectionListModel<>(new ArrayList<>());
+        final @NotNull CollectionListModel<TestCaseDto> model = new CollectionListModel<>(new ArrayList<>());
 
-        final JBList<TestCaseDto> list = new JBList<>(model);
+        final @NotNull JBList<TestCaseDto> list = new JBList<>(model);
         list.setBackground(UIUtil.getPanelBackground());
         list.setOpaque(true);
         list.setPaintBusy(true);
@@ -46,7 +46,7 @@ public final class ListPanelBuilder {
 
         FontSync.syncWithNativeEditor(p, list, fontSyncDisposable);
 
-        final JBScrollPane scrollPane = new JBScrollPane(list);
+        final @NotNull JBScrollPane scrollPane = new JBScrollPane(list);
         scrollPane.setOpaque(true);
         scrollPane.setBackground(UIUtil.getPanelBackground());
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -66,9 +66,9 @@ public final class ListPanelBuilder {
                                            final @NotNull AbstractEditorContextMenu contextMenu,
                                            final @NotNull Supplier<Optional<JBTable>> gridTableSupplier,
                                            final @NotNull BooleanSupplier gridActiveSupplier) {
-        final JBList<TestCaseDto> list = view.list();
+        final @NotNull JBList<TestCaseDto> list = view.list();
 
-        final CardMouseListener mouseListener = new CardMouseListener(p, editor, list, view.model(), dir, contextMenu);
+        final @NotNull CardMouseListener mouseListener = new CardMouseListener(p, editor, list, view.model(), dir, contextMenu);
         list.addMouseListener(mouseListener);
         list.addMouseWheelListener(mouseListener);
         list.addMouseMotionListener(mouseListener);

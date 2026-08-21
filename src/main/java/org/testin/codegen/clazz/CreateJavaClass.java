@@ -15,11 +15,11 @@ public class CreateJavaClass implements GenAction {
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestSetDirectoryDto dir)) return;
-        final List<String> fqcn = Fqcn.ofClass(p, dir);
+        final @NotNull List<String> fqcn = Fqcn.ofClass(p, dir);
         if (fqcn.isEmpty()) return;
 
-        final List<String> packageSegments = fqcn.subList(0, fqcn.size() - 1);
-        final String className = fqcn.getLast();
+        final @NotNull List<String> packageSegments = fqcn.subList(0, fqcn.size() - 1);
+        final @NotNull String className = fqcn.getLast();
 
         Logger.info("Ready to generate Test Class: " + className + " in package: " + fqcn);
 

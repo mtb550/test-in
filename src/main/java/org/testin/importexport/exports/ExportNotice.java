@@ -47,14 +47,14 @@ final class ExportNotice {
      * only thing in the plugin that asks the operating system to open anything.
      */
     private static void openWithAssociatedProgram(final @NotNull Project p, final @NotNull VirtualFile virtualFile) {
-        final Notifier notifier = Services.getInstance(p, Notifier.class);
+        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
         if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
             notifier.error(p, "System Error", "Opening a file is not supported on this system.");
             return;
         }
 
-        final File toOpen = new File(virtualFile.getPath());
+        final @NotNull File toOpen = new File(virtualFile.getPath());
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Desktop.getDesktop().open(toOpen);
@@ -75,7 +75,7 @@ final class ExportNotice {
 
     private static void show(final @NotNull Project p, final @NotNull File file, final @NotNull Runnable open) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            final Notifier notifier = Services.getInstance(p, Notifier.class);
+            final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
             notifier.infoWithActions(p, "Exported", file.getName(), notifier.action("Open file", open));
         });
     }

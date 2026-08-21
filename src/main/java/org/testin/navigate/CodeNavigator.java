@@ -20,8 +20,8 @@ import java.util.Optional;
 public class CodeNavigator {
 
     public void toCode(final @NotNull Project p, final @NotNull List<String> fqcn) {
-        final String className = String.join(".", fqcn.subList(0, fqcn.size() - 1));
-        final String methodName = fqcn.getLast();
+        final @NotNull String className = String.join(".", fqcn.subList(0, fqcn.size() - 1));
+        final @NotNull String methodName = fqcn.getLast();
 
         Logger.trace("org.testin.navigate to method, className: " + className + ", methodName: " + methodName);
 
@@ -34,14 +34,14 @@ public class CodeNavigator {
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
                     try {
-                        final Optional<PsiClass> found = Optional.ofNullable(
+                        final @NotNull Optional<PsiClass> found = Optional.ofNullable(
                                 JavaPsiFacade.getInstance(p).findClass(className, GlobalSearchScope.projectScope(p)));
 
                         if (found.isPresent()) {
-                            final PsiClass targetClass = found.orElseThrow();
+                            final @NotNull PsiClass targetClass = found.orElseThrow();
                             Navigatable targetElement = targetClass;
 
-                            final PsiMethod[] exactMethods = targetClass.findMethodsByName(methodName, false);
+                            final PsiMethod @NotNull[] exactMethods = targetClass.findMethodsByName(methodName, false);
 
                             if (exactMethods.length > 0)
                                 targetElement = exactMethods[0];
@@ -54,7 +54,7 @@ public class CodeNavigator {
                                     }
                                 }
 
-                            final Navigatable finalTarget = targetElement;
+                            final @NotNull Navigatable finalTarget = targetElement;
                             ApplicationManager.getApplication().invokeLater(() -> {
                                 if (finalTarget.canNavigate())
                                     finalTarget.navigate(true);

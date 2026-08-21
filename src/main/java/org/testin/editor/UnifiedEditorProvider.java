@@ -20,11 +20,11 @@ public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
     public @NotNull FileEditor createEditor(final @NotNull Project p, final @NotNull VirtualFile file) {
         if (file instanceof UnifiedVirtualFile unifiedFile) {
 
-            final FileType ft = unifiedFile.getFileType();
+            final @NotNull FileType ft = unifiedFile.getFileType();
             if (!(ft instanceof EditorType editorType))
                 throw new IllegalArgumentException("Unknown FileType: " + ft);
 
-            final TestinEditor editor = editorType.getFactory().apply(p, unifiedFile);
+            final @NotNull TestinEditor editor = editorType.getFactory().apply(p, unifiedFile);
             return new UnifiedFileEditor(p, unifiedFile, editor);
         }
 

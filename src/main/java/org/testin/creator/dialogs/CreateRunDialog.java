@@ -43,7 +43,7 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
 
     @Override
     protected void submit() {
-        final String name = component().getText().trim();
+        final @NotNull String name = component().getText().trim();
         if (name.isEmpty()) {
             component().showEmptyWarning();
             return;

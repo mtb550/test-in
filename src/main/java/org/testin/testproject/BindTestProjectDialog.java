@@ -45,7 +45,7 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
 
         title = "Select Test Project";
 
-        final ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
+        final @NotNull ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
                 .column("Test Project", 260)
                 .column("Status", 100)
                 .build();
@@ -71,7 +71,7 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
      * selection.
      */
     private void selectCurrent() {
-        final String bound = Services.getInstance(p, BoundTestProject.class).name();
+        final @NotNull String bound = Services.getInstance(p, BoundTestProject.class).name();
 
         for (int row = 0; row < projects.getRowCount(); row++) {
             if (projects.getValueAt(row, 0).equals(bound)) {
@@ -83,10 +83,10 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
 
     @Override
     protected void submit() {
-        final List<Integer> selected = projects.getSelectedRows();
+        final @NotNull List<Integer> selected = projects.getSelectedRows();
         if (selected.isEmpty()) return;
 
-        final String name = projects.getValueAt(selected.getFirst(), 0);
+        final @NotNull String name = projects.getValueAt(selected.getFirst(), 0);
 
         if (!Services.getInstance(p, BoundTestProject.class).bind(name)) {
             Services.getInstance(p, Notifier.class).error(p, "Not Bound",

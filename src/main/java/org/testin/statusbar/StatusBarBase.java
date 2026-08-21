@@ -53,13 +53,13 @@ public abstract class StatusBarBase {
     public void updateItems(final StatusBarItem @NotNull [] items) {
         this.statusBar.removeAll();
 
-        final JBPanel<?> contentPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        final @NotNull JBPanel<?> contentPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         contentPanel.setOpaque(false);
 
         contentPanel.add(setStatusBarIcon());
 
         for (int i = 0; i < items.length; i++) {
-            final StatusBarItem item = items[i];
+            final @NotNull StatusBarItem item = items[i];
             contentPanel.add(createShortcut(item.getShortcutText()));
             contentPanel.add(createDot());
             contentPanel.add(createLabel(item.getName()));
@@ -76,33 +76,33 @@ public abstract class StatusBarBase {
     }
 
     private @NotNull JBLabel setStatusBarIcon() {
-        final JBLabel label = new JBLabel(icon);
+        final @NotNull JBLabel label = new JBLabel(icon);
         label.setBorder(border);
         return label;
     }
 
     private @NotNull JBLabel createShortcut(final @NotNull String text) {
-        final JBLabel label = new JBLabel(text);
+        final @NotNull JBLabel label = new JBLabel(text);
         label.setForeground(shortcutColor);
         label.setFont(shortcutFont);
         return label;
     }
 
     private @NotNull JBLabel createDot() {
-        final JBLabel label = new JBLabel(INNER_SEPARATOR);
+        final @NotNull JBLabel label = new JBLabel(INNER_SEPARATOR);
         label.setForeground(dotColor);
         return label;
     }
 
     private @NotNull JBLabel createLabel(final @NotNull String text) {
-        final JBLabel label = new JBLabel(text);
+        final @NotNull JBLabel label = new JBLabel(text);
         label.setForeground(labelColor);
         label.setFont(font);
         return label;
     }
 
     private @NotNull JBLabel createSeparator() {
-        final JBLabel label = new JBLabel(OUTER_SEPARATOR);
+        final @NotNull JBLabel label = new JBLabel(OUTER_SEPARATOR);
         label.setForeground(separatorColor);
         label.setFont(font);
         return label;

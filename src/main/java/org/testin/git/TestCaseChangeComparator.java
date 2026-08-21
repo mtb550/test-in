@@ -19,7 +19,7 @@ final class TestCaseChangeComparator {
     static @NotNull List<FieldChange> compare(
             final @NotNull TestCaseDto oldState,
             final @NotNull TestCaseDto newState) {
-        final List<FieldChange> changes = new ArrayList<>();
+        final @NotNull List<FieldChange> changes = new ArrayList<>();
         addIfChanged(changes, "Description", oldState.getDescription(), newState.getDescription(), ChangeType.CHANGE_DESCRIPTION);
         addIfChanged(changes, "Expected Result", oldState.getExpectedResult(), newState.getExpectedResult(), ChangeType.CHANGE_EXPECTED_RESULT);
         addIfChanged(changes, "Steps", formatSteps(oldState), formatSteps(newState), ChangeType.CHANGE_STEPS);

@@ -48,7 +48,7 @@ public final class LoggerService implements Disposable {
     }
 
     private void startWriterThread() {
-        final Thread thread = new Thread(this::writeLoop, "Testin-Async-Logger");
+        final @NotNull Thread thread = new Thread(this::writeLoop, "Testin-Async-Logger");
         thread.setDaemon(true);
         thread.start();
         writerThread = Optional.of(thread);
@@ -66,7 +66,7 @@ public final class LoggerService implements Disposable {
             try {
                 while (isRunning || !logQueue.isEmpty()) {
 
-                    final Optional<Object> taken = Optional.ofNullable(logQueue.poll(500, TimeUnit.MILLISECONDS));
+                    final @NotNull Optional<Object> taken = Optional.ofNullable(logQueue.poll(500, TimeUnit.MILLISECONDS));
                     if (taken.isEmpty()) {
                         writer.flush();
                         continue;
@@ -80,7 +80,7 @@ public final class LoggerService implements Disposable {
                     written += message.length() + 1;
 
                     if (written >= MAX_LOG_SIZE) {
-                        final Optional<BufferedWriter> rolled = rollOver(writer);
+                        final @NotNull Optional<BufferedWriter> rolled = rollOver(writer);
 
                         // The roll-over closed the old writer before it failed, so
                         // there is nothing left to write into. Stop draining rather
@@ -147,7 +147,7 @@ public final class LoggerService implements Disposable {
         logQueue.offer(SHUTDOWN);
 
         if (writerThread.isPresent()) {
-            final Thread thread = writerThread.orElseThrow();
+            final @NotNull Thread thread = writerThread.orElseThrow();
             try {
                 thread.join(2000);
             } catch (final InterruptedException ex) {

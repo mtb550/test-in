@@ -24,7 +24,7 @@ public class SelectionListener implements ListSelectionListener {
     @Override
     public void valueChanged(final ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
-            final List<TestCaseDto> selected = list.getSelectedValuesList();
+            final @NotNull List<TestCaseDto> selected = list.getSelectedValuesList();
 
             if (!selected.isEmpty()) {
                 list.ensureIndexIsVisible(list.getSelectedIndex());

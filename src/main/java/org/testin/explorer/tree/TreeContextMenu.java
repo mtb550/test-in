@@ -108,7 +108,7 @@ public class TreeContextMenu extends DefaultActionGroup {
      * live in a shared utility class where this was the one caller.
      */
     private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends DumbAwareAction> actions) {
-        final DefaultActionGroup group = new DefaultActionGroup("Actions", true);
+        final @NotNull DefaultActionGroup group = new DefaultActionGroup("Actions", true);
         group.getTemplatePresentation().setIcon(AllIcons.Actions.Edit);
         actions.forEach(group::add);
         return group;

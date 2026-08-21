@@ -23,9 +23,9 @@ public abstract class AbstractListRenderer<U extends TestinEditor> implements Li
         final int globalIndex = editor.globalIndex(index);
 
         final boolean isRowHovered = (index == editor.getHoveredIndex());
-        final String hover = isRowHovered ? editor.getHoveredIconAction() : "";
+        final @NotNull String hover = isRowHovered ? editor.getHoveredIconAction() : "";
 
-        final BaseCard card = bindDataAndGetCard(list, tc, globalIndex, isSelected, isRowHovered, hover);
+        final @NotNull BaseCard card = bindDataAndGetCard(list, tc, globalIndex, isSelected, isRowHovered, hover);
 
         card.setBorder(isSelected ? SELECTED_BORDER : UNSELECTED_BORDER);
 

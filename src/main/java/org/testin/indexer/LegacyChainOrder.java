@@ -55,19 +55,19 @@ final class LegacyChainOrder {
     static @NotNull List<TestCaseDto> apply(final @NotNull Project p, final @NotNull Map<Path, TestCaseDto> files) {
         if (files.isEmpty() || files.values().stream().anyMatch(tc -> !tc.getOrder().isEmpty())) return List.of();
 
-        final Map<UUID, TestCaseDto> byId = new HashMap<>(files.size());
-        final Map<UUID, UUID> next = new HashMap<>(files.size());
+        final @NotNull Map<UUID, TestCaseDto> byId = new HashMap<>(files.size());
+        final @NotNull Map<UUID, UUID> next = new HashMap<>(files.size());
         Optional<UUID> head = Optional.empty();
 
         for (final Map.Entry<Path, TestCaseDto> file : files.entrySet()) {
-            final JsonNode chain = read(p, file.getKey());
-            final TestCaseDto testCase = file.getValue();
+            final @NotNull JsonNode chain = read(p, file.getKey());
+            final @NotNull TestCaseDto testCase = file.getValue();
 
             byId.put(testCase.getId(), testCase);
 
             if (chain.path(HEAD).asBoolean(false)) head = Optional.of(testCase.getId());
 
-            final String points = chain.path(NEXT).asText("");
+            final @NotNull String points = chain.path(NEXT).asText("");
             if (!points.isBlank()) {
                 try {
                     next.put(testCase.getId(), UUID.fromString(points));
@@ -79,8 +79,8 @@ final class LegacyChainOrder {
 
         if (head.isEmpty()) return List.of();
 
-        final List<TestCaseDto> ordered = new ArrayList<>(files.size());
-        final Set<UUID> walked = new HashSet<>();
+        final @NotNull List<TestCaseDto> ordered = new ArrayList<>(files.size());
+        final @NotNull Set<UUID> walked = new HashSet<>();
 
         // The chain ends where a case points at nobody, and a pointer that leads
         // back to a case already walked ends it too - a file written by two

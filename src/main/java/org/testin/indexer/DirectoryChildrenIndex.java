@@ -55,7 +55,7 @@ final class DirectoryChildrenIndex {
         synchronized (this) {
             if (!dirty) return;
 
-            final Map<Path, List<DirectoryDto>> rebuilt = new ConcurrentHashMap<>();
+            final @NotNull Map<Path, List<DirectoryDto>> rebuilt = new ConcurrentHashMap<>();
             for (final DirectoryDto directory : source.get()) {
                 // A test project sits under nothing, so it is nobody's child.
                 Optional.ofNullable(directory.getParent()).ifPresent(parent ->

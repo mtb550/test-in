@@ -63,7 +63,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
 
         final float smallSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
-        final Font dynamicSmallFont = JBUI.Fonts.smallFont().deriveFont(smallSize);
+        final @NotNull Font dynamicSmallFont = JBUI.Fonts.smallFont().deriveFont(smallSize);
 
         statusLabel.setFont(dynamicSmallFont);
         statusLabel.setForeground(UIUtil.getContextHelpForeground());
@@ -83,7 +83,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         currentPageLabel.setFont(dynamicSmallFont);
         pageSizeField.setFont(dynamicSmallFont);
 
-        final JBPanel<?> paginationPanel = new JBPanel<>(new FlowLayout(FlowLayout.CENTER, JBUI.scale(5), 0));
+        final @NotNull JBPanel<?> paginationPanel = new JBPanel<>(new FlowLayout(FlowLayout.CENTER, JBUI.scale(5), 0));
         paginationPanel.setOpaque(false);
 
         pageSizeField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -119,7 +119,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         paginationPanel.add(nextButton);
         paginationPanel.add(lastButton);
 
-        final JBPanel<?> eastPanel = new JBPanel<>(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        final @NotNull JBPanel<?> eastPanel = new JBPanel<>(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         eastPanel.setOpaque(false);
         eastPanel.add(executionTimeLabel);
         eastPanel.add(syncLabel);
@@ -138,7 +138,7 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     private void updateClock() {
-        final String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+        final @NotNull String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
         syncLabel.setText("System Time: " + currentTime);
     }
 

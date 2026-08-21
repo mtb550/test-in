@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Consumer;
-
 import com.intellij.util.ui.JBUI;
 
 /**
@@ -58,10 +57,10 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
 
         title = "Both Changed " + testCase;
 
-        final List<ComponentDialogBase<?>> rows = new ArrayList<>();
+        final @NotNull List<ComponentDialogBase<?>> rows = new ArrayList<>();
 
         for (final TestCaseMerge.Question question : questions) {
-            final ComponentDialogBase<RadioSelection<Boolean>> row = ComponentDialogBase.<Boolean>radios(label(question.field()))
+            final @NotNull ComponentDialogBase<RadioSelection<Boolean>> row = ComponentDialogBase.<Boolean>radios(label(question.field()))
                     .option("Mine: " + shortened(question.mine()), Boolean.FALSE)
                     .option("Remote: " + shortened(question.theirs()), Boolean.TRUE)
                     .select(Boolean.FALSE)
@@ -71,7 +70,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
             answers.add(row.getComponent());
         }
 
-        final ComponentDialogBase<DialogButton> keep = ComponentDialogBase.button("Keep Selected");
+        final @NotNull ComponentDialogBase<DialogButton> keep = ComponentDialogBase.button("Keep Selected");
         rows.add(keep);
 
         components = List.copyOf(rows);
@@ -91,7 +90,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
      * does.
      */
     private static @NotNull String label(final @NotNull String jsonField) {
-        final String constant = jsonField.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toUpperCase(Locale.ROOT);
+        final @NotNull String constant = jsonField.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toUpperCase(Locale.ROOT);
 
         for (final TestEditorAttributes attribute : TestEditorAttributes.values()) {
             if (attribute.name().equals(constant)) return attribute.getName();
@@ -100,7 +99,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
     }
 
     private static @NotNull String shortened(final @NotNull String value) {
-        final String oneLine = value.replace('\n', ' ').trim();
+        final @NotNull String oneLine = value.replace('\n', ' ').trim();
         if (oneLine.isEmpty()) return "(empty)";
 
         return oneLine.length() <= SHOWN ? oneLine : oneLine.substring(0, SHOWN - 1) + "…";
@@ -108,7 +107,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
 
     @Override
     protected void submit() {
-        final Set<String> takeTheirs = new LinkedHashSet<>();
+        final @NotNull Set<String> takeTheirs = new LinkedHashSet<>();
 
         for (int i = 0; i < questions.size(); i++) {
             if (answers.get(i).getSelected()) takeTheirs.add(questions.get(i).field());

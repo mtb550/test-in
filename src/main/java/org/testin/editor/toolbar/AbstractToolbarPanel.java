@@ -75,7 +75,7 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     }
 
     protected void layoutComponents() {
-        final GridBagConstraints gbc = new GridBagConstraints();
+        final @NotNull GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.NONE;

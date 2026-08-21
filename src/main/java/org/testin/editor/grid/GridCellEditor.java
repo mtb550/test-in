@@ -29,7 +29,7 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
         textArea.setWrapStyleWord(true);
         textArea.setOpaque(true);
 
-        final KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+        final @NotNull KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
         textArea.getInputMap().put(enter, "stopEditing");
         textArea.getActionMap().put("stopEditing", new AbstractAction() {
             @Override

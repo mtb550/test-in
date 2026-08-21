@@ -35,7 +35,7 @@ final class RunExecutionTimer implements Disposable {
     void start(final @NotNull TestRunItems item, final @NotNull Runnable repaint) {
         stop();
 
-        final Duration alreadyCounted = item.getDuration();
+        final @NotNull Duration alreadyCounted = item.getDuration();
         startedAt = System.currentTimeMillis();
 
         timer = new Timer(1000, ignored -> {

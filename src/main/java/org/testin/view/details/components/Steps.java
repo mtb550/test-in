@@ -19,19 +19,19 @@ public class Steps extends BaseDetails {
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int row) {
 
-        final List<String> steps = dto.getSteps();
+        final @NotNull List<String> steps = dto.getSteps();
 
         if (steps.isEmpty() || steps.stream().allMatch(String::isBlank))
             return row;
 
-        final JBPanel<?> stepsContainer = new JBPanel<>();
+        final @NotNull JBPanel<?> stepsContainer = new JBPanel<>();
         stepsContainer.setLayout(new BoxLayout(stepsContainer, BoxLayout.Y_AXIS));
         stepsContainer.setOpaque(false);
 
         for (int i = 0; i < steps.size(); i++) {
             if (steps.get(i).isBlank()) continue;
 
-            final String stepText = (i + 1) + "- " + Display.format(steps.get(i));
+            final @NotNull String stepText = (i + 1) + "- " + Display.format(steps.get(i));
             final int marginBottom = (i == steps.size() - 1) ? 0 : MARGIN_BOTTOM_PER_STEP;
             stepsContainer.add(createStepComponent(stepText, marginBottom));
         }
@@ -40,7 +40,7 @@ public class Steps extends BaseDetails {
     }
 
     private @NotNull JTextArea createStepComponent(final @NotNull String text, final int marginBottom) {
-        final JTextArea stepArea = new JTextArea(text);
+        final @NotNull JTextArea stepArea = new JTextArea(text);
         stepArea.setFont(JBFont.label().deriveFont(Font.PLAIN, getValueFontSize()));
         stepArea.setLineWrap(true);
         stepArea.setWrapStyleWord(true);

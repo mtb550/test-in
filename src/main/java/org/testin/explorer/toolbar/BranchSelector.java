@@ -74,7 +74,7 @@ public class BranchSelector {
     }
 
     public void updateProject(final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
-        final Path path = testProjectDirectory.map(TestProjectDirectoryDto::getPath).orElse(Path.of(""));
+        final @NotNull Path path = testProjectDirectory.map(TestProjectDirectoryDto::getPath).orElse(Path.of(""));
         this.projectPath = path;
 
         isUpdating = true;
@@ -118,7 +118,7 @@ public class BranchSelector {
     private void onSelection(final @NotNull ActionEvent e) {
         if (isUpdating) return;
 
-        final String selectedBranch = getSelectedBranch();
+        final @NotNull String selectedBranch = getSelectedBranch();
 
         if (selectedBranch.isEmpty() || showingPlaceholder || selectedBranch.equals(currentBranch)) {
             return;
@@ -146,7 +146,7 @@ public class BranchSelector {
     private void checkoutBranchAndRefreshTree(final @NotNull String targetBranch) {
         // Captured before the task starts: the field can be reassigned by a
         // project switch while the checkout is still running.
-        final Path repositoryPath = projectPath;
+        final @NotNull Path repositoryPath = projectPath;
         if (repositoryPath.toString().isEmpty()) return;
 
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Checking branch " + targetBranch, false) {
@@ -186,7 +186,7 @@ public class BranchSelector {
                                              final int pending) {
         restoreSelectedBranch();
 
-        final String changes = pending == 1 ? "1 change" : pending + " changes";
+        final @NotNull String changes = pending == 1 ? "1 change" : pending + " changes";
 
         new ConfirmDialog(p, "Uncommitted Changes",
                 changes + " in this test project are not committed. Switching does not leave them behind - "
@@ -207,7 +207,7 @@ public class BranchSelector {
                 // Empty means the checkout did not happen; the git reason is
                 // already in testin.log, and the sentence worth showing is the
                 // one below rather than the command's output (#63).
-                final String checkedOut = git.checkout(repositoryPath, targetBranch);
+                final @NotNull String checkedOut = git.checkout(repositoryPath, targetBranch);
                 if (checkedOut.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() -> refuseSwitch(repositoryPath, targetBranch));
                     return;
@@ -234,7 +234,7 @@ public class BranchSelector {
     private void refuseSwitch(final @NotNull Path repositoryPath, final @NotNull String targetBranch) {
         restoreSelectedBranch();
 
-        final Notifier notifier = Services.getInstance(p, Notifier.class);
+        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
         notifier.warnWithAction(p, "Branch Not Switched",
                 targetBranch + " was not checked out. There are uncommitted changes in this test project "
                         + "that switching would overwrite - commit them first.",
@@ -272,8 +272,8 @@ public class BranchSelector {
                         ApplicationManager.getApplication().invokeLater(() ->
                                 Services.getInstance(p, Notifier.class).warn(p, "Git Fetch Warning", "Could not refresh remote branches: " + fetchError.getMessage()));
                     }
-                    final List<String> branches = git.getAvailableBranches(repositoryPath);
-                    final String loadedCurrentBranch = git.getCurrentBranch(repositoryPath);
+                    final @NotNull List<String> branches = git.getAvailableBranches(repositoryPath);
+                    final @NotNull String loadedCurrentBranch = git.getCurrentBranch(repositoryPath);
                     if (!loadedCurrentBranch.isEmpty()) currentBranch = loadedCurrentBranch;
 
                     ApplicationManager.getApplication().invokeLater(() -> {

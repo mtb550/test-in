@@ -48,7 +48,7 @@ public final class GridExcelBehavior {
     private static void installSequenceColumnRowSelection(final @NotNull JBTable table) {
         // Register ahead of the UI handler: listeners run in order, and ours must
         // consume the press before the table UI applies plain cell selection.
-        final MouseListener[] existing = table.getMouseListeners();
+        final MouseListener @NotNull[] existing = table.getMouseListeners();
         for (final MouseListener listener : existing) table.removeMouseListener(listener);
         table.addMouseListener(new SequenceColumnRowSelector(table));
         for (final MouseListener listener : existing) table.addMouseListener(listener);
@@ -60,12 +60,12 @@ public final class GridExcelBehavior {
 
     private static void installClipboardActions(final @NotNull JBTable table) {
         final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
-        final InputMap inputMap = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        final @NotNull InputMap inputMap = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask), "testin.grid.copy");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask), "testin.grid.cut");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask), "testin.grid.paste");
 
-        final ActionMap actionMap = table.getActionMap();
+        final @NotNull ActionMap actionMap = table.getActionMap();
         actionMap.put("testin.grid.copy", action(() -> copySelection(table, false)));
         actionMap.put("testin.grid.cut", action(() -> copySelection(table, true)));
         actionMap.put("testin.grid.paste", action(() -> pasteIntoSelection(table)));
@@ -85,12 +85,12 @@ public final class GridExcelBehavior {
         final int[] cols = table.getSelectedColumns();
         if (rows.length == 0 || cols.length == 0) return;
 
-        final StringBuilder sb = new StringBuilder();
+        final @NotNull StringBuilder sb = new StringBuilder();
         for (int r = 0; r < rows.length; r++) {
             if (r > 0) sb.append('\n');
             for (int c = 0; c < cols.length; c++) {
                 if (c > 0) sb.append('\t');
-                final Object value = table.getValueAt(rows[r], cols[c]);
+                final @NotNull Object value = table.getValueAt(rows[r], cols[c]);
                 sb.append(escapeTsvField(Objects.toString(value, "")));
             }
         }
@@ -110,7 +110,7 @@ public final class GridExcelBehavior {
     private static void pasteIntoSelection(final @NotNull JBTable table) {
         // An empty clipboard and a clipboard holding no text are the same
         // nothing to paste.
-        final String text = Objects.requireNonNullElse(
+        final @NotNull String text = Objects.requireNonNullElse(
                 CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor), "");
         if (text.isEmpty()) return;
 
@@ -118,12 +118,12 @@ public final class GridExcelBehavior {
         final int anchorCol = table.getSelectedColumn();
         if (anchorRow < 0 || anchorCol < 0) return;
 
-        final List<List<String>> block = parseTsv(text);
+        final @NotNull List<List<String>> block = parseTsv(text);
         if (block.isEmpty()) return;
 
         if (block.size() == 1 && block.getFirst().size() == 1) {
             // Single value: fill every selected cell, like Excel.
-            final String value = block.getFirst().getFirst();
+            final @NotNull String value = block.getFirst().getFirst();
             for (final int row : table.getSelectedRows()) {
                 for (final int col : table.getSelectedColumns()) {
                     if (table.isCellEditable(row, col)) {
@@ -139,7 +139,7 @@ public final class GridExcelBehavior {
             final int row = anchorRow + r;
             if (row >= table.getRowCount()) break;
 
-            final List<String> fields = block.get(r);
+            final @NotNull List<String> fields = block.get(r);
             for (int c = 0; c < fields.size(); c++) {
                 final int col = anchorCol + c;
                 if (col >= table.getColumnCount()) break;
@@ -166,9 +166,9 @@ public final class GridExcelBehavior {
      * quoted fields may contain tabs, newlines, and doubled quotes.
      */
     private static @NotNull List<List<String>> parseTsv(final @NotNull String text) {
-        final List<List<String>> records = new ArrayList<>();
+        final @NotNull List<List<String>> records = new ArrayList<>();
         List<String> fields = new ArrayList<>();
-        final StringBuilder current = new StringBuilder();
+        final @NotNull StringBuilder current = new StringBuilder();
         boolean inQuotes = false;
 
         for (int i = 0; i < text.length(); i++) {

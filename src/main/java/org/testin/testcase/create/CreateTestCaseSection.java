@@ -46,9 +46,9 @@ public interface CreateTestCaseSection {
     void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction);
 
     default @NotNull JBPanel<?> createIconPanel(final @NotNull Icon icon) {
-        final JBPanel<?> iconPanel = new JBPanel<>(new GridBagLayout());
+        final @NotNull JBPanel<?> iconPanel = new JBPanel<>(new GridBagLayout());
         iconPanel.setOpaque(false);
-        final JBLabel iconLabel = new JBLabel(icon);
+        final @NotNull JBLabel iconLabel = new JBLabel(icon);
         iconLabel.setBorder(JBUI.Borders.empty(0, 10, 0, 8));
         iconPanel.add(iconLabel);
         return iconPanel;

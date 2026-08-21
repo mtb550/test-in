@@ -97,15 +97,15 @@ public final class TestCaseCacheService implements Disposable {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             reloadScheduled.set(false);
 
-            final List<TestCaseDto> testCases = source.get();
+            final @NotNull List<TestCaseDto> testCases = source.get();
 
             // Built beside the live sets and swapped in, not cleared and refilled.
             // A dialog reading them while a deletion rebuilds would otherwise see
             // the completion briefly empty.
-            final Set<String> newDescriptions = ConcurrentHashMap.newKeySet();
-            final Set<String> newExpectedResults = ConcurrentHashMap.newKeySet();
-            final Set<String> newModules = ConcurrentHashMap.newKeySet();
-            final Set<String> newSteps = ConcurrentHashMap.newKeySet();
+            final @NotNull Set<String> newDescriptions = ConcurrentHashMap.newKeySet();
+            final @NotNull Set<String> newExpectedResults = ConcurrentHashMap.newKeySet();
+            final @NotNull Set<String> newModules = ConcurrentHashMap.newKeySet();
+            final @NotNull Set<String> newSteps = ConcurrentHashMap.newKeySet();
 
             for (final TestCaseDto tc : testCases) {
                 addTo(newDescriptions, tc.getDescription());

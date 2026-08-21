@@ -54,15 +54,15 @@ final class GitCommandRunner {
             throw new IllegalArgumentException("Expected a git command");
         }
 
-        final GitCommand gitCommand = commandFor(command[1]);
+        final @NotNull GitCommand gitCommand = commandFor(command[1]);
 
-        final GitLineHandler handler = new GitLineHandler(project, workingDirectory, gitCommand);
+        final @NotNull GitLineHandler handler = new GitLineHandler(project, workingDirectory, gitCommand);
         handler.addParameters(Arrays.copyOfRange(command, 2, command.length));
         if (!remoteUrl.isBlank()) handler.setUrl(remoteUrl);
 
-        final GitCommandResult result = Git.getInstance().runCommand(handler);
+        final @NotNull GitCommandResult result = Git.getInstance().runCommand(handler);
         if (!result.success()) {
-            final String details = result.getErrorOutputAsJoinedString().isBlank()
+            final @NotNull String details = result.getErrorOutputAsJoinedString().isBlank()
                     ? result.getOutputAsJoinedString()
                     : result.getErrorOutputAsJoinedString();
             Logger.error("Git command failed: " + details);

@@ -40,7 +40,7 @@ final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
 
     @Override
     protected void submit() {
-        final String value = component().getText().trim();
+        final @NotNull String value = component().getText().trim();
         if (value.isEmpty()) {
             component().showEmptyWarning();
             return;

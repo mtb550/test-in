@@ -15,12 +15,12 @@ public class RemoveJavaClass implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof DirectoryDto dir)) return;
 
-        final List<String> fqcn = Fqcn.ofClass(p, dir);
+        final @NotNull List<String> fqcn = Fqcn.ofClass(p, dir);
         if (fqcn.isEmpty()) return;
 
-        final String packagePath = String.join("/", fqcn.subList(0, fqcn.size() - 1));
-        final String className = fqcn.getLast();
-        final String fileName = className + ".java";
+        final @NotNull String packagePath = String.join("/", fqcn.subList(0, fqcn.size() - 1));
+        final @NotNull String className = fqcn.getLast();
+        final @NotNull String fileName = className + ".java";
 
         JavaSourceRoot.writeInRoot(p, "removing class", testSourceRoot ->
                 JavaSourceRoot.deleteUnder(testSourceRoot, packagePath + "/" + fileName, this));

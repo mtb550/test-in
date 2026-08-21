@@ -33,14 +33,14 @@ public class ActionIcons extends BaseDetails {
         // The run slot draws what clicking it does, not how the last run went: a
         // passed case used to show a green tick here, which reads as a verdict
         // and is one - the verdict is a badge now, below.
-        final CardHoverAction navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD;
-        final CardHoverAction run = CardHoverAction.runSlot(dto);
+        final @NotNull CardHoverAction navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD;
+        final @NotNull CardHoverAction run = CardHoverAction.runSlot(dto);
 
         // Neither icon is drawn in an IDE that cannot act on it, and a row with
         // no icons in it is no row at all.
         if (!navigate.isOffered() && !run.isOffered()) return currentRow;
 
-        final JBPanel<?> actionsPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        final @NotNull JBPanel<?> actionsPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         actionsPanel.setOpaque(false);
 
         if (navigate.isOffered()) actionsPanel.add(hoverIcon(navigate, p, dto));
@@ -64,9 +64,9 @@ public class ActionIcons extends BaseDetails {
      * cannot end up disagreeing about a button they both show.
      */
     private @NotNull JBLabel hoverIcon(final @NotNull CardHoverAction action, final @NotNull Project p, final @NotNull TestCaseDto dto) {
-        final JBLabel label = new JBLabel();
-        final Icon base = IconUtil.scale(action.getIcon(), label, BASE_SCALE);
-        final Icon hover = IconUtil.scale(action.getIcon(), label, HOVER_SCALE);
+        final @NotNull JBLabel label = new JBLabel();
+        final @NotNull Icon base = IconUtil.scale(action.getIcon(), label, BASE_SCALE);
+        final @NotNull Icon hover = IconUtil.scale(action.getIcon(), label, HOVER_SCALE);
         label.setIcon(base);
         label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 

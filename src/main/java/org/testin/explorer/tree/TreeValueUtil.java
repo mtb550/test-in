@@ -53,7 +53,7 @@ public final class TreeValueUtil {
      * The value a tree node carries, when it is of this kind.
      */
     public static <T> @NotNull Optional<T> valueOf(final @Nullable Object component, final @NotNull Class<T> type) {
-        final Object value = valueOf(component);
+        final @NotNull Object value = valueOf(component);
         return type.isInstance(value) ? Optional.of(type.cast(value)) : Optional.empty();
     }
 

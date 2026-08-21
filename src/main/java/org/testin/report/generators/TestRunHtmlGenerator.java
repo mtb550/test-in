@@ -33,11 +33,11 @@ public final class TestRunHtmlGenerator {
                                     final @NotNull Map<UUID, TestCaseDto> detailsMap) {
 
         // Compute summary stats
-        final List<TestRunItems> results = tr.getResults();
+        final @NotNull List<TestRunItems> results = tr.getResults();
         final int total = results.size();
         // One traversal counts every status; a new TestStatus constant is
         // included automatically instead of needing another filter pass.
-        final TestRunSummary summary = TestRunSummary.of(results);
+        final @NotNull TestRunSummary summary = TestRunSummary.of(results);
         final long passed = summary.passed();
         final long failed = summary.failed();
         final long blocked = summary.blocked();
@@ -45,17 +45,17 @@ public final class TestRunHtmlGenerator {
         final int passRate = summary.passRate();
 
         // Run-level metadata
-        final String runName = tr.getChangeLog().replace(".json", "");
-        final String platform = tr.getPlatform();
-        final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
-        final String testerRole = settings.testerRole;
-        final String executedBy = summary.executedBy();
-        final String executionStarted = Display.formatDate(tr.getExecutionStartedAt());
-        final String executionEnded = Display.formatDate(tr.getExecutionEndedAt());
-        final String runStatus = trDir.getMarker().getStatus().getLabel();
+        final @NotNull String runName = tr.getChangeLog().replace(".json", "");
+        final @NotNull String platform = tr.getPlatform();
+        final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        final @NotNull String testerRole = settings.testerRole;
+        final @NotNull String executedBy = summary.executedBy();
+        final @NotNull String executionStarted = Display.formatDate(tr.getExecutionStartedAt());
+        final @NotNull String executionEnded = Display.formatDate(tr.getExecutionEndedAt());
+        final @NotNull String runStatus = trDir.getMarker().getStatus().getLabel();
 
         // Project name
-        final String projectName = p.getName();
+        final @NotNull String projectName = p.getName();
 
         StringBuilder html = new StringBuilder();
 
@@ -179,12 +179,12 @@ public final class TestRunHtmlGenerator {
         html.append("<table class='detail-table'>")
                 .append("<tr><th>#</th><th>Test Case</th><th>Priority</th></tr>");
 
-        final AtomicInteger seq = new AtomicInteger(1);
+        final @NotNull AtomicInteger seq = new AtomicInteger(1);
         results.stream()
                 .filter(filter)
                 .forEach(item -> {
-                    final String desc = ReportedCase.of(detailsMap, item.getId()).getDescription();
-                    final String bugPriority = item.getBugPriority().name();
+                    final @NotNull String desc = ReportedCase.of(detailsMap, item.getId()).getDescription();
+                    final @NotNull String bugPriority = item.getBugPriority().name();
                     html.append("<tr>")
                             .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
                             .append("<td>").append(escapedHtml(desc)).append("</td>")

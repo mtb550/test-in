@@ -147,7 +147,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
      * jump to the other fields.
      */
     public StatusBarItem @NotNull [] getStatusBarItems() {
-        final List<StatusBarItem> items = new ArrayList<>();
+        final @NotNull List<StatusBarItem> items = new ArrayList<>();
         items.add(SAVE);
         items.add(CANCEL);
         items.addAll(List.of(ownKeys));

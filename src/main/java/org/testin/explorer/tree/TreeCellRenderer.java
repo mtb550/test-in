@@ -37,10 +37,10 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                 append(Objects.toString(value, ""), SimpleTextAttributes.REGULAR_ATTRIBUTES);
                 return;
             }
-            final DirectoryType type = dir.getType();
+            final @NotNull DirectoryType type = dir.getType();
 
             // Only a run has one; every other node is drawn as the kind it is.
-            final Optional<TestRunStatus> runStatus = dir instanceof TestRunDirectoryDto trDir
+            final @NotNull Optional<TestRunStatus> runStatus = dir instanceof TestRunDirectoryDto trDir
                     ? Optional.of(trDir.getMarker().getStatus())
                     : Optional.empty();
 

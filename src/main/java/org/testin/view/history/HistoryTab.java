@@ -16,7 +16,7 @@ public class HistoryTab {
     public void load(final @NotNull JBPanel<?> historyTab) {
         historyTab.removeAll();
 
-        final JBLabel emptyState = new JBLabel("No history available yet", SwingConstants.CENTER);
+        final @NotNull JBLabel emptyState = new JBLabel("No history available yet", SwingConstants.CENTER);
         emptyState.setForeground(UIUtil.getContextHelpForeground());
         emptyState.setBorder(JBUI.Borders.empty(20));
 

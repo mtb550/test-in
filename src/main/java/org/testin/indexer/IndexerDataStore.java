@@ -217,7 +217,7 @@ final class IndexerDataStore {
      */
     <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull String markerFileName,
                               final @NotNull Class<M> type, final @NotNull String kind, final @NotNull String name) {
-        final Path markerFile = dirPath.resolve(markerFileName);
+        final @NotNull Path markerFile = dirPath.resolve(markerFileName);
 
         // Asked before reading, because a marker that is not there yet is the
         // ordinary case: a node is created, its directory appears, and the marker
@@ -274,7 +274,7 @@ final class IndexerDataStore {
      */
     void refreshFile(final @NotNull Path file) {
         // Boundary: java.nio answers null for a path with no parent (#71).
-        final Optional<Path> parent = Optional.ofNullable(file.getParent());
+        final @NotNull Optional<Path> parent = Optional.ofNullable(file.getParent());
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             parent.ifPresent(dir -> LocalFileSystem.getInstance().refreshNioFiles(List.of(dir), false, false, null));
@@ -287,7 +287,7 @@ final class IndexerDataStore {
      * main directories, and every package, set and run beneath it.
      */
     void removeTestProject(final @NotNull Path path) {
-        final String pathStr = path.toString();
+        final @NotNull String pathStr = path.toString();
         testProjectsByPath.remove(pathStr);
         testCasesMainDirsByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
         testRunsMainDirsByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
@@ -310,7 +310,7 @@ final class IndexerDataStore {
     }
 
     private void removeTestSetsUnder(final @NotNull Path path) {
-        final List<String> toRemove = testSetsDirByPath.entrySet().stream()
+        final @NotNull List<String> toRemove = testSetsDirByPath.entrySet().stream()
                 .filter(entry -> entry.getValue().getPath().startsWith(path))
                 .map(Map.Entry::getKey)
                 .toList();
@@ -320,7 +320,7 @@ final class IndexerDataStore {
     }
 
     private void removeTestRunsUnder(final @NotNull Path path) {
-        final List<String> toRemove = testRunsDirByPath.entrySet().stream()
+        final @NotNull List<String> toRemove = testRunsDirByPath.entrySet().stream()
                 .filter(entry -> entry.getValue().getPath().startsWith(path))
                 .map(Map.Entry::getKey)
                 .toList();
@@ -328,7 +328,7 @@ final class IndexerDataStore {
             testRunsDirByPath.remove(key);
         }
 
-        final List<String> toRemoveRuns = testRunsByPath.keySet().stream()
+        final @NotNull List<String> toRemoveRuns = testRunsByPath.keySet().stream()
                 .filter(key -> Path.of(key).startsWith(path))
                 .toList();
         for (final String key : toRemoveRuns) {
@@ -337,7 +337,7 @@ final class IndexerDataStore {
     }
 
     void removeTestSet(final @NotNull Path path) {
-        final String pathStr = path.toString();
+        final @NotNull String pathStr = path.toString();
         testSetsDirByPath.remove(pathStr);
         testCaseStore.removeForTestSet(pathStr);
         childrenIndex.invalidate();
@@ -345,7 +345,7 @@ final class IndexerDataStore {
     }
 
     void removeTestRun(final @NotNull Path path) {
-        final String pathStr = path.toString();
+        final @NotNull String pathStr = path.toString();
         testRunsDirByPath.remove(pathStr);
         testRunsByPath.remove(pathStr);
         childrenIndex.invalidate();
@@ -353,7 +353,7 @@ final class IndexerDataStore {
     }
 
     void removeTestSetPackage(final @NotNull Path path) {
-        final String pathStr = path.toString();
+        final @NotNull String pathStr = path.toString();
         testSetPackagesByPath.remove(pathStr);
 
         removeTestSetPackagesUnder(path);
@@ -364,7 +364,7 @@ final class IndexerDataStore {
     }
 
     void removeTestRunPackage(final @NotNull Path path) {
-        final String pathStr = path.toString();
+        final @NotNull String pathStr = path.toString();
         testRunPackagesByPath.remove(pathStr);
 
         removeTestRunPackagesUnder(path);
@@ -412,8 +412,8 @@ final class IndexerDataStore {
     }
 
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
-        final String oldStr = oldPath.toString();
-        final String newStr = newPath.toString();
+        final @NotNull String oldStr = oldPath.toString();
+        final @NotNull String newStr = newPath.toString();
         // A node renamed to the top of the tree has nothing above it, which is
         // what a root is - so this stays the one nullable the model declares.
         final @Nullable DirectoryDto newParentDto = Optional.ofNullable(newPath.getParent())
@@ -456,7 +456,7 @@ final class IndexerDataStore {
 
     @NotNull
     Optional<DirectoryDto> findByPath(final @NotNull Path path) {
-        final String key = path.toString();
+        final @NotNull String key = path.toString();
 
         return dirMaps.stream()
                 .map(map -> map.get(key))
@@ -466,16 +466,16 @@ final class IndexerDataStore {
     }
 
     private <V extends DirectoryDto> void renameDescendants(final @NotNull Map<String, V> map, final @NotNull Path oldPath, final @NotNull Path newPath) {
-        final List<Map.Entry<String, V>> toUpdate = new ArrayList<>();
+        final @NotNull List<Map.Entry<String, V>> toUpdate = new ArrayList<>();
         for (final Map.Entry<String, V> e : map.entrySet()) {
-            final Path p = e.getValue().getPath();
+            final @NotNull Path p = e.getValue().getPath();
             if (p.startsWith(oldPath) && !p.equals(oldPath)) {
                 toUpdate.add(e);
             }
         }
         for (final Map.Entry<String, V> e : toUpdate) {
-            final V dto = e.getValue();
-            final Path newChildPath = newPath.resolve(oldPath.relativize(dto.getPath()));
+            final @NotNull V dto = e.getValue();
+            final @NotNull Path newChildPath = newPath.resolve(oldPath.relativize(dto.getPath()));
             map.remove(e.getKey());
             map.put(newChildPath.toString(), dto);
             dto.setPath(newChildPath);
@@ -484,22 +484,22 @@ final class IndexerDataStore {
     }
 
     private <V> void renameDescendantKeys(final @NotNull Map<String, V> map, final @NotNull Path oldPath, final @NotNull Path newPath) {
-        final List<String> toMove = new ArrayList<>();
+        final @NotNull List<String> toMove = new ArrayList<>();
         for (final String key : map.keySet()) {
-            final Path p = Path.of(key);
+            final @NotNull Path p = Path.of(key);
             if (p.startsWith(oldPath) && !p.equals(oldPath)) {
                 toMove.add(key);
             }
         }
         for (final String key : toMove) {
-            final V v = map.remove(key);
-            final Path newKey = newPath.resolve(oldPath.relativize(Path.of(key)));
+            final @NotNull V v = map.remove(key);
+            final @NotNull Path newKey = newPath.resolve(oldPath.relativize(Path.of(key)));
             map.put(newKey.toString(), v);
         }
     }
 
     private void rebuildPath2(final @NotNull DirectoryDto dto) {
-        final ArrayList<String> path2 = new ArrayList<>();
+        final @NotNull ArrayList<String> path2 = new ArrayList<>();
         for (final DirectoryDto ancestor : dto.selfAndAncestors()) {
             path2.addFirst(ancestor.getName());
         }
@@ -517,7 +517,7 @@ final class IndexerDataStore {
     private @NotNull Collection<DirectoryDto> allDirectories() {
         // Test projects are included too; they are roots (null parent) and are
         // simply skipped by the children index.
-        final List<DirectoryDto> directories = new ArrayList<>();
+        final @NotNull List<DirectoryDto> directories = new ArrayList<>();
         for (final Map<String, ? extends DirectoryDto> map : dirMaps) {
             directories.addAll(map.values());
         }

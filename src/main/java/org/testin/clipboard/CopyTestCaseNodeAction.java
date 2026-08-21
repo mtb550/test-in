@@ -34,7 +34,7 @@ public class CopyTestCaseNodeAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final List<TestCaseDto> tcs = list.getSelectedValuesList();
+        final @NotNull List<TestCaseDto> tcs = list.getSelectedValuesList();
 
         if (!tcs.isEmpty()) {
             try {

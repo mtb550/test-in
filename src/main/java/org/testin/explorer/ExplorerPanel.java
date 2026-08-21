@@ -115,7 +115,7 @@ public final class ExplorerPanel implements Disposable {
         // directory walk that reads a marker per project, and the threading rule
         // in CLAUDE.md keeps disk work off the thread that paints (#66).
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final Map<String, ProjectStatus> listing = Services.getInstance(p, ProjectIndexer.class).testProjects();
+            final @NotNull Map<String, ProjectStatus> listing = Services.getInstance(p, ProjectIndexer.class).testProjects();
 
             // Binding changes what indexing covers, so the answer is re-indexed
             // rather than redrawn - the same route every other binder takes.
@@ -126,7 +126,7 @@ public final class ExplorerPanel implements Disposable {
                 return;
             }
 
-            final PanelState state = state(listing);
+            final @NotNull PanelState state = state(listing);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (p.isDisposed()) return;
@@ -194,10 +194,10 @@ public final class ExplorerPanel implements Disposable {
      * the listing it decides from is the one that pass already read.
      */
     private boolean bindTheOnlyProject(final @NotNull Map<String, ProjectStatus> projects) {
-        final BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
+        final @NotNull BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
         if (bound.isNamed() || projects.size() != 1) return false;
 
-        final String only = projects.keySet().iterator().next();
+        final @NotNull String only = projects.keySet().iterator().next();
         if (!bound.bind(only)) return false;
 
         Logger.info("Bound to the only test project under the root: " + only);
@@ -228,7 +228,7 @@ public final class ExplorerPanel implements Disposable {
 
         panel.setLayout(new BorderLayout());
 
-        final JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
+        final @NotNull JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
         topBar.add(branchSelector.getComponent(), BorderLayout.SOUTH);
         panel.add(topBar, BorderLayout.NORTH);
 
@@ -244,7 +244,7 @@ public final class ExplorerPanel implements Disposable {
      * look at, or the line in {@code testin.yml} that says which one (#8).
      */
     private void showWelcome(final @NotNull PanelState state) {
-        final StatusText emptyText = panel.getEmptyText();
+        final @NotNull StatusText emptyText = panel.getEmptyText();
 
         emptyText.setText(String.format("Welcome to %s", Bundle.getPluginName()), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
         emptyText.appendLine("");
@@ -255,7 +255,7 @@ public final class ExplorerPanel implements Disposable {
         emptyText.appendLine("");
         emptyText.appendLine("");
 
-        final BoundTestProject boundProject = Services.getInstance(p, BoundTestProject.class);
+        final @NotNull BoundTestProject boundProject = Services.getInstance(p, BoundTestProject.class);
 
         switch (state) {
             case NO_ROOT -> emptyText.appendLine(
@@ -265,7 +265,7 @@ public final class ExplorerPanel implements Disposable {
                     e -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class));
 
             case CLONE_BOUND -> {
-                final String url = Services.getInstance(p, TestinConfigService.class).get().testinRepoUrl();
+                final @NotNull String url = Services.getInstance(p, TestinConfigService.class).get().testinRepoUrl();
 
                 emptyText.appendLine(boundProject.name() + " is not on this machine yet",
                         SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
@@ -287,7 +287,7 @@ public final class ExplorerPanel implements Disposable {
                 // Say why before offering the picker, so a binding that stopped
                 // resolving - a renamed folder, an archived project - reads as a
                 // fact and not as a first run.
-                final String problem = boundProject.problem(underRoot);
+                final @NotNull String problem = boundProject.problem(underRoot);
                 if (!problem.isEmpty()) {
                     emptyText.appendLine(problem, SimpleTextAttributes.ERROR_ATTRIBUTES, null);
                     emptyText.appendLine("");

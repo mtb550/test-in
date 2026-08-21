@@ -49,25 +49,25 @@ public class RemoveAction extends AbstractProjectTreeAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final List<DirectoryDto> nodesToRemove = getRemovableNodes(tree.getSelectionPaths());
+        final @NotNull List<DirectoryDto> nodesToRemove = getRemovableNodes(tree.getSelectionPaths());
         if (nodesToRemove.isEmpty()) return;
 
         // What it holds goes in the message, under the question. The row below
         // carries the path, captioned "From", and a second captioned row would
         // read as a destination. A test project takes every test set, case and run inside
         // it, and removal is not recorded by the undo service.
-        final String holds = nodesToRemove.size() == 1
+        final @NotNull String holds = nodesToRemove.size() == 1
                 ? Services.getInstance(p, ProjectIndexer.class).contentsUnder(nodesToRemove.getFirst().getPath()).describe()
                 : "";
 
-        final String msg = (nodesToRemove.size() == 1
+        final @NotNull String msg = (nodesToRemove.size() == 1
                 ? "Remove '" + nodesToRemove.getFirst().getName() + "'?"
                 : "Remove these " + nodesToRemove.size() + " items?")
                 + (holds.isEmpty() ? "" : System.lineSeparator() + holds);
 
         // Single node: its path shows exactly what is being deleted. Several, and
         // there is no one path to show, which the dialog reads as no From row.
-        final String from = nodesToRemove.size() == 1 ? nodesToRemove.getFirst().getPath().toString() : "";
+        final @NotNull String from = nodesToRemove.size() == 1 ? nodesToRemove.getFirst().getPath().toString() : "";
         new ConfirmDialog(p, "Confirm Removing", msg, from, "", "Remove", () -> removeNodes(nodesToRemove)).show();
     }
 
@@ -77,13 +77,13 @@ public class RemoveAction extends AbstractProjectTreeAction {
         // Removal is asynchronous now, so the tree is rebuilt once the last node
         // is actually gone rather than immediately after the loop - at which
         // point none of them would have been removed yet.
-        final AtomicInteger pending = new AtomicInteger(nodesToRemove.size());
-        final AtomicInteger removed = new AtomicInteger();
+        final @NotNull AtomicInteger pending = new AtomicInteger(nodesToRemove.size());
+        final @NotNull AtomicInteger removed = new AtomicInteger();
 
         // Both outcomes drain the counter so the tree is rebuilt either way; only
         // the ones that actually went are counted. A fixed container reports
         // false - it is never removed, and used to be reported as if it were.
-        final Consumer<Boolean> onRemoved = wasRemoved -> {
+        final @NotNull Consumer<Boolean> onRemoved = wasRemoved -> {
             if (wasRemoved) removed.incrementAndGet();
             if (pending.decrementAndGet() != 0) return;
 

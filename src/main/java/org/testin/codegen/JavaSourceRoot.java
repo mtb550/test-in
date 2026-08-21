@@ -51,11 +51,11 @@ public final class JavaSourceRoot {
      * root stopped being valid, which is what happens when the folder is deleted.
      */
     public static @NotNull Optional<VirtualFile> find(final @NotNull Project p) {
-        final Optional<VirtualFile> cached = Config.testSourceRoot();
+        final @NotNull Optional<VirtualFile> cached = Config.testSourceRoot();
         if (cached.isPresent()) return cached;
 
         for (final Module module : ModuleManager.getInstance(p).getModules()) {
-            final List<VirtualFile> sourceRoots = ModuleRootManager.getInstance(module)
+            final @NotNull List<VirtualFile> sourceRoots = ModuleRootManager.getInstance(module)
                     .getSourceRoots(JavaSourceRootType.TEST_SOURCE);
 
             if (!sourceRoots.isEmpty()) {
@@ -74,7 +74,7 @@ public final class JavaSourceRoot {
      * something - the tester is left wondering why no code appeared otherwise.
      */
     public static @NotNull Optional<VirtualFile> findOrWarn(final @NotNull Project p) {
-        final Optional<VirtualFile> root = find(p);
+        final @NotNull Optional<VirtualFile> root = find(p);
         if (root.isEmpty()) {
             Services.getInstance(p, Notifier.class).softShow(p,
                     "Java Test Source Not Found",
@@ -111,18 +111,18 @@ public final class JavaSourceRoot {
      */
     public static void deleteUnder(final @NotNull VirtualFile root, final @NotNull String relativePath,
                                    final @NotNull Object requestor) throws IOException {
-        final Optional<VirtualFile> found = under(root, relativePath).filter(VirtualFile::exists);
+        final @NotNull Optional<VirtualFile> found = under(root, relativePath).filter(VirtualFile::exists);
         if (found.isEmpty()) return;
 
-        final VirtualFile target = found.orElseThrow();
+        final @NotNull VirtualFile target = found.orElseThrow();
         target.delete(requestor);
         Logger.info("Removed generated code at: " + target.getPath());
     }
 
     public static @NotNull Optional<VirtualFile> packageFolder(final @NotNull VirtualFile root,
                                                                final @NotNull List<String> packageSegments) throws IOException {
-        final String relative = String.join("/", packageSegments);
-        final Optional<VirtualFile> folder = Optional.ofNullable(VfsUtil.createDirectoryIfMissing(root, relative));
+        final @NotNull String relative = String.join("/", packageSegments);
+        final @NotNull Optional<VirtualFile> folder = Optional.ofNullable(VfsUtil.createDirectoryIfMissing(root, relative));
 
         if (folder.isEmpty()) Logger.error("Could not create the package folder: " + relative);
         return folder;
@@ -145,21 +145,21 @@ public final class JavaSourceRoot {
     public static @NotNull Optional<VirtualFile> classFile(final @NotNull VirtualFile root,
                                                            final @NotNull List<String> packageSegments,
                                                            final @NotNull String className) throws IOException {
-        final Optional<VirtualFile> folder = packageFolder(root, packageSegments);
+        final @NotNull Optional<VirtualFile> folder = packageFolder(root, packageSegments);
         if (folder.isEmpty()) return Optional.empty();
 
-        final String fileName = className + ".java";
-        final Optional<VirtualFile> existing = Optional.ofNullable(folder.get().findChild(fileName));
+        final @NotNull String fileName = className + ".java";
+        final @NotNull Optional<VirtualFile> existing = Optional.ofNullable(folder.get().findChild(fileName));
 
         if (existing.isPresent()) {
             Logger.info("Test class already exists: " + existing.get().getPath());
             return existing;
         }
 
-        final String packageName = String.join(".", packageSegments);
-        final String declaration = packageName.isEmpty() ? "" : "package " + packageName + ";\n\n";
+        final @NotNull String packageName = String.join(".", packageSegments);
+        final @NotNull String declaration = packageName.isEmpty() ? "" : "package " + packageName + ";\n\n";
 
-        final VirtualFile file = folder.get().createChildData(JavaSourceRoot.class, fileName);
+        final @NotNull VirtualFile file = folder.get().createChildData(JavaSourceRoot.class, fileName);
         VfsUtil.saveText(file, declaration + "public class " + className + " {\n\n}\n");
 
         Logger.info("Test class created at: " + file.getPath());
@@ -171,7 +171,7 @@ public final class JavaSourceRoot {
      * none. For a caller already inside a write action of its own.
      */
     public static void inRoot(final @NotNull Project p, final @NotNull RootWork work) throws IOException {
-        final Optional<VirtualFile> root = find(p);
+        final @NotNull Optional<VirtualFile> root = find(p);
         if (root.isPresent()) work.run(root.get());
     }
 
@@ -180,7 +180,7 @@ public final class JavaSourceRoot {
      * {@link #findOrWarn}.
      */
     public static void inRootOrWarn(final @NotNull Project p, final @NotNull RootWork work) throws IOException {
-        final Optional<VirtualFile> root = findOrWarn(p);
+        final @NotNull Optional<VirtualFile> root = findOrWarn(p);
         if (root.isPresent()) work.run(root.get());
     }
 

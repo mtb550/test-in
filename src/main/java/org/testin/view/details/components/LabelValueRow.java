@@ -43,7 +43,7 @@ public final class LabelValueRow {
 
         if (valueText.trim().isEmpty()) return row;
 
-        final JTextArea valueArea = new JTextArea(valueText);
+        final @NotNull JTextArea valueArea = new JTextArea(valueText);
         valueArea.setFont(JBFont.label().deriveFont(Font.PLAIN, valueFontSize));
         valueArea.setLineWrap(true);
         valueArea.setWrapStyleWord(true);
@@ -67,11 +67,11 @@ public final class LabelValueRow {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = JBUI.insets(LABEL_INSETS_TOP, LABEL_INSETS_LEFT, LABEL_INSETS_BOTTOM, LABEL_INSETS_RIGHT);
 
-        final JBLabel label = new JBLabel(labelText);
+        final @NotNull JBLabel label = new JBLabel(labelText);
         label.setForeground(JBColor.GRAY);
         label.setFont(JBFont.label().deriveFont(Font.BOLD, labelFontSize));
 
-        final Dimension prefSize = label.getPreferredSize();
+        final @NotNull Dimension prefSize = label.getPreferredSize();
         label.setPreferredSize(new Dimension(LABEL_WIDTH, prefSize.height));
         label.setMinimumSize(new Dimension(LABEL_WIDTH, prefSize.height));
 

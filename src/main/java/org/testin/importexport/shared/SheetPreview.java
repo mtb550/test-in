@@ -59,9 +59,9 @@ public final class SheetPreview implements DialogComponent {
         }
 
         for (final Map.Entry<String, List<TestCaseDto>> entry : sheets.entrySet()) {
-            final List<TestCaseDto> testCases = entry.getValue();
+            final @NotNull List<TestCaseDto> testCases = entry.getValue();
 
-            final DefaultTableModel model = new TablePanelBuilder().createModel(p, attributes, testCases);
+            final @NotNull DefaultTableModel model = new TablePanelBuilder().createModel(p, attributes, testCases);
             // Without this an edited cell is shown and then dropped: the model
             // holds it, and nothing carries it back to the test case.
             model.addTableModelListener(new CellEditListener(attributes, p, testCases));
@@ -84,15 +84,15 @@ public final class SheetPreview implements DialogComponent {
      * empty result means the tester selected nothing at all.
      */
     public @NotNull Map<String, List<TestCaseDto>> selected() {
-        final Map<String, List<TestCaseDto>> selectedBySheet = new LinkedHashMap<>();
+        final @NotNull Map<String, List<TestCaseDto>> selectedBySheet = new LinkedHashMap<>();
 
         for (final Map.Entry<String, List<TestCaseDto>> entry : sheets.entrySet()) {
             // A sheet the preview never built a table for shows nothing, so
             // nothing of it is selected.
-            final DefaultTableModel model = models.getOrDefault(entry.getKey(), NO_MODEL);
+            final @NotNull DefaultTableModel model = models.getOrDefault(entry.getKey(), NO_MODEL);
 
-            final List<TestCaseDto> casesInSheet = entry.getValue();
-            final List<TestCaseDto> selected = new ArrayList<>();
+            final @NotNull List<TestCaseDto> casesInSheet = entry.getValue();
+            final @NotNull List<TestCaseDto> selected = new ArrayList<>();
 
             for (int row = 0; row < model.getRowCount(); row++) {
                 if (Boolean.TRUE.equals(model.getValueAt(row, 0))) selected.add(casesInSheet.get(row));

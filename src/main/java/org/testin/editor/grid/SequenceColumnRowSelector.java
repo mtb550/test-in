@@ -30,7 +30,7 @@ final class SequenceColumnRowSelector extends MouseAdapter {
         if (viewRow < 0 || viewCol < 0) return;
         if (!GridPanelBuilder.isOrderColumn(table, viewCol)) return;
 
-        final ListSelectionModel rows = table.getSelectionModel();
+        final @NotNull ListSelectionModel rows = table.getSelectionModel();
 
         if (e.isShiftDown()) {
             final int anchor = rows.getAnchorSelectionIndex();

@@ -22,7 +22,7 @@ final class RemoveStepShortcutAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        final @NotNull Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
         if (UIUtil.isDescendingFrom(focusOwner, stepField)) {
             removeStep.run();
         }

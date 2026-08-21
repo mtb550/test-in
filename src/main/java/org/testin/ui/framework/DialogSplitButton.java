@@ -38,8 +38,8 @@ public final class DialogSplitButton implements DialogComponent {
 
         chosen = labels.getFirst();
 
-        final Action main = action(labels.getFirst());
-        final Action[] alternatives = labels.stream().skip(1).map(this::action).toArray(Action[]::new);
+        final @NotNull Action main = action(labels.getFirst());
+        final Action @NotNull[] alternatives = labels.stream().skip(1).map(this::action).toArray(Action[]::new);
 
         button = new JBOptionButton(main, alternatives.length == 0 ? null : alternatives);
 

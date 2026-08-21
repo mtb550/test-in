@@ -44,7 +44,7 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
         title = "Import Test Cases";
 
         preview = new SheetPreview(p, importAttributes);
-        final SourceForm form = new SourceForm(p, importAttributes, importLoader, preview::show);
+        final @NotNull SourceForm form = new SourceForm(p, importAttributes, importLoader, preview::show);
 
         components = List.of(
                 ComponentDialogBase.of(form),
@@ -70,7 +70,7 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
             return;
         }
 
-        final Map<String, List<TestCaseDto>> selected = preview.selected();
+        final @NotNull Map<String, List<TestCaseDto>> selected = preview.selected();
         if (selected.isEmpty()) {
             Services.getInstance(p, Notifier.class).softShow(p, "Import Empty", "Select at least one test case to import.");
             return;

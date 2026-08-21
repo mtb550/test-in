@@ -53,13 +53,13 @@ public class RenameAction extends AbstractProjectTreeAction {
         // rename. Asked first because applyRename resolves the new path against
         // the parent and would throw on null - the collision check below already
         // guarded for it while the rename itself did not (#66, F3).
-        final Optional<Path> found = Optional.ofNullable(dir.getPath().getParent());
+        final @NotNull Optional<Path> found = Optional.ofNullable(dir.getPath().getParent());
         if (found.isEmpty()) {
             Logger.warn("Rename refused, no parent directory: " + dir.getPath());
             return;
         }
 
-        final Path parent = found.orElseThrow();
+        final @NotNull Path parent = found.orElseThrow();
 
         // A sibling with the new name would make the VFS rename fail with
         // "already exists" - reject it with a message instead. Existence comes
@@ -69,7 +69,7 @@ public class RenameAction extends AbstractProjectTreeAction {
             return;
         }
 
-        final String oldName = dir.getName();
+        final @NotNull String oldName = dir.getName();
         applyRename(dir, newName, () -> Services.getInstance(p, Notifier.class).softShow(p, "Renamed"));
 
         // The dto reference stays valid across renames, so undo and redo are
@@ -100,8 +100,8 @@ public class RenameAction extends AbstractProjectTreeAction {
             dir.getType().getRenameCodegen().execute(p, new Renamed(dir, newName));
         }
 
-        final Path oldPath = dir.getPath();
-        final Path newPath = oldPath.getParent().resolve(newName);
+        final @NotNull Path oldPath = dir.getPath();
+        final @NotNull Path newPath = oldPath.getParent().resolve(newName);
 
         // The tree refreshes only after the indexer finished the VFS rename
         // and updated its cache - refreshing earlier shows stale state.

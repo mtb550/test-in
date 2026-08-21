@@ -59,12 +59,12 @@ public class DetailsTab {
 
     private void renderCase(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab,
                             final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
-        final JBPanel<?> contentPanel = new JBPanel<>(new GridBagLayout());
+        final @NotNull JBPanel<?> contentPanel = new JBPanel<>(new GridBagLayout());
         contentPanel.setOpaque(false);
 
         renderStoneLayout(p, contentPanel, dto, currentPath);
 
-        final JBScrollPane scrollPane = new JBScrollPane(contentPanel);
+        final @NotNull JBScrollPane scrollPane = new JBScrollPane(contentPanel);
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
 
@@ -78,14 +78,14 @@ public class DetailsTab {
     private void renderPlaceholder(final @NotNull JBPanel<?> panel) {
         panel.setLayout(new BorderLayout());
         panel.setBorder(JBUI.Borders.empty(25, 16, 0, 0));
-        final JBLabel placeholder = new JBLabel(PLACEHOLDER_TEXT);
+        final @NotNull JBLabel placeholder = new JBLabel(PLACEHOLDER_TEXT);
         placeholder.setForeground(JBColor.GRAY);
         placeholder.setFont(JBFont.label().deriveFont(FontSync.getBaseFontSize()));
         panel.add(placeholder, BorderLayout.NORTH);
     }
 
     private void renderStoneLayout(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
-        final GridBagConstraints gbc = new GridBagConstraints();
+        final @NotNull GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = JBUI.insets(INSETS_DEFAULT);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -134,7 +134,7 @@ public class DetailsTab {
     }
 
     private void addVerticalSpacer(final @NotNull JBPanel<?> panel, final int lastRow) {
-        final GridBagConstraints spacerGbc = new GridBagConstraints();
+        final @NotNull GridBagConstraints spacerGbc = new GridBagConstraints();
         spacerGbc.gridy = lastRow;
         spacerGbc.weighty = SPACER_WEIGHT_Y;
         panel.add(Box.createVerticalGlue(), spacerGbc);
@@ -162,10 +162,10 @@ public class DetailsTab {
     }
 
     private void openUpdateMenu(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
-        final List<TestCaseDto> items = List.of(dto);
+        final @NotNull List<TestCaseDto> items = List.of(dto);
 
         new TestCaseUpdateMenuDialog(p, items, (tcs, gt) -> {
-            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             resolveEditPath(p, dto, currentPath).ifPresent(editPath ->
                     tcs.forEach(tc -> indexer.putTestCase(editPath, tc)));
@@ -183,7 +183,7 @@ public class DetailsTab {
      */
     private @NotNull Optional<Path> resolveEditPath(final @NotNull Project p, final @NotNull TestCaseDto dto,
                                                     final @NotNull List<String> currentPath) {
-        final DirectoryDto parent = dto.getParent();
+        final @NotNull DirectoryDto parent = dto.getParent();
         if (!parent.getPath().toString().isEmpty()) {
             return Optional.of(parent.getPath());
         }
@@ -191,7 +191,7 @@ public class DetailsTab {
         if (currentPath.isEmpty()) return Optional.empty();
 
         // The platform answers null for a project with no directory of its own.
-        final Path basePath = Path.of(Objects.toString(p.getBasePath(), ""));
+        final @NotNull Path basePath = Path.of(Objects.toString(p.getBasePath(), ""));
 
         Path root = Services.getInstance(p, TestinRoot.class).getPath();
         if (root.toString().isEmpty()) root = basePath;

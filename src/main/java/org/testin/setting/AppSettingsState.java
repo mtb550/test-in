@@ -41,7 +41,7 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
     }
 
     private static @NotNull String orDefault(final @Nullable String value, final @NotNull String fallback) {
-        final String stored = orEmpty(value);
+        final @NotNull String stored = orEmpty(value);
         return stored.isBlank() ? fallback : stored;
     }
 

@@ -22,10 +22,10 @@ public class Title extends BaseDetails {
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
 
-        final String titleText = Display.format(dto.getDescription());
-        final String finalValue = titleText.trim().isEmpty() ? "-" : titleText;
+        final @NotNull String titleText = Display.format(dto.getDescription());
+        final @NotNull String finalValue = titleText.trim().isEmpty() ? "-" : titleText;
 
-        final JTextArea mainTitleArea = new JTextArea(finalValue);
+        final @NotNull JTextArea mainTitleArea = new JTextArea(finalValue);
 
         final float titleFontSize = FontSync.getBaseFontSize();
         mainTitleArea.setFont(JBFont.label().deriveFont(Font.BOLD, titleFontSize));

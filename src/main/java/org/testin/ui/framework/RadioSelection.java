@@ -24,14 +24,14 @@ public final class RadioSelection<T> implements DialogComponent {
     RadioSelection(final @NotNull String caption, final @NotNull List<Option<T>> options, final @NotNull T initial) {
         this.selected = initial;
 
-        final Font radioFont = JBFont.label().biggerOn(2f);
-        final ButtonGroup group = new ButtonGroup();
-        final JBPanel<?> radioRow = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        final @NotNull Font radioFont = JBFont.label().biggerOn(2f);
+        final @NotNull ButtonGroup group = new ButtonGroup();
+        final @NotNull JBPanel<?> radioRow = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 8, 0));
         radioRow.setOpaque(false);
 
         Optional<JRadioButton> first = Optional.empty();
         for (final Option<T> option : options) {
-            final JRadioButton radio = new JRadioButton(option.name());
+            final @NotNull JRadioButton radio = new JRadioButton(option.name());
             radio.setFont(radioFont);
             radio.setOpaque(false);
             radio.setSelected(option.value().equals(initial));

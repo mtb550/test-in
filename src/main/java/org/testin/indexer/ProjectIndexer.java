@@ -78,7 +78,7 @@ public final class ProjectIndexer {
                 return;
             }
 
-            final Path absoluteRoot = absoluteRoot();
+            final @NotNull Path absoluteRoot = absoluteRoot();
             if (absoluteRoot.toString().isEmpty()) {
                 indexing.set(false);
                 indexed.set(true);
@@ -86,7 +86,7 @@ public final class ProjectIndexer {
                 return;
             }
 
-            final List<Path> validProjects = boundOnly(collectValidProjects(absoluteRoot));
+            final @NotNull List<Path> validProjects = boundOnly(collectValidProjects(absoluteRoot));
             if (validProjects.isEmpty()) {
                 indexing.set(false);
                 indexed.set(true);
@@ -99,7 +99,7 @@ public final class ProjectIndexer {
             Logger.info("Indexing " + validProjects.size() + " projects..");
 
             for (final Path projectPath : validProjects) {
-                final String projectName = projectPath.getFileName().toString();
+                final @NotNull String projectName = projectPath.getFileName().toString();
 
                 ProgressManager.getInstance()
                         .run(new Task.Backgroundable(p, "Testin indexing - " + projectName, true) {
@@ -191,7 +191,7 @@ public final class ProjectIndexer {
      * the project listing can never disagree about where the root is.
      */
     private @NotNull Path absoluteRoot() {
-        final Path rootPath = Services.getInstance(p, TestinRoot.class).getPath();
+        final @NotNull Path rootPath = Services.getInstance(p, TestinRoot.class).getPath();
         if (rootPath.toString().isEmpty() || rootPath.isAbsolute()) return rootPath;
 
         return Optional.ofNullable(p.getBasePath()).map(base -> Path.of(base, rootPath.toString())).orElse(rootPath);
@@ -206,10 +206,10 @@ public final class ProjectIndexer {
      * it is the only screen that has a use for the others.
      */
     private @NotNull List<Path> boundOnly(final @NotNull List<Path> projects) {
-        final String bound = Services.getInstance(p, BoundTestProject.class).name();
+        final @NotNull String bound = Services.getInstance(p, BoundTestProject.class).name();
         if (bound.isEmpty()) return projects;
 
-        final List<Path> scoped = projects.stream()
+        final @NotNull List<Path> scoped = projects.stream()
                 .filter(path -> bound.equals(path.getFileName().toString()))
                 .toList();
 
@@ -232,12 +232,12 @@ public final class ProjectIndexer {
      * projects that were never indexed, which is exactly what the cache cannot do.
      */
     public @NotNull Map<String, ProjectStatus> testProjects() {
-        final Map<String, ProjectStatus> byName = new LinkedHashMap<>();
-        final Path root = absoluteRoot();
+        final @NotNull Map<String, ProjectStatus> byName = new LinkedHashMap<>();
+        final @NotNull Path root = absoluteRoot();
         if (root.toString().isEmpty()) return byName;
 
         for (final Path path : collectValidProjects(root)) {
-            final String name = path.getFileName().toString();
+            final @NotNull String name = path.getFileName().toString();
             try {
                 byName.put(name, Services.getInstance(p, DirectoryMapper.class)
                         .getTestProjectNode(p, path).getMarker().getStatus());
@@ -265,7 +265,7 @@ public final class ProjectIndexer {
 
         if (projectPaths.length == 0) return Collections.emptyList();
 
-        final List<Path> valid = new ArrayList<>();
+        final @NotNull List<Path> valid = new ArrayList<>();
         Arrays.stream(projectPaths).forEach(p -> {
             if (Files.exists(p.resolve(DirectoryType.TP.getMarker()))) {
                 valid.add(p);
@@ -305,7 +305,7 @@ public final class ProjectIndexer {
      * tester picked out themselves is still walked: they asked for it by name.
      */
     public @NotNull List<TestCaseDto> getTestCasesUnder(final @NotNull DirectoryDto dir) {
-        final List<TestCaseDto> cases = new ArrayList<>(getTestCasesForTestSet(dir.getPath()));
+        final @NotNull List<TestCaseDto> cases = new ArrayList<>(getTestCasesForTestSet(dir.getPath()));
 
         for (final DirectoryDto child : getChildren(dir.getPath())) {
             if (child.isRetired()) continue;
@@ -532,14 +532,14 @@ public final class ProjectIndexer {
     public void moveNode(final @NotNull Path oldPath,
                          final @NotNull Path newPath,
                          final @NotNull Consumer<@NotNull Boolean> onFinished) {
-        final Optional<Path> found = Optional.ofNullable(newPath.getParent());
+        final @NotNull Optional<Path> found = Optional.ofNullable(newPath.getParent());
         if (found.isEmpty()) {
             Logger.warn("Move refused, target has no parent directory: " + newPath);
             onFinished.accept(false);
             return;
         }
 
-        final Path targetParent = found.orElseThrow();
+        final @NotNull Path targetParent = found.orElseThrow();
 
         Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, targetParent, "Move Failed", (sourceVf, targetVf) -> {
             try {
@@ -569,27 +569,27 @@ public final class ProjectIndexer {
             return;
         }
 
-        final AtomicInteger pending = new AtomicInteger(sourcePaths.size());
-        final AtomicInteger copied = new AtomicInteger();
+        final @NotNull AtomicInteger pending = new AtomicInteger(sourcePaths.size());
+        final @NotNull AtomicInteger copied = new AtomicInteger();
 
         // Both outcomes drain the counter, so the tree is still rebuilt when a
         // copy fails; only the success path raises the count.
-        final Runnable operationFinished = () -> {
+        final @NotNull Runnable operationFinished = () -> {
             if (pending.decrementAndGet() != 0) return;
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 refreshIndexedProject(targetPath);
                 ApplicationManager.getApplication().invokeLater(() -> onComplete.accept(copied.get()));
             });
         };
-        final Runnable operationSucceeded = () -> {
+        final @NotNull Runnable operationSucceeded = () -> {
             copied.incrementAndGet();
             operationFinished.run();
         };
 
         for (final Path sourcePath : sourcePaths) {
-            final Path copiedRoot = targetPath.resolve(sourcePath.getFileName());
+            final @NotNull Path copiedRoot = targetPath.resolve(sourcePath.getFileName());
 
-            final Runnable copySucceeded = () -> {
+            final @NotNull Runnable copySucceeded = () -> {
                 reidentifyCopiedCases(copiedRoot);
                 operationSucceeded.run();
             };
@@ -645,7 +645,7 @@ public final class ProjectIndexer {
      * kind and a run for its folder, so neither answers true.
      */
     private static boolean isCaseFile(final @NotNull Path file) {
-        final String name = file.getFileName().toString();
+        final @NotNull String name = file.getFileName().toString();
         if (!name.endsWith(".json")) return false;
 
         try {
@@ -658,8 +658,8 @@ public final class ProjectIndexer {
 
     private void reidentify(final @NotNull Path caseFile) {
         try {
-            final TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(caseFile.toFile(), TestCaseDto.class);
-            final UUID fresh = UUID.randomUUID();
+            final @NotNull TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(caseFile.toFile(), TestCaseDto.class);
+            final @NotNull UUID fresh = UUID.randomUUID();
 
             tc.setId(fresh);
             Services.getInstance(p, FilesUtil.class).write(p, caseFile.resolveSibling(fresh + ".json"), tc);

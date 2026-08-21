@@ -30,10 +30,10 @@ public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
 
     @Override
     protected @NotNull List<List<String>> extractOriginalValues(final @NotNull List<TestCaseDto> items) {
-        final List<List<String>> originalGroups = new ArrayList<>();
+        final @NotNull List<List<String>> originalGroups = new ArrayList<>();
 
         for (final TestCaseDto tc : items) {
-            final List<String> groupStrings = new ArrayList<>();
+            final @NotNull List<String> groupStrings = new ArrayList<>();
             for (final Group g : tc.getGroup()) {
                 groupStrings.add(g.name());
             }
@@ -46,14 +46,14 @@ public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
     @Override
     protected void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<List<String>> newValues) {
         for (int i = 0; i < items.size(); i++) {
-            final List<Group> enumList = new ArrayList<>();
+            final @NotNull List<Group> enumList = new ArrayList<>();
 
             for (final String str : newValues.get(i)) {
-                final String cleanStr = Objects.toString(str, "").trim();
+                final @NotNull String cleanStr = Objects.toString(str, "").trim();
 
                 if (!cleanStr.isEmpty()) {
                     try {
-                        final Group g = Group.valueOf(cleanStr.toUpperCase());
+                        final @NotNull Group g = Group.valueOf(cleanStr.toUpperCase());
                         if (!enumList.contains(g)) {
                             enumList.add(g);
                         }

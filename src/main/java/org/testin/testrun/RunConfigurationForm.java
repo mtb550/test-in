@@ -41,20 +41,20 @@ public class RunConfigurationForm implements DialogComponent {
     }
 
     private @NotNull JBPanel<?> buildConfigurationPanel(final @NotNull String runName) {
-        final JBPanel<?> configurationPanel = new JBPanel<>(new GridBagLayout());
+        final @NotNull JBPanel<?> configurationPanel = new JBPanel<>(new GridBagLayout());
 
-        final GridBagConstraints labelGbc = new GridBagConstraints();
+        final @NotNull GridBagConstraints labelGbc = new GridBagConstraints();
         labelGbc.gridx = 0;
         labelGbc.anchor = GridBagConstraints.NORTHWEST;
         labelGbc.insets = JBUI.insets(4, 4, 4, 10);
 
-        final GridBagConstraints fieldGbc = new GridBagConstraints();
+        final @NotNull GridBagConstraints fieldGbc = new GridBagConstraints();
         fieldGbc.gridx = 1;
         fieldGbc.weightx = 1.0;
         fieldGbc.anchor = GridBagConstraints.NORTHWEST;
         fieldGbc.insets = JBUI.insets(4, 0, 4, 4);
 
-        final JBTextField runNameField = new JBTextField(runName);
+        final @NotNull JBTextField runNameField = new JBTextField(runName);
         runNameField.setEditable(false);
         runNameField.setEnabled(false);
         runNameField.setColumns(50);
@@ -68,7 +68,7 @@ public class RunConfigurationForm implements DialogComponent {
         int row = 3;
         for (final TestRunConfiguration field : TestRunConfiguration.values()) {
             if (field.isChoice()) {
-                final ComboBox<String> comboBox = new ComboBox<>(field.getOptions());
+                final @NotNull ComboBox<String> comboBox = new ComboBox<>(field.getOptions());
                 comboBox.setEditable(true);
                 fieldMap.put(field, comboBox);
                 addLabeledRow(configurationPanel, labelGbc, fieldGbc, row, field.getDisplayName(), comboBox);
@@ -85,13 +85,13 @@ public class RunConfigurationForm implements DialogComponent {
     }
 
     private void addLabeledRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints labelGbc, final @NotNull GridBagConstraints fieldGbc, final int row, final @NotNull String label, final @NotNull JComponent component) {
-        final GridBagConstraints lc = (GridBagConstraints) labelGbc.clone();
+        final @NotNull GridBagConstraints lc = (GridBagConstraints) labelGbc.clone();
         lc.gridy = row;
-        final JBLabel labelComp = new JBLabel(label);
+        final @NotNull JBLabel labelComp = new JBLabel(label);
         labelComp.setVerticalAlignment(SwingConstants.TOP);
         panel.add(labelComp, lc);
 
-        final GridBagConstraints fc = (GridBagConstraints) fieldGbc.clone();
+        final @NotNull GridBagConstraints fc = (GridBagConstraints) fieldGbc.clone();
         fc.gridy = row;
         panel.add(component, fc);
     }

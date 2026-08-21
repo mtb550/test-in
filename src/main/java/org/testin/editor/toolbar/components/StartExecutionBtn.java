@@ -20,7 +20,7 @@ public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
     private static @NotNull String tooltipFor(final @NotNull RunEditor editor) {
         if (editor.isExecuting()) return "Execution in progress";
 
-        final TestRunStatus status = editor.getParent().getMarker().getStatus();
+        final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();
         return status.isTerminal()
                 ? "Execution disabled — run status is " + status.getLabel()
                 : "Start Execution";

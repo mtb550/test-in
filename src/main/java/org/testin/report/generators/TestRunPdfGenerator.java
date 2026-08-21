@@ -79,7 +79,7 @@ public final class TestRunPdfGenerator {
             PdfFont regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
             PdfFont italicFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE);
 
-            final String projectName = Services.getInstance(p, BoundTestProject.class).name();
+            final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
 
             // TITLE
             document.add(new Paragraph("TEST SUMMARY REPORT")
@@ -113,7 +113,7 @@ public final class TestRunPdfGenerator {
 
             // One traversal of the results serves the whole report: the counts
             // below, the pass rate, and who executed it.
-            final TestRunSummary summary = TestRunSummary.of(tr.getResults());
+            final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
 
             Table overviewTable = new Table(UnitValue.createPercentArray(new float[]{30, 70}))
                     .useAllAvailableWidth()
@@ -345,9 +345,9 @@ public final class TestRunPdfGenerator {
                             .setTextAlignment(TextAlignment.CENTER)));
 
             // Test Case column
-            final String caseName = ReportedCase.of(detailsMap, item.getId()).getDescription();
-            final String tcName = caseName.isEmpty() ? "—" : caseName;
-            final Cell testCaseCell = new Cell()
+            final @NotNull String caseName = ReportedCase.of(detailsMap, item.getId()).getDescription();
+            final @NotNull String tcName = caseName.isEmpty() ? "—" : caseName;
+            final @NotNull Cell testCaseCell = new Cell()
                     .setBackgroundColor(rowBg)
                     .setBorder(new SolidBorder(BORDER_GRAY, 1))
                     .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6);

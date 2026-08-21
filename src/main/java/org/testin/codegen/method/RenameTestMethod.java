@@ -15,7 +15,7 @@ public class RenameTestMethod extends UpdateTestBase implements GenAction {
         if (!(obj instanceof TestCaseDto tc)) return;
 
         applyUpdate(p, tc, "Rename Test Method", pm -> {
-            final String newName = NameSanitizer.methodName(tc.getDescription());
+            final @NotNull String newName = NameSanitizer.methodName(tc.getDescription());
             if (!pm.getName().equals(newName)) {
                 pm.setName(newName);
             }

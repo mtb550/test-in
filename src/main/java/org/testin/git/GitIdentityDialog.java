@@ -34,13 +34,13 @@ final class GitIdentityDialog extends AbstractFrameworkDialog<TextInput> {
 
         title = "Set Git Identity and Commit";
 
-        final ComponentDialogBase<TextInput> name = ComponentDialogBase.textField()
+        final @NotNull ComponentDialogBase<TextInput> name = ComponentDialogBase.textField()
                 .placeholder("your name...")
                 .build();
-        final ComponentDialogBase<TextInput> email = ComponentDialogBase.textField()
+        final @NotNull ComponentDialogBase<TextInput> email = ComponentDialogBase.textField()
                 .placeholder("your email address...")
                 .build();
-        final ComponentDialogBase<RadioSelection<Boolean>> where = ComponentDialogBase.<Boolean>radios("Apply to")
+        final @NotNull ComponentDialogBase<RadioSelection<Boolean>> where = ComponentDialogBase.<Boolean>radios("Apply to")
                 .option("This repository", false)
                 .option("Every repository on this machine", true)
                 .select(false)
@@ -63,13 +63,13 @@ final class GitIdentityDialog extends AbstractFrameworkDialog<TextInput> {
 
     @Override
     protected void submit() {
-        final String name = nameField.getText().trim();
+        final @NotNull String name = nameField.getText().trim();
         if (name.isEmpty()) {
             nameField.showEmptyWarning();
             return;
         }
 
-        final String email = emailField.getText().trim();
+        final @NotNull String email = emailField.getText().trim();
         if (email.isEmpty()) {
             emailField.showEmptyWarning();
             return;

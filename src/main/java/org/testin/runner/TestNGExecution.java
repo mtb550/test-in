@@ -175,7 +175,7 @@ public final class TestNGExecution {
      *         they share a run - the count the one notification reports
      */
     public int stop(final @NotNull List<TestCaseDto> cases) {
-        final List<TestCaseDto> asked = cases.stream()
+        final @NotNull List<TestCaseDto> asked = cases.stream()
                 .filter(tc -> tc.getTempStatus() == RunStatus.RUNNING)
                 .toList();
 
@@ -184,12 +184,12 @@ public final class TestNGExecution {
         // One configuration is one process, however many cases it holds, so a
         // case cannot be stopped without stopping the ones beside it. Leaving
         // those showing Running would be the older bug in a smaller place.
-        final Set<String> runs = asked.stream()
+        final @NotNull Set<String> runs = asked.stream()
                 .map(tc -> configOf.getOrDefault(tc, ""))
                 .filter(name -> !name.isEmpty())
                 .collect(Collectors.toSet());
 
-        final List<TestCaseDto> stopping = Stream.concat(
+        final @NotNull List<TestCaseDto> stopping = Stream.concat(
                         asked.stream(),
                         configOf.entrySet().stream().filter(e -> runs.contains(e.getValue())).map(Map.Entry::getKey))
                 .distinct()
@@ -202,7 +202,7 @@ public final class TestNGExecution {
             stopped.add(tc.getId());
         });
 
-        final List<RunContentDescriptor> theirs = running(runs);
+        final @NotNull List<RunContentDescriptor> theirs = running(runs);
         Logger.info("Stopping " + stopping.size() + " test case(s) in " + runs.size()
                 + " run(s): " + theirs.size() + " had reached a process");
 
@@ -229,13 +229,13 @@ public final class TestNGExecution {
         // Answered where it arrives. A descriptor with no handler has nothing
         // behind it to stop, and saying so is the difference between a stop that
         // could not act and one that silently did nothing.
-        final Optional<ProcessHandler> found = Optional.ofNullable(descriptor.getProcessHandler());
+        final @NotNull Optional<ProcessHandler> found = Optional.ofNullable(descriptor.getProcessHandler());
         if (found.isEmpty()) {
             Logger.warn("Not stopping '" + descriptor.getDisplayName() + "': it has no process handler");
             return;
         }
 
-        final ProcessHandler handler = found.orElseThrow();
+        final @NotNull ProcessHandler handler = found.orElseThrow();
 
         handler.putUserData(ProcessHandler.TERMINATION_REQUESTED, Boolean.TRUE);
 

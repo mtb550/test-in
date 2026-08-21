@@ -68,8 +68,8 @@ public class SyncActionAction extends AbstractProjectTreeAction {
 
                 try {
                     indicator.setText("Checking remote configuration...");
-                    final String remoteName = git.getRemoteName(repoPath);
-                    final String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
+                    final @NotNull String remoteName = git.getRemoteName(repoPath);
+                    final @NotNull String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
 
                     if (remoteUrl.isEmpty()) {
                         ApplicationManager.getApplication().invokeLater(() ->
@@ -78,7 +78,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                         return;
                     }
 
-                    final String branch = git.getDefaultBranch(repoPath);
+                    final @NotNull String branch = git.getDefaultBranch(repoPath);
                     if (branch.isBlank()) {
                         throw new IllegalStateException("Could not determine the repository default branch.");
                     }
@@ -99,7 +99,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
 
                     // Asked here too, for the same reason: naming the files
                     // that conflict is another git status.
-                    final List<String> conflicting = conflicts ? git.conflictingPaths(repoPath) : List.of();
+                    final @NotNull List<String> conflicting = conflicts ? git.conflictingPaths(repoPath) : List.of();
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (conflicts) {
@@ -114,13 +114,13 @@ public class SyncActionAction extends AbstractProjectTreeAction {
     }
 
     private void showConflictActions(final @NotNull Path repoPath, final @NotNull List<String> conflicting) {
-        final Notifier notifier = Services.getInstance(p, Notifier.class);
+        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
-        final NotificationAction resolveAction = notifier.action(
+        final @NotNull NotificationAction resolveAction = notifier.action(
                 "Resolve", () -> resolveConflicts(repoPath, conflicting));
-        final NotificationAction continueAction = notifier.action(
+        final @NotNull NotificationAction continueAction = notifier.action(
                 "Continue rebase", () -> finishRebase(repoPath, false));
-        final NotificationAction abortAction = notifier.action(
+        final @NotNull NotificationAction abortAction = notifier.action(
                 "Abort rebase", () -> finishRebase(repoPath, true));
 
         notifier.warnWithActions(
@@ -153,7 +153,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         // Called from a background task's body and from its error handler, both
         // off the EDT - which is where the git question has to be asked.
         final boolean conflicts = git.hasConflicts(repoPath);
-        final List<String> conflicting = conflicts ? git.conflictingPaths(repoPath) : List.of();
+        final @NotNull List<String> conflicting = conflicts ? git.conflictingPaths(repoPath) : List.of();
 
         ApplicationManager.getApplication().invokeLater(() -> {
             if (conflicts) showConflictActions(repoPath, conflicting);
@@ -222,7 +222,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
      */
     private static @NotNull Optional<Path> projectOn(final @NotNull TreePath selectionPath) {
         for (final Object component : selectionPath.getPath()) {
-            final Optional<Path> project = TreeValueUtil.valueOf(component, TestProjectDirectoryDto.class)
+            final @NotNull Optional<Path> project = TreeValueUtil.valueOf(component, TestProjectDirectoryDto.class)
                     .map(TestProjectDirectoryDto::getPath);
             if (project.isPresent()) return project;
         }

@@ -85,13 +85,13 @@ public final class Notifier {
                     .map(IdeFrame::getStatusBar)
                     .map(StatusBar::getComponent)
                     .ifPresent(statusBarComponent -> {
-                        final Balloon balloon = JBPopupFactory.getInstance()
+                        final @NotNull Balloon balloon = JBPopupFactory.getInstance()
                                 .createHtmlTextBalloonBuilder(htmlContent, MessageType.INFO, null)
                                 .setFadeoutTime(5000)
                                 .setAnimationCycle(200)
                                 .createBalloon();
 
-                        final Point targetPoint = new Point(statusBarComponent.getWidth() - 30,
+                        final @NotNull Point targetPoint = new Point(statusBarComponent.getWidth() - 30,
                                 statusBarComponent.getHeight() / 2);
                         balloon.show(new RelativePoint(statusBarComponent, targetPoint), Balloon.Position.above);
                     });
@@ -164,7 +164,7 @@ public final class Notifier {
         // by which is called - so "no title" needs a value to be chosen by. It
         // used to be a null, which the annotation sweep then declared impossible
         // while the one caller that passes it went on passing it (#93).
-        final Notification notification = title.isEmpty()
+        final @NotNull Notification notification = title.isEmpty()
                 ? NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(message, type)
                 : NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(title, message, type);
 

@@ -30,7 +30,7 @@ public final class GenerateReportDialog extends AbstractFrameworkDialog<Destinat
 
         title = "Generate Report";
 
-        final DestinationForm form = new DestinationForm(p,
+        final @NotNull DestinationForm form = new DestinationForm(p,
                 Arrays.stream(FileTypes.values()).filter(FileTypes::isReportable).toArray(FileTypes[]::new),
                 FileTypes.PDF,
                 suggestedFileName,

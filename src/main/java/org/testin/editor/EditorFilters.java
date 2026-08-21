@@ -22,7 +22,7 @@ public record EditorFilters(@NotNull String query, @NotNull Set<Group> groups,
                             @NotNull Set<Priority> priorities, @NotNull Set<String> modules) {
 
     public static @NotNull EditorFilters of(final @NotNull AbstractToolbarPanel toolBar) {
-        final FilterPopupBtn filters = toolBar.getToolbarItem(FilterPopupBtn.class);
+        final @NotNull FilterPopupBtn filters = toolBar.getToolbarItem(FilterPopupBtn.class);
 
         return new EditorFilters(
                 toolBar.getSearchTxt().getSearchQuery(),

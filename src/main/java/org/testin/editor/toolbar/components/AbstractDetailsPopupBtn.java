@@ -48,11 +48,11 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
 
         // Only when nothing is stored yet: the attributes the enum flags on, not
         // every option. A saved selection is honored exactly as it was saved.
-        final String defaults = options.stream()
+        final @NotNull String defaults = options.stream()
                 .filter(o -> o.getToolBarDefault().isSelectedByDefault())
                 .map(Enum::name)
                 .collect(Collectors.joining(","));
-        final String saved = PropertiesComponent.getInstance().getValue(propertyKey, defaults);
+        final @NotNull String saved = PropertiesComponent.getInstance().getValue(propertyKey, defaults);
 
         for (final String s : saved.split(",")) {
             if (s.isEmpty()) continue;
@@ -70,7 +70,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
     }
 
     private void saveProps() {
-        final String joinedNames = selectedDetails.stream()
+        final @NotNull String joinedNames = selectedDetails.stream()
                 .map(Enum::name)
                 .collect(Collectors.joining(","));
 
@@ -78,7 +78,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
     }
 
     private void showDetailsPopup(final @NotNull Runnable onToolBarDetailsSelectedChanged) {
-        final CheckBoxList<E> detailsList = new CheckBoxList<>() {
+        final @NotNull CheckBoxList<E> detailsList = new CheckBoxList<>() {
             /**
              * Grays the locked attributes out, and stops the click and the space
              * key from toggling them - the platform asks this before both.

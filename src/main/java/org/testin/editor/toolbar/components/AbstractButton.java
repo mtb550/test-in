@@ -62,7 +62,7 @@ public abstract class AbstractButton extends JButton {
         // the pointer arrives and shrinking it when it leaves, which re-laid out
         // the whole toolbar and shifted the buttons under the pointer.
         setIcon(zoomedIcon);
-        final Dimension size = getPreferredSize();
+        final @NotNull Dimension size = getPreferredSize();
         setIcon(restIcon);
 
         // Swing cannot build this one. BasicLookAndFeel.getDisabledIcon only grays
@@ -137,12 +137,12 @@ public abstract class AbstractButton extends JButton {
 
     @Override
     protected void paintComponent(final @NotNull Graphics g) {
-        final Container parent = getParent();
+        final @NotNull Container parent = getParent();
         g.setColor(Optional.ofNullable(parent).map(Container::getBackground).orElseGet(this::getBackground));
         g.fillRect(0, 0, getWidth(), getHeight());
 
         if (hovered) {
-            final Graphics2D g2 = (Graphics2D) g.create();
+            final @NotNull Graphics2D g2 = (Graphics2D) g.create();
             try {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(JBUI.CurrentTheme.ActionButton.hoverBackground());

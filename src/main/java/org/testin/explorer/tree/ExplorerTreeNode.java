@@ -29,7 +29,7 @@ public final class ExplorerTreeNode extends AbstractTreeNode<Object> {
 
     @Override
     public @NotNull Collection<? extends AbstractTreeNode<?>> getChildren() {
-        final Object value = getValue();
+        final @NotNull Object value = getValue();
         if (value instanceof TestProjectDirectoryDto projectDirectory) {
             if (projectDirectory.getMarker().getStatus() != ProjectStatus.ACTIVE) return List.of();
             return List.of(
@@ -40,22 +40,22 @@ public final class ExplorerTreeNode extends AbstractTreeNode<Object> {
         if (!(value instanceof DirectoryDto directory)) return List.of();
 
         try {
-            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+            final @NotNull ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
             indexer.awaitIndexing();
-            final List<ExplorerTreeNode> children = new ArrayList<>();
+            final @NotNull List<ExplorerTreeNode> children = new ArrayList<>();
             for (final DirectoryDto child : indexer.getChildren(directory.getPath())) {
                 children.add(child(child));
             }
             return children;
         } catch (final Exception ex) {
-            final String message = "Could not load '" + directory.getName() + "'";
+            final @NotNull String message = "Could not load '" + directory.getName() + "'";
             Logger.error(message + ": " + ex.getMessage());
             return List.of(child(new TreeLoadError(message)));
         }
     }
 
     private @NotNull ExplorerTreeNode child(final @NotNull Object value) {
-        final ExplorerTreeNode child = new ExplorerTreeNode(project, value);
+        final @NotNull ExplorerTreeNode child = new ExplorerTreeNode(project, value);
         child.setParent(this);
         return child;
     }
@@ -77,7 +77,7 @@ public final class ExplorerTreeNode extends AbstractTreeNode<Object> {
 
     @Override
     protected void update(final @NotNull PresentationData presentation) {
-        final Object value = getValue();
+        final @NotNull Object value = getValue();
         presentation.setPresentableText(value instanceof DirectoryDto directory ? directory.getName() : String.valueOf(value));
     }
 }

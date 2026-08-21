@@ -55,7 +55,7 @@ public final class SpellChecker {
      * field.
      */
     public static @NotNull EditorTextField createField(final @NotNull Project p) {
-        final List<EditorCustomization> customizations = new ArrayList<>();
+        final @NotNull List<EditorCustomization> customizations = new ArrayList<>();
         ContainerUtil.addIfNotNull(customizations,
                 SpellCheckingEditorCustomizationProvider.getInstance().getEnabledCustomization());
 
@@ -75,11 +75,11 @@ public final class SpellChecker {
     public static @NotNull EditorTextField createCompletionField(final @NotNull Project p,
                                                                  final @NotNull TextCompletionProvider provider,
                                                                  final @NotNull String text) {
-        final EditorTextField field = createField(p);
+        final @NotNull EditorTextField field = createField(p);
 
         // Blocking rather than cancellable: this runs while the dialog is being
         // built and the field cannot be returned half-made.
-        final PsiFile psiFile = ReadAction.computeBlocking(
+        final @NotNull PsiFile psiFile = ReadAction.computeBlocking(
                 () -> PsiDocumentManager.getInstance(p).getPsiFile(field.getDocument()));
 
         Optional.ofNullable(psiFile).ifPresentOrElse(

@@ -51,18 +51,18 @@ public class GridEditListener implements TableModelListener {
 
         updating = true;
         try {
-            final TestEditorAttributes attr = TestEditorAttributes.values()[col];
+            final @NotNull TestEditorAttributes attr = TestEditorAttributes.values()[col];
 
             // The table model refuses these columns already; asked again of the
             // same attribute because a programmatic setValueAt never goes through
             // the model's answer.
             if (!attr.can(Can.EDIT)) return;
 
-            final TestCaseDto tc = pageItems.get(row);
+            final @NotNull TestCaseDto tc = pageItems.get(row);
 
-            final Object before = attr.gridValue(p, tc);
+            final @NotNull Object before = attr.gridValue(p, tc);
             attr.getImportSetter().execute(p, tc, String.valueOf(model.getValueAt(row, col)));
-            final Object after = attr.gridValue(p, tc);
+            final @NotNull Object after = attr.gridValue(p, tc);
 
             // Always write the normalized value back to the cell - it renumbers
             // steps and drops blank entries even when nothing really changed.
@@ -91,7 +91,7 @@ public class GridEditListener implements TableModelListener {
             return;
         }
 
-        final GenType generator = attr.getGenType();
+        final @NotNull GenType generator = attr.getGenType();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             Services.getInstance(p, ProjectIndexer.class).putTestCase(testSetPath, tc);

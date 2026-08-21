@@ -39,7 +39,7 @@ record NodesTransferable(@NotNull TreeTransferPayload payload) implements Transf
     public @NotNull Object getTransferData(final @NotNull DataFlavor flavor) throws UnsupportedFlavorException {
         if (TreeTransferHandler.NODE_FLAVOR.equals(flavor)) return payload;
         if (DataFlavor.javaFileListFlavor.equals(flavor)) {
-            final List<File> files = new ArrayList<>();
+            final @NotNull List<File> files = new ArrayList<>();
             for (final DirectoryDto node : payload.nodes()) {
                 if (node instanceof TestSetDirectoryDto || node instanceof TestRunDirectoryDto)
                     files.add(node.getPath().toFile());

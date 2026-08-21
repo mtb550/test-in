@@ -23,10 +23,10 @@ public class Badges extends BaseDetails {
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        final JBPanel<?> badgesPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
+        final @NotNull JBPanel<?> badgesPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
         badgesPanel.setOpaque(false);
 
-        final List<Shared.Badge> badges = new ArrayList<>();
+        final @NotNull List<Shared.Badge> badges = new ArrayList<>();
         badges.add(Shared.createPriorityBadge(dto));
 
         for (final Group group : dto.getGroup()) {
@@ -34,7 +34,7 @@ public class Badges extends BaseDetails {
         }
 
         // Last, the way a card orders them. None for a case nobody has run.
-        final RunStatus tempStatus = dto.getTempStatus();
+        final @NotNull RunStatus tempStatus = dto.getTempStatus();
         if (tempStatus.hasBadge()) badges.add(Shared.createRunStatusBadge(tempStatus.getBadge()));
 
         Shared.showBadges(badgesPanel, badges);

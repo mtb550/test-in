@@ -49,7 +49,7 @@ final class IndexingScanner {
 
     private void scanProjectContents(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
-            final TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).getTestProjectNode(p, projectPath);
+            final @NotNull TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).getTestProjectNode(p, projectPath);
 
             if (tp.getMarker().getStatus() == ProjectStatus.ARCHIVED) {
                 Logger.info("Skipping archived project: " + projectPath.getFileName());
@@ -61,7 +61,7 @@ final class IndexingScanner {
                 indicator.setFraction(0.1);
                 indicator.setText(tp.getName() + " - test sets...");
 
-            final TestCasesMainDirectoryDto tcd = tp.getTestCasesDirectory();
+            final @NotNull TestCasesMainDirectoryDto tcd = tp.getTestCasesDirectory();
             store.getTestCasesMainDirsByPath().put(tcd.getPath().toString(), tcd);
             scanTestSets(tcd.getPath(), tcd, indicator);
 
@@ -69,7 +69,7 @@ final class IndexingScanner {
                 indicator.setFraction(0.5);
                 indicator.setText(tp.getName() + " - test runs...");
 
-            final TestRunsMainDirectoryDto trd = tp.getTestRunsDirectory();
+            final @NotNull TestRunsMainDirectoryDto trd = tp.getTestRunsDirectory();
             store.getTestRunsMainDirsByPath().put(trd.getPath().toString(), trd);
             scanTestRunDirs(trd.getPath(), trd, indicator);
 
@@ -83,7 +83,7 @@ final class IndexingScanner {
 
     private void scanTestSets(final @NotNull Path tcDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
         try (Stream<Path> paths = Files.list(tcDir)) {
-            final List<Path> dirs = paths.filter(Files::isDirectory).toList();
+            final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
             dirs.forEach(dirPath -> {
                 if (Files.exists(dirPath.resolve(DirectoryType.TS.getMarker()))) {
@@ -103,8 +103,8 @@ final class IndexingScanner {
 
     private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
         try {
-            final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
-            final TestSetPackageDirectoryDto tsp = dirMapper.getTestSetPackageNode(p, path, parent);
+            final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
+            final @NotNull TestSetPackageDirectoryDto tsp = dirMapper.getTestSetPackageNode(p, path, parent);
 
             store.getTestSetPackagesByPath().put(path.toString(), tsp);
 
@@ -127,14 +127,14 @@ final class IndexingScanner {
     private void scanTestSet(final @NotNull Path path, final @NotNull DirectoryDto parent,
                              final @NotNull ProgressIndicator indicator) {
         try {
-            final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
-            final TestSetDirectoryDto ts = dirMapper.getTestSetNode(p, path, parent);
+            final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
+            final @NotNull TestSetDirectoryDto ts = dirMapper.getTestSetNode(p, path, parent);
 
             store.getTestSetsDirByPath().put(path.toString(), ts);
 
-            final List<UUID> caseIds = Collections.synchronizedList(new ArrayList<>());
-            final Map<Path, TestCaseDto> loaded = Collections.synchronizedMap(new LinkedHashMap<>());
-            final Mapper mapper = Services.getInstance(p, Mapper.class);
+            final @NotNull List<UUID> caseIds = Collections.synchronizedList(new ArrayList<>());
+            final @NotNull Map<Path, TestCaseDto> loaded = Collections.synchronizedMap(new LinkedHashMap<>());
+            final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
 
             try (Stream<Path> files = Files.list(path)) {
                 files.filter(Files::isRegularFile)
@@ -142,7 +142,7 @@ final class IndexingScanner {
                         .parallel()
                         .forEach(filePath -> {
                             try {
-                                final TestCaseDto tc = mapper.readValue(filePath.toFile(), TestCaseDto.class);
+                                final @NotNull TestCaseDto tc = mapper.readValue(filePath.toFile(), TestCaseDto.class);
                                 tc.setParent(ts);
                                 tc.setId(identityOf(filePath, tc));
                                 store.getTestCasesById().put(tc.getId(), tc);
@@ -175,7 +175,7 @@ final class IndexingScanner {
     private void scanTestRunDirs(final @NotNull Path trDir, final @NotNull DirectoryDto parent,
                                  final @NotNull ProgressIndicator indicator) {
         try (Stream<Path> paths = Files.list(trDir)) {
-            final List<Path> dirs = paths.filter(Files::isDirectory).toList();
+            final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
             dirs.forEach(dirPath -> {
                 if (Files.exists(dirPath.resolve(DirectoryType.TR.getMarker()))) {
@@ -194,8 +194,8 @@ final class IndexingScanner {
     private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent,
                                        final @NotNull ProgressIndicator indicator) {
         try {
-            final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
-            final TestRunPackageDirectoryDto trp = dirMapper.getTestRunPackageNode(p, path, parent);
+            final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
+            final @NotNull TestRunPackageDirectoryDto trp = dirMapper.getTestRunPackageNode(p, path, parent);
 
             store.getTestRunPackagesByPath().put(path.toString(), trp);
 
@@ -218,16 +218,16 @@ final class IndexingScanner {
     private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent,
                              final @NotNull ProgressIndicator indicator) {
         try {
-            final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
-            final TestRunDirectoryDto tr = dirMapper.getTestRunNode(p, path, parent);
+            final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
+            final @NotNull TestRunDirectoryDto tr = dirMapper.getTestRunNode(p, path, parent);
 
             store.getTestRunsDirByPath().put(path.toString(), tr);
 
-            final String fileName = path.getFileName().toString();
-            final Path jsonPath = path.resolve(fileName + ".json");
+            final @NotNull String fileName = path.getFileName().toString();
+            final @NotNull Path jsonPath = path.resolve(fileName + ".json");
             if (Files.exists(jsonPath)) {
-                final Mapper mapper = Services.getInstance(p, Mapper.class);
-                final TestRunDto trr = mapper.readValue(jsonPath.toFile(), TestRunDto.class);
+                final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
+                final @NotNull TestRunDto trr = mapper.readValue(jsonPath.toFile(), TestRunDto.class);
                 trr.dropStampsWithoutVerdict();
                 store.getTestRunsByPath().put(path.toString(), trr);
             }
@@ -261,10 +261,10 @@ final class IndexingScanner {
      * believing what it says.
      */
     private static @NotNull UUID identityOf(final @NotNull Path filePath, final @NotNull TestCaseDto tc) {
-        final String name = filePath.getFileName().toString().replace(".json", "");
+        final @NotNull String name = filePath.getFileName().toString().replace(".json", "");
 
         try {
-            final UUID fromName = UUID.fromString(name);
+            final @NotNull UUID fromName = UUID.fromString(name);
 
             if (!fromName.equals(tc.getId())) {
                 Logger.warn("Test case " + filePath.getFileName() + " says its id is " + tc.getId()

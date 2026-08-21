@@ -69,7 +69,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     }
 
     private static @NotNull JBPanel<?> verticalStack(final @NotNull List<DialogComponent> dialogComponents) {
-        final JBPanel<?> stack = new JBPanel<>();
+        final @NotNull JBPanel<?> stack = new JBPanel<>();
         stack.setLayout(new BoxLayout(stack, BoxLayout.Y_AXIS));
         stack.setOpaque(false);
         for (final DialogComponent dialogComponent : dialogComponents) {
@@ -127,11 +127,11 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     }
 
     private @NotNull JBPopup buildPopup() {
-        final JBPanel<?> contentPanel = buildContentPanel();
+        final @NotNull JBPanel<?> contentPanel = buildContentPanel();
         bindShortcutKeys(contentPanel);
         bindSubmitGesture();
 
-        final ComponentPopupBuilder builder = DialogStyle.createPopupBuilder(contentPanel, focusComponent(), dto().title());
+        final @NotNull ComponentPopupBuilder builder = DialogStyle.createPopupBuilder(contentPanel, focusComponent(), dto().title());
         if (preferredSize.width > 0) {
             contentPanel.setPreferredSize(preferredSize);
             builder.setResizable(true).setMovable(true);
@@ -175,7 +175,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
      */
     private @NotNull List<DialogComponent> builtComponents() {
         if (built.isEmpty()) {
-            final List<DialogComponent> dialogComponents = new ArrayList<>();
+            final @NotNull List<DialogComponent> dialogComponents = new ArrayList<>();
             for (final ComponentDialogBase<?> holder : dto().components()) {
                 dialogComponents.add(holder.getComponent());
             }
@@ -206,7 +206,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
      * button row) at the bottom. When none claims it, the last one fills.
      */
     private @NotNull JBPanel<?> buildContentPanel() {
-        final List<DialogComponent> all = builtComponents();
+        final @NotNull List<DialogComponent> all = builtComponents();
 
         int fillIndex = -1;
         for (int i = 0; i < all.size(); i++) {
@@ -223,7 +223,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
         // Every component refused it; something has to go in the center.
         if (fillIndex < 0) fillIndex = all.size() - 1;
 
-        final JBPanel<?> stack = new JBPanel<>(new BorderLayout());
+        final @NotNull JBPanel<?> stack = new JBPanel<>(new BorderLayout());
         stack.setOpaque(false);
         if (fillIndex > 0) {
             stack.add(verticalStack(all.subList(0, fillIndex)), BorderLayout.NORTH);
@@ -233,10 +233,10 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
             stack.add(verticalStack(all.subList(fillIndex + 1, all.size())), BorderLayout.SOUTH);
         }
 
-        final DialogStatusBar statusBar = new DialogStatusBar();
+        final @NotNull DialogStatusBar statusBar = new DialogStatusBar();
         statusBar.updateItems(dto().shortcuts().toArray(StatusBarItem[]::new));
 
-        final JBPanel<?> contentPanel = DialogStyle.styleContent(new JBPanel<>(new BorderLayout()));
+        final @NotNull JBPanel<?> contentPanel = DialogStyle.styleContent(new JBPanel<>(new BorderLayout()));
         contentPanel.setBorder(BorderFactory.createEmptyBorder());
         contentPanel.add(stack, BorderLayout.CENTER);
         contentPanel.add(statusBar.getPanel(), BorderLayout.SOUTH);
@@ -257,23 +257,23 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
      * whenever the focus is elsewhere inside the dialog.
      */
     private void bindShortcutKeys(final @NotNull JBPanel<?> contentPanel) {
-        final List<StatusBarShortcut> declared = dto().shortcuts();
-        final Set<KeyStroke> bound = new HashSet<>();
+        final @NotNull List<StatusBarShortcut> declared = dto().shortcuts();
+        final @NotNull Set<KeyStroke> bound = new HashSet<>();
 
         for (int i = 0; i < declared.size(); i++) {
-            final StatusBarShortcut shortcut = declared.get(i);
+            final @NotNull StatusBarShortcut shortcut = declared.get(i);
             if (!shortcut.isBindable()) continue;
 
             // isBindable guarantees both; requireNonNull makes that visible to dataflow.
-            final KeyStroke key = Objects.requireNonNull(shortcut.shortcut()).getKey();
-            final Runnable action = Objects.requireNonNull(shortcut.action());
+            final @NotNull KeyStroke key = Objects.requireNonNull(shortcut.shortcut()).getKey();
+            final @NotNull Runnable action = Objects.requireNonNull(shortcut.action());
 
             // Two entries on one key would silently shadow each other.
             if (!bound.add(key)) {
                 throw new IllegalStateException("Duplicate dialog shortcut: " + shortcut.getShortcutText());
             }
 
-            final String actionKey = "testin.framework.shortcut." + i;
+            final @NotNull String actionKey = "testin.framework.shortcut." + i;
             installKey(contentPanel, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, key, actionKey, action);
             for (final DialogComponent dialogComponent : builtComponents()) {
                 if (!dialogComponent.acceptsDialogKeys()) continue;

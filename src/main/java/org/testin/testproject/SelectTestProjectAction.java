@@ -39,7 +39,7 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
         // The listing walks the Testin root and reads a marker per project, so it
         // happens off the EDT; the dialog it feeds opens back on it (#66).
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final Map<String, ProjectStatus> underRoot = Services.getInstance(p, ProjectIndexer.class).testProjects();
+            final @NotNull Map<String, ProjectStatus> underRoot = Services.getInstance(p, ProjectIndexer.class).testProjects();
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (p.isDisposed()) return;

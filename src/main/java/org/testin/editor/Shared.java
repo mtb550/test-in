@@ -121,7 +121,7 @@ public class Shared {
         }
 
         for (int i = 0; i < panel.getComponentCount(); i++) {
-            final BadgePill pill = (BadgePill) panel.getComponent(i);
+            final @NotNull BadgePill pill = (BadgePill) panel.getComponent(i);
 
             if (i < badges.size()) pill.show(badges.get(i));
             else pill.setVisible(false);
@@ -149,7 +149,7 @@ public class Shared {
      * band no longer covered the icon it belonged to.
      */
     public static @NotNull ActionIcons descriptionActionIcons(final int titleWidth) {
-        final Icon icon = AllIcons.Nodes.Class;
+        final @NotNull Icon icon = AllIcons.Nodes.Class;
         final int x = JBUI.scale(16) + titleWidth + JBUI.scale(10);
         final int y = JBUI.scale(12);
 
@@ -164,7 +164,7 @@ public class Shared {
      */
     public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth,
                                                   final @NotNull String hoveredAction, final @NotNull CardHoverAction runSlot) {
-        final ActionIcons icons = descriptionActionIcons(titleWidth);
+        final @NotNull ActionIcons icons = descriptionActionIcons(titleWidth);
 
         drawIfOffered(c, g, CardHoverAction.NAVIGATE_TO_TEST_METHOD, icons.navigate(), hoveredAction);
         drawIfOffered(c, g, runSlot, icons.run(), hoveredAction);
@@ -193,7 +193,7 @@ public class Shared {
         findScrollPane(e.getComponent())
                 .filter(scrollPane -> e.getComponent() != scrollPane)
                 .ifPresent(scrollPane -> {
-                    final MouseWheelEvent clonedEvent = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
+                    final @NotNull MouseWheelEvent clonedEvent = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
                     scrollPane.dispatchEvent(clonedEvent);
                     e.consume();
                 });
@@ -209,7 +209,7 @@ public class Shared {
 
     private static void drawHoverableIcon(final @NotNull Component c, final @NotNull Graphics g, final @NotNull Icon baseIcon, final int x, final int y, final boolean isHovered) {
         if (isHovered) {
-            final Icon scaledIcon = IconUtil.scale(baseIcon, c, 1.5f);
+            final @NotNull Icon scaledIcon = IconUtil.scale(baseIcon, c, 1.5f);
             final int offsetX = (scaledIcon.getIconWidth() - baseIcon.getIconWidth()) / 2;
             final int offsetY = (scaledIcon.getIconHeight() - baseIcon.getIconHeight()) / 2;
             scaledIcon.paintIcon(c, g, x - offsetX, y - offsetY);
@@ -304,7 +304,7 @@ public class Shared {
 
         @Override
         protected void paintComponent(final Graphics g) {
-            final Graphics2D g2 = (Graphics2D) g.create();
+            final @NotNull Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(getBackground());
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), BADGE_RADIUS, BADGE_RADIUS);

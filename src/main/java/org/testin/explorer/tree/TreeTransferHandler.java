@@ -67,7 +67,7 @@ public class TreeTransferHandler extends TransferHandler {
      * paste into project B. Unresolvable ownership rejects.
      */
     static boolean sameTestProject(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
-        final Optional<Path> sourceProject = owningProject(source).map(DirectoryDto::getPath);
+        final @NotNull Optional<Path> sourceProject = owningProject(source).map(DirectoryDto::getPath);
 
         return sourceProject.isPresent()
                 && sourceProject.equals(owningProject(target).map(DirectoryDto::getPath));
@@ -96,8 +96,8 @@ public class TreeTransferHandler extends TransferHandler {
      */
     static boolean isValidDestination(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target,
                                       final @NotNull Predicate<Path> occupied) {
-        final Path sourcePath = source.getPath().normalize();
-        final Path targetPath = target.getPath().normalize();
+        final @NotNull Path sourcePath = source.getPath().normalize();
+        final @NotNull Path targetPath = target.getPath().normalize();
 
         if (sourcePath.equals(targetPath) || targetPath.startsWith(sourcePath)) return false;
         if (targetPath.equals(sourcePath.getParent())) return false;
@@ -115,7 +115,7 @@ public class TreeTransferHandler extends TransferHandler {
      */
     @Override
     protected @Nullable Transferable createTransferable(final @NotNull JComponent c) {
-        final List<DirectoryDto> directories = transferableSelection();
+        final @NotNull List<DirectoryDto> directories = transferableSelection();
         if (directories.isEmpty()) return null;
 
         // A styled ghost instead of Swing's raw black box.
@@ -130,16 +130,16 @@ public class TreeTransferHandler extends TransferHandler {
      * A small theme-colored pill with the dragged name or count.
      */
     private @NotNull BufferedImage createDragImage(final @NotNull String text) {
-        final Font font = tree.getFont();
-        final FontMetrics metrics = tree.getFontMetrics(font);
+        final @NotNull Font font = tree.getFont();
+        final @NotNull FontMetrics metrics = tree.getFontMetrics(font);
         final int padX = JBUI.scale(10);
         final int padY = JBUI.scale(5);
         final int width = metrics.stringWidth(text) + padX * 2;
         final int height = metrics.getHeight() + padY * 2;
         final int arc = JBUI.scale(10);
 
-        final BufferedImage image = ImageUtil.createImage(tree.getGraphicsConfiguration(), width, height, BufferedImage.TYPE_INT_ARGB);
-        final Graphics2D g = image.createGraphics();
+        final @NotNull BufferedImage image = ImageUtil.createImage(tree.getGraphicsConfiguration(), width, height, BufferedImage.TYPE_INT_ARGB);
+        final @NotNull Graphics2D g = image.createGraphics();
         try {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -213,7 +213,7 @@ public class TreeTransferHandler extends TransferHandler {
      */
     private boolean anySourceLands(final @NotNull TransferSupport support, final @NotNull DirectoryDto target) {
         try {
-            final TreeTransferPayload payload = (TreeTransferPayload) support.getTransferable().getTransferData(NODE_FLAVOR);
+            final @NotNull TreeTransferPayload payload = (TreeTransferPayload) support.getTransferable().getTransferData(NODE_FLAVOR);
             for (final DirectoryDto source : payload.nodes()) {
                 if (canTransferInto(source, target)) return true;
             }
@@ -228,13 +228,13 @@ public class TreeTransferHandler extends TransferHandler {
         if (!canImport(support)) return false;
 
         try {
-            final TreeTransferPayload payload = (TreeTransferPayload) support.getTransferable().getTransferData(NODE_FLAVOR);
-            final Optional<DirectoryDto> landing = targetDirectory(support);
+            final @NotNull TreeTransferPayload payload = (TreeTransferPayload) support.getTransferable().getTransferData(NODE_FLAVOR);
+            final @NotNull Optional<DirectoryDto> landing = targetDirectory(support);
             if (landing.isEmpty()) return false;
-            final DirectoryDto target = landing.get();
+            final @NotNull DirectoryDto target = landing.get();
 
             final int action = resolveAction(support, payload);
-            final List<DirectoryDto> sources = transferableSources(payload.nodes(), target, action);
+            final @NotNull List<DirectoryDto> sources = transferableSources(payload.nodes(), target, action);
 
             // Clipboard pastes are notified by PasteNodeAction before this runs.
             if (support.isDrop()) notifyNameCollisions(payload.nodes(), target);
@@ -243,8 +243,8 @@ public class TreeTransferHandler extends TransferHandler {
             // Drag-drop confirms before changing anything; clipboard paste
             // already confirmed in PasteNodeAction.
             if (support.isDrop()) {
-                final String verb = action == COPY ? "Copy" : "Move";
-                final Path fromPath = sources.getFirst().getPath().getParent();
+                final @NotNull String verb = action == COPY ? "Copy" : "Move";
+                final @NotNull Path fromPath = sources.getFirst().getPath().getParent();
                 new ConfirmDialog(p, verb,
                         verb + " " + describe(sources) + " into '" + target.getName() + "'?",
                         Objects.toString(fromPath, ""),
@@ -270,7 +270,7 @@ public class TreeTransferHandler extends TransferHandler {
                                                             final @NotNull DirectoryDto target, final int action) {
         if (action != COPY && action != MOVE) return List.of();
 
-        final List<DirectoryDto> accepted = new ArrayList<>();
+        final @NotNull List<DirectoryDto> accepted = new ArrayList<>();
         for (final DirectoryDto source : nodes) {
             if (canTransferInto(source, target)) accepted.add(source);
         }
@@ -301,13 +301,13 @@ public class TreeTransferHandler extends TransferHandler {
      * Small soft balloon naming what could not land because the name is taken.
      */
     public void notifyNameCollisions(final DirectoryDto @NotNull [] nodes, final @NotNull DirectoryDto target) {
-        final List<DirectoryDto> collided = new ArrayList<>();
+        final @NotNull List<DirectoryDto> collided = new ArrayList<>();
         for (final DirectoryDto source : nodes) {
             if (isNameCollision(source, target)) collided.add(source);
         }
         if (collided.isEmpty()) return;
 
-        final String verb = collided.size() == 1 ? " already exists in '" : " already exist in '";
+        final @NotNull String verb = collided.size() == 1 ? " already exists in '" : " already exist in '";
         Services.getInstance(p, Notifier.class).softShow(p, describe(collided) + verb + target.getName() + "'");
     }
 
@@ -316,7 +316,7 @@ public class TreeTransferHandler extends TransferHandler {
         if (action == MOVE) {
             moveNodes(sources, target);
         } else {
-            final List<Path> sourcePaths = sources.stream().map(DirectoryDto::getPath).toList();
+            final @NotNull List<Path> sourcePaths = sources.stream().map(DirectoryDto::getPath).toList();
             Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), copied -> {
                 generateForCopies(sources, target);
                 refresh.run();
@@ -376,8 +376,8 @@ public class TreeTransferHandler extends TransferHandler {
 
     private void moveNodes(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
         // Captured before the move - the DTO paths change underneath.
-        final List<Path> oldPaths = sources.stream().map(DirectoryDto::getPath).toList();
-        final List<Path> newPaths = sources.stream()
+        final @NotNull List<Path> oldPaths = sources.stream().map(DirectoryDto::getPath).toList();
+        final @NotNull List<Path> newPaths = sources.stream()
                 .map(source -> target.getPath().resolve(source.getName()))
                 .toList();
 
@@ -401,8 +401,8 @@ public class TreeTransferHandler extends TransferHandler {
      */
     private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to,
                            final @NotNull IntConsumer onDone) {
-        final AtomicInteger remaining = new AtomicInteger(from.size());
-        final AtomicInteger moved = new AtomicInteger();
+        final @NotNull AtomicInteger remaining = new AtomicInteger(from.size());
+        final @NotNull AtomicInteger moved = new AtomicInteger();
 
         // Before the data moves, while the old paths are still what find the
         // generated code - and here rather than at the gesture, because undo and
@@ -435,7 +435,7 @@ public class TreeTransferHandler extends TransferHandler {
     private void generateForCopies(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
         if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
 
-        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         for (final DirectoryDto source : sources) {
             indexer.find(target.getPath().resolve(source.getName())).ifPresent(copy -> SubtreeCode.generate(p, copy));
@@ -496,7 +496,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     public void copySelectionToClipboard(final boolean cut) {
-        final List<DirectoryDto> directories = transferableSelection();
+        final @NotNull List<DirectoryDto> directories = transferableSelection();
         if (directories.isEmpty()) return;
 
         final int action = cut ? MOVE : COPY;

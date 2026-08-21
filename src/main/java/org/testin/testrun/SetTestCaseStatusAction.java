@@ -42,12 +42,12 @@ public class SetTestCaseStatusAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final List<TestCaseDto> selectedItems = list.getSelectedValuesList();
+        final @NotNull List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         // Single selection of a run item: collect failure details first, apply after the dialog closes.
         if (status.isCollectsFailureDetails() && editor instanceof RunEditor runEditor && selectedItems.size() == 1) {
-            final Optional<TestRunItems> runItem = runEditor.runItem(selectedItems.getFirst().getId())
+            final @NotNull Optional<TestRunItems> runItem = runEditor.runItem(selectedItems.getFirst().getId())
                     .filter(item -> !item.isRemoved());
 
             if (runItem.isPresent()) {

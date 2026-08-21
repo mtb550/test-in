@@ -36,7 +36,7 @@ public class TestCard extends BaseCard {
                 .filter(activeDetails::contains)
                 .forEach(attr -> attr.applyToUI(tc, badges, details, p));
 
-        final RunStatus runStatus = tc.getTempStatus();
+        final @NotNull RunStatus runStatus = tc.getTempStatus();
         this.runSlot = CardHoverAction.runSlot(tc);
 
         if (runStatus.hasBadge()) badges.add(Shared.createRunStatusBadge(runStatus.getBadge()));
@@ -47,7 +47,7 @@ public class TestCard extends BaseCard {
     @Override
     public void paint(final Graphics g) {
         if (isPendingCut) {
-            final Graphics2D g2 = (Graphics2D) g.create();
+            final @NotNull Graphics2D g2 = (Graphics2D) g.create();
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
             super.paint(g2);
             g2.dispose();

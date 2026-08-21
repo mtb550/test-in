@@ -17,10 +17,10 @@ import java.awt.*;
 final class Captions {
 
     static @NotNull JBPanel<?> panel(final @NotNull String caption) {
-        final JBPanel<?> captionPanel = new JBPanel<>(new GridBagLayout());
+        final @NotNull JBPanel<?> captionPanel = new JBPanel<>(new GridBagLayout());
         captionPanel.setOpaque(false);
 
-        final JBLabel label = new JBLabel(caption);
+        final @NotNull JBLabel label = new JBLabel(caption);
         label.setFont(JBUI.Fonts.smallFont());
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         captionPanel.add(label);

@@ -109,19 +109,19 @@ public class GenerateReportAction extends AbstractProjectAction {
                                 final @NotNull FileTypes format, final @NotNull File outputFile) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                final Path dirPath = tr.getPath();
+                final @NotNull Path dirPath = tr.getPath();
 
-                final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                final TestRunDto runData = indexer.getTestRunByPath(dirPath);
+                final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                final @NotNull TestRunDto runData = indexer.getTestRunByPath(dirPath);
 
-                final Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(p, runData);
+                final @NotNull Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(p, runData);
 
                 final byte[] fileBytes = format.generateReport(p, tr, runData, detailsMap);
 
                 Files.write(outputFile.toPath(), fileBytes);
 
-                final Notifier notifier = Services.getInstance(p, Notifier.class);
-                final NotificationAction openAction = notifier.action("Open report", () -> {
+                final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+                final @NotNull NotificationAction openAction = notifier.action("Open report", () -> {
 
                     try {
                         java.awt.Desktop.getDesktop().open(outputFile);
@@ -130,7 +130,7 @@ public class GenerateReportAction extends AbstractProjectAction {
                     }
                 });
 
-                final NotificationAction copyAction = new NotificationAction("Copy path") {
+                final @NotNull NotificationAction copyAction = new NotificationAction("Copy path") {
                     @Override
                     public void actionPerformed(final @NotNull AnActionEvent e, final @NotNull Notification notification) {
                         CopyPasteManager.getInstance().setContents(new StringSelection(outputFile.getAbsolutePath()));
@@ -153,13 +153,13 @@ public class GenerateReportAction extends AbstractProjectAction {
     }
 
     private @NotNull Map<UUID, TestCaseDto> fetchTestCaseDetails(final @NotNull Project p, final @NotNull TestRunDto tr) {
-        final Map<UUID, TestCaseDto> detailsMap = new ConcurrentHashMap<>();
+        final @NotNull Map<UUID, TestCaseDto> detailsMap = new ConcurrentHashMap<>();
 
         if (tr.getResults().isEmpty()) {
             return detailsMap;
         }
 
-        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         for (final TestRunItems item : tr.getResults()) {
             indexer.findTestCase(item.getId()).ifPresent(tc -> detailsMap.put(item.getId(), tc));

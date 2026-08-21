@@ -28,14 +28,14 @@ public class MoveJavaClass implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof Moved moved)) return;
 
-        final List<String> fqcn = Fqcn.ofClass(p, moved.dir());
+        final @NotNull List<String> fqcn = Fqcn.ofClass(p, moved.dir());
         if (fqcn.isEmpty()) return;
 
-        final List<String> destination = moved.destinationPackage(p);
-        final String fileName = fqcn.getLast() + ".java";
+        final @NotNull List<String> destination = moved.destinationPackage(p);
+        final @NotNull String fileName = fqcn.getLast() + ".java";
 
         JavaSourceRoot.commandInRoot(p, "Move Test Class", "moving class", sourceRoot -> {
-            final Optional<VirtualFile> file =
+            final @NotNull Optional<VirtualFile> file =
                     Optional.ofNullable(sourceRoot.findFileByRelativePath(String.join("/", fqcn) + ".java"));
 
             if (file.isEmpty()) {
@@ -43,7 +43,7 @@ public class MoveJavaClass implements GenAction {
                 return;
             }
 
-            final Optional<VirtualFile> target = JavaSourceRoot.packageFolder(sourceRoot, destination);
+            final @NotNull Optional<VirtualFile> target = JavaSourceRoot.packageFolder(sourceRoot, destination);
 
             // No folder to move into, and a class dropped where it already is:
             // neither is a move.

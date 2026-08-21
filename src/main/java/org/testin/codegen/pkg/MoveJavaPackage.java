@@ -28,11 +28,11 @@ public class MoveJavaPackage implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof Moved moved)) return;
 
-        final List<String> fqcn = Fqcn.ofPackage(moved.dir());
-        final List<String> destination = moved.destinationPackage(p);
+        final @NotNull List<String> fqcn = Fqcn.ofPackage(moved.dir());
+        final @NotNull List<String> destination = moved.destinationPackage(p);
 
         JavaSourceRoot.commandInRoot(p, "Move Test Package", "moving package", sourceRoot -> {
-            final Optional<VirtualFile> found = Optional.ofNullable(sourceRoot.findFileByRelativePath(String.join("/", fqcn)))
+            final @NotNull Optional<VirtualFile> found = Optional.ofNullable(sourceRoot.findFileByRelativePath(String.join("/", fqcn)))
                     .filter(VirtualFile::isDirectory);
 
             if (found.isEmpty()) {
@@ -40,8 +40,8 @@ public class MoveJavaPackage implements GenAction {
                 return;
             }
 
-            final VirtualFile folder = found.get();
-            final Optional<VirtualFile> target = JavaSourceRoot.packageFolder(sourceRoot, destination);
+            final @NotNull VirtualFile folder = found.get();
+            final @NotNull Optional<VirtualFile> target = JavaSourceRoot.packageFolder(sourceRoot, destination);
 
             // No folder to move into; a package dropped where it already is; and a
             // package dropped into itself, which would take the folder with it.

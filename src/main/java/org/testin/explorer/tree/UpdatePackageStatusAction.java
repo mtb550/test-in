@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
+
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
@@ -52,7 +53,7 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
     }
 
     private void mark(final @NotNull DirectoryDto dir) {
-        final PackageMarker marker = (PackageMarker) dir.getMarker();
+        final @NotNull PackageMarker marker = (PackageMarker) dir.getMarker();
         try {
             marker.setStatus(status);
             marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
@@ -71,7 +72,7 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final Optional<PackageMarker> marker = selectedMarker();
+        final @NotNull Optional<PackageMarker> marker = selectedMarker();
 
         e.getPresentation().setVisible(marker.isPresent());
         e.getPresentation().setEnabled(marker.filter(m -> m.getStatus() != status).isPresent());

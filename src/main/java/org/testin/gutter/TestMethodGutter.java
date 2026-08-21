@@ -81,7 +81,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.awaitIndexing();
 
                 // Generated code outlives the case it was generated from: the

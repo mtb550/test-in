@@ -56,7 +56,7 @@ final class TestinConfigWriter {
      */
     static boolean write(final @NotNull Path file, final @NotNull String key, final @NotNull String value) {
         try {
-            final String before = Files.isRegularFile(file) ? Files.readString(file) : HEADER;
+            final @NotNull String before = Files.isRegularFile(file) ? Files.readString(file) : HEADER;
             Files.writeString(file, apply(before, key, value));
             Logger.info("Wrote " + key + " to " + file);
             return true;
@@ -75,13 +75,13 @@ final class TestinConfigWriter {
     static @NotNull String apply(final @NotNull String content, final @NotNull String key, final @NotNull String value) {
         // Split after each newline so every line keeps its own ending: a file
         // written on Windows stays that way, including the lines not touched.
-        final String[] lines = content.split("(?<=\n)", -1);
-        final Pattern assignment = assignment(key);
-        final String scalar = scalar(value);
+        final String @NotNull[] lines = content.split("(?<=\n)", -1);
+        final @NotNull Pattern assignment = assignment(key);
+        final @NotNull String scalar = scalar(value);
 
         for (int i = 0; i < lines.length; i++) {
-            final String line = lines[i];
-            final String text = line.stripTrailing();
+            final @NotNull String line = lines[i];
+            final @NotNull String text = line.stripTrailing();
             if (!assignment.matcher(text).matches()) continue;
 
             // Everything the line ended with - trailing spaces, the newline, the
@@ -91,7 +91,7 @@ final class TestinConfigWriter {
             return String.join("", lines);
         }
 
-        final String separator = content.isEmpty() || content.endsWith("\n") ? "" : "\n";
+        final @NotNull String separator = content.isEmpty() || content.endsWith("\n") ? "" : "\n";
         return content + separator + key + ": " + scalar + "\n";
     }
 

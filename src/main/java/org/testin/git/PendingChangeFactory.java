@@ -66,12 +66,12 @@ final class PendingChangeFactory {
      */
     private static @NotNull ChangeSubject subjectOf(final @NotNull Path relativePath, final @NotNull String json,
                                                     final @NotNull Mapper mapper) {
-        final String fileName = relativePath.getFileName().toString();
+        final @NotNull String fileName = relativePath.getFileName().toString();
 
         if (fileName.startsWith(".")) return ChangeSubject.MARKER;
         if (!fileName.endsWith(JSON)) return ChangeSubject.OTHER;
 
-        final Map<String, Object> fields = fieldsIn(mapper, json);
+        final @NotNull Map<String, Object> fields = fieldsIn(mapper, json);
         if (fields.containsKey("results")) return ChangeSubject.TEST_RUN;
         if (fields.containsKey("description") || fields.containsKey("expectedResult")) return ChangeSubject.TEST_CASE;
 
@@ -109,25 +109,25 @@ final class PendingChangeFactory {
     private static @NotNull PendingChange testCase(
             final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson,
             final @NotNull Path relativePath, final @NotNull Mapper mapper) {
-        final String testSet = parentName(relativePath);
+        final @NotNull String testSet = parentName(relativePath);
 
         return switch (type) {
             case ADDED -> {
-                final TestCaseDto newState = read(mapper, afterJson, TestCaseDto.class);
+                final @NotNull TestCaseDto newState = read(mapper, afterJson, TestCaseDto.class);
                 yield new PendingChange(ChangeSubject.TEST_CASE, newState.getDescription(), testSet,
                         newState.getId().toString(), relativePath, DiffType.ADDED, null, newState,
                         List.of(new FieldChange("Test Case", "", newState.getDescription(), ChangeType.CREATE_TEST_CASE)));
             }
             case DELETED -> {
-                final TestCaseDto oldState = read(mapper, beforeJson, TestCaseDto.class);
+                final @NotNull TestCaseDto oldState = read(mapper, beforeJson, TestCaseDto.class);
                 yield new PendingChange(ChangeSubject.TEST_CASE, oldState.getDescription(), testSet,
                         oldState.getId().toString(), relativePath, DiffType.DELETED, oldState, null,
                         List.of(new FieldChange("Test Case", oldState.getDescription(), "", ChangeType.REMOVE_TEST_CASE)));
             }
             case MODIFIED -> {
-                final TestCaseDto oldState = read(mapper, beforeJson, TestCaseDto.class);
-                final TestCaseDto newState = read(mapper, afterJson, TestCaseDto.class);
-                final List<FieldChange> fieldChanges = TestCaseChangeComparator.compare(oldState, newState);
+                final @NotNull TestCaseDto oldState = read(mapper, beforeJson, TestCaseDto.class);
+                final @NotNull TestCaseDto newState = read(mapper, afterJson, TestCaseDto.class);
+                final @NotNull List<FieldChange> fieldChanges = TestCaseChangeComparator.compare(oldState, newState);
 
                 // A test case file that changed with no reviewable field
                 // different - a reordering, an audit stamp - is still a change
@@ -144,9 +144,9 @@ final class PendingChangeFactory {
     private static @NotNull PendingChange testRun(
             final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson,
             final @NotNull Path relativePath, final @NotNull Mapper mapper) {
-        final String runName = parentName(relativePath);
+        final @NotNull String runName = parentName(relativePath);
 
-        final List<FieldChange> changes = switch (type) {
+        final @NotNull List<FieldChange> changes = switch (type) {
             case ADDED -> List.of(new FieldChange("Test Run", "", summary(read(mapper, afterJson, TestRunDto.class)),
                     ChangeType.CREATE_TEST_RUN));
             case DELETED -> List.of(new FieldChange("Test Run", summary(read(mapper, beforeJson, TestRunDto.class)), "",
@@ -165,11 +165,11 @@ final class PendingChangeFactory {
     private static @NotNull PendingChange marker(
             final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson,
             final @NotNull Path relativePath, final @NotNull Mapper mapper) {
-        final String node = parentName(relativePath);
-        final String before = statusIn(mapper, beforeJson);
-        final String after = statusIn(mapper, afterJson);
+        final @NotNull String node = parentName(relativePath);
+        final @NotNull String before = statusIn(mapper, beforeJson);
+        final @NotNull String after = statusIn(mapper, afterJson);
 
-        final ChangeType changeType = switch (type) {
+        final @NotNull ChangeType changeType = switch (type) {
             case ADDED -> ChangeType.CREATE_MARKER;
             case DELETED -> ChangeType.REMOVE_MARKER;
             case MODIFIED -> ChangeType.CHANGE_MARKER;
@@ -189,7 +189,7 @@ final class PendingChangeFactory {
     }
 
     private static @NotNull PendingChange other(final @NotNull DiffType type, final @NotNull Path relativePath) {
-        final ChangeType changeType = switch (type) {
+        final @NotNull ChangeType changeType = switch (type) {
             case ADDED -> ChangeType.CREATE_FILE;
             case DELETED -> ChangeType.REMOVE_FILE;
             case MODIFIED -> ChangeType.CHANGE_FILE;
@@ -213,12 +213,12 @@ final class PendingChangeFactory {
      * statuses and this needs the word, not the type.
      */
     private static @NotNull String statusIn(final @NotNull Mapper mapper, final @NotNull String json) {
-        final Object status = fieldsIn(mapper, json).get("status");
+        final @NotNull Object status = fieldsIn(mapper, json).get("status");
         return Objects.toString(status, "");
     }
 
     private static @NotNull String parentName(final @NotNull Path relativePath) {
-        final Path parent = relativePath.getParent();
+        final @NotNull Path parent = relativePath.getParent();
         return Optional.ofNullable(parent).map(Path::getFileName).map(Path::toString).orElse("");
     }
 

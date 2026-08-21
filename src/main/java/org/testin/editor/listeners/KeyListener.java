@@ -30,14 +30,14 @@ public class KeyListener extends KeyAdapter {
     public void keyPressed(final KeyEvent e) {
         if (!Shortcuts.CopyItem.matches(e)) return;
 
-        final List<TestCaseDto> selectedCases = list.getSelectedValuesList();
+        final @NotNull List<TestCaseDto> selectedCases = list.getSelectedValuesList();
         if (selectedCases.isEmpty()) return;
 
-        final String titles = selectedCases.stream()
+        final @NotNull String titles = selectedCases.stream()
                 .map(TestCaseDto::getDescription)
                 .collect(Collectors.joining("\n"));
 
-        final StringSelection selection = new StringSelection(titles);
+        final @NotNull StringSelection selection = new StringSelection(titles);
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
     }
 }

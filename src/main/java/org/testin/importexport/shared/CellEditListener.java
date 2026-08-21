@@ -34,14 +34,14 @@ public class CellEditListener implements TableModelListener {
             if (row >= 0 && col >= 2) {
                 isUpdating = true;
                 try {
-                    final DefaultTableModel model = (DefaultTableModel) e.getSource();
-                    final String updatedValue = String.valueOf(model.getValueAt(row, col));
-                    final TestEditorAttributes currentAttr = importAttributes.get(col - 2);
-                    final TestCaseDto tc = testCases.get(row);
+                    final @NotNull DefaultTableModel model = (DefaultTableModel) e.getSource();
+                    final @NotNull String updatedValue = String.valueOf(model.getValueAt(row, col));
+                    final @NotNull TestEditorAttributes currentAttr = importAttributes.get(col - 2);
+                    final @NotNull TestCaseDto tc = testCases.get(row);
 
                     currentAttr.getImportSetter().execute(p, tc, updatedValue);
 
-                    final String formattedValue = currentAttr.getTestValueExtractor().execute(tc, p);
+                    final @NotNull String formattedValue = currentAttr.getTestValueExtractor().execute(tc, p);
                     model.setValueAt(formattedValue, row, col);
                 } finally {
                     isUpdating = false;

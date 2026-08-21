@@ -43,8 +43,8 @@ public final class GitDiffProcessor {
     public static @NotNull List<PendingChange> getPendingChanges(
             final @NotNull Project project,
             final @NotNull Path repositoryRoot) {
-        final Path root = repositoryRoot.toAbsolutePath().normalize();
-        final GitRepositoryService repositories = new GitRepositoryService(project);
+        final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
+        final @NotNull GitRepositoryService repositories = new GitRepositoryService(project);
 
         return toDiffs(repositories.status(root), root,
                 Services.getInstance(project, Mapper.class),
@@ -67,11 +67,11 @@ public final class GitDiffProcessor {
             final @NotNull Path repositoryRoot,
             final @NotNull Mapper mapper,
             final @NotNull Function<String, String> committedContent) {
-        final Path root = repositoryRoot.toAbsolutePath().normalize();
-        final List<PendingChange> result = new ArrayList<>();
+        final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
+        final @NotNull List<PendingChange> result = new ArrayList<>();
 
         for (final GitRefs.StatusEntry entry : GitRefs.parseStatus(statusLines)) {
-            final Path relativePath = Path.of(entry.path());
+            final @NotNull Path relativePath = Path.of(entry.path());
 
             // An untracked file that is no longer there is not a pending change:
             // Git listed it a moment ago and something removed it since. Listing
@@ -118,7 +118,7 @@ public final class GitDiffProcessor {
             final @NotNull GitRefs.StatusEntry entry) {
         if (entry.type() == DiffType.DELETED) return "";
 
-        final Path file = root.resolve(relativePath);
+        final @NotNull Path file = root.resolve(relativePath);
         try {
             return Files.readString(file, StandardCharsets.UTF_8);
         } catch (final IOException ex) {

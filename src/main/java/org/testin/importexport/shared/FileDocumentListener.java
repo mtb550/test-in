@@ -62,10 +62,10 @@ public class FileDocumentListener implements DocumentListener {
     }
 
     private void triggerLoadIfValid() {
-        final String filePath = fileField.getText().trim();
+        final @NotNull String filePath = fileField.getText().trim();
         if (filePath.isEmpty()) return;
 
-        final File importFile = new File(filePath);
+        final @NotNull File importFile = new File(filePath);
         if (!importFile.exists() || !importFile.isFile()) return;
 
         loadFile(importFile);
@@ -81,7 +81,7 @@ public class FileDocumentListener implements DocumentListener {
         // Parsing a workbook is heavy I/O; keep it off the EDT — this fires per keystroke.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                final Map<String, List<TestCaseDto>> parsedData = importLoader.apply(importFile, format);
+                final @NotNull Map<String, List<TestCaseDto>> parsedData = importLoader.apply(importFile, format);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (parsedData.isEmpty()) {

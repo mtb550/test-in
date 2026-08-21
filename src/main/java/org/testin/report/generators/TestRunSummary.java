@@ -31,7 +31,7 @@ public record TestRunSummary(long total, long passed, long failed, long blocked,
                              int passRate, @NotNull String executedBy) {
 
     public static @NotNull TestRunSummary of(final @NotNull List<TestRunItems> results) {
-        final Map<TestStatus, Long> counts = results.stream()
+        final @NotNull Map<TestStatus, Long> counts = results.stream()
                 .collect(Collectors.groupingBy(TestRunItems::getStatus, Collectors.counting()));
 
         final long passed = counts.getOrDefault(TestStatus.PASSED, 0L);

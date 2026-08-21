@@ -39,16 +39,16 @@ public class UpdateRunItemAction extends AbstractProjectAction {
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
         // Nothing selected is nothing to edit.
-        final Optional<TestCaseDto> selected = ListValue.selected(list);
+        final @NotNull Optional<TestCaseDto> selected = ListValue.selected(list);
         if (selected.isEmpty()) return;
 
         if (!(editor instanceof RunEditor runEditor)) return;
 
-        final Optional<TestRunItems> found = runEditor.runItem(selected.orElseThrow().getId());
+        final @NotNull Optional<TestRunItems> found = runEditor.runItem(selected.orElseThrow().getId());
         if (found.isEmpty()) return;
 
-        final TestRunItems runItem = found.orElseThrow();
-        final TestCaseDto testCase = selected.orElseThrow();
+        final @NotNull TestRunItems runItem = found.orElseThrow();
+        final @NotNull TestCaseDto testCase = selected.orElseThrow();
 
         // The test case is gone: what the run recorded against it stands as it is.
         if (runItem.isRemoved()) {
@@ -79,7 +79,7 @@ public class UpdateRunItemAction extends AbstractProjectAction {
         // Details belong to failed test cases only - the dialog's title stays
         // truthful and the action reads as what it is.
         boolean enabled = false;
-        final Optional<TestCaseDto> selected = ListValue.selected(list);
+        final @NotNull Optional<TestCaseDto> selected = ListValue.selected(list);
         if (selected.isPresent() && list.getSelectedValuesList().size() == 1 && editor instanceof RunEditor runEditor) {
             enabled = runEditor.runItem(selected.orElseThrow().getId())
                     .filter(item -> item.getStatus() == TestStatus.FAILED)

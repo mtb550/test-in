@@ -37,14 +37,14 @@ public class UpdateTestCaseAction extends AbstractProjectAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final List<TestCaseDto> selectedItems = list.getSelectedValuesList();
+        final @NotNull List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         Logger.trace("update test cases: " + selectedItems.stream().map(TestCaseDto::getDescription).collect(Collectors.joining(", ")));
 
         new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> {
 
-            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             for (final TestCaseDto tc : updatedItems)
                 indexer.putTestCase(path, tc);
 

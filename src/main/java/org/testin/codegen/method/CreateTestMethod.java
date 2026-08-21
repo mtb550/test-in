@@ -59,7 +59,7 @@ public class CreateTestMethod implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        final List<String> fqcn = Fqcn.ofMethod(tc);
+        final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
 
         parse(fqcn).ifPresentOrElse(
                 target -> {
@@ -71,9 +71,9 @@ public class CreateTestMethod implements GenAction {
     }
 
     private void createMethod(final @NotNull Project p, final @NotNull Target target, final @NotNull TestCaseDto tc) {
-        final List<String> packageList = target.packageList();
-        final String className = target.className();
-        final String methodName = target.methodName();
+        final @NotNull List<String> packageList = target.packageList();
+        final @NotNull String className = target.className();
+        final @NotNull String methodName = target.methodName();
 
         try {
             findOrCreateClass(p, target.path(), packageList, className).ifPresentOrElse(
@@ -93,10 +93,10 @@ public class CreateTestMethod implements GenAction {
     private @NotNull Optional<PsiClass> findOrCreateClass(final @NotNull Project p, final @NotNull String path,
                                                           final @NotNull List<String> packageList,
                                                           final @NotNull String className) {
-        final JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(p);
-        final GlobalSearchScope scope = GlobalSearchScope.projectScope(p);
+        final @NotNull JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(p);
+        final @NotNull GlobalSearchScope scope = GlobalSearchScope.projectScope(p);
 
-        final Optional<PsiClass> existing = Optional.ofNullable(psiFacade.findClass(path, scope));
+        final @NotNull Optional<PsiClass> existing = Optional.ofNullable(psiFacade.findClass(path, scope));
         if (existing.isPresent()) return existing;
 
         try {
@@ -127,20 +127,20 @@ public class CreateTestMethod implements GenAction {
                                 final @NotNull List<String> packageList, final @NotNull String className,
                                 final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
-            final String relativePath = String.join("/", packageList) + "/" + className + ".java";
-            final Optional<VirtualFile> found = JavaSourceRoot.under(sourceRoot, relativePath);
+            final @NotNull String relativePath = String.join("/", packageList) + "/" + className + ".java";
+            final @NotNull Optional<VirtualFile> found = JavaSourceRoot.under(sourceRoot, relativePath);
             if (found.isEmpty()) {
                 Logger.error("retryInjectPhysically: file not found at " + relativePath + " for method '" + methodName + "'");
                 return;
             }
 
-            final PsiFile psiFile = PsiManager.getInstance(p).findFile(found.orElseThrow());
+            final @NotNull PsiFile psiFile = PsiManager.getInstance(p).findFile(found.orElseThrow());
             if (!(psiFile instanceof PsiJavaFile javaPsiFile)) {
                 Logger.error("retryInjectPhysically: file " + className + ".java is not a valid Java file for method '" + methodName + "'");
                 return;
             }
 
-            final PsiClass[] classes = javaPsiFile.getClasses();
+            final PsiClass @NotNull[] classes = javaPsiFile.getClasses();
             if (classes.length == 0) {
                 Logger.error("retryInjectPhysically: no classes found in " + className + ".java for method '" + methodName + "'");
                 return;
@@ -181,8 +181,8 @@ public class CreateTestMethod implements GenAction {
     private void injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass,
                               final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
-            final PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
-            final PsiFile file = targetClass.getContainingFile();
+            final @NotNull PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
+            final @NotNull PsiFile file = targetClass.getContainingFile();
 
             if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, factory);
 
@@ -193,10 +193,10 @@ public class CreateTestMethod implements GenAction {
                 }
             }
 
-            final StringBuilder attributes = new StringBuilder();
+            final @NotNull StringBuilder attributes = new StringBuilder();
 
             if (!tc.getGroup().isEmpty()) {
-                final List<String> activeGroups = tc.getGroup().stream()
+                final @NotNull List<String> activeGroups = tc.getGroup().stream()
                         .filter(g -> g != Group.UNASSIGNED)
                         .map(g -> "\"" + g.getName() + "\"")
                         .toList();
@@ -210,15 +210,15 @@ public class CreateTestMethod implements GenAction {
 
             attributes.append(", priority = ").append(tc.getPriority().getValue());
 
-            final String annotationText = String.format("@Test(description = \"%s\", testName = \"%s\"%s)",
+            final @NotNull String annotationText = String.format("@Test(description = \"%s\", testName = \"%s\"%s)",
                     tc.getDescription().replace("\"", "\\\""),
                     tc.getId(),
                     attributes);
 
-            final String methodText = annotationText + "\npublic void " + methodName + "() {\n    // TODO: Auto-generated test steps for " + methodName + "\n}";
+            final @NotNull String methodText = annotationText + "\npublic void " + methodName + "() {\n    // TODO: Auto-generated test steps for " + methodName + "\n}";
 
-            final PsiMethod newMethod = factory.createMethodFromText(methodText, targetClass);
-            final PsiElement addedElement = targetClass.add(newMethod);
+            final @NotNull PsiMethod newMethod = factory.createMethodFromText(methodText, targetClass);
+            final @NotNull PsiElement addedElement = targetClass.add(newMethod);
             CodeStyleManager.getInstance(p).reformat(addedElement);
 
             Logger.info("Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());

@@ -29,7 +29,7 @@ public final class Fqcn {
      * Packages, class and method for the automation code of one test case.
      */
     public static @NotNull ArrayList<String> ofMethod(final @NotNull TestCaseDto tc) {
-        final ArrayList<String> generatedFqcn = withoutTestCasesDir(tc.getParent().getPath2());
+        final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(tc.getParent().getPath2());
 
         if (generatedFqcn.isEmpty()) {
             generatedFqcn.add("DefaultTest");
@@ -51,7 +51,7 @@ public final class Fqcn {
      * IndexOutOfBoundsException to go with it. Callers skip on empty (#66, F1).
      */
     public static @NotNull List<String> ofClass(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        final ArrayList<String> generatedFqcn = withoutTestCasesDir(dir.getPath2());
+        final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(dir.getPath2());
 
         if (generatedFqcn.isEmpty()) {
             Services.getInstance(p, Notifier.class).softShow(p, "Class Name Unknown",
@@ -67,7 +67,7 @@ public final class Fqcn {
      * Packages alone, for a directory that becomes one.
      */
     public static @NotNull List<String> ofPackage(final @NotNull DirectoryDto dir) {
-        final ArrayList<String> generatedFqcn = withoutTestCasesDir(dir.getPath2());
+        final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(dir.getPath2());
 
         if (generatedFqcn.isEmpty()) {
             generatedFqcn.add("generated");
@@ -82,7 +82,7 @@ public final class Fqcn {
      * place in the tree, not a package, so it never appears in generated code.
      */
     private static @NotNull ArrayList<String> withoutTestCasesDir(final @NotNull List<String> path2) {
-        final ArrayList<String> names = new ArrayList<>(path2);
+        final @NotNull ArrayList<String> names = new ArrayList<>(path2);
         names.remove(DirectoryType.TCD.getDisplayedName());
         return names;
     }

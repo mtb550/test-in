@@ -63,15 +63,15 @@ public class CreateTestRun implements NodeCreator {
                               final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
 
-            final Path testCasesPath = testCasesRoot.getPath();
-            final DefaultMutableTreeNode fullModelNode = buildDirectoryTree(testCasesPath, testCasesRoot);
+            final @NotNull Path testCasesPath = testCasesRoot.getPath();
+            final @NotNull DefaultMutableTreeNode fullModelNode = buildDirectoryTree(testCasesPath, testCasesRoot);
 
-            final CheckedTreeNode root = convertToCheckedNodes(fullModelNode);
+            final @NotNull CheckedTreeNode root = convertToCheckedNodes(fullModelNode);
 
             ApplicationManager.getApplication().invokeLater(() -> {
 
-                final RunConfigurationForm form = new RunConfigurationForm(name);
-                final SelectionTree selection = new SelectionTree(root, RunTreeCellRenderer.create(Collections.emptyMap()));
+                final @NotNull RunConfigurationForm form = new RunConfigurationForm(name);
+                final @NotNull SelectionTree selection = new SelectionTree(root, RunTreeCellRenderer.create(Collections.emptyMap()));
 
                 new RunConfigurationDialog(p, form, selection, () -> {
                     // The popup is not modal - the tree stays live while the
@@ -81,7 +81,7 @@ public class CreateTestRun implements NodeCreator {
                         return;
                     }
 
-                    final TestRunDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, newDirPath, parentDir);
+                    final @NotNull TestRunDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, newDirPath, parentDir);
                     saveSelectedToJSON(form, selection, newDirPath, Services.getInstance(p, ExplorerPanel.class), tr);
                 }).show();
             });
@@ -100,10 +100,10 @@ public class CreateTestRun implements NodeCreator {
      */
     private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder,
                                                                final @NotNull DirectoryDto thisNodeDto) {
-        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         indexer.awaitIndexing();
 
-        final DefaultMutableTreeNode node = new DefaultMutableTreeNode(thisNodeDto);
+        final @NotNull DefaultMutableTreeNode node = new DefaultMutableTreeNode(thisNodeDto);
 
         if (thisNodeDto instanceof TestSetDirectoryDto) {
             for (final TestCaseDto tc : indexer.getTestCasesForTestSet(folder)) {
@@ -117,7 +117,7 @@ public class CreateTestRun implements NodeCreator {
             // offered for a new run: that is what retiring it means (#68).
             if (child.isRetired()) continue;
 
-            final DefaultMutableTreeNode childNode = buildDirectoryTree(child.getPath(), child);
+            final @NotNull DefaultMutableTreeNode childNode = buildDirectoryTree(child.getPath(), child);
 
             // An empty test set, or a package holding only empty ones, would
             // clutter the tree with a branch that cannot be ticked.
@@ -128,7 +128,7 @@ public class CreateTestRun implements NodeCreator {
     }
 
     private void saveSelectedToJSON(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull ExplorerPanel pp, final @NotNull TestRunDirectoryDto trDir) {
-        final TestRunDto tr = new TestRunDto()
+        final @NotNull TestRunDto tr = new TestRunDto()
                 .setCreatedBy(Services.getInstance(p, AppSettingsState.class).testerName)
                 .setChangeLog(form.getChangeLog().getText().trim())
                 .setCommitId(form.getCommitIdField().getText().trim())
@@ -139,10 +139,10 @@ public class CreateTestRun implements NodeCreator {
                 .setBrowser(form.getFieldValue(TestRunConfiguration.BROWSER))
                 .setDeviceType(form.getFieldValue(TestRunConfiguration.DEVICE_TYPE));
 
-        final List<TestRunItems> items = new ArrayList<>();
+        final @NotNull List<TestRunItems> items = new ArrayList<>();
         selection.forEachChecked(checked -> {
             if (checked instanceof TestCaseDto tc) {
-                final TestRunItems item = new TestRunItems();
+                final @NotNull TestRunItems item = new TestRunItems();
                 item.setId(tc.getId());
                 item.setStatus(TestStatus.PENDING);
                 items.add(item);
@@ -178,8 +178,8 @@ public class CreateTestRun implements NodeCreator {
     }
 
     private @NotNull CheckedTreeNode convertToCheckedNodes(final @NotNull DefaultMutableTreeNode node) {
-        final Object userObj = node.getUserObject();
-        final CheckedTreeNode newNode = new CheckedTreeNode(userObj);
+        final @NotNull Object userObj = node.getUserObject();
+        final @NotNull CheckedTreeNode newNode = new CheckedTreeNode(userObj);
         for (int i = 0; i < node.getChildCount(); i++) {
             newNode.add(convertToCheckedNodes((DefaultMutableTreeNode) node.getChildAt(i)));
         }

@@ -32,7 +32,7 @@ public class TestCaseExecutionTracker {
 
             @Override
             public void onTestFinished(final @NotNull SMTestProxy test) {
-                final String testName = test.getPresentableName().toLowerCase();
+                final @NotNull String testName = test.getPresentableName().toLowerCase();
 
                 if (test.isPassed()) {
                     TestCaseExecutionListener.broadcast(p, testName, RunStatus.PASSED, "");

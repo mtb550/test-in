@@ -44,7 +44,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
 
             if (!OptionalPlugin.GIT.isAvailableOrWarn(p)) return;
 
-            final String projectName = NameSanitizer.projectNameFromUrl(name);
+            final @NotNull String projectName = NameSanitizer.projectNameFromUrl(name);
             new CreateTestProjectCloneAction(p, name, projectName, pp).execute();
 
         }).show();

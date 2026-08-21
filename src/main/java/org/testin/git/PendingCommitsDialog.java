@@ -72,7 +72,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
 
         title = "Pending Changes";
 
-        final ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
+        final @NotNull ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
                 .column("Change Type", 150)
                 .column("Test Set", 150)
                 .column("Name", 240)
@@ -84,20 +84,20 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         // checked out, and takes a name that is not on the list as a new branch
         // to start - which is how a tester keeps a cycle's results off main
         // without leaving the dialog.
-        final ComponentDialogBase<ChoiceInput> branchRow =
+        final @NotNull ComponentDialogBase<ChoiceInput> branchRow =
                 ComponentDialogBase.choice("Branch", offered(branches, currentBranch), currentBranch);
 
         // Deliberately empty. Pre-filling it produced five commits called
         // "Updated test cases" in one afternoon of testing - a default that gets
         // accepted rather than read, and a history that tells a reviewer nothing.
-        final ComponentDialogBase<TextInput> messageField = ComponentDialogBase.textField()
+        final @NotNull ComponentDialogBase<TextInput> messageField = ComponentDialogBase.textField()
                 .placeholder("what changed, in a line...")
                 .build();
         // Push first, because a commit nobody pushed helps no colleague - the
         // review used to end in a commit and then offer the push in a
         // notification, which is a second decision taken away from the changes
         // it is about. Commit alone stays, one click under it.
-        final ComponentDialogBase<DialogSplitButton> commitButton =
+        final @NotNull ComponentDialogBase<DialogSplitButton> commitButton =
                 ComponentDialogBase.splitButton(PUSH, COMMIT);
 
         components = List.of(table, branchRow, messageField, commitButton);
@@ -133,7 +133,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                                                  final @NotNull String current) {
         if (current.isEmpty() || branches.contains(current)) return branches;
 
-        final List<String> withCurrent = new ArrayList<>(branches);
+        final @NotNull List<String> withCurrent = new ArrayList<>(branches);
         withCurrent.addFirst(current);
 
         return withCurrent;
@@ -169,7 +169,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
      * of its rows are selected.
      */
     private @NotNull List<PendingChange> selectedDifferences() {
-        final Set<PendingChange> selected = new LinkedHashSet<>();
+        final @NotNull Set<PendingChange> selected = new LinkedHashSet<>();
         for (final int row : changes.getSelectedRows()) {
             if (row < rowDifferences.size()) selected.add(rowDifferences.get(row));
         }
@@ -185,7 +185,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     private void revertRow(final @NotNull Project p, final int row) {
         if (row >= rowDifferences.size()) return;
 
-        final PendingChange diff = rowDifferences.get(row);
+        final @NotNull PendingChange diff = rowDifferences.get(row);
 
         // A run's verdicts and a node's marker are records of work rather than
         // edits: putting one back would say a case was never run, or that a
@@ -197,12 +197,12 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         }
 
         try {
-            final Optional<Path> found = Optional.ofNullable(repoRoot.resolve(diff.relativeFilePath()).getParent());
+            final @NotNull Optional<Path> found = Optional.ofNullable(repoRoot.resolve(diff.relativeFilePath()).getParent());
             if (found.isEmpty()) return;
 
-            final Path testSetPath = found.orElseThrow();
-            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-            final UUID testCaseId = UUID.fromString(diff.testCaseId());
+            final @NotNull Path testSetPath = found.orElseThrow();
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull UUID testCaseId = UUID.fromString(diff.testCaseId());
 
             switch (diff.type()) {
                 case ADDED -> indexer.removeTestCase(testSetPath, testCaseId);
@@ -210,11 +210,11 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                 case MODIFIED -> {
                     // The row's own label says which field it reverts; a label
                     // that names no revertable field leaves the row alone.
-                    final Optional<RevertAction> revert = ChangeType
+                    final @NotNull Optional<RevertAction> revert = ChangeType
                             .fromLabel(changes.getValueAt(row, COLUMN_CHANGE_TYPE))
                             .filter(ChangeType::isRevertable)
                             .map(ChangeType::getRevertAction);
-                    final Optional<TestCaseDto> current = indexer.findTestCase(testCaseId);
+                    final @NotNull Optional<TestCaseDto> current = indexer.findTestCase(testCaseId);
 
                     if (revert.isEmpty() || current.isEmpty()) return;
 
@@ -239,7 +239,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
 
     @Override
     protected void submit() {
-        final List<PendingChange> selected = selectedDifferences();
+        final @NotNull List<PendingChange> selected = selectedDifferences();
         if (selected.isEmpty()) return;
 
         // Said here, next to the empty field, rather than as a balloon after the

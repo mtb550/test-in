@@ -31,7 +31,7 @@ public class GroupSection implements CreateTestCaseSection {
         Arrays.stream(Group.values())
                 .filter(Group::isActive)
                 .map(group -> {
-                    final JBCheckBox checkBox = new JBCheckBox(group.name());
+                    final @NotNull JBCheckBox checkBox = new JBCheckBox(group.name());
                     checkBox.setFont(fieldFont);
                     return checkBox;
                 })
@@ -65,7 +65,7 @@ public class GroupSection implements CreateTestCaseSection {
 
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        final ArrayList<Group> selectedGroups = new ArrayList<>();
+        final @NotNull ArrayList<Group> selectedGroups = new ArrayList<>();
         for (final Component c : group.getComponents()) {
             if (c instanceof JBCheckBox cb && cb.isSelected()) {
                 selectedGroups.add(Group.valueOf(cb.getText()));
@@ -105,7 +105,7 @@ public class GroupSection implements CreateTestCaseSection {
         for (final Component c : group.getComponents()) {
             if (c instanceof JBCheckBox cb) {
                 try {
-                    final Group group = Group.valueOf(cb.getText());
+                    final @NotNull Group group = Group.valueOf(cb.getText());
                     cb.setSelected(selectedList.contains(group));
 
                 } catch (final Exception ex) {

@@ -40,17 +40,17 @@ public class TestCaseUpdateMenuDialog {
         ViewToolWindowFactory.panel().ifPresent(viewPanel -> viewPanel.refreshIfShowing(updated));
 
         Logger.trace("Generating automation code: " + gt);
-        final GenAction action = gt.getAction();
-        final TestCaseDto first = updated.getFirst();
+        final @NotNull GenAction action = gt.getAction();
+        final @NotNull TestCaseDto first = updated.getFirst();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(p, first));
     }
 
     public void show() {
         final boolean isSingle = items.size() == 1;
-        final String title = isSingle ? "Update Test Case" : "Update " + items.size() + " Test Cases";
+        final @NotNull String title = isSingle ? "Update Test Case" : "Update " + items.size() + " Test Cases";
 
-        final UpdateTestCaseFields[] fields = UpdateTestCaseFields.values();
+        final UpdateTestCaseFields @NotNull[] fields = UpdateTestCaseFields.values();
 
         new ShortcutMenuPopup<>(p, title, fields,
                 UpdateTestCaseFields::getIcon,
@@ -59,7 +59,7 @@ public class TestCaseUpdateMenuDialog {
                 UpdateTestCaseFields::bindShortcut,
                 selectedItem -> {
 
-                    final GenType gt = selectedItem.getGt();
+                    final @NotNull GenType gt = selectedItem.getGt();
                     Logger.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + gt);
 
                     if (isSingle) {

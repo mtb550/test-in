@@ -102,7 +102,7 @@ public final class SelectionTable implements DialogComponent {
     }
 
     public @NotNull List<Integer> getSelectedRows() {
-        final List<Integer> rows = new ArrayList<>();
+        final @NotNull List<Integer> rows = new ArrayList<>();
         for (final int row : table.getSelectedRows()) rows.add(row);
         return rows;
     }
@@ -112,7 +112,7 @@ public final class SelectionTable implements DialogComponent {
     }
 
     public @NotNull String getValueAt(final int row, final int column) {
-        final Object value = model.getValueAt(row, column);
+        final @NotNull Object value = model.getValueAt(row, column);
         return Objects.toString(value, "");
     }
 
@@ -124,7 +124,7 @@ public final class SelectionTable implements DialogComponent {
      * Adds a right-click entry, given the row it was invoked on.
      */
     public void onRowAction(final @NotNull String label, final @NotNull IntConsumer action) {
-        final JMenuItem item = new JMenuItem(label);
+        final @NotNull JMenuItem item = new JMenuItem(label);
         item.addActionListener(event -> {
             final int row = table.getSelectedRow();
             if (row >= 0) action.accept(row);

@@ -50,16 +50,16 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!(editor instanceof TestEditor destUI)) return;
 
-            final CutState cutState = Services.getInstance(p, CutState.class);
+            final @NotNull CutState cutState = Services.getInstance(p, CutState.class);
             final boolean isCut = cutState.isCutting();
 
             cutState.source().ifPresent(sourceUI -> {
-                final List<TestCaseDto> cutItems = sourceUI.getAllTestCases().stream()
+                final @NotNull List<TestCaseDto> cutItems = sourceUI.getAllTestCases().stream()
                         .filter(tc -> cutState.isPending(tc.getId()))
                         .toList();
 
                 ApplicationManager.getApplication().runWriteAction(() -> {
-                    final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                    final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                     for (final TestCaseDto tc : cutItems) {
                         indexer.removeTestCase(sourceUI.getParent().getPath(), tc.getId());
                     }
@@ -74,7 +74,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
             int pasted = 0;
 
             for (final TestCaseDto tc : pastedCases) {
-                final TestCaseDto clonedTc = cloneForPasting(p, tc, isCut);
+                final @NotNull TestCaseDto clonedTc = cloneForPasting(p, tc, isCut);
 
                 clonedTc.setParent(destUI.getParent());
                 destUI.getAllTestCases().add(clonedTc);
@@ -126,10 +126,10 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
      */
     private @NotNull List<TestCaseDto> readTestCases(final @NotNull Transferable contents) {
         try {
-            final String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
+            final @NotNull String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
             if (!json.trim().startsWith("[")) return List.of();
 
-            final List<TestCaseDto> parsed = Services.getInstance(p, Mapper.class).readValue(json, new TypeReference<>() {
+            final @NotNull List<TestCaseDto> parsed = Services.getInstance(p, Mapper.class).readValue(json, new TypeReference<>() {
             });
 
             // Hand-edited JSON can carry a null entry, and the clipboard is not a
@@ -142,9 +142,9 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
     }
 
     private @NotNull TestCaseDto cloneForPasting(final @NotNull Project p, final @NotNull TestCaseDto original, final boolean isCut) {
-        final ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        final @NotNull ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
-        final TestCaseDto clonedTc = Services.getInstance(p, Mapper.class).convertValue(original, TestCaseDto.class);
+        final @NotNull TestCaseDto clonedTc = Services.getInstance(p, Mapper.class).convertValue(original, TestCaseDto.class);
 
         if (isCut) {
             clonedTc.setUpdatedAt(now);

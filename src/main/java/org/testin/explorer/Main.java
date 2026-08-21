@@ -23,8 +23,8 @@ public class Main implements ToolWindowFactory, DumbAware {
             if (!p.isDisposed())
                 StartupActivity.execute(p);
 
-            final ExplorerPanel pp = Services.getInstance(p, ExplorerPanel.class);
-            final Content content = ContentFactory.getInstance().createContent(pp.getPanel(), null, false);
+            final @NotNull ExplorerPanel pp = Services.getInstance(p, ExplorerPanel.class);
+            final @NotNull Content content = ContentFactory.getInstance().createContent(pp.getPanel(), null, false);
 
             tw.setTitleActions(new ExplorerPanelActions().create(p, pp));
             tw.getContentManager().addContent(content);

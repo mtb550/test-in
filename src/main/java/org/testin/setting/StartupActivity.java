@@ -26,7 +26,7 @@ public final class StartupActivity implements ProjectActivity {
     private static final @NotNull Key<Boolean> SOURCE_ROOT_CHECKED = Key.create("testin.sourceRootChecked");
 
     public static void execute(final @NotNull Project p) {
-        final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
         if (settings.rootTestinPath.isEmpty()) {
             Logger.info("First run detected — saving default settings to testinSettings.xml");
@@ -63,7 +63,7 @@ public final class StartupActivity implements ProjectActivity {
         // Before the first index, never after it: the config names the test
         // project this repository exercises, and an index that started without it
         // would have to be thrown away and run again (#6).
-        final TestinProjectConfig config = Services.getInstance(p, TestinConfigService.class).get();
+        final @NotNull TestinProjectConfig config = Services.getInstance(p, TestinConfigService.class).get();
         Logger.info(config.isBound()
                 ? "Bound to test project '" + config.testinProject() + "'"
                 : "No test project bound to " + p.getName());

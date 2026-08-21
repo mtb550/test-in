@@ -26,7 +26,7 @@ import java.util.*;
 final class TestRunChangeComparator {
 
     static @NotNull List<FieldChange> compare(final @NotNull TestRunDto oldRun, final @NotNull TestRunDto newRun) {
-        final List<FieldChange> changes = new ArrayList<>();
+        final @NotNull List<FieldChange> changes = new ArrayList<>();
 
         addIfChanged(changes, "Results", verdictSummary(oldRun), verdictSummary(newRun));
         addIfChanged(changes, "Change Log", oldRun.getChangeLog(), newRun.getChangeLog());
@@ -57,15 +57,15 @@ final class TestRunChangeComparator {
      * status that any case holds. "12 cases: 7 Passed, 3 Failed, 2 Pending".
      */
     static @NotNull String verdictSummary(final @NotNull TestRunDto run) {
-        final List<TestRunItems> results = run.getResults();
+        final @NotNull List<TestRunItems> results = run.getResults();
         if (results.isEmpty()) return "no cases";
 
-        final Map<TestStatus, Integer> counts = new EnumMap<>(TestStatus.class);
+        final @NotNull Map<TestStatus, Integer> counts = new EnumMap<>(TestStatus.class);
         for (final TestRunItems item : results) {
             counts.merge(item.getStatus(), 1, Integer::sum);
         }
 
-        final StringBuilder line = new StringBuilder(results.size() + " case" + (results.size() == 1 ? "" : "s") + ": ");
+        final @NotNull StringBuilder line = new StringBuilder(results.size() + " case" + (results.size() == 1 ? "" : "s") + ": ");
         boolean first = true;
         for (final Map.Entry<TestStatus, Integer> entry : counts.entrySet()) {
             if (!first) line.append(", ");

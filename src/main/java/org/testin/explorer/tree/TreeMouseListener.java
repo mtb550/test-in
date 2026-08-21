@@ -29,7 +29,7 @@ public class TreeMouseListener extends PopupHandler {
                 tree.setSelectionPath(selPath);
             }
 
-            final ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, treeContextMenu);
+            final @NotNull ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, treeContextMenu);
             popupMenu.getComponent().show(comp, x, y);
         });
     }

@@ -69,15 +69,15 @@ public final class TestCaseExecutionSubscriber {
     private void record(final @NotNull String testName, final @NotNull RunStatus status, final @NotNull String error) {
         Logger.debug("Execution report: testName='" + testName + "', status='" + status + "'");
 
-        final Optional<TestCaseDto> byId = parseUuid(testName).flatMap(indexer::findTestCase);
+        final @NotNull Optional<TestCaseDto> byId = parseUuid(testName).flatMap(indexer::findTestCase);
         byId.ifPresent(tc -> runningDtoId = Optional.of(tc.getId()));
 
-        final Optional<TestCaseDto> reported = byId.isPresent()
+        final @NotNull Optional<TestCaseDto> reported = byId.isPresent()
                 ? byId
                 : Optional.ofNullable(uuidToDtoId.get(testName)).flatMap(indexer::findTestCase);
 
         reported.ifPresent(tc -> {
-            final RunStatus reportedStatus = verdictFor(tc, status);
+            final @NotNull RunStatus reportedStatus = verdictFor(tc, status);
 
             Logger.debug("  reporting on '" + tc.getDescription() + "', tempStatus='" + reportedStatus + "'");
             tc.setTempStatus(reportedStatus);

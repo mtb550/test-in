@@ -47,7 +47,7 @@ public record PendingChange(@NotNull ChangeSubject subject, @NotNull String name
             throw new IllegalStateException("A " + subject + " change is not about a test case: " + relativeFilePath);
         }
 
-        final TestCaseDto state = type == DiffType.DELETED ? oldState : newState;
+        final @NotNull TestCaseDto state = type == DiffType.DELETED ? oldState : newState;
         if (state == null) {
             throw new IllegalStateException("A " + type + " change carries no test case: " + relativeFilePath);
         }

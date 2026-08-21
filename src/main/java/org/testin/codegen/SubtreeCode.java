@@ -42,7 +42,7 @@ public final class SubtreeCode {
     }
 
     private static void walk(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         Logger.info("Generating code for " + dir.getName());
         dir.getType().getCodegen().execute(p, dir);

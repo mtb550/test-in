@@ -27,7 +27,7 @@ public class PrioritySection implements CreateTestCaseSection {
     private final @NotNull JBPanel<?> wrapper;
 
     public PrioritySection() {
-        final Priority[] activePriorities = Arrays.stream(Priority.values())
+        final Priority @NotNull[] activePriorities = Arrays.stream(Priority.values())
                 .filter(Priority::isActive)
                 .toArray(Priority[]::new);
 

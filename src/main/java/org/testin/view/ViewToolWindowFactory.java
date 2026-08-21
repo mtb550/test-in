@@ -73,14 +73,14 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
                 StartupActivity.execute(p);
             }
 
-            final ViewPanel panel = new ViewPanel(p);
+            final @NotNull ViewPanel panel = new ViewPanel(p);
             viewPanel = Optional.of(panel);
 
-            final ContentFactory contentFactory = ContentFactory.getInstance();
+            final @NotNull ContentFactory contentFactory = ContentFactory.getInstance();
 
-            final Content detailsTab = contentFactory.createContent(panel.getDetailsScrollPane(), "Details", false);
-            final Content historyTab = contentFactory.createContent(panel.getHistoryScrollPane(), "History", false);
-            final Content bugsTab = contentFactory.createContent(panel.getOpenBugsScrollPane(), "Open Bugs", false);
+            final @NotNull Content detailsTab = contentFactory.createContent(panel.getDetailsScrollPane(), "Details", false);
+            final @NotNull Content historyTab = contentFactory.createContent(panel.getHistoryScrollPane(), "History", false);
+            final @NotNull Content bugsTab = contentFactory.createContent(panel.getOpenBugsScrollPane(), "Open Bugs", false);
 
             toolWindow.getContentManager().addContent(detailsTab);
             toolWindow.getContentManager().addContent(historyTab);

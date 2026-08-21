@@ -57,7 +57,7 @@ public final class DestinationForm implements DialogComponent {
         // selection needs no lookup back from text.
         formatCombo.setRenderer(SimpleListCellRenderer.create("", FileTypes::getLabel));
 
-        final FileChooserDescriptor descriptor = FileChooserDescriptorFactory
+        final @NotNull FileChooserDescriptor descriptor = FileChooserDescriptorFactory
                 .createSingleFolderDescriptor()
                 .withTitle(chooserTitle)
                 .withDescription(chooserDescription);
@@ -87,7 +87,7 @@ public final class DestinationForm implements DialogComponent {
         final int dot = fileName.lastIndexOf('.');
         if (dot < 0) return fileName + extension;
 
-        final String tail = fileName.substring(dot);
+        final @NotNull String tail = fileName.substring(dot);
         final boolean tailIsAnExtension = Arrays.stream(FileTypes.values())
                 .anyMatch(type -> type.getExtension().equalsIgnoreCase(tail));
 
@@ -95,7 +95,7 @@ public final class DestinationForm implements DialogComponent {
     }
 
     private @NotNull FormRows buildRows() {
-        final FormRows formRows = new FormRows()
+        final @NotNull FormRows formRows = new FormRows()
                 .row("Destination:", folderField)
                 .row("File name:", fileNameField)
                 .row("Format:", formatCombo);
@@ -112,8 +112,8 @@ public final class DestinationForm implements DialogComponent {
      * folder when the checkbox is ticked.
      */
     public @NotNull Optional<Destination> resolve() {
-        final String folder = folderField.getText().trim();
-        final String fileName = fileNameField.getText().trim();
+        final @NotNull String folder = folderField.getText().trim();
+        final @NotNull String fileName = fileNameField.getText().trim();
 
         if (fileName.isEmpty()) {
             fileNameField.requestFocus();
@@ -124,13 +124,13 @@ public final class DestinationForm implements DialogComponent {
             return Optional.empty();
         }
 
-        final Optional<FileTypes> selectedFormat = Optional.ofNullable((FileTypes) formatCombo.getSelectedItem());
+        final @NotNull Optional<FileTypes> selectedFormat = Optional.ofNullable((FileTypes) formatCombo.getSelectedItem());
         if (selectedFormat.isEmpty()) {
             formatCombo.requestFocus();
             return Optional.empty();
         }
 
-        final FileTypes format = selectedFormat.orElseThrow();
+        final @NotNull FileTypes format = selectedFormat.orElseThrow();
 
         if (offersDefaultFolder && setDefaultCheckBox.isSelected())
             Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder = folder;

@@ -26,7 +26,7 @@ public class UpdateTestBase {
      * annotation - empty when the class holds no such method.
      */
     protected @NotNull Optional<PsiMethod> findMethodByTestName(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
-        final String targetId = tc.getId().toString();
+        final @NotNull String targetId = tc.getId().toString();
 
         return Arrays.stream(pc.getMethods())
                 .filter(method -> getTestAnnotation(method)
@@ -45,15 +45,15 @@ public class UpdateTestBase {
 
     protected void updateAnnotationAttribute(final @NotNull PsiElementFactory pf, final @NotNull PsiAnnotation pa,
                                              final @NotNull String attrName, final @NotNull String newValue) {
-        final String annotationText = pa.getText();
+        final @NotNull String annotationText = pa.getText();
 
-        final String attrPattern = attrName + " = ";
+        final @NotNull String attrPattern = attrName + " = ";
         final int attrStart = annotationText.indexOf(attrPattern);
 
         if (attrStart >= 0) {
             final int valueStart = attrStart + attrPattern.length();
             final int valueEnd = findValueEnd(annotationText, valueStart);
-            final String newAnnotationText = annotationText.substring(0, valueStart) + newValue +
+            final @NotNull String newAnnotationText = annotationText.substring(0, valueStart) + newValue +
                     annotationText.substring(valueEnd);
             pa.replace(pf.createAnnotationFromText(newAnnotationText, null));
             return;
@@ -62,9 +62,9 @@ public class UpdateTestBase {
         final int insertPos = annotationText.lastIndexOf(')');
         if (insertPos <= 0) return;
 
-        final String before = annotationText.substring(0, insertPos);
-        final String after = annotationText.substring(insertPos);
-        final String separator = before.contains("=") ? ", " : "";
+        final @NotNull String before = annotationText.substring(0, insertPos);
+        final @NotNull String after = annotationText.substring(insertPos);
+        final @NotNull String separator = before.contains("=") ? ", " : "";
         pa.replace(pf.createAnnotationFromText(before + separator + attrName + " = " + newValue + after, null));
     }
 
@@ -145,9 +145,9 @@ public class UpdateTestBase {
     // its @Test method by testName, then apply the specific update inside a write command action.
     private void applyToMethod(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title,
                                final @NotNull Consumer<PsiMethod> updater, final @NotNull Consumer<String> onMissing) {
-        final List<String> fqcn = Fqcn.ofMethod(tc);
+        final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
         if (fqcn.size() < 2) return;
-        final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
+        final @NotNull String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
         ApplicationManager.getApplication().invokeLater(() ->
                 WriteCommandAction.runWriteCommandAction(p, title, null, () -> {

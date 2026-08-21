@@ -30,7 +30,7 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
     public MarkerDetailsViewDialog(final @NotNull Project p, final @NotNull DirectoryDto dto) {
         super(p);
 
-        final Marker marker = dto.getMarker();
+        final @NotNull Marker marker = dto.getMarker();
 
         title = "Details";
 

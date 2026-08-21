@@ -89,7 +89,7 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
      * snapshotted on the EDT, so later clicks can never tear the persisted JSON.
      */
     private void persist(final @NotNull RunEditor editor, final @NotNull TestRunMarker marker) {
-        final RunStatusService statusService = Services.getInstance(p, RunStatusService.class);
+        final @NotNull RunStatusService statusService = Services.getInstance(p, RunStatusService.class);
         statusService.persistMarker(p, editor.getParent().getPath(), marker.getStatus());
         statusService.persistRun(p, editor);
     }

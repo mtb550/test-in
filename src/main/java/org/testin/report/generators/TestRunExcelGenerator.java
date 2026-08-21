@@ -42,8 +42,8 @@ public final class TestRunExcelGenerator {
                                      final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 
-            final Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
-            final Worksheet ws = wb.newWorksheet("Test Run Report");
+            final @NotNull Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
+            final @NotNull Worksheet ws = wb.newWorksheet("Test Run Report");
 
             ws.value(0, 0, "Test Run Report:");
             ws.style(0, 0).bold().fontSize(14).set();
@@ -59,10 +59,10 @@ public final class TestRunExcelGenerator {
 
             // The same headline the other three formats print, from the same
             // summary, so a spreadsheet and a PDF of one run cannot disagree.
-            final TestRunSummary summary = TestRunSummary.of(tr.getResults());
-            final List<String> headings = new ArrayList<>(
+            final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
+            final @NotNull List<String> headings = new ArrayList<>(
                     List.of("Passed", "Failed", "Blocked", "Untested", "Executed", "Pass Rate"));
-            final List<String> values = new ArrayList<>(List.of(
+            final @NotNull List<String> values = new ArrayList<>(List.of(
                     String.valueOf(summary.passed()), String.valueOf(summary.failed()),
                     String.valueOf(summary.blocked()), String.valueOf(summary.untested()),
                     String.valueOf(summary.executed()), summary.passRate() + "%"));
@@ -96,16 +96,16 @@ public final class TestRunExcelGenerator {
 
             row++;
             for (final var result : tr.getResults()) {
-                final UUID id = result.getId();
+                final @NotNull UUID id = result.getId();
                 ws.value(row, 0, id.toString());
 
-                final TestCaseDto details = ReportedCase.of(detailsMap, id);
-                final String title = orNotAvailable(details.getDescription());
-                final String expectedResult = orNotAvailable(details.getExpectedResult());
+                final @NotNull TestCaseDto details = ReportedCase.of(detailsMap, id);
+                final @NotNull String title = orNotAvailable(details.getDescription());
+                final @NotNull String expectedResult = orNotAvailable(details.getExpectedResult());
 
                 ws.value(row, 1, title);
 
-                final TestStatus statusEnum = result.getStatus();
+                final @NotNull TestStatus statusEnum = result.getStatus();
                 ws.value(row, 2, statusEnum.name());
                 ws.style(row, 2).fontColor(statusEnum.getHex()).bold().set();
 
@@ -118,7 +118,7 @@ public final class TestRunExcelGenerator {
                 ws.value(row, 5, result.getBugPriority().getName());
                 ws.style(row, 5).bold().set();
 
-                final String formattedDuration = Display.formatDuration(result.getDuration());
+                final @NotNull String formattedDuration = Display.formatDuration(result.getDuration());
                 ws.value(row, 6, formattedDuration);
 
                 ws.value(row, 7, expectedResult);

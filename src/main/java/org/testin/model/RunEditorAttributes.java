@@ -145,7 +145,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             "FQCN",
             ToolBarDefault.LOCKED_UNCHECKED,
             (item, p) -> {
-                final TestCaseDto tc = item.requireTc();
+                final @NotNull TestCaseDto tc = item.requireTc();
                 return String.join(" > ", Fqcn.ofMethod(tc));
             }
     );

@@ -31,8 +31,8 @@ public class ExportExcel {
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
                              final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try (Workbook workbook = new XSSFWorkbook()) {
-            final CellStyle headerStyle = workbook.createCellStyle();
-            final Font headerFont = workbook.createFont();
+            final @NotNull CellStyle headerStyle = workbook.createCellStyle();
+            final @NotNull Font headerFont = workbook.createFont();
             headerFont.setBold(true);
             headerStyle.setFont(headerFont);
 
@@ -45,20 +45,20 @@ public class ExportExcel {
                     safeSheetName = safeSheetName.substring(0, 28) + "...";
                 }
 
-                final Sheet sheet = workbook.createSheet(safeSheetName);
+                final @NotNull Sheet sheet = workbook.createSheet(safeSheetName);
 
-                final Row headerRow = sheet.createRow(0);
+                final @NotNull Row headerRow = sheet.createRow(0);
                 for (int i = 0; i < exportAction.exportAttributes.size(); i++) {
-                    final Cell cell = headerRow.createCell(i);
+                    final @NotNull Cell cell = headerRow.createCell(i);
                     cell.setCellValue(exportAction.exportAttributes.get(i).getName());
                     cell.setCellStyle(headerStyle);
                 }
 
                 int rowIndex = 1;
                 for (final TestCaseDto tc : entry.getValue()) {
-                    final Row row = sheet.createRow(rowIndex++);
+                    final @NotNull Row row = sheet.createRow(rowIndex++);
                     for (int i = 0; i < exportAction.exportAttributes.size(); i++) {
-                        final Cell cell = row.createCell(i);
+                        final @NotNull Cell cell = row.createCell(i);
                         cell.setCellValue(exportAction.exportAttributes.get(i).getTestValueExtractor().execute(tc, p));
                     }
                 }

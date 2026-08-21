@@ -22,7 +22,7 @@ public class RunListRenderer extends AbstractListRenderer<RunEditor> {
         // The results map can be transiently empty during a refresh while the list
         // still repaints; render a pending placeholder rather than crashing inside
         // the cell renderer.
-        final TestRunItems runItem = editor.runItem(tc.getId())
+        final @NotNull TestRunItems runItem = editor.runItem(tc.getId())
                 .orElseGet(() -> TestRunItems.builder().id(tc.getId()).tc(tc).build());
 
         card.updateData(globalIndex, editor.getSelectedDetails(), runItem, editor.cardTitle(globalIndex, tc));

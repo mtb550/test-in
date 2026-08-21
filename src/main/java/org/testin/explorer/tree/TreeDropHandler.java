@@ -25,15 +25,15 @@ public class TreeDropHandler implements FileDropHandler {
      */
     @Override
     public @Nullable Object handleDrop(final @NotNull FileDropEvent event, final @NotNull Continuation<? super Boolean> continuation) {
-        final Project p = event.getProject();
-        final Transferable transferable = event.getTransferable();
+        final @NotNull Project p = event.getProject();
+        final @NotNull Transferable transferable = event.getTransferable();
 
         if (!transferable.isDataFlavorSupported(TreeTransferHandler.NODE_FLAVOR)) {
             return false;
         }
 
         try {
-            final TreeTransferPayload payload = (TreeTransferPayload) transferable.getTransferData(TreeTransferHandler.NODE_FLAVOR);
+            final @NotNull TreeTransferPayload payload = (TreeTransferPayload) transferable.getTransferData(TreeTransferHandler.NODE_FLAVOR);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 for (final DirectoryDto node : payload.nodes()) {

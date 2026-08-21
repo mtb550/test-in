@@ -62,7 +62,7 @@ public class FontSync {
         isGlobalWatcherActive = true;
 
         // Single debounce timer instead of allocating one per wheel event.
-        final Timer debounce = new Timer(50, evt -> syncJavaEditorToGlobal(p));
+        final @NotNull Timer debounce = new Timer(50, evt -> syncJavaEditorToGlobal(p));
         debounce.setRepeats(false);
 
         IdeEventQueue.getInstance().addPostprocessor(event -> {
@@ -94,7 +94,7 @@ public class FontSync {
 
     private static void pushEditorSizeToGlobal(final @NotNull Editor activeEditor) {
         final float localSize = activeEditor.getColorsScheme().getEditorFontSize();
-        final EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
+        final @NotNull EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
         if (localSize == globalScheme.getEditorFontSize()) return;
 
         globalScheme.setEditorFontSize(localSize);
@@ -108,7 +108,7 @@ public class FontSync {
 
     private static void zoomGlobalIdeEditors(final @NotNull Project p, final @NotNull JComponent component, final boolean zoomIn) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            final EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
+            final @NotNull EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
             final float newSize = Math.clamp(getBaseFontSize() + (zoomIn ? 1.0f : -1.0f), 8.0f, 72.0f);
 
             globalScheme.setEditorFontSize(newSize);
@@ -131,7 +131,7 @@ public class FontSync {
                 // Each subscriber tracks its own last size, so a font change
                 // scales every synced component's children - not just the
                 // first one the message bus happens to notify.
-                final Object stored = component.getClientProperty(LAST_BASE_SIZE);
+                final @NotNull Object stored = component.getClientProperty(LAST_BASE_SIZE);
                 final float lastSize = stored instanceof Float previous ? previous : newSize;
 
                 final float delta = newSize - lastSize;

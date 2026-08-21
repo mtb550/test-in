@@ -69,7 +69,7 @@ public final class SettingsConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
-        final AppSettingsState settings = Services.getInstance(AppSettingsState.class);
+        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
         boolean modified = !testinPathPanel.getPathText().equals(settings.rootTestinPath);
         modified |= !Objects.equals(logLevelComboBox.getSelectedItem(), settings.logLevel);
         modified |= !testerNameField.getText().equals(settings.testerName);
@@ -80,7 +80,7 @@ public final class SettingsConfigurable implements Configurable {
 
     @Override
     public void apply() {
-        final AppSettingsState settings = Services.getInstance(AppSettingsState.class);
+        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
 
         // Decided before the fields are overwritten: a moved root is the only change
         // that invalidates the tree, and re-indexing is far too heavy to run for a
@@ -88,7 +88,7 @@ public final class SettingsConfigurable implements Configurable {
         final boolean rootChanged = TestinRoot.isRootChanged(settings.rootTestinPath, testinPathPanel.getPathText());
 
         settings.rootTestinPath = testinPathPanel.getPathText();
-        final String selectedLogLevel = (String) logLevelComboBox.getSelectedItem();
+        final @NotNull String selectedLogLevel = (String) logLevelComboBox.getSelectedItem();
         settings.logLevel = Objects.requireNonNullElse(selectedLogLevel, Level.INFO.name());
         settings.testerName = testerNameField.getText();
         settings.testerRole = testerRoleField.getText();
@@ -120,7 +120,7 @@ public final class SettingsConfigurable implements Configurable {
 
     @Override
     public void reset() {
-        final AppSettingsState settings = Services.getInstance(AppSettingsState.class);
+        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
 
         testinPathPanel.setPathText(settings.rootTestinPath);
         logLevelComboBox.setSelectedItem(settings.logLevel);

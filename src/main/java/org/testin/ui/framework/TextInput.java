@@ -102,8 +102,8 @@ public final class TextInput implements DialogComponent {
 
             private boolean allows(final @NotNull FilterBypass bypass, final int offset, final int length,
                                    final @Nullable String text) throws BadLocationException {
-                final String current = bypass.getDocument().getText(0, bypass.getDocument().getLength());
-                final String next = current.substring(0, offset) + Objects.requireNonNullElse(text, "")
+                final @NotNull String current = bypass.getDocument().getText(0, bypass.getDocument().getLength());
+                final @NotNull String next = current.substring(0, offset) + Objects.requireNonNullElse(text, "")
                         + current.substring(offset + length);
 
                 return next.isEmpty() || pattern.matcher(next).matches();

@@ -10,7 +10,6 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import git4idea.commands.Git;
 import git4idea.commands.GitCommandResult;
-
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.explorer.ExplorerPanel;
@@ -55,15 +54,15 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
                 indicator.setText("Cloning into " + projectName + "...");
 
                 try {
-                    final Path parentPath = Services.getInstance(p, TestinRoot.class).getPath();
-                    final GitCommandResult result = Git.getInstance().clone(p, parentPath, gitUrl, projectName);
+                    final @NotNull Path parentPath = Services.getInstance(p, TestinRoot.class).getPath();
+                    final @NotNull GitCommandResult result = Git.getInstance().clone(p, parentPath, gitUrl, projectName);
                     result.throwOnError();
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         // The indexer owns disk reads/refresh: scanSingleProject re-scans the cloned
                         // project from disk. No direct VFS refresh here.
-                        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                        final Path projectPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(projectName);
+                        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                        final @NotNull Path projectPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(projectName);
 
                         indexer.scanSingleProject(projectPath);
 

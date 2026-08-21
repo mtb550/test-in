@@ -83,8 +83,8 @@ public class ExportHtml {
             int totalExported = 0;
 
             for (final Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
-                final String sheetName = entry.getKey();
-                final List<TestCaseDto> testCases = entry.getValue();
+                final @NotNull String sheetName = entry.getKey();
+                final @NotNull List<TestCaseDto> testCases = entry.getValue();
 
                 if (testCases.isEmpty()) continue;
 
@@ -118,7 +118,7 @@ public class ExportHtml {
             writer.write("<p><em>Total test cases exported: " + totalExported + "</em></p>");
             writer.newLine();
 
-            final String exportDate = Display.formatDate(ZonedDateTime.now());
+            final @NotNull String exportDate = Display.formatDate(ZonedDateTime.now());
             writer.write("<p><em>Exported on: " + htmlEscape(exportDate) + "</em></p>");
             writer.newLine();
 
@@ -133,7 +133,7 @@ public class ExportHtml {
     }
 
     private @NotNull String htmlEscape(final @NotNull String value) {
-        final StringBuilder sb = new StringBuilder(value.length());
+        final @NotNull StringBuilder sb = new StringBuilder(value.length());
         for (int i = 0; i < value.length(); i++) {
             final char c = value.charAt(i);
             sb.append(HTML_ESCAPES.getOrDefault(c, String.valueOf(c)));

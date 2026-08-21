@@ -45,11 +45,11 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
     private void paste(final @NotNull TreeTransferHandler transferHandler, final @NotNull Transferable contents,
                        final @NotNull DirectoryDto target) {
         try {
-            final TreeTransferPayload payload = (TreeTransferPayload) contents.getTransferData(TreeTransferHandler.NODE_FLAVOR);
+            final @NotNull TreeTransferPayload payload = (TreeTransferPayload) contents.getTransferData(TreeTransferHandler.NODE_FLAVOR);
 
             // Only what can actually land on this target - family rules, plus
             // never onto itself, into its own subtree, or into its own parent.
-            final List<DirectoryDto> nodes = Arrays.stream(payload.nodes())
+            final @NotNull List<DirectoryDto> nodes = Arrays.stream(payload.nodes())
                     .filter(node -> transferHandler.canTransferInto(node, target))
                     .toList();
 
@@ -58,9 +58,9 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
 
             // Cut-paste moves, copy-paste duplicates - each says what it does.
             final boolean move = payload.clipboardAction() == TransferHandler.MOVE;
-            final String verb = move ? "Move" : "Copy";
-            final String what = nodes.size() == 1 ? "'" + nodes.getFirst().getName() + "'" : nodes.size() + " items";
-            final Path fromPath = nodes.getFirst().getPath().getParent();
+            final @NotNull String verb = move ? "Move" : "Copy";
+            final @NotNull String what = nodes.size() == 1 ? "'" + nodes.getFirst().getName() + "'" : nodes.size() + " items";
+            final @NotNull Path fromPath = nodes.getFirst().getPath().getParent();
 
             new ConfirmDialog(p, "Paste",
                     verb + " " + what + " into '" + target.getName() + "'?",

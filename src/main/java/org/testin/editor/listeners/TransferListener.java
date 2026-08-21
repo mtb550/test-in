@@ -42,7 +42,7 @@ public class TransferListener extends TransferHandler {
 
         draggedIndices = rawList.getSelectedIndices();
 
-        final List<TestCaseDto> items = rawList.getSelectedValuesList().stream()
+        final @NotNull List<TestCaseDto> items = rawList.getSelectedValuesList().stream()
                 .filter(TestCaseDto.class::isInstance)
                 .map(TestCaseDto.class::cast)
                 .toList();
@@ -73,10 +73,10 @@ public class TransferListener extends TransferHandler {
     @Override
     public boolean importData(final TransferSupport support) {
         try {
-            final Object data = support.getTransferable().getTransferData(FLAVOR);
+            final @NotNull Object data = support.getTransferable().getTransferData(FLAVOR);
             if (!(data instanceof List<?> rawList)) return false;
 
-            final List<TestCaseDto> items = rawList.stream()
+            final @NotNull List<TestCaseDto> items = rawList.stream()
                     .filter(TestCaseDto.class::isInstance)
                     .map(TestCaseDto.class::cast)
                     .toList();
@@ -88,7 +88,7 @@ public class TransferListener extends TransferHandler {
             final int[] dragged = draggedIndices;
             if (dragged.length == 0) return false;
 
-            final JBList.DropLocation dl = (JBList.DropLocation) support.getDropLocation();
+            final @NotNull JBList.DropLocation dl = (JBList.DropLocation) support.getDropLocation();
             final int offset = editor.globalIndex(0);
             int insertAtGlobal = offset + dl.getIndex();
 
@@ -96,8 +96,8 @@ public class TransferListener extends TransferHandler {
                     .map(i -> offset + i)
                     .toArray();
 
-            final List<TestCaseDto> allItems = editor.getAllTestCases();
-            final List<TestCaseDto> itemsToMove = new ArrayList<>();
+            final @NotNull List<TestCaseDto> allItems = editor.getAllTestCases();
+            final @NotNull List<TestCaseDto> itemsToMove = new ArrayList<>();
 
             synchronized (allItems) {
                 int finalInsertAtGlobal = insertAtGlobal;

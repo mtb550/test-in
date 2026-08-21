@@ -57,7 +57,7 @@ public final class TestinRoot {
     }
 
     public void setPath(final @Nullable Path path) {
-        final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         settings.rootTestinPath = Objects.toString(path, "");
     }
 }

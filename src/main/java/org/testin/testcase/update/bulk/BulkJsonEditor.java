@@ -42,17 +42,17 @@ final class BulkJsonEditor {
      * to the read-only original on the left and the editable copy on the right.
      */
     static void setupEditorAppearance(final @NotNull Editor editor, final @NotNull Project p) {
-        final FileType jsonFileType = FileTypeManager.getInstance().getFileTypeByExtension("json");
-        final EditorHighlighter highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(p, jsonFileType);
+        final @NotNull FileType jsonFileType = FileTypeManager.getInstance().getFileTypeByExtension("json");
+        final @NotNull EditorHighlighter highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(p, jsonFileType);
 
         if (editor instanceof EditorEx)
             ((EditorEx) editor).setHighlighter(highlighter);
 
-        final EditorColorsScheme scheme = editor.getColorsScheme();
+        final @NotNull EditorColorsScheme scheme = editor.getColorsScheme();
         scheme.setEditorFontSize(15f);
         scheme.setLineSpacing(1.4f);
 
-        final EditorSettings settings = editor.getSettings();
+        final @NotNull EditorSettings settings = editor.getSettings();
         settings.setLineNumbersShown(true);
         settings.setLineMarkerAreaShown(false);
         settings.setFoldingOutlineShown(true);
@@ -91,15 +91,15 @@ final class BulkJsonEditor {
      * Ctrl+Shift+A: one caret at the end of every editable value.
      */
     static void placeCaretOnAll(final @NotNull Editor editor, final @NotNull List<RangeMarker> markers) {
-        final CaretModel caretModel = editor.getCaretModel();
+        final @NotNull CaretModel caretModel = editor.getCaretModel();
         caretModel.removeSecondaryCarets();
 
         boolean isFirst = true;
         for (final RangeMarker marker : markers) {
             if (!marker.isValid()) continue;
 
-            final LogicalPosition logPos = editor.offsetToLogicalPosition(marker.getEndOffset());
-            final VisualPosition visPos = editor.logicalToVisualPosition(logPos);
+            final @NotNull LogicalPosition logPos = editor.offsetToLogicalPosition(marker.getEndOffset());
+            final @NotNull VisualPosition visPos = editor.logicalToVisualPosition(logPos);
 
             if (isFirst) {
                 caretModel.moveToVisualPosition(visPos);
