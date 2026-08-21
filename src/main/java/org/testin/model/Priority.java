@@ -1,6 +1,7 @@
 package org.testin.model;
 
 import com.intellij.ui.JBColor;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Shortcuts;
@@ -8,6 +9,7 @@ import org.testin.util.Shortcuts;
 import java.awt.*;
 
 @Getter
+@AllArgsConstructor
 public enum Priority {
     HIGH(
             "High",
@@ -36,21 +38,13 @@ public enum Priority {
     private final @NotNull String name;
     private final int value;
     private final @NotNull Color color;
+    // Always true here, and still a real extension point rather than dead: it is
+    // read through method references (Priority::isActive, Group::isActive) that a
+    // search for isActive() does not find, and Group.UNASSIGNED in the third enum
+    // of the set is genuinely inactive. Deleting it once already reached a
+    // failing compile - remove it from all three enums together or not at all
+    // (#66, E3).
     private final boolean active;
     private final @NotNull Shortcuts shortcut;
 
-    // SameParameterValue reports active as always true here, and it is - but the
-    // field is a real extension point, not dead. It is read through method
-    // references (Priority::isActive, Group::isActive) that a search for
-    // isActive() does not find, and Group.UNASSIGNED in the third enum of the set
-    // is genuinely inactive. Deleting it once already reached a failing compile.
-    // Remove it from all three enums together or not at all (#66, E3).
-    @SuppressWarnings("SameParameterValue")
-    Priority(final @NotNull String name, final int value, final @NotNull Color color, final boolean active, final @NotNull Shortcuts shortcut) {
-        this.name = name;
-        this.value = value;
-        this.color = color;
-        this.active = active;
-        this.shortcut = shortcut;
-    }
 }

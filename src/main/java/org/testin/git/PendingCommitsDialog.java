@@ -212,7 +212,8 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                     // that names no revertable field leaves the row alone.
                     final Optional<RevertAction> revert = ChangeType
                             .fromLabel(changes.getValueAt(row, COLUMN_CHANGE_TYPE))
-                            .flatMap(ChangeType::getRevertAction);
+                            .filter(ChangeType::isRevertable)
+                            .map(ChangeType::getRevertAction);
                     final Optional<TestCaseDto> current = indexer.findTestCase(testCaseId);
 
                     if (revert.isEmpty() || current.isEmpty()) return;

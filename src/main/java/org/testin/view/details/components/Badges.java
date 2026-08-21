@@ -6,6 +6,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.Shared;
 import org.testin.model.Group;
+import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
 
 import java.awt.*;
@@ -32,10 +33,9 @@ public class Badges extends BaseDetails {
             badges.add(Shared.createGroupBadge(group));
         }
 
-        // Last, the way a card orders them. Empty for a case nobody has run.
-        dto.getTempStatus().getBadge()
-                .map(Shared::createRunStatusBadge)
-                .ifPresent(badges::add);
+        // Last, the way a card orders them. None for a case nobody has run.
+        final RunStatus tempStatus = dto.getTempStatus();
+        if (tempStatus.hasBadge()) badges.add(Shared.createRunStatusBadge(tempStatus.getBadge()));
 
         Shared.showBadges(badgesPanel, badges);
 

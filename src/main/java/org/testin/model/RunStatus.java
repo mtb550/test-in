@@ -3,12 +3,9 @@ package org.testin.model;
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBColor;
 import lombok.AllArgsConstructor;
-import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
 import javax.swing.*;
 import java.awt.*;
 
@@ -17,7 +14,7 @@ import java.awt.*;
 public enum RunStatus {
     IDLE(
             AllIcons.RunConfigurations.TestState.Run,
-            null
+            Badge.NONE
     ),
 
     PASSED(
@@ -43,22 +40,30 @@ public enum RunStatus {
     private final @NotNull Icon icon;
 
     /**
-     * The card badge, null for IDLE - a case nobody has run carries no badge.
+     * The card badge, and {@link Badge#NONE} for IDLE - a case nobody has run
+     * carries none.
      * <p>
      * Label and color are one fact, so they are one field: a status cannot end
      * up with a label and no color to draw it in.
      */
-    @Getter(AccessLevel.NONE)
-    private final @Nullable Badge badge;
+    private final @NotNull Badge badge;
 
     /**
-     * The badge this status draws on a card, and empty for IDLE - a case nobody
-     * has run carries none.
+     * Whether this status draws a badge at all. The one reader of what the badge
+     * is, so no caller has to know that "nobody has run this" and "there is
+     * nothing to draw" are the same fact.
      */
-    public @NotNull Optional<Badge> getBadge() {
-        return Optional.ofNullable(badge);
+    public boolean hasBadge() {
+        return badge != Badge.NONE;
     }
 
     public record Badge(@NotNull String label, @NotNull JBColor color) {
+
+        /**
+         * The badge of a case nobody has run: no word and no color to draw it
+         * in. Never drawn - {@link #hasBadge()} is what decides that - and here
+         * so IDLE says it carries none with a value of its own type.
+         */
+        public static final @NotNull Badge NONE = new Badge("", JBColor.GRAY);
     }
 }

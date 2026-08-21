@@ -1,10 +1,12 @@
 package org.testin.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 
 @Getter
+@AllArgsConstructor
 public enum Group {
     UNASSIGNED(
             "<No Group>",
@@ -57,10 +59,4 @@ public enum Group {
     private final @NotNull String name;
     private final boolean active;
     private final boolean assignable;
-
-    Group(final @NotNull String name, final boolean active, final boolean assignable) {
-        this.name = name;
-        this.active = active;
-        this.assignable = assignable;
-    }
 }

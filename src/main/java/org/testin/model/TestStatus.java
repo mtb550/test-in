@@ -3,14 +3,12 @@ package org.testin.model;
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
+import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.UIUtil;
 import lombok.AllArgsConstructor;
-import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -67,7 +65,7 @@ public enum TestStatus {
             // No menu entry, so not on the menu: the run owns this status. It
             // means "queued to run", and a run only clears it on completion, so a
             // tester setting it afterward leaves a state nothing reconciles.
-            null,
+            MenuEntry.NONE,
             false
     ),
 
@@ -82,7 +80,7 @@ public enum TestStatus {
             // execute and nothing left to judge. The row stays because the run
             // executed it once, and what it recorded is history rather than a
             // verdict anyone can still give (#66).
-            null,
+            MenuEntry.NONE,
             false
     ),
 
@@ -97,7 +95,7 @@ public enum TestStatus {
             // when the run completes or closes becomes untested by itself. It is
             // the record of a case the run never reached, not a verdict someone
             // chose, so there is nothing for a menu entry to apply.
-            null,
+            MenuEntry.NONE,
             false
     );
 
@@ -108,15 +106,16 @@ public enum TestStatus {
     private final @NotNull String label;
 
     /**
-     * How this status appears on the status menu, or null when the menu does not
-     * offer it. Null is the whole answer: there used to be a separate
-     * addedToMenu flag beside this, which allowed the two states that cannot
-     * mean anything — an entry that is never shown, and a status offered with no
-     * key to apply it. PENDING was the first: off the menu, yet carrying an icon
-     * and a key nothing could reach.
+     * How this status appears on the status menu, and {@link MenuEntry#NONE} for
+     * the two the run sets for itself.
+     * <p>
+     * One field is the whole answer: there used to be a separate addedToMenu
+     * flag beside it, which allowed the two states that cannot mean anything —
+     * an entry that is never shown, and a status offered with no key to apply
+     * it. PENDING was the first: off the menu, yet carrying an icon and a key
+     * nothing could reach.
      */
-    @Getter(AccessLevel.NONE)
-    private final @Nullable MenuEntry menuEntry;
+    private final @NotNull MenuEntry menuEntry;
 
     /**
      * True when applying this status first collects details in a dialog (FAILED).
@@ -130,16 +129,7 @@ public enum TestStatus {
      * here so no caller has to know the two facts coincide.
      */
     public boolean isVerdict() {
-        return getMenuEntry().isPresent();
-    }
-
-    /**
-     * How the status menu draws this status, and empty for a status the menu
-     * does not offer. The one reader of the field, so nothing else has to know
-     * that "not on the menu" and "not a verdict" are the same fact.
-     */
-    public @NotNull Optional<MenuEntry> getMenuEntry() {
-        return Optional.ofNullable(menuEntry);
+        return menuEntry != MenuEntry.NONE;
     }
 
     /**
@@ -148,5 +138,14 @@ public enum TestStatus {
      * one, which is what makes the null meaningful.
      */
     public record MenuEntry(@NotNull Icon icon, @NotNull KeyStroke shortcut) {
+
+        /**
+         * The presentation of a status the menu does not offer: nothing to draw
+         * and no key that reaches it. Never shown - {@link #isVerdict()} is what
+         * decides that - and here so a status off the menu says so with a value
+         * of its own type.
+         */
+        public static final @NotNull MenuEntry NONE =
+                new MenuEntry(EmptyIcon.ICON_16, KeyStroke.getKeyStroke(KeyEvent.VK_UNDEFINED, 0));
     }
 }

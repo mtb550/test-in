@@ -1,10 +1,8 @@
 package org.testin.git;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -14,12 +12,12 @@ import java.util.Optional;
 public enum ChangeType {
     CREATE_TEST_CASE(
             "Create Test Case",
-            null
+            RevertAction.NONE
     ),
 
     REMOVE_TEST_CASE(
             "Remove Test Case",
-            null
+            RevertAction.NONE
     ),
 
     CHANGE_DESCRIPTION(
@@ -77,64 +75,64 @@ public enum ChangeType {
 
     CREATE_TEST_RUN(
             "Create Test Run",
-            null
+            RevertAction.NONE
     ),
 
     CHANGE_TEST_RUN(
             "Change Test Run",
-            null
+            RevertAction.NONE
     ),
 
     REMOVE_TEST_RUN(
             "Remove Test Run",
-            null
+            RevertAction.NONE
     ),
 
     CREATE_MARKER(
             "Create Marker",
-            null
+            RevertAction.NONE
     ),
 
     CHANGE_MARKER(
             "Change Marker",
-            null
+            RevertAction.NONE
     ),
 
     REMOVE_MARKER(
             "Remove Marker",
-            null
+            RevertAction.NONE
     ),
 
     CREATE_FILE(
             "Create File",
-            null
+            RevertAction.NONE
     ),
 
     CHANGE_FILE(
             "Change File",
-            null
+            RevertAction.NONE
     ),
 
     REMOVE_FILE(
             "Remove File",
-            null
+            RevertAction.NONE
     );
 
     private final @NotNull String label;
 
     /**
-     * Absent for add/remove: creating or deleting a whole test case has no field
-     * to revert.
+     * How a row of this kind is put back. Add and remove revert nothing:
+     * creating or deleting a whole test case has no field to put back.
      */
-    @Getter(AccessLevel.NONE)
-    private final @Nullable RevertAction revertAction;
+    private final @NotNull RevertAction revertAction;
 
     /**
-     * How a row of this kind is put back, and empty for the kinds that cannot
-     * be - which is what greys the revert out.
+     * Whether a row of this kind can be put back at all - which is what greys
+     * the revert out. The one reader of what the action is, so no caller has to
+     * know that "reverts nothing" and "cannot be reverted" are the same fact.
      */
-    public @NotNull Optional<RevertAction> getRevertAction() {
-        return Optional.ofNullable(revertAction);
+    public boolean isRevertable() {
+        return revertAction != RevertAction.NONE;
     }
 
     /**

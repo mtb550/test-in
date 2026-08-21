@@ -3,9 +3,9 @@ package org.testin.model;
 import org.testng.annotations.Test;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.testng.Assert.*;
 
@@ -15,8 +15,8 @@ import static org.testng.Assert.*;
  * A tester gives one of three verdicts — passed, failed or blocked. The other
  * two are the plugin's: PENDING means queued for a run that has not reached the
  * case yet, and UNTESTED means the run finished without reaching it. Neither is
- * something to pick from a menu, and the menu is built from the entries that
- * are present, so an absent entry is what keeps them off it.
+ * something to pick from a menu, and the menu is built from the statuses that
+ * are verdicts, so {@link TestStatus.MenuEntry#NONE} is what keeps them off it.
  * <p>
  * Asserted because the failure is silent in both directions: give one of the two
  * an entry and it appears in the context menu with a key that sets a state
@@ -28,7 +28,7 @@ public class TestStatusMenuTest {
     @Test
     public void aTesterChoosesExactlyPassedFailedOrBlocked() {
         final List<TestStatus> onMenu = Arrays.stream(TestStatus.values())
-                .filter(status -> status.getMenuEntry().isPresent())
+                .filter(TestStatus::isVerdict)
                 .toList();
 
         assertEquals(onMenu, List.of(TestStatus.PASSED, TestStatus.FAILED, TestStatus.BLOCKED));
@@ -36,33 +36,30 @@ public class TestStatusMenuTest {
 
     @Test
     public void thePluginSetsPendingAndUntestedItself() {
-        assertTrue(TestStatus.PENDING.getMenuEntry().isEmpty(), "queued for a run, not a verdict");
-        assertTrue(TestStatus.UNTESTED.getMenuEntry().isEmpty(),
-                "set when a run finishes without reaching the case");
+        assertFalse(TestStatus.PENDING.isVerdict(), "queued for a run, not a verdict");
+        assertFalse(TestStatus.UNTESTED.isVerdict(), "set when a run finishes without reaching the case");
+    }
+
+    /**
+     * The two the plugin sets carry the entry that draws nothing, which is the
+     * whole of what keeps them off the menu.
+     */
+    @Test
+    public void theStatusesOffMenuCarryTheEmptyEntry() {
+        assertSame(TestStatus.PENDING.getMenuEntry(), TestStatus.MenuEntry.NONE);
+        assertSame(TestStatus.UNTESTED.getMenuEntry(), TestStatus.MenuEntry.NONE);
     }
 
     @Test
     public void everyOfferedStatusHasAKeyAndAnIcon() {
-        for (final TestStatus status : TestStatus.values()) {
-            status.getMenuEntry().ifPresent(entry -> {
-                assertNotNull(entry.icon(), status + " is offered, so it needs an icon");
-                assertNotNull(entry.shortcut(), status + " is offered, so it needs a key");
-            });
-        }
-    }
-
-    /**
-     * isVerdict answers "did a tester choose this?" out of the same menu entry
-     * this class pins, and something now depends on the two meaning the same
-     * thing: reading an old run drops the execution stamp from every case
-     * without a verdict. Give a tester-settable status no menu entry and that
-     * would start erasing real times, with nothing else failing to say so.
-     */
-    @Test
-    public void aVerdictIsExactlyAStatusTheMenuOffers() {
-        for (final TestStatus status : TestStatus.values()) {
-            assertEquals(status.isVerdict(), status.getMenuEntry().isPresent(), status + " disagrees with the menu");
-        }
+        Arrays.stream(TestStatus.values())
+                .filter(TestStatus::isVerdict)
+                .forEach(status -> {
+                    assertNotSame(status.getMenuEntry(), TestStatus.MenuEntry.NONE,
+                            status + " is offered, so it needs an entry of its own");
+                    assertNotEquals(status.getMenuEntry().shortcut().getKeyCode(), KeyEvent.VK_UNDEFINED,
+                            status + " is offered, so it needs a key that reaches it");
+                });
     }
 
     /**
@@ -72,8 +69,8 @@ public class TestStatusMenuTest {
     @Test
     public void noTwoOfferedStatusesShareAKey() {
         final List<KeyStroke> keys = Arrays.stream(TestStatus.values())
+                .filter(TestStatus::isVerdict)
                 .map(TestStatus::getMenuEntry)
-                .flatMap(Optional::stream)
                 .map(TestStatus.MenuEntry::shortcut)
                 .toList();
 
