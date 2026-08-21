@@ -8,11 +8,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
 import java.awt.*;
+import java.util.Optional;
 import java.io.File;
 import java.io.IOException;
 
@@ -33,10 +33,12 @@ final class ExportNotice {
      * a JSON document.
      */
     static void show(final @NotNull Project p, final @NotNull File file) {
-        show(p, file, () -> {
-            final VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(file.getAbsolutePath());
-            openWithAssociatedProgram(p, virtualFile);
-        });
+        show(p, file, () -> Optional
+                .ofNullable(LocalFileSystem.getInstance().findFileByPath(file.getAbsolutePath()))
+                .filter(VirtualFile::exists)
+                .ifPresentOrElse(found -> openWithAssociatedProgram(p, found),
+                        () -> Services.getInstance(p, Notifier.class)
+                                .error(p, "Open Error", "The file does not exist.")));
     }
 
     /**
@@ -44,13 +46,8 @@ final class ExportNotice {
      * when the desktop cannot. Here rather than in a utility class: this is the
      * only thing in the plugin that asks the operating system to open anything.
      */
-    private static void openWithAssociatedProgram(final @NotNull Project p, final @Nullable VirtualFile virtualFile) {
+    private static void openWithAssociatedProgram(final @NotNull Project p, final @NotNull VirtualFile virtualFile) {
         final Notifier notifier = Services.getInstance(p, Notifier.class);
-
-        if (virtualFile == null || !virtualFile.exists()) {
-            notifier.error(p, "Open Error", "The file does not exist.");
-            return;
-        }
 
         if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
             notifier.error(p, "System Error", "Opening a file is not supported on this system.");

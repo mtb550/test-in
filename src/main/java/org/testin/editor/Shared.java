@@ -10,7 +10,6 @@ import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.Group;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -204,7 +203,7 @@ public class Shared {
      * The scroll pane this component sits in, walking up until Swing runs out
      * of parents - which is where the null comes from and where it stops.
      */
-    private static @NotNull Optional<JBScrollPane> findScrollPane(final @Nullable Component component) {
+    private static @NotNull Optional<JBScrollPane> findScrollPane(final @NotNull Component component) {
         Component current = component;
         while (current != null) {
             if (current instanceof JBScrollPane scrollPane)

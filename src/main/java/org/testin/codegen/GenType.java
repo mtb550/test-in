@@ -1,9 +1,8 @@
 package org.testin.codegen;
 
-import lombok.AccessLevel;
+import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.method.update.NoOpCodeUpdate;
 import org.testin.util.OptionalPlugin;
 
@@ -138,35 +137,40 @@ public enum GenType {
             "read-only attribute"
     );
 
-    /**
-     * Returned when the Java plugin is absent: notify once per project, then skip quietly.
-     */
-    private static final @NotNull GenAction JAVA_UNAVAILABLE = (p, obj) -> OptionalPlugin.JAVA.isAvailableOrWarnOnce(p);
-
     private final @NotNull String description;
     private final @NotNull String tooltip;
 
     /**
-     * Set for data-only fields that never change generated code; null for Java-backed actions.
+     * What this operation does to the generated code.
+     * <p>
+     * A value for every constant: the data-only attributes carry the no-op, and
+     * everything else carries the resolver below. The resolver looks the real
+     * generator up when it runs rather than here, which is what keeps this enum
+     * free of PSI classes so it still loads in an IDE without Java support - and
+     * is why the field can hold a value instead of a null standing for "look it
+     * up later" (#71).
      */
-    @Getter(AccessLevel.NONE)
-    private final @Nullable GenAction dataOnlyAction;
+    private final @NotNull GenAction action;
 
     GenType(final @NotNull String description, final @NotNull String tooltip) {
         this.description = description;
         this.tooltip = tooltip;
-        this.dataOnlyAction = null;
+        this.action = this::runJavaAction;
     }
 
     GenType(final @NotNull String description, final @NotNull String tooltip, final @NotNull String dataOnlyField) {
         this.description = description;
         this.tooltip = tooltip;
-        this.dataOnlyAction = new NoOpCodeUpdate(dataOnlyField);
+        this.action = new NoOpCodeUpdate(dataOnlyField);
     }
 
-    public @NotNull GenAction getAction() {
-        if (dataOnlyAction != null) return dataOnlyAction;
-        if (!OptionalPlugin.JAVA.isAvailable()) return JAVA_UNAVAILABLE;
-        return GenRegistry.actionFor(this);
+    /**
+     * Runs the Java-backed generator for this operation - or, in an IDE with no
+     * Java plugin, says so once per project and skips quietly.
+     */
+    private void runJavaAction(final @NotNull Project p, final @NotNull Object obj) {
+        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+
+        GenRegistry.actionFor(this).execute(p, obj);
     }
 }
