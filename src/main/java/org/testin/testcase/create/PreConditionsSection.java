@@ -43,17 +43,8 @@ public class PreConditionsSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void showSection(final @NotNull JBPanel<?> contentPanel) {
-        if (wrapper.getParent() == null)
-            contentPanel.add(wrapper);
-        preConditionsField.requestFocus();
-    }
-
-    @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        if (wrapper.getParent() != null) {
-            dto.setPreConditions(preConditionsField.getText().trim());
-        }
+        dto.setPreConditions(preConditionsField.getText().trim());
     }
 
     @Override

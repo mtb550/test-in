@@ -19,6 +19,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 public class PrioritySection implements CreateTestCaseSection {
     final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
@@ -37,12 +38,14 @@ public class PrioritySection implements CreateTestCaseSection {
         this.priority.setRenderer(new ColoredListCellRenderer<>() {
             @Override
             protected void customizeCellRenderer(final @NotNull JList<? extends Priority> list, final Priority value, final int index, final boolean selected, final boolean hasFocus) {
-                if (value != null) {
-                    setIcon(IconManager.createIcon(value.getColor()));
+                // Swing renders the empty selection with no value at all, and
+                // there is nothing to draw for it.
+                Optional.ofNullable(value).ifPresent(priority -> {
+                    setIcon(IconManager.createIcon(priority.getColor()));
                     append(" Priority:  ");
-                    append(value.name());
-                    append("    " + value.getShortcut().getShortcutText(), new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GRAY));
-                }
+                    append(priority.name());
+                    append("    " + priority.getShortcut().getShortcutText(), new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GRAY));
+                });
             }
         });
 
@@ -58,22 +61,13 @@ public class PrioritySection implements CreateTestCaseSection {
         return wrapper;
     }
 
-    @Override
-    public void showSection(final @NotNull JBPanel<?> contentPanel) {
-        if (wrapper.getParent() == null)
-            contentPanel.add(wrapper);
-        priority.requestFocus();
-    }
-
     public @NotNull ComboBox<Priority> getCombo() {
         return priority;
     }
 
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        if (wrapper.getParent() != null) {
-            dto.setPriority((Priority) Objects.requireNonNull(priority.getSelectedItem()));
-        }
+        dto.setPriority((Priority) Objects.requireNonNull(priority.getSelectedItem()));
     }
 
     @Override

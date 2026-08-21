@@ -59,16 +59,8 @@ public class DescriptionSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void showSection(final @NotNull JBPanel<?> contentPanel) {
-        if (wrapper.getParent() == null)
-            contentPanel.add(wrapper);
-        descriptionField.requestFocus();
-    }
-
-    @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        if (wrapper.getParent() != null && descriptionField.isEnabled())
-            dto.setDescription(descriptionField.getText().trim());
+        if (descriptionField.isEnabled()) dto.setDescription(descriptionField.getText().trim());
     }
 
     @Override

@@ -31,6 +31,14 @@ import java.util.stream.Collectors;
 
 @Getter
 public abstract class TestCaseBaseDialog {
+    /**
+     * Every section is a key in the status bar mapping, both being built from
+     * CreateTestCaseFields. This is what a section that somehow is not would
+     * show: an empty bar rather than another section's items.
+     */
+    @Getter(AccessLevel.NONE)
+    private static final @NotNull StatusBarItem[] NO_ITEMS = new StatusBarItem[0];
+
     protected final @NotNull Project p;
     protected final @NotNull DescriptionSection DescriptionSection;
     protected final @NotNull ExpectedResultSection expectedResultSection;
@@ -135,19 +143,23 @@ public abstract class TestCaseBaseDialog {
 
     }
 
+    /**
+     * The section the focused component belongs to. Focus can sit on the dialog
+     * itself between two sections, which is no section rather than a missing one.
+     */
+    private @NotNull Optional<CreateTestCaseSection> sectionHolding(final @NotNull Component focusOwner) {
+        return getAllSections().stream()
+                .filter(section -> UIUtil.isDescendingFrom(focusOwner, section.getWrapper()))
+                .findFirst();
+    }
+
     protected void initDynamicStatusBar(final @NotNull JComponent parentPanel) {
-        focusListener = evt -> {
-            final Component focusOwner = (Component) evt.getNewValue();
-            if (focusOwner != null && UIUtil.isDescendingFrom(focusOwner, parentPanel)) {
-                for (final CreateTestCaseSection section : getAllSections()) {
-                    if (UIUtil.isDescendingFrom(focusOwner, section.getWrapper())) {
-                        final StatusBarItem[] items = statusBarMapping.getOrDefault(section, statusBarMapping.get(DescriptionSection));
-                        if (items != null) statusBarSection.updateItems(items);
-                        return;
-                    }
-                }
-            }
-        };
+        // Focus leaving the window arrives as no new owner at all, and a focus
+        // owner outside this dialog is somebody else's business.
+        focusListener = evt -> Optional.ofNullable((Component) evt.getNewValue())
+                .filter(focusOwner -> UIUtil.isDescendingFrom(focusOwner, parentPanel))
+                .flatMap(this::sectionHolding)
+                .ifPresent(section -> statusBarSection.updateItems(statusBarMapping.getOrDefault(section, NO_ITEMS)));
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("focusOwner", focusListener);
 
         // Removal runs on any disposal path (popup onClosed or project teardown).
@@ -176,7 +188,7 @@ public abstract class TestCaseBaseDialog {
 
             @Override
             public void update(final @NotNull AnActionEvent e) {
-                if (LookupManager.getInstance(p).getActiveLookup() != null) {
+                if (completionIsOpen()) {
                     e.getPresentation().setEnabled(false);
                     return;
                 }
@@ -195,12 +207,23 @@ public abstract class TestCaseBaseDialog {
         }.registerCustomShortcutSet(shortcutSet, component);
     }
 
+    /**
+     * Whether code completion is showing its popup. The platform answers with no
+     * lookup when it is not, and this is the one place that reads that.
+     */
+    private boolean completionIsOpen() {
+        return LookupManager.getInstance(p).getActiveLookup() != null;
+    }
+
     public @NotNull Runnable save(final @NotNull TestCaseDto dto, final @NotNull Consumer<@NotNull TestCaseDto> onSave, final @NotNull JBPopup[] popupWrapper) {
         return () -> {
-            getAllSections().forEach(section -> section.applyTo(dto));
+            // A section the tester never opened holds its empty defaults, and
+            // writing those over the dto would erase what is already there. Asked
+            // here rather than at the top of all eight applyTo methods.
+            getAllSections().stream().filter(CreateTestCaseSection::isShown).forEach(section -> section.applyTo(dto));
 
             final String title = dto.getDescription();
-            if (DescriptionSection.getWrapper().getParent() == null || !title.trim().isEmpty()) {
+            if (!DescriptionSection.isShown() || !title.trim().isEmpty()) {
                 onSave.accept(dto);
 
                 popupWrapper[0].closeOk(null);

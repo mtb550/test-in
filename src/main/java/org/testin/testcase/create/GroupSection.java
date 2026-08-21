@@ -50,9 +50,7 @@ public class GroupSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void showSection(final @NotNull JBPanel<?> contentPanel) {
-        if (wrapper.getParent() == null)
-            contentPanel.add(wrapper);
+    public void focusOnShow() {
         focusFirstCheckbox();
     }
 
@@ -67,15 +65,13 @@ public class GroupSection implements CreateTestCaseSection {
 
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        if (wrapper.getParent() != null) {
-            final ArrayList<Group> selectedGroups = new ArrayList<>();
-            for (final Component c : group.getComponents()) {
-                if (c instanceof JBCheckBox cb && cb.isSelected()) {
-                    selectedGroups.add(Group.valueOf(cb.getText()));
-                }
+        final ArrayList<Group> selectedGroups = new ArrayList<>();
+        for (final Component c : group.getComponents()) {
+            if (c instanceof JBCheckBox cb && cb.isSelected()) {
+                selectedGroups.add(Group.valueOf(cb.getText()));
             }
-            dto.setGroup(selectedGroups);
         }
+        dto.setGroup(selectedGroups);
     }
 
     @Override

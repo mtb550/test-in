@@ -15,7 +15,27 @@ import java.awt.*;
 public interface CreateTestCaseSection {
     @NotNull JBPanel<?> getWrapper();
 
-    void showSection(final @NotNull JBPanel<?> contentPanel);
+    /**
+     * Whether the tester has opened this section. An unopened section has not
+     * been added to the dialog and so has no parent, and a missing parent
+     * means nothing else here - which is why it is read in this one place.
+     */
+    default boolean isShown() {
+        return getWrapper().getParent() != null;
+    }
+
+    default void showSection(final @NotNull JBPanel<?> contentPanel) {
+        if (!isShown()) contentPanel.add(getWrapper());
+        focusOnShow();
+    }
+
+    /**
+     * What takes focus when the section opens: the component it already
+     * advertises, unless a section wants something else or nothing at all.
+     */
+    default void focusOnShow() {
+        getFocusComponent().requestFocus();
+    }
 
     void applyTo(final @NotNull TestCaseDto dto);
 

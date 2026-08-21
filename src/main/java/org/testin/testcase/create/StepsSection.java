@@ -27,6 +27,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class StepsSection implements CreateTestCaseSection {
     final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
@@ -64,11 +65,12 @@ public class StepsSection implements CreateTestCaseSection {
         return wrapper;
     }
 
+    /**
+     * Nothing: the tester opens the steps to type into a field that the
+     * two-argument overload has not added yet, and it focuses that field.
+     */
     @Override
-    public void showSection(final @NotNull JBPanel<?> contentPanel) {
-        if (wrapper.getParent() == null) {
-            contentPanel.add(wrapper);
-        }
+    public void focusOnShow() {
     }
 
     public void showSection(final @NotNull JBPanel<?> contentPanel, final @NotNull UIAction repackAction) {
@@ -159,15 +161,13 @@ public class StepsSection implements CreateTestCaseSection {
 
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        if (wrapper.getParent() != null) {
-            final List<String> finalSteps = new ArrayList<>();
-            for (final EditorTextField sf : stepFields) {
-                if (!sf.getText().trim().isEmpty()) {
-                    finalSteps.add(sf.getText().trim());
-                }
+        final List<String> finalSteps = new ArrayList<>();
+        for (final EditorTextField sf : stepFields) {
+            if (!sf.getText().trim().isEmpty()) {
+                finalSteps.add(sf.getText().trim());
             }
-            dto.setSteps(finalSteps);
         }
+        dto.setSteps(finalSteps);
     }
 
     @Override
@@ -184,16 +184,21 @@ public class StepsSection implements CreateTestCaseSection {
         return stepsContainer;
     }
 
+    /**
+     * The components of the row a step field sits in. A field that has not been
+     * added to one has nothing to iterate, so the caller needs no test.
+     */
+    private static @NotNull Component[] rowOf(final @NotNull EditorTextField field) {
+        return Optional.ofNullable(field.getParent()).map(Container::getComponents).orElse(new Component[0]);
+    }
+
     @Override
     public void setEditable(final boolean editable) {
         for (final EditorTextField field : stepFields) {
             field.setEnabled(editable);
-            final Container row = field.getParent();
-            if (row != null) {
-                for (final Component c : row.getComponents()) {
-                    if (c instanceof JBPanel<?> buttonWrapper) {
-                        buttonWrapper.setVisible(editable);
-                    }
+            for (final Component c : rowOf(field)) {
+                if (c instanceof JBPanel<?> buttonWrapper) {
+                    buttonWrapper.setVisible(editable);
                 }
             }
         }

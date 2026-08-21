@@ -40,17 +40,8 @@ public class TestDataSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void showSection(final @NotNull JBPanel<?> contentPanel) {
-        if (wrapper.getParent() == null)
-            contentPanel.add(wrapper);
-        testDataField.requestFocus();
-    }
-
-    @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        if (wrapper.getParent() != null) {
-            dto.setTestData(testDataField.getText().trim());
-        }
+        dto.setTestData(testDataField.getText().trim());
     }
 
     @Override

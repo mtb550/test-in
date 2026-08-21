@@ -48,17 +48,8 @@ public class ExpectedResultSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void showSection(final @NotNull JBPanel<?> contentPanel) {
-        if (wrapper.getParent() == null)
-            contentPanel.add(wrapper);
-        expectedResultField.requestFocus();
-    }
-
-    @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        if (wrapper.getParent() != null) {
-            dto.setExpectedResult(expectedResultField.getText().trim());
-        }
+        dto.setExpectedResult(expectedResultField.getText().trim());
     }
 
     @Override

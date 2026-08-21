@@ -48,17 +48,8 @@ public class ModuleSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void showSection(final @NotNull JBPanel<?> contentPanel) {
-        if (wrapper.getParent() == null)
-            contentPanel.add(wrapper);
-        moduleField.requestFocus();
-    }
-
-    @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        if (wrapper.getParent() != null) {
-            dto.setModule(moduleField.getText().trim());
-        }
+        dto.setModule(moduleField.getText().trim());
     }
 
     @Override
