@@ -47,13 +47,15 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
      * missing URL does it in one place whichever way it came up missing.
      */
     private static @NotNull String askForRemoteUrl(final @NotNull Project p) {
-        final @NotNull String typed = Messages.showInputDialog(
+        // Cancelling the dialog types nothing, which is the same as typing
+        // nothing into it.
+        final @NotNull String typed = Objects.requireNonNullElse(Messages.showInputDialog(
                 p,
                 "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
                 "Configure Remote",
-                Messages.getQuestionIcon());
+                Messages.getQuestionIcon()), "");
 
-        return Objects.requireNonNullElse(typed, "").trim();
+        return typed.trim();
     }
 
     /**

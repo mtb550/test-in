@@ -88,8 +88,8 @@ public final class SettingsConfigurable implements Configurable {
         final boolean rootChanged = TestinRoot.isRootChanged(settings.rootTestinPath, testinPathPanel.getPathText());
 
         settings.rootTestinPath = testinPathPanel.getPathText();
-        final @NotNull String selectedLogLevel = (String) logLevelComboBox.getSelectedItem();
-        settings.logLevel = Objects.requireNonNullElse(selectedLogLevel, Level.INFO.name());
+        settings.logLevel = Objects.requireNonNullElse((String) logLevelComboBox.getSelectedItem(),
+                Level.INFO.name());
         settings.testerName = testerNameField.getText();
         settings.testerRole = testerRoleField.getText();
         settings.defaultDownloadFolder = downloadFolderField.getText();

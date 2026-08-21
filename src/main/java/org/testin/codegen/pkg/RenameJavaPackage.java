@@ -4,7 +4,6 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
@@ -76,8 +75,8 @@ public class RenameJavaPackage implements GenAction {
             if (child.isDirectory()) {
                 updatePackageDeclarationsRecursive(p, root, child, newTop, parentPackage);
             } else if ("java".equals(child.getExtension())) {
-                final @NotNull PsiFile psiFile = PsiManager.getInstance(p).findFile(child);
-                if (psiFile instanceof PsiJavaFile javaFile) {
+                // Not loaded and not Java are one answer: nothing to retarget.
+                if (PsiManager.getInstance(p).findFile(child) instanceof PsiJavaFile javaFile) {
                     final @NotNull String newPackage = buildNewPackage(root, child.getParent(), newTop, parentPackage);
                     if (!newPackage.equals(javaFile.getPackageName())) {
                         javaFile.setPackageName(newPackage);

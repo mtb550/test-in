@@ -3,7 +3,6 @@ package org.testin.codegen;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import lombok.AccessLevel;
@@ -58,8 +57,7 @@ public final class PackageDeclarations {
      */
     public static void retarget(final @NotNull Project p, final @NotNull VirtualFile sourceRoot,
                                 final @NotNull VirtualFile file, final @NotNull VirtualFile holder) {
-        final @NotNull PsiFile psiFile = PsiManager.getInstance(p).findFile(file);
-        if (!(psiFile instanceof PsiJavaFile javaFile)) return;
+        if (!(PsiManager.getInstance(p).findFile(file) instanceof PsiJavaFile javaFile)) return;
 
         final @NotNull String declared = packageOf(sourceRoot, holder);
         if (declared.equals(javaFile.getPackageName())) return;
@@ -73,11 +71,12 @@ public final class PackageDeclarations {
      * the default package for the root itself.
      */
     public static @NotNull String packageOf(final @NotNull VirtualFile sourceRoot, final @NotNull VirtualFile dir) {
-        final @NotNull String relative = VfsUtil.getRelativePath(dir, sourceRoot, '/');
+        // No relative path when the directory is not under the root at all, which
+        // is not a package this plugin generated - the default package is the
+        // honest answer and leaves the file compiling either way.
+        final @NotNull String relative = Objects.requireNonNullElse(
+                VfsUtil.getRelativePath(dir, sourceRoot, '/'), "");
 
-        // Null when the directory is not under the root at all, which is not a
-        // package this plugin generated - the default package is the honest
-        // answer and leaves the file compiling either way.
-        return Objects.requireNonNullElse(relative, "").replace('/', '.');
+        return relative.replace('/', '.');
     }
 }

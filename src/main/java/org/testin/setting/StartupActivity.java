@@ -16,7 +16,6 @@ import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.runner.TestCaseExecutionTracker;
 import org.testin.services.Services;
-import org.testin.setting.TestinRoot;
 import org.testin.util.Once;
 
 import java.nio.file.Path;

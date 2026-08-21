@@ -134,8 +134,9 @@ public class CreateTestMethod implements GenAction {
                 return;
             }
 
-            final @NotNull PsiFile psiFile = PsiManager.getInstance(p).findFile(found.orElseThrow());
-            if (!(psiFile instanceof PsiJavaFile javaPsiFile)) {
+            // instanceof answers no for a file the PSI has not loaded and for one
+            // that is not Java, which are the same thing to do about here.
+            if (!(PsiManager.getInstance(p).findFile(found.orElseThrow()) instanceof PsiJavaFile javaPsiFile)) {
                 Logger.error("retryInjectPhysically: file " + className + ".java is not a valid Java file for method '" + methodName + "'");
                 return;
             }

@@ -11,7 +11,6 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
-import org.testin.testcase.Rank;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;

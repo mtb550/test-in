@@ -79,10 +79,10 @@ public final class SpellChecker {
 
         // Blocking rather than cancellable: this runs while the dialog is being
         // built and the field cannot be returned half-made.
-        final @NotNull PsiFile psiFile = ReadAction.computeBlocking(
-                () -> PsiDocumentManager.getInstance(p).getPsiFile(field.getDocument()));
+        final Optional<PsiFile> psiFile = Optional.ofNullable(ReadAction.computeBlocking(
+                () -> PsiDocumentManager.getInstance(p).getPsiFile(field.getDocument())));
 
-        Optional.ofNullable(psiFile).ifPresentOrElse(
+        psiFile.ifPresentOrElse(
                 file -> TextCompletionUtil.installProvider(file, provider, true),
                 () -> Logger.warn("Completion not installed: the field has no PSI file"));
 
