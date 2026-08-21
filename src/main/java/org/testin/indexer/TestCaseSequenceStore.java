@@ -35,8 +35,8 @@ final class TestCaseSequenceStore {
     }
 
     @NotNull List<TestCaseDto> getForTestSet(final @NotNull Path testSetPath) {
-        final List<UUID> ids = testSetCaseIds.get(testSetPath.toString());
-        if (ids == null || ids.isEmpty()) return Collections.emptyList();
+        final List<UUID> ids = testSetCaseIds.getOrDefault(testSetPath.toString(), List.of());
+        if (ids.isEmpty()) return List.of();
 
         // Every case in the set, in rank order. It used to be a walk from
         // whichever case claimed to be the head, with the ones the walk never
@@ -47,8 +47,9 @@ final class TestCaseSequenceStore {
         final List<TestCaseDto> cases = new ArrayList<>(ids.size());
 
         for (final UUID id : ids) {
-            final TestCaseDto testCase = testCasesById.get(id);
-            if (testCase != null && seen.add(id)) cases.add(testCase);
+            // An id the index has no case for is one the scanner could not read;
+            // it is left out rather than drawn as a blank row.
+            if (seen.add(id)) Optional.ofNullable(testCasesById.get(id)).ifPresent(cases::add);
         }
 
         return TestCaseOrder.ordered(cases);
@@ -103,8 +104,8 @@ final class TestCaseSequenceStore {
 
     void remove(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
         testCasesById.remove(testCaseId);
-        final List<UUID> ids = testSetCaseIds.get(testSetPath.toString());
-        if (ids != null) ids.remove(testCaseId);
+        Optional.ofNullable(testSetCaseIds.get(testSetPath.toString()))
+                .ifPresent(ids -> ids.remove(testCaseId));
 
         final Path filePath = testSetPath.resolve(testCaseId + ".json");
         try {
@@ -142,12 +143,10 @@ final class TestCaseSequenceStore {
                     .write(project, testSetPath.resolve(testCase.getId() + ".json"), testCase);
         }
 
-        final List<UUID> oldIds = testSetCaseIds.get(path);
-        if (oldIds != null) {
-            oldIds.stream()
-                    .filter(id -> !newIds.contains(id))
-                    .forEach(testCasesById::remove);
-        }
+        // Whatever the set held and no longer holds stops being indexed at all.
+        Optional.ofNullable(testSetCaseIds.get(path)).ifPresent(oldIds -> oldIds.stream()
+                .filter(id -> !newIds.contains(id))
+                .forEach(testCasesById::remove));
         testSetCaseIds.put(path, ids);
     }
 

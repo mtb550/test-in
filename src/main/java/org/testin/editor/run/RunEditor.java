@@ -12,7 +12,6 @@ import com.intellij.ui.table.JBTable;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.EscapeAction;
 import org.testin.editor.*;
 import org.testin.editor.grid.GridPanelBuilder;
@@ -126,7 +125,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * The run being edited, and empty while a reload is replacing it. Volatile:
      * loaded off the EDT and read on it.
      */
-    private volatile @Nullable TestRunDto tr;
+    private volatile @NotNull Optional<TestRunDto> tr = Optional.empty();
 
     /**
      * What the run recorded for this case, empty when it recorded nothing - a
@@ -141,7 +140,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * The run being edited, empty while a reload is replacing it.
      */
     public @NotNull Optional<TestRunDto> run() {
-        return Optional.ofNullable(tr);
+        return tr;
     }
 
     @Getter
@@ -218,13 +217,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             try {
                 final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.awaitIndexing();
-                // Snapshot the volatile field into a local. Re-reading it between
-                // the null check and the call would let another thread clear it.
-                TestRunDto run = tr;
-                if (run == null) {
-                    run = indexer.getTestRunByPath(parent.getPath());
-                    tr = run;
-                }
+                // Snapshotted into a local: reading the volatile field twice would
+                // let another thread empty it between the question and the answer.
+                final TestRunDto run = tr.orElseGet(() -> indexer.getTestRunByPath(parent.getPath()));
+                tr = Optional.of(run);
 
                 resultsMap.putAll(run.getResults().stream()
                         .collect(Collectors.toMap(TestRunItems::getId, item -> item,
@@ -232,7 +228,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
                 final List<TestCaseDto> loadedItems = new ArrayList<>();
                 for (final TestRunItems item : run.getResults()) {
-                    final TestCaseDto indexed = indexer.findTestCase(item.getId()).orElse(null);
+                    final Optional<TestCaseDto> indexed = indexer.findTestCase(item.getId());
 
                     // A case deleted since the run leaves its result behind, and
                     // the result is what the run is a record of. The row stays,
@@ -241,16 +237,15 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                     // In memory only. The file heals the next time the run is
                     // written, the way the missing-stamp repair already does -
                     // opening a run rewrites nothing.
-                    if (indexed == null) {
+                    if (indexed.isEmpty()) {
                         Logger.warn("Test run references a deleted test case id=" + item.getId());
                         item.setStatus(TestStatus.REMOVED);
                     }
 
-                    final TestCaseDto testCase = indexed != null ? indexed : TestCaseDto.deleted(item.getId());
+                    final TestCaseDto testCase = indexed.orElseGet(() -> TestCaseDto.deleted(item.getId()));
 
                     loadedItems.add(testCase);
-                    final TestRunItems runItem = resultsMap.get(item.getId());
-                    if (runItem != null) runItem.setTc(testCase);
+                    runItem(item.getId()).ifPresent(runItem -> runItem.setTc(testCase));
                 }
 
                 final List<TestCaseDto> ordered = TestCaseOrder.ordered(loadedItems);
@@ -396,7 +391,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         this.currentTestCases.clear();
         this.resultsMap.clear();
 
-        this.tr = null;
+        this.tr = Optional.empty();
 
         this.model.removeAll();
 
@@ -605,7 +600,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     @Override
-    public @Nullable JComponent getPreferredFocusedComponent() {
+    public @NotNull JComponent getPreferredFocusedComponent() {
         return list;
     }
 
@@ -665,9 +660,9 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         list.ensureIndexIsVisible(localIndex);
 
         final TestCaseDto currentTc = currentTestCases.get(globalIndex);
-        final TestRunItems runItem = resultsMap.get(currentTc.getId());
+        final Optional<TestRunItems> runItem = runItem(currentTc.getId()).filter(item -> !item.isRemoved());
 
-        if (runItem == null || runItem.isRemoved()) {
+        if (runItem.isEmpty()) {
             // No run data for this case, or no test case left to run: either way
             // the execution moves on. Status changes themselves go through
             // RunStatusService, which owns advance + persist.
@@ -675,7 +670,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             return;
         }
 
-        executionTimer.start(runItem, () -> {
+        executionTimer.start(runItem.get(), () -> {
             // A model event, not a repaint. The card grows a Duration line
             // the moment that value stops being blank, which makes the row
             // taller. JList re-measures a row only when the model says that row
@@ -757,8 +752,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * together.
      */
     public void stopExecution() {
-        final TestRunDto run = tr;
-        if (run != null) run.markExecutionEnded();
+        tr.ifPresent(TestRunDto::markExecutionEnded);
 
         haltExecution();
     }
@@ -810,9 +804,9 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     private int firstPendingIndex() {
         for (int i = 0; i < currentTestCases.size(); i++) {
-            final TestRunItems item = resultsMap.get(currentTestCases.get(i).getId());
-
-            if (item != null && item.getStatus() == TestStatus.PENDING) return i;
+            if (runItem(currentTestCases.get(i).getId())
+                    .filter(item -> item.getStatus() == TestStatus.PENDING)
+                    .isPresent()) return i;
         }
 
         return 0;

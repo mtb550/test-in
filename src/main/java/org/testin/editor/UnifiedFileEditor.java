@@ -8,7 +8,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import lombok.Getter;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -35,8 +34,13 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
         return editor.getComponent();
     }
 
+    /**
+     * Strengthened from the platform's nullable contract: every Testin editor is
+     * built around a list, and the list is final and made in the constructor -
+     * so there is no moment when the editor is open and has nothing to focus.
+     */
     @Override
-    public @Nullable JComponent getPreferredFocusedComponent() {
+    public @NotNull JComponent getPreferredFocusedComponent() {
         return editor.getPreferredFocusedComponent();
     }
 

@@ -30,6 +30,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.List;
 import java.util.Set;
@@ -175,8 +176,18 @@ public class TreeTransferHandler extends TransferHandler {
      * second rule that agrees with this one until the day it does not.
      */
     public boolean canPasteFromClipboard() {
-        final Transferable contents = CopyPasteManager.getInstance().getContents();
-        return contents != null && canImport(new TransferSupport(tree, contents));
+        return clipboardContents()
+                .map(contents -> canImport(new TransferSupport(tree, contents)))
+                .orElse(false);
+    }
+
+    /**
+     * What is on the clipboard, and empty when it holds nothing - which is what
+     * the platform says with a null. Both the question and the paste ask here,
+     * so they cannot disagree about what an empty clipboard is.
+     */
+    private static @NotNull Optional<Transferable> clipboardContents() {
+        return Optional.ofNullable(CopyPasteManager.getInstance().getContents());
     }
 
     private @NotNull List<DirectoryDto> transferableSelection() {
@@ -246,7 +257,7 @@ public class TreeTransferHandler extends TransferHandler {
                 final Path fromPath = sources.getFirst().getPath().getParent();
                 new ConfirmDialog(p, verb,
                         verb + " " + describe(sources) + " into '" + target.getName() + "'?",
-                        fromPath == null ? "" : fromPath.toString(),
+                        Objects.toString(fromPath, ""),
                         target.getPath().toString(),
                         verb,
                         () -> transfer(action, sources, target)
@@ -464,11 +475,11 @@ public class TreeTransferHandler extends TransferHandler {
      * node has any. Which generator that is belongs to the node itself.
      */
     private void moveCodeOf(final @NotNull Path from, final @NotNull Path to) {
-        final Path target = to.getParent();
-        if (target == null) return;
-
-        Services.getInstance(p, ProjectIndexer.class).find(from)
-                .ifPresent(dir -> dir.getType().getMoveCodegen().execute(p, new Moved(dir, target)));
+        // A destination with no parent is the filesystem root, which is not a
+        // place a test set can land.
+        Optional.ofNullable(to.getParent()).ifPresent(target ->
+                Services.getInstance(p, ProjectIndexer.class).find(from)
+                        .ifPresent(dir -> dir.getType().getMoveCodegen().execute(p, new Moved(dir, target))));
     }
 
     // Both parameters are Swing's, and Swing passes null for either when the
@@ -512,8 +523,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     public void pasteFromClipboard() {
-        final Transferable contents = CopyPasteManager.getInstance().getContents();
-        if (contents != null) importData(new TransferSupport(tree, contents));
+        clipboardContents().ifPresent(contents -> importData(new TransferSupport(tree, contents)));
     }
 
     private void updateClipboardState(final int action, final @NotNull List<DirectoryDto> directories) {
