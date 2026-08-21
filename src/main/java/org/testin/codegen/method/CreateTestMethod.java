@@ -187,11 +187,13 @@ public class CreateTestMethod implements GenAction {
 
             if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, factory);
 
-            for (final PsiMethod m : targetClass.getMethods()) {
-                if (m.getName().equals(methodName)) {
-                    Logger.info("Method already exists: " + methodName);
-                    return;
-                }
+            // By name, not by walking every method the class already has. A
+            // generated set is one class, so the walk grew with it: importing a
+            // sheet of a thousand compared half a million names on the way
+            // through (#66, finding 23).
+            if (targetClass.findMethodsByName(methodName, false).length > 0) {
+                Logger.info("Method already exists: " + methodName);
+                return;
             }
 
             final @NotNull StringBuilder attributes = new StringBuilder();
