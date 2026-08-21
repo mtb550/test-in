@@ -36,6 +36,23 @@ public abstract class DirectoryDto {
     private @Nullable DirectoryDto parent;
 
     /**
+     * This node and every node above it, nearest first, ending at the test
+     * project.
+     * <p>
+     * The root's absent parent is what ends the walk, and this is the only
+     * place that reads it. Everything that needs the chain - rebuilding a
+     * path2, finding which test project owns a node - gets a list it can
+     * iterate or stream without asking whether anything is above it.
+     */
+    public @NotNull List<DirectoryDto> selfAndAncestors() {
+        final List<DirectoryDto> chain = new ArrayList<>();
+        for (DirectoryDto current = this; current != null; current = current.getParent()) {
+            chain.add(current);
+        }
+        return chain;
+    }
+
+    /**
      * A child's {@code path2}, from its parent's and its own name.
      * <p>
      * On the type that owns {@code path2}, so a node built from the tree and one

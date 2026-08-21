@@ -10,6 +10,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.ListValue;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -71,11 +72,7 @@ public final class ShortcutMenuPopup<T> {
     }
 
     private void registerShortcuts(final @NotNull JBList<T> list, final @NotNull JBPopup popup) {
-        final Runnable triggerSelection = () -> {
-            if (list.getSelectedValue() != null) {
-                select(list.getSelectedValue(), popup);
-            }
-        };
+        final Runnable triggerSelection = () -> ListValue.selected(list).ifPresent(item -> select(item, popup));
 
         for (final T item : items) {
             shortcutBinder.bind(item, list, () -> select(item, popup));

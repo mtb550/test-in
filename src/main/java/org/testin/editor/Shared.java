@@ -204,15 +204,7 @@ public class Shared {
      * of parents - which is where the null comes from and where it stops.
      */
     private static @NotNull Optional<JBScrollPane> findScrollPane(final @NotNull Component component) {
-        Component current = component;
-        while (current != null) {
-            if (current instanceof JBScrollPane scrollPane)
-                return Optional.of(scrollPane);
-
-            current = current.getParent();
-        }
-
-        return Optional.empty();
+        return Optional.ofNullable((JBScrollPane) SwingUtilities.getAncestorOfClass(JBScrollPane.class, component));
     }
 
     private static void drawHoverableIcon(final @NotNull Component c, final @NotNull Graphics g, final @NotNull Icon baseIcon, final int x, final int y, final boolean isHovered) {

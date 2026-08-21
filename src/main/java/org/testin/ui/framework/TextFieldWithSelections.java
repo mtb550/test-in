@@ -11,9 +11,9 @@ import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.ListValue;
 import org.testin.ui.dialogs.DialogStyle;
 
-import java.util.Objects;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
@@ -124,8 +124,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
     public @NotNull T getSelectedValue() {
         // A single-selection list can still be emptied (e.g. Ctrl+click on the
         // selected row); the first row is the declared default.
-        final SelectionList<T> selected = list.getSelectedValue();
-        return Objects.requireNonNullElse(selected, list.getModel().getElementAt(0)).value();
+        return ListValue.selected(list).orElseGet(() -> list.getModel().getElementAt(0)).value();
     }
 
     @Override
@@ -144,14 +143,13 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
     }
 
     private void syncLeadingIcon() {
-        final SelectionList<T> selected = list.getSelectedValue();
-        if (selected == null) return;
-
         // setExtensions does not refresh the field on its own; without this
         // the icon goes stale when the selection moves by keyboard.
-        DialogStyle.setLeadingIcon(textField, selected.icon());
-        textField.revalidate();
-        textField.repaint();
+        ListValue.selected(list).ifPresent(selected -> {
+            DialogStyle.setLeadingIcon(textField, selected.icon());
+            textField.revalidate();
+            textField.repaint();
+        });
     }
 
     private void installNavigation() {

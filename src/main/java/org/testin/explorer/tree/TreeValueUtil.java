@@ -5,6 +5,8 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import java.util.Objects;
+import java.util.Arrays;
 import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -12,7 +14,6 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,9 @@ import java.util.Optional;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TreeValueUtil {
+
+    private static final TreePath @NotNull [] NO_PATHS = new TreePath[0];
+    private static final int @NotNull [] NO_ROWS = new int[0];
 
     /**
      * Unwraps whatever a Swing tree node carries - the async model wraps it
@@ -64,7 +68,7 @@ public final class TreeValueUtil {
      * The directory at the end of a path.
      */
     public static @NotNull Optional<DirectoryDto> directoryAt(final @Nullable TreePath path) {
-        return path == null ? Optional.empty() : directoryOf(path.getLastPathComponent());
+        return Optional.ofNullable(path).flatMap(at -> directoryOf(at.getLastPathComponent()));
     }
 
     /**
@@ -80,8 +84,8 @@ public final class TreeValueUtil {
      * Whatever the tree has selected, when it is of this kind.
      */
     public static <T> @NotNull Optional<T> selected(final @NotNull SimpleTree tree, final @NotNull Class<T> type) {
-        final TreePath path = tree.getSelectionPath();
-        return path == null ? Optional.empty() : valueOf(path.getLastPathComponent(), type);
+        return Optional.ofNullable(tree.getSelectionPath())
+                .flatMap(path -> valueOf(path.getLastPathComponent(), type));
     }
 
     /**
@@ -117,13 +121,19 @@ public final class TreeValueUtil {
      * over null rather than an empty array when nothing is selected, which is
      * the one place that is converted rather than asked.
      */
-    public static @NotNull List<DirectoryDto> selectedDirectories(final @Nullable TreePath[] paths) {
-        if (paths == null) return List.of();
+    public static @NotNull List<DirectoryDto> selectedDirectories(final TreePath @Nullable [] paths) {
+        return Arrays.stream(Objects.requireNonNullElse(paths, NO_PATHS))
+                .map(TreeValueUtil::directoryAt)
+                .flatMap(Optional::stream)
+                .toList();
+    }
 
-        final List<DirectoryDto> values = new ArrayList<>(paths.length);
-        for (final TreePath path : paths) {
-            directoryAt(path).ifPresent(values::add);
-        }
-        return values;
+    /**
+     * The rows the tree has selected, and none when it has no selection - the
+     * same conversion as {@link #selectedDirectories}, for the callers that
+     * want screen rows rather than values.
+     */
+    public static int @NotNull [] selectedRows(final @NotNull SimpleTree tree) {
+        return Objects.requireNonNullElse(tree.getSelectionRows(), NO_ROWS);
     }
 }

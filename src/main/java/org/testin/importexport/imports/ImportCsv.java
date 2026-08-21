@@ -13,7 +13,6 @@ import org.testin.services.Services;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.Objects;
 
 @AllArgsConstructor
 public class ImportCsv {
@@ -59,25 +58,20 @@ public class ImportCsv {
         for (int r = 1; r < records.size(); r++) {
             final String[] values = records.get(r);
 
-            boolean isRowEmpty = true;
-            for (final String val : values) {
-                if (val != null && !val.trim().isEmpty()) {
-                    isRowEmpty = false;
-                    break;
-                }
-            }
-            if (isRowEmpty) continue;
+            // Every field comes from endRecord below, which builds them from a
+            // StringBuilder - so a field is blank or it is text, never absent.
+            if (Arrays.stream(values).allMatch(String::isBlank)) continue;
 
             final TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
 
             for (final TestEditorAttributes attr : TestEditorAttributes.values()) {
                 if (attr.can(Can.IMPORT)) {
-                    final Integer colIndex = headerIndexMap.get(attr.getName().toLowerCase());
-                    String rawValue = "";
-                    if (colIndex != null && colIndex < values.length) {
-                        final String val = values[colIndex];
-                        rawValue = Objects.requireNonNullElse(val, "").trim();
-                    }
+                    // A column this file does not carry, or a short row that
+                    // stops before it, both read as blank.
+                    final String rawValue = Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
+                            .filter(colIndex -> colIndex < values.length)
+                            .map(colIndex -> values[colIndex].trim())
+                            .orElse("");
                     attr.getImportSetter().execute(p, currentTestCase, rawValue);
                 }
             }
@@ -156,8 +150,7 @@ public class ImportCsv {
         fields.add(current.toString());
         current.setLength(0);
 
-        final boolean allEmpty = fields.stream().allMatch(f -> f == null || f.isEmpty());
-        if (!allEmpty) {
+        if (!fields.stream().allMatch(String::isEmpty)) {
             records.add(fields.toArray(new String[0]));
         }
         fields.clear();

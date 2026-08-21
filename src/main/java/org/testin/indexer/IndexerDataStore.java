@@ -274,12 +274,10 @@ final class IndexerDataStore {
      */
     void refreshFile(final @NotNull Path file) {
         // Boundary: java.nio answers null for a path with no parent (#71).
-        final @Nullable Path parent = file.getParent();
+        final Optional<Path> parent = Optional.ofNullable(file.getParent());
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            if (parent != null) {
-                LocalFileSystem.getInstance().refreshNioFiles(List.of(parent), false, false, null);
-            }
+            parent.ifPresent(dir -> LocalFileSystem.getInstance().refreshNioFiles(List.of(dir), false, false, null));
             LocalFileSystem.getInstance().refreshAndFindFileByNioFile(file);
         });
     }
@@ -406,12 +404,9 @@ final class IndexerDataStore {
     }
 
     void updateRunMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
-        final TestRunDirectoryDto trd = testRunsDirByPath.get(runPath.toString());
-        if (trd != null) {
-            trd.setMarker(marker);
-        } else {
-            Logger.warn("updateRunMarker: run dir not indexed, updating marker on disk only: " + runPath);
-        }
+        Optional.ofNullable(testRunsDirByPath.get(runPath.toString()))
+                .ifPresentOrElse(trd -> trd.setMarker(marker),
+                        () -> Logger.warn("updateRunMarker: run dir not indexed, updating marker on disk only: " + runPath));
 
         Services.getInstance(p, FilesUtil.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), marker);
     }
@@ -419,8 +414,11 @@ final class IndexerDataStore {
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
         final String oldStr = oldPath.toString();
         final String newStr = newPath.toString();
-        final Path newParentPath = newPath.getParent();
-        final DirectoryDto newParentDto = newParentPath == null ? null : findByPath(newParentPath).orElse(null);
+        // A node renamed to the top of the tree has nothing above it, which is
+        // what a root is - so this stays the one nullable the model declares.
+        final @Nullable DirectoryDto newParentDto = Optional.ofNullable(newPath.getParent())
+                .flatMap(this::findByPath)
+                .orElse(null);
 
         for (final Map<String, ? extends DirectoryDto> map : dirMaps) {
             renameMapEntry(map, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
@@ -502,8 +500,8 @@ final class IndexerDataStore {
 
     private void rebuildPath2(final @NotNull DirectoryDto dto) {
         final ArrayList<String> path2 = new ArrayList<>();
-        for (DirectoryDto cur = dto; cur != null; cur = cur.getParent()) {
-            path2.addFirst(cur.getName());
+        for (final DirectoryDto ancestor : dto.selfAndAncestors()) {
+            path2.addFirst(ancestor.getName());
         }
         dto.setPath2(path2);
     }
@@ -527,11 +525,10 @@ final class IndexerDataStore {
     }
 
     private <V> void renameMapEntry(final @NotNull Map<String, V> map, final @NotNull String oldKey, final @NotNull String newKey, final @NotNull Consumer<V> updater) {
-        final V value = map.remove(oldKey);
-        if (value != null) {
+        Optional.ofNullable(map.remove(oldKey)).ifPresent(value -> {
             updater.accept(value);
             map.put(newKey, value);
-        }
+        });
     }
 
     void clearAll() {

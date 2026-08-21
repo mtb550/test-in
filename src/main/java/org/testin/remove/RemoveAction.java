@@ -49,10 +49,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        TreePath[] paths = tree.getSelectionPaths();
-        if (paths == null || paths.length == 0) return;
-
-        List<DirectoryDto> nodesToRemove = getRemovableNodes(paths);
+        final List<DirectoryDto> nodesToRemove = getRemovableNodes(tree.getSelectionPaths());
         if (nodesToRemove.isEmpty()) return;
 
         // What it holds goes in the message, under the question. The row below
@@ -109,9 +106,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        TreePath[] paths = tree.getSelectionPaths();
-        boolean enabled = paths != null && !getRemovableNodes(paths).isEmpty();
-        e.getPresentation().setEnabled(enabled);
+        e.getPresentation().setEnabled(!getRemovableNodes(tree.getSelectionPaths()).isEmpty());
     }
 
     @Override

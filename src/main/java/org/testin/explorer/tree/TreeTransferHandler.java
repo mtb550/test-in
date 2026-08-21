@@ -78,11 +78,9 @@ public class TreeTransferHandler extends TransferHandler {
      * unresolvable.
      */
     private static @NotNull Optional<DirectoryDto> owningProject(final @NotNull DirectoryDto node) {
-        DirectoryDto current = node;
-        while (current != null && !(current instanceof TestProjectDirectoryDto)) {
-            current = current.getParent();
-        }
-        return Optional.ofNullable(current);
+        return node.selfAndAncestors().stream()
+                .filter(TestProjectDirectoryDto.class::isInstance)
+                .findFirst();
     }
 
     private static @NotNull String describe(final @NotNull List<DirectoryDto> sources) {

@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.ListValue;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestEditorAttributes.Can;
@@ -30,9 +31,10 @@ public class CopyTestCaseAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final TestCaseDto tc = list.getSelectedValue();
-        if (tc == null) return;
+        ListValue.selected(list).ifPresent(this::copyDetailsOf);
+    }
 
+    private void copyDetailsOf(final @NotNull TestCaseDto tc) {
         final String text = Arrays.stream(TestEditorAttributes.values())
                 .filter(a -> a.can(Can.COPY))
                 .map(attr -> attr.getName2() + " " + attr.getTestValueExtractor().execute(tc, p))

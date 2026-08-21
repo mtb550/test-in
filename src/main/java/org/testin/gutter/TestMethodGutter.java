@@ -13,7 +13,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.view.ViewPanel;
@@ -46,21 +45,14 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
             return;
         }
 
-        PsiLiteralExpression literal = PsiTreeUtil.getParentOfType(token, PsiLiteralExpression.class);
-        if (literal == null) return;
-
-        PsiNameValuePair nameValuePair = PsiTreeUtil.getParentOfType(literal, PsiNameValuePair.class);
-        if (nameValuePair == null || !"testName".equals(nameValuePair.getName())) return;
-
-        PsiAnnotation annotation = PsiTreeUtil.getParentOfType(nameValuePair, PsiAnnotation.class);
-        if (annotation == null || !annotation.hasQualifiedName("org.testng.annotations.Test")) return;
-
-        String extractedValue = StringUtil.unquoteString(literal.getText()).trim();
-        if (extractedValue.isEmpty()) return;
-
-        // Only mark testin-managed methods: a handwritten testName like "smoke"
-        // is not a UUID and clicking its marker would throw.
-        parseUuid(extractedValue).ifPresent(testCaseId -> result.add(new RelatedItemLineMarkerInfo<>(
+        // Only mark testin-managed methods: a string that is not the testName
+        // of a TestNG @Test is ordinary code, and a handwritten testName like
+        // "smoke" is not a UUID - clicking its marker would throw.
+        Optional.ofNullable(PsiTreeUtil.getParentOfType(token, PsiLiteralExpression.class))
+                .filter(TestMethodGutter::namesATestCase)
+                .map(literal -> StringUtil.unquoteString(literal.getText()).trim())
+                .flatMap(TestMethodGutter::parseUuid)
+                .ifPresent(testCaseId -> result.add(new RelatedItemLineMarkerInfo<>(
                 element,
                 element.getTextRange(),
                 AllIcons.Nodes.Related,
@@ -71,6 +63,19 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         )));
     }
 
+    /**
+     * Whether this string literal is the testName of a TestNG @Test. Each step
+     * up the tree can run out of parents, and running out means the same as
+     * finding the wrong thing: not ours.
+     */
+    private static boolean namesATestCase(final @NotNull PsiLiteralExpression literal) {
+        return Optional.ofNullable(PsiTreeUtil.getParentOfType(literal, PsiNameValuePair.class))
+                .filter(pair -> "testName".equals(pair.getName()))
+                .map(pair -> PsiTreeUtil.getParentOfType(pair, PsiAnnotation.class))
+                .filter(annotation -> annotation.hasQualifiedName("org.testng.annotations.Test"))
+                .isPresent();
+    }
+
     private void openViewPanel(final @NotNull Project p, final @NotNull UUID uuid) {
         Logger.info("Searching for UUID: " + uuid);
 
@@ -79,20 +84,15 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.awaitIndexing();
 
-                final TestCaseDto dto = indexer.findTestCase(uuid).orElse(null);
-
                 // Generated code outlives the case it was generated from: the
                 // annotation still names an id nobody can open.
-                if (dto == null) {
-                    Logger.error("Unable to find test case with UUID: " + uuid);
-                    return;
-                }
-
-                Logger.info("Found in indexer: " + dto.getDescription());
-
-                ApplicationManager.getApplication().invokeLater(() ->
-                        ViewToolWindowFactory.showPanel(p, List.of(dto), dto.getParent().getPath2(), ViewPanel::focusDetailsTab)
-                );
+                indexer.findTestCase(uuid).ifPresentOrElse(
+                        dto -> {
+                            Logger.info("Found in indexer: " + dto.getDescription());
+                            ApplicationManager.getApplication().invokeLater(() ->
+                                    ViewToolWindowFactory.showPanel(p, List.of(dto), dto.getParent().getPath2(), ViewPanel::focusDetailsTab));
+                        },
+                        () -> Logger.error("Unable to find test case with UUID: " + uuid));
 
             } catch (final Exception ex) {
                 Logger.error("Error: " + ex.getMessage());

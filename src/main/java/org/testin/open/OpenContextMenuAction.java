@@ -5,6 +5,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -67,8 +68,8 @@ public class OpenContextMenuAction extends DumbAwareAction {
      * empty selection, and for the bounds of a row that is not showing.
      */
     private static @NotNull Optional<Point> selectedRow(final @NotNull SimpleTree tree) {
-        final int[] rows = tree.getSelectionRows();
-        if (rows == null || rows.length == 0) return Optional.empty();
+        final int[] rows = TreeValueUtil.selectedRows(tree);
+        if (rows.length == 0) return Optional.empty();
 
         return Optional.ofNullable(tree.getRowBounds(rows[0]))
                 .map(bounds -> new Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2));

@@ -28,7 +28,7 @@ public class ViewDetailsAction extends AbstractProjectAction {
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final List<TestCaseDto> selected = list.getSelectedValuesList();
 
-        if (selected != null && !selected.isEmpty())
+        if (!selected.isEmpty())
             ViewToolWindowFactory.showPanel(p, selected, path, ViewPanel::focusDetailsTab);
     }
 

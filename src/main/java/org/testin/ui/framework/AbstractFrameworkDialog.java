@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The dialog framework shell (issue #11). A concrete dialog assigns the
@@ -49,13 +50,19 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
 
     /**
      * Optional: a fixed size for large working dialogs. Setting it also makes
-     * the popup resizable and movable.
+     * the popup resizable and movable. Zero, the default, is a dialog that
+     * sizes itself to its content - which is what most of them do.
      */
-    protected Dimension preferredSize;
+    protected @NotNull Dimension preferredSize = new Dimension();
 
-    private DialogDto dto;
-    private List<DialogComponent> built;
-    private JBPopup popup;
+    /**
+     * Built on first show and kept: the declaration, the components that hold
+     * the Swing state, and the popup itself. Empty until then, because a
+     * subclass has not finished declaring itself while its constructor runs.
+     */
+    private @NotNull Optional<DialogDto> dto = Optional.empty();
+    private @NotNull Optional<List<DialogComponent>> built = Optional.empty();
+    private @NotNull Optional<JBPopup> popup = Optional.empty();
 
     protected AbstractFrameworkDialog(final @NotNull Project p) {
         this.p = p;
@@ -109,24 +116,28 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     public final void show() {
         // Assembled on first show: by now the subclass is fully constructed,
         // so its declaration (and its this:: references) is safe to use.
-        if (popup == null) {
-            final JBPanel<?> contentPanel = buildContentPanel();
-            bindShortcutKeys(contentPanel);
-            bindSubmitGesture();
-
-            final ComponentPopupBuilder builder = DialogStyle.createPopupBuilder(contentPanel, focusComponent(), dto().title());
-            if (preferredSize != null) {
-                contentPanel.setPreferredSize(preferredSize);
-                builder.setResizable(true).setMovable(true);
-            }
-
-            popup = builder.createPopup();
-        } else if (popup.isDisposed()) {
+        if (popup.isEmpty()) {
+            popup = Optional.of(buildPopup());
+        } else if (getPopup().isDisposed()) {
             // A JBPopup cannot be reopened after it closes.
             throw new IllegalStateException("This dialog was already shown and closed - create a new instance");
         }
 
         getPopup().showCenteredInCurrentWindow(p);
+    }
+
+    private @NotNull JBPopup buildPopup() {
+        final JBPanel<?> contentPanel = buildContentPanel();
+        bindShortcutKeys(contentPanel);
+        bindSubmitGesture();
+
+        final ComponentPopupBuilder builder = DialogStyle.createPopupBuilder(contentPanel, focusComponent(), dto().title());
+        if (preferredSize.width > 0) {
+            contentPanel.setPreferredSize(preferredSize);
+            builder.setResizable(true).setMovable(true);
+        }
+
+        return builder.createPopup();
     }
 
     protected final void closeOk() {
@@ -142,40 +153,39 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     }
 
     protected final @NotNull JBPopup getPopup() {
-        if (popup == null) {
-            throw new IllegalStateException("Dialog popup is created on first show()");
-        }
-        return popup;
+        return popup.orElseThrow(() -> new IllegalStateException("Dialog popup is created on first show()"));
     }
 
     /**
      * Packages the declared fields exactly once; @NonNull reports a forgotten part.
      */
     private @NotNull DialogDto dto() {
-        if (dto == null) {
-            dto = DialogDto.builder()
+        if (dto.isEmpty()) {
+            dto = Optional.of(DialogDto.builder()
                     .title(title)
                     .components(components)
                     .shortcuts(shortcuts)
-                    .build();
+                    .build());
         }
-        return dto;
+        return dto.orElseThrow();
     }
 
     /**
      * The declared components, built exactly once — they hold Swing state.
      */
     private @NotNull List<DialogComponent> builtComponents() {
-        if (built == null) {
-            built = new ArrayList<>();
+        if (built.isEmpty()) {
+            final List<DialogComponent> dialogComponents = new ArrayList<>();
             for (final ComponentDialogBase<?> holder : dto().components()) {
-                built.add(holder.getComponent());
+                dialogComponents.add(holder.getComponent());
             }
-            if (built.isEmpty()) {
+            if (dialogComponents.isEmpty()) {
                 throw new IllegalStateException("A dialog needs at least one component");
             }
+
+            built = Optional.of(dialogComponents);
         }
-        return built;
+        return built.orElseThrow();
     }
 
     private @NotNull DialogComponent primaryComponent() {

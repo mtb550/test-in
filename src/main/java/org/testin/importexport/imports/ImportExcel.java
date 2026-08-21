@@ -53,55 +53,71 @@ public class ImportExcel {
             if (workbook.isSheetHidden(i) || workbook.isSheetVeryHidden(i)) continue;
 
             final Sheet sheet = workbook.getSheetAt(i);
-            final String sheetName = sheet.getSheetName();
-
-            final Row headerRow = sheet.getRow(0);
-            if (headerRow == null) continue;
-
-            final Map<String, Integer> headerIndexMap = new HashMap<>();
-
-            for (final Cell cell : headerRow) {
-                final String headerName = dataFormatter.formatCellValue(cell).trim();
-                for (final TestEditorAttributes reqCol : importAction.importAttributes) {
-                    if (reqCol.getName().equalsIgnoreCase(headerName)) {
-                        headerIndexMap.put(reqCol.getName().toLowerCase(), cell.getColumnIndex());
-                    }
-                }
-            }
-
-            final List<TestCaseDto> sheetList = new ArrayList<>();
-
-            for (int r = 1; r <= sheet.getLastRowNum(); r++) {
-                final Row row = sheet.getRow(r);
-                if (row == null) continue;
-
-                boolean isRowEmpty = true;
-                for (int c = 0; c < row.getLastCellNum(); c++) {
-                    if (row.getCell(c) != null && !dataFormatter.formatCellValue(row.getCell(c)).trim().isEmpty()) {
-                        isRowEmpty = false;
-                        break;
-                    }
-                }
-                if (isRowEmpty) continue;
-
-                final TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
-
-                for (final TestEditorAttributes attr : TestEditorAttributes.values()) {
-                    if (attr.can(Can.IMPORT)) {
-                        final Integer colIndex = headerIndexMap.get(attr.getName().toLowerCase());
-                        final String rawValue = colIndex == null
-                                ? ""
-                                : dataFormatter.formatCellValue(row.getCell(colIndex)).trim();
-                        attr.getImportSetter().execute(p, currentTestCase, rawValue);
-                    }
-                }
-
-                sheetList.add(currentTestCase);
-            }
+            final List<TestCaseDto> sheetList = parseSheet(p, sheet, dataFormatter);
 
             if (!sheetList.isEmpty()) {
-                result.put(sheetName, sheetList);
+                result.put(sheet.getSheetName(), sheetList);
             }
         }
+    }
+
+    /**
+     * The cases on one sheet, and none at all for a sheet with no header row -
+     * an empty sheet, or one whose first row the file never wrote.
+     */
+    private @NotNull List<TestCaseDto> parseSheet(final @NotNull Project p, final @NotNull Sheet sheet,
+                                                  final @NotNull DataFormatter dataFormatter) {
+        return Optional.ofNullable(sheet.getRow(0))
+                .map(headerRow -> readRows(p, sheet, headerRow, dataFormatter))
+                .orElseGet(List::of);
+    }
+
+    private @NotNull List<TestCaseDto> readRows(final @NotNull Project p, final @NotNull Sheet sheet,
+                                                final @NotNull Row headerRow, final @NotNull DataFormatter dataFormatter) {
+        final Map<String, Integer> headerIndexMap = new HashMap<>();
+        for (final Cell cell : headerRow) {
+            final String headerName = dataFormatter.formatCellValue(cell).trim();
+            for (final TestEditorAttributes reqCol : importAction.importAttributes) {
+                if (reqCol.getName().equalsIgnoreCase(headerName)) {
+                    headerIndexMap.put(reqCol.getName().toLowerCase(), cell.getColumnIndex());
+                }
+            }
+        }
+
+        final List<TestCaseDto> sheetList = new ArrayList<>();
+
+        // The sheet's own iterator visits the rows that exist, so a file with a
+        // gap in the middle needs no test for the rows that are not there.
+        for (final Row row : sheet) {
+            if (row.getRowNum() == headerRow.getRowNum() || isEmpty(row, dataFormatter)) continue;
+
+            final TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
+
+            for (final TestEditorAttributes attr : TestEditorAttributes.values()) {
+                if (attr.can(Can.IMPORT)) {
+                    // A column the file does not carry reads as blank, which is
+                    // what an absent value means to every importer.
+                    final String rawValue = Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
+                            .map(colIndex -> dataFormatter.formatCellValue(row.getCell(colIndex)).trim())
+                            .orElse("");
+                    attr.getImportSetter().execute(p, currentTestCase, rawValue);
+                }
+            }
+
+            sheetList.add(currentTestCase);
+        }
+
+        return sheetList;
+    }
+
+    /**
+     * A row worth importing has something in it. The formatter answers a missing
+     * cell with an empty string, so no cell needs testing for its own absence.
+     */
+    private static boolean isEmpty(final @NotNull Row row, final @NotNull DataFormatter dataFormatter) {
+        for (int c = 0; c < row.getLastCellNum(); c++) {
+            if (!dataFormatter.formatCellValue(row.getCell(c)).trim().isEmpty()) return false;
+        }
+        return true;
     }
 }
