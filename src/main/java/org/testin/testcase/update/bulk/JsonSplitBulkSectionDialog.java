@@ -14,7 +14,6 @@ import org.testin.util.Shortcuts;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -80,7 +79,8 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
     protected abstract @NotNull String getOriginalValue(final @NotNull TestCaseDto tc);
 
     /**
-     * Applies one edited (non-null, trimmed) value to the test case.
+     * Applies one edited, trimmed value to the test case. Called only for rows
+     * the tester actually changed.
      */
     protected abstract void setValue(final @NotNull TestCaseDto tc, final @NotNull String value);
 
@@ -99,17 +99,13 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
         return true;
     }
 
-    protected void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<String> newValues) {
+    protected void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<EditedValue> newValues) {
         for (int i = 0; i < items.size(); i++) {
-            // A row the tester did not touch arrives as nothing at all, and is
-            // deliberately not the same as a row they emptied (see submit).
-            final @NotNull Optional<String> raw = Optional.ofNullable(newValues.get(i));
-            if (raw.isEmpty()) continue;
+            final @NotNull EditedValue edited = newValues.get(i);
+            if (!edited.changed()) continue;
+            if (edited.value().isEmpty() && !acceptsBlank()) continue;
 
-            final @NotNull String value = raw.orElseThrow().trim();
-            if (value.isEmpty() && !acceptsBlank()) continue;
-
-            setValue(items.get(i), value);
+            setValue(items.get(i), edited.value());
         }
     }
 
@@ -134,18 +130,16 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
 
     @Override
     protected void submit() {
-        final @NotNull List<String> newValues = new ArrayList<>();
+        final @NotNull List<EditedValue> newValues = new ArrayList<>();
 
         for (int i = 0; i < selectedItems.size(); i++) {
-            // The editor shows newlines flattened to spaces, so writing an
-            // untouched row back would permanently flatten a stored multi-line
-            // value. A null entry is "unchanged, skip", which is what applyValues
-            // reads - and an unreadable value is unchanged by definition.
+            // A row reading the same as it started was not edited, and neither
+            // was one the editor cannot read back - both are left as they are.
             final int index = i;
             newValues.add(editors.valueAt(index)
                     .filter(current -> !current.equals(originalEscaped.get(index)))
-                    .map(current -> BulkJsonEditor.unescapeJson(current).trim())
-                    .orElse(null));
+                    .map(current -> EditedValue.of(BulkJsonEditor.unescapeJson(current).trim()))
+                    .orElse(EditedValue.UNCHANGED));
         }
 
         applyValues(selectedItems, newValues);
