@@ -136,7 +136,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
         return Collections.emptyList();
     }
 
-    private TestCaseDto cloneForPasting(final @NotNull Project p, final TestCaseDto original, final boolean isCut) {
+    private @NotNull TestCaseDto cloneForPasting(final @NotNull Project p, final @NotNull TestCaseDto original, final boolean isCut) {
         final ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
         final TestCaseDto clonedTc = Services.getInstance(p, Mapper.class).convertValue(original, TestCaseDto.class);

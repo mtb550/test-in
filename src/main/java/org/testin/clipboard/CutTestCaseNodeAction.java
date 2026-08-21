@@ -28,7 +28,7 @@ public class CutTestCaseNodeAction extends AbstractProjectAction {
     private final TestinEditor editor;
     private final JBList<TestCaseDto> list;
 
-    public CutTestCaseNodeAction(final @NotNull Project p, final TestinEditor editor, final JBList<TestCaseDto> list) {
+    public CutTestCaseNodeAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Cut Node", "Cut selected test case(s) to clipboard", AllIcons.Actions.MenuCut);
         this.editor = editor;
         this.list = list;

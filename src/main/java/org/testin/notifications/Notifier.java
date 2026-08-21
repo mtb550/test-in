@@ -147,7 +147,7 @@ public final class Notifier {
         notify(p, title, message, NotificationType.ERROR, actions);
     }
 
-    private void notify(final @NotNull Project p, final String title, final @NotNull String message,
+    private void notify(final @NotNull Project p, final @NotNull String title, final @NotNull String message,
                         final @NotNull NotificationType type, final @NotNull NotificationAction... actions) {
         final Notification notification = title == null
                 ? NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(message, type)

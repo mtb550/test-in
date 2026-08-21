@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class NavigateToCodeAction extends AbstractProjectAction {
     private final JBList<TestCaseDto> list;
 
-    public NavigateToCodeAction(final @NotNull Project p, final JBList<TestCaseDto> list) {
+    public NavigateToCodeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Navigate to Code", "Jump to the automated test case", AllIcons.General.ArrowRight);
         this.list = list;
         this.registerCustomShortcutSet(Shortcuts.NavigateToCode.getCustomShortcut(), list);

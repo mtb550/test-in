@@ -1,6 +1,7 @@
 package org.testin.testcase.create;
 
 import com.intellij.codeInsight.lookup.LookupManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -10,6 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
@@ -21,6 +23,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -46,6 +49,51 @@ public abstract class TestCaseBaseDialog {
     protected final @NotNull Disposable dialogDisposable;
     protected final @NotNull Map<CreateTestCaseSection, StatusBarItem[]> statusBarMapping;
     private final @NotNull List<CreateTestCaseSection> cachedSections;
+    /**
+     * The dialog's popup, empty until the constructor has finished building it.
+     * <p>
+     * Here rather than in each dialog. Both build a component popup, both repack
+     * it when a section grows, and both show it centred - and they had already
+     * drifted three ways: one guarded the repack with an if-block and the other
+     * with an early return, one showed the popup only if it existed while the
+     * other threw if it did not (#71).
+     */
+    @Getter(AccessLevel.NONE)
+    private @NotNull Optional<JBPopup> popup = Optional.empty();
+
+    /**
+     * Takes ownership of the popup the subclass just built, and hands it back so
+     * the constructor can go on using it.
+     */
+    protected final @NotNull JBPopup ownPopup(final @NotNull JBPopup built) {
+        popup = Optional.of(built);
+        return built;
+    }
+
+    /**
+     * Re-measures the popup around a section that just grew or shrank, and
+     * scrolls whatever holds focus back into view.
+     * <p>
+     * Does nothing before the popup exists: a section's fillData can fire this
+     * while the dialog is still being built.
+     */
+    protected final void repack() {
+        popup.ifPresent(open -> {
+            open.pack(false, true);
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                final Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+                if (focusOwner instanceof JComponent jComp) {
+                    jComp.scrollRectToVisible(new Rectangle(0, 0, jComp.getWidth(), jComp.getHeight()));
+                }
+            });
+        });
+    }
+
+    public void show() {
+        popup.ifPresent(open -> open.showCenteredInCurrentWindow(p));
+    }
+
     /**
      * A focus change nothing listens for, before the dynamic status bar is
      * installed.

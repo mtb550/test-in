@@ -8,10 +8,10 @@ import com.intellij.ui.PopupHandler;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.open.OpenAction;
 
 import javax.swing.*;
+import java.util.Optional;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -24,22 +24,19 @@ public class TreeMouseListener extends PopupHandler {
 
     @Override
     public void invokePopup(final @NotNull Component comp, final int x, final int y) {
-        final TreePath selPath = rowPathAt(x, y);
-        if (selPath == null || TreeValueUtil.directoryAt(selPath).isEmpty()) return;
+        nodeAt(x, y).ifPresent(selPath -> {
+            if (!tree.getSelectionModel().isPathSelected(selPath)) {
+                tree.setSelectionPath(selPath);
+            }
 
-        if (!tree.getSelectionModel().isPathSelected(selPath)) {
-            tree.setSelectionPath(selPath);
-        }
-
-        final ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, treeContextMenu);
-        popupMenu.getComponent().show(comp, x, y);
+            final ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, treeContextMenu);
+            popupMenu.getComponent().show(comp, x, y);
+        });
     }
 
     @Override
     public void mouseClicked(final @NotNull MouseEvent e) {
-        final TreePath selPath = rowPathAt(e.getX(), e.getY());
-
-        if (selPath == null || TreeValueUtil.directoryAt(selPath).isEmpty()) return;
+        if (nodeAt(e.getX(), e.getY()).isEmpty()) return;
 
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
             new OpenAction(p, tree).execute(p);
@@ -48,18 +45,23 @@ public class TreeMouseListener extends PopupHandler {
     }
 
     /**
-     * The whole row responds, not only the label: the wide selection paints
-     * the full width, so clicks in the indentation or right of the text must
-     * hit the same node. Matches the row by Y alone; below the last row is
-     * still a miss.
+     * The node under the pointer, and empty when there is none there.
+     * <p>
+     * The whole row responds, not only the label: the wide selection paints the
+     * full width, so clicks in the indentation or right of the text hit the same
+     * node. Matched by Y alone, and below the last row is still a miss.
+     * <p>
+     * A path with nothing behind it is a miss too. Both callers wanted a node
+     * rather than a path, and each used to ask for the path and then ask again
+     * whether it had one - the same question in two places (#71).
      */
-    private @Nullable TreePath rowPathAt(final int x, final int y) {
+    private @NotNull Optional<TreePath> nodeAt(final int x, final int y) {
         final int row = tree.getClosestRowForLocation(x, y);
-        if (row < 0) return null;
+        if (row < 0) return Optional.empty();
 
-        final Rectangle bounds = tree.getRowBounds(row);
-        if (bounds == null || y < bounds.y || y >= bounds.y + bounds.height) return null;
-
-        return tree.getPathForRow(row);
+        return Optional.ofNullable(tree.getRowBounds(row))
+                .filter(bounds -> y >= bounds.y && y < bounds.y + bounds.height)
+                .map(bounds -> tree.getPathForRow(row))
+                .filter(path -> TreeValueUtil.directoryAt(path).isPresent());
     }
 }

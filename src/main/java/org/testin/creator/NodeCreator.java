@@ -18,5 +18,5 @@ public interface NodeCreator {
      * tree at all. Either way there is no node yet for the caller's follow-up.
      */
     @NotNull
-    Optional<DirectoryDto> execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath);
+    Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath);
 }

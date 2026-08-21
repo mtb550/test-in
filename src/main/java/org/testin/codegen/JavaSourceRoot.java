@@ -51,8 +51,8 @@ public final class JavaSourceRoot {
      * root stopped being valid, which is what happens when the folder is deleted.
      */
     public static @NotNull Optional<VirtualFile> find(final @NotNull Project p) {
-        final VirtualFile cached = Config.getTestSourceRoot();
-        if (cached != null && cached.isValid()) return Optional.of(cached);
+        final Optional<VirtualFile> cached = Config.testSourceRoot();
+        if (cached.isPresent()) return cached;
 
         for (final Module module : ModuleManager.getInstance(p).getModules()) {
             final List<VirtualFile> sourceRoots = ModuleRootManager.getInstance(module)
@@ -60,7 +60,7 @@ public final class JavaSourceRoot {
 
             if (!sourceRoots.isEmpty()) {
                 Logger.debug("Found test source root: " + sourceRoots.getFirst());
-                Config.setTestSourceRoot(sourceRoots.getFirst());
+                Config.rememberTestSourceRoot(sourceRoots.getFirst());
                 return Optional.of(sourceRoots.getFirst());
             }
         }

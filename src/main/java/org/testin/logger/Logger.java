@@ -52,7 +52,7 @@ public final class Logger {
         log(Level.FATAL, WALKER.getCallerClass().getSimpleName(), message);
     }
 
-    private static void log(final Level level, final String callerClass, final String message) {
+    private static void log(final @NotNull Level level, final @NotNull String callerClass, final @NotNull String message) {
         getService().ifPresentOrElse(
                 service -> service.log(level, callerClass, message),
                 () -> System.out.println("[" + level.paddedName + "] [" + callerClass + "] " + message));

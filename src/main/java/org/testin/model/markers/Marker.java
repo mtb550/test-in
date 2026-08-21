@@ -39,7 +39,7 @@ public interface Marker {
      */
     int getOrder();
 
-    Marker setOrder(int order);
+    @NotNull Marker setOrder(int order);
 
     @NotNull String getCreatedBy();
 

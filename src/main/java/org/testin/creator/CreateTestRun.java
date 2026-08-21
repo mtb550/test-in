@@ -60,7 +60,7 @@ public class CreateTestRun implements NodeCreator {
      * the bound project's own tree.
      */
     private void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name,
-                              final DirectoryDto parentDir, final @NotNull Path newDirPath) {
+                              final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
 
             final Path testCasesPath = testCasesRoot.getPath();
@@ -127,7 +127,7 @@ public class CreateTestRun implements NodeCreator {
         return node;
     }
 
-    private void saveSelectedToJSON(final RunConfigurationForm form, final SelectionTree selection, final Path savePath, final ExplorerPanel pp, final TestRunDirectoryDto trDir) {
+    private void saveSelectedToJSON(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull ExplorerPanel pp, final @NotNull TestRunDirectoryDto trDir) {
         final TestRunDto tr = new TestRunDto()
                 .setCreatedBy(Services.getInstance(p, AppSettingsState.class).testerName)
                 .setChangeLog(form.getChangeLog().getText().trim())

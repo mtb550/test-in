@@ -108,9 +108,12 @@ public final class TestCaseMerge {
         final List<Question> questions = new ArrayList<>();
 
         for (final String field : fields(mineNode, theirsNode)) {
-            final JsonNode was = baseNode.get(field);
-            final JsonNode ours = mineNode.get(field);
-            final JsonNode yours = theirsNode.get(field);
+            // path, not get: a field the JSON does not carry answers with
+            // Jackson's own empty node rather than with null, so nothing below
+            // has to ask whether it got one (#71).
+            final JsonNode was = baseNode.path(field);
+            final JsonNode ours = mineNode.path(field);
+            final JsonNode yours = theirsNode.path(field);
 
             if (same(ours, yours)) continue;
 
@@ -148,7 +151,7 @@ public final class TestCaseMerge {
                               final @NotNull String theirs) {
         if (!takeTheirs) return;
 
-        set(merged, question.field(), mapper.readTree(theirs).get(question.field()));
+        set(merged, question.field(), mapper.readTree(theirs).path(question.field()));
     }
 
     /**
@@ -158,13 +161,13 @@ public final class TestCaseMerge {
      */
     private static void stampTheLaterEdit(final @NotNull ObjectNode merged, final @NotNull ObjectNode mine,
                                           final @NotNull ObjectNode theirs) {
-        final ZonedDateTime mineAt = TestDataParser.date(text(mine.get(UPDATED_AT)));
-        final ZonedDateTime theirsAt = TestDataParser.date(text(theirs.get(UPDATED_AT)));
+        final ZonedDateTime mineAt = TestDataParser.date(text(mine.path(UPDATED_AT)));
+        final ZonedDateTime theirsAt = TestDataParser.date(text(theirs.path(UPDATED_AT)));
 
         final ObjectNode later = theirsAt.isAfter(mineAt) ? theirs : mine;
 
-        set(merged, UPDATED_AT, later.get(UPDATED_AT));
-        set(merged, UPDATED_BY, later.get(UPDATED_BY));
+        set(merged, UPDATED_AT, later.path(UPDATED_AT));
+        set(merged, UPDATED_BY, later.path(UPDATED_BY));
     }
 
     /**
@@ -179,8 +182,11 @@ public final class TestCaseMerge {
         return names;
     }
 
-    private static void set(final @NotNull ObjectNode target, final @NotNull String field, final JsonNode value) {
-        if (value == null) target.remove(field);
+    private static void set(final @NotNull ObjectNode target, final @NotNull String field, final @NotNull JsonNode value) {
+        // A field the winning side does not carry is removed rather than written
+        // as an empty one - the merged case has to look like a case, not like a
+        // case with holes in it.
+        if (value.isMissingNode()) target.remove(field);
         else target.set(field, value);
     }
 
@@ -188,9 +194,9 @@ public final class TestCaseMerge {
      * Two values Git would call different but a tester would not: an absent
      * field and a null one say the same thing about a test case.
      */
-    private static boolean same(final JsonNode one, final JsonNode other) {
-        final boolean oneEmpty = one == null || one.isNull();
-        final boolean otherEmpty = other == null || other.isNull();
+    private static boolean same(final @NotNull JsonNode one, final @NotNull JsonNode other) {
+        final boolean oneEmpty = one.isMissingNode() || one.isNull();
+        final boolean otherEmpty = other.isMissingNode() || other.isNull();
 
         if (oneEmpty || otherEmpty) return oneEmpty == otherEmpty;
 
@@ -202,8 +208,8 @@ public final class TestCaseMerge {
      * and the JSON of anything with structure - a list of steps says more as
      * {@code ["open the app", "sign in"]} than as a class name.
      */
-    private static @NotNull String text(final JsonNode value) {
-        if (value == null || value.isNull()) return "";
+    private static @NotNull String text(final @NotNull JsonNode value) {
+        if (value.isMissingNode() || value.isNull()) return "";
 
         return value.isValueNode() ? value.asText() : value.toString();
     }
