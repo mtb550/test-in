@@ -345,11 +345,8 @@ public final class TestRunPdfGenerator {
                             .setTextAlignment(TextAlignment.CENTER)));
 
             // Test Case column
-            final TestCaseDto tc = detailsMap.get(item.getId());
-            String tcName = tc != null ? tc.getDescription() : "";
-            if (tcName.isEmpty()) {
-                tcName = "—";
-            }
+            final String caseName = ReportedCase.of(detailsMap, item.getId()).getDescription();
+            final String tcName = caseName.isEmpty() ? "—" : caseName;
             final Cell testCaseCell = new Cell()
                     .setBackgroundColor(rowBg)
                     .setBorder(new SolidBorder(BORDER_GRAY, 1))

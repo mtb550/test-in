@@ -313,9 +313,8 @@ public final class TestRunWordGenerator {
             XWPFTableCell tcCell = row.getCell(1);
             shadeCell(tcCell, rowBg);
             setCellPadding(tcCell, 4, 6, 4, 6);
-            final TestCaseDto tc = detailsMap.get(item.getId());
-            String tcName = tc != null ? tc.getDescription() : "";
-            if (tcName.isEmpty()) tcName = "—";
+            final String caseName = ReportedCase.of(detailsMap, item.getId()).getDescription();
+            final String tcName = caseName.isEmpty() ? "—" : caseName;
             setCellText(tcCell, tcName, 9, false, BLACK);
 
             if (withFailureDetail) {

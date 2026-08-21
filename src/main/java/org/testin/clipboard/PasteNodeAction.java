@@ -3,10 +3,10 @@ package org.testin.clipboard;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.ClipboardContents;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.explorer.tree.TreeTransferPayload;
@@ -16,6 +16,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Shortcuts;
 
+import java.util.Objects;
 import javax.swing.*;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.InputEvent;
@@ -37,10 +38,8 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (!(tree.getTransferHandler() instanceof TreeTransferHandler transferHandler)) return;
 
-        final Transferable contents = CopyPasteManager.getInstance().getContents();
-        if (contents == null || !contents.isDataFlavorSupported(TreeTransferHandler.NODE_FLAVOR)) return;
-
-        TreeValueUtil.selectedDirectory(tree).ifPresent(target -> paste(transferHandler, contents, target));
+        ClipboardContents.withFlavor(TreeTransferHandler.NODE_FLAVOR).ifPresent(contents ->
+                TreeValueUtil.selectedDirectory(tree).ifPresent(target -> paste(transferHandler, contents, target)));
     }
 
     private void paste(final @NotNull TreeTransferHandler transferHandler, final @NotNull Transferable contents,
@@ -65,7 +64,7 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
 
             new ConfirmDialog(p, "Paste",
                     verb + " " + what + " into '" + target.getName() + "'?",
-                    fromPath == null ? "" : fromPath.toString(),
+                    Objects.toString(fromPath, ""),
                     target.getPath().toString(),
                     verb,
                     transferHandler::pasteFromClipboard

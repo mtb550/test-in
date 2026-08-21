@@ -8,6 +8,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Level;
+import java.util.Objects;
 
 /**
  * The persisted shape, and only that: the fields that are literally in
@@ -35,7 +36,7 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
     public @NotNull String testerRole = "";
 
     private static @NotNull String orEmpty(final @Nullable String value) {
-        return value != null ? value : "";
+        return Objects.requireNonNullElse(value, "");
     }
 
     private static @NotNull String orDefault(final @Nullable String value, final @NotNull String fallback) {

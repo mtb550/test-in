@@ -13,6 +13,7 @@ import org.testin.services.Services;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.Objects;
 
 @AllArgsConstructor
 public class ImportCsv {
@@ -75,7 +76,7 @@ public class ImportCsv {
                     String rawValue = "";
                     if (colIndex != null && colIndex < values.length) {
                         final String val = values[colIndex];
-                        rawValue = val != null ? val.trim() : "";
+                        rawValue = Objects.requireNonNullElse(val, "").trim();
                     }
                     attr.getImportSetter().execute(p, currentTestCase, rawValue);
                 }

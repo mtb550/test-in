@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -83,7 +84,7 @@ public record TestinProjectConfig(int version,
     }
 
     private static @NotNull String strip(final @Nullable String value) {
-        return value == null ? "" : value.strip();
+        return Objects.requireNonNullElse(value, "").strip();
     }
 
     private static @NotNull String validRepoUrl(final @NotNull String value) {

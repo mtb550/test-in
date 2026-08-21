@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.ui.dialogs.DialogStyle;
 
+import java.util.Objects;
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -102,7 +103,7 @@ public final class TextInput implements DialogComponent {
             private boolean allows(final @NotNull FilterBypass bypass, final int offset, final int length,
                                    final @Nullable String text) throws BadLocationException {
                 final String current = bypass.getDocument().getText(0, bypass.getDocument().getLength());
-                final String next = current.substring(0, offset) + (text == null ? "" : text)
+                final String next = current.substring(0, offset) + Objects.requireNonNullElse(text, "")
                         + current.substring(offset + length);
 
                 return next.isEmpty() || pattern.matcher(next).matches();

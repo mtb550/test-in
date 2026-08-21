@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -90,7 +91,7 @@ public final class GridExcelBehavior {
             for (int c = 0; c < cols.length; c++) {
                 if (c > 0) sb.append('\t');
                 final Object value = table.getValueAt(rows[r], cols[c]);
-                sb.append(escapeTsvField(value == null ? "" : value.toString()));
+                sb.append(escapeTsvField(Objects.toString(value, "")));
             }
         }
         CopyPasteManager.getInstance().setContents(new StringSelection(sb.toString()));

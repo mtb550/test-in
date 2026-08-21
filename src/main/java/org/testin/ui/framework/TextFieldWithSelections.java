@@ -13,6 +13,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
 
+import java.util.Objects;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
@@ -124,7 +125,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
         // A single-selection list can still be emptied (e.g. Ctrl+click on the
         // selected row); the first row is the declared default.
         final SelectionList<T> selected = list.getSelectedValue();
-        return (selected != null ? selected : list.getModel().getElementAt(0)).value();
+        return Objects.requireNonNullElse(selected, list.getModel().getElementAt(0)).value();
     }
 
     @Override

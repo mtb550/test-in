@@ -6,6 +6,7 @@ import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
@@ -112,7 +113,7 @@ public final class SelectionTable implements DialogComponent {
 
     public @NotNull String getValueAt(final int row, final int column) {
         final Object value = model.getValueAt(row, column);
-        return value == null ? "" : value.toString();
+        return Objects.toString(value, "");
     }
 
     public void removeRow(final int row) {

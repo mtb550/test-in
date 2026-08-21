@@ -6,6 +6,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
@@ -48,7 +49,7 @@ public final class ChoiceInput implements DialogComponent {
      */
     public @NotNull String getValue() {
         final Object value = combo.getEditor().getItem();
-        return value == null ? "" : value.toString().trim();
+        return Objects.toString(value, "").trim();
     }
 
     /**

@@ -14,6 +14,7 @@ import org.testin.util.Shortcuts;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -48,7 +49,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         title = getPopupTitle();
 
         for (final List<String> values : extractOriginalValues(selectedItems)) {
-            final List<String> current = values != null ? new ArrayList<>(values) : new ArrayList<>();
+            final List<String> current = new ArrayList<>(Objects.requireNonNullElse(values, List.<String>of()));
             // An empty list still needs one span, or there is nowhere to type.
             if (current.isEmpty()) current.add("");
 

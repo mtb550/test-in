@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -193,7 +194,7 @@ public final class ProjectIndexer {
         final Path rootPath = Services.getInstance(p, TestinRoot.class).getPath();
         if (rootPath.toString().isEmpty() || rootPath.isAbsolute()) return rootPath;
 
-        return p.getBasePath() != null ? Path.of(p.getBasePath(), rootPath.toString()) : rootPath;
+        return Optional.ofNullable(p.getBasePath()).map(base -> Path.of(base, rootPath.toString())).orElse(rootPath);
     }
 
     /**

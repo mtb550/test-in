@@ -22,6 +22,16 @@ import java.util.UUID;
 public final class TestRunExcelGenerator {
 
     /**
+     * What a spreadsheet cell shows for a description or expected result that is
+     * not there - because the case is gone, or because nobody filled it in. Both
+     * read the same to whoever opens the report.
+     */
+    private static @NotNull String orNotAvailable(final @NotNull String value) {
+        return value.isEmpty() ? "N/A" : value;
+    }
+
+
+    /**
      * The project is not read here and is part of the signature anyway: all four
      * generators are called through one functional interface in {@code FileTypes},
      * and the three that render a document do need it (#61).
@@ -89,9 +99,9 @@ public final class TestRunExcelGenerator {
                 final UUID id = result.getId();
                 ws.value(row, 0, id.toString());
 
-                final TestCaseDto details = detailsMap.get(id);
-                final String title = details != null ? details.getDescription() : "N/A";
-                final String expectedResult = details != null ? details.getExpectedResult() : "N/A";
+                final TestCaseDto details = ReportedCase.of(detailsMap, id);
+                final String title = orNotAvailable(details.getDescription());
+                final String expectedResult = orNotAvailable(details.getExpectedResult());
 
                 ws.value(row, 1, title);
 

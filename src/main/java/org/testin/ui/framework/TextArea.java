@@ -1,11 +1,12 @@
 package org.testin.ui.framework;
 
-import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import java.util.Objects;
+import org.testin.util.ClipboardContents;
 import org.testin.logger.Logger;
 
 import javax.imageio.ImageIO;
@@ -28,6 +29,17 @@ import java.util.Base64;
  * everywhere else, and it claims the dialog's remaining space.
  */
 public final class TextArea implements DialogComponent {
+
+    /**
+     * The paste that inserts nothing, standing in for a look and feel that
+     * supplies no paste action of its own.
+     */
+    private static final @NotNull Action NO_PASTE = new AbstractAction() {
+        @Override
+        public void actionPerformed(final ActionEvent event) {
+        }
+    };
+
 
     private final @NotNull JBTextArea area;
     private final @NotNull JBScrollPane panel;
@@ -92,31 +104,47 @@ public final class TextArea implements DialogComponent {
     }
 
     /**
+     * Inserts whatever image the clipboard is holding as a data URI, and says
+     * whether it did. An empty clipboard and text on the clipboard are the same
+     * answer - no - which is what makes the caller a single line.
+     */
+    private boolean insertPastedImage() {
+        return ClipboardContents.withFlavor(DataFlavor.imageFlavor)
+                .map(this::insertAsDataUri)
+                .orElse(false);
+    }
+
+    private boolean insertAsDataUri(final @NotNull Transferable contents) {
+        try {
+            final String dataUri = toDataUri((Image) contents.getTransferData(DataFlavor.imageFlavor));
+            if (dataUri.isEmpty()) return false;
+
+            area.insert(dataUri, area.getCaretPosition());
+            return true;
+        } catch (final UnsupportedFlavorException | IOException ex) {
+            // The clipboard would not hand over the image it just said it had -
+            // the normal paste runs instead.
+            Logger.warn("Could not read the pasted image: " + ex.getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Ctrl+V with an image on the clipboard (e.g. a screenshot) inserts it as
      * a base64 PNG data-URI; plain text pastes as always. Copy and cut stay
      * the component's own.
      */
     private void installImagePaste() {
-        final Action defaultPaste = area.getActionMap().get(DefaultEditorKit.pasteAction);
+        // A text area always has a paste action; one whose look and feel somehow
+        // does not gets an action that inserts nothing, so the fallback below is
+        // unconditional.
+        final Action defaultPaste = Objects.requireNonNullElse(
+                area.getActionMap().get(DefaultEditorKit.pasteAction), NO_PASTE);
         area.getActionMap().put(DefaultEditorKit.pasteAction, new AbstractAction() {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                final Transferable contents = CopyPasteManager.getInstance().getContents();
-                if (contents != null && contents.isDataFlavorSupported(DataFlavor.imageFlavor)) {
-                    try {
-                        final Image image = (Image) contents.getTransferData(DataFlavor.imageFlavor);
-                        final String dataUri = toDataUri(image);
-                        if (!dataUri.isEmpty()) {
-                            area.insert(dataUri, area.getCaretPosition());
-                            return;
-                        }
-                    } catch (final UnsupportedFlavorException | IOException ex) {
-                        // The clipboard would not hand over the image it just said
-                        // it had - fall through to the normal paste.
-                        Logger.warn("Could not read the pasted image: " + ex.getMessage());
-                    }
-                }
-                if (defaultPaste != null) defaultPaste.actionPerformed(event);
+                if (insertPastedImage()) return;
+                defaultPaste.actionPerformed(event);
             }
         });
     }

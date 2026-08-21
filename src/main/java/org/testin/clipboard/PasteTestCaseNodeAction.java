@@ -5,10 +5,10 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.ClipboardContents;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
@@ -27,7 +27,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -97,21 +96,9 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
 
-        boolean enabled = false;
-        Transferable contents = CopyPasteManager.getInstance().getContents();
-        if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-            try {
-                String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
-                if (json.trim().startsWith("[")) {
-                    List<TestCaseDto> parsedList = Services.getInstance(p, Mapper.class).readValue(json, new TypeReference<>() {
-                    });
-                    enabled = !parsedList.isEmpty();
-                }
-            } catch (final Exception ex) {
-                Logger.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
-            }
-        }
-        e.getPresentation().setEnabled(enabled);
+        e.getPresentation().setEnabled(ClipboardContents.withFlavor(DataFlavor.stringFlavor)
+                .map(this::holdsTestCases)
+                .orElse(false));
     }
 
     @Override
@@ -120,20 +107,36 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
         return ActionUpdateThread.BGT;
     }
 
-    private List<TestCaseDto> getFromClipboard(final @NotNull Project p) {
-        Transferable contents = CopyPasteManager.getInstance().getContents();
-        if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-            try {
-                String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
+    /**
+     * Whether the clipboard holds test cases. Anything else on it belongs to
+     * some other copy and leaves the menu entry disabled.
+     */
+    private boolean holdsTestCases(final @NotNull Transferable contents) {
+        return !readTestCases(contents).isEmpty();
+    }
 
-                return Services.getInstance(p, Mapper.class).readValue(json, new TypeReference<>() {
-                });
+    private @NotNull List<TestCaseDto> getFromClipboard(final @NotNull Project p) {
+        return ClipboardContents.withFlavor(DataFlavor.stringFlavor)
+                .map(this::readTestCases)
+                .orElseGet(List::of);
+    }
 
-            } catch (final Exception ex) {
-                Logger.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
-            }
+    /**
+     * The test cases on the clipboard, or none of them. Text that is not a JSON
+     * array is not a failed read - it is a tester copying a word - so it is
+     * turned away before the parser sees it and reports it as a warning.
+     */
+    private @NotNull List<TestCaseDto> readTestCases(final @NotNull Transferable contents) {
+        try {
+            final String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
+            if (!json.trim().startsWith("[")) return List.of();
+
+            return Services.getInstance(p, Mapper.class).readValue(json, new TypeReference<>() {
+            });
+        } catch (final Exception ex) {
+            Logger.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
+            return List.of();
         }
-        return Collections.emptyList();
     }
 
     private @NotNull TestCaseDto cloneForPasting(final @NotNull Project p, final @NotNull TestCaseDto original, final boolean isCut) {

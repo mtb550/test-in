@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import java.util.Objects;
 
 /**
  * Makes every generated file under a directory declare the package it is
@@ -76,6 +77,6 @@ public final class PackageDeclarations {
         // Null when the directory is not under the root at all, which is not a
         // package this plugin generated - the default package is the honest
         // answer and leaves the file compiling either way.
-        return relative == null || relative.isEmpty() ? "" : relative.replace('/', '.');
+        return Objects.requireNonNullElse(relative, "").replace('/', '.');
     }
 }

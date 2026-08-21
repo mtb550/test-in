@@ -53,7 +53,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 "Configure Remote",
                 Messages.getQuestionIcon());
 
-        return typed == null ? "" : typed.trim();
+        return Objects.requireNonNullElse(typed, "").trim();
     }
 
     /**

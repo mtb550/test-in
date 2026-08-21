@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Objects;
 
 /**
  * Undo/redo for reversible tree operations (move, rename). Each recorded
@@ -15,6 +16,17 @@ import java.util.Deque;
 public final class TreeUndoService {
 
     private static final int LIMIT = 20;
+
+    /**
+     * What an empty stack offers: an operation that describes itself as nothing
+     * and does nothing in either direction. It is never run - undo and redo ask
+     * the stack whether it has anything first - but it lets the two description
+     * readers be unconditional, which is the whole reason it exists.
+     */
+    private static final @NotNull TreeOperation NOTHING = new TreeOperation("", () -> {
+    }, () -> {
+    });
+
     private final @NotNull Deque<TreeOperation> undoStack = new ArrayDeque<>();
     private final @NotNull Deque<TreeOperation> redoStack = new ArrayDeque<>();
 
@@ -40,30 +52,35 @@ public final class TreeUndoService {
      * empty - which is what the menu entry then appends to its own word.
      */
     public @NotNull String undoDescription() {
-        final TreeOperation operation = undoStack.peek();
-        return operation == null ? "" : operation.description();
+        return next(undoStack).description();
     }
 
     /**
      * What the next redo would redo, empty when there is nothing to redo.
      */
     public @NotNull String redoDescription() {
-        final TreeOperation operation = redoStack.peek();
-        return operation == null ? "" : operation.description();
+        return next(redoStack).description();
+    }
+
+    /**
+     * The operation at the top of a stack, or the one that stands for none.
+     */
+    private static @NotNull TreeOperation next(final @NotNull Deque<TreeOperation> stack) {
+        return Objects.requireNonNullElse(stack.peek(), NOTHING);
     }
 
     public void undo() {
-        final TreeOperation operation = undoStack.poll();
-        if (operation == null) return;
+        if (!canUndo()) return;
 
+        final TreeOperation operation = undoStack.pop();
         operation.undo().run();
         redoStack.push(operation);
     }
 
     public void redo() {
-        final TreeOperation operation = redoStack.poll();
-        if (operation == null) return;
+        if (!canRedo()) return;
 
+        final TreeOperation operation = redoStack.pop();
         operation.redo().run();
         undoStack.push(operation);
     }

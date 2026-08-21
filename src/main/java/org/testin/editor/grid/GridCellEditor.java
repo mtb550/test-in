@@ -4,6 +4,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTextArea;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
@@ -55,7 +56,7 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
     public @NotNull Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
         editingTable = Optional.of(table);
         editingRow = row;
-        textArea.setText(value == null ? "" : value.toString());
+        textArea.setText(Objects.toString(value, ""));
         textArea.setFont(table.getFont());
         textArea.setBackground(table.getSelectionBackground());
         textArea.setForeground(table.getForeground());

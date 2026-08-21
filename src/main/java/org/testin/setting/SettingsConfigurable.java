@@ -89,7 +89,7 @@ public final class SettingsConfigurable implements Configurable {
 
         settings.rootTestinPath = testinPathPanel.getPathText();
         final String selectedLogLevel = (String) logLevelComboBox.getSelectedItem();
-        settings.logLevel = selectedLogLevel != null ? selectedLogLevel : Level.INFO.name();
+        settings.logLevel = Objects.requireNonNullElse(selectedLogLevel, Level.INFO.name());
         settings.testerName = testerNameField.getText();
         settings.testerRole = testerRoleField.getText();
         settings.defaultDownloadFolder = downloadFolderField.getText();

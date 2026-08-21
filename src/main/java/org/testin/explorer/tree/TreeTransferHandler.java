@@ -9,6 +9,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.ClipboardContents;
 import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.Moved;
 import org.testin.codegen.SubtreeCode;
@@ -176,18 +177,9 @@ public class TreeTransferHandler extends TransferHandler {
      * second rule that agrees with this one until the day it does not.
      */
     public boolean canPasteFromClipboard() {
-        return clipboardContents()
+        return ClipboardContents.current()
                 .map(contents -> canImport(new TransferSupport(tree, contents)))
                 .orElse(false);
-    }
-
-    /**
-     * What is on the clipboard, and empty when it holds nothing - which is what
-     * the platform says with a null. Both the question and the paste ask here,
-     * so they cannot disagree about what an empty clipboard is.
-     */
-    private static @NotNull Optional<Transferable> clipboardContents() {
-        return Optional.ofNullable(CopyPasteManager.getInstance().getContents());
     }
 
     private @NotNull List<DirectoryDto> transferableSelection() {
@@ -523,7 +515,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     public void pasteFromClipboard() {
-        clipboardContents().ifPresent(contents -> importData(new TransferSupport(tree, contents)));
+        ClipboardContents.current().ifPresent(contents -> importData(new TransferSupport(tree, contents)));
     }
 
     private void updateClipboardState(final int action, final @NotNull List<DirectoryDto> directories) {

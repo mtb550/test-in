@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
@@ -31,7 +32,7 @@ public class GroupMultiSelectEditor extends AbstractCellEditor implements TableC
     @Override
     public @NotNull Component getTableCellEditorComponent(final @NotNull JTable table, final @Nullable Object value,
                                                           final boolean isSelected, final int row, final int column) {
-        currentValue = value != null ? value.toString() : "";
+        currentValue = Objects.toString(value, "");
         button.setText(currentValue);
         return button;
     }

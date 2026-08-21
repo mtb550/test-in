@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.services.Services;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 /**
  * The Testin root, as a path.
@@ -60,6 +61,6 @@ public final class TestinRoot {
 
     public void setPath(final @Nullable Path path) {
         final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
-        settings.rootTestinPath = path != null ? path.toString() : "";
+        settings.rootTestinPath = Objects.toString(path, "");
     }
 }

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.IconManager;
 import org.testin.util.Shortcuts;
 
+import java.util.Optional;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -137,7 +138,7 @@ public abstract class AbstractButton extends JButton {
     @Override
     protected void paintComponent(final @NotNull Graphics g) {
         final Container parent = getParent();
-        g.setColor(parent != null ? parent.getBackground() : getBackground());
+        g.setColor(Optional.ofNullable(parent).map(Container::getBackground).orElseGet(this::getBackground));
         g.fillRect(0, 0, getWidth(), getHeight());
 
         if (hovered) {

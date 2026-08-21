@@ -183,8 +183,7 @@ public final class TestRunHtmlGenerator {
         results.stream()
                 .filter(filter)
                 .forEach(item -> {
-                    final TestCaseDto d = detailsMap.get(item.getId());
-                    final String desc = d != null ? d.getDescription() : "";
+                    final String desc = ReportedCase.of(detailsMap, item.getId()).getDescription();
                     final String bugPriority = item.getBugPriority().name();
                     html.append("<tr>")
                             .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")

@@ -11,6 +11,8 @@ import org.testin.util.Mapper;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -212,12 +214,12 @@ final class PendingChangeFactory {
      */
     private static @NotNull String statusIn(final @NotNull Mapper mapper, final @NotNull String json) {
         final Object status = fieldsIn(mapper, json).get("status");
-        return status == null ? "" : status.toString();
+        return Objects.toString(status, "");
     }
 
     private static @NotNull String parentName(final @NotNull Path relativePath) {
         final Path parent = relativePath.getParent();
-        return parent == null ? "" : parent.getFileName().toString();
+        return Optional.ofNullable(parent).map(Path::getFileName).map(Path::toString).orElse("");
     }
 
     private static <T> @NotNull T read(final @NotNull Mapper mapper, final @NotNull String json,

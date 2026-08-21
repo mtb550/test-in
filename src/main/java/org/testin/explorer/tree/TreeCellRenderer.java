@@ -55,7 +55,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
         } catch (final Exception ex) {
             Logger.error("Error rendering tree node: " + ex.getMessage());
             setIcon(AllIcons.General.Error);
-            append(value != null ? value.toString() : "Error", SimpleTextAttributes.ERROR_ATTRIBUTES);
+            append(Objects.toString(value, "Error"), SimpleTextAttributes.ERROR_ATTRIBUTES);
         }
     }
 
