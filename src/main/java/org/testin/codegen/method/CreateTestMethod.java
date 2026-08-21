@@ -2,7 +2,6 @@ package org.testin.codegen.method;
 
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
@@ -20,6 +19,8 @@ import java.util.Optional;
 import java.util.List;
 
 public class CreateTestMethod implements GenAction {
+
+    private static final String TESTNG_TEST = "org.testng.annotations.Test";
 
     /**
      * Splits an FQCN list into the parts the generator needs, or null when there
@@ -95,11 +96,11 @@ public class CreateTestMethod implements GenAction {
         final JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(p);
         final GlobalSearchScope scope = GlobalSearchScope.projectScope(p);
 
-        final PsiClass existing = psiFacade.findClass(path, scope);
-        if (existing != null) return Optional.of(existing);
+        final Optional<PsiClass> existing = Optional.ofNullable(psiFacade.findClass(path, scope));
+        if (existing.isPresent()) return existing;
 
         try {
-            JavaSourceRoot.inRootOrWarn(p, sourceRoot -> writeEmptyClass(sourceRoot, packageList, className));
+            JavaSourceRoot.inRootOrWarn(p, root -> JavaSourceRoot.classFile(root, packageList, className));
 
         } catch (final IOException ex) {
             Logger.error("Failed to create class file for '" + className + "': " + ex.getMessage());
@@ -107,31 +108,6 @@ public class CreateTestMethod implements GenAction {
 
         PsiDocumentManager.getInstance(p).commitAllDocuments();
         return Optional.ofNullable(psiFacade.findClass(path, scope));
-    }
-
-    /**
-     * Writes the class file a generated method needs, when it is not there yet.
-     * <p>
-     * Package segments are camelCase (see NameSanitizer.packageName); lowercasing
-     * the directory here would disagree with the emitted package declaration and
-     * with CreateJavaClass, so findClass could never resolve the class.
-     */
-    private void writeEmptyClass(final @NotNull VirtualFile sourceRoot, final @NotNull List<String> packageList,
-                                 final @NotNull String className) throws IOException {
-        final VirtualFile packageDir = VfsUtil.createDirectoryIfMissing(sourceRoot, String.join("/", packageList));
-        if (packageDir == null) return;
-
-        final String fileName = className + ".java";
-        if (packageDir.findChild(fileName) != null) return;
-
-        final VirtualFile javaFile = packageDir.createChildData(this, fileName);
-        final String packageName = String.join(".", packageList);
-        final String fileContent = packageName.isEmpty()
-                ? "public class " + className + " {\n\n}\n"
-                : "package " + packageName + ";\n\npublic class " + className + " {\n\n}\n";
-
-        VfsUtil.saveText(javaFile, fileContent);
-        javaFile.refresh(false, false);
     }
 
     private void retryInjectPhysically(final @NotNull Project p, final @NotNull List<String> packageList,
@@ -177,21 +153,29 @@ public class CreateTestMethod implements GenAction {
         }
     }
 
+    /**
+     * Puts the TestNG @Test import in the file, when it is not there already.
+     * <p>
+     * Both of the platform's empty answers mean the same thing here - a file
+     * with no import list of its own, and a TestNG that is not on the classpath
+     * - so neither is asked about separately.
+     */
+    private void addTestImport(final @NotNull Project p, final @NotNull PsiJavaFile javaFile,
+                               final @NotNull PsiElementFactory factory) {
+        Optional.ofNullable(javaFile.getImportList())
+                .filter(imports -> imports.findSingleClassImportStatement(TESTNG_TEST) == null)
+                .ifPresent(imports -> Optional
+                        .ofNullable(JavaPsiFacade.getInstance(p).findClass(TESTNG_TEST, GlobalSearchScope.allScope(p)))
+                        .ifPresent(testClass -> imports.add(factory.createImportStatement(testClass))));
+    }
+
     private void injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass,
                               final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
             final PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
             final PsiFile file = targetClass.getContainingFile();
 
-            if (file instanceof PsiJavaFile javaFile) {
-                final PsiImportList importList = javaFile.getImportList();
-                if (importList != null && importList.findSingleClassImportStatement("org.testng.annotations.Test") == null) {
-                    final PsiClass testClass = JavaPsiFacade.getInstance(p).findClass("org.testng.annotations.Test", GlobalSearchScope.allScope(p));
-                    if (testClass != null) {
-                        importList.add(factory.createImportStatement(testClass));
-                    }
-                }
-            }
+            if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, factory);
 
             for (final PsiMethod m : targetClass.getMethods()) {
                 if (m.getName().equals(methodName)) {

@@ -11,6 +11,7 @@ import org.testin.codegen.Moved;
 import org.testin.codegen.PackageDeclarations;
 import org.testin.logger.Logger;
 
+import java.util.Optional;
 import java.util.List;
 
 /**
@@ -31,25 +32,25 @@ public class MoveJavaPackage implements GenAction {
         final List<String> destination = moved.destinationPackage(p);
 
         JavaSourceRoot.commandInRoot(p, "Move Test Package", "moving package", sourceRoot -> {
-            final VirtualFile folder = sourceRoot.findFileByRelativePath(String.join("/", fqcn));
+            final Optional<VirtualFile> found = Optional.ofNullable(sourceRoot.findFileByRelativePath(String.join("/", fqcn)))
+                    .filter(VirtualFile::isDirectory);
 
-            if (folder == null || !folder.isDirectory()) {
+            if (found.isEmpty()) {
                 Logger.info("Package not found for move: " + String.join(".", fqcn));
                 return;
             }
 
-            final VirtualFile target = VfsUtil.createDirectoryIfMissing(sourceRoot, String.join("/", destination));
-            if (target == null) {
-                Logger.error("Could not create the package to move " + folder.getName() + " into: " + String.join(".", destination));
-                return;
-            }
+            final VirtualFile folder = found.get();
+            final Optional<VirtualFile> target = JavaSourceRoot.packageFolder(sourceRoot, destination);
 
-            // A package dropped where it already is, and a package dropped into
-            // itself: neither is a move, and the second would take the folder
-            // with it.
-            if (target.equals(folder.getParent()) || VfsUtil.isAncestor(folder, target, false)) return;
+            // No folder to move into; a package dropped where it already is; and a
+            // package dropped into itself, which would take the folder with it.
+            // None of the three is a move.
+            if (target.isEmpty()
+                    || target.get().equals(folder.getParent())
+                    || VfsUtil.isAncestor(folder, target.get(), false)) return;
 
-            folder.move(this, target);
+            folder.move(this, target.get());
             PackageDeclarations.retarget(p, sourceRoot, folder);
 
             Logger.info("Moved package " + folder.getName() + " into: " + String.join(".", destination));

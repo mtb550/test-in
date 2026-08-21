@@ -1,7 +1,6 @@
 package org.testin.codegen.clazz;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
@@ -11,6 +10,7 @@ import org.testin.codegen.Moved;
 import org.testin.codegen.PackageDeclarations;
 import org.testin.logger.Logger;
 
+import java.util.Optional;
 import java.util.List;
 
 /**
@@ -35,23 +35,22 @@ public class MoveJavaClass implements GenAction {
         final String fileName = fqcn.getLast() + ".java";
 
         JavaSourceRoot.commandInRoot(p, "Move Test Class", "moving class", sourceRoot -> {
-            final VirtualFile file = sourceRoot.findFileByRelativePath(String.join("/", fqcn) + ".java");
+            final Optional<VirtualFile> file =
+                    Optional.ofNullable(sourceRoot.findFileByRelativePath(String.join("/", fqcn) + ".java"));
 
-            if (file == null) {
+            if (file.isEmpty()) {
                 Logger.info("Class not found for move: " + String.join(".", fqcn));
                 return;
             }
 
-            final VirtualFile target = VfsUtil.createDirectoryIfMissing(sourceRoot, String.join("/", destination));
-            if (target == null) {
-                Logger.error("Could not create the package to move " + fileName + " into: " + String.join(".", destination));
-                return;
-            }
+            final Optional<VirtualFile> target = JavaSourceRoot.packageFolder(sourceRoot, destination);
 
-            if (target.equals(file.getParent())) return;
+            // No folder to move into, and a class dropped where it already is:
+            // neither is a move.
+            if (target.isEmpty() || target.get().equals(file.get().getParent())) return;
 
-            file.move(this, target);
-            PackageDeclarations.retarget(p, sourceRoot, file, target);
+            file.get().move(this, target.get());
+            PackageDeclarations.retarget(p, sourceRoot, file.get(), target.get());
 
             Logger.info("Moved " + fileName + " to package: " + String.join(".", destination));
         });

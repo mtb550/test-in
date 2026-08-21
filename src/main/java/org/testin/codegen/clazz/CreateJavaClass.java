@@ -1,8 +1,6 @@
 package org.testin.codegen.clazz;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
@@ -20,33 +18,12 @@ public class CreateJavaClass implements GenAction {
         final List<String> fqcn = Fqcn.ofClass(p, dir);
         if (fqcn.isEmpty()) return;
 
-        final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
+        final List<String> packageSegments = fqcn.subList(0, fqcn.size() - 1);
         final String className = fqcn.getLast();
-        final String fileName = className + ".java";
 
         Logger.info("Ready to generate Test Class: " + className + " in package: " + fqcn);
 
-        JavaSourceRoot.writeInRootOrWarn(p, "creating test class", testSourceRoot -> {
-            final VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, path.replace(".", "/"));
-            if (vf == null) {
-                Logger.error("Could not create package directory: " + path.replace(".", "/"));
-                return;
-            }
-
-            final VirtualFile existingFile = vf.findChild(fileName);
-            if (existingFile != null) {
-                Logger.info("File already exists: " + existingFile.getPath());
-                return;
-            }
-
-            final VirtualFile javaFile = vf.createChildData(this, fileName);
-            final String fileContent = "package " + path + ";\n\n" +
-                    "public class " + className + " {\n" +
-                    "    \n" +
-                    "}\n";
-
-            VfsUtil.saveText(javaFile, fileContent);
-            Logger.info("Test Class created physically at: " + javaFile.getPath());
-        });
+        JavaSourceRoot.writeInRootOrWarn(p, "creating test class",
+                root -> JavaSourceRoot.classFile(root, packageSegments, className));
     }
 }
