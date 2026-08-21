@@ -3,6 +3,7 @@ package org.testin.importexport.exports;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
@@ -18,15 +19,50 @@ import java.util.Map;
 public class ExportExcel {
 
     /**
+     * Excel's limit on a sheet name, which POI enforces by throwing.
+     */
+    private static final int MAX_SHEET_NAME = 31;
+
+    private final @NotNull ExportAction exportAction;
+
+    /**
      * Whether the workbook already carries a sheet of this name. POI says it
      * does not by handing back no sheet, and this is the one place that reads
-     * that.
+     * that. Case does not count: Excel refuses "Login" beside "login", so
+     * neither does the lookup.
      */
     private static boolean hasSheet(final @NotNull Workbook workbook, final @NotNull String name) {
         return workbook.getSheet(name) != null;
     }
 
-    private final @NotNull ExportAction exportAction;
+    /**
+     * A sheet name Excel will accept and this workbook does not already hold.
+     * <p>
+     * Two test sets can want the same sheet: their names differ but sanitize
+     * alike - "A/B" and "A*B" both become "A_B" - and a name longer than the
+     * limit is cut to it, which collapses more of them. The first one keeps the
+     * name and the rest are numbered.
+     * <p>
+     * It used to retry with the first 28 characters and an ellipsis, which broke
+     * twice over: a name shorter than 28 threw out of substring, and a longer
+     * one produced the same string on every pass, so the loop never ended.
+     * POI decides what is legal - it knows about the colon and the quote this
+     * class never removed - and the number is what makes it unique.
+     */
+    static @NotNull String uniqueSheetName(final @NotNull Workbook workbook, final @NotNull String proposal) {
+        final @NotNull String safe = WorkbookUtil.createSafeSheetName(proposal, '_');
+        if (!hasSheet(workbook, safe)) return safe;
+
+        // The base is shortened by as much as the number needs, so a name
+        // already at the limit still has somewhere to put it.
+        for (int attempt = 2; ; attempt++) {
+            final @NotNull String suffix = " (" + attempt + ")";
+            final @NotNull String base = safe.substring(0, Math.min(safe.length(), MAX_SHEET_NAME - suffix.length()));
+            final @NotNull String candidate = base + suffix;
+
+            if (!hasSheet(workbook, candidate)) return candidate;
+        }
+    }
 
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
                              final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
@@ -37,15 +73,7 @@ public class ExportExcel {
             headerStyle.setFont(headerFont);
 
             for (final Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
-                String safeSheetName = entry.getKey().replaceAll("[\\\\/*?\\[\\]]", "_");
-                if (safeSheetName.length() > 31) {
-                    safeSheetName = safeSheetName.substring(0, 31);
-                }
-                while (hasSheet(workbook, safeSheetName)) {
-                    safeSheetName = safeSheetName.substring(0, 28) + "...";
-                }
-
-                final @NotNull Sheet sheet = workbook.createSheet(safeSheetName);
+                final @NotNull Sheet sheet = workbook.createSheet(uniqueSheetName(workbook, entry.getKey()));
 
                 final @NotNull Row headerRow = sheet.createRow(0);
                 for (int i = 0; i < exportAction.exportAttributes.size(); i++) {
