@@ -40,7 +40,7 @@ public abstract class TestCaseBaseDialog {
     private static final @NotNull StatusBarItem[] NO_ITEMS = new StatusBarItem[0];
 
     protected final @NotNull Project p;
-    protected final @NotNull DescriptionSection DescriptionSection;
+    protected final @NotNull DescriptionSection descriptionSection;
     protected final @NotNull ExpectedResultSection expectedResultSection;
     protected final @NotNull ModuleSection moduleSection;
     protected final @NotNull TestDataSection testDataSection;
@@ -121,7 +121,7 @@ public abstract class TestCaseBaseDialog {
         this.dialogDisposable = Disposer.newDisposable("testin.testCaseDialog");
         Disposer.register(p, dialogDisposable);
 
-        this.DescriptionSection = new DescriptionSection(p);
+        this.descriptionSection = new DescriptionSection(p);
         this.expectedResultSection = new ExpectedResultSection(p);
         this.moduleSection = new ModuleSection(p);
         this.testDataSection = new TestDataSection();
@@ -223,13 +223,13 @@ public abstract class TestCaseBaseDialog {
             getAllSections().stream().filter(CreateTestCaseSection::isShown).forEach(section -> section.applyTo(dto));
 
             final @NotNull String title = dto.getDescription();
-            if (!DescriptionSection.isShown() || !title.trim().isEmpty()) {
+            if (!descriptionSection.isShown() || !title.trim().isEmpty()) {
                 onSave.accept(dto);
 
                 popupWrapper[0].closeOk(null);
 
             } else
-                DescriptionSection.setError(true);
+                descriptionSection.setError(true);
         };
     }
 

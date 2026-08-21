@@ -94,7 +94,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
         mainPanel.add(statusBarSection.getPanel(), BorderLayout.SOUTH);
 
         final @NotNull JBPopup dialogPopup = ownPopup(JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(mainPanel, DescriptionSection.getFocusComponent())
+                .createComponentPopupBuilder(mainPanel, descriptionSection.getFocusComponent())
                 .setTitle("Create Test Case")
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
