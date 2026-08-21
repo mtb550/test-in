@@ -35,12 +35,29 @@ public final class TestinRoot {
     private final @NotNull Project p;
 
     /**
-     * A stored root as a path. Missing, empty and whitespace-only values all mean
-     * "no root configured" and normalize to the empty path, so callers have one
-     * thing to check rather than three.
+     * The path of a project with no root configured. Empty, blank and never-set
+     * settings all normalize to it, so there is one thing to compare against
+     * rather than three ways of being absent.
+     */
+    public static final @NotNull Path NONE = Path.of("");
+
+    /**
+     * A stored root as a path, and {@link #NONE} when nothing is stored.
+     * <p>
+     * Nullable on purpose, and the only place here that is: this reads a value
+     * out of the settings XML, where the entry can be missing altogether. A
+     * missing entry, an empty one and a whitespace one are one answer.
      */
     public static @NotNull Path normalize(final @Nullable String rawPath) {
         return Path.of(Objects.requireNonNullElse(rawPath, "").trim());
+    }
+
+    /**
+     * Whether a root has been configured at all. Asked by name so no caller has
+     * to know that "not configured" is spelled as the empty path.
+     */
+    public static boolean isConfigured(final @NotNull Path root) {
+        return !NONE.equals(root);
     }
 
     /**
@@ -56,8 +73,8 @@ public final class TestinRoot {
         return normalize(Services.getInstance(p, AppSettingsState.class).rootTestinPath);
     }
 
-    public void setPath(final @Nullable Path path) {
+    public void setPath(final @NotNull Path path) {
         final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
-        settings.rootTestinPath = Objects.toString(path, "");
+        settings.rootTestinPath = path.toString();
     }
 }

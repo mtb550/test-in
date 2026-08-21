@@ -16,10 +16,10 @@ import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.runner.TestCaseExecutionTracker;
 import org.testin.services.Services;
+import org.testin.setting.TestinRoot;
 import org.testin.util.Once;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 public final class StartupActivity implements ProjectActivity {
 
@@ -38,11 +38,10 @@ public final class StartupActivity implements ProjectActivity {
 
         Logger.info("StartupActivity.execute()");
 
-        Path testinPath = null;
+        // An unconfigured root is the empty path, not the absence of one.
+        final @NotNull Path testinPath = TestinRoot.normalize(settings.rootTestinPath);
 
-        if (!settings.rootTestinPath.isBlank()) {
-            testinPath = Path.of(settings.rootTestinPath);
-        } else {
+        if (!TestinRoot.isConfigured(testinPath)) {
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (!p.isDisposed()) {
                     Services.getInstance(p, Notifier.class).warnWithAction(p,
@@ -68,8 +67,9 @@ public final class StartupActivity implements ProjectActivity {
                 ? "Bound to test project '" + config.testinProject() + "'"
                 : "No test project bound to " + p.getName());
 
-        Optional.ofNullable(testinPath).ifPresent(root ->
-                Services.getInstance(p, ProjectIndexer.class).indexWithProgress());
+        if (TestinRoot.isConfigured(testinPath)) {
+            Services.getInstance(p, ProjectIndexer.class).indexWithProgress();
+        }
 
         TestCaseExecutionTracker.initGlobalListener(p);
     }
