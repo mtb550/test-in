@@ -48,8 +48,10 @@ public final class GenerateReportDialog extends AbstractFrameworkDialog<Destinat
     @Override
     protected void submit() {
         component().resolve().ifPresent(destination -> {
-            onGenerate.accept(destination.format(), destination.file());
+            // The format and the file are values, so the dialog goes first
+            // and the report is generated under a progress bar (#87).
             closeOk();
+            onGenerate.accept(destination.format(), destination.file());
         });
     }
 }

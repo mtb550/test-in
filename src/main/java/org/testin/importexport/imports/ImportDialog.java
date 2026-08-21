@@ -76,8 +76,11 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
             return;
         }
 
-        onImport.accept(selected);
+        // Closed before the work starts: the map above is the tester's
+        // choice already taken out of the preview, so nothing the import reads
+        // belongs to a dialog that is gone (#87).
         closeOk();
+        onImport.accept(selected);
     }
 
 }

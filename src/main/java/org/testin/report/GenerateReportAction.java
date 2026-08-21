@@ -5,7 +5,6 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
@@ -24,6 +23,7 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.BackgroundWork;
 import org.testin.util.Shortcuts;
 
 import java.awt.datatransfer.StringSelection;
@@ -107,7 +107,10 @@ public class GenerateReportAction extends AbstractProjectAction {
 
     private void processAndSave(final @NotNull Project p, final @NotNull TestRunDirectoryDto tr,
                                 final @NotNull FileTypes format, final @NotNull File outputFile) {
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+        // Under a bar rather than on a bare pooled thread: the dialog is gone by
+        // now, and without one the tester sees nothing at all between pressing
+        // Generate and the notification arriving (#87).
+        BackgroundWork.run(p, "Generating the " + format.getLabel() + " report for " + tr.getName(), "Report Error", indicator -> {
             try {
                 final @NotNull Path dirPath = tr.getPath();
 

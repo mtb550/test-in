@@ -50,6 +50,10 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunCon
     protected void submit() {
         if (!selection.hasChecked()) return;
 
+        // Not closed first, deliberately: the callback reads the form and the
+        // checked tree to build the run before it hands the writing off, and a
+        // closed dialog has no components to read. It returns as soon as it has
+        // them, so the dialog still goes on the button (#87).
         onCreate.run();
         closeOk();
     }

@@ -4,9 +4,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -23,6 +20,8 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
+import org.testin.ui.dialogs.DestinationForm;
+import org.testin.util.BackgroundWork;
 import org.testin.util.Mapper;
 
 import java.io.InputStream;
@@ -52,32 +51,41 @@ public class ExportAction extends AbstractProjectTreeAction {
         if (resolved.isEmpty()) return;
         final @NotNull VirtualFile targetDir = resolved.get();
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Exporting test cases", true) {
-            @Override
-            public void run(final @NotNull ProgressIndicator indicator) {
-                indicator.setIndeterminate(true);
-                final @NotNull Map<String, List<TestCaseDto>> sheets = gatherData(targetDir, dirDto);
-                if (sheets.isEmpty()) {
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(p, Notifier.class).softShow(p, "Export Empty", "No test cases found."));
-                    return;
-                }
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    // The framework dialog reports through this callback rather
-                    // than a return code, so the destination is never read back
-                    // out of a dialog that was canceled. It hands back the cases
-                    // the tester left ticked, not the ones gathered above.
-                    new ExportDialog(p, exportAttributes, sheets, targetDir, (destination, selected) -> {
-                        try {
-                            destination.format().exportToFile(p, ExportAction.this, destination.file(), selected);
-                        } catch (final Exception ex) {
-                            Logger.error("Export crashed: " + ex.getMessage());
-                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class).error(p, "Export Failed", ex.getMessage()));
-                        }
-                    }).show();
-                });
+        BackgroundWork.run(p, "Reading test cases in " + dirDto.getName(), "Export Failed", gathering -> {
+            final @NotNull Map<String, List<TestCaseDto>> sheets = gatherData(targetDir, dirDto);
+            if (sheets.isEmpty()) {
+                ApplicationManager.getApplication().invokeLater(() ->
+                        Services.getInstance(p, Notifier.class).softShow(p, "Export Empty", "No test cases found."));
+                return;
             }
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                // The framework dialog reports through this callback rather
+                // than a return code, so the destination is never read back
+                // out of a dialog that was canceled. It hands back the cases
+                // the tester left ticked, not the ones gathered above.
+                new ExportDialog(p, exportAttributes, sheets, targetDir, (destination, selected) ->
+                        writeExport(destination, selected)).show();
+            });
         });
+    }
+
+    /**
+     * The write, once the tester has chosen a file. Under its own bar and after
+     * the dialog has closed: a workbook of several hundred cases took the EDT
+     * with it, and the dialog sat there for all of it (#87).
+     */
+    private void writeExport(final DestinationForm.@NotNull Destination destination,
+                             final @NotNull Map<String, List<TestCaseDto>> selected) {
+        final int cases = selected.values().stream().mapToInt(List::size).sum();
+
+        BackgroundWork.run(p, "Exporting " + cases + " test cases to " + destination.file().getName(),
+                "Export Failed", indicator -> {
+                    destination.format().exportToFile(p, ExportAction.this, destination.file(), selected);
+
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Services.getInstance(p, Notifier.class).softShowCounted(p, "Exported", cases));
+                });
     }
 
     public @NotNull Map<String, List<TestCaseDto>> gatherData(final @NotNull VirtualFile targetDirectory,

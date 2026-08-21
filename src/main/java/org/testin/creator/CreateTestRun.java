@@ -26,6 +26,7 @@ import org.testin.testrun.RunConfigurationDialog;
 import org.testin.testrun.RunConfigurationForm;
 import org.testin.testrun.RunTreeCellRenderer;
 import org.testin.ui.framework.SelectionTree;
+import org.testin.util.BackgroundWork;
 import org.testin.util.EditorUtil;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -150,7 +151,9 @@ public class CreateTestRun implements NodeCreator {
         });
         tr.setResults(items);
 
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+        // The form and the checked tree were read above, while the dialog was
+        // still there; from here nothing touches a component (#87).
+        BackgroundWork.run(p, "Creating test run " + savePath.getFileName(), "Test Run Not Created", indicator -> {
             Services.getInstance(p, ProjectIndexer.class).putTestRun(savePath, tr);
 
             // Defaults are correct (status CREATED); addTestRunDir stamps the

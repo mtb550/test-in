@@ -77,8 +77,10 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
                 return;
             }
 
-            onExport.accept(destination, selected);
+            // Both the destination and the selection are values already, so
+            // the dialog can go before the write begins (#87).
             closeOk();
+            onExport.accept(destination, selected);
         });
     }
 }

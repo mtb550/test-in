@@ -4,7 +4,9 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +26,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.BackgroundWork;
 import org.testin.util.EditorUtil;
 import org.testin.util.NameSanitizer;
 import org.testin.util.OptionalPlugin;
@@ -34,6 +37,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class ImportAction extends AbstractProjectTreeAction {
 
@@ -72,18 +76,26 @@ public class ImportAction extends AbstractProjectTreeAction {
         // only the test-method generation is skipped (with a one-time notice).
         final boolean generateCode = OptionalPlugin.JAVA.isAvailableOrWarnOnce(p);
 
-        ApplicationManager.getApplication().runWriteAction(() -> {
+        final int total = selectedCasesBySheet.values().stream().mapToInt(List::size).sum();
+
+        // Off the EDT and under a bar. Every case is a file of its own, written
+        // through java.nio by the indexer, so the loop belongs on a background
+        // thread; what needs the EDT asks for it by name below (#87).
+        BackgroundWork.run(p, "Importing " + total + " test cases into " + selectedDirDto.getName(),
+                "Import Failed", indicator -> {
+            indicator.setIndeterminate(false);
+
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
                 final @NotNull List<TestCaseDto> flatList = new ArrayList<>();
                 selectedCasesBySheet.values().forEach(flatList::addAll);
 
-                linkAndSaveTestCases(p, targetPath, flatList, rankOfTail(p, targetPath));
+                linkAndSaveTestCases(p, targetPath, flatList, rankOfTail(p, targetPath), indicator, 0, total);
 
                 for (final TestCaseDto tc : flatList) tc.setParent(ts);
 
-                if (generateCode) generateTestMethods(p, flatList, ts.getName());
+                if (generateCode) onEdt(() -> generateTestMethods(p, flatList, ts.getName()));
 
-                Services.getInstance(p, EditorUtil.class).closeThenOpen(p, ts);
+                onEdt(() -> Services.getInstance(p, EditorUtil.class).closeThenOpen(p, ts));
                 Services.getInstance(p, Notifier.class).softShowCounted(p, "Imported", flatList.size());
 
             } else {
@@ -93,16 +105,20 @@ public class ImportAction extends AbstractProjectTreeAction {
 
                     final @NotNull String cName = NameSanitizer.removeSpecialChars(entry.getKey());
                     final @NotNull Path newDirPath = targetPath.resolve(cName);
-                    // A test set creator always answers with the set it made.
-                    final @NotNull TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) new CreateTestSet(p)
-                            .execute(cName, selectedDirDto, newDirPath)
-                            .orElseThrow();
+                    // A test set creator always answers with the set it made. On
+                    // the EDT: making one generates its Java class, which is a
+                    // write command.
+                    final @NotNull TestSetDirectoryDto sheetDto = onEdtCompute(() ->
+                            (TestSetDirectoryDto) new CreateTestSet(p)
+                                    .execute(cName, selectedDirDto, newDirPath)
+                                    .orElseThrow());
 
-                    linkAndSaveTestCases(p, newDirPath, sheetCases, rankOfTail(p, newDirPath));
+                    linkAndSaveTestCases(p, newDirPath, sheetCases, rankOfTail(p, newDirPath),
+                            indicator, totalImported, total);
 
                     for (final TestCaseDto tc : sheetCases) tc.setParent(sheetDto);
 
-                    if (generateCode) generateTestMethods(p, sheetCases, cName);
+                    if (generateCode) onEdt(() -> generateTestMethods(p, sheetCases, cName));
 
                     totalImported += sheetCases.size();
                 }
@@ -118,8 +134,28 @@ public class ImportAction extends AbstractProjectTreeAction {
             Services.getInstance(p, ProjectIndexer.class).refreshDirectory(targetPath);
             ApplicationManager.getApplication().invokeLater(() ->
                     Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh());
-
         });
+    }
+
+    /**
+     * Runs work that must be on the EDT and waits for it, so the steps of an
+     * import stay in the order the import wrote them. Safe to wait from here:
+     * the bar is a background task, so the EDT is not waiting on us.
+     */
+    private static void onEdt(final @NotNull Runnable work) {
+        // Explicitly non-modal. The default modality is the one captured where
+        // the task was started, which was the import dialog - and that dialog is
+        // closed by now, so waiting on it would wait forever.
+        ApplicationManager.getApplication().invokeAndWait(work, ModalityState.nonModal());
+    }
+
+    /**
+     * The same, for a step whose answer the next one needs.
+     */
+    private static <T> @NotNull T onEdtCompute(final @NotNull Supplier<T> work) {
+        final @NotNull List<T> answer = new ArrayList<>(1);
+        onEdt(() -> answer.add(work.get()));
+        return answer.getFirst();
     }
 
     /**
@@ -145,7 +181,9 @@ public class ImportAction extends AbstractProjectTreeAction {
 
     private void linkAndSaveTestCases(final @NotNull Project p, final @NotNull Path dirPath,
                                       final @NotNull List<TestCaseDto> testCases,
-                                      final @NotNull String tailRank) {
+                                      final @NotNull String tailRank,
+                                      final @NotNull ProgressIndicator indicator,
+                                      final int done, final int total) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         // After what is already in the set, in the order the sheet listed them.
@@ -161,8 +199,13 @@ public class ImportAction extends AbstractProjectTreeAction {
         // The imported cases keep the audit their file carried; the tail is an
         // existing case whose link changed, so it is an ordinary save and is
         // recorded as modified by whoever ran the import.
+        int written = 0;
         for (final TestCaseDto tc : testCases) {
             indexer.putImportedTestCase(dirPath, tc);
+
+            written++;
+            indicator.setFraction((done + written) / (double) total);
+            indicator.setText2(tc.getDescription());
         }
     }
 
