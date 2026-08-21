@@ -532,12 +532,14 @@ public final class ProjectIndexer {
     public void moveNode(final @NotNull Path oldPath,
                          final @NotNull Path newPath,
                          final @NotNull Consumer<@NotNull Boolean> onFinished) {
-        final Path targetParent = newPath.getParent();
-        if (targetParent == null) {
+        final Optional<Path> found = Optional.ofNullable(newPath.getParent());
+        if (found.isEmpty()) {
             Logger.warn("Move refused, target has no parent directory: " + newPath);
             onFinished.accept(false);
             return;
         }
+
+        final Path targetParent = found.orElseThrow();
 
         Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, targetParent, "Move Failed", (sourceVf, targetVf) -> {
             try {

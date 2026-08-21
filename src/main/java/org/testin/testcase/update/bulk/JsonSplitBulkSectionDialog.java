@@ -14,6 +14,7 @@ import org.testin.util.Shortcuts;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -100,10 +101,12 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
 
     protected void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<String> newValues) {
         for (int i = 0; i < items.size(); i++) {
-            final String raw = newValues.get(i);
-            if (raw == null) continue; // unchanged row - never rewrite (see submit)
+            // A row the tester did not touch arrives as nothing at all, and is
+            // deliberately not the same as a row they emptied (see submit).
+            final Optional<String> raw = Optional.ofNullable(newValues.get(i));
+            if (raw.isEmpty()) continue;
 
-            final String value = raw.trim();
+            final String value = raw.orElseThrow().trim();
             if (value.isEmpty() && !acceptsBlank()) continue;
 
             setValue(items.get(i), value);

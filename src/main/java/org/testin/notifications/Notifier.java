@@ -11,6 +11,7 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.wm.IdeFrame;
+import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.ui.awt.RelativePoint;
 import lombok.AccessLevel;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
@@ -76,20 +78,23 @@ public final class Notifier {
      */
     private void showBalloon(final @NotNull Project p, final @NotNull String htmlContent) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(p);
-            if (ideFrame == null || ideFrame.getStatusBar() == null) return;
+            // A project window that is closing, or has not opened its frame yet,
+            // has no status bar to anchor to - and a balloon nobody can see is
+            // not a failure worth reporting.
+            Optional.ofNullable(WindowManager.getInstance().getIdeFrame(p))
+                    .map(IdeFrame::getStatusBar)
+                    .map(StatusBar::getComponent)
+                    .ifPresent(statusBarComponent -> {
+                        final Balloon balloon = JBPopupFactory.getInstance()
+                                .createHtmlTextBalloonBuilder(htmlContent, MessageType.INFO, null)
+                                .setFadeoutTime(5000)
+                                .setAnimationCycle(200)
+                                .createBalloon();
 
-            final JComponent statusBarComponent = ideFrame.getStatusBar().getComponent();
-            if (statusBarComponent == null) return;
-
-            final Balloon balloon = JBPopupFactory.getInstance()
-                    .createHtmlTextBalloonBuilder(htmlContent, MessageType.INFO, null)
-                    .setFadeoutTime(5000)
-                    .setAnimationCycle(200)
-                    .createBalloon();
-
-            final Point targetPoint = new Point(statusBarComponent.getWidth() - 30, statusBarComponent.getHeight() / 2);
-            balloon.show(new RelativePoint(statusBarComponent, targetPoint), Balloon.Position.above);
+                        final Point targetPoint = new Point(statusBarComponent.getWidth() - 30,
+                                statusBarComponent.getHeight() / 2);
+                        balloon.show(new RelativePoint(statusBarComponent, targetPoint), Balloon.Position.above);
+                    });
         });
     }
 

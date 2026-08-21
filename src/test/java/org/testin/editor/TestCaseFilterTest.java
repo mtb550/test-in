@@ -9,7 +9,9 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
 
@@ -50,6 +52,10 @@ public class TestCaseFilterTest {
                 .tc(passed)
                 .build();
 
+        // The filter asks for an answer per id, and a case the run never
+        // recorded answers with nothing rather than with a null.
+        final Map<UUID, TestRunItems> recorded = Map.of(passed.getId(), item);
+
         final List<TestCaseDto> result = TestCaseFilter.filter(
                 List.of(passed, missing),
                 "",
@@ -57,7 +63,7 @@ public class TestCaseFilterTest {
                 Set.of(),
                 Set.of(),
                 Set.of(TestStatus.PASSED),
-                Map.of(passed.getId(), item)::get);
+                id -> Optional.ofNullable(recorded.get(id)));
 
         assertEquals(result, List.of(passed));
     }

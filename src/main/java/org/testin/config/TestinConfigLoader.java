@@ -114,13 +114,13 @@ final class TestinConfigLoader {
      * its root, which is where a clone puts it.
      */
     static @NotNull Optional<Path> file(final @NotNull Project p) {
-        final String basePath = p.getBasePath();
-        if (basePath == null) {
+        final Optional<String> basePath = Optional.ofNullable(p.getBasePath());
+        if (basePath.isEmpty()) {
             Logger.info("No base path for " + p.getName() + ", so there is no testin.yml to read or write");
             return Optional.empty();
         }
 
-        final Path root = Path.of(basePath);
+        final Path root = Path.of(basePath.orElseThrow());
         for (final String name : FILE_NAMES) {
             final Path candidate = root.resolve(name);
             if (Files.isRegularFile(candidate)) return Optional.of(candidate);

@@ -4,10 +4,10 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
+import java.util.Objects;
 
 public class GroupMultiSelectEditor extends AbstractCellEditor implements TableCellEditor {
     private final @NotNull JButton button = new JButton();

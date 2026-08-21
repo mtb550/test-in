@@ -89,8 +89,11 @@ final class BulkJsonEditors implements DialogComponent {
         rightEditor = EditorFactory.getInstance().createEditor(rightDoc, p);
         BulkJsonEditor.setupEditorAppearance(rightEditor, p);
 
-        Color caretRowColor = rightEditor.getColorsScheme().getColor(EditorColors.CARET_ROW_COLOR);
-        if (caretRowColor == null) caretRowColor = new JBColor(Gray._245, Gray._50);
+        // A scheme that defines no caret row color gets the one this dialog
+        // would have drawn anyway, light or dark.
+        final Color caretRowColor = Optional
+                .ofNullable(rightEditor.getColorsScheme().getColor(EditorColors.CARET_ROW_COLOR))
+                .orElseGet(() -> new JBColor(Gray._245, Gray._50));
         leftLineAttr.setBackgroundColor(caretRowColor);
 
         splitter = new JBSplitter(false, 0.5f);
@@ -346,13 +349,15 @@ final class BulkJsonEditors implements DialogComponent {
                     position = rightEditor.logicalToVisualPosition(rightEditor.offsetToLogicalPosition(snapped));
                 }
 
+                // Clicking a spot that already has a caret takes it away, unless
+                // it is the last one; clicking anywhere else adds one.
                 final CaretModel caretModel = rightEditor.getCaretModel();
-                final Caret existing = caretModel.getCaretAt(position);
-                if (existing != null) {
-                    if (caretModel.getCaretCount() > 1) caretModel.removeCaret(existing);
-                } else {
-                    caretModel.addCaret(position, true);
-                }
+                final VisualPosition clicked = position;
+                Optional.ofNullable(caretModel.getCaretAt(clicked)).ifPresentOrElse(
+                        existing -> {
+                            if (caretModel.getCaretCount() > 1) caretModel.removeCaret(existing);
+                        },
+                        () -> caretModel.addCaret(clicked, true));
                 event.consume();
             }
         });

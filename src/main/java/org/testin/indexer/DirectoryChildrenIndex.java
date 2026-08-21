@@ -6,6 +6,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -56,8 +57,9 @@ final class DirectoryChildrenIndex {
 
             final Map<Path, List<DirectoryDto>> rebuilt = new ConcurrentHashMap<>();
             for (final DirectoryDto directory : source.get()) {
-                if (directory.getParent() == null) continue;
-                rebuilt.computeIfAbsent(directory.getParent().getPath(), ignored -> new ArrayList<>()).add(directory);
+                // A test project sits under nothing, so it is nobody's child.
+                Optional.ofNullable(directory.getParent()).ifPresent(parent ->
+                        rebuilt.computeIfAbsent(parent.getPath(), ignored -> new ArrayList<>()).add(directory));
             }
             // Retired nodes - archived packages, deprecated test sets - sort after
             // the live ones, so last quarter's work stops being the first thing in

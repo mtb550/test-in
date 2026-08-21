@@ -1,8 +1,6 @@
 package org.testin.testcase.create;
 
 import com.intellij.ui.components.JBLabel;
-
-
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;

@@ -10,6 +10,7 @@ import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.*;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,7 @@ public final class TestCaseFilter {
         // No run items on this path - the test editor has no statuses to filter
         // by. An empty map says that; a function returning null only implies it.
         return filter(source, query, groups, priorities, modules, Collections.emptySet(),
-                Collections.<UUID, TestRunItems>emptyMap()::get);
+                id -> Optional.empty());
     }
 
     public static @NotNull List<TestCaseDto> filter(
@@ -38,7 +39,7 @@ public final class TestCaseFilter {
             final @NotNull Set<Priority> priorities,
             final @NotNull Set<String> modules,
             final @NotNull Set<TestStatus> statuses,
-            final @NotNull Function<UUID, TestRunItems> runItemProvider) {
+            final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
         if (source.isEmpty()) {
             return Collections.emptyList();
         }
@@ -56,7 +57,7 @@ public final class TestCaseFilter {
             final @NotNull Set<Priority> priorities,
             final @NotNull Set<String> modules,
             final @NotNull Set<TestStatus> statuses,
-            final @NotNull Function<UUID, TestRunItems> runItemProvider) {
+            final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
         final boolean matchesSearch = query.isEmpty()
                 || containsIgnoreCase(testCase.getDescription(), query)
                 || testCase.getId().toString().toLowerCase(Locale.ROOT).contains(query)
@@ -76,9 +77,11 @@ public final class TestCaseFilter {
     private static boolean matchesStatus(
             final @NotNull UUID id,
             final @NotNull Set<TestStatus> statuses,
-            final @NotNull Function<UUID, TestRunItems> runItemProvider) {
-        final TestRunItems runItem = runItemProvider.apply(id);
-        return runItem != null && statuses.contains(runItem.getStatus());
+            final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
+        return runItemProvider.apply(id)
+                .map(TestRunItems::getStatus)
+                .filter(statuses::contains)
+                .isPresent();
     }
 
     private static boolean containsIgnoreCase(final @NotNull String value, final @NotNull String query) {

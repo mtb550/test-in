@@ -10,12 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.ui.dialogs.DialogStyle;
 
-import java.util.Objects;
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.swing.event.DocumentEvent;
 

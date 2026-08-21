@@ -94,10 +94,10 @@ public final class BoundTestProject {
         if (!isNamed() || get().isPresent()) return "";
 
         final String name = name();
-        final ProjectStatus status = underRoot.get(name);
+        final Optional<ProjectStatus> status = Optional.ofNullable(underRoot.get(name));
 
-        if (status == null) return "testin.yml names " + name + ", which is not under the Testin root";
-        if (status == ProjectStatus.ARCHIVED) return name + " is archived, so it is not opened";
+        if (status.isEmpty()) return "testin.yml names " + name + ", which is not under the Testin root";
+        if (status.orElseThrow() == ProjectStatus.ARCHIVED) return name + " is archived, so it is not opened";
         return "testin.yml names " + name + ", which could not be read";
     }
 

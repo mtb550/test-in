@@ -9,7 +9,6 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.ClipboardContents;
 import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.Moved;
 import org.testin.codegen.SubtreeCode;
@@ -19,6 +18,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.ClipboardContents;
 import org.testin.util.OptionalPlugin;
 import org.testin.ui.framework.ConfirmDialog;
 

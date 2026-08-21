@@ -21,6 +21,7 @@ import org.testin.logger.Logger;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseWheelEvent;
+import java.util.Optional;
 
 public class FontSync {
 
@@ -80,26 +81,29 @@ public class FontSync {
 
     private static void syncJavaEditorToGlobal(final @NotNull Project p) {
         try {
-            if (!p.isDisposed()) {
-                final Editor activeEditor = FileEditorManager.getInstance(p).getSelectedTextEditor();
-                if (activeEditor != null) {
-                    final float localSize = activeEditor.getColorsScheme().getEditorFontSize();
-                    final EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
+            if (p.isDisposed()) return;
 
-                    if (localSize != globalScheme.getEditorFontSize()) {
-                        globalScheme.setEditorFontSize(localSize);
-                        for (final Editor editor : EditorFactory.getInstance().getAllEditors()) {
-                            editor.getColorsScheme().setEditorFontSize(localSize);
-                        }
-                        ApplicationManager.getApplication().getMessageBus()
-                                .syncPublisher(EditorColorsManager.TOPIC)
-                                .globalSchemeChange(globalScheme);
-                    }
-                }
-            }
+            // No editor has focus in a project showing only the tree, and there
+            // is then no local font size to push out to the others.
+            Optional.ofNullable(FileEditorManager.getInstance(p).getSelectedTextEditor())
+                    .ifPresent(FontSync::pushEditorSizeToGlobal);
         } catch (final Exception ex) {
             Logger.error(ex.getMessage());
         }
+    }
+
+    private static void pushEditorSizeToGlobal(final @NotNull Editor activeEditor) {
+        final float localSize = activeEditor.getColorsScheme().getEditorFontSize();
+        final EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
+        if (localSize == globalScheme.getEditorFontSize()) return;
+
+        globalScheme.setEditorFontSize(localSize);
+        for (final Editor editor : EditorFactory.getInstance().getAllEditors()) {
+            editor.getColorsScheme().setEditorFontSize(localSize);
+        }
+        ApplicationManager.getApplication().getMessageBus()
+                .syncPublisher(EditorColorsManager.TOPIC)
+                .globalSchemeChange(globalScheme);
     }
 
     private static void zoomGlobalIdeEditors(final @NotNull Project p, final @NotNull JComponent component, final boolean zoomIn) {
@@ -123,8 +127,7 @@ public class FontSync {
     private static void updateComponentFontSize(final @NotNull JComponent component) {
         final float newSize = getBaseFontSize();
         ApplicationManager.getApplication().invokeLater(() -> {
-            final Font currentFont = component.getFont();
-            if (currentFont != null) {
+            Optional.ofNullable(component.getFont()).ifPresent(currentFont -> {
                 // Each subscriber tracks its own last size, so a font change
                 // scales every synced component's children - not just the
                 // first one the message bus happens to notify.
@@ -146,15 +149,14 @@ public class FontSync {
                     component.revalidate();
                     component.repaint();
                 }
-            }
+            });
         });
     }
 
     private static void applyDeltaRecursively(final @NotNull Container container, final float delta) {
         for (final Component child : container.getComponents()) {
-            final Font f = child.getFont();
-            if (f != null)
-                child.setFont(f.deriveFont(Math.max(8.0f, f.getSize2D() + delta)));
+            Optional.ofNullable(child.getFont()).ifPresent(font ->
+                    child.setFont(font.deriveFont(Math.max(8.0f, font.getSize2D() + delta))));
 
             if (child instanceof Container)
                 applyDeltaRecursively((Container) child, delta);

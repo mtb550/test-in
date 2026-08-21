@@ -3,6 +3,7 @@ package org.testin.ui.framework;
 import com.intellij.util.IconUtil;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
 import org.jetbrains.annotations.Nullable;
@@ -170,12 +171,10 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     /**
      * Fluent builder for {@link DialogDetails}.
      */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class DetailsBuilder {
 
         private final @NotNull List<DialogDetails.Row> rows = new ArrayList<>();
-
-        private DetailsBuilder() {
-        }
 
         /**
          * One caption/value row; a blank value skips the row.
@@ -222,7 +221,9 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             if (options.isEmpty()) {
                 throw new IllegalStateException("radios needs at least one .option(...)");
             }
-            if (selected == null || options.stream().noneMatch(option -> option.value().equals(selected))) {
+            // A builder that was never given a selection matches no option
+            // either, so one test covers both mistakes.
+            if (options.stream().noneMatch(option -> option.value().equals(selected))) {
                 throw new IllegalStateException("radios needs .select(...) with one of the declared options");
             }
             return new ComponentDialogBase<>(new RadioSelection<>(caption, List.copyOf(options), selected));
@@ -232,14 +233,12 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     /**
      * Fluent builder for {@link TextArea}.
      */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class TextAreaBuilder {
 
         private @NotNull String placeholder = "";
         private @NotNull String value = "";
         private int rows = 5;
-
-        private TextAreaBuilder() {
-        }
 
         public @NotNull TextAreaBuilder placeholder(final @NotNull String placeholder) {
             this.placeholder = placeholder;
@@ -267,15 +266,13 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     /**
      * Fluent builder for {@link TextInput}.
      */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class TextInputBuilder {
 
         private @NotNull Icon icon = DialogStyle.NO_ICON;
         private @NotNull String placeholder = "";
         private @NotNull String value = "";
         private @NotNull String accepts = TextInput.ANYTHING;
-
-        private TextInputBuilder() {
-        }
 
         public @NotNull TextInputBuilder icon(final @NotNull Icon icon) {
             this.icon = desaturate(icon);
@@ -317,14 +314,12 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     /**
      * Fluent builder for {@link TextFieldWithSelections}.
      */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class TextFieldBuilder<T> {
 
         private final @NotNull List<SelectionList<T>> selections = new ArrayList<>();
         private @NotNull Icon icon = DialogStyle.NO_ICON;
         private @NotNull String placeholder = "";
-
-        private TextFieldBuilder() {
-        }
 
         /**
          * The field's leading icon before a selection takes over.

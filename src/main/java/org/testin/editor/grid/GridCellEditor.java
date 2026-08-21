@@ -4,7 +4,6 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTextArea;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
@@ -13,6 +12,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
+import java.util.Objects;
 import java.util.Optional;
 
 public class GridCellEditor extends AbstractCellEditor implements TableCellEditor {

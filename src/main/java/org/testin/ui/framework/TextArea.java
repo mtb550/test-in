@@ -5,9 +5,8 @@ import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import java.util.Objects;
-import org.testin.util.ClipboardContents;
 import org.testin.logger.Logger;
+import org.testin.util.ClipboardContents;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -21,6 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Objects;
 
 /**
  * A multi-line text area — for pasted content like an error, an exception, or

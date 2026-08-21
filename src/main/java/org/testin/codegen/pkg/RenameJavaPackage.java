@@ -8,8 +8,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
-import java.util.Objects;
-import java.util.Optional;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
@@ -19,6 +17,8 @@ import org.testin.util.NameSanitizer;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class RenameJavaPackage implements GenAction {
 

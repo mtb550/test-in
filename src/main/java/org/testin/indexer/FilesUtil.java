@@ -2,10 +2,10 @@ package org.testin.indexer;
 
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -50,12 +50,9 @@ final class FilesUtil {
         }
 
         try {
-            // Boundary: java.nio answers null for a path with no parent, which is
-            // a filesystem root. Kept here and never carried further (#71).
-            final @Nullable Path parent = path.getParent();
-            if (parent != null) {
-                Files.createDirectories(parent);
-            }
+            // The platform's own helper: it knows that a path with no parent - a
+            // filesystem root - has no folder to create.
+            FileUtil.createParentDirs(path.toFile());
             Files.write(path, jsonBytes);
         } catch (final IOException ex) {
             reportWriteFailure(p, path, ex);

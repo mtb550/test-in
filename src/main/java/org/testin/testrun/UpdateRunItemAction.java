@@ -18,6 +18,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.testrun.create.FailedResultDialog;
+import org.testin.util.ListValue;
 
 import java.util.Optional;
 import org.testin.util.Shortcuts;
@@ -37,15 +38,17 @@ public class UpdateRunItemAction extends AbstractProjectAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        // Swing answers null when nothing is selected, which is nothing to edit.
-        final TestCaseDto selected = list.getSelectedValue();
-        if (selected == null) return;
+        // Nothing selected is nothing to edit.
+        final Optional<TestCaseDto> selected = ListValue.selected(list);
+        if (selected.isEmpty()) return;
 
         if (!(editor instanceof RunEditor runEditor)) return;
 
-        final Optional<TestRunItems> found = runEditor.runItem(selected.getId());
+        final Optional<TestRunItems> found = runEditor.runItem(selected.orElseThrow().getId());
         if (found.isEmpty()) return;
-        final TestRunItems runItem = found.get();
+
+        final TestRunItems runItem = found.orElseThrow();
+        final TestCaseDto testCase = selected.orElseThrow();
 
         // The test case is gone: what the run recorded against it stands as it is.
         if (runItem.isRemoved()) {
@@ -53,7 +56,7 @@ public class UpdateRunItemAction extends AbstractProjectAction {
             return;
         }
 
-        Logger.trace("update test run item for: " + selected.getDescription());
+        Logger.trace("update test run item for: " + testCase.getDescription());
 
         // The same details dialog that opens automatically on a Failed status;
         // F2 edits without touching the status.
@@ -76,9 +79,9 @@ public class UpdateRunItemAction extends AbstractProjectAction {
         // Details belong to failed test cases only - the dialog's title stays
         // truthful and the action reads as what it is.
         boolean enabled = false;
-        final TestCaseDto selected = list.getSelectedValue();
-        if (selected != null && list.getSelectedValuesList().size() == 1 && editor instanceof RunEditor runEditor) {
-            enabled = runEditor.runItem(selected.getId())
+        final Optional<TestCaseDto> selected = ListValue.selected(list);
+        if (selected.isPresent() && list.getSelectedValuesList().size() == 1 && editor instanceof RunEditor runEditor) {
+            enabled = runEditor.runItem(selected.orElseThrow().getId())
                     .filter(item -> item.getStatus() == TestStatus.FAILED)
                     .isPresent();
         }

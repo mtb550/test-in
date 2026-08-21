@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -56,7 +57,7 @@ final class LegacyChainOrder {
 
         final Map<UUID, TestCaseDto> byId = new HashMap<>(files.size());
         final Map<UUID, UUID> next = new HashMap<>(files.size());
-        UUID head = null;
+        Optional<UUID> head = Optional.empty();
 
         for (final Map.Entry<Path, TestCaseDto> file : files.entrySet()) {
             final JsonNode chain = read(p, file.getKey());
@@ -64,7 +65,7 @@ final class LegacyChainOrder {
 
             byId.put(testCase.getId(), testCase);
 
-            if (chain.path(HEAD).asBoolean(false)) head = testCase.getId();
+            if (chain.path(HEAD).asBoolean(false)) head = Optional.of(testCase.getId());
 
             final String points = chain.path(NEXT).asText("");
             if (!points.isBlank()) {
@@ -76,14 +77,20 @@ final class LegacyChainOrder {
             }
         }
 
-        if (head == null) return List.of();
+        if (head.isEmpty()) return List.of();
 
         final List<TestCaseDto> ordered = new ArrayList<>(files.size());
         final Set<UUID> walked = new HashSet<>();
 
-        for (UUID id = head; id != null && walked.add(id); id = next.get(id)) {
-            final TestCaseDto testCase = byId.get(id);
-            if (testCase != null) ordered.add(testCase);
+        // The chain ends where a case points at nobody, and a pointer that leads
+        // back to a case already walked ends it too - a file written by two
+        // testers at once could otherwise loop forever.
+        UUID id = head.orElseThrow();
+        while (walked.add(id)) {
+            Optional.ofNullable(byId.get(id)).ifPresent(ordered::add);
+            if (!next.containsKey(id)) break;
+
+            id = next.get(id);
         }
 
         // Whatever the chain never reached goes on the end, in the order the

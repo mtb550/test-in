@@ -297,10 +297,9 @@ public class Shared {
          */
         @Override
         public Color getForeground() {
-            final Color bg = getBackground();
-            if (bg == null) return super.getForeground();
-
-            return isLight(bg) ? TEXT_ON_LIGHT : JBColor.WHITE;
+            return Optional.ofNullable(getBackground())
+                    .map(bg -> isLight(bg) ? TEXT_ON_LIGHT : JBColor.WHITE)
+                    .orElseGet(super::getForeground);
         }
 
         @Override

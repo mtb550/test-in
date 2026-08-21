@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 /**
  * One captioned radio row — a muted caption and one radio button per option
@@ -29,7 +29,7 @@ public final class RadioSelection<T> implements DialogComponent {
         final JBPanel<?> radioRow = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 8, 0));
         radioRow.setOpaque(false);
 
-        JRadioButton first = null;
+        Optional<JRadioButton> first = Optional.empty();
         for (final Option<T> option : options) {
             final JRadioButton radio = new JRadioButton(option.name());
             radio.setFont(radioFont);
@@ -38,10 +38,10 @@ public final class RadioSelection<T> implements DialogComponent {
             radio.addActionListener(event -> selected = option.value());
             group.add(radio);
             radioRow.add(radio);
-            if (first == null) first = radio;
+            if (first.isEmpty()) first = Optional.of(radio);
         }
         // The builder guarantees at least one option.
-        this.firstButton = Objects.requireNonNull(first);
+        this.firstButton = first.orElseThrow();
 
         panel = new JBPanel<>(new BorderLayout());
         panel.setOpaque(false);

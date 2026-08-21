@@ -5,6 +5,8 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -18,6 +20,7 @@ import java.awt.*;
  * Font sizes are arguments rather than read here, so a caller that overrides
  * them keeps deciding how its own rows look.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LabelValueRow {
 
     private static final int LABEL_WIDTH = 255;
@@ -29,9 +32,6 @@ public final class LabelValueRow {
     private static final int VALUE_INSETS_LEFT = 0;
     private static final int VALUE_INSETS_BOTTOM = 12;
     private static final int VALUE_INSETS_RIGHT = 16;
-
-    private LabelValueRow() {
-    }
 
     /**
      * Adds the value in the read-only wrapping area both callers use. A blank

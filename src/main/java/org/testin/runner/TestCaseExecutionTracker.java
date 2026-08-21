@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.RunStatus;
+import org.testin.util.Once;
 
 import java.util.Objects;
 
@@ -21,8 +22,7 @@ public class TestCaseExecutionTracker {
      * status change again, once per registration.
      */
     public static synchronized void initGlobalListener(final @NotNull Project p) {
-        if (p.getUserData(LISTENER_REGISTERED) != null) return;
-        p.putUserData(LISTENER_REGISTERED, Boolean.TRUE);
+        if (!Once.claim(p, LISTENER_REGISTERED)) return;
 
         p.getMessageBus().connect(p).subscribe(SMTRunnerEventsListener.TEST_STATUS, new SMTRunnerEventsAdapter() {
             @Override

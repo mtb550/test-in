@@ -16,8 +16,10 @@ import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.runner.TestCaseExecutionTracker;
 import org.testin.services.Services;
+import org.testin.util.Once;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public final class StartupActivity implements ProjectActivity {
 
@@ -66,9 +68,8 @@ public final class StartupActivity implements ProjectActivity {
                 ? "Bound to test project '" + config.testinProject() + "'"
                 : "No test project bound to " + p.getName());
 
-        if (testinPath != null) {
-            Services.getInstance(p, ProjectIndexer.class).indexWithProgress();
-        }
+        Optional.ofNullable(testinPath).ifPresent(root ->
+                Services.getInstance(p, ProjectIndexer.class).indexWithProgress());
 
         TestCaseExecutionTracker.initGlobalListener(p);
     }
@@ -79,8 +80,7 @@ public final class StartupActivity implements ProjectActivity {
      * generation (packages, classes, test methods) will be skipped.
      */
     private static void checkTestSourceRootOnce(final @NotNull Project p) {
-        if (p.getUserData(SOURCE_ROOT_CHECKED) != null) return;
-        p.putUserData(SOURCE_ROOT_CHECKED, Boolean.TRUE);
+        if (!Once.claim(p, SOURCE_ROOT_CHECKED)) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {

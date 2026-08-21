@@ -11,6 +11,7 @@ import org.testin.setting.AppSettingsState;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -151,8 +152,8 @@ final class TestCaseSequenceStore {
     }
 
     void removeForTestSet(final @NotNull String path) {
-        final List<UUID> ids = testSetCaseIds.remove(path);
-        if (ids != null) ids.forEach(testCasesById::remove);
+        Optional.ofNullable(testSetCaseIds.remove(path))
+                .ifPresent(ids -> ids.forEach(testCasesById::remove));
     }
 
     void clear() {

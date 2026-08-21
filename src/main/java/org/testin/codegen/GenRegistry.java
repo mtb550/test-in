@@ -3,7 +3,6 @@ package org.testin.codegen;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import java.util.Optional;
 import org.testin.codegen.clazz.CreateJavaClass;
 import org.testin.codegen.clazz.RemoveJavaClass;
 import org.testin.codegen.clazz.MoveJavaClass;
@@ -20,6 +19,7 @@ import org.testin.codegen.pkg.RenameJavaPackage;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Maps each Java-backed generator type to its implementation. This is the only

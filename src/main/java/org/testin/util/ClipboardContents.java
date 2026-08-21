@@ -1,5 +1,7 @@
 package org.testin.util;
 
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 import com.intellij.openapi.ide.CopyPasteManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,10 +22,8 @@ import java.util.Optional;
  * holding somebody else's data mean the same thing everywhere: nothing to
  * paste.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ClipboardContents {
-
-    private ClipboardContents() {
-    }
 
     public static @NotNull Optional<Transferable> current() {
         return Optional.ofNullable(CopyPasteManager.getInstance().getContents());

@@ -14,6 +14,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 
 import java.util.Objects;
 import javax.swing.*;
+import java.util.Optional;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -38,19 +39,22 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
             }
             final DirectoryType type = dir.getType();
 
-            final TestRunStatus runStatus = dir instanceof TestRunDirectoryDto trDir ? trDir.getMarker().getStatus() : null;
+            // Only a run has one; every other node is drawn as the kind it is.
+            final Optional<TestRunStatus> runStatus = dir instanceof TestRunDirectoryDto trDir
+                    ? Optional.of(trDir.getMarker().getStatus())
+                    : Optional.empty();
 
             // A run is drawn as its status, not as its kind: the tree then says
             // where every cycle stands without opening any of them. Every other
             // node takes the icon of what it is.
-            setIcon(runStatus != null ? runStatus.getIcon() : type.getIcon());
+            setIcon(runStatus.map(TestRunStatus::getIcon).orElseGet(type::getIcon));
             // Gray for a node that is cut, and for one retired from current work -
             // a deprecated test set or an archived package - so the tree says at
             // a glance what is live without opening the details of anything.
             final boolean grayed = selectedNodes.contains(dir) || dir.isRetired();
             append(dir.getName(), grayed ? SimpleTextAttributes.GRAYED_ATTRIBUTES : type.getAttributes());
             append(" ");
-            append(runStatus != null ? runStatus.getLabel() : "", SimpleTextAttributes.GRAY_ATTRIBUTES);
+            append(runStatus.map(TestRunStatus::getLabel).orElse(""), SimpleTextAttributes.GRAY_ATTRIBUTES);
 
         } catch (final Exception ex) {
             Logger.error("Error rendering tree node: " + ex.getMessage());

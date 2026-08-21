@@ -6,6 +6,7 @@ import org.testin.model.dto.TestCaseDto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class StepsBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
@@ -42,8 +43,7 @@ public class StepsBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
             final List<String> cleanSteps = new ArrayList<>();
 
             for (final String step : newValues.get(i)) {
-                if (step == null) continue;
-                final String cleanStr = step.trim();
+                final String cleanStr = Objects.toString(step, "").trim();
 
                 if (!cleanStr.isEmpty()) {
                     cleanSteps.add(cleanStr);

@@ -559,7 +559,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                     filters.priorities(),
                     filters.modules(),
                     statusFilter,
-                    resultsMap::get);
+                    this::runItem);
         }
     }
 

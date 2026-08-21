@@ -1,5 +1,7 @@
 package org.testin.report.generators;
 
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 
@@ -20,10 +22,8 @@ import java.util.UUID;
  * display decision it makes once, in one place, for both reasons a description
  * can be blank.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class ReportedCase {
-
-    private ReportedCase() {
-    }
 
     static @NotNull TestCaseDto of(final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull UUID id) {
         return detailsMap.getOrDefault(id, new TestCaseDto());

@@ -11,8 +11,8 @@ import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.ListValue;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.ListValue;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

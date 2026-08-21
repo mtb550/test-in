@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.ClipboardContents;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.explorer.tree.TreeTransferPayload;
@@ -14,9 +13,9 @@ import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.ui.framework.ConfirmDialog;
+import org.testin.util.ClipboardContents;
 import org.testin.util.Shortcuts;
 
-import java.util.Objects;
 import javax.swing.*;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.InputEvent;
@@ -24,6 +23,7 @@ import java.awt.event.KeyEvent;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class PasteNodeAction extends AbstractProjectTreeAction {
 

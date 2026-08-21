@@ -25,6 +25,7 @@ import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class RenameAction extends AbstractProjectTreeAction {
 
@@ -52,11 +53,13 @@ public class RenameAction extends AbstractProjectTreeAction {
         // rename. Asked first because applyRename resolves the new path against
         // the parent and would throw on null - the collision check below already
         // guarded for it while the rename itself did not (#66, F3).
-        final Path parent = dir.getPath().getParent();
-        if (parent == null) {
+        final Optional<Path> found = Optional.ofNullable(dir.getPath().getParent());
+        if (found.isEmpty()) {
             Logger.warn("Rename refused, no parent directory: " + dir.getPath());
             return;
         }
+
+        final Path parent = found.orElseThrow();
 
         // A sibling with the new name would make the VFS rename fail with
         // "already exists" - reject it with a message instead. Existence comes

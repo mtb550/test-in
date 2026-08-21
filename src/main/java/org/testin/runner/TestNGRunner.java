@@ -18,7 +18,6 @@ import com.theoryinpractice.testng.model.TestType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.Fqcn;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -99,7 +98,7 @@ public final class TestNGRunner {
         final TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         final List<TestCaseDto> found = new ArrayList<>();
-        Module module = null;
+        Optional<Module> module = Optional.empty();
 
         for (final TestCaseDto tc : cases) {
             final Optional<PsiClass> owner = generatedClassOf(p, tc);
@@ -110,20 +109,23 @@ public final class TestNGRunner {
             }
 
             found.add(tc);
-            if (module == null) module = ModuleUtilCore.findModuleForPsiElement(owner.get());
+            if (module.isEmpty()) {
+                module = Optional.ofNullable(ModuleUtilCore.findModuleForPsiElement(owner.orElseThrow()));
+            }
         }
 
         if (found.isEmpty()) return;
 
-        final Module finalModule = module;
-        ApplicationManager.getApplication().invokeLater(() -> launch(p, found, finalModule));
+        final Optional<Module> runModule = module;
+        ApplicationManager.getApplication().invokeLater(() -> launch(p, found, runModule));
     }
 
     /**
      * Builds the configuration and starts it, for whichever of the cases the
      * tester still wants.
      */
-    private void launch(final @NotNull Project p, final @NotNull List<TestCaseDto> found, final @Nullable Module module) {
+    private void launch(final @NotNull Project p, final @NotNull List<TestCaseDto> found,
+                        final @NotNull Optional<Module> module) {
         final TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         // Asked here rather than earlier: a case stopped while the run was being
@@ -141,18 +143,20 @@ public final class TestNGRunner {
         final RunManager runManager = RunManager.getInstance(p);
         final TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
 
-        RunnerAndConfigurationSettings settings = runManager.findConfigurationByName(name);
-        if (settings == null) {
-            settings = runManager.createConfiguration(name, configType.getConfigurationFactories()[0]);
-            runManager.addConfiguration(settings);
-        }
+        final RunnerAndConfigurationSettings settings = Optional.ofNullable(runManager.findConfigurationByName(name))
+                .orElseGet(() -> {
+                    final RunnerAndConfigurationSettings created =
+                            runManager.createConfiguration(name, configType.getConfigurationFactories()[0]);
+                    runManager.addConfiguration(created);
+                    return created;
+                });
 
         final TestNGConfiguration configuration = (TestNGConfiguration) settings.getConfiguration();
         configuration.getPersistantData().TEST_OBJECT = TestType.PATTERN.getType();
         configuration.getPersistantData().setPatterns(patterns);
         configuration.setAllowRunningInParallel(true);
 
-        if (module != null) configuration.setModule(module);
+        module.ifPresent(configuration::setModule);
 
         runManager.setTemporaryConfiguration(settings);
         runManager.setSelectedConfiguration(settings);
@@ -175,19 +179,20 @@ public final class TestNGRunner {
         if (fqcn.size() < 2) return Optional.empty();
 
         final String classFqcn = String.join(".", fqcn.subList(0, fqcn.size() - 1));
-        final PsiClass owner = JavaPsiFacade.getInstance(p).findClass(classFqcn, GlobalSearchScope.projectScope(p));
+        final Optional<PsiClass> owner = Optional.ofNullable(
+                JavaPsiFacade.getInstance(p).findClass(classFqcn, GlobalSearchScope.projectScope(p)));
 
-        if (owner == null) {
+        if (owner.isEmpty()) {
             Logger.warn("No generated class " + classFqcn + " for '" + tc.getDescription() + "'");
             return Optional.empty();
         }
 
-        if (owner.findMethodsByName(fqcn.getLast(), false).length == 0) {
+        if (owner.orElseThrow().findMethodsByName(fqcn.getLast(), false).length == 0) {
             Logger.warn("No generated method " + fqcn.getLast() + " in " + classFqcn);
             return Optional.empty();
         }
 
-        return Optional.of(owner);
+        return owner;
     }
 
     /**

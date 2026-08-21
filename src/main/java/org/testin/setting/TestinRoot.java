@@ -40,10 +40,7 @@ public final class TestinRoot {
      * thing to check rather than three.
      */
     public static @NotNull Path normalize(final @Nullable String rawPath) {
-        if (rawPath == null || rawPath.trim().isEmpty()) {
-            return Path.of("");
-        }
-        return Path.of(rawPath.trim());
+        return Path.of(Objects.requireNonNullElse(rawPath, "").trim());
     }
 
     /**

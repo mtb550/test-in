@@ -1,5 +1,7 @@
 package org.testin.testcase;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 
@@ -21,10 +23,8 @@ import java.util.List;
  * Nothing can be unreachable, so nothing can be unsorted: what is in the folder
  * is on the screen, in the order the ranks give.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestCaseOrder {
-
-    private TestCaseOrder() {
-    }
 
     /**
      * Ranked cases first, in rank order; then any without a rank yet - imported,

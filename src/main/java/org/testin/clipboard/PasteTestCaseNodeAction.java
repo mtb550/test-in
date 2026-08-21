@@ -8,7 +8,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.ClipboardContents;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
@@ -17,6 +16,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.ClipboardContents;
 import org.testin.util.Mapper;
 import org.testin.util.Shortcuts;
 
@@ -28,6 +28,7 @@ import java.awt.event.KeyEvent;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class PasteTestCaseNodeAction extends AbstractProjectAction {
@@ -47,8 +48,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
         if (pastedCases.isEmpty()) return;
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            TestEditor destUI = (editor instanceof TestEditor) ? (TestEditor) editor : null;
-            if (destUI == null) return;
+            if (!(editor instanceof TestEditor destUI)) return;
 
             final CutState cutState = Services.getInstance(p, CutState.class);
             final boolean isCut = cutState.isCutting();
@@ -73,10 +73,8 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
 
             int pasted = 0;
 
-            for (TestCaseDto tc : pastedCases) {
-                if (tc == null) continue;
-
-                TestCaseDto clonedTc = cloneForPasting(p, tc, isCut);
+            for (final TestCaseDto tc : pastedCases) {
+                final TestCaseDto clonedTc = cloneForPasting(p, tc, isCut);
 
                 clonedTc.setParent(destUI.getParent());
                 destUI.getAllTestCases().add(clonedTc);
@@ -131,8 +129,12 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
             final String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
             if (!json.trim().startsWith("[")) return List.of();
 
-            return Services.getInstance(p, Mapper.class).readValue(json, new TypeReference<>() {
+            final List<TestCaseDto> parsed = Services.getInstance(p, Mapper.class).readValue(json, new TypeReference<>() {
             });
+
+            // Hand-edited JSON can carry a null entry, and the clipboard is not a
+            // trusted source of our own format.
+            return parsed.stream().filter(Objects::nonNull).toList();
         } catch (final Exception ex) {
             Logger.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
             return List.of();

@@ -22,6 +22,7 @@ import org.testin.services.Services;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -106,22 +107,22 @@ public final class EditorUtil {
         final FileEditorManager fed = FileEditorManager.getInstance(p);
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            VirtualFile targetVf = null;
+            Optional<VirtualFile> targetVf = Optional.empty();
 
             for (final VirtualFile openVf : fed.getOpenFiles()) {
                 if (openVf.getName().equals(dir.getName())) {
-                    targetVf = openVf;
+                    targetVf = Optional.of(openVf);
                     fed.closeFile(openVf);
                     break;
                 }
             }
 
-            if (targetVf == null) {
+            if (targetVf.isEmpty()) {
                 open(p, dir);
                 return;
             }
 
-            fed.openFile(targetVf, true);
+            fed.openFile(targetVf.orElseThrow(), true);
         });
     }
 
@@ -181,9 +182,10 @@ public final class EditorUtil {
 
     public void restoreLastOpened(final @NotNull Project p) {
         try {
-            final String saved = PropertiesComponent.getInstance(p).getValue(OPEN_EDITORS_KEY);
+            final String saved = Objects.requireNonNullElse(
+                    PropertiesComponent.getInstance(p).getValue(OPEN_EDITORS_KEY), "");
 
-            if (saved == null || saved.isEmpty()) {
+            if (saved.isEmpty()) {
                 Logger.debug("EditorStateService: no saved editors to restore");
                 return;
             }

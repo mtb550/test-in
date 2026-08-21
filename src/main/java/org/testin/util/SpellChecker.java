@@ -19,6 +19,7 @@ import org.testin.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Turns the IDE's own spell checker on for a text field (issue #1).
@@ -81,11 +82,9 @@ public final class SpellChecker {
         final PsiFile psiFile = ReadAction.computeBlocking(
                 () -> PsiDocumentManager.getInstance(p).getPsiFile(field.getDocument()));
 
-        if (psiFile == null) {
-            Logger.warn("Completion not installed: the field has no PSI file");
-        } else {
-            TextCompletionUtil.installProvider(psiFile, provider, true);
-        }
+        Optional.ofNullable(psiFile).ifPresentOrElse(
+                file -> TextCompletionUtil.installProvider(file, provider, true),
+                () -> Logger.warn("Completion not installed: the field has no PSI file"));
 
         field.setText(text);
         return field;

@@ -3,6 +3,7 @@ package org.testin.logger;
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +12,7 @@ public final class Logger {
 
     private static final StackWalker WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
-    private static volatile LoggerService backendService;
+    private static volatile @NotNull Optional<LoggerService> backendService = Optional.empty();
 
     public static void setLogLevel(final @NotNull Level level) {
         getService().ifPresent(service -> service.setLogLevel(level));
@@ -62,11 +63,10 @@ public final class Logger {
      * Empty before the application is up: the two callers fall back to stdout.
      */
     private static @NotNull Optional<LoggerService> getService() {
-        if (backendService == null) {
-            if (ApplicationManager.getApplication() != null) {
-                backendService = ApplicationManager.getApplication().getService(LoggerService.class);
-            }
+        if (backendService.isEmpty()) {
+            backendService = Optional.ofNullable(ApplicationManager.getApplication())
+                    .map(application -> application.getService(LoggerService.class));
         }
-        return Optional.ofNullable(backendService);
+        return backendService;
     }
 }

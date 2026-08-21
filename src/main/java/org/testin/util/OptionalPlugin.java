@@ -56,12 +56,18 @@ public enum OptionalPlugin {
         if (known == Availability.UNKNOWN) {
             // Enabled = installed and not disabled; a disabled plugin's classes
             // are just as absent as an uninstalled one's.
-            known = PluginManager.getInstance().findEnabledPlugin(PluginId.getId(pluginId)) != null
-                    ? Availability.PRESENT
-                    : Availability.ABSENT;
+            known = isEnabledInIde() ? Availability.PRESENT : Availability.ABSENT;
             availability = known;
         }
         return known == Availability.PRESENT;
+    }
+
+    /**
+     * Whether the IDE has this plugin enabled. The platform says it does not by
+     * finding no plugin, and this is the one place that reads that.
+     */
+    private boolean isEnabledInIde() {
+        return PluginManager.getInstance().findEnabledPlugin(PluginId.getId(pluginId)) != null;
     }
 
     /**
@@ -92,10 +98,7 @@ public enum OptionalPlugin {
      */
     public boolean isAvailableOrWarnOnce(final @NotNull Project p) {
         if (isAvailable()) return true;
-        if (p.getUserData(warned) == null) {
-            p.putUserData(warned, Boolean.TRUE);
-            warn(p);
-        }
+        if (Once.claim(p, warned)) warn(p);
         return false;
     }
 

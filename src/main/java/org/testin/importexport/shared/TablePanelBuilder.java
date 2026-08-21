@@ -5,7 +5,6 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
-import java.util.Optional;
 import org.testin.logger.Logger;
 import org.testin.model.Priority;
 import org.testin.model.TestEditorAttributes;
@@ -18,6 +17,7 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class TablePanelBuilder {
 

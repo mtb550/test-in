@@ -12,7 +12,6 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import java.util.Objects;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
@@ -28,6 +27,7 @@ import org.testin.util.Mapper;
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.Objects;
 
 public class ExportAction extends AbstractProjectTreeAction {
 

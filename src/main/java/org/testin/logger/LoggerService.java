@@ -33,7 +33,11 @@ public final class LoggerService implements Disposable {
     private final Path logFile = Path.of(PathManager.getLogPath(), "testin.log");
     private volatile boolean isRunning = true;
     private volatile Level currentLogLevel = Level.DISABLED;
-    private Thread writerThread;
+    /**
+     * Empty until start() runs, which dispose has to allow for: a service the
+     * IDE created and threw away without ever starting has no thread to join.
+     */
+    private @NotNull Optional<Thread> writerThread = Optional.empty();
 
     public LoggerService() {
         startWriterThread();
@@ -44,9 +48,10 @@ public final class LoggerService implements Disposable {
     }
 
     private void startWriterThread() {
-        writerThread = new Thread(this::writeLoop, "Testin-Async-Logger");
-        writerThread.setDaemon(true);
-        writerThread.start();
+        final Thread thread = new Thread(this::writeLoop, "Testin-Async-Logger");
+        thread.setDaemon(true);
+        thread.start();
+        writerThread = Optional.of(thread);
     }
 
     private void writeLoop() {
@@ -61,14 +66,14 @@ public final class LoggerService implements Disposable {
             try {
                 while (isRunning || !logQueue.isEmpty()) {
 
-                    final Object taken = logQueue.poll(500, TimeUnit.MILLISECONDS);
-                    if (taken == null) {
+                    final Optional<Object> taken = Optional.ofNullable(logQueue.poll(500, TimeUnit.MILLISECONDS));
+                    if (taken.isEmpty()) {
                         writer.flush();
                         continue;
                     }
 
                     // The wake-up from dispose, not a line to write.
-                    if (!(taken instanceof String message)) continue;
+                    if (!(taken.orElseThrow() instanceof String message)) continue;
 
                     writer.write(message);
                     writer.newLine();
@@ -141,13 +146,14 @@ public final class LoggerService implements Disposable {
         //noinspection ResultOfMethodCallIgnored
         logQueue.offer(SHUTDOWN);
 
-        if (writerThread != null) {
+        if (writerThread.isPresent()) {
+            final Thread thread = writerThread.orElseThrow();
             try {
-                writerThread.join(2000);
+                thread.join(2000);
             } catch (final InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
-            if (writerThread.isAlive()) writerThread.interrupt();
+            if (thread.isAlive()) thread.interrupt();
         }
     }
 }

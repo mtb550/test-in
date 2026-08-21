@@ -18,6 +18,7 @@ import org.testin.services.Services;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -225,15 +226,16 @@ public final class TestNGExecution {
      * and a live process that ignores the request.
      */
     private void kill(final @NotNull RunContentDescriptor descriptor) {
-        final ProcessHandler handler = descriptor.getProcessHandler();
-
-        // The platform's null, answered where it arrives. A descriptor with no
-        // handler has nothing behind it to stop, and saying so is the difference
-        // between a stop that could not act and one that silently did nothing.
-        if (handler == null) {
+        // Answered where it arrives. A descriptor with no handler has nothing
+        // behind it to stop, and saying so is the difference between a stop that
+        // could not act and one that silently did nothing.
+        final Optional<ProcessHandler> found = Optional.ofNullable(descriptor.getProcessHandler());
+        if (found.isEmpty()) {
             Logger.warn("Not stopping '" + descriptor.getDisplayName() + "': it has no process handler");
             return;
         }
+
+        final ProcessHandler handler = found.orElseThrow();
 
         handler.putUserData(ProcessHandler.TERMINATION_REQUESTED, Boolean.TRUE);
 

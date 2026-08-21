@@ -6,7 +6,6 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
-import java.util.Optional;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.Renamed;
@@ -14,6 +13,7 @@ import org.testin.logger.Logger;
 import org.testin.util.NameSanitizer;
 
 import java.util.List;
+import java.util.Optional;
 
 public class RenameJavaClass implements GenAction {
 

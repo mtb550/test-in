@@ -137,9 +137,7 @@ public class TestRunItems {
      * @throws IllegalStateException if called on an item the editor filtered out
      */
     public @NotNull TestCaseDto requireTc() {
-        if (tc == null)
-            throw new IllegalStateException("Run item " + id + " has no test case; it should not have reached the editor");
-
-        return tc;
+        return Optional.ofNullable(tc).orElseThrow(() -> new IllegalStateException(
+                "Run item " + id + " has no test case; it should not have reached the editor"));
     }
 }

@@ -3,7 +3,6 @@ package org.testin.git;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import java.util.Optional;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -15,6 +14,7 @@ import java.awt.*;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**

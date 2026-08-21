@@ -8,6 +8,8 @@ import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -20,10 +22,8 @@ import java.util.List;
  * Each dialog carried its own copy, so a fix to the escaping in one left the
  * other writing different text back into storage.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class BulkJsonEditor {
-
-    private BulkJsonEditor() {
-    }
 
     /**
      * Newlines flatten to spaces: the editor shows one value per line, so a

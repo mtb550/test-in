@@ -8,6 +8,7 @@ import org.testin.model.dto.TestCaseDto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
@@ -48,8 +49,7 @@ public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
             final List<Group> enumList = new ArrayList<>();
 
             for (final String str : newValues.get(i)) {
-                if (str == null) continue;
-                final String cleanStr = str.trim();
+                final String cleanStr = Objects.toString(str, "").trim();
 
                 if (!cleanStr.isEmpty()) {
                     try {

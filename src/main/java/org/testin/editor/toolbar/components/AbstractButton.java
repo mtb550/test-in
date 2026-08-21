@@ -10,12 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.IconManager;
 import org.testin.util.Shortcuts;
 
-import java.util.Optional;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 /**
  * A flat toolbar button: the icon alone at rest, a rounded hover pill and a

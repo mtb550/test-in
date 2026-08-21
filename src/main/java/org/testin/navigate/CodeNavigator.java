@@ -10,12 +10,12 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
-import java.util.Optional;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
 import java.util.List;
+import java.util.Optional;
 
 public class CodeNavigator {
 

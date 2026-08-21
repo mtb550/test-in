@@ -1,5 +1,7 @@
 package org.testin.util;
 
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -15,10 +17,8 @@ import java.util.Optional;
  * <p>
  * The tree's side of this is {@link org.testin.explorer.tree.TreeValueUtil}.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ListValue {
-
-    private ListValue() {
-    }
 
     public static <T> @NotNull Optional<T> selected(final @NotNull JList<T> list) {
         return Optional.ofNullable(list.getSelectedValue());

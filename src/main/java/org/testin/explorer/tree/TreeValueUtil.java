@@ -5,8 +5,6 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import java.util.Objects;
-import java.util.Arrays;
 import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -14,7 +12,9 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**

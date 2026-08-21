@@ -124,11 +124,13 @@ public final class DestinationForm implements DialogComponent {
             return Optional.empty();
         }
 
-        final FileTypes format = (FileTypes) formatCombo.getSelectedItem();
-        if (format == null) {
+        final Optional<FileTypes> selectedFormat = Optional.ofNullable((FileTypes) formatCombo.getSelectedItem());
+        if (selectedFormat.isEmpty()) {
             formatCombo.requestFocus();
             return Optional.empty();
         }
+
+        final FileTypes format = selectedFormat.orElseThrow();
 
         if (offersDefaultFolder && setDefaultCheckBox.isSelected())
             Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder = folder;

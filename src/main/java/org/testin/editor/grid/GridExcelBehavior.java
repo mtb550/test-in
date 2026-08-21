@@ -6,7 +6,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -16,6 +15,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Excel / DataGrip-style interaction for the grid tables:
@@ -108,8 +108,11 @@ public final class GridExcelBehavior {
     }
 
     private static void pasteIntoSelection(final @NotNull JBTable table) {
-        final String text = CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor);
-        if (text == null || text.isEmpty()) return;
+        // An empty clipboard and a clipboard holding no text are the same
+        // nothing to paste.
+        final String text = Objects.requireNonNullElse(
+                CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor), "");
+        if (text.isEmpty()) return;
 
         final int anchorRow = table.getSelectedRow();
         final int anchorCol = table.getSelectedColumn();
