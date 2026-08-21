@@ -44,7 +44,7 @@ final class DirectoryChildrenIndex {
      * decides between them, so a set can be put third without renumbering the
      * set that was third already.
      */
-    private static final Comparator<DirectoryDto> BY_ARRANGEMENT = Comparator
+    private static final @NotNull Comparator<DirectoryDto> BY_ARRANGEMENT = Comparator
             .comparing(DirectoryDto::isRetired)
             .thenComparingInt(DirectoryDto::getOrder)
             .thenComparing(node -> node.getMarker().getCreatedAt())

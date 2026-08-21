@@ -35,7 +35,7 @@ import java.util.Objects;
 
 public class DetailsTab {
 
-    private static final String SHORTCUT_REGISTERED_KEY = "DetailsTab.f2.registered";
+    private static final @NotNull String SHORTCUT_REGISTERED_KEY = "DetailsTab.f2.registered";
 
     final int SCROLL_UNIT_INCREMENT = 16;
     final @NotNull String PLACEHOLDER_TEXT = "Select a test case to view details";

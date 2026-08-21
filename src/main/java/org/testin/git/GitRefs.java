@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GitRefs {
 
-    private static final Pattern HEAD_BRANCH = Pattern.compile("(?m)^\\s*HEAD branch:\\s*(\\S+)\\s*$");
+    private static final @NotNull Pattern HEAD_BRANCH = Pattern.compile("(?m)^\\s*HEAD branch:\\s*(\\S+)\\s*$");
 
     private static final @NotNull String REMOTES_PREFIX = "remotes/";
 

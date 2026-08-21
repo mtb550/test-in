@@ -27,7 +27,7 @@ import java.util.Objects;
 
 public class PasteNodeAction extends AbstractProjectTreeAction {
 
-    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK);
+    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK);
 
     public PasteNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, tree, "Paste", "Paste items", AllIcons.Actions.MenuPaste);

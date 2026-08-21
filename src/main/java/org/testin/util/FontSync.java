@@ -30,7 +30,7 @@ public class FontSync {
      * shared value let whichever component updated first consume the change,
      * leaving every other subscriber's children at the old size.
      */
-    private static final String LAST_BASE_SIZE = "testin.fontSync.lastBaseSize";
+    private static final @NotNull String LAST_BASE_SIZE = "testin.fontSync.lastBaseSize";
 
     private static boolean isGlobalWatcherActive = false;
 

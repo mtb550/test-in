@@ -14,14 +14,14 @@ import java.util.function.BiFunction;
 
 public class EditorType extends FakeFileType {
 
-    public static final EditorType TEST_RUN = new EditorType(
+    public static final @NotNull EditorType TEST_RUN = new EditorType(
             "Test Run",
             "Test Run Editor",
             AllIcons.Nodes.Services,
             RunEditor::new
     );
 
-    public static final EditorType TEST_CASE = new EditorType(
+    public static final @NotNull EditorType TEST_CASE = new EditorType(
             "Test Case",
             "Test Case Editor",
             AllIcons.FileTypes.Text,

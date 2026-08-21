@@ -24,9 +24,9 @@ import java.util.List;
 
 public class CutTestCaseNodeAction extends AbstractProjectAction {
 
-    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
-    private final TestinEditor editor;
-    private final JBList<TestCaseDto> list;
+    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
+    private final @NotNull TestinEditor editor ;
+    private final @NotNull JBList<TestCaseDto> list ;
 
     public CutTestCaseNodeAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Cut Node", "Cut selected test case(s) to clipboard", AllIcons.Actions.MenuCut);

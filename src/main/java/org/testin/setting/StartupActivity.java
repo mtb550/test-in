@@ -23,7 +23,7 @@ import java.util.Optional;
 
 public final class StartupActivity implements ProjectActivity {
 
-    private static final Key<Boolean> SOURCE_ROOT_CHECKED = Key.create("testin.sourceRootChecked");
+    private static final @NotNull Key<Boolean> SOURCE_ROOT_CHECKED = Key.create("testin.sourceRootChecked");
 
     public static void execute(final @NotNull Project p) {
         final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);

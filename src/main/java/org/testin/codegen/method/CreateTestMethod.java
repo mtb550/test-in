@@ -20,7 +20,7 @@ import java.util.List;
 
 public class CreateTestMethod implements GenAction {
 
-    private static final String TESTNG_TEST = "org.testng.annotations.Test";
+    private static final @NotNull String TESTNG_TEST = "org.testng.annotations.Test";
 
     /**
      * Splits an FQCN list into the parts the generator needs, or null when there

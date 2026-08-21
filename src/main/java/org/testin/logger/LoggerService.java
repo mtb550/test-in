@@ -24,15 +24,15 @@ public final class LoggerService implements Disposable {
      * sentinel would have to be identity-compared against text a tester could
      * legitimately write.
      */
-    private static final Object SHUTDOWN = new Object();
-    private final BlockingQueue<Object> logQueue = new ArrayBlockingQueue<>(10000);
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final @NotNull Object SHUTDOWN = new Object();
+    private final @NotNull BlockingQueue<Object> logQueue = new ArrayBlockingQueue<>(10000);
+    private final @NotNull DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     // The IDE's log directory - beside idea.log, so Help -> Show Log in
     // Explorer finds it and Collect Logs and Diagnostic Data bundles it.
     // Resolved once; the location never depends on any open project.
-    private final Path logFile = Path.of(PathManager.getLogPath(), "testin.log");
+    private final @NotNull Path logFile = Path.of(PathManager.getLogPath(), "testin.log");
     private volatile boolean isRunning = true;
-    private volatile Level currentLogLevel = Level.DISABLED;
+    private volatile @NotNull Level currentLogLevel = Level.DISABLED;
     /**
      * Empty until start() runs, which dispose has to allow for: a service the
      * IDE created and threw away without ever starting has no thread to join.

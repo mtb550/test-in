@@ -18,7 +18,7 @@ import java.awt.event.KeyEvent;
 
 public class RedoNodeAction extends AbstractProjectAction {
 
-    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK);
+    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK);
 
     public RedoNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, "Redo", "Redo last action", AllIcons.Actions.Redo);

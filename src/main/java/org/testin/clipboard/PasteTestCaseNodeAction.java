@@ -33,7 +33,7 @@ import java.util.UUID;
 
 public class PasteTestCaseNodeAction extends AbstractProjectAction {
 
-    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
+    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
     private final @NotNull TestinEditor editor;
 
     public PasteTestCaseNodeAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {

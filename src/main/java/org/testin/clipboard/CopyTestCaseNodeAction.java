@@ -23,7 +23,7 @@ import java.util.List;
 
 public class CopyTestCaseNodeAction extends AbstractProjectAction {
 
-    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
+    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
     private final @NotNull JBList<TestCaseDto> list;
 
     public CopyTestCaseNodeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {

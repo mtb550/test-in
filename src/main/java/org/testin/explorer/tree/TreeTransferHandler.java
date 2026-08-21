@@ -43,7 +43,7 @@ import java.util.function.Predicate;
  * Transfers application values and lets the async model rebuild from indexer state.
  */
 public class TreeTransferHandler extends TransferHandler {
-    public static final DataFlavor NODE_FLAVOR =
+    public static final @NotNull DataFlavor NODE_FLAVOR =
             new DataFlavor(TreeTransferPayload.class, "Testin tree nodes");
 
     private final @NotNull Project p;

@@ -13,7 +13,7 @@ import java.util.Objects;
 
 public class TestCaseExecutionTracker {
 
-    private static final Key<Boolean> LISTENER_REGISTERED = Key.create("testin.executionListenerRegistered");
+    private static final @NotNull Key<Boolean> LISTENER_REGISTERED = Key.create("testin.executionListenerRegistered");
 
     /**
      * Subscribes once per project. {@code StartupActivity.execute} runs both from

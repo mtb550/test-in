@@ -69,7 +69,7 @@ public enum TestRunConfiguration {
      * enum, and the constants are declared first.
      */
     private static final class Free {
-        private static final String[] OPTIONS = new String[0];
+        private static final String @NotNull[] OPTIONS = new String[0];
     }
 
     /**

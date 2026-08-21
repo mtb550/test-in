@@ -41,27 +41,27 @@ import java.util.function.Predicate;
 public final class TestRunPdfGenerator {
 
 
-    private static final Map<Integer, float[]> COLUMN_WIDTHS = Map.of(
+    private static final @NotNull Map<Integer, float[]> COLUMN_WIDTHS = Map.of(
             0, new float[]{7, 93},
             1, new float[]{7, 83, 10},
             2, new float[]{7, 73, 10, 10}
     );
-    private final DeviceRgb DARK_NAVY = new DeviceRgb(0x1F, 0x38, 0x64);
-    private final DeviceRgb MEDIUM_BLUE = new DeviceRgb(0x2E, 0x54, 0x96);
-    private final DeviceRgb DARK_GRAY = new DeviceRgb(0x59, 0x59, 0x59);
-    private final DeviceRgb GREEN = new DeviceRgb(0x2E, 0x7D, 0x32);
-    private final DeviceRgb RED = new DeviceRgb(0xC0, 0x39, 0x2B);
-    private final DeviceRgb DARK_YELLOW = new DeviceRgb(0xB8, 0x86, 0x0B);
-    private final DeviceRgb LIGHT_BG = new DeviceRgb(0xF2, 0xF5, 0xFA);
-    private final DeviceRgb BORDER_GRAY = new DeviceRgb(0xD0, 0xD7, 0xE5);
-    private final DeviceRgb WHITE = new DeviceRgb(0xFF, 0xFF, 0xFF);
-    private final DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
-    private final DeviceRgb LINK_BLUE = new DeviceRgb(0x00, 0x52, 0xCC);
-    private final Map<BugPriority, DeviceRgb> PRIORITY_COLOR = Map.of(
+    private final @NotNull DeviceRgb DARK_NAVY = new DeviceRgb(0x1F, 0x38, 0x64);
+    private final @NotNull DeviceRgb MEDIUM_BLUE = new DeviceRgb(0x2E, 0x54, 0x96);
+    private final @NotNull DeviceRgb DARK_GRAY = new DeviceRgb(0x59, 0x59, 0x59);
+    private final @NotNull DeviceRgb GREEN = new DeviceRgb(0x2E, 0x7D, 0x32);
+    private final @NotNull DeviceRgb RED = new DeviceRgb(0xC0, 0x39, 0x2B);
+    private final @NotNull DeviceRgb DARK_YELLOW = new DeviceRgb(0xB8, 0x86, 0x0B);
+    private final @NotNull DeviceRgb LIGHT_BG = new DeviceRgb(0xF2, 0xF5, 0xFA);
+    private final @NotNull DeviceRgb BORDER_GRAY = new DeviceRgb(0xD0, 0xD7, 0xE5);
+    private final @NotNull DeviceRgb WHITE = new DeviceRgb(0xFF, 0xFF, 0xFF);
+    private final @NotNull DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
+    private final @NotNull DeviceRgb LINK_BLUE = new DeviceRgb(0x00, 0x52, 0xCC);
+    private final @NotNull Map<BugPriority, DeviceRgb> PRIORITY_COLOR = Map.of(
             BugPriority.HIGH, RED,
             BugPriority.MEDIUM, DARK_YELLOW
     );
-    private final Map<BugSeverity, DeviceRgb> SEVERITY_COLOR = Map.of(
+    private final @NotNull Map<BugSeverity, DeviceRgb> SEVERITY_COLOR = Map.of(
             BugSeverity.BLOCKER, RED,
             BugSeverity.MAJOR, DARK_YELLOW
     );

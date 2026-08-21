@@ -15,7 +15,7 @@ import java.awt.event.KeyEvent;
 
 public class CutNodeAction extends DumbAwareAction {
 
-    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK);
+    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK);
     private final @NotNull SimpleTree tree;
 
     public CutNodeAction(final @NotNull SimpleTree tree) {

@@ -33,20 +33,20 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     // The declaration — the subclass assigns these in its constructor.
     // ------------------------------------------------------------------
 
-    protected String title;
+    protected @NotNull String title ;
     /**
      * The dialog's content, top to bottom. The first component is the primary
      * one — it holds the focus, carries the key bindings, and its type is the
      * dialog's type parameter (see {@link #component()}).
      */
-    protected List<? extends ComponentDialogBase<?>> components;
+    protected @NotNull List<? extends ComponentDialogBase<?>> components ;
     /**
      * The status bar mapping — the one declaration that renders the hints and
      * binds the keys. The first bindable entry is the primary action: a
      * component's own submit gesture (e.g. a mouse click on a selection)
      * triggers it.
      */
-    protected List<StatusBarShortcut> shortcuts;
+    protected @NotNull List<StatusBarShortcut> shortcuts ;
 
     /**
      * Optional: a fixed size for large working dialogs. Setting it also makes

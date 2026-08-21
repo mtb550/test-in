@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class TestinFileSystem extends DeprecatedVirtualFileSystem implements NonPhysicalFileSystem {
 
-    public static final String PROTOCOL = "testin";
+    public static final @NotNull String PROTOCOL = "testin";
 
     @Override
     public @NonNls @NotNull String getProtocol() {

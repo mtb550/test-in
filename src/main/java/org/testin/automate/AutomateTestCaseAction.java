@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
+
 import java.util.Optional;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -20,7 +21,7 @@ import java.awt.event.KeyEvent;
 
 public class AutomateTestCaseAction extends AbstractProjectAction {
 
-    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_F12, InputEvent.CTRL_DOWN_MASK);
+    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_F12, InputEvent.CTRL_DOWN_MASK);
     private final @NotNull JBList<TestCaseDto> list;
 
     public AutomateTestCaseAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Logger {
 
-    private static final StackWalker WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+    private static final @NotNull StackWalker WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
     private static volatile @NotNull Optional<LoggerService> backendService = Optional.empty();
 

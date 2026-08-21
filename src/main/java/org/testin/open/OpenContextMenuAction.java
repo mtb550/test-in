@@ -27,7 +27,7 @@ import java.util.function.Supplier;
  */
 public class OpenContextMenuAction extends DumbAwareAction {
 
-    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0);
+    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0);
 
     private final @NotNull JComponent owner;
     private final @NotNull DefaultActionGroup cm;

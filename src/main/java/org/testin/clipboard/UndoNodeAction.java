@@ -18,7 +18,7 @@ import java.awt.event.KeyEvent;
 
 public class UndoNodeAction extends AbstractProjectAction {
 
-    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK);
+    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK);
 
     public UndoNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, "Undo", "Undo last action", AllIcons.Actions.Undo);
