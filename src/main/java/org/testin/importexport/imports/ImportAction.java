@@ -92,6 +92,18 @@ public class ImportAction extends AbstractProjectTreeAction {
         BackgroundWork.run(p, "Importing " + total + " test cases into " + selectedDirDto.getName(),
                 "Import Failed", indicator -> {
             indicator.setIndeterminate(false);
+            final long startedAt = System.currentTimeMillis();
+
+            // Once for the import, not once per sheet. Adding a test method
+            // resolves the references inside it, resolving reads the stub index,
+            // and reading the index while it is being rebuilt waits for the
+            // rebuild. Waiting here costs a background thread; waiting inside a
+            // write action costs the whole IDE.
+            if (generateCode) {
+                indicator.setText2("Waiting for indexing to finish");
+                DumbService.getInstance(p).waitForSmartMode();
+            }
+            final long readyAt = System.currentTimeMillis();
 
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
                 final @NotNull List<TestCaseDto> flatList = new ArrayList<>();
@@ -135,6 +147,8 @@ public class ImportAction extends AbstractProjectTreeAction {
                 Services.getInstance(p, Notifier.class).softShowCounted(p, "Imported", totalImported);
             }
 
+            report(total, startedAt, readyAt);
+
             // Asynchronous refresh: a synchronous recursive VFS refresh inside a
             // write action is disallowed by the platform and can freeze the IDE.
             // The indexer owns the refresh and runs the whole call, lookup
@@ -143,6 +157,21 @@ public class ImportAction extends AbstractProjectTreeAction {
             ApplicationManager.getApplication().invokeLater(() ->
                     Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh());
         });
+    }
+
+    /**
+     * What the import spent, in the log, every time one runs.
+     * <p>
+     * Here because the alternative is guessing. An import is a file per case and
+     * a PSI method per case, and which of the two dominates depends on the sheet
+     * and on whether the IDE was indexing - so the answer is measured rather
+     * than assumed, and it is in the log the next time somebody asks.
+     */
+    private static void report(final int cases, final long startedAt, final long readyAt) {
+        final long finishedAt = System.currentTimeMillis();
+        Logger.info("Import: " + cases + " cases in " + (finishedAt - startedAt) + "ms"
+                + " (waiting for the index " + (readyAt - startedAt) + "ms,"
+                + " writing and generating " + (finishedAt - readyAt) + "ms)");
     }
 
     /**
@@ -186,15 +215,7 @@ public class ImportAction extends AbstractProjectTreeAction {
     private void generateTestMethods(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases,
                                      final @NotNull String targetName, final @NotNull ProgressIndicator indicator) {
         Logger.info("Import: generating test methods for '" + targetName + "' with " + testCases.size() + " cases");
-
-        // Off the EDT, before any of it. Adding a method resolves the references
-        // inside it, resolving reads the stub index, and reading the index while
-        // it is being rebuilt waits for the rebuild - which is exactly what the
-        // import has just caused by writing a file per test case. Waiting here
-        // costs a background thread; waiting inside the write action below cost
-        // the whole IDE, with the CPU idle for all of it.
-        indicator.setText2("Waiting for indexing to finish");
-        DumbService.getInstance(p).waitForSmartMode();
+        final long startedAt = System.currentTimeMillis();
 
         for (int from = 0; from < testCases.size(); from += METHODS_PER_COMMAND) {
             final @NotNull List<TestCaseDto> batch =
@@ -208,6 +229,9 @@ public class ImportAction extends AbstractProjectTreeAction {
                 }
             }));
         }
+
+        Logger.info("Import: generated " + testCases.size() + " test methods in "
+                + (System.currentTimeMillis() - startedAt) + "ms");
     }
 
     private void linkAndSaveTestCases(final @NotNull Project p, final @NotNull Path dirPath,
