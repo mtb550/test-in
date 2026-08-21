@@ -11,11 +11,11 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Optional;
 import java.nio.file.Path;
 
 /**
@@ -61,12 +61,17 @@ final class TestinConfigLoader {
             });
 
     static @NotNull TestinProjectConfig load(final @NotNull Project p) {
-        final Path file = file(p);
-        if (file == null || !Files.isRegularFile(file)) {
-            Logger.info("No testin.yml in " + p.getName() + ", so this repository is not bound to a test project");
-            return TestinProjectConfig.EMPTY;
-        }
+        return file(p)
+                .filter(Files::isRegularFile)
+                .map(TestinConfigLoader::read)
+                .orElseGet(() -> {
+                    Logger.info("No testin.yml in " + p.getName()
+                            + ", so this repository is not bound to a test project");
+                    return TestinProjectConfig.EMPTY;
+                });
+    }
 
+    private static @NotNull TestinProjectConfig read(final @NotNull Path file) {
         try {
             return parse(Files.readString(file), file.toString());
         } catch (final IOException ex) {
@@ -108,19 +113,20 @@ final class TestinConfigLoader {
      * Base path only, deliberately: a multi-module repository carries the file at
      * its root, which is where a clone puts it.
      */
-    static @Nullable Path file(final @NotNull Project p) {
+    static @NotNull Optional<Path> file(final @NotNull Project p) {
         final String basePath = p.getBasePath();
         if (basePath == null) {
             Logger.info("No base path for " + p.getName() + ", so there is no testin.yml to read or write");
-            return null;
+            return Optional.empty();
         }
 
         final Path root = Path.of(basePath);
         for (final String name : FILE_NAMES) {
             final Path candidate = root.resolve(name);
-            if (Files.isRegularFile(candidate)) return candidate;
+            if (Files.isRegularFile(candidate)) return Optional.of(candidate);
         }
 
-        return root.resolve(FILE_NAMES[0]);
+        // Nothing there yet, so the first name is where a write would put it.
+        return Optional.of(root.resolve(FILE_NAMES[0]));
     }
 }

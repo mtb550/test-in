@@ -6,13 +6,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.editor.*;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.navigate.NavigateToCodeAction;
-import org.testin.run.RunTestCaseAction;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.*;
@@ -77,38 +74,22 @@ public class CardMouseListener extends MouseAdapter {
         final Rectangle bounds = list.getCellBounds(index, index);
         if (!bounds.contains(e.getPoint())) return;
 
-        final CardHoverAction action = getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y);
-
-        if (action != null) {
+        getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y).ifPresent(action -> {
             final TestCaseDto tc = list.getModel().getElementAt(index);
 
-            if (action == CardHoverAction.NAVIGATE_TO_TEST_METHOD) {
-                Logger.trace("org.testin.navigate action, tc: " + tc.getDescription());
-                new NavigateToCodeAction(p, list).execute(p, tc);
-
-            } else if (action == CardHoverAction.RUN_TEST_CASE) {
-                Logger.trace("run action, tc: " + tc.getDescription());
-                new RunTestCaseAction(p, list).execute(tc);
-            }
+            Logger.trace(action.getTooltip() + ", tc: " + tc.getDescription());
+            action.execute(p, tc);
 
             e.consume();
-        }
+        });
     }
 
     @Override
     public void mouseMoved(final MouseEvent e) {
         final int index = list.locationToIndex(e.getPoint());
-        CardHoverAction currentAction = null;
+        final Optional<CardHoverAction> currentAction = actionUnder(e, index);
 
-        if (index != -1) {
-            final Rectangle bounds = list.getCellBounds(index, index);
-
-            if (bounds.contains(e.getPoint())) {
-                currentAction = getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y);
-            }
-        }
-
-        list.setCursor(Cursor.getPredefinedCursor(currentAction != null ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
+        list.setCursor(Cursor.getPredefinedCursor(currentAction.isPresent() ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
 
         boolean needsRepaint = false;
 
@@ -117,13 +98,15 @@ public class CardMouseListener extends MouseAdapter {
             needsRepaint = true;
         }
 
-        final String actionName = currentAction != null ? currentAction.name() : null;
+        final String actionName = currentAction.map(Enum::name).orElse("");
 
-        if (actionName == null ? editor.getHoveredIconAction() != null : !actionName.equals(editor.getHoveredIconAction())) {
+        if (!actionName.equals(editor.getHoveredIconAction())) {
             editor.setHoveredIconAction(actionName);
             needsRepaint = true;
 
-            list.setToolTipText(Optional.ofNullable(currentAction).map(CardHoverAction::getHintText).orElse(null));
+            // Swing's own contract: a null tooltip is no tooltip, and an empty
+            // one is a small empty box that follows the pointer.
+            list.setToolTipText(currentAction.map(CardHoverAction::getHintText).orElse(null));
         }
 
         if (needsRepaint)
@@ -132,9 +115,9 @@ public class CardMouseListener extends MouseAdapter {
 
     @Override
     public void mouseExited(final MouseEvent e) {
-        if (editor.getHoveredIndex() != -1 || editor.getHoveredIconAction() != null) {
+        if (editor.getHoveredIndex() != -1 || !editor.getHoveredIconAction().isEmpty()) {
             editor.setHoveredIndex(-1);
-            editor.setHoveredIconAction(null);
+            editor.setHoveredIconAction("");
             list.setToolTipText(null);
             list.repaint();
         }
@@ -145,8 +128,20 @@ public class CardMouseListener extends MouseAdapter {
         Shared.forwardWheelToScrollPane(e);
     }
 
-    private @Nullable CardHoverAction getActionAtPoint(final int index, final int xInCell, final int yInCell) {
-        if (index == -1) return null;
+    /**
+     * The action under the pointer, when the pointer is inside a row at all.
+     */
+    private @NotNull Optional<CardHoverAction> actionUnder(final @NotNull MouseEvent e, final int index) {
+        if (index == -1) return Optional.empty();
+
+        final Rectangle bounds = list.getCellBounds(index, index);
+        if (!bounds.contains(e.getPoint())) return Optional.empty();
+
+        return getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y);
+    }
+
+    private @NotNull Optional<CardHoverAction> getActionAtPoint(final int index, final int xInCell, final int yInCell) {
+        if (index == -1) return Optional.empty();
 
         // Must match the font the card paints the title in, or the width is
         // measured against the wrong glyphs and every target shifts.
@@ -156,10 +151,13 @@ public class CardMouseListener extends MouseAdapter {
         // The title is asked of the editor, which owns what it reads, and where
         // the icons sit is asked of Shared, which paints them. Neither is worked
         // out here: both used to be, and both drifted.
-        final String title = editor.cardTitle(editor.globalIndex(index), list.getModel().getElementAt(index));
+        final TestCaseDto tc = list.getModel().getElementAt(index);
+        final String title = editor.cardTitle(editor.globalIndex(index), tc);
         final int titleWidth = list.getFontMetrics(titleFont).stringWidth(title);
 
-        return Shared.descriptionActionIcons(titleWidth).at(xInCell, yInCell);
+        // The card draws the run button or the stop button by the same rule, so
+        // the pointer is over whichever one this case is offering.
+        return Shared.descriptionActionIcons(titleWidth).at(xInCell, yInCell, CardHoverAction.runSlot(tc));
     }
 
 }

@@ -65,15 +65,15 @@ public class ChangeTypeRevertTest {
 
         assertEquals(changes.size(), 10, "every editable field differs between the two states");
         for (final FieldChange change : changes) {
-            assertNotNull(change.changeType().getRevertAction(),
+            assertTrue(change.changeType().getRevertAction().isPresent(),
                     change.changeType() + " appears in a review, so it must be revertable");
         }
     }
 
     @Test
     public void creatingOrRemovingAWholeTestCaseHasNoFieldToRevert() {
-        assertNull(ChangeType.CREATE_TEST_CASE.getRevertAction());
-        assertNull(ChangeType.REMOVE_TEST_CASE.getRevertAction());
+        assertTrue(ChangeType.CREATE_TEST_CASE.getRevertAction().isEmpty());
+        assertTrue(ChangeType.REMOVE_TEST_CASE.getRevertAction().isEmpty());
     }
 
     /**
@@ -85,7 +85,7 @@ public class ChangeTypeRevertTest {
     public void eachRevertRestoresItsOwnFieldAndNothingElse() {
         for (final FieldChange change : TestCaseChangeComparator.compare(committed(), edited())) {
             final TestCaseDto current = edited();
-            change.changeType().getRevertAction().apply(current, committed());
+            change.changeType().getRevertAction().orElseThrow().apply(current, committed());
 
             final List<FieldChange> left = TestCaseChangeComparator.compare(committed(), current);
 
@@ -100,7 +100,7 @@ public class ChangeTypeRevertTest {
     public void revertingEveryChangeRestoresTheCommittedTestCase() {
         final TestCaseDto current = edited();
         for (final FieldChange change : TestCaseChangeComparator.compare(committed(), edited())) {
-            change.changeType().getRevertAction().apply(current, committed());
+            change.changeType().getRevertAction().orElseThrow().apply(current, committed());
         }
 
         assertEquals(TestCaseChangeComparator.compare(committed(), current), List.of(),
@@ -116,8 +116,8 @@ public class ChangeTypeRevertTest {
         final TestCaseDto committed = committed();
         final TestCaseDto current = edited();
 
-        ChangeType.CHANGE_STEPS.getRevertAction().apply(current, committed);
-        ChangeType.CHANGE_GROUP.getRevertAction().apply(current, committed);
+        ChangeType.CHANGE_STEPS.getRevertAction().orElseThrow().apply(current, committed);
+        ChangeType.CHANGE_GROUP.getRevertAction().orElseThrow().apply(current, committed);
 
         current.getSteps().add("typed after the revert");
         current.getGroup().add(Group.REGRESSION);
@@ -143,13 +143,13 @@ public class ChangeTypeRevertTest {
     @Test
     public void everyLabelFindsItsOwnChangeTypeAgain() {
         for (final ChangeType type : ChangeType.values()) {
-            assertEquals(ChangeType.fromLabel(type.getLabel()), type);
+            assertEquals(ChangeType.fromLabel(type.getLabel()).orElseThrow(), type);
         }
     }
 
     @Test
     public void anUnknownLabelFindsNothing() {
-        assertNull(ChangeType.fromLabel("Change Something That Does Not Exist"));
-        assertNull(ChangeType.fromLabel(null));
+        assertTrue(ChangeType.fromLabel("Change Something That Does Not Exist").isEmpty());
+        assertTrue(ChangeType.fromLabel("").isEmpty(), "and no label at all names nothing either");
     }
 }

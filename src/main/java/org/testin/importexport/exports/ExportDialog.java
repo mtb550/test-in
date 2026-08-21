@@ -70,16 +70,15 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
 
     @Override
     protected void submit() {
-        final DestinationForm.Destination destination = component().resolve();
-        if (destination == null) return;
+        component().resolve().ifPresent(destination -> {
+            final Map<String, List<TestCaseDto>> selected = preview.selected();
+            if (selected.isEmpty()) {
+                Services.getInstance(p, Notifier.class).softShow(p, "Export Empty", "Select at least one test case to export.");
+                return;
+            }
 
-        final Map<String, List<TestCaseDto>> selected = preview.selected();
-        if (selected.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softShow(p, "Export Empty", "Select at least one test case to export.");
-            return;
-        }
-
-        onExport.accept(destination, selected);
-        closeOk();
+            onExport.accept(destination, selected);
+            closeOk();
+        });
     }
 }

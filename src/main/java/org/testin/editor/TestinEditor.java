@@ -2,7 +2,6 @@ package org.testin.editor;
 
 import com.intellij.openapi.Disposable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.model.dto.TestCaseDto;
@@ -12,9 +11,7 @@ import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 public interface TestinEditor extends Disposable {
     @NotNull DirectoryDto getParent();
@@ -50,13 +47,27 @@ public interface TestinEditor extends Disposable {
 
     void refreshView();
 
+    /**
+     * Throws away what this editor holds and reads the index again.
+     * <p>
+     * {@link #refreshView()} redraws from the lists the editor is holding, which
+     * is what a page change or a filter needs. This is for when those lists are
+     * the wrong data altogether - a branch was checked out, a sync brought a
+     * colleague's edits - and the editor has to go back to the indexer for what
+     * the node holds now.
+     * <p>
+     * The refresh button in the editor's own toolbar is the same thing, so it
+     * calls this rather than keeping a second copy of it.
+     */
+    void reload();
+
     @NotNull List<TestCaseDto> getSelectedTestCases();
 
     void appendNewTestCase(final @NotNull TestCaseDto tc);
 
     @NotNull JComponent getComponent();
 
-    @Nullable JComponent getPreferredFocusedComponent();
+    @NotNull JComponent getPreferredFocusedComponent();
 
     @NotNull Set<?> getSelectedDetails();
 
@@ -76,19 +87,20 @@ public interface TestinEditor extends Disposable {
 
     void updateSequenceAndSaveAll();
 
-    void selectTestCase(final @Nullable TestCaseDto tc);
+    void selectTestCase(final @NotNull TestCaseDto tc);
 
-    @NotNull Set<UUID> getUnsortedIds();
+    /**
+     * Which action icon the pointer is over, by name, and empty for none.
+     */
+    @NotNull String getHoveredIconAction();
 
-    @Nullable String getHoveredIconAction();
-
-    void setHoveredIconAction(final @Nullable String action);
+    void setHoveredIconAction(final @NotNull String action);
 
     int getHoveredIndex();
 
     void setHoveredIndex(final int index);
 
     default void dispose() {
-        Optional.ofNullable(ViewToolWindowFactory.getViewPanel()).ifPresent(ViewPanel::reset);
+        ViewToolWindowFactory.panel().ifPresent(ViewPanel::reset);
     }
 }

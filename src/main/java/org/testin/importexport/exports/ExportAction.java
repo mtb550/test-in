@@ -12,26 +12,26 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Mapper;
 
-import javax.swing.tree.TreePath;
 import java.io.InputStream;
 import java.util.*;
 
 public class ExportAction extends AbstractProjectTreeAction {
 
     protected final @NotNull List<TestEditorAttributes> exportAttributes = Arrays.stream(TestEditorAttributes.values())
-            .filter(TestEditorAttributes::isExportable)
+            .filter(a -> a.can(Can.EXPORT))
             .toList();
 
     public ExportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
@@ -41,14 +41,16 @@ public class ExportAction extends AbstractProjectTreeAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final TreePath path = tree.getSelectionPath();
-        if (path == null) return;
+        TreeValueUtil.selectedDirectory(tree).ifPresent(this::exportFrom);
+    }
 
-        final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
-        if (!(userObject instanceof DirectoryDto dirDto)) return;
-
-        final VirtualFile targetDir = resolveTargetDir(dirDto);
-        if (targetDir == null) return;
+    /**
+     * Everything the action does once it knows which node it is exporting from.
+     */
+    private void exportFrom(final @NotNull DirectoryDto dirDto) {
+        final Optional<VirtualFile> resolved = resolveTargetDir(dirDto);
+        if (resolved.isEmpty()) return;
+        final VirtualFile targetDir = resolved.get();
 
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Exporting test cases", true) {
             @Override
@@ -101,18 +103,16 @@ public class ExportAction extends AbstractProjectTreeAction {
     }
 
     /**
-     * Null when the path is not in the VFS; a file resolves to its parent directory.
+     * Empty when the path is not in the VFS; a file resolves to its parent
+     * directory.
      */
-    public @Nullable VirtualFile resolveTargetDir(final @NotNull DirectoryDto dirDto) {
-        final VirtualFile target = LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString());
-        if (target == null) return null;
-
-        return target.isDirectory() ? target : target.getParent();
+    public @NotNull Optional<VirtualFile> resolveTargetDir(final @NotNull DirectoryDto dirDto) {
+        return Optional.ofNullable(LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString()))
+                .map(target -> target.isDirectory() ? target : target.getParent());
     }
 
     public @NotNull List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project p, final @NotNull VirtualFile dir) {
-        final Map<UUID, TestCaseDto> tcMap = new HashMap<>();
-        TestCaseDto head = null;
+        final List<TestCaseDto> loaded = new ArrayList<>();
 
         final VirtualFile[] files = dir.getChildren();
         if (files == null) return Collections.emptyList();
@@ -120,41 +120,24 @@ public class ExportAction extends AbstractProjectTreeAction {
         for (final VirtualFile file : files) {
             if (!file.isDirectory() && file.getName().endsWith(".json")) {
                 try (InputStream is = file.getInputStream()) {
-                    final TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(is, TestCaseDto.class);
-                    tcMap.put(tc.getId(), tc);
-                    if (Boolean.TRUE.equals(tc.getIsHead())) {
-                        head = tc;
-                    }
+                    loaded.add(Services.getInstance(p, Mapper.class).readValue(is, TestCaseDto.class));
                 } catch (final Exception ex) {
                     Logger.error("Loading test cases failed: " + ex.getMessage());
                 }
             }
         }
 
-        if (head == null && !tcMap.isEmpty()) {
-            return new ArrayList<>(tcMap.values());
-        }
-
-        final List<TestCaseDto> orderedList = new ArrayList<>();
-        TestCaseDto current = head;
-
-        while (current != null) {
-            orderedList.add(current);
-            if (current.getNext() != null) {
-                current = tcMap.get(current.getNext());
-            } else {
-                current = null;
-            }
-        }
-
-        return orderedList;
+        // The same order the editor shows, from the same rule - a sheet whose
+        // rows are in a different order from the screen they were exported from
+        // is a sheet nobody trusts.
+        return new ArrayList<>(TestCaseOrder.ordered(loaded));
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final DirectoryDto selected = TreeValueUtil.singleSelectedDirectory(tree);
-
-        e.getPresentation().setEnabled(selected != null && selected.isTestCaseContainer());
+        e.getPresentation().setEnabled(TreeValueUtil.singleSelectedDirectory(tree)
+                .filter(DirectoryDto::isTestCaseContainer)
+                .isPresent());
     }
 
     @Override

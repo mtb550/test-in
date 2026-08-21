@@ -8,51 +8,60 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.setting.StartupActivity;
 
-import java.util.ArrayList;
+import java.util.Optional;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
 
-    @Getter
-    private static @Nullable ViewPanel viewPanel;
+    /**
+     * The panel, from the moment the tool window builds it. Static because the
+     * tool window is, and null only before that first build - which is why
+     * nothing outside asks for the field itself (#71).
+     */
+    private static @NotNull Optional<ViewPanel> viewPanel = Optional.empty();
+
+    /**
+     * What a caller with nothing to do afterward passes.
+     */
+    private static final @NotNull Consumer<ViewPanel> NOTHING_AFTER = viewer -> {
+    };
 
     static void onPanelDisposed(final @NotNull ViewPanel panel) {
-        if (viewPanel == panel) {
-            viewPanel = null;
-        }
+        if (viewPanel.filter(held -> held == panel).isPresent()) viewPanel = Optional.empty();
     }
 
-    public static @Nullable ToolWindow getToolWindow(final @NotNull Project p) {
-        return ToolWindowManager.getInstance(p).getToolWindow("testin.view");
+    /**
+     * The panel, once the tool window has built it.
+     */
+    public static @NotNull Optional<ViewPanel> panel() {
+        return viewPanel;
     }
 
-    public static void showPanel(final @NotNull Project p, final @Nullable List<TestCaseDto> testCases, final @Nullable ArrayList<String> path, final @Nullable Consumer<ViewPanel> onReadyAction) {
-        final ToolWindow tw = getToolWindow(p);
-
-        if (tw != null) {
-            tw.show(() -> {
-                final ViewPanel viewer = getViewPanel();
-                if (viewer != null) {
-                    viewer.show(testCases, path);
-
-                    if (onReadyAction != null) {
-                        onReadyAction.accept(viewer);
-                    }
-                }
-            });
-        }
+    /**
+     * The view tool window, empty in a project that has never opened it - which
+     * is what the platform answers, converted here rather than at five callers.
+     */
+    public static @NotNull Optional<ToolWindow> toolWindow(final @NotNull Project p) {
+        return Optional.ofNullable(ToolWindowManager.getInstance(p).getToolWindow("testin.view"));
     }
 
-    public static void showPanel(final @NotNull Project p, final @Nullable List<TestCaseDto> testCases, final @Nullable ArrayList<String> path) {
-        showPanel(p, testCases, path, null);
+    public static void showPanel(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases,
+                                 final @NotNull List<String> path, final @NotNull Consumer<ViewPanel> onReadyAction) {
+        toolWindow(p).ifPresent(tw -> tw.show(() -> panel().ifPresent(viewer -> {
+            viewer.show(testCases, path);
+            onReadyAction.accept(viewer);
+        })));
+    }
+
+    public static void showPanel(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases,
+                                 final @NotNull List<String> path) {
+        showPanel(p, testCases, path, NOTHING_AFTER);
     }
 
     @Override
@@ -64,19 +73,20 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
                 StartupActivity.execute(p);
             }
 
-            viewPanel = new ViewPanel(p);
+            final ViewPanel panel = new ViewPanel(p);
+            viewPanel = Optional.of(panel);
 
             final ContentFactory contentFactory = ContentFactory.getInstance();
 
-            final Content detailsTab = contentFactory.createContent(viewPanel.getDetailsScrollPane(), "Details", false);
-            final Content historyTab = contentFactory.createContent(viewPanel.getHistoryScrollPane(), "History", false);
-            final Content bugsTab = contentFactory.createContent(viewPanel.getOpenBugsScrollPane(), "Open Bugs", false);
+            final Content detailsTab = contentFactory.createContent(panel.getDetailsScrollPane(), "Details", false);
+            final Content historyTab = contentFactory.createContent(panel.getHistoryScrollPane(), "History", false);
+            final Content bugsTab = contentFactory.createContent(panel.getOpenBugsScrollPane(), "Open Bugs", false);
 
             toolWindow.getContentManager().addContent(detailsTab);
             toolWindow.getContentManager().addContent(historyTab);
             toolWindow.getContentManager().addContent(bugsTab);
 
-            toolWindow.setTitleActions(new ViewPanelActions().create(viewPanel.getPage(), toolWindow.getComponent()));
+            toolWindow.setTitleActions(new ViewPanelActions().create(panel.getPage(), toolWindow.getComponent()));
         });
     }
 

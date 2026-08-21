@@ -8,19 +8,19 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.config.TestinConfigService;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.explorer.ExplorerPanel;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.Tools;
 
-import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Locale;
 
 /**
@@ -41,6 +41,30 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         this.commits = new GitCommitService(p);
     }
 
+    /**
+     * The remote URL as the tester types it, or empty when they close the prompt.
+     * Empty rather than null, so the caller that decides what to do about a
+     * missing URL does it in one place whichever way it came up missing.
+     */
+    private static @NotNull String askForRemoteUrl(final @NotNull Project p) {
+        final String typed = Messages.showInputDialog(
+                p,
+                "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
+                "Configure Remote",
+                Messages.getQuestionIcon());
+
+        return typed == null ? "" : typed.trim();
+    }
+
+    /**
+     * How a commit is named to the tester. The id when Git could give one - it is
+     * what they search for on the remote - and a plain phrase when it could not,
+     * so a successful push is never reported as "Commit  is on origin/main".
+     */
+    private static @NotNull String commitLabel(final @NotNull String commitId) {
+        return commitId.isBlank() ? "The commit" : "Commit " + commitId;
+    }
+
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.EDT;
@@ -48,19 +72,24 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final TreePath path = tree.getSelectionPath();
-        if (path == null) return;
-        final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
-
-        e.getPresentation().setEnabled(userObject instanceof TestProjectDirectoryDto);
+        e.getPresentation().setEnabled(TreeValueUtil.selected(tree, TestProjectDirectoryDto.class).isPresent());
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        TreeValueUtil.projectPath(tree).ifPresent(this::openFor);
+    }
 
-        final Path path = Services.getInstance(p, Tools.class).getProjectPath(tree);
-        if (path == null) return;
-
+    /**
+     * The review for a repository the caller already knows, rather than for
+     * whatever the tree has selected.
+     * <p>
+     * A branch that would not switch has the path and a reason to offer the
+     * review, and nothing selected to read one from. The menu entry goes through
+     * here too, once it has resolved its selection to a repository - the review
+     * is about a repository either way.
+     */
+    public void openFor(final @NotNull Path path) {
         if (!git.isRepository(path)) {
             Services.getInstance(p, Notifier.class).warnWithAction(p,
                     "Git repository not found",
@@ -79,31 +108,140 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         GitBackgroundTask.run(p, "Scanning for changes", true,
                 indicator -> {
                     final List<PendingChange> changes = GitDiffProcessor.getPendingChanges(p, path);
-                    ApplicationManager.getApplication().invokeLater(() -> reviewChanges(p, path, changes));
+
+                    // Read here and carried in, because the dialog cannot ask:
+                    // every Git command goes through git4idea's authentication
+                    // setup, which asserts it is not running on the EDT, and a
+                    // dialog is built on the EDT.
+                    final List<String> branches = git.getLocalBranches(path);
+                    final String current = git.getCurrentBranch(path);
+
+                    // A commit that succeeded and a push that failed leave
+                    // nothing pending and work that never left the machine.
+                    final int unpushed = git.unpushedCount(path);
+
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            reviewChanges(p, path, changes, branches, current, unpushed));
                 },
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to calculate diffs: " + ex.getMessage()));
     }
 
     private void reviewChanges(final @NotNull Project p, final @NotNull Path path,
-                               final @NotNull List<PendingChange> changes) {
+                               final @NotNull List<PendingChange> changes,
+                               final @NotNull List<String> branches,
+                               final @NotNull String currentBranch,
+                               final int unpushed) {
         if (changes.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softShow(p, "No changes");
+            offerThePush(p, path, currentBranch, unpushed);
             return;
         }
 
         // The dialog owns the whole review - which changes, the message, and
         // whether it goes to the remote - so there is nothing left to ask
         // afterward.
-        new PendingCommitsDialog(p, changes, path,
-                request -> performCommitWorkflow(p, path, request.message(), request.changes(), request.push())).show();
+        new PendingCommitsDialog(p, changes, path, branches, currentBranch,
+                request -> commitOnBranch(p, path, request)).show();
+    }
+
+    /**
+     * Puts the review's changes on the branch the review named.
+     * <p>
+     * Three cases and one of them is the ordinary one. The branch that is
+     * already checked out commits as it always did. A name that was not on the
+     * list starts a branch here and takes the uncommitted work along, which is
+     * how a cycle's results stay off main without leaving the dialog. An
+     * existing branch is checked out first - and Git can refuse that, when the
+     * switch would overwrite the very changes being committed, so the refusal is
+     * reported and nothing is committed anywhere.
+     * <p>
+     * Off the EDT, because all three ask Git.
+     */
+    private void commitOnBranch(final @NotNull Project p, final @NotNull Path repoPath,
+                                final @NotNull PendingCommitsDialog.Request request) {
+        final String target = request.branch();
+
+        GitBackgroundTask.run(p, "Preparing the branch", false,
+                indicator -> {
+                    final String current = git.getCurrentBranch(repoPath);
+
+                    if (target.isEmpty() || target.equals(current)) {
+                        performCommitWorkflow(p, repoPath, request, target.isEmpty() ? current : target);
+                        return;
+                    }
+
+                    indicator.setText((request.newBranch() ? "Starting " : "Checking out ") + target);
+
+                    final boolean moved = request.newBranch()
+                            ? git.startBranch(repoPath, target)
+                            : !git.checkout(repoPath, target).isEmpty();
+
+                    if (!moved) {
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                Services.getInstance(p, Notifier.class).error(p, "Branch Not Switched",
+                                        target + " could not be checked out, so nothing was committed. "
+                                                + "The changes are still here and still yours."));
+                        return;
+                    }
+
+                    // A branch started here begins at the commit that is already
+                    // checked out, so not one file changed and there is nothing
+                    // to read again - the panel is only redrawn so its branch box
+                    // stops naming the branch that was left. Moving to a branch
+                    // that already existed is the other thing entirely: every
+                    // file under the project was just replaced.
+                    if (!request.newBranch()) {
+                        Services.getInstance(p, ProjectIndexer.class).refreshDirectory(repoPath);
+                    }
+
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        final ExplorerPanel panel = Services.getInstance(p, ExplorerPanel.class);
+
+                        if (request.newBranch()) panel.refresh();
+                        else panel.reindex("Switched to " + target);
+
+                        performCommitWorkflow(p, repoPath, request, target);
+                    });
+                },
+                ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error",
+                        "Could not prepare " + target + ": " + ex.getMessage()));
+    }
+
+    /**
+     * What to say when there is nothing to commit.
+     * <p>
+     * Usually nothing happened and "No changes" is the whole truth. But a commit
+     * that succeeded and a push that failed - a conflict, a rejected pull, a
+     * dropped connection - leaves exactly this state with work that has not left
+     * the machine, and the review saying "No changes" was the last thing the
+     * plugin had to offer: the commit existed, nothing was pending, and no
+     * action anywhere pushed it (#66).
+     */
+    private void offerThePush(final @NotNull Project p, final @NotNull Path path,
+                              final @NotNull String currentBranch, final int unpushed) {
+        final Notifier notifier = Services.getInstance(p, Notifier.class);
+
+        if (unpushed == 0) {
+            notifier.softShow(p, "No changes");
+            return;
+        }
+
+        final String waiting = unpushed == 1 ? "1 commit is" : unpushed + " commits are";
+
+        notifier.warnWithAction(p, "Not Pushed",
+                waiting + " committed here and not on the remote.",
+                "Push",
+                () -> pushToRemote(p, path, commits.headCommitId(path), currentBranch));
     }
 
     private void performCommitWorkflow(
             final @NotNull Project p,
             final @NotNull Path repoPath,
-            final @NotNull String commitMessage,
-            final @NotNull Collection<PendingChange> selectedChanges,
-            final boolean push) {
+            final @NotNull PendingCommitsDialog.Request request,
+            final @NotNull String branch) {
+        final String commitMessage = request.message();
+        final Collection<PendingChange> selectedChanges = request.changes();
+        final boolean push = request.push();
+
         GitBackgroundTask.run(p, push ? "Committing and pushing" : "Committing to local Git", false,
                 indicator -> {
                     indicator.setText("Staging and committing files");
@@ -116,7 +254,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (push) {
-                            pushToRemote(p, repoPath, commitId);
+                            pushToRemote(p, repoPath, commitId, branch);
                             return;
                         }
 
@@ -124,8 +262,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     });
                 },
                 ex -> {
-                    if (isIdentityError(ex.getMessage())) {
-                        promptAndSetGitIdentity(p, repoPath, commitMessage, selectedChanges, push);
+                    if (isIdentityError(Objects.toString(ex.getMessage(), ""))) {
+                        promptAndSetGitIdentity(p, repoPath, request, branch);
                     } else {
                         Services.getInstance(p, Notifier.class).error(p, "Commit Failed", "Failed to commit changes:" + System.lineSeparator() + ex.getMessage());
                     }
@@ -148,20 +286,30 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage()));
     }
 
-    private void pushToRemote(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull String commitId) {
+    /**
+     * @param committedOn the branch the commit went onto, or null when Git could
+     *                    not say which one that was. A push follows the commit
+     *                    rather than the remote's default: they are the same
+     *                    branch on almost every push, and on the one that
+     *                    matters - a cycle committed onto its own branch - the
+     *                    default would send the work somewhere the tester did
+     *                    not choose
+     */
+    private void pushToRemote(final @NotNull Project p, final @NotNull Path repoPath,
+                              final @NotNull String commitId, final @NotNull String committedOn) {
         GitBackgroundTask.run(p, "Checking Git remote", false,
                 indicator -> {
                     final String remoteName = git.getRemoteName(repoPath);
-                    final String remoteUrl = remoteName == null ? "" : git.getRemoteUrl(repoPath, remoteName);
-                    final String branch = git.getDefaultBranch(repoPath);
-                    if (branch == null || branch.isBlank()) {
-                        throw new IllegalStateException("Could not determine the repository default branch.");
+                    final String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
+                    final String branch = committedOn.isBlank() ? git.getDefaultBranch(repoPath) : committedOn;
+                    if (branch.isBlank()) {
+                        throw new IllegalStateException("Could not determine which branch to push.");
                     }
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        // A null remote name always yields an empty URL above; naming it here
-                        // keeps the "already configured" branch provably non-null.
-                        if (remoteName == null || remoteUrl.isEmpty()) {
-                            configureRemoteAndPush(p, repoPath, remoteName == null ? "origin" : remoteName, branch, commitId);
+                        // A repository with no remote yields an empty URL above, and
+                        // origin is the name the configure step would create.
+                        if (remoteUrl.isEmpty()) {
+                            configureRemoteAndPush(p, repoPath, remoteName.isEmpty() ? "origin" : remoteName, branch, commitId);
                         } else {
                             executeGitPush(p, repoPath, remoteName, branch, commitId);
                         }
@@ -199,21 +347,6 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage()));
     }
 
-    /**
-     * The remote URL as the tester types it, or empty when they close the prompt.
-     * Empty rather than null, so the caller that decides what to do about a
-     * missing URL does it in one place whichever way it came up missing.
-     */
-    private static @NotNull String askForRemoteUrl(final @NotNull Project p) {
-        final String typed = Messages.showInputDialog(
-                p,
-                "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
-                "Configure Remote",
-                Messages.getQuestionIcon());
-
-        return typed == null ? "" : typed.trim();
-    }
-
     private void executeGitPush(final @NotNull Project p, final @NotNull Path repoPath,
                                 final @NotNull String remote, final @NotNull String branch,
                                 final @NotNull String commitId) {
@@ -240,19 +373,42 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     // with the failure that needs it.
                     final Notifier notifier = Services.getInstance(p, Notifier.class);
                     notifier.errorWithActions(p, "Push Failed", ex.getMessage(),
-                            notifier.action("Try Again", () -> pushToRemote(p, repoPath, commitId)));
+                            notifier.action("Try Again", () -> pushToRemote(p, repoPath, commitId, branch)));
                 });
     }
 
+    /**
+     * On the background thread that failed, because naming the conflicting files
+     * means asking Git for them.
+     */
     private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote,
                                      final @NotNull String branch) {
+        final List<String> conflicting = git.conflictingPaths(repoPath);
         final Notifier notifier = Services.getInstance(p, Notifier.class);
+
         notifier.warnWithActions(
                 p,
                 "Git Conflicts",
-                "Pull stopped because conflicts must be resolved in the IDE before continuing.",
+                GitRefs.conflictMessage(conflicting),
+                notifier.action("Resolve", () -> resolveConflicts(repoPath, remote, branch, conflicting)),
                 notifier.action("Continue rebase", () -> finishRebase(repoPath, remote, branch, false)),
                 notifier.action("Abort rebase", () -> finishRebase(repoPath, remote, branch, true)));
+    }
+
+    /**
+     * Merges the conflicted test cases and continues the rebase when nothing is
+     * left conflicting.
+     * <p>
+     * Off the EDT because it reads Git and writes files; the questions it cannot
+     * answer open on the EDT from inside.
+     */
+    private void resolveConflicts(final @NotNull Path repoPath, final @NotNull String remote,
+                                  final @NotNull String branch, final @NotNull List<String> conflicting) {
+        ApplicationManager.getApplication().executeOnPooledThread(() ->
+                ConflictResolution.resolve(p, repoPath, conflicting,
+                        () -> finishRebase(repoPath, remote, branch, false),
+                        leftOver -> Services.getInstance(p, Notifier.class).warn(p, "Still Conflicting",
+                                GitRefs.conflictMessage(leftOver))));
     }
 
     private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote,
@@ -263,7 +419,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     // to the task's error handler - which is where the conflict
                     // recovery below lives. The git reason is already logged (#63).
                     if (abort) {
-                        if (git.couldNotAbortRebase(repoPath)) throw new IllegalStateException("Could not abort the rebase.");
+                        if (git.couldNotAbortRebase(repoPath))
+                            throw new IllegalStateException("Could not abort the rebase.");
                     } else {
                         if (git.couldNotContinueRebase(repoPath))
                             throw new IllegalStateException("Could not continue the rebase.");
@@ -284,9 +441,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     private void promptAndSetGitIdentity(
             final @NotNull Project p,
             final @NotNull Path repoPath,
-            final @NotNull String pendingCommitMessage,
-            final @NotNull Collection<PendingChange> selectedChanges,
-            final boolean push) {
+            final @NotNull PendingCommitsDialog.Request request,
+            final @NotNull String branch) {
         // The dialog validates what it collected - a blank name or email never
         // leaves it - so this is the workflow resuming, not a second check.
         ApplicationManager.getApplication().invokeLater(() -> new GitIdentityDialog(p, identity ->
@@ -297,7 +453,9 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                                 // The tester is watching: they just filled the dialog
                                 // in and the commit resumes on the next line.
                                 Services.getInstance(p, Notifier.class).softShow(p, "Identity set");
-                                performCommitWorkflow(p, repoPath, pendingCommitMessage, selectedChanges, push);
+                                // The branch is settled by now - this is the
+                                // same commit resuming, not a second decision.
+                                performCommitWorkflow(p, repoPath, request, branch);
                             });
                         },
                         ex -> Services.getInstance(p, Notifier.class).error(p, "Config Failed",
@@ -306,17 +464,10 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     }
 
     /**
-     * How a commit is named to the tester. The id when Git could give one - it is
-     * what they search for on the remote - and a plain phrase when it could not,
-     * so a successful push is never reported as "Commit  is on origin/main".
+     * An exception with no message of its own arrives here as the empty string,
+     * converted where it comes out of the JDK rather than checked here (#71).
      */
-    private static @NotNull String commitLabel(final @NotNull String commitId) {
-        return commitId.isBlank() ? "The commit" : "Commit " + commitId;
-    }
-
-    private boolean isIdentityError(final @Nullable String message) {
-        if (message == null) return false;
-
+    private boolean isIdentityError(final @NotNull String message) {
         final String normalized = message.toLowerCase(Locale.ROOT);
         return normalized.contains("author identity unknown")
                 || normalized.contains("please tell me who you are");

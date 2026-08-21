@@ -63,7 +63,7 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
     protected void submit() {
         // The form validates and focuses its own field; what the import
         // consumes is the parsed data below.
-        if (component().resolve() == null) return;
+        if (component().resolve().isEmpty()) return;
 
         if (preview.isEmpty()) {
             Services.getInstance(p, Notifier.class).softShow(p, "Import Empty", "No data loaded from the selected file.");

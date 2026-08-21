@@ -32,6 +32,11 @@ public class Badges extends BaseDetails {
             badges.add(Shared.createGroupBadge(group));
         }
 
+        // Last, the way a card orders them. Empty for a case nobody has run.
+        dto.getTempStatus().getBadge()
+                .map(Shared::createRunStatusBadge)
+                .ifPresent(badges::add);
+
         Shared.showBadges(badgesPanel, badges);
 
         return addFullWidthRow(panel, gbc, badgesPanel,

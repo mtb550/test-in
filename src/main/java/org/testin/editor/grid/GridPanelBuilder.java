@@ -8,12 +8,12 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.hover.TableHoverListener;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.editor.EditorColors;
 import org.testin.editor.Shared;
 import org.testin.logger.Logger;
 import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.TestRunItems;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.dto.TestCaseDto;
@@ -25,6 +25,7 @@ import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -92,7 +93,7 @@ public class GridPanelBuilder {
             @Override
             public @NotNull Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
 
-                textArea.setText(value == null ? "" : value.toString());
+                textArea.setText(Objects.toString(value, ""));
                 textArea.setFont(table.getFont());
                 textArea.setForeground(table.getForeground());
                 // Per-cell selection background (multi-interval selection: only the
@@ -162,8 +163,17 @@ public class GridPanelBuilder {
         });
     }
 
-    private static @NotNull String widthKey(final @NotNull Object kind, final @Nullable Object header) {
-        return "testin.grid.colWidth." + kind + "." + header;
+    /**
+     * Where this column's width is remembered, and empty for a table carrying no
+     * kind - one with nothing to remember it under.
+     * <p>
+     * The save and the read both ask here, so a width cannot be written under a
+     * key the reader would not look at. Each used to build the key itself after
+     * checking the kind for null, which is the same question asked twice.
+     */
+    private static @NotNull Optional<String> widthKey(final @NotNull JBTable table, final @NotNull TableColumn column) {
+        return Optional.ofNullable(table.getClientProperty(GRID_KIND_KEY))
+                .map(kind -> "testin.grid.colWidth." + kind + "." + column.getHeaderValue());
     }
 
     private static void addColumnResizeListener(final @NotNull JBTable table) {
@@ -172,13 +182,10 @@ public class GridPanelBuilder {
             public void columnMarginChanged(final javax.swing.event.ChangeEvent e) {
                 // getResizingColumn() is non-null only during a user drag-resize,
                 // so programmatic auto-sizing never overwrites the saved widths.
-                final TableColumn resizing = table.getTableHeader() != null
-                        ? table.getTableHeader().getResizingColumn() : null;
-                final Object kind = table.getClientProperty(GRID_KIND_KEY);
-                if (resizing != null && kind != null) {
-                    PropertiesComponent.getInstance()
-                            .setValue(widthKey(kind, resizing.getHeaderValue()), resizing.getWidth(), -1);
-                }
+                Optional.ofNullable(table.getTableHeader())
+                        .map(JTableHeader::getResizingColumn)
+                        .ifPresent(resizing -> widthKey(table, resizing).ifPresent(key ->
+                                PropertiesComponent.getInstance().setValue(key, resizing.getWidth(), -1)));
 
                 updateRowHeights(table);
             }
@@ -224,31 +231,29 @@ public class GridPanelBuilder {
 
     private static void autoSizeColumns(final @NotNull JBTable table) {
         final FontMetrics fm = table.getFontMetrics(table.getFont());
-        final Object kind = table.getClientProperty(GRID_KIND_KEY);
         int tableTotalWidth = 0;
         for (int i = 0; i < table.getColumnCount(); i++) {
             final TableColumn col = table.getColumnModel().getColumn(i);
 
             // A width the user set by dragging wins over auto-sizing,
             // so refreshes and page changes keep the chosen layout.
-            final int savedWidth = kind != null
-                    ? PropertiesComponent.getInstance().getInt(widthKey(kind, col.getHeaderValue()), -1)
-                    : -1;
+            final int savedWidth = widthKey(table, col)
+                    .map(key -> PropertiesComponent.getInstance().getInt(key, -1))
+                    .orElse(-1);
             if (savedWidth > 0) {
                 col.setPreferredWidth(savedWidth);
                 tableTotalWidth += savedWidth;
                 continue;
             }
 
-            int maxWidth;
+            // A column with no renderer of its own is drawn by the header's, which
+            // is what the table would have used anyway.
+            final TableCellRenderer headerRenderer = Optional.ofNullable(col.getHeaderRenderer())
+                    .orElseGet(() -> table.getTableHeader().getDefaultRenderer());
 
-            TableCellRenderer headerRenderer = col.getHeaderRenderer();
-            if (headerRenderer == null) {
-                headerRenderer = table.getTableHeader().getDefaultRenderer();
-            }
             final Component headerComp = headerRenderer.getTableCellRendererComponent(
                     table, col.getHeaderValue(), false, false, 0, i);
-            maxWidth = headerComp.getPreferredSize().width;
+            int maxWidth = headerComp.getPreferredSize().width;
 
             // The width is capped below, so once a row has pushed it past the cap
             // no later row can change the answer. A Description column reaches
@@ -257,10 +262,8 @@ public class GridPanelBuilder {
             final int capBeforePadding = MAX_COL_WIDTH - (2 * CELL_PADDING + 20);
 
             for (int r = 0; r < table.getRowCount() && maxWidth < capBeforePadding; r++) {
-                final Object value = table.getValueAt(r, i);
-                if (value != null) {
-                    maxWidth = Math.max(maxWidth, fm.stringWidth(value.toString()));
-                }
+                // An empty cell measures zero and so never widens the column.
+                maxWidth = Math.max(maxWidth, fm.stringWidth(Objects.toString(table.getValueAt(r, i), "")));
             }
 
             maxWidth += 2 * CELL_PADDING + 20;
@@ -284,8 +287,7 @@ public class GridPanelBuilder {
                 final int column = table.getSelectedColumn();
                 if (row < 0 || column < 0 || !table.isCellEditable(row, column)) return;
                 if (table.editCellAt(row, column)) {
-                    final Component editor = table.getEditorComponent();
-                    if (editor != null) editor.requestFocusInWindow();
+                    Optional.ofNullable(table.getEditorComponent()).ifPresent(Component::requestFocusInWindow);
                 }
             }
         };
@@ -324,10 +326,8 @@ public class GridPanelBuilder {
         for (final TestCaseDto tc : testCases) {
             // Never skip rows: callers map grid rows back to testCases by index,
             // so a dropped row would make every following row act on the wrong test case.
-            TestRunItems runItem = resultsMap.get(tc.getId());
-            if (runItem == null) {
-                runItem = TestRunItems.builder().id(tc.getId()).tc(tc).build();
-            }
+            final TestRunItems runItem = Optional.ofNullable(resultsMap.get(tc.getId()))
+                    .orElseGet(() -> TestRunItems.builder().id(tc.getId()).tc(tc).build());
 
             final String[] row = new String[columns.length];
             final int rowNumber = index++;
@@ -378,7 +378,7 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        final JBTable table = buildTable(columns, rows, column -> TestEditorAttributes.values()[column].isEditable(), "test");
+        final JBTable table = buildTable(columns, rows, column -> TestEditorAttributes.values()[column].can(Can.EDIT), "test");
         applyColumnVisibility(table, TestEditorAttributes.class, attributes);
         return table;
     }

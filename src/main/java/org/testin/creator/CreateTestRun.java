@@ -5,10 +5,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.CheckedTreeNode;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.explorer.ExplorerPanel;
-import org.testin.logger.Logger;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.model.DirectoryMapper;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
@@ -16,14 +15,13 @@ import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.testproject.BoundTestProject;
 import org.testin.setting.AppSettingsState;
+import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.RunConfigurationDialog;
 import org.testin.testrun.RunConfigurationForm;
 import org.testin.testrun.RunTreeCellRenderer;
@@ -32,6 +30,7 @@ import org.testin.util.EditorUtil;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,18 +44,23 @@ public class CreateTestRun implements NodeCreator {
      * including its own tree refresh and editor opening. Always returns null.
      */
     @Override
-    public @Nullable DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
+    public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         // The tree this was started from only exists when a project is bound, so
         // nobody can click their way into the miss. It is checked because a run
         // written against no project would be a directory nothing owns.
-        final @Nullable TestProjectDirectoryDto tp = Services.getInstance(p, BoundTestProject.class).get();
-        if (tp == null) {
-            Logger.warn("Create test run: no test project is bound to " + p.getName());
-            return null;
-        }
+        Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
+                tp -> configureRun(tp.getTestCasesDirectory(), name, parentDir, newDirPath),
+                () -> Logger.warn("Create test run: no test project is bound to " + p.getName()));
 
-        final DirectoryDto testCasesRoot = tp.getTestCasesDirectory();
+        return Optional.empty();
+    }
 
+    /**
+     * The dialog the creator is: which test cases the run covers, chosen from
+     * the bound project's own tree.
+     */
+    private void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name,
+                              final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
 
             final Path testCasesPath = testCasesRoot.getPath();
@@ -82,8 +86,6 @@ public class CreateTestRun implements NodeCreator {
                 }).show();
             });
         });
-
-        return null;
     }
 
     /**
@@ -125,7 +127,7 @@ public class CreateTestRun implements NodeCreator {
         return node;
     }
 
-    private void saveSelectedToJSON(final RunConfigurationForm form, final SelectionTree selection, final Path savePath, final ExplorerPanel pp, final TestRunDirectoryDto trDir) {
+    private void saveSelectedToJSON(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull ExplorerPanel pp, final @NotNull TestRunDirectoryDto trDir) {
         final TestRunDto tr = new TestRunDto()
                 .setCreatedBy(Services.getInstance(p, AppSettingsState.class).testerName)
                 .setChangeLog(form.getChangeLog().getText().trim())
@@ -175,7 +177,7 @@ public class CreateTestRun implements NodeCreator {
         });
     }
 
-    private @NotNull CheckedTreeNode convertToCheckedNodes(final DefaultMutableTreeNode node) {
+    private @NotNull CheckedTreeNode convertToCheckedNodes(final @NotNull DefaultMutableTreeNode node) {
         final Object userObj = node.getUserObject();
         final CheckedTreeNode newNode = new CheckedTreeNode(userObj);
         for (int i = 0; i < node.getChildCount(); i++) {

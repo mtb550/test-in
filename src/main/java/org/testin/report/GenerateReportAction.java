@@ -11,7 +11,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.run.RunEditor;
@@ -26,11 +25,12 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Shortcuts;
-import org.testin.util.Tools;
 
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Optional;
+import java.util.function.Supplier;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
@@ -38,8 +38,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GenerateReportAction extends AbstractProjectAction {
 
-    private final @Nullable SimpleTree tree;
-    private final @Nullable TestinEditor editor;
+    /**
+     * Which run this action reports on, decided by the surface it was built for:
+     * the tree's selected node, or the run an editor is showing.
+     * <p>
+     * It used to be two nullable fields, and every reader worked out again which
+     * constructor had been called (#71).
+     */
+    private final @NotNull Supplier<Optional<TestRunDirectoryDto>> selectedRun;
 
     /**
      * The tree entry, which registers the shortcut itself: the context menu
@@ -48,15 +54,13 @@ public class GenerateReportAction extends AbstractProjectAction {
      */
     public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, "Generate Report", "Generate test run report", AllIcons.ToolbarDecorator.Export);
-        this.tree = tree;
-        this.editor = null;
+        this.selectedRun = () -> TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
         registerCustomShortcutSet(Shortcuts.GenerateReport.getCustomShortcut(), tree);
     }
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor) {
         super(p, "Generate Report", "Generate test run report", null);
-        this.tree = null;
-        this.editor = editor;
+        this.selectedRun = () -> editor instanceof RunEditor re ? Optional.of(re.getParent()) : Optional.empty();
     }
 
     /**
@@ -81,32 +85,19 @@ public class GenerateReportAction extends AbstractProjectAction {
     }
 
     /**
-     * The run this action reports on: the tree's selected node, or the run the
-     * editor is showing. Asked by both {@link #isAvailable()} and
-     * {@link #execute()}, so the two can never disagree about which run is meant.
-     */
-    private @Nullable TestRunDirectoryDto selectedRun() {
-        if (tree != null) return TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
-        return editor instanceof RunEditor re ? re.getParent() : null;
-    }
-
-    /**
      * True when the current selection resolves to a test run.
      */
     public boolean isAvailable() {
-        return selectedRun() != null;
+        return selectedRun.get().isPresent();
     }
 
     /**
      * Direct entry point for toolbar buttons — no AnActionEvent required.
      */
     public void execute() {
-        final TestRunDirectoryDto tr = selectedRun();
-        if (tr == null) return;
-
-        final String suggestedName = tr.getPath().getFileName().toString() + "_Report";
-
-        new GenerateReportDialog(p, suggestedName, (format, file) -> processAndSave(p, tr, format, file)).show();
+        selectedRun.get().ifPresent(tr -> new GenerateReportDialog(p,
+                tr.getPath().getFileName().toString() + "_Report",
+                (format, file) -> processAndSave(p, tr, format, file)).show());
     }
 
     @Override
@@ -115,40 +106,25 @@ public class GenerateReportAction extends AbstractProjectAction {
     }
 
     private void processAndSave(final @NotNull Project p, final @NotNull TestRunDirectoryDto tr,
-                                final @NotNull FileTypes format, final @Nullable File outputFile) {
+                                final @NotNull FileTypes format, final @NotNull File outputFile) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 final Path dirPath = tr.getPath();
 
                 final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 final TestRunDto runData = indexer.getTestRunByPath(dirPath);
-                if (runData == null) {
-                    Services.getInstance(p, Notifier.class).softShow(p, "Report Empty",
-                            "No test run data found at: " + dirPath);
-                    return;
-                }
 
                 final Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(p, runData);
 
                 final byte[] fileBytes = format.generateReport(p, tr, runData, detailsMap);
 
-                final File reportFile;
-                if (outputFile != null) {
-                    reportFile = outputFile;
-                } else {
-                    final String cleanName = runData.getChangeLog().replace(".json", "");
-                    final String rawTimestamp = Tools.formatDate(java.time.ZonedDateTime.now());
-                    final String safeTimestamp = rawTimestamp.replace(":", "-").replace("/", "-");
-                    reportFile = dirPath.resolve(cleanName + "_Report_" + safeTimestamp + format.getExtension()).toFile();
-                }
-
-                Files.write(reportFile.toPath(), fileBytes);
+                Files.write(outputFile.toPath(), fileBytes);
 
                 final Notifier notifier = Services.getInstance(p, Notifier.class);
                 final NotificationAction openAction = notifier.action("Open report", () -> {
 
                     try {
-                        java.awt.Desktop.getDesktop().open(reportFile);
+                        java.awt.Desktop.getDesktop().open(outputFile);
                     } catch (final Exception openEx) {
                         Logger.error("Failed to open report: " + openEx.getMessage());
                     }
@@ -157,14 +133,14 @@ public class GenerateReportAction extends AbstractProjectAction {
                 final NotificationAction copyAction = new NotificationAction("Copy path") {
                     @Override
                     public void actionPerformed(final @NotNull AnActionEvent e, final @NotNull Notification notification) {
-                        CopyPasteManager.getInstance().setContents(new StringSelection(reportFile.getAbsolutePath()));
+                        CopyPasteManager.getInstance().setContents(new StringSelection(outputFile.getAbsolutePath()));
                     }
                 };
                 copyAction.getTemplatePresentation().setIcon(AllIcons.Actions.Copy);
 
                 Services.getInstance(p, Notifier.class).infoWithActions(p,
                         format.name() + " Report Generated",
-                        "Saved successfully: " + reportFile.getName(),
+                        "Saved successfully: " + outputFile.getName(),
                         openAction,
                         copyAction
                 );
@@ -186,10 +162,7 @@ public class GenerateReportAction extends AbstractProjectAction {
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         for (final TestRunItems item : tr.getResults()) {
-            final TestCaseDto tc = indexer.getTestCaseById(item.getId());
-            if (tc != null) {
-                detailsMap.put(item.getId(), tc);
-            }
+            indexer.findTestCase(item.getId()).ifPresent(tc -> detailsMap.put(item.getId(), tc));
         }
 
         return detailsMap;

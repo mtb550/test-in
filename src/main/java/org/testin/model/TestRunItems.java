@@ -13,6 +13,7 @@ import org.testin.model.dto.TestCaseDto;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.UUID;
 
 @Setter
@@ -35,11 +36,42 @@ public class TestRunItems {
      * raw run item read straight from the file.
      */
     @JsonIgnore
+    @Getter(AccessLevel.NONE)
     @Nullable
     private TestCaseDto tc;
 
     @NotNull
     private UUID id;
+    @NotNull
+    @Builder.Default
+    private TestStatus status = TestStatus.PENDING;
+    @NotNull
+    @Builder.Default
+    private String actualResult = "";
+    @NotNull
+    @Builder.Default
+    private BugSeverity bugSeverity = BugSeverity.EMPTY;
+    @NotNull
+    @Builder.Default
+    private BugPriority bugPriority = BugPriority.EMPTY;
+    @NotNull
+    @Builder.Default
+    private Duration duration = Duration.ZERO;
+    @NotNull
+    @Builder.Default
+    private String executedBy = "";
+    /**
+     * When the verdict was given; {@link Config#NOT_EXECUTED} until there is one.
+     * It used to default to "now", so every case in a freshly built run already
+     * carried a plausible execution time before anyone had run anything.
+     */
+    @NotNull
+    @Builder.Default
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
+    private ZonedDateTime executedAt = Config.NOT_EXECUTED;
+    @NotNull
+    @Builder.Default
+    private String stacktrace = "";
 
     /**
      * True when the test case behind this result has been deleted since the run.
@@ -53,44 +85,6 @@ public class TestRunItems {
     public boolean isRemoved() {
         return status == TestStatus.REMOVED;
     }
-
-    @NotNull
-    @Builder.Default
-    private TestStatus status = TestStatus.PENDING;
-
-    @NotNull
-    @Builder.Default
-    private String actualResult = "";
-
-    @NotNull
-    @Builder.Default
-    private BugSeverity bugSeverity = BugSeverity.EMPTY;
-
-    @NotNull
-    @Builder.Default
-    private BugPriority bugPriority = BugPriority.EMPTY;
-
-    @NotNull
-    @Builder.Default
-    private Duration duration = Duration.ZERO;
-
-    @NotNull
-    @Builder.Default
-    private String executedBy = "";
-
-    /**
-     * When the verdict was given; {@link Config#NOT_EXECUTED} until there is one.
-     * It used to default to "now", so every case in a freshly built run already
-     * carried a plausible execution time before anyone had run anything.
-     */
-    @NotNull
-    @Builder.Default
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
-    private ZonedDateTime executedAt = Config.NOT_EXECUTED;
-
-    @NotNull
-    @Builder.Default
-    private String stacktrace = "";
 
     /**
      * Records a tester's verdict: the status, when it was reached, and by whom.
@@ -123,14 +117,22 @@ public class TestRunItems {
     }
 
     /**
+     * The test case, for the paths where it may not be there: a dialog opened on
+     * a run item whose case is no longer in the test set. The rendering paths
+     * ask {@link #requireTc()} instead, which states the invariant they rely on.
+     */
+    public @NotNull Optional<TestCaseDto> testCase() {
+        return Optional.ofNullable(tc);
+    }
+
+    /**
      * The test case, for the rendering path, where it is always present.
      * <p>
      * {@code RunEditor} skips run items whose test case has been deleted and
      * assigns {@code tc} to every one it keeps, so an item that reaches a
      * renderer or a grid row has one. This states that invariant where it is
-     * relied on, instead of eight unchecked {@code getTc()} calls that read
-     * like oversights. If it ever fails, it fails by name rather than as an
-     * NPE inside a Swing paint.
+     * relied on, instead of unchecked reads that look like oversights. If it
+     * ever fails, it fails by name rather than as an NPE inside a Swing paint.
      *
      * @throws IllegalStateException if called on an item the editor filtered out
      */

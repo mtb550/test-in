@@ -18,6 +18,11 @@ import java.awt.datatransfer.Transferable;
 
 public class TreeDropHandler implements FileDropHandler {
 
+    /**
+     * The platform's own signature: a Kotlin suspend function seen from Java,
+     * whose return is either the result or the suspension marker. Nullable
+     * because the platform declares it so (#71).
+     */
     @Override
     public @Nullable Object handleDrop(final @NotNull FileDropEvent event, final @NotNull Continuation<? super Boolean> continuation) {
         final Project p = event.getProject();

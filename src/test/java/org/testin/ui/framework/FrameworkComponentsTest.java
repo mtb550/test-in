@@ -1,6 +1,8 @@
 package org.testin.ui.framework;
 
 import com.intellij.ui.components.fields.ExtendableTextField;
+import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.Shortcuts;
 import org.testng.annotations.Test;
 
 import javax.swing.*;
@@ -19,8 +21,8 @@ public class FrameworkComponentsTest {
     private static TextFieldWithSelections<Integer> twoSelections() {
         return ComponentDialogBase.<Integer>textFieldWithSelections()
                 .placeholder("set name..")
-                .selection(null, "One", "first row", 1)
-                .selection(null, "Two", "second row", 2)
+                .selection(DialogStyle.NO_ICON, "One", "first row", 1)
+                .selection(DialogStyle.NO_ICON, "Two", "second row", 2)
                 .build()
                 .getComponent();
     }
@@ -106,7 +108,7 @@ public class FrameworkComponentsTest {
 
     @Test
     public void messageShowsFromToRowsOnlyWhenGiven() {
-        final DialogMessage plain = ComponentDialogBase.message("Remove 'X'?", null, null).getComponent();
+        final DialogMessage plain = ComponentDialogBase.message("Remove 'X'?").getComponent();
         final DialogMessage transfer = ComponentDialogBase.message("Move 'X' into 'Y'?", "a/b", "a/c").getComponent();
 
         assertEquals(rowCount(plain), 1, "message only");
@@ -115,7 +117,7 @@ public class FrameworkComponentsTest {
 
     @Test
     public void selectionRowKeepsAllDeclaredParts() {
-        final SelectionList<String> row = SelectionList.add(null, "Test Set", "Holds test cases", "TS");
+        final SelectionList<String> row = SelectionList.add(DialogStyle.NO_ICON, "Test Set", "Holds test cases", "TS");
 
         assertEquals(row.name(), "Test Set");
         assertEquals(row.hint(), "Holds test cases");
@@ -161,7 +163,7 @@ public class FrameworkComponentsTest {
         final DialogDetails details = ComponentDialogBase.details()
                 .row("Description", "shown")
                 .row("Expected", "")
-                .row("Skipped", null)
+                .row("Skipped", "   ")
                 .build()
                 .getComponent();
 

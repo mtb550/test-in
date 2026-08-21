@@ -10,9 +10,9 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.ui.dialogs.DialogStyle;
 
+import java.util.Optional;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -27,15 +27,15 @@ public class ZoomIndicatorDialog {
      * instead of allocating one per wheel event; hide() clears the reference so
      * nothing dangles after the popup is gone.
      */
-    private static @Nullable JBPopup currentPopup;
+    private static @NotNull Optional<JBPopup> currentPopup = Optional.empty();
 
     static {
         HIDE_TIMER.setRepeats(false);
     }
 
     private static void hide() {
-        if (currentPopup != null && !currentPopup.isDisposed()) currentPopup.cancel();
-        currentPopup = null;
+        currentPopup.filter(popup -> !popup.isDisposed()).ifPresent(JBPopup::cancel);
+        currentPopup = Optional.empty();
     }
 
     public static void show(final @NotNull Project p, final @NotNull JComponent parent, final float currentSize) {
@@ -70,7 +70,7 @@ public class ZoomIndicatorDialog {
                 .setFocusable(false)
                 .setRequestFocus(false)
                 .createPopup();
-        currentPopup = popup;
+        currentPopup = Optional.of(popup);
 
         final Dimension popupSize = panel.getPreferredSize();
         final Rectangle visibleRect = parent.getVisibleRect();

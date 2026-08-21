@@ -9,13 +9,12 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.test.TestEditorContextMenu;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.datatransfer.StringSelection;
@@ -29,11 +28,11 @@ public class CutTestCaseNodeAction extends AbstractProjectAction {
     private final TestinEditor editor;
     private final JBList<TestCaseDto> list;
 
-    public CutTestCaseNodeAction(final @NotNull Project p, final TestinEditor editor, final JBList<TestCaseDto> list) {
+    public CutTestCaseNodeAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Cut Node", "Cut selected test case(s) to clipboard", AllIcons.Actions.MenuCut);
         this.editor = editor;
         this.list = list;
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), list);
     }
 
     @Override
@@ -42,18 +41,14 @@ public class CutTestCaseNodeAction extends AbstractProjectAction {
 
         if (!selectedTestCases.isEmpty()) {
             try {
-                TestEditorContextMenu.setGlobalCutAction(true);
-
-                TestEditorContextMenu.getGlobalPendingCutIds().clear();
-                selectedTestCases.forEach(tc -> TestEditorContextMenu.getGlobalPendingCutIds().add(tc.getId()));
-                TestEditorContextMenu.setGlobalSourceEditorUI(editor);
+                Services.getInstance(p, CutState.class).cut(editor, selectedTestCases);
 
                 String json = Services.getInstance(p, Mapper.class).writeValueAsString(selectedTestCases);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
                 list.repaint();
 
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "cut", selectedTestCases.size());
+                Services.getInstance(p, Notifier.class).softShowCounted(p, "Cut", selectedTestCases.size());
 
             } catch (final Exception ex) {
                 Logger.error("Exception: " + ex.getMessage());

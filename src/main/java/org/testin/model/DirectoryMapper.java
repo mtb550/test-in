@@ -5,15 +5,14 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.*;
 import org.testin.model.markers.*;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.Tools;
 
+import java.util.List;
 import java.nio.file.Path;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -27,7 +26,7 @@ public final class DirectoryMapper {
                 .name(fileName)
                 .path(path)
                 .pathName(fileName)
-                .path2(Services.getInstance(p, Tools.class).buildPath2(null, fileName))
+                .path2(DirectoryDto.pathOf(List.of(), fileName))
                 .build();
 
         tp.setTestCasesDirectory(getTestCasesRootNode(p, path, tp));
@@ -46,7 +45,7 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .pathName(fileName)
-                    .path2(Services.getInstance(p, Tools.class).buildPath2(null, fileName))
+                    .path2(DirectoryDto.pathOf(List.of(), fileName))
                     .marker(marker)
                     .build();
 
@@ -72,7 +71,7 @@ public final class DirectoryMapper {
                 .path(dir)
                 .name(DirectoryType.TCD.getDisplayedName())
                 .parent(tp)
-                .path2(Services.getInstance(p, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
+                .path2(DirectoryDto.pathOf(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
                 .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(dir, DirectoryType.TCD.getMarker(),
                         TestCasesMainDirectoryMarker.class, "test cases directory", DirectoryType.TCD.getDisplayedName()))
                 .build();
@@ -84,7 +83,7 @@ public final class DirectoryMapper {
                 .path(dir)
                 .name(DirectoryType.TRD.getDisplayedName())
                 .parent(tp)
-                .path2(Services.getInstance(p, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TRD.getDisplayedName()))
+                .path2(DirectoryDto.pathOf(tp.getPath2(), DirectoryType.TRD.getDisplayedName()))
                 .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(dir, DirectoryType.TRD.getMarker(),
                         TestRunsMainDirectoryMarker.class, "test runs directory", DirectoryType.TRD.getDisplayedName()))
                 .build();
@@ -98,7 +97,7 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName))
+                    .path2(DirectoryDto.pathOf(parent.getPath2(), fileName))
                     .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(path, DirectoryType.TSP.getMarker(),
                             TestSetPackageMarker.class, "test set package", fileName))
                     .build();
@@ -121,7 +120,7 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName))
+                    .path2(DirectoryDto.pathOf(parent.getPath2(), fileName))
                     .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(path, DirectoryType.TRP.getMarker(),
                             TestRunPackageMarker.class, "test run package", fileName))
                     .build();
@@ -144,7 +143,7 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName))
+                    .path2(DirectoryDto.pathOf(parent.getPath2(), fileName))
                     .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(path, DirectoryType.TS.getMarker(),
                             TestSetMarker.class, "test set", fileName))
                     .build();
@@ -163,7 +162,9 @@ public final class DirectoryMapper {
      * Builds a run node without reading the marker file (used when creating a new run).
      */
     public @NotNull TestRunDirectoryDto setTestRunNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
-        return buildTestRunNode(p, path, parent, null);
+        // The marker a new run starts with, rather than none at all: what the
+        // builder would have defaulted to, said out loud.
+        return buildTestRunNode(p, path, parent, new TestRunMarker());
     }
 
     /**
@@ -176,7 +177,7 @@ public final class DirectoryMapper {
     }
 
     private @NotNull TestRunDirectoryDto buildTestRunNode(final @NotNull Project p, final @NotNull Path path,
-                                                          final @NotNull DirectoryDto parent, final @Nullable TestRunMarker marker) {
+                                                          final @NotNull DirectoryDto parent, final @NotNull TestRunMarker marker) {
         final String fileName = path.getFileName().toString();
         try {
             final var builder = TestRunDirectoryDto
@@ -184,9 +185,9 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName));
+                    .path2(DirectoryDto.pathOf(parent.getPath2(), fileName));
 
-            if (marker != null) builder.marker(marker);
+            builder.marker(marker);
 
             final TestRunDirectoryDto testRunDirectoryDto = builder.build();
             Logger.info("retrieve the test run directory: " + testRunDirectoryDto);

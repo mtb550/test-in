@@ -7,15 +7,23 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
+import org.testin.config.TestinConfigService;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
+import org.testin.util.EditorUtil;
 import org.testin.services.Services;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RefreshAction extends AbstractProjectAction {
+
+    /**
+     * What the toolbar button reports when it is the tester pressing Refresh.
+     */
+    private static final @NotNull String REFRESHED = "Refreshed";
+
     private final @NotNull ExplorerPanel pp;
     private final @NotNull AtomicBoolean refreshGuard = new AtomicBoolean(false);
 
@@ -25,6 +33,19 @@ public class RefreshAction extends AbstractProjectAction {
     }
 
     public void execute() {
+        execute(REFRESHED);
+    }
+
+    /**
+     * Re-indexes and rebuilds the tree, reporting the outcome in the caller's
+     * words.
+     * <p>
+     * A branch switch is this action with a different sentence at the end: the
+     * work is identical - re-index, rebuild, close what is gone - and the only
+     * thing the tester needs told apart is what caused it. One notification
+     * either way, because two would be one too many for one press.
+     */
+    public void execute(final @NotNull String outcome) {
         if (!refreshGuard.compareAndSet(false, true)) {
             Logger.info("Refresh: already in progress, ignoring click");
             return;
@@ -32,17 +53,35 @@ public class RefreshAction extends AbstractProjectAction {
 
         Logger.info("Refresh: re-indexing started");
 
-        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        indexer.resetForReindex();
-
-        indexer.indexWithProgress();
-
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            // The repository's testin.yml is on disk too, and Refresh is the
+            // tester saying "read the disk again". It was read once when the
+            // service was created and never after, so a file that was deleted,
+            // hand-edited, or brought in by a branch switch left the plugin
+            // acting on what it said at startup (#6).
+            //
+            // Before the index, exactly as at startup: the file names the test
+            // project, and indexing is scoped to it.
+            Services.getInstance(p, TestinConfigService.class).reload();
+
+            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            indexer.resetForReindex();
+            indexer.indexWithProgress();
             indexer.awaitIndexing();
 
             Logger.info("Refresh: re-indexing complete, rebuilding tree");
 
             ApplicationManager.getApplication().invokeLater(() -> {
+                if (p.isDisposed()) {
+                    refreshGuard.set(false);
+                    return;
+                }
+
+                // Before the tree is rebuilt: an editor is holding the node
+                // it was opened on and the cases it read from it, and after a
+                // re-index either can be data that is gone.
+                Services.getInstance(p, EditorUtil.class).refreshOpen(p);
+
                 pp.refresh();
 
                 refreshGuard.set(false);
@@ -51,7 +90,7 @@ public class RefreshAction extends AbstractProjectAction {
                 // At the end, not the start: the tree is only usable now, and a
                 // click that found a refresh already running returned above
                 // without saying anything.
-                Services.getInstance(p, Notifier.class).softShow(p, "Refreshed");
+                Services.getInstance(p, Notifier.class).softShow(p, outcome);
             });
         });
     }

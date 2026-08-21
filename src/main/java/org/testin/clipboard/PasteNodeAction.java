@@ -14,7 +14,7 @@ import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.datatransfer.Transferable;
@@ -30,7 +30,7 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
 
     public PasteNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, tree, "Paste", "Paste items", AllIcons.Actions.MenuPaste);
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
     }
 
     @Override
@@ -40,9 +40,11 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
         final Transferable contents = CopyPasteManager.getInstance().getContents();
         if (contents == null || !contents.isDataFlavorSupported(TreeTransferHandler.NODE_FLAVOR)) return;
 
-        final DirectoryDto target = TreeValueUtil.selectedDirectory(tree.getSelectionPath());
-        if (target == null) return;
+        TreeValueUtil.selectedDirectory(tree).ifPresent(target -> paste(transferHandler, contents, target));
+    }
 
+    private void paste(final @NotNull TreeTransferHandler transferHandler, final @NotNull Transferable contents,
+                       final @NotNull DirectoryDto target) {
         try {
             final TreeTransferPayload payload = (TreeTransferPayload) contents.getTransferData(TreeTransferHandler.NODE_FLAVOR);
 
@@ -63,7 +65,7 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
 
             new ConfirmDialog(p, "Paste",
                     verb + " " + what + " into '" + target.getName() + "'?",
-                    fromPath == null ? null : fromPath.toString(),
+                    fromPath == null ? "" : fromPath.toString(),
                     target.getPath().toString(),
                     verb,
                     transferHandler::pasteFromClipboard
@@ -74,10 +76,24 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
         }
     }
 
+    /**
+     * Greyed out where nothing can land: a test project holds its two
+     * containers and nothing else, so pasting into one has no meaning.
+     * <p>
+     * Asked of the transfer handler, which is what the paste itself asks: the
+     * clipboard's flavor, the target, the family rules and the own-subtree
+     * check. Deciding any of it here would be a second rule to keep in step.
+     */
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(tree.getTransferHandler() instanceof TreeTransferHandler handler
+                && handler.canPasteFromClipboard());
+    }
+
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - no update() here reads Swing state; do not switch to EDT (#52).
-        return ActionUpdateThread.BGT;
+        // update() reads the tree's selection, which is Swing state (#52).
+        return ActionUpdateThread.EDT;
     }
 
 }

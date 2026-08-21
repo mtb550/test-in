@@ -3,7 +3,6 @@ package org.testin.view.details.components;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.FontSync;
 
@@ -22,7 +21,7 @@ public abstract class BaseDetails {
 
     public abstract int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow);
 
-    protected int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @Nullable String valueText, final int row) {
+    protected int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @NotNull String valueText, final int row) {
         return LabelValueRow.add(panel, gbc, labelText, valueText, getLabelFontSize(), getValueFontSize(), row);
     }
 

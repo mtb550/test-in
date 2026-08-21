@@ -14,11 +14,11 @@ import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.EscapeAction;
 import org.testin.editor.*;
 import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.editor.list.ListPanelBuilder;
+import org.testin.editor.grid.GridView;
 import org.testin.editor.list.ListView;
 import org.testin.editor.listeners.*;
 import org.testin.editor.statusbar.StatusBar;
@@ -32,14 +32,13 @@ import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.CreateTestCaseAction;
-import org.testin.testcase.SortResult;
-import org.testin.testcase.TestCaseSorter;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.util.FontSync;
 import org.testin.view.GridViewDetailsAction;
-import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.*;
@@ -84,17 +83,13 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     @Getter
     private final @NotNull List<TestCaseDto> allTestCases;
     @Getter
-    private final @NotNull Set<UUID> unsortedIds;
-    @Getter
     private final @NotNull List<TestCaseDto> currentTestCases;
     /**
-     * Child disposable for the current grid table's font-sync subscription;
-     * replaced on every grid rebuild so old subscriptions do not accumulate.
+     * The grid, from the moment the tester first switches to it - table, scroll
+     * pane and the font-sync subscription that goes with them. Empty until then,
+     * and after a rebuild that failed (#66, finding 18).
      */
-    private @Nullable Disposable gridFontSyncDisposable;
-    private @Nullable JBTable gridTable;
-
-    private @Nullable JBScrollPane gridScrollPane;
+    private @NotNull Optional<GridView> grid = Optional.empty();
 
     @Getter
     @Setter
@@ -103,7 +98,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
      * Test case selected before a reload. Held as an id, not as a dto: a refresh
      * replaces the objects, so identity would not survive it.
      */
-    private @Nullable UUID selectionToRestore;
+    private @NotNull Optional<UUID> selectionToRestore = Optional.empty();
     /**
      * Grid column selected before a reload, so the cell comes back, not just the row.
      */
@@ -115,11 +110,17 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
     @Getter
     @Setter
-    private @Nullable String hoveredIconAction = null;
+    private @NotNull String hoveredIconAction = "";
 
     @Getter
     @Setter
     private int hoveredIndex = -1;
+    /**
+     * True from the moment a load starts until its data is on screen. The empty
+     * message asks it, so a list that is empty because it is still loading keeps
+     * the loading message instead of being told there is nothing to show.
+     */
+    private volatile boolean loading;
 
     public TestEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
         this.p = p;
@@ -132,7 +133,6 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
         this.currentTestCases = Collections.synchronizedList(new ArrayList<>());
 
-        this.unsortedIds = Collections.synchronizedSet(new HashSet<>());
 
         this.mainPanel = new JBPanel<>(new BorderLayout());
         this.center = new EditorCenter(this.mainPanel);
@@ -164,27 +164,20 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
         this.contextMenu = new TestEditorContextMenu(p, this, parent, list, model);
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
-                () -> gridTable,
+                () -> grid.map(GridView::table),
                 () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);
 
         this.statusBar = new StatusBar();
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         StatusBarListener.attach(this);
 
-        new TestCaseExecutionSubscriber(p, list, projectDisposable);
+        new TestCaseExecutionSubscriber(p, projectDisposable, list::repaint);
 
         // List view is the default mode when the editor opens.
         onToolBarSwitchedToListView();
 
         loadDataAsync();
     }
-
-    /**
-     * True from the moment a load starts until its data is on screen. The empty
-     * message asks it, so a list that is empty because it is still loading keeps
-     * the loading message instead of being told there is nothing to show.
-     */
-    private volatile boolean loading;
 
     private void loadDataAsync() {
         final int generation = modelGeneration.incrementAndGet();
@@ -200,7 +193,6 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
                     if (generation != modelGeneration.get()) return;
                     allTestCases.clear();
                     currentTestCases.clear();
-                    unsortedIds.clear();
                     list.setPaintBusy(false);
                     loading = false;
                     // The message comes from refreshView, which is the one place
@@ -212,19 +204,16 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
             Services.getInstance(p, TestCaseCacheService.class).load(items);
 
-            final SortResult result = TestCaseSorter.sortTestCases(p, items);
+            final List<TestCaseDto> ordered = TestCaseOrder.ordered(items);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (generation != modelGeneration.get()) return;
                 allTestCases.clear();
-                allTestCases.addAll(result.sortedList());
+                allTestCases.addAll(ordered);
                 currentTestCases.clear();
-                currentTestCases.addAll(result.sortedList());
+                currentTestCases.addAll(ordered);
 
-                unsortedIds.clear();
-                unsortedIds.addAll(result.unsortedIds());
-
-                result.sortedList().forEach(tc -> tc.setParent(parent));
+                ordered.forEach(tc -> tc.setParent(parent));
 
                 // The item may now sit on a different page than before the reload.
                 jumpToPageOfPendingSelection();
@@ -238,7 +227,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private void onDataSynced() {
-        sortAndIdentifyUnsorted(this::refreshView);
+        orderThen(this::refreshView);
     }
 
     @Override
@@ -248,26 +237,23 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             snapshot = new ArrayList<>(this.allTestCases);
         }
 
-        this.unsortedIds.clear();
         final Path dirPath = parent.getPath();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            for (int i = 0; i < snapshot.size(); i++) {
-                final TestCaseDto current = snapshot.get(i);
-                current.setIsHead(i == 0);
-                current.setNext(i < snapshot.size() - 1 ? snapshot.get(i + 1).getId() : null);
-            }
+            // Ranked along the order on screen, which is the order the tester
+            // just arranged. A case already sitting in the right place keeps the
+            // rank it had, so a drag writes the case that moved and leaves the
+            // rest of the set alone.
+            final List<TestCaseDto> moved = TestCaseOrder.place(snapshot);
 
-            Services.getInstance(p, ProjectIndexer.class).updateSequence(dirPath, snapshot);
+            Services.getInstance(p, ProjectIndexer.class).updateSequence(dirPath, snapshot, moved);
 
             ApplicationManager.getApplication().invokeLater(this::refreshView);
         });
     }
 
     @Override
-    public void selectTestCase(final @Nullable TestCaseDto tc) {
-        if (tc == null) return;
-
+    public void selectTestCase(final @NotNull TestCaseDto tc) {
         if (!currentTestCases.contains(tc)) {
             toolBar.getToolbarItem(FilterPopupBtn.class).resetToolBarFilter();
 
@@ -302,7 +288,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     @Override
     public void appendNewTestCase(final @NotNull TestCaseDto tc) {
         this.allTestCases.add(tc);
-        sortAndIdentifyUnsorted(() -> {
+        orderThen(() -> {
             updateSequenceAndSaveAll();
 
             // VFS refresh goes through the indexer - file access is the
@@ -334,7 +320,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         return mainPanel;
     }
 
-    public @Nullable JComponent getPreferredFocusedComponent() {
+    public @NotNull JComponent getPreferredFocusedComponent() {
         return list;
     }
 
@@ -382,8 +368,8 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private void updateGridColumns() {
-        if (gridTable == null) return;
-        gridPanelBuilder.applyColumnVisibility(gridTable, TestEditorAttributes.class, getSelectedDetails());
+        grid.ifPresent(view ->
+                gridPanelBuilder.applyColumnVisibility(view.table(), TestEditorAttributes.class, getSelectedDetails()));
     }
 
     @Override
@@ -400,22 +386,28 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     public void onToolBarSwitchedToGridView() {
         Logger.debug("[switch] -> GRID view, currentView=" + toolBar.getCurrentView());
         rebuildGrid();
-        // rebuildGrid() swallows failures; the grid parts are then still null
-        // and the previous center stays visible instead of an NPE.
-        if (gridScrollPane != null) center.set(gridScrollPane);
-        if (gridTable != null) SwingUtilities.invokeLater(gridTable::requestFocusInWindow);
+        // rebuildGrid() swallows failures; the grid is then still empty and the
+        // previous center stays visible instead of an NPE.
+        grid.ifPresent(view -> {
+            center.set(view.scrollPane());
+            SwingUtilities.invokeLater(view.table()::requestFocusInWindow);
+        });
     }
 
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
+        reload();
+    }
+
+    @Override
+    public void reload() {
         toolBar.clearFiltersAndSearch();
 
         rememberSelection();
 
         this.allTestCases.clear();
         this.currentTestCases.clear();
-        this.unsortedIds.clear();
         this.model.removeAll();
         this.list.setPaintBusy(true);
         this.list.getEmptyText().setText("Refreshing...");
@@ -451,9 +443,10 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         currentPage = page.page();
         final List<TestCaseDto> pageItems = new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
 
-        final UUID selectedId = selectionToRestore != null
-                ? selectionToRestore
-                : (list.getSelectedValue() != null ? list.getSelectedValue().getId() : null);
+        // What was selected before the reload, or what is selected right now.
+        // Swing answers null for an empty selection, which is converted here.
+        final Optional<UUID> selectedId = selectionToRestore
+                .or(() -> Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId));
 
         modelChangeNotifier.pause();
         model.replaceAll(pageItems);
@@ -461,17 +454,17 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
         // Matched by id: a reload hands back different dto instances for the
         // same test cases, so comparing objects would drop the selection.
-        if (selectedId != null) {
+        selectedId.ifPresent(id -> {
             for (final TestCaseDto item : pageItems) {
-                if (selectedId.equals(item.getId())) {
+                if (id.equals(item.getId())) {
                     // Selected by value, not by index: the list model owns its own
                     // ordering, so an index into pageItems is not safe to reuse.
                     list.setSelectedValue(item, true);
                     break;
                 }
             }
-        }
-        selectionToRestore = null;
+        });
+        selectionToRestore = Optional.empty();
 
         showEmptyStateIfNothingToDraw(totalItems);
 
@@ -480,7 +473,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");
             rebuildGrid();
-            if (gridScrollPane != null) center.set(gridScrollPane);
+            grid.ifPresent(view -> center.set(view.scrollPane()));
         }
     }
 
@@ -514,20 +507,21 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
      * Records the selected test case (and grid column) before the data is reloaded.
      */
     private void rememberSelection() {
-        final TestCaseDto selected = list.getSelectedValue();
-        selectionToRestore = selected != null ? selected.getId() : null;
-        gridColumnToRestore = gridTable != null ? gridTable.getSelectedColumn() : -1;
+        selectionToRestore = Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId);
+        gridColumnToRestore = grid.map(view -> view.table().getSelectedColumn()).orElse(-1);
     }
 
     /**
      * Moves to whichever page now holds the remembered test case.
      */
     private void jumpToPageOfPendingSelection() {
-        final int page = PageWindow.pageContaining(selectionToRestore, currentTestCases, pageSize);
+        final int page = selectionToRestore
+                .map(id -> PageWindow.pageContaining(id, currentTestCases, pageSize))
+                .orElse(0);
 
         // Not on any page anymore - the case was deleted or filtered out, so
         // there is nothing left to restore.
-        if (page == 0) selectionToRestore = null;
+        if (page == 0) selectionToRestore = Optional.empty();
         else currentPage = page;
     }
 
@@ -542,27 +536,29 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         final Set<TestEditorAttributes> attributes = getSelectedDetails();
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
         try {
-            gridTable = gridPanelBuilder.buildTestTable(p, pageItems, attributes, (currentPage - 1) * pageSize);
+            final JBTable table = gridPanelBuilder.buildTestTable(p, pageItems, attributes, (currentPage - 1) * pageSize);
 
-            if (gridFontSyncDisposable != null) Disposer.dispose(gridFontSyncDisposable);
-            gridFontSyncDisposable = Disposer.newDisposable(projectDisposable, "testin.testEditor.gridFontSync");
-            FontSync.syncWithNativeEditor(p, gridTable, gridFontSyncDisposable);
+            // The previous grid's subscription goes with the previous grid, so
+            // they do not accumulate one per rebuild.
+            grid.ifPresent(previous -> Disposer.dispose(previous.fontSync()));
+            final Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin.testEditor.gridFontSync");
+            FontSync.syncWithNativeEditor(p, table, fontSync);
 
-            gridTable.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, gridTable, pageItems));
-            gridTable.getModel().addTableModelListener(new GridEditListener(p, pageItems, model::allContentsChanged, parent.getPath()));
+            table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, pageItems));
+            table.getModel().addTableModelListener(new GridEditListener(p, pageItems, model::allContentsChanged, parent.getPath()));
             // ESC in grid view behaves like ESC in the list: hide the view panel, then clear the selection.
-            new EscapeAction(p, gridTable);
+            new EscapeAction(p, table);
             // ENTER on the non-editable sequence column opens the details view.
-            new GridViewDetailsAction(p, gridTable, pageItems, parent.getPath2()).installDoubleClick();
-            gridTable.addMouseListener(new GridContextMenuListener(gridTable, list, contextMenu, pageItems));
+            new GridViewDetailsAction(p, table, pageItems, parent.getPath2()).installDoubleClick();
+            table.addMouseListener(new GridContextMenuListener(table, list, contextMenu, pageItems));
 
-            GridPanelBuilder.restoreSelection(gridTable, list, pageItems, gridColumnToRestore);
+            GridPanelBuilder.restoreSelection(table, list, pageItems, gridColumnToRestore);
             // Cleared regardless of whether the row was found, so a stale column can
             // never be applied to an unrelated rebuild.
             gridColumnToRestore = -1;
 
-            gridScrollPane = new JBScrollPane(gridTable);
-            Logger.debug("[grid] rebuildGrid done, rows=" + gridTable.getRowCount() + ", cols=" + gridTable.getColumnCount());
+            grid = Optional.of(new GridView(table, new JBScrollPane(table), fontSync));
+            Logger.debug("[grid] rebuildGrid done, rows=" + table.getRowCount() + ", cols=" + table.getColumnCount());
         } catch (final Exception ex) {
             Logger.error("[grid] rebuildGrid FAILED: " + ex);
         }
@@ -578,8 +574,8 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
      * the indexer. Persisting must wait for the sort to land - callers use
      * this instead of running the two steps sequentially themselves.
      */
-    public void resortAndPersistSequence() {
-        sortAndIdentifyUnsorted(this::updateSequenceAndSaveAll);
+    public void reorderAndPersist() {
+        orderThen(this::updateSequenceAndSaveAll);
     }
 
     /**
@@ -588,7 +584,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
      * where onDone continues (persisting, refreshing). Any newer sort or load
      * bumps the generation, so a stale result never overwrites a newer one.
      */
-    private void sortAndIdentifyUnsorted(final @NotNull Runnable onDone) {
+    private void orderThen(final @NotNull Runnable onDone) {
         final List<TestCaseDto> snapshot;
         synchronized (allTestCases) {
             snapshot = new ArrayList<>(allTestCases);
@@ -601,17 +597,15 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         final int generation = modelGeneration.incrementAndGet();
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             if (generation != modelGeneration.get()) return;
-            final SortResult result = TestCaseSorter.sortTestCases(p, snapshot);
+            final List<TestCaseDto> ordered = TestCaseOrder.ordered(snapshot);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (generation != modelGeneration.get()) return;
 
                 synchronized (allTestCases) {
                     this.allTestCases.clear();
-                    this.allTestCases.addAll(result.sortedList());
+                    this.allTestCases.addAll(ordered);
                 }
-                this.unsortedIds.clear();
-                this.unsortedIds.addAll(result.unsortedIds());
 
                 onDone.run();
             });
@@ -656,15 +650,13 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         toolBar.dispose();
         statusBar.dispose();
 
-        final TestCaseDto selectedInThisFile = list.getSelectedValue();
-
-        final ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
-        if (viewer != null)
-            viewer.hide(selectedInThisFile);
+        // Swing answers null when the editor is closing with nothing selected,
+        // and then there is no case whose view panel needs closing.
+        Optional.ofNullable(list.getSelectedValue()).ifPresent(selectedInThisFile ->
+                ViewToolWindowFactory.panel().ifPresent(viewer -> viewer.hide(selectedInThisFile)));
 
         allTestCases.clear();
         currentTestCases.clear();
-        unsortedIds.clear();
 
         model.removeListDataListener(modelChangeNotifier);
         model.removeAll();

@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.testng.Assert.*;
 
@@ -14,8 +15,8 @@ import static org.testng.Assert.*;
  * A tester gives one of three verdicts — passed, failed or blocked. The other
  * two are the plugin's: PENDING means queued for a run that has not reached the
  * case yet, and UNTESTED means the run finished without reaching it. Neither is
- * something to pick from a menu, and the menu is built from
- * {@code getMenuEntry() != null}, so a null entry is what keeps them off it.
+ * something to pick from a menu, and the menu is built from the entries that
+ * are present, so an absent entry is what keeps them off it.
  * <p>
  * Asserted because the failure is silent in both directions: give one of the two
  * an entry and it appears in the context menu with a key that sets a state
@@ -27,7 +28,7 @@ public class TestStatusMenuTest {
     @Test
     public void aTesterChoosesExactlyPassedFailedOrBlocked() {
         final List<TestStatus> onMenu = Arrays.stream(TestStatus.values())
-                .filter(status -> status.getMenuEntry() != null)
+                .filter(status -> status.getMenuEntry().isPresent())
                 .toList();
 
         assertEquals(onMenu, List.of(TestStatus.PASSED, TestStatus.FAILED, TestStatus.BLOCKED));
@@ -35,18 +36,18 @@ public class TestStatusMenuTest {
 
     @Test
     public void thePluginSetsPendingAndUntestedItself() {
-        assertNull(TestStatus.PENDING.getMenuEntry(), "queued for a run, not a verdict");
-        assertNull(TestStatus.UNTESTED.getMenuEntry(), "set when a run finishes without reaching the case");
+        assertTrue(TestStatus.PENDING.getMenuEntry().isEmpty(), "queued for a run, not a verdict");
+        assertTrue(TestStatus.UNTESTED.getMenuEntry().isEmpty(),
+                "set when a run finishes without reaching the case");
     }
 
     @Test
     public void everyOfferedStatusHasAKeyAndAnIcon() {
         for (final TestStatus status : TestStatus.values()) {
-            final TestStatus.MenuEntry entry = status.getMenuEntry();
-            if (entry == null) continue;
-
-            assertNotNull(entry.icon(), status + " is offered, so it needs an icon");
-            assertNotNull(entry.shortcut(), status + " is offered, so it needs a key");
+            status.getMenuEntry().ifPresent(entry -> {
+                assertNotNull(entry.icon(), status + " is offered, so it needs an icon");
+                assertNotNull(entry.shortcut(), status + " is offered, so it needs a key");
+            });
         }
     }
 
@@ -60,7 +61,7 @@ public class TestStatusMenuTest {
     @Test
     public void aVerdictIsExactlyAStatusTheMenuOffers() {
         for (final TestStatus status : TestStatus.values()) {
-            assertEquals(status.isVerdict(), status.getMenuEntry() != null, status + " disagrees with the menu");
+            assertEquals(status.isVerdict(), status.getMenuEntry().isPresent(), status + " disagrees with the menu");
         }
     }
 
@@ -72,7 +73,7 @@ public class TestStatusMenuTest {
     public void noTwoOfferedStatusesShareAKey() {
         final List<KeyStroke> keys = Arrays.stream(TestStatus.values())
                 .map(TestStatus::getMenuEntry)
-                .filter(entry -> entry != null)
+                .flatMap(Optional::stream)
                 .map(TestStatus.MenuEntry::shortcut)
                 .toList();
 

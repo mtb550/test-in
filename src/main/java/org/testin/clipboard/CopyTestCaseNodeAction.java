@@ -8,13 +8,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.editor.test.TestEditorContextMenu;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.datatransfer.StringSelection;
@@ -30,7 +29,7 @@ public class CopyTestCaseNodeAction extends AbstractProjectAction {
     public CopyTestCaseNodeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Copy Node", "Copy selected test case(s) to clipboard", AllIcons.Actions.Copy);
         this.list = list;
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), list);
     }
 
     @Override
@@ -39,12 +38,12 @@ public class CopyTestCaseNodeAction extends AbstractProjectAction {
 
         if (!tcs.isEmpty()) {
             try {
-                TestEditorContextMenu.clearCutState();
+                Services.getInstance(p, CutState.class).clear();
 
                 String json = Services.getInstance(p, Mapper.class).writeValueAsString(tcs);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "copied", tcs.size());
+                Services.getInstance(p, Notifier.class).softShowCounted(p, "Copied", tcs.size());
 
             } catch (final Exception ex) {
                 Logger.error("Exception: " + ex.getMessage());

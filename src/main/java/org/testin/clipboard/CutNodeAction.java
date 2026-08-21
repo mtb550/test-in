@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.tree.TreeTransferHandler;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;
@@ -21,7 +21,7 @@ public class CutNodeAction extends DumbAwareAction {
     public CutNodeAction(final @NotNull SimpleTree tree) {
         super("Cut", "Cut selected items", AllIcons.Actions.MenuCut);
         this.tree = tree;
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
     }
 
     @Override
@@ -32,10 +32,25 @@ public class CutNodeAction extends DumbAwareAction {
     }
 
 
+    /**
+     * Greyed out where there is nothing to copy: a test project and the two
+     * containers under it are the tree's fixed shape, not nodes that go
+     * anywhere.
+     * <p>
+     * Greyed rather than hidden, so the menu keeps the same shape whatever is
+     * right-clicked - a tester learns what a node cannot do by reading it, not
+     * by noticing an entry that is missing.
+     */
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(tree.getTransferHandler() instanceof TreeTransferHandler handler
+                && handler.hasTransferableSelection());
+    }
+
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - no update() here reads Swing state; do not switch to EDT (#52).
-        return ActionUpdateThread.BGT;
+        // update() reads the tree's selection, which is Swing state (#52).
+        return ActionUpdateThread.EDT;
     }
 
 }

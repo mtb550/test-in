@@ -2,7 +2,6 @@ package org.testin.explorer.tree;
 
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -36,14 +35,21 @@ public final class TreeUndoService {
         return !redoStack.isEmpty();
     }
 
-    public @Nullable String undoDescription() {
+    /**
+     * What the next undo would undo, and nothing at all when the stack is
+     * empty - which is what the menu entry then appends to its own word.
+     */
+    public @NotNull String undoDescription() {
         final TreeOperation operation = undoStack.peek();
-        return operation == null ? null : operation.description();
+        return operation == null ? "" : operation.description();
     }
 
-    public @Nullable String redoDescription() {
+    /**
+     * What the next redo would redo, empty when there is nothing to redo.
+     */
+    public @NotNull String redoDescription() {
         final TreeOperation operation = redoStack.peek();
-        return operation == null ? null : operation.description();
+        return operation == null ? "" : operation.description();
     }
 
     public void undo() {

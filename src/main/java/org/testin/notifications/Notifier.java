@@ -47,13 +47,28 @@ public final class Notifier {
     }
 
     /**
+     * The tester acted on a test case that has no generated method.
+     * <p>
+     * One sentence for one situation, whichever action they reached it through -
+     * running the case, or editing it and expecting the code to follow. Both used
+     * to give up in silence, each in its own way: the runner ran whatever else
+     * the class held, and an edit changed the case and left the code alone (#34,
+     * #66 finding 19).
+     * <p>
+     * It fades rather than going in the log: it is feedback on what they just
+     * did, and the remedy - generate the code - is a keystroke away.
+     */
+    public void softShowNoGeneratedCode(final @NotNull Project p, final @NotNull String testCase) {
+        softShow(p, testCase + " has no generated code yet");
+    }
+
+    /**
      * Confirms an operation that ran over a selection: "Node copied" for one,
      * "Nodes copied 3" for several. Here rather than at the call sites so that
      * every bulk action pluralizes and counts the same way (#62).
      */
-    public void softShowCounted(final @NotNull Project p, final @NotNull String noun,
-                                final @NotNull String outcome, final int count) {
-        softShow(p, count == 1 ? noun + " " + outcome : noun + "s " + outcome + " " + count);
+    public void softShowCounted(final @NotNull Project p, final @NotNull String outcome, final int count) {
+        softShow(p, count == 1 ? outcome : outcome + " " + count);
     }
 
     /**
@@ -78,8 +93,14 @@ public final class Notifier {
         });
     }
 
+    /**
+     * An error with nothing written above the message: the message is the whole
+     * of it.
+     */
+    private static final @NotNull String NO_TITLE = "";
+
     public void error(final @NotNull Project p, final @NotNull String message) {
-        notify(p, null, message, NotificationType.ERROR);
+        notify(p, NO_TITLE, message, NotificationType.ERROR);
     }
 
     public void info(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
@@ -132,9 +153,13 @@ public final class Notifier {
         notify(p, title, message, NotificationType.ERROR, actions);
     }
 
-    private void notify(final @NotNull Project p, final String title, final @NotNull String message,
+    private void notify(final @NotNull Project p, final @NotNull String title, final @NotNull String message,
                         final @NotNull NotificationType type, final @NotNull NotificationAction... actions) {
-        final Notification notification = title == null
+        // The platform has one overload with a title and one without, and picks
+        // by which is called - so "no title" needs a value to be chosen by. It
+        // used to be a null, which the annotation sweep then declared impossible
+        // while the one caller that passes it went on passing it (#93).
+        final Notification notification = title.isEmpty()
                 ? NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(message, type)
                 : NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(title, message, type);
 

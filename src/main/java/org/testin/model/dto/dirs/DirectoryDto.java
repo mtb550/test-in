@@ -9,6 +9,7 @@ import org.testin.model.markers.Marker;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -35,6 +36,21 @@ public abstract class DirectoryDto {
     private @Nullable DirectoryDto parent;
 
     /**
+     * A child's {@code path2}, from its parent's and its own name.
+     * <p>
+     * On the type that owns {@code path2}, so a node built from the tree and one
+     * read from disk describe where they sit in the same way. The parent list is
+     * absent for a test project, which has nothing above it.
+     */
+    public static @NotNull ArrayList<String> pathOf(final @NotNull List<String> parentPath,
+                                                    final @NotNull String name) {
+        final ArrayList<String> path = new ArrayList<>(parentPath);
+        path.add(name);
+
+        return path;
+    }
+
+    /**
      * The node's marker; each subtype's Lombok-generated getter returns its
      * concrete marker type and satisfies this by covariant return. Audit info
      * (created/modified by and when) lives only here — the marker JSON is the
@@ -42,6 +58,28 @@ public abstract class DirectoryDto {
      */
     @NonNull
     public abstract Marker getMarker();
+
+    /**
+     * The number the tester gave this node, or {@link Marker#NOT_ORDERED} when
+     * they have not - which sorts after every number anyone did give.
+     */
+    public int getOrder() {
+        return getMarker().getOrder();
+    }
+
+    /**
+     * Whether a tester can put this node in a deliberate order among its
+     * siblings.
+     * <p>
+     * False here, for the nodes that have no siblings worth arranging: the two
+     * containers of a project are exactly two and always the same way round, and
+     * a project is what the tree is rooted at. Everything a tester puts in a
+     * folder says otherwise - unnumbered, those still read by the date they were
+     * made, which is the order they have always had.
+     */
+    public boolean isOrderable() {
+        return false;
+    }
 
     /**
      * File name of this node's marker JSON inside the directory.
@@ -146,7 +184,7 @@ public abstract class DirectoryDto {
     /**
      * True when the node is out of current work: a deprecated test set, an
      * archived package. Nothing inside it changes; what changes is how the
-     * plugin treats it - drawn gray, sorted after its siblings, left collapsed
+     * plugin treats it - drawn gray, ordered after its siblings, left collapsed
      * by expand-all, and not offered when a run is configured. Declared here so
      * the renderer, the children index, the tree node and the run dialog ask
      * one question instead of each knowing which status enum means "retired"

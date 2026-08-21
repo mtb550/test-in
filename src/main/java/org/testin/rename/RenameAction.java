@@ -6,10 +6,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.codegen.clazz.RenameJavaClass;
-import org.testin.codegen.pkg.RenameJavaPackage;
+import org.testin.codegen.Renamed;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeUndoService;
 import org.testin.explorer.tree.TreeValueUtil;
@@ -17,16 +15,13 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.OptionalPlugin;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
-import javax.swing.tree.TreePath;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.nio.file.Path;
@@ -39,19 +34,15 @@ public class RenameAction extends AbstractProjectTreeAction {
     public RenameAction(final @NotNull Project p, final @NotNull ExplorerPanel pp, final @NotNull SimpleTree tree) {
         super(p, tree, "Rename", "Rename selected node", AllIcons.Actions.Edit);
         this.pp = pp;
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final TreePath path = tree.getSelectionPath();
-        if (path == null) return;
-
-        final DirectoryDto dir = TreeValueUtil.directoryOf(path.getLastPathComponent());
-        if (dir == null || !dir.isRenamable()) return;
-
-        new RenameDialog(p, dir.getName(), newName -> renameNode(dir, newName)).show();
+        TreeValueUtil.selectedDirectory(tree)
+                .filter(DirectoryDto::isRenamable)
+                .ifPresent(dir -> new RenameDialog(p, dir.getName(), newName -> renameNode(dir, newName)).show());
     }
 
     private void renameNode(final @NotNull DirectoryDto dir, final @NotNull String newName) {
@@ -87,7 +78,8 @@ public class RenameAction extends AbstractProjectTreeAction {
     }
 
     private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName) {
-        applyRename(dir, newName, null);
+        applyRename(dir, newName, () -> {
+        });
     }
 
     /**
@@ -96,10 +88,14 @@ public class RenameAction extends AbstractProjectTreeAction {
      * was renamed would double-report one keystroke (#62).
      */
     private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName,
-                             final @Nullable Runnable onDone) {
+                             final @NotNull Runnable onDone) {
         Services.getInstance(p, EditorUtil.class).close(p, dir.getName());
 
-        dispatchRenameCodegen(dir, newName);
+        // Before the data rename, while the old name is still what finds the
+        // generated code. Which generator that is belongs to the node, not here.
+        if (OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) {
+            dir.getType().getRenameCodegen().execute(p, new Renamed(dir, newName));
+        }
 
         final Path oldPath = dir.getPath();
         final Path newPath = oldPath.getParent().resolve(newName);
@@ -115,30 +111,16 @@ public class RenameAction extends AbstractProjectTreeAction {
 
             Logger.info("Success! Renamed to: " + newName);
 
-            if (onDone != null) onDone.run();
+            onDone.run();
         });
     }
 
 
-    // todo, to be moved to the codegen package and enhanced, later (#51)
-    private void dispatchRenameCodegen(final @NotNull DirectoryDto dir, final @NotNull String newName) {
-        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
-
-        if (dir instanceof TestProjectDirectoryDto || dir instanceof TestSetPackageDirectoryDto) {
-            new RenameJavaPackage().execute(p, dir, newName);
-        } else if (dir instanceof TestSetDirectoryDto tsDir) {
-            new RenameJavaClass().execute(p, tsDir, newName);
-        }
-    }
-
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        TreePath path = tree.getSelectionPath();
-
-        e.getPresentation().setEnabled(path != null &&
-                TreeValueUtil.directoryOf(path.getLastPathComponent()) instanceof DirectoryDto dir &&
-                dir.isRenamable()
-        );
+        e.getPresentation().setEnabled(TreeValueUtil.selectedDirectory(tree)
+                .filter(DirectoryDto::isRenamable)
+                .isPresent());
     }
 
     @Override

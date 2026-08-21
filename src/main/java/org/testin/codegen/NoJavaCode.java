@@ -21,7 +21,7 @@ public final class NoJavaCode implements GenAction {
 
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        Logger.debug("Create " + nodeType + ": generates no Java code");
+        Logger.debug(nodeType + " generates no Java code");
     }
 }
 

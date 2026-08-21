@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * The headline counts every report format shares (#48).
@@ -66,6 +68,64 @@ public class TestRunSummaryTest {
         assertEquals(summary.untested(), 1);
         assertEquals(summary.executed(), 4, "passed, failed and blocked were run; the pending one was not");
         assertEquals(summary.passRate(), 50, "2 of the 4 that ran");
+    }
+
+    /**
+     * The headline the reader adds up. Every case in the run is under exactly one
+     * of the five figures printed beneath the total, so a total that is bigger
+     * than their sum is a case the report never explained - which is what a run
+     * holding removed cases printed before they had a tile.
+     */
+    @Test
+    public void theFiguresUnderTheTotalAddUpToIt() {
+        final TestRunSummary summary = TestRunSummary.of(List.of(
+                item(TestStatus.PASSED),
+                item(TestStatus.FAILED),
+                item(TestStatus.BLOCKED),
+                item(TestStatus.UNTESTED),
+                item(TestStatus.PENDING),
+                item(TestStatus.REMOVED),
+                item(TestStatus.REMOVED)));
+
+        assertEquals(summary.total(), 7);
+        assertEquals(summary.removed(), 2);
+        assertEquals(summary.passed() + summary.failed() + summary.blocked()
+                + summary.untested() + summary.removed(), summary.total());
+    }
+
+    /**
+     * The tile appears because something was removed, not because the format
+     * always prints one. Asked here so four generators cannot disagree about
+     * when it shows.
+     */
+    @Test
+    public void theRemovedTileShowsOnlyWhenThereIsSomethingToShow() {
+        final TestRunSummary ordinary = TestRunSummary.of(List.of(
+                item(TestStatus.PASSED),
+                item(TestStatus.UNTESTED)));
+
+        final TestRunSummary withRemoved = TestRunSummary.of(List.of(
+                item(TestStatus.PASSED),
+                item(TestStatus.REMOVED)));
+
+        assertFalse(ordinary.hasRemoved(), "an ordinary run prints six figures, not a seventh reading zero");
+        assertTrue(withRemoved.hasRemoved());
+    }
+
+    /**
+     * A removed case was never run, and counting it as outstanding work would
+     * put it in the untested table as well - nobody can carry it forward, the
+     * test case is gone.
+     */
+    @Test
+    public void aRemovedCaseIsNeitherUntestedNorExecuted() {
+        final TestRunSummary summary = TestRunSummary.of(List.of(
+                item(TestStatus.PASSED),
+                item(TestStatus.REMOVED)));
+
+        assertEquals(summary.untested(), 0);
+        assertEquals(summary.executed(), 1);
+        assertEquals(summary.passRate(), 100, "the removed case is not a case that failed to pass");
     }
 
     @Test

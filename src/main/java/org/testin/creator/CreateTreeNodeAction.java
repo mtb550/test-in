@@ -10,6 +10,7 @@ import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.creator.dialogs.CreateRunDialog;
 import org.testin.creator.dialogs.CreateTestDialog;
 import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.*;
@@ -17,29 +18,28 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.Shortcuts;
-import org.testin.util.Tools;
 
-import javax.swing.tree.TreePath;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 public class CreateTreeNodeAction extends AbstractProjectTreeAction {
-    private final @NotNull Tools tools;
 
     public CreateTreeNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, tree, "Create", "Create new node", AllIcons.General.Add);
-        this.tools = Services.getInstance(p, Tools.class);
         this.registerCustomShortcutSet(Shortcuts.CreateItem.getCustomShortcut(), tree);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final DirectoryDto pDir = tools.getCurrentSelectedDirectory(tree);
-        final TreePath path = tree.getSelectionPath();
+        TreeValueUtil.selectedDirectory(tree).ifPresent(this::createUnder);
+    }
 
-        if (path == null || pDir == null) return;
-
+    /**
+     * Everything the action does once it knows which node it is creating under.
+     */
+    private void createUnder(final @NotNull DirectoryDto pDir) {
         final BiConsumer<String, DirectoryType> onCreate = (s, dt) -> {
 
             if (s.isEmpty()) return;
@@ -56,20 +56,20 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
                 return;
             }
 
-            DirectoryDto dir = dt.getAction().apply(p).execute(s, pDir, newDirPath);
+            final Optional<DirectoryDto> created = dt.getAction().apply(p).execute(s, pDir, newDirPath);
             Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
 
-            // Asynchronous creators (test runs) return null and run their own
-            // follow-up once their dialog completes - including their own
-            // confirmation, which is why this one sits after the null check.
-            if (dir == null) return;
+            // Asynchronous creators (test runs) answer with nothing and run their
+            // own follow-up once their dialog completes - including their own
+            // confirmation, which is why this one is inside the ifPresent.
+            created.ifPresent(dir -> {
+                Services.getInstance(p, Notifier.class).softShow(p, "Created");
 
-            Services.getInstance(p, Notifier.class).softShow(p, "Node created");
+                if (dt == DirectoryType.TS)
+                    Services.getInstance(p, EditorUtil.class).open(p, dir);
 
-            if (dt == DirectoryType.TS)
-                Services.getInstance(p, EditorUtil.class).open(p, dir);
-
-            dt.getCodegen().execute(p, dir);
+                dt.getCodegen().execute(p, dir);
+            });
 
         };
 
@@ -87,14 +87,12 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
 
-        DirectoryDto parentDir = tools.getCurrentSelectedDirectory(tree);
-
-        if (parentDir == null || parentDir instanceof TestProjectDirectoryDto) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
-
-        e.getPresentation().setEnabled(parentDir.canCreateChildren());
+        // A test project holds its two fixed containers and nothing else, so
+        // there is nothing to create directly under it.
+        e.getPresentation().setEnabled(TreeValueUtil.selectedDirectory(tree)
+                .filter(parent -> !(parent instanceof TestProjectDirectoryDto))
+                .filter(DirectoryDto::canCreateChildren)
+                .isPresent());
     }
 
     @Override

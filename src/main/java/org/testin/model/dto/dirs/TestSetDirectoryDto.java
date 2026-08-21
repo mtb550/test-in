@@ -55,4 +55,13 @@ public class TestSetDirectoryDto extends DirectoryDto {
     public boolean isRetired() {
         return marker.getStatus() == TestSetStatus.DEPRECATED;
     }
+
+    /**
+     * A test set is arranged by the tester: the order of a suite is a plan for
+     * working through it, not an accident of naming.
+     */
+    @Override
+    public boolean isOrderable() {
+        return true;
+    }
 }

@@ -2,7 +2,6 @@ package org.testin.importexport.shared;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.Group;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -31,7 +30,7 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
     private final @NotNull SelectionTable groups;
     private final @NotNull Consumer<@NotNull String> onPicked;
 
-    public GroupSelectionDialog(final @NotNull Project p, final @Nullable String currentSelection,
+    public GroupSelectionDialog(final @NotNull Project p, final @NotNull String currentSelection,
                                 final @NotNull Consumer<@NotNull String> onPicked) {
         super(p);
         this.onPicked = onPicked;
@@ -61,9 +60,9 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
      * stores its groups as text, so the match is by name - the value the cell
      * holds is the value this dialog produced last time.
      */
-    private @NotNull List<Integer> rowsOf(final @Nullable String currentSelection) {
+    private @NotNull List<Integer> rowsOf(final @NotNull String currentSelection) {
         final List<Integer> rows = new ArrayList<>();
-        if (currentSelection == null || currentSelection.isBlank()) return rows;
+        if (currentSelection.isBlank()) return rows;
 
         final List<String> selected = Arrays.stream(currentSelection.split(","))
                 .map(String::trim)

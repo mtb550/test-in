@@ -142,11 +142,11 @@ public class FilterPopupBtn extends AbstractButton implements ToolbarItem {
         final ActionGroup filterModuleMenu = new ActionGroup("Module", true) {
             @Override
             public AnAction @NotNull [] getChildren(final @Nullable AnActionEvent e) {
-                final List<String> sortedModules = new ArrayList<>(availableModulesSupplier.get());
-                Collections.sort(sortedModules);
+                final List<String> orderedModules = new ArrayList<>(availableModulesSupplier.get());
+                Collections.sort(orderedModules);
 
                 final List<AnAction> actions = new ArrayList<>();
-                for (final String module : sortedModules) {
+                for (final String module : orderedModules) {
                     actions.add(new ToggleFilterAction<>(module, null,
                             module, selectedModule, FilterMembership.plain(), onChanged));
                 }

@@ -5,22 +5,28 @@ import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
+import lombok.Getter;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.util.List;
-import java.util.Optional;
 
 @AllArgsConstructor
 public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor {
 
     private final @NotNull Project p;
     private final @NotNull UnifiedVirtualFile vf;
+
+    /**
+     * The Testin editor inside this tab. Exposed so a re-index can tell it to
+     * read the node again - the tab is what the platform hands back, and the
+     * editor is what holds the data.
+     */
+    @Getter
     private final @NotNull TestinEditor editor;
 
     @Override
@@ -28,8 +34,13 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
         return editor.getComponent();
     }
 
+    /**
+     * Strengthened from the platform's nullable contract: every Testin editor is
+     * built around a list, and the list is final and made in the constructor -
+     * so there is no moment when the editor is open and has nothing to focus.
+     */
     @Override
-    public @Nullable JComponent getPreferredFocusedComponent() {
+    public @NotNull JComponent getPreferredFocusedComponent() {
         return editor.getPreferredFocusedComponent();
     }
 
@@ -74,8 +85,8 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
     public void selectNotify() {
         final List<TestCaseDto> selected = editor.getSelectedTestCases();
 
-        Optional.ofNullable(ViewToolWindowFactory.getToolWindow(p))
-                .map(tw -> ViewToolWindowFactory.getViewPanel())
+        ViewToolWindowFactory.toolWindow(p)
+                .flatMap(tw -> ViewToolWindowFactory.panel())
                 .ifPresent(viewer -> {
 
                     if (!selected.isEmpty())

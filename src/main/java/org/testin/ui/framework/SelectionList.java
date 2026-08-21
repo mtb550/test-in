@@ -1,7 +1,6 @@
 package org.testin.ui.framework;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -12,10 +11,10 @@ import javax.swing.*;
  * submit. Framework-internal — dialogs declare rows through
  * {@code ComponentDialogBase.textFieldWithSelections().selection(...)}.
  */
-record SelectionList<T>(@Nullable Icon icon, @NotNull String name, @Nullable String hint, @NotNull T value) {
+record SelectionList<T>(@NotNull Icon icon, @NotNull String name, @NotNull String hint, @NotNull T value) {
 
-    static <T> @NotNull SelectionList<T> add(final @Nullable Icon icon, final @NotNull String name,
-                                             final @Nullable String hint, final @NotNull T value) {
+    static <T> @NotNull SelectionList<T> add(final @NotNull Icon icon, final @NotNull String name,
+                                             final @NotNull String hint, final @NotNull T value) {
         return new SelectionList<>(icon, name, hint, value);
     }
 }

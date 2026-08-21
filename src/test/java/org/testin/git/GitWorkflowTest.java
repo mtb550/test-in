@@ -2,6 +2,7 @@ package org.testin.git;
 
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Mapper;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
@@ -149,7 +150,8 @@ public class GitWorkflowTest {
                 testCase("a registered user signs in"),
                 testCase("a wrong password is refused"));
 
-        cases.getFirst().setIsHead(true).setNext(cases.get(1).getId());
+        // Ranked in the order the editor would show them.
+        TestCaseOrder.rankAll(cases);
 
         for (final TestCaseDto testCase : cases) {
             write(work, "Test Cases/login flow/" + testCase.getId() + ".json", testCase);
@@ -182,9 +184,15 @@ public class GitWorkflowTest {
     }
 
     private void commit(final Set<String> paths, final String message) {
-        final List<String> add = new ArrayList<>(List.of("add", "--"));
-        add.addAll(paths);
-        mustGit(work, add.toArray(String[]::new));
+        // Through the plugin's own rule, not a copy of it: which paths git add
+        // may be given is the thing being tested when a rename is involved.
+        final Set<String> stageable = GitCommitService.stageable(work, paths);
+
+        if (!stageable.isEmpty()) {
+            final List<String> add = new ArrayList<>(List.of("add", "--"));
+            add.addAll(stageable);
+            mustGit(work, add.toArray(String[]::new));
+        }
 
         final List<String> commit = new ArrayList<>(List.of("commit", "--only", "-m", message, "--"));
         commit.addAll(paths);
@@ -322,6 +330,166 @@ public class GitWorkflowTest {
     }
 
     /**
+     * A rename the tester staged somewhere else - the IDE's own commit window,
+     * or the command line - and then brought to this review.
+     * <p>
+     * Two things had to be true and neither was. The review has to list both
+     * sides, or the commit carries the new file and leaves the old one behind,
+     * and whoever pulls it has the test case twice. And the old path must be
+     * kept out of {@code git add}, which refuses a path that is in neither the
+     * working tree nor the index - one of those fails the command outright, so
+     * the commit never happens.
+     */
+    @Test
+    public void aRenameStagedElsewhereCommitsBothSides() throws IOException {
+        final List<TestCaseDto> cases = writeTestProject();
+        commit(stagedFor(review()), "the first commit");
+
+        final String file = cases.getFirst().getId() + ".json";
+        mustGit(work, "mv", "Test Cases/login flow/" + file, "Test Cases/" + file);
+
+        final List<PendingChange> pending = review();
+        assertEquals(pending.stream().filter(change -> change.type() == DiffType.DELETED).count(), 1);
+        assertEquals(pending.stream().filter(change -> change.type() == DiffType.ADDED).count(), 1);
+
+        commit(stagedFor(pending), "the case moved out of the test set");
+
+        final List<String> committed = mustGit(work, "ls-tree", "-r", "--name-only", "HEAD")
+                .lines().filter(line -> line.endsWith(file)).toList();
+
+        assertEquals(committed.size(), 1);
+        assertEquals(committed.getFirst(), "Test Cases/" + file);
+        assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
+    }
+
+    /**
+     * The conflict this product actually gets: a colleague edited one field of a
+     * test case and the tester edited another, so Git stops on a file where
+     * nobody disagreed about anything (#90).
+     * <p>
+     * Everything here is real - a remote, a colleague's clone, a rebase that
+     * genuinely stops - because the merge rules being right is not the same as
+     * the merge working. The three stages have to be readable while the rebase
+     * is stopped, the merged file has to be one Git accepts as a resolution, and
+     * the rebase has to finish afterward.
+     */
+    @Test
+    public void aConflictedTestCaseIsMergedFieldByFieldAndTheRebaseFinishes() throws IOException {
+        final List<TestCaseDto> cases = writeTestProject();
+        commit(stagedFor(review()), "the first commit");
+        mustGit(work, "push", "-u", "origin", "main");
+
+        final String relativePath = "Test Cases/login flow/" + cases.getFirst().getId() + ".json";
+
+        // The colleague sharpens the expected result.
+        final Path colleague = cloneAsColleague();
+        mustGit(colleague, "config", "user.name", "Colleague");
+        mustGit(colleague, "config", "user.email", "colleague@example.invalid");
+
+        final Path theirCopy = colleague.resolve(relativePath);
+        final TestCaseDto theirs = mapper().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+        Files.writeString(theirCopy, mapper().writeValueAsString(
+                theirs.setExpectedResult("the dashboard opens within two seconds").setUpdatedBy("colleague")),
+                StandardCharsets.UTF_8);
+        mustGit(colleague, "commit", "-am", "tightened the expected result");
+        mustGit(colleague, "push", "origin", "main");
+
+        // The tester rewords the description of the same case, and commits.
+        final Path myCopy = work.resolve(relativePath);
+        final TestCaseDto mine = mapper().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+        Files.writeString(myCopy, mapper().writeValueAsString(
+                mine.setDescription("a registered user signs in with a valid password").setUpdatedBy("muteb")),
+                StandardCharsets.UTF_8);
+        commit(stagedFor(review()), "reworded the description");
+
+        // Git stops: one file, two commits, no way for it to know the two edits
+        // are in different fields.
+        assertNull(git(work, "pull", "--rebase", "--autostash", "origin", "main"),
+                "the pull is expected to stop on the conflict");
+
+        final List<String> conflicting = GitRefs.unmergedPaths(
+                mustGit(work, "status", "--porcelain", "-uall").lines().filter(line -> !line.isBlank()).toList());
+        assertEquals(conflicting, List.of(relativePath));
+
+        // What the plugin does with it: read the three sides Git is holding and
+        // merge them field by field.
+        final String base = mustGit(work, "show", ":1:" + relativePath);
+        final String remote = mustGit(work, "show", ":2:" + relativePath);
+        final String replayed = mustGit(work, "show", ":3:" + relativePath);
+
+        final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), base, replayed, remote);
+        assertTrue(merge.isSettled(), "different fields are not a disagreement");
+
+        Files.writeString(myCopy, merge.merged().toPrettyString(), StandardCharsets.UTF_8);
+        mustGit(work, "add", "--", relativePath);
+        mustGit(work, "-c", "core.editor=true", "rebase", "--continue");
+
+        // Both edits survived, and the repository is not mid-rebase any more.
+        final TestCaseDto merged = mapper().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+        assertEquals(merged.getDescription(), "a registered user signs in with a valid password");
+        assertEquals(merged.getExpectedResult(), "the dashboard opens within two seconds");
+        assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
+        assertEquals(review(), List.of(), "a resolved rebase leaves nothing pending");
+    }
+
+    /**
+     * Two testers adding a test case to the same test set at the same time -
+     * the thing this product does more than anything else, and the thing that
+     * used to conflict (#90).
+     * <p>
+     * Neither new file conflicts: they are new files with new names. Nothing
+     * else conflicts either, now that a case carries its own position - the case
+     * that happened to be last used to be rewritten by both testers to point at
+     * their own new one, and that third file was the conflict. Git merges this
+     * on its own, with nothing for the plugin to resolve.
+     */
+    @Test
+    public void twoTestersAddingCasesToOneSetDoNotConflictAtAll() throws IOException {
+        writeTestProject();
+        commit(stagedFor(review()), "the first commit");
+        mustGit(work, "push", "-u", "origin", "main");
+
+        // The colleague appends a case and pushes it.
+        final Path colleague = cloneAsColleague();
+        mustGit(colleague, "config", "user.name", "Colleague");
+        mustGit(colleague, "config", "user.email", "colleague@example.invalid");
+
+        final TestCaseDto theirNewCase = testCase("a locked account cannot sign in").setOrder("s");
+        write(colleague, "Test Cases/login flow/" + theirNewCase.getId() + ".json", theirNewCase);
+
+        mustGit(colleague, "add", "-A");
+        mustGit(colleague, "commit", "-m", "added the locked account case");
+        mustGit(colleague, "push", "origin", "main");
+
+        // This tester appends one too, at the same moment.
+        final TestCaseDto myNewCase = testCase("a signed-in user signs out").setOrder("s");
+        write(work, "Test Cases/login flow/" + myNewCase.getId() + ".json", myNewCase);
+        commit(stagedFor(review()), "added the sign out case");
+
+        // No conflict to resolve: the pull rebases straight through.
+        assertNotNull(git(work, "pull", "--rebase", "--autostash", "origin", "main"),
+                "two appended cases touch two files and merge on their own");
+
+        final List<TestCaseDto> after = new ArrayList<>();
+        try (Stream<Path> files = Files.list(work.resolve("Test Cases/login flow"))) {
+            for (final Path file : files.filter(f -> f.getFileName().toString().endsWith(".json")).sorted().toList()) {
+                after.add(mapper().readValue(Files.readString(file, StandardCharsets.UTF_8), TestCaseDto.class));
+            }
+        }
+
+        assertEquals(after.size(), 4, "both testers keep their case");
+
+        // Same rank on both, which is allowed: the order is settled the same way
+        // on every machine, so two testers never see two different lists.
+        final List<TestCaseDto> ordered = TestCaseOrder.ordered(after);
+        assertEquals(ordered, TestCaseOrder.ordered(new ArrayList<>(after.reversed())),
+                "the order does not depend on what order the files were read in");
+        assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(theirNewCase.getId())));
+        assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(myNewCase.getId())));
+        assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
+    }
+
+    /**
      * The colleague half of the round trip: they change a case and push, and the
      * change arrives here on a pull.
      */
@@ -362,7 +530,7 @@ public class GitWorkflowTest {
         final String remoteInfo = mustGit(work, "remote", "show", "origin");
 
         assertTrue(remoteInfo.contains("HEAD branch:"), "git reports a HEAD branch line: " + remoteInfo);
-        assertNull(GitRefs.parseHeadBranch(remoteInfo), "an empty remote names no branch, so the push falls back to the local one");
+        assertEquals(GitRefs.parseHeadBranch(remoteInfo), "", "an empty remote names no branch, so the push falls back to the local one");
     }
 
     /**

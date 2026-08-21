@@ -2,6 +2,7 @@ package org.testin.testproject;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -35,18 +36,26 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Map<String, ProjectStatus> underRoot = Services.getInstance(p, ProjectIndexer.class).testProjects();
+        // The listing walks the Testin root and reads a marker per project, so it
+        // happens off the EDT; the dialog it feeds opens back on it (#66).
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final Map<String, ProjectStatus> underRoot = Services.getInstance(p, ProjectIndexer.class).testProjects();
 
-        // An empty picker would say nothing at all. The button beside this one
-        // is the answer, so the message points at it rather than opening a
-        // dialog with no rows in it.
-        if (underRoot.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softShow(p, "No Test Projects",
-                    "Create one under the Testin root first");
-            return;
-        }
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (p.isDisposed()) return;
 
-        new BindTestProjectDialog(p, underRoot, pp::reindex).show();
+                // An empty picker would say nothing at all. The button beside
+                // this one is the answer, so the message points at it rather
+                // than opening a dialog with no rows in it.
+                if (underRoot.isEmpty()) {
+                    Services.getInstance(p, Notifier.class).softShow(p, "No Test Projects",
+                            "Create one under the Testin root first");
+                    return;
+                }
+
+                new BindTestProjectDialog(p, underRoot, pp::reindex).show();
+            });
+        });
     }
 
     @Override

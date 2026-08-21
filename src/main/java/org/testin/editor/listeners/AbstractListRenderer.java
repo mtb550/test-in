@@ -3,7 +3,6 @@ package org.testin.editor.listeners;
 import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.editor.BaseCard;
 import org.testin.editor.EditorColors;
 import org.testin.editor.TestinEditor;
@@ -24,7 +23,7 @@ public abstract class AbstractListRenderer<U extends TestinEditor> implements Li
         final int globalIndex = editor.globalIndex(index);
 
         final boolean isRowHovered = (index == editor.getHoveredIndex());
-        final String hover = isRowHovered ? editor.getHoveredIconAction() : null;
+        final String hover = isRowHovered ? editor.getHoveredIconAction() : "";
 
         final BaseCard card = bindDataAndGetCard(list, tc, globalIndex, isSelected, isRowHovered, hover);
 
@@ -33,6 +32,6 @@ public abstract class AbstractListRenderer<U extends TestinEditor> implements Li
         return card;
     }
 
-    protected abstract @NotNull BaseCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final @Nullable String hover);
+    protected abstract @NotNull BaseCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover);
 }
 

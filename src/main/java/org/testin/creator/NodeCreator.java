@@ -1,22 +1,22 @@
 package org.testin.creator;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.dirs.DirectoryDto;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 @FunctionalInterface
 public interface NodeCreator {
 
     /**
-     * Creates the node and returns its directory DTO.
+     * Creates the node and answers with it.
      * <p>
-     * May return {@code null} for creators that finish asynchronously
-     * (e.g. {@link CreateTestRun}, which completes after its dialog's OK and
-     * performs its own tree refresh and editor opening). Callers must guard
-     * their follow-up steps accordingly.
+     * Empty for a creator that finishes asynchronously - {@link CreateTestRun}
+     * completes after its dialog's OK and performs its own tree refresh, editor
+     * opening and confirmation - and for one that cannot be started from the
+     * tree at all. Either way there is no node yet for the caller's follow-up.
      */
-    @Nullable
-    DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath);
+    @NotNull
+    Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath);
 }

@@ -9,16 +9,16 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.util.FontSync;
 import org.testin.view.bugs.OpenBugsTab;
 import org.testin.view.details.DetailsTab;
 import org.testin.view.history.HistoryTab;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.List;
 
 public class ViewPanel implements Disposable {
@@ -58,7 +58,7 @@ public class ViewPanel implements Disposable {
 
         refreshCurrentView();
 
-        new ViewPanelExecutionSubscriber(p, this);
+        new TestCaseExecutionSubscriber(p, this, this::refreshCurrentView);
     }
 
     private @NotNull JBScrollPane createScrollPane(final @NotNull Component view) {
@@ -70,30 +70,28 @@ public class ViewPanel implements Disposable {
         return sp;
     }
 
-    public void show(final @NotNull Project p, final @Nullable List<TestCaseDto> testCases, final @Nullable ArrayList<String> path) {
-        final ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
-        if (tw == null || testCases == null || testCases.isEmpty()) return;
+    public void show(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
+        if (testCases.isEmpty()) return;
 
-        tw.show(() -> {
+        ViewToolWindowFactory.toolWindow(p).ifPresent(tw -> tw.show(() -> {
             selectDetailsTab();
             this.updateList(testCases, path);
-        });
+        }));
     }
 
-    public void show(final @Nullable List<TestCaseDto> testCases, final @Nullable ArrayList<String> path) {
+    public void show(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
         this.show(p, testCases, path);
     }
 
     public @NotNull ViewPanel hide() {
-        final ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
-        if (tw != null && tw.isVisible()) {
-            tw.hide(null);
-        }
+        ViewToolWindowFactory.toolWindow(p)
+                .filter(ToolWindow::isVisible)
+                .ifPresent(tw -> tw.hide(null));
         return this;
     }
 
     public void reset() {
-        this.updateList(null, null);
+        this.updateList(List.of(), List.of());
     }
 
     /**
@@ -101,41 +99,38 @@ public class ViewPanel implements Disposable {
      * test case is shown on Details - no other tab was ever asked for.
      */
     private void selectDetailsTab() {
-        final ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
-        if (tw == null) return;
-
-        final Content[] contents = tw.getContentManager().getContents();
-        for (final Content content : contents) {
-            if (ViewTab.DETAILS.getDisplayName().equals(content.getDisplayName())) {
-                tw.getContentManager().setSelectedContent(content);
-                break;
+        ViewToolWindowFactory.toolWindow(p).ifPresent(tw -> {
+            for (final Content content : tw.getContentManager().getContents()) {
+                if (ViewTab.DETAILS.getDisplayName().equals(content.getDisplayName())) {
+                    tw.getContentManager().setSelectedContent(content);
+                    break;
+                }
             }
-        }
+        });
     }
 
-    public void hide(final @Nullable TestCaseDto testCaseDtoToMatch) {
-        final ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
-        if (tw == null || !tw.isVisible()) return;
+    /**
+     * Closes the panel when what it is showing is the case being closed
+     * elsewhere - an editor shutting down takes its own case off the screen.
+     */
+    public void hide(final @NotNull TestCaseDto testCaseDtoToMatch) {
+        if (ViewToolWindowFactory.toolWindow(p).filter(ToolWindow::isVisible).isEmpty()) return;
 
-        final TestCaseDto currentlyShown = this.getCurrentTestCaseDto();
-
-        if (currentlyShown != null && testCaseDtoToMatch != null &&
-                currentlyShown.getId().equals(testCaseDtoToMatch.getId())) {
-            this.reset();
-            this.hide();
-        }
+        getCurrentTestCase()
+                .filter(shown -> shown.getId().equals(testCaseDtoToMatch.getId()))
+                .ifPresent(shown -> {
+                    this.reset();
+                    this.hide();
+                });
     }
 
-    public void updateList(final @Nullable List<TestCaseDto> testCases, final @Nullable ArrayList<String> path) {
+    public void updateList(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
         this.page.updateList(testCases, path);
         this.refreshCurrentView();
     }
 
     public void refreshCurrentView() {
-        final TestCaseDto currentTestCaseDto = this.getCurrentTestCaseDto();
-        final ArrayList<String> currentPath = this.page.getCurrentPath();
-
-        new DetailsTab().load(p, detailsTab, currentTestCaseDto, currentPath);
+        new DetailsTab().load(p, detailsTab, getCurrentTestCase(), page.getCurrentPath());
         new HistoryTab().load(historyTab);
         new OpenBugsTab().load(openBugsTab);
 
@@ -149,14 +144,15 @@ public class ViewPanel implements Disposable {
      * questions in a row; whether a refresh is needed is the panel's own business.
      */
     public void refreshIfShowing(final @NotNull Collection<TestCaseDto> updated) {
-        final TestCaseDto current = getCurrentTestCaseDto();
-        if (current == null) return;
-
-        if (updated.stream().anyMatch(item -> item.getId().equals(current.getId())))
-            refreshCurrentView();
+        getCurrentTestCase()
+                .filter(current -> updated.stream().anyMatch(item -> item.getId().equals(current.getId())))
+                .ifPresent(current -> refreshCurrentView());
     }
 
-    public @Nullable TestCaseDto getCurrentTestCaseDto() {
+    /**
+     * The case on display, empty while the panel is showing none.
+     */
+    public @NotNull Optional<TestCaseDto> getCurrentTestCase() {
         return page.getCurrentItem();
     }
 

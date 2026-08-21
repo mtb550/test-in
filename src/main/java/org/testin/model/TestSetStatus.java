@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  * Deprecated is not deleted: the cases stay readable and the runs that already
  * used them keep their history. What it changes is what happens next — a
  * deprecated set is retired ({@code DirectoryDto.isRetired()}): drawn gray,
- * sorted after its siblings, and not offered when a new run is configured (#68).
+ * ordered after its siblings, and not offered when a new run is configured (#68).
  */
 @Getter
 @AllArgsConstructor

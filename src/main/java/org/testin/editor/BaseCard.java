@@ -9,7 +9,6 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,8 +29,16 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected final @NotNull JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
     protected final @NotNull BorderLayoutPanel wrapper = new BorderLayoutPanel();
     protected boolean isRowHovered;
-    protected @Nullable String hoveredAction;
-    protected boolean isRunning;
+    /**
+     * Which action icon the pointer is over, by name, and empty for none - the
+     * card draws one of them larger, and "none" is a state it draws too.
+     */
+    protected @NotNull String hoveredAction = "";
+    /**
+     * Which button the card offers in its run slot. Run until something says
+     * otherwise, so a card whose state nobody tracks still offers the gesture.
+     */
+    protected @NotNull CardHoverAction runSlot = CardHoverAction.RUN_TEST_CASE;
 
     public BaseCard() {
         setLayout(new BorderLayout());
@@ -129,7 +136,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         badgePanel.repaint();
     }
 
-    public void setActionsState(final boolean isSelected, final boolean isRowHovered, final @Nullable String hoveredAction) {
+    public void setActionsState(final boolean isSelected, final boolean isRowHovered, final @NotNull String hoveredAction) {
         this.isRowHovered = isRowHovered;
         this.hoveredAction = hoveredAction;
         if (isSelected) {
@@ -151,7 +158,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected void paintChildren(final Graphics g) {
         super.paintChildren(g);
         if (isRowHovered) {
-            Shared.drawDescriptionActionIcons(this, g, titleWidth(), hoveredAction, isRunning);
+            Shared.drawDescriptionActionIcons(this, g, titleWidth(), hoveredAction, runSlot);
         }
     }
 

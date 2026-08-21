@@ -14,7 +14,6 @@ import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.Shortcuts;
 
-import javax.swing.tree.TreePath;
 
 public class OpenAction extends AbstractProjectTreeAction {
 
@@ -25,17 +24,14 @@ public class OpenAction extends AbstractProjectTreeAction {
     }
 
     public void execute(final @NotNull Project p) {
-        TreePath[] paths = tree.getSelectionPaths();
-        if (paths == null) return;
-
-        for (TreePath path : paths) {
-            final DirectoryDto directoryDto = TreeValueUtil.directoryOf(path.getLastPathComponent());
-            // Skip unresolvable nodes but keep opening the rest of the selection.
-            if (directoryDto == null || !directoryDto.isOpenableInEditor()) continue;
-
-            Logger.info("open: " + directoryDto.getPath());
-            Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, directoryDto);
-        }
+        // Unresolvable nodes are not in the list at all, and one that cannot be
+        // opened is skipped: the rest of the selection still opens.
+        TreeValueUtil.selectedDirectories(tree.getSelectionPaths()).stream()
+                .filter(DirectoryDto::isOpenableInEditor)
+                .forEach(dir -> {
+                    Logger.info("open: " + dir.getPath());
+                    Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, dir);
+                });
     }
 
     @Override
@@ -45,20 +41,8 @@ public class OpenAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        TreePath[] paths = tree.getSelectionPaths();
-        boolean shouldEnable = false;
-
-        if (paths != null) {
-            for (TreePath path : paths) {
-                Object value = TreeValueUtil.valueOf(path.getLastPathComponent());
-                if (value instanceof DirectoryDto dir && dir.isOpenableInEditor()) {
-                    shouldEnable = true;
-                    break;
-                }
-            }
-        }
-
-        e.getPresentation().setEnabled(shouldEnable);
+        e.getPresentation().setEnabled(TreeValueUtil.selectedDirectories(tree.getSelectionPaths()).stream()
+                .anyMatch(DirectoryDto::isOpenableInEditor));
     }
 
     @Override

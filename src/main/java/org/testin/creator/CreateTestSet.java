@@ -13,13 +13,14 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 @AllArgsConstructor
 public class CreateTestSet implements NodeCreator {
     private final @NotNull Project p;
 
     @Override
-    public @NotNull DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
+    public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         final TestSetDirectoryDto ts = Services.getInstance(p, DirectoryMapper.class).getTestSetNode(p, newDirPath, parentDir);
 
         Services.getInstance(p, ProjectIndexer.class).addTestSet(ts);
@@ -31,7 +32,7 @@ public class CreateTestSet implements NodeCreator {
             }
         });
 
-        return ts;
+        return Optional.of(ts);
     }
 
 }

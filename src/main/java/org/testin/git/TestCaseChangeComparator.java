@@ -48,12 +48,12 @@ final class TestCaseChangeComparator {
         }
     }
 
-    private static String groupNames(final @NotNull TestCaseDto testCase) {
+    private static @NotNull String groupNames(final @NotNull TestCaseDto testCase) {
         return testCase.getGroup().stream().map(Group::getName)
                 .reduce((first, second) -> first + ", " + second).orElse("");
     }
 
-    private static String formatSteps(final @NotNull TestCaseDto testCase) {
+    private static @NotNull String formatSteps(final @NotNull TestCaseDto testCase) {
         return String.join("\n", testCase.getSteps());
     }
 }

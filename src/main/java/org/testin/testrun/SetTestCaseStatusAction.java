@@ -14,8 +14,9 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.testrun.create.FailedResultDialog;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
+import java.util.Optional;
 import java.util.List;
 
 /**
@@ -36,7 +37,7 @@ public class SetTestCaseStatusAction extends AbstractProjectAction {
         this.list = list;
         this.status = status;
 
-        this.registerCustomShortcutSet(Tools.customShortcut(entry.shortcut()), list);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(entry.shortcut()), list);
     }
 
     @Override
@@ -46,9 +47,11 @@ public class SetTestCaseStatusAction extends AbstractProjectAction {
 
         // Single selection of a run item: collect failure details first, apply after the dialog closes.
         if (status.isCollectsFailureDetails() && editor instanceof RunEditor runEditor && selectedItems.size() == 1) {
-            final TestRunItems runItem = runEditor.getResultsMap().get(selectedItems.getFirst().getId());
-            if (runItem != null && !runItem.isRemoved()) {
-                new FailedResultDialog(p, runItem, this::applyStatus).show();
+            final Optional<TestRunItems> runItem = runEditor.runItem(selectedItems.getFirst().getId())
+                    .filter(item -> !item.isRemoved());
+
+            if (runItem.isPresent()) {
+                new FailedResultDialog(p, runItem.get(), this::applyStatus).show();
                 return;
             }
         }

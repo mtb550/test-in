@@ -6,8 +6,8 @@ import com.intellij.ui.SimpleTextAttributes;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.TestRunItems;
+import java.util.Optional;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -30,20 +30,21 @@ public final class RunTreeCellRenderer {
             @Override
             public void customizeRenderer(final @NotNull JTree tree, final @NotNull Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
                 if (value instanceof CheckedTreeNode node) {
-                    final @Nullable Object userObj = node.getUserObject();
+                    // instanceof is false for a node carrying nothing, so the kinds
+                    // below answer for the empty node too.
+                    final Object userObj = node.getUserObject();
 
                     if (userObj instanceof DirectoryDto dir)
                         getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 
                     else if (userObj instanceof TestCaseDto tc) {
-                        final @Nullable TestRunItems result = resultsMap.get(tc.getId());
-
-                        if (result != null) {
-                            final @NotNull TestStatus status = result.getStatus();
+                        // A case the run has no row for is drawn plainly: it is in the
+                        // tree to be picked, not to report a verdict it never got.
+                        Optional.ofNullable(resultsMap.get(tc.getId())).ifPresentOrElse(result -> {
+                            final TestStatus status = result.getStatus();
                             getTextRenderer().append(tc.getDescription(), status.getStyle());
                             getTextRenderer().append(status.getDisplayText(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
-                        } else
-                            getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+                        }, () -> getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES));
 
                     } else if (userObj instanceof String str)
                         getTextRenderer().append(str, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);

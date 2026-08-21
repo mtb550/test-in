@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Local Git repository operations used by the pending-commit workflow.
@@ -82,8 +83,36 @@ public final class GitCommitService {
 
         paths.addAll(markersAlongside(repositoryPath, paths));
 
-        GitCommandRunner.execute(project, repositoryPath, withPaths(paths, "git", "add", "--"));
+        final Set<String> stageable = stageable(repositoryPath, paths);
+        if (!stageable.isEmpty()) {
+            GitCommandRunner.execute(project, repositoryPath, withPaths(stageable, "git", "add", "--"));
+        }
+
         GitCommandRunner.execute(project, repositoryPath, withPaths(paths, "git", "commit", "--only", "-m", message, "--"));
+    }
+
+    /**
+     * Of the paths to commit, the ones {@code git add} can be given.
+     * <p>
+     * It refuses a path that is in neither the working tree nor the index, and
+     * one such path fails the whole command - so the commit would not happen at
+     * all. The old side of a rename someone staged in another tool is exactly
+     * that path: the index already carries the move, and nothing by that name is
+     * left on disk.
+     * <p>
+     * Nothing is lost by leaving them out. {@code git commit --only} takes the
+     * working tree for every path it is given, so a file that is gone is
+     * committed as the deletion it is, staged or not. What still needs staging is
+     * the untracked file, which is every new test case.
+     * <p>
+     * Static and package-private so the Git workflow test stages the way the
+     * plugin does, instead of keeping a second copy of this rule that cannot be
+     * wrong in the same way.
+     */
+    static @NotNull Set<String> stageable(final @NotNull Path repositoryPath, final @NotNull Set<String> paths) {
+        return paths.stream()
+                .filter(path -> Files.exists(repositoryPath.resolve(path)))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**

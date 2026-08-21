@@ -10,8 +10,8 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
-import org.testin.logger.Logger;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
@@ -36,13 +36,13 @@ public class RemoveAction extends AbstractProjectTreeAction {
         this.registerCustomShortcutSet(DeletePackage.getCustomShortcut(), tree);
     }
 
-    private boolean isRemovable(final @Nullable Object dir) {
-        return dir instanceof DirectoryDto dto && dto.isRemovable();
-    }
-
+    /**
+     * @param paths Swing's own answer, which is null rather than empty when
+     *              nothing is selected - see TreeValueUtil.selectedDirectories
+     */
     private @NotNull List<DirectoryDto> getRemovableNodes(final TreePath @Nullable [] paths) {
         return TreeValueUtil.selectedDirectories(paths).stream()
-                .filter(this::isRemovable)
+                .filter(DirectoryDto::isRemovable)
                 .toList();
     }
 
@@ -68,9 +68,10 @@ public class RemoveAction extends AbstractProjectTreeAction {
                 : "Remove these " + nodesToRemove.size() + " items?")
                 + (holds.isEmpty() ? "" : System.lineSeparator() + holds);
 
-        // Single node: its path shows exactly what is being deleted.
-        final String from = nodesToRemove.size() == 1 ? nodesToRemove.getFirst().getPath().toString() : null;
-        new ConfirmDialog(p, "Confirm Removing", msg, from, null, "Remove", () -> removeNodes(nodesToRemove)).show();
+        // Single node: its path shows exactly what is being deleted. Several, and
+        // there is no one path to show, which the dialog reads as no From row.
+        final String from = nodesToRemove.size() == 1 ? nodesToRemove.getFirst().getPath().toString() : "";
+        new ConfirmDialog(p, "Confirm Removing", msg, from, "", "Remove", () -> removeNodes(nodesToRemove)).show();
     }
 
     private void removeNodes(final @NotNull List<DirectoryDto> nodesToRemove) {
@@ -93,7 +94,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
             Logger.info("Removed " + removed.get() + " of " + nodesToRemove.size() + " node(s).");
 
             if (removed.get() > 0) {
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Node", "removed", removed.get());
+                Services.getInstance(p, Notifier.class).softShowCounted(p, "Removed", removed.get());
             }
         };
 

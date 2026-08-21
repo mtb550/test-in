@@ -1,6 +1,7 @@
 package org.testin.model.markers;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
@@ -37,6 +38,49 @@ import java.time.temporal.ChronoUnit;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
 public abstract class AbstractMarker implements Marker {
+
+    /**
+     * Where this node sits among its siblings: a number the tester typed.
+     * <p>
+     * {@link Marker#NOT_ORDERED} when they have not, which is the largest number
+     * there is - so an unnumbered node sorts after every numbered one by
+     * ordinary comparison, and nothing anywhere has to ask whether a number is
+     * really a number. A marker file written before this existed has no such key
+     * and arrives here the same way.
+     * <p>
+     * Left out of the JSON when it is that value: a file nobody ordered stays
+     * silent about order rather than carrying a number a human would never
+     * write.
+     * <p>
+     * Here rather than on each kind of node: a test set, a package and a project
+     * all sit among siblings, and one field they inherit is one place to change
+     * it - the same reason the audit pair below lives here.
+     */
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AbstractMarker.Unordered.class)
+    private int order = Marker.NOT_ORDERED;
+
+    /**
+     * Keeps {@link Marker#NOT_ORDERED} out of the file.
+     * <p>
+     * Jackson asks a value filter whether it {@code equals} the value being
+     * written and leaves the key out when it says yes - which is why this class
+     * answers a question about a number it is not. That is the contract Jackson
+     * documents for {@code JsonInclude.Include.CUSTOM}, and the reason to use it
+     * here is that the alternative is a marker carrying 2147483647: a number no
+     * human wrote, in a file people read and commit.
+     */
+    static final class Unordered {
+
+        @Override
+        public boolean equals(final Object value) {
+            return value instanceof Integer order && order == Marker.NOT_ORDERED;
+        }
+
+        @Override
+        public int hashCode() {
+            return Marker.NOT_ORDERED;
+        }
+    }
 
     @NonNull
     private String createdBy = "";

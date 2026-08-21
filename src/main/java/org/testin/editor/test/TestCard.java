@@ -2,11 +2,14 @@ package org.testin.editor.test;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.clipboard.CutState;
 import org.testin.editor.BaseCard;
+import org.testin.editor.CardHoverAction;
 import org.testin.editor.Shared;
 import org.testin.model.RunStatus;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.services.Services;
 
 import java.awt.*;
 import java.util.*;
@@ -23,25 +26,20 @@ public class TestCard extends BaseCard {
         this.p = p;
     }
 
-    public void updateData(final int index, final @NotNull TestCaseDto tc, final @NotNull Set<?> activeDetails, final boolean isUnsorted, final @NotNull String title) {
+    public void updateData(final int index, final @NotNull TestCaseDto tc, final @NotNull Set<?> activeDetails, final @NotNull String title) {
         badges.clear();
         details.clear();
 
-        this.isPendingCut = TestEditorContextMenu.isGlobalCutAction() && TestEditorContextMenu.getGlobalPendingCutIds().contains(tc.getId());
+        this.isPendingCut = Services.getInstance(p, CutState.class).isPending(tc.getId());
 
         Arrays.stream(TestEditorAttributes.values())
                 .filter(activeDetails::contains)
                 .forEach(attr -> attr.applyToUI(tc, badges, details, p));
 
-        if (isUnsorted) {
-            badges.add(Shared.createUnsortedBadge());
-        }
-
         final RunStatus runStatus = tc.getTempStatus();
-        this.isRunning = runStatus == RunStatus.RUNNING;
+        this.runSlot = CardHoverAction.runSlot(tc);
 
-        final RunStatus.Badge badge = runStatus.getBadge();
-        if (badge != null) badges.add(Shared.createRunStatusBadge(badge));
+        runStatus.getBadge().ifPresent(badge -> badges.add(Shared.createRunStatusBadge(badge)));
 
         updateUI(index, title, badges, details);
     }

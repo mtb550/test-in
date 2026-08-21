@@ -20,19 +20,23 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.*;
+import org.testin.model.BugPriority;
+import org.testin.model.BugSeverity;
+import org.testin.model.TestRunConfiguration;
+import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
+import org.testin.util.Display;
 
 import java.io.ByteArrayOutputStream;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.function.Predicate;
-import org.testin.util.Tools;
-import org.testin.testproject.BoundTestProject;
 
 public final class TestRunPdfGenerator {
 
@@ -130,8 +134,8 @@ public final class TestRunPdfGenerator {
 
 
             addOverviewRow(overviewTable, "Executed By", summary.executedBy(), boldFont, regularFont);
-            addOverviewRow(overviewTable, "Execution Started", Tools.formatDate(tr.getExecutionStartedAt()), boldFont, regularFont);
-            addOverviewRow(overviewTable, "Execution Ended", Tools.formatDate(tr.getExecutionEndedAt()), boldFont, regularFont);
+            addOverviewRow(overviewTable, "Execution Started", Display.formatDate(tr.getExecutionStartedAt()), boldFont, regularFont);
+            addOverviewRow(overviewTable, "Execution Ended", Display.formatDate(tr.getExecutionEndedAt()), boldFont, regularFont);
             addOverviewRow(overviewTable, "Run Status", trDir.getMarker().getStatus().name(), boldFont, regularFont);
 
             document.add(overviewTable);
@@ -154,7 +158,13 @@ public final class TestRunPdfGenerator {
                     .setMarginBottom(12));
 
 
-            Table statsTable = new Table(UnitValue.createPercentArray(new float[]{100f / 6, 100f / 6, 100f / 6, 100f / 6, 100f / 6, 100f / 6}))
+            // Six tiles, or seven when the run has removed cases: the total
+            // counts them, so without a tile of their own the figures below the
+            // total do not add up to it.
+            final float[] tileWidths = new float[summary.hasRemoved() ? 7 : 6];
+            Arrays.fill(tileWidths, 100f / tileWidths.length);
+
+            Table statsTable = new Table(UnitValue.createPercentArray(tileWidths))
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
 
@@ -163,6 +173,9 @@ public final class TestRunPdfGenerator {
             addStatCell(statsTable, String.valueOf(summary.failed()), "Failed", RED, boldFont);
             addStatCell(statsTable, String.valueOf(summary.blocked()), "Blocked", DARK_YELLOW, boldFont);
             addStatCell(statsTable, String.valueOf(summary.untested()), "Untested", DARK_GRAY, boldFont);
+            if (summary.hasRemoved()) {
+                addStatCell(statsTable, String.valueOf(summary.removed()), "Removed", DARK_GRAY, boldFont);
+            }
             addStatCell(statsTable, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE, boldFont);
 
             document.add(statsTable);
@@ -206,6 +219,14 @@ public final class TestRunPdfGenerator {
                             .setMarginBottom(6));
             document.add(untestedHeading);
 
+            // Removed
+            if (summary.hasRemoved()) {
+                document.add(new Paragraph()
+                        .add(new Paragraph("Removed (" + summary.removed() + ")")
+                                .setFont(boldFont).setFontSize(11).setFontColor(DARK_GRAY)
+                                .setMarginBottom(6)));
+            }
+
             // SECTIONS 4+: one case table per status, empty ones omitted. Numbered
             // as printed rather than per section, so a run with nothing blocked
             // does not jump from 5 to 7.
@@ -240,7 +261,7 @@ public final class TestRunPdfGenerator {
             footerCanvas.add(new Paragraph()
                     .setFont(regularFont).setFontSize(8).setFontColor(DARK_GRAY)
                     .setTextAlignment(TextAlignment.CENTER)
-                    .add(new Text(Tools.formatDate(ZonedDateTime.now())))
+                    .add(new Text(Display.formatDate(ZonedDateTime.now())))
                     .add(new Text("  |  Generated automatically by "))
                     .add(new Link("Testin", PdfAction.createURI("https://plugins.jetbrains.com/plugin/31514-testin"))
                             .setFontColor(LINK_BLUE))

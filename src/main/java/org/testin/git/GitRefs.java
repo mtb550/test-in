@@ -3,7 +3,6 @@ package org.testin.git;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -45,8 +44,11 @@ public final class GitRefs {
      *       until something stages it - so it is an addition, not nothing.</li>
      *   <li>A path containing a space comes back wrapped in double quotes with
      *       C-style escapes, and every test set named with a space produces one.</li>
-     *   <li>A rename is reported as {@code old -> new}, and the new path is the
-     *       one the review is about.</li>
+     *   <li>A rename is reported as {@code old -> new} and is <b>two</b> changes,
+     *       not one: the file is there under the new name and gone from the old.
+     *       Listing only the new path commits half the move, and whoever pulls it
+     *       gets both copies. A copy - {@code C} - is the one arrow that leaves
+     *       its source where it was, so only {@code R} produces the deletion.</li>
      * </ul>
      */
     public static @NotNull List<StatusEntry> parseStatus(final @NotNull List<String> porcelainLines) {
@@ -63,7 +65,13 @@ public final class GitRefs {
             final String path = unquote(renameArrow < 0 ? rawPath : rawPath.substring(renameArrow + 4));
             if (path.isEmpty()) continue;
 
-            entries.add(new StatusEntry(typeOf(code), path.replace('\\', '/')));
+            // The deletion first, so the move reads in the order it happened.
+            if (renameArrow >= 0 && code.indexOf('R') >= 0) {
+                final String from = unquote(rawPath.substring(0, renameArrow));
+                if (!from.isEmpty()) entries.add(new StatusEntry(DiffType.DELETED, slashed(from)));
+            }
+
+            entries.add(new StatusEntry(typeOf(code), slashed(path)));
         }
         return entries;
     }
@@ -101,9 +109,60 @@ public final class GitRefs {
                 .anyMatch(UNMERGED::contains);
     }
 
+    /**
+     * A path as the rest of the plugin compares them: forward slashes, whatever
+     * the platform wrote. Git speaks slashes on every platform, and a path read
+     * back from a marker on Windows does not.
+     */
+    private static @NotNull String slashed(final @NotNull String path) {
+        return path.replace('\\', '/');
+    }
+
+    /**
+     * The paths Git reports as conflicting, from the same porcelain output
+     * {@link #hasUnmergedPaths} answers yes or no about.
+     */
+    public static @NotNull List<String> unmergedPaths(final @NotNull List<String> porcelainLines) {
+        return porcelainLines.stream()
+                .filter(line -> line.length() >= 4)
+                .filter(line -> UNMERGED.contains(line.substring(0, 2)))
+                .map(line -> unquote(line.substring(3)))
+                .filter(path -> !path.isEmpty())
+                .map(GitRefs::slashed)
+                .toList();
+    }
+
+    /**
+     * What a tester is told when a pull stops on conflicts.
+     * <p>
+     * Naming the files is the whole point: "resolve them in the IDE" without
+     * saying which ones sends a tester looking through a tree for something the
+     * plugin already knows (#66). Both the sync and the push say this, from
+     * here, because two copies of a sentence drift the way two copies of a rule
+     * do.
+     */
+    public static @NotNull String conflictMessage(final @NotNull List<String> unmergedPaths) {
+        if (unmergedPaths.isEmpty()) {
+            return "The pull stopped on a conflict. Continue once it is resolved, or abort to roll the pull back.";
+        }
+
+        final int shown = Math.min(unmergedPaths.size(), 3);
+        final String names = String.join(", ", unmergedPaths.subList(0, shown));
+        final String more = unmergedPaths.size() > shown ? " and " + (unmergedPaths.size() - shown) + " more" : "";
+
+        return "Both sides changed " + names + more + ". Resolve the conflict, then continue - or abort to roll "
+                + "the pull back and keep what is here.";
+    }
+
     private static @NotNull DiffType typeOf(final @NotNull String code) {
         if (code.equals("??") || code.indexOf('A') >= 0) return DiffType.ADDED;
         if (code.indexOf('D') >= 0) return DiffType.DELETED;
+
+        // After the deletion check, so a rename whose new file was then deleted
+        // stays a deletion. Nothing existed under the new name to modify, which
+        // is what makes it an addition rather than a change.
+        if (code.indexOf('R') >= 0) return DiffType.ADDED;
+
         return DiffType.MODIFIED;
     }
 
@@ -151,28 +210,28 @@ public final class GitRefs {
      * A remote with no commits reports {@code HEAD branch: (unknown)} - it has no
      * branches yet, so there is nothing to name. Read literally that is a branch
      * called {@code (unknown)}, which is what a first push tried to pull from:
-     * "couldn't find remote ref (unknown)". Null instead, so the caller falls
+     * "couldn't find remote ref (unknown)". Empty instead, so the caller falls
      * back to the branch checked out here, which is the one being pushed.
      */
-    public static @Nullable String parseHeadBranch(final @NotNull String remoteShowOutput) {
+    public static @NotNull String parseHeadBranch(final @NotNull String remoteShowOutput) {
         final Matcher matcher = HEAD_BRANCH.matcher(remoteShowOutput);
-        if (!matcher.find()) return null;
+        if (!matcher.find()) return "";
 
         final String branch = matcher.group(1);
-        return NO_HEAD_BRANCH.equals(branch) ? null : branch;
+        return NO_HEAD_BRANCH.equals(branch) ? "" : branch;
     }
 
     /**
      * The remote to sync with: {@code origin} when present, otherwise the
-     * first remote, otherwise {@code null}.
+     * first remote, otherwise nothing at all.
      */
-    public static @Nullable String chooseRemote(final @NotNull List<String> remotes) {
+    public static @NotNull String chooseRemote(final @NotNull List<String> remotes) {
         final List<String> names = remotes.stream()
                 .map(String::trim)
                 .filter(name -> !name.isEmpty())
                 .toList();
         if (names.contains("origin")) return "origin";
-        return names.isEmpty() ? null : names.getFirst();
+        return names.isEmpty() ? "" : names.getFirst();
     }
 
     /**

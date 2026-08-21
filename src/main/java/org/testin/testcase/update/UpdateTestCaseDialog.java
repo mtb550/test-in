@@ -1,6 +1,5 @@
 package org.testin.testcase.update;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -10,7 +9,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.UIAction;
 import org.testin.testcase.UpdateTestCaseFields;
@@ -20,28 +18,14 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
-    private @Nullable JBPopup popup;
-
     public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p);
 
-        final UIAction repackPopup = () -> {
-            // fillData can run this callback before the popup is created.
-            if (popup == null) return;
-            popup.pack(false, true);
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-                final Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-                if (focusOwner instanceof JComponent jComp) {
-                    jComp.scrollRectToVisible(new Rectangle(0, 0, jComp.getWidth(), jComp.getHeight()));
-                }
-            });
-        };
+        final UIAction repackPopup = this::repack;
 
         final CreateTestCaseSection targetSection = selectedItem.getSectionExtractor().apply(this);
 
@@ -110,7 +94,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(statusBarSection.getPanel(), BorderLayout.SOUTH);
 
-        popup = JBPopupFactory.getInstance()
+        final JBPopup dialogPopup = ownPopup(JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, targetSection.getFocusComponent())
                 .setTitle("Update " + selectedItem.getName())
                 .setRequestFocus(true)
@@ -124,10 +108,9 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
                         dispose();
                     }
                 })
-                .createPopup();
+                .createPopup());
 
-        final Runnable saveAction = save(existingDto, onSave, new JBPopup[]{popup});
-        final JBPopup dialogPopup = popup;
+        final Runnable saveAction = save(existingDto, onSave, new JBPopup[]{dialogPopup});
 
         registerShortcut(mainPanel, Shortcuts.Enter.getCustomShortcut(), saveAction::run);
 
@@ -135,11 +118,5 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         // editor popup has been open over the dialog - the spelling corrections,
         // for one - the built-in handler stops seeing the key.
         registerShortcut(mainPanel, Shortcuts.Escape.getCustomShortcut(), dialogPopup::cancel);
-    }
-
-    public void show() {
-        // Assigned at the end of the constructor; @Nullable only because the
-        // repack callback above can fire before that point.
-        Objects.requireNonNull(popup, "popup is created in the constructor").showCenteredInCurrentWindow(p);
     }
 }

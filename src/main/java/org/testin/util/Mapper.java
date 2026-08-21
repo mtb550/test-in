@@ -1,7 +1,9 @@
 package org.testin.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.intellij.openapi.components.Service;
@@ -107,6 +109,30 @@ public final class Mapper {
             Logger.error("Failed to serialize object to string: " + value.getClass().getSimpleName());
             throw new IllegalStateException("Could not serialize " + value.getClass().getSimpleName(), ex);
         }
+    }
+
+    /**
+     * JSON as a tree rather than as an object, for the one job that is about the
+     * file and not about what it holds: merging two versions of a test case
+     * field by field, where a side that will not parse into a DTO still has
+     * fields worth keeping (#90).
+     * <p>
+     * An empty object for anything unreadable. Every caller here treats an
+     * unknown side as one that says nothing, which is what an empty object is.
+     */
+    public @NotNull ObjectNode readTree(final @NotNull String content) {
+        try {
+            final JsonNode node = mapper.readTree(content);
+            return node instanceof ObjectNode object ? object : mapper.createObjectNode();
+
+        } catch (final Exception ex) {
+            Logger.debug("Mapper.readTree() could not parse the content: " + ex.getMessage());
+            return mapper.createObjectNode();
+        }
+    }
+
+    public @NotNull ObjectNode createObjectNode() {
+        return mapper.createObjectNode();
     }
 
     public @NotNull <T> T convertValue(final @NotNull Object fromValue, final @NotNull Class<T> toValueType) {

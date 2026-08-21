@@ -3,7 +3,6 @@ package org.testin.importexport.exports;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
@@ -46,9 +45,7 @@ public class ExportCsv {
         ExportNotice.show(p, destFile);
     }
 
-    private @NotNull String escapeCsvField(final @Nullable String value) {
-        if (value == null) return "";
-
+    private @NotNull String escapeCsvField(final @NotNull String value) {
         if (value.contains(",") ||
                 value.contains("\"") ||
                 value.contains("\n") ||

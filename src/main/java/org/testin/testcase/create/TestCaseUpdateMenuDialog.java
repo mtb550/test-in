@@ -10,7 +10,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testcase.update.UpdateTestCaseDialog;
 import org.testin.ui.dialogs.ShortcutMenuPopup;
-import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.util.List;
@@ -38,8 +37,7 @@ public class TestCaseUpdateMenuDialog {
      */
     public static void applyAftermath(final @NotNull Project p, final @NotNull List<TestCaseDto> updated,
                                       final @NotNull GenType gt) {
-        final ViewPanel viewPanel = ViewToolWindowFactory.getViewPanel();
-        if (viewPanel != null) viewPanel.refreshIfShowing(updated);
+        ViewToolWindowFactory.panel().ifPresent(viewPanel -> viewPanel.refreshIfShowing(updated));
 
         Logger.trace("Generating automation code: " + gt);
         final GenAction action = gt.getAction();

@@ -131,7 +131,7 @@ public class StatusBar extends JBPanel<StatusBar> {
 
     /**
      * Already formatted by the caller: the blank for "nothing measured" is
-     * decided by {@code Tools.getFormattedDuration}, not here.
+     * decided by {@code Display.formatDuration}, not here.
      */
     public void showExecutionTime(final @NotNull String formatted) {
         executionTimeLabel.setText(formatted);

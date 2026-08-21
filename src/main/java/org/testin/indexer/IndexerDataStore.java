@@ -83,24 +83,49 @@ final class IndexerDataStore {
         return testCaseStore.getForTestSet(testSetPath);
     }
 
-    @Nullable
+    @NotNull
     TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
-        return testRunsByPath.get(testRunPath.toString());
+        return indexed(testRunsByPath.get(testRunPath.toString()), "test run", testRunPath);
     }
 
-    @Nullable
+    @NotNull
     TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {
-        return testRunsDirByPath.get(path.toString());
+        return indexed(testRunsDirByPath.get(path.toString()), "test run directory", path);
     }
 
-    @Nullable
-    TestCaseDto getTestCaseById(final @NotNull UUID id) {
-        return testCaseStore.getTestCasesById().get(id);
+    /**
+     * A test case by id, which may genuinely be gone.
+     * <p>
+     * The one lookup here keyed by data rather than by something on screen: a
+     * test run holds the ids of the cases it ran, an execution event names one,
+     * and a case can be deleted after either was written. So this answers with
+     * an Optional - absence is a state of the data, not a caller's mistake.
+     */
+    @NotNull
+    Optional<TestCaseDto> findTestCase(final @NotNull UUID id) {
+        return Optional.ofNullable(testCaseStore.getTestCasesById().get(id));
     }
 
-    @Nullable
+    @NotNull
     TestSetDirectoryDto getTestSetDirByPath(final @NotNull Path path) {
-        return testSetsDirByPath.get(path.toString());
+        return indexed(testSetsDirByPath.get(path.toString()), "test set", path);
+    }
+
+    /**
+     * A node the cache was asked for by something that already had it.
+     * <p>
+     * You cannot open a test set that is not indexed, rename one that is not
+     * selected, or report on a run the tree is not showing - the key came out of
+     * this cache, so the answer is in it. A miss is therefore a mistake in the
+     * plugin, not a state of the data, and it is said once here rather than
+     * guessed at by every caller.
+     */
+    private static <T> @NotNull T indexed(final @Nullable T node, final @NotNull String kind,
+                                          final @NotNull Path path) {
+        if (node != null) return node;
+
+        Logger.error("No " + kind + " indexed at " + path);
+        throw new IllegalStateException("No " + kind + " indexed at " + path);
     }
 
     void putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
@@ -115,8 +140,9 @@ final class IndexerDataStore {
         testCaseStore.remove(testSetPath, tcId);
     }
 
-    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> sortedList) {
-        testCaseStore.updateSequence(testSetPath, sortedList);
+    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList,
+                        final @NotNull List<TestCaseDto> moved) {
+        testCaseStore.updateSequence(testSetPath, orderedList, moved);
     }
 
     void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
@@ -237,16 +263,25 @@ final class IndexerDataStore {
      * Makes a single file the plugin just wrote with {@code java.nio} visible in
      * the IDE, creating its VFS entry when there is not one yet.
      * <p>
-     * The directory form above cannot do this job: refreshing a path the VFS has
-     * never seen leaves it unseen, and refreshing the parent recursively to find
-     * one new file would walk a whole project to deliver two lines of YAML.
+     * The directory it sits in is refreshed first, and that is the part that
+     * matters: a file the VFS has never seen is discovered by re-reading its
+     * parent's children, not by resolving the file itself. One level only -
+     * recursion here would walk a whole project to deliver two lines of YAML,
+     * which is what the directory form above is for.
      * <p>
      * Synchronous, and therefore on a pooled thread: a refresh that resolves a
      * path reads the VFS persistence, which the EDT is not allowed to do.
      */
     void refreshFile(final @NotNull Path file) {
-        ApplicationManager.getApplication().executeOnPooledThread(() ->
-                LocalFileSystem.getInstance().refreshAndFindFileByNioFile(file));
+        // Boundary: java.nio answers null for a path with no parent (#71).
+        final @Nullable Path parent = file.getParent();
+
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            if (parent != null) {
+                LocalFileSystem.getInstance().refreshNioFiles(List.of(parent), false, false, null);
+            }
+            LocalFileSystem.getInstance().refreshAndFindFileByNioFile(file);
+        });
     }
 
     /**
@@ -385,7 +420,7 @@ final class IndexerDataStore {
         final String oldStr = oldPath.toString();
         final String newStr = newPath.toString();
         final Path newParentPath = newPath.getParent();
-        final DirectoryDto newParentDto = newParentPath == null ? null : findByPath(newParentPath);
+        final DirectoryDto newParentDto = newParentPath == null ? null : findByPath(newParentPath).orElse(null);
 
         for (final Map<String, ? extends DirectoryDto> map : dirMaps) {
             renameMapEntry(map, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
@@ -403,13 +438,17 @@ final class IndexerDataStore {
         // The renamed/moved node itself was modified - record it in the marker,
         // the persisted home of audit info. Descendants only changed location,
         // so their own audit stays untouched.
-        final DirectoryDto renamed = findByPath(newPath);
-        if (renamed != null) {
+        findByPath(newPath).ifPresent(renamed -> {
             renamed.getMarker().touch(testerName());
             writeMarker(renamed.getPath(), renamed.getMarkerFileName(), renamed.getMarker());
-        }
+        });
     }
 
+    /**
+     * @param newParent null only for a node moved to a path with no parent -
+     *                  the filesystem-root boundary above, carried one call
+     *                  deep rather than re-derived here (#71)
+     */
     private void updatePathAndPath2(final @NotNull DirectoryDto dto, final @NotNull Path newPath, final @Nullable DirectoryDto newParent) {
         dto.setPath(newPath);
         dto.setName(newPath.getFileName().toString());
@@ -417,14 +456,15 @@ final class IndexerDataStore {
         rebuildPath2(dto);
     }
 
-    @Nullable
-    DirectoryDto findByPath(final @NotNull Path path) {
+    @NotNull
+    Optional<DirectoryDto> findByPath(final @NotNull Path path) {
         final String key = path.toString();
-        for (final Map<String, ? extends DirectoryDto> map : dirMaps) {
-            final DirectoryDto dto = map.get(key);
-            if (dto != null) return dto;
-        }
-        return null;
+
+        return dirMaps.stream()
+                .map(map -> map.get(key))
+                .filter(Objects::nonNull)
+                .map(DirectoryDto.class::cast)
+                .findFirst();
     }
 
     private <V extends DirectoryDto> void renameDescendants(final @NotNull Map<String, V> map, final @NotNull Path oldPath, final @NotNull Path newPath) {

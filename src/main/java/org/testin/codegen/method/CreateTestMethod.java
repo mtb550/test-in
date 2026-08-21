@@ -1,26 +1,26 @@
 package org.testin.codegen.method;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
+import org.testin.codegen.JavaSourceRoot;
 import org.testin.logger.Logger;
 import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.Services;
-import org.testin.util.Tools;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.List;
 
 public class CreateTestMethod implements GenAction {
+
+    private static final String TESTNG_TEST = "org.testng.annotations.Test";
 
     /**
      * Splits an FQCN list into the parts the generator needs, or null when there
@@ -31,118 +31,102 @@ public class CreateTestMethod implements GenAction {
      * IndexOutOfBoundsException out of the async path. Splitting in one place is
      * what stops the two drifting apart again.
      */
-    static @Nullable Target parse(final @NotNull List<String> fqcn) {
-        if (fqcn.size() < 2) return null;
+    static @NotNull Optional<Target> parse(final @NotNull List<String> fqcn) {
+        if (fqcn.size() < 2) return Optional.empty();
 
-        return new Target(
+        return Optional.of(new Target(
                 String.join(".", fqcn.subList(0, fqcn.size() - 1)),
                 fqcn.subList(0, fqcn.size() - 2),
                 fqcn.get(fqcn.size() - 2),
-                fqcn.getLast());
+                fqcn.getLast()));
     }
 
+    /**
+     * Writes the method here and now, in the caller's command when there is one.
+     * <p>
+     * A command inside a command is the outer one, so a caller generating for a
+     * whole set - an import, a copied test set - opens one command around its
+     * loop and gets one write lock, one reparse of the class and one undo entry
+     * instead of one of each per case. This used to hand every case to
+     * {@code invokeLater}, which put each one in an event of its own and so
+     * outside any command the caller had opened: fifty cases meant fifty
+     * separate freezes and fifty entries in the IDE's undo (#51).
+     * <p>
+     * On the EDT, because a write command action is. Both callers are: a dialog
+     * that just closed, and the copy's completion.
+     */
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
-        final Target target = parse(fqcn);
-        if (target == null) {
-            Logger.error("FQCN list is too short to generate a method: " + fqcn);
-            return;
-        }
+        final List<String> fqcn = Fqcn.ofMethod(tc);
 
-        Logger.info("Creating Test Case for: " + fqcn);
-
-        ApplicationManager.getApplication().invokeLater(() ->
-                WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null, () ->
-                        createMethod(p, target, tc)
-                ));
+        parse(fqcn).ifPresentOrElse(
+                target -> {
+                    Logger.info("Creating Test Case for: " + fqcn);
+                    WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null,
+                            () -> createMethod(p, target, tc));
+                },
+                () -> Logger.error("FQCN list is too short to generate a method: " + fqcn));
     }
 
-    public void executeSync(final @NotNull Project p, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
-        final Target target = parse(fqcn);
-        if (target == null) {
-            Logger.error("FQCN list is too short to generate a method: " + fqcn);
-            return;
-        }
-
-        Logger.info("Creating Test Case (sync) for: " + fqcn);
-
-        try {
-            WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null, () ->
-                    createMethod(p, target, tc)
-            );
-        } catch (final Exception ex) {
-            Logger.error("Failed to inject Java method '" + target.methodName() + "': " + ex.getMessage());
-        }
-    }
-
-    private void createMethod(final @NotNull Project p, final @NotNull Target target, final @Nullable TestCaseDto tc) {
+    private void createMethod(final @NotNull Project p, final @NotNull Target target, final @NotNull TestCaseDto tc) {
         final List<String> packageList = target.packageList();
         final String className = target.className();
         final String methodName = target.methodName();
 
         try {
-            final PsiClass targetClass = findOrCreateClass(p, target.path(), packageList, className);
-            if (targetClass != null) {
-                injectMethod(p, targetClass, methodName, tc);
-            } else
-                retryInjectPhysically(p, packageList, className, methodName, tc);
+            findOrCreateClass(p, target.path(), packageList, className).ifPresentOrElse(
+                    targetClass -> injectMethod(p, targetClass, methodName, tc),
+                    () -> retryInjectPhysically(p, packageList, className, methodName, tc));
 
         } catch (final Exception ex) {
             Logger.error("Failed to inject Java method: " + ex.getMessage());
         }
     }
 
-    private @Nullable PsiClass findOrCreateClass(final @NotNull Project p, final @NotNull String path,
-                                                 final @NotNull List<String> packageList,
-                                                 final @NotNull String className) {
+    /**
+     * The class the method goes in, written out first if it is not there yet.
+     * Empty when it could not be found or created, which is what sends the
+     * caller down the physical-injection path.
+     */
+    private @NotNull Optional<PsiClass> findOrCreateClass(final @NotNull Project p, final @NotNull String path,
+                                                          final @NotNull List<String> packageList,
+                                                          final @NotNull String className) {
         final JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(p);
         final GlobalSearchScope scope = GlobalSearchScope.projectScope(p);
 
-        final PsiClass targetClass = psiFacade.findClass(path, scope);
-        if (targetClass != null) return targetClass;
+        final Optional<PsiClass> existing = Optional.ofNullable(psiFacade.findClass(path, scope));
+        if (existing.isPresent()) return existing;
 
         try {
-            final VirtualFile sourceRoot = Services.getInstance(p, Tools.class).getTestSourceRootOrWarn(p);
-            if (sourceRoot != null) {
-                // Package segments are camelCase (see NameSanitizer.packageName); lowercasing
-                // the directory here would disagree with the emitted package declaration
-                // and with CreateJavaClass, so findClass could never resolve the class.
-                final VirtualFile packageDir = VfsUtil.createDirectoryIfMissing(sourceRoot, String.join("/", packageList));
-                if (packageDir != null) {
-                    final String fileName = className + ".java";
-                    if (packageDir.findChild(fileName) == null) {
-                        final VirtualFile javaFile = packageDir.createChildData(this, fileName);
-                        final String packageName = String.join(".", packageList);
-                        final String fileContent = packageName.isEmpty()
-                                ? "public class " + className + " {\n\n}\n"
-                                : "package " + packageName + ";\n\npublic class " + className + " {\n\n}\n";
-                        VfsUtil.saveText(javaFile, fileContent);
-                        javaFile.refresh(false, false);
-                    }
-                }
-            }
+            JavaSourceRoot.inRootOrWarn(p, root -> JavaSourceRoot.classFile(root, packageList, className));
 
         } catch (final IOException ex) {
             Logger.error("Failed to create class file for '" + className + "': " + ex.getMessage());
         }
 
         PsiDocumentManager.getInstance(p).commitAllDocuments();
-        return psiFacade.findClass(path, scope);
+        return Optional.ofNullable(psiFacade.findClass(path, scope));
     }
 
     private void retryInjectPhysically(final @NotNull Project p, final @NotNull List<String> packageList,
                                        final @NotNull String className, final @NotNull String methodName,
-                                       final @Nullable TestCaseDto tc) {
-        try {
-            final VirtualFile sourceRoot = Services.getInstance(p, Tools.class).getTestSourceRoot(p);
-            if (sourceRoot == null) {
-                Logger.error("retryInjectPhysically: sourceRoot is null, cannot inject method '" + methodName + "'");
-                return;
-            }
+                                       final @NotNull TestCaseDto tc) {
+        JavaSourceRoot.find(p).ifPresentOrElse(
+                sourceRoot -> injectIntoFile(p, sourceRoot, packageList, className, methodName, tc),
+                () -> Logger.error("retryInjectPhysically: no Java test source root, cannot inject method '"
+                        + methodName + "'"));
+    }
 
+    /**
+     * The fallback path: the class file is on disk but the PSI did not give us
+     * the class, so it is read back and the method injected into it.
+     */
+    private void injectIntoFile(final @NotNull Project p, final @NotNull VirtualFile sourceRoot,
+                                final @NotNull List<String> packageList, final @NotNull String className,
+                                final @NotNull String methodName, final @NotNull TestCaseDto tc) {
+        try {
             final String relativePath = String.join("/", packageList) + "/" + className + ".java";
             final VirtualFile javaFile = sourceRoot.findFileByRelativePath(relativePath);
             if (javaFile == null) {
@@ -169,26 +153,29 @@ public class CreateTestMethod implements GenAction {
         }
     }
 
-    private void injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass,
-                              final @NotNull String methodName, final @Nullable TestCaseDto tc) {
-        if (tc == null) {
-            Logger.error("injectMethod: no test case data for method '" + methodName + "'");
-            return;
-        }
+    /**
+     * Puts the TestNG @Test import in the file, when it is not there already.
+     * <p>
+     * Both of the platform's empty answers mean the same thing here - a file
+     * with no import list of its own, and a TestNG that is not on the classpath
+     * - so neither is asked about separately.
+     */
+    private void addTestImport(final @NotNull Project p, final @NotNull PsiJavaFile javaFile,
+                               final @NotNull PsiElementFactory factory) {
+        Optional.ofNullable(javaFile.getImportList())
+                .filter(imports -> imports.findSingleClassImportStatement(TESTNG_TEST) == null)
+                .ifPresent(imports -> Optional
+                        .ofNullable(JavaPsiFacade.getInstance(p).findClass(TESTNG_TEST, GlobalSearchScope.allScope(p)))
+                        .ifPresent(testClass -> imports.add(factory.createImportStatement(testClass))));
+    }
 
+    private void injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass,
+                              final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
             final PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
             final PsiFile file = targetClass.getContainingFile();
 
-            if (file instanceof PsiJavaFile javaFile) {
-                final PsiImportList importList = javaFile.getImportList();
-                if (importList != null && importList.findSingleClassImportStatement("org.testng.annotations.Test") == null) {
-                    final PsiClass testClass = JavaPsiFacade.getInstance(p).findClass("org.testng.annotations.Test", GlobalSearchScope.allScope(p));
-                    if (testClass != null) {
-                        importList.add(factory.createImportStatement(testClass));
-                    }
-                }
-            }
+            if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, factory);
 
             for (final PsiMethod m : targetClass.getMethods()) {
                 if (m.getName().equals(methodName)) {

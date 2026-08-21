@@ -5,8 +5,7 @@ import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenAction;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.Services;
-import org.testin.util.Tools;
+import org.testin.util.NameSanitizer;
 
 public class UpdateTestDescription extends UpdateTestBase implements GenAction {
 
@@ -20,7 +19,7 @@ public class UpdateTestDescription extends UpdateTestBase implements GenAction {
         final String newValue = "\"" + tc.getDescription().replace("\"", "\\\"") + "\"";
         updateTestAnnotationAttribute(p, pm, "description", newValue);
 
-        final String newMethodName = Services.getInstance(p, Tools.class).sanitizeMethodName(tc.getDescription());
+        final String newMethodName = NameSanitizer.methodName(tc.getDescription());
         if (!pm.getName().equals(newMethodName)) {
             pm.setName(newMethodName);
         }

@@ -3,8 +3,6 @@ package org.testin.editor.listeners;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
 
-import javax.swing.*;
-import java.util.Optional;
 
 public class StatusBarListener {
 
@@ -45,7 +43,7 @@ public class StatusBarListener {
                 editor.getStatusBar().getPageSizeField().setText(String.valueOf(editor.getPageSize()));
             }
 
-            Optional.ofNullable(editor.getPreferredFocusedComponent()).ifPresent(JComponent::requestFocusInWindow);
+            editor.getPreferredFocusedComponent().requestFocusInWindow();
         });
     }
 }

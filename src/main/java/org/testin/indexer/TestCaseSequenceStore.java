@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 
@@ -34,34 +35,24 @@ final class TestCaseSequenceStore {
     }
 
     @NotNull List<TestCaseDto> getForTestSet(final @NotNull Path testSetPath) {
-        final List<UUID> ids = testSetCaseIds.get(testSetPath.toString());
-        if (ids == null || ids.isEmpty()) return Collections.emptyList();
+        final List<UUID> ids = testSetCaseIds.getOrDefault(testSetPath.toString(), List.of());
+        if (ids.isEmpty()) return List.of();
 
-        final Map<UUID, TestCaseDto> byId = new HashMap<>(ids.size());
-        for (final UUID id : ids) {
-            final TestCaseDto testCase = testCasesById.get(id);
-            if (testCase != null) byId.put(id, testCase);
-        }
-
-        final List<TestCaseDto> result = new ArrayList<>(byId.size());
-        final Set<UUID> visited = new HashSet<>();
-        TestCaseDto head = byId.values().stream()
-                .filter(testCase -> Boolean.TRUE.equals(testCase.getIsHead()))
-                .findFirst()
-                .orElse(null);
-
-        while (head != null && visited.add(head.getId())) {
-            result.add(head);
-            head = head.getNext() == null ? null : byId.get(head.getNext());
-        }
+        // Every case in the set, in rank order. It used to be a walk from
+        // whichever case claimed to be the head, with the ones the walk never
+        // reached appended afterward - so a set whose head was lost came back in
+        // an order nobody chose, and a case pointed at by nothing looked like it
+        // belonged at the end.
+        final Set<UUID> seen = new HashSet<>(ids.size());
+        final List<TestCaseDto> cases = new ArrayList<>(ids.size());
 
         for (final UUID id : ids) {
-            final TestCaseDto testCase = testCasesById.get(id);
-            if (testCase != null && visited.add(testCase.getId())) {
-                result.add(testCase);
-            }
+            // An id the index has no case for is one the scanner could not read;
+            // it is left out rather than drawn as a blank row.
+            if (seen.add(id)) Optional.ofNullable(testCasesById.get(id)).ifPresent(cases::add);
         }
-        return result;
+
+        return TestCaseOrder.ordered(cases);
     }
 
     void put(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
@@ -113,8 +104,8 @@ final class TestCaseSequenceStore {
 
     void remove(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
         testCasesById.remove(testCaseId);
-        final List<UUID> ids = testSetCaseIds.get(testSetPath.toString());
-        if (ids != null) ids.remove(testCaseId);
+        Optional.ofNullable(testSetCaseIds.get(testSetPath.toString()))
+                .ifPresent(ids -> ids.remove(testCaseId));
 
         final Path filePath = testSetPath.resolve(testCaseId + ".json");
         try {
@@ -124,28 +115,38 @@ final class TestCaseSequenceStore {
         }
     }
 
-    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> sortedList) {
+    /**
+     * The set's membership and order after a rearrangement.
+     *
+     * @param moved the cases whose rank actually changed. Only these are
+     *              written: the order is a value each case carries now, so a
+     *              case that stayed put has nothing new to say, and rewriting it
+     *              would put an untouched file in the tester's next commit
+     */
+    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList,
+                        final @NotNull List<TestCaseDto> moved) {
         final String path = testSetPath.toString();
-        final List<UUID> ids = new ArrayList<>(sortedList.size());
+        final List<UUID> ids = new ArrayList<>(orderedList.size());
         final Set<UUID> newIds = new HashSet<>();
 
-        for (int i = 0; i < sortedList.size(); i++) {
-            final TestCaseDto testCase = sortedList.get(i);
-            testCase.setIsHead(i == 0);
-            testCase.setNext(i < sortedList.size() - 1 ? sortedList.get(i + 1).getId() : null);
+        final Set<UUID> movedIds = new HashSet<>();
+        for (final TestCaseDto testCase : moved) movedIds.add(testCase.getId());
+
+        for (final TestCaseDto testCase : orderedList) {
             ids.add(testCase.getId());
             newIds.add(testCase.getId());
             testCasesById.put(testCase.getId(), testCase);
+
+            if (!movedIds.contains(testCase.getId())) continue;
+
             Services.getInstance(project, FilesUtil.class)
                     .write(project, testSetPath.resolve(testCase.getId() + ".json"), testCase);
         }
 
-        final List<UUID> oldIds = testSetCaseIds.get(path);
-        if (oldIds != null) {
-            oldIds.stream()
-                    .filter(id -> !newIds.contains(id))
-                    .forEach(testCasesById::remove);
-        }
+        // Whatever the set held and no longer holds stops being indexed at all.
+        Optional.ofNullable(testSetCaseIds.get(path)).ifPresent(oldIds -> oldIds.stream()
+                .filter(id -> !newIds.contains(id))
+                .forEach(testCasesById::remove));
         testSetCaseIds.put(path, ids);
     }
 

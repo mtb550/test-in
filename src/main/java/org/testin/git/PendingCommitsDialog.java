@@ -43,13 +43,27 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     private final @NotNull List<PendingChange> rowDifferences = new ArrayList<>();
     private final @NotNull Path repoRoot;
     private final @NotNull SelectionTable changes;
+    private final @NotNull ChoiceInput branch;
     private final @NotNull TextInput message;
     private final @NotNull DialogSplitButton commit;
     private final @NotNull Consumer<Request> onCommit;
 
+    /**
+     * @param branches      the branches to offer, read by the caller. Every Git
+     *                      command in this plugin goes through git4idea's
+     *                      authentication setup, which asserts it is not on the
+     *                      EDT - and a dialog constructor is on the EDT. So the
+     *                      background pass that collected the changes collects
+     *                      these too
+     * @param currentBranch the branch the repository is on, empty when Git could
+     *                      not say - a repository with no commit yet has a
+     *                      branch name and no branch
+     */
     public PendingCommitsDialog(final @NotNull Project p,
                                 final @NotNull List<PendingChange> differences,
                                 final @NotNull Path repoRoot,
+                                final @NotNull List<String> branches,
+                                final @NotNull String currentBranch,
                                 final @NotNull Consumer<Request> onCommit) {
         super(p);
         this.repoRoot = repoRoot;
@@ -64,6 +78,14 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                 .column("Before", 180)
                 .column("After", 180)
                 .build();
+        // The branch is part of the review, not a thing to remember to do
+        // first. It offers the branches this machine has, on the one that is
+        // checked out, and takes a name that is not on the list as a new branch
+        // to start - which is how a tester keeps a cycle's results off main
+        // without leaving the dialog.
+        final ComponentDialogBase<ChoiceInput> branchRow =
+                ComponentDialogBase.choice("Branch", offered(branches, currentBranch), currentBranch);
+
         // Deliberately empty. Pre-filling it produced five commits called
         // "Updated test cases" in one afternoon of testing - a default that gets
         // accepted rather than read, and a history that tells a reviewer nothing.
@@ -77,8 +99,9 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         final ComponentDialogBase<DialogSplitButton> commitButton =
                 ComponentDialogBase.splitButton(PUSH, COMMIT);
 
-        components = List.of(table, messageField, commitButton);
+        components = List.of(table, branchRow, messageField, commitButton);
         changes = table.getComponent();
+        branch = branchRow.getComponent();
         message = messageField.getComponent();
         commit = commitButton.getComponent();
 
@@ -97,6 +120,22 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         // letting them press it and be told afterward.
         changes.onSelectionChanged(() -> commit.setEnabled(!changes.getSelectedRows().isEmpty()));
         commit.setEnabled(!changes.getSelectedRows().isEmpty());
+    }
+
+    /**
+     * The branches to offer, with the current one always among them: it is the
+     * selected value, and a list that did not contain its own selection would
+     * read as a branch about to be created. A repository with no commit yet has
+     * exactly that shape - Git names the branch and lists none.
+     */
+    private static @NotNull List<String> offered(final @NotNull List<String> branches,
+                                                 final @NotNull String current) {
+        if (current.isEmpty() || branches.contains(current)) return branches;
+
+        final List<String> withCurrent = new ArrayList<>(branches);
+        withCurrent.addFirst(current);
+
+        return withCurrent;
     }
 
     /**
@@ -156,8 +195,6 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             return;
         }
 
-        final ChangeType changeType = ChangeType.fromLabel(changes.getValueAt(row, COLUMN_CHANGE_TYPE));
-
         try {
             final Path testSetPath = repoRoot.resolve(diff.relativeFilePath()).getParent();
             if (testSetPath == null) return;
@@ -167,19 +204,19 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
 
             switch (diff.type()) {
                 case ADDED -> indexer.removeTestCase(testSetPath, testCaseId);
-                case DELETED -> {
-                    final TestCaseDto oldState = diff.oldState();
-                    if (oldState == null) return;
-                    indexer.putTestCase(testSetPath, oldState);
-                }
+                case DELETED -> indexer.putTestCase(testSetPath, diff.committedState());
                 case MODIFIED -> {
-                    final TestCaseDto current = indexer.getTestCaseById(testCaseId);
-                    final TestCaseDto oldState = diff.oldState();
-                    final RevertAction revert = changeType == null ? null : changeType.getRevertAction();
-                    if (current == null || oldState == null || revert == null) return;
+                    // The row's own label says which field it reverts; a label
+                    // that names no revertable field leaves the row alone.
+                    final Optional<RevertAction> revert = ChangeType
+                            .fromLabel(changes.getValueAt(row, COLUMN_CHANGE_TYPE))
+                            .flatMap(ChangeType::getRevertAction);
+                    final Optional<TestCaseDto> current = indexer.findTestCase(testCaseId);
 
-                    revert.apply(current, oldState);
-                    indexer.putTestCase(testSetPath, current);
+                    if (revert.isEmpty() || current.isEmpty()) return;
+
+                    revert.get().apply(current.get(), diff.committedState());
+                    indexer.putTestCase(testSetPath, current.get());
                 }
             }
 
@@ -209,14 +246,25 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             return;
         }
 
-        onCommit.accept(new Request(selected, message.getText().trim(), PUSH.equals(commit.getChosen())));
+        onCommit.accept(new Request(selected, message.getText().trim(),
+                PUSH.equals(commit.getChosen()), branch.getValue(), branch.isNew()));
         closeOk();
     }
 
     /**
-     * What the tester asked for: these changes, under this message, and whether
-     * it goes to the remote as well as into the local history.
+     * What the tester asked for: these changes, under this message, onto this
+     * branch, and whether it goes to the remote as well as into the local
+     * history.
+     *
+     * @param branch    where the commit goes. The branch that is checked out
+     *                  unless the tester picked or typed another
+     * @param newBranch true when the name is not one of the branches offered, so
+     *                  the commit starts it rather than switching to it. Decided
+     *                  here, where the list that was offered is known, rather
+     *                  than by asking Git again later and racing whoever else
+     *                  touched the repository in between
      */
-    public record Request(@NotNull List<PendingChange> changes, @NotNull String message, boolean push) {
+    public record Request(@NotNull List<PendingChange> changes, @NotNull String message, boolean push,
+                          @NotNull String branch, boolean newBranch) {
     }
 }

@@ -4,24 +4,27 @@ import com.intellij.openapi.project.Project;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.testin.logger.Logger;
-import org.testin.model.*;
+import org.testin.model.BugPriority;
+import org.testin.model.BugSeverity;
+import org.testin.model.TestRunConfiguration;
+import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
+import org.testin.util.Display;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
-import org.testin.util.Tools;
-import org.testin.testproject.BoundTestProject;
 
 public final class TestRunWordGenerator {
 
@@ -30,6 +33,12 @@ public final class TestRunWordGenerator {
             3, new int[]{3, 87, 10},
             4, new int[]{3, 77, 10, 10}
     );
+    /**
+     * No rule under the paragraph, said as a color of no color rather than as a
+     * null the border writer would have to check (#71).
+     */
+    final String NO_BORDER = "";
+
     final String DARK_NAVY = "1F3864";
     final String MEDIUM_BLUE = "2E5496";
     final String DARK_GRAY = "595959";
@@ -57,12 +66,12 @@ public final class TestRunWordGenerator {
 
                 final String projectName = Services.getInstance(p, BoundTestProject.class).name();
 
-                addText(doc, "TEST SUMMARY REPORT", 18, true, DARK_NAVY, null, 2);
+                addText(doc, "TEST SUMMARY REPORT", 18, true, DARK_NAVY, NO_BORDER, 2);
 
                 String subtitleText = projectName + "  |  " + tr.getPlatform() + ", " + tr.getComponent();
                 addText(doc, subtitleText, 10, false, MEDIUM_BLUE, DARK_NAVY, 5);
 
-                XWPFParagraph conf = addText(doc, "Confidential — QA Test Execution Summary", 8, false, DARK_GRAY, null, 20);
+                XWPFParagraph conf = addText(doc, "Confidential — QA Test Execution Summary", 8, false, DARK_GRAY, NO_BORDER, 20);
                 setItalic(conf);
 
                 addHeading(doc, "1. Report Overview", 0, 15);
@@ -90,8 +99,8 @@ public final class TestRunWordGenerator {
                     addOverviewRow(overviewTable, 4, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType());
 
                 addOverviewRow(overviewTable, 5, "Executed By", summary.executedBy());
-                addOverviewRow(overviewTable, 6, "Execution Started", Tools.formatDate(tr.getExecutionStartedAt()));
-                addOverviewRow(overviewTable, 7, "Execution Ended", Tools.formatDate(tr.getExecutionEndedAt()));
+                addOverviewRow(overviewTable, 6, "Execution Started", Display.formatDate(tr.getExecutionStartedAt()));
+                addOverviewRow(overviewTable, 7, "Execution Ended", Display.formatDate(tr.getExecutionEndedAt()));
                 addOverviewRow(overviewTable, 8, "Run Status", trDir.getMarker().getStatus().name());
 
 
@@ -101,26 +110,38 @@ public final class TestRunWordGenerator {
 
                 addText(doc, String.format(
                         "This run holds %d test cases, of which %d were executed. Of those, %d%% passed. The results below summarize the outcome.",
-                        summary.total(), summary.executed(), summary.passRate()), 11, false, BLACK, null, 12);
+                        summary.total(), summary.executed(), summary.passRate()), 11, false, BLACK, NO_BORDER, 12);
 
-                XWPFTable statsTable = doc.createTable(1, 6);
+                // Seven tiles when the run has removed cases, six otherwise:
+                // the total counts them, so without a tile of their own the
+                // figures below the total do not add up to it.
+                final int tiles = summary.hasRemoved() ? 7 : 6;
+
+                XWPFTable statsTable = doc.createTable(1, tiles);
                 statsTable.setWidth("100%");
                 statsTable.setWidthType(TableWidthType.PCT);
                 setTableBorders(statsTable);
-                setTableWidths(statsTable, 17, 17, 17, 17, 16, 16);
+                setTableWidths(statsTable, evenWidths(tiles));
 
-                addStatCell(statsTable, 0, String.valueOf(summary.total()), "Total Cases", DARK_NAVY);
-                addStatCell(statsTable, 1, String.valueOf(summary.passed()), "Passed", GREEN);
-                addStatCell(statsTable, 2, String.valueOf(summary.failed()), "Failed", RED);
-                addStatCell(statsTable, 3, String.valueOf(summary.blocked()), "Blocked", DARK_YELLOW);
-                addStatCell(statsTable, 4, String.valueOf(summary.untested()), "Untested", DARK_GRAY);
-                addStatCell(statsTable, 5, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE);
+                int tile = 0;
+                addStatCell(statsTable, tile++, String.valueOf(summary.total()), "Total Cases", DARK_NAVY);
+                addStatCell(statsTable, tile++, String.valueOf(summary.passed()), "Passed", GREEN);
+                addStatCell(statsTable, tile++, String.valueOf(summary.failed()), "Failed", RED);
+                addStatCell(statsTable, tile++, String.valueOf(summary.blocked()), "Blocked", DARK_YELLOW);
+                addStatCell(statsTable, tile++, String.valueOf(summary.untested()), "Untested", DARK_GRAY);
+                if (summary.hasRemoved()) {
+                    addStatCell(statsTable, tile++, String.valueOf(summary.removed()), "Removed", DARK_GRAY);
+                }
+                addStatCell(statsTable, tile, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE);
 
                 addHeading(doc, "3. Result Analysis", 20, 12);
                 addColoredCount(doc, "Passed (" + summary.passed() + ")", GREEN);
                 addColoredCount(doc, "Failed (" + summary.failed() + ")", RED);
                 addColoredCount(doc, "Blocked (" + summary.blocked() + ")", DARK_YELLOW);
                 addColoredCount(doc, "Untested (" + summary.untested() + ")", DARK_GRAY);
+                if (summary.hasRemoved()) {
+                    addColoredCount(doc, "Removed (" + summary.removed() + ")", DARK_GRAY);
+                }
 
                 // One case table per status, empty ones omitted, numbered as
                 // printed so an absent section leaves no gap in the numbering.
@@ -134,7 +155,7 @@ public final class TestRunWordGenerator {
                             section.isWithFailureDetail(), section::matches);
                 }
 
-                addFooter(doc, Tools.formatDate(ZonedDateTime.now()));
+                addFooter(doc, Display.formatDate(ZonedDateTime.now()));
 
                 applyPageMargins(doc);
 
@@ -150,7 +171,7 @@ public final class TestRunWordGenerator {
 
     private @NotNull XWPFParagraph addText(final @NotNull XWPFDocument doc, final @NotNull String text, final int size,
                                            final boolean bold, final @NotNull String color,
-                                           final @Nullable String bottomBorder, final int spacingAfterPt) {
+                                           final @NotNull String bottomBorder, final int spacingAfterPt) {
         final XWPFParagraph p = doc.createParagraph();
         p.setSpacingAfter(spacingAfterPt * 20);
         final XWPFRun run = p.createRun();
@@ -159,7 +180,7 @@ public final class TestRunWordGenerator {
         run.setFontFamily("Calibri");
         run.setBold(bold);
         run.setColor(color);
-        if (bottomBorder != null) {
+        if (!bottomBorder.isEmpty()) {
             final CTBorder bottom = p.getCTPPr().addNewPBdr().addNewBottom();
             bottom.setVal(STBorder.Enum.forString("single"));
             bottom.setSz(BigInteger.valueOf(16));
@@ -261,7 +282,7 @@ public final class TestRunWordGenerator {
                                 final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull String headerBg,
                                 final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
         addHeading(doc, sectionNumber + ". " + sectionTitle, 20, 12);
-        addText(doc, description, 11, false, BLACK, null, 12);
+        addText(doc, description, 11, false, BLACK, NO_BORDER, 12);
 
         int cols = withFailureDetail ? 4 : 2;
         XWPFTable table = doc.createTable(1, cols);
@@ -414,6 +435,20 @@ public final class TestRunWordGenerator {
                 right.setVal(STBorder.Enum.forString("single"));
             }
         }
+    }
+
+    /**
+     * Percentages that fill the row exactly, whatever the tile count. The
+     * leftmost columns carry the remainder, which is what the handwritten
+     * widths did when there were always six of them.
+     */
+    private int @NotNull [] evenWidths(final int columns) {
+        final int[] widths = new int[columns];
+        Arrays.fill(widths, 100 / columns);
+
+        for (int i = 0; i < 100 % columns; i++) widths[i]++;
+
+        return widths;
     }
 
     private void setTableWidths(final @NotNull XWPFTable table, final int... percents) {

@@ -2,7 +2,6 @@ package org.testin.testrun.create;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.TestRunItems;
@@ -10,6 +9,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.*;
 import org.testin.util.Shortcuts;
 
+import java.util.Optional;
 import java.util.List;
 
 /**
@@ -32,9 +32,9 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
         this.runItem = runItem;
         this.onSave = onSave;
 
-        // tc is wired lazily by the run editor; a run item whose test case no
-        // longer exists in the test set never gets it assigned.
-        final @Nullable TestCaseDto tc = runItem.getTc();
+        // The case is wired lazily by the run editor; a run item whose test case
+        // no longer exists in the test set never gets one.
+        final Optional<TestCaseDto> tc = runItem.testCase();
 
         final @NotNull ComponentDialogBase<TextInput> actualResultField = ComponentDialogBase.textField()
                 .placeholder("set actual result..")
@@ -73,8 +73,8 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
         // the two rows describing the case are affected, and the Expected row
         // is left blank rather than filled with an apology - DialogDetails drops
         // blank rows, so it simply does not appear.
-        final String description = tc != null ? tc.getDescription() : "No longer in the test set";
-        final String expectedResult = tc != null ? tc.getExpectedResult() : "";
+        final String description = tc.map(TestCaseDto::getDescription).orElse("No longer in the test set");
+        final String expectedResult = tc.map(TestCaseDto::getExpectedResult).orElse("");
 
         components = List.of(
                 ComponentDialogBase.details()
@@ -95,7 +95,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
      * EMPTY is a persistence default, not a choice — Enhancement by default.
      */
     private static @NotNull BugSeverity severityOf(final @NotNull TestRunItems runItem) {
-        final @Nullable BugSeverity stored = runItem.getBugSeverity();
+        final BugSeverity stored = runItem.getBugSeverity();
         return stored == BugSeverity.EMPTY ? BugSeverity.ENHANCEMENT : stored;
     }
 
@@ -103,7 +103,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
      * EMPTY is a persistence default, not a choice — Low by default.
      */
     private static @NotNull BugPriority priorityOf(final @NotNull TestRunItems runItem) {
-        final @Nullable BugPriority stored = runItem.getBugPriority();
+        final BugPriority stored = runItem.getBugPriority();
         return stored == BugPriority.EMPTY ? BugPriority.LOW : stored;
     }
 

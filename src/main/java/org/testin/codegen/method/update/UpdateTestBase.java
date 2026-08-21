@@ -6,39 +6,41 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.codegen.Fqcn;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.Tools;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class UpdateTestBase {
 
-    protected @Nullable PsiMethod findMethodByTestName(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
-        final String targetId = tc.getId().toString();
-        for (final PsiMethod m : pc.getMethods()) {
-            final PsiAnnotation annotation = m.getModifierList().findAnnotation("org.testng.annotations.Test");
-            if (annotation != null) {
+    private static final @NotNull String TEST_ANNOTATION = "org.testng.annotations.Test";
 
-                final String annText = annotation.getText();
-                if (annText != null && annText.contains("testName") && annText.contains(targetId)) {
-                    return m;
-                }
-            }
-        }
-        return null;
+    /**
+     * The generated method for this test case, found by the id in its @Test
+     * annotation - empty when the class holds no such method.
+     */
+    protected @NotNull Optional<PsiMethod> findMethodByTestName(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
+        final String targetId = tc.getId().toString();
+
+        return Arrays.stream(pc.getMethods())
+                .filter(method -> getTestAnnotation(method)
+                        .map(PsiAnnotation::getText)
+                        .filter(text -> text.contains("testName") && text.contains(targetId))
+                        .isPresent())
+                .findFirst();
     }
 
-    protected @Nullable PsiAnnotation getTestAnnotation(final @NotNull PsiMethod pm) {
-        final PsiModifierList modifierList = pm.getModifierList();
-        final PsiAnnotation annotation = modifierList.findAnnotation("org.testng.annotations.Test");
-        if (annotation == null) {
-            Logger.warn("Update: method has no @Test annotation");
-        }
-        return annotation;
+    /**
+     * The method's @Test annotation, empty on a method that has none.
+     */
+    protected @NotNull Optional<PsiAnnotation> getTestAnnotation(final @NotNull PsiMethod pm) {
+        return Optional.ofNullable(pm.getModifierList().findAnnotation(TEST_ANNOTATION));
     }
 
     protected void updateAnnotationAttribute(final @NotNull PsiElementFactory pf, final @NotNull PsiAnnotation pa,
@@ -99,18 +101,51 @@ public class UpdateTestBase {
      */
     protected void updateTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm,
                                                  final @NotNull String attrName, final @NotNull String newValue) {
-        final PsiAnnotation testAnnotation = getTestAnnotation(pm);
-        if (testAnnotation == null) return;
+        getTestAnnotation(pm).ifPresentOrElse(testAnnotation -> {
+            updateAnnotationAttribute(JavaPsiFacade.getElementFactory(p), testAnnotation, attrName, newValue);
+            com.intellij.psi.codeStyle.CodeStyleManager.getInstance(p).reformat(pm);
+        }, () -> Logger.warn("Update: method has no @Test annotation"));
+    }
 
-        updateAnnotationAttribute(JavaPsiFacade.getElementFactory(p), testAnnotation, attrName, newValue);
-        com.intellij.psi.codeStyle.CodeStyleManager.getInstance(p).reformat(pm);
+    /**
+     * The edit was saved and no code changed, because there is no generated
+     * method to change.
+     * <p>
+     * Said out loud rather than written to the log and forgotten. The tester
+     * watched the case change in the editor and has no other way to learn that
+     * the code did not follow - it happened five times in one log before anybody
+     * noticed (#66, finding 19).
+     */
+    private void noCodeToUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String detail) {
+        Logger.warn("Update: " + detail);
+
+        Services.getInstance(p, Notifier.class).softShowNoGeneratedCode(p, tc.getDescription());
+    }
+
+    /**
+     * Applies a change to the case's generated method, and says so when there is
+     * none to change.
+     */
+    protected void applyUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title,
+                               final @NotNull Consumer<PsiMethod> updater) {
+        applyToMethod(p, tc, title, updater, detail -> noCodeToUpdate(p, tc, detail));
+    }
+
+    /**
+     * The same, for removing the method: one that is not there needs no
+     * removing, so nothing is said. A balloon reading "has no generated code
+     * yet" while the tester deletes a case is a balloon about nothing.
+     */
+    protected void applyRemoval(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title,
+                                final @NotNull Consumer<PsiMethod> updater) {
+        applyToMethod(p, tc, title, updater, detail -> Logger.debug("Remove: " + detail + ", so nothing to remove"));
     }
 
     // Shared boilerplate for all update actions: resolve the FQCN, locate the target class and
     // its @Test method by testName, then apply the specific update inside a write command action.
-    protected void applyUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title,
-                               final @NotNull Consumer<PsiMethod> updater) {
-        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+    private void applyToMethod(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title,
+                               final @NotNull Consumer<PsiMethod> updater, final @NotNull Consumer<String> onMissing) {
+        final List<String> fqcn = Fqcn.ofMethod(tc);
         if (fqcn.size() < 2) return;
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
@@ -118,15 +153,12 @@ public class UpdateTestBase {
                 WriteCommandAction.runWriteCommandAction(p, title, null, () -> {
                     final PsiClass targetClass = JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p));
                     if (targetClass == null) {
-                        Logger.warn("Update: class not found: " + path);
+                        onMissing.accept("class not found: " + path);
                         return;
                     }
-                    final PsiMethod targetMethod = findMethodByTestName(targetClass, tc);
-                    if (targetMethod == null) {
-                        Logger.warn("Update: no method found with testName=" + tc.getId());
-                        return;
-                    }
-                    updater.accept(targetMethod);
+
+                    findMethodByTestName(targetClass, tc).ifPresentOrElse(updater,
+                            () -> onMissing.accept("no method with testName=" + tc.getId()));
                 }));
     }
 }

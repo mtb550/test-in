@@ -11,16 +11,17 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.FileDocumentListener;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.ui.dialogs.FormRows;
 import org.testin.ui.framework.DialogComponent;
 
+import java.util.Optional;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -106,15 +107,15 @@ public final class SourceForm implements DialogComponent {
     }
 
     /**
-     * The chosen file, or null when the field is still empty - in which case it
-     * takes the focus and the dialog stays open. Remembers the file's folder
+     * The chosen file, or empty when the field is still empty - in which case
+     * it takes the focus and the dialog stays open. Remembers the file's folder
      * when the checkbox is ticked.
      */
-    public @Nullable File resolve() {
+    public @NotNull Optional<File> resolve() {
         final String filePath = fileField.getText().trim();
         if (filePath.isEmpty()) {
             fileField.getTextField().requestFocus();
-            return null;
+            return Optional.empty();
         }
 
         final File source = new File(filePath);
@@ -125,7 +126,7 @@ public final class SourceForm implements DialogComponent {
                 Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder = folder.getAbsolutePath();
         }
 
-        return source;
+        return Optional.of(source);
     }
 
     /**
@@ -141,7 +142,7 @@ public final class SourceForm implements DialogComponent {
         }
 
         final String columns = importAttributes.stream()
-                .filter(TestEditorAttributes::isImportable)
+                .filter(a -> a.can(Can.IMPORT))
                 .map(TestEditorAttributes::getName)
                 .collect(Collectors.joining(", "));
 

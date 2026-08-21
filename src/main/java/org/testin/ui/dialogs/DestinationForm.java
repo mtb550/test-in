@@ -10,12 +10,12 @@ import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTextField;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.importexport.FileTypes;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.ui.framework.DialogComponent;
 
+import java.util.Optional;
 import javax.swing.*;
 import java.io.File;
 import java.util.Arrays;
@@ -101,39 +101,39 @@ public final class DestinationForm implements DialogComponent {
                 .row("Format:", formatCombo);
 
         if (offersDefaultFolder)
-            formRows.row(null, setDefaultCheckBox);
+            formRows.unlabeledRow(setDefaultCheckBox);
 
         return formRows;
     }
 
     /**
-     * The destination, or null when a field is still empty - in which case the
+     * The destination, or empty when a field is still empty - in which case the
      * offending field takes the focus and the dialog stays open. Remembers the
      * folder when the checkbox is ticked.
      */
-    public @Nullable Destination resolve() {
+    public @NotNull Optional<Destination> resolve() {
         final String folder = folderField.getText().trim();
         final String fileName = fileNameField.getText().trim();
 
         if (fileName.isEmpty()) {
             fileNameField.requestFocus();
-            return null;
+            return Optional.empty();
         }
         if (folder.isEmpty()) {
             folderField.getTextField().requestFocus();
-            return null;
+            return Optional.empty();
         }
 
         final FileTypes format = (FileTypes) formatCombo.getSelectedItem();
         if (format == null) {
             formatCombo.requestFocus();
-            return null;
+            return Optional.empty();
         }
 
         if (offersDefaultFolder && setDefaultCheckBox.isSelected())
             Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder = folder;
 
-        return new Destination(new File(folder, withExtension(fileName, format.getExtension())), format);
+        return Optional.of(new Destination(new File(folder, withExtension(fileName, format.getExtension())), format));
     }
 
     private @NotNull String defaultFolder() {

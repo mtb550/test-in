@@ -12,9 +12,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
@@ -38,13 +36,16 @@ public class StepsSection implements CreateTestCaseSection {
     private final @NotNull JBPanel<?> stepsContainer;
     private final @NotNull JBPanel<?> wrapper;
     /**
-     * Parent for the per-step shortcut registrations; set by the owning dialog.
+     * Parent for the per-step shortcut registrations, so a row recreated by a
+     * fillData does not keep the discarded one alive. The owning dialog's, given
+     * at construction - there is no moment when the section has steps and no
+     * disposable to hang them from (#71).
      */
-    @Setter
-    private @Nullable Disposable parentDisposable;
+    private final @NotNull Disposable parentDisposable;
 
-    public StepsSection(final @NotNull Project p) {
+    public StepsSection(final @NotNull Project p, final @NotNull Disposable parentDisposable) {
         this.p = p;
+        this.parentDisposable = parentDisposable;
         this.stepFields = new ArrayList<>();
 
         this.stepsContainer = new JBPanel<>();
@@ -82,9 +83,9 @@ public class StepsSection implements CreateTestCaseSection {
         });
     }
 
-    public void addStepField(final @Nullable String text, final @NotNull UIAction repackAction) {
+    public void addStepField(final @NotNull String text, final @NotNull UIAction repackAction) {
         final TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getSteps(), CreateTestCaseFields.STEPS.getIcon());
-        final EditorTextField stepField = SpellChecker.createCompletionField(p, provider, text != null ? text : "");
+        final EditorTextField stepField = SpellChecker.createCompletionField(p, provider, text);
 
         stepField.setOneLineMode(true);
         stepField.setFont(fieldFont);
@@ -122,11 +123,8 @@ public class StepsSection implements CreateTestCaseSection {
 
         // Tied to the dialog's disposable: rows are recreated on every fillData,
         // and unparented registrations would keep the discarded rows alive.
-        if (parentDisposable != null) {
-            removeStepShortcut.registerCustomShortcutSet(Shortcuts.CreateTestCaseRemoveStep.getCustomShortcut(), stepField, parentDisposable);
-        } else {
-            removeStepShortcut.registerCustomShortcutSet(Shortcuts.CreateTestCaseRemoveStep.getCustomShortcut(), stepField);
-        }
+        removeStepShortcut.registerCustomShortcutSet(
+                Shortcuts.CreateTestCaseRemoveStep.getCustomShortcut(), stepField, parentDisposable);
 
         final JBPanel<?> buttonWrapper = new JBPanel<>(new BorderLayout());
         buttonWrapper.setOpaque(false);

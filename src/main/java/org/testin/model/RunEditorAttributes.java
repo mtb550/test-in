@@ -4,11 +4,12 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.Fqcn;
 import org.testin.editor.Shared;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.util.Tools;
+import org.testin.util.Display;
 
 import java.util.List;
 import java.util.Map;
@@ -117,7 +118,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     DURATION(
             "Duration",
             ToolBarDefault.ON,
-            (item, p) -> Services.getInstance(p, Tools.class).getFormattedDuration(item.getDuration())
+            (item, p) -> Display.formatDuration(item.getDuration())
     ),
 
     EXECUTED_BY(
@@ -129,18 +130,15 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     EXECUTED_AT(
             "Executed At",
             ToolBarDefault.OFF,
-            (item, p) -> Tools.formatDate(item.getExecutedAt())
+            (item, p) -> Display.formatDate(item.getExecutedAt())
     ),
 
     PATH(
             "Path",
             ToolBarDefault.LOCKED_UNCHECKED,
-            (item, p) -> {
-                final TestCaseDto tc = Services.getInstance(p, ProjectIndexer.class).getTestCaseById(item.getId());
-                if (tc != null)
-                    return String.join(" > ", tc.getParent().getPath2());
-                return "";
-            }
+            (item, p) -> Services.getInstance(p, ProjectIndexer.class).findTestCase(item.getId())
+                    .map(tc -> String.join(" > ", tc.getParent().getPath2()))
+                    .orElse("")
     ),
 
     FQCN(
@@ -148,7 +146,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             ToolBarDefault.LOCKED_UNCHECKED,
             (item, p) -> {
                 final TestCaseDto tc = item.requireTc();
-                return String.join(" > ", Services.getInstance(p, Tools.class).buildFqcnMethod(tc));
+                return String.join(" > ", Fqcn.ofMethod(tc));
             }
     );
 

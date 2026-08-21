@@ -9,7 +9,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryMapper;
 import org.testin.model.DirectoryType;
@@ -291,19 +290,48 @@ public final class ProjectIndexer {
         return store.getTestCasesForTestSet(testSetPath);
     }
 
-    public @Nullable TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
+    /**
+     * Every test case under this node, in tree order: a test set's own cases, and
+     * those of every test set beneath a package.
+     * <p>
+     * No instanceof and no special case for a package: a node that holds no cases
+     * of its own answers with an empty list, so one walk serves a test set, a
+     * package of them, and the Test Cases root alike.
+     * <p>
+     * Retired branches are left out. A deprecated test set, or anything under an
+     * archived package, is not current work - the same rule that keeps it out of
+     * the case selection when a run is configured (#68). A retired node the
+     * tester picked out themselves is still walked: they asked for it by name.
+     */
+    public @NotNull List<TestCaseDto> getTestCasesUnder(final @NotNull DirectoryDto dir) {
+        final List<TestCaseDto> cases = new ArrayList<>(getTestCasesForTestSet(dir.getPath()));
+
+        for (final DirectoryDto child : getChildren(dir.getPath())) {
+            if (child.isRetired()) continue;
+
+            cases.addAll(getTestCasesUnder(child));
+        }
+
+        return cases;
+    }
+
+    public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
         return store.getTestRunByPath(testRunPath);
     }
 
-    public @Nullable TestCaseDto getTestCaseById(final @NotNull UUID id) {
-        return store.getTestCaseById(id);
+    /**
+     * A test case by id, empty when it is not indexed - a case deleted after a
+     * run recorded it, or after the code that names it was generated.
+     */
+    public @NotNull Optional<TestCaseDto> findTestCase(final @NotNull UUID id) {
+        return store.findTestCase(id);
     }
 
-    public @Nullable TestSetDirectoryDto getTestSetByPath(final @NotNull Path path) {
+    public @NotNull TestSetDirectoryDto getTestSetByPath(final @NotNull Path path) {
         return store.getTestSetDirByPath(path);
     }
 
-    public @Nullable TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {
+    public @NotNull TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {
         return store.getTestRunDirByPath(path);
     }
 
@@ -325,28 +353,6 @@ public final class ProjectIndexer {
                 .filter(tc -> tc.getParent().getPath().startsWith(path)).count();
 
         return new NodeContents(sets, cases, runs);
-    }
-
-    /**
-     * How much a node holds, for a caller that has to say it out loud.
-     */
-    public record NodeContents(long testSets, long testCases, long testRuns) {
-
-        /**
-         * The sentence a confirmation shows, or blank when the node holds
-         * nothing - "and nothing else goes with it" is not worth a line.
-         */
-        public @NotNull String describe() {
-            if (testSets == 0 && testCases == 0 && testRuns == 0) return "";
-
-            return "Holds " + testSets + " test set" + plural(testSets)
-                    + ", " + testCases + " test case" + plural(testCases)
-                    + " and " + testRuns + " test run" + plural(testRuns);
-        }
-
-        private @NotNull String plural(final long count) {
-            return count == 1 ? "" : "s";
-        }
     }
 
     public @NotNull Map<String, TestProjectDirectoryDto> getTestProjectsByPath() {
@@ -389,8 +395,9 @@ public final class ProjectIndexer {
         return List.copyOf(store.getTestCasesById().values());
     }
 
-    public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> sortedList) {
-        store.updateSequence(testSetPath, sortedList);
+    public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList,
+                               final @NotNull List<TestCaseDto> moved) {
+        store.updateSequence(testSetPath, orderedList, moved);
     }
 
     /**
@@ -523,11 +530,11 @@ public final class ProjectIndexer {
      */
     public void moveNode(final @NotNull Path oldPath,
                          final @NotNull Path newPath,
-                         final @Nullable Consumer<@NotNull Boolean> onFinished) {
+                         final @NotNull Consumer<@NotNull Boolean> onFinished) {
         final Path targetParent = newPath.getParent();
         if (targetParent == null) {
             Logger.warn("Move refused, target has no parent directory: " + newPath);
-            if (onFinished != null) onFinished.accept(false);
+            onFinished.accept(false);
             return;
         }
 
@@ -541,10 +548,8 @@ public final class ProjectIndexer {
         }, () -> {
             store.renameNode(oldPath, newPath);
             Logger.info("Moved successfully to: " + newPath);
-            if (onFinished != null) onFinished.accept(true);
-        }, () -> {
-            if (onFinished != null) onFinished.accept(false);
-        });
+            onFinished.accept(true);
+        }, () -> onFinished.accept(false));
     }
 
     /**
@@ -555,9 +560,9 @@ public final class ProjectIndexer {
      * finished copy from a failed one (#66, F2).
      */
     public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath,
-                          final @Nullable IntConsumer onComplete) {
+                          final @NotNull IntConsumer onComplete) {
         if (sourcePaths.isEmpty()) {
-            if (onComplete != null) onComplete.accept(0);
+            onComplete.accept(0);
             return;
         }
 
@@ -570,9 +575,7 @@ public final class ProjectIndexer {
             if (pending.decrementAndGet() != 0) return;
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 refreshIndexedProject(targetPath);
-                if (onComplete != null) {
-                    ApplicationManager.getApplication().invokeLater(() -> onComplete.accept(copied.get()));
-                }
+                ApplicationManager.getApplication().invokeLater(() -> onComplete.accept(copied.get()));
             });
         };
         final Runnable operationSucceeded = () -> {
@@ -581,6 +584,13 @@ public final class ProjectIndexer {
         };
 
         for (final Path sourcePath : sourcePaths) {
+            final Path copiedRoot = targetPath.resolve(sourcePath.getFileName());
+
+            final Runnable copySucceeded = () -> {
+                reidentifyCopiedCases(copiedRoot);
+                operationSucceeded.run();
+            };
+
             Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
                 try {
                     sourceVf.copy(this, targetVf, sourceVf.getName());
@@ -588,7 +598,72 @@ public final class ProjectIndexer {
                     Logger.error(ex.getMessage());
                     throw new RuntimeException(ex);
                 }
-            }, operationSucceeded, operationFinished);
+            }, copySucceeded, operationFinished);
+        }
+    }
+
+    /**
+     * Gives every test case in a freshly copied subtree an id of its own.
+     * <p>
+     * A copy is a copy of the files, so the cases in it arrive carrying the ids
+     * of the cases they came from - and a case's id is its identity here: the
+     * index holds one case per id, so the copy and the original would resolve to
+     * the same case, and editing either would edit both. Pasting a single case
+     * has always taken a fresh id; copying a whole set never went through that
+     * code (#51).
+     * <p>
+     * Before the index reads them, and by the file name, because the file name
+     * is what the scanner takes the identity from - the id inside is rewritten
+     * to match so the two never disagree.
+     * <p>
+     * Test runs are left alone. Their file is named for their folder rather than
+     * for an id, so they are not touched by this, and a copied run still refers
+     * to the cases it actually executed.
+     */
+    private void reidentifyCopiedCases(final @NotNull Path copiedRoot) {
+        final List<Path> caseFiles;
+
+        try (Stream<Path> files = Files.walk(copiedRoot)) {
+            // Collected before rewriting: the walk is lazy, and creating and
+            // deleting files under it while it runs is not its contract.
+            caseFiles = files.filter(Files::isRegularFile).filter(ProjectIndexer::isCaseFile).toList();
+
+        } catch (final IOException ex) {
+            Logger.error("Could not read the copied nodes at " + copiedRoot + ": " + ex.getMessage());
+            return;
+        }
+
+        caseFiles.forEach(this::reidentify);
+        Logger.info("Gave " + caseFiles.size() + " copied test case(s) new ids under " + copiedRoot.getFileName());
+    }
+
+    /**
+     * A test case is the file whose name is an id. A marker is named for its
+     * kind and a run for its folder, so neither answers true.
+     */
+    private static boolean isCaseFile(final @NotNull Path file) {
+        final String name = file.getFileName().toString();
+        if (!name.endsWith(".json")) return false;
+
+        try {
+            UUID.fromString(name.substring(0, name.length() - ".json".length()));
+            return true;
+        } catch (final IllegalArgumentException notACase) {
+            return false;
+        }
+    }
+
+    private void reidentify(final @NotNull Path caseFile) {
+        try {
+            final TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(caseFile.toFile(), TestCaseDto.class);
+            final UUID fresh = UUID.randomUUID();
+
+            tc.setId(fresh);
+            Services.getInstance(p, FilesUtil.class).write(p, caseFile.resolveSibling(fresh + ".json"), tc);
+            Files.delete(caseFile);
+
+        } catch (final Exception ex) {
+            Logger.error("Could not give the copied case " + caseFile.getFileName() + " a new id: " + ex.getMessage());
         }
     }
 
@@ -651,11 +726,17 @@ public final class ProjectIndexer {
     }
 
     /**
-     * The node at a path, whatever kind it is, or null when nothing is indexed
+     * The node at a path, whatever kind it is, empty when nothing is indexed
      * there. Saves a caller that only has a path from having to know which kind
      * of node to ask for.
+     * <p>
+     * The one path lookup that answers rather than promises: its callers ask
+     * about a path they remembered - editors to reopen from a previous session,
+     * a path typed into settings - and what was there last time may not be there
+     * now. Every other lookup is keyed by something on the screen and returns
+     * the node (#71).
      */
-    public @Nullable DirectoryDto findByPath(final @NotNull Path path) {
+    public @NotNull Optional<DirectoryDto> find(final @NotNull Path path) {
         return store.findByPath(path);
     }
 
@@ -667,7 +748,7 @@ public final class ProjectIndexer {
      * Cache lookup, no disk access: true when a tree node exists at the path.
      */
     public boolean nodeExists(final @NotNull Path path) {
-        return store.findByPath(path) != null;
+        return store.findByPath(path).isPresent();
     }
 
     /**
@@ -692,7 +773,7 @@ public final class ProjectIndexer {
      * {@code executeVfsAction} reports and swallows a failure before the cache
      * update and the callback are reached.
      */
-    public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @Nullable Runnable onFinished) {
+    public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
         Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, vf -> {
             try {
                 vf.rename(this, newPath.getFileName().toString());
@@ -706,7 +787,29 @@ public final class ProjectIndexer {
             // rename succeeded: otherwise the target directory already exists
             // and the rename fails with "already exists in VFS".
             store.renameNode(oldPath, newPath);
-            if (onFinished != null) onFinished.run();
+            onFinished.run();
         });
+    }
+
+    /**
+     * How much a node holds, for a caller that has to say it out loud.
+     */
+    public record NodeContents(long testSets, long testCases, long testRuns) {
+
+        /**
+         * The sentence a confirmation shows, or blank when the node holds
+         * nothing - "and nothing else goes with it" is not worth a line.
+         */
+        public @NotNull String describe() {
+            if (testSets == 0 && testCases == 0 && testRuns == 0) return "";
+
+            return "Holds " + testSets + " test set" + plural(testSets)
+                    + ", " + testCases + " test case" + plural(testCases)
+                    + " and " + testRuns + " test run" + plural(testRuns);
+        }
+
+        private @NotNull String plural(final long count) {
+            return count == 1 ? "" : "s";
+        }
     }
 }

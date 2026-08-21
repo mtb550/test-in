@@ -4,7 +4,6 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,15 +32,22 @@ public final class FormRows extends JBPanel<FormRows> {
     }
 
     /**
-     * One label/field row. A null label leaves the label column empty, which is
-     * how a checkbox lines up under the fields above it.
+     * A row whose label column stays empty - how a checkbox lines up under the
+     * fields above it.
      */
-    public @NotNull FormRows row(final @Nullable String label, final @NotNull JComponent field) {
+    public @NotNull FormRows unlabeledRow(final @NotNull JComponent field) {
+        return row("", field);
+    }
+
+    /**
+     * One label/field row.
+     */
+    public @NotNull FormRows row(final @NotNull String label, final @NotNull JComponent field) {
         gbc.gridx = 0;
         gbc.gridy = nextRow;
         gbc.gridwidth = 1;
         gbc.weightx = 0;
-        add(label != null ? new JBLabel(label) : new JBPanel<>(), gbc);
+        add(label.isEmpty() ? new JBPanel<>() : new JBLabel(label), gbc);
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;

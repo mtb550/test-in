@@ -21,7 +21,10 @@ public class TransferListener extends TransferHandler {
     private static final @NotNull DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
     private final @NotNull Project p;
     private final @NotNull TestinEditor editor;
-    private int @Nullable [] draggedIndices;
+    /**
+     * The rows the drag started on, and empty when it did not start on this list.
+     */
+    private int @NotNull [] draggedIndices = new int[0];
 
     public TransferListener(final @NotNull Project p, final @NotNull TestinEditor editor) {
         this.p = p;
@@ -80,10 +83,10 @@ public class TransferListener extends TransferHandler {
 
             if (items.isEmpty()) return false;
 
-            // Null when the drag did not start on this list: there is nothing
+            // Empty when the drag did not start on this list: there is nothing
             // here to reorder, and treating it as an insert would duplicate.
             final int[] dragged = draggedIndices;
-            if (dragged == null) return false;
+            if (dragged.length == 0) return false;
 
             final JBList.DropLocation dl = (JBList.DropLocation) support.getDropLocation();
             final int offset = editor.globalIndex(0);
@@ -115,7 +118,7 @@ public class TransferListener extends TransferHandler {
 
             // After the save, inside the try: a drop that threw on the way here
             // is logged, not confirmed (#62).
-            Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "reordered", itemsToMove.size());
+            Services.getInstance(p, Notifier.class).softShowCounted(p, "Re-sorted", itemsToMove.size());
 
             itemsToMove.stream().findFirst().ifPresentOrElse(
                     editor::selectTestCase,

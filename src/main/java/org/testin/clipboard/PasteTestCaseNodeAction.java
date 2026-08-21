@@ -12,14 +12,13 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
-import org.testin.editor.test.TestEditorContextMenu;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -40,7 +39,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
     public PasteTestCaseNodeAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Paste Node", "Paste selected test cases from clipboard", AllIcons.Actions.MenuPaste);
         this.editor = editor;
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), list);
     }
 
     @Override
@@ -52,13 +51,12 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
             TestEditor destUI = (editor instanceof TestEditor) ? (TestEditor) editor : null;
             if (destUI == null) return;
 
-            boolean isCut = TestEditorContextMenu.isGlobalCutAction();
-            TestinEditor sourceUI = TestEditorContextMenu.getGlobalSourceEditorUI();
+            final CutState cutState = Services.getInstance(p, CutState.class);
+            final boolean isCut = cutState.isCutting();
 
-            if (isCut && sourceUI != null) {
-
-                List<TestCaseDto> cutItems = sourceUI.getAllTestCases().stream()
-                        .filter(tc -> TestEditorContextMenu.getGlobalPendingCutIds().contains(tc.getId()))
+            cutState.source().ifPresent(sourceUI -> {
+                final List<TestCaseDto> cutItems = sourceUI.getAllTestCases().stream()
+                        .filter(tc -> cutState.isPending(tc.getId()))
                         .toList();
 
                 ApplicationManager.getApplication().runWriteAction(() -> {
@@ -70,9 +68,9 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
 
                 sourceUI.getAllTestCases().removeAll(cutItems);
                 if (sourceUI != destUI && sourceUI instanceof TestEditor sourceEditor) {
-                    sourceEditor.resortAndPersistSequence();
+                    sourceEditor.reorderAndPersist();
                 }
-            }
+            });
 
             int pasted = 0;
 
@@ -86,15 +84,13 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
                 pasted++;
             }
 
-            destUI.resortAndPersistSequence();
+            destUI.reorderAndPersist();
 
-            if (isCut) {
-                TestEditorContextMenu.clearCutState();
-            }
+            if (isCut) cutState.clear();
 
             // Inside the invokeLater and after the sequence is persisted: the
             // action itself returns long before the cases exist (#62).
-            if (pasted > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "pasted", pasted);
+            if (pasted > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, "Pasted", pasted);
         });
     }
 
@@ -140,7 +136,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
         return Collections.emptyList();
     }
 
-    private TestCaseDto cloneForPasting(final @NotNull Project p, final TestCaseDto original, final boolean isCut) {
+    private @NotNull TestCaseDto cloneForPasting(final @NotNull Project p, final @NotNull TestCaseDto original, final boolean isCut) {
         final ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
         final TestCaseDto clonedTc = Services.getInstance(p, Mapper.class).convertValue(original, TestCaseDto.class);

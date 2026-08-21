@@ -20,6 +20,12 @@ final class ToggleFilterAction<T> extends DumbAwareToggleAction {
     private final @NotNull FilterMembership<T> membership;
     private final @NotNull Runnable onChanged;
 
+    /**
+     * @param icon the swatch a priority row shows, and null on every other row.
+     *             Really null rather than an empty icon: a toggle draws its own
+     *             checkmark where the icon would go, and an icon that is there
+     *             but paints nothing takes that place (#71)
+     */
     ToggleFilterAction(final @NotNull String text, final @Nullable Icon icon,
                        final @NotNull T value, final @NotNull Set<T> selection,
                        final @NotNull FilterMembership<T> membership, final @NotNull Runnable onChanged) {

@@ -9,7 +9,6 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -105,7 +104,7 @@ public final class TestinPathPanel {
         return pathField.getText();
     }
 
-    public void setPathText(final @Nullable String text) {
-        pathField.setText(text != null ? text : "");
+    public void setPathText(final @NotNull String text) {
+        pathField.setText(text);
     }
 }

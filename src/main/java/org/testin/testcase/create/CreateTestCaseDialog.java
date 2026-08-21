@@ -1,6 +1,5 @@
 package org.testin.testcase.create;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -10,7 +9,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.UIAction;
 import org.testin.ui.dialogs.DialogStyle;
@@ -22,25 +20,12 @@ import java.util.function.Consumer;
 
 public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
-    private @Nullable JBPopup popup;
-
     public CreateTestCaseDialog(final @NotNull Project p, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p);
 
         final TestCaseDto dto = new TestCaseDto();
 
-        final UIAction repackPopup = () -> {
-            if (popup != null) {
-                popup.pack(false, true);
-
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    final Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-                    if (focusOwner instanceof JComponent jComp) {
-                        jComp.scrollRectToVisible(new Rectangle(0, 0, jComp.getWidth(), jComp.getHeight()));
-                    }
-                });
-            }
-        };
+        final UIAction repackPopup = this::repack;
 
         final JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
             @Override
@@ -108,8 +93,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(statusBarSection.getPanel(), BorderLayout.SOUTH);
 
-        // Popup creation
-        popup = JBPopupFactory.getInstance()
+        final JBPopup dialogPopup = ownPopup(JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, DescriptionSection.getFocusComponent())
                 .setTitle("Create Test Case")
                 .setRequestFocus(true)
@@ -123,10 +107,9 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
                         dispose();
                     }
                 })
-                .createPopup();
+                .createPopup());
 
-        final Runnable saveAction = save(dto, onSave, new JBPopup[]{popup});
-        final JBPopup dialogPopup = popup;
+        final Runnable saveAction = save(dto, onSave, new JBPopup[]{dialogPopup});
 
         // register enter shortcut
         registerShortcut(mainPanel, Shortcuts.Enter.getCustomShortcut(), saveAction::run);
@@ -135,11 +118,5 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
         // editor popup has been open over the dialog - the spelling corrections,
         // for one - the built-in handler stops seeing the key.
         registerShortcut(mainPanel, Shortcuts.Escape.getCustomShortcut(), dialogPopup::cancel);
-    }
-
-    public void show() {
-        if (popup != null) {
-            popup.showCenteredInCurrentWindow(p);
-        }
     }
 }

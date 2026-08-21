@@ -10,9 +10,9 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.clipboard.CutState;
+import org.testin.services.Services;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.editor.test.TestEditorContextMenu;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -23,29 +23,25 @@ import java.awt.datatransfer.StringSelection;
 
 public class EscapeAction extends AbstractProjectAction {
 
-    // Exactly one of tree / list / table is set, by the constructor that was
-    // used; the surface this action was registered on is the one that is
-    // non-null. transferHandler accompanies the tree.
-    private final @Nullable SimpleTree tree;
-    private final @Nullable TreeTransferHandler transferHandler;
-    private final @Nullable JBList<TestCaseDto> list;
-    private final @Nullable JBTable table;
+    /**
+     * What ESC does on the surface this action was registered on, chosen by the
+     * constructor that was used.
+     * <p>
+     * It used to be four fields - a tree, its transfer handler, a list and a
+     * table - of which exactly one set was filled in, and the action worked out
+     * again at every press which constructor had been called (#71).
+     */
+    private final @NotNull Runnable onEscape;
 
     public EscapeAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
         super(p, "Escape Action", "Clear a pending cut or copy in the tree", AllIcons.Actions.InlayGear);
-        this.tree = tree;
-        this.transferHandler = transferHandler;
-        this.list = null;
-        this.table = null;
+        this.onEscape = () -> clearTreeTransfer(transferHandler);
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), tree);
     }
 
     public EscapeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Escape Action", "Clear a pending cut or copy, close the details panel, then clear the selection", AllIcons.Actions.InlayGear);
-        this.list = list;
-        this.table = null;
-        this.tree = null;
-        this.transferHandler = null;
+        this.onEscape = () -> stepBack(list::clearSelection);
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), list);
     }
 
@@ -54,51 +50,47 @@ public class EscapeAction extends AbstractProjectAction {
      */
     public EscapeAction(final @NotNull Project p, final @NotNull JBTable table) {
         super(p, "Escape Action", "Cancel the cell being edited, or clear the selection when not editing", AllIcons.Actions.InlayGear);
-        this.table = table;
-        this.list = null;
-        this.tree = null;
-        this.transferHandler = null;
+        this.onEscape = () -> escapeInGrid(table);
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), table);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (tree != null && transferHandler != null) {
-            transferHandler.getSelectedNodes().clear();
-            transferHandler.resetLastAction();
-            Logger.info("Clipboard/Cut state cleared via ESC.");
+        onEscape.run();
+    }
+
+    private void clearTreeTransfer(final @NotNull TreeTransferHandler transferHandler) {
+        transferHandler.getSelectedNodes().clear();
+        transferHandler.resetLastAction();
+        Logger.info("Clipboard/Cut state cleared via ESC.");
+    }
+
+    private void escapeInGrid(final @NotNull JBTable table) {
+        // While a cell is open the editor owns ESC: cancel the edit only.
+        if (table.isEditing()) {
+            table.getCellEditor().cancelCellEditing();
             return;
         }
 
-        if (list != null) {
-            clearClipboardState();
-            if (hideViewPanelIfVisible()) return;
+        stepBack(table::clearSelection);
+    }
 
-            if (!list.isSelectionEmpty()) {
-                list.clearSelection();
-            }
-            return;
-        }
+    /**
+     * One step back per press, on any surface that shows test cases: drop a
+     * pending cut, then close the details panel, then clear the selection.
+     * Clearing a selection that is already empty is what Swing does with it -
+     * nothing - so it is not asked about first.
+     */
+    private void stepBack(final @NotNull Runnable clearSelection) {
+        clearClipboardState();
+        if (hideViewPanelIfVisible()) return;
 
-        if (table != null) {
-            // While a cell is open the editor owns ESC: cancel the edit only.
-            if (table.isEditing()) {
-                table.getCellEditor().cancelCellEditing();
-                return;
-            }
-
-            clearClipboardState();
-            if (hideViewPanelIfVisible()) return;
-
-            if (table.getSelectedRowCount() > 0 || table.getSelectedColumnCount() > 0) {
-                table.clearSelection();
-            }
-        }
+        clearSelection.run();
     }
 
     private void clearClipboardState() {
-        if (TestEditorContextMenu.isGlobalCutAction()) {
-            TestEditorContextMenu.clearCutState();
+        if (Services.getInstance(p, CutState.class).isCutting()) {
+            Services.getInstance(p, CutState.class).clear();
         }
         CopyPasteManager.getInstance().setContents(new StringSelection(""));
     }
@@ -107,12 +99,13 @@ public class EscapeAction extends AbstractProjectAction {
      * True when the view panel was open and has been hidden by this ESC.
      */
     private boolean hideViewPanelIfVisible() {
-        final ToolWindow toolWindow = ViewToolWindowFactory.getToolWindow(p);
-        if (toolWindow != null && toolWindow.isVisible()) {
-            toolWindow.hide(null);
-            return true;
-        }
-        return false;
+        return ViewToolWindowFactory.toolWindow(p)
+                .filter(ToolWindow::isVisible)
+                .map(toolWindow -> {
+                    toolWindow.hide(null);
+                    return true;
+                })
+                .orElse(false);
     }
 
     @Override

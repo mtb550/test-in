@@ -1,7 +1,6 @@
 package org.testin.ui.framework;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.util.Shortcuts;
 
@@ -12,10 +11,17 @@ import org.testin.util.Shortcuts;
  * work without being shown (issue #11). Keys a component already binds itself
  * (e.g. list navigation) are declared as display-only {@link #hint}s.
  */
-public record StatusBarShortcut(@Nullable Shortcuts shortcut,
+public record StatusBarShortcut(@NotNull Shortcuts shortcut,
                                 @NotNull String displayText,
                                 @NotNull String name,
-                                @Nullable Runnable action) implements StatusBarItem {
+                                @NotNull Runnable action) implements StatusBarItem {
+
+    /**
+     * What a hint runs: nothing. A hint is bound to no key, so the key never
+     * arrives and this never runs - it exists so the record has no null in it.
+     */
+    private static final @NotNull Runnable NOTHING = () -> {
+    };
 
     public static @NotNull StatusBarShortcut build(final @NotNull Shortcuts shortcut, final @NotNull String name, final @NotNull Runnable action) {
         return new StatusBarShortcut(shortcut, shortcut.getShortcutText(), name, action);
@@ -25,14 +31,14 @@ public record StatusBarShortcut(@Nullable Shortcuts shortcut,
      * A display-only entry for keys the component binds itself.
      */
     public static @NotNull StatusBarShortcut hint(final @NotNull String displayText, final @NotNull String name) {
-        return new StatusBarShortcut(null, displayText, name, null);
+        return new StatusBarShortcut(Shortcuts.EMPTY, displayText, name, NOTHING);
     }
 
     /**
      * True when this entry also binds a key; hints only render.
      */
     public boolean isBindable() {
-        return shortcut != null && action != null;
+        return shortcut != Shortcuts.EMPTY;
     }
 
     @Override

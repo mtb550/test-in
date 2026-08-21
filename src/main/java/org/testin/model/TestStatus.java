@@ -5,10 +5,12 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.ui.UIUtil;
 import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -113,6 +115,7 @@ public enum TestStatus {
      * key to apply it. PENDING was the first: off the menu, yet carrying an icon
      * and a key nothing could reach.
      */
+    @Getter(AccessLevel.NONE)
     private final @Nullable MenuEntry menuEntry;
 
     /**
@@ -127,7 +130,16 @@ public enum TestStatus {
      * here so no caller has to know the two facts coincide.
      */
     public boolean isVerdict() {
-        return menuEntry != null;
+        return getMenuEntry().isPresent();
+    }
+
+    /**
+     * How the status menu draws this status, and empty for a status the menu
+     * does not offer. The one reader of the field, so nothing else has to know
+     * that "not on the menu" and "not a verdict" are the same fact.
+     */
+    public @NotNull Optional<MenuEntry> getMenuEntry() {
+        return Optional.ofNullable(menuEntry);
     }
 
     /**

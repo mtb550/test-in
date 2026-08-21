@@ -5,8 +5,8 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
@@ -33,9 +33,10 @@ public class UpdateTestSetStatusAction extends AbstractProjectTreeAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final TestSetDirectoryDto ts = selectedTestSet();
-        if (ts == null) return;
+        selectedTestSet().ifPresent(this::mark);
+    }
 
+    private void mark(final @NotNull TestSetDirectoryDto ts) {
         try {
             ts.getMarker().setStatus(status);
             ts.getMarker().touch(Services.getInstance(p, AppSettingsState.class).testerName);
@@ -54,14 +55,14 @@ public class UpdateTestSetStatusAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final TestSetDirectoryDto ts = selectedTestSet();
+        final Optional<TestSetDirectoryDto> ts = selectedTestSet();
 
-        e.getPresentation().setVisible(ts != null);
-        e.getPresentation().setEnabled(ts != null && ts.getMarker().getStatus() != status);
+        e.getPresentation().setVisible(ts.isPresent());
+        e.getPresentation().setEnabled(ts.filter(set -> set.getMarker().getStatus() != status).isPresent());
     }
 
-    private @Nullable TestSetDirectoryDto selectedTestSet() {
-        return TreeValueUtil.singleSelectedDirectory(tree) instanceof TestSetDirectoryDto ts ? ts : null;
+    private @NotNull Optional<TestSetDirectoryDto> selectedTestSet() {
+        return TreeValueUtil.singleSelected(tree, TestSetDirectoryDto.class);
     }
 
     @Override

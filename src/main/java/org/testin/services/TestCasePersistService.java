@@ -6,7 +6,6 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 
@@ -18,15 +17,11 @@ import java.util.List;
 public final class TestCasePersistService implements Disposable {
     private final @NotNull Project p;
 
-    public void persist(final @Nullable Path path, final @Nullable List<TestCaseDto> tcs) {
-        if (path == null || tcs == null || tcs.isEmpty()) return;
+    public void persist(final @NotNull Path path, final @NotNull List<TestCaseDto> tcs) {
+        if (tcs.isEmpty()) return;
 
-        ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> {
-            for (final TestCaseDto tc : tcs) {
-                if (tc == null) continue;
-                Services.getInstance(p, ProjectIndexer.class).putTestCase(path, tc);
-            }
-        }));
+        ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() ->
+                tcs.forEach(tc -> Services.getInstance(p, ProjectIndexer.class).putTestCase(path, tc))));
     }
 
     @Override

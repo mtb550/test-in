@@ -14,7 +14,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import git4idea.GitUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
@@ -25,7 +24,9 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
 import javax.swing.tree.TreePath;
+import java.util.Optional;
 import java.nio.file.Path;
+import java.util.List;
 
 public class SyncActionAction extends AbstractProjectTreeAction {
     private final @NotNull ExplorerPanel pp;
@@ -41,13 +42,15 @@ public class SyncActionAction extends AbstractProjectTreeAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        getActiveProjectPath().ifPresentOrElse(this::syncRepository, () ->
+                Services.getInstance(p, Notifier.class).error(p, "Sync Error",
+                        "Could not determine the active project. Please select a project in the tree."));
+    }
 
-        final Path repoPath = getActiveProjectPath();
-
-        if (repoPath == null) {
-            Services.getInstance(p, Notifier.class).error(p, "Sync Error", "Could not determine the active project. Please select a project in the tree.");
-            return;
-        }
+    /**
+     * Everything the action does once it knows which repository it is syncing.
+     */
+    private void syncRepository(final @NotNull Path repoPath) {
 
         // Soft, and not an error: nothing failed. The tester pressed Sync on a
         // test project that was never put under Git, and the sentence says which
@@ -67,9 +70,9 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                 try {
                     indicator.setText("Checking remote configuration...");
                     final String remoteName = git.getRemoteName(repoPath);
-                    final String remoteUrl = remoteName == null ? "" : git.getRemoteUrl(repoPath, remoteName);
+                    final String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
 
-                    if (remoteName == null || remoteUrl.isEmpty()) {
+                    if (remoteUrl.isEmpty()) {
                         ApplicationManager.getApplication().invokeLater(() ->
                                 Services.getInstance(p, Notifier.class).warn(p, "Sync Aborted", "No remote URL is configured for this project. Push a commit first to configure the remote.")
                         );
@@ -77,7 +80,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                     }
 
                     final String branch = git.getDefaultBranch(repoPath);
-                    if (branch == null || branch.isBlank()) {
+                    if (branch.isBlank()) {
                         throw new IllegalStateException("Could not determine the repository default branch.");
                     }
 
@@ -95,9 +98,13 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                     // platform's own assertion.
                     final boolean conflicts = git.hasConflicts(repoPath);
 
+                    // Asked here too, for the same reason: naming the files
+                    // that conflict is another git status.
+                    final List<String> conflicting = conflicts ? git.conflictingPaths(repoPath) : List.of();
+
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (conflicts) {
-                            showConflictActions(repoPath);
+                            showConflictActions(repoPath, conflicting);
                         } else {
                             Services.getInstance(p, Notifier.class).error(p, "Sync Failed", "Could not pull changes:\n" + ex.getMessage());
                         }
@@ -107,18 +114,35 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         });
     }
 
-    private void showConflictActions(final @NotNull Path repoPath) {
+    private void showConflictActions(final @NotNull Path repoPath, final @NotNull List<String> conflicting) {
         final Notifier notifier = Services.getInstance(p, Notifier.class);
+
+        final NotificationAction resolveAction = notifier.action(
+                "Resolve", () -> resolveConflicts(repoPath, conflicting));
         final NotificationAction continueAction = notifier.action(
                 "Continue rebase", () -> finishRebase(repoPath, false));
         final NotificationAction abortAction = notifier.action(
                 "Abort rebase", () -> finishRebase(repoPath, true));
+
         notifier.warnWithActions(
                 p,
                 "Git Conflicts",
-                "Pull stopped because conflicts must be resolved in the IDE before continuing.",
+                GitRefs.conflictMessage(conflicting),
+                resolveAction,
                 continueAction,
                 abortAction);
+    }
+
+    /**
+     * Merges the conflicted test cases and continues the pull when nothing is
+     * left conflicting. Off the EDT: it reads Git and writes files.
+     */
+    private void resolveConflicts(final @NotNull Path repoPath, final @NotNull List<String> conflicting) {
+        ApplicationManager.getApplication().executeOnPooledThread(() ->
+                ConflictResolution.resolve(p, repoPath, conflicting,
+                        () -> finishRebase(repoPath, false),
+                        leftOver -> Services.getInstance(p, Notifier.class).warn(p, "Still Conflicting",
+                                GitRefs.conflictMessage(leftOver))));
     }
 
     /**
@@ -130,9 +154,10 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         // Called from a background task's body and from its error handler, both
         // off the EDT - which is where the git question has to be asked.
         final boolean conflicts = git.hasConflicts(repoPath);
+        final List<String> conflicting = conflicts ? git.conflictingPaths(repoPath) : List.of();
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (conflicts) showConflictActions(repoPath);
+            if (conflicts) showConflictActions(repoPath, conflicting);
             else Services.getInstance(p, Notifier.class).error(p, "Git Conflict Operation Failed", message);
         });
     }
@@ -183,24 +208,26 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         Services.getInstance(p, ProjectIndexer.class).scanSingleProject(repoPath);
     }
 
-    private @Nullable Path getActiveProjectPath() {
+    /**
+     * The test project the selection sits under - the nearest one walking up the
+     * selected path, and the tree's own root when nothing is selected.
+     */
+    private @NotNull Optional<Path> getActiveProjectPath() {
         final TreePath selectionPath = tree.getSelectionPath();
         if (selectionPath != null) {
             for (final Object component : selectionPath.getPath()) {
-                final TestProjectDirectoryDto project = TreeValueUtil.valueOf(component, TestProjectDirectoryDto.class);
-                if (project != null) return project.getPath();
+                final Optional<Path> project = TreeValueUtil.valueOf(component, TestProjectDirectoryDto.class)
+                        .map(TestProjectDirectoryDto::getPath);
+                if (project.isPresent()) return project;
             }
         }
 
-        final TestProjectDirectoryDto root = TreeValueUtil.valueOf(tree.getModel().getRoot(), TestProjectDirectoryDto.class);
-        return root == null ? null : root.getPath();
+        return TreeValueUtil.projectPath(tree);
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final TreePath path = tree.getSelectionPath();
-        if (path == null) return;
-        e.getPresentation().setEnabled(TreeValueUtil.valueOf(path.getLastPathComponent(), TestProjectDirectoryDto.class) != null);
+        e.getPresentation().setEnabled(TreeValueUtil.selected(tree, TestProjectDirectoryDto.class).isPresent());
     }
 
     @Override

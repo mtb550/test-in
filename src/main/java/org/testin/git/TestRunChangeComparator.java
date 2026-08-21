@@ -6,13 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestRunDto;
-import org.testin.util.Tools;
+import org.testin.util.Display;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Compares two revisions of a test run, the way {@link TestCaseChangeComparator}
@@ -41,10 +37,10 @@ final class TestRunChangeComparator {
         addIfChanged(changes, "Browser", oldRun.getBrowser(), newRun.getBrowser());
         addIfChanged(changes, "Device Type", oldRun.getDeviceType(), newRun.getDeviceType());
         addIfChanged(changes, "Test Type", oldRun.getTestType(), newRun.getTestType());
-        addIfChanged(changes, "Execution Started", Tools.formatDate(oldRun.getExecutionStartedAt()),
-                Tools.formatDate(newRun.getExecutionStartedAt()));
-        addIfChanged(changes, "Execution Ended", Tools.formatDate(oldRun.getExecutionEndedAt()),
-                Tools.formatDate(newRun.getExecutionEndedAt()));
+        addIfChanged(changes, "Execution Started", Display.formatDate(oldRun.getExecutionStartedAt()),
+                Display.formatDate(newRun.getExecutionStartedAt()));
+        addIfChanged(changes, "Execution Ended", Display.formatDate(oldRun.getExecutionEndedAt()),
+                Display.formatDate(newRun.getExecutionEndedAt()));
 
         // A run file that changed with nothing above different still changed -
         // an id, a field this comparator does not read - and it has to be

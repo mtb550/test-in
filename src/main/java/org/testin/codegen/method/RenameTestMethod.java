@@ -6,8 +6,7 @@ import org.testin.codegen.GenAction;
 import org.testin.codegen.method.update.UpdateTestBase;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.Services;
-import org.testin.util.Tools;
+import org.testin.util.NameSanitizer;
 
 public class RenameTestMethod extends UpdateTestBase implements GenAction {
 
@@ -16,7 +15,7 @@ public class RenameTestMethod extends UpdateTestBase implements GenAction {
         if (!(obj instanceof TestCaseDto tc)) return;
 
         applyUpdate(p, tc, "Rename Test Method", pm -> {
-            final String newName = Services.getInstance(p, Tools.class).sanitizeMethodName(tc.getDescription());
+            final String newName = NameSanitizer.methodName(tc.getDescription());
             if (!pm.getName().equals(newName)) {
                 pm.setName(newName);
             }

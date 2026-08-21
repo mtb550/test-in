@@ -1,5 +1,6 @@
 package org.testin.explorer.tree;
 
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -9,12 +10,15 @@ import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.codegen.Moved;
+import org.testin.codegen.SubtreeCode;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.OptionalPlugin;
 import org.testin.ui.framework.ConfirmDialog;
 
 import javax.swing.*;
@@ -26,6 +30,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,22 +66,22 @@ public class TreeTransferHandler extends TransferHandler {
      * paste into project B. Unresolvable ownership rejects.
      */
     static boolean sameTestProject(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
-        final DirectoryDto sourceProject = owningProject(source);
-        final DirectoryDto targetProject = owningProject(target);
+        final Optional<Path> sourceProject = owningProject(source).map(DirectoryDto::getPath);
 
-        return sourceProject != null && targetProject != null
-                && sourceProject.getPath().equals(targetProject.getPath());
+        return sourceProject.isPresent()
+                && sourceProject.equals(owningProject(target).map(DirectoryDto::getPath));
     }
 
     /**
-     * Null when the node hangs outside any test project - ownership unresolvable.
+     * Empty when the node hangs outside any test project - ownership
+     * unresolvable.
      */
-    private static @Nullable DirectoryDto owningProject(final @NotNull DirectoryDto node) {
+    private static @NotNull Optional<DirectoryDto> owningProject(final @NotNull DirectoryDto node) {
         DirectoryDto current = node;
         while (current != null && !(current instanceof TestProjectDirectoryDto)) {
             current = current.getParent();
         }
-        return current;
+        return Optional.ofNullable(current);
     }
 
     private static @NotNull String describe(final @NotNull List<DirectoryDto> sources) {
@@ -104,6 +110,10 @@ public class TreeTransferHandler extends TransferHandler {
         return COPY_OR_MOVE;
     }
 
+    /**
+     * Swing's contract: null is how a TransferHandler says there is nothing to
+     * drag, and the platform reads it before anything of ours does (#71).
+     */
     @Override
     protected @Nullable Transferable createTransferable(final @NotNull JComponent c) {
         final List<DirectoryDto> directories = transferableSelection();
@@ -147,8 +157,39 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
-     * Only nodes that declare themselves transferable can be cut, copied or dragged.
+     * Whether copying or cutting would put anything on the clipboard - which is
+     * true of the nodes that declare themselves transferable, and no others.
+     * <p>
+     * The menu entries ask this rather than deciding for themselves, so what a
+     * greyed Copy means and what Copy would do are the same rule read twice.
      */
+    public boolean hasTransferableSelection() {
+        return !transferableSelection().isEmpty();
+    }
+
+    /**
+     * Whether what is on the clipboard could land on what is selected.
+     * <p>
+     * The same question the paste itself asks, through the same method - the
+     * flavor, the target, the family rules and the own-subtree check all
+     * together. A menu entry deciding any part of that for itself would be a
+     * second rule that agrees with this one until the day it does not.
+     */
+    public boolean canPasteFromClipboard() {
+        return clipboardContents()
+                .map(contents -> canImport(new TransferSupport(tree, contents)))
+                .orElse(false);
+    }
+
+    /**
+     * What is on the clipboard, and empty when it holds nothing - which is what
+     * the platform says with a null. Both the question and the paste ask here,
+     * so they cannot disagree about what an empty clipboard is.
+     */
+    private static @NotNull Optional<Transferable> clipboardContents() {
+        return Optional.ofNullable(CopyPasteManager.getInstance().getContents());
+    }
+
     private @NotNull List<DirectoryDto> transferableSelection() {
         return TreeValueUtil.selectedDirectories(tree.getSelectionPaths()).stream()
                 .filter(DirectoryDto::isTransferable)
@@ -158,8 +199,10 @@ public class TreeTransferHandler extends TransferHandler {
     @Override
     public boolean canImport(final @NotNull TransferSupport support) {
         if (!support.isDataFlavorSupported(NODE_FLAVOR)) return false;
-        final DirectoryDto target = targetDirectory(support);
-        final boolean valid = target != null && target.isTransferTarget() && anySourceLands(support, target);
+        final boolean valid = targetDirectory(support)
+                .filter(DirectoryDto::isTransferTarget)
+                .filter(target -> anySourceLands(support, target))
+                .isPresent();
 
         // No drop highlight over places nothing can land on - the highlight
         // otherwise lingers as a stray selection band.
@@ -196,8 +239,9 @@ public class TreeTransferHandler extends TransferHandler {
 
         try {
             final TreeTransferPayload payload = (TreeTransferPayload) support.getTransferable().getTransferData(NODE_FLAVOR);
-            final DirectoryDto target = targetDirectory(support);
-            if (target == null) return false;
+            final Optional<DirectoryDto> landing = targetDirectory(support);
+            if (landing.isEmpty()) return false;
+            final DirectoryDto target = landing.get();
 
             final int action = resolveAction(support, payload);
             final List<DirectoryDto> sources = transferableSources(payload.nodes(), target, action);
@@ -213,7 +257,7 @@ public class TreeTransferHandler extends TransferHandler {
                 final Path fromPath = sources.getFirst().getPath().getParent();
                 new ConfirmDialog(p, verb,
                         verb + " " + describe(sources) + " into '" + target.getName() + "'?",
-                        fromPath == null ? null : fromPath.toString(),
+                        Objects.toString(fromPath, ""),
                         target.getPath().toString(),
                         verb,
                         () -> transfer(action, sources, target)
@@ -284,8 +328,9 @@ public class TreeTransferHandler extends TransferHandler {
         } else {
             final List<Path> sourcePaths = sources.stream().map(DirectoryDto::getPath).toList();
             Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), copied -> {
+                generateForCopies(sources, target);
                 refresh.run();
-                confirmLanded("pasted", copied);
+                confirmLanded("Pasted", copied);
             });
         }
 
@@ -300,25 +345,31 @@ public class TreeTransferHandler extends TransferHandler {
     private void confirmLanded(final @NotNull String outcome, final int landed) {
         if (landed == 0) return;
 
-        Services.getInstance(p, Notifier.class).softShowCounted(p, "Node", outcome, landed);
+        Services.getInstance(p, Notifier.class).softShowCounted(p, outcome, landed);
     }
 
-    private @Nullable DirectoryDto targetDirectory(final @NotNull TransferSupport support) {
-        if (support.isDrop()) {
-            final TreePath path = dropPath(support);
-            return path == null ? null : TreeValueUtil.directoryOf(path.getLastPathComponent());
-        }
-        return TreeValueUtil.selectedDirectory(tree.getSelectionPath());
+    /**
+     * Where the transfer would land: the row under a drop, or whatever the tree
+     * has selected for a clipboard paste.
+     */
+    private @NotNull Optional<DirectoryDto> targetDirectory(final @NotNull TransferSupport support) {
+        return support.isDrop()
+                ? dropPath(support).flatMap(TreeValueUtil::directoryAt)
+                : TreeValueUtil.selectedDirectory(tree);
     }
 
-    private @Nullable TreePath dropPath(final @NotNull TransferSupport support) {
+    /**
+     * SimpleTree has a drop location type of its own, and reporting the drop by
+     * the wrong one is how ordering silently refused every drop it was given.
+     */
+    private @NotNull Optional<TreePath> dropPath(final @NotNull TransferSupport support) {
         if (support.getDropLocation() instanceof SimpleTree.DropLocation dropLocation) {
-            return dropLocation.getPath();
+            return Optional.ofNullable(dropLocation.getPath());
         }
         if (support.getDropLocation() instanceof JTree.DropLocation dropLocation) {
-            return dropLocation.getPath();
+            return Optional.ofNullable(dropLocation.getPath());
         }
-        return null;
+        return Optional.empty();
     }
 
     private int resolveAction(final @NotNull TransferSupport support, final @NotNull TreeTransferPayload payload) {
@@ -340,7 +391,7 @@ public class TreeTransferHandler extends TransferHandler {
                 .map(source -> target.getPath().resolve(source.getName()))
                 .toList();
 
-        moveBatch(oldPaths, newPaths, moved -> confirmLanded("moved", moved));
+        moveBatch(oldPaths, newPaths, moved -> confirmLanded("Moved", moved));
 
         Services.getInstance(p, TreeUndoService.class).push(new TreeUndoService.TreeOperation(
                 "Move " + describe(sources),
@@ -349,7 +400,8 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to) {
-        moveBatch(from, to, null);
+        moveBatch(from, to, moved -> {
+        });
     }
 
     /**
@@ -358,9 +410,15 @@ public class TreeTransferHandler extends TransferHandler {
      * the nodes moved would double-report one keystroke.
      */
     private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to,
-                           final @Nullable IntConsumer onDone) {
+                           final @NotNull IntConsumer onDone) {
         final AtomicInteger remaining = new AtomicInteger(from.size());
         final AtomicInteger moved = new AtomicInteger();
+
+        // Before the data moves, while the old paths are still what find the
+        // generated code - and here rather than at the gesture, because undo and
+        // redo are this same routine with the two lists swapped, so they carry
+        // the code back and forth without knowing they do (#51).
+        syncCode(from, to);
 
         for (int i = 0; i < from.size(); i++) {
             Services.getInstance(p, ProjectIndexer.class).moveNode(from.get(i), to.get(i), wasMoved -> {
@@ -371,11 +429,61 @@ public class TreeTransferHandler extends TransferHandler {
                 if (remaining.decrementAndGet() != 0) return;
 
                 refresh.run();
-                if (onDone != null) onDone.accept(moved.get());
+                onDone.accept(moved.get());
             });
         }
     }
 
+    /**
+     * Generates the Java for what was just copied.
+     * <p>
+     * A copy has none of its own: the files were duplicated, and nothing in them
+     * is Java. Unlike a move there is nothing to carry over, so each copied node
+     * and everything under it is generated from scratch - which is also why this
+     * runs after the copy rather than before it, the opposite of a move (#51).
+     */
+    private void generateForCopies(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
+        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+
+        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+
+        for (final DirectoryDto source : sources) {
+            indexer.find(target.getPath().resolve(source.getName())).ifPresent(copy -> SubtreeCode.generate(p, copy));
+        }
+    }
+
+    /**
+     * Moves the generated Java of every node in the batch, as one command.
+     * <p>
+     * One command for the gesture rather than one per node: every mover opens a
+     * command of its own, and a command inside a command is the outer one, so
+     * dragging twenty test sets takes the write lock once, reparses once and
+     * leaves the tester one undo entry beside the tree's own - not twenty to
+     * press through, each undoing a class move while the tree stays where it is.
+     * Whether this IDE has Java is asked once here for the same reason (#51).
+     */
+    private void syncCode(final @NotNull List<Path> from, final @NotNull List<Path> to) {
+        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+
+        WriteCommandAction.runWriteCommandAction(p, "Move Test Code", null, () -> {
+            for (int i = 0; i < from.size(); i++) moveCodeOf(from.get(i), to.get(i));
+        });
+    }
+
+    /**
+     * Moves the generated Java that belongs to the node at this path, if the
+     * node has any. Which generator that is belongs to the node itself.
+     */
+    private void moveCodeOf(final @NotNull Path from, final @NotNull Path to) {
+        // A destination with no parent is the filesystem root, which is not a
+        // place a test set can land.
+        Optional.ofNullable(to.getParent()).ifPresent(target ->
+                Services.getInstance(p, ProjectIndexer.class).find(from)
+                        .ifPresent(dir -> dir.getType().getMoveCodegen().execute(p, new Moved(dir, target))));
+    }
+
+    // Both parameters are Swing's, and Swing passes null for either when the
+    // drag ended without one (#71).
     @Override
     protected void exportDone(final @Nullable JComponent source, final @Nullable Transferable data, final int action) {
         if (action != MOVE) resetLastAction();
@@ -411,12 +519,11 @@ public class TreeTransferHandler extends TransferHandler {
         // it, and which of the two it was. A copy changes nothing on screen, so
         // without this the tester has no way to tell it happened.
         Services.getInstance(p, Notifier.class)
-                .softShowCounted(p, "Node", cut ? "cut" : "copied", directories.size());
+                .softShowCounted(p, cut ? "Cut" : "Copied", directories.size());
     }
 
     public void pasteFromClipboard() {
-        final Transferable contents = CopyPasteManager.getInstance().getContents();
-        if (contents != null) importData(new TransferSupport(tree, contents));
+        clipboardContents().ifPresent(contents -> importData(new TransferSupport(tree, contents)));
     }
 
     private void updateClipboardState(final int action, final @NotNull List<DirectoryDto> directories) {

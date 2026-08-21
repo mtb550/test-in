@@ -19,7 +19,6 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.ui.framework.DialogComponent;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Shortcuts;
@@ -30,6 +29,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.IntFunction;
@@ -63,7 +63,7 @@ final class BulkJsonEditors implements DialogComponent {
      * The escaped text each value started as, by marker index. Diff highlighting
      * compares against it; the dialogs know what "original" means, this does not.
      */
-    private @Nullable IntFunction<String> originalTextAt;
+    private @NotNull IntFunction<String> originalTextAt = index -> "";
 
     BulkJsonEditors(final @NotNull Project p) {
         this.p = p;
@@ -168,14 +168,16 @@ final class BulkJsonEditors implements DialogComponent {
     }
 
     /**
-     * The current text of one value, or null when its marker did not survive an
-     * edit - the caller decides what an unreadable value means.
+     * The current text of one value, empty when its marker did not survive an
+     * edit - the caller decides what an unreadable value means. An Optional
+     * rather than an empty string, because a value the tester cleared is an
+     * answer and an unreadable one is not (#71).
      */
-    @Nullable String valueAt(final int index) {
+    @NotNull Optional<String> valueAt(final int index) {
         final RangeMarker marker = markers.get(index);
-        if (!marker.isValid()) return null;
+        if (!marker.isValid()) return Optional.empty();
 
-        return rightDoc.getText(new TextRange(marker.getStartOffset(), marker.getEndOffset()));
+        return Optional.of(rightDoc.getText(new TextRange(marker.getStartOffset(), marker.getEndOffset())));
     }
 
     /**
@@ -285,7 +287,7 @@ final class BulkJsonEditors implements DialogComponent {
     }
 
     private void refreshDiffHighlights() {
-        if (rightEditor.isDisposed() || originalTextAt == null) return;
+        if (rightEditor.isDisposed()) return;
 
         final MarkupModel markup = rightEditor.getMarkupModel();
         for (final RangeHighlighter highlighter : markup.getAllHighlighters()) {
@@ -296,12 +298,14 @@ final class BulkJsonEditors implements DialogComponent {
         diffAttr.setBackgroundColor(new JBColor(new Color(228, 250, 228), new Color(43, 61, 44)));
 
         for (int i = 0; i < markers.size(); i++) {
-            final String current = valueAt(i);
-            if (current == null || current.equals(originalTextAt.apply(i))) continue;
-
-            final RangeMarker marker = markers.get(i);
-            markup.addRangeHighlighter(marker.getStartOffset(), marker.getEndOffset(),
-                    HighlighterLayer.SELECTION - 1, diffAttr, HighlighterTargetArea.EXACT_RANGE);
+            final int index = i;
+            valueAt(index)
+                    .filter(current -> !current.equals(originalTextAt.apply(index)))
+                    .ifPresent(current -> {
+                        final RangeMarker marker = markers.get(index);
+                        markup.addRangeHighlighter(marker.getStartOffset(), marker.getEndOffset(),
+                                HighlighterLayer.SELECTION - 1, diffAttr, HighlighterTargetArea.EXACT_RANGE);
+                    });
         }
     }
 

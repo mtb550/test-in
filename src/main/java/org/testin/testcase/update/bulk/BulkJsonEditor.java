@@ -9,7 +9,6 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -30,13 +29,11 @@ final class BulkJsonEditor {
      * Newlines flatten to spaces: the editor shows one value per line, so a
      * multi-line value would otherwise break the JSON shape being edited.
      */
-    static @NotNull String escapeJson(final @Nullable String str) {
-        if (str == null) return "";
+    static @NotNull String escapeJson(final @NotNull String str) {
         return str.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
     }
 
-    static @NotNull String unescapeJson(final @Nullable String str) {
-        if (str == null) return "";
+    static @NotNull String unescapeJson(final @NotNull String str) {
         return str.replace("\\\"", "\"").replace("\\\\", "\\");
     }
 

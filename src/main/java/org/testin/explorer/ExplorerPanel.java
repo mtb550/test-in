@@ -13,12 +13,11 @@ import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.config.TestinConfigService;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.RefreshAction;
 import org.testin.explorer.tree.ExplorerTree;
-import org.testin.explorer.version.BranchSelector;
+import org.testin.explorer.toolbar.BranchSelector;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
@@ -32,19 +31,24 @@ import org.testin.testproject.CreateTestProjectCloneAction;
 import org.testin.util.Bundle;
 
 import java.awt.*;
+import java.util.Optional;
 import java.util.Map;
 
 @Service(Service.Level.PROJECT)
 public final class ExplorerPanel implements Disposable {
     private final @NotNull Project p;
 
-    /** The component the tool window shows. */
+    /**
+     * The component the tool window shows.
+     */
     @Getter
     private final @NotNull JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
 
     private final @NotNull BranchSelector branchSelector;
 
-    /** Asked for by every action that changes a node and has to redraw it. */
+    /**
+     * Asked for by every action that changes a node and has to redraw it.
+     */
     @Getter
     private final @NotNull ExplorerTree projectTree;
 
@@ -54,6 +58,13 @@ public final class ExplorerPanel implements Disposable {
      * not walked twice for the same picture.
      */
     private @NotNull Map<String, ProjectStatus> underRoot = Map.of();
+
+    /**
+     * How many projects the welcome screen offers as lines before it hands the
+     * choice to the picker instead. A status text does not scroll, so a long
+     * list would run off the panel.
+     */
+    private static final int INLINE_CHOICES = 6;
 
     public ExplorerPanel(final @NotNull Project p) {
         this.p = p;
@@ -100,23 +111,97 @@ public final class ExplorerPanel implements Disposable {
      * box and the empty state can then never disagree about which project is open.
      */
     public void refresh() {
-        final @Nullable TestProjectDirectoryDto tp = bound();
+        // Gathered off the EDT, drawn on it. What the panel decides on is a
+        // directory walk that reads a marker per project, and the threading rule
+        // in CLAUDE.md keeps disk work off the thread that paints (#66).
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final Map<String, ProjectStatus> listing = Services.getInstance(p, ProjectIndexer.class).testProjects();
 
+            // Binding changes what indexing covers, so the answer is re-indexed
+            // rather than redrawn - the same route every other binder takes.
+            if (bindTheOnlyProject(listing)) {
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (!p.isDisposed()) reindex();
+                });
+                return;
+            }
+
+            final PanelState state = state(listing);
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (p.isDisposed()) return;
+                draw(state);
+            });
+        });
+    }
+
+    /**
+     * Draws the panel from an answer it was given. On the EDT, and reading
+     * nothing: every question it could ask was answered by
+     * {@link #state(Map)} before it was called.
+     */
+    private void draw(final @NotNull PanelState state) {
         panel.removeAll();
         panel.getEmptyText().clear();
 
-        if (tp == null) {
-            showWelcome(state());
-        } else {
-            showTree(tp);
-        }
+        bound().ifPresentOrElse(this::showTree, () -> showWelcome(state));
 
         panel.revalidate();
         panel.repaint();
     }
 
-    private @Nullable TestProjectDirectoryDto bound() {
+    /**
+     * Binds to a project the tester clicked in the welcome screen, off the EDT
+     * because it writes {@code testin.yml}, and redraws either way - a write
+     * that failed has said so, and the screen must not sit there looking as
+     * though the click did nothing.
+     */
+    private void bindTo(final @NotNull String name) {
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final boolean bound = Services.getInstance(p, BoundTestProject.class).bind(name);
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (p.isDisposed()) return;
+
+                // Re-indexed rather than redrawn: indexing is scoped to the
+                // bound project, so the cache built before the binding is not
+                // the one the tree needs.
+                if (bound) reindex();
+                else refresh();
+            });
+        });
+    }
+
+    private @NotNull Optional<TestProjectDirectoryDto> bound() {
         return Services.getInstance(p, BoundTestProject.class).get();
+    }
+
+    /**
+     * Binds a repository that names no test project to the only one there is,
+     * and says whether it did.
+     * <p>
+     * A picker with one row is a question with one answer, and a fresh clone of
+     * an automation repository beside a Testin root that holds a single project
+     * is the common first run. It writes the binding and the tree opens, rather
+     * than asking a tester who has nothing to choose between.
+     * <p>
+     * Only when the repository names nothing at all. A name that resolves to
+     * nothing - a renamed folder, an archived project - is a different state
+     * with a different sentence, and silently rebinding it would hide the thing
+     * the tester needs to know (#8).
+     * <p>
+     * On the pooled thread that gathers, because it writes {@code testin.yml};
+     * the listing it decides from is the one that pass already read.
+     */
+    private boolean bindTheOnlyProject(final @NotNull Map<String, ProjectStatus> projects) {
+        final BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
+        if (bound.isNamed() || projects.size() != 1) return false;
+
+        final String only = projects.keySet().iterator().next();
+        if (!bound.bind(only)) return false;
+
+        Logger.info("Bound to the only test project under the root: " + only);
+        return true;
     }
 
     /**
@@ -124,15 +209,15 @@ public final class ExplorerPanel implements Disposable {
      * {@link PanelState}. The root and the project listing are disk reads, so
      * they are asked for once per draw rather than once per branch.
      */
-    private @NotNull PanelState state() {
-        // Read once and used three times over. It is a directory walk that reads
-        // a marker per project, and drawing the panel must not do that more than
-        // it has to.
-        underRoot = Services.getInstance(p, ProjectIndexer.class).testProjects();
+    private @NotNull PanelState state(final @NotNull Map<String, ProjectStatus> listing) {
+        // Handed in rather than read here: the caller has already walked the root
+        // to decide whether there was one project to bind to, and that walk reads
+        // a marker per project.
+        underRoot = listing;
 
         return PanelState.of(
                 !Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty(),
-                bound() != null,
+                bound().isPresent(),
                 Services.getInstance(p, BoundTestProject.class).isMissing(underRoot),
                 Services.getInstance(p, TestinConfigService.class).get().hasRepoUrl(),
                 !underRoot.isEmpty());
@@ -150,7 +235,7 @@ public final class ExplorerPanel implements Disposable {
         panel.add(projectTree.getComponent(), BorderLayout.CENTER);
 
         projectTree.refresh();
-        branchSelector.updateProject(tp);
+        branchSelector.updateProject(Optional.of(tp));
     }
 
     /**
@@ -208,6 +293,18 @@ public final class ExplorerPanel implements Disposable {
                     emptyText.appendLine("");
                 }
 
+                // Few enough to read at a glance: one line each, one click to
+                // bind. The dialog is for the root that holds more than a
+                // screenful, where a list in a status text stops being a list.
+                if (underRoot.size() <= INLINE_CHOICES) {
+                    underRoot.forEach((name, status) -> emptyText.appendLine(
+                            AllIcons.Actions.ModuleDirectory,
+                            name + "  " + status.getLabel(),
+                            SimpleTextAttributes.LINK_ATTRIBUTES,
+                            e -> bindTo(name)));
+                    return;
+                }
+
                 emptyText.appendLine(
                         AllIcons.Actions.ModuleDirectory,
                         "Select the test project for this repository",
@@ -229,6 +326,14 @@ public final class ExplorerPanel implements Disposable {
      */
     public void reindex() {
         new RefreshAction(p, this).execute();
+    }
+
+    /**
+     * Re-indexes and rebuilds, reporting what caused it rather than the generic
+     * refresh - a branch switch says which branch.
+     */
+    public void reindex(final @NotNull String outcome) {
+        new RefreshAction(p, this).execute(outcome);
     }
 
     @Override

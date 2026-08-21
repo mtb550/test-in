@@ -5,8 +5,8 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
@@ -33,9 +33,10 @@ public class UpdateTestProjectStatusAction extends AbstractProjectTreeAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final TestProjectDirectoryDto tp = selectedTestProject();
-        if (tp == null) return;
+        selectedTestProject().ifPresent(this::mark);
+    }
 
+    private void mark(final @NotNull TestProjectDirectoryDto tp) {
         try {
             tp.getMarker().setStatus(projectStatus);
             tp.getMarker().touch(Services.getInstance(p, AppSettingsState.class).testerName);
@@ -55,14 +56,14 @@ public class UpdateTestProjectStatusAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final TestProjectDirectoryDto tp = selectedTestProject();
+        final Optional<TestProjectDirectoryDto> tp = selectedTestProject();
 
-        e.getPresentation().setVisible(tp != null);
-        e.getPresentation().setEnabled(tp != null && tp.getMarker().getStatus() != projectStatus);
+        e.getPresentation().setVisible(tp.isPresent());
+        e.getPresentation().setEnabled(tp.filter(project -> project.getMarker().getStatus() != projectStatus).isPresent());
     }
 
-    private @Nullable TestProjectDirectoryDto selectedTestProject() {
-        return TreeValueUtil.singleSelectedDirectory(tree) instanceof TestProjectDirectoryDto tp ? tp : null;
+    private @NotNull Optional<TestProjectDirectoryDto> selectedTestProject() {
+        return TreeValueUtil.singleSelected(tree, TestProjectDirectoryDto.class);
     }
 
     @Override

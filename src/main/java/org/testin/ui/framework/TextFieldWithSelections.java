@@ -11,7 +11,6 @@ import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.*;
@@ -34,13 +33,13 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
     private final @NotNull ExtendableTextField textField;
     private final @NotNull JBList<SelectionList<T>> list;
     private final @NotNull JBPanel<?> panel;
-    private final @Nullable String placeHolderText;
+    private final @NotNull String placeHolderText;
     private @NotNull Runnable submitRequest = () -> {
     };
     private boolean emptyWarningShown;
 
-    TextFieldWithSelections(final @Nullable Icon icon,
-                            final @Nullable String placeHolderText,
+    TextFieldWithSelections(final @NotNull Icon icon,
+                            final @NotNull String placeHolderText,
                             final @NotNull List<SelectionList<T>> selections) {
         this.placeHolderText = placeHolderText;
         textField = new ExtendableTextField("");
@@ -50,7 +49,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
         // 12px left rhythm shared by the field text and the list rows below.
         textField.setBorder(JBUI.Borders.empty(10, 12));
 
-        if (placeHolderText != null && !placeHolderText.isBlank()) {
+        if (!placeHolderText.isBlank()) {
             textField.getEmptyText().setText(placeHolderText);
             TextComponentEmptyText.setupPlaceholderVisibility(textField);
             // Typing clears a red empty-submit warning back to the normal look.
@@ -114,7 +113,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
     }
 
     private void showPlaceholder(final @NotNull SimpleTextAttributes attributes) {
-        if (placeHolderText == null || placeHolderText.isBlank()) return;
+        if (placeHolderText.isBlank()) return;
 
         textField.getEmptyText().clear();
         textField.getEmptyText().appendText(placeHolderText, attributes);
@@ -185,7 +184,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
             setIcon(value.icon());
             setIconTextGap(JBUI.scale(8));
             append(value.name());
-            if (value.hint() != null) {
+            if (!value.hint().isEmpty()) {
                 // Platform hint standard: theme-aware gray, italic.
                 append("   " + value.hint(), SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES);
             }

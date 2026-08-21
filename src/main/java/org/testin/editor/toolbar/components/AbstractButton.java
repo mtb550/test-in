@@ -7,7 +7,6 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.util.IconManager;
 import org.testin.util.Shortcuts;
 
@@ -36,9 +35,11 @@ public abstract class AbstractButton extends JButton {
 
     private boolean hovered;
 
-    public AbstractButton(final @Nullable String tooltip, final @NotNull Icon icon) {
+    public AbstractButton(final @NotNull String tooltip, final @NotNull Icon icon) {
         super(null, icon);
-        setToolTipText(tooltip);
+        // Swing's own contract: a null tooltip is no tooltip at all, and an
+        // empty one is a small empty box that follows the pointer.
+        setToolTipText(tooltip.isEmpty() ? null : tooltip);
         setFocusable(false);
         setBorderPainted(false);
         setContentAreaFilled(false);
@@ -95,12 +96,13 @@ public abstract class AbstractButton extends JButton {
      * toolbar button does, so the key is discoverable without opening the menu
      * that also carries it.
      * <p>
-     * The Swing tooltip is deliberately left unset: HelpTooltip replaces it, and
-     * a button carrying both shows the plain one on some paths and the rich one
-     * on others.
+     * The Swing tooltip is deliberately left unset - no tooltip, which is what an
+     * empty one means to the constructor above: HelpTooltip replaces it, and a
+     * button carrying both shows the plain one on some paths and the rich one on
+     * others.
      */
     public AbstractButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Shortcuts shortcut) {
-        this(null, icon);
+        this("", icon);
 
         new HelpTooltip()
                 .setDescription(HtmlChunk.text(tooltip))

@@ -100,7 +100,7 @@ public class TestinConfigTest {
         final String before = """
                 # testin.yml - do not delete this comment
                 version: 1
-
+                
                 # the suite this repository drives
                 testinProject: old-name
                 defaultBranch: main
@@ -109,7 +109,7 @@ public class TestinConfigTest {
         assertEquals(TestinConfigWriter.apply(before, "testinProject", "new-name"), """
                 # testin.yml - do not delete this comment
                 version: 1
-
+                
                 # the suite this repository drives
                 testinProject: new-name
                 defaultBranch: main

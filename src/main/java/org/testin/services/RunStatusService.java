@@ -7,7 +7,6 @@ import com.intellij.ui.components.JBList;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
@@ -25,6 +24,7 @@ import org.testin.setting.AppSettingsState;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -38,11 +38,9 @@ public final class RunStatusService {
         if (executingIndex == -1) return;
 
         final TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
-        final TestRunItems item = editor.getResultsMap().get(currentTc.getId());
-
-        if (item != null) {
-            item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
-        }
+        final Optional<TestRunItems> item = editor.runItem(currentTc.getId());
+        item.ifPresent(runItem ->
+                runItem.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName));
 
         Logger.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
 
@@ -51,7 +49,7 @@ public final class RunStatusService {
 
         // Only when a verdict was actually recorded: a missing run item leaves
         // the status exactly as it was.
-        if (item != null) confirmVerdict(p, status, 1);
+        item.ifPresent(recorded -> confirmVerdict(p, status, 1));
 
         ApplicationManager.getApplication().invokeLater(() -> {
             final UUID currentId = currentTc.getId();
@@ -65,8 +63,9 @@ public final class RunStatusService {
     public void executeManual(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
-        final TestRunItems item = editor.getResultsMap().get(tc.getId());
-        if (item == null) return;
+        final Optional<TestRunItems> found = editor.runItem(tc.getId());
+        if (found.isEmpty()) return;
+        final TestRunItems item = found.get();
 
         final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
         if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
@@ -78,7 +77,7 @@ public final class RunStatusService {
         Logger.trace("[RunStatusService]: Status updated -> " + tc.getDescription() + " = " + status);
 
         persistRun(p, editor);
-        triggerFilterRefresh(ui, null);
+        triggerFilterRefresh(ui);
 
         confirmVerdict(p, status, 1);
     }
@@ -101,8 +100,7 @@ public final class RunStatusService {
 
         if (selectedItems.size() == 1) {
             final TestCaseDto tc = selectedItems.getFirst();
-            final TestRunItems only = editor.getResultsMap().get(tc.getId());
-            if (only != null && only.isRemoved()) {
+            if (editor.runItem(tc.getId()).filter(TestRunItems::isRemoved).isPresent()) {
                 refuseRemoved(p);
                 return;
             }
@@ -117,11 +115,11 @@ public final class RunStatusService {
             int recorded = 0;
 
             for (final TestCaseDto tc : selectedItems) {
-                final TestRunItems item = editor.getResultsMap().get(tc.getId());
-                if (item != null && item.isRemoved()) continue;
+                final Optional<TestRunItems> found = editor.runItem(tc.getId())
+                        .filter(item -> !item.isRemoved());
 
-                if (item != null) {
-                    item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
+                if (found.isPresent()) {
+                    found.get().recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
                     recorded++;
 
                     final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
@@ -157,10 +155,8 @@ public final class RunStatusService {
      * its sequential run writer.
      */
     public void persistRun(final @NotNull Project p, final @NotNull RunEditor editor) {
-        final TestRunDto tr = editor.getTr();
-        if (tr == null) return;
-
-        Services.getInstance(p, ProjectIndexer.class).persistRun(editor.getParent().getPath(), tr);
+        editor.run().ifPresent(tr ->
+                Services.getInstance(p, ProjectIndexer.class).persistRun(editor.getParent().getPath(), tr));
     }
 
     /**
@@ -180,10 +176,6 @@ public final class RunStatusService {
     public void persistMarker(final @NotNull Project p, final @NotNull Path runPath,
                               final @NotNull TestRunStatus status) {
         final TestRunDirectoryDto trd = Services.getInstance(p, ProjectIndexer.class).getTestRunDirByPath(runPath);
-        if (trd == null) {
-            Logger.warn("persistMarker: run not indexed: " + runPath);
-            return;
-        }
 
         final TestRunMarker marker = trd.getMarker();
         marker.setStatus(status);
@@ -214,7 +206,6 @@ public final class RunStatusService {
      */
     private void finishRun(final @NotNull Project p, final @NotNull Path runPath) {
         final TestRunDto tr = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(runPath);
-        if (tr == null) return;
 
         int closed = 0;
         for (final TestRunItems item : tr.getResults()) {
@@ -231,16 +222,28 @@ public final class RunStatusService {
             Logger.info("Run finished with " + closed + " case(s) not executed; marked untested: " + runPath);
     }
 
-    private void triggerFilterRefresh(final @NotNull TestinEditor editor, final @Nullable JBList<TestCaseDto> list) {
+    /**
+     * The same refresh, for a caller with no list of its own to repaint.
+     */
+    private void triggerFilterRefresh(final @NotNull TestinEditor editor) {
+        ApplicationManager.getApplication().invokeLater(() -> refreshEditor(editor));
+    }
+
+    private void triggerFilterRefresh(final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (list != null) {
-                list.repaint();
-            }
-            if (editor instanceof RunEditor runEditor) {
-                runEditor.refreshAfterStatusChange();
-            } else if (editor instanceof Toolbar) {
-                ((Toolbar) editor).onToolBarFilterSelectionChanged();
-            }
+            list.repaint();
+            refreshEditor(editor);
         });
+    }
+
+    /**
+     * What both refreshes do to the editor itself, on the EDT.
+     */
+    private void refreshEditor(final @NotNull TestinEditor editor) {
+        if (editor instanceof RunEditor runEditor) {
+            runEditor.refreshAfterStatusChange();
+        } else if (editor instanceof Toolbar toolbar) {
+            toolbar.onToolBarFilterSelectionChanged();
+        }
     }
 }

@@ -76,12 +76,15 @@ public final class TestinConfigService {
      * loud rather than report as done.
      */
     private boolean set(final @NotNull String key, final @NotNull String value) {
-        final Path file = TestinConfigLoader.file(p);
-        if (file == null) {
-            Logger.warn("No base path for " + p.getName() + ", so " + key + " cannot be written");
-            return false;
-        }
+        return TestinConfigLoader.file(p)
+                .map(file -> writeTo(file, key, value))
+                .orElseGet(() -> {
+                    Logger.warn("No base path for " + p.getName() + ", so " + key + " cannot be written");
+                    return false;
+                });
+    }
 
+    private boolean writeTo(final @NotNull Path file, final @NotNull String key, final @NotNull String value) {
         if (!TestinConfigWriter.write(file, key, value)) return false;
 
         // The file was written with java.nio, so until the VFS is told, the

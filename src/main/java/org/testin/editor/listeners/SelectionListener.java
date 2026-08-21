@@ -13,7 +13,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @AllArgsConstructor
 public class SelectionListener implements ListSelectionListener {
@@ -30,9 +29,9 @@ public class SelectionListener implements ListSelectionListener {
             if (!selected.isEmpty()) {
                 list.ensureIndexIsVisible(list.getSelectedIndex());
 
-                Optional.ofNullable(ViewToolWindowFactory.getToolWindow(p))
+                ViewToolWindowFactory.toolWindow(p)
                         .filter(ToolWindow::isVisible)
-                        .map(tw -> ViewToolWindowFactory.getViewPanel())
+                        .flatMap(tw -> ViewToolWindowFactory.panel())
                         .ifPresent(viewer -> viewer.show(selected, path));
             }
 

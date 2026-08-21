@@ -7,6 +7,7 @@ import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.util.Key;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.JavaSourceRoot;
 import org.testin.config.TestinConfigService;
 import org.testin.config.TestinProjectConfig;
 import org.testin.indexer.ProjectIndexer;
@@ -15,7 +16,6 @@ import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.runner.TestCaseExecutionTracker;
 import org.testin.services.Services;
-import org.testin.util.Tools;
 
 import java.nio.file.Path;
 
@@ -74,7 +74,7 @@ public final class StartupActivity implements ProjectActivity {
     }
 
     /**
-     * The Java test source root is detected automatically (see Tools.getTestSourceRoot);
+     * The Java test source root is detected automatically by JavaSourceRoot;
      * warn once per project when none exists so the user knows automation code
      * generation (packages, classes, test methods) will be skipped.
      */
@@ -85,7 +85,7 @@ public final class StartupActivity implements ProjectActivity {
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
                     if (p.isDisposed()) return;
-                    if (Services.getInstance(p, Tools.class).getTestSourceRoot(p) == null) {
+                    if (JavaSourceRoot.find(p).isEmpty()) {
                         Services.getInstance(p, Notifier.class).softShow(p,
                                 "Java Test Source Not Found",
                                 "Unable to find a Java test source package in this project - "

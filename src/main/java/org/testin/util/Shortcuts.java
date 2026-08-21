@@ -1,7 +1,9 @@
 package org.testin.util;
 
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.actionSystem.Shortcut;
+import com.intellij.openapi.keymap.KeymapUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.intellij.lang.annotations.MagicConstant;
@@ -13,13 +15,26 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 /**
- * Keystrokes shared by more than one class. Single-use keystrokes live as
- * constants in their owning action/enum class; the helper methods are in
- * {@link Tools}.
+ * Every keystroke question the plugin asks, and the keys more than one class
+ * binds.
+ * <p>
+ * The constants are the shared keys - a single-use keystroke stays a constant in
+ * the action or enum that owns it. The four static helpers answer the same
+ * questions for those: what shortcut set is this, what does it read as, does
+ * this event match. One owner either way, so a shared key and a single-use key
+ * cannot start behaving differently.
  */
 @Getter
 @AllArgsConstructor
 public enum Shortcuts {
+
+    /**
+     * No key at all. A status bar hint renders a keystroke its component binds
+     * itself and binds nothing of its own, and this is what it carries instead
+     * of a null every reader would have to check (#71). The keystroke is one
+     * the keyboard cannot produce, so nothing can match it by accident.
+     */
+    EMPTY(KeyStroke.getKeyStroke(KeyEvent.VK_UNDEFINED, 0)),
 
     // Dialog confirm / dismiss
     Enter(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
@@ -45,6 +60,10 @@ public enum Shortcuts {
     UpdateItem(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0)),
     CopyItem(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)),
     DeletePackage(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)),
+
+    // A confirmation's second answer - the one that is neither doing it nor
+    // walking away, e.g. reviewing the changes a branch switch would carry.
+    ConfirmAlternative(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK)),
 
     // Run editor: export the run's results (context menu + toolbar button)
     GenerateReport(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)),
@@ -93,6 +112,11 @@ public enum Shortcuts {
     private final @NotNull KeyStroke key;
 
     /**
+     * No key, as a key: what a status or a field carries when nothing binds it.
+     */
+    public static final @NotNull KeyStroke NO_KEY = EMPTY.key;
+
+    /**
      * The platform menu modifier (Cmd on macOS, Ctrl elsewhere), same source
      * as the other cross-platform shortcuts; plain Ctrl in headless test runs.
      */
@@ -106,18 +130,57 @@ public enum Shortcuts {
     }
 
     public @NotNull CustomShortcutSet getCustomShortcut() {
-        return Tools.customShortcut(key);
+        return customShortcut(key);
     }
 
     public @NotNull Shortcut getShortcut() {
-        return Tools.keyboardShortcut(key);
+        return keyboardShortcut(key);
     }
 
     public @NotNull String getShortcutText() {
-        return Tools.shortcutText(key);
+        return shortcutText(key);
     }
 
     public boolean matches(final @NotNull KeyEvent e) {
-        return Tools.matches(e, key);
+        return matches(e, key);
+    }
+
+    // The same four questions for a keystroke that is not one of the shared keys
+    // above - a single-use one a class declares for itself. One owner either way,
+    // so a key bound here and a key bound there behave the same.
+
+    public static @NotNull CustomShortcutSet customShortcut(final @NotNull KeyStroke key) {
+        return new CustomShortcutSet(key);
+    }
+
+    public static @NotNull Shortcut keyboardShortcut(final @NotNull KeyStroke key) {
+        return new KeyboardShortcut(key, null);
+    }
+
+    /**
+     * A keystroke as a tester reads it, and nothing at all for the key that
+     * never arrives - what is bound to no key has no name to show (#71).
+     */
+    public static @NotNull String shortcutText(final @NotNull KeyStroke key) {
+        return isNoKey(key) ? "" : KeymapUtil.getKeystrokeText(key);
+    }
+
+    /**
+     * True when this is the keystroke nothing produces - see {@link #EMPTY}.
+     */
+    public static boolean isNoKey(final @NotNull KeyStroke key) {
+        return NO_KEY.equals(key);
+    }
+
+    /**
+     * Whether the event is this shortcut.
+     * <p>
+     * Built into a KeyStroke and compared, rather than comparing the modifier
+     * masks: KeyStroke normalizes what it is given to carry both the old and the
+     * extended bits, while KeyEvent.getModifiersEx reports only the extended
+     * ones. Ctrl+C therefore compared 130 against 128 and never matched.
+     */
+    public static boolean matches(final @NotNull KeyEvent e, final @NotNull KeyStroke key) {
+        return key.equals(KeyStroke.getKeyStrokeForEvent(e));
     }
 }

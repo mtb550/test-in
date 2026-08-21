@@ -19,8 +19,8 @@ import org.testin.run.RunTestCaseAction;
 import org.testin.run.StartExecutionAction;
 import org.testin.testrun.SetTestCaseStatusAction;
 import org.testin.testrun.UpdateRunItemAction;
-import org.testin.view.ViewDetailsAction;
 import org.testin.util.OptionalPlugin;
+import org.testin.view.ViewDetailsAction;
 
 public class RunEditorContextMenu extends AbstractEditorContextMenu {
 
@@ -35,8 +35,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         // One action per user-settable status: a new TestStatus constant shows
         // up here automatically (issue #37).
         for (final TestStatus status : TestStatus.values()) {
-            if (status.getMenuEntry() != null)
-                add(new SetTestCaseStatusAction(p, ui, list, status, status.getMenuEntry()));
+            status.getMenuEntry().ifPresent(entry -> add(new SetTestCaseStatusAction(p, ui, list, status, entry)));
         }
         addSeparator();
         add(new UpdateRunItemAction(p, ui, list));

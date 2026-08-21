@@ -103,10 +103,11 @@ be committed back into storage.
   implements `submit()`. Never hand-build popup layouts.
 - **Every state-changing action confirms itself** with one soft notification at
   the point it succeeded: `Services.getInstance(p, Notifier.class).softShow(p,
-  "Copied")`. The message names the **outcome in the past tense**, one or two
-  words, no trailing dots — `Copied`, `Pasted`, `Renamed`, `Removed`, `Passed`.
-  Three words only where two things on the same screen could be meant: `Node
-  copied` against `Test case copied`. A bulk operation notifies once with a
+  "Copied")`. The message is the **outcome in the past tense** and nothing
+  else — `Copied`, `Pasted`, `Renamed`, `Removed`, `Re-sorted`, `Passed`. One
+  word wherever one will do, no trailing dots, and **no noun**: the tester
+  pressed the key on the thing in front of them, so naming it back is a word
+  they read every time and needed once. A bulk operation notifies once with a
   count — `Removed 4`, never four balloons.
   <p>
   Not around `actionPerformed`: an action that returns early, opens a

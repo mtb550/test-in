@@ -1,6 +1,5 @@
 package org.testin.view.details.components;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.HtmlChunk;
@@ -10,10 +9,7 @@ import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.CardHoverAction;
-import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.navigate.NavigateToCodeAction;
-import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,60 +24,55 @@ public class ActionIcons extends BaseDetails {
     final int INSETS_LEFT = 16;
     final int INSETS_BOTTOM = 0;
     final int INSETS_RIGHT = 16;
-    final @NotNull Icon navIconRaw = AllIcons.Nodes.Class;
 
     public ActionIcons() {
     }
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
+        // The run slot draws what clicking it does, not how the last run went: a
+        // passed case used to show a green tick here, which reads as a verdict
+        // and is one - the verdict is a badge now, below.
+        final CardHoverAction navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD;
+        final CardHoverAction run = CardHoverAction.runSlot(dto);
+
         // Neither icon is drawn in an IDE that cannot act on it, and a row with
         // no icons in it is no row at all.
-        final boolean navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD.isOffered();
-        final boolean run = CardHoverAction.RUN_TEST_CASE.isOffered();
-        if (!navigate && !run) return currentRow;
+        if (!navigate.isOffered() && !run.isOffered()) return currentRow;
 
         final JBPanel<?> actionsPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         actionsPanel.setOpaque(false);
 
-        if (navigate) {
-            actionsPanel.add(hoverIcon(navIconRaw,
-                    CardHoverAction.NAVIGATE_TO_TEST_METHOD.getTooltip(),
-                    Shortcuts.NavigateToCode.getShortcutText(),
-                    () -> new NavigateToCodeAction(p, null).execute(p, dto)));
-        }
+        if (navigate.isOffered()) actionsPanel.add(hoverIcon(navigate, p, dto));
 
-        if (navigate && run) {
+        if (navigate.isOffered() && run.isOffered())
             actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(STRUT_WIDTH)));
-        }
 
-        if (run) {
-            final RunStatus currentStatus = dto.getTempStatus();
-            actionsPanel.add(hoverIcon(currentStatus.getIcon(),
-                    currentStatus.getTooltip(),
-                    Shortcuts.RunTestCase.getShortcutText(),
-                    () -> currentStatus.executeAction(p, dto, null)));
-        }
+        if (run.isOffered()) actionsPanel.add(hoverIcon(run, p, dto));
 
         return addFullWidthRow(panel, gbc, actionsPanel,
                 JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT), currentRow);
     }
 
     /**
-     * An icon label that grows on hover and acts on click. Sized to the hovered
-     * icon from the start, so growing it does not reflow the row.
+     * One action's icon: a label that grows on hover and does that action's work
+     * on click. Sized to the hovered icon from the start, so growing it does not
+     * reflow the row.
+     * <p>
+     * Everything it draws comes off the action itself - the icon, the tooltip,
+     * the key it names, and what the click does - so this panel and the cards
+     * cannot end up disagreeing about a button they both show.
      */
-    private @NotNull JBLabel hoverIcon(final @NotNull Icon raw, final @NotNull String tooltip,
-                                       final @NotNull String shortcut, final @NotNull Runnable onClick) {
+    private @NotNull JBLabel hoverIcon(final @NotNull CardHoverAction action, final @NotNull Project p, final @NotNull TestCaseDto dto) {
         final JBLabel label = new JBLabel();
-        final Icon base = IconUtil.scale(raw, label, BASE_SCALE);
-        final Icon hover = IconUtil.scale(raw, label, HOVER_SCALE);
+        final Icon base = IconUtil.scale(action.getIcon(), label, BASE_SCALE);
+        final Icon hover = IconUtil.scale(action.getIcon(), label, HOVER_SCALE);
         label.setIcon(base);
         label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         new HelpTooltip()
-                .setDescription(HtmlChunk.text(tooltip))
-                .setShortcut(shortcut)
+                .setDescription(HtmlChunk.text(action.getTooltip()))
+                .setShortcut(action.getShortcut().getShortcutText())
                 .installOn(label);
 
         // From the hovered icon itself: scaling 16px by 1.8 gives 28.8, which the
@@ -103,7 +94,7 @@ public class ActionIcons extends BaseDetails {
 
             @Override
             public void mouseClicked(final MouseEvent e) {
-                onClick.run();
+                action.execute(p, dto);
             }
         });
 

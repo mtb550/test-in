@@ -6,8 +6,8 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Display;
 import org.testin.util.FontSync;
-import org.testin.util.Tools;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,7 +22,7 @@ public class Title extends BaseDetails {
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
 
-        final String titleText = Tools.format(dto.getDescription());
+        final String titleText = Display.format(dto.getDescription());
         final String finalValue = titleText.trim().isEmpty() ? "-" : titleText;
 
         final JTextArea mainTitleArea = new JTextArea(finalValue);

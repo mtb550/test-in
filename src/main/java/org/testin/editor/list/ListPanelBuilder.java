@@ -21,6 +21,7 @@ import org.testin.util.FontSync;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -63,7 +64,7 @@ public final class ListPanelBuilder {
                                            final @NotNull ListView view,
                                            final @NotNull DirectoryDto dir,
                                            final @NotNull AbstractEditorContextMenu contextMenu,
-                                           final @NotNull Supplier<JBTable> gridTableSupplier,
+                                           final @NotNull Supplier<Optional<JBTable>> gridTableSupplier,
                                            final @NotNull BooleanSupplier gridActiveSupplier) {
         final JBList<TestCaseDto> list = view.list();
 

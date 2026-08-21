@@ -3,14 +3,15 @@ package org.testin.util;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.editor.EditorType;
+import org.testin.editor.UnifiedFileEditor;
 import org.testin.editor.UnifiedVirtualFile;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -28,12 +29,12 @@ import java.util.Optional;
 public final class EditorUtil {
     private final @NotNull String OPEN_EDITORS_KEY = "testin.openEditors";
 
-    public boolean isOpen(final @NotNull Project p, final @Nullable String s) {
+    public boolean isOpen(final @NotNull Project p, final @NotNull String s) {
         final FileEditorManager fed = FileEditorManager.getInstance(p);
         final VirtualFile[] openFiles = fed.getOpenFiles();
 
         for (final VirtualFile vf : openFiles) {
-            if (s != null && s.equals(vf.getName())) {
+            if (s.equals(vf.getName())) {
                 fed.openFile(vf, true);
                 return true;
             }
@@ -53,6 +54,52 @@ public final class EditorUtil {
             }
         }
 
+    }
+
+    /**
+     * Brings every open Testin editor back in line with the index that was just
+     * rebuilt: the ones whose node is still there read it again, and the ones
+     * whose node is gone close.
+     * <p>
+     * An editor holds the node it was opened on and the test cases it read from
+     * it, so after a re-index both can be wrong. A branch switch replaces every
+     * file under the project - a test set that is still there holds different
+     * cases, and one the branch does not have is not there at all. Left alone,
+     * the first shows a colleague's old data and the second shows cases that
+     * exist nowhere, and saving either would write them back.
+     * <p>
+     * On the EDT, after indexing has finished. Asked before the cache is rebuilt
+     * it would close every editor in the project.
+     */
+    public void refreshOpen(final @NotNull Project p) {
+        final FileEditorManager fed = FileEditorManager.getInstance(p);
+
+        for (final VirtualFile open : fed.getOpenFiles()) {
+            if (!(open instanceof UnifiedVirtualFile testinFile)) continue;
+
+            if (!isIndexed(p, testinFile)) {
+                Logger.info("Closing the editor for a node that is no longer indexed: " + testinFile.getName());
+                fed.closeFile(testinFile);
+                continue;
+            }
+
+            for (final FileEditor tab : fed.getAllEditors(testinFile)) {
+                if (tab instanceof UnifiedFileEditor unified) unified.getEditor().reload();
+            }
+        }
+    }
+
+    /**
+     * Whether the index still holds this editor's node, asked of the index that
+     * owns its kind: a run editor's node of the test runs, a test set editor's
+     * of the test sets. The kind is the node's own class, which is what decided
+     * the editor type when it was opened.
+     */
+    private boolean isIndexed(final @NotNull Project p, final @NotNull UnifiedVirtualFile file) {
+        // Asked as a question rather than by fetching and comparing to null: the
+        // lookups promise a node now, so calling one to find out whether there
+        // is one would fail rather than answer (#71).
+        return Services.getInstance(p, ProjectIndexer.class).nodeExists(file.getDir().getPath());
     }
 
     public void closeThenOpen(final @NotNull Project p, final @NotNull DirectoryDto dir) {
@@ -87,9 +134,7 @@ public final class EditorUtil {
                         .ifPresent(editorManager -> editorManager.openFile(newVf, true)));
     }
 
-    public void openIfNotOpen(final @NotNull Project p, final @Nullable DirectoryDto dir) {
-        if (dir == null) return;
-
+    public void openIfNotOpen(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         if (isOpen(p, dir.getName())) {
             Logger.info("Editor already open, focusing: " + dir.getName());
 
@@ -152,10 +197,15 @@ public final class EditorUtil {
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             for (final String entry : entries) {
-                final DirectoryDto dir = indexer.findByPath(Path.of(entry));
-                Logger.debug("restoring editor for '" + entry + "' -> " + (dir != null ? "found" : "not indexed"));
-
-                openIfNotOpen(p, dir);
+                // A remembered editor whose node is not there any more is not
+                // reopened: the path was written last time the project closed and
+                // the node may have been removed since.
+                indexer.find(Path.of(entry)).ifPresentOrElse(
+                        dir -> {
+                            Logger.debug("restoring editor for '" + entry + "' -> found");
+                            openIfNotOpen(p, dir);
+                        },
+                        () -> Logger.debug("restoring editor for '" + entry + "' -> not indexed"));
             }
 
             PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY, null);

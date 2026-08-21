@@ -6,8 +6,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -27,13 +26,13 @@ import java.util.Optional;
 public enum TestRunStatus {
     CREATED(
             "Created",
-            null,
+            Shortcuts.NO_KEY,
             AllIcons.General.Add
     ),
 
     IN_PROGRESS(
             "In Progress",
-            null,
+            Shortcuts.NO_KEY,
             AllIcons.Actions.BuildAutoReloadChanges
     ),
 
@@ -63,16 +62,17 @@ public enum TestRunStatus {
     private final @NotNull String label;
 
     /**
-     * Null for the statuses the tester cannot set directly from the keyboard.
+     * The key that moves a run to this status, and {@link Shortcuts#NO_KEY} for
+     * the statuses no key reaches.
      */
-    private final @Nullable KeyStroke shortcut;
+    private final @NotNull KeyStroke shortcut;
     private final @NotNull Icon icon;
 
     /**
-     * The status the advance action moves this run to, or null when terminal.
+     * The status the advance action moves this run to, empty when terminal.
      */
-    public @Nullable TestRunStatus nextStatus() {
-        return TRANSITIONS.get(this);
+    public @NotNull Optional<TestRunStatus> nextStatus() {
+        return Optional.ofNullable(TRANSITIONS.get(this));
     }
 
     /**
@@ -83,19 +83,17 @@ public enum TestRunStatus {
     }
 
     public @NotNull String getShortcutText() {
-        return Optional.ofNullable(shortcut)
-                .map(Tools::shortcutText)
-                .orElse("");
+        return Shortcuts.shortcutText(shortcut);
     }
 
     public void bindShortcut(final @NotNull JComponent component, final @NotNull Runnable onAction) {
-        if (shortcut != null) {
-            new DumbAwareAction() {
-                @Override
-                public void actionPerformed(final @NotNull AnActionEvent e) {
-                    onAction.run();
-                }
-            }.registerCustomShortcutSet(Tools.customShortcut(shortcut), component);
-        }
+        if (Shortcuts.isNoKey(shortcut)) return;
+
+        new DumbAwareAction() {
+            @Override
+            public void actionPerformed(final @NotNull AnActionEvent e) {
+                onAction.run();
+            }
+        }.registerCustomShortcutSet(Shortcuts.customShortcut(shortcut), component);
     }
 }

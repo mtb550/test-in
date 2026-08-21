@@ -10,7 +10,7 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.explorer.tree.TreeUndoService;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;
@@ -22,7 +22,7 @@ public class UndoNodeAction extends AbstractProjectAction {
 
     public UndoNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, "Undo", "Undo last action", AllIcons.Actions.Undo);
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class UndoNodeAction extends AbstractProjectAction {
     public void update(final @NotNull AnActionEvent e) {
         final TreeUndoService undo = Services.getInstance(p, TreeUndoService.class);
         e.getPresentation().setEnabled(undo.canUndo());
-        e.getPresentation().setText(undo.canUndo() ? "Undo " + undo.undoDescription() : "Undo");
+        e.getPresentation().setText(("Undo " + undo.undoDescription()).trim());
     }
 
     @Override

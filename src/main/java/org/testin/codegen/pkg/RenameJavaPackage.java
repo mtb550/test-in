@@ -8,11 +8,12 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
+import org.testin.codegen.JavaSourceRoot;
+import org.testin.codegen.Renamed;
 import org.testin.logger.Logger;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.services.Services;
-import org.testin.util.Tools;
+import org.testin.util.NameSanitizer;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,27 +22,28 @@ public class RenameJavaPackage implements GenAction {
 
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (!(obj instanceof DirectoryDto dir)) return;
-        execute(p, dir, dir.getName());
+        if (!(obj instanceof Renamed renamed)) return;
+
+        final List<String> fqcn = Fqcn.ofPackage(renamed.dir());
+        final String newName = renamed.newName();
+
+        JavaSourceRoot.find(p).ifPresentOrElse(
+                testSourceRoot -> renameUnder(p, testSourceRoot, fqcn, newName),
+                () -> Logger.info("Could not find Test Source Root in the project modules."));
     }
 
-    public void execute(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
-        final Tools tools = Services.getInstance(p, Tools.class);
-
-        final List<String> fqcn = tools.buildFqcnPackage(dir);
-        final VirtualFile testSourceRoot = tools.getTestSourceRoot(p);
-        if (testSourceRoot == null) {
-            Logger.info("Could not find Test Source Root in the project modules.");
-            return;
-        }
-
+    /**
+     * The rename itself, once the source root is known.
+     */
+    private void renameUnder(final @NotNull Project p, final @NotNull VirtualFile testSourceRoot,
+                             final @NotNull List<String> fqcn, final @NotNull String newName) {
         final VirtualFile pkgDir = testSourceRoot.findFileByRelativePath(String.join("/", fqcn));
         if (pkgDir == null || !pkgDir.isDirectory()) {
             Logger.info("Package not found for rename: " + String.join(".", fqcn));
             return;
         }
 
-        final String newTop = tools.sanitizePackageName(newName);
+        final String newTop = NameSanitizer.packageName(newName);
         // The package path of the directory that CONTAINS the renamed package, e.g. "muath"
         // for a package at "muath.pkgtu" -> "muath.pkg". Needed so the new package
         // declaration keeps the full prefix instead of just "pkg".

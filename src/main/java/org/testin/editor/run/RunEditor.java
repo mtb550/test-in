@@ -12,11 +12,11 @@ import com.intellij.ui.table.JBTable;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.EscapeAction;
 import org.testin.editor.*;
 import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.editor.list.ListPanelBuilder;
+import org.testin.editor.grid.GridView;
 import org.testin.editor.list.ListView;
 import org.testin.editor.listeners.GridContextMenuListener;
 import org.testin.editor.listeners.GridSelectionListener;
@@ -43,10 +43,10 @@ import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
-import org.testin.testcase.TestCaseSorter;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.testrun.UpdateTestRunStatusAction;
+import org.testin.util.Display;
 import org.testin.util.FontSync;
-import org.testin.util.Tools;
 import org.testin.view.GridViewDetailsAction;
 
 import javax.swing.*;
@@ -72,7 +72,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     @Getter
     private final @NotNull List<TestCaseDto> currentTestCases;
 
-    @Getter
+    /**
+     * What the run recorded for each case, by case id. Not handed out: callers
+     * ask {@link #runItem(UUID)}, so "this case has no run item" is one answer
+     * rather than eight map lookups each checked for null (#71).
+     */
     private final @NotNull Map<UUID, TestRunItems> resultsMap;
 
     private final @NotNull GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
@@ -83,18 +87,17 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     private final @NotNull AtomicInteger loadGeneration = new AtomicInteger();
     /**
-     * Child disposable for the current grid table's font-sync subscription;
-     * replaced on every grid rebuild so old subscriptions do not accumulate.
+     * The grid, from the moment the tester first switches to it - table, scroll
+     * pane and the font-sync subscription that goes with them. Empty until then,
+     * and after a rebuild that failed (#66, finding 18).
      */
-    private @Nullable Disposable gridFontSyncDisposable;
+    private @NotNull Optional<GridView> grid = Optional.empty();
     private @NotNull JBPanel<?> mainPanel;
     private @NotNull EditorCenter center;
-    private @Nullable JBList<TestCaseDto> list;
-    private @Nullable CollectionListModel<TestCaseDto> model;
-    private @Nullable JBTable gridTable;
+    private final @NotNull JBList<TestCaseDto> list;
+    private final @NotNull CollectionListModel<TestCaseDto> model;
+    private final @NotNull JBScrollPane listScrollPane;
     private @NotNull RunEditorContextMenu contextMenu;
-    private @Nullable JBScrollPane gridScrollPane;
-    private @NotNull JBScrollPane listScrollPane;
     @Getter
     @Setter
     private int currentPage = 1;
@@ -112,13 +115,32 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Getter
     @Setter
-    private @Nullable String hoveredIconAction = null;
+    private @NotNull String hoveredIconAction = "";
 
     @Getter
     @Setter
     private int hoveredIndex = -1;
-    @Getter
-    private volatile @Nullable TestRunDto tr;
+    /**
+     * The run being edited, and empty while a reload is replacing it. Volatile:
+     * loaded off the EDT and read on it.
+     */
+    private volatile @NotNull Optional<TestRunDto> tr = Optional.empty();
+
+    /**
+     * What the run recorded for this case, empty when it recorded nothing - a
+     * case added to the test set after the run was created, or a map still being
+     * refilled by a reload.
+     */
+    public @NotNull Optional<TestRunItems> runItem(final @NotNull UUID id) {
+        return Optional.ofNullable(resultsMap.get(id));
+    }
+
+    /**
+     * The run being edited, empty while a reload is replacing it.
+     */
+    public @NotNull Optional<TestRunDto> run() {
+        return tr;
+    }
 
     @Getter
     private int currentlyExecutingIndex = -1;
@@ -128,7 +150,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * hands back different objects for the same test cases and TestCaseDto has no
      * equals, so identity would not survive it.
      */
-    private @Nullable UUID selectionToRestore;
+    private @NotNull Optional<UUID> selectionToRestore = Optional.empty();
 
     /**
      * Grid column selected before a reload, so the cell comes back, not just the row.
@@ -148,27 +170,29 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         this.resultsMap = new ConcurrentHashMap<>();
 
-        buildOpeningPanel();
+        // Shared list-view construction (see ListPanelBuilder, the counterpart of
+        // GridPanelBuilder). Built here rather than in buildOpeningPanel so the
+        // three parts of it are final: the editor never exists without a list.
+        final ListView listView = ListPanelBuilder.build(p, projectDisposable);
+        this.model = listView.model();
+        this.list = listView.list();
+        this.listScrollPane = listView.scrollPane();
+
+        buildOpeningPanel(listView);
         loadDataAsync();
     }
 
-    private void buildOpeningPanel() {
+    private void buildOpeningPanel(final @NotNull ListView listView) {
         toolBar = new RunToolbar(p, this);
         statusBar = new StatusBar();
         StatusBarListener.attach(this);
-
-        // Shared list-view construction (see ListPanelBuilder, the counterpart of GridPanelBuilder).
-        final ListView listView = ListPanelBuilder.build(p, projectDisposable);
-        model = listView.model();
-        list = listView.list();
-        listScrollPane = listView.scrollPane();
 
         // Run editor specifics: the run card renderer.
         list.setCellRenderer(new RunListRenderer(p, this));
 
         this.contextMenu = new RunEditorContextMenu(p, this, parent, list);
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
-                () -> gridTable,
+                () -> grid.map(GridView::table),
                 () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);
 
         mainPanel = new JBPanel<>(new BorderLayout());
@@ -185,74 +209,61 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     private void loadDataAsync() {
         final int generation = loadGeneration.incrementAndGet();
-        if (list != null) {
-            list.setPaintBusy(true);
-            list.getEmptyText().setText("Loading...");
-        }
+        list.setPaintBusy(true);
+        list.getEmptyText().setText("Loading...");
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.awaitIndexing();
-                // Snapshot the volatile field into a local. Re-reading it between
-                // the null check and the call would let another thread clear it.
-                TestRunDto run = tr;
-                if (run == null) {
-                    run = indexer.getTestRunByPath(parent.getPath());
-                    tr = run;
-                }
+                // Snapshotted into a local: reading the volatile field twice would
+                // let another thread empty it between the question and the answer.
+                final TestRunDto run = tr.orElseGet(() -> indexer.getTestRunByPath(parent.getPath()));
+                tr = Optional.of(run);
 
-                if (run != null) {
-                    final Map<UUID, TestRunItems> newResults = run.getResults().stream()
-                            .collect(Collectors.toMap(TestRunItems::getId, item -> item,
-                                    (existingItem, duplicateItem) -> existingItem));
-                    resultsMap.putAll(newResults);
-                }
+                resultsMap.putAll(run.getResults().stream()
+                        .collect(Collectors.toMap(TestRunItems::getId, item -> item,
+                                (existingItem, duplicateItem) -> existingItem)));
 
                 final List<TestCaseDto> loadedItems = new ArrayList<>();
-                if (run != null) {
-                    for (final TestRunItems item : run.getResults()) {
-                        final TestCaseDto indexed = indexer.getTestCaseById(item.getId());
+                for (final TestRunItems item : run.getResults()) {
+                    final Optional<TestCaseDto> indexed = indexer.findTestCase(item.getId());
 
-                        // A case deleted since the run leaves its result behind, and
-                        // the result is what the run is a record of. The row stays,
-                        // says so, and takes the one status a tester cannot give.
-                        //
-                        // In memory only. The file heals the next time the run is
-                        // written, the way the missing-stamp repair already does -
-                        // opening a run rewrites nothing.
-                        if (indexed == null) {
-                            Logger.warn("Test run references a deleted test case id=" + item.getId());
-                            item.setStatus(TestStatus.REMOVED);
-                        }
-
-                        final TestCaseDto testCase = indexed != null ? indexed : TestCaseDto.deleted(item.getId());
-
-                        loadedItems.add(testCase);
-                        final TestRunItems runItem = resultsMap.get(item.getId());
-                        if (runItem != null) runItem.setTc(testCase);
+                    // A case deleted since the run leaves its result behind, and
+                    // the result is what the run is a record of. The row stays,
+                    // says so, and takes the one status a tester cannot give.
+                    //
+                    // In memory only. The file heals the next time the run is
+                    // written, the way the missing-stamp repair already does -
+                    // opening a run rewrites nothing.
+                    if (indexed.isEmpty()) {
+                        Logger.warn("Test run references a deleted test case id=" + item.getId());
+                        item.setStatus(TestStatus.REMOVED);
                     }
+
+                    final TestCaseDto testCase = indexed.orElseGet(() -> TestCaseDto.deleted(item.getId()));
+
+                    loadedItems.add(testCase);
+                    runItem(item.getId()).ifPresent(runItem -> runItem.setTc(testCase));
                 }
 
-                final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(p, loadedItems).sortedList();
-                Services.getInstance(p, TestCaseCacheService.class).load(sorted);
+                final List<TestCaseDto> ordered = TestCaseOrder.ordered(loadedItems);
+                Services.getInstance(p, TestCaseCacheService.class).load(ordered);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (generation != loadGeneration.get()) return;
                     allTestCases.clear();
-                    allTestCases.addAll(sorted);
+                    allTestCases.addAll(ordered);
                     currentTestCases.clear();
-                    currentTestCases.addAll(sorted);
+                    currentTestCases.addAll(ordered);
 
                     // Before refreshView reads currentPage: the reload may have moved
                     // the remembered test case onto a different page.
                     jumpToPageOfPendingSelection();
 
-                    if (list != null) {
-                        list.setPaintBusy(false);
-                        if (allTestCases.isEmpty()) {
-                            list.getEmptyText().setText("No test cases found in this run.");
-                        }
+                    list.setPaintBusy(false);
+                    if (allTestCases.isEmpty()) {
+                        list.getEmptyText().setText("No test cases found in this run.");
                     }
                     // Also the first paint's answer: Stop starts hidden because a run
                     // that has just loaded is not executing.
@@ -262,10 +273,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             } catch (final Exception ex) {
                 Logger.error("Failed to load Test Run data from disk: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    if (list != null) {
-                        list.setPaintBusy(false);
-                        list.getEmptyText().setText("Unable to load this test run.");
-                    }
+                    list.setPaintBusy(false);
+                    list.getEmptyText().setText("Unable to load this test run.");
                 });
             }
         });
@@ -281,7 +290,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public void onToolBarSearchFocusReleased() {
-        if (list != null) list.requestFocusInWindow();
+        list.requestFocusInWindow();
     }
 
     @Override
@@ -327,12 +336,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private void refreshCards() {
-        if (list != null && model != null) model.allContentsChanged();
+        model.allContentsChanged();
     }
 
     private void updateGridColumns() {
-        if (gridTable == null) return;
-        gridPanelBuilder.applyColumnVisibility(gridTable, RunEditorAttributes.class, getSelectedDetails());
+        grid.ifPresent(view ->
+                gridPanelBuilder.applyColumnVisibility(view.table(), RunEditorAttributes.class, getSelectedDetails()));
     }
 
     @Override
@@ -349,18 +358,28 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     public void onToolBarSwitchedToGridView() {
         Logger.debug("[switch] -> GRID view, currentView=" + toolBar.getCurrentView());
         rebuildGrid();
-        // rebuildGrid() swallows failures; the grid parts are then still null
-        // and the previous center stays visible instead of an NPE.
-        if (gridScrollPane != null) center.set(gridScrollPane);
-        if (gridTable != null) SwingUtilities.invokeLater(gridTable::requestFocusInWindow);
+        // rebuildGrid() swallows failures; the grid is then still empty and the
+        // previous center stays visible instead of an NPE.
+        grid.ifPresent(view -> {
+            center.set(view.scrollPane());
+            SwingUtilities.invokeLater(view.table()::requestFocusInWindow);
+        });
     }
 
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
 
-        // Before anything is cleared: the timer holds the item it is counting,
-        // and everything it is counted into is about to be thrown away.
+        reload();
+    }
+
+    /**
+     * Re-read and redrawn. The execution stops first: the timer holds the item
+     * it is counting and everything it is counted into is about to be thrown
+     * away.
+     */
+    @Override
+    public void reload() {
         haltExecution();
 
         toolBar.clearFiltersAndSearch();
@@ -371,15 +390,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         this.currentTestCases.clear();
         this.resultsMap.clear();
 
-        this.tr = null;
+        this.tr = Optional.empty();
 
-        if (this.model != null)
-            this.model.removeAll();
+        this.model.removeAll();
 
-        if (this.list != null) {
-            this.list.setPaintBusy(true);
-            this.list.getEmptyText().setText("Refreshing...");
-        }
+        this.list.setPaintBusy(true);
+        this.list.getEmptyText().setText("Refreshing...");
 
         loadDataAsync();
     }
@@ -422,27 +438,26 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // ConcurrentModificationException after currentTestCases is next mutated.
         final List<TestCaseDto> pageItems = new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
 
-        final UUID selectedId = selectionToRestore != null
-                ? selectionToRestore
-                : (list != null && list.getSelectedValue() != null ? list.getSelectedValue().getId() : null);
+        // What was selected before the reload, or what is selected right now.
+        // Swing answers null for an empty selection, which is converted here.
+        final Optional<UUID> selectedId = selectionToRestore
+                .or(() -> Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId));
 
-        if (model != null) {
-            model.replaceAll(pageItems);
-        }
+        model.replaceAll(pageItems);
 
         // Matched by id: a reload hands back different dto instances for the same
         // test cases, so comparing objects would drop the selection.
-        if (selectedId != null && list != null) {
+        selectedId.ifPresent(id -> {
             for (final TestCaseDto item : pageItems) {
-                if (selectedId.equals(item.getId())) {
+                if (id.equals(item.getId())) {
                     // Selected by value, not by index: the list model owns its own
                     // ordering, so an index into pageItems is not safe to reuse.
                     list.setSelectedValue(item, true);
                     break;
                 }
             }
-        }
-        selectionToRestore = null;
+        });
+        selectionToRestore = Optional.empty();
 
         statusBar.updatePaginationState(page.page(), page.totalPages(), total);
         showExecutionTotal();
@@ -450,7 +465,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");
             rebuildGrid();
-            if (gridScrollPane != null) center.set(gridScrollPane);
+            grid.ifPresent(view -> center.set(view.scrollPane()));
         }
     }
 
@@ -458,9 +473,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * Records the selected test case (and grid column) before the data is reloaded.
      */
     private void rememberSelection() {
-        final TestCaseDto selected = list != null ? list.getSelectedValue() : null;
-        selectionToRestore = selected != null ? selected.getId() : null;
-        gridColumnToRestore = gridTable != null ? gridTable.getSelectedColumn() : -1;
+        // Swing answers null when nothing is selected, which is the one thing
+        // there is nothing to remember about.
+        selectionToRestore = Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId);
+        gridColumnToRestore = grid.map(view -> view.table().getSelectedColumn()).orElse(-1);
     }
 
     /**
@@ -468,11 +484,13 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * that a reload pushed onto another page is not lost.
      */
     private void jumpToPageOfPendingSelection() {
-        final int page = PageWindow.pageContaining(selectionToRestore, currentTestCases, pageSize);
+        final int page = selectionToRestore
+                .map(id -> PageWindow.pageContaining(id, currentTestCases, pageSize))
+                .orElse(0);
 
         // Not on any page anymore - the case was deleted or filtered out, so
         // there is nothing left to restore.
-        if (page == 0) selectionToRestore = null;
+        if (page == 0) selectionToRestore = Optional.empty();
         else currentPage = page;
     }
 
@@ -487,31 +505,29 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         final Set<RunEditorAttributes> attributes = getSelectedDetails();
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
         try {
-            gridTable = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap, (currentPage - 1) * pageSize);
+            final JBTable table = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap, (currentPage - 1) * pageSize);
 
-            if (gridFontSyncDisposable != null) Disposer.dispose(gridFontSyncDisposable);
-            gridFontSyncDisposable = Disposer.newDisposable(projectDisposable, "testin.runEditor.gridFontSync");
-            FontSync.syncWithNativeEditor(p, gridTable, gridFontSyncDisposable);
+            // The previous grid's subscription goes with the previous grid, so
+            // they do not accumulate one per rebuild.
+            grid.ifPresent(previous -> Disposer.dispose(previous.fontSync()));
+            final Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin.runEditor.gridFontSync");
+            FontSync.syncWithNativeEditor(p, table, fontSync);
 
-            gridTable.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, gridTable, pageItems));
+            table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, pageItems));
             // ESC in grid view behaves like ESC in the list: hide the view panel, then clear the selection.
-            new EscapeAction(p, gridTable);
+            new EscapeAction(p, table);
             // ENTER on the non-editable sequence column opens the details view.
-            new GridViewDetailsAction(p, gridTable, pageItems, parent.getPath2()).installDoubleClick();
-            // Read the nullable field once: the context menu listener needs a real
-            // list, and the selection carried over from list view comes from it.
-            final JBList<TestCaseDto> currentList = list;
-            if (currentList != null) {
-                gridTable.addMouseListener(new GridContextMenuListener(gridTable, currentList, contextMenu, pageItems));
+            new GridViewDetailsAction(p, table, pageItems, parent.getPath2()).installDoubleClick();
 
-                GridPanelBuilder.restoreSelection(gridTable, currentList, pageItems, gridColumnToRestore);
-            }
+            table.addMouseListener(new GridContextMenuListener(table, list, contextMenu, pageItems));
+            GridPanelBuilder.restoreSelection(table, list, pageItems, gridColumnToRestore);
+
             // Cleared regardless of whether the row was found, so a stale column can never
             // be applied to an unrelated rebuild.
             gridColumnToRestore = -1;
 
-            gridScrollPane = new JBScrollPane(gridTable);
-            Logger.debug("[grid] rebuildGrid done, rows=" + gridTable.getRowCount() + ", cols=" + gridTable.getColumnCount());
+            grid = Optional.of(new GridView(table, new JBScrollPane(table), fontSync));
+            Logger.debug("[grid] rebuildGrid done, rows=" + table.getRowCount() + ", cols=" + table.getColumnCount());
         } catch (final Exception ex) {
             Logger.error("[grid] rebuildGrid FAILED: " + ex);
         }
@@ -566,16 +582,15 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         Disposer.dispose(projectDisposable);
 
         executionTimer.dispose();
-        if (list != null)
-            for (final MouseListener listener : list.getMouseListeners())
-                list.removeMouseListener(listener);
+        for (final MouseListener listener : list.getMouseListeners())
+            list.removeMouseListener(listener);
 
         toolBar.dispose();
         statusBar.dispose();
 
         allTestCases.clear();
         resultsMap.clear();
-        if (model != null) model.removeAll();
+        model.removeAll();
         mainPanel.removeAll();
         TestinEditor.super.dispose();
 
@@ -584,8 +599,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     @Override
-    public @Nullable JComponent getPreferredFocusedComponent() {
-        return list != null ? list : mainPanel;
+    public @NotNull JComponent getPreferredFocusedComponent() {
+        return list;
     }
 
     public @NotNull JComponent getComponent() {
@@ -597,11 +612,9 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     @Override
-    public void selectTestCase(final @Nullable TestCaseDto tc) {
-        if (tc == null) return;
-
+    public void selectTestCase(final @NotNull TestCaseDto tc) {
         final int index = currentTestCases.indexOf(tc);
-        if (index < 0 || list == null) return;
+        if (index < 0) return;
 
         final int targetPage = (index / Math.max(1, pageSize)) + 1;
         final int localIndex = index % Math.max(1, pageSize);
@@ -615,28 +628,20 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private void selectVisibleIndex(final int index) {
-        if (list == null || index < 0 || index >= list.getModel().getSize()) return;
+        if (index < 0 || index >= list.getModel().getSize()) return;
         list.setSelectedIndex(index);
         list.ensureIndexIsVisible(index);
         list.requestFocusInWindow();
     }
 
     @Override
-    public @NotNull Set<UUID> getUnsortedIds() {
-        return Collections.emptySet();
-    }
-
-    @Override
     public @NotNull List<TestCaseDto> getSelectedTestCases() {
-        return list != null ? list.getSelectedValuesList() : Collections.emptyList();
+        return list.getSelectedValuesList();
     }
 
     public void startTimerForIndex(final int globalIndex) {
         if (globalIndex >= currentTestCases.size()) {
-            final JBList<TestCaseDto> currentList = list;
-            if (currentList == null) return;
-
-            new UpdateTestRunStatusAction(p, this, currentList).onExecutionFinished(this);
+            new UpdateTestRunStatusAction(p, this, list).onExecutionFinished(this);
             return;
         }
 
@@ -650,15 +655,13 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         final int localIndex = globalIndex - ((currentPage - 1) * pageSize);
 
-        if (list != null) {
-            list.setSelectedIndex(localIndex);
-            list.ensureIndexIsVisible(localIndex);
-        }
+        list.setSelectedIndex(localIndex);
+        list.ensureIndexIsVisible(localIndex);
 
         final TestCaseDto currentTc = currentTestCases.get(globalIndex);
-        final TestRunItems runItem = resultsMap.get(currentTc.getId());
+        final Optional<TestRunItems> runItem = runItem(currentTc.getId()).filter(item -> !item.isRemoved());
 
-        if (runItem == null || runItem.isRemoved()) {
+        if (runItem.isEmpty()) {
             // No run data for this case, or no test case left to run: either way
             // the execution moves on. Status changes themselves go through
             // RunStatusService, which owns advance + persist.
@@ -666,7 +669,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             return;
         }
 
-        executionTimer.start(runItem, () -> {
+        executionTimer.start(runItem.get(), () -> {
             // A model event, not a repaint. The card grows a Duration line
             // the moment that value stops being blank, which makes the row
             // taller. JList re-measures a row only when the model says that row
@@ -677,7 +680,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             // Only when the case is on the page being viewed: contentsChanged
             // fires with index -1 for one that is not, which invalidates the
             // layout of the whole list once a second for a row nobody can see.
-            if (model != null && model.contains(currentTc)) model.contentsChanged(currentTc);
+            if (model.contains(currentTc)) model.contentsChanged(currentTc);
             showExecutionTotal();
         });
     }
@@ -694,7 +697,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 .map(TestRunItems::getDuration)
                 .reduce(Duration.ZERO, Duration::plus);
 
-        statusBar.showExecutionTime(Services.getInstance(p, Tools.class).getFormattedDuration(total));
+        statusBar.showExecutionTime(Display.formatDuration(total));
     }
 
     /**
@@ -748,8 +751,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * together.
      */
     public void stopExecution() {
-        final TestRunDto run = tr;
-        if (run != null) run.markExecutionEnded();
+        tr.ifPresent(TestRunDto::markExecutionEnded);
 
         haltExecution();
     }
@@ -773,13 +775,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public void onStartExecutionClicked() {
-        final JBList<TestCaseDto> currentList = list;
-        final TestRunDto run = tr;
-        if (currentList == null || run == null) return;
+        final Optional<TestRunDto> run = run();
+        if (run.isEmpty()) return;
 
         // Before the status change, which is what persists the run.
-        run.markExecutionStarted();
-        new UpdateTestRunStatusAction(p, this, currentList).applyStatusChange(this, TestRunStatus.IN_PROGRESS);
+        run.get().markExecutionStarted();
+        new UpdateTestRunStatusAction(p, this, list).applyStatusChange(this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(firstPendingIndex());
         refreshExecutionButtons();
     }
@@ -802,22 +803,26 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     private int firstPendingIndex() {
         for (int i = 0; i < currentTestCases.size(); i++) {
-            final TestRunItems item = resultsMap.get(currentTestCases.get(i).getId());
-
-            if (item != null && item.getStatus() == TestStatus.PENDING) return i;
+            if (runItem(currentTestCases.get(i).getId())
+                    .filter(item -> item.getStatus() == TestStatus.PENDING)
+                    .isPresent()) return i;
         }
 
         return 0;
     }
 
     /**
-     * The tester's own stop. The confirmation lives here rather than in
-     * {@link #stopExecution()} because that runs on four internal paths - the last
-     * verdict, a bulk apply, the run completing - where nobody pressed anything.
+     * The tester's own stop, and the only one that reaches the test runner.
+     * <p>
+     * {@link #stopExecution()} runs on four internal paths - the last verdict, a
+     * bulk apply, the run completing - where nobody pressed anything and a test
+     * that is running is running legitimately. Killing it there would end a run
+     * the tester never asked to end.
      */
     @Override
     public void onStopExecutionClicked() {
         stopExecution();
+
         // The other stop paths persist as part of the verdict or status change they
         // belong to; this one is the tester's alone, so it writes the run itself -
         // the case duration ticked so far and the end stamp would otherwise live only

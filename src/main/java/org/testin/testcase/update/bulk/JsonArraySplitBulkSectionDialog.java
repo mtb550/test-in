@@ -5,7 +5,6 @@ import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -28,7 +27,7 @@ import java.util.function.Consumer;
 public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkDialog<BulkJsonEditors> {
 
     private final @NotNull List<TestCaseDto> selectedItems;
-    private final @Nullable Consumer<List<TestCaseDto>> updatedItems;
+    private final @NotNull Consumer<List<TestCaseDto>> updatedItems;
     private final @NotNull BulkJsonEditors editors;
 
     private final @NotNull List<List<String>> originalValues = new ArrayList<>();
@@ -41,7 +40,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
     private final @NotNull List<int[]> spanOwners = new ArrayList<>();
 
     protected JsonArraySplitBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems,
-                                              final @Nullable Consumer<List<TestCaseDto>> updatedItems) {
+                                              final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
         super(p);
         this.selectedItems = selectedItems;
         this.updatedItems = updatedItems;
@@ -114,12 +113,26 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         editors.focusFirstValue();
     }
 
+    /**
+     * Told where an editable item landed in the text being built.
+     */
+    @FunctionalInterface
+    private interface ItemRecorder {
+        void record(int start, int end, int testCaseIndex, int itemIndex);
+    }
+
+    /**
+     * The read-only side: it is written the same way and remembers nothing.
+     */
+    private static final @NotNull ItemRecorder RECORDS_NOTHING = (start, end, testCaseIndex, itemIndex) -> {
+    };
+
     @Override
     protected void submit() {
         readEditorIntoValues();
         applyValues(selectedItems, activeValues);
-        // todo, apply update automation edit bulk test cases. set to null for now
-        if (updatedItems != null) updatedItems.accept(selectedItems);
+        // todo, apply update automation edit bulk test cases.
+        updatedItems.accept(selectedItems);
 
         closeOk();
     }
@@ -186,11 +199,9 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
      */
     private void readEditorIntoValues() {
         for (int span = 0; span < spanOwners.size() && span < editors.valueCount(); span++) {
-            final String text = editors.valueAt(span);
-            if (text == null) continue;
-
             final int[] owner = spanOwners.get(span);
-            activeValues.get(owner[0]).set(owner[1], BulkJsonEditor.unescapeJson(text));
+            editors.valueAt(span).ifPresent(text ->
+                    activeValues.get(owner[0]).set(owner[1], BulkJsonEditor.unescapeJson(text)));
         }
     }
 
@@ -213,8 +224,11 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
             left.append(prefix);
             right.append(prefix);
 
-            appendItems(left, originalValues.get(i), null, null, i);
-            appendItems(right, activeValues.get(i), editableRanges, spanOwners, i);
+            appendItems(left, originalValues.get(i), RECORDS_NOTHING, i);
+            appendItems(right, activeValues.get(i), (start, end, testCase, item) -> {
+                editableRanges.add(new int[]{start, end});
+                spanOwners.add(new int[]{testCase, item});
+            }, i);
 
             final String suffix = "    ]\n  }";
             final String comma = (i < selectedItems.size() - 1) ? ",\n" : "\n";
@@ -229,23 +243,19 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
     }
 
     /**
-     * One quoted item per line. Passing the range and owner lists in records
-     * where each value sits; the left side passes null, because nothing there
-     * is editable.
+     * One quoted item per line, telling the recorder where each one landed. The
+     * left side records nothing, because nothing there is editable - which it
+     * says with a recorder that does nothing rather than with two nulls (#71).
      */
     private void appendItems(final @NotNull StringBuilder out, final @NotNull List<String> items,
-                             final @Nullable List<int[]> ranges, final @Nullable List<int[]> owners,
-                             final int testCaseIndex) {
+                             final @NotNull ItemRecorder recorder, final int testCaseIndex) {
         for (int j = 0; j < items.size(); j++) {
             out.append("      \"");
 
             final int start = out.length();
             out.append(BulkJsonEditor.escapeJson(items.get(j)));
 
-            if (ranges != null && owners != null) {
-                ranges.add(new int[]{start, out.length()});
-                owners.add(new int[]{testCaseIndex, j});
-            }
+            recorder.record(start, out.length(), testCaseIndex, j);
 
             out.append("\"").append(j < items.size() - 1 ? "," : "").append("\n");
         }

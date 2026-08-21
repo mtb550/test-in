@@ -6,7 +6,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,11 +38,10 @@ public final class LabelValueRow {
      * value adds nothing and leaves the row number where it was.
      */
     public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc,
-                          final @NotNull String labelText, final @Nullable String valueText,
+                          final @NotNull String labelText, final @NotNull String valueText,
                           final float labelFontSize, final float valueFontSize, final int row) {
 
-        if (valueText == null || valueText.trim().isEmpty())
-            return row;
+        if (valueText.trim().isEmpty()) return row;
 
         final JTextArea valueArea = new JTextArea(valueText);
         valueArea.setFont(JBFont.label().deriveFont(Font.PLAIN, valueFontSize));

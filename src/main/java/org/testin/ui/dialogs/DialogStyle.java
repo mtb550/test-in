@@ -1,16 +1,15 @@
 package org.testin.ui.dialogs;
 
-import com.intellij.openapi.ui.popup.ActiveIcon;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,14 +20,21 @@ import java.awt.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DialogStyle {
 
+    /**
+     * No icon: one that paints nothing, in no space. A field or a row that has
+     * no icon says so with an icon of its own type rather than with a null the
+     * framework and every caller would have to check (#71).
+     */
+    public static final @NotNull Icon NO_ICON = EmptyIcon.ICON_0;
+
     public static <T extends JComponent> @NotNull T styleContent(final @NotNull T component) {
         component.setOpaque(true);
         component.setBackground(UIUtil.getPanelBackground());
         return component;
     }
 
-    public static void setLeadingIcon(final @NotNull ExtendableTextField textField, final @Nullable Icon icon) {
-        if (icon == null) {
+    public static void setLeadingIcon(final @NotNull ExtendableTextField textField, final @NotNull Icon icon) {
+        if (icon == NO_ICON) {
             textField.setExtensions();
             return;
         }
@@ -53,9 +59,8 @@ public final class DialogStyle {
 
     public static @NotNull ComponentPopupBuilder createPopupBuilder(final @NotNull JComponent content,
                                                                     final @NotNull JComponent focusComponent,
-                                                                    final @NotNull String title,
-                                                                    final @Nullable Icon titleIcon) {
-        final ComponentPopupBuilder builder = JBPopupFactory.getInstance()
+                                                                    final @NotNull String title) {
+        return JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(content, focusComponent)
                 .setTitle(title)
                 .setRequestFocus(true)
@@ -65,12 +70,6 @@ public final class DialogStyle {
                 .setMovable(false)
                 .setResizable(false)
                 .setMinSize(new Dimension(JBUI.scale(350), 0));
-
-        if (titleIcon != null) {
-            builder.setTitleIcon(new ActiveIcon(titleIcon));
-        }
-
-        return builder;
     }
 
 }

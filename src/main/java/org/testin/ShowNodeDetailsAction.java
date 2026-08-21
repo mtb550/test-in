@@ -8,10 +8,8 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.tree.TreeValueUtil;
-import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.view.marker.MarkerDetailsViewDialog;
 
-import javax.swing.tree.TreePath;
 
 public class ShowNodeDetailsAction extends AbstractProjectTreeAction {
 
@@ -22,14 +20,7 @@ public class ShowNodeDetailsAction extends AbstractProjectTreeAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        TreePath path = tree.getSelectionPath();
-        if (path == null) return;
-
-        Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
-
-        if (!(userObject instanceof DirectoryDto dir)) return;
-
-        new MarkerDetailsViewDialog(p, dir).show();
+        TreeValueUtil.selectedDirectory(tree).ifPresent(dir -> new MarkerDetailsViewDialog(p, dir).show());
     }
 
     @Override
