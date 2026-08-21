@@ -155,13 +155,6 @@ public class CreateTestMethod implements GenAction {
     }
 
     /**
-     * Puts the TestNG @Test import in the file, when it is not there already.
-     * <p>
-     * Both of the platform's empty answers mean the same thing here - a file
-     * with no import list of its own, and a TestNG that is not on the classpath
-     * - so neither is asked about separately.
-     */
-    /**
      * Whether the file already imports TestNG's @Test. The platform answers "it
      * does not" with no import statement, and this is the one place that reads
      * that.
@@ -170,6 +163,13 @@ public class CreateTestMethod implements GenAction {
         return imports.findSingleClassImportStatement(TESTNG_TEST) != null;
     }
 
+    /**
+     * Puts the TestNG @Test import in the file, when it is not there already.
+     * <p>
+     * Both of the platform's empty answers mean the same thing here - a file
+     * with no import list of its own, and a TestNG that is not on the classpath
+     * - so neither is asked about separately.
+     */
     private void addTestImport(final @NotNull Project p, final @NotNull PsiJavaFile javaFile,
                                final @NotNull PsiElementFactory factory) {
         Optional.ofNullable(javaFile.getImportList())

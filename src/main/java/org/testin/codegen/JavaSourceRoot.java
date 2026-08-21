@@ -84,16 +84,6 @@ public final class JavaSourceRoot {
     }
 
     /**
-     * The folder this package stands for under the root, made if it is not there
-     * yet, and empty when the platform could not make it - which it says by
-     * answering null.
-     * <p>
-     * Said once here rather than at each of the four generators that need a
-     * package folder: three worded the failure differently and the fourth said
-     * nothing at all, so the same missing folder explained itself differently
-     * depending on which generator noticed (#71).
-     */
-    /**
      * Whatever sits at a path under the source root: nothing when the code was
      * never generated for that node, or when someone deleted it by hand. Both
      * are ordinary states, which is why every caller gets an answer rather than
@@ -119,6 +109,16 @@ public final class JavaSourceRoot {
         Logger.info("Removed generated code at: " + target.getPath());
     }
 
+    /**
+     * The folder this package stands for under the root, made if it is not there
+     * yet, and empty when the platform could not make it - which it says by
+     * answering null.
+     * <p>
+     * Said once here rather than at each of the four generators that need a
+     * package folder: three worded the failure differently and the fourth said
+     * nothing at all, so the same missing folder explained itself differently
+     * depending on which generator noticed (#71).
+     */
     public static @NotNull Optional<VirtualFile> packageFolder(final @NotNull VirtualFile root,
                                                                final @NotNull List<String> packageSegments) throws IOException {
         final @NotNull String relative = String.join("/", packageSegments);
