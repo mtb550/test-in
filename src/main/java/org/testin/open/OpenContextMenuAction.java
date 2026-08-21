@@ -10,59 +10,80 @@ import org.testin.util.Shortcuts;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.Optional;
+import java.util.function.Supplier;
 
+/**
+ * Opens a component's context menu from the keyboard, over whatever is selected
+ * in it.
+ * <p>
+ * A tree and a list answer "where is the selection" in different words, and that
+ * is the only difference between them here. So each entry point brings its own
+ * answer and everything after it is the same: one component, one menu, one point
+ * to show it at. It used to hold a field for each kind and null the other, which
+ * made the whole of {@code actionPerformed} a walk through four null checks
+ * deciding which half of the class it was in.
+ */
 public class OpenContextMenuAction extends DumbAwareAction {
 
     private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0);
-    private final SimpleTree tree;
-    private final JBList<?> list;
-    private final DefaultActionGroup cm;
 
-    public OpenContextMenuAction(final SimpleTree tree, final DefaultActionGroup cm) {
-        super("Show Context Menu");
-        this.tree = tree;
-        this.cm = cm;
-        this.list = null;
-        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
+    private final @NotNull JComponent owner;
+    private final @NotNull DefaultActionGroup cm;
+
+    /**
+     * Where on the owner the menu appears, and empty when nothing is selected -
+     * there is no sensible place to put a menu about nothing.
+     */
+    private final @NotNull Supplier<Optional<Point>> anchor;
+
+    public OpenContextMenuAction(final @NotNull SimpleTree tree, final @NotNull DefaultActionGroup cm) {
+        this(tree, cm, () -> selectedRow(tree));
     }
 
-    public OpenContextMenuAction(final JBList<?> list, final DefaultActionGroup cm) {
+    public OpenContextMenuAction(final @NotNull JBList<?> list, final @NotNull DefaultActionGroup cm) {
+        this(list, cm, () -> selectedCell(list));
+    }
+
+    private OpenContextMenuAction(final @NotNull JComponent owner, final @NotNull DefaultActionGroup cm,
+                                  final @NotNull Supplier<Optional<Point>> anchor) {
         super("Show Context Menu");
-        this.list = list;
+        this.owner = owner;
         this.cm = cm;
-        this.tree = null;
-        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), list);
+        this.anchor = anchor;
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), owner);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (tree != null && cm != null) {
-            int[] selectedRows = tree.getSelectionRows();
-            if (selectedRows != null && selectedRows.length > 0) {
-                Rectangle rect = tree.getRowBounds(selectedRows[0]);
-                if (rect != null) {
-                    ActionManager.getInstance()
-                            .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, cm)
-                            .getComponent()
-                            .show(tree, rect.x + (rect.width / 2), rect.y + (rect.height / 2));
+        anchor.get().ifPresent(at -> ActionManager.getInstance()
+                .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, cm)
+                .getComponent()
+                .show(owner, at.x, at.y));
+    }
 
-                }
-            }
-            return;
-        }
+    /**
+     * The middle of the selected row. Swing answers null for the rows of an
+     * empty selection, and for the bounds of a row that is not showing.
+     */
+    private static @NotNull Optional<Point> selectedRow(final @NotNull SimpleTree tree) {
+        final int[] rows = tree.getSelectionRows();
+        if (rows == null || rows.length == 0) return Optional.empty();
 
-        if (list != null && cm != null) {
-            int selectedIndex = list.getSelectedIndex();
-            if (selectedIndex != -1) {
-                Rectangle rect = list.getCellBounds(selectedIndex, selectedIndex);
-                if (rect != null) {
-                    ActionManager.getInstance()
-                            .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, cm)
-                            .getComponent()
-                            .show(list, rect.x + (rect.width / 4), rect.y + (rect.height / 2));
-                }
-            }
-        }
+        return Optional.ofNullable(tree.getRowBounds(rows[0]))
+                .map(bounds -> new Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2));
+    }
+
+    /**
+     * A quarter across the selected cell rather than half, so a long test case
+     * name is still readable beside the menu.
+     */
+    private static @NotNull Optional<Point> selectedCell(final @NotNull JBList<?> list) {
+        final int index = list.getSelectedIndex();
+        if (index == -1) return Optional.empty();
+
+        return Optional.ofNullable(list.getCellBounds(index, index))
+                .map(bounds -> new Point(bounds.x + bounds.width / 4, bounds.y + bounds.height / 2));
     }
 
     @Override
@@ -70,5 +91,4 @@ public class OpenContextMenuAction extends DumbAwareAction {
         // BGT on purpose - no update() here reads Swing state; do not switch to EDT (#52).
         return ActionUpdateThread.BGT;
     }
-
 }

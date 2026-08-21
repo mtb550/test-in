@@ -8,10 +8,10 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.TestRunConfiguration;
 import org.testin.ui.framework.DialogComponent;
 
+import java.util.Optional;
 import javax.swing.*;
 import java.awt.*;
 import java.util.EnumMap;
@@ -97,12 +97,13 @@ public class RunConfigurationForm implements DialogComponent {
     }
 
     public @NotNull String getFieldValue(final @NotNull TestRunConfiguration field) {
-        final @Nullable JComponent comp = fieldMap.get(field);
-        if (comp instanceof ComboBox<?> comboBox) {
-            final @Nullable Object selected = comboBox.getSelectedItem();
-            return selected != null ? selected.toString().trim() : "";
-        }
-        return "";
+        // Nothing under that field, a field that is not a combo box, and a combo
+        // box with nothing chosen all mean the same thing here: no value.
+        return Optional.ofNullable(fieldMap.get(field))
+                .filter(ComboBox.class::isInstance)
+                .map(comp -> ((ComboBox<?>) comp).getSelectedItem())
+                .map(selected -> selected.toString().trim())
+                .orElse("");
     }
 
     @Override

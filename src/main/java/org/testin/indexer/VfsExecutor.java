@@ -9,7 +9,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.VfsBiOperation;
@@ -17,6 +16,7 @@ import org.testin.util.VfsOperation;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -30,6 +30,19 @@ import java.util.function.Consumer;
 @Service(Service.Level.PROJECT)
 final class VfsExecutor {
 
+    /**
+     * The file at this path, and empty when the VFS cannot resolve it - deleted
+     * underneath us, or never refreshed into it.
+     * <p>
+     * Off the EDT by contract: refreshAndFindFile refreshes synchronously and
+     * reads the VFS persistence, which the EDT is not allowed to do. The one
+     * place the platform's null becomes an answer of its own, so the three
+     * operations below are written as though a path always resolves (#71).
+     */
+    private static @NotNull Optional<VirtualFile> find(final @NotNull Path path) {
+        return Optional.ofNullable(LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path));
+    }
+
     // Renaming is the only single-path VFS operation, so the title it reports a
     // failure under is not a parameter: one caller, one word, and a second
     // operation would bring its own method rather than a second string.
@@ -41,26 +54,20 @@ final class VfsExecutor {
         // not allowed to do, while the operation itself mutates the VFS and so
         // needs the write action.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            // Boundary: the VFS answers null for a path it cannot resolve -
-            // deleted underneath us, or never refreshed into it (#71).
-            final @Nullable VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
+            final Optional<VirtualFile> vf = find(path);
 
-            ApplicationManager.getApplication().invokeLater(() -> {
-                if (vf == null) {
-                    Services.getInstance(p, Notifier.class).error(p, "Could not find path on disk:\n" + path, errorTitle);
-                    return;
-                }
-
-                WriteAction.run(() -> {
-                    try {
-                        operation.execute(vf);
-                    } catch (final Exception ex) {
-                        // A failed VFS operation is reported, never thrown into the
-                        // EDT as an exception dialog (parity with the two-path form).
-                        Services.getInstance(p, Notifier.class).error(p, "Operation failed: " + ex.getMessage(), errorTitle);
-                    }
-                });
-            });
+            ApplicationManager.getApplication().invokeLater(() -> vf.ifPresentOrElse(
+                    file -> WriteAction.run(() -> {
+                        try {
+                            operation.execute(file);
+                        } catch (final Exception ex) {
+                            // A failed VFS operation is reported, never thrown into the
+                            // EDT as an exception dialog (parity with the two-path form).
+                            Services.getInstance(p, Notifier.class).error(p, "Operation failed: " + ex.getMessage(), errorTitle);
+                        }
+                    }),
+                    () -> Services.getInstance(p, Notifier.class)
+                            .error(p, "Could not find path on disk:\n" + path, errorTitle)));
         });
     }
 
@@ -69,12 +76,11 @@ final class VfsExecutor {
                           final @NotNull Runnable onSuccess, final @NotNull Runnable onFailure) {
         // Both lookups off the EDT, the operation on it - see the single-path form.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            // Boundary: the VFS answers null for a path it cannot resolve (#71).
-            final @Nullable VirtualFile sourceVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourcePath);
-            final @Nullable VirtualFile targetVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(targetPath);
+            final Optional<VirtualFile> sourceVf = find(sourcePath);
+            final Optional<VirtualFile> targetVf = find(targetPath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                if (sourceVf == null || targetVf == null) {
+                if (sourceVf.isEmpty() || targetVf.isEmpty()) {
                     Services.getInstance(p, Notifier.class).error(p, "Could not find source or target path on disk.", errorTitle);
                     onFailure.run();
                     return;
@@ -82,7 +88,7 @@ final class VfsExecutor {
 
                 WriteAction.run(() -> {
                     try {
-                        operation.execute(sourceVf, targetVf);
+                        operation.execute(sourceVf.get(), targetVf.get());
                         onSuccess.run();
                     } catch (final Exception ex) {
                         Services.getInstance(p, Notifier.class).error(p, "Operation failed: " + ex.getMessage(), errorTitle);
@@ -111,16 +117,15 @@ final class VfsExecutor {
     void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path,
                   final @NotNull Consumer<@NotNull Boolean> onDeleted) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            // Boundary: the VFS answers null for a path it cannot resolve -
-            // deleted underneath us, or never refreshed into it (#71).
-            final @Nullable VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
+            final Optional<VirtualFile> vf = find(path);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 final AtomicBoolean deleted = new AtomicBoolean(true);
 
                 WriteAction.run(() -> {
                     try {
-                        if (vf != null) vf.delete(requester);
+                        // A path the VFS cannot find counts as deleted - see above.
+                        if (vf.isPresent()) vf.get().delete(requester);
                     } catch (final IOException ex) {
                         deleted.set(false);
                         Services.getInstance(p, Notifier.class).error(p, "Could not delete file: " + ex.getMessage(), "Error");

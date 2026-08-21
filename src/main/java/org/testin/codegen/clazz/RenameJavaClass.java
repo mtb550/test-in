@@ -10,7 +10,6 @@ import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.Renamed;
 import org.testin.logger.Logger;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.NameSanitizer;
 
 import java.util.List;

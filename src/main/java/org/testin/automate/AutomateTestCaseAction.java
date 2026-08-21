@@ -6,8 +6,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectAction;
+import java.util.Optional;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -32,13 +32,9 @@ public class AutomateTestCaseAction extends AbstractProjectAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         // update() disables the action on an empty selection, but the shortcut
-        // and the selection can race, and getSelectedValue() is the one thing here
-        // that can hand back null.
-        final @Nullable TestCaseDto tc = list.getSelectedValue();
-        if (tc == null) return;
-
+        // and the selection can race, so Swing can still answer with nothing.
         /// TODO: to be implemented by integrating to pi agent automatic, next release
-        Logger.info(tc.getDescription());
+        Optional.ofNullable(list.getSelectedValue()).ifPresent(tc -> Logger.info(tc.getDescription()));
 
         // Says so until then. This is the one action in the menu that changes
         // nothing, and silence here reads as a bug rather than as unbuilt: after
