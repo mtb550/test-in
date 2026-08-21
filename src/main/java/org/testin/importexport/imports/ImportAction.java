@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +41,13 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class ImportAction extends AbstractProjectTreeAction {
+
+    /**
+     * How many test methods go into one write command. Small enough that the
+     * EDT comes back between batches, large enough that a sheet is not a
+     * thousand separate undo entries.
+     */
+    private static final int METHODS_PER_COMMAND = 25;
 
     protected final @NotNull List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(a -> a.can(Can.IMPORT))
@@ -93,7 +101,7 @@ public class ImportAction extends AbstractProjectTreeAction {
 
                 for (final TestCaseDto tc : flatList) tc.setParent(ts);
 
-                if (generateCode) onEdt(() -> generateTestMethods(p, flatList, ts.getName()));
+                if (generateCode) generateTestMethods(p, flatList, ts.getName(), indicator);
 
                 onEdt(() -> Services.getInstance(p, EditorUtil.class).closeThenOpen(p, ts));
                 Services.getInstance(p, Notifier.class).softShowCounted(p, "Imported", flatList.size());
@@ -118,7 +126,7 @@ public class ImportAction extends AbstractProjectTreeAction {
 
                     for (final TestCaseDto tc : sheetCases) tc.setParent(sheetDto);
 
-                    if (generateCode) onEdt(() -> generateTestMethods(p, sheetCases, cName));
+                    if (generateCode) generateTestMethods(p, sheetCases, cName, indicator);
 
                     totalImported += sheetCases.size();
                 }
@@ -159,24 +167,47 @@ public class ImportAction extends AbstractProjectTreeAction {
     }
 
     /**
-     * Generates the automation test method for each imported case, as one
-     * command. The target name only labels the log line.
+     * Generates the automation test method for each imported case, in batches.
+     * The target name only labels the log line.
      * <p>
      * Through the registry like every other caller: naming the generator class
      * made this the one place that could keep working its own way while the
-     * rest of the plugin changed how a method is made. One command around the
-     * loop, so a sheet of two hundred cases is one write lock and one undo
-     * rather than two hundred of each (#51).
+     * rest of the plugin changed how a method is made.
+     * <p>
+     * Batched rather than one command for the whole sheet, which is what #51
+     * asked for and what froze the IDE for forty-nine seconds on a sheet of five
+     * hundred and fifty. A write action cannot be interrupted, so one command
+     * around every case holds the EDT until the last one is written - the
+     * progress bar cannot even repaint. Twenty-five at a time releases it
+     * between batches. The cost is an undo entry per batch instead of one for
+     * the sheet, and a single undo of a fifty-second operation was not a thing
+     * anyone could use.
      */
     private void generateTestMethods(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases,
-                                     final @NotNull String targetName) {
+                                     final @NotNull String targetName, final @NotNull ProgressIndicator indicator) {
         Logger.info("Import: generating test methods for '" + targetName + "' with " + testCases.size() + " cases");
 
-        WriteCommandAction.runWriteCommandAction(p, "Create Test Methods", null, () -> {
-            for (final TestCaseDto tc : testCases) {
-                GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
-            }
-        });
+        // Off the EDT, before any of it. Adding a method resolves the references
+        // inside it, resolving reads the stub index, and reading the index while
+        // it is being rebuilt waits for the rebuild - which is exactly what the
+        // import has just caused by writing a file per test case. Waiting here
+        // costs a background thread; waiting inside the write action below cost
+        // the whole IDE, with the CPU idle for all of it.
+        indicator.setText2("Waiting for indexing to finish");
+        DumbService.getInstance(p).waitForSmartMode();
+
+        for (int from = 0; from < testCases.size(); from += METHODS_PER_COMMAND) {
+            final @NotNull List<TestCaseDto> batch =
+                    testCases.subList(from, Math.min(from + METHODS_PER_COMMAND, testCases.size()));
+            final int written = from + batch.size();
+
+            indicator.setText2("Generating test methods: " + written + " of " + testCases.size());
+            onEdt(() -> WriteCommandAction.runWriteCommandAction(p, "Create Test Methods", null, () -> {
+                for (final TestCaseDto tc : batch) {
+                    GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
+                }
+            }));
+        }
     }
 
     private void linkAndSaveTestCases(final @NotNull Project p, final @NotNull Path dirPath,
