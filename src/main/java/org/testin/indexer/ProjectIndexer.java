@@ -165,8 +165,28 @@ public final class ProjectIndexer {
         });
     }
 
+    /**
+     * Blocks until the index is built.
+     * <p>
+     * Only from a thread holding no lock. A read action that blocks here holds
+     * the read lock for as long as the wait, and every write action in the IDE
+     * queues behind it - including the one {@code DumbService} takes on the EDT
+     * to start indexing. The tree used to call this from its Invoker, which the
+     * platform runs inside a read action, and a 32-second wait froze the IDE
+     * until it was killed (#89).
+     * <p>
+     * Checked rather than documented, because the comment was not enough: the
+     * call site that did it looked exactly like the two that are safe.
+     */
     public void awaitIndexing() {
         if (indexed.get()) return;
+
+        if (ApplicationManager.getApplication().isReadAccessAllowed()) {
+            Logger.error("awaitIndexing() called while holding a read action - "
+                    + "this blocks every write action in the IDE. Returning without waiting.");
+            return;
+        }
+
         try {
             indexingLatch.await();
         } catch (final InterruptedException ex) {

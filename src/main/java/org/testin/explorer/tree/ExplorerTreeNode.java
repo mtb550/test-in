@@ -40,8 +40,17 @@ public final class ExplorerTreeNode extends AbstractTreeNode<Object> {
         if (!(value instanceof DirectoryDto directory)) return List.of();
 
         try {
+            // Never waits for the index, and this is load-bearing rather than an
+            // optimization. The platform calls this on the tree's Invoker inside
+            // a read action, and a read action that blocks blocks every write
+            // action in the IDE with it - including the one DumbService takes to
+            // start indexing, which is the EDT's. Waiting here for 32 seconds
+            // froze the whole IDE and killed it (#89).
+            //
+            // A node with nothing indexed under it yet answers with nothing, and
+            // ExplorerPanel.refreshWhenIndexed draws it again when the index is
+            // ready. That wait is on a pooled thread, holding no lock.
             final @NotNull ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-            indexer.awaitIndexing();
             final @NotNull List<ExplorerTreeNode> children = new ArrayList<>();
             for (final DirectoryDto child : indexer.getChildren(directory.getPath())) {
                 children.add(child(child));
