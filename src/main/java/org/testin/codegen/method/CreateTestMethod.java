@@ -5,8 +5,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
@@ -119,7 +117,7 @@ public class CreateTestMethod implements GenAction {
         if (first.isEmpty()) return;
 
         final @NotNull Target target = first.orElseThrow();
-        Logger.info("Creating " + count(cases.size(), "test method") + " in " + target.path());
+        Logger.info("Creating " + testMethods(cases.size()) + " in " + target.path());
 
         findOrCreateClass(p, target.path(), target.packageList(), target.className()).ifPresentOrElse(
                 targetClass -> injectAsText(p, targetClass, cases),
@@ -174,7 +172,7 @@ public class CreateTestMethod implements GenAction {
         // Counted, not narrated. Re-importing a sheet skips every method in it,
         // and a line each buried everything else the import had to say.
         if (alreadyThere > 0) {
-            Logger.info(alreadyThere + " of " + count(cases.size(), "test method")
+            Logger.info(alreadyThere + " of " + testMethods(cases.size())
                     + " already in " + targetClass.getQualifiedName());
         }
 
@@ -312,16 +310,11 @@ public class CreateTestMethod implements GenAction {
     }
 
     /**
-     * Adds the method and hands back what it added, or nothing when the class
-     * already had it. The caller reformats: one method on its own reformats
-     * itself, a whole set reformats the class once at the end.
+     * A count of test methods, singular when there is one. Log lines are read
+     * by people.
      */
-    /**
-     * A count with its noun, singular when there is one of it. Log lines are
-     * read by people.
-     */
-    private static @NotNull String count(final int howMany, final @NotNull String noun) {
-        return howMany + " " + noun + (howMany == 1 ? "" : "s");
+    private static @NotNull String testMethods(final int howMany) {
+        return howMany + " test method" + (howMany == 1 ? "" : "s");
     }
 
     /**
@@ -354,6 +347,14 @@ public class CreateTestMethod implements GenAction {
                 + methodName + "\n}";
     }
 
+    /**
+     * Adds one method through the PSI and hands back what it added, or nothing
+     * when the class already had it. The caller reformats what it gets.
+     * <p>
+     * The slow way, kept for the two places that cannot write text: a class
+     * with no document to edit, and one the PSI would not give us at all, which
+     * is read back off disk instead.
+     */
     private @NotNull Optional<PsiElement> injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass,
                                                        final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
