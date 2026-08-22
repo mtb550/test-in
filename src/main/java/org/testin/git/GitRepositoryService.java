@@ -33,8 +33,16 @@ public final class GitRepositoryService {
     /**
      * A filesystem question, not an IDE one - so this stays as it was.
      */
-    public boolean isRepository(final @NotNull Path path) {
-        return GitUtil.isGitRoot(path);
+    /**
+     * True when the directory is not a Git repository at all.
+     * <p>
+     * Asked in the negative because that is the only way it is ever asked - all
+     * three callers wrote {@code if (!isRepository(...))} - and a question read
+     * one way at every call site should be named that way. The same rule
+     * {@link #couldNotAbortRebase} follows.
+     */
+    public boolean isNotRepository(final @NotNull Path path) {
+        return !GitUtil.isGitRoot(path);
     }
 
     /**

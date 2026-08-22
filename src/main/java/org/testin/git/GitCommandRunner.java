@@ -70,8 +70,12 @@ final class GitCommandRunner {
      * <p>
      * Needs Git 2.25 or newer, which is where {@code --pathspec-from-file}
      * arrived for both {@code add} and {@code commit}.
+     * <p>
+     * Answers nothing, unlike its two siblings: the commands that take a path
+     * list are {@code add}, which prints nothing when it works, and
+     * {@code commit}, whose summary nobody reads. A failure still raises.
      */
-    static @NotNull String executeOverPaths(
+    static void executeOverPaths(
             final @NotNull Project project,
             final @NotNull Path workingDirectory,
             final @NotNull Collection<String> paths,
@@ -84,7 +88,7 @@ final class GitCommandRunner {
             full[command.length] = "--pathspec-from-file=" + pathspec;
             full[command.length + 1] = "--pathspec-file-nul";
 
-            return run(project, workingDirectory, "", full);
+            run(project, workingDirectory, "", full);
         } finally {
             try {
                 Files.deleteIfExists(pathspec);

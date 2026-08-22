@@ -90,7 +90,7 @@ public class BranchSelector {
             showPlaceholder("No project path found");
             return;
         }
-        if (!git.isRepository(path)) {
+        if (git.isNotRepository(path)) {
             showPlaceholder("Not a Git repository");
             return;
         }

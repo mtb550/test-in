@@ -92,7 +92,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
      * is about a repository either way.
      */
     public void openFor(final @NotNull Path path) {
-        if (!git.isRepository(path)) {
+        if (git.isNotRepository(path)) {
             Services.getInstance(p, Notifier.class).warnWithAction(p,
                     "Git repository not found",
                     "The selected project (" + path.getFileName() + ") is not a Git repository.",
