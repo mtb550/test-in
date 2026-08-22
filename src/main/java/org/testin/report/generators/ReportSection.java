@@ -2,6 +2,7 @@ package org.testin.report.generators;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.TestRunSummary;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 

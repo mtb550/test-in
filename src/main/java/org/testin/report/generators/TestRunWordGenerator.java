@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.*;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.TestRunSummary;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.testin.logger.Logger;
 import org.testin.model.BugPriority;

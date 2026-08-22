@@ -16,6 +16,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.services.Services;
 
 import javax.swing.*;
+import java.util.List;
 import java.util.function.Function;
 
 @Getter
@@ -34,7 +35,9 @@ public enum DirectoryType {
                 if (removed) GenType.REMOVE_TEST_PROJECT.getAction().execute(p, dir);
                 onRemoved.accept(removed);
             }),
-            SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
+            SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES,
+            NodeStatistics.CHILDREN,
+            List.of(NodeCount.TEST_SETS, NodeCount.PACKAGES, NodeCount.TEST_CASES, NodeCount.TEST_RUNS)
     ),
 
     TCD(
@@ -47,7 +50,9 @@ public enum DirectoryType {
             new NoJavaCode("Test Cases directory"),
             new NoJavaCode("Test Cases directory"),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved),
-            SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
+            SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES,
+            NodeStatistics.CHILDREN,
+            List.of(NodeCount.TEST_SETS, NodeCount.PACKAGES, NodeCount.TEST_CASES)
     ),
 
     TRD(
@@ -60,7 +65,9 @@ public enum DirectoryType {
             new NoJavaCode("Test Runs directory"),
             new NoJavaCode("Test Runs directory"),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved),
-            SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
+            SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES,
+            NodeStatistics.CHILDREN,
+            List.of(NodeCount.PACKAGES, NodeCount.TEST_RUNS)
     ),
 
     TSP(
@@ -76,7 +83,9 @@ public enum DirectoryType {
                 if (removed) GenType.REMOVE_TEST_SET_PACKAGE.getAction().execute(p, dir);
                 onRemoved.accept(removed);
             }),
-            SimpleTextAttributes.REGULAR_ATTRIBUTES
+            SimpleTextAttributes.REGULAR_ATTRIBUTES,
+            NodeStatistics.CHILDREN,
+            List.of(NodeCount.TEST_SETS, NodeCount.PACKAGES, NodeCount.TEST_CASES)
     ),
 
     TRP(
@@ -89,7 +98,9 @@ public enum DirectoryType {
             new NoJavaCode("test run package"),
             new NoJavaCode("test run package"),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestRunPackage(dir.getPath(), onRemoved),
-            SimpleTextAttributes.REGULAR_ATTRIBUTES
+            SimpleTextAttributes.REGULAR_ATTRIBUTES,
+            NodeStatistics.CHILDREN,
+            List.of(NodeCount.PACKAGES, NodeCount.TEST_RUNS)
     ),
 
     TS(
@@ -105,7 +116,9 @@ public enum DirectoryType {
                 if (removed) GenType.REMOVE_TEST_SET.getAction().execute(p, dir);
                 onRemoved.accept(removed);
             }),
-            SimpleTextAttributes.REGULAR_ATTRIBUTES
+            SimpleTextAttributes.REGULAR_ATTRIBUTES,
+            NodeStatistics.CHILDREN,
+            List.of(NodeCount.TEST_CASES)
     ),
 
     TR(
@@ -118,7 +131,9 @@ public enum DirectoryType {
             new NoJavaCode("test run"),
             new NoJavaCode("test run"),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestRun(dir.getPath(), onRemoved),
-            SimpleTextAttributes.REGULAR_ATTRIBUTES
+            SimpleTextAttributes.REGULAR_ATTRIBUTES,
+            NodeStatistics.VERDICTS,
+            List.of(NodeCount.TOTAL)
     );
 
     private final @NotNull String description;
@@ -165,4 +180,25 @@ public enum DirectoryType {
 
     private final @NotNull RemoveHandler removeHandler;
     private final @NotNull SimpleTextAttributes attributes;
+
+    /**
+     * Which of the two ways of counting a node this kind is counted by, and so
+     * what its Details draws - see {@link NodeStatistics}. Declared here beside
+     * the icon and the codegen because it is the same kind of fact: something
+     * true of the type, answered once, rather than a question the Details
+     * dialog asks about the node in front of it (#82).
+     */
+    private final @NotNull NodeStatistics statistics;
+
+    /**
+     * The counts this kind of node reports as rows in its Details, in order.
+     * <p>
+     * A type lists only what can apply to it. Nothing on the test-case side can
+     * hold a run and nothing on the run side can hold a test set, so those are
+     * impossible states rather than choices, and a {@code 0} there would imply
+     * it could be otherwise. A test run lists its total alone: the rest of its
+     * numbers are the chart, and printing them twice would be the popup
+     * disagreeing with itself about which one to read.
+     */
+    private final @NotNull List<NodeCount> counts;
 }

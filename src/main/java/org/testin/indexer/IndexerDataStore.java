@@ -84,6 +84,11 @@ final class IndexerDataStore {
     }
 
     @NotNull
+    Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
+        return Optional.ofNullable(testRunsByPath.get(testRunPath.toString()));
+    }
+
+    @NotNull
     TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
         return indexed(testRunsByPath.get(testRunPath.toString()), "test run", testRunPath);
     }

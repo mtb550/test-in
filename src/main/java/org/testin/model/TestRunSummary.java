@@ -1,15 +1,17 @@
-package org.testin.report.generators;
+package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * The headline counts of a test run, computed once for every report format.
+ * The headline counts of a test run: the one definition of how a run went.
+ * <p>
+ * In {@code model} rather than beside the reports because the reports stopped
+ * being its only reader - a run's Details popup shows the same numbers, and a
+ * second definition of "failed" is exactly what this class exists to prevent.
  * <p>
  * It exists because the three generators counted for themselves and drifted:
  * PDF and Word treated pending as PENDING + UNTESTED, HTML counted PENDING
@@ -29,6 +31,15 @@ import java.util.stream.Collectors;
  */
 public record TestRunSummary(long total, long passed, long failed, long blocked, long untested, long removed,
                              int passRate, @NotNull String executedBy) {
+
+    /**
+     * A run with nothing in it: no cases, no verdicts, nobody who ran it.
+     * <p>
+     * What a node that is not a test run reports, and what a run directory the
+     * scan could read nothing out of reports. An empty value of the type rather
+     * than an absent one, so every reader takes the same path.
+     */
+    public static final @NotNull TestRunSummary EMPTY = new TestRunSummary(0, 0, 0, 0, 0, 0, 0, "");
 
     public static @NotNull TestRunSummary of(final @NotNull List<TestRunItems> results) {
         final @NotNull Map<TestStatus, Long> counts = results.stream()

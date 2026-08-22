@@ -19,6 +19,7 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.TestRunSummary;
 import org.testin.logger.Logger;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;

@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import org.dhatim.fastexcel.Workbook;
 import org.dhatim.fastexcel.Worksheet;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.TestRunSummary;
 import org.testin.logger.Logger;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;

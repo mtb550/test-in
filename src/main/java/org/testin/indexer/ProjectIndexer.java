@@ -311,6 +311,21 @@ public final class ProjectIndexer {
     }
 
     /**
+     * How many test cases a test set holds.
+     * <p>
+     * Counted from the ids the store already keeps rather than from the cases:
+     * {@link #getTestCasesForTestSet} builds the list and sorts it into rank
+     * order, and sorting 2,770 cases to produce a number nobody reads is work
+     * for nothing.
+     * <p>
+     * A node that holds no cases of its own answers zero, so a walk asks every
+     * node it meets the same question instead of first asking what kind it is.
+     */
+    public long caseCountOf(final @NotNull Path testSetPath) {
+        return store.getTestSetCaseIds().getOrDefault(testSetPath.toString(), List.of()).size();
+    }
+
+    /**
      * Every test case under this node, in tree order: a test set's own cases, and
      * those of every test set beneath a package.
      * <p>
@@ -337,6 +352,20 @@ public final class ProjectIndexer {
 
     public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
         return store.getTestRunByPath(testRunPath);
+    }
+
+    /**
+     * The run recorded at this path, and empty when the tree has the directory
+     * but nothing could be read out of it - a run whose JSON is missing, or one
+     * that would not parse, both of which the scan logs and carries on past.
+     * <p>
+     * {@link #getTestRunByPath} is for callers that cannot continue without a
+     * run and should fail loudly; this is for the ones that can say so instead.
+     * The Details popup is the second kind: a run it cannot read is still a node
+     * whose name, path and audit it can show.
+     */
+    public @NotNull Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
+        return store.findTestRun(testRunPath);
     }
 
     /**
