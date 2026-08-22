@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
 import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.DialogComponent;
@@ -51,6 +52,8 @@ public final class SheetPreview implements DialogComponent {
      * selectable.
      */
     public void show(final @NotNull Map<String, List<TestCaseDto>> newSheets) {
+        Logger.info("Import preview: showing " + newSheets.values().stream().mapToInt(List::size).sum()
+                + " cases in " + newSheets.size() + " sheet(s), replacing " + sheets.size() + " sheet(s)");
         sheets = newSheets;
 
         models.clear();
@@ -97,6 +100,9 @@ public final class SheetPreview implements DialogComponent {
             for (int row = 0; row < model.getRowCount(); row++) {
                 if (Boolean.TRUE.equals(model.getValueAt(row, 0))) selected.add(casesInSheet.get(row));
             }
+
+            Logger.info("Import preview: sheet '" + entry.getKey() + "' holds " + casesInSheet.size()
+                    + " cases, table has " + model.getRowCount() + " rows, " + selected.size() + " ticked");
 
             if (!selected.isEmpty()) selectedBySheet.put(entry.getKey(), selected);
         }

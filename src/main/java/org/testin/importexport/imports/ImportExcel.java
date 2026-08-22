@@ -29,6 +29,12 @@ public class ImportExcel {
             Logger.error("Excel import parse failed: " + ex.getMessage());
             Services.getInstance(p, Notifier.class).error(p, "Excel Parse Error", ex.getMessage());
         }
+
+        // The count the file gave, against the count the tester ticks and the
+        // count the import writes. Three numbers that should agree, and did not
+        // (#66, finding 24).
+        Logger.info("Import: parsed " + result.values().stream().mapToInt(List::size).sum()
+                + " cases from " + result.size() + " sheet(s) of " + file.getName());
         return result;
     }
 
