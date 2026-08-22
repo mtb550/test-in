@@ -1,9 +1,11 @@
 package org.testin.codegen.method;
 
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -17,10 +19,14 @@ import org.testin.model.dto.TestCaseDto;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CreateTestMethod implements GenAction {
 
@@ -114,24 +120,68 @@ public class CreateTestMethod implements GenAction {
         Logger.info("Creating " + cases.size() + " test methods in " + target.path());
 
         findOrCreateClass(p, target.path(), target.packageList(), target.className()).ifPresentOrElse(
-                targetClass -> {
-                    final @NotNull List<PsiElement> added = new ArrayList<>(cases.size());
-                    for (final TestCaseDto tc : cases) {
-                        injectMethod(p, targetClass, Fqcn.ofMethod(tc).getLast(), tc).ifPresent(added::add);
-                    }
-
-                    // One reformat over the span just added, rather than one per
-                    // method. Not the whole class either: the class grows with
-                    // every group, so reformatting all of it each time would
-                    // cost more than the per-method formatting this replaces.
-                    if (!added.isEmpty()) {
-                        CodeStyleManager.getInstance(p).reformatRange(targetClass,
-                                added.getFirst().getTextRange().getStartOffset(),
-                                added.getLast().getTextRange().getEndOffset());
-                    }
-                },
+                targetClass -> injectAsText(p, targetClass, cases),
                 () -> cases.forEach(tc -> retryInjectPhysically(p, target.packageList(), target.className(),
                         Fqcn.ofMethod(tc).getLast(), tc)));
+    }
+
+    /**
+     * Writes a whole set of methods into the class as one edit.
+     * <p>
+     * Adding them through the PSI one at a time is what made this slow: every
+     * add throws away the class's member cache, the next add rebuilds it, and
+     * the rebuild grows with the class - so the last method of a sheet costs
+     * several times the first. Measured at 550 methods, the batches went from
+     * 590ms to 2,035ms across one import for identical work.
+     * <p>
+     * The text of every method goes in at the closing brace in a single
+     * document edit, the file is parsed once, and the inserted span is
+     * formatted once. Nothing reads the class between the first method and the
+     * last, so nothing has to rebuild anything.
+     */
+    private void injectAsText(final @NotNull Project p, final @NotNull PsiClass targetClass,
+                              final @NotNull List<TestCaseDto> cases) {
+        final @NotNull PsiFile file = targetClass.getContainingFile();
+        if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, JavaPsiFacade.getElementFactory(p));
+
+        // Named here, not asked of the class per method: the class does not
+        // change until the single edit below, so what it already holds is read
+        // once and what this pass adds is remembered as it goes.
+        final @NotNull Set<String> taken = Arrays.stream(targetClass.getMethods())
+                .map(PsiMethod::getName)
+                .collect(Collectors.toCollection(HashSet::new));
+
+        final @NotNull StringBuilder methods = new StringBuilder();
+        for (final TestCaseDto tc : cases) {
+            final @NotNull String methodName = Fqcn.ofMethod(tc).getLast();
+            if (!taken.add(methodName)) {
+                Logger.info("Method already exists: " + methodName);
+                continue;
+            }
+            methods.append('\n').append(methodText(methodName, tc)).append('\n');
+        }
+
+        if (methods.isEmpty()) return;
+
+        final @NotNull Optional<Document> document =
+                Optional.ofNullable(PsiDocumentManager.getInstance(p).getDocument(file));
+        final @NotNull Optional<PsiElement> closingBrace = Optional.ofNullable(targetClass.getRBrace());
+
+        if (document.isEmpty() || closingBrace.isEmpty()) {
+            // No document or no brace to write before: fall back to the way that
+            // does not need either, one method at a time.
+            Logger.warn("Writing " + cases.size() + " methods one at a time: " + targetClass.getQualifiedName()
+                    + " has no document to edit");
+            cases.forEach(tc -> injectMethod(p, targetClass, Fqcn.ofMethod(tc).getLast(), tc)
+                    .ifPresent(added -> CodeStyleManager.getInstance(p).reformat(added)));
+            return;
+        }
+
+        final int insertAt = closingBrace.orElseThrow().getTextRange().getStartOffset();
+        document.orElseThrow().insertString(insertAt, methods);
+        PsiDocumentManager.getInstance(p).commitDocument(document.orElseThrow());
+
+        CodeStyleManager.getInstance(p).reformatText(file, insertAt, insertAt + methods.length());
     }
 
     private void createMethod(final @NotNull Project p, final @NotNull Target target, final @NotNull TestCaseDto tc) {
@@ -250,6 +300,36 @@ public class CreateTestMethod implements GenAction {
      * already had it. The caller reformats: one method on its own reformats
      * itself, a whole set reformats the class once at the end.
      */
+    /**
+     * The source of one generated test method: its TestNG annotation and an
+     * empty body. Written here for both ways of adding it - one at a time
+     * through the PSI, and a whole set as text.
+     */
+    private static @NotNull String methodText(final @NotNull String methodName, final @NotNull TestCaseDto tc) {
+        final @NotNull StringBuilder attributes = new StringBuilder();
+
+        if (!tc.getGroup().isEmpty()) {
+            final @NotNull List<String> activeGroups = tc.getGroup().stream()
+                    .filter(g -> g != Group.UNASSIGNED)
+                    .map(g -> "\"" + g.getName() + "\"")
+                    .toList();
+
+            if (!activeGroups.isEmpty()) {
+                attributes.append(", groups = {").append(String.join(", ", activeGroups)).append("}");
+            }
+        }
+
+        attributes.append(", priority = ").append(tc.getPriority().getValue());
+
+        final @NotNull String annotation = String.format("@Test(description = \"%s\", testName = \"%s\"%s)",
+                tc.getDescription().replace("\"", "\\\""),
+                tc.getId(),
+                attributes);
+
+        return annotation + "\npublic void " + methodName + "() {\n    // TODO: Auto-generated test steps for "
+                + methodName + "\n}";
+    }
+
     private @NotNull Optional<PsiElement> injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass,
                                                        final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
@@ -267,31 +347,7 @@ public class CreateTestMethod implements GenAction {
                 return Optional.empty();
             }
 
-            final @NotNull StringBuilder attributes = new StringBuilder();
-
-            if (!tc.getGroup().isEmpty()) {
-                final @NotNull List<String> activeGroups = tc.getGroup().stream()
-                        .filter(g -> g != Group.UNASSIGNED)
-                        .map(g -> "\"" + g.getName() + "\"")
-                        .toList();
-
-                if (!activeGroups.isEmpty()) {
-                    attributes.append(", groups = {")
-                            .append(String.join(", ", activeGroups))
-                            .append("}");
-                }
-            }
-
-            attributes.append(", priority = ").append(tc.getPriority().getValue());
-
-            final @NotNull String annotationText = String.format("@Test(description = \"%s\", testName = \"%s\"%s)",
-                    tc.getDescription().replace("\"", "\\\""),
-                    tc.getId(),
-                    attributes);
-
-            final @NotNull String methodText = annotationText + "\npublic void " + methodName + "() {\n    // TODO: Auto-generated test steps for " + methodName + "\n}";
-
-            final @NotNull PsiMethod newMethod = factory.createMethodFromText(methodText, targetClass);
+            final @NotNull PsiMethod newMethod = factory.createMethodFromText(methodText(methodName, tc), targetClass);
             final @NotNull PsiElement addedElement = targetClass.add(newMethod);
 
             Logger.info("Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());

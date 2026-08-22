@@ -42,11 +42,16 @@ import java.util.function.Supplier;
 public class ImportAction extends AbstractProjectTreeAction {
 
     /**
-     * How many test methods go into one write command. Small enough that the
-     * EDT comes back between batches, large enough that a sheet is not a
-     * thousand separate undo entries.
+     * How many test methods go into one write command.
+     * <p>
+     * Larger than it was, because what a batch costs changed. Each one is now a
+     * single edit and a single reparse of the class file, and a reparse is
+     * proportional to the whole file - so twenty-two small batches reparse a
+     * growing file twenty-two times, where three large ones do it three times.
+     * Still batched rather than done in one go, so the EDT comes back in
+     * between and the progress bar can move.
      */
-    private static final int METHODS_PER_COMMAND = 25;
+    private static final int METHODS_PER_COMMAND = 200;
 
     protected final @NotNull List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(a -> a.can(Can.IMPORT))
