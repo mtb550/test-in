@@ -142,11 +142,18 @@ public class CreateTestMethod implements GenAction {
     private void injectAsText(final @NotNull Project p, final @NotNull PsiClass targetClass,
                               final @NotNull List<TestCaseDto> cases) {
         final @NotNull PsiFile file = targetClass.getContainingFile();
-        if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, JavaPsiFacade.getElementFactory(p));
+        final @NotNull PsiDocumentManager documents = PsiDocumentManager.getInstance(p);
+        final @NotNull Optional<Document> document = Optional.ofNullable(documents.getDocument(file));
 
-        // Named here, not asked of the class per method: the class does not
-        // change until the single edit below, so what it already holds is read
-        // once and what this pass adds is remembered as it goes.
+        if (document.isEmpty()) {
+            oneAtATime(p, targetClass, cases, "it has no document to edit");
+            return;
+        }
+
+        // Named before anything is written: the class does not change until the
+        // single edit below, so what it already holds is read once and what this
+        // pass adds is remembered as it goes. That also catches a sheet listing
+        // one description twice, which asking the class could not.
         final @NotNull Set<String> taken = Arrays.stream(targetClass.getMethods())
                 .map(PsiMethod::getName)
                 .collect(Collectors.toCollection(HashSet::new));
@@ -163,25 +170,40 @@ public class CreateTestMethod implements GenAction {
 
         if (methods.isEmpty()) return;
 
-        final @NotNull Optional<Document> document =
-                Optional.ofNullable(PsiDocumentManager.getInstance(p).getDocument(file));
-        final @NotNull Optional<PsiElement> closingBrace = Optional.ofNullable(targetClass.getRBrace());
+        if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, JavaPsiFacade.getElementFactory(p));
 
-        if (document.isEmpty() || closingBrace.isEmpty()) {
-            // No document or no brace to write before: fall back to the way that
-            // does not need either, one method at a time.
-            Logger.warn("Writing " + cases.size() + " methods one at a time: " + targetClass.getQualifiedName()
-                    + " has no document to edit");
-            cases.forEach(tc -> injectMethod(p, targetClass, Fqcn.ofMethod(tc).getLast(), tc)
-                    .ifPresent(added -> CodeStyleManager.getInstance(p).reformat(added)));
+        // The import is a PSI change, and a pending PSI change locks the
+        // document against being edited as text - the platform throws "Document
+        // is locked by write PSI operations" rather than letting the two ways of
+        // writing the same file interleave. Writing it through first is what the
+        // message asks for, and it is also why the brace is located afterwards:
+        // adding an import moves everything below it.
+        documents.doPostponedOperationsAndUnblockDocument(document.orElseThrow());
+
+        final @NotNull Optional<PsiElement> closingBrace = Optional.ofNullable(targetClass.getRBrace());
+        if (closingBrace.isEmpty()) {
+            oneAtATime(p, targetClass, cases, "it has no closing brace to write before");
             return;
         }
 
         final int insertAt = closingBrace.orElseThrow().getTextRange().getStartOffset();
         document.orElseThrow().insertString(insertAt, methods);
-        PsiDocumentManager.getInstance(p).commitDocument(document.orElseThrow());
+        documents.commitDocument(document.orElseThrow());
 
         CodeStyleManager.getInstance(p).reformatText(file, insertAt, insertAt + methods.length());
+    }
+
+    /**
+     * The way that needs neither a document nor a brace, for the classes where
+     * the one edit cannot be made. Slower, and says why it is being used.
+     */
+    private void oneAtATime(final @NotNull Project p, final @NotNull PsiClass targetClass,
+                            final @NotNull List<TestCaseDto> cases, final @NotNull String reason) {
+        Logger.warn("Writing " + cases.size() + " methods one at a time into "
+                + targetClass.getQualifiedName() + ": " + reason);
+
+        cases.forEach(tc -> injectMethod(p, targetClass, Fqcn.ofMethod(tc).getLast(), tc)
+                .ifPresent(added -> CodeStyleManager.getInstance(p).reformat(added)));
     }
 
     private void createMethod(final @NotNull Project p, final @NotNull Target target, final @NotNull TestCaseDto tc) {
