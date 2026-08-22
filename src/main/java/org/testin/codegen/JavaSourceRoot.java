@@ -160,7 +160,10 @@ public final class JavaSourceRoot {
         final @NotNull String declaration = packageName.isEmpty() ? "" : "package " + packageName + ";\n\n";
 
         final @NotNull VirtualFile file = folder.get().createChildData(JavaSourceRoot.class, fileName);
-        VfsUtil.saveText(file, declaration + "public class " + className + " {\n\n}\n");
+        // No blank line inside the braces: every generated method is written with
+        // one before it, so a class carrying its own would give the first
+        // method two.
+        VfsUtil.saveText(file, declaration + "public class " + className + " {\n}\n");
 
         Logger.info("Test class created at: " + file.getPath());
         return Optional.of(file);
