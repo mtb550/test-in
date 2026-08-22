@@ -4,6 +4,7 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +16,9 @@ import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.List;
 
@@ -70,6 +74,66 @@ public class CreateTestMethod implements GenAction {
                 () -> Logger.error("FQCN list is too short to generate a method: " + fqcn));
     }
 
+    /**
+     * Every case in one go.
+     * <p>
+     * A test set is one class, and the work that belongs to the class was being
+     * done per case: finding it through the stub index, and reformatting after
+     * every method. Both happen once here. Measured before this, one sheet of
+     * 550 took 36 seconds to generate, all of it in this method (#66, 25).
+     * <p>
+     * Grouped by class rather than assumed to be one, because nothing stops a
+     * caller handing over cases from two sets.
+     */
+    @Override
+    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+        final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
+
+        for (final Object item : items) {
+            if (!(item instanceof TestCaseDto tc)) continue;
+
+            final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
+            parse(fqcn).ifPresentOrElse(
+                    target -> byClass.computeIfAbsent(target.path(), ignored -> new ArrayList<>()).add(tc),
+                    () -> Logger.error("FQCN list is too short to generate a method: " + fqcn));
+        }
+
+        WriteCommandAction.runWriteCommandAction(p, "Create Test Methods", null,
+                () -> byClass.values().forEach(group -> createMethods(p, group)));
+    }
+
+    /**
+     * The methods of one class. Anything the class cannot be found for falls
+     * back to the per-case path, which writes the file out and reads it back.
+     */
+    private void createMethods(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
+        final @NotNull Optional<Target> first = parse(Fqcn.ofMethod(cases.getFirst()));
+        if (first.isEmpty()) return;
+
+        final @NotNull Target target = first.orElseThrow();
+        Logger.info("Creating " + cases.size() + " test methods in " + target.path());
+
+        findOrCreateClass(p, target.path(), target.packageList(), target.className()).ifPresentOrElse(
+                targetClass -> {
+                    final @NotNull List<PsiElement> added = new ArrayList<>(cases.size());
+                    for (final TestCaseDto tc : cases) {
+                        injectMethod(p, targetClass, Fqcn.ofMethod(tc).getLast(), tc).ifPresent(added::add);
+                    }
+
+                    // One reformat over the span just added, rather than one per
+                    // method. Not the whole class either: the class grows with
+                    // every group, so reformatting all of it each time would
+                    // cost more than the per-method formatting this replaces.
+                    if (!added.isEmpty()) {
+                        CodeStyleManager.getInstance(p).reformatRange(targetClass,
+                                added.getFirst().getTextRange().getStartOffset(),
+                                added.getLast().getTextRange().getEndOffset());
+                    }
+                },
+                () -> cases.forEach(tc -> retryInjectPhysically(p, target.packageList(), target.className(),
+                        Fqcn.ofMethod(tc).getLast(), tc)));
+    }
+
     private void createMethod(final @NotNull Project p, final @NotNull Target target, final @NotNull TestCaseDto tc) {
         final @NotNull List<String> packageList = target.packageList();
         final @NotNull String className = target.className();
@@ -77,7 +141,8 @@ public class CreateTestMethod implements GenAction {
 
         try {
             findOrCreateClass(p, target.path(), packageList, className).ifPresentOrElse(
-                    targetClass -> injectMethod(p, targetClass, methodName, tc),
+                    targetClass -> injectMethod(p, targetClass, methodName, tc)
+                            .ifPresent(added -> CodeStyleManager.getInstance(p).reformat(added)),
                     () -> retryInjectPhysically(p, packageList, className, methodName, tc));
 
         } catch (final Exception ex) {
@@ -147,7 +212,8 @@ public class CreateTestMethod implements GenAction {
                 return;
             }
 
-            injectMethod(p, classes[0], methodName, tc);
+            injectMethod(p, classes[0], methodName, tc)
+                    .ifPresent(added -> CodeStyleManager.getInstance(p).reformat(added));
 
         } catch (final Exception ex) {
             Logger.error("retryInjectPhysically failed for method '" + methodName + "': " + ex.getMessage());
@@ -179,8 +245,13 @@ public class CreateTestMethod implements GenAction {
                         .ifPresent(testClass -> imports.add(factory.createImportStatement(testClass))));
     }
 
-    private void injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass,
-                              final @NotNull String methodName, final @NotNull TestCaseDto tc) {
+    /**
+     * Adds the method and hands back what it added, or nothing when the class
+     * already had it. The caller reformats: one method on its own reformats
+     * itself, a whole set reformats the class once at the end.
+     */
+    private @NotNull Optional<PsiElement> injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass,
+                                                       final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
             final @NotNull PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
             final @NotNull PsiFile file = targetClass.getContainingFile();
@@ -193,7 +264,7 @@ public class CreateTestMethod implements GenAction {
             // through (#66, finding 23).
             if (targetClass.findMethodsByName(methodName, false).length > 0) {
                 Logger.info("Method already exists: " + methodName);
-                return;
+                return Optional.empty();
             }
 
             final @NotNull StringBuilder attributes = new StringBuilder();
@@ -222,12 +293,13 @@ public class CreateTestMethod implements GenAction {
 
             final @NotNull PsiMethod newMethod = factory.createMethodFromText(methodText, targetClass);
             final @NotNull PsiElement addedElement = targetClass.add(newMethod);
-            CodeStyleManager.getInstance(p).reformat(addedElement);
 
             Logger.info("Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());
+            return Optional.of(addedElement);
 
         } catch (final Exception ex) {
             Logger.error("injectMethod failed for '" + methodName + "': " + ex.getMessage());
+            return Optional.empty();
         }
     }
 

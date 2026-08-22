@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.method.update.NoOpCodeUpdate;
 import org.testin.util.OptionalPlugin;
 
+import java.util.List;
+
 /**
  * Every automation-code operation the plugin can perform. Constants carry no
  * PSI-dependent classes: Java-backed actions are resolved lazily through
@@ -172,5 +174,17 @@ public enum GenType {
         if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
 
         GenRegistry.actionFor(this).execute(p, obj);
+    }
+
+    /**
+     * Generates for a whole list in one go, through the registry like the
+     * single-item form. A caller with a set in hand - an import, a copied test
+     * set - hands the set over rather than the cases one by one, so the
+     * generator can do the work that is per class once instead of per case.
+     */
+    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+
+        GenRegistry.actionFor(this).executeAll(p, items);
     }
 }

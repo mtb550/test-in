@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
@@ -223,11 +222,9 @@ public class ImportAction extends AbstractProjectTreeAction {
             final int written = from + batch.size();
 
             indicator.setText2("Generating test methods: " + written + " of " + testCases.size());
-            onEdt(() -> WriteCommandAction.runWriteCommandAction(p, "Create Test Methods", null, () -> {
-                for (final TestCaseDto tc : batch) {
-                    GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
-                }
-            }));
+            // The batch as one, not case by case: the generator finds the
+            // class and reformats it once for the whole group.
+            onEdt(() -> GenType.CREATE_TEST_CASE.executeAll(p, batch));
         }
 
         Logger.info("Import: generated " + testCases.size() + " test methods in "
