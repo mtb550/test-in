@@ -69,27 +69,29 @@ public class CreateTestMethod implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
-
-        parse(fqcn).ifPresentOrElse(
-                target -> {
-                    Logger.info("Creating Test Case for: " + fqcn);
-                    WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null,
-                            () -> createMethod(p, target, tc));
-                },
-                () -> Logger.error("FQCN list is too short to generate a method: " + fqcn));
+        // One case is a set of one. There is no second way of writing a method
+        // here: the two used to differ only in that this one added through the
+        // PSI and the other wrote text, which is a difference in speed, not in
+        // what ends up in the file.
+        executeAll(p, List.of(tc));
     }
 
     /**
-     * Every case in one go.
+     * Writes the methods for these cases. The only way in - one case comes
+     * through it as a set of one.
      * <p>
-     * A test set is one class, and the work that belongs to the class was being
+     * A test set is one class, and the work that belongs to the class was once
      * done per case: finding it through the stub index, and reformatting after
-     * every method. Both happen once here. Measured before this, one sheet of
-     * 550 took 36 seconds to generate, all of it in this method (#66, 25).
+     * every method. Both happen once per class here, and the methods go in as
+     * one edit rather than one insertion each. One sheet of 550 took 38 seconds
+     * to generate before that and takes under two now (#66, 25).
      * <p>
      * Grouped by class rather than assumed to be one, because nothing stops a
      * caller handing over cases from two sets.
+     * <p>
+     * On the EDT, because a write command action is - and one command around
+     * the whole set, so a sheet is one write lock and one undo entry rather
+     * than one of each per case (#51).
      */
     @Override
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
@@ -122,7 +124,7 @@ public class CreateTestMethod implements GenAction {
         findOrCreateClass(p, target.path(), target.packageList(), target.className()).ifPresentOrElse(
                 targetClass -> injectAsText(p, targetClass, cases),
                 () -> cases.forEach(tc -> retryInjectPhysically(p, target.packageList(), target.className(),
-                        Fqcn.ofMethod(tc).getLast(), tc)));
+                        Fqcn.methodNameOf(tc), tc)));
     }
 
     /**
@@ -160,7 +162,7 @@ public class CreateTestMethod implements GenAction {
 
         final @NotNull StringBuilder methods = new StringBuilder();
         for (final TestCaseDto tc : cases) {
-            final @NotNull String methodName = Fqcn.ofMethod(tc).getLast();
+            final @NotNull String methodName = Fqcn.methodNameOf(tc);
             if (!taken.add(methodName)) {
                 Logger.info("Method already exists: " + methodName);
                 continue;
@@ -202,24 +204,8 @@ public class CreateTestMethod implements GenAction {
         Logger.warn("Writing " + cases.size() + " methods one at a time into "
                 + targetClass.getQualifiedName() + ": " + reason);
 
-        cases.forEach(tc -> injectMethod(p, targetClass, Fqcn.ofMethod(tc).getLast(), tc)
+        cases.forEach(tc -> injectMethod(p, targetClass, Fqcn.methodNameOf(tc), tc)
                 .ifPresent(added -> CodeStyleManager.getInstance(p).reformat(added)));
-    }
-
-    private void createMethod(final @NotNull Project p, final @NotNull Target target, final @NotNull TestCaseDto tc) {
-        final @NotNull List<String> packageList = target.packageList();
-        final @NotNull String className = target.className();
-        final @NotNull String methodName = target.methodName();
-
-        try {
-            findOrCreateClass(p, target.path(), packageList, className).ifPresentOrElse(
-                    targetClass -> injectMethod(p, targetClass, methodName, tc)
-                            .ifPresent(added -> CodeStyleManager.getInstance(p).reformat(added)),
-                    () -> retryInjectPhysically(p, packageList, className, methodName, tc));
-
-        } catch (final Exception ex) {
-            Logger.error("Failed to inject Java method: " + ex.getMessage());
-        }
     }
 
     /**

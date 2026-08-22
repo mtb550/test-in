@@ -26,6 +26,15 @@ import java.util.List;
 public final class Fqcn {
 
     /**
+     * The method name alone, for the callers that want only the tail of
+     * {@link #ofMethod}. Four places derived it the same way, and a name says
+     * what the last element of that list is.
+     */
+    public static @NotNull String methodNameOf(final @NotNull TestCaseDto tc) {
+        return ofMethod(tc).getLast();
+    }
+
+    /**
      * Packages, class and method for the automation code of one test case.
      */
     public static @NotNull ArrayList<String> ofMethod(final @NotNull TestCaseDto tc) {

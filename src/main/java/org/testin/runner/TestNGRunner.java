@@ -215,7 +215,7 @@ public final class TestNGRunner {
     private static @NotNull String configNameFor(final @NotNull List<TestCaseDto> cases) {
         final @NotNull List<String> classes = cases.stream().map(TestNGRunner::simpleClassOf).distinct().toList();
 
-        if (cases.size() == 1) return classes.getFirst() + "." + Fqcn.ofMethod(cases.getFirst()).getLast();
+        if (cases.size() == 1) return classes.getFirst() + "." + Fqcn.methodNameOf(cases.getFirst());
         if (classes.size() == 1) return classes.getFirst();
 
         return classes.getFirst() + " and " + (classes.size() - 1) + " more";
