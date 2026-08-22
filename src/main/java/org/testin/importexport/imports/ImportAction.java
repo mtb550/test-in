@@ -34,6 +34,7 @@ import org.testin.util.OptionalPlugin;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.List;
 import java.util.Map;
@@ -109,47 +110,31 @@ public class ImportAction extends AbstractProjectTreeAction {
             }
             final long readyAt = System.currentTimeMillis();
 
-            if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                final @NotNull List<TestCaseDto> flatList = new ArrayList<>();
-                selectedCasesBySheet.values().forEach(flatList::addAll);
+            int imported = 0;
+            for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set
+                    : targetSets(p, selectedDirDto, targetPath, selectedCasesBySheet).entrySet()) {
 
-                linkAndSaveTestCases(p, targetPath, flatList, rankOfTail(p, targetPath), indicator, 0, total);
+                final @NotNull TestSetDirectoryDto into = set.getKey();
+                final @NotNull List<TestCaseDto> cases = set.getValue();
+                final @NotNull Path setPath = into.getPath();
 
-                for (final TestCaseDto tc : flatList) tc.setParent(ts);
+                linkAndSaveTestCases(p, setPath, cases, rankOfTail(p, setPath), indicator, imported, total);
 
-                if (generateCode) generateTestMethods(p, flatList, ts.getName(), indicator);
+                for (final TestCaseDto tc : cases) tc.setParent(into);
 
-                onEdt(() -> Services.getInstance(p, EditorUtil.class).closeThenOpen(p, ts));
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Imported", flatList.size());
+                if (generateCode) generateTestMethods(p, cases, into.getName(), indicator);
 
-            } else {
-                int totalImported = 0;
-                for (final Map.Entry<String, List<TestCaseDto>> entry : selectedCasesBySheet.entrySet()) {
-                    final @NotNull List<TestCaseDto> sheetCases = entry.getValue();
-
-                    final @NotNull String cName = NameSanitizer.removeSpecialChars(entry.getKey());
-                    final @NotNull Path newDirPath = targetPath.resolve(cName);
-                    // A test set creator always answers with the set it made. On
-                    // the EDT: making one generates its Java class, which is a
-                    // write command.
-                    final @NotNull TestSetDirectoryDto sheetDto = onEdtCompute(() ->
-                            (TestSetDirectoryDto) new CreateTestSet(p)
-                                    .execute(cName, selectedDirDto, newDirPath)
-                                    .orElseThrow());
-
-                    linkAndSaveTestCases(p, newDirPath, sheetCases, rankOfTail(p, newDirPath),
-                            indicator, totalImported, total);
-
-                    for (final TestCaseDto tc : sheetCases) tc.setParent(sheetDto);
-
-                    if (generateCode) generateTestMethods(p, sheetCases, cName, indicator);
-
-                    totalImported += sheetCases.size();
-                }
-                // Same wording as the single-test-set branch above: the tester
-                // chose which shape to import into, so the count is the news (#62).
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Imported", totalImported);
+                imported += cases.size();
             }
+
+            // The set the tester was standing on is reopened, so what they just
+            // imported is in front of them. A container has no editor of its own.
+            if (selectedDirDto instanceof TestSetDirectoryDto ts) {
+                onEdt(() -> Services.getInstance(p, EditorUtil.class).closeThenOpen(p, ts));
+            }
+
+            // The count is the news, whichever shape was imported into (#62).
+            Services.getInstance(p, Notifier.class).softShowCounted(p, "Imported", imported);
 
             report(total, startedAt, readyAt);
 
@@ -161,6 +146,42 @@ public class ImportAction extends AbstractProjectTreeAction {
             ApplicationManager.getApplication().invokeLater(() ->
                     Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh());
         });
+    }
+
+    /**
+     * Which test set each sheet's cases are going into.
+     * <p>
+     * Two shapes, and only this decides between them: a test set takes every
+     * sheet into itself, and a container takes one new set per sheet, named
+     * after it. What happens to a set's cases afterwards - written, parented,
+     * generated, counted - is the same either way, and used to be written twice.
+     * <p>
+     * The sets are made before any case is written, and on the EDT, because
+     * making one generates its Java class and that is a write command.
+     */
+    private @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targetSets(
+            final @NotNull Project p, final @NotNull DirectoryDto selectedDirDto, final @NotNull Path targetPath,
+            final @NotNull Map<String, List<TestCaseDto>> casesBySheet) {
+
+        if (selectedDirDto instanceof TestSetDirectoryDto ts) {
+            final @NotNull List<TestCaseDto> everything = new ArrayList<>();
+            casesBySheet.values().forEach(everything::addAll);
+
+            return Map.of(ts, everything);
+        }
+
+        final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> sets = new LinkedHashMap<>();
+        casesBySheet.forEach((sheetName, cases) -> {
+            final @NotNull String name = NameSanitizer.removeSpecialChars(sheetName);
+            final @NotNull Path path = targetPath.resolve(name);
+
+            // A test set creator always answers with the set it made.
+            sets.put(onEdtCompute(() -> (TestSetDirectoryDto) new CreateTestSet(p)
+                    .execute(name, selectedDirDto, path)
+                    .orElseThrow()), cases);
+        });
+
+        return sets;
     }
 
     /**
