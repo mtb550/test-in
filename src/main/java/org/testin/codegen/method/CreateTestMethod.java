@@ -119,7 +119,7 @@ public class CreateTestMethod implements GenAction {
         if (first.isEmpty()) return;
 
         final @NotNull Target target = first.orElseThrow();
-        Logger.info("Creating " + cases.size() + " test methods in " + target.path());
+        Logger.info("Creating " + count(cases.size(), "test method") + " in " + target.path());
 
         findOrCreateClass(p, target.path(), target.packageList(), target.className()).ifPresentOrElse(
                 targetClass -> injectAsText(p, targetClass, cases),
@@ -161,13 +161,21 @@ public class CreateTestMethod implements GenAction {
                 .collect(Collectors.toCollection(HashSet::new));
 
         final @NotNull StringBuilder methods = new StringBuilder();
+        int alreadyThere = 0;
         for (final TestCaseDto tc : cases) {
             final @NotNull String methodName = Fqcn.methodNameOf(tc);
             if (!taken.add(methodName)) {
-                Logger.info("Method already exists: " + methodName);
+                alreadyThere++;
                 continue;
             }
             methods.append('\n').append(methodText(methodName, tc)).append('\n');
+        }
+
+        // Counted, not narrated. Re-importing a sheet skips every method in it,
+        // and a line each buried everything else the import had to say.
+        if (alreadyThere > 0) {
+            Logger.info(alreadyThere + " of " + count(cases.size(), "test method")
+                    + " already in " + targetClass.getQualifiedName());
         }
 
         if (methods.isEmpty()) return;
@@ -308,6 +316,14 @@ public class CreateTestMethod implements GenAction {
      * already had it. The caller reformats: one method on its own reformats
      * itself, a whole set reformats the class once at the end.
      */
+    /**
+     * A count with its noun, singular when there is one of it. Log lines are
+     * read by people.
+     */
+    private static @NotNull String count(final int howMany, final @NotNull String noun) {
+        return howMany + " " + noun + (howMany == 1 ? "" : "s");
+    }
+
     /**
      * The source of one generated test method: its TestNG annotation and an
      * empty body. Written here for both ways of adding it - one at a time
