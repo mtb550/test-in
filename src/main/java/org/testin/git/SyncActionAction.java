@@ -32,11 +32,18 @@ public class SyncActionAction extends AbstractProjectTreeAction {
     private final @NotNull GitRepositoryService git;
     private final @NotNull GitSyncService sync;
 
+    /**
+     * For the push at the end. The same service the review pushes through, so
+     * there is one way commits leave this machine rather than two.
+     */
+    private final @NotNull GitCommitService commits;
+
     public SyncActionAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ExplorerPanel pp) {
-        super(p, tree, "Sync / Pull Changes", "Pull the latest test cases from the remote repository", AllIcons.Actions.SyncPanels);
+        super(p, tree, "Sync With Remote", "Pull the latest test cases, then push anything committed here", AllIcons.Actions.SyncPanels);
         this.pp = pp;
         this.git = new GitRepositoryService(p);
         this.sync = new GitSyncService(p);
+        this.commits = new GitCommitService(p);
     }
 
     @Override
@@ -78,16 +85,35 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                         return;
                     }
 
-                    final @NotNull String branch = git.getDefaultBranch(repoPath);
+                    final @NotNull String branch = git.syncBranch(repoPath);
                     if (branch.isBlank()) {
-                        throw new IllegalStateException("Could not determine the repository default branch.");
+                        throw new IllegalStateException("Could not determine which branch to sync.");
+                    }
+
+                    // A pull into a rebase that is still halfway through is
+                    // refused by Git with a fatal about a leftover directory,
+                    // which is a sentence about Git's internals shown to someone
+                    // who pressed Sync. The state is already knowable, so it is
+                    // asked before the pull rather than read out of its failure.
+                    if (git.hasConflicts(repoPath)) {
+                        final @NotNull List<String> unfinished = git.conflictingPaths(repoPath);
+                        ApplicationManager.getApplication().invokeLater(() -> showConflictActions(repoPath, unfinished));
+                        return;
                     }
 
                     indicator.setText("Pulling latest changes from " + branch + "...");
-                    sync.pull(repoPath, remoteName, branch);
+                    sync.pull(repoPath, remoteUrl, remoteName, branch);
+
+                    // Both directions, because the button says Sync. It used to
+                    // pull and then report "Up to date with the remote" with the
+                    // tester's own commits still sitting here - which is how a
+                    // whole afternoon of work stayed on one machine while the
+                    // message said it had not (#89).
+                    indicator.setText("Pushing what is committed here...");
+                    final int pushed = pushUnpushed(repoPath, remoteName, branch);
 
                     indicator.setText("Refreshing files...");
-                    refreshAfterSync(repoPath);
+                    refreshAfterSync(repoPath, pushed);
 
                 } catch (final Exception ex) {
                     Logger.error(ex.getMessage());
@@ -105,7 +131,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                         if (conflicts) {
                             showConflictActions(repoPath, conflicting);
                         } else {
-                            Services.getInstance(p, Notifier.class).error(p, "Sync Failed", "Could not pull changes:\n" + ex.getMessage());
+                            Services.getInstance(p, Notifier.class).error(p, "Sync Failed", "Could not sync with the remote:\n" + ex.getMessage());
                         }
                     });
                 }
@@ -117,7 +143,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
         final @NotNull NotificationAction resolveAction = notifier.action(
-                "Resolve", () -> resolveConflicts(repoPath, conflicting));
+                "Resolve", () -> resolveConflicts(repoPath));
         final @NotNull NotificationAction continueAction = notifier.action(
                 "Continue rebase", () -> finishRebase(repoPath, false));
         final @NotNull NotificationAction abortAction = notifier.action(
@@ -136,12 +162,11 @@ public class SyncActionAction extends AbstractProjectTreeAction {
      * Merges the conflicted test cases and continues the pull when nothing is
      * left conflicting. Off the EDT: it reads Git and writes files.
      */
-    private void resolveConflicts(final @NotNull Path repoPath, final @NotNull List<String> conflicting) {
+    private void resolveConflicts(final @NotNull Path repoPath) {
         ApplicationManager.getApplication().executeOnPooledThread(() ->
-                ConflictResolution.resolve(p, repoPath, conflicting,
-                        () -> finishRebase(repoPath, false),
-                        leftOver -> Services.getInstance(p, Notifier.class).warn(p, "Still Conflicting",
-                                GitRefs.conflictMessage(leftOver))));
+                ConflictResolution.resolveRebase(p, repoPath,
+                        () -> finishSyncInBackground(repoPath),
+                        leftOver -> showConflictActions(repoPath, leftOver)));
     }
 
     /**
@@ -183,12 +208,71 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                     reportRebaseFailure(repoPath, "Could not continue the rebase.");
                     return;
                 }
-                refreshAfterSync(repoPath);
+                refreshAfterSync(repoPath, 0);
             }
         });
     }
 
-    private void refreshAfterSync(final @NotNull Path repoPath) {
+    /**
+     * Ends a sync that had stopped on conflicts: push what the rebase freed up,
+     * then refresh.
+     * <p>
+     * In a background task because {@link ConflictResolution#resolveRebase}
+     * hands back on the EDT, and everything here - pushing, refreshing the VFS
+     * synchronously, rescanning the project - is work the EDT may not do. The
+     * straight-through path got that for free by sitting inside a task already;
+     * this one has to ask.
+     */
+    private void finishSyncInBackground(final @NotNull Path repoPath) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Finishing sync", false) {
+            @Override
+            public void run(final @NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+
+                // The same ending as a sync that never stopped: the commits the
+                // rebase just replayed are still only here, and a refresh that
+                // reported "up to date" over them would be the same untruth from
+                // the other door.
+                int pushed = 0;
+                try {
+                    final @NotNull String remoteName = git.getRemoteName(repoPath);
+                    if (!remoteName.isEmpty()) {
+                        indicator.setText("Pushing what is committed here...");
+                        pushed = pushUnpushed(repoPath, remoteName, git.syncBranch(repoPath));
+                    }
+                } catch (final Exception ex) {
+                    // The pull and the merge both worked; only the push did not,
+                    // and the tree still has to be rebuilt around what arrived.
+                    Logger.error("Could not push after resolving: " + ex.getMessage());
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Services.getInstance(p, Notifier.class).error(p, "Push Failed",
+                                    "The conflicts were resolved, but the push did not go through:\n" + ex.getMessage()));
+                }
+
+                indicator.setText("Refreshing files...");
+                refreshAfterSync(repoPath, pushed);
+            }
+        });
+    }
+
+    /**
+     * Pushes the commits that are here and not on the remote, and answers how
+     * many went.
+     * <p>
+     * Asked rather than attempted: a push with nothing to push still contacts
+     * the remote, and on a sync pressed out of habit that is a network round
+     * trip - and, over SSH, possibly a passphrase prompt - for no reason.
+     */
+    private int pushUnpushed(final @NotNull Path repoPath, final @NotNull String remote,
+                             final @NotNull String branch) {
+        final int unpushed = git.unpushedCount(repoPath);
+        if (unpushed == 0) return 0;
+
+        commits.push(repoPath, remote, branch);
+        return unpushed;
+    }
+
+    private void refreshAfterSync(final @NotNull Path repoPath, final int pushed) {
         refreshRepository(repoPath);
         ApplicationManager.getApplication().invokeLater(() -> {
             // A balloon, not a log entry. A sync is pressed and watched: it
@@ -196,7 +280,9 @@ public class SyncActionAction extends AbstractProjectTreeAction {
             // what it leaves behind is the tree itself rather than a line in the
             // Notifications log. The failures still go there, which is what the
             // log is worth keeping for.
-            Services.getInstance(p, Notifier.class).softShow(p, "Synced", "Up to date with the remote");
+            Services.getInstance(p, Notifier.class).softShow(p, "Synced", pushed == 0
+                    ? "Up to date with the remote"
+                    : "Pushed " + pushed + (pushed == 1 ? " commit" : " commits"));
             pp.getProjectTree().refresh();
         });
     }

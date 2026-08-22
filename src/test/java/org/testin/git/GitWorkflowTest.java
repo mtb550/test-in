@@ -117,6 +117,64 @@ public class GitWorkflowTest {
         }
     }
 
+    // ------------------------------------------------------------ large commits
+
+    /**
+     * The Windows command-line limit, in characters. A process whose command
+     * line is longer than this cannot be started at all, and the refusal names
+     * neither the limit nor a path - it arrives as {@code CreateProcess
+     * error=206}, which is what a tester saw instead of their commit.
+     */
+    private static final int WINDOWS_COMMAND_LINE_LIMIT = 32767;
+
+    /**
+     * A commit whose paths would not fit on a command line still lands.
+     * <p>
+     * The size is the test. An import brings in hundreds of test cases at once
+     * and every one of them is a new file, so the first commit after an import
+     * is the largest one a tester ever makes - and it was the one that could not
+     * be made. 1,200 cases under a name holding a space is roughly what a
+     * spreadsheet import produces, and about three times the limit.
+     * <p>
+     * Driven through {@link GitCommandRunner#pathspecBytes}, so what Git reads
+     * here is what the plugin writes. Running the command is left to real Git
+     * rather than to the runner, which needs a live IDE for git4idea.
+     */
+    @Test
+    public void aCommitTooLargeForTheCommandLineStillLands() throws IOException {
+        mustGit(work, "commit", "--allow-empty", "-m", "root");
+
+        final Path set = work.resolve("test-01").resolve("Test Cases").resolve("pkg1").resolve("Login");
+        Files.createDirectories(set);
+
+        final Set<String> paths = new LinkedHashSet<>();
+        for (int i = 0; i < 1200; i++) {
+            final String name = UUID.randomUUID() + ".json";
+            Files.writeString(set.resolve(name), "{}");
+            paths.add("test-01/Test Cases/pkg1/Login/" + name);
+        }
+
+        final int asArguments = paths.stream().mapToInt(path -> path.length() + 3).sum();
+        assertTrue(asArguments > WINDOWS_COMMAND_LINE_LIMIT,
+                "the point of this test is a list that cannot be passed as arguments, and this one is only "
+                        + asArguments + " characters");
+
+        final Path pathspec = Files.createTempFile("testin-pathspec", ".lst");
+        Files.write(pathspec, GitCommandRunner.pathspecBytes(paths));
+
+        mustGit(work, "add", "--pathspec-from-file=" + pathspec, "--pathspec-file-nul");
+        mustGit(work, "commit", "--only", "-m", "imported 1200 cases",
+                "--pathspec-from-file=" + pathspec, "--pathspec-file-nul");
+
+        final long committed = mustGit(work, "show", "--name-only", "--pretty=format:", "HEAD")
+                .lines().filter(line -> !line.isBlank()).count();
+
+        assertEquals(committed, 1200, "every selected case belongs in the commit");
+        assertTrue(mustGit(work, "status", "--porcelain").isBlank(), "nothing should be left behind");
+
+        Files.deleteIfExists(pathspec);
+    }
+
     // ------------------------------------------------------- the test project
 
     private TestCaseDto testCase(final String description) {

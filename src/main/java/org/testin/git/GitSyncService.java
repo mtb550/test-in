@@ -21,8 +21,17 @@ public final class GitSyncService {
         this.project = project;
     }
 
-    public void pull(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
-        GitCommandRunner.execute(project, repositoryPath,
+    /**
+     * Pulls, telling the handler which remote URL it is for.
+     * <p>
+     * The URL is what lets the IDE find the credentials it already holds for
+     * that host. This was the one network command in the plugin that did not
+     * pass it, so a sync against a private repository asked for credentials the
+     * IDE had already been given, or failed where every other command succeeded.
+     */
+    public void pull(final @NotNull Path repositoryPath, final @NotNull String remoteUrl,
+                     final @NotNull String remote, final @NotNull String branch) {
+        GitCommandRunner.executeRemote(project, repositoryPath, remoteUrl,
                 "git", "pull", "--rebase", "--autostash", remote, branch);
     }
 

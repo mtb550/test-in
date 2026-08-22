@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -58,6 +59,59 @@ public final class GitRepositoryService {
                 .orElse("");
 
         return headBranch.isEmpty() ? currentBranch : headBranch;
+    }
+
+    /**
+     * The branch this repository syncs: the one that is checked out.
+     * <p>
+     * The one owner of that question, because it used to have two answers. The
+     * push already used the branch its commit went onto; the Sync button asked
+     * {@link #getDefaultBranch} instead, which is what the <em>remote</em> calls
+     * its HEAD. A tester on a feature branch therefore pressed Sync and had
+     * every commit on it replayed onto master - conflicts on work that had none,
+     * a rewritten branch that no longer matched its own remote, and their test
+     * cases never reaching the branch they were on (#89).
+     * <p>
+     * The remote's default is the fallback and nothing more, for the two cases
+     * where Git cannot name a branch here: a detached HEAD, and a repository
+     * with no commit in it yet.
+     */
+    public @NotNull String syncBranch(final @NotNull Path path) {
+        final @NotNull String current = getCurrentBranch(path);
+
+        return current.isEmpty() ? getDefaultBranch(path) : current;
+    }
+
+    /**
+     * Which commit a running rebase is replaying, counting from one, and zero
+     * when no rebase is running.
+     * <p>
+     * Read so that resolving conflicts one after another can tell progress from
+     * a standstill: a round that leaves this where it found it has not moved the
+     * rebase on, and repeating it would only ask the same question forever.
+     * <p>
+     * Git keeps the number in the directory it leaves behind for the rebase -
+     * the same directory {@link #isRebaseInProgress} looks for - and the two
+     * backends name their file differently.
+     */
+    public int rebaseStep(final @NotNull Path path) {
+        final @NotNull Path gitDir = path.resolve(".git");
+
+        return readStep(gitDir.resolve("rebase-merge").resolve("msgnum"))
+                + readStep(gitDir.resolve("rebase-apply").resolve("next"));
+    }
+
+    /**
+     * The number in one of Git's counter files, and zero when it is not there
+     * or holds something else - both of which mean "no rebase to be at a step
+     * of".
+     */
+    private int readStep(final @NotNull Path counter) {
+        try {
+            return Integer.parseInt(Files.readString(counter).trim());
+        } catch (final IOException | NumberFormatException ex) {
+            return 0;
+        }
     }
 
     public void fetchRemoteBranches(final @NotNull Path path) {

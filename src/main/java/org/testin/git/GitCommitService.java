@@ -7,7 +7,6 @@ import org.testin.model.DirectoryType;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -84,10 +83,10 @@ public final class GitCommitService {
 
         final @NotNull Set<String> stageable = stageable(repositoryPath, paths);
         if (!stageable.isEmpty()) {
-            GitCommandRunner.execute(project, repositoryPath, withPaths(stageable, "git", "add", "--"));
+            GitCommandRunner.executeOverPaths(project, repositoryPath, stageable, "git", "add");
         }
 
-        GitCommandRunner.execute(project, repositoryPath, withPaths(paths, "git", "commit", "--only", "-m", message, "--"));
+        GitCommandRunner.executeOverPaths(project, repositoryPath, paths, "git", "commit", "--only", "-m", message);
     }
 
     /**
@@ -191,15 +190,5 @@ public final class GitCommitService {
         Logger.info("Git push completed for " + repositoryPath);
     }
 
-    /**
-     * Appends the path set after the fixed arguments. Call sites include the
-     * {@code "--"} separator explicitly so the full command stays readable.
-     */
-    private @NotNull String[] withPaths(final @NotNull Set<String> paths, final @NotNull String... fixedArgs) {
-        final String @NotNull[] result = Arrays.copyOf(fixedArgs, fixedArgs.length + paths.size());
-        int index = fixedArgs.length;
-        for (final String path : paths) result[index++] = path;
-        return result;
-    }
 }
 

@@ -109,6 +109,17 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     private void scanForChanges(final @NotNull Project p, final @NotNull Path path) {
         GitBackgroundTask.run(p, "Scanning for changes", true,
                 indicator -> {
+                    // Nothing can be committed while a rebase is unfinished, and
+                    // Git says so in its own words - "interactive rebase in
+                    // progress ... nothing to commit" - after the tester has
+                    // picked their changes and typed a message. So the review is
+                    // not offered at all; what is offered is the way out of the
+                    // rebase, which is the only thing that can happen next (#89).
+                    if (git.hasConflicts(path)) {
+                        showConflictActions(path, git.getRemoteName(path), git.syncBranch(path));
+                        return;
+                    }
+
                     final @NotNull List<PendingChange> changes = GitDiffProcessor.getPendingChanges(p, path);
 
                     // Read here and carried in, because the dialog cannot ask:
@@ -303,7 +314,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 indicator -> {
                     final @NotNull String remoteName = git.getRemoteName(repoPath);
                     final @NotNull String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
-                    final @NotNull String branch = committedOn.isBlank() ? git.getDefaultBranch(repoPath) : committedOn;
+                    final @NotNull String branch = committedOn.isBlank() ? git.syncBranch(repoPath) : committedOn;
                     if (branch.isBlank()) {
                         throw new IllegalStateException("Could not determine which branch to push.");
                     }
@@ -392,7 +403,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 p,
                 "Git Conflicts",
                 GitRefs.conflictMessage(conflicting),
-                notifier.action("Resolve", () -> resolveConflicts(repoPath, remote, branch, conflicting)),
+                notifier.action("Resolve", () -> resolveConflicts(repoPath, remote, branch)),
                 notifier.action("Continue rebase", () -> finishRebase(repoPath, remote, branch, false)),
                 notifier.action("Abort rebase", () -> finishRebase(repoPath, remote, branch, true)));
     }
@@ -405,12 +416,32 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
      * answer open on the EDT from inside.
      */
     private void resolveConflicts(final @NotNull Path repoPath, final @NotNull String remote,
-                                  final @NotNull String branch, final @NotNull List<String> conflicting) {
+                                  final @NotNull String branch) {
         ApplicationManager.getApplication().executeOnPooledThread(() ->
-                ConflictResolution.resolve(p, repoPath, conflicting,
-                        () -> finishRebase(repoPath, remote, branch, false),
+                ConflictResolution.resolveRebase(p, repoPath,
+                        () -> pushAfterRebase(repoPath, remote, branch),
                         leftOver -> Services.getInstance(p, Notifier.class).warn(p, "Still Conflicting",
                                 GitRefs.conflictMessage(leftOver))));
+    }
+
+    /**
+     * Pushes once the rebase is through.
+     * <p>
+     * Separate from {@link #finishRebase} because the rebase is already over by
+     * the time this runs - {@link ConflictResolution#resolveRebase} carried it
+     * to the end - and asking Git to continue a rebase that has finished fails
+     * with "no rebase in progress".
+     */
+    private void pushAfterRebase(final @NotNull Path repoPath, final @NotNull String remote,
+                                 final @NotNull String branch) {
+        GitBackgroundTask.run(p, "Pushing " + branch, false,
+                indicator -> {
+                    commits.push(repoPath, remote, branch);
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Services.getInstance(p, Notifier.class).info(p, "Rebase continued",
+                                    "Changes pushed to the remote"));
+                },
+                ex -> Services.getInstance(p, Notifier.class).error(p, "Push Failed", ex.getMessage()));
     }
 
     private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote,

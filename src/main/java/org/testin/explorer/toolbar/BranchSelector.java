@@ -11,6 +11,7 @@ import org.testin.explorer.ExplorerPanel;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.ViewPendingCommitsAction;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.ui.framework.ConfirmDialog;
@@ -41,6 +42,12 @@ public class BranchSelector {
     // Written from background git tasks and read on the EDT. Empty, never null,
     // when no branch is known yet.
     private volatile @NotNull String currentBranch = "";
+
+    /**
+     * The branches the box is currently showing, so a second pass that brings
+     * nothing new can leave it untouched. Empty while it holds a placeholder.
+     */
+    private volatile @NotNull List<String> shown = List.of();
 
     private boolean isUpdating = false;
 
@@ -77,34 +84,44 @@ public class BranchSelector {
         final @NotNull Path path = testProjectDirectory.map(TestProjectDirectoryDto::getPath).orElse(Path.of(""));
         this.projectPath = path;
 
-        isUpdating = true;
-        try {
-            model.removeAllElements();
-            comboBox.setEnabled(false);
-            currentBranch = "";
-        } finally {
-            isUpdating = false;
-        }
+        currentBranch = "";
 
         if (path.toString().isEmpty()) {
             showPlaceholder("No project path found");
-        } else if (git.isRepository(path)) {
-            showPlaceholder("Loading branches...");
-            loadGitBranches(path);
-        } else {
-            showPlaceholder("Not a Git repository");
+            return;
         }
+        if (!git.isRepository(path)) {
+            showPlaceholder("Not a Git repository");
+            return;
+        }
+
+        showPlaceholder("Loading branches...");
+        loadGitBranches(path);
     }
 
     /**
-     * Adds a non-branch entry without letting the selection listener treat it as
-     * a checkout request.
+     * Replaces whatever the box holds with an explanation, and marks it as one.
+     * <p>
+     * The whole job, not half of it: clearing the box, forgetting what was in
+     * it, saying it cannot be selected from, and only then putting the words up.
+     * It used to add the words while its caller did the clearing, and the two
+     * drifted the moment there was something else to forget - a refresh left
+     * {@code shown} holding the previous branches, so the load that followed
+     * found nothing new to show and left "Loading branches..." on screen with
+     * the box disabled.
+     * <p>
+     * The marking matters just as much: a box holding "Failed to load branches"
+     * that did not say it was a placeholder read a click on it as a request to
+     * check out a branch by that name.
      */
     private void showPlaceholder(final @NotNull String text) {
         isUpdating = true;
         try {
+            model.removeAllElements();
             model.addElement(text);
+            shown = List.of();
             showingPlaceholder = true;
+            comboBox.setEnabled(false);
         } finally {
             isUpdating = false;
         }
@@ -260,67 +277,116 @@ public class BranchSelector {
         }
     }
 
+    /**
+     * Fills the box, twice.
+     * <p>
+     * First from what Git already holds, which needs no network and is on
+     * screen immediately. Then from the remote, once the fetch behind it comes
+     * back with anything new.
+     * <p>
+     * It used to fetch first and show nothing until it returned. A fetch can
+     * stop to ask for credentials, sit on a host that is not reachable, or take
+     * a minute on a large repository - and on this repository it asked for a
+     * username while the IDE was frozen, so the box read "Loading branches..."
+     * until the IDE was killed (#89). The branches Git already knows are the
+     * answer to almost every question anyone asks this box, and they were there
+     * the whole time.
+     */
     private void loadGitBranches(final @NotNull Path repositoryPath) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Fetching Git branches", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Loading Git branches", true) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                try {
-                    try {
-                        git.fetchRemoteBranches(repositoryPath);
-                    } catch (final Exception fetchError) {
-                        ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(p, Notifier.class).warn(p, "Git Fetch Warning", "Could not refresh remote branches: " + fetchError.getMessage()));
-                    }
-                    final @NotNull List<String> branches = git.getAvailableBranches(repositoryPath);
-                    final @NotNull String loadedCurrentBranch = git.getCurrentBranch(repositoryPath);
-                    if (!loadedCurrentBranch.isEmpty()) currentBranch = loadedCurrentBranch;
 
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        isUpdating = true;
-                        try {
-                            model.removeAllElements();
+                indicator.setText("Reading branches");
+                readBranchesInto(repositoryPath);
 
-                            if (!branches.isEmpty()) {
-                                showingPlaceholder = false;
-                                for (final String branch : branches) {
-                                    model.addElement(branch);
-                                }
+                indicator.setText("Fetching from remote");
+                fetchQuietly(repositoryPath);
+                if (indicator.isCanceled()) return;
 
-                                if (!currentBranch.isEmpty() && branches.contains(currentBranch)) {
-                                    comboBox.setSelectedItem(currentBranch);
-                                } else {
-                                    comboBox.setSelectedIndex(0);
-                                    currentBranch = getSelectedBranch();
-                                }
-
-                                comboBox.setEnabled(true);
-                            } else {
-                                model.addElement("No branches found");
-                                showingPlaceholder = true;
-                                comboBox.setEnabled(false);
-                            }
-                        } finally {
-                            isUpdating = false;
-                        }
-                    });
-
-                } catch (final Exception ex) {
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        isUpdating = true;
-                        try {
-                            model.removeAllElements();
-                            model.addElement("Failed to load branches");
-                            comboBox.setEnabled(false);
-                        } finally {
-                            isUpdating = false;
-                        }
-                        Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to load branches: " + ex.getMessage());
-                    });
-                }
+                readBranchesInto(repositoryPath);
             }
         });
     }
+
+    /**
+     * Reads the branches Git holds on disk and hands them to the box. No
+     * network, so nothing here can hang on a remote.
+     */
+    private void readBranchesInto(final @NotNull Path repositoryPath) {
+        try {
+            final @NotNull List<String> branches = git.getAvailableBranches(repositoryPath);
+            final @NotNull String loadedCurrentBranch = git.getCurrentBranch(repositoryPath);
+            if (!loadedCurrentBranch.isEmpty()) currentBranch = loadedCurrentBranch;
+
+            ApplicationManager.getApplication().invokeLater(() -> showBranches(branches));
+        } catch (final Exception ex) {
+            Logger.error("Could not read branches: " + ex.getMessage());
+            ApplicationManager.getApplication().invokeLater(() -> {
+                showPlaceholder("Failed to load branches");
+                Services.getInstance(p, Notifier.class)
+                        .error(p, "Git Error", "Failed to load branches: " + ex.getMessage());
+            });
+        }
+    }
+
+    /**
+     * Brings the remote up to date, and says so rather than failing when it
+     * cannot: the box is already showing branches, and a remote that is down is
+     * not a reason to take them away.
+     */
+    private void fetchQuietly(final @NotNull Path repositoryPath) {
+        try {
+            git.fetchRemoteBranches(repositoryPath);
+        } catch (final Exception fetchError) {
+            Logger.error("Could not refresh remote branches: " + fetchError.getMessage());
+            ApplicationManager.getApplication().invokeLater(() ->
+                    Services.getInstance(p, Notifier.class).warn(p, "Git Fetch Warning",
+                            "Could not refresh remote branches: " + fetchError.getMessage()));
+        }
+    }
+
+    /**
+     * The one owner of what the box holds. Both passes come through here, and
+     * so does every future caller: filling a combo box means suppressing its
+     * own listener, deciding what stays selected and whether it is selectable
+     * at all, and a second copy of that is how a placeholder became a checkout
+     * request the first time.
+     * <p>
+     * A second pass that brings nothing new leaves the box alone entirely. The
+     * tester may have opened it, or picked a branch that is checking out, and
+     * rebuilding the model underneath them would take that back.
+     */
+    private void showBranches(final @NotNull List<String> branches) {
+        if (branches.isEmpty()) {
+            showPlaceholder("No branches found");
+            return;
+        }
+        if (branches.equals(shown)) return;
+
+        isUpdating = true;
+        try {
+            model.removeAllElements();
+            for (final String branch : branches) {
+                model.addElement(branch);
+            }
+
+            if (branches.contains(currentBranch)) {
+                comboBox.setSelectedItem(currentBranch);
+            } else {
+                comboBox.setSelectedIndex(0);
+                currentBranch = getSelectedBranch();
+            }
+
+            shown = List.copyOf(branches);
+            showingPlaceholder = false;
+            comboBox.setEnabled(true);
+        } finally {
+            isUpdating = false;
+        }
+    }
+
 
     public @NotNull JComponent getComponent() {
         return comboBox;

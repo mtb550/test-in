@@ -55,6 +55,79 @@ public final class ConflictResolution {
     }
 
     /**
+     * Carries a stopped rebase all the way through, resolving each stop as it
+     * comes.
+     * <p>
+     * A rebase stops once per conflicting commit, not once per conflict. So
+     * resolving one stop and handing back left a tester pressing Resolve on the
+     * same notification over and over - thirty-one commits meant up to
+     * thirty-one presses of a button named Resolve, which is not what the word
+     * means (#89). This keeps going: merge, continue, and if the next commit
+     * stops too, merge that one as well.
+     * <p>
+     * It stops of its own accord in three places, and only these three: the
+     * rebase finished, something is left that needs the tester's answer, or a
+     * round went by without {@link GitRepositoryService#rebaseStep} advancing.
+     * The last is what makes the loop provably finite rather than argued to be -
+     * every turn of it must move the rebase on by at least one commit.
+     * <p>
+     * Call it off the EDT. {@code onFinished} and {@code onStuck} are handed
+     * back on the EDT.
+     */
+    public static void resolveRebase(final @NotNull Project p, final @NotNull Path repositoryPath,
+                                     final @NotNull Runnable onFinished,
+                                     final @NotNull Consumer<List<String>> onStuck) {
+        final @NotNull GitRepositoryService git = new GitRepositoryService(p);
+
+        round(p, git, repositoryPath, git.rebaseStep(repositoryPath), onFinished, onStuck);
+    }
+
+    /**
+     * One stop: resolve what is conflicting now, continue, and decide whether
+     * there is another stop to take.
+     */
+    private static void round(final @NotNull Project p, final @NotNull GitRepositoryService git,
+                              final @NotNull Path repositoryPath, final int stepBefore,
+                              final @NotNull Runnable onFinished,
+                              final @NotNull Consumer<List<String>> onStuck) {
+        resolve(p, repositoryPath, git.conflictingPaths(repositoryPath),
+                () -> ApplicationManager.getApplication().executeOnPooledThread(
+                        () -> continueOn(p, git, repositoryPath, stepBefore, onFinished, onStuck)),
+                onStuck);
+    }
+
+    /**
+     * What to do once a stop is resolved: continue the rebase, and read what
+     * that left behind.
+     */
+    private static void continueOn(final @NotNull Project p, final @NotNull GitRepositoryService git,
+                                   final @NotNull Path repositoryPath, final int stepBefore,
+                                   final @NotNull Runnable onFinished,
+                                   final @NotNull Consumer<List<String>> onStuck) {
+        if (!git.couldNotContinueRebase(repositoryPath)) {
+            ApplicationManager.getApplication().invokeLater(onFinished);
+            return;
+        }
+
+        // It stopped again. Only conflicts are ours to carry on with; anything
+        // else is a failure the caller has to report.
+        if (!git.hasConflicts(repositoryPath)) {
+            ApplicationManager.getApplication().invokeLater(() -> onStuck.accept(List.of()));
+            return;
+        }
+
+        final int stepNow = git.rebaseStep(repositoryPath);
+        if (stepNow <= stepBefore) {
+            final @NotNull List<String> stillConflicting = git.conflictingPaths(repositoryPath);
+            Logger.warn("The rebase did not move past commit " + stepNow + "; leaving it to the tester");
+            ApplicationManager.getApplication().invokeLater(() -> onStuck.accept(stillConflicting));
+            return;
+        }
+
+        round(p, git, repositoryPath, stepNow, onFinished, onStuck);
+    }
+
+    /**
      * Resolves what it can and asks about the rest.
      * <p>
      * Called on a background thread - it reads Git and writes files - and hands
