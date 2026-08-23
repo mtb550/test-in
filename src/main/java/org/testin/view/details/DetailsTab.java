@@ -109,7 +109,7 @@ public class DetailsTab {
                 new AttributeRow(TestEditorAttributes.EXPECTED_RESULT, (p, dto) -> Display.format(dto.getExpectedResult())),
                 new Steps(),
                 new AttributeRow(TestEditorAttributes.PRE_CONDITIONS, (p, dto) -> Display.format(dto.getPreConditions())),
-                new AttributeRow(TestEditorAttributes.TEST_DATA, (p, dto) -> Display.format(dto.getTestData())),
+                new AttributeRow(TestEditorAttributes.TEST_DATA, (p, dto) -> Display.entriesOnLines(dto.getTestData())),
                 // No FQCN row. The fully qualified class and method name is how
                 // the plugin finds the generated code to navigate to and run -
                 // it is machinery, not something a tester reads while executing.

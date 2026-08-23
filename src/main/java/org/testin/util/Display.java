@@ -35,6 +35,19 @@ public final class Display {
     }
 
     /**
+     * A comma-separated line - "field: value, field: value" - broken so each
+     * entry sits on its own line, and nothing else: no capital, no closing dot.
+     * Test data is written this way and read a field at a time, so both the
+     * details panel and the grid cell break it where the commas are and show it
+     * otherwise verbatim - the two surfaces match, and neither reformats what the
+     * tester typed. Display only: the stored value keeps its single line, so the
+     * grid cell editor still round-trips it unchanged.
+     */
+    public static @NotNull String entriesOnLines(final @NotNull String text) {
+        return text.replaceAll(",\\s*", "\n");
+    }
+
+    /**
      * A timestamp as everything shows it: the card, the grid, the details popup,
      * an exported sheet, a report footer - and blank when there is no moment to
      * show, which {@link Config#NOT_EXECUTED} is how the model says it.

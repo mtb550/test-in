@@ -17,6 +17,7 @@ import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.TestRunItems;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Display;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -93,7 +94,8 @@ public class GridPanelBuilder {
             @Override
             public @NotNull Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
 
-                textArea.setText(Objects.toString(value, ""));
+                final @NotNull String raw = Objects.toString(value, "");
+                textArea.setText(isTestDataColumn(table, column) ? Display.entriesOnLines(raw) : raw);
                 textArea.setFont(table.getFont());
                 textArea.setForeground(table.getForeground());
                 // Per-cell selection background (multi-interval selection: only the
@@ -313,6 +315,19 @@ public class GridPanelBuilder {
      */
     public static boolean isOrderColumn(final @NotNull JTable table, final int viewColumn) {
         return viewColumn >= 0 && isOrderColumn(table.convertColumnIndexToModel(viewColumn));
+    }
+
+    /**
+     * Whether a view column is the test-data column of a test grid. Test data is
+     * stored as one line of comma-separated "field: value" pairs; the grid breaks
+     * it a field per line for display, matching the details panel. Only test grids
+     * have the column, so the kind is checked before the enum is indexed.
+     */
+    private static boolean isTestDataColumn(final @NotNull JTable table, final int viewColumn) {
+        if (viewColumn < 0 || !"test".equals(table.getClientProperty(GRID_KIND_KEY))) return false;
+        final int modelColumn = table.convertColumnIndexToModel(viewColumn);
+        return modelColumn >= 0 && modelColumn < TestEditorAttributes.values().length
+                && TestEditorAttributes.values()[modelColumn] == TestEditorAttributes.TEST_DATA;
     }
 
     public @NotNull JBTable buildRunTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<RunEditorAttributes> attributes, final @NotNull Map<UUID, TestRunItems> resultsMap, final int firstItemIndex) {
