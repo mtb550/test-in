@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
+import org.testin.util.EditorUtil;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -97,7 +98,15 @@ public final class Rescan {
 
         ApplicationManager.getApplication().invokeLater(() -> {
             if (p.isDisposed()) return;
+
             Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
+
+            // The tree is not the only thing showing what a file used to say. An
+            // editor holds the node it was opened on and the cases it read from
+            // it, so after the scan both can be wrong - and this is the same
+            // call the Refresh button makes, so a change noticed on disk lands
+            // exactly where a change the tester asked about lands.
+            Services.getInstance(p, EditorUtil.class).refreshOpen(p);
         });
     }
 }
