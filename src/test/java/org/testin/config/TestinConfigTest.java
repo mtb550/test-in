@@ -20,20 +20,18 @@ public class TestinConfigTest {
 
     private static final String FULL = """
             # testin.yml
-            version: 1
-            testinProject: checkout-regression
-            testinRepoUrl: https://github.com/acme/checkout-testcases
-            defaultBranch: main
+            location: remote
+            connection: git
+            testinProject: checkout-testcases
+            RepoUrl: https://github.com/acme/checkout-testcases
             """;
 
     @Test
     public void readsEveryKey() {
         final TestinProjectConfig config = TestinConfigLoader.parse(FULL, "full");
 
-        assertEquals(config.version(), 1);
-        assertEquals(config.testinProject(), "checkout-regression");
-        assertEquals(config.testinRepoUrl(), "https://github.com/acme/checkout-testcases");
-        assertEquals(config.defaultBranch(), "main");
+        assertEquals(config.repoUrl(), "https://github.com/acme/checkout-testcases");
+        assertEquals(config.projectName(), "checkout-testcases", "the key names the project");
         assertTrue(config.isBound());
         assertTrue(config.hasRepoUrl());
     }
@@ -45,11 +43,10 @@ public class TestinConfigTest {
      */
     @Test
     public void absentKeysAreEmpty() {
-        final TestinProjectConfig config = TestinConfigLoader.parse("version: 1\n", "partial");
+        final TestinProjectConfig config = TestinConfigLoader.parse("# nothing but a comment\n", "partial");
 
-        assertEquals(config.testinProject(), "");
-        assertEquals(config.testinRepoUrl(), "");
-        assertEquals(config.defaultBranch(), "");
+        assertEquals(config.repoUrl(), "");
+        assertEquals(config.projectName(), "", "no name in the file and no URL to take one from");
         assertFalse(config.isBound());
         assertFalse(config.hasRepoUrl());
     }
@@ -65,7 +62,6 @@ public class TestinConfigTest {
                 somethingFromALaterBuild: true
                 """, "unknown-key");
 
-        assertEquals(config.testinProject(), "checkout-regression");
     }
 
     /**
@@ -84,10 +80,173 @@ public class TestinConfigTest {
      */
     @Test
     public void refusesARepoUrlThatIsNotOne() {
-        assertEquals(TestinConfigLoader.parse("testinRepoUrl: \"https://x.com/r; rm -rf /\"\n", "injected").testinRepoUrl(), "");
-        assertEquals(TestinConfigLoader.parse("testinRepoUrl: file:///etc/passwd\n", "scheme").testinRepoUrl(), "");
-        assertEquals(TestinConfigLoader.parse("testinRepoUrl: git@github.com:acme/cases.git\n", "ssh").testinRepoUrl(),
+        assertEquals(TestinConfigLoader.parse("RepoUrl: \"https://x.com/r; rm -rf /\"\n", "injected").repoUrl(), "");
+        assertEquals(TestinConfigLoader.parse("RepoUrl: file:///etc/passwd\n", "scheme").repoUrl(), "");
+        assertEquals(TestinConfigLoader.parse("RepoUrl: git@github.com:acme/cases.git\n", "ssh").repoUrl(),
                 "git@github.com:acme/cases.git");
+    }
+
+    /**
+     * A server address makes the channel available, and nothing else has to say
+     * so (#94).
+     * <p>
+     * There is deliberately no {@code connection: git|ssh} key. A mode word and
+     * an address are two facts about one thing, and the day they disagree
+     * something has to choose which half of the file to believe.
+     */
+    /**
+     * The mode decides, not the addresses (#94).
+     * <p>
+     * The file can contradict itself - say local and still carry a host - so one
+     * key is the authority and the rest is read against it. Otherwise something
+     * has to choose which half of the file to believe.
+     */
+    @Test
+    public void aProjectIsLocalUntilTheFileSaysOtherwise() {
+        final TestinProjectConfig quiet = TestinConfigLoader.parse("connection: git\ntestinProject: cases\nRepoUrl: https://github.com/acme/cases.git\n",
+                "an address and no location");
+
+        assertEquals(quiet.location(), TestinLocation.LOCAL, "left out, it is local");
+        assertEquals(quiet.connection(), ConnectionType.NONE);
+        assertFalse(quiet.hasSftp());
+        assertFalse(quiet.hasRepoUrl());
+    }
+
+    @Test
+    public void anAddressAloneDoesNotMakeAProjectRemote() {
+        final TestinProjectConfig stillLocal = TestinConfigLoader.parse(
+                "location: local\nconnection: sftp\nsftpHost: qa.internal\n", "local with a host left in");
+
+        assertEquals(stillLocal.connection(), ConnectionType.NONE, "local wins over everything below it");
+        assertFalse(stillLocal.hasSftp());
+    }
+
+    /**
+     * A server path is a root holding several projects, and a root names none of
+     * them - so that side says which one.
+     */
+    @Test
+    public void aProjectIsNamedByTheFile() {
+        final TestinProjectConfig onAServer = TestinConfigLoader.parse(
+                "location: remote\nconnection: sftp\nsftpHost: qa.internal\n"
+                        + "sftpPath: /srv/testin\ntestinProject: test-01\n", "sftp");
+
+        assertEquals(onAServer.projectName(), "test-01");
+        assertTrue(onAServer.isBound());
+    }
+
+    @Test
+    public void anSftpServerWithNoProjectIsNotReachable() {
+        final TestinProjectConfig unnamed = TestinConfigLoader.parse(
+                "location: remote\nconnection: sftp\nsftpHost: qa.internal\n", "no project");
+
+        assertFalse(unnamed.hasSftp(), "a root holding several projects does not say which one");
+    }
+
+    @Test
+    public void anSftpProjectIsReadFromItsParts() {
+        final TestinProjectConfig onAServer = TestinConfigLoader.parse(
+                "location: remote\nconnection: sftp\nsftpHost: qa.internal\nsftpPort: 2222\n"
+                        + "sftpPath: /srv/testin\ntestinProject: test-01\n", "sftp");
+
+        assertTrue(onAServer.hasSftp());
+        assertFalse(onAServer.hasRepoUrl(), "this team shares through a server and has no repository");
+        assertEquals(onAServer.sftpAddress().host(), "qa.internal");
+        assertEquals(onAServer.sftpAddress().port(), 2222);
+        assertEquals(onAServer.projectName(), "test-01");
+        assertEquals(onAServer.sftpAddress().path(), "/srv/testin/test-01", "the root, with the project under it");
+    }
+
+    /**
+     * The address points at the project's folder, composed in one place (#94).
+     * <p>
+     * Two places deciding this is how "/Testin/test-01/test-01" happens: the
+     * file names the project, and whatever syncs names it again.
+     */
+    @Test
+    public void theAddressIsTheProjectsOwnFolder() {
+        assertEquals(sftp("/Testin").sftpAddress().path(), "/Testin/test-01");
+    }
+
+    /**
+     * Writing the whole path is the obvious thing for a tester to do, and must
+     * not be read as asking for the folder twice.
+     */
+    @Test
+    public void aPathThatAlreadyNamesTheProjectIsLeftAlone() {
+        assertEquals(sftp("/Testin/test-01").sftpAddress().path(), "/Testin/test-01",
+                "never /Testin/test-01/test-01");
+        assertEquals(sftp("/Testin/test-01/").sftpAddress().path(), "/Testin/test-01");
+    }
+
+    /**
+     * A file reaching a server called test-01, with the given root.
+     */
+    private static TestinProjectConfig sftp(final String root) {
+        return TestinConfigLoader.parse("location: remote\nconnection: sftp\nsftpHost: qa.internal\n"
+                + "sftpPath: " + root + "\ntestinProject: test-01\n", root);
+    }
+
+    @Test
+    public void theSftpPortIsTwentyTwoUnlessSaid() {
+        final TestinProjectConfig onAServer = TestinConfigLoader.parse(
+                "location: remote\nconnection: sftp\nsftpHost: qa.internal\ntestinProject: test-01\n", "no port");
+
+        assertEquals(onAServer.sftpAddress().port(), 22);
+    }
+
+    @Test
+    public void aGitProjectIsReadFromItsUrl() {
+        final TestinProjectConfig inGit = TestinConfigLoader.parse(
+                "location: remote\nconnection: git\ntestinProject: cases\nRepoUrl: https://github.com/acme/cases.git\n", "git");
+
+        assertTrue(inGit.hasRepoUrl());
+        assertFalse(inGit.hasSftp());
+        assertTrue(inGit.connection().isShowsBranches(), "branches mean something in Git");
+        assertFalse(inGit.connection().isSyncsToServer(), "and the sync action is off, not just quiet");
+        assertEquals(inGit.projectName(), "cases");
+    }
+
+    @Test
+    public void anSftpProjectNeverShowsBranches() {
+        final TestinProjectConfig onAServer = TestinConfigLoader.parse(
+                "location: remote\nconnection: sftp\nsftpHost: qa.internal\ntestinProject: test-01\n", "sftp");
+
+        assertFalse(onAServer.connection().isShowsBranches(), "there are no branches to choose");
+        assertFalse(onAServer.connection().isFetchesOnRefresh(), "and nothing here may reach a Git remote");
+        assertTrue(onAServer.connection().isSyncsToServer(), "but there is a server to sync to");
+    }
+
+    /**
+     * The account never travels in the committed file.
+     * <p>
+     * One shared account written here would be everybody's, and a tester's own
+     * would be wrong for everybody else - the same reason the Testin root folder
+     * is kept out of this file.
+     */
+    @Test
+    public void anSftpHostCarryingAnAccountIsRefused() {
+        assertEquals(TestinConfigLoader.parse(
+                "location: remote\nconnection: sftp\nsftpHost: muteb@qa.internal\n", "account")
+                .sftpHost(), "");
+    }
+
+    @Test
+    public void refusesAnSftpHostThatIsNotOne() {
+        assertEquals(TestinConfigLoader.parse(
+                "location: remote\nconnection: sftp\nsftpHost: \"qa.internal; rm -rf /\"\n",
+                "injected").sftpHost(), "");
+        assertEquals(TestinConfigLoader.parse(
+                "location: remote\nconnection: sftp\nsftpHost: sftp://qa.internal\n", "a URL, not a host")
+                .sftpHost(), "");
+    }
+
+    @Test
+    public void aWordNobodyCanReadIsLocalRatherThanAGuess() {
+        assertEquals(TestinConfigLoader.parse("location: somewhere\n", "nonsense").location(),
+                TestinLocation.LOCAL, "a project nobody can reach is better left on this machine");
+        assertEquals(TestinConfigLoader.parse("location: remote\nconnection: ftp\n", "nonsense").connection(),
+                ConnectionType.NONE);
     }
 
     /**
@@ -99,20 +258,20 @@ public class TestinConfigTest {
     public void writingAKeyKeepsEveryOtherLine() {
         final String before = """
                 # testin.yml - do not delete this comment
-                version: 1
+                location: remote
                 
-                # the suite this repository drives
-                testinProject: old-name
-                defaultBranch: main
+                # the test project this repository drives
+                RepoUrl: old-name
+                sftpPort: 22
                 """;
 
-        assertEquals(TestinConfigWriter.apply(before, "testinProject", "new-name"), """
+        assertEquals(TestinConfigWriter.apply(before, "RepoUrl", "new-name"), """
                 # testin.yml - do not delete this comment
-                version: 1
+                location: remote
                 
-                # the suite this repository drives
-                testinProject: new-name
-                defaultBranch: main
+                # the test project this repository drives
+                RepoUrl: new-name
+                sftpPort: 22
                 """);
     }
 
@@ -122,12 +281,12 @@ public class TestinConfigTest {
      */
     @Test
     public void appendsAKeyThatIsNotThere() {
-        assertEquals(TestinConfigWriter.apply("version: 1\n", "testinProject", "checkout"),
-                "version: 1\ntestinProject: checkout\n");
+        assertEquals(TestinConfigWriter.apply("location: remote\n", "RepoUrl", "checkout"),
+                "location: remote\nRepoUrl: checkout\n");
 
         // No trailing newline before, one line added after, nothing lost between.
-        assertEquals(TestinConfigWriter.apply("version: 1", "testinProject", "checkout"),
-                "version: 1\ntestinProject: checkout\n");
+        assertEquals(TestinConfigWriter.apply("location: remote", "RepoUrl", "checkout"),
+                "location: remote\nRepoUrl: checkout\n");
     }
 
     /**
@@ -136,8 +295,8 @@ public class TestinConfigTest {
      */
     @Test
     public void keepsWindowsLineEndings() {
-        assertEquals(TestinConfigWriter.apply("version: 1\r\ntestinProject: old\r\n", "testinProject", "new"),
-                "version: 1\r\ntestinProject: new\r\n");
+        assertEquals(TestinConfigWriter.apply("location: remote\r\nRepoUrl: old\r\n", "RepoUrl", "new"),
+                "location: remote\r\nRepoUrl: new\r\n");
     }
 
     /**
@@ -157,8 +316,8 @@ public class TestinConfigTest {
      */
     @Test
     public void aCommentedKeyIsNotTheKey() {
-        assertEquals(TestinConfigWriter.apply("# testinProject: example\ntestinProject: old\n", "testinProject", "new"),
-                "# testinProject: example\ntestinProject: new\n");
+        assertEquals(TestinConfigWriter.apply("# testinProject: example\nRepoUrl: old\n", "RepoUrl", "new"),
+                "# testinProject: example\nRepoUrl: new\n");
     }
 
     /**
@@ -178,11 +337,88 @@ public class TestinConfigTest {
      */
     @Test
     public void writtenValuesReadBack() {
-        String content = TestinConfigWriter.apply("version: 1\n", "testinProject", "checkout-regression");
-        content = TestinConfigWriter.apply(content, "testinRepoUrl", "https://github.com/acme/cases.git");
+        String content = TestinConfigWriter.apply("location: remote\n", "testinProject", "checkout-regression");
+        content = TestinConfigWriter.apply(content, "RepoUrl", "https://github.com/acme/cases.git");
 
         final TestinProjectConfig config = TestinConfigLoader.parse(content, "round-trip");
-        assertEquals(config.testinProject(), "checkout-regression");
-        assertEquals(config.testinRepoUrl(), "https://github.com/acme/cases.git");
+        assertEquals(config.repoUrl(), "https://github.com/acme/cases.git");
+    }
+    /**
+     * A Git repository is named by the key like every other kind (#94).
+     * <p>
+     * Not by its clone URL. That was the rule once, and it made the Git case the
+     * one place where renaming something elsewhere - the repository on GitHub -
+     * silently re-pointed a binding here.
+     */
+    @Test
+    public void aGitProjectIsNamedByTheKey() {
+        final TestinProjectConfig named = TestinConfigLoader.parse(
+                "location: remote\nconnection: git\n"
+                        + "RepoUrl: https://github.com/mtb550/test-01.git\n"
+                        + "testinProject: checkout\n", "git");
+
+        assertEquals(named.projectName(), "checkout", "the file says so, not the URL");
+        assertTrue(named.isBound());
+        assertTrue(named.hasRepoUrl());
+    }
+
+    @Test
+    public void aUrlWithNoNameLeavesTheRepositoryUnbound() {
+        final TestinProjectConfig unnamed = TestinConfigLoader.parse(
+                "location: remote\nconnection: git\n"
+                        + "RepoUrl: https://github.com/mtb550/test-01.git\n", "no name");
+
+        assertEquals(unnamed.projectName(), "", "the tester picks once, which writes the key");
+        assertFalse(unnamed.isBound());
+        assertTrue(unnamed.hasRepoUrl(), "and it can still be cloned");
+    }
+
+    /**
+     * A project on this machine only has no address to be named by, so the key
+     * is the only thing that can say which one - and it is read here too (#94).
+     */
+    @Test
+    public void aLocalProjectIsNamedByTheKey() {
+        final TestinProjectConfig here = TestinConfigLoader.parse(
+                "location: local\ntestinProject: test-01\n", "local");
+
+        assertEquals(here.projectName(), "test-01");
+        assertTrue(here.isBound(), "picking a project sticks across an IDE restart");
+        assertFalse(here.hasSftp());
+        assertFalse(here.hasRepoUrl());
+    }
+
+
+    /**
+     * A token never reaches the committed file (#94).
+     * <p>
+     * Git hands out {@code https://user:token@host/repo} as a remote's URL
+     * without being asked, and this file is shared with everyone who clones -
+     * so a token in it is in the history forever.
+     */
+    @Test
+    public void aTokenIsStrippedOutOfACloneUrl() {
+        assertEquals(TestinProjectConfig.withoutCredentials(
+                "https://mtb550:ghp_secret@github.com/mtb550/test-01.git"),
+                "https://github.com/mtb550/test-01.git");
+
+        assertEquals(TestinConfigLoader.parse(
+                "location: remote\nconnection: git\ntestinProject: test-01\n"
+                        + "RepoUrl: https://mtb550:ghp_secret@github.com/mtb550/test-01.git\n", "token")
+                .repoUrl(), "https://github.com/mtb550/test-01.git",
+                "stripped on the way in too, however it got there");
+    }
+
+    /**
+     * The account every SSH clone URL carries is not a secret and stays.
+     */
+    @Test
+    public void anSshAccountSurvives() {
+        assertEquals(TestinProjectConfig.withoutCredentials("git@github.com:mtb550/test-01.git"),
+                "git@github.com:mtb550/test-01.git");
+        assertEquals(TestinProjectConfig.withoutCredentials("ssh://git@host:2222/qa/cases.git"),
+                "ssh://git@host:2222/qa/cases.git");
+        assertEquals(TestinProjectConfig.withoutCredentials("https://github.com/mtb550/test-01.git"),
+                "https://github.com/mtb550/test-01.git");
     }
 }

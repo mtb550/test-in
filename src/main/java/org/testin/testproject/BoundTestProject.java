@@ -40,7 +40,7 @@ public final class BoundTestProject {
      * name that resolves to nothing has to show.
      */
     public @NotNull String name() {
-        return Services.getInstance(p, TestinConfigService.class).get().testinProject();
+        return Services.getInstance(p, TestinConfigService.class).get().projectName();
     }
 
     /**

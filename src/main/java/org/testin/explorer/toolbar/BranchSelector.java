@@ -7,6 +7,8 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import org.jetbrains.annotations.NotNull;
+import org.testin.config.ConnectionType;
+import org.testin.config.TestinConfigService;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.ViewPendingCommitsAction;
@@ -86,12 +88,23 @@ public class BranchSelector {
 
         currentBranch = "";
 
-        if (path.toString().isEmpty()) {
-            showPlaceholder("No project path found");
-            return;
-        }
-        if (git.isNotRepository(path)) {
-            showPlaceholder("Not a Git repository");
+        // What testin.yml says this project is decides whether branches are its
+        // business at all. A server-hosted project has none, so the box is not
+        // shown and nothing here reaches a Git remote - which is the whole point
+        // of asking the channel rather than asking the folder.
+        final @NotNull ConnectionType connection =
+                Services.getInstance(p, TestinConfigService.class).get().connection();
+
+        final boolean showable = connection.isShowsBranches()
+                && !path.toString().isEmpty()
+                && !git.isNotRepository(path);
+
+        comboBox.setVisible(showable);
+
+        if (!showable) {
+            // Still said, for the log and for a project declared as Git that has
+            // not been cloned here yet.
+            showPlaceholder(connection.isShowsBranches() ? "Not a Git repository" : "Not shared through Git");
             return;
         }
 

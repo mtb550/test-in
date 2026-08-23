@@ -7,6 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.sftp.SyncWithSftpAction;
 import org.testin.EscapeAction;
 import org.testin.ShowNodeDetailsAction;
 import org.testin.clipboard.*;
@@ -79,6 +80,9 @@ public class TreeContextMenu extends DefaultActionGroup {
             add(new SyncActionAction(p, tree, pp));
             add(new ViewPendingCommitsAction(p, tree));
         }
+
+        addSeparator();
+        add(new SyncWithSftpAction(p, tree, pp));
 
         addSeparator();
         add(new SetTestRunStatusAction(p, tree));

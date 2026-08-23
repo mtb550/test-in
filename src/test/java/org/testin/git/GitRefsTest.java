@@ -313,4 +313,5 @@ public class GitRefsTest {
     public void emptyAndTruncatedLinesAreSkipped() {
         assertEquals(GitRefs.parseStatus(List.of("", "  ", "??")), List.of());
     }
+
 }

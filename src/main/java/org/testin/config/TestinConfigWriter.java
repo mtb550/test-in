@@ -28,13 +28,36 @@ final class TestinConfigWriter {
      * must never go in it, because the next person to open it is a tester who did
      * not write it.
      */
+    /**
+     * What a file the plugin creates starts as.
+     * <p>
+     * One key and no explanation. The format is documented where a tester
+     * reads documentation, not in every repository that carries a copy of it -
+     * a comment block here is written once and then maintained forever, in
+     * files nobody remembers are theirs to update.
+     */
+    /**
+     * What a file the plugin creates starts as.
+     * <p>
+     * Every key it can carry, listed once so a tester setting up a server months
+     * later reads the file rather than the documentation - and short enough that
+     * nobody has to maintain it. The commented lines are the whole format.
+     */
     private static final @NotNull String HEADER = """
-            # testin.yml - the Testin test project this repository exercises.
-            #
-            # Committed on purpose: a fresh clone of this repository then needs no
-            # setting up. Machine-specific values - the Testin root folder, the
-            # tester name - are settings on each machine and are never written here.
-            version: 1
+            # Which test project this repository drives. Committed, so a clone needs no setup.
+            # No machine or person here: root folder, account and passwords live in Testin's
+            # settings.
+
+            location: local
+
+            # location: remote             shared, then one of:
+            # connection: git
+            # RepoUrl: https://github.com/you/test-01.git
+            # connection: sftp
+            # sftpHost: 127.0.0.1
+            # sftpPort: 22                 optional, 22
+            # sftpPath: /Testin            the folder holding the projects
+            # testinProject: test-01       which of them, in every case
             """;
 
     /**

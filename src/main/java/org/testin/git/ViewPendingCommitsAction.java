@@ -339,7 +339,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         // The repository already says where its test project lives, so a clone of
         // it should not have to be told again. Asking is the fallback, not the
         // first move (#8).
-        final @NotNull String known = config.get().testinRepoUrl();
+        final @NotNull String known = config.get().repoUrl();
         final @NotNull String remoteUrl = known.isEmpty() ? askForRemoteUrl(p) : known;
 
         if (remoteUrl.isEmpty()) {

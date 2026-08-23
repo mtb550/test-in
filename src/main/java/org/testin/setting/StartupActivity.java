@@ -63,7 +63,7 @@ public final class StartupActivity implements ProjectActivity {
         // would have to be thrown away and run again (#6).
         final @NotNull TestinProjectConfig config = Services.getInstance(p, TestinConfigService.class).get();
         Logger.info(config.isBound()
-                ? "Bound to test project '" + config.testinProject() + "'"
+                ? "Bound to test project '" + config.projectName() + "'"
                 : "No test project bound to " + p.getName());
 
         if (TestinRoot.isConfigured(testinPath)) {

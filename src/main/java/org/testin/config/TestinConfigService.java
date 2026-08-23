@@ -62,7 +62,7 @@ public final class TestinConfigService {
      * message about it, mid-push, would be about the wrong thing.
      */
     public void rememberRepoUrl(final @NotNull String url) {
-        set("testinRepoUrl", url);
+        set("RepoUrl", TestinProjectConfig.withoutCredentials(url));
     }
 
     /**

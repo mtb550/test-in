@@ -24,6 +24,7 @@ import org.testin.testproject.BoundTestProject;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -744,6 +745,66 @@ public final class ProjectIndexer {
 
     public void addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
         store.addTestRunPackage(trp);
+    }
+
+    /**
+     * Every file in a test project, by the path a server names it with (#94).
+     * <p>
+     * Walked from disk rather than read out of the cache, and that is not a
+     * detail: two directories in the sandbox project carry no marker, so the
+     * scan skips them - and the four test cases inside them have never been in
+     * the cache. A sync built on {@code getAllTestCases} would not upload those
+     * four, and would then delete them from the server as files that no longer
+     * exist.
+     * <p>
+     * Here rather than in the server package because reading test data is the
+     * indexer's job. The {@code git} package is exempt from that rule because
+     * Git writes the working tree itself; a transfer has no such claim.
+     */
+    public @NotNull Map<String, byte[]> filesUnder(final @NotNull Path projectPath) {
+        final @NotNull Map<String, byte[]> files = new TreeMap<>();
+
+        try (Stream<Path> paths = Files.walk(projectPath)) {
+            for (final Path file : paths.filter(Files::isRegularFile).toList()) {
+                final @NotNull String relative =
+                        projectPath.relativize(file).toString().replace(File.separatorChar, '/');
+
+                if (isGitsOwn(relative)) continue;
+
+                files.put(relative, Files.readAllBytes(file));
+            }
+        } catch (final IOException ex) {
+            Logger.error("Could not read the project at " + projectPath + ": " + ex.getMessage());
+        }
+
+        return files;
+    }
+
+    /**
+     * Whether the file belongs to Git rather than to the test project.
+     * <p>
+     * A repository's own directory is not test data. Its files change on every
+     * command - HEAD, FETCH_HEAD, the index, the logs - so carrying them to a
+     * server means a conflict on every sync forever, and writing one machine's
+     * copy over another's would break the repository rather than share it.
+     */
+    public static boolean isGitsOwn(final @NotNull String relative) {
+        return relative.equals(".git") || relative.startsWith(".git/");
+    }
+
+    /**
+     * Writes what arrived from a server into the project.
+     * <p>
+     * Through {@code FilesUtil}, which refuses to write an empty file - exactly
+     * the protection a transfer that was cut off halfway needs, because an empty
+     * test case would be indexed as a case with no fields rather than as a
+     * failure.
+     */
+    public void acceptIncoming(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
+        final @NotNull FilesUtil writer = Services.getInstance(p, FilesUtil.class);
+
+        files.forEach((relative, content) -> writer.write(p, projectPath.resolve(relative), content));
+        Logger.info("Wrote " + files.size() + " incoming files into " + projectPath);
     }
 
     public void scanSingleProject(final @NotNull Path projectPath) {

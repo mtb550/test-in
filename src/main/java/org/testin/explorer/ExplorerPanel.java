@@ -13,15 +13,18 @@ import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.config.ConnectionType;
 import org.testin.config.TestinConfigService;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.RefreshAction;
 import org.testin.explorer.tree.ExplorerTree;
 import org.testin.explorer.toolbar.BranchSelector;
+import org.testin.git.GitRepositoryService;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.util.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.setting.SettingsConfigurable;
 import org.testin.setting.TestinRoot;
@@ -29,6 +32,8 @@ import org.testin.testproject.BindTestProjectDialog;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testproject.CreateTestProjectCloneAction;
 import org.testin.util.Bundle;
+
+import java.nio.file.Path;
 
 import java.awt.*;
 import java.util.Optional;
@@ -236,6 +241,49 @@ public final class ExplorerPanel implements Disposable {
 
         projectTree.refresh();
         branchSelector.updateProject(Optional.of(tp));
+        rememberWhereItCameFrom(tp.getPath());
+    }
+
+    /**
+     * Records the test project's remote in {@code testin.yml}, once (#94).
+     * <p>
+     * That line is what lets a colleague who clones this repository be offered
+     * the test project rather than an empty tree - the panel already reads it to
+     * do so. Until now nothing wrote it unless somebody happened to configure a
+     * remote during a push, so the usual case was a repository that knew where
+     * its test data lived and never said.
+     * <p>
+     * Off the EDT: asking Git for a remote URL is a command. Written only when
+     * the file has nothing, so a URL a team chose deliberately is never replaced
+     * by whatever one machine happens to have.
+     * <p>
+     * The guard is "the file already answered", not "the file answered and is a
+     * Git project". Those read alike and are not: a repository reached over SFTP,
+     * or one with no location at all, is never a Git project - so the second
+     * form can never become true, and this ran again on every refresh, writing
+     * the key over and over. A file that says sftp is skipped outright, because
+     * a Git URL is not a fact about it.
+     */
+    private void rememberWhereItCameFrom(final @NotNull Path projectPath) {
+        if (!OptionalPlugin.GIT.isAvailable()) return;
+
+        final @NotNull TestinConfigService config = Services.getInstance(p, TestinConfigService.class);
+        if (!config.get().repoUrl().isEmpty()) return;
+        if (config.get().connection() == ConnectionType.SFTP) return;
+
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final @NotNull GitRepositoryService git = new GitRepositoryService(p);
+            if (git.isNotRepository(projectPath)) return;
+
+            final @NotNull String remote = git.getRemoteName(projectPath);
+            if (remote.isEmpty()) return;
+
+            final @NotNull String url = git.getRemoteUrl(projectPath, remote);
+            if (url.isEmpty()) return;
+
+            config.rememberRepoUrl(url);
+            Logger.info("Recorded where " + projectPath.getFileName() + " is cloned from: " + url);
+        });
     }
 
     /**
@@ -265,7 +313,7 @@ public final class ExplorerPanel implements Disposable {
                     e -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class));
 
             case CLONE_BOUND -> {
-                final @NotNull String url = Services.getInstance(p, TestinConfigService.class).get().testinRepoUrl();
+                final @NotNull String url = Services.getInstance(p, TestinConfigService.class).get().repoUrl();
 
                 emptyText.appendLine(boundProject.name() + " is not on this machine yet",
                         SimpleTextAttributes.GRAYED_ATTRIBUTES, null);

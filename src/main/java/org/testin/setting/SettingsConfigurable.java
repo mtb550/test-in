@@ -30,6 +30,18 @@ public final class SettingsConfigurable implements Configurable {
     private final @NotNull JBTextField testerNameField = new JBTextField();
     private final @NotNull JBTextField testerRoleField = new JBTextField();
     private final @NotNull TextFieldWithBrowseButton downloadFolderField = new TextFieldWithBrowseButton();
+
+    /**
+     * The account this machine uses on a test project's server (#94).
+     * <p>
+     * Here rather than in {@code testin.yml}, which is committed: the server
+     * address is the team's and belongs in that file, but who connects is the
+     * person's. The password is not here either - it goes to the IDE's
+     * credential store, because this file is plain text on disk.
+     */
+    private final @NotNull JBTextField sftpUserField = new JBTextField();
+
+    private final @NotNull TextFieldWithBrowseButton sftpKeyFileField = new TextFieldWithBrowseButton();
     private final @NotNull ComboBox<String> logLevelComboBox;
 
     public SettingsConfigurable() {
@@ -63,6 +75,10 @@ public final class SettingsConfigurable implements Configurable {
                 .addLabeledComponent(new JBLabel("Tester role: "), testerRoleField, 1, false)
                 .addVerticalGap(5)
                 .addLabeledComponent(new JBLabel("Default download folder: "), downloadFolderField, 1, false)
+                .addVerticalGap(5)
+                .addLabeledComponent(new JBLabel("SFTP account: "), sftpUserField, 1, false)
+                .addVerticalGap(5)
+                .addLabeledComponent(new JBLabel("SFTP key file: "), sftpKeyFileField, 1, false)
                 .addComponentFillVertically(new JBPanel<>(), 0)
                 .getPanel();
     }
@@ -75,6 +91,8 @@ public final class SettingsConfigurable implements Configurable {
         modified |= !testerNameField.getText().equals(settings.testerName);
         modified |= !testerRoleField.getText().equals(settings.testerRole);
         modified |= !downloadFolderField.getText().equals(settings.defaultDownloadFolder);
+        modified |= !sftpUserField.getText().equals(settings.sftpUser);
+        modified |= !sftpKeyFileField.getText().equals(settings.sftpKeyFile);
         return modified;
     }
 
@@ -93,6 +111,8 @@ public final class SettingsConfigurable implements Configurable {
         settings.testerName = testerNameField.getText();
         settings.testerRole = testerRoleField.getText();
         settings.defaultDownloadFolder = downloadFolderField.getText();
+        settings.sftpUser = sftpUserField.getText().trim();
+        settings.sftpKeyFile = sftpKeyFileField.getText().trim();
 
         Logger.setLogLevel(Level.valueOf(settings.logLevel));
 
@@ -127,6 +147,8 @@ public final class SettingsConfigurable implements Configurable {
         testerNameField.setText(settings.testerName);
         testerRoleField.setText(settings.testerRole);
         downloadFolderField.setText(settings.defaultDownloadFolder);
+        sftpUserField.setText(settings.sftpUser);
+        sftpKeyFileField.setText(settings.sftpKeyFile);
     }
 
 }

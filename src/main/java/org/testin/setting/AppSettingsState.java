@@ -36,6 +36,21 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
     public @NotNull String testerName = "";
     public @NotNull String testerRole = "";
 
+    /**
+     * The account this machine connects to a test project's server with (#94).
+     * <p>
+     * A machine setting and not a repository one: testin.yml is committed, so an
+     * account written there would be everybody's. Empty means the tester has not
+     * said, and the sync asks.
+     */
+    public @NotNull String sftpUser = "";
+
+    /**
+     * The private key file to offer that server, when no SSH agent is holding
+     * one. Empty means the agent, or a password, does the proving.
+     */
+    public @NotNull String sftpKeyFile = "";
+
     private static @NotNull String orEmpty(final @Nullable String value) {
         return Objects.requireNonNullElse(value, "");
     }
@@ -63,5 +78,7 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
         defaultDownloadFolder = orEmpty(defaultDownloadFolder);
         testerName = orEmpty(testerName);
         testerRole = orEmpty(testerRole);
+        sftpUser = orEmpty(sftpUser);
+        sftpKeyFile = orEmpty(sftpKeyFile);
     }
 }

@@ -258,6 +258,7 @@ public final class GitRefs {
                 || value.endsWith(".git");
     }
 
+
     public static @NotNull String localNameOf(final @NotNull String remoteBranchName) {
         return remoteBranchName.substring(remoteBranchName.indexOf('/') + 1);
     }

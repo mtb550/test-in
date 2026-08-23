@@ -93,7 +93,7 @@ final class TestinConfigLoader {
 
         try {
             final @NotNull TestinProjectConfig config = YAML.readValue(yaml, TestinProjectConfig.class);
-            Logger.info("Read " + source + ": test project '" + config.testinProject() + "'");
+            Logger.info("Read " + source + ": test project '" + config.projectName() + "'");
             return config;
 
         } catch (final Exception ex) {
