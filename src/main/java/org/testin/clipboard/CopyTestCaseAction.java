@@ -12,12 +12,12 @@ import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.ListValue;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class CopyTestCaseAction extends AbstractProjectAction {
@@ -31,20 +31,27 @@ public class CopyTestCaseAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        ListValue.selected(list).ifPresent(this::copyDetailsOf);
-    }
+        final @NotNull List<TestCaseDto> selected = list.getSelectedValuesList();
+        if (selected.isEmpty()) return;
 
-    private void copyDetailsOf(final @NotNull TestCaseDto tc) {
-        final @NotNull String text = Arrays.stream(TestEditorAttributes.values())
-                .filter(a -> a.can(Can.COPY))
-                .map(attr -> attr.getName2() + " " + attr.getTestValueExtractor().execute(tc, p))
-                .collect(Collectors.joining("\n"));
+        // One case per block, blank line between them, so a multi-case copy reads
+        // as separate details and not one run-on.
+        final @NotNull String text = selected.stream()
+                .map(this::detailsOf)
+                .collect(Collectors.joining("\n\n"));
 
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
 
         // Not just "Copied": the same list also offers Copy Node, which puts the
         // case itself on the clipboard rather than its readable details (#62).
-        Services.getInstance(p, Notifier.class).softShow(p, "Details copied");
+        Services.getInstance(p, Notifier.class).softShow(p, selected.size() == 1 ? "Details copied" : "Details copied " + selected.size());
+    }
+
+    private @NotNull String detailsOf(final @NotNull TestCaseDto tc) {
+        return Arrays.stream(TestEditorAttributes.values())
+                .filter(a -> a.can(Can.COPY))
+                .map(attr -> attr.getName2() + " " + attr.getTestValueExtractor().execute(tc, p))
+                .collect(Collectors.joining("\n"));
     }
 
     @Override

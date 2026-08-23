@@ -150,7 +150,6 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         list.setDropMode(DropMode.INSERT);
         list.setTransferHandler(new TransferListener(p, this));
         list.setCellRenderer(new TestListRenderer(p, this));
-        list.addKeyListener(new KeyListener(p, list));
 
         this.pageSize = PropertiesComponent.getInstance().getInt("testin.pageSize", 50);
 
