@@ -150,7 +150,7 @@ public final class ConflictResolution {
         final @NotNull List<Pending> pending = new ArrayList<>();
 
         for (final String relativePath : conflicting) {
-            if (!isTestCase(relativePath)) {
+            if (!TestCaseMerge.isTestCase(relativePath)) {
                 leftOver.add(relativePath);
                 continue;
             }
@@ -258,12 +258,4 @@ public final class ConflictResolution {
         return path.getFileName().toString();
     }
 
-    /**
-     * Whether the conflict is in a test case at all. A run's results and a
-     * marker are different shapes with different rules, and a file from outside
-     * the plugin is somebody else's business.
-     */
-    private static boolean isTestCase(final @NotNull String relativePath) {
-        return relativePath.endsWith(".json") && relativePath.contains("Test Cases/");
-    }
 }

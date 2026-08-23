@@ -14,6 +14,7 @@ import org.testin.util.Mapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * Writes test data to disk. Package-private, and in this package, so that the
@@ -61,6 +62,49 @@ final class FilesUtil {
             Files.write(path, jsonBytes);
         } catch (final IOException ex) {
             reportWriteFailure(p, path, ex);
+        }
+    }
+
+    /**
+     * Removes a file, and the folders it leaves empty behind it, up to but never
+     * including the project.
+     * <p>
+     * A sync that deletes the last case in a test set would otherwise leave the
+     * folder and its marker standing, so the tree keeps showing a set with
+     * nothing in it that nobody can explain. Stops at the project because an
+     * empty project is still a project - somebody made it deliberately.
+     */
+    void delete(final @NotNull Project p, final @NotNull Path path, final @NotNull Path stopAt) {
+        try {
+            Services.getInstance(OwnWrites.class).record(path);
+            Files.deleteIfExists(path);
+        } catch (final IOException ex) {
+            Services.getInstance(p, Notifier.class).error(p, "unable to remove: " + ex.getMessage());
+            Logger.error("unable to remove " + path + ": " + ex.getMessage());
+            return;
+        }
+
+        removeEmptyFolders(path.getParent(), stopAt);
+    }
+
+    /**
+     * Walks up from a removed file, dropping every folder it emptied.
+     * <p>
+     * A folder that will not be read is left standing rather than reported: the
+     * file the tester asked to remove is already gone, and a leftover empty
+     * folder is untidy where a failure notification about it would be alarming.
+     */
+    private void removeEmptyFolders(final @NotNull Path folder, final @NotNull Path stopAt) {
+        for (Path at = folder; at != null && at.startsWith(stopAt) && !at.equals(stopAt); at = at.getParent()) {
+            try (Stream<Path> inside = Files.list(at)) {
+                if (inside.findAny().isPresent()) return;
+
+                Services.getInstance(OwnWrites.class).record(at);
+                Files.deleteIfExists(at);
+            } catch (final IOException ex) {
+                Logger.warn("Left an empty folder behind at " + at + ": " + ex.getMessage());
+                return;
+            }
         }
     }
 

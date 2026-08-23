@@ -807,6 +807,25 @@ public final class ProjectIndexer {
         Logger.info("Wrote " + files.size() + " incoming files into " + projectPath);
     }
 
+    /**
+     * Removes files the server no longer holds, once the tester has agreed to
+     * it, and reads the project again.
+     * <p>
+     * The mirror of {@link #acceptIncoming}, and file-level for the same reason:
+     * a sync exchanges files rather than nodes, and the node those files add up
+     * to comes back from the scan. Going node by node would mean the sync
+     * knowing which of them is a case, a set or a run, which is the question the
+     * scan exists to answer.
+     */
+    public void removeIncoming(final @NotNull Path projectPath, final @NotNull Collection<String> relatives) {
+        final @NotNull FilesUtil files = Services.getInstance(p, FilesUtil.class);
+
+        relatives.forEach(relative -> files.delete(p, projectPath.resolve(relative), projectPath));
+        Logger.info("Removed " + relatives.size() + " files the server no longer holds from " + projectPath);
+
+        scanSingleProject(projectPath);
+    }
+
     public void scanSingleProject(final @NotNull Path projectPath) {
         Logger.info("Scanning single project: " + projectPath.getFileName());
         try {

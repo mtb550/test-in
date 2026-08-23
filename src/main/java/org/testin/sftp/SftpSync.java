@@ -1,6 +1,7 @@
 package org.testin.sftp;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
@@ -8,7 +9,9 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.git.TestCaseMerge;
 import org.testin.services.Services;
+import org.testin.setting.AppSettingsState;
 import org.testin.util.Mapper;
 
 import java.nio.charset.StandardCharsets;
@@ -16,6 +19,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -58,22 +62,43 @@ public final class SftpSync {
     /**
      * What one sync did, for the sentence the tester reads afterwards.
      *
-     * @param conflicts files both sides changed, and files one side deleted while
-     *                  the other changed them. Reported rather than guessed at -
-     *                  the merge that settles them field by field is
-     *                  {@code TestCaseMerge}, and wiring it in is its own step
+     * @param merged        files both sides changed that {@link TestCaseMerge}
+     *                      settled field by field, with nobody asked
+     * @param conflicts     what is left after that: cases where both testers
+     *                      rewrote the same field, and files that are not test
+     *                      cases at all, which have no fields to merge
+     * @param unsettled     the same cases, carrying the question to put to the
+     *                      tester and the merge so far
+     * @param blockedBy     why nothing ran, and empty when something did. A
+     *                      second tester syncing the same project at the same
+     *                      moment is told who has it rather than made to guess
      */
-    public record Outcome(int uploaded, int downloaded, int unchanged, int conflicts,
-                          @NotNull List<String> conflicting, @NotNull List<String> removedOnServer) {
+    public record Outcome(int uploaded, int downloaded, int unchanged, int merged, int conflicts,
+                          @NotNull List<String> conflicting, @NotNull List<String> removedOnServer,
+                          @NotNull List<Unsettled> unsettled, @NotNull String blockedBy) {
+
+        /**
+         * Nothing ran, because somebody else is syncing this project.
+         */
+        public static @NotNull Outcome blocked(final @NotNull String because) {
+            return new Outcome(0, 0, 0, 0, 0, List.of(), List.of(), List.of(), because);
+        }
+
+        public boolean isBlocked() {
+            return !blockedBy.isEmpty();
+        }
 
         public @NotNull String describe() {
-            if (uploaded == 0 && downloaded == 0 && conflicts == 0 && removedOnServer.isEmpty()) {
+            if (isBlocked()) return blockedBy;
+
+            if (uploaded == 0 && downloaded == 0 && merged == 0 && conflicts == 0 && removedOnServer.isEmpty()) {
                 return "Already up to date";
             }
 
             final @NotNull StringBuilder said = new StringBuilder();
             if (uploaded > 0) said.append("Sent ").append(uploaded);
             if (downloaded > 0) said.append(said.isEmpty() ? "Took " : ", took ").append(downloaded);
+            if (merged > 0) said.append(said.isEmpty() ? "Merged " : ", merged ").append(merged);
             if (conflicts > 0) said.append(said.isEmpty() ? "" : ", ").append(conflicts).append(" need you");
             if (!removedOnServer.isEmpty()) {
                 said.append(said.isEmpty() ? "" : ", ").append(removedOnServer.size()).append(" gone from the server");
@@ -102,54 +127,92 @@ public final class SftpSync {
         final @NotNull Baseline baseline = BaselineStore.read(mapper, baselineFile);
 
         try (SftpTransport transport = SftpTransport.open(address, user, auth, knownHosts)) {
-            indicator.setText("Asking the server what it has...");
-            final boolean serverKnowsThisProject = transport.exists(MANIFEST);
-            final @NotNull Manifest remote = readManifest(transport, mapper);
+            final @NotNull SyncLock lock = new SyncLock(transport);
 
-            // A server with no manifest has never heard of this project - which
-            // is not the same as a manifest saying a file is gone. Reading the
-            // first as the second turns an emptied server into thousands of
-            // deletions the tester never asked for, and no way out of them: the
-            // baseline keeps insisting the files were there. So when the server
-            // knows nothing, neither does the baseline, and everything here is
-            // simply sent.
-            final @NotNull Baseline against = serverKnowsThisProject ? baseline : Baseline.EMPTY;
-            if (!serverKnowsThisProject && !baseline.contents().isEmpty()) {
-                Logger.info("The server has no record of " + address.path() + ", so this is a first sync");
+            // Before anything is read, because what this protects is the record
+            // rather than the transfer: two syncs reading one manifest both
+            // write it back, and the second one's describes a server it never
+            // looked at.
+            final @NotNull Optional<String> heldBy =
+                    lock.takenBy(Services.getInstance(AppSettingsState.class).testerName);
+            if (heldBy.isPresent()) return Outcome.blocked(heldBy.get());
+
+            try {
+                return inside(p, projectRoot, address, indicator, transport, indexer, mapper, baselineFile, local, baseline);
+            } finally {
+                lock.release();
             }
-
-            final @NotNull Plan plan = decide(Manifest.of(local), remote, against.manifest());
-
-            // Two records, kept apart on purpose. The manifest says what the
-            // server holds, so it starts from what the server already held and
-            // changes only where something was actually sent or removed. The
-            // baseline says what both sides agreed, so a file that could not be
-            // settled keeps its old entry - and is therefore still unsettled
-            // next time, instead of one side quietly winning.
-            // Seeded without Git's own files, so entries an earlier build wrote
-            // are dropped rather than carried forward - the next sync cleans up
-            // after this one without anybody deleting anything by hand.
-            final @NotNull Map<String, Manifest.Entry> onServer = withoutGit(remote.entries());
-            final @NotNull Map<String, String> agreed = withoutGit(against.contents());
-            final @NotNull Map<String, byte[]> incoming = new TreeMap<>();
-
-            transfer(transport, indicator, plan, local, onServer, agreed, incoming);
-
-            if (!incoming.isEmpty()) {
-                indicator.setText("Writing " + incoming.size() + " files from the server...");
-                indexer.acceptIncoming(projectRoot, incoming);
-            }
-
-            indicator.setText("Recording what both sides now hold...");
-            writeManifest(transport, mapper, new Manifest(onServer));
-            BaselineStore.write(mapper, baselineFile, new Baseline(agreed));
-
-            final @NotNull Outcome outcome = plan.outcome();
-            Logger.info("Synced " + projectRoot.getFileName() + " with " + address.display() + ": "
-                    + outcome.describe());
-
-            return outcome;
         }
+    }
+
+    /**
+     * Everything one sync does while it holds the lock.
+     * <p>
+     * Split out so the lock is taken and given back in one place, in a finally
+     * that no early return can slip past - a lock left behind blocks every
+     * tester on the team until somebody deletes a hidden folder over SSH.
+     */
+    private static @NotNull Outcome inside(final @NotNull Project p, final @NotNull Path projectRoot,
+                                           final @NotNull SftpAddress address,
+                                           final @NotNull ProgressIndicator indicator,
+                                           final @NotNull SftpTransport transport,
+                                           final @NotNull ProjectIndexer indexer, final @NotNull Mapper mapper,
+                                           final @NotNull Path baselineFile,
+                                           final @NotNull Map<String, byte[]> local,
+                                           final @NotNull Baseline baseline) {
+        indicator.setText("Asking the server what it has...");
+        final boolean serverKnowsThisProject = transport.exists(MANIFEST);
+        final @NotNull Manifest remote = readManifest(transport, mapper);
+
+        // A server with no manifest has never heard of this project - which
+        // is not the same as a manifest saying a file is gone. Reading the
+        // first as the second turns an emptied server into thousands of
+        // deletions the tester never asked for, and no way out of them: the
+        // baseline keeps insisting the files were there. So when the server
+        // knows nothing, neither does the baseline, and everything here is
+        // simply sent.
+        final @NotNull Baseline against = serverKnowsThisProject ? baseline : Baseline.EMPTY;
+        if (!serverKnowsThisProject && !baseline.contents().isEmpty()) {
+            Logger.info("The server has no record of " + address.path() + ", so this is a first sync");
+        }
+
+        final @NotNull Plan plan = decide(Manifest.of(local), remote, against.manifest());
+
+        // Two records, kept apart on purpose. The manifest says what the
+        // server holds, so it starts from what the server already held and
+        // changes only where something was actually sent or removed. The
+        // baseline says what both sides agreed, so a file that could not be
+        // settled keeps its old entry - and is therefore still unsettled
+        // next time, instead of one side quietly winning.
+        // Seeded without Git's own files, so entries an earlier build wrote
+        // are dropped rather than carried forward - the next sync cleans up
+        // after this one without anybody deleting anything by hand.
+        final @NotNull Map<String, Manifest.Entry> onServer = withoutGit(remote.entries());
+        final @NotNull Map<String, String> agreed = withoutGit(against.contents());
+        final @NotNull Map<String, byte[]> incoming = new TreeMap<>();
+
+        transfer(transport, indicator, plan, local, onServer, agreed, incoming);
+
+        // After the transfer, so a case both sides changed is settled
+        // against what the server actually holds rather than against what
+        // it held before this sync moved anything.
+        final @NotNull List<Unsettled> unsettled =
+                settle(transport, mapper, indicator, plan, local, onServer, agreed, incoming);
+
+        if (!incoming.isEmpty()) {
+            indicator.setText("Writing " + incoming.size() + " files from the server...");
+            indexer.acceptIncoming(projectRoot, incoming);
+        }
+
+        indicator.setText("Recording what both sides now hold...");
+        writeManifest(transport, mapper, new Manifest(onServer));
+        BaselineStore.write(mapper, baselineFile, new Baseline(agreed));
+
+        final @NotNull Outcome outcome = plan.outcome(unsettled);
+        Logger.info("Synced " + projectRoot.getFileName() + " with " + address.display() + ": "
+                + outcome.describe());
+
+        return outcome;
     }
 
     /**
@@ -210,6 +273,166 @@ public final class SftpSync {
         // work this tester was asked about and never answered.
     }
 
+
+
+    /**
+     * Puts the cases a tester answered onto both sides, and records that they
+     * now agree (#94).
+     * <p>
+     * Its own pass rather than part of the sync that raised the questions,
+     * because that sync runs on a background thread and the questions are a
+     * dialog. Blocking a background task on the tester is how an IDE freezes;
+     * asking afterward costs one more connection on the rarest path there is.
+     * <p>
+     * Both sides and the record, in that order and all three: writing only this
+     * machine's copy would leave the case unsettled on the server and ask the
+     * same question again on the next sync, forever.
+     */
+    public static void finish(final @NotNull Project p, final @NotNull Path projectRoot,
+                              final @NotNull SftpAddress address, final @NotNull String user,
+                              final @NotNull SftpAuth auth, final @NotNull Path knownHosts,
+                              final @NotNull Map<String, String> answered) {
+        if (answered.isEmpty()) return;
+
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
+        final @NotNull Path baselineFile = BaselineStore.fileFor(projectRoot);
+
+        try (SftpTransport transport = SftpTransport.open(address, user, auth, knownHosts)) {
+            final @NotNull SyncLock lock = new SyncLock(transport);
+            if (lock.takenBy(Services.getInstance(AppSettingsState.class).testerName).isPresent()) {
+                Logger.warn("Somebody else is syncing " + address.path() + ", so the answers were not sent");
+                return;
+            }
+
+            try {
+                final @NotNull Map<String, Manifest.Entry> onServer =
+                        new TreeMap<>(readManifest(transport, mapper).entries());
+                final @NotNull Map<String, String> agreed =
+                        new TreeMap<>(BaselineStore.read(mapper, baselineFile).contents());
+                final @NotNull Map<String, byte[]> incoming = new TreeMap<>();
+
+                answered.forEach((path, settled) -> {
+                    final byte @NotNull [] content = settled.getBytes(StandardCharsets.UTF_8);
+
+                    transport.write(path, content);
+                    incoming.put(path, content);
+                    onServer.put(path, Manifest.Entry.of(content));
+                    agreed.put(path, settled);
+                });
+
+                indexer.acceptIncoming(projectRoot, incoming);
+                writeManifest(transport, mapper, new Manifest(onServer));
+                BaselineStore.write(mapper, baselineFile, new Baseline(agreed));
+
+                Logger.info("Settled " + answered.size() + " test cases on both sides of " + address.display());
+            } finally {
+                lock.release();
+            }
+        }
+    }
+
+    /**
+     * Settles what it can of the files both sides changed, and hands back the
+     * rest as questions (#94).
+     * <p>
+     * A test case is JSON with named fields, so two testers editing different
+     * ones is not a conflict at all - it only looked like one because the sync
+     * compares whole files. {@link TestCaseMerge} is the same three-way merge
+     * the Git channel uses, on the same three versions: what both sides last
+     * agreed, what this machine holds, and what the server holds. Being the same
+     * one matters more than being here at all - a team whose test cases merge
+     * one way over Git and another way over SSH has two answers to one question.
+     * <p>
+     * A settled case is written to both sides at once and recorded as agreed, so
+     * the next sync sees nothing to do. An unsettled one is left exactly as it
+     * was on both sides: nothing is sent, nothing is fetched, and the baseline
+     * keeps its old entry, so the case is still unsettled next time rather than
+     * one side having quietly won.
+     * <p>
+     * Anything that is not a test case stays a conflict. A marker or a run has no
+     * fields to merge, and which of two versions a team meant is not a question
+     * about bytes.
+     */
+    private static @NotNull List<Unsettled> settle(final @NotNull SftpTransport transport,
+                                                   final @NotNull Mapper mapper,
+                                                   final @NotNull ProgressIndicator indicator,
+                                                   final @NotNull Plan plan,
+                                                   final @NotNull Map<String, byte[]> local,
+                                                   final @NotNull Map<String, Manifest.Entry> onServer,
+                                                   final @NotNull Map<String, String> agreed,
+                                                   final @NotNull Map<String, byte[]> incoming) {
+        final @NotNull List<Unsettled> unsettled = new ArrayList<>();
+        final @NotNull List<String> mergeable = plan.conflicting.stream()
+                .filter(TestCaseMerge::isTestCase)
+                .toList();
+
+        if (mergeable.isEmpty()) return List.of();
+
+        indicator.setText("Merging " + mergeable.size() + " changed on both sides...");
+
+        for (final String path : mergeable) {
+            indicator.setText2(path);
+
+            final @NotNull String base = agreed.getOrDefault(path, "");
+            final @NotNull String mine = text(local.getOrDefault(path, new byte[0]));
+            final @NotNull String theirs = text(transport.read(path));
+
+            // One side deleted the case and the other edited it. Which of those
+            // a team meant is not a field question, so it stays with the tester.
+            if (mine.isBlank() || theirs.isBlank()) continue;
+
+            final @NotNull TestCaseMerge.Merge merge = TestCaseMerge.of(mapper, base, mine, theirs);
+
+            if (!merge.isSettled()) {
+                unsettled.add(new Unsettled(path, name(mapper, mine, path), merge.merged(),
+                        merge.questions(), theirs));
+                continue;
+            }
+
+            keep(transport, mapper, merge.merged(), path, onServer, agreed, incoming);
+            plan.settled.add(path);
+        }
+
+        plan.conflicting.removeAll(plan.settled);
+
+        return List.copyOf(unsettled);
+    }
+
+    /**
+     * Writes one merged case to both sides and records that they now agree.
+     * <p>
+     * The same bytes to the server and into this machine's copy, from the one
+     * serialization: writing each side from its own would let the two differ by
+     * a space and conflict again on the next sync forever.
+     */
+    private static void keep(final @NotNull SftpTransport transport, final @NotNull Mapper mapper,
+                             final @NotNull ObjectNode merged, final @NotNull String path,
+                             final @NotNull Map<String, Manifest.Entry> onServer,
+                             final @NotNull Map<String, String> agreed,
+                             final @NotNull Map<String, byte[]> incoming) {
+        final @NotNull String settled = mapper.writeValueAsString(merged);
+        final byte @NotNull [] content = settled.getBytes(StandardCharsets.UTF_8);
+
+        transport.write(path, content);
+        incoming.put(path, content);
+        onServer.put(path, Manifest.Entry.of(content));
+        agreed.put(path, settled);
+    }
+
+    /**
+     * What the case is called, for the dialog title - its description, and its
+     * file name when the description is blank or the side being read will not
+     * parse.
+     */
+    private static @NotNull String name(final @NotNull Mapper mapper, final @NotNull String json,
+                                        final @NotNull String path) {
+        final @NotNull String description = mapper.readTree(json).path("description").asText("");
+        if (!description.isBlank()) return description;
+
+        return Path.of(path).getFileName().toString();
+    }
+
     /**
      * The same map without anything belonging to Git.
      */
@@ -238,7 +461,7 @@ public final class SftpSync {
      */
     static @NotNull Outcome wouldDo(final @NotNull Manifest local, final @NotNull Manifest remote,
                                     final @NotNull Manifest base) {
-        return decide(local, remote, base).outcome();
+        return decide(local, remote, base).outcome(List.of());
     }
 
     /**
@@ -301,6 +524,13 @@ public final class SftpSync {
         private final @NotNull List<String> conflicting = new ArrayList<>();
         private final @NotNull List<String> removedOnServer = new ArrayList<>();
 
+        /**
+         * The ones the field merge finished, which are no longer conflicts and
+         * are counted as their own outcome - a tester who is told "merged 3"
+         * knows something happened that they did not have to do.
+         */
+        private final @NotNull List<String> settled = new ArrayList<>();
+
         private void add(final @NotNull String path, final @NotNull TransferAction action) {
             switch (action) {
                 case UPLOAD -> toUpload.add(path);
@@ -316,9 +546,10 @@ public final class SftpSync {
             }
         }
 
-        private @NotNull Outcome outcome() {
-            return new Outcome(toUpload.size(), toDownload.size(), unchangedPaths.size(),
-                    conflicting.size(), List.copyOf(conflicting), List.copyOf(removedOnServer));
+        private @NotNull Outcome outcome(final @NotNull List<Unsettled> unsettled) {
+            return new Outcome(toUpload.size(), toDownload.size(), unchangedPaths.size(), settled.size(),
+                    conflicting.size(), List.copyOf(conflicting), List.copyOf(removedOnServer),
+                    unsettled, "");
         }
     }
 }

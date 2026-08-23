@@ -139,6 +139,25 @@ public final class SftpTransport implements AutoCloseable {
         }
     }
 
+    /**
+     * Removes a directory, and says nothing when there was none.
+     * <p>
+     * Only ever an empty one: this exists to release the sync lock, and a lock
+     * folder holding anything but its own holder file is a lock somebody else is
+     * still inside. Its contents are removed first, by the caller that put them
+     * there.
+     */
+    public void removeDirectory(final @NotNull String relative) {
+        final @NotNull String path = address.resolve(relative);
+
+        try {
+            sftp.rmdir(path);
+        } catch (final SftpException ex) {
+            if (ex.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) return;
+            throw failed("remove the directory " + path, ex);
+        }
+    }
+
     public boolean exists(final @NotNull String relative) {
         try {
             sftp.stat(address.resolve(relative));
@@ -156,8 +175,17 @@ public final class SftpTransport implements AutoCloseable {
      * syncing at the same moment cannot both be told they made it.
      */
     public boolean makeDirectory(final @NotNull String relative) {
+        final @NotNull String path = address.resolve(relative);
+
+        // The folders above it first, and only them: the atomicity this relies
+        // on is in creating the last one. Without this a project the server has
+        // never held could not be locked - mkdir refuses when the parent is not
+        // there, which reads as "somebody else has it", so the very first sync
+        // of a project would refuse itself.
+        makeParentsOf(path);
+
         try {
-            sftp.mkdir(address.resolve(relative));
+            sftp.mkdir(path);
             return true;
         } catch (final SftpException ex) {
             return false;

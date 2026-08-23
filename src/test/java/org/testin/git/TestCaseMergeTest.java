@@ -184,4 +184,28 @@ public class TestCaseMergeTest {
         assertTrue(merge.isSettled());
         assertEquals(merge.merged().get("description").asText(), "mine");
     }
+
+    /**
+     * Which files this merge can be asked about at all.
+     * <p>
+     * Both channels ask it now - the Git rebase and the server sync - and that
+     * is why it lives here rather than in each of them. Two spellings of the
+     * question would mean one channel merging a file the other refused, and a
+     * team meeting the difference on the day it costs the most.
+     */
+    @Test
+    public void aTestCaseIsWhatThisCanMerge() {
+        assertTrue(TestCaseMerge.isTestCase("Test Cases/Login/6197ec6e.json"));
+        assertTrue(TestCaseMerge.isTestCase("Test Cases\\Login\\6197ec6e.json"),
+                "Git names paths with slashes and Windows names them with backslashes");
+    }
+
+    @Test
+    public void aMarkerARunOrAnythingElseIsNot() {
+        assertFalse(TestCaseMerge.isTestCase("Test Cases/Login/.ts"), "a marker has no named fields to merge");
+        assertFalse(TestCaseMerge.isTestCase(".tp"));
+        assertFalse(TestCaseMerge.isTestCase("Test Runs/Cycle 1/Cycle 1.json"),
+                "a run records what happened; it is not something two people edit into one");
+        assertFalse(TestCaseMerge.isTestCase("Test Cases/Login/notes.txt"));
+    }
 }

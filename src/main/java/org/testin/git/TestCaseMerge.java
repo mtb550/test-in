@@ -98,6 +98,24 @@ public final class TestCaseMerge {
      * @param mine   this machine's version
      * @param theirs the version the pull brought
      */
+    /**
+     * Whether this file is something this class can merge at all.
+     * <p>
+     * Only a test case is: it is JSON with named fields, so two testers editing
+     * different ones is not a conflict. A marker or a run is settled another
+     * way, and anything else is not test data.
+     * <p>
+     * Here rather than in the channels, because both of them - the Git rebase
+     * and the server sync - have to ask exactly the question this class can
+     * answer, and two spellings of it would mean one channel merging a file the
+     * other refused.
+     */
+    public static boolean isTestCase(final @NotNull String relativePath) {
+        final @NotNull String slashed = relativePath.replace('\\', '/');
+
+        return slashed.endsWith(".json") && slashed.contains("Test Cases/");
+    }
+
     public static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String base,
                                     final @NotNull String mine, final @NotNull String theirs) {
         final @NotNull ObjectNode baseNode = mapper.readTree(base);

@@ -17,10 +17,17 @@ import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
+import org.testin.git.ResolveConflictDialog;
+import org.testin.git.TestCaseMerge;
 import org.testin.services.Services;
+import org.testin.ui.framework.ConfirmDialog;
+import org.testin.util.Mapper;
 import org.testin.setting.AppSettingsState;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.Optional;
 
 /**
@@ -143,11 +150,18 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
                     final @NotNull SftpSync.Outcome outcome = SftpSync.run(
                             p, projectRoot, address, account.user(), auth, knownHosts(), indicator);
 
+                    // Nothing moved and nothing to reread: somebody else is
+                    // syncing this project, and the tester is told who.
+                    if (outcome.isBlocked()) {
+                        report(outcome, projectRoot, address, account, auth);
+                        return;
+                    }
+
                     indicator.setText("Rereading the project...");
                     Services.getInstance(p, ProjectIndexer.class).refreshDirectory(projectRoot);
                     Services.getInstance(p, ProjectIndexer.class).scanSingleProject(projectRoot);
 
-                    report(outcome);
+                    report(outcome, projectRoot, address, account, auth);
                 } catch (final Exception ex) {
                     Logger.error("Sync with " + address.display() + " failed: " + ex.getMessage());
                     ApplicationManager.getApplication().invokeLater(() ->
@@ -173,7 +187,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
         // than on the one after.
         if (!account.password().isEmpty()) return SftpAuth.withPassword(account.password());
 
-        final @NotNull java.util.Optional<SftpAuth> agent = SshAgent.loadedIdentities().map(SftpAuth::withAgent);
+        final @NotNull Optional<SftpAuth> agent = SshAgent.loadedIdentities().map(SftpAuth::withAgent);
         if (agent.isPresent()) return agent.orElseThrow();
 
         final @NotNull String stored = SftpSecret.ACCOUNT_PASSWORD.read(address, account.user());
@@ -206,28 +220,113 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
         return Path.of(System.getProperty("user.home", ""), ".ssh", "known_hosts");
     }
 
-    private void report(final @NotNull SftpSync.Outcome outcome) {
+    private void report(final @NotNull SftpSync.Outcome outcome, final @NotNull Path projectRoot,
+                        final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account,
+                        final @NotNull SftpAuth auth) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            pp.getProjectTree().refresh();
-
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-            if (outcome.conflicts() == 0 && outcome.removedOnServer().isEmpty()) {
-                notifier.softShow(p, "Synced", outcome.describe());
+
+            if (outcome.isBlocked()) {
+                notifier.warn(p, "Somebody else is syncing this project", outcome.blockedBy()
+                        + " Nothing was sent or fetched. Try again when they have finished.");
                 return;
             }
 
-            if (!outcome.conflicting().isEmpty()) {
+            pp.getProjectTree().refresh();
+
+            if (outcome.conflicts() == 0 && outcome.removedOnServer().isEmpty()) {
+                notifier.softShow(p, "Synced", outcome.describe());
+            } else if (!outcome.conflicting().isEmpty()) {
                 notifier.warn(p, "Synced, with " + outcome.conflicts() + " left to you",
                         "Both sides changed " + naming(outcome.conflicting())
-                                + ". This machine's copies were kept, and nothing was sent for them.");
+                                + ", and they are not test cases, so there are no fields to merge. "
+                                + "This machine kept its copies, and nothing was sent for them.");
             }
 
-            if (!outcome.removedOnServer().isEmpty()) {
-                notifier.warn(p, outcome.removedOnServer().size() + " gone from the server",
-                        naming(outcome.removedOnServer()) + " were removed there and are still here. "
-                                + "Nothing was deleted on this machine - delete them here to agree, "
-                                + "or sync again after putting them back.");
+            askAboutDeletions(outcome, projectRoot);
+            askAboutConflicts(outcome.unsettled(), projectRoot, address, account, auth, new TreeMap<>());
+        });
+    }
+
+    /**
+     * Offers to remove what the server no longer holds.
+     * <p>
+     * Asked rather than done, because a deletion is the one thing a sync cannot
+     * take back: the file is gone from both sides and there is no third copy.
+     * The count is in the question, because 3 files and 1,204 files deserve very
+     * different amounts of thought.
+     */
+    private void askAboutDeletions(final @NotNull SftpSync.Outcome outcome, final @NotNull Path projectRoot) {
+        if (outcome.removedOnServer().isEmpty()) return;
+
+        final int count = outcome.removedOnServer().size();
+        final @NotNull String what = count == 1 ? "1 file" : count + " files";
+
+        new ConfirmDialog(p, "Removed On The Server",
+                what + " here were deleted on the server by somebody else, and this machine has not "
+                        + "touched them since: " + naming(outcome.removedOnServer())
+                        + ". Removing them here agrees with that. Keeping them sends them back on the next sync.",
+                "", "", "Remove " + what,
+                () -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                    Services.getInstance(p, ProjectIndexer.class)
+                            .removeIncoming(projectRoot, outcome.removedOnServer());
+
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        pp.getProjectTree().refresh();
+                        Services.getInstance(p, Notifier.class).softShow(p, "Removed " + count);
+                    });
+                })).show();
+    }
+
+    /**
+     * Puts one case both testers rewrote in front of the tester, then the next,
+     * and sends the answers when there are no more.
+     * <p>
+     * One at a time, because each answer is a choice between two versions of a
+     * sentence somebody wrote, and a dialog holding six of those is a dialog
+     * nobody reads. The same dialog the Git channel opens, on the same merge, so
+     * a conflict looks the same however the team shares their work.
+     */
+    private void askAboutConflicts(final @NotNull List<Unsettled> unsettled, final @NotNull Path projectRoot,
+                                   final @NotNull SftpAddress address,
+                                   final @NotNull SftpAccountDialog.Account account,
+                                   final @NotNull SftpAuth auth,
+                                   final @NotNull Map<String, String> answered) {
+        if (unsettled.isEmpty()) {
+            send(answered, projectRoot, address, account, auth);
+            return;
+        }
+
+        final @NotNull Unsettled next = unsettled.getFirst();
+        final @NotNull List<Unsettled> rest = List.copyOf(unsettled.subList(1, unsettled.size()));
+        final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
+
+        new ResolveConflictDialog(p, next.name(), next.questions(), takeTheirs -> {
+            for (final TestCaseMerge.Question question : next.questions()) {
+                TestCaseMerge.answer(mapper, next.merged(), question, takeTheirs.contains(question.field()),
+                        next.theirs());
             }
+
+            answered.put(next.path(), mapper.writeValueAsString(next.merged()));
+            askAboutConflicts(rest, projectRoot, address, account, auth, answered);
+        }).show();
+    }
+
+    /**
+     * Sends what the tester settled, off the EDT - it opens a connection.
+     */
+    private void send(final @NotNull Map<String, String> answered, final @NotNull Path projectRoot,
+                      final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account,
+                      final @NotNull SftpAuth auth) {
+        if (answered.isEmpty()) return;
+
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            SftpSync.finish(p, projectRoot, address, account.user(), auth, knownHosts(), answered);
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                pp.getProjectTree().refresh();
+                Services.getInstance(p, Notifier.class).softShow(p, "Settled " + answered.size());
+            });
         });
     }
 
@@ -237,7 +336,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
      * Named because "2,249 files" sends a tester looking through a tree for
      * something the plugin already knows the name of.
      */
-    private static @NotNull String naming(final @NotNull java.util.List<String> paths) {
+    private static @NotNull String naming(final @NotNull List<String> paths) {
         final @NotNull String first = String.join(", ", paths.stream().limit(3).toList());
 
         return paths.size() > 3 ? first + " and " + (paths.size() - 3) + " more" : first;
