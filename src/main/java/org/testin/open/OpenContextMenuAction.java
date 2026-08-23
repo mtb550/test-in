@@ -3,6 +3,7 @@ package org.testin.open;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.tree.TreeValueUtil;
@@ -46,6 +47,10 @@ public class OpenContextMenuAction extends DumbAwareAction {
         this(list, cm, () -> selectedCell(list));
     }
 
+    public OpenContextMenuAction(final @NotNull JBTable table, final @NotNull DefaultActionGroup cm) {
+        this(table, cm, () -> selectedCell(table));
+    }
+
     private OpenContextMenuAction(final @NotNull JComponent owner, final @NotNull DefaultActionGroup cm,
                                   final @NotNull Supplier<Optional<Point>> anchor) {
         super("Show Context Menu");
@@ -73,6 +78,22 @@ public class OpenContextMenuAction extends DumbAwareAction {
 
         return Optional.ofNullable(tree.getRowBounds(rows[0]))
                 .map(bounds -> new Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2));
+    }
+
+    /**
+     * The same for a grid, where the selection is a cell rather than a row.
+     * <p>
+     * Anchored on the cell the tester is actually in, so the menu opens where
+     * they are looking - a grid can be scrolled sideways, and the first column
+     * is often off screen.
+     */
+    private static @NotNull Optional<Point> selectedCell(final @NotNull JBTable table) {
+        final int row = table.getSelectedRow();
+        final int column = table.getSelectedColumn();
+        if (row < 0 || column < 0) return Optional.empty();
+
+        final @NotNull Rectangle cell = table.getCellRect(row, column, true);
+        return Optional.of(new Point(cell.x + cell.width / 4, cell.y + cell.height / 2));
     }
 
     /**

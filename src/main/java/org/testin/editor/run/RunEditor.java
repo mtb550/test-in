@@ -20,6 +20,8 @@ import org.testin.editor.grid.GridView;
 import org.testin.editor.list.ListView;
 import org.testin.editor.listeners.GridContextMenuListener;
 import org.testin.editor.listeners.GridSelectionListener;
+import org.testin.editor.listeners.RunGridEditListener;
+import org.testin.open.OpenContextMenuAction;
 import org.testin.editor.listeners.RunListRenderer;
 import org.testin.editor.listeners.StatusBarListener;
 import org.testin.editor.statusbar.StatusBar;
@@ -513,13 +515,20 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             final @NotNull Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin.runEditor.gridFontSync");
             FontSync.syncWithNativeEditor(p, table, fontSync);
 
-            table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, pageItems));
+            table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, list, pageItems));
+            // Typing into the Actual Result cell writes it to the run (#74).
+            table.getModel().addTableModelListener(
+                    new RunGridEditListener(p, this, pageItems, model::allContentsChanged));
             // ESC in grid view behaves like ESC in the list: hide the view panel, then clear the selection.
             new EscapeAction(p, table);
             // ENTER on the non-editable sequence column opens the details view.
             new GridViewDetailsAction(p, table, pageItems, parent.getPath2()).installDoubleClick();
 
             table.addMouseListener(new GridContextMenuListener(table, list, contextMenu, pageItems));
+            // Every shortcut the menu offers - the verdict keys above all -
+            // live on the grid too, and quiet while a cell is open (#74).
+            contextMenu.bindShortcutsTo(table);
+            new OpenContextMenuAction(table, contextMenu);
             GridPanelBuilder.restoreSelection(table, list, pageItems, gridColumnToRestore);
 
             // Cleared regardless of whether the row was found, so a stale column can never

@@ -361,8 +361,10 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        // Nothing in a run grid is editable yet; #74 is where that changes.
-        final @NotNull JBTable table = buildTable(columns, rows, column -> false, "run");
+        // Which columns can be typed into is the attribute's own declaration, the
+        // same way the test grid asks its attributes (#74).
+        final @NotNull JBTable table = buildTable(columns, rows,
+                column -> RunEditorAttributes.values()[column].isEdited(), "run");
         applyColumnVisibility(table, RunEditorAttributes.class, attributes);
         return table;
     }

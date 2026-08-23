@@ -46,8 +46,15 @@ public class GridContextMenuListener extends MouseAdapter {
         final int column = table.columnAtPoint(e.getPoint());
         if (row < 0 || row >= pageItems.size() || column < 0) return;
 
-        table.changeSelection(row, column, false, false);
-        list.setSelectedIndex(row);
+        // Right-clicking inside a selection acts on the selection. Moving it to
+        // the clicked row would silently drop the other seven rows the tester
+        // had chosen, and the menu would then fail one case where it said eight
+        // (#74). Outside it, the click chooses the row, as a click does.
+        if (!table.isRowSelected(row)) {
+            table.changeSelection(row, column, false, false);
+            list.setSelectedIndex(row);
+        }
+
         ActionManager.getInstance()
                 .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, contextMenu)
                 .getComponent().show(e.getComponent(), e.getX(), e.getY());

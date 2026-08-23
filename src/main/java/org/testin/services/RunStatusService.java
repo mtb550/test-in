@@ -21,6 +21,8 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.setting.AppSettingsState;
+import org.testin.ui.framework.ConfirmDialog;
+import org.testin.util.Display;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -98,6 +100,56 @@ public final class RunStatusService {
         final @NotNull List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
+        final @NotNull List<String> losing = wouldBeErased(editor, selectedItems, status);
+        if (losing.isEmpty()) {
+            record(p, ui, list, status, editor, selectedItems);
+            return;
+        }
+
+        new ConfirmDialog(p, status.getLabel(), erasureWarning(losing, selectedItems.size()), "", "",
+                status.getLabel(), () -> record(p, ui, list, status, editor, selectedItems)).show();
+    }
+
+    /**
+     * Everything the selection holds that this verdict would erase, named once
+     * each however many rows carry it.
+     * <p>
+     * Asked of the whole selection rather than row by row, because the tester is
+     * answering one question about one gesture: eight rows failing eight
+     * different ways is still "you typed things here and they are about to go".
+     */
+    private @NotNull List<String> wouldBeErased(final @NotNull RunEditor editor,
+                                                final @NotNull List<TestCaseDto> selected,
+                                                final @NotNull TestStatus status) {
+        return selected.stream()
+                .map(tc -> editor.runItem(tc.getId()))
+                .flatMap(Optional::stream)
+                .filter(item -> !item.isRemoved())
+                .flatMap(item -> item.wouldClear(status).stream())
+                .distinct()
+                .toList();
+    }
+
+    /**
+     * The sentence the tester reads before a verdict throws work away. Written
+     * about what they typed rather than about fields: "the actual result", not
+     * "actualResult will be reset".
+     */
+    private @NotNull String erasureWarning(final @NotNull List<String> losing, final int rows) {
+        final @NotNull String where = rows == 1 ? "this case" : "these " + rows + " cases";
+
+        return "Passing " + where + " clears " + Display.andJoin(losing)
+                + ", because a case that passed has nothing to explain. "
+                + "There is no copy of it anywhere else.";
+    }
+
+    /**
+     * What {@link #applyStatus} does once the tester has nothing left to lose by
+     * it - either because the verdict erases nothing, or because they said so.
+     */
+    private void record(final @NotNull Project p, final @NotNull TestinEditor ui,
+                        final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status,
+                        final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
         if (selectedItems.size() == 1) {
             final @NotNull TestCaseDto tc = selectedItems.getFirst();
             if (editor.runItem(tc.getId()).filter(TestRunItems::isRemoved).isPresent()) {

@@ -13,6 +13,7 @@ import org.testin.model.dto.TestCaseDto;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -104,16 +105,34 @@ public class TestRunItems {
      * by whichever path applies the status.
      */
     public void recordVerdict(final @NotNull TestStatus next, final @NotNull String tester) {
-        if (next == TestStatus.PASSED) {
-            bugSeverity = BugSeverity.EMPTY;
-            bugPriority = BugPriority.EMPTY;
-            actualResult = "";
-            stacktrace = "";
-        }
+        if (clears(next)) FailureDetail.clearAll(this);
 
         status = next;
         executedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         executedBy = tester;
+    }
+
+    /**
+     * Whether this verdict erases what a failure recorded. Passing does; the
+     * other two do not, because a case that is blocked or failing still has
+     * something to explain.
+     */
+    private static boolean clears(final @NotNull TestStatus next) {
+        return next == TestStatus.PASSED;
+    }
+
+    /**
+     * What recording this verdict would erase, in the tester's words, and empty
+     * when it would erase nothing (#74).
+     * <p>
+     * Invisible until the run grid could be typed into: a tester writes a
+     * paragraph into the Actual Result cell, presses P, and watches it vanish.
+     * So the verdict asks first, and asking means knowing what is at stake -
+     * which is this, and which is the same list {@link #recordVerdict} clears,
+     * declared once in {@link FailureDetail}.
+     */
+    public @NotNull List<String> wouldClear(final @NotNull TestStatus next) {
+        return clears(next) ? FailureDetail.filledIn(this) : List.of();
     }
 
     /**

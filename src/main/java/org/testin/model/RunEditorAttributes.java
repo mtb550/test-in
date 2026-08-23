@@ -1,7 +1,6 @@
 package org.testin.model;
 
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
@@ -16,7 +15,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
-@AllArgsConstructor
 public enum RunEditorAttributes implements ToolBarAttribute {
 
     /**
@@ -81,10 +79,19 @@ public enum RunEditorAttributes implements ToolBarAttribute {
         }
     },
 
+    /**
+     * The one column of a run grid a tester types into (#74).
+     * <p>
+     * Everything else on a row is either the test case's, which the run does not
+     * own, or a verdict, which is set by its own key and clears the fields that
+     * explain a failure as it goes. Typing a status into a cell would be a
+     * fourth way to record one.
+     */
     ACTUAL_RESULT(
             "Actual Result",
             ToolBarDefault.ON,
-            (item, p) -> item.getActualResult()
+            (item, p) -> item.getActualResult(),
+            (item, typed) -> item.setActualResult(typed)
     ),
 
     BUG_SEVERITY(
@@ -153,6 +160,38 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     private final @NotNull String name;
     private final @NotNull ToolBarDefault toolBarDefault;
     private final @NotNull ValueExtractor<TestRunItems> runValueExtractor;
+
+    /**
+     * What typing into this column does. {@link RunValueSetter#NONE} for every
+     * column that is only read.
+     */
+    private final @NotNull RunValueSetter runValueSetter;
+
+    RunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault,
+                        final @NotNull ValueExtractor<TestRunItems> runValueExtractor) {
+        this(name, toolBarDefault, runValueExtractor, RunValueSetter.NONE);
+    }
+
+    RunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault,
+                        final @NotNull ValueExtractor<TestRunItems> runValueExtractor,
+                        final @NotNull RunValueSetter runValueSetter) {
+        this.name = name;
+        this.toolBarDefault = toolBarDefault;
+        this.runValueExtractor = runValueExtractor;
+        this.runValueSetter = runValueSetter;
+    }
+
+    /**
+     * Whether the grid lets a tester type into this column.
+     * <p>
+     * The one place that asks, so the table model, the edit listener and
+     * anything added later all get the same answer from the same declaration -
+     * rather than the model refusing one set of columns and a listener guarding
+     * a different set.
+     */
+    public boolean isEdited() {
+        return runValueSetter != RunValueSetter.NONE;
+    }
 
     /**
      * Renders as a plain detail row. The attributes drawn as badges override

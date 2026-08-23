@@ -543,13 +543,15 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             final @NotNull Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin.testEditor.gridFontSync");
             FontSync.syncWithNativeEditor(p, table, fontSync);
 
-            table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, pageItems));
+            table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, list, pageItems));
             table.getModel().addTableModelListener(new GridEditListener(p, pageItems, model::allContentsChanged, parent.getPath()));
             // ESC in grid view behaves like ESC in the list: hide the view panel, then clear the selection.
             new EscapeAction(p, table);
             // ENTER on the non-editable sequence column opens the details view.
             new GridViewDetailsAction(p, table, pageItems, parent.getPath2()).installDoubleClick();
             table.addMouseListener(new GridContextMenuListener(table, list, contextMenu, pageItems));
+            // Every shortcut the menu offers, live on the grid too (#74).
+            contextMenu.bindShortcutsTo(table);
 
             GridPanelBuilder.restoreSelection(table, list, pageItems, gridColumnToRestore);
             // Cleared regardless of whether the row was found, so a stale column can

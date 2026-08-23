@@ -2,6 +2,8 @@ package org.testin.util;
 
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -41,5 +43,20 @@ public class DisplayFormatTest {
     public void blankIsEmpty() {
         assertEquals(Display.format("   "), "");
         assertEquals(Display.format(""), "");
+    }
+
+    /**
+     * A dialog naming what it is about to erase reads as a sentence, so the
+     * list inside it has to as well - "the actual result, the stacktrace" is a
+     * log line, not a warning somebody reads.
+     */
+    @Test
+    public void aListOfThingsReadsAsASentence() {
+        assertEquals(Display.andJoin(List.of()), "");
+        assertEquals(Display.andJoin(List.of("the actual result")), "the actual result");
+        assertEquals(Display.andJoin(List.of("the actual result", "the stacktrace")),
+                "the actual result and the stacktrace");
+        assertEquals(Display.andJoin(List.of("the actual result", "the stacktrace", "the bug severity")),
+                "the actual result, the stacktrace and the bug severity");
     }
 }

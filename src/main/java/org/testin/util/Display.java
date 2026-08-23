@@ -8,6 +8,7 @@ import org.testin.model.Config;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * How a stored value is shown to a tester - and only that.
@@ -22,6 +23,21 @@ import java.time.ZonedDateTime;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Display {
+
+    /**
+     * A list of things as a person would say it: "a", "a and b", "a, b and c".
+     * <p>
+     * Here because a dialog naming what it is about to erase reads as a
+     * sentence, and "the actual result, the stacktrace" reads as a log line.
+     * Same reason as everything else in this class - the shape a value is shown
+     * in has one owner.
+     */
+    public static @NotNull String andJoin(final @NotNull List<String> parts) {
+        if (parts.isEmpty()) return "";
+        if (parts.size() == 1) return parts.getFirst();
+
+        return String.join(", ", parts.subList(0, parts.size() - 1)) + " and " + parts.getLast();
+    }
 
     /**
      * A value as the details panel shows it: capitalized, and ended with a full
