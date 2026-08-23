@@ -9,8 +9,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import java.util.Objects;
@@ -19,22 +17,14 @@ import java.util.Optional;
 /**
  * Writes a run grid edit into the run (#74).
  * <p>
- * The counterpart of {@link GridEditListener}, which does the same for the test
- * grid, and deliberately not the same class: a test case edit writes a test case
- * and regenerates automation code, a run edit writes the run JSON and generates
- * nothing. Sharing one listener between them would mean a listener that asks
- * which editor it is in on every keystroke.
- * <p>
- * Both guards the test one carries are here for the same reasons. Re-entrancy,
- * because writing the normalized value back into the cell fires this again; and
- * no write when nothing changed, so a cell the tester tabbed through does not
- * rewrite the run and stamp it as modified.
+ * The counterpart of {@link GridEditListener}, and deliberately not the same
+ * class: a test case edit writes a test case and regenerates automation code, a
+ * run edit writes the run JSON and generates nothing. What the two do share -
+ * the guards, and confirming the edit - is {@link AbstractGridEditListener}'s.
  */
-public class RunGridEditListener implements TableModelListener {
+public class RunGridEditListener extends AbstractGridEditListener {
 
-    private final @NotNull Project p;
     private final @NotNull RunEditor editor;
-    private final @NotNull List<TestCaseDto> pageItems;
 
     /**
      * Repaints the list behind the grid, so a card shows what was typed into the
@@ -42,47 +32,30 @@ public class RunGridEditListener implements TableModelListener {
      */
     private final @NotNull Runnable onEdited;
 
-    private boolean updating = false;
-
     public RunGridEditListener(final @NotNull Project p, final @NotNull RunEditor editor,
                                final @NotNull List<TestCaseDto> pageItems, final @NotNull Runnable onEdited) {
-        this.p = p;
+        super(p, pageItems);
         this.editor = editor;
-        this.pageItems = pageItems;
         this.onEdited = onEdited;
     }
 
     @Override
-    public void tableChanged(final TableModelEvent e) {
-        if (updating) return;
-        if (e.getType() != TableModelEvent.UPDATE) return;
-
-        final int row = e.getFirstRow();
-        final int col = e.getColumn();
-        if (row < 0 || col < 0) return;
-        if (!(e.getSource() instanceof DefaultTableModel model)
-                || row >= model.getRowCount()
-                || row >= pageItems.size()
-                || col >= model.getColumnCount()
-                || col >= RunEditorAttributes.values().length) return;
-
-        updating = true;
-        try {
-            apply(model, RunEditorAttributes.values()[col], row, col);
-        } finally {
-            updating = false;
-        }
+    protected int columnCount() {
+        return RunEditorAttributes.values().length;
     }
 
-    private void apply(final @NotNull DefaultTableModel model, final @NotNull RunEditorAttributes attr,
-                       final int row, final int col) {
+    @Override
+    protected boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto onThisRow,
+                            final int row, final int col) {
+        final @NotNull RunEditorAttributes attr = RunEditorAttributes.values()[col];
+
         // The table model refuses these columns already; asked again of the same
         // attribute because a programmatic setValueAt never goes through the
         // model's answer.
-        if (!attr.isEdited()) return;
+        if (!attr.isEdited()) return false;
 
-        final @NotNull Optional<TestRunItems> found = editor.runItem(pageItems.get(row).getId());
-        if (found.isEmpty()) return;
+        final @NotNull Optional<TestRunItems> found = editor.runItem(onThisRow.getId());
+        if (found.isEmpty()) return false;
         final @NotNull TestRunItems item = found.get();
 
         final @NotNull String before = attr.getRunValueExtractor().execute(item, p);
@@ -92,7 +65,7 @@ public class RunGridEditListener implements TableModelListener {
         if (item.isRemoved()) {
             model.setValueAt(before, row, col);
             Services.getInstance(p, RunStatusService.class).refuseRemoved(p);
-            return;
+            return false;
         }
 
         attr.getRunValueSetter().execute(item, String.valueOf(model.getValueAt(row, col)));
@@ -102,9 +75,11 @@ public class RunGridEditListener implements TableModelListener {
         // cell must show, even where the setter normalized what was typed.
         model.setValueAt(after, row, col);
 
-        if (Objects.equals(before, after)) return;
+        if (Objects.equals(before, after)) return false;
 
         Services.getInstance(p, RunStatusService.class).persistRun(p, editor);
         onEdited.run();
+
+        return true;
     }
 }

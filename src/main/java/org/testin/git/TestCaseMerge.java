@@ -87,18 +87,6 @@ public final class TestCaseMerge {
     }
 
     /**
-     * Merges the three stages Git holds.
-     *
-     * @param mapper the project's mapper - handed in rather than reached for, so
-     *               the merge rules can be asserted without an IDE
-     * @param base   the common ancestor, or empty text when there is none. Two
-     *               testers who created a case under the same name share no
-     *               past, so every field reads as set by both - which is the
-     *               honest answer
-     * @param mine   this machine's version
-     * @param theirs the version the pull brought
-     */
-    /**
      * Whether this file is something this class can merge at all.
      * <p>
      * Only a test case is: it is JSON with named fields, so two testers editing
@@ -116,6 +104,18 @@ public final class TestCaseMerge {
         return slashed.endsWith(".json") && slashed.contains("Test Cases/");
     }
 
+    /**
+     * Merges the three stages Git holds.
+     *
+     * @param mapper the project's mapper - handed in rather than reached for, so
+     *               the merge rules can be asserted without an IDE
+     * @param base   the common ancestor, or empty text when there is none. Two
+     *               testers who created a case under the same name share no
+     *               past, so every field reads as set by both - which is the
+     *               honest answer
+     * @param mine   this machine's version
+     * @param theirs the version the pull brought
+     */
     public static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String base,
                                     final @NotNull String mine, final @NotNull String theirs) {
         final @NotNull ObjectNode baseNode = mapper.readTree(base);

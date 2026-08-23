@@ -11,73 +11,64 @@ import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
-public class GridEditListener implements TableModelListener {
-    private final @NotNull Project p;
-    private final @NotNull List<TestCaseDto> pageItems;
+/**
+ * Writes a test grid edit into the test case, and regenerates the automation
+ * code for the field that changed.
+ * <p>
+ * The guards, and saying the edit landed, are
+ * {@link AbstractGridEditListener}'s - shared with the run grid, which needs
+ * both for the same reasons and used to carry its own copy of them.
+ */
+public class GridEditListener extends AbstractGridEditListener {
+
     private final @NotNull Runnable onEdited;
+
     /**
      * The test set this grid belongs to; the grid never mixes test sets.
      */
     private final @NotNull Path testSetPath;
-    private boolean updating = false;
 
     public GridEditListener(final @NotNull Project p, final @NotNull List<TestCaseDto> pageItems,
                             final @NotNull Runnable onEdited, final @NotNull Path testSetPath) {
-        this.p = p;
-        this.pageItems = pageItems;
+        super(p, pageItems);
         this.onEdited = onEdited;
         this.testSetPath = testSetPath;
     }
 
     @Override
-    public void tableChanged(final TableModelEvent e) {
-        if (updating) return;
-        if (e.getType() != TableModelEvent.UPDATE) return;
-        final int row = e.getFirstRow();
-        final int col = e.getColumn();
-        if (row < 0 || col < 0) return;
-        if (!(e.getSource() instanceof DefaultTableModel model)
-                || row >= model.getRowCount()
-                || row >= pageItems.size()
-                || col >= model.getColumnCount()
-                || col >= TestEditorAttributes.values().length) return;
+    protected int columnCount() {
+        return TestEditorAttributes.values().length;
+    }
 
-        updating = true;
-        try {
-            final @NotNull TestEditorAttributes attr = TestEditorAttributes.values()[col];
+    @Override
+    protected boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto tc,
+                            final int row, final int col) {
+        final @NotNull TestEditorAttributes attr = TestEditorAttributes.values()[col];
 
-            // The table model refuses these columns already; asked again of the
-            // same attribute because a programmatic setValueAt never goes through
-            // the model's answer.
-            if (!attr.can(Can.EDIT)) return;
+        // The table model refuses these columns already; asked again of the same
+        // attribute because a programmatic setValueAt never goes through the
+        // model's answer.
+        if (!attr.can(Can.EDIT)) return false;
 
-            final @NotNull TestCaseDto tc = pageItems.get(row);
+        final @NotNull Object before = attr.gridValue(p, tc);
+        attr.getImportSetter().execute(p, tc, String.valueOf(model.getValueAt(row, col)));
+        final @NotNull Object after = attr.gridValue(p, tc);
 
-            final @NotNull Object before = attr.gridValue(p, tc);
-            attr.getImportSetter().execute(p, tc, String.valueOf(model.getValueAt(row, col)));
-            final @NotNull Object after = attr.gridValue(p, tc);
+        // Always write the normalized value back to the cell - it renumbers
+        // steps and drops blank entries even when nothing really changed.
+        model.setValueAt(after, row, col);
 
-            // Always write the normalized value back to the cell - it renumbers
-            // steps and drops blank entries even when nothing really changed.
-            model.setValueAt(after, row, col);
+        if (Objects.equals(before, after)) return false;
 
-            // Committing a cell without editing it must not rewrite the JSON or
-            // regenerate code. Comparing the extracted values, not the raw text,
-            // means a cosmetic difference alone is correctly treated as no change.
-            if (Objects.equals(before, after)) return;
+        persistAndGenerate(tc, attr);
+        onEdited.run();
 
-            persistAndGenerate(tc, attr);
-            onEdited.run();
-        } finally {
-            updating = false;
-        }
+        return true;
     }
 
     /**

@@ -138,7 +138,8 @@ public final class SftpSync {
             if (heldBy.isPresent()) return Outcome.blocked(heldBy.get());
 
             try {
-                return inside(p, projectRoot, address, indicator, transport, indexer, mapper, baselineFile, local, baseline);
+                return inside(projectRoot, address, indicator, transport, indexer, mapper, baselineFile,
+                        local, baseline);
             } finally {
                 lock.release();
             }
@@ -152,7 +153,7 @@ public final class SftpSync {
      * that no early return can slip past - a lock left behind blocks every
      * tester on the team until somebody deletes a hidden folder over SSH.
      */
-    private static @NotNull Outcome inside(final @NotNull Project p, final @NotNull Path projectRoot,
+    private static @NotNull Outcome inside(final @NotNull Path projectRoot,
                                            final @NotNull SftpAddress address,
                                            final @NotNull ProgressIndicator indicator,
                                            final @NotNull SftpTransport transport,

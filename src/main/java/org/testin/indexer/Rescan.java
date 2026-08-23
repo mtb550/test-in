@@ -71,7 +71,7 @@ public final class Rescan {
         booked.set(false);
 
         final @NotNull List<Path> testProjects = List.copyOf(waiting);
-        waiting.removeAll(testProjects);
+        testProjects.forEach(waiting::remove);
         if (testProjects.isEmpty()) return;
 
         Logger.info("Something changed on disk in " + testProjects.size()

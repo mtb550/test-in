@@ -91,7 +91,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             "Actual Result",
             ToolBarDefault.ON,
             (item, p) -> item.getActualResult(),
-            (item, typed) -> item.setActualResult(typed)
+            TestRunItems::setActualResult
     ),
 
     BUG_SEVERITY(
