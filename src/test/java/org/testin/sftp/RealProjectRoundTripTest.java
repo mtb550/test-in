@@ -27,6 +27,13 @@ import static org.testng.Assert.assertTrue;
  * says how long that took, because the whole design rests on the claim that the
  * file count matters more than the bytes.
  * <p>
+ * The claim was checked against the alternative once: the same project as a
+ * single tar moved in about a second where 2,246 loose files took 88, and loose
+ * files were kept anyway, because they stay browsable on the server and the
+ * manifest makes every sync after the first one cheap. The measurement is
+ * recorded rather than repeated - the code it needed was 110 lines nothing
+ * shipped ever called.
+ * <p>
  * Skipped when the project it reads is not on this machine, so it is a gift on
  * the machine that has it and silent everywhere else. It only ever reads that
  * directory; everything written goes to a temporary server and a temporary
@@ -117,51 +124,6 @@ public class RealProjectRoundTripTest {
                 + " | up " + uploadMillis + " ms, down " + downloadMillis + " ms");
 
         assertEquals(back.keySet(), local.keySet(), "the server should hold exactly what this machine does");
-
-        final List<String> differing = new ArrayList<>();
-        local.forEach((path, content) -> {
-            if (!java.util.Arrays.equals(content, back.get(path))) differing.add(path);
-        });
-        assertEquals(differing, List.of(), "these came back different");
-    }
-
-    /**
-     * The same project, the same server, as one bundle - against the
-     * file-by-file figure above.
-     * <p>
-     * This is the comparison the transfer shape was decided on, run rather than
-     * estimated.
-     */
-    @Test
-    public void aBundleMovesTheWholeProjectInOneTransfer() throws Exception {
-        final Map<String, byte[]> local = readProject();
-
-        final long packStarted = System.nanoTime();
-        final byte[] bundle = ProjectBundle.pack(local);
-        final long packMillis = (System.nanoTime() - packStarted) / 1_000_000;
-
-        final long upStarted = System.nanoTime();
-        try (SftpTransport transport = connect()) {
-            transport.write(".testin/project.tar", bundle);
-        }
-        final long upMillis = (System.nanoTime() - upStarted) / 1_000_000;
-
-        final long downStarted = System.nanoTime();
-        final byte[] fetched;
-        try (SftpTransport transport = connect()) {
-            fetched = transport.read(".testin/project.tar");
-        }
-        final long downMillis = (System.nanoTime() - downStarted) / 1_000_000;
-
-        final long unpackStarted = System.nanoTime();
-        final Map<String, byte[]> back = ProjectBundle.unpack(fetched);
-        final long unpackMillis = (System.nanoTime() - unpackStarted) / 1_000_000;
-
-        System.out.println("[bundle round trip] " + local.size() + " files as " + bundle.length + " bytes"
-                + " | pack " + packMillis + " ms, up " + upMillis + " ms,"
-                + " down " + downMillis + " ms, unpack " + unpackMillis + " ms");
-
-        assertEquals(back.keySet(), local.keySet(), "the bundle should hold exactly what this machine does");
 
         final List<String> differing = new ArrayList<>();
         local.forEach((path, content) -> {

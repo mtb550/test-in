@@ -228,6 +228,20 @@ public final class SftpSync {
     }
 
     /**
+     * What a sync would do, without doing any of it.
+     * <p>
+     * Here so the decision can be driven against a real server without a running
+     * IDE. {@link #run} needs a project - the indexer reads this machine's copy
+     * and the mapper reads the server's manifest - and neither can be built
+     * outside one, so a test of the sync had either to skip or to reimplement
+     * this loop and test its own copy of it.
+     */
+    static @NotNull Outcome wouldDo(final @NotNull Manifest local, final @NotNull Manifest remote,
+                                    final @NotNull Manifest base) {
+        return decide(local, remote, base).outcome();
+    }
+
+    /**
      * What every file's three states say should happen to it.
      */
     private static @NotNull Plan decide(final @NotNull Manifest local, final @NotNull Manifest remote,
