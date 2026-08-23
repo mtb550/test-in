@@ -4,26 +4,23 @@ import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsAdapter;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener;
 import com.intellij.execution.testframework.sm.runner.SMTestProxy;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.RunStatus;
-import org.testin.util.Once;
 
 import java.util.Objects;
 
 public class TestCaseExecutionTracker {
 
-    private static final @NotNull Key<Boolean> LISTENER_REGISTERED = Key.create("testin.executionListenerRegistered");
-
     /**
-     * Subscribes once per project. {@code StartupActivity.execute} runs both from
-     * the startup extension and from the tree tool window factory, so this is
-     * called more than once; every extra subscription would broadcast each test
-     * status change again, once per registration.
+     * Subscribes to the IDE's test events for the life of the project.
+     * <p>
+     * Called from {@code StartupActivity.execute}, which claims its own run once
+     * per project, so this subscribes once without a flag of its own. It carried
+     * one while three doors led to startup, and it had to: every extra
+     * subscription broadcast each test status change again, once per
+     * registration.
      */
-    public static synchronized void initGlobalListener(final @NotNull Project p) {
-        if (!Once.claim(p, LISTENER_REGISTERED)) return;
-
+    public static void initGlobalListener(final @NotNull Project p) {
         p.getMessageBus().connect(p).subscribe(SMTRunnerEventsListener.TEST_STATUS, new SMTRunnerEventsAdapter() {
             @Override
             public void onTestStarted(final @NotNull SMTestProxy test) {

@@ -22,9 +22,25 @@ import java.nio.file.Path;
 
 public final class StartupActivity implements ProjectActivity {
 
-    private static final @NotNull Key<Boolean> SOURCE_ROOT_CHECKED = Key.create("testin.sourceRootChecked");
+    private static final @NotNull Key<Boolean> STARTED = Key.create("testin.started");
 
+    /**
+     * Everything Testin does when a project opens, once per project.
+     * <p>
+     * Three doors lead here - the platform's startup extension, the tree tool
+     * window and the view tool window - because any of the three can be the
+     * first thing a tester touches, and each has to work on its own. They are
+     * not alternatives, though: opening a project ran all of them, so the log
+     * said {@code StartupActivity.execute()} twice, the settings were read
+     * twice, and a full scan of the Testin root was started a second time while
+     * the first was still walking it.
+     * <p>
+     * Guarded here rather than at each door, so a fourth door costs nothing and
+     * cannot forget.
+     */
     public static void execute(final @NotNull Project p) {
+        if (!Once.claim(p, STARTED)) return;
+
         final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
         if (settings.rootTestinPath.isEmpty()) {
@@ -56,7 +72,7 @@ public final class StartupActivity implements ProjectActivity {
         Services.getInstance(p, TestinRoot.class).setPath(testinPath);
         Logger.info("testin Path: " + testinPath);
 
-        checkTestSourceRootOnce(p);
+        checkTestSourceRoot(p);
 
         // Before the first index, never after it: the config names the test
         // project this repository exercises, and an index that started without it
@@ -75,12 +91,14 @@ public final class StartupActivity implements ProjectActivity {
 
     /**
      * The Java test source root is detected automatically by JavaSourceRoot;
-     * warn once per project when none exists so the user knows automation code
-     * generation (packages, classes, test methods) will be skipped.
+     * warn when none exists so the user knows automation code generation
+     * (packages, classes, test methods) will be skipped.
+     * <p>
+     * It kept a claim of its own while this method could run twice. It cannot
+     * now, and a second flag for the same question is a second answer waiting to
+     * disagree with the first.
      */
-    private static void checkTestSourceRootOnce(final @NotNull Project p) {
-        if (!Once.claim(p, SOURCE_ROOT_CHECKED)) return;
-
+    private static void checkTestSourceRoot(final @NotNull Project p) {
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
                     if (p.isDisposed()) return;
