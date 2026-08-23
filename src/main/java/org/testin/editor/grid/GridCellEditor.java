@@ -3,12 +3,12 @@ package org.testin.editor.grid;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTextArea;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
@@ -38,11 +38,11 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
             }
         });
 
-        // ALT+ENTER is the spreadsheet convention for a line break inside a
-        // cell; SHIFT+ENTER keeps working for anyone used to it. Both insert at
-        // the caret - append() put the break at the end of the text instead.
-        textArea.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK), "insertNewLine");
-        textArea.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK), "insertNewLine");
+        // Ctrl+Enter inserts a line break inside the cell; plain Enter commits.
+        // The break goes in at the caret, not the end of the text. Shared with
+        // the expected-result field through Shortcuts.InsertNewLine, so both
+        // surfaces use the one key.
+        textArea.getInputMap().put(Shortcuts.InsertNewLine.getKey(), "insertNewLine");
         textArea.getActionMap().put("insertNewLine", new AbstractAction() {
             @Override
             public void actionPerformed(final ActionEvent e) {

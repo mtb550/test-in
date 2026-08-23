@@ -112,6 +112,11 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
         final @NotNull Runnable saveAction = save(existingDto, onSave, new JBPopup[]{dialogPopup});
 
+        // The expected-result field is a multi-line text area: it rebinds Enter,
+        // Ctrl+Enter and Tab on itself, since a multi-line editor would otherwise
+        // swallow them.
+        expectedResultSection.enableMultiLine(this, saveAction);
+
         registerShortcut(mainPanel, Shortcuts.Enter.getCustomShortcut(), saveAction::run);
 
         // Escape is bound rather than left to the popup's own cancel key: once an

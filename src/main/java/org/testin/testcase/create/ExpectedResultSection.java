@@ -1,5 +1,7 @@
 package org.testin.testcase.create;
 
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.TextFieldWithAutoCompletion;
@@ -15,21 +17,23 @@ import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class ExpectedResultSection implements CreateTestCaseSection {
     final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
+    private final @NotNull Project p;
     @Getter
     private final @NotNull EditorTextField expectedResultField;
     private final @NotNull JBPanel<?> wrapper;
 
     public ExpectedResultSection(final @NotNull Project p) {
+        this.p = p;
         this.expectedResultField = SpellChecker.createCompletionField(p,
                 new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getExpectedResults(), CreateTestCaseFields.EXPECTED_RESULT.getIcon()),
                 "");
-        this.expectedResultField.setOneLineMode(true);
         this.expectedResultField.setFont(fieldFont);
         this.expectedResultField.setPlaceholder(CreateTestCaseFields.EXPECTED_RESULT.getPlaceholder());
         this.expectedResultField.setShowPlaceholderWhenFocused(true);
@@ -40,6 +44,45 @@ public class ExpectedResultSection implements CreateTestCaseSection {
         this.wrapper.add(createIconPanel(CreateTestCaseFields.EXPECTED_RESULT.getIcon()), BorderLayout.WEST);
         this.wrapper.add(this.expectedResultField, BorderLayout.CENTER);
         this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
+    }
+
+    /**
+     * Turns the field into a multi-line text area and hands its keys to the ones
+     * a tester expects there. A multi-line editor otherwise takes Enter and Tab
+     * for itself, so each is rebound:
+     * <ul>
+     *   <li>Enter saves the dialog,</li>
+     *   <li>Ctrl+Enter ({@link Shortcuts#InsertNewLine}) inserts a line break,</li>
+     *   <li>Tab / Shift+Tab move to the next / previous field,</li>
+     *   <li>Alt+Enter is left to the platform - it opens the spelling corrections.</li>
+     * </ul>
+     * Bound through the dialog's own registrar, which already stands these keys
+     * down while an autocomplete popup is open, and so through the action system -
+     * the only place an IntelliJ editor reads its keys from (a Swing binding on it
+     * is never reached).
+     */
+    public void enableMultiLine(final @NotNull TestCaseBaseDialog base, final @NotNull Runnable onSave) {
+        expectedResultField.setOneLineMode(false);
+
+        base.registerShortcut(expectedResultField, Shortcuts.Enter.getCustomShortcut(), onSave::run);
+        base.registerShortcut(expectedResultField, Shortcuts.InsertNewLine.getCustomShortcut(), this::insertNewLine);
+        base.registerShortcut(expectedResultField, Shortcuts.TabNext.getCustomShortcut(), expectedResultField::transferFocus);
+        base.registerShortcut(expectedResultField, Shortcuts.TabPrevious.getCustomShortcut(), expectedResultField::transferFocusBackward);
+    }
+
+    /**
+     * Inserts a line break at the caret. The editor exists only while the field
+     * is on screen and focused, which is the only time this key can fire.
+     */
+    private void insertNewLine() {
+        final @Nullable Editor editor = expectedResultField.getEditor();
+        if (editor == null) return;
+
+        final int caret = editor.getCaretModel().getOffset();
+        WriteCommandAction.runWriteCommandAction(p, () -> {
+            editor.getDocument().insertString(caret, "\n");
+            editor.getCaretModel().moveToOffset(caret + 1);
+        });
     }
 
     @Override

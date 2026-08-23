@@ -47,6 +47,13 @@ public enum Shortcuts {
      */
     Corrections(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK)),
 
+    /**
+     * Inserts a line break where Enter cannot, because Enter commits or saves:
+     * the grid cell editor and the multi-line expected-result field. One key for
+     * both, so the two surfaces stay learnable as a pair.
+     */
+    InsertNewLine(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK)),
+
     // Bulk JSON editors: add and remove an array item, caret on every value
     AddArrayItem(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK)),
     RemoveArrayItem(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.SHIFT_DOWN_MASK)),
