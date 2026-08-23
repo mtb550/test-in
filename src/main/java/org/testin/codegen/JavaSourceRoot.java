@@ -40,6 +40,13 @@ public final class JavaSourceRoot {
     /**
      * Work to do against the source root, allowed to fail the way file work
      * does - which is why it is not a plain {@link java.util.function.Consumer}.
+     * <p>
+     * The {@code throws} stays deliberately, and is one of the four exceptions
+     * to the rule in CLAUDE.md that a method handles its own failures. It is a
+     * functional interface whose whole point is to let the lambda fail so that
+     * {@link #run} catches for all of them; removing it would put a try/catch
+     * in every generator lambda, which is the duplication this class exists to
+     * delete.
      */
     @FunctionalInterface
     public interface RootWork {
