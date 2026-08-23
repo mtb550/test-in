@@ -43,11 +43,23 @@ final class VfsExecutor {
         return Optional.ofNullable(LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path));
     }
 
+    /**
+     * Says this change is the plugin's own, so the file watcher does not read
+     * the project again for something the plugin is already redrawing (#20).
+     * <p>
+     * Claimed before the operation runs, because the VFS event can arrive while
+     * it is still running.
+     */
+    private static void claim(final @NotNull Path path) {
+        Services.getInstance(OwnWrites.class).record(path);
+    }
+
     // Renaming is the only single-path VFS operation, so the title it reports a
     // failure under is not a parameter: one caller, one word, and a second
     // operation would bring its own method rather than a second string.
     void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull VfsOperation operation) {
         final @NotNull String errorTitle = "Rename Failed";
+        claim(path);
 
         // The lookup runs off the EDT and the operation on it: refreshAndFindFile
         // refreshes synchronously and reads the VFS persistence, which the EDT is
@@ -74,6 +86,9 @@ final class VfsExecutor {
     void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath,
                           final @NotNull String errorTitle, final @NotNull VfsBiOperation operation,
                           final @NotNull Runnable onSuccess, final @NotNull Runnable onFailure) {
+        claim(sourcePath);
+        claim(targetPath);
+
         // Both lookups off the EDT, the operation on it - see the single-path form.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Optional<VirtualFile> sourceVf = find(sourcePath);
@@ -116,6 +131,7 @@ final class VfsExecutor {
      */
     void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path,
                   final @NotNull Consumer<@NotNull Boolean> onDeleted) {
+        claim(path);
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Optional<VirtualFile> vf = find(path);
 

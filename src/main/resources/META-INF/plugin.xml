@@ -137,6 +137,10 @@
              "unknown file" color their non-physical virtual file would get -->
         <editorTabColorProvider implementation="org.testin.editor.TestinTabColorProvider" order="first"/>
 
+        <!-- Notices test data changing on disk - a hand edit, a pull, a branch
+             switch - and reads the projects that changed again (#20) -->
+        <vfs.asyncListener implementation="org.testin.indexer.TestinFileWatcher"/>
+
         <!-- First run activity -->
         <postStartupActivity
                 implementation="org.testin.setting.StartupActivity"

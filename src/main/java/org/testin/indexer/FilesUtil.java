@@ -50,6 +50,11 @@ final class FilesUtil {
         }
 
         try {
+            // Before the write, not after: the VFS event can arrive while this
+            // thread is still in Files.write, and a file claimed a moment too
+            // late looks to the watcher like somebody else's edit (#20).
+            Services.getInstance(OwnWrites.class).record(path);
+
             // The platform's own helper: it knows that a path with no parent - a
             // filesystem root - has no folder to create.
             FileUtil.createParentDirs(path.toFile());
