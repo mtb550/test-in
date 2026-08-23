@@ -65,22 +65,26 @@ public class NotExecutedTimestampTest {
     }
 
     @Test
-    public void theFirstStartIsKeptAndTheLastEndWins() throws InterruptedException {
-        final TestRunDto run = new TestRunDto();
+    public void theFirstStartIsKeptAndTheLastEndWins() {
+        try {
+            final TestRunDto run = new TestRunDto();
 
-        run.markExecutionStarted();
-        final ZonedDateTime firstStart = run.getExecutionStartedAt();
-        run.markExecutionEnded();
-        final ZonedDateTime firstEnd = run.getExecutionEndedAt();
+            run.markExecutionStarted();
+            final ZonedDateTime firstStart = run.getExecutionStartedAt();
+            run.markExecutionEnded();
+            final ZonedDateTime firstEnd = run.getExecutionEndedAt();
 
-        // Both stamps are truncated to the second, so a second must pass for the
-        // difference to be observable at all.
-        Thread.sleep(1100);
-        run.markExecutionStarted();
-        run.markExecutionEnded();
+            // Both stamps are truncated to the second, so a second must pass for the
+            // difference to be observable at all.
+            Thread.sleep(1100);
+            run.markExecutionStarted();
+            run.markExecutionEnded();
 
-        assertEquals(run.getExecutionStartedAt(), firstStart, "a resumed run still started when it started");
-        assertTrue(run.getExecutionEndedAt().isAfter(firstEnd), "the run ended when it last stopped");
+            assertEquals(run.getExecutionStartedAt(), firstStart, "a resumed run still started when it started");
+            assertTrue(run.getExecutionEndedAt().isAfter(firstEnd), "the run ended when it last stopped");
+        } catch (final InterruptedException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**

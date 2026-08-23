@@ -41,13 +41,17 @@ public class MarkerJsonTest {
      * time a label is reworded.
      */
     @Test
-    public void writesTheAuditBlockAndTheStatusAndNothingElse() throws Exception {
-        final String json = mapper.writeValueAsString(new TestSetMarker().setCreatedBy("mtb"));
+    public void writesTheAuditBlockAndTheStatusAndNothingElse() {
+        try {
+            final String json = mapper.writeValueAsString(new TestSetMarker().setCreatedBy("mtb"));
 
-        assertTrue(json.contains("\"createdBy\":\"mtb\""), json);
-        assertTrue(json.contains("\"modifiedBy\""), json);
-        assertTrue(json.contains("\"status\":\"ACTIVE\""), json);
-        assertFalse(json.contains("statusLabel"), json);
+            assertTrue(json.contains("\"createdBy\":\"mtb\""), json);
+            assertTrue(json.contains("\"modifiedBy\""), json);
+            assertTrue(json.contains("\"status\":\"ACTIVE\""), json);
+            assertFalse(json.contains("statusLabel"), json);
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -60,22 +64,30 @@ public class MarkerJsonTest {
      * left out instead, and a file without the key reads back as unordered.
      */
     @Test
-    public void anUnorderedMarkerCarriesNoOrderAtAll() throws Exception {
-        assertFalse(mapper.writeValueAsString(new TestSetMarker()).contains("order"),
-                mapper.writeValueAsString(new TestSetMarker()));
+    public void anUnorderedMarkerCarriesNoOrderAtAll() {
+        try {
+            assertFalse(mapper.writeValueAsString(new TestSetMarker()).contains("order"),
+                    mapper.writeValueAsString(new TestSetMarker()));
 
-        assertEquals(mapper.readValue("{}", TestSetMarker.class).getOrder(), Marker.NOT_ORDERED);
+            assertEquals(mapper.readValue("{}", TestSetMarker.class).getOrder(), Marker.NOT_ORDERED);
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
      * A node the tester did order carries the number they typed, and only that.
      */
     @Test
-    public void anOrderedMarkerCarriesTheNumberTyped() throws Exception {
-        final String json = mapper.writeValueAsString(new TestSetMarker().setOrder(3));
+    public void anOrderedMarkerCarriesTheNumberTyped() {
+        try {
+            final String json = mapper.writeValueAsString(new TestSetMarker().setOrder(3));
 
-        assertTrue(json.contains("\"order\":3"), json);
-        assertEquals(mapper.readValue(json, TestSetMarker.class).getOrder(), 3);
+            assertTrue(json.contains("\"order\":3"), json);
+            assertEquals(mapper.readValue(json, TestSetMarker.class).getOrder(), 3);
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -85,13 +97,17 @@ public class MarkerJsonTest {
      * now, so every marker reads an old file.
      */
     @Test
-    public void readsThePreRenameKeysOnEveryMarker() throws Exception {
-        final String old = "{\"createdBy\":\"a\",\"updatedBy\":\"b\",\"updatedAt\":\"" + onDisk + "\",\"status\":\"ACTIVE\"}";
+    public void readsThePreRenameKeysOnEveryMarker() {
+        try {
+            final String old = "{\"createdBy\":\"a\",\"updatedBy\":\"b\",\"updatedAt\":\"" + onDisk + "\",\"status\":\"ACTIVE\"}";
 
-        assertEquals(mapper.readValue(old, TestProjectMarker.class).getModifiedBy(), "b");
-        assertEquals(mapper.readValue(old, TestProjectMarker.class).getModifiedAt().toInstant(), when.toInstant());
-        assertEquals(mapper.readValue(old, TestSetMarker.class).getModifiedBy(), "b");
-        assertEquals(mapper.readValue(old, TestSetMarker.class).getModifiedAt().toInstant(), when.toInstant());
+            assertEquals(mapper.readValue(old, TestProjectMarker.class).getModifiedBy(), "b");
+            assertEquals(mapper.readValue(old, TestProjectMarker.class).getModifiedAt().toInstant(), when.toInstant());
+            assertEquals(mapper.readValue(old, TestSetMarker.class).getModifiedBy(), "b");
+            assertEquals(mapper.readValue(old, TestSetMarker.class).getModifiedAt().toInstant(), when.toInstant());
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -100,10 +116,14 @@ public class MarkerJsonTest {
      * the seven markers but not to the two directory ones.
      */
     @Test
-    public void ignoresAKeyTheMarkerDoesNotHave() throws Exception {
-        final String withStatus = "{\"createdBy\":\"a\",\"status\":\"ACTIVE\",\"whatever\":1}";
+    public void ignoresAKeyTheMarkerDoesNotHave() {
+        try {
+            final String withStatus = "{\"createdBy\":\"a\",\"status\":\"ACTIVE\",\"whatever\":1}";
 
-        assertEquals(mapper.readValue(withStatus, TestCasesMainDirectoryMarker.class).getCreatedBy(), "a");
+            assertEquals(mapper.readValue(withStatus, TestCasesMainDirectoryMarker.class).getCreatedBy(), "a");
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -113,13 +133,17 @@ public class MarkerJsonTest {
      * modified at the moment they were read.
      */
     @Test
-    public void aMarkerNeverModifiedReportsItsCreation() throws Exception {
-        final String onlyCreated = "{\"createdBy\":\"mtb\",\"createdAt\":\"" + onDisk + "\"}";
+    public void aMarkerNeverModifiedReportsItsCreation() {
+        try {
+            final String onlyCreated = "{\"createdBy\":\"mtb\",\"createdAt\":\"" + onDisk + "\"}";
 
-        final TestCasesMainDirectoryMarker marker = mapper.readValue(onlyCreated, TestCasesMainDirectoryMarker.class);
+            final TestCasesMainDirectoryMarker marker = mapper.readValue(onlyCreated, TestCasesMainDirectoryMarker.class);
 
-        assertEquals(marker.getModifiedBy(), "mtb", "nobody has modified it, so it stands as its creator made it");
-        assertEquals(marker.getModifiedAt().toInstant(), when.toInstant(), "and at the time they made it");
+            assertEquals(marker.getModifiedBy(), "mtb", "nobody has modified it, so it stands as its creator made it");
+            assertEquals(marker.getModifiedAt().toInstant(), when.toInstant(), "and at the time they made it");
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -128,12 +152,16 @@ public class MarkerJsonTest {
      * existing marker unreadable rather than merely differently formatted.
      */
     @Test
-    public void roundTripsTheDateFormatOnDisk() throws Exception {
-        final String json = mapper.writeValueAsString(new TestSetMarker().setCreatedAt(when).setModifiedAt(when));
-        assertTrue(json.contains(onDisk), json);
+    public void roundTripsTheDateFormatOnDisk() {
+        try {
+            final String json = mapper.writeValueAsString(new TestSetMarker().setCreatedAt(when).setModifiedAt(when));
+            assertTrue(json.contains(onDisk), json);
 
-        final TestSetMarker read = mapper.readValue(json, TestSetMarker.class);
-        assertEquals(read.getCreatedAt().toInstant(), when.toInstant());
-        assertEquals(read.getModifiedAt().toInstant(), when.toInstant());
+            final TestSetMarker read = mapper.readValue(json, TestSetMarker.class);
+            assertEquals(read.getCreatedAt().toInstant(), when.toInstant());
+            assertEquals(read.getModifiedAt().toInstant(), when.toInstant());
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 }

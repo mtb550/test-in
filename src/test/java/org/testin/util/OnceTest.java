@@ -60,36 +60,40 @@ public class OnceTest {
     }
 
     @Test
-    public void exactlyOneOfManyThreadsArrivingTogetherIsAdmitted() throws InterruptedException {
-        final UserDataHolderBase project = new UserDataHolderBase();
-        final AtomicInteger admitted = new AtomicInteger();
-        final int doors = 32;
-        final CountDownLatch open = new CountDownLatch(1);
-        final CountDownLatch done = new CountDownLatch(doors);
-        final ExecutorService threads = Executors.newFixedThreadPool(doors);
-
+    public void exactlyOneOfManyThreadsArrivingTogetherIsAdmitted() {
         try {
-            for (int i = 0; i < doors; i++) {
-                threads.execute(() -> {
-                    try {
-                        open.await();
-                        if (Once.claim(project, STARTED)) admitted.incrementAndGet();
-                    } catch (final InterruptedException ex) {
-                        Thread.currentThread().interrupt();
-                    } finally {
-                        done.countDown();
-                    }
-                });
+            final UserDataHolderBase project = new UserDataHolderBase();
+            final AtomicInteger admitted = new AtomicInteger();
+            final int doors = 32;
+            final CountDownLatch open = new CountDownLatch(1);
+            final CountDownLatch done = new CountDownLatch(doors);
+            final ExecutorService threads = Executors.newFixedThreadPool(doors);
+
+            try {
+                for (int i = 0; i < doors; i++) {
+                    threads.execute(() -> {
+                        try {
+                            open.await();
+                            if (Once.claim(project, STARTED)) admitted.incrementAndGet();
+                        } catch (final InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                        } finally {
+                            done.countDown();
+                        }
+                    });
+                }
+
+                open.countDown();
+                assertTrue(done.await(10, TimeUnit.SECONDS), "the threads should all have finished");
+            } finally {
+                threads.shutdownNow();
             }
 
-            open.countDown();
-            assertTrue(done.await(10, TimeUnit.SECONDS), "the threads should all have finished");
-        } finally {
-            threads.shutdownNow();
+            assertEquals(admitted.get(), 1,
+                    "reading the flag and setting it have to be one step, or two threads both start Testin");
+        } catch (final InterruptedException ex) {
+            throw new AssertionError(ex);
         }
-
-        assertEquals(admitted.get(), 1,
-                "reading the flag and setting it have to be one step, or two threads both start Testin");
     }
 
     @Test

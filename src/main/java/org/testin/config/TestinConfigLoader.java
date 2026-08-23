@@ -53,9 +53,18 @@ final class TestinConfigLoader {
                                                      final @NotNull JsonParser parser,
                                                      final @NotNull JsonDeserializer<?> deserializer,
                                                      final @NotNull Object beanOrClass,
-                                                     final @NotNull String key) throws IOException {
+                                                     final @NotNull String key) {
                     Logger.warn("Unknown key in testin.yml, ignored: " + key);
-                    parser.skipChildren();
+
+                    // Jackson's contract allows this to throw; the plugin's does
+                    // not, and there is nothing to propagate anyway. Failing to
+                    // skip a key already being ignored is still a key ignored.
+                    try {
+                        parser.skipChildren();
+                    } catch (final IOException ex) {
+                        Logger.warn("Could not skip past " + key + " in testin.yml: " + ex.getMessage());
+                    }
+
                     return true;
                 }
             });

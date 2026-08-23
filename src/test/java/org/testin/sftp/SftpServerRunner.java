@@ -41,52 +41,61 @@ public final class SftpServerRunner {
      */
     private static final String TESTIN_ROOT = "Testin";
 
-    public static void main(final String[] args) throws Exception {
-        final Path home = Path.of(System.getProperty("user.home"), ".testin-sftp");
-        Files.createDirectories(home);
+    public static void main(final String[] args) {
 
-        // Also to a file, because when this starts with Windows there is no
-        // console to read - and "it is not working" needs somewhere to look.
-        log(home, "starting");
-        final Path root = Files.createDirectories(home.resolve("srv"));
-        final Path hostKey = home.resolve("host.ser");
+        try {
+            final Path home = Path.of(System.getProperty("user.home"), ".testin-sftp");
+            Files.createDirectories(home);
 
-        // The Testin root, mirrored. A tester's machine has one folder holding a
-        // list of projects, and the server holds the same - so what is on it can
-        // be read without translating anything, and a second Testin root could be
-        // pointed straight at it.
-        final Path testinRoot = Files.createDirectories(root.resolve(TESTIN_ROOT));
+            // Also to a file, because when this starts with Windows there is no
+            // console to read - and "it is not working" needs somewhere to look.
+            log(home, "starting");
+            final Path root = Files.createDirectories(home.resolve("srv"));
+            final Path hostKey = home.resolve("host.ser");
 
-        final SshServer server = SshServer.setUpDefaultServer();
-        server.setHost("127.0.0.1");
-        server.setPort(PORT);
-        server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(hostKey));
-        server.setPasswordAuthenticator((user, password, session) ->
-                USER.equals(user) && PASSWORD.equals(password));
-        server.setPublickeyAuthenticator((user, key, session) -> USER.equals(user));
-        server.setSubsystemFactories(List.of(new SftpSubsystemFactory()));
-        server.setFileSystemFactory(new VirtualFileSystemFactory(root));
-        server.start();
+            // The Testin root, mirrored. A tester's machine has one folder holding a
+            // list of projects, and the server holds the same - so what is on it can
+            // be read without translating anything, and a second Testin root could be
+            // pointed straight at it.
+            final Path testinRoot = Files.createDirectories(root.resolve(TESTIN_ROOT));
 
-        final String knownHostsLine = trust(server);
+            final SshServer server = SshServer.setUpDefaultServer();
+            server.setHost("127.0.0.1");
+            server.setPort(PORT);
+            server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(hostKey));
+            server.setPasswordAuthenticator((user, password, session) ->
+                    USER.equals(user) && PASSWORD.equals(password));
+            server.setPublickeyAuthenticator((user, key, session) -> USER.equals(user));
+            server.setSubsystemFactories(List.of(new SftpSubsystemFactory()));
+            server.setFileSystemFactory(new VirtualFileSystemFactory(root));
+            server.start();
 
-        System.out.println();
-        System.out.println("  SFTP server running.");
-        System.out.println("  ---------------------------------------------------------------");
-        System.out.println("  address for testin.yml : sftp://127.0.0.1" + (PORT == 22 ? "" : ":" + PORT) + "/" + TESTIN_ROOT);
-        System.out.println("  account                : " + USER);
-        System.out.println("  password               : " + PASSWORD);
-        System.out.println("  it serves              : " + testinRoot);
-        System.out.println("  host key trusted in    : " + knownHostsFile());
-        System.out.println("  ---------------------------------------------------------------");
-        System.out.println("  " + knownHostsLine.trim());
-        System.out.println();
-        System.out.println("  Watch " + testinRoot + " to see what the plugin sends.");
-        System.out.println("  Ctrl+C to stop.");
-        System.out.println();
+            final String knownHostsLine = trust(server);
 
-        log(home, "listening on 127.0.0.1:" + PORT + ", serving " + testinRoot);
-        Thread.currentThread().join();
+            System.out.println();
+            System.out.println("  SFTP server running.");
+            System.out.println("  ---------------------------------------------------------------");
+            System.out.println("  address for testin.yml : sftp://127.0.0.1" + (PORT == 22 ? "" : ":" + PORT) + "/" + TESTIN_ROOT);
+            System.out.println("  account                : " + USER);
+            System.out.println("  password               : " + PASSWORD);
+            System.out.println("  it serves              : " + testinRoot);
+            System.out.println("  host key trusted in    : " + knownHostsFile());
+            System.out.println("  ---------------------------------------------------------------");
+            System.out.println("  " + knownHostsLine.trim());
+            System.out.println();
+            System.out.println("  Watch " + testinRoot + " to see what the plugin sends.");
+            System.out.println("  Ctrl+C to stop.");
+            System.out.println();
+
+            log(home, "listening on 127.0.0.1:" + PORT + ", serving " + testinRoot);
+            Thread.currentThread().join();
+
+        } catch (final Exception ex) {
+
+            throw new AssertionError(ex);
+
+        }
+
     }
 
     /**
@@ -126,20 +135,24 @@ public final class SftpServerRunner {
      * test that connects with the check disabled proves the transport works in a
      * way the plugin must never run.
      */
-    private static String trust(final SshServer server) throws Exception {
-        final KeyPair pair = server.getKeyPairProvider().loadKeys(null).iterator().next();
-        final String line = host() + " " + PublicKeyEntry.toString(pair.getPublic()) + System.lineSeparator();
+    private static String trust(final SshServer server) {
+        try {
+            final KeyPair pair = server.getKeyPairProvider().loadKeys(null).iterator().next();
+            final String line = host() + " " + PublicKeyEntry.toString(pair.getPublic()) + System.lineSeparator();
 
-        final Path file = knownHostsFile();
-        Files.createDirectories(file.getParent());
+            final Path file = knownHostsFile();
+            Files.createDirectories(file.getParent());
 
-        final String existing = Files.exists(file) ? Files.readString(file) : "";
-        if (existing.contains(line.trim())) return line;
+            final String existing = Files.exists(file) ? Files.readString(file) : "";
+            if (existing.contains(line.trim())) return line;
 
-        final String separator = existing.isEmpty() || existing.endsWith("\n") ? "" : System.lineSeparator();
-        Files.writeString(file, separator + line, StandardCharsets.UTF_8,
-                StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            final String separator = existing.isEmpty() || existing.endsWith("\n") ? "" : System.lineSeparator();
+            Files.writeString(file, separator + line, StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 
-        return line;
+            return line;
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 }

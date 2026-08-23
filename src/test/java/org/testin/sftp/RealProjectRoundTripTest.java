@@ -51,25 +51,37 @@ public class RealProjectRoundTripTest {
     private Path downloaded;
 
     @BeforeMethod
-    public void startServer() throws Exception {
+    public void startServer() {
+        // Outside the try, and it has to be: a skip is a RuntimeException, so a
+        // catch broad enough for the server's checked failures would swallow it
+        // and report this as a failure on every machine that simply does not
+        // have the project.
         if (!Files.isDirectory(PROJECT)) {
             throw new SkipException("No test project at " + PROJECT + " on this machine");
         }
 
-        server = SftpTestServer.start();
-        knownHosts = Files.createTempFile("testin-known-hosts", "");
-        Files.writeString(knownHosts, server.knownHostsLine());
-        downloaded = Files.createTempDirectory("testin-downloaded");
+        try {
+            server = SftpTestServer.start();
+            knownHosts = Files.createTempFile("testin-known-hosts", "");
+            Files.writeString(knownHosts, server.knownHostsLine());
+            downloaded = Files.createTempDirectory("testin-downloaded");
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @AfterMethod
-    public void stopServer() throws IOException {
-        if (server != null) server.close();
-        if (knownHosts != null) Files.deleteIfExists(knownHosts);
-        if (downloaded == null || !Files.exists(downloaded)) return;
+    public void stopServer() {
+        try {
+            if (server != null) server.close();
+            if (knownHosts != null) Files.deleteIfExists(knownHosts);
+            if (downloaded == null || !Files.exists(downloaded)) return;
 
-        try (Stream<Path> paths = Files.walk(downloaded)) {
-            paths.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
+            try (Stream<Path> paths = Files.walk(downloaded)) {
+                paths.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
+            }
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -83,53 +95,61 @@ public class RealProjectRoundTripTest {
      * names it with - forward slashes, relative to the project root. The Git
      * directory is not test data and is not part of what a server holds.
      */
-    private static Map<String, byte[]> readProject() throws IOException {
-        final Map<String, byte[]> files = new TreeMap<>();
+    private static Map<String, byte[]> readProject() {
+        try {
+            final Map<String, byte[]> files = new TreeMap<>();
 
-        try (Stream<Path> paths = Files.walk(PROJECT)) {
-            final List<Path> regular = paths.filter(Files::isRegularFile)
-                    .filter(path -> !PROJECT.relativize(path).toString().replace('\\', '/').startsWith(".git/"))
-                    .toList();
+            try (Stream<Path> paths = Files.walk(PROJECT)) {
+                final List<Path> regular = paths.filter(Files::isRegularFile)
+                        .filter(path -> !PROJECT.relativize(path).toString().replace('\\', '/').startsWith(".git/"))
+                        .toList();
 
-            for (final Path path : regular) {
-                files.put(PROJECT.relativize(path).toString().replace('\\', '/'), Files.readAllBytes(path));
+                for (final Path path : regular) {
+                    files.put(PROJECT.relativize(path).toString().replace('\\', '/'), Files.readAllBytes(path));
+                }
             }
-        }
 
-        return files;
+            return files;
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @Test
-    public void aWholeProjectSurvivesTheRoundTrip() throws Exception {
-        final Map<String, byte[]> local = readProject();
-        assertTrue(local.size() > 100, "this is meant to run against a real project, not a toy: " + local.size());
+    public void aWholeProjectSurvivesTheRoundTrip() {
+        try {
+            final Map<String, byte[]> local = readProject();
+            assertTrue(local.size() > 100, "this is meant to run against a real project, not a toy: " + local.size());
 
-        final long uploadStarted = System.nanoTime();
-        try (SftpTransport transport = connect()) {
-            local.forEach(transport::write);
-        }
-        final long uploadMillis = (System.nanoTime() - uploadStarted) / 1_000_000;
-
-        final long downloadStarted = System.nanoTime();
-        final Map<String, byte[]> back = new TreeMap<>();
-        try (SftpTransport transport = connect()) {
-            for (final String path : transport.filesUnder("")) {
-                back.put(path, transport.read(path));
+            final long uploadStarted = System.nanoTime();
+            try (SftpTransport transport = connect()) {
+                local.forEach(transport::write);
             }
+            final long uploadMillis = (System.nanoTime() - uploadStarted) / 1_000_000;
+
+            final long downloadStarted = System.nanoTime();
+            final Map<String, byte[]> back = new TreeMap<>();
+            try (SftpTransport transport = connect()) {
+                for (final String path : transport.filesUnder("")) {
+                    back.put(path, transport.read(path));
+                }
+            }
+            final long downloadMillis = (System.nanoTime() - downloadStarted) / 1_000_000;
+
+            final long bytes = local.values().stream().mapToLong(content -> content.length).sum();
+            System.out.println("[round trip] " + local.size() + " files, " + bytes + " bytes"
+                    + " | up " + uploadMillis + " ms, down " + downloadMillis + " ms");
+
+            assertEquals(back.keySet(), local.keySet(), "the server should hold exactly what this machine does");
+
+            final List<String> differing = new ArrayList<>();
+            local.forEach((path, content) -> {
+                if (!java.util.Arrays.equals(content, back.get(path))) differing.add(path);
+            });
+            assertEquals(differing, List.of(), "these came back different");
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
         }
-        final long downloadMillis = (System.nanoTime() - downloadStarted) / 1_000_000;
-
-        final long bytes = local.values().stream().mapToLong(content -> content.length).sum();
-        System.out.println("[round trip] " + local.size() + " files, " + bytes + " bytes"
-                + " | up " + uploadMillis + " ms, down " + downloadMillis + " ms");
-
-        assertEquals(back.keySet(), local.keySet(), "the server should hold exactly what this machine does");
-
-        final List<String> differing = new ArrayList<>();
-        local.forEach((path, content) -> {
-            if (!java.util.Arrays.equals(content, back.get(path))) differing.add(path);
-        });
-        assertEquals(differing, List.of(), "these came back different");
     }
 
     /**
@@ -137,29 +157,33 @@ public class RealProjectRoundTripTest {
      * which is the comparison every future sync is decided by.
      */
     @Test
-    public void theManifestsAgreeAfterARoundTrip() throws Exception {
-        final Map<String, byte[]> local = readProject();
+    public void theManifestsAgreeAfterARoundTrip() {
+        try {
+            final Map<String, byte[]> local = readProject();
 
-        try (SftpTransport transport = connect()) {
-            local.forEach(transport::write);
-        }
-
-        final Map<String, byte[]> back = new TreeMap<>();
-        try (SftpTransport transport = connect()) {
-            for (final String path : transport.filesUnder("")) {
-                back.put(path, transport.read(path));
+            try (SftpTransport transport = connect()) {
+                local.forEach(transport::write);
             }
-        }
 
-        final Manifest before = Manifest.of(local);
-        final Manifest after = Manifest.of(back);
+            final Map<String, byte[]> back = new TreeMap<>();
+            try (SftpTransport transport = connect()) {
+                for (final String path : transport.filesUnder("")) {
+                    back.put(path, transport.read(path));
+                }
+            }
 
-        assertEquals(after.entries(), before.entries(), "a sync run now would think nothing had changed");
-        assertEquals(after.totalBytes(), before.totalBytes());
+            final Manifest before = Manifest.of(local);
+            final Manifest after = Manifest.of(back);
 
-        for (final String path : before.pathsWith(after)) {
-            assertEquals(TransferAction.of(before.at(path).sha256(), before.at(path).sha256(), after.at(path).sha256()),
-                    TransferAction.NOTHING, path + " would have been transferred again");
+            assertEquals(after.entries(), before.entries(), "a sync run now would think nothing had changed");
+            assertEquals(after.totalBytes(), before.totalBytes());
+
+            for (final String path : before.pathsWith(after)) {
+                assertEquals(TransferAction.of(before.at(path).sha256(), before.at(path).sha256(), after.at(path).sha256()),
+                        TransferAction.NOTHING, path + " would have been transferred again");
+            }
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
         }
     }
 }

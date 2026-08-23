@@ -58,31 +58,35 @@ public class LightServiceContractTest {
             "com.intellij.openapi.project.Project,kotlinx.coroutines.CoroutineScope");
 
     @Test
-    public void everyLightServiceCanBeBuiltByThePlatform() throws Exception {
-        final List<Class<?>> services = findServices();
-        if (services.isEmpty()) {
-            fail("No @Service classes found under " + ROOT_PACKAGE + ": the scan is looking in the wrong place");
-        }
-
-        System.out.println("Checked " + services.size() + " light services");
-
-        final List<String> breaches = new ArrayList<>();
-
-        for (final Class<?> service : services) {
-            if (!Modifier.isFinal(service.getModifiers())) {
-                breaches.add(service.getName() + " is not final");
+    public void everyLightServiceCanBeBuiltByThePlatform() {
+        try {
+            final List<Class<?>> services = findServices();
+            if (services.isEmpty()) {
+                fail("No @Service classes found under " + ROOT_PACKAGE + ": the scan is looking in the wrong place");
             }
 
-            if (Arrays.stream(service.getDeclaredConstructors()).noneMatch(LightServiceContractTest::isAccepted)) {
-                breaches.add(service.getName() + " declares no constructor the platform will call, only "
-                        + Arrays.stream(service.getDeclaredConstructors())
-                        .map(LightServiceContractTest::signature)
-                        .toList());
-            }
-        }
+            System.out.println("Checked " + services.size() + " light services");
 
-        if (!breaches.isEmpty()) {
-            fail("Light services the platform will refuse to build:\n  " + String.join("\n  ", breaches));
+            final List<String> breaches = new ArrayList<>();
+
+            for (final Class<?> service : services) {
+                if (!Modifier.isFinal(service.getModifiers())) {
+                    breaches.add(service.getName() + " is not final");
+                }
+
+                if (Arrays.stream(service.getDeclaredConstructors()).noneMatch(LightServiceContractTest::isAccepted)) {
+                    breaches.add(service.getName() + " declares no constructor the platform will call, only "
+                            + Arrays.stream(service.getDeclaredConstructors())
+                            .map(LightServiceContractTest::signature)
+                            .toList());
+                }
+            }
+
+            if (!breaches.isEmpty()) {
+                fail("Light services the platform will refuse to build:\n  " + String.join("\n  ", breaches));
+            }
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -94,27 +98,36 @@ public class LightServiceContractTest {
         return String.join(",", Arrays.stream(constructor.getParameterTypes()).map(Class::getName).toList());
     }
 
-    private static @NotNull List<Class<?>> findServices() throws Exception {
-        final ClassLoader loader = LightServiceContractTest.class.getClassLoader();
-        final Path dir = SOURCE_ROOT.resolve(ROOT_PACKAGE.replace('.', '/'));
+    private static @NotNull List<Class<?>> findServices() {
 
-        if (!Files.isDirectory(dir)) {
-            throw new IllegalStateException("No sources at " + dir.toAbsolutePath()
-                    + " - this test expects to run from the project root");
+        try {
+            final ClassLoader loader = LightServiceContractTest.class.getClassLoader();
+            final Path dir = SOURCE_ROOT.resolve(ROOT_PACKAGE.replace('.', '/'));
+
+            if (!Files.isDirectory(dir)) {
+                throw new IllegalStateException("No sources at " + dir.toAbsolutePath()
+                        + " - this test expects to run from the project root");
+            }
+
+            final List<Class<?>> services = new ArrayList<>();
+
+            try (Stream<Path> files = Files.walk(dir)) {
+                files.filter(f -> f.toString().endsWith(".java"))
+                        .map(LightServiceContractTest::toClassName)
+                        .forEach(name -> {
+                            final Class<?> type = loadWithoutInitializing(loader, name);
+                            if (type != null && type.isAnnotationPresent(Service.class)) services.add(type);
+                        });
+            }
+
+            return services;
+
+        } catch (final Exception ex) {
+
+            throw new AssertionError(ex);
+
         }
 
-        final List<Class<?>> services = new ArrayList<>();
-
-        try (Stream<Path> files = Files.walk(dir)) {
-            files.filter(f -> f.toString().endsWith(".java"))
-                    .map(LightServiceContractTest::toClassName)
-                    .forEach(name -> {
-                        final Class<?> type = loadWithoutInitializing(loader, name);
-                        if (type != null && type.isAnnotationPresent(Service.class)) services.add(type);
-                    });
-        }
-
-        return services;
     }
 
     private static @NotNull String toClassName(final @NotNull Path file) {

@@ -8,6 +8,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.logger.Logger;
 import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.*;
@@ -90,19 +91,47 @@ public final class TextInput implements DialogComponent {
         ((AbstractDocument) textField.getDocument()).setDocumentFilter(new DocumentFilter() {
             @Override
             public void insertString(final @NotNull FilterBypass bypass, final int offset, final String text,
-                                     final AttributeSet attributes) throws BadLocationException {
-                if (allows(bypass, offset, 0, text)) super.insertString(bypass, offset, text, attributes);
+                                     final AttributeSet attributes) {
+                if (!allows(bypass, offset, 0, text)) return;
+
+                try {
+                    super.insertString(bypass, offset, text, attributes);
+                } catch (final BadLocationException ex) {
+                    Logger.warn("Could not insert at " + offset + ": " + ex.getMessage());
+                }
             }
 
             @Override
             public void replace(final @NotNull FilterBypass bypass, final int offset, final int length,
-                                final String text, final AttributeSet attributes) throws BadLocationException {
-                if (allows(bypass, offset, length, text)) super.replace(bypass, offset, length, text, attributes);
+                                final String text, final AttributeSet attributes) {
+                if (!allows(bypass, offset, length, text)) return;
+
+                try {
+                    super.replace(bypass, offset, length, text, attributes);
+                } catch (final BadLocationException ex) {
+                    Logger.warn("Could not replace " + length + " at " + offset + ": " + ex.getMessage());
+                }
             }
 
+            /**
+             * Whether what the field would then hold still matches the pattern.
+             * <p>
+             * A document that cannot be read allows the edit. The filter is here
+             * to keep a value well formed, not to be the last line of defense -
+             * the dialog checks again on submit - and refusing every keystroke
+             * because the document would not answer leaves a field the tester
+             * cannot type in at all, with nothing on screen saying why.
+             */
             private boolean allows(final @NotNull FilterBypass bypass, final int offset, final int length,
-                                   final @Nullable String text) throws BadLocationException {
-                final @NotNull String current = bypass.getDocument().getText(0, bypass.getDocument().getLength());
+                                   final @Nullable String text) {
+                final @NotNull String current;
+                try {
+                    current = bypass.getDocument().getText(0, bypass.getDocument().getLength());
+                } catch (final BadLocationException ex) {
+                    Logger.warn("Could not read the field to check it: " + ex.getMessage());
+                    return true;
+                }
+
                 final @NotNull String next = current.substring(0, offset) + Objects.requireNonNullElse(text, "")
                         + current.substring(offset + length);
 

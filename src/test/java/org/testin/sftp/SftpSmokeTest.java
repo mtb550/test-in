@@ -9,7 +9,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Properties;
@@ -35,65 +34,77 @@ public class SftpSmokeTest {
     private SftpTestServer server;
 
     @BeforeMethod
-    public void startServer() throws IOException {
+    public void startServer() {
         server = SftpTestServer.start();
     }
 
     @AfterMethod
-    public void stopServer() throws IOException {
+    public void stopServer() {
         if (server != null) server.close();
     }
 
     /**
      * Opens a session that verifies the host, the way the plugin must.
      */
-    private Session connectVerifying() throws Exception {
-        final JSch jsch = new JSch();
-        jsch.setKnownHosts(new ByteArrayInputStream(server.knownHostsLine().getBytes(StandardCharsets.UTF_8)));
-
-        final Session session = jsch.getSession(SftpTestServer.USER, "127.0.0.1", server.port());
-        session.setPassword(SftpTestServer.PASSWORD);
-        session.connect(10_000);
-
-        return session;
-    }
-
-    @Test
-    public void aFilePutOnTheServerComesBackByteForByte() throws Exception {
-        final Session session = connectVerifying();
-        final ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
-        sftp.connect(10_000);
-
+    private Session connectVerifying() {
         try {
-            final byte[] content = "{\"description\":\"Sign in\"}".getBytes(StandardCharsets.UTF_8);
-            sftp.put(new ByteArrayInputStream(content), "case.json");
+            final JSch jsch = new JSch();
+            jsch.setKnownHosts(new ByteArrayInputStream(server.knownHostsLine().getBytes(StandardCharsets.UTF_8)));
 
-            assertTrue(Files.exists(server.root().resolve("case.json")), "the server should hold it");
-            assertEquals(Files.readAllBytes(server.root().resolve("case.json")), content);
-            assertEquals(sftp.get("case.json").readAllBytes(), content, "and it should come back unchanged");
-        } finally {
-            sftp.disconnect();
-            session.disconnect();
+            final Session session = jsch.getSession(SftpTestServer.USER, "127.0.0.1", server.port());
+            session.setPassword(SftpTestServer.PASSWORD);
+            session.connect(10_000);
+
+            return session;
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
         }
     }
 
     @Test
-    public void directoriesCanBeMadeAndListed() throws Exception {
-        final Session session = connectVerifying();
-        final ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
-        sftp.connect(10_000);
-
+    public void aFilePutOnTheServerComesBackByteForByte() {
         try {
-            // mkdir is the one operation SFTP makes atomic, which is what the
-            // sync lock will be built on.
-            sftp.mkdir("Test Cases");
-            assertTrue(Files.isDirectory(server.root().resolve("Test Cases")), "a name with a space still works");
+            final Session session = connectVerifying();
+            final ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
+            sftp.connect(10_000);
 
-            sftp.put(new ByteArrayInputStream("{}".getBytes(StandardCharsets.UTF_8)), "Test Cases/a.json");
-            assertEquals(sftp.ls("Test Cases").size(), 3, ". and .. and the file");
-        } finally {
-            sftp.disconnect();
-            session.disconnect();
+            try {
+                final byte[] content = "{\"description\":\"Sign in\"}".getBytes(StandardCharsets.UTF_8);
+                sftp.put(new ByteArrayInputStream(content), "case.json");
+
+                assertTrue(Files.exists(server.root().resolve("case.json")), "the server should hold it");
+                assertEquals(Files.readAllBytes(server.root().resolve("case.json")), content);
+                assertEquals(sftp.get("case.json").readAllBytes(), content, "and it should come back unchanged");
+            } finally {
+                sftp.disconnect();
+                session.disconnect();
+            }
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    @Test
+    public void directoriesCanBeMadeAndListed() {
+        try {
+            final Session session = connectVerifying();
+            final ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
+            sftp.connect(10_000);
+
+            try {
+                // mkdir is the one operation SFTP makes atomic, which is what the
+                // sync lock will be built on.
+                sftp.mkdir("Test Cases");
+                assertTrue(Files.isDirectory(server.root().resolve("Test Cases")), "a name with a space still works");
+
+                sftp.put(new ByteArrayInputStream("{}".getBytes(StandardCharsets.UTF_8)), "Test Cases/a.json");
+                assertEquals(sftp.ls("Test Cases").size(), 3, ". and .. and the file");
+            } finally {
+                sftp.disconnect();
+                session.disconnect();
+            }
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -127,20 +138,24 @@ public class SftpSmokeTest {
      * so the plugin never gets there by omission.
      */
     @Test
-    public void theCheckHasToBeTurnedOffOnPurpose() throws Exception {
-        final JSch jsch = new JSch();
-        final Session session = jsch.getSession(SftpTestServer.USER, "127.0.0.1", server.port());
-        session.setPassword(SftpTestServer.PASSWORD);
-
-        final Properties off = new Properties();
-        off.put("StrictHostKeyChecking", "no");
-        session.setConfig(off);
-        session.connect(10_000);
-
+    public void theCheckHasToBeTurnedOffOnPurpose() {
         try {
-            assertTrue(session.isConnected());
-        } finally {
-            session.disconnect();
+            final JSch jsch = new JSch();
+            final Session session = jsch.getSession(SftpTestServer.USER, "127.0.0.1", server.port());
+            session.setPassword(SftpTestServer.PASSWORD);
+
+            final Properties off = new Properties();
+            off.put("StrictHostKeyChecking", "no");
+            session.setConfig(off);
+            session.connect(10_000);
+
+            try {
+                assertTrue(session.isConnected());
+            } finally {
+                session.disconnect();
+            }
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
         }
     }
 }

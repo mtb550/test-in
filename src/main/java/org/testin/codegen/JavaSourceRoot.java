@@ -100,13 +100,18 @@ public final class JavaSourceRoot {
      * neither of them was ever a failure when there was nothing to remove.
      */
     public static void deleteUnder(final @NotNull VirtualFile root, final @NotNull String relativePath,
-                                   final @NotNull Object requestor) throws IOException {
+                                   final @NotNull Object requestor) {
         final @NotNull Optional<VirtualFile> found = under(root, relativePath).filter(VirtualFile::exists);
         if (found.isEmpty()) return;
 
         final @NotNull VirtualFile target = found.orElseThrow();
-        target.delete(requestor);
-        Logger.info("Removed generated code at: " + target.getPath());
+
+        try {
+            target.delete(requestor);
+            Logger.info("Removed generated code at: " + target.getPath());
+        } catch (final IOException ex) {
+            Logger.error("Could not remove generated code at " + target.getPath() + ": " + ex.getMessage());
+        }
     }
 
     /**
@@ -120,9 +125,16 @@ public final class JavaSourceRoot {
      * depending on which generator noticed (#71).
      */
     public static @NotNull Optional<VirtualFile> packageFolder(final @NotNull VirtualFile root,
-                                                               final @NotNull List<String> packageSegments) throws IOException {
+                                                               final @NotNull List<String> packageSegments) {
         final @NotNull String relative = String.join("/", packageSegments);
-        final @NotNull Optional<VirtualFile> folder = Optional.ofNullable(VfsUtil.createDirectoryIfMissing(root, relative));
+
+        final @NotNull Optional<VirtualFile> folder;
+        try {
+            folder = Optional.ofNullable(VfsUtil.createDirectoryIfMissing(root, relative));
+        } catch (final IOException ex) {
+            Logger.error("Could not create the package folder " + relative + ": " + ex.getMessage());
+            return Optional.empty();
+        }
 
         if (folder.isEmpty()) Logger.error("Could not create the package folder: " + relative);
         return folder;
@@ -144,7 +156,7 @@ public final class JavaSourceRoot {
      */
     public static @NotNull Optional<VirtualFile> classFile(final @NotNull VirtualFile root,
                                                            final @NotNull List<String> packageSegments,
-                                                           final @NotNull String className) throws IOException {
+                                                           final @NotNull String className) {
         final @NotNull Optional<VirtualFile> folder = packageFolder(root, packageSegments);
         if (folder.isEmpty()) return Optional.empty();
 
@@ -159,32 +171,55 @@ public final class JavaSourceRoot {
         final @NotNull String packageName = String.join(".", packageSegments);
         final @NotNull String declaration = packageName.isEmpty() ? "" : "package " + packageName + ";\n\n";
 
-        final @NotNull VirtualFile file = folder.get().createChildData(JavaSourceRoot.class, fileName);
-        // No blank line inside the braces: every generated method is written with
-        // one before it, so a class carrying its own would give the first
-        // method two.
-        VfsUtil.saveText(file, declaration + "public class " + className + " {\n}\n");
+        try {
+            final @NotNull VirtualFile file = folder.get().createChildData(JavaSourceRoot.class, fileName);
+            // No blank line inside the braces: every generated method is written
+            // with one before it, so a class carrying its own would give the
+            // first method two.
+            VfsUtil.saveText(file, declaration + "public class " + className + " {\n}\n");
 
-        Logger.info("Test class created at: " + file.getPath());
-        return Optional.of(file);
+            Logger.info("Test class created at: " + file.getPath());
+            return Optional.of(file);
+        } catch (final IOException ex) {
+            Logger.error("Could not create the test class " + fileName + ": " + ex.getMessage());
+            return Optional.empty();
+        }
     }
 
     /**
      * Runs the work against the root, and does nothing at all when there is
      * none. For a caller already inside a write action of its own.
+     * <p>
+     * The one place an IO failure from generating code is caught and named.
+     * Every runner below leads here, so a file that could not be written
+     * explains itself the same way whichever generator was doing the writing -
+     * which is the whole reason this class hands out runners.
+     *
+     * @param whatFailed named in the log if the work raises, e.g. "removing class"
      */
-    public static void inRoot(final @NotNull Project p, final @NotNull RootWork work) throws IOException {
-        final @NotNull Optional<VirtualFile> root = find(p);
-        if (root.isPresent()) work.run(root.get());
+    public static void inRoot(final @NotNull Project p, final @NotNull String whatFailed,
+                              final @NotNull RootWork work) {
+        run(find(p), whatFailed, work);
     }
 
     /**
      * The same, and tells the tester when there is no root - see
      * {@link #findOrWarn}.
      */
-    public static void inRootOrWarn(final @NotNull Project p, final @NotNull RootWork work) throws IOException {
-        final @NotNull Optional<VirtualFile> root = findOrWarn(p);
-        if (root.isPresent()) work.run(root.get());
+    public static void inRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed,
+                                    final @NotNull RootWork work) {
+        run(findOrWarn(p), whatFailed, work);
+    }
+
+    private static void run(final @NotNull Optional<VirtualFile> root, final @NotNull String whatFailed,
+                            final @NotNull RootWork work) {
+        if (root.isEmpty()) return;
+
+        try {
+            work.run(root.get());
+        } catch (final IOException ex) {
+            Logger.info("Error " + whatFailed + ": " + ex.getMessage());
+        }
     }
 
     /**
@@ -197,13 +232,7 @@ public final class JavaSourceRoot {
      */
     public static void writeInRoot(final @NotNull Project p, final @NotNull String whatFailed,
                                    final @NotNull RootWork work) {
-        WriteAction.run(() -> {
-            try {
-                inRoot(p, work);
-            } catch (final IOException ex) {
-                Logger.info("Error " + whatFailed + ": " + ex.getMessage());
-            }
-        });
+        WriteAction.run(() -> inRoot(p, whatFailed, work));
     }
 
     /**
@@ -217,13 +246,7 @@ public final class JavaSourceRoot {
      */
     public static void commandInRoot(final @NotNull Project p, final @NotNull String title,
                                      final @NotNull String whatFailed, final @NotNull RootWork work) {
-        WriteCommandAction.runWriteCommandAction(p, title, null, () -> {
-            try {
-                inRoot(p, work);
-            } catch (final IOException ex) {
-                Logger.info("Error " + whatFailed + ": " + ex.getMessage());
-            }
-        });
+        WriteCommandAction.runWriteCommandAction(p, title, null, () -> inRoot(p, whatFailed, work));
     }
 
     /**
@@ -234,12 +257,6 @@ public final class JavaSourceRoot {
      */
     public static void writeInRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed,
                                          final @NotNull RootWork work) {
-        WriteAction.run(() -> {
-            try {
-                inRootOrWarn(p, work);
-            } catch (final IOException ex) {
-                Logger.info("Error " + whatFailed + ": " + ex.getMessage());
-            }
-        });
+        WriteAction.run(() -> inRootOrWarn(p, whatFailed, work));
     }
 }

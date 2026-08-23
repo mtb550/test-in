@@ -47,20 +47,29 @@ final class SftpTestServer implements AutoCloseable {
         this.root = root;
     }
 
-    static SftpTestServer start() throws IOException {
-        final Path directory = Files.createTempDirectory("testin-sftp");
-        final Path root = Files.createDirectories(directory.resolve("srv"));
+    static SftpTestServer start() {
 
-        final SshServer server = SshServer.setUpDefaultServer();
-        server.setPort(0);
-        server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(directory.resolve("host.ser")));
-        server.setPasswordAuthenticator((user, password, session) ->
-                USER.equals(user) && PASSWORD.equals(password));
-        server.setSubsystemFactories(List.of(new SftpSubsystemFactory()));
-        server.setFileSystemFactory(new VirtualFileSystemFactory(root));
-        server.start();
+        try {
+            final Path directory = Files.createTempDirectory("testin-sftp");
+            final Path root = Files.createDirectories(directory.resolve("srv"));
 
-        return new SftpTestServer(server, directory, root);
+            final SshServer server = SshServer.setUpDefaultServer();
+            server.setPort(0);
+            server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(directory.resolve("host.ser")));
+            server.setPasswordAuthenticator((user, password, session) ->
+                    USER.equals(user) && PASSWORD.equals(password));
+            server.setSubsystemFactories(List.of(new SftpSubsystemFactory()));
+            server.setFileSystemFactory(new VirtualFileSystemFactory(root));
+            server.start();
+
+            return new SftpTestServer(server, directory, root);
+
+        } catch (final IOException ex) {
+
+            throw new AssertionError(ex);
+
+        }
+
     }
 
     int port() {
@@ -74,12 +83,16 @@ final class SftpTestServer implements AutoCloseable {
      * wrong key is refused by the server for the reason a real one would refuse
      * it.
      */
-    void acceptOnly(final Path publicKeyFile) throws IOException, GeneralSecurityException {
-        final AuthorizedKeyEntry entry = AuthorizedKeyEntry.readAuthorizedKeys(publicKeyFile).iterator().next();
-        final java.security.PublicKey allowed = entry.resolvePublicKey(null, null, null);
+    void acceptOnly(final Path publicKeyFile) {
+        try {
+            final AuthorizedKeyEntry entry = AuthorizedKeyEntry.readAuthorizedKeys(publicKeyFile).iterator().next();
+            final java.security.PublicKey allowed = entry.resolvePublicKey(null, null, null);
 
-        server.setPublickeyAuthenticator((user, offered, session) ->
-                USER.equals(user) && KeyUtils.compareKeys(allowed, offered));
+            server.setPublickeyAuthenticator((user, offered, session) ->
+                    USER.equals(user) && KeyUtils.compareKeys(allowed, offered));
+        } catch (final IOException | GeneralSecurityException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -91,18 +104,22 @@ final class SftpTestServer implements AutoCloseable {
      *
      * @return the private key file; the public one is beside it, with .pub
      */
-    Path generateKey(final String name, final String passphrase) throws Exception {
-        final Path privateKey = directory.resolve(name);
-        final com.jcraft.jsch.KeyPair pair =
-                com.jcraft.jsch.KeyPair.genKeyPair(new com.jcraft.jsch.JSch(), com.jcraft.jsch.KeyPair.RSA, 2048);
+    Path generateKey(final String name, final String passphrase) {
+        try {
+            final Path privateKey = directory.resolve(name);
+            final com.jcraft.jsch.KeyPair pair =
+                    com.jcraft.jsch.KeyPair.genKeyPair(new com.jcraft.jsch.JSch(), com.jcraft.jsch.KeyPair.RSA, 2048);
 
-        if (passphrase.isEmpty()) pair.writePrivateKey(privateKey.toString());
-        else pair.writePrivateKey(privateKey.toString(), passphrase.getBytes(StandardCharsets.UTF_8));
+            if (passphrase.isEmpty()) pair.writePrivateKey(privateKey.toString());
+            else pair.writePrivateKey(privateKey.toString(), passphrase.getBytes(StandardCharsets.UTF_8));
 
-        pair.writePublicKey(privateKey + ".pub", "testin");
-        pair.dispose();
+            pair.writePublicKey(privateKey + ".pub", "testin");
+            pair.dispose();
 
-        return privateKey;
+            return privateKey;
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -120,19 +137,27 @@ final class SftpTestServer implements AutoCloseable {
      * a tester. A test that switched host key checking off would be proving the
      * transport works in a configuration the plugin must never use.
      */
-    String knownHostsLine() throws IOException, GeneralSecurityException {
-        final KeyPair pair = server.getKeyPairProvider().loadKeys(null).iterator().next();
+    String knownHostsLine() {
+        try {
+            final KeyPair pair = server.getKeyPairProvider().loadKeys(null).iterator().next();
 
-        return "[127.0.0.1]:" + port() + " " + PublicKeyEntry.toString(pair.getPublic()) + "\n";
+            return "[127.0.0.1]:" + port() + " " + PublicKeyEntry.toString(pair.getPublic()) + "\n";
+        } catch (final IOException | GeneralSecurityException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @Override
-    public void close() throws IOException {
-        server.stop(true);
+    public void close() {
+        try {
+            server.stop(true);
 
-        if (!Files.exists(directory)) return;
-        try (Stream<Path> paths = Files.walk(directory)) {
-            paths.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
+            if (!Files.exists(directory)) return;
+            try (Stream<Path> paths = Files.walk(directory)) {
+                paths.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
+            }
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
         }
     }
 }

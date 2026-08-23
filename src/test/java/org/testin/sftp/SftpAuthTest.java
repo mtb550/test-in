@@ -32,16 +32,24 @@ public class SftpAuthTest {
     private Path knownHosts;
 
     @BeforeMethod
-    public void startServer() throws Exception {
-        server = SftpTestServer.start();
-        knownHosts = Files.createTempFile("testin-known-hosts", "");
-        Files.writeString(knownHosts, server.knownHostsLine());
+    public void startServer() {
+        try {
+            server = SftpTestServer.start();
+            knownHosts = Files.createTempFile("testin-known-hosts", "");
+            Files.writeString(knownHosts, server.knownHostsLine());
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @AfterMethod
-    public void stopServer() throws IOException {
-        if (server != null) server.close();
-        if (knownHosts != null) Files.deleteIfExists(knownHosts);
+    public void stopServer() {
+        try {
+            if (server != null) server.close();
+            if (knownHosts != null) Files.deleteIfExists(knownHosts);
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     private SftpTransport connectWith(final SftpAuth auth) {
@@ -50,13 +58,17 @@ public class SftpAuthTest {
     }
 
     @Test
-    public void anUnencryptedKeyConnects() throws Exception {
-        final Path key = server.generateKey("plain_key", "");
-        server.acceptOnly(Path.of(key + ".pub"));
+    public void anUnencryptedKeyConnects() {
+        try {
+            final Path key = server.generateKey("plain_key", "");
+            server.acceptOnly(Path.of(key + ".pub"));
 
-        try (SftpTransport transport = connectWith(SftpAuth.withKey(key.toString(), ""))) {
-            transport.write("case.json", "{}".getBytes(StandardCharsets.UTF_8));
-            assertTrue(transport.exists("case.json"));
+            try (SftpTransport transport = connectWith(SftpAuth.withKey(key.toString(), ""))) {
+                transport.write("case.json", "{}".getBytes(StandardCharsets.UTF_8));
+                assertTrue(transport.exists("case.json"));
+            }
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -65,25 +77,33 @@ public class SftpAuthTest {
      * a tester who followed any sensible instruction will have.
      */
     @Test
-    public void anEncryptedKeyConnectsWithItsPassphrase() throws Exception {
-        final Path key = server.generateKey("encrypted_key", "correct horse");
-        server.acceptOnly(Path.of(key + ".pub"));
+    public void anEncryptedKeyConnectsWithItsPassphrase() {
+        try {
+            final Path key = server.generateKey("encrypted_key", "correct horse");
+            server.acceptOnly(Path.of(key + ".pub"));
 
-        try (SftpTransport transport = connectWith(SftpAuth.withKey(key.toString(), "correct horse"))) {
-            transport.write("case.json", "{\"x\":1}".getBytes(StandardCharsets.UTF_8));
-            assertEquals(transport.read("case.json"), "{\"x\":1}".getBytes(StandardCharsets.UTF_8));
+            try (SftpTransport transport = connectWith(SftpAuth.withKey(key.toString(), "correct horse"))) {
+                transport.write("case.json", "{\"x\":1}".getBytes(StandardCharsets.UTF_8));
+                assertEquals(transport.read("case.json"), "{\"x\":1}".getBytes(StandardCharsets.UTF_8));
+            }
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
         }
     }
 
     @Test
-    public void theWrongPassphraseIsRefused() throws Exception {
-        final Path key = server.generateKey("encrypted_key", "correct horse");
-        server.acceptOnly(Path.of(key + ".pub"));
+    public void theWrongPassphraseIsRefused() {
+        try {
+            final Path key = server.generateKey("encrypted_key", "correct horse");
+            server.acceptOnly(Path.of(key + ".pub"));
 
-        final IllegalStateException refused = expectThrows(IllegalStateException.class,
-                () -> connectWith(SftpAuth.withKey(key.toString(), "wrong")));
+            final IllegalStateException refused = expectThrows(IllegalStateException.class,
+                    () -> connectWith(SftpAuth.withKey(key.toString(), "wrong")));
 
-        assertTrue(refused.getMessage().contains("Could not connect"), refused.getMessage());
+            assertTrue(refused.getMessage().contains("Could not connect"), refused.getMessage());
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -91,15 +111,19 @@ public class SftpAuthTest {
      * perfectly valid key and the passphrase is right.
      */
     @Test
-    public void aKeyTheServerDoesNotKnowIsRefused() throws Exception {
-        final Path allowed = server.generateKey("allowed_key", "");
-        final Path other = server.generateKey("other_key", "");
-        server.acceptOnly(Path.of(allowed + ".pub"));
+    public void aKeyTheServerDoesNotKnowIsRefused() {
+        try {
+            final Path allowed = server.generateKey("allowed_key", "");
+            final Path other = server.generateKey("other_key", "");
+            server.acceptOnly(Path.of(allowed + ".pub"));
 
-        final IllegalStateException refused = expectThrows(IllegalStateException.class,
-                () -> connectWith(SftpAuth.withKey(other.toString(), "")));
+            final IllegalStateException refused = expectThrows(IllegalStateException.class,
+                    () -> connectWith(SftpAuth.withKey(other.toString(), "")));
 
-        assertTrue(refused.getMessage().contains("Could not connect"), refused.getMessage());
+            assertTrue(refused.getMessage().contains("Could not connect"), refused.getMessage());
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -112,17 +136,24 @@ public class SftpAuthTest {
      * to use it, and this server has never heard of whatever it holds.
      */
     @Test
-    public void withNoAgentItFallsThroughToTheKeyFile() throws Exception {
+    public void withNoAgentItFallsThroughToTheKeyFile() {
+        // Outside the try, and it has to be: a skip is a RuntimeException, so a
+        // catch broad enough for the key generation's checked failures would
+        // swallow it and fail this on any machine that does have an agent.
         if (SshAgent.loadedIdentities().isPresent()) {
             throw new SkipException("an agent on this machine is holding keys, which is the other path");
         }
 
-        final Path key = server.generateKey("fallback_key", "a passphrase");
-        server.acceptOnly(Path.of(key + ".pub"));
+        try {
+            final Path key = server.generateKey("fallback_key", "a passphrase");
+            server.acceptOnly(Path.of(key + ".pub"));
 
-        try (SftpTransport transport = connectWith(SftpAuth.forKey(key.toString(), () -> "a passphrase"))) {
-            transport.write("case.json", "{}".getBytes(StandardCharsets.UTF_8));
-            assertTrue(transport.exists("case.json"));
+            try (SftpTransport transport = connectWith(SftpAuth.forKey(key.toString(), () -> "a passphrase"))) {
+                transport.write("case.json", "{}".getBytes(StandardCharsets.UTF_8));
+                assertTrue(transport.exists("case.json"));
+            }
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -133,18 +164,22 @@ public class SftpAuthTest {
      * would be asked for and thrown away.
      */
     @Test
-    public void thePassphraseIsOnlyFetchedIfItIsNeeded() throws Exception {
-        final boolean agentHasKeys = SshAgent.loadedIdentities().isPresent();
-        final boolean[] asked = {false};
+    public void thePassphraseIsOnlyFetchedIfItIsNeeded() {
+        try {
+            final boolean agentHasKeys = SshAgent.loadedIdentities().isPresent();
+            final boolean[] asked = {false};
 
-        SftpAuth.forKey("some-key", () -> {
-            asked[0] = true;
-            return "";
-        });
+            SftpAuth.forKey("some-key", () -> {
+                asked[0] = true;
+                return "";
+            });
 
-        assertEquals(asked[0], !agentHasKeys,
-                agentHasKeys ? "an agent is holding keys, so nothing should have been asked for"
-                        : "no agent, so the key file's passphrase was needed");
+            assertEquals(asked[0], !agentHasKeys,
+                    agentHasKeys ? "an agent is holding keys, so nothing should have been asked for"
+                            : "no agent, so the key file's passphrase was needed");
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -152,10 +187,14 @@ public class SftpAuthTest {
      * check here that would have to guess which of several things was missing.
      */
     @Test
-    public void offeringNothingIsRefused() throws Exception {
-        final Path key = server.generateKey("allowed_key", "");
-        server.acceptOnly(Path.of(key + ".pub"));
+    public void offeringNothingIsRefused() {
+        try {
+            final Path key = server.generateKey("allowed_key", "");
+            server.acceptOnly(Path.of(key + ".pub"));
 
-        expectThrows(IllegalStateException.class, () -> connectWith(SftpAuth.NONE));
+            expectThrows(IllegalStateException.class, () -> connectWith(SftpAuth.NONE));
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 }

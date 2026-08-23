@@ -30,16 +30,24 @@ public class SftpTransportTest {
     private Path knownHosts;
 
     @BeforeMethod
-    public void startServer() throws Exception {
-        server = SftpTestServer.start();
-        knownHosts = Files.createTempFile("testin-known-hosts", "");
-        Files.writeString(knownHosts, server.knownHostsLine());
+    public void startServer() {
+        try {
+            server = SftpTestServer.start();
+            knownHosts = Files.createTempFile("testin-known-hosts", "");
+            Files.writeString(knownHosts, server.knownHostsLine());
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @AfterMethod
-    public void stopServer() throws IOException {
-        if (server != null) server.close();
-        if (knownHosts != null) Files.deleteIfExists(knownHosts);
+    public void stopServer() {
+        try {
+            if (server != null) server.close();
+            if (knownHosts != null) Files.deleteIfExists(knownHosts);
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     private SftpTransport connect() {
@@ -143,11 +151,15 @@ public class SftpTransportTest {
      * about the connection is correct.
      */
     @Test
-    public void anUnknownHostIsRefused() throws IOException {
-        Files.writeString(knownHosts, "");
+    public void anUnknownHostIsRefused() {
+        try {
+            Files.writeString(knownHosts, "");
 
-        final IllegalStateException refused = expectThrows(IllegalStateException.class, this::connect);
-        assertTrue(refused.getMessage().contains("Could not connect"), refused.getMessage());
+            final IllegalStateException refused = expectThrows(IllegalStateException.class, this::connect);
+            assertTrue(refused.getMessage().contains("Could not connect"), refused.getMessage());
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @Test

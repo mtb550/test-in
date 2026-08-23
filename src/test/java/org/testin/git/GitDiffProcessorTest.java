@@ -47,16 +47,24 @@ public class GitDiffProcessorTest {
     }
 
     @BeforeMethod
-    public void createRepositoryRoot() throws IOException {
-        root = Files.createTempDirectory("testin-diff");
-        committed.clear();
+    public void createRepositoryRoot() {
+        try {
+            root = Files.createTempDirectory("testin-diff");
+            committed.clear();
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @AfterMethod
-    public void removeRepositoryRoot() throws IOException {
-        if (root == null || !Files.exists(root)) return;
-        try (Stream<Path> paths = Files.walk(root)) {
-            paths.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
+    public void removeRepositoryRoot() {
+        try {
+            if (root == null || !Files.exists(root)) return;
+            try (Stream<Path> paths = Files.walk(root)) {
+                paths.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
+            }
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -73,10 +81,14 @@ public class GitDiffProcessorTest {
     /**
      * Writes a file into the working tree exactly as the plugin would.
      */
-    private void onDisk(final String relativePath, final TestCaseDto testCase) throws IOException {
-        final Path file = root.resolve(relativePath);
-        Files.createDirectories(file.getParent());
-        Files.writeString(file, mapper().writeValueAsString(testCase), StandardCharsets.UTF_8);
+    private void onDisk(final String relativePath, final TestCaseDto testCase) {
+        try {
+            final Path file = root.resolve(relativePath);
+            Files.createDirectories(file.getParent());
+            Files.writeString(file, mapper().writeValueAsString(testCase), StandardCharsets.UTF_8);
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     private List<PendingChange> review(final String... statusLines) {
@@ -88,7 +100,7 @@ public class GitDiffProcessorTest {
      * untracked, and it has to appear.
      */
     @Test
-    public void aNewlyWrittenTestCaseIsInTheReview() throws IOException {
+    public void aNewlyWrittenTestCaseIsInTheReview() {
         onDisk("Test Cases/login/case.json", testCase("a brand new case"));
 
         final List<PendingChange> review = review("?? \"Test Cases/login/case.json\"");
@@ -100,7 +112,7 @@ public class GitDiffProcessorTest {
     }
 
     @Test
-    public void anEditedTestCaseListsOnlyTheFieldsThatMoved() throws IOException {
+    public void anEditedTestCaseListsOnlyTheFieldsThatMoved() {
         final TestCaseDto before = testCase("the original");
         final TestCaseDto after = testCase("the original").setId(before.getId()).setModule("billing");
 
@@ -137,19 +149,23 @@ public class GitDiffProcessorTest {
      * that hid them left the tester unable to commit it (#66).
      */
     @Test
-    public void markersAreListedAsMarkerChanges() throws IOException {
-        onDisk("Test Cases/login/case.json", testCase("the test case among them"));
-        Files.writeString(root.resolve("Test Cases/login/.ts"), "{}", StandardCharsets.UTF_8);
-        Files.writeString(root.resolve(".tp"), "{}", StandardCharsets.UTF_8);
+    public void markersAreListedAsMarkerChanges() {
+        try {
+            onDisk("Test Cases/login/case.json", testCase("the test case among them"));
+            Files.writeString(root.resolve("Test Cases/login/.ts"), "{}", StandardCharsets.UTF_8);
+            Files.writeString(root.resolve(".tp"), "{}", StandardCharsets.UTF_8);
 
-        final List<PendingChange> review = review(
-                "?? .tp",
-                "?? \"Test Cases/login/.ts\"",
-                "?? \"Test Cases/login/case.json\"");
+            final List<PendingChange> review = review(
+                    "?? .tp",
+                    "?? \"Test Cases/login/.ts\"",
+                    "?? \"Test Cases/login/case.json\"");
 
-        assertEquals(review.size(), 3, "every changed file is a row - what is not listed cannot be committed");
-        assertEquals(review.stream().filter(change -> change.subject() == ChangeSubject.MARKER).count(), 2);
-        assertEquals(review.stream().filter(change -> change.subject() == ChangeSubject.TEST_CASE).count(), 1);
+            assertEquals(review.size(), 3, "every changed file is a row - what is not listed cannot be committed");
+            assertEquals(review.stream().filter(change -> change.subject() == ChangeSubject.MARKER).count(), 2);
+            assertEquals(review.stream().filter(change -> change.subject() == ChangeSubject.TEST_CASE).count(), 1);
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -158,7 +174,7 @@ public class GitDiffProcessorTest {
      * what the review lists, so it gets a row rather than disappearing (#66).
      */
     @Test
-    public void aFileGitCallsModifiedIsAlwaysARow() throws IOException {
+    public void aFileGitCallsModifiedIsAlwaysARow() {
         final TestCaseDto unchanged = testCase("identical on both sides");
 
         committed.put("Test Cases/login/case.json", mapper().writeValueAsString(unchanged));
@@ -175,21 +191,25 @@ public class GitDiffProcessorTest {
      * which is what {@code -uall} is for. Every one of them is a row.
      */
     @Test
-    public void awholeNewTestSetIsReviewedCaseByCase() throws IOException {
-        for (int index = 1; index <= 3; index++) {
-            onDisk("Test Cases/login flow/case-" + index + ".json", testCase("case " + index));
+    public void awholeNewTestSetIsReviewedCaseByCase() {
+        try {
+            for (int index = 1; index <= 3; index++) {
+                onDisk("Test Cases/login flow/case-" + index + ".json", testCase("case " + index));
+            }
+            Files.writeString(root.resolve("Test Cases/login flow/.ts"), "{}", StandardCharsets.UTF_8);
+
+            final List<PendingChange> review = review(
+                    "?? \"Test Cases/login flow/.ts\"",
+                    "?? \"Test Cases/login flow/case-1.json\"",
+                    "?? \"Test Cases/login flow/case-2.json\"",
+                    "?? \"Test Cases/login flow/case-3.json\"");
+
+            assertEquals(review.size(), 4, "three cases and the marker that makes the directory a test set");
+            assertTrue(review.stream().allMatch(diff -> diff.type() == DiffType.ADDED));
+            assertEquals(review.stream().filter(diff -> diff.subject() == ChangeSubject.TEST_CASE).count(), 3);
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
         }
-        Files.writeString(root.resolve("Test Cases/login flow/.ts"), "{}", StandardCharsets.UTF_8);
-
-        final List<PendingChange> review = review(
-                "?? \"Test Cases/login flow/.ts\"",
-                "?? \"Test Cases/login flow/case-1.json\"",
-                "?? \"Test Cases/login flow/case-2.json\"",
-                "?? \"Test Cases/login flow/case-3.json\"");
-
-        assertEquals(review.size(), 4, "three cases and the marker that makes the directory a test set");
-        assertTrue(review.stream().allMatch(diff -> diff.type() == DiffType.ADDED));
-        assertEquals(review.stream().filter(diff -> diff.subject() == ChangeSubject.TEST_CASE).count(), 3);
     }
 
     /**
@@ -198,7 +218,7 @@ public class GitDiffProcessorTest {
      * all the way to reading the file off disk.
      */
     @Test
-    public void aQuotedPathStillFindsItsFile() throws IOException {
+    public void aQuotedPathStillFindsItsFile() {
         onDisk("Test Cases/login flow/a case.json", testCase("quoted all the way down"));
 
         final List<PendingChange> review = review("?? \"Test Cases/login flow/a case.json\"");
@@ -215,7 +235,7 @@ public class GitDiffProcessorTest {
      * with it: the tester still has to be able to commit everything else (#66).
      */
     @Test
-    public void anUntrackedFileThatVanishedIsSkippedAndTheRestSurvives() throws IOException {
+    public void anUntrackedFileThatVanishedIsSkippedAndTheRestSurvives() {
         onDisk("Test Cases/login/case.json", testCase("still here"));
 
         final List<PendingChange> review = review(

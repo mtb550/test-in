@@ -82,38 +82,46 @@ public class GitWorkflowTest {
     }
 
     @BeforeMethod
-    public void createRepositories() throws IOException {
-        if (git(Path.of("."), "--version") == null) {
-            throw new SkipException("Git is not on the PATH, so the workflow cannot be exercised");
+    public void createRepositories() {
+        try {
+            if (git(Path.of("."), "--version") == null) {
+                throw new SkipException("Git is not on the PATH, so the workflow cannot be exercised");
+            }
+
+            final Path base = Files.createTempDirectory("testin-workflow");
+            remote = base.resolve("remote.git");
+            work = base.resolve("work");
+            Files.createDirectories(remote);
+            Files.createDirectories(work);
+
+            mustGit(remote, "init", "--bare", "--initial-branch=main");
+            mustGit(work, "init", "--initial-branch=main");
+
+            // Local, so the test never depends on - or touches - the developer's own
+            // Git identity.
+            mustGit(work, "config", "user.name", "Testin Test");
+            mustGit(work, "config", "user.email", "testin@example.invalid");
+            mustGit(work, "remote", "add", "origin", remote.toUri().toString());
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
         }
-
-        final Path base = Files.createTempDirectory("testin-workflow");
-        remote = base.resolve("remote.git");
-        work = base.resolve("work");
-        Files.createDirectories(remote);
-        Files.createDirectories(work);
-
-        mustGit(remote, "init", "--bare", "--initial-branch=main");
-        mustGit(work, "init", "--initial-branch=main");
-
-        // Local, so the test never depends on - or touches - the developer's own
-        // Git identity.
-        mustGit(work, "config", "user.name", "Testin Test");
-        mustGit(work, "config", "user.email", "testin@example.invalid");
-        mustGit(work, "remote", "add", "origin", remote.toUri().toString());
     }
 
     @AfterMethod
-    public void removeRepositories() throws IOException {
-        if (remote == null) return;
-        final Path base = remote.getParent();
-        if (base == null || !Files.exists(base)) return;
+    public void removeRepositories() {
+        try {
+            if (remote == null) return;
+            final Path base = remote.getParent();
+            if (base == null || !Files.exists(base)) return;
 
-        try (Stream<Path> paths = Files.walk(base)) {
-            paths.sorted(Comparator.reverseOrder()).forEach(path -> {
-                path.toFile().setWritable(true);
-                path.toFile().delete();
-            });
+            try (Stream<Path> paths = Files.walk(base)) {
+                paths.sorted(Comparator.reverseOrder()).forEach(path -> {
+                    path.toFile().setWritable(true);
+                    path.toFile().delete();
+                });
+            }
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -141,38 +149,42 @@ public class GitWorkflowTest {
      * rather than to the runner, which needs a live IDE for git4idea.
      */
     @Test
-    public void aCommitTooLargeForTheCommandLineStillLands() throws IOException {
-        mustGit(work, "commit", "--allow-empty", "-m", "root");
+    public void aCommitTooLargeForTheCommandLineStillLands() {
+        try {
+            mustGit(work, "commit", "--allow-empty", "-m", "root");
 
-        final Path set = work.resolve("test-01").resolve("Test Cases").resolve("pkg1").resolve("Login");
-        Files.createDirectories(set);
+            final Path set = work.resolve("test-01").resolve("Test Cases").resolve("pkg1").resolve("Login");
+            Files.createDirectories(set);
 
-        final Set<String> paths = new LinkedHashSet<>();
-        for (int i = 0; i < 1200; i++) {
-            final String name = UUID.randomUUID() + ".json";
-            Files.writeString(set.resolve(name), "{}");
-            paths.add("test-01/Test Cases/pkg1/Login/" + name);
+            final Set<String> paths = new LinkedHashSet<>();
+            for (int i = 0; i < 1200; i++) {
+                final String name = UUID.randomUUID() + ".json";
+                Files.writeString(set.resolve(name), "{}");
+                paths.add("test-01/Test Cases/pkg1/Login/" + name);
+            }
+
+            final int asArguments = paths.stream().mapToInt(path -> path.length() + 3).sum();
+            assertTrue(asArguments > WINDOWS_COMMAND_LINE_LIMIT,
+                    "the point of this test is a list that cannot be passed as arguments, and this one is only "
+                            + asArguments + " characters");
+
+            final Path pathspec = Files.createTempFile("testin-pathspec", ".lst");
+            Files.write(pathspec, GitCommandRunner.pathspecBytes(paths));
+
+            mustGit(work, "add", "--pathspec-from-file=" + pathspec, "--pathspec-file-nul");
+            mustGit(work, "commit", "--only", "-m", "imported 1200 cases",
+                    "--pathspec-from-file=" + pathspec, "--pathspec-file-nul");
+
+            final long committed = mustGit(work, "show", "--name-only", "--pretty=format:", "HEAD")
+                    .lines().filter(line -> !line.isBlank()).count();
+
+            assertEquals(committed, 1200, "every selected case belongs in the commit");
+            assertTrue(mustGit(work, "status", "--porcelain").isBlank(), "nothing should be left behind");
+
+            Files.deleteIfExists(pathspec);
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
         }
-
-        final int asArguments = paths.stream().mapToInt(path -> path.length() + 3).sum();
-        assertTrue(asArguments > WINDOWS_COMMAND_LINE_LIMIT,
-                "the point of this test is a list that cannot be passed as arguments, and this one is only "
-                        + asArguments + " characters");
-
-        final Path pathspec = Files.createTempFile("testin-pathspec", ".lst");
-        Files.write(pathspec, GitCommandRunner.pathspecBytes(paths));
-
-        mustGit(work, "add", "--pathspec-from-file=" + pathspec, "--pathspec-file-nul");
-        mustGit(work, "commit", "--only", "-m", "imported 1200 cases",
-                "--pathspec-from-file=" + pathspec, "--pathspec-file-nul");
-
-        final long committed = mustGit(work, "show", "--name-only", "--pretty=format:", "HEAD")
-                .lines().filter(line -> !line.isBlank()).count();
-
-        assertEquals(committed, 1200, "every selected case belongs in the commit");
-        assertTrue(mustGit(work, "status", "--porcelain").isBlank(), "nothing should be left behind");
-
-        Files.deleteIfExists(pathspec);
     }
 
     // ------------------------------------------------------- the test project
@@ -187,18 +199,27 @@ public class GitWorkflowTest {
                 .build();
     }
 
-    private void write(final Path root, final String relativePath, final Object content) throws IOException {
-        final Path file = root.resolve(relativePath);
-        Files.createDirectories(file.getParent() == null ? root : file.getParent());
-        Files.writeString(file, content instanceof String text ? text : mapper().writeValueAsString(content),
-                StandardCharsets.UTF_8);
+    private void write(final Path root, final String relativePath, final Object content) {
+
+        try {
+            final Path file = root.resolve(relativePath);
+            Files.createDirectories(file.getParent() == null ? root : file.getParent());
+            Files.writeString(file, content instanceof String text ? text : mapper().writeValueAsString(content),
+                    StandardCharsets.UTF_8);
+
+        } catch (final IOException ex) {
+
+            throw new AssertionError(ex);
+
+        }
+
     }
 
     /**
      * A test project as the plugin lays one out: a marker per directory, and the
      * test cases linked head to tail the way the editor orders them.
      */
-    private List<TestCaseDto> writeTestProject() throws IOException {
+    private List<TestCaseDto> writeTestProject() {
         write(work, ".tp", "{\"status\":\"ACTIVE\"}");
         write(work, "Test Cases/.tcd", "{}");
         write(work, "Test Runs/.trd", "{}");
@@ -257,10 +278,13 @@ public class GitWorkflowTest {
         mustGit(work, commit.toArray(String[]::new));
     }
 
-    private Path cloneAsColleague() throws IOException {
+    private Path cloneAsColleague() {
+
         final Path colleague = remote.getParent().resolve("colleague");
         mustGit(remote.getParent(), "clone", remote.toUri().toString(), colleague.toString());
         return colleague;
+
+
     }
 
     // ------------------------------------------------------------------ tests
@@ -270,7 +294,7 @@ public class GitWorkflowTest {
      * made at all: everything is untracked, and untracked was invisible.
      */
     @Test
-    public void aNewTestProjectIsReviewedCommittedAndPushed() throws IOException {
+    public void aNewTestProjectIsReviewedCommittedAndPushed() {
         final List<TestCaseDto> cases = writeTestProject();
 
         final List<PendingChange> pending = review();
@@ -295,7 +319,7 @@ public class GitWorkflowTest {
      * test set because a marker sits in it, and the review never lists markers.
      */
     @Test
-    public void whatTheColleagueClonesIsAUsableTestProject() throws IOException {
+    public void whatTheColleagueClonesIsAUsableTestProject() {
         writeTestProject();
 
         commit(stagedFor(review()), "the first commit");
@@ -320,7 +344,7 @@ public class GitWorkflowTest {
      * comes along is only what those cases need to mean anything.
      */
     @Test
-    public void onlyTheMarkersAboveTheSelectedCasesTravel() throws IOException {
+    public void onlyTheMarkersAboveTheSelectedCasesTravel() {
         writeTestProject();
 
         final Set<String> staged = stagedFor(review().stream()
@@ -339,7 +363,7 @@ public class GitWorkflowTest {
      * Git and reports only the field that moved.
      */
     @Test
-    public void editingACaseShowsExactlyWhatChanged() throws IOException {
+    public void editingACaseShowsExactlyWhatChanged() {
         final List<TestCaseDto> cases = writeTestProject();
         commit(stagedFor(review()), "the first commit");
 
@@ -359,7 +383,7 @@ public class GitWorkflowTest {
     }
 
     @Test
-    public void addingACaseToACommittedTestSetIsReviewedAsAnAddition() throws IOException {
+    public void addingACaseToACommittedTestSetIsReviewedAsAnAddition() {
         writeTestProject();
         commit(stagedFor(review()), "the first commit");
 
@@ -374,17 +398,21 @@ public class GitWorkflowTest {
     }
 
     @Test
-    public void deletingACaseIsReviewedFromWhatWasCommitted() throws IOException {
-        final List<TestCaseDto> cases = writeTestProject();
-        commit(stagedFor(review()), "the first commit");
+    public void deletingACaseIsReviewedFromWhatWasCommitted() {
+        try {
+            final List<TestCaseDto> cases = writeTestProject();
+            commit(stagedFor(review()), "the first commit");
 
-        Files.delete(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json"));
+            Files.delete(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json"));
 
-        final List<PendingChange> pending = review();
+            final List<PendingChange> pending = review();
 
-        assertEquals(pending.size(), 1);
-        assertEquals(pending.getFirst().type(), DiffType.DELETED);
-        assertEquals(pending.getFirst().testCase().getDescription(), "a registered user signs in");
+            assertEquals(pending.size(), 1);
+            assertEquals(pending.getFirst().type(), DiffType.DELETED);
+            assertEquals(pending.getFirst().testCase().getDescription(), "a registered user signs in");
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -399,7 +427,7 @@ public class GitWorkflowTest {
      * the commit never happens.
      */
     @Test
-    public void aRenameStagedElsewhereCommitsBothSides() throws IOException {
+    public void aRenameStagedElsewhereCommitsBothSides() {
         final List<TestCaseDto> cases = writeTestProject();
         commit(stagedFor(review()), "the first commit");
 
@@ -432,62 +460,66 @@ public class GitWorkflowTest {
      * the rebase has to finish afterward.
      */
     @Test
-    public void aConflictedTestCaseIsMergedFieldByFieldAndTheRebaseFinishes() throws IOException {
-        final List<TestCaseDto> cases = writeTestProject();
-        commit(stagedFor(review()), "the first commit");
-        mustGit(work, "push", "-u", "origin", "main");
+    public void aConflictedTestCaseIsMergedFieldByFieldAndTheRebaseFinishes() {
+        try {
+            final List<TestCaseDto> cases = writeTestProject();
+            commit(stagedFor(review()), "the first commit");
+            mustGit(work, "push", "-u", "origin", "main");
 
-        final String relativePath = "Test Cases/login flow/" + cases.getFirst().getId() + ".json";
+            final String relativePath = "Test Cases/login flow/" + cases.getFirst().getId() + ".json";
 
-        // The colleague sharpens the expected result.
-        final Path colleague = cloneAsColleague();
-        mustGit(colleague, "config", "user.name", "Colleague");
-        mustGit(colleague, "config", "user.email", "colleague@example.invalid");
+            // The colleague sharpens the expected result.
+            final Path colleague = cloneAsColleague();
+            mustGit(colleague, "config", "user.name", "Colleague");
+            mustGit(colleague, "config", "user.email", "colleague@example.invalid");
 
-        final Path theirCopy = colleague.resolve(relativePath);
-        final TestCaseDto theirs = mapper().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
-        Files.writeString(theirCopy, mapper().writeValueAsString(
-                theirs.setExpectedResult("the dashboard opens within two seconds").setUpdatedBy("colleague")),
-                StandardCharsets.UTF_8);
-        mustGit(colleague, "commit", "-am", "tightened the expected result");
-        mustGit(colleague, "push", "origin", "main");
+            final Path theirCopy = colleague.resolve(relativePath);
+            final TestCaseDto theirs = mapper().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+            Files.writeString(theirCopy, mapper().writeValueAsString(
+                    theirs.setExpectedResult("the dashboard opens within two seconds").setUpdatedBy("colleague")),
+                    StandardCharsets.UTF_8);
+            mustGit(colleague, "commit", "-am", "tightened the expected result");
+            mustGit(colleague, "push", "origin", "main");
 
-        // The tester rewords the description of the same case, and commits.
-        final Path myCopy = work.resolve(relativePath);
-        final TestCaseDto mine = mapper().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
-        Files.writeString(myCopy, mapper().writeValueAsString(
-                mine.setDescription("a registered user signs in with a valid password").setUpdatedBy("muteb")),
-                StandardCharsets.UTF_8);
-        commit(stagedFor(review()), "reworded the description");
+            // The tester rewords the description of the same case, and commits.
+            final Path myCopy = work.resolve(relativePath);
+            final TestCaseDto mine = mapper().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+            Files.writeString(myCopy, mapper().writeValueAsString(
+                    mine.setDescription("a registered user signs in with a valid password").setUpdatedBy("muteb")),
+                    StandardCharsets.UTF_8);
+            commit(stagedFor(review()), "reworded the description");
 
-        // Git stops: one file, two commits, no way for it to know the two edits
-        // are in different fields.
-        assertNull(git(work, "pull", "--rebase", "--autostash", "origin", "main"),
-                "the pull is expected to stop on the conflict");
+            // Git stops: one file, two commits, no way for it to know the two edits
+            // are in different fields.
+            assertNull(git(work, "pull", "--rebase", "--autostash", "origin", "main"),
+                    "the pull is expected to stop on the conflict");
 
-        final List<String> conflicting = GitRefs.unmergedPaths(
-                mustGit(work, "status", "--porcelain", "-uall").lines().filter(line -> !line.isBlank()).toList());
-        assertEquals(conflicting, List.of(relativePath));
+            final List<String> conflicting = GitRefs.unmergedPaths(
+                    mustGit(work, "status", "--porcelain", "-uall").lines().filter(line -> !line.isBlank()).toList());
+            assertEquals(conflicting, List.of(relativePath));
 
-        // What the plugin does with it: read the three sides Git is holding and
-        // merge them field by field.
-        final String base = mustGit(work, "show", ":1:" + relativePath);
-        final String remote = mustGit(work, "show", ":2:" + relativePath);
-        final String replayed = mustGit(work, "show", ":3:" + relativePath);
+            // What the plugin does with it: read the three sides Git is holding and
+            // merge them field by field.
+            final String base = mustGit(work, "show", ":1:" + relativePath);
+            final String remote = mustGit(work, "show", ":2:" + relativePath);
+            final String replayed = mustGit(work, "show", ":3:" + relativePath);
 
-        final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), base, replayed, remote);
-        assertTrue(merge.isSettled(), "different fields are not a disagreement");
+            final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), base, replayed, remote);
+            assertTrue(merge.isSettled(), "different fields are not a disagreement");
 
-        Files.writeString(myCopy, merge.merged().toPrettyString(), StandardCharsets.UTF_8);
-        mustGit(work, "add", "--", relativePath);
-        mustGit(work, "-c", "core.editor=true", "rebase", "--continue");
+            Files.writeString(myCopy, merge.merged().toPrettyString(), StandardCharsets.UTF_8);
+            mustGit(work, "add", "--", relativePath);
+            mustGit(work, "-c", "core.editor=true", "rebase", "--continue");
 
-        // Both edits survived, and the repository is not mid-rebase any more.
-        final TestCaseDto merged = mapper().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
-        assertEquals(merged.getDescription(), "a registered user signs in with a valid password");
-        assertEquals(merged.getExpectedResult(), "the dashboard opens within two seconds");
-        assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
-        assertEquals(review(), List.of(), "a resolved rebase leaves nothing pending");
+            // Both edits survived, and the repository is not mid-rebase any more.
+            final TestCaseDto merged = mapper().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+            assertEquals(merged.getDescription(), "a registered user signs in with a valid password");
+            assertEquals(merged.getExpectedResult(), "the dashboard opens within two seconds");
+            assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
+            assertEquals(review(), List.of(), "a resolved rebase leaves nothing pending");
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -502,49 +534,53 @@ public class GitWorkflowTest {
      * on its own, with nothing for the plugin to resolve.
      */
     @Test
-    public void twoTestersAddingCasesToOneSetDoNotConflictAtAll() throws IOException {
-        writeTestProject();
-        commit(stagedFor(review()), "the first commit");
-        mustGit(work, "push", "-u", "origin", "main");
+    public void twoTestersAddingCasesToOneSetDoNotConflictAtAll() {
+        try {
+            writeTestProject();
+            commit(stagedFor(review()), "the first commit");
+            mustGit(work, "push", "-u", "origin", "main");
 
-        // The colleague appends a case and pushes it.
-        final Path colleague = cloneAsColleague();
-        mustGit(colleague, "config", "user.name", "Colleague");
-        mustGit(colleague, "config", "user.email", "colleague@example.invalid");
+            // The colleague appends a case and pushes it.
+            final Path colleague = cloneAsColleague();
+            mustGit(colleague, "config", "user.name", "Colleague");
+            mustGit(colleague, "config", "user.email", "colleague@example.invalid");
 
-        final TestCaseDto theirNewCase = testCase("a locked account cannot sign in").setOrder("s");
-        write(colleague, "Test Cases/login flow/" + theirNewCase.getId() + ".json", theirNewCase);
+            final TestCaseDto theirNewCase = testCase("a locked account cannot sign in").setOrder("s");
+            write(colleague, "Test Cases/login flow/" + theirNewCase.getId() + ".json", theirNewCase);
 
-        mustGit(colleague, "add", "-A");
-        mustGit(colleague, "commit", "-m", "added the locked account case");
-        mustGit(colleague, "push", "origin", "main");
+            mustGit(colleague, "add", "-A");
+            mustGit(colleague, "commit", "-m", "added the locked account case");
+            mustGit(colleague, "push", "origin", "main");
 
-        // This tester appends one too, at the same moment.
-        final TestCaseDto myNewCase = testCase("a signed-in user signs out").setOrder("s");
-        write(work, "Test Cases/login flow/" + myNewCase.getId() + ".json", myNewCase);
-        commit(stagedFor(review()), "added the sign out case");
+            // This tester appends one too, at the same moment.
+            final TestCaseDto myNewCase = testCase("a signed-in user signs out").setOrder("s");
+            write(work, "Test Cases/login flow/" + myNewCase.getId() + ".json", myNewCase);
+            commit(stagedFor(review()), "added the sign out case");
 
-        // No conflict to resolve: the pull rebases straight through.
-        assertNotNull(git(work, "pull", "--rebase", "--autostash", "origin", "main"),
-                "two appended cases touch two files and merge on their own");
+            // No conflict to resolve: the pull rebases straight through.
+            assertNotNull(git(work, "pull", "--rebase", "--autostash", "origin", "main"),
+                    "two appended cases touch two files and merge on their own");
 
-        final List<TestCaseDto> after = new ArrayList<>();
-        try (Stream<Path> files = Files.list(work.resolve("Test Cases/login flow"))) {
-            for (final Path file : files.filter(f -> f.getFileName().toString().endsWith(".json")).sorted().toList()) {
-                after.add(mapper().readValue(Files.readString(file, StandardCharsets.UTF_8), TestCaseDto.class));
+            final List<TestCaseDto> after = new ArrayList<>();
+            try (Stream<Path> files = Files.list(work.resolve("Test Cases/login flow"))) {
+                for (final Path file : files.filter(f -> f.getFileName().toString().endsWith(".json")).sorted().toList()) {
+                    after.add(mapper().readValue(Files.readString(file, StandardCharsets.UTF_8), TestCaseDto.class));
+                }
             }
+
+            assertEquals(after.size(), 4, "both testers keep their case");
+
+            // Same rank on both, which is allowed: the order is settled the same way
+            // on every machine, so two testers never see two different lists.
+            final List<TestCaseDto> ordered = TestCaseOrder.ordered(after);
+            assertEquals(ordered, TestCaseOrder.ordered(new ArrayList<>(after.reversed())),
+                    "the order does not depend on what order the files were read in");
+            assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(theirNewCase.getId())));
+            assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(myNewCase.getId())));
+            assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
         }
-
-        assertEquals(after.size(), 4, "both testers keep their case");
-
-        // Same rank on both, which is allowed: the order is settled the same way
-        // on every machine, so two testers never see two different lists.
-        final List<TestCaseDto> ordered = TestCaseOrder.ordered(after);
-        assertEquals(ordered, TestCaseOrder.ordered(new ArrayList<>(after.reversed())),
-                "the order does not depend on what order the files were read in");
-        assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(theirNewCase.getId())));
-        assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(myNewCase.getId())));
-        assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
     }
 
     /**
@@ -552,31 +588,35 @@ public class GitWorkflowTest {
      * change arrives here on a pull.
      */
     @Test
-    public void aColleaguesChangeArrivesOnAPull() throws IOException {
-        final List<TestCaseDto> cases = writeTestProject();
-        commit(stagedFor(review()), "the first commit");
-        mustGit(work, "push", "-u", "origin", "main");
+    public void aColleaguesChangeArrivesOnAPull() {
+        try {
+            final List<TestCaseDto> cases = writeTestProject();
+            commit(stagedFor(review()), "the first commit");
+            mustGit(work, "push", "-u", "origin", "main");
 
-        final Path colleague = cloneAsColleague();
-        mustGit(colleague, "config", "user.name", "Colleague");
-        mustGit(colleague, "config", "user.email", "colleague@example.invalid");
+            final Path colleague = cloneAsColleague();
+            mustGit(colleague, "config", "user.name", "Colleague");
+            mustGit(colleague, "config", "user.email", "colleague@example.invalid");
 
-        final Path theirCopy = colleague.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json");
-        final TestCaseDto theirs = mapper().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
-        Files.writeString(theirCopy, mapper().writeValueAsString(theirs.setExpectedResult("the dashboard opens within two seconds")),
-                StandardCharsets.UTF_8);
+            final Path theirCopy = colleague.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json");
+            final TestCaseDto theirs = mapper().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+            Files.writeString(theirCopy, mapper().writeValueAsString(theirs.setExpectedResult("the dashboard opens within two seconds")),
+                    StandardCharsets.UTF_8);
 
-        mustGit(colleague, "commit", "-am", "tightened the expected result");
-        mustGit(colleague, "push", "origin", "main");
+            mustGit(colleague, "commit", "-am", "tightened the expected result");
+            mustGit(colleague, "push", "origin", "main");
 
-        mustGit(work, "pull", "--rebase", "--autostash", "origin", "main");
+            mustGit(work, "pull", "--rebase", "--autostash", "origin", "main");
 
-        final TestCaseDto pulled = mapper().readValue(
-                Files.readString(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json"),
-                        StandardCharsets.UTF_8), TestCaseDto.class);
+            final TestCaseDto pulled = mapper().readValue(
+                    Files.readString(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json"),
+                            StandardCharsets.UTF_8), TestCaseDto.class);
 
-        assertEquals(pulled.getExpectedResult(), "the dashboard opens within two seconds");
-        assertEquals(review(), List.of(), "a clean pull leaves nothing pending");
+            assertEquals(pulled.getExpectedResult(), "the dashboard opens within two seconds");
+            assertEquals(review(), List.of(), "a clean pull leaves nothing pending");
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -596,7 +636,7 @@ public class GitWorkflowTest {
      * typed into a test - quoting, untracked marks and all.
      */
     @Test
-    public void gitReportsNewTestCasesAsUntrackedWithQuotedPaths() throws IOException {
+    public void gitReportsNewTestCasesAsUntrackedWithQuotedPaths() {
         writeTestProject();
 
         final String status = mustGit(work, "status", "--porcelain", "-uall");

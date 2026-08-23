@@ -15,7 +15,6 @@ import org.testin.logger.Logger;
 import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -228,12 +227,8 @@ public class CreateTestMethod implements GenAction {
         final @NotNull Optional<PsiClass> existing = Optional.ofNullable(psiFacade.findClass(path, scope));
         if (existing.isPresent()) return existing;
 
-        try {
-            JavaSourceRoot.inRootOrWarn(p, root -> JavaSourceRoot.classFile(root, packageList, className));
-
-        } catch (final IOException ex) {
-            Logger.error("Failed to create class file for '" + className + "': " + ex.getMessage());
-        }
+        JavaSourceRoot.inRootOrWarn(p, "creating the class for " + className,
+                root -> JavaSourceRoot.classFile(root, packageList, className));
 
         PsiDocumentManager.getInstance(p).commitAllDocuments();
         return Optional.ofNullable(psiFacade.findClass(path, scope));

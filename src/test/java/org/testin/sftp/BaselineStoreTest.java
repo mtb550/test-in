@@ -44,17 +44,25 @@ public class BaselineStoreTest {
     }
 
     @BeforeMethod
-    public void createDirectory() throws IOException {
-        directory = Files.createTempDirectory("testin-baseline");
-        mapper = mapper();
+    public void createDirectory() {
+        try {
+            directory = Files.createTempDirectory("testin-baseline");
+            mapper = mapper();
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @AfterMethod
-    public void removeDirectory() throws IOException {
-        if (directory == null || !Files.exists(directory)) return;
+    public void removeDirectory() {
+        try {
+            if (directory == null || !Files.exists(directory)) return;
 
-        try (Stream<Path> paths = Files.walk(directory)) {
-            paths.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
+            try (Stream<Path> paths = Files.walk(directory)) {
+                paths.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
+            }
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -86,28 +94,36 @@ public class BaselineStoreTest {
     }
 
     @Test
-    public void anUnreadableBaselineAnswersEmptyRatherThanHalfOfItself() throws IOException {
-        final Path file = directory.resolve("corrupt.json.gz");
-        Files.write(file, "this is not gzip".getBytes(StandardCharsets.UTF_8));
+    public void anUnreadableBaselineAnswersEmptyRatherThanHalfOfItself() {
+        try {
+            final Path file = directory.resolve("corrupt.json.gz");
+            Files.write(file, "this is not gzip".getBytes(StandardCharsets.UTF_8));
 
-        assertSame(BaselineStore.read(mapper, file), Baseline.EMPTY,
-                "every file then looks new to both sides, so the next sync asks instead of deleting");
+            assertSame(BaselineStore.read(mapper, file), Baseline.EMPTY,
+                    "every file then looks new to both sides, so the next sync asks instead of deleting");
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @Test
-    public void nothingIsLeftBehindWhenAWriteFails() throws IOException {
-        // A directory with something in it where the file should be. An empty
-        // one is not enough: a move that replaces an existing entry removes an
-        // empty directory and succeeds, which is the platform behaving sensibly
-        // and not the failure this is about.
-        final Path taken = directory.resolve("taken.json.gz");
-        Files.createDirectories(taken);
-        Files.writeString(taken.resolve("occupied"), "in the way");
+    public void nothingIsLeftBehindWhenAWriteFails() {
+        try {
+            // A directory with something in it where the file should be. An empty
+            // one is not enough: a move that replaces an existing entry removes an
+            // empty directory and succeeds, which is the platform behaving sensibly
+            // and not the failure this is about.
+            final Path taken = directory.resolve("taken.json.gz");
+            Files.createDirectories(taken);
+            Files.writeString(taken.resolve("occupied"), "in the way");
 
-        assertFalse(BaselineStore.write(mapper, taken, new Baseline(Map.of("a.json", "{}"))),
-                "a baseline that could not be stored must say so");
-        assertFalse(Files.exists(directory.resolve("taken.json.gz.part")),
-                "a half-written baseline claims files were agreed that never arrived");
+            assertFalse(BaselineStore.write(mapper, taken, new Baseline(Map.of("a.json", "{}"))),
+                    "a baseline that could not be stored must say so");
+            assertFalse(Files.exists(directory.resolve("taken.json.gz.part")),
+                    "a half-written baseline claims files were agreed that never arrived");
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @Test
