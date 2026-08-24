@@ -1,5 +1,6 @@
 package org.testin.ui.framework;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.DocumentAdapter;
@@ -24,6 +25,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.text.DefaultEditorKit;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A large input field over a selection list — the component of the create
@@ -50,6 +52,11 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
     private final @NotNull JBPanel<?> panel;
     private final @NotNull String placeHolderText;
     private final @NotNull Rows<T> rows;
+    /**
+     * Which query the rows on screen answer. Bumped on every request so a slow
+     * answer arriving after a newer keystroke knows it is stale and steps aside.
+     */
+    private final @NotNull AtomicInteger queryGeneration = new AtomicInteger();
     private @NotNull Runnable submitRequest = () -> {
     };
     private boolean emptyWarningShown;
@@ -134,9 +141,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
      * nothing rather than rebuild a list nobody is looking at.
      */
     private void installRowRefresh() {
-        final @NotNull Timer debounce = new Timer(DEBOUNCE_MILLIS, event -> {
-            if (panel.isShowing()) show(rows.forQuery(textField.getText().trim()));
-        });
+        final @NotNull Timer debounce = new Timer(DEBOUNCE_MILLIS, event -> requestRows());
         debounce.setRepeats(false);
 
         textField.getDocument().addDocumentListener(new DocumentAdapter() {
@@ -144,6 +149,33 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
             protected void textChanged(final @NotNull DocumentEvent e) {
                 debounce.restart();
             }
+        });
+    }
+
+    /**
+     * Asks {@link Rows} for the query off the EDT, and shows the answer back on
+     * it.
+     * <p>
+     * A search is a pass over every test case in the project, and that does not
+     * belong on the thread painting the dialog - a large project made the field
+     * stutter as the tester typed. Each request takes the next generation, so a
+     * slow answer that lands after a newer keystroke is dropped rather than
+     * painted over the newer one. A fixed set answers instantly and takes the
+     * same path, harmlessly.
+     */
+    private void requestRows() {
+        if (!panel.isShowing()) return;
+
+        final int generation = queryGeneration.incrementAndGet();
+        final @NotNull String query = textField.getText().trim();
+
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final @NotNull List<SelectionList<T>> found = rows.forQuery(query);
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (generation != queryGeneration.get() || !panel.isShowing()) return;
+                show(found);
+            });
         });
     }
 

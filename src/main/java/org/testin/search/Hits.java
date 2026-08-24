@@ -36,8 +36,11 @@ public final class Hits {
      * How many hits are shown.
      * <p>
      * A query of one letter matches thousands, and nobody reads past the first
-     * screen of them - they type another letter instead. Capping is also what
-     * makes a short query cheap: the scan stops as soon as it has this many.
+     * screen of them - they type another letter instead. The cap is on what is
+     * shown, not on the work done to find it: the matches are sorted best-first
+     * before the top ones are kept, so the pass reads every case either way. What
+     * keeps a short query cheap is refusing to search cases for it at all
+     * ({@link #tooShort}).
      */
     private static final int SHOWN = 50;
 
