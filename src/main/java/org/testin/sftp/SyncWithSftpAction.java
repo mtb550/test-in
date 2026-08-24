@@ -239,8 +239,8 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
             } else if (!outcome.conflicting().isEmpty()) {
                 notifier.warn(p, "Synced, with " + outcome.conflicts() + " left to you",
                         "Both sides changed " + naming(outcome.conflicting())
-                                + ", and they are not test cases, so there are no fields to merge. "
-                                + "This machine kept its copies, and nothing was sent for them.");
+                                + ". This machine kept its copies and sent nothing for them; "
+                                + "you'll be asked about anything that can be merged field by field.");
             }
 
             askAboutDeletions(outcome, projectRoot);
