@@ -415,6 +415,17 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         loadDataAsync();
     }
 
+    /**
+     * Busy while a grid cell is open for editing - a reload would discard the
+     * half-typed value, so an on-disk refresh leaves this editor be until the
+     * tester is done (#20). The run editor answers this with its execution state
+     * as well; a test set has no execution, only its cells.
+     */
+    @Override
+    public boolean isBusy() {
+        return grid.map(GridView::isCellOpen).orElse(false);
+    }
+
     @Override
     public @NotNull String cardTitle(final int globalIndex, final @NotNull TestCaseDto tc) {
         final @NotNull Set<TestEditorAttributes> selected = getSelectedDetails();

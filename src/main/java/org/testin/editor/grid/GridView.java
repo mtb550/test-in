@@ -19,4 +19,14 @@ import org.jetbrains.annotations.NotNull;
 public record GridView(@NotNull JBTable table,
                        @NotNull JBScrollPane scrollPane,
                        @NotNull Disposable fontSync) {
+
+    /**
+     * Whether a cell is open for editing under the tester's cursor. A reload
+     * would throw that half-typed value away, so an editor showing this grid
+     * reports itself busy while it is true and an on-disk refresh waits for the
+     * tester to finish (#20). One owner for the question, asked by both editors.
+     */
+    public boolean isCellOpen() {
+        return table.isEditing();
+    }
 }

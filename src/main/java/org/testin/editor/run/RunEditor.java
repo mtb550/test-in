@@ -770,7 +770,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     @Override
     public boolean isBusy() {
-        return isExecuting() || grid.map(view -> view.table().isEditing()).orElse(false);
+        return isExecuting() || grid.map(GridView::isCellOpen).orElse(false);
     }
 
     /**
