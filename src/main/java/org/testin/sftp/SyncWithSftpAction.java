@@ -265,7 +265,8 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
         new ConfirmDialog(p, "Removed On The Server",
                 what + " here were deleted on the server by somebody else, and this machine has not "
                         + "touched them since: " + naming(outcome.removedOnServer())
-                        + ". Removing them here agrees with that. Keeping them sends them back on the next sync.",
+                        + ". Removing them here agrees with that. Keeping them offers the same choice "
+                        + "again on the next sync.",
                 "", "", "Remove " + what,
                 () -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
                     Services.getInstance(p, ProjectIndexer.class)
