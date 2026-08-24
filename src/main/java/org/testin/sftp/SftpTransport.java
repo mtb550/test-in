@@ -188,7 +188,13 @@ public final class SftpTransport implements AutoCloseable {
             sftp.mkdir(path);
             return true;
         } catch (final SftpException ex) {
-            return false;
+            // Already there means somebody else holds the lock, which is the false
+            // the caller is asking for. Anything else - no permission, a full disk
+            // - is a real failure wearing the same false, and reading it as
+            // "another sync is running" sends the tester chasing a colleague who
+            // is not there. So it is raised unless the folder now exists.
+            if (exists(relative)) return false;
+            throw failed("make the directory " + path, ex);
         }
     }
 
