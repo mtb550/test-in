@@ -55,6 +55,12 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
                 .row("Modified At", Display.formatDate(marker.getModifiedAt()))
                 .row("Status", marker.getStatusLabel());
 
+        // Whatever else the marker has to say about itself - a run lists the
+        // configuration it was created with. Added without asking what kind of
+        // marker this is, the same way the status row is: a marker with nothing
+        // to add returns nothing, and a blank value is dropped.
+        marker.getDetailRows().forEach(extra -> details.row(extra.caption(), extra.value()));
+
         type.getCounts().forEach(count -> details.row(count.getCaption(), count.of(figures)));
 
         components = List.of(

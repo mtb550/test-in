@@ -41,6 +41,7 @@ import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.view.marker.MarkerDetailsViewDialog;
 import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
@@ -374,6 +375,21 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
 
         reload();
+    }
+
+    /**
+     * What this run is: its audit, its status, and the configuration it was
+     * created with.
+     * <p>
+     * The same popup the tree's Details action opens, on the same node - so the
+     * tester reads one thing in one shape whether they reached it from the tree
+     * or from the run they already have open. Everything in it comes from the
+     * node's marker, which the indexer is holding, so nothing is read from disk
+     * to answer.
+     */
+    @Override
+    public void onToolBarNodeDetailsClicked() {
+        new MarkerDetailsViewDialog(p, parent).show();
     }
 
     /**

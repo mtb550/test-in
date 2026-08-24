@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -86,5 +87,22 @@ public interface Marker {
     @JsonIgnore
     default @NotNull String getStatusLabel() {
         return "";
+    }
+
+    /**
+     * What else this marker has to say about its node, as captions and values
+     * the Details popup lists under the audit block.
+     * <p>
+     * Empty for a marker with nothing to add, which is most of them. The same
+     * shape as {@link #getStatusLabel()} and for the same reason: the popup adds
+     * whatever comes back without asking which kind of marker it is, and the
+     * details builder drops a row whose value is blank.
+     * <p>
+     * JsonIgnore for the reason the status label is - a derived list must never
+     * reach the marker file.
+     */
+    @JsonIgnore
+    default @NotNull List<DetailRow> getDetailRows() {
+        return List.of();
     }
 }

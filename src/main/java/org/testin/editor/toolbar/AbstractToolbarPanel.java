@@ -89,11 +89,24 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
             }
         }
 
+        // The search takes the slack, which is what puts everything before it on
+        // the left and everything after it hard against the right edge.
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(searchTxt, gbc);
-
         toolbarItems.put(SearchTxt.class, searchTxt);
+
+        gbc.gridx++;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+
+        for (final ToolbarItem item : getTrailingComponents()) {
+            if (item instanceof JComponent component) {
+                toolbarItems.put(item.getClass(), item);
+                add(component, gbc);
+                gbc.gridx++;
+            }
+        }
 
         wireViewButtons();
     }
@@ -126,6 +139,19 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     }
 
     protected abstract @NotNull List<ToolbarItem> getCustomComponents();
+
+    /**
+     * The items that sit after the search field, against the right edge.
+     * <p>
+     * Declared apart from {@link #getCustomComponents()} rather than by a flag on
+     * each item, because the search is what separates the two sides: it is the
+     * one component that takes the leftover width, so where an item goes is
+     * decided by which side of it the item is added on. A toolbar with nothing on
+     * the right says so by not overriding this.
+     */
+    protected @NotNull List<ToolbarItem> getTrailingComponents() {
+        return List.of();
+    }
 
     @Override
     public void dispose() {

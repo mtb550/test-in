@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 public class CreateTestRun implements NodeCreator {
@@ -127,16 +128,21 @@ public class CreateTestRun implements NodeCreator {
     }
 
     private void saveSelectedToJSON(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull ExplorerPanel pp, final @NotNull TestRunDirectoryDto trDir) {
+        // Read once, here, while the dialog is still on screen. Everything below
+        // works from this map rather than going back to the form, and the
+        // background write further down could not go back to it anyway (#87).
+        final @NotNull Map<TestRunConfiguration, String> configuration = form.configuration();
+
         final @NotNull TestRunDto tr = new TestRunDto()
                 .setCreatedBy(Services.getInstance(p, AppSettingsState.class).testerName)
-                .setChangeLog(form.getChangeLog().getText().trim())
-                .setCommitId(form.getCommitIdField().getText().trim())
-                .setPlatform(form.getFieldValue(TestRunConfiguration.PLATFORM))
-                .setComponent(form.getFieldValue(TestRunConfiguration.COMPONENT))
-                .setTestType(form.getFieldValue(TestRunConfiguration.TEST_TYPE))
-                .setLanguage(form.getFieldValue(TestRunConfiguration.LANGUAGE))
-                .setBrowser(form.getFieldValue(TestRunConfiguration.BROWSER))
-                .setDeviceType(form.getFieldValue(TestRunConfiguration.DEVICE_TYPE));
+                .setChangeLog(configuration.get(TestRunConfiguration.CHANGE_LOG))
+                .setCommitId(configuration.get(TestRunConfiguration.COMMIT_ID))
+                .setPlatform(configuration.get(TestRunConfiguration.PLATFORM))
+                .setComponent(configuration.get(TestRunConfiguration.COMPONENT))
+                .setTestType(configuration.get(TestRunConfiguration.TEST_TYPE))
+                .setLanguage(configuration.get(TestRunConfiguration.LANGUAGE))
+                .setBrowser(configuration.get(TestRunConfiguration.BROWSER))
+                .setDeviceType(configuration.get(TestRunConfiguration.DEVICE_TYPE));
 
         final @NotNull List<TestRunItems> items = new ArrayList<>();
         selection.forEachChecked(checked -> {
@@ -156,7 +162,11 @@ public class CreateTestRun implements NodeCreator {
 
             // Defaults are correct (status CREATED); addTestRunDir stamps the
             // tester's audit info before the marker's first write.
-            TestRunMarker marker = new TestRunMarker();
+            //
+            // The configuration goes on the marker too, so the node can describe
+            // itself without its run file being opened: Details on a run, from
+            // the tree or from the run's own toolbar, is then a lookup.
+            final @NotNull TestRunMarker marker = new TestRunMarker().setConfiguration(configuration);
             trDir.setMarker(marker);
 
             Services.getInstance(p, ProjectIndexer.class).addTestRunDir(trDir);

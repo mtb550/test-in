@@ -28,6 +28,13 @@ public interface Toolbar {
 
     void onToolBarRefreshButtonClicked();
 
+    /**
+     * The tester asked what this node is. Default empty because only the run
+     * toolbar offers it today.
+     */
+    default void onToolBarNodeDetailsClicked() {
+    }
+
     default void onToolBarSwitchedToListView() {
     }
 
