@@ -359,7 +359,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         public @NotNull ComponentDialogBase<TextFieldWithSelections<T>> build() {
             if (rows.isPresent()) {
                 return new ComponentDialogBase<>(
-                        new TextFieldWithSelections<>(icon, placeholder, rows.orElseThrow(), SEARCH_ROWS));
+                        new TextFieldWithSelections<>(icon, placeholder, List.of(), rows.orElseThrow(), SEARCH_ROWS));
             }
 
             if (selections.isEmpty()) {
@@ -372,7 +372,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             // case of the other.
             final @NotNull List<SelectionList<T>> fixed = List.copyOf(selections);
             return new ComponentDialogBase<>(
-                    new TextFieldWithSelections<>(icon, placeholder, query -> fixed, fixed.size()));
+                    new TextFieldWithSelections<>(icon, placeholder, fixed, query -> fixed, fixed.size()));
         }
     }
 }

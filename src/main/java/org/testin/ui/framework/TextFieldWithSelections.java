@@ -1,6 +1,7 @@
 package org.testin.ui.framework;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.DocumentAdapter;
@@ -20,6 +21,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -61,8 +63,14 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
     private @NotNull Runnable submitRequest = () -> {
     };
     private boolean emptyWarningShown;
+    /**
+     * Whether the opening rows have been asked for. Once, on the first time the
+     * dialog is on screen - a hierarchy event can say "showing" more than once
+     * for one dialog, and a search is too expensive to run again for it.
+     */
+    private boolean askedOnce;
 
-    TextFieldWithSelections(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull Rows<T> rows, final int visibleRows) {
+    TextFieldWithSelections(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull List<SelectionList<T>> shownBeforeAsking, final @NotNull Rows<T> rows, final int visibleRows) {
         this.placeHolderText = placeHolderText;
         this.rows = rows;
         textField = new ExtendableTextField("");
@@ -96,7 +104,11 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
         // as results come and go.
         list.setVisibleRowCount(visibleRows);
         list.setCellRenderer(new SelectionRenderer<>());
-        show(rows.forQuery(""));
+        // What there is to show before anything has been asked. A fixed set of
+        // choices is all of it and is on screen from here, so Enter works on the
+        // first frame; a search has nothing yet and fills in from installFirstFill
+        // a moment later, off this thread.
+        show(shownBeforeAsking);
 
         list.addListSelectionListener(event -> syncLeadingIcon());
         syncLeadingIcon();
@@ -127,6 +139,28 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
         panel.add(scrollPane, BorderLayout.CENTER);
 
         installRowRefresh();
+        installFirstFill();
+    }
+
+    /**
+     * Asks for the opening rows once the dialog is on screen, instead of in the
+     * constructor.
+     * <p>
+     * The first list is a query like any other, and for the search it is the
+     * broadest one there is - every test set and every test run in the project,
+     * copied, filtered and sorted. Building it in the constructor ran that pass
+     * on the thread painting the dialog, at the moment the tester pressed the
+     * shortcut, which is the one moment they are watching it. A fixed set takes
+     * this path too and answers with what is already showing, so nothing moves.
+     */
+    private void installFirstFill() {
+        panel.addHierarchyListener(event -> {
+            if ((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) == 0) return;
+            if (askedOnce || !panel.isShowing()) return;
+
+            askedOnce = true;
+            requestRows();
+        });
     }
 
     /**
@@ -167,13 +201,19 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
         final int generation = queryGeneration.incrementAndGet();
         final @NotNull String query = textField.getText().trim();
 
+        // This dialog's own modality, read here while it is on screen. A runnable
+        // posted without it is queued behind the open dialog and runs only once
+        // that dialog closes - which, for the list the dialog exists to show,
+        // means never.
+        final @NotNull ModalityState modality = ModalityState.stateForComponent(panel);
+
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull List<SelectionList<T>> found = rows.forQuery(query);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (generation != queryGeneration.get() || !panel.isShowing()) return;
                 show(found);
-            });
+            }, modality);
         });
     }
 
