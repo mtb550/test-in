@@ -152,6 +152,14 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
      * Enter takes, so it has to be a row the tester can see.
      */
     private void show(final @NotNull List<SelectionList<T>> found) {
+        // A fixed set of choices answers the same rows every time the tester
+        // types, and replacing them only to drop back to the first would throw
+        // away the kind they picked above the name they are entering - a run made
+        // "Test Run" however they set it. Rows that did not change leave the
+        // selection alone; a search, whose rows do change, still opens on the top
+        // row, which is what Enter takes.
+        if (found.equals(rowModel.getItems())) return;
+
         rowModel.replaceAll(found);
 
         if (found.isEmpty()) return;
