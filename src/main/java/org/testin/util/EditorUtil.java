@@ -216,11 +216,17 @@ public final class EditorUtil {
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
         for (final VirtualFile open : fed.getOpenFiles()) {
-            if (dir.getName().equals(open.getName())) {
-                Logger.info("Editor already open, focusing: " + dir.getName());
-                fed.openFile(open, true);
-                return true;
-            }
+            // By path, not by name: two nodes in different packages can share a
+            // name, and matching on the name focused whichever one happened to be
+            // open first - so a case picked from the search opened its neighbour's
+            // editor. The path is the node's identity, which is what editorFor
+            // already matches on.
+            if (!(open instanceof UnifiedVirtualFile testinFile)) continue;
+            if (!testinFile.getDir().getPath().equals(dir.getPath())) continue;
+
+            Logger.info("Editor already open, focusing: " + dir.getName());
+            fed.openFile(open, true);
+            return true;
         }
 
         if (!dir.isOpenableInEditor()) {
