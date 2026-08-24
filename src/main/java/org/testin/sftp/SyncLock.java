@@ -42,9 +42,19 @@ public record SyncLock(@NotNull SftpTransport transport) {
     public @NotNull Optional<String> takenBy(final @NotNull String tester) {
         if (!transport.makeDirectory(FOLDER)) return Optional.of(whoHasIt());
 
-        // After the directory, so the claim is what the other client sees first
-        // and this is only ever the explanation of a claim already made.
-        transport.write(HOLDER, (tester + "\n" + ZonedDateTime.now()).getBytes(StandardCharsets.UTF_8));
+        try {
+            // After the directory, so the claim is what the other client sees
+            // first and this is only ever the explanation of a claim already made.
+            transport.write(HOLDER, (tester + "\n" + ZonedDateTime.now()).getBytes(StandardCharsets.UTF_8));
+        } catch (final RuntimeException ex) {
+            // The directory is the lock, and it is already on the server. Failing
+            // to write the holder line inside it would otherwise leave that lock
+            // behind with no sync ever entering the finally that releases it - so
+            // it is given back here before the failure travels on, rather than
+            // freezing every tester until a hidden folder is deleted over SSH.
+            release();
+            throw ex;
+        }
         return Optional.empty();
     }
 
