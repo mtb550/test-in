@@ -377,7 +377,11 @@ public final class SftpSync {
 
             final @NotNull String base = agreed.getOrDefault(path, "");
             final @NotNull String mine = text(local.getOrDefault(path, new byte[0]));
-            final @NotNull String theirs = text(transport.read(path));
+            // Read only while the server still holds it. A case the server
+            // deleted is not there to fetch, and asking for it throws and takes
+            // the whole sync down with it - so an absent side is read as blank,
+            // which is exactly the delete-versus-edit the next line hands over.
+            final @NotNull String theirs = onServer.containsKey(path) ? text(transport.read(path)) : "";
 
             // One side deleted the case and the other edited it. Which of those
             // a team meant is not a field question, so it stays with the tester.
