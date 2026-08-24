@@ -2,6 +2,7 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -835,9 +836,22 @@ public final class ProjectIndexer {
     }
 
     public void scanSingleProject(final @NotNull Path projectPath) {
+        scanSingleProject(projectPath, new EmptyProgressIndicator());
+    }
+
+    /**
+     * The same pass, reporting into a bar the tester can watch and stop.
+     * <p>
+     * The indicator is carried rather than made here because the scan is what
+     * knows the answer: which test set it is on, how far through it is, and
+     * whether Cancel has been pressed. A caller that has a bar hands it over; a
+     * caller with nowhere to show one passes an empty indicator, which reports
+     * nothing and is never cancelled, so both go down one path (#20).
+     */
+    public void scanSingleProject(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         Logger.info("Scanning single project: " + projectPath.getFileName());
         try {
-            scanCoordinator.scan(projectPath);
+            scanCoordinator.scan(projectPath, indicator);
         } catch (final Exception ex) {
             Logger.error("Failed to scan single project: " + ex.getMessage());
         }

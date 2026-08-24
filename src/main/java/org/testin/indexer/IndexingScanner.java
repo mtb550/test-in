@@ -85,7 +85,14 @@ final class IndexingScanner {
         try (Stream<Path> paths = Files.list(tcDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
-            dirs.forEach(dirPath -> {
+            for (final Path dirPath : dirs) {
+                // Between test sets, because that is where the tester's Cancel
+                // has to land: a project is thousands of files and the pass is
+                // long enough to want stopping. Asked rather than thrown -
+                // stopping is an answer, so there is no exception for every
+                // caller above to sort back out from a real failure.
+                if (indicator.isCanceled()) return;
+
                 if (Files.exists(dirPath.resolve(DirectoryType.TS.getMarker()))) {
                     scanTestSet(dirPath, parent, indicator);
 
@@ -95,7 +102,7 @@ final class IndexingScanner {
                 } else {
                     Logger.warn("Skipping unmarked directory under test cases (missing .ts/.tsp): " + dirPath);
                 }
-            });
+            }
         } catch (final Exception ex) {
             Logger.error("Failed to list test sets: " + ex.getMessage());
         }
@@ -175,7 +182,10 @@ final class IndexingScanner {
         try (Stream<Path> paths = Files.list(trDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
-            dirs.forEach(dirPath -> {
+            for (final Path dirPath : dirs) {
+                // The same stopping point on the run side, for the same reason.
+                if (indicator.isCanceled()) return;
+
                 if (Files.exists(dirPath.resolve(DirectoryType.TR.getMarker()))) {
                     scanTestRun(dirPath, parent, indicator);
                 } else if (Files.exists(dirPath.resolve(DirectoryType.TRP.getMarker()))) {
@@ -183,7 +193,7 @@ final class IndexingScanner {
                 } else {
                     Logger.warn("Skipping unmarked directory under test runs (missing .tr/.trp): " + dirPath);
                 }
-            });
+            }
         } catch (final Exception ex) {
             Logger.error("Failed to list test runs: " + ex.getMessage());
         }

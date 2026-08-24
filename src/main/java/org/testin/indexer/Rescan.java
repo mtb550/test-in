@@ -99,9 +99,9 @@ public final class Rescan {
      * (#77).
      * <p>
      * The re-read itself is long - a project is thousands of files - so it runs
-     * as a {@code Task.Backgroundable} with a progress bar the tester can cancel,
-     * the way every other index pass does, rather than on a shared scheduled
-     * thread that shows nothing and cannot be stopped.
+     * as a {@code Task.Backgroundable} with a progress bar the tester can watch
+     * and stop, rather than on a shared scheduled thread that shows nothing and
+     * cannot be stopped.
      */
     private void refresh(final @NotNull Project p, final @NotNull List<Path> testProjects) {
         if (p.isDisposed() || !Services.isCreated(p, ExplorerPanel.class)) return;
@@ -110,9 +110,25 @@ public final class Rescan {
                 new Task.Backgroundable(p, "Reading test data that changed on disk", true) {
                     @Override
                     public void run(final @NotNull ProgressIndicator indicator) {
-                        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                        testProjects.forEach(indexer::scanSingleProject);
+                        indicator.setIndeterminate(false);
 
+                        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+
+                        // Handed down rather than kept here. The bar belongs to
+                        // this task but only the scan can fill it in, and only
+                        // the scan can stop: held back, the tester watched a
+                        // title with no test set named under it and a Cancel
+                        // button that did nothing.
+                        for (final Path testProject : testProjects) {
+                            if (indicator.isCanceled()) break;
+
+                            indexer.scanSingleProject(testProject, indicator);
+                        }
+
+                        // After a cancel as well as after a finish. Whatever was
+                        // read is in the index either way, and a tree still
+                        // showing what the files used to say would be further
+                        // from the truth than a partial one.
                         ApplicationManager.getApplication().invokeLater(() -> {
                             if (p.isDisposed()) return;
 

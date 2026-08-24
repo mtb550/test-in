@@ -27,15 +27,6 @@ final class ProjectScanCoordinator {
         }
     }
 
-    void scan(final @NotNull Path projectPath) {
-        scanLock.readLock().lock();
-        try {
-            scanner.scanProject(projectPath);
-        } finally {
-            scanLock.readLock().unlock();
-        }
-    }
-
     void rescanExclusively(final @NotNull Path projectPath) {
         scanLock.writeLock().lock();
         try {
