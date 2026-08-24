@@ -1,6 +1,8 @@
 package org.testin.editor.toolbar;
 
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.dto.dirs.DirectoryDto;
 
 import java.util.Set;
 
@@ -29,11 +31,17 @@ public interface Toolbar {
     void onToolBarRefreshButtonClicked();
 
     /**
-     * The tester asked what this node is. Default empty because only the run
-     * toolbar offers it today.
+     * Which project this editor is in, and which node it was opened on.
+     * <p>
+     * Asked rather than acted on, the way {@link #getAvailableModules()} is: the
+     * editor knows what it is showing, and the toolbar decides what to do with
+     * that. It is what lets one Details button serve both editors - the node
+     * answers for itself, and a test set and a test run are both a
+     * {@link DirectoryDto} carrying a marker.
      */
-    default void onToolBarNodeDetailsClicked() {
-    }
+    @NotNull Project getProject();
+
+    @NotNull DirectoryDto getEditedNode();
 
     default void onToolBarSwitchedToListView() {
     }

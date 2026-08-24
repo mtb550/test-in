@@ -32,9 +32,4 @@ public class RunToolbar extends AbstractToolbarPanel {
                 // because it needs its own horizontal-fill constraints.
         );
     }
-
-    @Override
-    public @NotNull List<ToolbarItem> getTrailingComponents() {
-        return List.of(new NodeDetailsBtn(getCallbacks()::onToolBarNodeDetailsClicked));
-    }
 }

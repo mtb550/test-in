@@ -39,9 +39,9 @@ import org.testin.model.TestRunItems;
 import org.testin.model.TestRunStatus;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.view.marker.MarkerDetailsViewDialog;
 import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
@@ -377,20 +377,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         reload();
     }
 
-    /**
-     * What this run is: its audit, its status, and the configuration it was
-     * created with.
-     * <p>
-     * The same popup the tree's Details action opens, on the same node - so the
-     * tester reads one thing in one shape whether they reached it from the tree
-     * or from the run they already have open. Everything in it comes from the
-     * node's marker, which the indexer is holding, so nothing is read from disk
-     * to answer.
-     */
-    @Override
-    public void onToolBarNodeDetailsClicked() {
-        new MarkerDetailsViewDialog(p, parent).show();
-    }
 
     /**
      * Re-read and redrawn. The execution stops first: the timer holds the item
@@ -557,6 +543,22 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         } catch (final Exception ex) {
             Logger.error("[grid] rebuildGrid FAILED: " + ex);
         }
+    }
+
+
+    /**
+     * This editor's own node, for the toolbar's Details button. The field is
+     * called parent because the test cases are its children; what the toolbar
+     * wants is the node itself, so it is named for that.
+     */
+    @Override
+    public @NotNull Project getProject() {
+        return p;
+    }
+
+    @Override
+    public @NotNull DirectoryDto getEditedNode() {
+        return parent;
     }
 
 

@@ -96,17 +96,17 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         add(searchTxt, gbc);
         toolbarItems.put(SearchTxt.class, searchTxt);
 
+        // After the search, so it sits against the right edge. Laid out here
+        // rather than offered to the subclasses, because both toolbars want the
+        // same button in the same place and an override point they would both
+        // fill in identically is a place for them to drift apart.
         gbc.gridx++;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.NONE;
 
-        for (final ToolbarItem item : getTrailingComponents()) {
-            if (item instanceof JComponent component) {
-                toolbarItems.put(item.getClass(), item);
-                add(component, gbc);
-                gbc.gridx++;
-            }
-        }
+        final @NotNull NodeDetailsBtn details = new NodeDetailsBtn(callbacks);
+        add(details, gbc);
+        toolbarItems.put(NodeDetailsBtn.class, details);
 
         wireViewButtons();
     }
@@ -139,19 +139,6 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     }
 
     protected abstract @NotNull List<ToolbarItem> getCustomComponents();
-
-    /**
-     * The items that sit after the search field, against the right edge.
-     * <p>
-     * Declared apart from {@link #getCustomComponents()} rather than by a flag on
-     * each item, because the search is what separates the two sides: it is the
-     * one component that takes the leftover width, so where an item goes is
-     * decided by which side of it the item is added on. A toolbar with nothing on
-     * the right says so by not overriding this.
-     */
-    protected @NotNull List<ToolbarItem> getTrailingComponents() {
-        return List.of();
-    }
 
     @Override
     public void dispose() {

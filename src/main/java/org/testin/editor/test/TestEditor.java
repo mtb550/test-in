@@ -31,6 +31,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.services.Services;
@@ -669,6 +670,22 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             });
         });
     }
+
+    /**
+     * This editor's own node, for the toolbar's Details button. The field is
+     * called parent because the test cases are its children; what the toolbar
+     * wants is the node itself, so it is named for that.
+     */
+    @Override
+    public @NotNull Project getProject() {
+        return p;
+    }
+
+    @Override
+    public @NotNull DirectoryDto getEditedNode() {
+        return parent;
+    }
+
 
     @Override
     public @NotNull Set<String> getAvailableModules() {
