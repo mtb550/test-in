@@ -73,11 +73,21 @@ public final class TestinFileWatcher implements AsyncFileListener {
     }
 
     /**
-     * The path an event is about, and empty for an event with no path on this
-     * file system - which the platform answers for events about files that are
-     * not on disk at all, the plugin's own virtual editor files among them.
+     * The path an event is about, and empty for one whose path this file system
+     * cannot name - a jar entry, an in-memory file.
+     * <p>
+     * Asked of {@code getPath} rather than {@code getFile}: a file being created
+     * has no {@link com.intellij.openapi.vfs.VirtualFile} yet, so {@code getFile}
+     * answers null for exactly the additions a pull brings - and reading it drove
+     * them straight to empty, leaving a branch that only added test cases
+     * unnoticed until the tester pressed Refresh. The path is there for every
+     * event; whether it is test data at all is {@link WatchedPath}'s to decide.
      */
     private static @NotNull Optional<Path> changedFile(final @NotNull VFileEvent event) {
-        return Optional.ofNullable(event.getFile()).map(file -> Path.of(file.getPath()));
+        try {
+            return Optional.of(Path.of(event.getPath()));
+        } catch (final RuntimeException notAFileSystemPath) {
+            return Optional.empty();
+        }
     }
 }
