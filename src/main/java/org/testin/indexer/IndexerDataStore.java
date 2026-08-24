@@ -519,7 +519,19 @@ final class IndexerDataStore {
         childrenIndex.invalidate();
     }
 
-    private @NotNull Collection<DirectoryDto> allDirectories() {
+    /**
+     * Every indexed node, of every kind, in no particular order.
+     * <p>
+     * Read from the seven maps the scan already fills rather than kept as an
+     * eighth: a list of the same nodes would be a second record of one fact, and
+     * would have to be corrected by every create, move, rename and delete that
+     * the maps already handle.
+     * <p>
+     * Package-private rather than private since #29, which searches node names
+     * and needs the same list the children index is built from - the one place
+     * that already answers "every node the plugin knows".
+     */
+    @NotNull Collection<DirectoryDto> allDirectories() {
         // Test projects are included too; they are roots (null parent) and are
         // simply skipped by the children index.
         final @NotNull List<DirectoryDto> directories = new ArrayList<>();

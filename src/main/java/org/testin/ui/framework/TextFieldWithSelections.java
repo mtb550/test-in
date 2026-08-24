@@ -1,5 +1,6 @@
 package org.testin.ui.framework;
 
+import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.SimpleTextAttributes;
@@ -21,28 +22,44 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.text.DefaultEditorKit;
 import java.util.List;
 
 /**
  * A large input field over a selection list — the component of the create
- * dialogs. The leading icon of the field follows the selected row, a mouse
- * click on a row submits, and Up/Down move the selection while focus stays in
- * the field. Rendering matches the existing create-node popup exactly.
+ * dialogs, and of the search (#29). The leading icon of the field follows the
+ * selected row, a mouse click on a row submits, and Up/Down move the selection
+ * while focus stays in the field. Rendering matches the existing create-node
+ * popup exactly.
+ * <p>
+ * The rows come from {@link Rows}, which is asked again - debounced - every time
+ * the tester types. A dialog with fixed choices declares rows that ignore the
+ * query, and behaves exactly as it did before that was possible.
  */
 public final class TextFieldWithSelections<T> implements DialogComponent {
 
+    /**
+     * How long after the last keystroke the rows are asked for again. The same
+     * 300ms the editors' own search field waits, so the two feel alike.
+     */
+    private static final int DEBOUNCE_MILLIS = 300;
+
     private final @NotNull ExtendableTextField textField;
+    private final @NotNull CollectionListModel<SelectionList<T>> rowModel = new CollectionListModel<>();
     private final @NotNull JBList<SelectionList<T>> list;
     private final @NotNull JBPanel<?> panel;
     private final @NotNull String placeHolderText;
+    private final @NotNull Rows<T> rows;
     private @NotNull Runnable submitRequest = () -> {
     };
     private boolean emptyWarningShown;
 
     TextFieldWithSelections(final @NotNull Icon icon,
                             final @NotNull String placeHolderText,
-                            final @NotNull List<SelectionList<T>> selections) {
+                            final @NotNull Rows<T> rows,
+                            final int visibleRows) {
         this.placeHolderText = placeHolderText;
+        this.rows = rows;
         textField = new ExtendableTextField("");
         // Derived from the label font at construction, so every dialog open
         // picks up the current IDE font-size setting.
@@ -66,13 +83,15 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
         }
         DialogStyle.setLeadingIcon(textField, icon);
 
-        list = new JBList<>(selections);
+        list = new JBList<>(rowModel);
         list.setBorder(JBUI.Borders.empty(6));
         list.setFont(JBFont.label().biggerOn(2f));
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.setSelectedIndex(0);
-        list.setVisibleRowCount(selections.size());
+        // Fixed, so the dialog does not change height under the tester's hands
+        // as results come and go.
+        list.setVisibleRowCount(visibleRows);
         list.setCellRenderer(new SelectionRenderer<>());
+        show(rows.forQuery(""));
 
         list.addListSelectionListener(event -> syncLeadingIcon());
         syncLeadingIcon();
@@ -85,6 +104,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
         });
 
         installNavigation();
+        installClipboard();
 
         final @NotNull JBPanel<?> listWrapper = new JBPanel<>(new BorderLayout());
         listWrapper.add(list, BorderLayout.CENTER);
@@ -92,12 +112,64 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
         final @NotNull JBScrollPane scrollPane = new JBScrollPane(listWrapper);
         scrollPane.setBorder(JBUI.Borders.empty());
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        // As needed rather than never: a fixed list is exactly as tall as its
+        // rows and shows no bar, and a search can answer with more rows than fit.
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         panel = new JBPanel<>(new BorderLayout());
         panel.setOpaque(false);
         panel.add(textField, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
+
+        installRowRefresh();
+    }
+
+    /**
+     * Asks for the rows again a moment after the tester stops typing.
+     * <p>
+     * Debounced because a query of six letters is six queries otherwise, and the
+     * last one is the only one anybody sees. The timer does not repeat, and it
+     * checks the panel is still on screen before it does anything - a dialog
+     * closed within the debounce leaves one pending fire, and it should do
+     * nothing rather than rebuild a list nobody is looking at.
+     */
+    private void installRowRefresh() {
+        final @NotNull Timer debounce = new Timer(DEBOUNCE_MILLIS, event -> {
+            if (panel.isShowing()) show(rows.forQuery(textField.getText().trim()));
+        });
+        debounce.setRepeats(false);
+
+        textField.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent e) {
+                debounce.restart();
+            }
+        });
+    }
+
+    /**
+     * Puts these rows on screen, with the first one selected - which is what
+     * Enter takes, so it has to be a row the tester can see.
+     */
+    private void show(final @NotNull List<SelectionList<T>> found) {
+        rowModel.replaceAll(found);
+
+        if (found.isEmpty()) return;
+
+        list.setSelectedIndex(0);
+        list.ensureIndexIsVisible(0);
+    }
+
+    /**
+     * What the tester picked, and empty when a search found nothing.
+     * <p>
+     * Separate from {@link #getSelectedValue()} because they answer different
+     * questions: a dialog offering a fixed set of choices always has one, and a
+     * dialog offering what a query matched may have none, which is an ordinary
+     * thing for a search rather than a failure.
+     */
+    public @NotNull java.util.Optional<T> selection() {
+        return ListValue.selected(list).map(SelectionList::value);
     }
 
     public @NotNull String getText() {
@@ -121,6 +193,10 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
         textField.repaint();
     }
 
+    /**
+     * What the tester picked, for a dialog whose rows are fixed and therefore
+     * never empty. A search asks {@link #selection()} instead.
+     */
     public @NotNull T getSelectedValue() {
         // A single-selection list can still be emptied (e.g. Ctrl+click on the
         // selected row); the first row is the declared default.
@@ -150,6 +226,29 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
             textField.revalidate();
             textField.repaint();
         });
+    }
+
+    /**
+     * Cut, copy and paste in the field.
+     * <p>
+     * A field inside a popup does not always inherit them: the popup and the
+     * dialog both bind keys on the way to it, and what reaches the text
+     * component is whatever they left. Bound by name to the actions the text
+     * component already has, so this asks for the standard behavior rather than
+     * writing a second one - and a tester can paste a test case id or a ticket
+     * number into the search instead of typing it out (#29).
+     */
+    private void installClipboard() {
+        final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+
+        bindEditorAction(KeyEvent.VK_V, menuMask, DefaultEditorKit.pasteAction);
+        bindEditorAction(KeyEvent.VK_C, menuMask, DefaultEditorKit.copyAction);
+        bindEditorAction(KeyEvent.VK_X, menuMask, DefaultEditorKit.cutAction);
+        bindEditorAction(KeyEvent.VK_A, menuMask, DefaultEditorKit.selectAllAction);
+    }
+
+    private void bindEditorAction(final int keyCode, final int modifiers, final @NotNull String actionName) {
+        textField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(keyCode, modifiers), actionName);
     }
 
     private void installNavigation() {

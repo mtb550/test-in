@@ -11,13 +11,16 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.EditorType;
+import org.testin.editor.TestinEditor;
 import org.testin.editor.UnifiedFileEditor;
 import org.testin.editor.UnifiedVirtualFile;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
+import org.testin.view.ViewToolWindowFactory;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -103,6 +106,58 @@ public final class EditorUtil {
         return Services.getInstance(p, ProjectIndexer.class).nodeExists(file.getDir().getPath());
     }
 
+    /**
+     * Opens a node's editor and puts the cursor on one of its test cases (#29).
+     * <p>
+     * The two halves are separate because opening is asynchronous: the editor is
+     * built when the platform gets round to it, so the case cannot be selected in
+     * the same breath. Waiting for the editor to appear rather than assuming it
+     * has is why this is here and not written out at the call site - the create
+     * action does the same thing today by holding the editor it already had, and
+     * a caller that only has a node has nothing to hold.
+     *
+     * @param tc the case to land on inside that editor
+     */
+    public void openAndSelect(final @NotNull Project p, final @NotNull DirectoryDto dir,
+                              final @NotNull TestCaseDto tc) {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            // One block and in order, because openNow blocks until the editor
+            // exists - so the next line has something to talk to. Two separate
+            // invokeLater calls did not work: the open pumps the event queue
+            // while it waits, and the second call ran inside the first.
+            if (!openNow(p, dir)) return;
+
+            // Told to the editor rather than done to it: an editor that has just
+            // been built has no test cases yet - it reads them on a pooled
+            // thread - so it is asked to land on the case once it has one.
+            editorFor(p, dir).ifPresent(editor -> editor.selectWhenLoaded(tc.getId()));
+
+            // Outside the editor's own business, and it works either way: the
+            // details panel is handed the case itself rather than asked to find
+            // it, so it fills in whether the editor is ready or not.
+            ViewToolWindowFactory.showPanel(p, List.of(tc), dir.getPath2());
+        });
+    }
+
+    /**
+     * The open Testin editor showing this node, and empty when none is - which
+     * happens when the open above could not build one.
+     */
+    private @NotNull Optional<TestinEditor> editorFor(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+        final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
+
+        for (final VirtualFile open : fed.getOpenFiles()) {
+            if (!(open instanceof UnifiedVirtualFile testinFile)) continue;
+            if (!testinFile.getDir().getPath().equals(dir.getPath())) continue;
+
+            for (final FileEditor tab : fed.getAllEditors(testinFile)) {
+                if (tab instanceof UnifiedFileEditor unified) return Optional.of(unified.getEditor());
+            }
+        }
+
+        return Optional.empty();
+    }
+
     public void closeThenOpen(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
@@ -126,23 +181,58 @@ public final class EditorUtil {
         });
     }
 
+    /**
+     * Opens the node's editor, or focuses it when it is already open.
+     * <p>
+     * There used to be an {@code openIfNotOpen} beside this saying the same
+     * thing, from when this one always opened a second tab. Opening what is
+     * already open <em>is</em> focusing it, so the two names were one behavior.
+     */
     public void open(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        final @NotNull EditorType ft = dir instanceof TestRunDirectoryDto ? EditorType.TEST_RUN : EditorType.TEST_CASE;
-        final @NotNull UnifiedVirtualFile newVf = new UnifiedVirtualFile(dir, ft);
-
-        ApplicationManager.getApplication().invokeLater(() ->
-                Optional.ofNullable(FileEditorManager.getInstance(p))
-                        .ifPresent(editorManager -> editorManager.openFile(newVf, true)));
+        ApplicationManager.getApplication().invokeLater(() -> openNow(p, dir));
     }
 
-    public void openIfNotOpen(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        if (isOpen(p, dir.getName())) {
-            Logger.info("Editor already open, focusing: " + dir.getName());
+    /**
+     * Opens the node's editor, or focuses it when it is already open, and
+     * answers whether there is now an editor to talk to.
+     * <p>
+     * <b>On the EDT, and synchronous.</b> {@code openFile} blocks until the
+     * editor exists, so a caller that needs to say something to that editor can
+     * say it on the next line. It cannot say it from a second
+     * {@code invokeLater}: openFile pumps the event queue while it waits, so the
+     * second call runs <em>inside</em> the first and finds no editor yet. That
+     * is why a test case picked from the search opened its editor on page one
+     * with nothing selected, while one whose editor was already open worked
+     * (#29).
+     * <p>
+     * A node with no editor is refused rather than guessed at. The type used to
+     * be read as "a test run, or else a test set", so every other node - a
+     * package, the Test Cases folder, the Test Runs folder - was opened as a
+     * test set and died casting itself to one. What can be opened is the node's
+     * own declaration, and the two kinds that say yes are exactly the two the
+     * editors are written for.
+     */
+    private boolean openNow(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+        final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
-        } else {
-            Logger.info("Opening Editor: " + dir.getPath());
-            open(p, dir);
+        for (final VirtualFile open : fed.getOpenFiles()) {
+            if (dir.getName().equals(open.getName())) {
+                Logger.info("Editor already open, focusing: " + dir.getName());
+                fed.openFile(open, true);
+                return true;
+            }
         }
+
+        if (!dir.isOpenableInEditor()) {
+            Logger.info("Nothing to open for " + dir.getName() + " - it holds nodes rather than test cases");
+            return false;
+        }
+
+        Logger.info("Opening Editor: " + dir.getPath());
+        final @NotNull EditorType ft = dir instanceof TestRunDirectoryDto ? EditorType.TEST_RUN : EditorType.TEST_CASE;
+        fed.openFile(new UnifiedVirtualFile(dir, ft), true);
+
+        return true;
     }
 
     public void saveOpen(final @NotNull Project p) {
@@ -205,7 +295,7 @@ public final class EditorUtil {
                 indexer.find(Path.of(entry)).ifPresentOrElse(
                         dir -> {
                             Logger.debug("restoring editor for '" + entry + "' -> found");
-                            openIfNotOpen(p, dir);
+                            open(p, dir);
                         },
                         () -> Logger.debug("restoring editor for '" + entry + "' -> not indexed"));
             }

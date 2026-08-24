@@ -12,6 +12,7 @@ import org.testin.view.ViewToolWindowFactory;
 import javax.swing.*;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public interface TestinEditor extends Disposable {
     @NotNull DirectoryDto getParent();
@@ -88,6 +89,28 @@ public interface TestinEditor extends Disposable {
     void updateSequenceAndSaveAll();
 
     void selectTestCase(final @NotNull TestCaseDto tc);
+
+    /**
+     * Land on this case as soon as there is data to land on (#29).
+     * <p>
+     * {@link #selectTestCase} needs the editor to be holding its test cases
+     * already, which an editor that was opened a moment ago is not: it reads
+     * them on a pooled thread, so anything asked of it in the meantime finds an
+     * empty list and quietly does nothing. That is what happened to the search -
+     * picking a case in an open editor worked, and picking one in a closed
+     * editor opened it on page one with nothing selected.
+     * <p>
+     * So this is told rather than done. The editor already remembers a case to
+     * come back to across a reload, and already moves to whichever page holds it
+     * before the first paint; this is the same promise, made from outside. Which
+     * means the page is right too - a case that is the four hundredth of a set
+     * opens on the page it is actually on.
+     *
+     * @param id the case, by id rather than by object: a load hands back
+     *           different instances for the same cases, so the object a caller
+     *           holds is not the one the editor will have
+     */
+    void selectWhenLoaded(final @NotNull UUID id);
 
     /**
      * Which action icon the pointer is over, by name, and empty for none.

@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The typed content part of a framework dialog. Each component type gets its
@@ -317,7 +318,15 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class TextFieldBuilder<T> {
 
+        /**
+         * How many rows a searching picker shows before it scrolls. Enough to
+         * scan without moving the eye, and few enough that the dialog is not the
+         * whole screen.
+         */
+        private static final int SEARCH_ROWS = 12;
+
         private final @NotNull List<SelectionList<T>> selections = new ArrayList<>();
+        private @NotNull Optional<Rows<T>> rows = Optional.empty();
         private @NotNull Icon icon = DialogStyle.NO_ICON;
         private @NotNull String placeholder = "";
 
@@ -343,11 +352,32 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             return this;
         }
 
+        /**
+         * Rows that answer to what the tester has typed, for a picker that
+         * searches rather than one that offers a fixed set (#29).
+         */
+        public @NotNull TextFieldBuilder<T> rows(final @NotNull Rows<T> rows) {
+            this.rows = Optional.of(rows);
+            return this;
+        }
+
         public @NotNull ComponentDialogBase<TextFieldWithSelections<T>> build() {
-            if (selections.isEmpty()) {
-                throw new IllegalStateException("textFieldWithSelections needs at least one .selection(...)");
+            if (rows.isPresent()) {
+                return new ComponentDialogBase<>(
+                        new TextFieldWithSelections<>(icon, placeholder, rows.orElseThrow(), SEARCH_ROWS));
             }
-            return new ComponentDialogBase<>(new TextFieldWithSelections<>(icon, placeholder, List.copyOf(selections)));
+
+            if (selections.isEmpty()) {
+                throw new IllegalStateException(
+                        "textFieldWithSelections needs at least one .selection(...) or a .rows(...)");
+            }
+
+            // A fixed set is rows that ignore the query, so there is one way to
+            // hold rows rather than two, and one of them declared as a special
+            // case of the other.
+            final @NotNull List<SelectionList<T>> fixed = List.copyOf(selections);
+            return new ComponentDialogBase<>(
+                    new TextFieldWithSelections<>(icon, placeholder, query -> fixed, fixed.size()));
         }
     }
 }

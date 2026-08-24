@@ -208,6 +208,23 @@
 
     </extensions>
 
+    <!-- The one shortcut that is not bound to a component. Every other key in
+         the plugin is registered on the thing it acts on, so it works there and
+         nowhere else; a search has to open from the tree, from either editor and
+         from the view panel alike, so it lives in the keymap - which is also
+         where a tester rebinds it if it collides with something of theirs (#29). -->
+    <actions>
+        <action
+                id="Testin.Search"
+                class="org.testin.search.SearchAction"
+                text="Search Test Project"
+                description="Find a test case, test set, package or run and go to it"
+        >
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt F"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta alt F"/>
+        </action>
+    </actions>
+
     <!-- close listeners -->
     <applicationListeners>
 

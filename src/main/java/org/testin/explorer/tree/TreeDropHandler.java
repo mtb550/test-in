@@ -41,13 +41,13 @@ public class TreeDropHandler implements FileDropHandler {
                     if (node instanceof TestSetDirectoryDto ts) {
                         Logger.info("dragged Test set: " + ts.getName());
 
-                        Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, ts);
+                        Services.getInstance(p, EditorUtil.class).open(p, ts);
                         continue;
                     }
 
                     if (node instanceof TestRunDirectoryDto tr) {
                         Logger.info("dragged Test Run: " + tr.getName());
-                        Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, tr);
+                        Services.getInstance(p, EditorUtil.class).open(p, tr);
                     }
                 }
             });

@@ -445,6 +445,19 @@ public final class ProjectIndexer {
         return List.copyOf(store.getTestCasesById().values());
     }
 
+    /**
+     * Every indexed node, of every kind - the other half of what the plugin
+     * knows, beside {@link #getAllTestCases()} (#29).
+     * <p>
+     * A view of what the scan already holds, so it costs one pass over memory
+     * and cannot go stale: there is nothing here to update when a node is
+     * created, moved or removed, because the maps it reads are the ones those
+     * operations already change.
+     */
+    public @NotNull List<DirectoryDto> getAllNodes() {
+        return List.copyOf(store.allDirectories());
+    }
+
     public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList,
                                final @NotNull List<TestCaseDto> moved) {
         store.updateSequence(testSetPath, orderedList, moved);

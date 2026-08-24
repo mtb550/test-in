@@ -221,6 +221,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
                 loading = false;
 
                 refreshView();
+                focusIfGoingTo();
             });
         });
     }
@@ -508,6 +509,51 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     private void rememberSelection() {
         selectionToRestore = Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId);
         gridColumnToRestore = grid.map(view -> view.table().getSelectedColumn()).orElse(-1);
+    }
+
+    @Override
+    public void selectWhenLoaded(final @NotNull UUID id) {
+        final @NotNull Optional<TestCaseDto> loaded = currentTestCases.stream()
+                .filter(tc -> id.equals(tc.getId()))
+                .findFirst();
+
+        // Already holding it, so nothing is coming to do this later: go now,
+        // through the one method that owns going somewhere - it turns to the
+        // right page and takes the focus with it.
+        if (loaded.isPresent()) {
+            selectTestCase(loaded.get());
+            return;
+        }
+
+        // Not loaded yet. The load ends by moving to the page that holds the
+        // remembered case and repainting, which is exactly what is wanted -
+        // all that is missing is the focus, because this is a tester asking to
+        // be taken somewhere rather than a reload putting things back.
+        selectionToRestore = Optional.of(id);
+        goingTo = true;
+    }
+
+    /**
+     * Whether the pending selection is somewhere the tester asked to go, rather
+     * than where they already were before a reload.
+     * <p>
+     * The difference is only the focus, and it matters both ways: a refresh that
+     * grabbed focus would take it off whatever they were doing, and a Go To that
+     * did not would leave them looking at the right row with the keyboard still
+     * pointed somewhere else.
+     */
+    private boolean goingTo = false;
+
+    /**
+     * Focuses the list when the case that has just been restored is one the
+     * tester asked to be taken to. Called once the page and the selection are
+     * settled, because focusing a row that is about to be replaced is no use.
+     */
+    private void focusIfGoingTo() {
+        if (!goingTo) return;
+
+        goingTo = false;
+        list.requestFocusInWindow();
     }
 
     /**

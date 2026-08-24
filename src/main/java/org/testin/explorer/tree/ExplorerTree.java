@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.tree.AsyncTreeModel;
+import com.intellij.ui.tree.TreeVisitor;
 import com.intellij.ui.tree.StructureTreeModel;
 import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.ui.tree.TreeUtil;
@@ -17,12 +18,22 @@ import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 
 import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ExplorerTree implements Disposable {
+
+    /**
+     * What a reveal does afterward when the caller wants nothing - the same
+     * shape the view panel uses for the same reason.
+     */
+    private static final @NotNull Runnable NOTHING_AFTER = () -> {
+    };
+
     private final @NotNull Project p;
     private final @NotNull ExplorerPanel pp;
     private final @NotNull JBScrollPane scrollPane;
@@ -69,6 +80,62 @@ public class ExplorerTree implements Disposable {
         final @NotNull TreeContextMenu treeContextMenu = new TreeContextMenu(p, pp, mainTree);
         mainTree.addMouseListener(new TreeMouseListener(p, mainTree, treeContextMenu));
         treeContextMenu.registerShortcuts(mainTree, transferHandler);
+    }
+
+    /**
+     * Expands to a node and selects it, wherever it is (#29).
+     * <p>
+     * Matched on the path the node already carries rather than on a node object,
+     * because the tree builds its own wrappers as it expands and the caller has
+     * the one the indexer holds - two objects for one node, and only one of them
+     * is ever in the tree.
+     * <p>
+     * The visitor is what makes this work at any depth: the platform walks from
+     * the root, and a branch whose path is not a prefix of the target is not
+     * expanded at all, so revealing a case eight levels down opens eight nodes
+     * rather than the whole tree.
+     */
+    public void reveal(final @NotNull Path target) {
+        reveal(target, NOTHING_AFTER);
+    }
+
+    /**
+     * The same, and then whatever the caller wanted done once the node is
+     * actually there.
+     * <p>
+     * A callback rather than a returned promise, because the one thing anybody
+     * wants afterward is the focus - and asking for it before the walk finishes
+     * puts it on a row the tree has not selected yet.
+     *
+     * @param afterFound run on the EDT once the node is selected and scrolled to
+     */
+    public void reveal(final @NotNull Path target, final @NotNull Runnable afterFound) {
+        if (disposed) return;
+
+        TreeUtil.promiseSelect(mainTree, new TreeVisitor() {
+            @Override
+            public @NotNull Action visit(final @NotNull TreePath path) {
+                final @NotNull Optional<Path> at = TreeValueUtil.directoryAt(path).map(DirectoryDto::getPath);
+                if (at.isEmpty()) return Action.CONTINUE;
+
+                if (at.get().equals(target)) return Action.INTERRUPT;
+
+                return target.startsWith(at.get()) ? Action.CONTINUE : Action.SKIP_CHILDREN;
+            }
+        }).onSuccess(found -> ApplicationManager.getApplication().invokeLater(() -> {
+            if (disposed) return;
+
+            mainTree.scrollPathToVisible(found);
+            afterFound.run();
+        }));
+    }
+
+    /**
+     * Puts the keyboard on the tree, for a tester who asked to be taken to a
+     * node: the node is selected, and the arrow keys should move from it.
+     */
+    public void focus() {
+        mainTree.requestFocusInWindow();
     }
 
     /**
