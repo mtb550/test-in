@@ -88,7 +88,20 @@ public final class EditorUtil {
             }
 
             for (final FileEditor tab : fed.getAllEditors(testinFile)) {
-                if (tab instanceof UnifiedFileEditor unified) unified.getEditor().reload();
+                if (!(tab instanceof UnifiedFileEditor unified)) continue;
+
+                final @NotNull TestinEditor editor = unified.getEditor();
+                // A running run or an open grid cell is live state the tester is
+                // in the middle of, and a reload throws it away - the timer stops
+                // with its seconds unstamped, the half-typed cell is gone. The
+                // change on disk waits for them to finish; their own Refresh
+                // button, pressed on purpose, still reloads.
+                if (editor.isBusy()) {
+                    Logger.info("Leaving a busy editor as it is rather than reloading under the tester: "
+                            + testinFile.getName());
+                    continue;
+                }
+                editor.reload();
             }
         }
     }

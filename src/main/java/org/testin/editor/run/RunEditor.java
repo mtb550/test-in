@@ -764,6 +764,16 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * Busy while a run is being executed or a grid cell is open for editing -
+     * either is live state that a reload under the tester would throw away, so an
+     * on-disk refresh leaves this editor be until it is done (#20, #74).
+     */
+    @Override
+    public boolean isBusy() {
+        return isExecuting() || grid.map(view -> view.table().isEditing()).orElse(false);
+    }
+
+    /**
      * Whether execution may start. Asked by both the toolbar button and the
      * context menu action, which used to answer it differently.
      */

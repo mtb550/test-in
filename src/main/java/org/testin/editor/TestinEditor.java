@@ -62,6 +62,21 @@ public interface TestinEditor extends Disposable {
      */
     void reload();
 
+    /**
+     * Whether this editor is in the middle of something a reload would ruin - a
+     * run being executed, a grid cell open under the tester's cursor.
+     * <p>
+     * A change noticed on disk (#20) reloads every open editor to bring it back
+     * in step, but an editor busy this way holds live state the reload throws
+     * away: the run's timer stops with its seconds unstamped, the half-typed cell
+     * is lost. So the on-disk refresh leaves a busy editor alone and catches it up
+     * next time; the tester's own Refresh button is their choice and still
+     * reloads. An editor with no such state answers no.
+     */
+    default boolean isBusy() {
+        return false;
+    }
+
     @NotNull List<TestCaseDto> getSelectedTestCases();
 
     void appendNewTestCase(final @NotNull TestCaseDto tc);
