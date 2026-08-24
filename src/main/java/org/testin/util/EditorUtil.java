@@ -178,11 +178,16 @@ public final class EditorUtil {
             Optional<VirtualFile> targetVf = Optional.empty();
 
             for (final VirtualFile openVf : fed.getOpenFiles()) {
-                if (openVf.getName().equals(dir.getName())) {
-                    targetVf = Optional.of(openVf);
-                    fed.closeFile(openVf);
-                    break;
-                }
+                // By path, not by name: two nodes in different packages can share
+                // a name, and matching on it would close a neighbour's editor
+                // instead of this node's. The path is the node's identity, the
+                // same match openNow and editorFor use.
+                if (!(openVf instanceof UnifiedVirtualFile testinFile)) continue;
+                if (!testinFile.getDir().getPath().equals(dir.getPath())) continue;
+
+                targetVf = Optional.of(openVf);
+                fed.closeFile(openVf);
+                break;
             }
 
             if (targetVf.isEmpty()) {
