@@ -25,6 +25,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.text.DefaultEditorKit;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -208,7 +209,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
      * dialog offering what a query matched may have none, which is an ordinary
      * thing for a search rather than a failure.
      */
-    public @NotNull java.util.Optional<T> selection() {
+    public @NotNull Optional<T> selection() {
         return ListValue.selected(list).map(SelectionList::value);
     }
 
