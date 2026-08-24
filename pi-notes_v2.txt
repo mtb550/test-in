@@ -1,0 +1,213 @@
+================================================================================
+ TESTIN — DEEP CODE REVIEW NOTES  (pi-notes_v2)
+ The deeper pass over the remaining large/complex infrastructure, run after
+ the original pi-notes.txt (224 lines). This file consolidates the first-pass
+ findings with everything the deeper read turned up, and re-states the verdict.
+ No source files were edited; this notes file is the only thing written.
+================================================================================
+
+--------------------------------------------------------------------------------
+0. SCOPE OF THIS SECOND PASS
+--------------------------------------------------------------------------------
+Read fully this round: DirectoryChildrenIndex, LegacyChainOrder, NodeCounter,
+Once, VfsOperation, VfsBiOperation, BackgroundWork, RunEditor, TestEditor,
+TestNGExecution, TestNGRunner, TestCaseExecutionTracker/Listener/Subscriber,
+TestCaseCacheService, RunStatusService, GitRefs, TestCaseMerge, SftpTransport,
+SftpSync, TestRunWordGenerator, TestRunPdfGenerator, TreeTransferHandler,
+GridPanelBuilder, BulkJsonEditors, ViewPendingCommitsAction, BranchSelector,
+GitRepositoryService, ConflictResolution, TestRunSummary, FontSync,
+TestCaseDto, TestCaseSequenceStore, ProjectIndexer (acceptIncoming /
+removeIncoming / filesUnder), FilesUtil (OwnWrites.record), TestCaseCacheService.
+
+The first pass found 6 bugs (BUG-1..BUG-6 below). This pass confirms all of
+them, adds 3 new findings (NEW A..C), and re-confirms the design concerns.
+
+--------------------------------------------------------------------------------
+1. VERDICT (re-stated after the deeper pass)
+--------------------------------------------------------------------------------
+The deeper pass does not change the verdict — it strengthens it. The most
+complex remaining files (TreeTransferHandler, GridPanelBuilder, BulkJsonEditors,
+BranchSelector, GitRepositoryService, ConflictResolution, ViewPendingCommitsAction,
+TestNGExecution, the Vfs* helpers, the execution tracker chain) are all senior-grade:
+small focused methods, correct EDT/IO threading, and comments that explain the bug
+each design was fixing (#34, #61, #63, #66, #71, #88, #89, #90).
+
+- Simple & clear: YES.
+- Structure professional & easy to understand/maintain: YES.
+- Bugs: 9 total (2 that genuinely matter, the rest minor/edge-case/cosmetic).
+
+The genuinely-mattering ones:
+  * BUG-2 — TestNGExecution identity-keyed maps break Stop-after-reload
+            (a run becomes unkillable from the UI).
+  * NEW BUG A — test-case deletion bypasses OwnWrites/VFS-refresh, so the IDE
+                file watcher treats it as an external change and does a needless
+                full rescan/tree rebuild; the Project view keeps a stale entry.
+Everything else is cosmetic or a low-impact edge case.
+
+--------------------------------------------------------------------------------
+2. FULL BUG LIST  (first pass + this pass, consolidated)
+--------------------------------------------------------------------------------
+
+[BUG-1] PDF footer drawn only on the LAST page            (cosmetic)
+  report/generators/TestRunPdfGenerator.java:249 — footer Canvas built on
+  `pdf.getLastPage()`. Multi-page reports get no footer on intermediate pages,
+  while the Word generator (TestRunWordGenerator.java:463) does all pages.
+  Also the rule baseline (y=34) doesn't match the text rect (y=0,h=28).
+
+[BUG-2] TestNGExecution keys maps by TestCaseDto *identity*   (REAL, matters)
+  runner/TestNGExecution.java — `configOf: Map<TestCaseDto,String>` and
+  `pending: Set<TestCaseDto>` are keyed by DTO identity. TestCaseDto has
+  @Getter/@Setter/@ToString but NO @EqualsAndHashCode, so equality is Object
+  identity. The editor reloads test cases off the EDT and hands back DIFFERENT
+  instances for the same case. After a reload:
+    - `stop()` filters `tc.getTempStatus() == RUNNING` — tempStatus is a DTO
+      field (@JsonIgnore), and reloaded DTOs are IDLE — so the filter already
+      fails.
+    - `configOf.getOrDefault(tc, "")` looks up by identity on the fresh
+      instance -> "" -> the process is never killed.
+  Net effect: Stop after a reload returns 0 and the run keeps running,
+  unkillable from the UI. `stopped` correctly keys by UUID; configOf/pending
+  should too (key by `tc.getId()`).
+
+[BUG-3] SftpTransport leaks JSch Session/Channel on connect failure   (edge-case)
+  sftp/SftpTransport.java:open() — if auth.apply / session.connect /
+  openChannel / sftp.connect throws, close() is only on the success path, so the
+  created Session+Channel leak one TCP connection per failed attempt.
+
+[BUG-4] FontSync.isGlobalWatcherActive ownership bug        (minor)
+  util/FontSync.java:35 — static flag set true by the FIRST subscriber and reset
+  false on THAT subscriber's disposal. If A and B subscribe and A disposes first,
+  the flag goes false while B's watcher is still live; the next subscriber then
+  registers a second global watcher + debounce timer. EDT-only, so no race.
+
+[BUG-5] passRate integer-division truncation                (cosmetic)
+  model/TestRunSummary.java:63 — `passed * 100 / executed` truncates: 2/3->66%,
+  1/3->33%. `passed*100` can't overflow int realistically.
+
+[BUG-6] SftpSync half-failed transfer — correct by design     (noted for record)
+  On a mid-transfer throw, manifest/baseline are never written, so nothing is
+  falsely recorded as agreed; the next sync re-compares. A half-written server
+  file is "unrecorded" but harmless (re-checked next sync).
+
+[NEW A] TestCaseSequenceStore.remove bypasses OwnWrites + VFS refresh   (REAL)
+  indexer/TestCaseSequenceStore.java:112 — `Files.deleteIfExists(filePath)`
+  deletes the case file directly. FilesUtil.write() DOES call
+  OwnWrites.record() (FilesUtil.java:57/79/102), so the plugin's own writes are
+  claimed and the IDE file watcher ignores them — but this delete does NOT
+  record the write. Consequences:
+    1. The IDE file watcher sees the deletion as an EXTERNAL change and triggers
+       a needless full rescan / tree rebuild after every test-case delete.
+    2. The IDE Project view keeps the stale entry until another refresh.
+  Fix idea: delete through FilesUtil (which records OwnWrites), or call
+  OwnWrites.record(filePath) before/around the delete, and refresh the tree.
+
+[NEW B] acceptIncoming writes files but never re-scans the project    (REAL)
+  indexer/ProjectIndexer.java:803 — `acceptIncoming` writes downloaded files via
+  FilesUtil (so OwnWrites claims them and the watcher won't rescan), but never
+  calls `scanSingleProject(projectPath)`. Its mirror `removeIncoming` DOES call
+  it, and its comment says "the node those files add up to comes back from the
+  scan." So after a sync downloads new/changed test cases they do NOT appear in
+  the tree/editors until a manual refresh. `filesUnder` reads the disk directly,
+  so the NEXT sync is accurate, but the UI is stale right after this one.
+
+[NEW C] TestCaseCacheService.cache lacks the null-steps guard     (minor, REAL)
+  services/TestCaseCacheService.java — `reload` guards `Optional.of(tc.getSteps())
+  .ifPresent(...)` with the comment "Jackson can leave steps null on hand-edited
+  JSON despite the field default." But the `load`/`addNewItems` path
+  (`cacheAsync` -> `cache`) calls `tc.getSteps().forEach(...)` directly, so a
+  null-steps DTO loaded through that path NPEs on the pooled thread. Same guard
+  should apply in `cache`.
+
+--------------------------------------------------------------------------------
+3. DESIGN / MAINTAINABILITY CONCERNS  (this pass added to M-1..M-7)
+--------------------------------------------------------------------------------
+[M-1..M-7] unchanged from pi-notes.txt (big classes; transient state in
+TestCaseDto; volatile Optional; Logger/Notifier singletons; Lombok; badge/pill
+reuse; grid renderer reuse).
+
+[M-8] TreeTransferHandler.moveBatch hangs silently on a failed move
+  explorer/tree/TreeTransferHandler.java — `moveBatch` counts `remaining`
+  callbacks; each node's onFinished only runs on the SUCCESS path of
+  executeVfsAction (the single-path form has no success callback; failures are
+  swallowed/reported by VfsExecutor). A failed move means the counter never
+  reaches 0, so `refresh.run()` and confirmLanded never run and the tree is
+  never refreshed. Failure-path only (rare), but the async counter has no
+  timeout/finally.
+
+[M-9] Grid renderer creates a NEW wrapper JPanel per paint
+  editor/grid/GridPanelBuilder.java — the wrappingRenderer reuses one textArea
+  (standard Swing practice) but constructs a fresh wrapper JPanel on every
+  getTableCellRendererComponent call. Correct and cheap, but the "one shared
+  component" pattern documented in M-7 is actually "shared textArea, fresh
+  wrapper" — keep the textArea shared, don't share across tables.
+
+[M-10] BranchSelector: `volatile List<String> shown` read-then-compare
+  explorer/toolbar/BranchSelector.java — `showBranches` reads `shown` and
+  `currentBranch` off the EDT (volatile, fine) but the "branches.equals(shown)"
+  guard plus `shown = List.copyOf(...)` is a compare-and-set that is not atomic:
+  two background passes could both pass the guard and rebuild. In practice the
+  loads are serialized by the caller, so it is safe; just keep the discipline.
+
+[M-11] TestCaseDto remains a persistence+live-state hybrid
+  Confirmed again: tempStatus/tempError @JsonIgnore volatile fields mutate the
+  same object the cache and runner hold. The resultsMap-by-UUID pattern in
+  RunEditor is the cleaner alternative; live run state could live there instead
+  of in the DTO. This is also the root cause behind BUG-2.
+
+--------------------------------------------------------------------------------
+4. THINGS HANDLED WELL — NEW THIS PASS (worth keeping)
+--------------------------------------------------------------------------------
+- TestNGExecution.stop() keys `stopped` by UUID — the one map that got it
+  right; the model to copy for configOf/pending.
+- GitRepositoryService.run() returns Optional.empty on failure rather than
+  raising, and every caller already treats "no answer" as its own empty/false —
+  the Optional-vs-empty-string rationale (#71) is explicitly documented and
+  correct (git checkout prints nothing on success).
+- ConflictResolution.resolveRebase is provably finite: every loop turn must
+  advance rebaseStep, and it stops on "did not advance". The 31-commit loop
+  fix (#89) is a genuinely good design.
+- BranchSelector.showPlaceholder owns the WHOLE "box holds an explanation"
+  state (model clear + shown reset + placeholder flag + disabled), fixing the
+  two places where a placeholder string was read as a checkout request.
+- BulkJsonEditors multi-caret bulk editing: guarded blocks, caret snapping to
+  nearest editable range, diff highlighting by marker, scroll sync — a complex
+  editor UI done cleanly, with the "acceptsDialogKeys=false + bind through the
+  action system" IntelliJ-editor-key gotcha documented.
+- TestCaseCacheService.reload: CAS collapse of bursts + swap-in-not-clear
+  rebuild (completion never briefly empty) + supplier source — all three are
+  correct concurrency choices.
+- DirectoryChildrenIndex/LegacyChainOrder/NodeCounter/Once/BackgroundWork:
+  small, single-purpose, clearly commented.
+- GridPanelBuilder: ORDER column recognized by constant not column number so
+  enum reorder moves the column; row heights re-measured without selection
+  changing them; column-width persistence keyed by the "grid.kind" client
+  property so rebuilds/restarts survive.
+
+--------------------------------------------------------------------------------
+5. OTHER PROJECTS IN THE FOLDER  (unchanged from pi-notes.txt)
+--------------------------------------------------------------------------------
+- nafath-test: sibling TestNG automation project; functional but less
+  documented/explicit (Tools 430, GenerateClasses 426, BasePage 399, Asserter
+  385; @SneakyThrows; commented-out main blocks). Not part of the plugin.
+- testin_example: empty Maven skeleton. Nothing to review.
+- tempToBeRemoved: throwaway IntelliJ-generated Main. Meant to be deleted.
+
+--------------------------------------------------------------------------------
+6. SUMMARY FOR THE USER
+--------------------------------------------------------------------------------
+- Simple & clear: YES. The deeper pass confirms it — even the 400-500 line
+  files (TreeTransferHandler, GridPanelBuilder, BulkJsonEditors,
+  ViewPendingCommitsAction, BranchSelector) are readable and well-factored.
+- Structure professional & easy to maintain: YES, strongly. Package layout,
+  naming, enforced indexer-owns-file-access rule, and why-comments are
+  excellent.
+- Bugs: 9 total. The two that matter: BUG-2 (Stop-after-reload leaves a run
+  unkillable) and NEW BUG A (test-case deletion bypasses OwnWrites/VFS-refresh
+  -> needless rescan + stale Project view). NEW B (no re-scan after download ->
+  stale UI) is a close third. The rest are cosmetic/minor/edge-case.
+- Biggest maintainability levers: split the 3-4 largest classes; move live
+  run-state out of TestCaseDto into an id-keyed map (which would also fix
+  BUG-2); route the delete in TestCaseSequenceStore through FilesUtil.
+- Nothing was edited. pi-notes.txt (first pass) and pi-notes_v2.txt (this
+  deeper pass) are the only files written.
+================================================================================

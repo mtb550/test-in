@@ -1,0 +1,224 @@
+================================================================================
+ TESTIN — CODE REVIEW NOTES  (pi-notes)
+ Reviewed: IdeaProjects folder, main focus the `testin` IntelliJ plugin.
+ Date: review snapshot of current working tree. No files were edited.
+================================================================================
+
+--------------------------------------------------------------------------------
+1. OVERALL CONCLUSION
+--------------------------------------------------------------------------------
+
+VERDICT: This is a genuinely professional, senior-level codebase. It is not
+"simple" in the toy sense, but it is SIMPLE IN THE GOOD SENSE — small focused
+classes, one idea per file, clear names, and comments that explain *why* a
+design is the way it is (and often the bug that forced it). The structure is
+professional, consistent, and easy to navigate. It is very maintainable.
+
+Strengths, in order:
+
+- **Package structure is excellent.** All-lowercase, feature-named packages
+  (`editor`, `explorer`, `indexer`, `git`, `sftp`, `report`, `model`) with no
+  `enums`/`listeners`/`mappers` catch-all packages. Sub-packages don't repeat
+  their parent (`editor/run`, `editor/grid`). Easy to guess where a file lives.
+- **Consistent conventions, enforced.** `final @NotNull` on params/locals, `p`
+  for Project, `Abstract*` vs `Base*` parent naming, `Testin`-prefix against
+  platform-name collisions, Optional-for-maybe patterns. CLAUDE.md documents
+  these and the code follows them everywhere I sampled.
+- **Comments are unusually good.** They record the *reason* behind a decision
+  and the bug it fixed (e.g. #34 stop-a-run, #66 copy ids, #89 read-action
+  freeze, #90 field-by-field merge). This is the single biggest maintainability
+  win in the codebase.
+- **Tests are real and behavior-pinning.** 58 test classes covering the tricky
+  logic (merge, diff, sync, rank/order, verdict, renderer, framework
+  declarations) — not just smoke tests.
+- **The indexer-owns-file-access rule is actually enforced** (FilesUtil is
+  package-private inside `indexer`, so the compiler enforces it, not just a
+  comment). That is the right way to make an architecture rule stick.
+- **Error paths are handled honestly** — logging + notification or a raise,
+  never silent catches, never a catch that neither logs nor notifies.
+
+So: code simple/clear — YES. Structure professional and understandable — YES.
+Maintainable — YES, above industry average.
+
+The issues below are mostly small, edge-case, or style-level; none of them
+indicate a structural problem.
+
+--------------------------------------------------------------------------------
+2. REAL BUGS / ISSUES FOUND
+--------------------------------------------------------------------------------
+
+[BUG-1] PDF report footer is drawn only on the LAST page
+  File: report/generators/TestRunPdfGenerator.java:249
+  `Canvas footerCanvas = new Canvas(pdf.getLastPage(), ...)`.
+  For a multi-page report (a large run can span several pages) only the final
+  page carries the footer; intermediate pages get no footer. The Word generator
+  (TestRunWordGenerator.java:463 `doc.createFooter`) does it correctly for all
+  pages, so the two report formats disagree.
+  Fix idea: iterate every page (`pdf.getNumberOfPages()`) and draw the footer
+  on each, or use iText's page-event mechanism. Also the footer's horizontal
+  rule baseline (y=34) doesn't match the text rectangle (y=0, h=28) — cosmetic.
+
+[BUG-2] TestNGExecution keys maps by TestCaseDto *identity*, which breaks after
+        a reload
+  Files: runner/TestNGExecution.java (`configOf: Map<TestCaseDto,String>`,
+  `pending: Set<TestCaseDto>`).
+  TestCaseDto has @Getter/@Setter/@ToString but NO @EqualsAndHashCode, so it
+  falls back to Object identity. The editor reloads test cases off the EDT and
+  hands back *different instances* for the same case (RunEditor comment admits
+  "a reload hands back different objects for the same test cases").
+  Consequence: a Stop click after a reload calls
+  `configOf.getOrDefault(tc, "")` on a fresh instance -> returns "" -> the run's
+  process is never killed, and the case is left showing Running until a report
+  arrives. `stopped` correctly uses UUIDs (good), but `configOf`/`pending` do
+  not.
+  Fix idea: key by `tc.getId()` (UUID) instead of the DTO instance, same as
+  `stopped` already does.
+
+[BUG-3] SftpTransport leaks the JSch session/channel on connection failure
+  File: sftp/SftpTransport.java:open()
+  If `auth.apply`, `session.connect`, `openChannel` or `sftp.connect` throws,
+  the already-created Session and Channel are never disconnected (close() is
+  only reachable on the success path). On a flaky server this leaks one TCP
+  connection per failed attempt. Low impact (short-lived), but a real leak.
+  Fix idea: wrap the connect steps so any failure disconnects the session.
+
+[BUG-4] FontSync.isGlobalWatcherActive is a single shared mutable static
+  File: util/FontSync.java:35
+  `private static boolean isGlobalWatcherActive`. It is set true on the first
+  subscriber and reset false on *that subscriber's* disposal (Disposer
+  callback). If component A and B both subscribe, then A is disposed first,
+  the flag flips to false while B's watcher is still live — the next
+  subscriber re-registers a second global watcher and debounce timer. Only
+  touched on the EDT so not a race, but it is an ownership bug: the flag
+  should be tied to the app/editor lifetime, not to one subscriber's disposal.
+  Minor, edge-case.
+
+[BUG-5] passRate uses integer division that truncates
+  File: model/TestRunSummary.java:63 `passed * 100 / executed`
+  Integer division truncates toward zero: 2/3 -> 66%, 1/3 -> 33%. Probably
+  intended (a percentage of a small run is coarse anyway), but worth
+  confirming; `passed * 100` could overflow int only with >21M cases — not
+  realistic. Cosmetic.
+
+[BUG-6] SftpSync half-failed transfer — correct by design, noted for record
+  If `transfer` throws mid-way, `writeManifest`/`BaselineStore.write` never run,
+  so nothing is falsely recorded as agreed; the next sync re-compares and
+  re-uploads what actually differs. Good design. But a file written to the
+  server by a half-failed upload is left "unrecorded" — harmless because the
+  next sync re-checks it.
+
+--------------------------------------------------------------------------------
+3. DESIGN / MAINTAINABILITY CONCERNS (not bugs)
+--------------------------------------------------------------------------------
+
+[M-1] A few classes are too large / do too much
+  - indexer/ProjectIndexer.java       927 lines
+  - editor/run/RunEditor.java         835 lines
+  - editor/test/TestEditor.java       674 lines
+  - indexer/IndexerDataStore.java     547 lines
+  - explorer/tree/TreeTransferHandler 524 lines
+  - git/ViewPendingCommitsAction.java 508 lines
+  - editor/grid/GridPanelBuilder.java 491 lines
+  - report/generators/TestRunWordGenerator.java 490 lines
+  - testcase/update/bulk/BulkJsonEditors.java  472 lines
+  The quality is high even in these, but 900-line files are hard to hold in
+  the head at once. The indexer and the two editors are the most likely places
+  a future regression lands. Consider splitting ProjectIndexer (the store, the
+  scan coordinator, and the VFS ops are already separable) and the two editors.
+
+[M-2] TestCaseDto carries transient execution state (tempStatus/tempError)
+  File: model/dto/TestCaseDto.java (@JsonIgnore tempStatus, tempError)
+  The persisted DTO embeds UI/live-run state (RunStatus.RUNNING, tempError).
+  It's @JsonIgnore so it never hits disk, but it means the *model* object is
+  mutated by the runner/listener, and any thread must know these fields are
+  volatile. This works, but mixing persisted data and live state in one DTO is
+  a smell — the live state could live in a separate map keyed by id (the way
+  `resultsMap` already works in RunEditor) to keep TestCaseDto a pure record.
+
+[M-3] `volatile Optional<X>` as a field pattern
+  Used in RunEditor, Logger, Config, TestCaseExecutionSubscriber. It is
+  documented and works (volatile makes the Optional reference safely
+  published), but Optional is not an atomic value — readers can observe an
+  intermediate empty between write steps. All uses here are single-assignment
+  writes, so it's safe in practice. Keep the discipline documented.
+
+[M-4] Logger/Notifier are the two cross-cutting singletons
+  logger/Logger.java holds one `System.out` call (the only one in the codebase,
+  good) and a static volatile Optional<LoggerService> backend. It's fine, but
+  the global-backend pattern means the logging destination is set once per
+  plugin and can't vary per-project — acceptable, just noted.
+
+[M-5] A handful of @SneakyThrows / Lombok usage
+  Lombok is compile-only (good — no runtime dep). @SneakyThrows hides checked
+  exceptions in a couple of places; the rest of the codebase checks and wraps
+  exceptions explicitly. Minor inconsistency with the otherwise explicit
+  style.
+
+[M-6] `Shared.showBadges` reuses BadgePill components and hides extras
+  Correct and deliberate (documented), but the pill reuse means a pill retains
+  its previous badge's text until `show()` is called; the visibility-hide path
+  is safe. Note it so a future editor doesn't "clean up" the reuse and pay a
+  repaint cost.
+
+[M-7] Grid renderer reuses one shared textArea/wrapper across cells
+  Standard Swing renderer practice within one table; safe because only one
+  cell is painted at a time. Just keep it that way — don't let a second table
+  share the same renderer instance.
+
+--------------------------------------------------------------------------------
+4. THINGS THAT ARE HANDLED WELL (worth keeping)
+--------------------------------------------------------------------------------
+
+- Identity-of-a-case-by-filename (IndexingScanner.identityOf) — smart fix for
+  copied files claiming one id; the Unsorted badge explains the orphan.
+- Empty-write refusal (FilesUtil) — prevents erasing markers/cases to zero
+  bytes; the "six markers left at zero bytes" comment shows it fixed a real
+  data-loss bug.
+- LegacyChainOrder one-time conversion of pre-rank test sets — good migration
+  strategy.
+- Git read uses plain file access, not the VFS (git is exempt) — correct, and
+  the exemption is documented in CLAUDE.md.
+- Sync does pull THEN push (not "up to date" while local commits sat
+  un-pushed) — fixed a real UX bug (#89).
+- Mapper raises instead of returning empty on serialization failure — fixed a
+  "failure written to disk as zero-byte file" bug.
+- run-status writer snapshots JSON bytes on the EDT, does only disk I/O on the
+  worker thread — a clean EDT/IO split.
+- TestRunVerdictTest, GitDiffProcessor.toDiffs, PendingChangeFactory etc. are
+  all testable without an IDE — the seams are good.
+
+--------------------------------------------------------------------------------
+5. OTHER PROJECTS IN THE FOLDER (brief)
+--------------------------------------------------------------------------------
+
+- nafath-test: a separate TestNG + RestAssured/Appium automation project
+  (161 test files). Different, more "scaffolded" style — big utility classes
+  (Tools.java 430, GenerateClasses 426, BasePage 399, Asserter 385) with
+  @SneakyThrows and commented-out code blocks in main(). Functional and
+  organized by feature packages, but less documented than testin and less
+  consistently explicit about null/error handling. It is a sibling project,
+  not part of the plugin.
+
+- testin_example: Maven skeleton (pom.xml with TestNG RELEASE dep), no Java
+  source files under src — an example/scaffold project. Nothing to review.
+
+- tempToBeRemoved: Maven skeleton with a single IntelliJ-generated Main.java
+  ("Hello and welcome", TIP comments, System.out in main). The name says it:
+  it is throwaway scaffolding. No issues worth fixing; it is meant to be
+  deleted.
+
+--------------------------------------------------------------------------------
+6. SUMMARY FOR THE USER
+--------------------------------------------------------------------------------
+
+- Simple & clear: YES. Code is readable, small-focused, heavily and
+  meaningfully commented.
+- Structure professional & easy to maintain: YES, strongly. Package layout,
+  naming, enforced architecture rule, and documented conventions are
+  excellent.
+- Bugs: 6 found (2 worth fixing: PDF footer only on last page; TestNGExecution
+  identity-keyed maps breaking after a reload). The rest are minor/edge-case.
+- The biggest maintainability lever left: splitting the 3-4 largest classes
+  and separating live run-state out of TestCaseDto.
+- Nothing was edited. This file (pi-notes.txt) is the only thing written.
+================================================================================
