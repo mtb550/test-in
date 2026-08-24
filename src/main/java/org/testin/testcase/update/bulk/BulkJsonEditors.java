@@ -106,8 +106,7 @@ final class BulkJsonEditors implements DialogComponent {
         installMultiCaretClick();
     }
 
-    private static void register(final @NotNull Runnable body, final @NotNull KeyStroke keyStroke,
-                                 final @NotNull JComponent target) {
+    private static void register(final @NotNull Runnable body, final @NotNull KeyStroke keyStroke, final @NotNull JComponent target) {
         new DumbAwareAction() {
             @Override
             public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -129,8 +128,7 @@ final class BulkJsonEditors implements DialogComponent {
      * Called once by the value dialog and again on every add or remove by the
      * array dialog, which is why the previous guards are torn down first.
      */
-    void setContent(final @NotNull String leftText, final @NotNull String rightText,
-                    final @NotNull List<int[]> editableRanges) {
+    void setContent(final @NotNull String leftText, final @NotNull String rightText, final @NotNull List<int[]> editableRanges) {
         WriteCommandAction.runWriteCommandAction(p, () -> {
             for (final RangeMarker guard : guardBlocks) rightDoc.removeGuardedBlock(guard);
             guardBlocks.clear();

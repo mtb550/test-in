@@ -139,11 +139,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to calculate diffs: " + ex.getMessage()));
     }
 
-    private void reviewChanges(final @NotNull Project p, final @NotNull Path path,
-                               final @NotNull List<PendingChange> changes,
-                               final @NotNull List<String> branches,
-                               final @NotNull String currentBranch,
-                               final int unpushed) {
+    private void reviewChanges(final @NotNull Project p, final @NotNull Path path, final @NotNull List<PendingChange> changes, final @NotNull List<String> branches, final @NotNull String currentBranch, final int unpushed) {
         if (changes.isEmpty()) {
             offerThePush(p, path, currentBranch, unpushed);
             return;
@@ -169,8 +165,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
      * <p>
      * Off the EDT, because all three ask Git.
      */
-    private void commitOnBranch(final @NotNull Project p, final @NotNull Path repoPath,
-                                final @NotNull PendingCommitsDialog.Request request) {
+    private void commitOnBranch(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull PendingCommitsDialog.Request request) {
         final @NotNull String target = request.branch();
 
         GitBackgroundTask.run(p, "Preparing the branch", false,
@@ -229,8 +224,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
      * plugin had to offer: the commit existed, nothing was pending, and no
      * action anywhere pushed it (#66).
      */
-    private void offerThePush(final @NotNull Project p, final @NotNull Path path,
-                              final @NotNull String currentBranch, final int unpushed) {
+    private void offerThePush(final @NotNull Project p, final @NotNull Path path, final @NotNull String currentBranch, final int unpushed) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
         if (unpushed == 0) {
@@ -246,11 +240,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 () -> pushToRemote(p, path, commits.headCommitId(path), currentBranch));
     }
 
-    private void performCommitWorkflow(
-            final @NotNull Project p,
-            final @NotNull Path repoPath,
-            final @NotNull PendingCommitsDialog.Request request,
-            final @NotNull String branch) {
+    private void performCommitWorkflow(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull PendingCommitsDialog.Request request, final @NotNull String branch) {
         final @NotNull String commitMessage = request.message();
         final @NotNull Collection<PendingChange> selectedChanges = request.changes();
         final boolean push = request.push();
@@ -308,8 +298,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
      *                    default would send the work somewhere the tester did
      *                    not choose
      */
-    private void pushToRemote(final @NotNull Project p, final @NotNull Path repoPath,
-                              final @NotNull String commitId, final @NotNull String committedOn) {
+    private void pushToRemote(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull String commitId, final @NotNull String committedOn) {
         GitBackgroundTask.run(p, "Checking Git remote", false,
                 indicator -> {
                     final @NotNull String remoteName = git.getRemoteName(repoPath);
@@ -331,9 +320,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Could not read the Git remote: " + ex.getMessage()));
     }
 
-    private void configureRemoteAndPush(final @NotNull Project p, final @NotNull Path repoPath,
-                                        final @NotNull String remoteName, final @NotNull String branch,
-                                        final @NotNull String commitId) {
+    private void configureRemoteAndPush(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull String remoteName, final @NotNull String branch, final @NotNull String commitId) {
         final @NotNull TestinConfigService config = Services.getInstance(p, TestinConfigService.class);
 
         // The repository already says where its test project lives, so a clone of
@@ -360,9 +347,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage()));
     }
 
-    private void executeGitPush(final @NotNull Project p, final @NotNull Path repoPath,
-                                final @NotNull String remote, final @NotNull String branch,
-                                final @NotNull String commitId) {
+    private void executeGitPush(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final @NotNull String commitId) {
         GitBackgroundTask.run(p, "Pushing to Remote", false,
                 indicator -> {
                     indicator.setText("Syncing with remote: pull --rebase, then push");
@@ -394,8 +379,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
      * On the background thread that failed, because naming the conflicting files
      * means asking Git for them.
      */
-    private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote,
-                                     final @NotNull String branch) {
+    private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
         final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
@@ -415,8 +399,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
      * Off the EDT because it reads Git and writes files; the questions it cannot
      * answer open on the EDT from inside.
      */
-    private void resolveConflicts(final @NotNull Path repoPath, final @NotNull String remote,
-                                  final @NotNull String branch) {
+    private void resolveConflicts(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ConflictResolution.resolveRebase(p, repoPath,
                         () -> pushAfterRebase(repoPath, remote, branch),
@@ -432,8 +415,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
      * to the end - and asking Git to continue a rebase that has finished fails
      * with "no rebase in progress".
      */
-    private void pushAfterRebase(final @NotNull Path repoPath, final @NotNull String remote,
-                                 final @NotNull String branch) {
+    private void pushAfterRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
         GitBackgroundTask.run(p, "Pushing " + branch, false,
                 indicator -> {
                     commits.push(repoPath, remote, branch);
@@ -444,8 +426,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Push Failed", ex.getMessage()));
     }
 
-    private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote,
-                              final @NotNull String branch, final boolean abort) {
+    private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final boolean abort) {
         GitBackgroundTask.run(p, abort ? "Aborting rebase" : "Continuing rebase", false,
                 indicator -> {
                     // GitTaskWork declares throws so a lambda can report failure
@@ -471,11 +452,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 });
     }
 
-    private void promptAndSetGitIdentity(
-            final @NotNull Project p,
-            final @NotNull Path repoPath,
-            final @NotNull PendingCommitsDialog.Request request,
-            final @NotNull String branch) {
+    private void promptAndSetGitIdentity(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull PendingCommitsDialog.Request request, final @NotNull String branch) {
         // The dialog validates what it collected - a blank name or email never
         // leaves it - so this is the workflow resuming, not a second check.
         ApplicationManager.getApplication().invokeLater(() -> new GitIdentityDialog(p, identity ->

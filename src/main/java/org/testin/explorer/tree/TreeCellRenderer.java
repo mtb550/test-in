@@ -25,8 +25,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
     private final @NotNull Set<DirectoryDto> selectedNodes;
 
     @Override
-    public void customizeCellRenderer(final @NotNull JTree tree, final @Nullable Object value, final boolean selected,
-                                      final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
+    public void customizeCellRenderer(final @NotNull JTree tree, final @Nullable Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
         try {
             if (TreeValueUtil.valueOf(value) instanceof TreeLoadError(String message)) {
                 setIcon(AllIcons.General.Error);

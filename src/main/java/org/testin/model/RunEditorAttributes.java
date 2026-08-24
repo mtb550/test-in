@@ -167,14 +167,11 @@ public enum RunEditorAttributes implements ToolBarAttribute {
      */
     private final @NotNull RunValueSetter runValueSetter;
 
-    RunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault,
-                        final @NotNull ValueExtractor<TestRunItems> runValueExtractor) {
+    RunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull ValueExtractor<TestRunItems> runValueExtractor) {
         this(name, toolBarDefault, runValueExtractor, RunValueSetter.NONE);
     }
 
-    RunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault,
-                        final @NotNull ValueExtractor<TestRunItems> runValueExtractor,
-                        final @NotNull RunValueSetter runValueSetter) {
+    RunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull ValueExtractor<TestRunItems> runValueExtractor, final @NotNull RunValueSetter runValueSetter) {
         this.name = name;
         this.toolBarDefault = toolBarDefault;
         this.runValueExtractor = runValueExtractor;

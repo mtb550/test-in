@@ -42,8 +42,7 @@ public abstract class AbstractProjectAction extends DumbAwareAction {
     /**
      * The icon is nullable because an action shown only in a list has none.
      */
-    protected AbstractProjectAction(final @NotNull Project p, final @NotNull String title,
-                                    final @NotNull String description, final @Nullable Icon icon) {
+    protected AbstractProjectAction(final @NotNull Project p, final @NotNull String title, final @NotNull String description, final @Nullable Icon icon) {
         super(title, description, icon);
         this.p = p;
     }

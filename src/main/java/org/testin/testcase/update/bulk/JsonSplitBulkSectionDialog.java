@@ -36,8 +36,7 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
      */
     private final @NotNull List<String> originalEscaped = new ArrayList<>();
 
-    protected JsonSplitBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems,
-                                         final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
+    protected JsonSplitBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
         super(p);
         this.selectedItems = selectedItems;
         this.updatedItems = updatedItems;

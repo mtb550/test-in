@@ -143,8 +143,7 @@ public class ImportCsv {
         return records;
     }
 
-    private void endRecord(final @NotNull List<String[]> records, final @NotNull List<String> fields,
-                           final @NotNull StringBuilder current) {
+    private void endRecord(final @NotNull List<String[]> records, final @NotNull List<String> fields, final @NotNull StringBuilder current) {
         if (fields.isEmpty() && current.isEmpty()) return; // blank line
 
         fields.add(current.toString());

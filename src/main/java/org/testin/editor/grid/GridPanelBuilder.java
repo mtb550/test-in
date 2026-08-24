@@ -220,8 +220,7 @@ public class GridPanelBuilder {
      * rebuilt with fewer columns would otherwise be asked to select one it no
      * longer has.
      */
-    public static void restoreSelection(final @NotNull JBTable table, final @NotNull JBList<TestCaseDto> list,
-                                        final @NotNull List<TestCaseDto> pageItems, final int columnToRestore) {
+    public static void restoreSelection(final @NotNull JBTable table, final @NotNull JBList<TestCaseDto> list, final @NotNull List<TestCaseDto> pageItems, final int columnToRestore) {
         final int selectedRow = pageItems.indexOf(list.getSelectedValue());
         if (selectedRow < 0) return;
 

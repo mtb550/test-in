@@ -102,8 +102,7 @@ public record TestinProjectConfig(@NotNull TestinLocation location,
      * mistake in it, and quietly behaving as something else would hide the one
      * fact the tester needs.
      */
-    private static void report(final @NotNull TestinLocation location, final @NotNull ConnectionType connection,
-                               final @NotNull String repoUrl, final @NotNull String host) {
+    private static void report(final @NotNull TestinLocation location, final @NotNull ConnectionType connection, final @NotNull String repoUrl, final @NotNull String host) {
         if (!location.isRemote()) return;
 
         if (connection == ConnectionType.NONE) {

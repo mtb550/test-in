@@ -17,8 +17,7 @@ import javax.swing.*;
  */
 public record SelectionList<T>(@NotNull Icon icon, @NotNull String name, @NotNull String hint, @NotNull T value) {
 
-    public static <T> @NotNull SelectionList<T> add(final @NotNull Icon icon, final @NotNull String name,
-                                                    final @NotNull String hint, final @NotNull T value) {
+    public static <T> @NotNull SelectionList<T> add(final @NotNull Icon icon, final @NotNull String name, final @NotNull String hint, final @NotNull T value) {
         return new SelectionList<>(icon, name, hint, value);
     }
 }

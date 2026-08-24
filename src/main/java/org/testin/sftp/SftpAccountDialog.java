@@ -30,8 +30,7 @@ final class SftpAccountDialog extends AbstractFrameworkDialog<TextInput> {
     private final @NotNull TextInput passwordField;
     private final @NotNull Consumer<@NotNull Account> onGiven;
 
-    SftpAccountDialog(final @NotNull Project p, final @NotNull SftpAddress address,
-                        final @NotNull String knownUser, final @NotNull Consumer<@NotNull Account> onGiven) {
+    SftpAccountDialog(final @NotNull Project p, final @NotNull SftpAddress address, final @NotNull String knownUser, final @NotNull Consumer<@NotNull Account> onGiven) {
         super(p);
         this.onGiven = onGiven;
 

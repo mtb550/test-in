@@ -66,8 +66,7 @@ public class BranchSelector {
      */
     private boolean showingPlaceholder = false;
 
-    public BranchSelector(final @NotNull Project p, final @NotNull ExplorerPanel pp,
-                          final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
+    public BranchSelector(final @NotNull Project p, final @NotNull ExplorerPanel pp, final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
         this.p = p;
         this.pp = pp;
         this.git = new GitRepositoryService(p);
@@ -212,8 +211,7 @@ public class BranchSelector {
      * unanswered leaves the panel saying where the repository actually is. A
      * switch that goes ahead puts it right again when the tree is rebuilt.
      */
-    private void askBeforeCarryingWorkAcross(final @NotNull Path repositoryPath, final @NotNull String targetBranch,
-                                             final int pending) {
+    private void askBeforeCarryingWorkAcross(final @NotNull Path repositoryPath, final @NotNull String targetBranch, final int pending) {
         restoreSelectedBranch();
 
         final @NotNull String changes = pending == 1 ? "1 change" : pending + " changes";

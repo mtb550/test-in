@@ -23,6 +23,5 @@ import java.util.List;
  * @param theirs    the server's whole version, because an answer of "theirs"
  *                  is read back out of it field by field
  */
-public record Unsettled(@NotNull String path, @NotNull String name, @NotNull ObjectNode merged,
-                        @NotNull List<TestCaseMerge.Question> questions, @NotNull String theirs) {
+public record Unsettled(@NotNull String path, @NotNull String name, @NotNull ObjectNode merged, @NotNull List<TestCaseMerge.Question> questions, @NotNull String theirs) {
 }

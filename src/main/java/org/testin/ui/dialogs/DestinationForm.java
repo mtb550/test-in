@@ -44,9 +44,7 @@ public final class DestinationForm implements DialogComponent {
      */
     private final boolean offersDefaultFolder;
 
-    public DestinationForm(final @NotNull Project p, final FileTypes @NotNull [] formats,
-                           final @NotNull FileTypes defaultFormat, final @NotNull String fileName,
-                           final @NotNull String chooserTitle, final @NotNull String chooserDescription) {
+    public DestinationForm(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String fileName, final @NotNull String chooserTitle, final @NotNull String chooserDescription) {
         this.p = p;
         this.formatCombo = new ComboBox<>(formats);
         this.offersDefaultFolder = defaultFolder().isBlank();

@@ -35,9 +35,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
      */
     private final @NotNull AtomicBoolean refreshQueued = new AtomicBoolean();
 
-    protected AbstractDetailsPopupBtn(final @NotNull String propertyKey,
-                                      final @NotNull Class<E> attributes,
-                                      final @NotNull Runnable onToolBarDetailsSelectedChanged) {
+    protected AbstractDetailsPopupBtn(final @NotNull String propertyKey, final @NotNull Class<E> attributes, final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         // A checked box, matching the check-box list this button opens. The
         // previous icon was a framed panel with rules in it, which the New UI
         // draws almost identically to the List View button beside it.

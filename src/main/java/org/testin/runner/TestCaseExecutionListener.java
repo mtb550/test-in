@@ -25,8 +25,7 @@ public interface TestCaseExecutionListener {
      * land while the project is closing, and it used to be written at only one
      * of the three.
      */
-    static void broadcast(final @NotNull Project p, final @NotNull String testName,
-                          final @NotNull RunStatus status, final @NotNull String error) {
+    static void broadcast(final @NotNull Project p, final @NotNull String testName, final @NotNull RunStatus status, final @NotNull String error) {
         if (p.isDisposed()) return;
 
         p.getMessageBus().syncPublisher(TOPIC).onStatusChanged(testName, status, error);

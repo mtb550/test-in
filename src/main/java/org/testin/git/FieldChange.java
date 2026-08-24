@@ -12,6 +12,5 @@ import org.jetbrains.annotations.NotNull;
  * nullable for an absence the model does not have, which pushed a null check onto
  * everything that renders a row.
  */
-public record FieldChange(@NotNull String fieldName, @NotNull String oldValue, @NotNull String newValue,
-                          @NotNull ChangeType changeType) {
+public record FieldChange(@NotNull String fieldName, @NotNull String oldValue, @NotNull String newValue, @NotNull ChangeType changeType) {
 }

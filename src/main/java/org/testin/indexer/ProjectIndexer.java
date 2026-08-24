@@ -458,8 +458,7 @@ public final class ProjectIndexer {
         return List.copyOf(store.allDirectories());
     }
 
-    public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList,
-                               final @NotNull List<TestCaseDto> moved) {
+    public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
         store.updateSequence(testSetPath, orderedList, moved);
     }
 
@@ -576,8 +575,7 @@ public final class ProjectIndexer {
      * way, so a file the VFS refused to delete was dropped from the cache and the
      * tree stopped showing a node that was still on disk (#66, F2).
      */
-    private void removeVf(final @NotNull Path path, final @NotNull Runnable cacheUpdate,
-                          final @NotNull Consumer<@NotNull Boolean> onRemoved) {
+    private void removeVf(final @NotNull Path path, final @NotNull Runnable cacheUpdate, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         Services.getInstance(p, VfsExecutor.class).removeVf(p, this, path,
                 deleted -> VirtualFileManager.getInstance().asyncRefresh(() -> {
                     if (deleted) cacheUpdate.run();
@@ -591,9 +589,7 @@ public final class ProjectIndexer {
      * wanted to confirm the move had to read the cache back afterward to find
      * out (#66, F2).
      */
-    public void moveNode(final @NotNull Path oldPath,
-                         final @NotNull Path newPath,
-                         final @NotNull Consumer<@NotNull Boolean> onFinished) {
+    public void moveNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Consumer<@NotNull Boolean> onFinished) {
         final @NotNull Optional<Path> found = Optional.ofNullable(newPath.getParent());
         if (found.isEmpty()) {
             Logger.warn("Move refused, target has no parent directory: " + newPath);
@@ -624,8 +620,7 @@ public final class ProjectIndexer {
      * to be a bare Runnable that fired either way, and callers could not tell a
      * finished copy from a failed one (#66, F2).
      */
-    public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath,
-                          final @NotNull IntConsumer onComplete) {
+    public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final @NotNull IntConsumer onComplete) {
         if (sourcePaths.isEmpty()) {
             onComplete.accept(0);
             return;
@@ -864,8 +859,7 @@ public final class ProjectIndexer {
      * missing or unreadable. The indexer owns both directions of the marker round
      * trip; nothing outside it opens a marker file (#49).
      */
-    public <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull String markerFileName,
-                                     final @NotNull Class<M> type, final @NotNull String kind, final @NotNull String name) {
+    public <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Class<M> type, final @NotNull String kind, final @NotNull String name) {
         return store.readMarker(dirPath, markerFileName, type, kind, name);
     }
 

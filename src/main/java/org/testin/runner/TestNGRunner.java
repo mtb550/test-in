@@ -124,8 +124,7 @@ public final class TestNGRunner {
      * Builds the configuration and starts it, for whichever of the cases the
      * tester still wants.
      */
-    private void launch(final @NotNull Project p, final @NotNull List<TestCaseDto> found,
-                        final @NotNull Optional<Module> module) {
+    private void launch(final @NotNull Project p, final @NotNull List<TestCaseDto> found, final @NotNull Optional<Module> module) {
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         // Asked here rather than earlier: a case stopped while the run was being

@@ -34,12 +34,7 @@ final class PendingChangeFactory {
      * that can offer it - answering null here used to drop a run, a reorder or
      * an audit stamp out of the commit entirely (#66).
      */
-    static @NotNull PendingChange fromFile(
-            final @NotNull DiffType type,
-            final @NotNull String beforeJson,
-            final @NotNull String afterJson,
-            final @NotNull Path relativePath,
-            final @NotNull Mapper mapper) {
+    static @NotNull PendingChange fromFile(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper) {
         return switch (subjectOf(relativePath, afterJson.isEmpty() ? beforeJson : afterJson, mapper)) {
             case TEST_CASE -> testCase(type, beforeJson, afterJson, relativePath, mapper);
             case TEST_RUN -> testRun(type, beforeJson, afterJson, relativePath, mapper);
@@ -64,8 +59,7 @@ final class PendingChangeFactory {
      * nobody planned for, and it is still listed - what the review does not show
      * cannot be committed.
      */
-    private static @NotNull ChangeSubject subjectOf(final @NotNull Path relativePath, final @NotNull String json,
-                                                    final @NotNull Mapper mapper) {
+    private static @NotNull ChangeSubject subjectOf(final @NotNull Path relativePath, final @NotNull String json, final @NotNull Mapper mapper) {
         final @NotNull String fileName = relativePath.getFileName().toString();
 
         if (fileName.startsWith(".")) return ChangeSubject.MARKER;
@@ -106,9 +100,7 @@ final class PendingChangeFactory {
         }
     }
 
-    private static @NotNull PendingChange testCase(
-            final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson,
-            final @NotNull Path relativePath, final @NotNull Mapper mapper) {
+    private static @NotNull PendingChange testCase(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper) {
         final @NotNull String testSet = parentName(relativePath);
 
         return switch (type) {
@@ -141,9 +133,7 @@ final class PendingChangeFactory {
         };
     }
 
-    private static @NotNull PendingChange testRun(
-            final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson,
-            final @NotNull Path relativePath, final @NotNull Mapper mapper) {
+    private static @NotNull PendingChange testRun(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper) {
         final @NotNull String runName = parentName(relativePath);
 
         final @NotNull List<FieldChange> changes = switch (type) {
@@ -162,9 +152,7 @@ final class PendingChangeFactory {
      * A marker change, described by the one thing in it a tester recognizes:
      * its status. Everything else it holds is the audit the plugin fills in.
      */
-    private static @NotNull PendingChange marker(
-            final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson,
-            final @NotNull Path relativePath, final @NotNull Mapper mapper) {
+    private static @NotNull PendingChange marker(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper) {
         final @NotNull String node = parentName(relativePath);
         final @NotNull String before = statusIn(mapper, beforeJson);
         final @NotNull String after = statusIn(mapper, afterJson);
@@ -222,8 +210,7 @@ final class PendingChangeFactory {
         return Optional.ofNullable(parent).map(Path::getFileName).map(Path::toString).orElse("");
     }
 
-    private static <T> @NotNull T read(final @NotNull Mapper mapper, final @NotNull String json,
-                                       final @NotNull Class<T> type) {
+    private static <T> @NotNull T read(final @NotNull Mapper mapper, final @NotNull String json, final @NotNull Class<T> type) {
         if (json.isEmpty()) throw new IllegalStateException("Missing Git file revision");
         return mapper.readValue(json, type);
     }

@@ -37,8 +37,7 @@ public abstract class BaseDetails {
      * The insets stay the caller's: the two rows sit at different distances from
      * whatever follows them, and that is the only thing they disagree about.
      */
-    protected int addFullWidthRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc,
-                                  final @NotNull JComponent component, final @NotNull Insets insets, final int row) {
+    protected int addFullWidthRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull JComponent component, final @NotNull Insets insets, final int row) {
         gbc.gridx = 0;
         gbc.gridy = row;
         gbc.gridwidth = 2;

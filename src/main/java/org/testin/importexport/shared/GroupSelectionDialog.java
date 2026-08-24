@@ -30,8 +30,7 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
     private final @NotNull SelectionTable groups;
     private final @NotNull Consumer<@NotNull String> onPicked;
 
-    public GroupSelectionDialog(final @NotNull Project p, final @NotNull String currentSelection,
-                                final @NotNull Consumer<@NotNull String> onPicked) {
+    public GroupSelectionDialog(final @NotNull Project p, final @NotNull String currentSelection, final @NotNull Consumer<@NotNull String> onPicked) {
         super(p);
         this.onPicked = onPicked;
 

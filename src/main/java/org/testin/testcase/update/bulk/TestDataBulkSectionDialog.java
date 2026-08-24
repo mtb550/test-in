@@ -9,8 +9,7 @@ import java.util.function.Consumer;
 
 public class TestDataBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
-    public TestDataBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems,
-                                     final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
+    public TestDataBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
         super(p, selectedItems, updatedItems);
     }
 

@@ -40,8 +40,7 @@ public final class PackageDeclarations {
      * @param sourceRoot the test source root every package is named from
      * @param moved      the directory that was just moved or renamed
      */
-    public static void retarget(final @NotNull Project p, final @NotNull VirtualFile sourceRoot,
-                                final @NotNull VirtualFile moved) {
+    public static void retarget(final @NotNull Project p, final @NotNull VirtualFile sourceRoot, final @NotNull VirtualFile moved) {
         for (final VirtualFile child : moved.getChildren()) {
             if (child.isDirectory()) {
                 retarget(p, sourceRoot, child);
@@ -55,8 +54,7 @@ public final class PackageDeclarations {
     /**
      * Rewrites one file's package to match the directory holding it.
      */
-    public static void retarget(final @NotNull Project p, final @NotNull VirtualFile sourceRoot,
-                                final @NotNull VirtualFile file, final @NotNull VirtualFile holder) {
+    public static void retarget(final @NotNull Project p, final @NotNull VirtualFile sourceRoot, final @NotNull VirtualFile file, final @NotNull VirtualFile holder) {
         if (!(PsiManager.getInstance(p).findFile(file) instanceof PsiJavaFile javaFile)) return;
 
         final @NotNull String declared = packageOf(sourceRoot, holder);

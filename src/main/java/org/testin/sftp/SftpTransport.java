@@ -58,8 +58,7 @@ public final class SftpTransport implements AutoCloseable {
     private final @NotNull Session session;
     private final @NotNull ChannelSftp sftp;
 
-    private SftpTransport(final @NotNull SftpAddress address, final @NotNull Session session,
-                          final @NotNull ChannelSftp sftp) {
+    private SftpTransport(final @NotNull SftpAddress address, final @NotNull Session session, final @NotNull ChannelSftp sftp) {
         this.address = address;
         this.session = session;
         this.sftp = sftp;
@@ -71,8 +70,7 @@ public final class SftpTransport implements AutoCloseable {
      * @param knownHosts the file of hosts this machine already trusts. A host
      *                   that is not in it is refused rather than trusted
      */
-    public static @NotNull SftpTransport open(final @NotNull SftpAddress address, final @NotNull String user,
-                                              final @NotNull SftpAuth auth, final @NotNull Path knownHosts) {
+    public static @NotNull SftpTransport open(final @NotNull SftpAddress address, final @NotNull String user, final @NotNull SftpAuth auth, final @NotNull Path knownHosts) {
         Session session = null;
         try {
             final @NotNull JSch jsch = new JSch();

@@ -29,9 +29,7 @@ public class SetTestCaseStatusAction extends AbstractProjectAction {
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull TestStatus status;
 
-    public SetTestCaseStatusAction(final @NotNull Project p, final @NotNull TestinEditor editor,
-                                   final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status,
-                                   final @NotNull TestStatus.MenuEntry entry) {
+    public SetTestCaseStatusAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status, final @NotNull TestStatus.MenuEntry entry) {
         super(p, status.getLabel(), "Set test case status to " + status.getLabel(), entry.icon());
         this.editor = editor;
         this.list = list;

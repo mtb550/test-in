@@ -35,8 +35,7 @@ public class TestCaseUpdateMenuDialog {
      * Every caller of this dialog needs both, and each had written both out, so
      * a change to what an update entails had to be made once per call site.
      */
-    public static void applyAftermath(final @NotNull Project p, final @NotNull List<TestCaseDto> updated,
-                                      final @NotNull GenType gt) {
+    public static void applyAftermath(final @NotNull Project p, final @NotNull List<TestCaseDto> updated, final @NotNull GenType gt) {
         ViewToolWindowFactory.panel().ifPresent(viewPanel -> viewPanel.refreshIfShowing(updated));
 
         Logger.trace("Generating automation code: " + gt);

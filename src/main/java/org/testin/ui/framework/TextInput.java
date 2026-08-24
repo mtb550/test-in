@@ -44,8 +44,7 @@ public final class TextInput implements DialogComponent {
      *                made to hold anything else - there is nothing to validate
      *                on submit and nothing to explain afterward
      */
-    TextInput(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull String initialValue,
-              final @NotNull String accepts) {
+    TextInput(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull String initialValue, final @NotNull String accepts) {
         this.placeHolderText = placeHolderText;
         textField = new ExtendableTextField(initialValue);
         // Derived from the label font at construction, so every dialog open
@@ -90,8 +89,7 @@ public final class TextInput implements DialogComponent {
     private void accept(final @NotNull Pattern pattern) {
         ((AbstractDocument) textField.getDocument()).setDocumentFilter(new DocumentFilter() {
             @Override
-            public void insertString(final @NotNull FilterBypass bypass, final int offset, final String text,
-                                     final AttributeSet attributes) {
+            public void insertString(final @NotNull FilterBypass bypass, final int offset, final String text, final AttributeSet attributes) {
                 if (refuses(bypass, offset, 0, text)) return;
 
                 try {
@@ -102,8 +100,7 @@ public final class TextInput implements DialogComponent {
             }
 
             @Override
-            public void replace(final @NotNull FilterBypass bypass, final int offset, final int length,
-                                final String text, final AttributeSet attributes) {
+            public void replace(final @NotNull FilterBypass bypass, final int offset, final int length, final String text, final AttributeSet attributes) {
                 if (refuses(bypass, offset, length, text)) return;
 
                 try {
@@ -123,8 +120,7 @@ public final class TextInput implements DialogComponent {
              * because the document would not answer leaves a field the tester
              * cannot type in at all, with nothing on screen saying why.
              */
-            private boolean refuses(final @NotNull FilterBypass bypass, final int offset, final int length,
-                                    final @Nullable String text) {
+            private boolean refuses(final @NotNull FilterBypass bypass, final int offset, final int length, final @Nullable String text) {
                 final @NotNull String current;
                 try {
                     current = bypass.getDocument().getText(0, bypass.getDocument().getLength());

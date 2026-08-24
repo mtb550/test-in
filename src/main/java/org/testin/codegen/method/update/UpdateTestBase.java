@@ -43,8 +43,7 @@ public class UpdateTestBase {
         return Optional.ofNullable(pm.getModifierList().findAnnotation(TEST_ANNOTATION));
     }
 
-    protected void updateAnnotationAttribute(final @NotNull PsiElementFactory pf, final @NotNull PsiAnnotation pa,
-                                             final @NotNull String attrName, final @NotNull String newValue) {
+    protected void updateAnnotationAttribute(final @NotNull PsiElementFactory pf, final @NotNull PsiAnnotation pa, final @NotNull String attrName, final @NotNull String newValue) {
         final @NotNull String annotationText = pa.getText();
 
         final @NotNull String attrPattern = attrName + " = ";
@@ -99,8 +98,7 @@ public class UpdateTestBase {
      * Updates one attribute of the method's @Test annotation and reformats the method.
      * The concrete update actions only differ in the attribute name and value expression.
      */
-    protected void updateTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm,
-                                                 final @NotNull String attrName, final @NotNull String newValue) {
+    protected void updateTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String attrName, final @NotNull String newValue) {
         getTestAnnotation(pm).ifPresentOrElse(testAnnotation -> {
             updateAnnotationAttribute(JavaPsiFacade.getElementFactory(p), testAnnotation, attrName, newValue);
             com.intellij.psi.codeStyle.CodeStyleManager.getInstance(p).reformat(pm);
@@ -126,8 +124,7 @@ public class UpdateTestBase {
      * Applies a change to the case's generated method, and says so when there is
      * none to change.
      */
-    protected void applyUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title,
-                               final @NotNull Consumer<PsiMethod> updater) {
+    protected void applyUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater) {
         applyToMethod(p, tc, title, updater, detail -> noCodeToUpdate(p, tc, detail));
     }
 
@@ -136,15 +133,13 @@ public class UpdateTestBase {
      * removing, so nothing is said. A balloon reading "has no generated code
      * yet" while the tester deletes a case is a balloon about nothing.
      */
-    protected void applyRemoval(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title,
-                                final @NotNull Consumer<PsiMethod> updater) {
+    protected void applyRemoval(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater) {
         applyToMethod(p, tc, title, updater, detail -> Logger.debug("Remove: " + detail + ", so nothing to remove"));
     }
 
     // Shared boilerplate for all update actions: resolve the FQCN, locate the target class and
     // its @Test method by testName, then apply the specific update inside a write command action.
-    private void applyToMethod(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title,
-                               final @NotNull Consumer<PsiMethod> updater, final @NotNull Consumer<String> onMissing) {
+    private void applyToMethod(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater, final @NotNull Consumer<String> onMissing) {
         final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
         if (fqcn.size() < 2) return;
         final @NotNull String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));

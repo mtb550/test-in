@@ -36,11 +36,7 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
     private final @NotNull BiConsumer<DestinationForm.@NotNull Destination,
             @NotNull Map<String, List<TestCaseDto>>> onExport;
 
-    public ExportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> exportAttributes,
-                        final @NotNull Map<String, List<TestCaseDto>> sheetsData,
-                        final @NotNull VirtualFile exportTarget,
-                        final @NotNull BiConsumer<DestinationForm.@NotNull Destination,
-                                @NotNull Map<String, List<TestCaseDto>>> onExport) {
+    public ExportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> exportAttributes, final @NotNull Map<String, List<TestCaseDto>> sheetsData, final @NotNull VirtualFile exportTarget, final @NotNull BiConsumer<DestinationForm.@NotNull Destination, @NotNull Map<String, List<TestCaseDto>>> onExport) {
         super(p);
         this.onExport = onExport;
 

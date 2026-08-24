@@ -81,8 +81,7 @@ public class EnumNullContractTest {
      * Loads without running the initializer, so the scan itself never triggers
      * the very failure it is looking for - that is left to the checked call.
      */
-    private static @Nullable Class<?> loadWithoutInitializing(final @NotNull ClassLoader loader,
-                                                              final @NotNull String name) {
+    private static @Nullable Class<?> loadWithoutInitializing(final @NotNull ClassLoader loader, final @NotNull String name) {
         try {
             return Class.forName(name, false, loader);
         } catch (final Throwable t) {

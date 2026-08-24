@@ -57,9 +57,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
      * A message with the muted From/To rows that show where a transfer goes.
      * An empty side is a side the message does not mention.
      */
-    public static @NotNull ComponentDialogBase<DialogMessage> message(final @NotNull String text,
-                                                                      final @NotNull String from,
-                                                                      final @NotNull String to) {
+    public static @NotNull ComponentDialogBase<DialogMessage> message(final @NotNull String text, final @NotNull String from, final @NotNull String to) {
         return new ComponentDialogBase<>(new DialogMessage(text, from, to));
     }
 
@@ -107,9 +105,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
      * open-set counterpart of {@link #radios}. The selected value must be one
      * of the options; what the tester types over it need not be.
      */
-    public static @NotNull ComponentDialogBase<ChoiceInput> choice(final @NotNull String caption,
-                                                                   final @NotNull List<String> options,
-                                                                   final @NotNull String selected) {
+    public static @NotNull ComponentDialogBase<ChoiceInput> choice(final @NotNull String caption, final @NotNull List<String> options, final @NotNull String selected) {
         return new ComponentDialogBase<>(new ChoiceInput(caption, List.copyOf(options), selected));
     }
 
@@ -346,8 +342,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         /**
          * One selectable row: icon, name, muted hint, and the submitted value.
          */
-        public @NotNull TextFieldBuilder<T> selection(final @NotNull Icon icon, final @NotNull String name,
-                                                      final @NotNull String hint, final @NotNull T value) {
+        public @NotNull TextFieldBuilder<T> selection(final @NotNull Icon icon, final @NotNull String name, final @NotNull String hint, final @NotNull T value) {
             selections.add(SelectionList.add(desaturate(icon), name, hint, value));
             return this;
         }

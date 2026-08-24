@@ -29,9 +29,7 @@ public final class TestRunHtmlGenerator {
     final String LIGHT_BG = "#f2f5fa";
     final String BORDER_COLOR = "#d0d7e5";
 
-    public @NotNull String generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir,
-                                    final @NotNull TestRunDto tr,
-                                    final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+    public @NotNull String generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
 
         // Compute summary stats
         final @NotNull List<TestRunItems> results = tr.getResults();
@@ -169,11 +167,7 @@ public final class TestRunHtmlGenerator {
      * differ only in the number, the heading, the blurb and that filter - the
      * table itself is one shape, so it is written once.
      */
-    private void appendCaseTable(final @NotNull StringBuilder html, final int sectionNumber,
-                                 final @NotNull String title, final @NotNull String blurb,
-                                 final @NotNull List<TestRunItems> results,
-                                 final @NotNull Map<UUID, TestCaseDto> detailsMap,
-                                 final @NotNull Predicate<TestRunItems> filter) {
+    private void appendCaseTable(final @NotNull StringBuilder html, final int sectionNumber, final @NotNull String title, final @NotNull String blurb, final @NotNull List<TestRunItems> results, final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull Predicate<TestRunItems> filter) {
 
         html.append("<div class='section-title-bar'><div class='section-title'>").append(sectionNumber).append(". ").append(title).append("</div></div>");
         html.append("<div class='summary-text'>").append(blurb).append("</div>");
@@ -195,16 +189,14 @@ public final class TestRunHtmlGenerator {
         html.append("</table>");
     }
 
-    private void overviewRow(final @NotNull StringBuilder html, final @NotNull String label,
-                             final @NotNull String value) {
+    private void overviewRow(final @NotNull StringBuilder html, final @NotNull String label, final @NotNull String value) {
         html.append("<tr>")
                 .append("<td class='label'>").append(label).append("</td>")
                 .append("<td class='value'>").append(escapedHtml(value)).append("</td>")
                 .append("</tr>");
     }
 
-    private void summaryCard(final @NotNull StringBuilder html, final @NotNull String value,
-                             final @NotNull String label, final @NotNull String color) {
+    private void summaryCard(final @NotNull StringBuilder html, final @NotNull String value, final @NotNull String label, final @NotNull String color) {
         html.append("<div class='summary-card'>")
                 .append("<div class='card-value' style='color: ").append(color).append(";'>").append(value).append("</div>")
                 .append("<div class='card-label'>").append(label).append("</div>")

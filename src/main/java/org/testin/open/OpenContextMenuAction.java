@@ -51,8 +51,7 @@ public class OpenContextMenuAction extends DumbAwareAction {
         this(table, cm, () -> selectedCell(table));
     }
 
-    private OpenContextMenuAction(final @NotNull JComponent owner, final @NotNull DefaultActionGroup cm,
-                                  final @NotNull Supplier<Optional<Point>> anchor) {
+    private OpenContextMenuAction(final @NotNull JComponent owner, final @NotNull DefaultActionGroup cm, final @NotNull Supplier<Optional<Point>> anchor) {
         super("Show Context Menu");
         this.owner = owner;
         this.cm = cm;

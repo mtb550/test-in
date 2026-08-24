@@ -59,13 +59,7 @@ public final class ListPanelBuilder {
      * mouse handling (hover icons, wheel forwarding, context menu), shortcuts,
      * view-panel selection sync, and grid-selection sync.
      */
-    public static void wireCommonListeners(final @NotNull Project p,
-                                           final @NotNull TestinEditor editor,
-                                           final @NotNull ListView view,
-                                           final @NotNull DirectoryDto dir,
-                                           final @NotNull AbstractEditorContextMenu contextMenu,
-                                           final @NotNull Supplier<Optional<JBTable>> gridTableSupplier,
-                                           final @NotNull BooleanSupplier gridActiveSupplier) {
+    public static void wireCommonListeners(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull ListView view, final @NotNull DirectoryDto dir, final @NotNull AbstractEditorContextMenu contextMenu, final @NotNull Supplier<Optional<JBTable>> gridTableSupplier, final @NotNull BooleanSupplier gridActiveSupplier) {
         final @NotNull JBList<TestCaseDto> list = view.list();
 
         final @NotNull CardMouseListener mouseListener = new CardMouseListener(p, editor, list, view.model(), dir, contextMenu);

@@ -21,10 +21,7 @@ import java.util.List;
  * for {@link DiffType#ADDED}, {@code newState} is null for
  * {@link DiffType#DELETED}. Both are null for anything that is not a test case.
  */
-public record PendingChange(@NotNull ChangeSubject subject, @NotNull String name, @NotNull String testSet,
-                            @NotNull String testCaseId, @NotNull Path relativeFilePath, @NotNull DiffType type,
-                            @Nullable TestCaseDto oldState, @Nullable TestCaseDto newState,
-                            @NotNull List<FieldChange> fieldChanges) {
+public record PendingChange(@NotNull ChangeSubject subject, @NotNull String name, @NotNull String testSet, @NotNull String testCaseId, @NotNull Path relativeFilePath, @NotNull DiffType type, @Nullable TestCaseDto oldState, @Nullable TestCaseDto newState, @NotNull List<FieldChange> fieldChanges) {
 
     /**
      * The test case this change is about: the side of it that exists.

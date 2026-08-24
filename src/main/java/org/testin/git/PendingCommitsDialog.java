@@ -59,12 +59,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
      *                      not say - a repository with no commit yet has a
      *                      branch name and no branch
      */
-    public PendingCommitsDialog(final @NotNull Project p,
-                                final @NotNull List<PendingChange> differences,
-                                final @NotNull Path repoRoot,
-                                final @NotNull List<String> branches,
-                                final @NotNull String currentBranch,
-                                final @NotNull Consumer<Request> onCommit) {
+    public PendingCommitsDialog(final @NotNull Project p, final @NotNull List<PendingChange> differences, final @NotNull Path repoRoot, final @NotNull List<String> branches, final @NotNull String currentBranch, final @NotNull Consumer<Request> onCommit) {
         super(p);
         this.repoRoot = repoRoot;
         this.onCommit = onCommit;
@@ -128,8 +123,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
      * read as a branch about to be created. A repository with no commit yet has
      * exactly that shape - Git names the branch and lists none.
      */
-    private static @NotNull List<String> offered(final @NotNull List<String> branches,
-                                                 final @NotNull String current) {
+    private static @NotNull List<String> offered(final @NotNull List<String> branches, final @NotNull String current) {
         if (current.isEmpty() || branches.contains(current)) return branches;
 
         final @NotNull List<String> withCurrent = new ArrayList<>(branches);
@@ -266,7 +260,6 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
      *                  than by asking Git again later and racing whoever else
      *                  touched the repository in between
      */
-    public record Request(@NotNull List<PendingChange> changes, @NotNull String message, boolean push,
-                          @NotNull String branch, boolean newBranch) {
+    public record Request(@NotNull List<PendingChange> changes, @NotNull String message, boolean push, @NotNull String branch, boolean newBranch) {
     }
 }

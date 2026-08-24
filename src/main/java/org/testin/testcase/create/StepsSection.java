@@ -140,8 +140,7 @@ public class StepsSection implements CreateTestCaseSection {
         stepsContainer.add(stepRow);
     }
 
-    private void removeStepAction(final @NotNull JBPanel<?> stepRow, final @NotNull EditorTextField stepField,
-                                  final @NotNull UIAction repackAction) {
+    private void removeStepAction(final @NotNull JBPanel<?> stepRow, final @NotNull EditorTextField stepField, final @NotNull UIAction repackAction) {
         if (stepFields.size() == 1) {
             stepField.setText("");
             stepField.requestFocus();

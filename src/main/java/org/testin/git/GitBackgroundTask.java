@@ -27,15 +27,13 @@ public final class GitBackgroundTask extends Task.Backgroundable {
     private final @NotNull GitTaskWork work;
     private final @NotNull Consumer<Exception> onError;
 
-    public GitBackgroundTask(final @NotNull Project p, final @NotNull String title, final boolean cancellable,
-                             final @NotNull GitTaskWork work, final @NotNull Consumer<Exception> onError) {
+    public GitBackgroundTask(final @NotNull Project p, final @NotNull String title, final boolean cancellable, final @NotNull GitTaskWork work, final @NotNull Consumer<Exception> onError) {
         super(p, title, cancellable);
         this.work = work;
         this.onError = onError;
     }
 
-    public static void run(final @NotNull Project p, final @NotNull String title, final boolean cancellable,
-                           final @NotNull GitTaskWork work, final @NotNull Consumer<Exception> onError) {
+    public static void run(final @NotNull Project p, final @NotNull String title, final boolean cancellable, final @NotNull GitTaskWork work, final @NotNull Consumer<Exception> onError) {
         ProgressManager.getInstance().run(new GitBackgroundTask(p, title, cancellable, work, onError));
     }
 

@@ -118,9 +118,7 @@ public final class RunStatusService {
      * answering one question about one gesture: eight rows failing eight
      * different ways is still "you typed things here and they are about to go".
      */
-    private @NotNull List<String> wouldBeErased(final @NotNull RunEditor editor,
-                                                final @NotNull List<TestCaseDto> selected,
-                                                final @NotNull TestStatus status) {
+    private @NotNull List<String> wouldBeErased(final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selected, final @NotNull TestStatus status) {
         return selected.stream()
                 .map(tc -> editor.runItem(tc.getId()))
                 .flatMap(Optional::stream)
@@ -147,9 +145,7 @@ public final class RunStatusService {
      * What {@link #applyStatus} does once the tester has nothing left to lose by
      * it - either because the verdict erases nothing, or because they said so.
      */
-    private void record(final @NotNull Project p, final @NotNull TestinEditor ui,
-                        final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status,
-                        final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+    private void record(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
         if (selectedItems.size() == 1) {
             final @NotNull TestCaseDto tc = selectedItems.getFirst();
             if (editor.runItem(tc.getId()).filter(TestRunItems::isRemoved).isPresent()) {
@@ -225,8 +221,7 @@ public final class RunStatusService {
      * Neither does anything now: createdAt means what it says, and touch records
      * who changed the status and when (#27).
      */
-    public void persistMarker(final @NotNull Project p, final @NotNull Path runPath,
-                              final @NotNull TestRunStatus status) {
+    public void persistMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunStatus status) {
         final @NotNull TestRunDirectoryDto trd = Services.getInstance(p, ProjectIndexer.class).getTestRunDirByPath(runPath);
 
         final @NotNull TestRunMarker marker = trd.getMarker();

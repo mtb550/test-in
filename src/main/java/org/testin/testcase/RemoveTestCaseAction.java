@@ -27,9 +27,7 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull CollectionListModel<TestCaseDto> model;
 
-    public RemoveTestCaseAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull DirectoryDto dir,
-                                final @NotNull JBList<TestCaseDto> list,
-                                final @NotNull CollectionListModel<TestCaseDto> model) {
+    public RemoveTestCaseAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         super(p, "Delete", "Delete test case", AllIcons.Actions.DeleteTag);
         this.editor = editor;
         this.dir = dir;

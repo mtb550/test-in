@@ -30,8 +30,7 @@ public class GroupMultiSelectEditor extends AbstractCellEditor implements TableC
     }
 
     @Override
-    public @NotNull Component getTableCellEditorComponent(final @NotNull JTable table, final @Nullable Object value,
-                                                          final boolean isSelected, final int row, final int column) {
+    public @NotNull Component getTableCellEditorComponent(final @NotNull JTable table, final @Nullable Object value, final boolean isSelected, final int row, final int column) {
         currentValue = Objects.toString(value, "");
         button.setText(currentValue);
         return button;

@@ -10,7 +10,5 @@ import org.testin.model.dto.TestCaseDto;
  * The constructed list view: model, list, and the scroll pane wrapping it.
  * Built by {@link ListPanelBuilder}.
  */
-public record ListView(@NotNull CollectionListModel<TestCaseDto> model,
-                       @NotNull JBList<TestCaseDto> list,
-                       @NotNull JBScrollPane scrollPane) {
+public record ListView(@NotNull CollectionListModel<TestCaseDto> model, @NotNull JBList<TestCaseDto> list, @NotNull JBScrollPane scrollPane) {
 }

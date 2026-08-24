@@ -263,8 +263,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
      * the remote, and on a sync pressed out of habit that is a network round
      * trip - and, over SSH, possibly a passphrase prompt - for no reason.
      */
-    private int pushUnpushed(final @NotNull Path repoPath, final @NotNull String remote,
-                             final @NotNull String branch) {
+    private int pushUnpushed(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
         final int unpushed = git.unpushedCount(repoPath);
         if (unpushed == 0) return 0;
 

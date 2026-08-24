@@ -17,8 +17,7 @@ import java.util.Map;
 public class ExportCsv {
     private final @NotNull ExportAction exportAction;
 
-    public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
-                             final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
+    public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), StandardCharsets.UTF_8))) {
             final @NotNull List<String> headerNames = exportAction.exportAttributes.stream()
                     .map(TestEditorAttributes::getName)

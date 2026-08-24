@@ -11,8 +11,7 @@ import java.util.function.Consumer;
 
 public class StepsBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
 
-    public StepsBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems,
-                                  final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
+    public StepsBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
         super(p, selectedItems, updatedItems);
     }
 

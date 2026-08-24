@@ -60,8 +60,7 @@ public class CreateTestRun implements NodeCreator {
      * The dialog the creator is: which test cases the run covers, chosen from
      * the bound project's own tree.
      */
-    private void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name,
-                              final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
+    private void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
 
             final @NotNull Path testCasesPath = testCasesRoot.getPath();
@@ -99,8 +98,7 @@ public class CreateTestRun implements NodeCreator {
      * <p>
      * The caller below drops the empties instead - the same behavior, one rule.
      */
-    private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder,
-                                                               final @NotNull DirectoryDto thisNodeDto) {
+    private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder, final @NotNull DirectoryDto thisNodeDto) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         indexer.awaitIndexing();
 

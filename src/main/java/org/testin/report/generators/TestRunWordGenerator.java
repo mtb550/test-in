@@ -59,9 +59,7 @@ public final class TestRunWordGenerator {
             BugSeverity.MAJOR, DARK_YELLOW
     );
 
-    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir,
-                                     final @NotNull TestRunDto tr,
-                                     final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (XWPFDocument doc = new XWPFDocument()) {
 
@@ -170,9 +168,7 @@ public final class TestRunWordGenerator {
         }
     }
 
-    private @NotNull XWPFParagraph addText(final @NotNull XWPFDocument doc, final @NotNull String text, final int size,
-                                           final boolean bold, final @NotNull String color,
-                                           final @NotNull String bottomBorder, final int spacingAfterPt) {
+    private @NotNull XWPFParagraph addText(final @NotNull XWPFDocument doc, final @NotNull String text, final int size, final boolean bold, final @NotNull String color, final @NotNull String bottomBorder, final int spacingAfterPt) {
         final @NotNull XWPFParagraph p = doc.createParagraph();
         p.setSpacingAfter(spacingAfterPt * 20);
         final @NotNull XWPFRun run = p.createRun();
@@ -196,8 +192,7 @@ public final class TestRunWordGenerator {
         }
     }
 
-    private void addHeading(final @NotNull XWPFDocument doc, final @NotNull String text, final int beforePt,
-                            final int afterPt) {
+    private void addHeading(final @NotNull XWPFDocument doc, final @NotNull String text, final int beforePt, final int afterPt) {
         final @NotNull XWPFParagraph p = doc.createParagraph();
         p.setSpacingBefore(beforePt * 20);
         p.setSpacingAfter(afterPt * 20);
@@ -213,8 +208,7 @@ public final class TestRunWordGenerator {
         headingBottom.setColor(DARK_NAVY);
     }
 
-    private void addOverviewRow(final @NotNull XWPFTable table, final int rowIdx, final @NotNull String label,
-                                final @NotNull String value) {
+    private void addOverviewRow(final @NotNull XWPFTable table, final int rowIdx, final @NotNull String label, final @NotNull String value) {
         final @NotNull XWPFTableRow row = rowIdx == 0 ? table.getRow(0) : table.createRow();
         final @NotNull XWPFTableCell labelCell = row.getCell(0);
         final @NotNull XWPFTableCell valueCell = row.getCell(1);
@@ -225,8 +219,7 @@ public final class TestRunWordGenerator {
         setCellText(valueCell, value, 10, false, BLACK);
     }
 
-    private void addStatCell(final @NotNull XWPFTable table, final int col, final @NotNull String number,
-                             final @NotNull String label, final @NotNull String numberColor) {
+    private void addStatCell(final @NotNull XWPFTable table, final int col, final @NotNull String number, final @NotNull String label, final @NotNull String numberColor) {
         final @NotNull XWPFTableRow row = table.getRow(0);
         final @NotNull XWPFTableCell cell = row.getCell(col);
         shadeCell(cell, LIGHT_BG);
@@ -250,8 +243,7 @@ public final class TestRunWordGenerator {
      * One colored count in the result analysis. It carries the spacing the body
      * paragraph below it used to provide.
      */
-    private void addColoredCount(final @NotNull XWPFDocument doc, final @NotNull String heading,
-                                 final @NotNull String headingColor) {
+    private void addColoredCount(final @NotNull XWPFDocument doc, final @NotNull String heading, final @NotNull String headingColor) {
         final @NotNull XWPFParagraph hp = doc.createParagraph();
         hp.setSpacingAfter(120);
 
@@ -277,11 +269,7 @@ public final class TestRunWordGenerator {
         };
     }
 
-    private void buildCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber,
-                                final @NotNull String sectionTitle, final @NotNull String description,
-                                final @NotNull TestRunDto tr,
-                                final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull String headerBg,
-                                final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
+    private void buildCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull String headerBg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
         addHeading(doc, sectionNumber + ". " + sectionTitle, 20, 12);
         addText(doc, description, 11, false, BLACK, NO_BORDER, 12);
 
@@ -358,16 +346,14 @@ public final class TestRunWordGenerator {
         setTableWidths(table, widthsFor(cols));
     }
 
-    private void addCaseHeader(final @NotNull XWPFTableRow headerRow, final int col, final @NotNull String text,
-                               final @NotNull String bgColor) {
+    private void addCaseHeader(final @NotNull XWPFTableRow headerRow, final int col, final @NotNull String text, final @NotNull String bgColor) {
         final @NotNull XWPFTableCell cell = headerRow.getCell(col);
         shadeCell(cell, bgColor);
         setCellPadding(cell, 5, 6, 5, 6);
         setCellText(cell, text, 9, true, WHITE);
     }
 
-    private void setCellText(final @NotNull XWPFTableCell cell, final @NotNull String text, final int size,
-                             final boolean bold, final @NotNull String color) {
+    private void setCellText(final @NotNull XWPFTableCell cell, final @NotNull String text, final int size, final boolean bold, final @NotNull String color) {
         final @NotNull XWPFParagraph p = cell.getParagraphs().getFirst();
         if (p.getRuns().isEmpty()) {
             final @NotNull XWPFRun run = p.createRun();
@@ -391,8 +377,7 @@ public final class TestRunWordGenerator {
         getTcPr(cell).addNewShd().setFill(hex);
     }
 
-    private void setCellPadding(final @NotNull XWPFTableCell cell, final int topPt, final int leftPt,
-                                final int bottomPt, final int rightPt) {
+    private void setCellPadding(final @NotNull XWPFTableCell cell, final int topPt, final int leftPt, final int bottomPt, final int rightPt) {
         final @NotNull CTTcMar mar = getTcPr(cell).addNewTcMar();
         final @NotNull CTTblWidth top = mar.addNewTop();
         top.setW(topPt * 20);

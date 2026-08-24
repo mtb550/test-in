@@ -26,9 +26,7 @@ public class FileDocumentListener implements DocumentListener {
     private final @NotNull BiConsumer<FileTypes, Map<String, List<TestCaseDto>>> onDataLoaded;
     private final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader;
 
-    public FileDocumentListener(final @NotNull TextFieldWithBrowseButton fileField, final @NotNull Project p,
-                                final @NotNull BiConsumer<FileTypes, Map<String, List<TestCaseDto>>> onDataLoaded,
-                                final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {
+    public FileDocumentListener(final @NotNull TextFieldWithBrowseButton fileField, final @NotNull Project p, final @NotNull BiConsumer<FileTypes, Map<String, List<TestCaseDto>>> onDataLoaded, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {
         this.fileField = fileField;
         this.p = p;
         this.onDataLoaded = onDataLoaded;

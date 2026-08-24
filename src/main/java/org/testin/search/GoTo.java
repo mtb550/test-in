@@ -93,8 +93,7 @@ public final class GoTo {
      * @param withFocus whether the tool window takes the keyboard as it opens.
      *                  False when an editor is about to want it
      */
-    private static void showTree(final @NotNull Project p, final boolean withFocus,
-                                 final @NotNull Consumer<ExplorerTree> onShown) {
+    private static void showTree(final @NotNull Project p, final boolean withFocus, final @NotNull Consumer<ExplorerTree> onShown) {
         Optional.ofNullable(ToolWindowManager.getInstance(p).getToolWindow(TREE))
                 .ifPresentOrElse(
                         tw -> tw.activate(() -> onShown.accept(

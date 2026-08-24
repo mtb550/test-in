@@ -51,8 +51,7 @@ public class ImportExcel {
         return result;
     }
 
-    private void parseWorkbook(final @NotNull Workbook workbook, final @NotNull Project p,
-                               final @NotNull Map<String, List<TestCaseDto>> result) {
+    private void parseWorkbook(final @NotNull Workbook workbook, final @NotNull Project p, final @NotNull Map<String, List<TestCaseDto>> result) {
         final @NotNull DataFormatter dataFormatter = new DataFormatter();
 
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -71,15 +70,13 @@ public class ImportExcel {
      * The cases on one sheet, and none at all for a sheet with no header row -
      * an empty sheet, or one whose first row the file never wrote.
      */
-    private @NotNull List<TestCaseDto> parseSheet(final @NotNull Project p, final @NotNull Sheet sheet,
-                                                  final @NotNull DataFormatter dataFormatter) {
+    private @NotNull List<TestCaseDto> parseSheet(final @NotNull Project p, final @NotNull Sheet sheet, final @NotNull DataFormatter dataFormatter) {
         return Optional.ofNullable(sheet.getRow(0))
                 .map(headerRow -> readRows(p, sheet, headerRow, dataFormatter))
                 .orElseGet(List::of);
     }
 
-    private @NotNull List<TestCaseDto> readRows(final @NotNull Project p, final @NotNull Sheet sheet,
-                                                final @NotNull Row headerRow, final @NotNull DataFormatter dataFormatter) {
+    private @NotNull List<TestCaseDto> readRows(final @NotNull Project p, final @NotNull Sheet sheet, final @NotNull Row headerRow, final @NotNull DataFormatter dataFormatter) {
         final @NotNull Map<String, Integer> headerIndexMap = new HashMap<>();
         for (final Cell cell : headerRow) {
             final @NotNull String headerName = dataFormatter.formatCellValue(cell).trim();

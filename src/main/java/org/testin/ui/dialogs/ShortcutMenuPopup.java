@@ -34,14 +34,7 @@ public final class ShortcutMenuPopup<T> {
     private final @NotNull ItemShortcutBinder<T> shortcutBinder;
     private final @NotNull Consumer<T> onSelection;
 
-    public ShortcutMenuPopup(final @NotNull Project p,
-                             final @NotNull String title,
-                             final T @NotNull [] items,
-                             final @NotNull Function<T, Icon> icon,
-                             final @NotNull Function<T, String> label,
-                             final @NotNull Function<T, String> shortcutText,
-                             final @NotNull ItemShortcutBinder<T> shortcutBinder,
-                             final @NotNull Consumer<T> onSelection) {
+    public ShortcutMenuPopup(final @NotNull Project p, final @NotNull String title, final T @NotNull [] items, final @NotNull Function<T, Icon> icon, final @NotNull Function<T, String> label, final @NotNull Function<T, String> shortcutText, final @NotNull ItemShortcutBinder<T> shortcutBinder, final @NotNull Consumer<T> onSelection) {
         this.p = p;
         this.title = title;
         this.items = items;

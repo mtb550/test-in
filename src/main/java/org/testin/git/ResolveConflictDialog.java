@@ -48,9 +48,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
      *                   Named rather than numbered, so the caller applies them by
      *                   field and never by row order
      */
-    public ResolveConflictDialog(final @NotNull Project p, final @NotNull String testCase,
-                                 final @NotNull List<TestCaseMerge.Question> questions,
-                                 final @NotNull Consumer<Set<String>> onResolved) {
+    public ResolveConflictDialog(final @NotNull Project p, final @NotNull String testCase, final @NotNull List<TestCaseMerge.Question> questions, final @NotNull Consumer<Set<String>> onResolved) {
         super(p);
         this.questions = questions;
         this.onResolved = onResolved;

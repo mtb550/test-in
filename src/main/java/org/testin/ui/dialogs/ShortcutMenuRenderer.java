@@ -17,9 +17,7 @@ final class ShortcutMenuRenderer<T> extends ColoredListCellRenderer<T> {
     private final @NotNull Function<T, String> label;
     private final @NotNull Function<T, String> shortcutText;
 
-    ShortcutMenuRenderer(final @NotNull Function<T, Icon> icon,
-                         final @NotNull Function<T, String> label,
-                         final @NotNull Function<T, String> shortcutText) {
+    ShortcutMenuRenderer(final @NotNull Function<T, Icon> icon, final @NotNull Function<T, String> label, final @NotNull Function<T, String> shortcutText) {
         this.icon = icon;
         this.label = label;
         this.shortcutText = shortcutText;

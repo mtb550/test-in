@@ -38,8 +38,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             GenType.NO_CODE_CHANGE
     ) {
         @Override
-        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges,
-                              final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             // Drawn by the card title, ahead of the description: "1. Log in with a valid user".
         }
     },
@@ -54,8 +53,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
         @Override
-        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges,
-                              final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             // The card title is the description; a details row under it would print it twice.
         }
     },
@@ -101,8 +99,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.EDIT, Can.IMPORT, Can.EXPORT
     ) {
         @Override
-        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges,
-                              final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             badges.add(Shared.createPriorityBadge(tc));
         }
     },
@@ -158,8 +155,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.EDIT, Can.IMPORT, Can.EXPORT
     ) {
         @Override
-        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges,
-                              final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             tc.getGroup().stream().map(Shared::createGroupBadge).forEach(badges::add);
         }
     },
@@ -278,12 +274,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     @Getter(AccessLevel.NONE)
     private final @NotNull Set<Can> can;
 
-    TestEditorAttributes(final @NotNull String name, final @NotNull String name2,
-                         final @NotNull ToolBarDefault toolBarDefault,
-                         final @NotNull ValueExtractor<TestCaseDto> testValueExtractor,
-                         final @NotNull ImportSetter importSetter,
-                         final @NotNull GenType genType,
-                         final @NotNull Can... can) {
+    TestEditorAttributes(final @NotNull String name, final @NotNull String name2, final @NotNull ToolBarDefault toolBarDefault, final @NotNull ValueExtractor<TestCaseDto> testValueExtractor, final @NotNull ImportSetter importSetter, final @NotNull GenType genType, final @NotNull Can... can) {
         this.name = name;
         this.name2 = name2;
         this.toolBarDefault = toolBarDefault;
@@ -317,8 +308,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
      * this in their own body — the two behaviors sit on the constants that
      * have them instead of being chosen by a null at run time.
      */
-    public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges,
-                          final @NotNull Map<String, String> details, final @NotNull Project p) {
+    public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
         details.put(name, testValueExtractor.execute(tc, p));
     }
 

@@ -19,8 +19,7 @@ public final class AttributeRow extends BaseDetails {
     private final @NotNull TestEditorAttributes attribute;
     private final @NotNull BiFunction<Project, TestCaseDto, String> extractor;
 
-    public AttributeRow(final @NotNull TestEditorAttributes attribute,
-                        final @NotNull BiFunction<Project, TestCaseDto, String> extractor) {
+    public AttributeRow(final @NotNull TestEditorAttributes attribute, final @NotNull BiFunction<Project, TestCaseDto, String> extractor) {
         this.attribute = attribute;
         this.extractor = extractor;
     }

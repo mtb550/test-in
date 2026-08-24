@@ -44,9 +44,7 @@ public final class BackgroundWork {
      *                   {@link ProgressIndicator#setFraction}. Anything that
      *                   cannot leaves the bar as it found it.
      */
-    public static void run(final @NotNull Project p, final @NotNull String title,
-                           final @NotNull String whatFailed,
-                           final @NotNull Consumer<@NotNull ProgressIndicator> work) {
+    public static void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final @NotNull Consumer<@NotNull ProgressIndicator> work) {
 
         ProgressManager.getInstance().run(new Task.Backgroundable(p, title, false) {
             @Override

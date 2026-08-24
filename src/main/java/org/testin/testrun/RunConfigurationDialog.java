@@ -19,8 +19,7 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunCon
     private final @NotNull Runnable onCreate;
     private final @NotNull SelectionTree selection;
 
-    public RunConfigurationDialog(final @NotNull Project p, final @NotNull RunConfigurationForm form,
-                                  final @NotNull SelectionTree selection, final @NotNull Runnable onCreate) {
+    public RunConfigurationDialog(final @NotNull Project p, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Runnable onCreate) {
         super(p);
         this.onCreate = onCreate;
         this.selection = selection;

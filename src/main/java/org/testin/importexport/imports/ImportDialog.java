@@ -35,9 +35,7 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
     // soon as the source field is filled.
     private final @NotNull SheetPreview preview;
 
-    public ImportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> importAttributes,
-                        final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader,
-                        final @NotNull Consumer<@NotNull Map<String, List<TestCaseDto>>> onImport) {
+    public ImportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader, final @NotNull Consumer<@NotNull Map<String, List<TestCaseDto>>> onImport) {
         super(p);
         this.onImport = onImport;
 

@@ -105,8 +105,7 @@ public class GenerateReportAction extends AbstractProjectAction {
         return ActionUpdateThread.EDT;
     }
 
-    private void processAndSave(final @NotNull Project p, final @NotNull TestRunDirectoryDto tr,
-                                final @NotNull FileTypes format, final @NotNull File outputFile) {
+    private void processAndSave(final @NotNull Project p, final @NotNull TestRunDirectoryDto tr, final @NotNull FileTypes format, final @NotNull File outputFile) {
         // Under a bar rather than on a bare pooled thread: the dialog is gone by
         // now, and without one the tester sees nothing at all between pressing
         // Generate and the notification arriving (#87).

@@ -124,8 +124,7 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestSet(final @NotNull Path path, final @NotNull DirectoryDto parent,
-                             final @NotNull ProgressIndicator indicator) {
+    private void scanTestSet(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final @NotNull TestSetDirectoryDto ts = dirMapper.getTestSetNode(p, path, parent);
@@ -172,8 +171,7 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestRunDirs(final @NotNull Path trDir, final @NotNull DirectoryDto parent,
-                                 final @NotNull ProgressIndicator indicator) {
+    private void scanTestRunDirs(final @NotNull Path trDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
         try (Stream<Path> paths = Files.list(trDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
@@ -191,8 +189,7 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent,
-                                       final @NotNull ProgressIndicator indicator) {
+    private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final @NotNull TestRunPackageDirectoryDto trp = dirMapper.getTestRunPackageNode(p, path, parent);
@@ -215,8 +212,7 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent,
-                             final @NotNull ProgressIndicator indicator) {
+    private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final @NotNull TestRunDirectoryDto tr = dirMapper.getTestRunNode(p, path, parent);

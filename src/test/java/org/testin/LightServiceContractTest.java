@@ -140,8 +140,7 @@ public class LightServiceContractTest {
      * declares, and a class that cannot initialize outside a running IDE still
      * has to declare it correctly.
      */
-    private static @Nullable Class<?> loadWithoutInitializing(final @NotNull ClassLoader loader,
-                                                              final @NotNull String name) {
+    private static @Nullable Class<?> loadWithoutInitializing(final @NotNull ClassLoader loader, final @NotNull String name) {
         try {
             return Class.forName(name, false, loader);
         } catch (final Throwable t) {

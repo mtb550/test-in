@@ -53,8 +53,7 @@ public class TreeTransferHandler extends TransferHandler {
     private final @NotNull Set<DirectoryDto> selectedNodes;
     private int clipboardAction = COPY;
 
-    public TreeTransferHandler(final @NotNull Project p, final @NotNull SimpleTree tree,
-                               final @NotNull Set<DirectoryDto> selectedNodes, final @NotNull Runnable refresh) {
+    public TreeTransferHandler(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull Set<DirectoryDto> selectedNodes, final @NotNull Runnable refresh) {
         this.p = p;
         this.tree = tree;
         this.selectedNodes = selectedNodes;
@@ -94,8 +93,7 @@ public class TreeTransferHandler extends TransferHandler {
      * ("already exists"). Applies to copy and move alike. The occupied check
      * is injected so the rules stay testable without an indexer.
      */
-    static boolean isValidDestination(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target,
-                                      final @NotNull Predicate<Path> occupied) {
+    static boolean isValidDestination(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target, final @NotNull Predicate<Path> occupied) {
         final @NotNull Path sourcePath = source.getPath().normalize();
         final @NotNull Path targetPath = target.getPath().normalize();
 
@@ -266,8 +264,7 @@ public class TreeTransferHandler extends TransferHandler {
     /**
      * Only the sources the target accepts and that can actually land on it.
      */
-    private @NotNull List<DirectoryDto> transferableSources(final DirectoryDto @NotNull [] nodes,
-                                                            final @NotNull DirectoryDto target, final int action) {
+    private @NotNull List<DirectoryDto> transferableSources(final DirectoryDto @NotNull [] nodes, final @NotNull DirectoryDto target, final int action) {
         if (action != COPY && action != MOVE) return List.of();
 
         final @NotNull List<DirectoryDto> accepted = new ArrayList<>();
@@ -311,8 +308,7 @@ public class TreeTransferHandler extends TransferHandler {
         Services.getInstance(p, Notifier.class).softShow(p, describe(collided) + verb + target.getName() + "'");
     }
 
-    private void transfer(final int action, final @NotNull List<DirectoryDto> sources,
-                          final @NotNull DirectoryDto target) {
+    private void transfer(final int action, final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
         if (action == MOVE) {
             moveNodes(sources, target);
         } else {
@@ -399,8 +395,7 @@ public class TreeTransferHandler extends TransferHandler {
      * "Undone" and "Redone" by their own actions, and a second balloon saying
      * the nodes moved would double-report one keystroke.
      */
-    private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to,
-                           final @NotNull IntConsumer onDone) {
+    private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to, final @NotNull IntConsumer onDone) {
         final @NotNull AtomicInteger remaining = new AtomicInteger(from.size());
         final @NotNull AtomicInteger moved = new AtomicInteger();
 

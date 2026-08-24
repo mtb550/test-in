@@ -32,8 +32,7 @@ public class TestCaseMergeTest {
      * A test case as the plugin writes one, with the fields a merge decides
      * about.
      */
-    private static String testCase(final String description, final String expected, final String priority,
-                                   final String updatedBy, final String updatedAt, final String rank) {
+    private static String testCase(final String description, final String expected, final String priority, final String updatedBy, final String updatedAt, final String rank) {
         return """
                 {
                   "order" : "%s",

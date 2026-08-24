@@ -32,8 +32,7 @@ public class RunGridEditListener extends AbstractGridEditListener {
      */
     private final @NotNull Runnable onEdited;
 
-    public RunGridEditListener(final @NotNull Project p, final @NotNull RunEditor editor,
-                               final @NotNull List<TestCaseDto> pageItems, final @NotNull Runnable onEdited) {
+    public RunGridEditListener(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> pageItems, final @NotNull Runnable onEdited) {
         super(p, pageItems);
         this.editor = editor;
         this.onEdited = onEdited;
@@ -45,8 +44,7 @@ public class RunGridEditListener extends AbstractGridEditListener {
     }
 
     @Override
-    protected boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto onThisRow,
-                            final int row, final int col) {
+    protected boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto onThisRow, final int row, final int col) {
         final @NotNull RunEditorAttributes attr = RunEditorAttributes.values()[col];
 
         // The table model refuses these columns already; asked again of the same

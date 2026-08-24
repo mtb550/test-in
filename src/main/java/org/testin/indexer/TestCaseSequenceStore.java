@@ -123,8 +123,7 @@ final class TestCaseSequenceStore {
      *              case that stayed put has nothing new to say, and rewriting it
      *              would put an untouched file in the tester's next commit
      */
-    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList,
-                        final @NotNull List<TestCaseDto> moved) {
+    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
         final @NotNull String path = testSetPath.toString();
         final @NotNull List<UUID> ids = new ArrayList<>(orderedList.size());
         final @NotNull Set<UUID> newIds = new HashSet<>();

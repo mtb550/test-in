@@ -23,8 +23,7 @@ public final class ExplorerTreeStructure extends AbstractTreeStructure {
     private final @NotNull Project project;
     private volatile @NotNull ExplorerTreeNode root;
 
-    public ExplorerTreeStructure(final @NotNull Project project,
-                                final @NotNull Optional<TestProjectDirectoryDto> selectedProject) {
+    public ExplorerTreeStructure(final @NotNull Project project, final @NotNull Optional<TestProjectDirectoryDto> selectedProject) {
         this.project = project;
         this.root = createRoot(selectedProject);
     }
@@ -58,8 +57,7 @@ public final class ExplorerTreeStructure extends AbstractTreeStructure {
     }
 
     @Override
-    public @NotNull NodeDescriptor<?> createDescriptor(final @NotNull Object element,
-                                                       final @Nullable NodeDescriptor parentDescriptor) {
+    public @NotNull NodeDescriptor<?> createDescriptor(final @NotNull Object element, final @Nullable NodeDescriptor parentDescriptor) {
         return (ExplorerTreeNode) element;
     }
 

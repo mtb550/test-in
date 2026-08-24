@@ -12,8 +12,7 @@ import static org.testng.Assert.*;
  */
 public class TreeUndoServiceTest {
 
-    private static TreeUndoService.TreeOperation counting(final String description,
-                                                          final AtomicInteger undone, final AtomicInteger redone) {
+    private static TreeUndoService.TreeOperation counting(final String description, final AtomicInteger undone, final AtomicInteger redone) {
         return new TreeUndoService.TreeOperation(description, undone::incrementAndGet, redone::incrementAndGet);
     }
 

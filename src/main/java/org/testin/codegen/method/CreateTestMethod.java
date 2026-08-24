@@ -138,8 +138,7 @@ public class CreateTestMethod implements GenAction {
      * formatted once. Nothing reads the class between the first method and the
      * last, so nothing has to rebuild anything.
      */
-    private void injectAsText(final @NotNull Project p, final @NotNull PsiClass targetClass,
-                              final @NotNull List<TestCaseDto> cases) {
+    private void injectAsText(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> cases) {
         final @NotNull PsiFile file = targetClass.getContainingFile();
         final @NotNull PsiDocumentManager documents = PsiDocumentManager.getInstance(p);
         final @NotNull Optional<Document> document = Optional.ofNullable(documents.getDocument(file));
@@ -204,8 +203,7 @@ public class CreateTestMethod implements GenAction {
      * The way that needs neither a document nor a brace, for the classes where
      * the one edit cannot be made. Slower, and says why it is being used.
      */
-    private void oneAtATime(final @NotNull Project p, final @NotNull PsiClass targetClass,
-                            final @NotNull List<TestCaseDto> cases, final @NotNull String reason) {
+    private void oneAtATime(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> cases, final @NotNull String reason) {
         Logger.warn("Writing " + cases.size() + " methods one at a time into "
                 + targetClass.getQualifiedName() + ": " + reason);
 
@@ -218,9 +216,7 @@ public class CreateTestMethod implements GenAction {
      * Empty when it could not be found or created, which is what sends the
      * caller down the physical-injection path.
      */
-    private @NotNull Optional<PsiClass> findOrCreateClass(final @NotNull Project p, final @NotNull String path,
-                                                          final @NotNull List<String> packageList,
-                                                          final @NotNull String className) {
+    private @NotNull Optional<PsiClass> findOrCreateClass(final @NotNull Project p, final @NotNull String path, final @NotNull List<String> packageList, final @NotNull String className) {
         final @NotNull JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(p);
         final @NotNull GlobalSearchScope scope = GlobalSearchScope.projectScope(p);
 
@@ -234,9 +230,7 @@ public class CreateTestMethod implements GenAction {
         return Optional.ofNullable(psiFacade.findClass(path, scope));
     }
 
-    private void retryInjectPhysically(final @NotNull Project p, final @NotNull List<String> packageList,
-                                       final @NotNull String className, final @NotNull String methodName,
-                                       final @NotNull TestCaseDto tc) {
+    private void retryInjectPhysically(final @NotNull Project p, final @NotNull List<String> packageList, final @NotNull String className, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         JavaSourceRoot.find(p).ifPresentOrElse(
                 sourceRoot -> injectIntoFile(p, sourceRoot, packageList, className, methodName, tc),
                 () -> Logger.error("retryInjectPhysically: no Java test source root, cannot inject method '"
@@ -247,9 +241,7 @@ public class CreateTestMethod implements GenAction {
      * The fallback path: the class file is on disk but the PSI did not give us
      * the class, so it is read back and the method injected into it.
      */
-    private void injectIntoFile(final @NotNull Project p, final @NotNull VirtualFile sourceRoot,
-                                final @NotNull List<String> packageList, final @NotNull String className,
-                                final @NotNull String methodName, final @NotNull TestCaseDto tc) {
+    private void injectIntoFile(final @NotNull Project p, final @NotNull VirtualFile sourceRoot, final @NotNull List<String> packageList, final @NotNull String className, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
             final @NotNull String relativePath = String.join("/", packageList) + "/" + className + ".java";
             final @NotNull Optional<VirtualFile> found = JavaSourceRoot.under(sourceRoot, relativePath);
@@ -295,8 +287,7 @@ public class CreateTestMethod implements GenAction {
      * with no import list of its own, and a TestNG that is not on the classpath
      * - so neither is asked about separately.
      */
-    private void addTestImport(final @NotNull Project p, final @NotNull PsiJavaFile javaFile,
-                               final @NotNull PsiElementFactory factory) {
+    private void addTestImport(final @NotNull Project p, final @NotNull PsiJavaFile javaFile, final @NotNull PsiElementFactory factory) {
         Optional.ofNullable(javaFile.getImportList())
                 .filter(imports -> !alreadyImportsTest(imports))
                 .ifPresent(imports -> Optional
@@ -350,8 +341,7 @@ public class CreateTestMethod implements GenAction {
      * with no document to edit, and one the PSI would not give us at all, which
      * is read back off disk instead.
      */
-    private @NotNull Optional<PsiElement> injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass,
-                                                       final @NotNull String methodName, final @NotNull TestCaseDto tc) {
+    private @NotNull Optional<PsiElement> injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
             final @NotNull PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
             final @NotNull PsiFile file = targetClass.getContainingFile();
@@ -383,7 +373,6 @@ public class CreateTestMethod implements GenAction {
      * The pieces of a fully qualified method name: everything before the method
      * for the file path, the package segments, the class, and the method.
      */
-    record Target(@NotNull String path, @NotNull List<String> packageList,
-                  @NotNull String className, @NotNull String methodName) {
+    record Target(@NotNull String path, @NotNull List<String> packageList, @NotNull String className, @NotNull String methodName) {
     }
 }

@@ -83,9 +83,7 @@ final class VfsExecutor {
         });
     }
 
-    void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath,
-                          final @NotNull String errorTitle, final @NotNull VfsBiOperation operation,
-                          final @NotNull Runnable onSuccess, final @NotNull Runnable onFailure) {
+    void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull VfsBiOperation operation, final @NotNull Runnable onSuccess, final @NotNull Runnable onFailure) {
         claim(sourcePath);
         claim(targetPath);
 
@@ -129,8 +127,7 @@ final class VfsExecutor {
      * A path the VFS cannot find counts as deleted: there is nothing left to
      * remove, and the cache should stop describing it.
      */
-    void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path,
-                  final @NotNull Consumer<@NotNull Boolean> onDeleted) {
+    void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onDeleted) {
         claim(path);
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Optional<VirtualFile> vf = find(path);

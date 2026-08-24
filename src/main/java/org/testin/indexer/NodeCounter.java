@@ -78,8 +78,7 @@ public final class NodeCounter {
      * Every node under this one, at any depth, in no particular order - it is
      * about to be tallied.
      */
-    private static @NotNull List<DirectoryDto> beneath(final @NotNull ProjectIndexer indexer,
-                                                       final @NotNull DirectoryDto node) {
+    private static @NotNull List<DirectoryDto> beneath(final @NotNull ProjectIndexer indexer, final @NotNull DirectoryDto node) {
         final @NotNull List<DirectoryDto> found = new ArrayList<>();
 
         for (final DirectoryDto child : indexer.getChildren(node.getPath())) {

@@ -9,8 +9,7 @@ import java.util.function.Consumer;
 
 public class ModuleBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
-    public ModuleBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems,
-                                   final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
+    public ModuleBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
         super(p, selectedItems, updatedItems);
     }
 

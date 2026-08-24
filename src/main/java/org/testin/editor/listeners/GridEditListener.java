@@ -33,8 +33,7 @@ public class GridEditListener extends AbstractGridEditListener {
      */
     private final @NotNull Path testSetPath;
 
-    public GridEditListener(final @NotNull Project p, final @NotNull List<TestCaseDto> pageItems,
-                            final @NotNull Runnable onEdited, final @NotNull Path testSetPath) {
+    public GridEditListener(final @NotNull Project p, final @NotNull List<TestCaseDto> pageItems, final @NotNull Runnable onEdited, final @NotNull Path testSetPath) {
         super(p, pageItems);
         this.onEdited = onEdited;
         this.testSetPath = testSetPath;
@@ -46,8 +45,7 @@ public class GridEditListener extends AbstractGridEditListener {
     }
 
     @Override
-    protected boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto tc,
-                            final int row, final int col) {
+    protected boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto tc, final int row, final int col) {
         final @NotNull TestEditorAttributes attr = TestEditorAttributes.values()[col];
 
         // The table model refuses these columns already; asked again of the same

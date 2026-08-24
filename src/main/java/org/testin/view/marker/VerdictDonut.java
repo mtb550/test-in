@@ -112,8 +112,7 @@ public final class VerdictDonut implements DialogComponent {
     /**
      * One row per slice: its color, its name, and its number.
      */
-    private static @NotNull JBPanel<?> legend(final @NotNull List<NodeCount> slices,
-                                              final @NotNull NodeFigures figures) {
+    private static @NotNull JBPanel<?> legend(final @NotNull List<NodeCount> slices, final @NotNull NodeFigures figures) {
         final @NotNull JBPanel<?> rows = new JBPanel<>();
         rows.setLayout(new BoxLayout(rows, BoxLayout.Y_AXIS));
         rows.setOpaque(false);
@@ -126,8 +125,7 @@ public final class VerdictDonut implements DialogComponent {
         return rows;
     }
 
-    private static @NotNull JBPanel<?> legendRow(final @NotNull NodeCount slice,
-                                                 final @NotNull NodeFigures figures) {
+    private static @NotNull JBPanel<?> legendRow(final @NotNull NodeCount slice, final @NotNull NodeFigures figures) {
         final @NotNull JBPanel<?> row = new JBPanel<>(new BorderLayout(JBUI.scale(8), 0));
         row.setOpaque(false);
         row.setPreferredSize(new Dimension(JBUI.scale(LEGEND_WIDTH), JBUI.scale(ROW_HEIGHT)));

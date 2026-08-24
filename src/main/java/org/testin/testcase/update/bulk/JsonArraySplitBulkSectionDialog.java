@@ -40,8 +40,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
      */
     private final @NotNull List<int[]> spanOwners = new ArrayList<>();
 
-    protected JsonArraySplitBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems,
-                                              final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
+    protected JsonArraySplitBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
         super(p);
         this.selectedItems = selectedItems;
         this.updatedItems = updatedItems;
@@ -248,8 +247,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
      * left side records nothing, because nothing there is editable - which it
      * says with a recorder that does nothing rather than with two nulls (#71).
      */
-    private void appendItems(final @NotNull StringBuilder out, final @NotNull List<String> items,
-                             final @NotNull ItemRecorder recorder, final int testCaseIndex) {
+    private void appendItems(final @NotNull StringBuilder out, final @NotNull List<String> items, final @NotNull ItemRecorder recorder, final int testCaseIndex) {
         for (int j = 0; j < items.size(); j++) {
             out.append("      \"");
 

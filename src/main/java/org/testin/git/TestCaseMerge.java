@@ -116,8 +116,7 @@ public final class TestCaseMerge {
      * @param mine   this machine's version
      * @param theirs the version the pull brought
      */
-    public static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String base,
-                                    final @NotNull String mine, final @NotNull String theirs) {
+    public static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String base, final @NotNull String mine, final @NotNull String theirs) {
         final @NotNull ObjectNode baseNode = mapper.readTree(base);
         final @NotNull ObjectNode mineNode = mapper.readTree(mine);
         final @NotNull ObjectNode theirsNode = mapper.readTree(theirs);
@@ -164,9 +163,7 @@ public final class TestCaseMerge {
     /**
      * Takes the tester's answer for one field.
      */
-    public static void answer(final @NotNull Mapper mapper, final @NotNull ObjectNode merged,
-                              final @NotNull Question question, final boolean takeTheirs,
-                              final @NotNull String theirs) {
+    public static void answer(final @NotNull Mapper mapper, final @NotNull ObjectNode merged, final @NotNull Question question, final boolean takeTheirs, final @NotNull String theirs) {
         if (!takeTheirs) return;
 
         set(merged, question.field(), mapper.readTree(theirs).path(question.field()));
@@ -177,8 +174,7 @@ public final class TestCaseMerge {
      * ours. Both are rewritten on every edit, so this is the one pair that
      * conflicts even when the testers agreed about everything else.
      */
-    private static void stampTheLaterEdit(final @NotNull ObjectNode merged, final @NotNull ObjectNode mine,
-                                          final @NotNull ObjectNode theirs) {
+    private static void stampTheLaterEdit(final @NotNull ObjectNode merged, final @NotNull ObjectNode mine, final @NotNull ObjectNode theirs) {
         final @NotNull ZonedDateTime mineAt = TestDataParser.date(text(mine.path(UPDATED_AT)));
         final @NotNull ZonedDateTime theirsAt = TestDataParser.date(text(theirs.path(UPDATED_AT)));
 

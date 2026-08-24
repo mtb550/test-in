@@ -50,8 +50,7 @@ public final class ConflictResolution {
     /**
      * One conflicted test case the merge could not finish on its own.
      */
-    private record Pending(@NotNull String relativePath, @NotNull String name, @NotNull ObjectNode merged,
-                           @NotNull List<TestCaseMerge.Question> questions, @NotNull String theirs) {
+    private record Pending(@NotNull String relativePath, @NotNull String name, @NotNull ObjectNode merged, @NotNull List<TestCaseMerge.Question> questions, @NotNull String theirs) {
     }
 
     /**
@@ -74,9 +73,7 @@ public final class ConflictResolution {
      * Call it off the EDT. {@code onFinished} and {@code onStuck} are handed
      * back on the EDT.
      */
-    public static void resolveRebase(final @NotNull Project p, final @NotNull Path repositoryPath,
-                                     final @NotNull Runnable onFinished,
-                                     final @NotNull Consumer<List<String>> onStuck) {
+    public static void resolveRebase(final @NotNull Project p, final @NotNull Path repositoryPath, final @NotNull Runnable onFinished, final @NotNull Consumer<List<String>> onStuck) {
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);
 
         round(p, git, repositoryPath, git.rebaseStep(repositoryPath), onFinished, onStuck);
@@ -86,10 +83,7 @@ public final class ConflictResolution {
      * One stop: resolve what is conflicting now, continue, and decide whether
      * there is another stop to take.
      */
-    private static void round(final @NotNull Project p, final @NotNull GitRepositoryService git,
-                              final @NotNull Path repositoryPath, final int stepBefore,
-                              final @NotNull Runnable onFinished,
-                              final @NotNull Consumer<List<String>> onStuck) {
+    private static void round(final @NotNull Project p, final @NotNull GitRepositoryService git, final @NotNull Path repositoryPath, final int stepBefore, final @NotNull Runnable onFinished, final @NotNull Consumer<List<String>> onStuck) {
         resolve(p, repositoryPath, git.conflictingPaths(repositoryPath),
                 () -> ApplicationManager.getApplication().executeOnPooledThread(
                         () -> continueOn(p, git, repositoryPath, stepBefore, onFinished, onStuck)),
@@ -100,10 +94,7 @@ public final class ConflictResolution {
      * What to do once a stop is resolved: continue the rebase, and read what
      * that left behind.
      */
-    private static void continueOn(final @NotNull Project p, final @NotNull GitRepositoryService git,
-                                   final @NotNull Path repositoryPath, final int stepBefore,
-                                   final @NotNull Runnable onFinished,
-                                   final @NotNull Consumer<List<String>> onStuck) {
+    private static void continueOn(final @NotNull Project p, final @NotNull GitRepositoryService git, final @NotNull Path repositoryPath, final int stepBefore, final @NotNull Runnable onFinished, final @NotNull Consumer<List<String>> onStuck) {
         if (!git.couldNotContinueRebase(repositoryPath)) {
             ApplicationManager.getApplication().invokeLater(onFinished);
             return;
@@ -140,9 +131,7 @@ public final class ConflictResolution {
      * @param onLeftOver  given whatever could not be resolved here - a run, a
      *                    marker, or a file the plugin never wrote
      */
-    public static void resolve(final @NotNull Project p, final @NotNull Path repositoryPath,
-                               final @NotNull List<String> conflicting, final @NotNull Runnable onResolved,
-                               final @NotNull Consumer<List<String>> onLeftOver) {
+    public static void resolve(final @NotNull Project p, final @NotNull Path repositoryPath, final @NotNull List<String> conflicting, final @NotNull Runnable onResolved, final @NotNull Consumer<List<String>> onLeftOver) {
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
 
@@ -187,10 +176,7 @@ public final class ConflictResolution {
      * dialogs at once would be three questions with no order to them, and each
      * answer is written and staged before the following question opens.
      */
-    private static void ask(final @NotNull Project p, final @NotNull GitRepositoryService git,
-                            final @NotNull Mapper mapper, final @NotNull Path repositoryPath,
-                            final @NotNull List<Pending> pending, final @NotNull List<String> leftOver,
-                            final @NotNull Runnable onResolved, final @NotNull Consumer<List<String>> onLeftOver) {
+    private static void ask(final @NotNull Project p, final @NotNull GitRepositoryService git, final @NotNull Mapper mapper, final @NotNull Path repositoryPath, final @NotNull List<Pending> pending, final @NotNull List<String> leftOver, final @NotNull Runnable onResolved, final @NotNull Consumer<List<String>> onLeftOver) {
         if (pending.isEmpty()) {
             // Nothing to put back together. A case carries its own position, so
             // two testers who each added one to the same set wrote two files
@@ -226,9 +212,7 @@ public final class ConflictResolution {
      * is over. Answers whether both halves worked - a file written and not
      * staged would stop the rebase again with no conflict left to see.
      */
-    private static boolean keep(final @NotNull Project p, final @NotNull GitRepositoryService git,
-                                final @NotNull Path repositoryPath, final @NotNull String relativePath,
-                                final @NotNull ObjectNode merged) {
+    private static boolean keep(final @NotNull Project p, final @NotNull GitRepositoryService git, final @NotNull Path repositoryPath, final @NotNull String relativePath, final @NotNull ObjectNode merged) {
         try {
             Files.writeString(repositoryPath.resolve(relativePath), merged.toPrettyString(), StandardCharsets.UTF_8);
 
@@ -249,8 +233,7 @@ public final class ConflictResolution {
      * What to call the case in a dialog title: its description, or the file name
      * when the side being read will not parse.
      */
-    private static @NotNull String name(final @NotNull Mapper mapper, final @NotNull String json,
-                                        final @NotNull String relativePath) {
+    private static @NotNull String name(final @NotNull Mapper mapper, final @NotNull String json, final @NotNull String relativePath) {
         final @NotNull String description = mapper.readTree(json).path("description").asText("");
         if (!description.isBlank()) return description;
 

@@ -43,8 +43,7 @@ public class DetailsTab {
     final double WEIGHT_X = 1.0;
     final double SPACER_WEIGHT_Y = 1.0;
 
-    public void load(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab,
-                     final @NotNull Optional<TestCaseDto> dto, final @NotNull List<String> currentPath) {
+    public void load(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab, final @NotNull Optional<TestCaseDto> dto, final @NotNull List<String> currentPath) {
         detailsTab.removeAll();
         detailsTab.setLayout(new BorderLayout());
         detailsTab.setBorder(BorderFactory.createEmptyBorder());
@@ -57,8 +56,7 @@ public class DetailsTab {
         detailsTab.repaint();
     }
 
-    private void renderCase(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab,
-                            final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
+    private void renderCase(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
         final @NotNull JBPanel<?> contentPanel = new JBPanel<>(new GridBagLayout());
         contentPanel.setOpaque(false);
 
@@ -181,8 +179,7 @@ public class DetailsTab {
      * the test set the navigation path names. Empty when neither says - a case
      * shown from a search result, with no path and no parent read yet.
      */
-    private @NotNull Optional<Path> resolveEditPath(final @NotNull Project p, final @NotNull TestCaseDto dto,
-                                                    final @NotNull List<String> currentPath) {
+    private @NotNull Optional<Path> resolveEditPath(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
         final @NotNull DirectoryDto parent = dto.getParent();
         if (!parent.getPath().toString().isEmpty()) {
             return Optional.of(parent.getPath());

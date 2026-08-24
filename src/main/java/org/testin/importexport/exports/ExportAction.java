@@ -74,8 +74,7 @@ public class ExportAction extends AbstractProjectTreeAction {
      * the dialog has closed: a workbook of several hundred cases took the EDT
      * with it, and the dialog sat there for all of it (#87).
      */
-    private void writeExport(final DestinationForm.@NotNull Destination destination,
-                             final @NotNull Map<String, List<TestCaseDto>> selected) {
+    private void writeExport(final DestinationForm.@NotNull Destination destination, final @NotNull Map<String, List<TestCaseDto>> selected) {
         final int cases = selected.values().stream().mapToInt(List::size).sum();
 
         BackgroundWork.run(p, "Exporting " + cases + " test cases to " + destination.file().getName(),
@@ -87,8 +86,7 @@ public class ExportAction extends AbstractProjectTreeAction {
                 });
     }
 
-    public @NotNull Map<String, List<TestCaseDto>> gatherData(final @NotNull VirtualFile targetDirectory,
-                                                              final @NotNull DirectoryDto dirDto) {
+    public @NotNull Map<String, List<TestCaseDto>> gatherData(final @NotNull VirtualFile targetDirectory, final @NotNull DirectoryDto dirDto) {
         final @NotNull Map<String, List<TestCaseDto>> allSheets = new LinkedHashMap<>();
 
         if (dirDto instanceof TestSetDirectoryDto) {

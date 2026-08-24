@@ -23,10 +23,7 @@ import java.util.Collection;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class GitCommandRunner {
 
-    static @NotNull String execute(
-            final @NotNull Project project,
-            final @NotNull Path workingDirectory,
-            final @NotNull String... command) {
+    static @NotNull String execute(final @NotNull Project project, final @NotNull Path workingDirectory, final @NotNull String... command) {
         return run(project, workingDirectory, "", command);
     }
 
@@ -41,11 +38,7 @@ final class GitCommandRunner {
      * is also how the IDE finds the credentials it already has for that host, so
      * a tester is asked once rather than on every push.
      */
-    static @NotNull String executeRemote(
-            final @NotNull Project project,
-            final @NotNull Path workingDirectory,
-            final @NotNull String remoteUrl,
-            final @NotNull String... command) {
+    static @NotNull String executeRemote(final @NotNull Project project, final @NotNull Path workingDirectory, final @NotNull String remoteUrl, final @NotNull String... command) {
         return run(project, workingDirectory, remoteUrl, command);
     }
 
@@ -75,11 +68,7 @@ final class GitCommandRunner {
      * list are {@code add}, which prints nothing when it works, and
      * {@code commit}, whose summary nobody reads. A failure still raises.
      */
-    static void executeOverPaths(
-            final @NotNull Project project,
-            final @NotNull Path workingDirectory,
-            final @NotNull Collection<String> paths,
-            final @NotNull String... command) {
+    static void executeOverPaths(final @NotNull Project project, final @NotNull Path workingDirectory, final @NotNull Collection<String> paths, final @NotNull String... command) {
         if (paths.isEmpty()) throw new IllegalArgumentException("Expected paths to run over");
 
         final @NotNull Path pathspec = writePathspec(paths);
@@ -128,11 +117,7 @@ final class GitCommandRunner {
         return String.join("\0", paths).getBytes(StandardCharsets.UTF_8);
     }
 
-    private static @NotNull String run(
-            final @NotNull Project project,
-            final @NotNull Path workingDirectory,
-            final @NotNull String remoteUrl,
-            final @NotNull String... command) {
+    private static @NotNull String run(final @NotNull Project project, final @NotNull Path workingDirectory, final @NotNull String remoteUrl, final @NotNull String... command) {
         if (command.length < 2 || !"git".equals(command[0])) {
             throw new IllegalArgumentException("Expected a git command");
         }

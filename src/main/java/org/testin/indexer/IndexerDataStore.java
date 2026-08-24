@@ -125,8 +125,7 @@ final class IndexerDataStore {
      * plugin, not a state of the data, and it is said once here rather than
      * guessed at by every caller.
      */
-    private static <T> @NotNull T indexed(final @Nullable T node, final @NotNull String kind,
-                                          final @NotNull Path path) {
+    private static <T> @NotNull T indexed(final @Nullable T node, final @NotNull String kind, final @NotNull Path path) {
         if (node != null) return node;
 
         Logger.error("No " + kind + " indexed at " + path);
@@ -145,8 +144,7 @@ final class IndexerDataStore {
         testCaseStore.remove(testSetPath, tcId);
     }
 
-    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList,
-                        final @NotNull List<TestCaseDto> moved) {
+    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
         testCaseStore.updateSequence(testSetPath, orderedList, moved);
     }
 
@@ -181,8 +179,7 @@ final class IndexerDataStore {
         addDir(testRunPackagesByPath, trp, DirectoryType.TRP.getMarker(), trp.getMarker());
     }
 
-    private <V extends DirectoryDto> void addDir(final @NotNull Map<String, V> map, final @NotNull V dto,
-                                                 final @NotNull String markerFileName, final @NotNull Object marker) {
+    private <V extends DirectoryDto> void addDir(final @NotNull Map<String, V> map, final @NotNull V dto, final @NotNull String markerFileName, final @NotNull Object marker) {
         stampIfNew(marker);
         map.put(dto.getPath().toString(), dto);
         childrenIndex.invalidate();
@@ -220,8 +217,7 @@ final class IndexerDataStore {
      * directory is a real node either way, and dropping the node out of the tree
      * would hide test cases over an unparsable audit stamp.
      */
-    <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull String markerFileName,
-                              final @NotNull Class<M> type, final @NotNull String kind, final @NotNull String name) {
+    <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Class<M> type, final @NotNull String kind, final @NotNull String name) {
         final @NotNull Path markerFile = dirPath.resolve(markerFileName);
 
         // Asked before reading, because a marker that is not there yet is the

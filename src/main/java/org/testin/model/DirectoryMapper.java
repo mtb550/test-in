@@ -176,8 +176,7 @@ public final class DirectoryMapper {
         return buildTestRunNode(p, path, parent, marker);
     }
 
-    private @NotNull TestRunDirectoryDto buildTestRunNode(final @NotNull Project p, final @NotNull Path path,
-                                                          final @NotNull DirectoryDto parent, final @NotNull TestRunMarker marker) {
+    private @NotNull TestRunDirectoryDto buildTestRunNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull TestRunMarker marker) {
         final @NotNull String fileName = path.getFileName().toString();
         try {
             final var builder = TestRunDirectoryDto

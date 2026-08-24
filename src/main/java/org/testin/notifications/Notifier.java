@@ -157,8 +157,7 @@ public final class Notifier {
         notify(p, title, message, NotificationType.ERROR, actions);
     }
 
-    private void notify(final @NotNull Project p, final @NotNull String title, final @NotNull String message,
-                        final @NotNull NotificationType type, final @NotNull NotificationAction... actions) {
+    private void notify(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationType type, final @NotNull NotificationAction... actions) {
         // The platform has one overload with a title and one without, and picks
         // by which is called - so "no title" needs a value to be chosen by. It
         // used to be a null, which the annotation sweep then declared impossible

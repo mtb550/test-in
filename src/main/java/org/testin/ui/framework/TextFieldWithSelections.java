@@ -62,10 +62,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
     };
     private boolean emptyWarningShown;
 
-    TextFieldWithSelections(final @NotNull Icon icon,
-                            final @NotNull String placeHolderText,
-                            final @NotNull Rows<T> rows,
-                            final int visibleRows) {
+    TextFieldWithSelections(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull Rows<T> rows, final int visibleRows) {
         this.placeHolderText = placeHolderText;
         this.rows = rows;
         textField = new ExtendableTextField("");
@@ -318,8 +315,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
 
     private static final class SelectionRenderer<T> extends ColoredListCellRenderer<SelectionList<T>> {
         @Override
-        protected void customizeCellRenderer(final @NotNull JList<? extends SelectionList<T>> list, final SelectionList<T> value,
-                                             final int index, final boolean selected, final boolean hasFocus) {
+        protected void customizeCellRenderer(final @NotNull JList<? extends SelectionList<T>> list, final SelectionList<T> value, final int index, final boolean selected, final boolean hasFocus) {
             setIcon(value.icon());
             setIconTextGap(JBUI.scale(8));
             append(value.name());

@@ -49,11 +49,7 @@ final class TestinConfigLoader {
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .addHandler(new DeserializationProblemHandler() {
                 @Override
-                public boolean handleUnknownProperty(final @NotNull DeserializationContext context,
-                                                     final @NotNull JsonParser parser,
-                                                     final @NotNull JsonDeserializer<?> deserializer,
-                                                     final @NotNull Object beanOrClass,
-                                                     final @NotNull String key) {
+                public boolean handleUnknownProperty(final @NotNull DeserializationContext context, final @NotNull JsonParser parser, final @NotNull JsonDeserializer<?> deserializer, final @NotNull Object beanOrClass, final @NotNull String key) {
                     Logger.warn("Unknown key in testin.yml, ignored: " + key);
 
                     // Jackson's contract allows this to throw; the plugin's does

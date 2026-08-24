@@ -16,9 +16,7 @@ public final class ConfirmDialog extends AbstractFrameworkDialog<DialogMessage> 
 
     private final @NotNull Runnable onConfirm;
 
-    public ConfirmDialog(final @NotNull Project p, final @NotNull String dialogTitle, final @NotNull String message,
-                         final @NotNull String from, final @NotNull String to,
-                         final @NotNull String confirmName, final @NotNull Runnable onConfirm) {
+    public ConfirmDialog(final @NotNull Project p, final @NotNull String dialogTitle, final @NotNull String message, final @NotNull String from, final @NotNull String to, final @NotNull String confirmName, final @NotNull Runnable onConfirm) {
         this(p, dialogTitle, message, from, to, confirmName, onConfirm, List.of());
     }
 
@@ -33,10 +31,7 @@ public final class ConfirmDialog extends AbstractFrameworkDialog<DialogMessage> 
      * @param alternatives extra answers, each closing the dialog before it runs.
      *                     Empty for the ordinary yes-or-no
      */
-    public ConfirmDialog(final @NotNull Project p, final @NotNull String dialogTitle, final @NotNull String message,
-                         final @NotNull String from, final @NotNull String to,
-                         final @NotNull String confirmName, final @NotNull Runnable onConfirm,
-                         final @NotNull List<Alternative> alternatives) {
+    public ConfirmDialog(final @NotNull Project p, final @NotNull String dialogTitle, final @NotNull String message, final @NotNull String from, final @NotNull String to, final @NotNull String confirmName, final @NotNull Runnable onConfirm, final @NotNull List<Alternative> alternatives) {
         super(p);
         this.onConfirm = onConfirm;
 

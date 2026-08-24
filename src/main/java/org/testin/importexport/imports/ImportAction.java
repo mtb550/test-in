@@ -80,8 +80,7 @@ public class ImportAction extends AbstractProjectTreeAction {
                 .show();
     }
 
-    private void executeImportWriteAction(final @NotNull Project p, final @NotNull DirectoryDto selectedDirDto,
-                                          final @NotNull Map<String, List<TestCaseDto>> selectedCasesBySheet) {
+    private void executeImportWriteAction(final @NotNull Project p, final @NotNull DirectoryDto selectedDirDto, final @NotNull Map<String, List<TestCaseDto>> selectedCasesBySheet) {
 
         final @NotNull Path targetPath = selectedDirDto.getPath();
 
@@ -159,9 +158,7 @@ public class ImportAction extends AbstractProjectTreeAction {
      * The sets are made before any case is written, and on the EDT, because
      * making one generates its Java class and that is a write command.
      */
-    private @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targetSets(
-            final @NotNull Project p, final @NotNull DirectoryDto selectedDirDto, final @NotNull Path targetPath,
-            final @NotNull Map<String, List<TestCaseDto>> casesBySheet) {
+    private @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targetSets(final @NotNull Project p, final @NotNull DirectoryDto selectedDirDto, final @NotNull Path targetPath, final @NotNull Map<String, List<TestCaseDto>> casesBySheet) {
 
         if (selectedDirDto instanceof TestSetDirectoryDto ts) {
             final @NotNull List<TestCaseDto> everything = new ArrayList<>();
@@ -237,8 +234,7 @@ public class ImportAction extends AbstractProjectTreeAction {
      * the sheet, and a single undo of a fifty-second operation was not a thing
      * anyone could use.
      */
-    private void generateTestMethods(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases,
-                                     final @NotNull String targetName, final @NotNull ProgressIndicator indicator) {
+    private void generateTestMethods(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull String targetName, final @NotNull ProgressIndicator indicator) {
         Logger.info("Import: generating test methods for '" + targetName + "' with " + testCases.size() + " cases");
         final long startedAt = System.currentTimeMillis();
 
@@ -257,11 +253,7 @@ public class ImportAction extends AbstractProjectTreeAction {
                 + (System.currentTimeMillis() - startedAt) + "ms");
     }
 
-    private void linkAndSaveTestCases(final @NotNull Project p, final @NotNull Path dirPath,
-                                      final @NotNull List<TestCaseDto> testCases,
-                                      final @NotNull String tailRank,
-                                      final @NotNull ProgressIndicator indicator,
-                                      final int done, final int total) {
+    private void linkAndSaveTestCases(final @NotNull Project p, final @NotNull Path dirPath, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         // After what is already in the set, in the order the sheet listed them.

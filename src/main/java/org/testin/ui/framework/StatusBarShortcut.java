@@ -11,10 +11,7 @@ import org.testin.util.Shortcuts;
  * work without being shown (issue #11). Keys a component already binds itself
  * (e.g. list navigation) are declared as display-only {@link #hint}s.
  */
-public record StatusBarShortcut(@NotNull Shortcuts shortcut,
-                                @NotNull String displayText,
-                                @NotNull String name,
-                                @NotNull Runnable action) implements StatusBarItem {
+public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String displayText, @NotNull String name, @NotNull Runnable action) implements StatusBarItem {
 
     /**
      * What a hint runs: nothing. A hint is bound to no key, so the key never

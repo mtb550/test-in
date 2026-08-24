@@ -130,9 +130,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
      */
     private final TestCaseDialogKey @NotNull [] ownKeys;
 
-    CreateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull Icon icon,
-                         final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor,
-                         final @NotNull String placeholder, final TestCaseDialogKey @NotNull ... ownKeys) {
+    CreateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull Icon icon, final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor, final @NotNull String placeholder, final TestCaseDialogKey @NotNull ... ownKeys) {
         this.name = name;
         this.shortcut = shortcut;
         this.icon = icon;

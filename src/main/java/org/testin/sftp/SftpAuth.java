@@ -69,8 +69,7 @@ public interface SftpAuth {
      * credential store costs a keychain round trip, and on most machines the
      * agent means it is never needed.
      */
-    static @NotNull SftpAuth forKey(final @NotNull String keyFile,
-                                      final @NotNull java.util.function.Supplier<String> passphrase) {
+    static @NotNull SftpAuth forKey(final @NotNull String keyFile, final @NotNull java.util.function.Supplier<String> passphrase) {
         return SshAgent.loadedIdentities()
                 .map(SftpAuth::withAgent)
                 .orElseGet(() -> withKey(keyFile, passphrase.get()));

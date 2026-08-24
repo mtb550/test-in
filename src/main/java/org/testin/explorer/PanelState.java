@@ -49,11 +49,7 @@ public enum PanelState {
      * @param cloneUrlKnown        the config says where the test project is cloned from
      * @param anyProjectsUnderRoot at least one test project folder exists under the root
      */
-    public static @NotNull PanelState of(final boolean rootConfigured,
-                                         final boolean projectResolved,
-                                         final boolean boundProjectMissing,
-                                         final boolean cloneUrlKnown,
-                                         final boolean anyProjectsUnderRoot) {
+    public static @NotNull PanelState of(final boolean rootConfigured, final boolean projectResolved, final boolean boundProjectMissing, final boolean cloneUrlKnown, final boolean anyProjectsUnderRoot) {
         if (!rootConfigured) return NO_ROOT;
         if (projectResolved) return TREE;
         if (boundProjectMissing && cloneUrlKnown) return CLONE_BOUND;

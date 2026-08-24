@@ -42,8 +42,7 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
                 TreeValueUtil.selectedDirectory(tree).ifPresent(target -> paste(transferHandler, contents, target)));
     }
 
-    private void paste(final @NotNull TreeTransferHandler transferHandler, final @NotNull Transferable contents,
-                       final @NotNull DirectoryDto target) {
+    private void paste(final @NotNull TreeTransferHandler transferHandler, final @NotNull Transferable contents, final @NotNull DirectoryDto target) {
         try {
             final @NotNull TreeTransferPayload payload = (TreeTransferPayload) contents.getTransferData(TreeTransferHandler.NODE_FLAVOR);
 

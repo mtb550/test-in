@@ -26,9 +26,7 @@ final class ToggleFilterAction<T> extends DumbAwareToggleAction {
      *             checkmark where the icon would go, and an icon that is there
      *             but paints nothing takes that place (#71)
      */
-    ToggleFilterAction(final @NotNull String text, final @Nullable Icon icon,
-                       final @NotNull T value, final @NotNull Set<T> selection,
-                       final @NotNull FilterMembership<T> membership, final @NotNull Runnable onChanged) {
+    ToggleFilterAction(final @NotNull String text, final @Nullable Icon icon, final @NotNull T value, final @NotNull Set<T> selection, final @NotNull FilterMembership<T> membership, final @NotNull Runnable onChanged) {
         super(text, null, icon);
         this.value = value;
         this.selection = selection;

@@ -44,8 +44,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
 
     private final @NotNull ExplorerPanel pp;
 
-    public SyncWithSftpAction(final @NotNull Project p, final @NotNull SimpleTree tree,
-                                final @NotNull ExplorerPanel pp) {
+    public SyncWithSftpAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ExplorerPanel pp) {
         super(p, tree, "Sync With SFTP", "Send this test project to its server and take what is there",
                 AllIcons.Actions.Upload);
         this.pp = pp;
@@ -124,9 +123,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
         }).show();
     }
 
-    private void syncInBackground(final @NotNull SftpAddress address, final @NotNull Path projectRoot,
-                                  final @NotNull SftpAccountDialog.Account account,
-                                  final @NotNull String keyFile) {
+    private void syncInBackground(final @NotNull SftpAddress address, final @NotNull Path projectRoot, final @NotNull SftpAccountDialog.Account account, final @NotNull String keyFile) {
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Syncing with " + address.display(), true) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
@@ -175,9 +172,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
      * How this machine proves who it is: the agent when one holds keys, then a
      * key file, then the password kept for this server.
      */
-    private @NotNull SftpAuth authFor(final @NotNull SftpAddress address,
-                                        final @NotNull SftpAccountDialog.Account account,
-                                        final @NotNull String keyFile) {
+    private @NotNull SftpAuth authFor(final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull String keyFile) {
         if (!keyFile.isEmpty()) {
             return SftpAuth.forKey(keyFile, () -> SftpSecret.KEY_PASSPHRASE.read(address, account.user()));
         }
@@ -201,8 +196,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
      * Opens the account dialog, for the two moments it is needed: no account
      * saved yet, and nothing on this machine able to prove the saved one.
      */
-    private void ask(final @NotNull SftpAddress address, final @NotNull Path projectRoot,
-                     final @NotNull String keyFile) {
+    private void ask(final @NotNull SftpAddress address, final @NotNull Path projectRoot, final @NotNull String keyFile) {
         final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
         new SftpAccountDialog(p, address, settings.sftpUser, account -> {
@@ -220,9 +214,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
         return Path.of(System.getProperty("user.home", ""), ".ssh", "known_hosts");
     }
 
-    private void report(final @NotNull SftpSync.Outcome outcome, final @NotNull Path projectRoot,
-                        final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account,
-                        final @NotNull SftpAuth auth) {
+    private void report(final @NotNull SftpSync.Outcome outcome, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth) {
         ApplicationManager.getApplication().invokeLater(() -> {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
@@ -288,11 +280,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
      * nobody reads. The same dialog the Git channel opens, on the same merge, so
      * a conflict looks the same however the team shares their work.
      */
-    private void askAboutConflicts(final @NotNull List<Unsettled> unsettled, final @NotNull Path projectRoot,
-                                   final @NotNull SftpAddress address,
-                                   final @NotNull SftpAccountDialog.Account account,
-                                   final @NotNull SftpAuth auth,
-                                   final @NotNull Map<String, String> answered) {
+    private void askAboutConflicts(final @NotNull List<Unsettled> unsettled, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth, final @NotNull Map<String, String> answered) {
         if (unsettled.isEmpty()) {
             send(answered, projectRoot, address, account, auth);
             return;
@@ -316,9 +304,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
     /**
      * Sends what the tester settled, off the EDT - it opens a connection.
      */
-    private void send(final @NotNull Map<String, String> answered, final @NotNull Path projectRoot,
-                      final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account,
-                      final @NotNull SftpAuth auth) {
+    private void send(final @NotNull Map<String, String> answered, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth) {
         if (answered.isEmpty()) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {

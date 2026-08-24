@@ -16,8 +16,7 @@ public class CellEditListener implements TableModelListener {
     private final @NotNull List<TestCaseDto> testCases;
     private boolean isUpdating = false;
 
-    public CellEditListener(final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull Project p,
-                            final @NotNull List<TestCaseDto> testCases) {
+    public CellEditListener(final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         this.importAttributes = importAttributes;
         this.p = p;
         this.testCases = testCases;

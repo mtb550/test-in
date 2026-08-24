@@ -107,8 +107,7 @@ public final class Hits {
      * against every attribute of every case in the project is both the slowest
      * query there is and the least useful: it matches nearly all of them.
      */
-    private static @NotNull List<Hit> cases(final @NotNull Project p, final @NotNull ProjectIndexer indexer,
-                                            final @NotNull String wanted, final int room) {
+    private static @NotNull List<Hit> cases(final @NotNull Project p, final @NotNull ProjectIndexer indexer, final @NotNull String wanted, final int room) {
         if (room <= 0 || tooShort(wanted)) return List.of();
 
         return indexer.getAllTestCases().stream()
@@ -125,8 +124,7 @@ public final class Hits {
      * Short-circuits on the first attribute that does, so the common case - a
      * description match - costs one comparison rather than eighteen.
      */
-    private static boolean matches(final @NotNull Project p, final @NotNull TestCaseDto tc,
-                                   final @NotNull String wanted) {
+    private static boolean matches(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String wanted) {
         for (final TestEditorAttributes attribute : TestEditorAttributes.values()) {
             if (contains(attribute.gridValue(p, tc), wanted)) return true;
         }

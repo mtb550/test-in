@@ -37,9 +37,7 @@ public final class LabelValueRow {
      * Adds the value in the read-only wrapping area both callers use. A blank
      * value adds nothing and leaves the row number where it was.
      */
-    public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc,
-                          final @NotNull String labelText, final @NotNull String valueText,
-                          final float labelFontSize, final float valueFontSize, final int row) {
+    public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @NotNull String valueText, final float labelFontSize, final float valueFontSize, final int row) {
 
         if (valueText.trim().isEmpty()) return row;
 
@@ -54,9 +52,7 @@ public final class LabelValueRow {
         return add(panel, gbc, labelText, valueArea, labelFontSize, row);
     }
 
-    public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc,
-                          final @NotNull String labelText, final @NotNull JComponent valueComponent,
-                          final float labelFontSize, final int row) {
+    public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @NotNull JComponent valueComponent, final float labelFontSize, final int row) {
 
         gbc.gridy = row;
         gbc.gridwidth = 1;

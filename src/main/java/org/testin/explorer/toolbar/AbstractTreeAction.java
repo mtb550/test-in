@@ -17,10 +17,7 @@ abstract class AbstractTreeAction extends DumbAwareAction {
     private final @NotNull ExplorerPanel pp;
     private final @NotNull Consumer<SimpleTree> operation;
 
-    protected AbstractTreeAction(final @NotNull ExplorerPanel pp,
-                                 final @NotNull String title, final @NotNull String description,
-                                 final @NotNull Icon icon,
-                                 final @NotNull Consumer<SimpleTree> operation) {
+    protected AbstractTreeAction(final @NotNull ExplorerPanel pp, final @NotNull String title, final @NotNull String description, final @NotNull Icon icon, final @NotNull Consumer<SimpleTree> operation) {
         super(title, description, icon);
         this.pp = pp;
         this.operation = operation;

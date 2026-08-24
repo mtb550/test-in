@@ -131,8 +131,7 @@ public final class EditorUtil {
      *
      * @param tc the case to land on inside that editor
      */
-    public void openAndSelect(final @NotNull Project p, final @NotNull DirectoryDto dir,
-                              final @NotNull TestCaseDto tc) {
+    public void openAndSelect(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull TestCaseDto tc) {
         ApplicationManager.getApplication().invokeLater(() -> {
             // One block and in order, because openNow blocks until the editor
             // exists - so the next line has something to talk to. Two separate

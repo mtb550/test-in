@@ -59,8 +59,7 @@ public abstract class DirectoryDto {
      * read from disk describe where they sit in the same way. The parent list is
      * absent for a test project, which has nothing above it.
      */
-    public static @NotNull ArrayList<String> pathOf(final @NotNull List<String> parentPath,
-                                                    final @NotNull String name) {
+    public static @NotNull ArrayList<String> pathOf(final @NotNull List<String> parentPath, final @NotNull String name) {
         final @NotNull ArrayList<String> path = new ArrayList<>(parentPath);
         path.add(name);
 

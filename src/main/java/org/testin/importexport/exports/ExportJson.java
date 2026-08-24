@@ -23,8 +23,7 @@ public class ExportJson {
      * so it is not the indexer's to own. {@code importexport} is an exempt
      * package for exactly this.
      */
-    public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
-                             final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
+    public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try {
             // The platform's own helper: it knows that a bare file name has no
             // parent directory to create, so nothing here has to.

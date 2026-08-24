@@ -36,8 +36,7 @@ public class RenameJavaPackage implements GenAction {
     /**
      * The rename itself, once the source root is known.
      */
-    private void renameUnder(final @NotNull Project p, final @NotNull VirtualFile testSourceRoot,
-                             final @NotNull List<String> fqcn, final @NotNull String newName) {
+    private void renameUnder(final @NotNull Project p, final @NotNull VirtualFile testSourceRoot, final @NotNull List<String> fqcn, final @NotNull String newName) {
         final @NotNull Optional<VirtualFile> found = JavaSourceRoot.under(testSourceRoot, String.join("/", fqcn))
                 .filter(VirtualFile::isDirectory);
         if (found.isEmpty()) {
@@ -63,14 +62,11 @@ public class RenameJavaPackage implements GenAction {
         });
     }
 
-    private void updatePackageDeclarations(final @NotNull Project p, final @NotNull VirtualFile root,
-                                           final @NotNull String newTop, final @NotNull String parentPackage) {
+    private void updatePackageDeclarations(final @NotNull Project p, final @NotNull VirtualFile root, final @NotNull String newTop, final @NotNull String parentPackage) {
         updatePackageDeclarationsRecursive(p, root, root, newTop, parentPackage);
     }
 
-    private void updatePackageDeclarationsRecursive(final @NotNull Project p, final @NotNull VirtualFile root,
-                                                    final @NotNull VirtualFile dir, final @NotNull String newTop,
-                                                    final @NotNull String parentPackage) {
+    private void updatePackageDeclarationsRecursive(final @NotNull Project p, final @NotNull VirtualFile root, final @NotNull VirtualFile dir, final @NotNull String newTop, final @NotNull String parentPackage) {
         for (final VirtualFile child : dir.getChildren()) {
             if (child.isDirectory()) {
                 updatePackageDeclarationsRecursive(p, root, child, newTop, parentPackage);
@@ -86,8 +82,7 @@ public class RenameJavaPackage implements GenAction {
         }
     }
 
-    private @NotNull String buildNewPackage(final @NotNull VirtualFile root, final @NotNull VirtualFile parentDir,
-                                            final @NotNull String newTop, final @NotNull String parentPackage) {
+    private @NotNull String buildNewPackage(final @NotNull VirtualFile root, final @NotNull VirtualFile parentDir, final @NotNull String newTop, final @NotNull String parentPackage) {
         // The root itself is no path below the root, which VfsUtil says with a
         // null and which means the same as saying it with an empty string.
         final @NotNull String rel = Objects.requireNonNullElse(VfsUtil.getRelativePath(parentDir, root, '/'), "");

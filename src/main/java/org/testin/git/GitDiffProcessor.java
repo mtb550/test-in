@@ -40,9 +40,7 @@ import java.util.function.Function;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GitDiffProcessor {
 
-    public static @NotNull List<PendingChange> getPendingChanges(
-            final @NotNull Project project,
-            final @NotNull Path repositoryRoot) {
+    public static @NotNull List<PendingChange> getPendingChanges(final @NotNull Project project, final @NotNull Path repositoryRoot) {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
         final @NotNull GitRepositoryService repositories = new GitRepositoryService(project);
 
@@ -62,11 +60,7 @@ public final class GitDiffProcessor {
      * @param committedContent the file's content as committed, empty when there
      *                         is none - a new file, or no commits yet
      */
-    static @NotNull List<PendingChange> toDiffs(
-            final @NotNull List<String> statusLines,
-            final @NotNull Path repositoryRoot,
-            final @NotNull Mapper mapper,
-            final @NotNull Function<String, String> committedContent) {
+    static @NotNull List<PendingChange> toDiffs(final @NotNull List<String> statusLines, final @NotNull Path repositoryRoot, final @NotNull Mapper mapper, final @NotNull Function<String, String> committedContent) {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
         final @NotNull List<PendingChange> result = new ArrayList<>();
 
@@ -112,10 +106,7 @@ public final class GitDiffProcessor {
      * up would disagree with the status line that named the file. {@code git} is
      * an exempt package for exactly this kind of read.
      */
-    private static @NotNull String workingContent(
-            final @NotNull Path root,
-            final @NotNull Path relativePath,
-            final @NotNull GitRefs.StatusEntry entry) {
+    private static @NotNull String workingContent(final @NotNull Path root, final @NotNull Path relativePath, final @NotNull GitRefs.StatusEntry entry) {
         if (entry.type() == DiffType.DELETED) return "";
 
         final @NotNull Path file = root.resolve(relativePath);

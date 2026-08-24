@@ -23,16 +23,14 @@ import org.jetbrains.annotations.NotNull;
  * @param run       how the run went, and {@link TestRunSummary#EMPTY} for every
  *                  node that is not one
  */
-public record NodeFigures(long testSets, long packages, long testCases, long testRuns,
-                          @NotNull TestRunSummary run) {
+public record NodeFigures(long testSets, long packages, long testCases, long testRuns, @NotNull TestRunSummary run) {
 
     /**
      * What a node with nothing in it reports. Zero is an answer.
      */
     public static final @NotNull NodeFigures NONE = new NodeFigures(0, 0, 0, 0, TestRunSummary.EMPTY);
 
-    public static @NotNull NodeFigures ofChildren(final long testSets, final long packages,
-                                                  final long testCases, final long testRuns) {
+    public static @NotNull NodeFigures ofChildren(final long testSets, final long packages, final long testCases, final long testRuns) {
         return new NodeFigures(testSets, packages, testCases, testRuns, TestRunSummary.EMPTY);
     }
 

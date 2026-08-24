@@ -76,8 +76,7 @@ final class TestRunChangeComparator {
         return line.toString();
     }
 
-    private static void addIfChanged(final @NotNull List<FieldChange> changes, final @NotNull String field,
-                                     final @NotNull String oldValue, final @NotNull String newValue) {
+    private static void addIfChanged(final @NotNull List<FieldChange> changes, final @NotNull String field, final @NotNull String oldValue, final @NotNull String newValue) {
         if (!Objects.equals(oldValue, newValue)) {
             changes.add(new FieldChange(field, oldValue, newValue, ChangeType.CHANGE_TEST_RUN));
         }

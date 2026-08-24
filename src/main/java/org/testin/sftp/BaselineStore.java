@@ -95,8 +95,7 @@ public final class BaselineStore {
      * at all: it would claim files were agreed that never arrived, and the next
      * sync would read that as the server having deleted them.
      */
-    public static boolean write(final @NotNull Mapper mapper, final @NotNull Path file,
-                                final @NotNull Baseline baseline) {
+    public static boolean write(final @NotNull Mapper mapper, final @NotNull Path file, final @NotNull Baseline baseline) {
         final @NotNull Path partial = file.resolveSibling(file.getFileName() + ".part");
 
         try {

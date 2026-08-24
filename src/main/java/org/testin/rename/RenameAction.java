@@ -90,8 +90,7 @@ public class RenameAction extends AbstractProjectTreeAction {
      * "Undone" and "Redone" by their own actions, and a second balloon saying it
      * was renamed would double-report one keystroke (#62).
      */
-    private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName,
-                             final @NotNull Runnable onDone) {
+    private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName, final @NotNull Runnable onDone) {
         Services.getInstance(p, EditorUtil.class).close(p, dir.getName());
 
         // Before the data rename, while the old name is still what finds the

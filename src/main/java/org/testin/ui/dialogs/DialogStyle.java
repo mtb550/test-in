@@ -57,9 +57,7 @@ public final class DialogStyle {
         });
     }
 
-    public static @NotNull ComponentPopupBuilder createPopupBuilder(final @NotNull JComponent content,
-                                                                    final @NotNull JComponent focusComponent,
-                                                                    final @NotNull String title) {
+    public static @NotNull ComponentPopupBuilder createPopupBuilder(final @NotNull JComponent content, final @NotNull JComponent focusComponent, final @NotNull String title) {
         return JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(content, focusComponent)
                 .setTitle(title)

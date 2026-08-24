@@ -19,6 +19,5 @@ public interface RemoveHandler {
      * its argument says which kind of completion it was: false for a deletion the
      * VFS refused, and for the fixed containers that are never removed at all.
      */
-    void remove(final @NotNull Project p, final @NotNull DirectoryDto dir,
-                final @NotNull Consumer<@NotNull Boolean> onRemoved);
+    void remove(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull Consumer<@NotNull Boolean> onRemoved);
 }

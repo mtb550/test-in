@@ -23,8 +23,7 @@ public final class GenerateReportDialog extends AbstractFrameworkDialog<Destinat
 
     private final @NotNull BiConsumer<@NotNull FileTypes, @NotNull File> onGenerate;
 
-    public GenerateReportDialog(final @NotNull Project p, final @NotNull String suggestedFileName,
-                                final @NotNull BiConsumer<@NotNull FileTypes, @NotNull File> onGenerate) {
+    public GenerateReportDialog(final @NotNull Project p, final @NotNull String suggestedFileName, final @NotNull BiConsumer<@NotNull FileTypes, @NotNull File> onGenerate) {
         super(p);
         this.onGenerate = onGenerate;
 

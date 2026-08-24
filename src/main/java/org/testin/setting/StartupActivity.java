@@ -112,8 +112,7 @@ public final class StartupActivity implements ProjectActivity {
     }
 
     @Override
-    public @NotNull Object execute(final @NotNull Project p,
-                                   final @NotNull Continuation<? super kotlin.Unit> continuation) {
+    public @NotNull Object execute(final @NotNull Project p, final @NotNull Continuation<? super kotlin.Unit> continuation) {
         execute(p);
         return kotlin.Unit.INSTANCE;
     }

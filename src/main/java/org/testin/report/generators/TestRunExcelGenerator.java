@@ -38,9 +38,7 @@ public final class TestRunExcelGenerator {
      * and the three that render a document do need it (#61).
      */
     @SuppressWarnings("unused")
-    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir,
-                                     final @NotNull TestRunDto tr,
-                                     final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 
             final @NotNull Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");

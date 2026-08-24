@@ -16,9 +16,7 @@ import org.jetbrains.annotations.NotNull;
  * drawing anything, and three ways for the answers to disagree - a table without
  * the scroll pane that shows it (#66, finding 18).
  */
-public record GridView(@NotNull JBTable table,
-                       @NotNull JBScrollPane scrollPane,
-                       @NotNull Disposable fontSync) {
+public record GridView(@NotNull JBTable table, @NotNull JBScrollPane scrollPane, @NotNull Disposable fontSync) {
 
     /**
      * Whether a cell is open for editing under the tester's cursor. A reload

@@ -57,8 +57,7 @@ public class TransferActionTest {
     }
 
     @Test(dataProvider = "table")
-    public void decidesOneActionPerSituation(final String base, final String local, final String remote,
-                                             final TransferAction expected, final String situation) {
+    public void decidesOneActionPerSituation(final String base, final String local, final String remote, final TransferAction expected, final String situation) {
         assertEquals(TransferAction.of(base, local, remote), expected, situation);
     }
 

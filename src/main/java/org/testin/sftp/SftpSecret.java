@@ -93,8 +93,7 @@ public enum SftpSecret {
      * keychain refused should be told, rather than asked again every sync with
      * no explanation.
      */
-    public boolean store(final @NotNull SftpAddress address, final @NotNull String user,
-                         final @NotNull String secret) {
+    public boolean store(final @NotNull SftpAddress address, final @NotNull String user, final @NotNull String secret) {
         try {
             PasswordSafe.getInstance().setPassword(attributes(address, user), secret);
             Logger.info("Stored the " + description + " for " + user + "@" + address.display());
@@ -116,8 +115,7 @@ public enum SftpSecret {
         }
     }
 
-    private @NotNull CredentialAttributes attributes(final @NotNull SftpAddress address,
-                                                     final @NotNull String user) {
+    private @NotNull CredentialAttributes attributes(final @NotNull SftpAddress address, final @NotNull String user) {
         return new CredentialAttributes(
                 CredentialAttributesKt.generateServiceName(SUBSYSTEM, keyFor(address, user)), user);
     }

@@ -86,15 +86,13 @@ public class Shared {
      * priority, and an empty pill is worse than no pill. One place decides it,
      * so every caller stays unconditional.
      */
-    public static void addBadge(final @NotNull List<Badge> badges, final @NotNull String caption,
-                                final @NotNull String value, final @NotNull Color color) {
+    public static void addBadge(final @NotNull List<Badge> badges, final @NotNull String caption, final @NotNull String value, final @NotNull Color color) {
         if (value.isBlank()) return;
 
         badges.add(captioned(caption, value, color));
     }
 
-    private static @NotNull Badge captioned(final @NotNull String caption, final @NotNull String value,
-                                            final @NotNull Color color) {
+    private static @NotNull Badge captioned(final @NotNull String caption, final @NotNull String value, final @NotNull Color color) {
         return new Badge(caption + ": " + value, color);
     }
 
@@ -162,8 +160,7 @@ public class Shared {
      * Draws the card's action icons: the navigate button, and whichever of the
      * run and stop buttons this card's state offers.
      */
-    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth,
-                                                  final @NotNull String hoveredAction, final @NotNull CardHoverAction runSlot) {
+    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth, final @NotNull String hoveredAction, final @NotNull CardHoverAction runSlot) {
         final @NotNull ActionIcons icons = descriptionActionIcons(titleWidth);
 
         drawIfOffered(c, g, CardHoverAction.NAVIGATE_TO_TEST_METHOD, icons.navigate(), hoveredAction);
@@ -174,8 +171,7 @@ public class Shared {
      * One button, drawn where it sits, and left out entirely in an IDE that
      * cannot act on it.
      */
-    private static void drawIfOffered(final @NotNull Component c, final @NotNull Graphics g, final @NotNull CardHoverAction action,
-                                      final @NotNull Rectangle at, final @NotNull String hoveredAction) {
+    private static void drawIfOffered(final @NotNull Component c, final @NotNull Graphics g, final @NotNull CardHoverAction action, final @NotNull Rectangle at, final @NotNull String hoveredAction) {
         if (!action.isOffered()) return;
 
         drawHoverableIcon(c, g, action.getIcon(), at.x, at.y, action.name().equals(hoveredAction));

@@ -51,16 +51,14 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         return Optional.ofNullable(ToolWindowManager.getInstance(p).getToolWindow("testin.view"));
     }
 
-    public static void showPanel(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases,
-                                 final @NotNull List<String> path, final @NotNull Consumer<ViewPanel> onReadyAction) {
+    public static void showPanel(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path, final @NotNull Consumer<ViewPanel> onReadyAction) {
         toolWindow(p).ifPresent(tw -> tw.show(() -> panel().ifPresent(viewer -> {
             viewer.show(testCases, path);
             onReadyAction.accept(viewer);
         })));
     }
 
-    public static void showPanel(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases,
-                                 final @NotNull List<String> path) {
+    public static void showPanel(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
         showPanel(p, testCases, path, NOTHING_AFTER);
     }
 

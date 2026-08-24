@@ -72,9 +72,7 @@ public final class SpellChecker {
      * pairing that class makes internally: it also ends at
      * {@link TextCompletionUtil#installProvider}.
      */
-    public static @NotNull EditorTextField createCompletionField(final @NotNull Project p,
-                                                                 final @NotNull TextCompletionProvider provider,
-                                                                 final @NotNull String text) {
+    public static @NotNull EditorTextField createCompletionField(final @NotNull Project p, final @NotNull TextCompletionProvider provider, final @NotNull String text) {
         final @NotNull EditorTextField field = createField(p);
 
         // Blocking rather than cancellable: this runs while the dialog is being

@@ -66,8 +66,7 @@ public enum TransferAction {
      * @param local  its hash on this machine now, empty when it is not there
      * @param remote its hash on the server now, empty when it is not there
      */
-    public static @NotNull TransferAction of(final @NotNull String base, final @NotNull String local,
-                                             final @NotNull String remote) {
+    public static @NotNull TransferAction of(final @NotNull String base, final @NotNull String local, final @NotNull String remote) {
         // Same bytes on both sides settles it before anything else is asked, and
         // it is also how "neither side has this file" answers - two empties are
         // equal. The rest of this method therefore knows the two sides differ.

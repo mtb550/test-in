@@ -93,8 +93,7 @@ public abstract class AbstractGridEditListener implements TableModelListener {
      * @param onThisRow the test case this row stands for, which both grids are a
      *                  view of even where what they write is not the case itself
      */
-    protected abstract boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto onThisRow,
-                                     final int row, final int col);
+    protected abstract boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto onThisRow, final int row, final int col);
 
     /**
      * The word the update dialog already uses for the same act, because it is the

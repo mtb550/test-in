@@ -37,9 +37,7 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
      *                  rather than read here, because both callers have already
      *                  read the same listing to decide whether to open this at all
      */
-    public BindTestProjectDialog(final @NotNull Project p,
-                                 final @NotNull Map<String, ProjectStatus> underRoot,
-                                 final @NotNull Runnable onBound) {
+    public BindTestProjectDialog(final @NotNull Project p, final @NotNull Map<String, ProjectStatus> underRoot, final @NotNull Runnable onBound) {
         super(p);
         this.onBound = onBound;
 

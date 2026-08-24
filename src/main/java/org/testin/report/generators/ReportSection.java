@@ -74,9 +74,7 @@ enum ReportSection {
     private final boolean withFailureDetail;
     private final @NotNull Set<TestStatus> statuses;
 
-    ReportSection(final @NotNull String title, final @NotNull String descriptionFmt,
-                  final @NotNull ToLongFunction<TestRunSummary> count, final boolean withFailureDetail,
-                  final @NotNull TestStatus... statuses) {
+    ReportSection(final @NotNull String title, final @NotNull String descriptionFmt, final @NotNull ToLongFunction<TestRunSummary> count, final boolean withFailureDetail, final @NotNull TestStatus... statuses) {
         this.title = title;
         this.descriptionFmt = descriptionFmt;
         this.count = count;

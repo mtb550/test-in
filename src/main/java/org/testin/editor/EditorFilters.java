@@ -18,8 +18,7 @@ import java.util.Set;
  * because only a run has one, and a field that half the callers must ignore is
  * worse than the caller that needs it asking for it.
  */
-public record EditorFilters(@NotNull String query, @NotNull Set<Group> groups,
-                            @NotNull Set<Priority> priorities, @NotNull Set<String> modules) {
+public record EditorFilters(@NotNull String query, @NotNull Set<Group> groups, @NotNull Set<Priority> priorities, @NotNull Set<String> modules) {
 
     public static @NotNull EditorFilters of(final @NotNull AbstractToolbarPanel toolBar) {
         final @NotNull FilterPopupBtn filters = toolBar.getToolbarItem(FilterPopupBtn.class);

@@ -57,9 +57,7 @@ public final class SourceForm implements DialogComponent {
      */
     private final boolean offersDefaultFolder;
 
-    public SourceForm(final @NotNull Project p, final @NotNull List<TestEditorAttributes> importAttributes,
-                      final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader,
-                      final @NotNull Consumer<@NotNull Map<String, List<TestCaseDto>>> onDataLoaded) {
+    public SourceForm(final @NotNull Project p, final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader, final @NotNull Consumer<@NotNull Map<String, List<TestCaseDto>>> onDataLoaded) {
         this.p = p;
         this.importAttributes = importAttributes;
         this.offersDefaultFolder = defaultFolder().isBlank();

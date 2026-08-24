@@ -72,10 +72,7 @@ public final class GitCommitService {
      * ones above a selected case travel whether they were picked or not, because
      * without them the case lands somewhere nothing recognizes.
      */
-    public void stageAndCommit(
-            final @NotNull Path repositoryPath,
-            final @NotNull String message,
-            final @NotNull Collection<PendingChange> selectedChanges) {
+    public void stageAndCommit(final @NotNull Path repositoryPath, final @NotNull String message, final @NotNull Collection<PendingChange> selectedChanges) {
         final @NotNull Set<String> paths = GitRefs.repoRelativePaths(selectedChanges);
         if (paths.isEmpty()) throw new IllegalArgumentException("No Git changes were selected");
 
@@ -134,11 +131,7 @@ public final class GitCommitService {
         GitCommandRunner.execute(project, repositoryPath, "git", "remote", "add", remoteName, remoteUrl);
     }
 
-    public void configureIdentity(
-            final @NotNull Path repositoryPath,
-            final @NotNull String name,
-            final @NotNull String email,
-            final boolean global) {
+    public void configureIdentity(final @NotNull Path repositoryPath, final @NotNull String name, final @NotNull String email, final boolean global) {
         final @NotNull String scope = global ? "--global" : "--local";
         GitCommandRunner.execute(project, repositoryPath, "git", "config", scope, "user.name", name);
         GitCommandRunner.execute(project, repositoryPath, "git", "config", scope, "user.email", email);

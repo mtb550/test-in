@@ -25,8 +25,7 @@ public class VerdictDonutTest {
 
     private static final List<NodeCount> SLICES = NodeStatistics.VERDICTS.getSlices();
 
-    private static NodeFigures run(final long passed, final long failed, final long blocked,
-                                   final long untested, final long removed) {
+    private static NodeFigures run(final long passed, final long failed, final long blocked, final long untested, final long removed) {
         final long total = passed + failed + blocked + untested + removed;
         final long executed = passed + failed + blocked;
 

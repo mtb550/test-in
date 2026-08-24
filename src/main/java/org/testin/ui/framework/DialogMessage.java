@@ -41,8 +41,7 @@ public final class DialogMessage implements DialogComponent {
      * that side. One place decides whether the row exists, so both calls above
      * are unconditional.
      */
-    private static void addPathRow(final @NotNull JBPanel<?> content, final @NotNull String caption,
-                                   final @NotNull String path, final int topGap) {
+    private static void addPathRow(final @NotNull JBPanel<?> content, final @NotNull String caption, final @NotNull String path, final int topGap) {
         if (path.isEmpty()) return;
 
         final @NotNull JBLabel label = new JBLabel(caption + ":  " + path);

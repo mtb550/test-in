@@ -16,9 +16,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class TestCaseChangeComparator {
 
-    static @NotNull List<FieldChange> compare(
-            final @NotNull TestCaseDto oldState,
-            final @NotNull TestCaseDto newState) {
+    static @NotNull List<FieldChange> compare(final @NotNull TestCaseDto oldState, final @NotNull TestCaseDto newState) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
         addIfChanged(changes, "Description", oldState.getDescription(), newState.getDescription(), ChangeType.CHANGE_DESCRIPTION);
         addIfChanged(changes, "Expected Result", oldState.getExpectedResult(), newState.getExpectedResult(), ChangeType.CHANGE_EXPECTED_RESULT);
@@ -37,12 +35,7 @@ final class TestCaseChangeComparator {
         return changes;
     }
 
-    private static void addIfChanged(
-            final @NotNull List<FieldChange> changes,
-            final @NotNull String field,
-            final @NotNull String oldValue,
-            final @NotNull String newValue,
-            final @NotNull ChangeType type) {
+    private static void addIfChanged(final @NotNull List<FieldChange> changes, final @NotNull String field, final @NotNull String oldValue, final @NotNull String newValue, final @NotNull ChangeType type) {
         if (!Objects.equals(oldValue, newValue)) {
             changes.add(new FieldChange(field, oldValue, newValue, type));
         }

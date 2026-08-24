@@ -96,8 +96,7 @@ public final class JavaSourceRoot {
      * are ordinary states, which is why every caller gets an answer rather than
      * a null to interpret.
      */
-    public static @NotNull Optional<VirtualFile> under(final @NotNull VirtualFile root,
-                                                       final @NotNull String relativePath) {
+    public static @NotNull Optional<VirtualFile> under(final @NotNull VirtualFile root, final @NotNull String relativePath) {
         return Optional.ofNullable(root.findFileByRelativePath(relativePath));
     }
 
@@ -106,8 +105,7 @@ public final class JavaSourceRoot {
      * Removing a class and removing a package were the same five lines, and
      * neither of them was ever a failure when there was nothing to remove.
      */
-    public static void deleteUnder(final @NotNull VirtualFile root, final @NotNull String relativePath,
-                                   final @NotNull Object requestor) {
+    public static void deleteUnder(final @NotNull VirtualFile root, final @NotNull String relativePath, final @NotNull Object requestor) {
         final @NotNull Optional<VirtualFile> found = under(root, relativePath).filter(VirtualFile::exists);
         if (found.isEmpty()) return;
 
@@ -131,8 +129,7 @@ public final class JavaSourceRoot {
      * nothing at all, so the same missing folder explained itself differently
      * depending on which generator noticed (#71).
      */
-    public static @NotNull Optional<VirtualFile> packageFolder(final @NotNull VirtualFile root,
-                                                               final @NotNull List<String> packageSegments) {
+    public static @NotNull Optional<VirtualFile> packageFolder(final @NotNull VirtualFile root, final @NotNull List<String> packageSegments) {
         final @NotNull String relative = String.join("/", packageSegments);
 
         final @NotNull Optional<VirtualFile> folder;
@@ -161,9 +158,7 @@ public final class JavaSourceRoot {
      * folder names and the declaration written here have to agree, or findClass
      * never resolves what was written.
      */
-    public static @NotNull Optional<VirtualFile> classFile(final @NotNull VirtualFile root,
-                                                           final @NotNull List<String> packageSegments,
-                                                           final @NotNull String className) {
+    public static @NotNull Optional<VirtualFile> classFile(final @NotNull VirtualFile root, final @NotNull List<String> packageSegments, final @NotNull String className) {
         final @NotNull Optional<VirtualFile> folder = packageFolder(root, packageSegments);
         if (folder.isEmpty()) return Optional.empty();
 
@@ -204,8 +199,7 @@ public final class JavaSourceRoot {
      *
      * @param whatFailed named in the log if the work raises, e.g. "removing class"
      */
-    public static void inRoot(final @NotNull Project p, final @NotNull String whatFailed,
-                              final @NotNull RootWork work) {
+    public static void inRoot(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
         run(find(p), whatFailed, work);
     }
 
@@ -213,13 +207,11 @@ public final class JavaSourceRoot {
      * The same, and tells the tester when there is no root - see
      * {@link #findOrWarn}.
      */
-    public static void inRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed,
-                                    final @NotNull RootWork work) {
+    public static void inRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
         run(findOrWarn(p), whatFailed, work);
     }
 
-    private static void run(final @NotNull Optional<VirtualFile> root, final @NotNull String whatFailed,
-                            final @NotNull RootWork work) {
+    private static void run(final @NotNull Optional<VirtualFile> root, final @NotNull String whatFailed, final @NotNull RootWork work) {
         if (root.isEmpty()) return;
 
         try {
@@ -237,8 +229,7 @@ public final class JavaSourceRoot {
      *
      * @param whatFailed named in the log if the work raises, e.g. "removing class"
      */
-    public static void writeInRoot(final @NotNull Project p, final @NotNull String whatFailed,
-                                   final @NotNull RootWork work) {
+    public static void writeInRoot(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
         WriteAction.run(() -> inRoot(p, whatFailed, work));
     }
 
@@ -251,8 +242,7 @@ public final class JavaSourceRoot {
      * @param title      names the command, as the platform shows it
      * @param whatFailed named in the log if the work raises, e.g. "moving class"
      */
-    public static void commandInRoot(final @NotNull Project p, final @NotNull String title,
-                                     final @NotNull String whatFailed, final @NotNull RootWork work) {
+    public static void commandInRoot(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final @NotNull RootWork work) {
         WriteCommandAction.runWriteCommandAction(p, title, null, () -> inRoot(p, whatFailed, work));
     }
 
@@ -262,8 +252,7 @@ public final class JavaSourceRoot {
      *
      * @param whatFailed named in the log if the work raises, e.g. "creating package"
      */
-    public static void writeInRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed,
-                                         final @NotNull RootWork work) {
+    public static void writeInRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
         WriteAction.run(() -> inRootOrWarn(p, whatFailed, work));
     }
 }

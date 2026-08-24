@@ -19,26 +19,14 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestCaseFilter {
 
-    public static @NotNull List<TestCaseDto> filter(
-            final @NotNull Collection<TestCaseDto> source,
-            final @NotNull String query,
-            final @NotNull Set<Group> groups,
-            final @NotNull Set<Priority> priorities,
-            final @NotNull Set<String> modules) {
+    public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull String query, final @NotNull Set<Group> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules) {
         // No run items on this path - the test editor has no statuses to filter
         // by. An empty map says that; a function returning null only implies it.
         return filter(source, query, groups, priorities, modules, Collections.emptySet(),
                 id -> Optional.empty());
     }
 
-    public static @NotNull List<TestCaseDto> filter(
-            final @NotNull Collection<TestCaseDto> source,
-            final @NotNull String query,
-            final @NotNull Set<Group> groups,
-            final @NotNull Set<Priority> priorities,
-            final @NotNull Set<String> modules,
-            final @NotNull Set<TestStatus> statuses,
-            final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
+    public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull String query, final @NotNull Set<Group> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules, final @NotNull Set<TestStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
         if (source.isEmpty()) {
             return Collections.emptyList();
         }
@@ -49,14 +37,7 @@ public final class TestCaseFilter {
                 .collect(Collectors.toList());
     }
 
-    private static boolean matches(
-            final @NotNull TestCaseDto testCase,
-            final @NotNull String query,
-            final @NotNull Set<Group> groups,
-            final @NotNull Set<Priority> priorities,
-            final @NotNull Set<String> modules,
-            final @NotNull Set<TestStatus> statuses,
-            final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
+    private static boolean matches(final @NotNull TestCaseDto testCase, final @NotNull String query, final @NotNull Set<Group> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules, final @NotNull Set<TestStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
         final boolean matchesSearch = query.isEmpty()
                 || containsIgnoreCase(testCase.getDescription(), query)
                 || testCase.getId().toString().toLowerCase(Locale.ROOT).contains(query)
@@ -73,10 +54,7 @@ public final class TestCaseFilter {
         return matchesSearch && matchesPriority && matchesGroup && matchesModule && matchesStatus;
     }
 
-    private static boolean matchesStatus(
-            final @NotNull UUID id,
-            final @NotNull Set<TestStatus> statuses,
-            final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
+    private static boolean matchesStatus(final @NotNull UUID id, final @NotNull Set<TestStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
         return runItemProvider.apply(id)
                 .map(TestRunItems::getStatus)
                 .filter(statuses::contains)

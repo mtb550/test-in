@@ -64,8 +64,7 @@ public class ExportExcel {
         }
     }
 
-    public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
-                             final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
+    public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try (Workbook workbook = new XSSFWorkbook()) {
             final @NotNull CellStyle headerStyle = workbook.createCellStyle();
             final @NotNull Font headerFont = workbook.createFont();

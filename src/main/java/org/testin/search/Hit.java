@@ -23,8 +23,7 @@ import java.util.Optional;
  * @param testCase the row to land on, and empty for a node - which is a node
  *                 selected and nothing more
  */
-public record Hit(@NotNull Icon icon, @NotNull String name, @NotNull String where,
-                  @NotNull DirectoryDto node, @NotNull Optional<TestCaseDto> testCase) {
+public record Hit(@NotNull Icon icon, @NotNull String name, @NotNull String where, @NotNull DirectoryDto node, @NotNull Optional<TestCaseDto> testCase) {
 
     /**
      * A test case, shown under the test set that holds it.

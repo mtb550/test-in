@@ -51,8 +51,7 @@ public final class TestCaseExecutionSubscriber {
      */
     private volatile @NotNull Optional<UUID> runningDtoId = Optional.empty();
 
-    public TestCaseExecutionSubscriber(final @NotNull Project p, final @NotNull Disposable parentDisposable,
-                                       final @NotNull Runnable onUpdated) {
+    public TestCaseExecutionSubscriber(final @NotNull Project p, final @NotNull Disposable parentDisposable, final @NotNull Runnable onUpdated) {
         this.p = p;
         this.indexer = Services.getInstance(p, ProjectIndexer.class);
         this.onUpdated = onUpdated;

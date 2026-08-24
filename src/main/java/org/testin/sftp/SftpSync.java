@@ -73,9 +73,7 @@ public final class SftpSync {
      *                      second tester syncing the same project at the same
      *                      moment is told who has it rather than made to guess
      */
-    public record Outcome(int uploaded, int downloaded, int unchanged, int merged, int conflicts,
-                          @NotNull List<String> conflicting, @NotNull List<String> removedOnServer,
-                          @NotNull List<Unsettled> unsettled, @NotNull String blockedBy) {
+    public record Outcome(int uploaded, int downloaded, int unchanged, int merged, int conflicts, @NotNull List<String> conflicting, @NotNull List<String> removedOnServer, @NotNull List<Unsettled> unsettled, @NotNull String blockedBy) {
 
         /**
          * Nothing ran, because somebody else is syncing this project.
@@ -111,10 +109,7 @@ public final class SftpSync {
     /**
      * Runs one sync and answers what it did.
      */
-    public static @NotNull Outcome run(final @NotNull Project p, final @NotNull Path projectRoot,
-                                       final @NotNull SftpAddress address, final @NotNull String user,
-                                       final @NotNull SftpAuth auth, final @NotNull Path knownHosts,
-                                       final @NotNull ProgressIndicator indicator) {
+    public static @NotNull Outcome run(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull String user, final @NotNull SftpAuth auth, final @NotNull Path knownHosts, final @NotNull ProgressIndicator indicator) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
         final @NotNull Path baselineFile = BaselineStore.fileFor(projectRoot);
@@ -153,14 +148,7 @@ public final class SftpSync {
      * that no early return can slip past - a lock left behind blocks every
      * tester on the team until somebody deletes a hidden folder over SSH.
      */
-    private static @NotNull Outcome inside(final @NotNull Path projectRoot,
-                                           final @NotNull SftpAddress address,
-                                           final @NotNull ProgressIndicator indicator,
-                                           final @NotNull SftpTransport transport,
-                                           final @NotNull ProjectIndexer indexer, final @NotNull Mapper mapper,
-                                           final @NotNull Path baselineFile,
-                                           final @NotNull Map<String, byte[]> local,
-                                           final @NotNull Baseline baseline) {
+    private static @NotNull Outcome inside(final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull ProgressIndicator indicator, final @NotNull SftpTransport transport, final @NotNull ProjectIndexer indexer, final @NotNull Mapper mapper, final @NotNull Path baselineFile, final @NotNull Map<String, byte[]> local, final @NotNull Baseline baseline) {
         indicator.setText("Asking the server what it has...");
         final boolean serverKnowsThisProject = transport.exists(MANIFEST);
         final @NotNull Manifest remote = readManifest(transport, mapper);
@@ -221,12 +209,7 @@ public final class SftpSync {
      * it is - a first sync moves every file, and an operation that long with no
      * progress reads as a hang.
      */
-    private static void transfer(final @NotNull SftpTransport transport, final @NotNull ProgressIndicator indicator,
-                                 final @NotNull Plan plan,
-                                 final @NotNull Map<String, byte[]> local,
-                                 final @NotNull Map<String, Manifest.Entry> onServer,
-                                 final @NotNull Map<String, String> agreed,
-                                 final @NotNull Map<String, byte[]> incoming) {
+    private static void transfer(final @NotNull SftpTransport transport, final @NotNull ProgressIndicator indicator, final @NotNull Plan plan, final @NotNull Map<String, byte[]> local, final @NotNull Map<String, Manifest.Entry> onServer, final @NotNull Map<String, String> agreed, final @NotNull Map<String, byte[]> incoming) {
         final int total = plan.toUpload.size() + plan.toDownload.size() + plan.toDeleteRemotely.size();
         int done = 0;
 
@@ -289,10 +272,7 @@ public final class SftpSync {
      * machine's copy would leave the case unsettled on the server and ask the
      * same question again on the next sync, forever.
      */
-    public static void finish(final @NotNull Project p, final @NotNull Path projectRoot,
-                              final @NotNull SftpAddress address, final @NotNull String user,
-                              final @NotNull SftpAuth auth, final @NotNull Path knownHosts,
-                              final @NotNull Map<String, String> answered) {
+    public static void finish(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull String user, final @NotNull SftpAuth auth, final @NotNull Path knownHosts, final @NotNull Map<String, String> answered) {
         if (answered.isEmpty()) return;
 
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -355,14 +335,7 @@ public final class SftpSync {
      * fields to merge, and which of two versions a team meant is not a question
      * about bytes.
      */
-    private static @NotNull List<Unsettled> settle(final @NotNull SftpTransport transport,
-                                                   final @NotNull Mapper mapper,
-                                                   final @NotNull ProgressIndicator indicator,
-                                                   final @NotNull Plan plan,
-                                                   final @NotNull Map<String, byte[]> local,
-                                                   final @NotNull Map<String, Manifest.Entry> onServer,
-                                                   final @NotNull Map<String, String> agreed,
-                                                   final @NotNull Map<String, byte[]> incoming) {
+    private static @NotNull List<Unsettled> settle(final @NotNull SftpTransport transport, final @NotNull Mapper mapper, final @NotNull ProgressIndicator indicator, final @NotNull Plan plan, final @NotNull Map<String, byte[]> local, final @NotNull Map<String, Manifest.Entry> onServer, final @NotNull Map<String, String> agreed, final @NotNull Map<String, byte[]> incoming) {
         final @NotNull List<Unsettled> unsettled = new ArrayList<>();
         final @NotNull List<String> mergeable = plan.conflicting.stream()
                 .filter(TestCaseMerge::isTestCase)
@@ -411,11 +384,7 @@ public final class SftpSync {
      * serialization: writing each side from its own would let the two differ by
      * a space and conflict again on the next sync forever.
      */
-    private static void keep(final @NotNull SftpTransport transport, final @NotNull Mapper mapper,
-                             final @NotNull ObjectNode merged, final @NotNull String path,
-                             final @NotNull Map<String, Manifest.Entry> onServer,
-                             final @NotNull Map<String, String> agreed,
-                             final @NotNull Map<String, byte[]> incoming) {
+    private static void keep(final @NotNull SftpTransport transport, final @NotNull Mapper mapper, final @NotNull ObjectNode merged, final @NotNull String path, final @NotNull Map<String, Manifest.Entry> onServer, final @NotNull Map<String, String> agreed, final @NotNull Map<String, byte[]> incoming) {
         final @NotNull String settled = mapper.writeValueAsString(merged);
         final byte @NotNull [] content = settled.getBytes(StandardCharsets.UTF_8);
 
@@ -430,8 +399,7 @@ public final class SftpSync {
      * file name when the description is blank or the side being read will not
      * parse.
      */
-    private static @NotNull String name(final @NotNull Mapper mapper, final @NotNull String json,
-                                        final @NotNull String path) {
+    private static @NotNull String name(final @NotNull Mapper mapper, final @NotNull String json, final @NotNull String path) {
         final @NotNull String description = mapper.readTree(json).path("description").asText("");
         if (!description.isBlank()) return description;
 
@@ -464,16 +432,14 @@ public final class SftpSync {
      * outside one, so a test of the sync had either to skip or to reimplement
      * this loop and test its own copy of it.
      */
-    static @NotNull Outcome wouldDo(final @NotNull Manifest local, final @NotNull Manifest remote,
-                                    final @NotNull Manifest base) {
+    static @NotNull Outcome wouldDo(final @NotNull Manifest local, final @NotNull Manifest remote, final @NotNull Manifest base) {
         return decide(local, remote, base).outcome(List.of());
     }
 
     /**
      * What every file's three states say should happen to it.
      */
-    private static @NotNull Plan decide(final @NotNull Manifest local, final @NotNull Manifest remote,
-                                        final @NotNull Manifest base) {
+    private static @NotNull Plan decide(final @NotNull Manifest local, final @NotNull Manifest remote, final @NotNull Manifest base) {
         final @NotNull Plan plan = new Plan();
 
         final @NotNull Set<String> everyPath = new TreeSet<>(local.pathsWith(remote));
@@ -511,8 +477,7 @@ public final class SftpSync {
         }
     }
 
-    private static void writeManifest(final @NotNull SftpTransport transport, final @NotNull Mapper mapper,
-                                      final @NotNull Manifest manifest) {
+    private static void writeManifest(final @NotNull SftpTransport transport, final @NotNull Mapper mapper, final @NotNull Manifest manifest) {
         transport.write(MANIFEST,
                 mapper.writeValueAsString(manifest.entries()).getBytes(StandardCharsets.UTF_8));
     }

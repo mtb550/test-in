@@ -15,9 +15,7 @@ public class CheckboxHeaderRenderer implements TableCellRenderer {
     private final @NotNull JBCheckBox headerCheckbox;
 
     @Override
-    public @NotNull Component getTableCellRendererComponent(final @NotNull JTable table, final @Nullable Object value,
-                                                            final boolean isSelected, final boolean hasFocus,
-                                                            final int row, final int column) {
+    public @NotNull Component getTableCellRendererComponent(final @NotNull JTable table, final @Nullable Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
         final @NotNull JTableHeader header = table.getTableHeader();
         headerCheckbox.setBackground(header.getBackground());
         headerCheckbox.setForeground(header.getForeground());
