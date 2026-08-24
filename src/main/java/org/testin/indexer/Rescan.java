@@ -2,6 +2,9 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.util.concurrency.AppExecutorUtil;
@@ -77,9 +80,14 @@ public final class Rescan {
         Logger.info("Something changed on disk in " + testProjects.size()
                 + (testProjects.size() == 1 ? " test project" : " test projects") + ", reading them again");
 
-        for (final Project p : ProjectManager.getInstance().getOpenProjects()) {
-            refresh(p, testProjects);
-        }
+        // Onto the EDT to start the tasks: ProgressManager launches a
+        // Task.Backgroundable from there, and the open-projects list is the
+        // platform's to read on it.
+        ApplicationManager.getApplication().invokeLater(() -> {
+            for (final Project p : ProjectManager.getInstance().getOpenProjects()) {
+                refresh(p, testProjects);
+            }
+        });
     }
 
     /**
@@ -89,24 +97,36 @@ public final class Rescan {
      * to correct, and asking its service container for a panel would build one
      * and start indexing there - a refresh of something the tester never opened
      * (#77).
+     * <p>
+     * The re-read itself is long - a project is thousands of files - so it runs
+     * as a {@code Task.Backgroundable} with a progress bar the tester can cancel,
+     * the way every other index pass does, rather than on a shared scheduled
+     * thread that shows nothing and cannot be stopped.
      */
     private void refresh(final @NotNull Project p, final @NotNull List<Path> testProjects) {
         if (p.isDisposed() || !Services.isCreated(p, ExplorerPanel.class)) return;
 
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        testProjects.forEach(indexer::scanSingleProject);
+        ProgressManager.getInstance().run(
+                new Task.Backgroundable(p, "Reading test data that changed on disk", true) {
+                    @Override
+                    public void run(final @NotNull ProgressIndicator indicator) {
+                        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                        testProjects.forEach(indexer::scanSingleProject);
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-            if (p.isDisposed()) return;
+                        ApplicationManager.getApplication().invokeLater(() -> {
+                            if (p.isDisposed()) return;
 
-            Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
+                            Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
 
-            // The tree is not the only thing showing what a file used to say. An
-            // editor holds the node it was opened on and the cases it read from
-            // it, so after the scan both can be wrong - and this is the same
-            // call the Refresh button makes, so a change noticed on disk lands
-            // exactly where a change the tester asked about lands.
-            Services.getInstance(p, EditorUtil.class).refreshOpen(p);
-        });
+                            // The tree is not the only thing showing what a file used
+                            // to say. An editor holds the node it was opened on and
+                            // the cases it read from it, so after the scan both can be
+                            // wrong - and this is the same call the Refresh button
+                            // makes, so a change noticed on disk lands exactly where a
+                            // change the tester asked about lands.
+                            Services.getInstance(p, EditorUtil.class).refreshOpen(p);
+                        });
+                    }
+                });
     }
 }
