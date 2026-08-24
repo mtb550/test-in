@@ -33,6 +33,7 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunCon
                 create);
 
         shortcuts = List.of(
+                StatusBarShortcut.hint("Tab", "Navigate"),
                 StatusBarShortcut.hint("Space", "Check"),
                 StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
 
