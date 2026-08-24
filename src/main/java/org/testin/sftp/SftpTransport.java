@@ -73,11 +73,12 @@ public final class SftpTransport implements AutoCloseable {
      */
     public static @NotNull SftpTransport open(final @NotNull SftpAddress address, final @NotNull String user,
                                               final @NotNull SftpAuth auth, final @NotNull Path knownHosts) {
+        Session session = null;
         try {
             final @NotNull JSch jsch = new JSch();
             jsch.setKnownHosts(knownHosts.toString());
 
-            final @NotNull Session session = jsch.getSession(user, address.host(), address.port());
+            session = jsch.getSession(user, address.host(), address.port());
             auth.apply(jsch, session);
             session.connect(TIMEOUT);
 
@@ -88,6 +89,10 @@ public final class SftpTransport implements AutoCloseable {
             return new SftpTransport(address, session, sftp);
 
         } catch (final Exception ex) {
+            // The session can already be up when the channel fails to open on top
+            // of it; left alone it leaks an SSH connection per failed attempt.
+            if (session != null && session.isConnected()) session.disconnect();
+
             Logger.error("Could not connect to " + address.display() + ": " + ex.getMessage());
             throw new IllegalStateException("Could not connect to " + address.display() + ": " + ex.getMessage());
         }
