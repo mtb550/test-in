@@ -1,11 +1,13 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.util.SystemInfo;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,6 +71,13 @@ public final class OwnWrites {
     }
 
     private static @NotNull String key(final @NotNull Path path) {
-        return path.toAbsolutePath().normalize().toString();
+        final @NotNull String full = path.toAbsolutePath().normalize().toString();
+
+        // On a case-insensitive file system - Windows, macOS - the event side and
+        // the write side can spell the same file in different case, the drive
+        // letter included, and an exact-match key then reads the plugin's own save
+        // as a tester's edit and re-reads the whole project under their hands.
+        // Folded to one case there, and left exactly as it is where case is real.
+        return SystemInfo.isFileSystemCaseSensitive ? full : full.toLowerCase(Locale.ROOT);
     }
 }
