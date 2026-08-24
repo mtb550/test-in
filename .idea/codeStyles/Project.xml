@@ -1,0 +1,16 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <JavaCodeStyleSettings>
+      <!-- Record components stay on one line, like method parameters below. -->
+      <option name="RECORD_COMPONENTS_WRAP" value="0" />
+    </JavaCodeStyleSettings>
+    <ScalaCodeStyleSettings>
+      <option name="MULTILINE_STRING_CLOSING_QUOTES_ON_NEW_LINE" value="true" />
+    </ScalaCodeStyleSettings>
+    <codeStyleSettings language="JAVA">
+      <!-- Declaration parameters are never wrapped: one signature, one line,
+           however long it gets. Reformat Code applies this everywhere. -->
+      <option name="METHOD_PARAMETERS_WRAP" value="0" />
+    </codeStyleSettings>
+  </code_scheme>
+</component>

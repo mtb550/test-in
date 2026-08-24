@@ -5,6 +5,9 @@
 # The spellchecker's project vocabulary, shared for the same reason the
 # inspection profile is: otherwise every machine rebuilds the same word list.
 !.idea/dictionaries/
+# The code style, shared for the same reason: one owner for the wrapping rules
+# so every machine formats the same way instead of re-wrapping each other's work.
+!.idea/codeStyles/
 .intellijPlatform/
 .run/
 .sandbox/
