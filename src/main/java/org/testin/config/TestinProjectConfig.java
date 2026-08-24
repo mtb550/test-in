@@ -44,13 +44,7 @@ import java.util.regex.Pattern;
  *                      sftp changes how the project is reached, not which
  *                      project it is
  */
-public record TestinProjectConfig(@NotNull TestinLocation location,
-                                  @NotNull ConnectionType connection,
-                                  @NotNull String repoUrl,
-                                  @NotNull String sftpHost,
-                                  int sftpPort,
-                                  @NotNull String sftpPath,
-                                  @NotNull String testinProject) {
+public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull ConnectionType connection, @NotNull String repoUrl, @NotNull String sftpHost, int sftpPort, @NotNull String sftpPath, @NotNull String testinProject) {
 
     /**
      * The port an address is assumed to be on when the file does not say.
@@ -122,13 +116,7 @@ public record TestinProjectConfig(@NotNull TestinLocation location,
      * promises.
      */
     @JsonCreator
-    static @NotNull TestinProjectConfig read(@JsonProperty("location") final @Nullable String location,
-                                             @JsonProperty("connection") final @Nullable String connection,
-                                             @JsonProperty("RepoUrl") final @Nullable String repoUrl,
-                                             @JsonProperty("sftpHost") final @Nullable String sftpHost,
-                                             @JsonProperty("sftpPort") final @Nullable Integer sftpPort,
-                                             @JsonProperty("sftpPath") final @Nullable String sftpPath,
-                                             @JsonProperty("testinProject") final @Nullable String testinProject) {
+    static @NotNull TestinProjectConfig read(@JsonProperty("location") final @Nullable String location, @JsonProperty("connection") final @Nullable String connection, @JsonProperty("RepoUrl") final @Nullable String repoUrl, @JsonProperty("sftpHost") final @Nullable String sftpHost, @JsonProperty("sftpPort") final @Nullable Integer sftpPort, @JsonProperty("sftpPath") final @Nullable String sftpPath, @JsonProperty("testinProject") final @Nullable String testinProject) {
         return new TestinProjectConfig(TestinLocation.of(strip(location)),
                 ConnectionType.of(strip(connection)),
                 strip(repoUrl),

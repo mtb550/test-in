@@ -81,11 +81,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     // What the shell provides.
     // ------------------------------------------------------------------
 
-    private static void installKey(final @NotNull JComponent component,
-                                   final @MagicConstant(intValues = {JComponent.WHEN_FOCUSED,
-                                           JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT,
-                                           JComponent.WHEN_IN_FOCUSED_WINDOW}) int condition,
-                                   final @NotNull KeyStroke key, final @NotNull String actionKey, final @NotNull Runnable action) {
+    private static void installKey(final @NotNull JComponent component, final @MagicConstant(intValues = {JComponent.WHEN_FOCUSED, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, JComponent.WHEN_IN_FOCUSED_WINDOW}) int condition, final @NotNull KeyStroke key, final @NotNull String actionKey, final @NotNull Runnable action) {
         component.getInputMap(condition).put(key, actionKey);
         component.getActionMap().put(actionKey, new AbstractAction() {
             @Override

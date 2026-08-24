@@ -15,7 +15,5 @@ import java.util.List;
 // generated builder is what calls it, and the inspection does not see generated
 // code (#61).
 @Builder
-record DialogDto(@NonNull String title,
-                 @NonNull List<? extends ComponentDialogBase<?>> components,
-                 @NonNull List<StatusBarShortcut> shortcuts) {
+record DialogDto(@NonNull String title, @NonNull List<? extends ComponentDialogBase<?>> components, @NonNull List<StatusBarShortcut> shortcuts) {
 }

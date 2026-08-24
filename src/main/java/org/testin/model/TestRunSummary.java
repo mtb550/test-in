@@ -29,8 +29,7 @@ import java.util.stream.Collectors;
  *                   run's own results, so a report says who ran the tests rather
  *                   than who printed the report.
  */
-public record TestRunSummary(long total, long passed, long failed, long blocked, long untested, long removed,
-                             int passRate, @NotNull String executedBy) {
+public record TestRunSummary(long total, long passed, long failed, long blocked, long untested, long removed, int passRate, @NotNull String executedBy) {
 
     /**
      * A run with nothing in it: no cases, no verdicts, nobody who ran it.
