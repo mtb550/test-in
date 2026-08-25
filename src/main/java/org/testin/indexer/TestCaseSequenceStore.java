@@ -16,12 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 final class TestCaseSequenceStore {
 
-    private final @NotNull Project project;
+    private final @NotNull Project p;
     private final @NotNull Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
     private final @NotNull Map<String, List<UUID>> testSetCaseIds = new ConcurrentHashMap<>();
 
-    TestCaseSequenceStore(final @NotNull Project project) {
-        this.project = project;
+    TestCaseSequenceStore(final @NotNull Project p) {
+        this.p = p;
     }
 
     @NotNull Map<UUID, TestCaseDto> getTestCasesById() {
@@ -63,7 +63,7 @@ final class TestCaseSequenceStore {
         // Known to the index means the case already exists, whatever its fields
         // say - the one question that separates a creation from an update without
         // trusting a value a tester could have typed.
-        final @NotNull String tester = Services.getInstance(project, AppSettingsState.class).testerName;
+        final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
         if (testCasesById.containsKey(testCase.getId())) testCase.touch(tester);
         else testCase.stampCreated(tester);
 
@@ -96,8 +96,8 @@ final class TestCaseSequenceStore {
                 path, ignored -> Collections.synchronizedList(new ArrayList<>()));
         if (!ids.contains(testCase.getId())) ids.add(testCase.getId());
 
-        Services.getInstance(project, FilesUtil.class)
-                .write(project, testSetPath.resolve(testCase.getId() + ".json"), testCase);
+        Services.getInstance(p, FilesUtil.class)
+                .write(p, testSetPath.resolve(testCase.getId() + ".json"), testCase);
     }
 
     void remove(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
@@ -109,8 +109,8 @@ final class TestCaseSequenceStore {
         // claims the delete and our own removal is not read as an external
         // change worth a rescan (#117). stopAt is the set itself: a set
         // outlives its last case, so nothing above the file is pruned.
-        Services.getInstance(project, FilesUtil.class)
-                .delete(project, testSetPath.resolve(testCaseId + ".json"), testSetPath);
+        Services.getInstance(p, FilesUtil.class)
+                .delete(p, testSetPath.resolve(testCaseId + ".json"), testSetPath);
     }
 
     /**
@@ -129,7 +129,7 @@ final class TestCaseSequenceStore {
         final @NotNull Set<UUID> movedIds = new HashSet<>();
         for (final TestCaseDto testCase : moved) movedIds.add(testCase.getId());
 
-        final @NotNull String tester = Services.getInstance(project, AppSettingsState.class).testerName;
+        final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
 
         for (final TestCaseDto testCase : orderedList) {
             ids.add(testCase.getId());
@@ -148,8 +148,8 @@ final class TestCaseSequenceStore {
 
             if (!movedIds.contains(testCase.getId())) continue;
 
-            Services.getInstance(project, FilesUtil.class)
-                    .write(project, testSetPath.resolve(testCase.getId() + ".json"), testCase);
+            Services.getInstance(p, FilesUtil.class)
+                    .write(p, testSetPath.resolve(testCase.getId() + ".json"), testCase);
         }
 
         // Whatever the set held and no longer holds stops being indexed at all.
