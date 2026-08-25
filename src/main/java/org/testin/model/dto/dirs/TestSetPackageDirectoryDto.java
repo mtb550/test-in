@@ -24,10 +24,6 @@ public class TestSetPackageDirectoryDto extends DirectoryDto {
         return true;
     }
 
-    @Override
-    public @NotNull String getMarkerFileName() {
-        return DirectoryType.TSP.getMarker();
-    }
 
     @Override
     public boolean acceptsTransferred(final @NotNull DirectoryDto source) {

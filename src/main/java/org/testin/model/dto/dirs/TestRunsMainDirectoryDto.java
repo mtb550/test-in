@@ -33,10 +33,6 @@ public class TestRunsMainDirectoryDto extends DirectoryDto {
         return false;
     }
 
-    @Override
-    public @NotNull String getMarkerFileName() {
-        return DirectoryType.TRD.getMarker();
-    }
 
     @Override
     public boolean acceptsTransferred(final @NotNull DirectoryDto source) {

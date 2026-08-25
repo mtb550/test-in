@@ -29,10 +29,6 @@ public class TestSetDirectoryDto extends DirectoryDto {
         return true;
     }
 
-    @Override
-    public @NotNull String getMarkerFileName() {
-        return DirectoryType.TS.getMarker();
-    }
 
     @Override
     public boolean isTransferTarget() {

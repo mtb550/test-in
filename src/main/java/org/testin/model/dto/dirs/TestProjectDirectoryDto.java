@@ -31,10 +31,6 @@ public class TestProjectDirectoryDto extends DirectoryDto {
     private TestProjectMarker marker = new TestProjectMarker();
 
 
-    @Override
-    public @NotNull String getMarkerFileName() {
-        return DirectoryType.TP.getMarker();
-    }
 
     // The test project node is fixed: not renamed, moved, removed or pasted
     // into from the tree - it is managed through its own actions.

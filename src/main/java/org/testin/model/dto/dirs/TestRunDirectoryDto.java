@@ -24,10 +24,6 @@ public class TestRunDirectoryDto extends DirectoryDto {
         return true;
     }
 
-    @Override
-    public @NotNull String getMarkerFileName() {
-        return DirectoryType.TR.getMarker();
-    }
 
     @Override
     public boolean isAllowedInTestSetFamily() {

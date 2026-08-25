@@ -99,9 +99,17 @@ public abstract class DirectoryDto {
 
     /**
      * File name of this node's marker JSON inside the directory.
+     * <p>
+     * Read from the kind rather than declared again. Every subclass overrode
+     * this to return its own {@code DirectoryType.X.getMarker()} - the same
+     * expression seven times, with the constant spelled in by hand beside a
+     * {@code getType()} that already named it. Nothing checked the two agreed,
+     * so a subclass could have answered one kind here and another there.
      */
     @NonNull
-    public abstract String getMarkerFileName();
+    public String getMarkerFileName() {
+        return getType().getMarker();
+    }
 
 
     // Capability flags replace the instanceof chains that used to branch on
