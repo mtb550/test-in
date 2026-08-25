@@ -185,6 +185,16 @@ public final class TestNGExecution {
     }
 
     /**
+     * The status a surface paints for this case: RUNNING while this service
+     * holds it, and whatever the last report wrote otherwise. The DTO's own
+     * answer alone is not enough - it dies with its instance on every rescan,
+     * which blanked the badge of a case mid-run.
+     */
+    public @NotNull RunStatus statusOf(final @NotNull TestCaseDto tc) {
+        return isRunning(tc.getId()) ? RunStatus.RUNNING : tc.getTempStatus();
+    }
+
+    /**
      * A report landed with this case's result, so its entry is spent. This is
      * what keeps {@link #isRunning} honest - and what keeps a casemate that
      * finished early out of the blast radius when the run they shared is

@@ -9,6 +9,7 @@ import org.testin.editor.Shared;
 import org.testin.model.RunStatus;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
 
 import java.awt.*;
@@ -36,7 +37,7 @@ public class TestCard extends BaseCard {
                 .filter(activeDetails::contains)
                 .forEach(attr -> attr.applyToUI(tc, badges, details, p));
 
-        final @NotNull RunStatus runStatus = tc.getTempStatus();
+        final @NotNull RunStatus runStatus = Services.getInstance(p, TestNGExecution.class).statusOf(tc);
         this.runSlot = CardHoverAction.runSlot(p, tc);
 
         if (runStatus.hasBadge()) badges.add(Shared.createRunStatusBadge(runStatus.getBadge()));

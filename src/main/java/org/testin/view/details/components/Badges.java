@@ -8,6 +8,8 @@ import org.testin.editor.Shared;
 import org.testin.model.Group;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.runner.TestNGExecution;
+import org.testin.services.Services;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class Badges extends BaseDetails {
         }
 
         // Last, the way a card orders them. None for a case nobody has run.
-        final @NotNull RunStatus tempStatus = dto.getTempStatus();
+        final @NotNull RunStatus tempStatus = Services.getInstance(p, TestNGExecution.class).statusOf(dto);
         if (tempStatus.hasBadge()) badges.add(Shared.createRunStatusBadge(tempStatus.getBadge()));
 
         Shared.showBadges(badgesPanel, badges);
