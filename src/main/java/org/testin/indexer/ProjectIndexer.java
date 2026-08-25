@@ -802,18 +802,27 @@ public final class ProjectIndexer {
     }
 
     /**
-     * Writes what arrived from a server into the project.
+     * Writes what arrived from a server into the project, and reads the project
+     * again.
      * <p>
      * Through {@code FilesUtil}, which refuses to write an empty file - exactly
      * the protection a transfer that was cut off halfway needs, because an empty
      * test case would be indexed as a case with no fields rather than as a
      * failure.
+     * <p>
+     * The scan is not optional: these writes are claimed as our own, so the
+     * watcher rightly ignores them, and no other path will ever index what they
+     * put on disk. Without it the next tree refresh repainted the old cache and
+     * the downloaded cases stayed invisible until a manual refresh (#118) - the
+     * mirror {@link #removeIncoming} always scanned.
      */
     public void acceptIncoming(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
         final @NotNull FilesUtil writer = Services.getInstance(p, FilesUtil.class);
 
         files.forEach((relative, content) -> writer.write(p, projectPath.resolve(relative), content));
         Logger.info("Wrote " + files.size() + " incoming files into " + projectPath);
+
+        scanSingleProject(projectPath);
     }
 
     /**

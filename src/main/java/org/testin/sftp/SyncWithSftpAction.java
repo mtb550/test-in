@@ -21,6 +21,7 @@ import org.testin.git.ResolveConflictDialog;
 import org.testin.git.TestCaseMerge;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
+import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
 import org.testin.setting.AppSettingsState;
 
@@ -224,7 +225,11 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
                 return;
             }
 
+            // The pair the Refresh button makes: the tree for the structure and
+            // the open editors for their contents, because a sync can rewrite a
+            // case an editor is showing (#118).
             pp.getProjectTree().refresh();
+            Services.getInstance(p, EditorUtil.class).refreshOpen(p);
 
             if (outcome.conflicts() == 0 && outcome.removedOnServer().isEmpty()) {
                 notifier.softShow(p, "Synced", outcome.describe());
@@ -266,6 +271,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         pp.getProjectTree().refresh();
+                        Services.getInstance(p, EditorUtil.class).refreshOpen(p);
                         Services.getInstance(p, Notifier.class).softShow(p, "Removed " + count);
                     });
                 })).show();
@@ -312,6 +318,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 pp.getProjectTree().refresh();
+                Services.getInstance(p, EditorUtil.class).refreshOpen(p);
                 Services.getInstance(p, Notifier.class).softShow(p, "Settled " + answered.size());
             });
         });
