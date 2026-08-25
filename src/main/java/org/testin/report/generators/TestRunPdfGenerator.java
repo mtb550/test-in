@@ -19,11 +19,12 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.markers.DetailRow;
 import org.testin.model.TestRunSummary;
 import org.testin.logger.Logger;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
-import org.testin.model.TestRunConfiguration;
+import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
@@ -42,11 +43,6 @@ import java.util.function.Predicate;
 public final class TestRunPdfGenerator {
 
 
-    private static final @NotNull Map<Integer, float[]> COLUMN_WIDTHS = Map.of(
-            0, new float[]{7, 93},
-            1, new float[]{7, 83, 10},
-            2, new float[]{7, 73, 10, 10}
-    );
     private final @NotNull DeviceRgb DARK_NAVY = new DeviceRgb(0x1F, 0x38, 0x64);
     private final @NotNull DeviceRgb MEDIUM_BLUE = new DeviceRgb(0x2E, 0x54, 0x96);
     private final @NotNull DeviceRgb DARK_GRAY = new DeviceRgb(0x59, 0x59, 0x59);
@@ -82,27 +78,32 @@ public final class TestRunPdfGenerator {
 
             // TITLE
             document.add(new Paragraph("TEST SUMMARY REPORT")
-                    .setFont(boldFont).setFontSize(18).setFontColor(DARK_NAVY)
+                    .setFont(boldFont).setFontSize(ReportFont.TITLE.pt()).setFontColor(DARK_NAVY)
                     .setMarginBottom(2));
 
-            // SUBTITLE
-            Paragraph subtitle = new Paragraph(projectName + "  |  " + tr.getPlatform() + ", " + tr.getComponent())
-                    .setFont(regularFont).setFontSize(10).setFontColor(MEDIUM_BLUE)
+            // SUBTITLE - the project, and the run under it. Two lines rather
+            // than one, because they answer different questions: which project
+            // this is, and which run of it.
+            document.add(new Paragraph(ReportText.joined("  |  ", projectName, ReportText.joined(", ", tr.getPlatform(), tr.getComponent())))
+                    .setFont(regularFont).setFontSize(ReportFont.SUBTITLE.pt()).setFontColor(MEDIUM_BLUE)
+                    .setMarginBottom(0));
+
+            // The rule closes the two names, above the notice - the notice is a
+            // caption on the block, not part of it.
+            document.add(new Paragraph(trDir.getName())
+                    .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(MEDIUM_BLUE)
                     .setPaddingBottom(4)
                     .setBorderBottom(new SolidBorder(DARK_NAVY, 2f))
-                    .setMarginBottom(1);
-
-            document.add(subtitle);
-
+                    .setMarginBottom(1));
 
             document.add(new Paragraph("Confidential — QA Test Execution Summary")
-                    .setFont(italicFont).setFontSize(8).setFontColor(DARK_GRAY)
+                    .setFont(italicFont).setFontSize(ReportFont.CAPTION.pt()).setFontColor(DARK_GRAY)
                     .setMarginBottom(20));
 
             // SECTION 1: REPORT OVERVIEW
             Paragraph sec1 = new Paragraph("1. Report Overview")
                     .setFont(boldFont)
-                    .setFontSize(13)
+                    .setFontSize(ReportFont.SECTION.pt())
                     .setFontColor(DARK_NAVY)
                     .setPaddingBottom(3)
                     .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
@@ -118,31 +119,16 @@ public final class TestRunPdfGenerator {
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
 
-            addOverviewRow(overviewTable, "Project", projectName, boldFont, regularFont);
-
-            if (!tr.getChangeLog().isEmpty())
-                addOverviewRow(overviewTable, TestRunConfiguration.CHANGE_LOG.getDisplayName(), tr.getChangeLog(), boldFont, regularFont);
-
-            addOverviewRow(overviewTable, TestRunConfiguration.COMMIT_ID.getDisplayName(), tr.getCommitId().isEmpty() ? "n/a" : tr.getCommitId(), boldFont, regularFont);
-
-            if (!tr.getPlatform().isEmpty() || !tr.getComponent().isEmpty())
-                addOverviewRow(overviewTable, TestRunConfiguration.PLATFORM.getDisplayName() + ", " + TestRunConfiguration.COMPONENT.getDisplayName(), tr.getPlatform() + ", " + tr.getComponent(), boldFont, regularFont);
-
-            if (!tr.getTestType().isEmpty())
-                addOverviewRow(overviewTable, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType(), boldFont, regularFont);
-
-
-            addOverviewRow(overviewTable, "Executed By", summary.executedBy(), boldFont, regularFont);
-            addOverviewRow(overviewTable, "Execution Started", Display.formatDate(tr.getExecutionStartedAt()), boldFont, regularFont);
-            addOverviewRow(overviewTable, "Execution Ended", Display.formatDate(tr.getExecutionEndedAt()), boldFont, regularFont);
-            addOverviewRow(overviewTable, "Run Status", trDir.getMarker().getStatus().name(), boldFont, regularFont);
+            for (final DetailRow row : ReportOverview.rowsFor(projectName, trDir, tr, summary)) {
+                addOverviewRow(overviewTable, row.caption(), row.value(), boldFont, regularFont);
+            }
 
             document.add(overviewTable);
 
             // SECTION 2: EXECUTION SUMMARY
             Paragraph sec2 = new Paragraph("2. Execution Summary")
                     .setFont(boldFont)
-                    .setFontSize(13)
+                    .setFontSize(ReportFont.SECTION.pt())
                     .setFontColor(DARK_NAVY)
                     .setPaddingBottom(3)
                     .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
@@ -153,7 +139,7 @@ public final class TestRunPdfGenerator {
             document.add(new Paragraph(
                     String.format("This run holds %d test cases, of which %d were executed. Of those, %d%% passed. The results below summarize the outcome.",
                             summary.total(), summary.executed(), summary.passRate()))
-                    .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
+                    .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(BLACK)
                     .setMarginBottom(12));
 
 
@@ -180,63 +166,48 @@ public final class TestRunPdfGenerator {
             document.add(statsTable);
 
             // SECTION 3: RESULT ANALYSIS
-            Paragraph sec3 = new Paragraph("3. Result Analysis")
-                    .setFont(boldFont)
-                    .setFontSize(13)
-                    .setFontColor(DARK_NAVY)
-                    .setPaddingBottom(3)
-                    .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
-                    .setMarginBottom(9)
-                    .setMarginTop(20);
-            document.add(sec3);
+            // SECTION 3: RESULT ANALYSIS - only what the tester wrote.
+            // A verdict they said nothing about prints no heading, and a run
+            // nobody analysed prints no section, so the numbering below starts
+            // at 3 instead of 4.
+            final boolean analysed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
 
-            // Passed
-            Paragraph passedHeading = new Paragraph()
-                    .add(new Paragraph("Passed (" + summary.passed() + ")")
-                            .setFont(boldFont).setFontSize(11).setFontColor(GREEN)
-                            .setMarginBottom(6));
-            document.add(passedHeading);
+            if (analysed) {
+                document.add(new Paragraph("3. Result Analysis")
+                        .setFont(boldFont)
+                        .setFontSize(ReportFont.SECTION.pt())
+                        .setFontColor(DARK_NAVY)
+                        .setPaddingBottom(3)
+                        .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
+                        .setMarginBottom(9)
+                        .setMarginTop(20));
 
-            // Failed
-            Paragraph failedHeading = new Paragraph()
-                    .add(new Paragraph("Failed (" + summary.failed() + ")")
-                            .setFont(boldFont).setFontSize(11).setFontColor(RED)
-                            .setMarginBottom(6));
-            document.add(failedHeading);
+                for (final ResultAnalysis section : ResultAnalysis.values()) {
+                    final @NotNull String written = section.writtenIn(tr.getResultAnalysis());
+                    if (written.isEmpty()) continue;
 
-            // Blocked
-            Paragraph blockedHeading = new Paragraph()
-                    .add(new Paragraph("Blocked (" + summary.blocked() + ")")
-                            .setFont(boldFont).setFontSize(11).setFontColor(DARK_YELLOW)
-                            .setMarginBottom(6));
-            document.add(blockedHeading);
+                    document.add(new Paragraph(section.heading(summary))
+                            .setFont(boldFont).setFontSize(ReportFont.LEAD.pt())
+                            .setFontColor(rgb(section.getHexColor()))
+                            .setMarginBottom(2));
 
-            // Untested
-            Paragraph untestedHeading = new Paragraph()
-                    .add(new Paragraph("Untested (" + summary.untested() + ")")
-                            .setFont(boldFont).setFontSize(11).setFontColor(DARK_GRAY)
-                            .setMarginBottom(6));
-            document.add(untestedHeading);
-
-            // Removed
-            if (summary.hasRemoved()) {
-                document.add(new Paragraph()
-                        .add(new Paragraph("Removed (" + summary.removed() + ")")
-                                .setFont(boldFont).setFontSize(11).setFontColor(DARK_GRAY)
-                                .setMarginBottom(6)));
+                    document.add(new Paragraph(written)
+                            .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(BLACK)
+                            .setMarginBottom(8));
+                }
             }
 
             // SECTIONS 4+: one case table per status, empty ones omitted. Numbered
             // as printed rather than per section, so a run with nothing blocked
             // does not jump from 5 to 7.
-            int sectionNumber = 4;
+            int sectionNumber = analysed ? 4 : 3;
             for (final ReportSection section : ReportSection.values()) {
                 final long count = section.count(summary);
                 if (count == 0) continue;
 
                 buildCaseTable(document, String.valueOf(sectionNumber++), section.getTitle(),
                         section.description(String.valueOf(count)), tr, detailsMap, boldFont, regularFont,
-                        colorOf(section), section.isWithFailureDetail(), section::matches);
+                        rgb(section.getHexColor()), rgb(section.textHex()), section.isWithFailureDetail(), section::matches);
             }
 
 
@@ -258,11 +229,11 @@ public final class TestRunPdfGenerator {
 
             // Footer — all text on a single line:
             footerCanvas.add(new Paragraph()
-                    .setFont(regularFont).setFontSize(8).setFontColor(DARK_GRAY)
+                    .setFont(regularFont).setFontSize(ReportFont.CAPTION.pt()).setFontColor(DARK_GRAY)
                     .setTextAlignment(TextAlignment.CENTER)
                     .add(new Text(Display.formatDate(ZonedDateTime.now())))
                     .add(new Text("  |  Generated automatically by "))
-                    .add(new Link("Testin", PdfAction.createURI("https://plugins.jetbrains.com/plugin/31514-testin"))
+                    .add(new Link("Testin", PdfAction.createURI(ReportText.PLUGIN_URL))
                             .setFontColor(LINK_BLUE))
                     .add(new Text(" IntelliJ plugin.")));
 
@@ -284,19 +255,24 @@ public final class TestRunPdfGenerator {
      * wants a DeviceRgb, Word a hex string — and a shared section has no business
      * knowing about either.
      */
-    private @NotNull DeviceRgb colorOf(final @NotNull ReportSection section) {
-        return switch (section) {
-            case FAILED -> RED;
-            case PASSED -> GREEN;
-            case BLOCKED -> DARK_YELLOW;
-            case UNTESTED, REMOVED -> DARK_GRAY;
-        };
+    /**
+     * A hex color as iText wants it.
+     * <p>
+     * The result-analysis sections declare their color once, as the hex string
+     * all three report formats already used, so the paragraph in the PDF is the
+     * same green as the one in the Word file and the HTML page.
+     */
+    private @NotNull DeviceRgb rgb(final @NotNull String hex) {
+        return new DeviceRgb(
+                Integer.parseInt(hex.substring(0, 2), 16),
+                Integer.parseInt(hex.substring(2, 4), 16),
+                Integer.parseInt(hex.substring(4, 6), 16));
     }
 
-    private void buildCaseTable(final @NotNull Document document, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont, final @NotNull DeviceRgb headerBg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
+    private void buildCaseTable(final @NotNull Document document, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont, final @NotNull DeviceRgb headerBg, final @NotNull DeviceRgb headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
         document.add(new Paragraph(sectionNumber + ". " + sectionTitle)
                 .setFont(boldFont)
-                .setFontSize(13)
+                .setFontSize(ReportFont.SECTION.pt())
                 .setFontColor(DARK_NAVY)
                 .setPaddingBottom(3)
                 .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
@@ -304,21 +280,24 @@ public final class TestRunPdfGenerator {
                 .setMarginTop(20));
 
         document.add(new Paragraph(description)
-                .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
+                .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(BLACK)
                 .setMarginBottom(12));
 
-        // Column widths depend on which extra columns are shown
-        int extraCols = withFailureDetail ? 2 : 0;
-        float[] widths = COLUMN_WIDTHS.getOrDefault(extraCols, new float[]{7, 73, 10, 10});
-        Table table = new Table(UnitValue.createPercentArray(widths))
+        // Sized by what is in them rather than by a share of the page each.
+        // Fixed shares meant guessing how wide "Enhancement" is: too small and it
+        // wrapped, too large and the description - the column anyone actually
+        // reads - lost the room for nothing. Under auto layout the narrow columns
+        // take what their longest word needs and the description takes the rest.
+        Table table = new Table(withFailureDetail ? 4 : 2)
                 .useAllAvailableWidth()
+                .setAutoLayout()
                 .setBorder(Border.NO_BORDER);
 
         // Header row
-        addCaseTableHeader(table, "#", headerBg, boldFont);
-        addCaseTableHeader(table, "Test Case", headerBg, boldFont);
-        if (withFailureDetail) addCaseTableHeader(table, "Priority", headerBg, boldFont);
-        if (withFailureDetail) addCaseTableHeader(table, "Severity", headerBg, boldFont);
+        addCaseTableHeader(table, "#", headerBg, headerFg, boldFont);
+        addCaseTableHeader(table, "Test Case", headerBg, headerFg, boldFont);
+        if (withFailureDetail) addCaseTableHeader(table, "Priority", headerBg, headerFg, boldFont);
+        if (withFailureDetail) addCaseTableHeader(table, "Severity", headerBg, headerFg, boldFont);
 
         // Data rows — alternating LIGHT_BG / WHITE
         int idx = 1;
@@ -335,7 +314,7 @@ public final class TestRunPdfGenerator {
                     .setBorder(new SolidBorder(BORDER_GRAY, 1))
                     .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
                     .add(new Paragraph(String.valueOf(idx))
-                            .setFont(regularFont).setFontSize(9.5f).setFontColor(DARK_GRAY)
+                            .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(DARK_GRAY)
                             .setTextAlignment(TextAlignment.CENTER)));
 
             // Test Case column
@@ -346,13 +325,13 @@ public final class TestRunPdfGenerator {
                     .setBorder(new SolidBorder(BORDER_GRAY, 1))
                     .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6);
             testCaseCell.add(new Paragraph(tcName)
-                    .setFont(regularFont).setFontSize(9.5f).setFontColor(BLACK)
+                    .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(BLACK)
                     .setMarginBottom(0));
             if (withFailureDetail) {
                 String actualResult = item.getActualResult();
                 if (actualResult.isEmpty()) actualResult = "—";
                 testCaseCell.add(new Paragraph("Actual result: " + actualResult)
-                        .setFont(regularFont).setFontSize(9f).setFontColor(DARK_GRAY));
+                        .setFont(regularFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY));
             }
             table.addCell(testCaseCell);
 
@@ -366,7 +345,7 @@ public final class TestRunPdfGenerator {
                         .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
                         .setVerticalAlignment(VerticalAlignment.MIDDLE)
                         .add(new Paragraph(priText)
-                                .setFont(boldFont).setFontSize(9.5f).setFontColor(priColor)
+                                .setFont(boldFont).setFontSize(ReportFont.BODY.pt()).setFontColor(priColor)
                                 .setTextAlignment(TextAlignment.CENTER)));
             }
 
@@ -381,7 +360,7 @@ public final class TestRunPdfGenerator {
                         .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
                         .setVerticalAlignment(VerticalAlignment.MIDDLE)
                         .add(new Paragraph(sevText)
-                                .setFont(boldFont).setFontSize(9.5f).setFontColor(sevColor)
+                                .setFont(boldFont).setFontSize(ReportFont.BODY.pt()).setFontColor(sevColor)
                                 .setTextAlignment(TextAlignment.CENTER)));
             }
 
@@ -391,13 +370,13 @@ public final class TestRunPdfGenerator {
         document.add(table);
     }
 
-    private void addCaseTableHeader(final @NotNull Table table, final @NotNull String text, final @NotNull DeviceRgb bgColor, final @NotNull PdfFont boldFont) {
+    private void addCaseTableHeader(final @NotNull Table table, final @NotNull String text, final @NotNull DeviceRgb bgColor, final @NotNull DeviceRgb textColor, final @NotNull PdfFont boldFont) {
         table.addCell(new Cell()
                 .setBackgroundColor(bgColor)
                 .setBorder(new SolidBorder(BORDER_GRAY, 1))
                 .setPaddingTop(5).setPaddingBottom(5).setPaddingLeft(6).setPaddingRight(6)
                 .add(new Paragraph(text)
-                        .setFont(boldFont).setFontSize(9.5f).setFontColor(WHITE)
+                        .setFont(boldFont).setFontSize(ReportFont.HEADING.pt()).setFontColor(textColor)
                         .setTextAlignment(TextAlignment.CENTER)));
     }
 
@@ -407,13 +386,13 @@ public final class TestRunPdfGenerator {
                 .setBorder(new SolidBorder(BORDER_GRAY, 1))
                 .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(8).setPaddingRight(8)
                 .add(new Paragraph(label)
-                        .setFont(boldFont).setFontSize(10.5f).setFontColor(DARK_NAVY)));
+                        .setFont(boldFont).setFontSize(ReportFont.HEADING.pt()).setFontColor(DARK_NAVY)));
 
         table.addCell(new Cell()
                 .setBorder(new SolidBorder(BORDER_GRAY, 1))
                 .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(8).setPaddingRight(8)
                 .add(new Paragraph(value)
-                        .setFont(regularFont).setFontSize(10.5f).setFontColor(BLACK)));
+                        .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(BLACK)));
     }
 
     private void addStatCell(final @NotNull Table table, final @NotNull String number, final @NotNull String label, final @NotNull DeviceRgb numberColor, final @NotNull PdfFont boldFont) {
@@ -423,12 +402,12 @@ public final class TestRunPdfGenerator {
                 .setPaddingTop(8).setPaddingBottom(8).setPaddingLeft(6).setPaddingRight(6);
 
         cell.add(new Paragraph(number)
-                .setFont(boldFont).setFontSize(20).setFontColor(numberColor)
+                .setFont(boldFont).setFontSize(ReportFont.FIGURE.pt()).setFontColor(numberColor)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setMarginBottom(4));
 
         cell.add(new Paragraph(label)
-                .setFont(boldFont).setFontSize(9).setFontColor(DARK_GRAY)
+                .setFont(boldFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY)
                 .setTextAlignment(TextAlignment.CENTER));
 
         table.addCell(cell);

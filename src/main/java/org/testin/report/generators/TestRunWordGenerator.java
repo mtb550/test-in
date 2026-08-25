@@ -4,12 +4,13 @@ import com.intellij.openapi.project.Project;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.*;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.markers.DetailRow;
 import org.testin.model.TestRunSummary;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.testin.logger.Logger;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
-import org.testin.model.TestRunConfiguration;
+import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
@@ -23,17 +24,13 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 
 public final class TestRunWordGenerator {
 
-    private static final @NotNull Map<Integer, int[]> COLUMN_WIDTHS = Map.of(
-            2, new int[]{3, 97},
-            3, new int[]{3, 87, 10},
-            4, new int[]{3, 77, 10, 10}
-    );
     /**
      * No rule under the paragraph, said as a color of no color rather than as a
      * null the border writer would have to check (#71).
@@ -43,6 +40,7 @@ public final class TestRunWordGenerator {
     final String DARK_NAVY = "1F3864";
     final String MEDIUM_BLUE = "2E5496";
     final String DARK_GRAY = "595959";
+    final String LINK_BLUE = "0052CC";
     final String GREEN = "2E7D32";
     final String RED = "C0392B";
     final String DARK_YELLOW = "B8860B";
@@ -65,12 +63,16 @@ public final class TestRunWordGenerator {
 
                 final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
 
-                addText(doc, "TEST SUMMARY REPORT", 18, true, DARK_NAVY, NO_BORDER, 2);
+                addText(doc, "TEST SUMMARY REPORT", ReportFont.TITLE.ptRounded(), true, DARK_NAVY, NO_BORDER, 2);
 
-                String subtitleText = projectName + "  |  " + tr.getPlatform() + ", " + tr.getComponent();
-                addText(doc, subtitleText, 10, false, MEDIUM_BLUE, DARK_NAVY, 5);
+                // The project, and the run under it - the same two lines the PDF
+                // prints, for the same reason.
+                addText(doc, ReportText.joined("  |  ", projectName, ReportText.joined(", ", tr.getPlatform(), tr.getComponent())),
+                        ReportFont.SUBTITLE.ptRounded(), false, MEDIUM_BLUE, NO_BORDER, 0);
+                // The rule closes the two names, above the notice.
+                addText(doc, trDir.getName(), ReportFont.LEAD.ptRounded(), false, MEDIUM_BLUE, DARK_NAVY, 1);
 
-                XWPFParagraph conf = addText(doc, "Confidential — QA Test Execution Summary", 8, false, DARK_GRAY, NO_BORDER, 20);
+                XWPFParagraph conf = addText(doc, "Confidential — QA Test Execution Summary", ReportFont.CAPTION.ptRounded(), false, DARK_GRAY, NO_BORDER, 20);
                 setItalic(conf);
 
                 addHeading(doc, "1. Report Overview", 0, 15);
@@ -84,23 +86,10 @@ public final class TestRunWordGenerator {
                 overviewTable.setWidthType(TableWidthType.PCT);
                 setTableWidths(overviewTable, 30, 70);
 
-                addOverviewRow(overviewTable, 0, "Project", projectName);
-
-                if (!tr.getChangeLog().isEmpty())
-                    addOverviewRow(overviewTable, 1, TestRunConfiguration.CHANGE_LOG.getDisplayName(), tr.getChangeLog());
-
-                addOverviewRow(overviewTable, 2, TestRunConfiguration.COMMIT_ID.getDisplayName(), tr.getCommitId().isEmpty() ? "n/a" : tr.getCommitId());
-
-                if (!tr.getPlatform().isEmpty() || !tr.getComponent().isEmpty())
-                    addOverviewRow(overviewTable, 3, TestRunConfiguration.PLATFORM.getDisplayName() + " \\ " + TestRunConfiguration.COMPONENT.getDisplayName(), tr.getPlatform() + ", " + tr.getComponent());
-
-                if (!tr.getTestType().isEmpty())
-                    addOverviewRow(overviewTable, 4, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType());
-
-                addOverviewRow(overviewTable, 5, "Executed By", summary.executedBy());
-                addOverviewRow(overviewTable, 6, "Execution Started", Display.formatDate(tr.getExecutionStartedAt()));
-                addOverviewRow(overviewTable, 7, "Execution Ended", Display.formatDate(tr.getExecutionEndedAt()));
-                addOverviewRow(overviewTable, 8, "Run Status", trDir.getMarker().getStatus().name());
+                int overviewRow = 0;
+                for (final DetailRow row : ReportOverview.rowsFor(projectName, trDir, tr, summary)) {
+                    addOverviewRow(overviewTable, overviewRow++, row.caption(), row.value());
+                }
 
 
                 setTableBorders(overviewTable);
@@ -109,7 +98,8 @@ public final class TestRunWordGenerator {
 
                 addText(doc, String.format(
                         "This run holds %d test cases, of which %d were executed. Of those, %d%% passed. The results below summarize the outcome.",
-                        summary.total(), summary.executed(), summary.passRate()), 11, false, BLACK, NO_BORDER, 12);
+                        summary.total(), summary.executed(), summary.passRate()),
+                        ReportFont.LEAD.ptRounded(), false, BLACK, NO_BORDER, 12);
 
                 // Seven tiles when the run has removed cases, six otherwise:
                 // the total counts them, so without a tile of their own the
@@ -133,24 +123,30 @@ public final class TestRunWordGenerator {
                 }
                 addStatCell(statsTable, tile, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE);
 
-                addHeading(doc, "3. Result Analysis", 20, 12);
-                addColoredCount(doc, "Passed (" + summary.passed() + ")", GREEN);
-                addColoredCount(doc, "Failed (" + summary.failed() + ")", RED);
-                addColoredCount(doc, "Blocked (" + summary.blocked() + ")", DARK_YELLOW);
-                addColoredCount(doc, "Untested (" + summary.untested() + ")", DARK_GRAY);
-                if (summary.hasRemoved()) {
-                    addColoredCount(doc, "Removed (" + summary.removed() + ")", DARK_GRAY);
+                // Only what the tester wrote - see the PDF generator.
+                final boolean analysed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
+
+                if (analysed) {
+                    addHeading(doc, "3. Result Analysis", 20, 12);
+
+                    for (final ResultAnalysis section : ResultAnalysis.values()) {
+                        final @NotNull String written = section.writtenIn(tr.getResultAnalysis());
+                        if (written.isEmpty()) continue;
+
+                        addColoredCount(doc, section.heading(summary), section.getHexColor());
+                        addText(doc, written, ReportFont.BODY.ptRounded(), false, BLACK, NO_BORDER, 8);
+                    }
                 }
 
                 // One case table per status, empty ones omitted, numbered as
                 // printed so an absent section leaves no gap in the numbering.
-                int sectionNumber = 4;
+                int sectionNumber = analysed ? 4 : 3;
                 for (final ReportSection section : ReportSection.values()) {
                     final long count = section.count(summary);
                     if (count == 0) continue;
 
                     buildCaseTable(doc, String.valueOf(sectionNumber++), section.getTitle(),
-                            section.description(String.valueOf(count)), tr, detailsMap, colorOf(section),
+                            section.description(String.valueOf(count)), tr, detailsMap, section.getHexColor(), section.textHex(),
                             section.isWithFailureDetail(), section::matches);
                 }
 
@@ -172,7 +168,10 @@ public final class TestRunWordGenerator {
         final @NotNull XWPFParagraph p = doc.createParagraph();
         p.setSpacingAfter(spacingAfterPt * 20);
         final @NotNull XWPFRun run = p.createRun();
-        run.setText(text);
+        // Several lines stay several lines - the result analysis is written in
+        // paragraphs and came out as one sentence here while the PDF showed it
+        // as typed.
+        writeLines(run, text, false);
         run.setFontSize(size);
         run.setFontFamily("Calibri");
         run.setBold(bold);
@@ -198,7 +197,7 @@ public final class TestRunWordGenerator {
         p.setSpacingAfter(afterPt * 20);
         final @NotNull XWPFRun run = p.createRun();
         run.setText(text);
-        run.setFontSize(13);
+        run.setFontSize(ReportFont.SECTION.ptRounded());
         run.setFontFamily("Calibri");
         run.setBold(true);
         run.setColor(DARK_NAVY);
@@ -215,8 +214,8 @@ public final class TestRunWordGenerator {
         shadeCell(labelCell, LIGHT_BG);
         setCellPadding(labelCell, 4, 8, 4, 8);
         setCellPadding(valueCell, 4, 8, 4, 8);
-        setCellText(labelCell, label, 10, true, DARK_NAVY);
-        setCellText(valueCell, value, 10, false, BLACK);
+        setCellText(labelCell, label, ReportFont.HEADING.ptRounded(), true, DARK_NAVY);
+        setCellText(valueCell, value, ReportFont.BODY.ptRounded(), false, BLACK);
     }
 
     private void addStatCell(final @NotNull XWPFTable table, final int col, final @NotNull String number, final @NotNull String label, final @NotNull String numberColor) {
@@ -224,7 +223,7 @@ public final class TestRunWordGenerator {
         final @NotNull XWPFTableCell cell = row.getCell(col);
         shadeCell(cell, LIGHT_BG);
         setCellPadding(cell, 8, 6, 8, 6);
-        setCellText(cell, number, 20, true, numberColor);
+        setCellText(cell, number, ReportFont.FIGURE.ptRounded(), true, numberColor);
 
         cell.getParagraphs().getFirst().setAlignment(ParagraphAlignment.CENTER);
 
@@ -233,7 +232,7 @@ public final class TestRunWordGenerator {
         lp.setSpacingBefore(80);
         final @NotNull XWPFRun lrun = lp.createRun();
         lrun.setText(label);
-        lrun.setFontSize(9);
+        lrun.setFontSize(ReportFont.SMALL.ptRounded());
         lrun.setFontFamily("Calibri");
         lrun.setBold(true);
         lrun.setColor(DARK_GRAY);
@@ -249,29 +248,15 @@ public final class TestRunWordGenerator {
 
         final @NotNull XWPFRun hrun = hp.createRun();
         hrun.setText(heading);
-        hrun.setFontSize(11);
+        hrun.setFontSize(ReportFont.LEAD.ptRounded());
         hrun.setFontFamily("Calibri");
         hrun.setBold(true);
         hrun.setColor(headingColor);
     }
 
-    /**
-     * The header color of a section's table. Per format, because Word wants a hex
-     * string where the PDF wants a DeviceRgb, and a shared section definition has
-     * no business knowing about either.
-     */
-    private @NotNull String colorOf(final @NotNull ReportSection section) {
-        return switch (section) {
-            case FAILED -> RED;
-            case PASSED -> GREEN;
-            case BLOCKED -> DARK_YELLOW;
-            case UNTESTED, REMOVED -> DARK_GRAY;
-        };
-    }
-
-    private void buildCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull String headerBg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
+    private void buildCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull String headerBg, final @NotNull String headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
         addHeading(doc, sectionNumber + ". " + sectionTitle, 20, 12);
-        addText(doc, description, 11, false, BLACK, NO_BORDER, 12);
+        addText(doc, description, ReportFont.LEAD.ptRounded(), false, BLACK, NO_BORDER, 12);
 
         int cols = withFailureDetail ? 4 : 2;
         XWPFTable table = doc.createTable(1, cols);
@@ -279,10 +264,10 @@ public final class TestRunWordGenerator {
         table.setWidthType(TableWidthType.PCT);
 
         XWPFTableRow headerRow = table.getRow(0);
-        addCaseHeader(headerRow, 0, "#", headerBg);
-        addCaseHeader(headerRow, 1, "Test Case", headerBg);
-        if (withFailureDetail) addCaseHeader(headerRow, 2, "Priority", headerBg);
-        if (withFailureDetail) addCaseHeader(headerRow, 3, "Severity", headerBg);
+        addCaseHeader(headerRow, 0, "#", headerBg, headerFg);
+        addCaseHeader(headerRow, 1, "Test Case", headerBg, headerFg);
+        if (withFailureDetail) addCaseHeader(headerRow, 2, "Priority", headerBg, headerFg);
+        if (withFailureDetail) addCaseHeader(headerRow, 3, "Severity", headerBg, headerFg);
 
         int idx = 1;
         boolean alt = true;
@@ -296,7 +281,7 @@ public final class TestRunWordGenerator {
             XWPFTableCell numCell = row.getCell(0);
             shadeCell(numCell, rowBg);
             setCellPadding(numCell, 4, 6, 4, 6);
-            setCellText(numCell, String.valueOf(idx), 9, false, DARK_GRAY);
+            setCellText(numCell, String.valueOf(idx), ReportFont.BODY.ptRounded(), false, DARK_GRAY);
             numCell.getParagraphs().getFirst().setAlignment(ParagraphAlignment.CENTER);
 
             XWPFTableCell tcCell = row.getCell(1);
@@ -304,7 +289,7 @@ public final class TestRunWordGenerator {
             setCellPadding(tcCell, 4, 6, 4, 6);
             final @NotNull String caseName = ReportedCase.of(detailsMap, item.getId()).getDescription();
             final @NotNull String tcName = caseName.isEmpty() ? "—" : caseName;
-            setCellText(tcCell, tcName, 9, false, BLACK);
+            setCellText(tcCell, tcName, ReportFont.BODY.ptRounded(), false, BLACK);
 
             if (withFailureDetail) {
                 String actualResult = item.getActualResult();
@@ -312,7 +297,7 @@ public final class TestRunWordGenerator {
                 XWPFParagraph ap = tcCell.addParagraph();
                 XWPFRun arun = ap.createRun();
                 arun.setText("Actual result: " + actualResult);
-                arun.setFontSize(8);
+                arun.setFontSize(ReportFont.SMALL.ptRounded());
                 arun.setFontFamily("Calibri");
                 arun.setColor(DARK_GRAY);
             }
@@ -323,7 +308,7 @@ public final class TestRunWordGenerator {
                 setCellPadding(priCell, 4, 6, 4, 6);
                 BugPriority pri = item.getBugPriority();
                 String priColor = PRIORITY_COLOR.getOrDefault(pri, DARK_GRAY);
-                setCellText(priCell, pri.getName(), 9, true, priColor);
+                setCellText(priCell, pri.getName(), ReportFont.BODY.ptRounded(), true, priColor);
             }
 
             if (withFailureDetail) {
@@ -334,7 +319,7 @@ public final class TestRunWordGenerator {
                 String sevColor = SEVERITY_COLOR.getOrDefault(sev, DARK_GRAY);
                 String sevText = sev.getName();
                 if (sevText.isEmpty()) sevText = "—";
-                setCellText(sevCell, sevText, 9, true, sevColor);
+                setCellText(sevCell, sevText, ReportFont.BODY.ptRounded(), true, sevColor);
             }
 
             idx++;
@@ -343,21 +328,84 @@ public final class TestRunWordGenerator {
         // Must run after the data rows are created — setTableBorders iterates existing rows,
         // so calling it right after createTable left every data row borderless.
         setTableBorders(table);
-        setTableWidths(table, widthsFor(cols));
+        autoFitToContent(table);
     }
 
-    private void addCaseHeader(final @NotNull XWPFTableRow headerRow, final int col, final @NotNull String text, final @NotNull String bgColor) {
+    /**
+     * Lets Word size the columns from what is in them.
+     * <p>
+     * The widths used to be a fixed share of the page, which meant guessing how
+     * much room "Enhancement" needs: too little and it wrapped, too much and the
+     * description column gave up space for nothing on every row of every report.
+     * The PDF and the HTML report both size these tables from their content now,
+     * and this is Word's way of doing it - the layout is marked autofit and each
+     * cell asks for no particular width, so Word measures the text itself.
+     * <p>
+     * The table still fills the page: its own width stays a full percentage, so
+     * what autofit decides is the split between the columns, not how much of the
+     * page they use.
+     */
+    private void autoFitToContent(final @NotNull XWPFTable table) {
+        final @NotNull CTTblPr properties = table.getCTTbl().getTblPr();
+        final @NotNull CTTblLayoutType layout =
+                properties.isSetTblLayout() ? properties.getTblLayout() : properties.addNewTblLayout();
+        layout.setType(STTblLayoutType.AUTOFIT);
+
+        for (final XWPFTableRow row : table.getRows()) {
+            for (final XWPFTableCell cell : row.getTableCells()) {
+                final @NotNull CTTcPr cellProperties = getTcPr(cell);
+                // Reused when the cell already has one: adding a second <w:tcW>
+                // is invalid XML, and Word answers invalid XML by refusing to
+                // open the file rather than by ignoring the extra element.
+                (cellProperties.isSetTcW() ? cellProperties.getTcW() : cellProperties.addNewTcW())
+                        .setType(STTblWidth.AUTO);
+            }
+        }
+    }
+
+    private void addCaseHeader(final @NotNull XWPFTableRow headerRow, final int col, final @NotNull String text, final @NotNull String bgColor, final @NotNull String textColor) {
         final @NotNull XWPFTableCell cell = headerRow.getCell(col);
         shadeCell(cell, bgColor);
         setCellPadding(cell, 5, 6, 5, 6);
-        setCellText(cell, text, 9, true, WHITE);
+        setCellText(cell, text, ReportFont.HEADING.ptRounded(), true, textColor);
+    }
+
+    /**
+     * Writes text that may be several lines, as several lines.
+     * <p>
+     * Word has no line break inside a run unless one is asked for: the whole
+     * string went in as one piece, so a change log covering three stories came
+     * out as one sentence with the breaks silently dropped. The PDF had always
+     * shown them.
+     *
+     * @param replaceFirst overwrite the run's existing first piece rather than
+     *                     adding to it, for a cell being filled a second time
+     */
+    private void writeLines(final @NotNull XWPFRun run, final @NotNull String text, final boolean replaceFirst) {
+        // lines() splits on every line terminator without this file having to
+        // name one, and answers nothing at all for empty text - which still
+        // needs a piece written, or the cell keeps whatever was there before.
+        final @NotNull List<String> lines = text.lines().toList();
+
+        if (lines.isEmpty()) {
+            run.setText("", 0);
+            return;
+        }
+
+        if (replaceFirst) run.setText(lines.getFirst(), 0);
+        else run.setText(lines.getFirst());
+
+        for (final String line : lines.subList(1, lines.size())) {
+            run.addBreak();
+            run.setText(line);
+        }
     }
 
     private void setCellText(final @NotNull XWPFTableCell cell, final @NotNull String text, final int size, final boolean bold, final @NotNull String color) {
         final @NotNull XWPFParagraph p = cell.getParagraphs().getFirst();
         if (p.getRuns().isEmpty()) {
             final @NotNull XWPFRun run = p.createRun();
-            run.setText(text);
+            writeLines(run, text, false);
             run.setFontSize(size);
             run.setFontFamily("Calibri");
             run.setBold(bold);
@@ -365,7 +413,7 @@ public final class TestRunWordGenerator {
 
         } else {
             final @NotNull XWPFRun run = p.getRuns().getFirst();
-            run.setText(text, 0);
+            writeLines(run, text, true);
             run.setFontSize(size);
             run.setFontFamily("Calibri");
             run.setBold(bold);
@@ -448,11 +496,27 @@ public final class TestRunWordGenerator {
         final @NotNull XWPFFooter footer = doc.createFooter(HeaderFooterType.DEFAULT);
         final @NotNull XWPFParagraph p = footer.createParagraph();
         p.setAlignment(ParagraphAlignment.CENTER);
-        final @NotNull XWPFRun run = p.createRun();
-        run.setText(date + "  |  Generated automatically by Testin IntelliJ plugin.");
-        run.setFontSize(8);
+        footerRun(p.createRun(), date + "  |  Generated automatically by ", DARK_GRAY);
+
+        // The plugin's name is a link here too. The PDF and the HTML report both
+        // linked it and this one printed it as plain text, so the one format a
+        // reader is most likely to have open was the one they could not click.
+        final @NotNull XWPFHyperlinkRun link = p.createHyperlinkRun(ReportText.PLUGIN_URL);
+        footerRun(link, "Testin", LINK_BLUE);
+        link.setUnderline(UnderlinePatterns.SINGLE);
+
+        footerRun(p.createRun(), " IntelliJ plugin.", DARK_GRAY);
+    }
+
+    /**
+     * One piece of the footer line, so the three of them cannot drift in size or
+     * face while only their color differs.
+     */
+    private void footerRun(final @NotNull XWPFRun run, final @NotNull String text, final @NotNull String color) {
+        run.setText(text);
+        run.setFontSize(ReportFont.CAPTION.ptRounded());
         run.setFontFamily("Calibri");
-        run.setColor(DARK_GRAY);
+        run.setColor(color);
     }
 
     private void applyPageMargins(final @NotNull XWPFDocument doc) {
@@ -460,16 +524,18 @@ public final class TestRunWordGenerator {
         final @NotNull CTSectPr sectPr = body.isSetSectPr() ? body.getSectPr() : body.addNewSectPr();
         final @NotNull CTPageMar pgMar = sectPr.isSetPgMar() ? sectPr.getPgMar() : sectPr.addNewPgMar();
 
-        // Standard 1-inch margins on all four sides. The old code only ever set
-        // the left margin, copied from a right margin that was never initialized.
-        final long marginTwips = 1440L;
-        pgMar.setLeft(marginTwips);
-        pgMar.setRight(marginTwips);
-        pgMar.setTop(marginTwips);
-        pgMar.setBottom(marginTwips);
+        // Half an inch at the sides, an inch top and bottom. A report is a wide
+        // table under a heading, and an inch of paper down each edge was room the
+        // test case column wanted. Left and right are the same number on purpose:
+        // they were both an inch before, and before that only the left was set at
+        // all, from a right margin nothing had initialized.
+        final long sideTwips = 720L;
+        final long endTwips = 1440L;
+
+        pgMar.setLeft(sideTwips);
+        pgMar.setRight(sideTwips);
+        pgMar.setTop(endTwips);
+        pgMar.setBottom(endTwips);
     }
 
-    private int @NotNull [] widthsFor(final int cols) {
-        return COLUMN_WIDTHS.getOrDefault(cols, new int[]{3, 77, 10, 10});
-    }
 }

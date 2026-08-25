@@ -46,7 +46,8 @@ public final class TestRunExcelGenerator {
 
             ws.value(0, 0, "Test Run Report:");
             ws.style(0, 0).bold().fontSize(14).set();
-            ws.value(0, 1, tr.getChangeLog().replace(".json", ""));
+            // The run's own name, not its change log - see the HTML generator.
+            ws.value(0, 1, trDir.getName());
 
             ws.value(1, 0, "Platform:");
             ws.style(1, 0).bold().set();
