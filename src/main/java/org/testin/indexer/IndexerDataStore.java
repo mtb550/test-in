@@ -134,18 +134,48 @@ final class IndexerDataStore {
 
     void putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
         testCaseStore.put(testSetPath, tc);
+        markTestSetModified(testSetPath);
     }
 
     void putImportedTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
         testCaseStore.putImported(testSetPath, tc);
+        markTestSetModified(testSetPath);
     }
 
     void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
         testCaseStore.remove(testSetPath, tcId);
+        markTestSetModified(testSetPath);
     }
 
     void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
         testCaseStore.updateSequence(testSetPath, orderedList, moved);
+        markTestSetModified(testSetPath);
+    }
+
+    /**
+     * A set whose contents changed was modified, and its marker says so.
+     * <p>
+     * The four methods above are the four ways a set's contents change - a case
+     * saved, one imported, one removed, the order rearranged - and each says so
+     * here rather than each writing the marker itself. The test case already
+     * carries its own audit, stamped where every save arrives; this is the other
+     * half of the same fact, and without it a set edited all week reported the
+     * day it was renamed.
+     * <p>
+     * The set only. A package and a test project are not modified because
+     * something below them was: a date meaning "something, somewhere underneath"
+     * cannot be read for anything, and it would write a marker per level on every
+     * keystroke that saves.
+     * <p>
+     * Empty when the path is not an indexed test set. That is not a failure - a
+     * case can be written into a set the scan has not reached yet - and it costs
+     * only the marker not being touched, so it is passed over rather than raised.
+     */
+    private void markTestSetModified(final @NotNull Path testSetPath) {
+        Optional.ofNullable(testSetsDirByPath.get(testSetPath.toString())).ifPresent(ts -> {
+            ts.getMarker().touch(testerName());
+            writeMarker(testSetPath, DirectoryType.TS.getMarker(), ts.getMarker());
+        });
     }
 
     void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {

@@ -131,9 +131,21 @@ final class TestCaseSequenceStore {
         final @NotNull Set<UUID> movedIds = new HashSet<>();
         for (final TestCaseDto testCase : moved) movedIds.add(testCase.getId());
 
+        final @NotNull String tester = Services.getInstance(project, AppSettingsState.class).testerName;
+
         for (final TestCaseDto testCase : orderedList) {
             ids.add(testCase.getId());
             newIds.add(testCase.getId());
+
+            // First sight of a case is its creation here too, not only in put.
+            // Both methods register cases in the same map and put decides
+            // creation-or-update by asking that map - so whichever of them sees a
+            // case first has to be the one that stamps it. This one saw a newly
+            // created case first, registered it unstamped, and put then found it
+            // already known and recorded an update: the case was born with a
+            // modifier and no creator, which is what the details panel showed.
+            if (!testCasesById.containsKey(testCase.getId())) testCase.stampCreated(tester);
+
             testCasesById.put(testCase.getId(), testCase);
 
             if (!movedIds.contains(testCase.getId())) continue;
