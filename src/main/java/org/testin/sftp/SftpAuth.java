@@ -5,6 +5,8 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * How this machine proves who it is to the server (#94).
  * <p>
@@ -40,11 +42,11 @@ public interface SftpAuth {
      * value.
      */
     static @NotNull SftpAuth withKey(final @NotNull String keyFile, final @NotNull String passphrase) {
-        return (jsch, session) -> jsch.addIdentity(keyFile, passphrase);
+        return (jsch, session) -> jsch.addIdentity(keyFile, passphrase.getBytes(StandardCharsets.UTF_8));
     }
 
     static @NotNull SftpAuth withPassword(final @NotNull String password) {
-        return (jsch, session) -> session.setPassword(password);
+        return (jsch, session) -> session.setPassword(password.getBytes(StandardCharsets.UTF_8));
     }
 
     /**

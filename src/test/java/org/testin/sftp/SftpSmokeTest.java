@@ -52,7 +52,7 @@ public class SftpSmokeTest {
             jsch.setKnownHosts(new ByteArrayInputStream(server.knownHostsLine().getBytes(StandardCharsets.UTF_8)));
 
             final Session session = jsch.getSession(SftpTestServer.USER, "127.0.0.1", server.port());
-            session.setPassword(SftpTestServer.PASSWORD);
+            session.setPassword(SftpTestServer.PASSWORD.getBytes(StandardCharsets.UTF_8));
             session.connect(10_000);
 
             return session;
@@ -121,7 +121,7 @@ public class SftpSmokeTest {
 
         try {
             final Session session = jsch.getSession(SftpTestServer.USER, "127.0.0.1", server.port());
-            session.setPassword(SftpTestServer.PASSWORD);
+            session.setPassword(SftpTestServer.PASSWORD.getBytes(StandardCharsets.UTF_8));
             session.connect(10_000);
             session.disconnect();
 
@@ -142,7 +142,7 @@ public class SftpSmokeTest {
         try {
             final JSch jsch = new JSch();
             final Session session = jsch.getSession(SftpTestServer.USER, "127.0.0.1", server.port());
-            session.setPassword(SftpTestServer.PASSWORD);
+            session.setPassword(SftpTestServer.PASSWORD.getBytes(StandardCharsets.UTF_8));
 
             final Properties off = new Properties();
             off.put("StrictHostKeyChecking", "no");
