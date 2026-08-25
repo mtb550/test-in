@@ -13,8 +13,6 @@ import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
@@ -97,7 +95,9 @@ public class RemoveAction extends AbstractProjectTreeAction {
 
         for (final DirectoryDto pkg : nodesToRemove) {
 
-            if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)
+            // A node with an editor open has that editor closed with it. The
+            // pair tested for here is exactly the pair that declares one.
+            if (pkg.isOpenableInEditor())
                 Services.getInstance(p, EditorUtil.class).close(p, pkg.getName());
 
             pkg.getType().getRemoveHandler().remove(p, pkg, onRemoved);

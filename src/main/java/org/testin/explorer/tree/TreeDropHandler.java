@@ -9,8 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 
@@ -38,17 +36,16 @@ public class TreeDropHandler implements FileDropHandler {
             ApplicationManager.getApplication().invokeLater(() -> {
                 for (final DirectoryDto node : payload.nodes()) {
 
-                    if (node instanceof TestSetDirectoryDto ts) {
-                        Logger.info("dragged Test set: " + ts.getName());
+                    // Asked of the node rather than worked out from its class.
+                    // The two kinds that were tested for here are exactly the two
+                    // that declare an editor, and both branches did the same
+                    // thing - so a third openable kind would have had to be added
+                    // here as well as to the declaration, and nothing would have
+                    // said so when it was not.
+                    if (!node.isOpenableInEditor()) continue;
 
-                        Services.getInstance(p, EditorUtil.class).open(p, ts);
-                        continue;
-                    }
-
-                    if (node instanceof TestRunDirectoryDto tr) {
-                        Logger.info("dragged Test Run: " + tr.getName());
-                        Services.getInstance(p, EditorUtil.class).open(p, tr);
-                    }
+                    Logger.info("dragged " + node.getType().getDisplayedName() + ": " + node.getName());
+                    Services.getInstance(p, EditorUtil.class).open(p, node);
                 }
             });
             return true;
