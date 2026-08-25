@@ -2,13 +2,11 @@ package org.testin.indexer;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -107,12 +105,12 @@ final class TestCaseSequenceStore {
         Optional.ofNullable(testSetCaseIds.get(testSetPath.toString()))
                 .ifPresent(ids -> ids.remove(testCaseId));
 
-        final @NotNull Path filePath = testSetPath.resolve(testCaseId + ".json");
-        try {
-            Files.deleteIfExists(filePath);
-        } catch (final Exception ex) {
-            Logger.error("Failed to delete test case file: " + filePath);
-        }
+        // Through the writer like the write paths beside it, so OwnWrites
+        // claims the delete and our own removal is not read as an external
+        // change worth a rescan (#117). stopAt is the set itself: a set
+        // outlives its last case, so nothing above the file is pruned.
+        Services.getInstance(project, FilesUtil.class)
+                .delete(project, testSetPath.resolve(testCaseId + ".json"), testSetPath);
     }
 
     /**
