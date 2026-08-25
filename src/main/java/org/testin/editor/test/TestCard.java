@@ -37,7 +37,7 @@ public class TestCard extends BaseCard {
                 .forEach(attr -> attr.applyToUI(tc, badges, details, p));
 
         final @NotNull RunStatus runStatus = tc.getTempStatus();
-        this.runSlot = CardHoverAction.runSlot(tc);
+        this.runSlot = CardHoverAction.runSlot(p, tc);
 
         if (runStatus.hasBadge()) badges.add(Shared.createRunStatusBadge(runStatus.getBadge()));
 

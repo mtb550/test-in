@@ -40,13 +40,13 @@ public class RunTestCaseAction extends AbstractProjectAction {
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @NotNull List<TestCaseDto> selected = list.getSelectedValuesList();
 
-        CardHoverAction.runSlot(selected).execute(p, selected);
+        CardHoverAction.runSlot(p, selected).execute(p, selected);
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
         final @NotNull List<TestCaseDto> selected = list.getSelectedValuesList();
-        final @NotNull CardHoverAction offered = CardHoverAction.runSlot(selected);
+        final @NotNull CardHoverAction offered = CardHoverAction.runSlot(p, selected);
 
         e.getPresentation().setEnabled(!list.isEmpty() && !selected.isEmpty());
         e.getPresentation().setText(offered.getTooltip());

@@ -6,7 +6,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.NavigateToCodeAction;
 import org.testin.notifications.Notifier;
@@ -115,8 +114,8 @@ public enum CardHoverAction {
      * Which of the two a case offers where a single run icon used to sit: the
      * stop while it is running, the run every other time.
      */
-    public static @NotNull CardHoverAction runSlot(final @NotNull TestCaseDto tc) {
-        return runSlot(List.of(tc));
+    public static @NotNull CardHoverAction runSlot(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        return runSlot(p, List.of(tc));
     }
 
     /**
@@ -129,9 +128,15 @@ public enum CardHoverAction {
      * pointer is over, the click, the context menu entry, and F5. The card and
      * the key disagreed for exactly as long as they answered this separately
      * (#66, finding 18).
+     * <p>
+     * Asked of the runner, not of the DTO: the DTO's temp status dies with its
+     * instance on every rescan, and a card that then offered Run on a running
+     * case would start it twice (#116).
      */
-    public static @NotNull CardHoverAction runSlot(final @NotNull List<TestCaseDto> cases) {
-        return cases.stream().anyMatch(tc -> tc.getTempStatus() == RunStatus.RUNNING)
+    public static @NotNull CardHoverAction runSlot(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
+        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
+
+        return cases.stream().anyMatch(tc -> execution.isRunning(tc.getId()))
                 ? STOP_TEST_CASE
                 : RUN_TEST_CASE;
     }

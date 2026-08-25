@@ -45,6 +45,13 @@ import java.util.stream.Stream;
  * <b>launch that has not happened yet</b> is dropped: a run hops to a pooled
  * thread and back to the EDT before its process exists, and a tester who presses
  * Stop in that second means it.
+ * <p>
+ * <b>Everything here is keyed by the case's id, never by the DTO.</b> An indexer
+ * rescan replaces every DTO instance mid-run, so a stop that keyed by instance
+ * could no longer reach anything - the run kept going and nothing could kill it
+ * (#116). The id survives the reload; {@link #isRunning} is the one answer to
+ * "is this case running" for the same reason, because the fresh instances know
+ * nothing.
  */
 @Service(Service.Level.PROJECT)
 public final class TestNGExecution {
@@ -62,14 +69,14 @@ public final class TestNGExecution {
      * one out, and the launch finds it gone when its turn comes. An entry lives
      * for the two thread hops between the click and the process.
      */
-    private final @NotNull Set<TestCaseDto> pending = ConcurrentHashMap.newKeySet();
+    private final @NotNull Set<UUID> pending = ConcurrentHashMap.newKeySet();
 
     /**
      * Which run each case is running under, by the configuration's name. This is
      * what lets a stop reach one run without touching another, and what tells it
      * which other cases go down with the process it kills.
      */
-    private final @NotNull Map<TestCaseDto, String> configOf = new ConcurrentHashMap<>();
+    private final @NotNull Map<UUID, String> configOf = new ConcurrentHashMap<>();
 
     /**
      * Cases the tester stopped, so a report arriving afterward is not read as a
@@ -96,10 +103,10 @@ public final class TestNGExecution {
      * clicked.
      */
     public void starting(final @NotNull TestCaseDto tc) {
-        pending.add(tc);
+        pending.add(tc.getId());
         stopped.remove(tc.getId());
 
-        TestCaseExecutionListener.broadcast(p, key(tc), RunStatus.RUNNING, "");
+        TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.RUNNING, "");
     }
 
     /**
@@ -111,14 +118,14 @@ public final class TestNGExecution {
      * then killed.
      */
     public @NotNull List<TestCaseDto> stillWanted(final @NotNull List<TestCaseDto> cases) {
-        return cases.stream().filter(pending::remove).toList();
+        return cases.stream().filter(tc -> pending.remove(tc.getId())).toList();
     }
 
     /**
      * Starts the configuration, and remembers which cases are running under it.
      */
     public void launch(final @NotNull List<TestCaseDto> cases, final @NotNull RunnerAndConfigurationSettings settings) {
-        cases.forEach(tc -> configOf.put(tc, settings.getName()));
+        cases.forEach(tc -> configOf.put(tc.getId(), settings.getName()));
         launchedNames.add(settings.getName());
 
         Logger.info("Starting " + settings.getName() + " with " + cases.size() + " test case(s)");
@@ -131,10 +138,10 @@ public final class TestNGExecution {
      * the tester why in their own words.
      */
     public void notStarting(final @NotNull TestCaseDto tc) {
-        pending.remove(tc);
-        configOf.remove(tc);
+        pending.remove(tc.getId());
+        configOf.remove(tc.getId());
 
-        TestCaseExecutionListener.broadcast(p, key(tc), RunStatus.IDLE, "");
+        TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.IDLE, "");
     }
 
     /**
@@ -165,6 +172,30 @@ public final class TestNGExecution {
     }
 
     /**
+     * Whether a stop has something to reach for this case: a launch on its way
+     * or a process it is running under.
+     * <p>
+     * The one owner of that question. It used to be answered from the DTO's own
+     * temp status, in three places - the stop's filter, the run/stop slot and
+     * the double-run guard - and all three went blind together the moment a
+     * rescan handed the editors fresh instances (#116).
+     */
+    public boolean isRunning(final @NotNull UUID id) {
+        return pending.contains(id) || configOf.containsKey(id);
+    }
+
+    /**
+     * A report landed with this case's result, so its entry is spent. This is
+     * what keeps {@link #isRunning} honest - and what keeps a casemate that
+     * finished early out of the blast radius when the run they shared is
+     * stopped later.
+     */
+    void finished(final @NotNull UUID id) {
+        pending.remove(id);
+        configOf.remove(id);
+    }
+
+    /**
      * Kills the runs these cases belong to and drops their launches that have not
      * started yet.
      * <p>
@@ -175,8 +206,9 @@ public final class TestNGExecution {
      *         they share a run - the count the one notification reports
      */
     public int stop(final @NotNull List<TestCaseDto> cases) {
-        final @NotNull List<TestCaseDto> asked = cases.stream()
-                .filter(tc -> tc.getTempStatus() == RunStatus.RUNNING)
+        final @NotNull List<UUID> asked = cases.stream()
+                .map(TestCaseDto::getId)
+                .filter(this::isRunning)
                 .toList();
 
         if (asked.isEmpty()) return 0;
@@ -185,21 +217,23 @@ public final class TestNGExecution {
         // case cannot be stopped without stopping the ones beside it. Leaving
         // those showing Running would be the older bug in a smaller place.
         final @NotNull Set<String> runs = asked.stream()
-                .map(tc -> configOf.getOrDefault(tc, ""))
+                .map(id -> configOf.getOrDefault(id, ""))
                 .filter(name -> !name.isEmpty())
                 .collect(Collectors.toSet());
 
-        final @NotNull List<TestCaseDto> stopping = Stream.concat(
+        // The casemates come straight from the map: an entry there is a case
+        // whose result is not in, because a report retires its entry the moment
+        // it lands - so nothing here can sweep up a verdict already given.
+        final @NotNull List<UUID> stopping = Stream.concat(
                         asked.stream(),
                         configOf.entrySet().stream().filter(e -> runs.contains(e.getValue())).map(Map.Entry::getKey))
                 .distinct()
-                .filter(tc -> tc.getTempStatus() == RunStatus.RUNNING)
                 .toList();
 
-        stopping.forEach(tc -> {
-            pending.remove(tc);
-            configOf.remove(tc);
-            stopped.add(tc.getId());
+        stopping.forEach(id -> {
+            pending.remove(id);
+            configOf.remove(id);
+            stopped.add(id);
         });
 
         final @NotNull List<RunContentDescriptor> theirs = running(runs);
@@ -207,7 +241,7 @@ public final class TestNGExecution {
                 + " run(s): " + theirs.size() + " had reached a process");
 
         theirs.forEach(this::kill);
-        stopping.forEach(tc -> TestCaseExecutionListener.broadcast(p, key(tc), RunStatus.IDLE, ""));
+        stopping.forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, ""));
 
         return stopping.size();
     }
@@ -264,7 +298,7 @@ public final class TestNGExecution {
      * is named by the case's id, which is what lets the first report identify the
      * case outright.
      */
-    private static @NotNull String key(final @NotNull TestCaseDto tc) {
-        return tc.getId().toString().toLowerCase();
+    private static @NotNull String key(final @NotNull UUID id) {
+        return id.toString().toLowerCase();
     }
 }

@@ -81,6 +81,12 @@ public final class TestCaseExecutionSubscriber {
             Logger.debug("  reporting on '" + tc.getDescription() + "', tempStatus='" + reportedStatus + "'");
             tc.setTempStatus(reportedStatus);
             tc.setTempError(error);
+
+            // The result is in, so the runner lets go of the case: what keeps
+            // its answer to "is this running" true, and keeps a case that
+            // finished early out of a later stop of the run it shared (#116).
+            if (reportedStatus != RunStatus.RUNNING)
+                Services.getInstance(p, TestNGExecution.class).finished(tc.getId());
         });
 
         // The first report TestNG makes under a name of its own: it is about the
