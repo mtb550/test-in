@@ -178,11 +178,6 @@ public final class TestRunHtmlGenerator {
     }
 
     /**
-     * A numbered section listing the cases the filter accepts. Failed and Pending
-     * differ only in the number, the heading, the blurb and that filter - the
-     * table itself is one shape, so it is written once.
-     */
-    /**
      * One section's cases.
      * <p>
      * Priority and severity belong to the failures and nowhere else, which is
@@ -252,6 +247,11 @@ public final class TestRunHtmlGenerator {
      * meaning: what the report actually says was buried under a hundred lines of
      * declarations, and a reader looking for the run's data had to scroll past
      * all of them to reach the first thing that is printed.
+     * <p>
+     * Built with a builder rather than by adding strings together, which is what
+     * the inspection would rather see. It is the same shape the rest of this
+     * class uses to put a page together, and a hundred declarations joined by
+     * plus signs would read as one expression instead of a list of rules.
      */
     private @NotNull String styles() {
         return new StringBuilder("<style>")

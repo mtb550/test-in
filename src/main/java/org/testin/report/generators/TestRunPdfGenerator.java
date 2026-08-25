@@ -250,12 +250,6 @@ public final class TestRunPdfGenerator {
 
 
     /**
-     * The header color of a section's table. Kept here rather than on
-     * {@link ReportSection} because each format has its own color type — iText
-     * wants a DeviceRgb, Word a hex string — and a shared section has no business
-     * knowing about either.
-     */
-    /**
      * A hex color as iText wants it.
      * <p>
      * The result-analysis sections declare their color once, as the hex string
