@@ -1,17 +1,21 @@
 package org.testin.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
+import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunItems;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.List;
 
 @Setter
@@ -56,6 +60,24 @@ public class TestRunDto {
     @NotNull
     @Builder.Default
     private String testType = "";
+
+    /**
+     * What the tester wrote about each verdict after the run finished, under the
+     * verdict it is about (#3. Result Analysis in the reports).
+     * <p>
+     * On the run rather than beside it, because it is a fact about this run and
+     * travels with it - the reports read it, a colleague pulling the run reads
+     * it, and it is committed with the results it explains.
+     * <p>
+     * A map keyed by the section rather than four fields: the sections, their
+     * headings and their counts all belong to {@link ResultAnalysis}, so a fifth
+     * one would be written, shown and reported without this class changing. Left
+     * out of the file entirely when nothing was written.
+     */
+    @NotNull
+    @Builder.Default
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Map<ResultAnalysis, String> resultAnalysis = new EnumMap<>(ResultAnalysis.class);
 
     @NotNull
     @Builder.Default

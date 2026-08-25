@@ -42,6 +42,9 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.TestRunSummary;
+import org.testin.testrun.ResultAnalysisDialog;
+import org.testin.editor.toolbar.components.ResultAnalysisBtn;
 import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
@@ -368,6 +371,25 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             center.set(view.scrollPane());
             SwingUtilities.invokeLater(view.table()::requestFocusInWindow);
         });
+    }
+
+    /**
+     * What the run means, in the tester's words, kept on the run itself.
+     * <p>
+     * The counts handed to the dialog are read from the results here rather than
+     * stored with the text: they are derived, and a stored copy would be wrong
+     * the moment a verdict changed.
+     */
+    @Override
+    public void onToolBarResultAnalysisClicked() {
+        run().ifPresent(runData -> new ResultAnalysisDialog(p,
+                TestRunSummary.of(runData.getResults()),
+                runData.getResultAnalysis(),
+                analysis -> {
+                    runData.setResultAnalysis(analysis);
+                    Services.getInstance(p, ProjectIndexer.class).putTestRun(parent.getPath(), runData);
+                    Services.getInstance(p, Notifier.class).softShow(p, "Saved");
+                }).show());
     }
 
     @Override
@@ -819,6 +841,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         startBtn.setVisible(!executing);
         stopBtn.setVisible(executing);
         startBtn.updateEnabledState();
+        toolBar.getToolbarItem(ResultAnalysisBtn.class).updateEnabledState();
 
         toolBar.revalidate();
         toolBar.repaint();

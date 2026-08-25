@@ -31,6 +31,13 @@ public interface Toolbar {
     void onToolBarRefreshButtonClicked();
 
     /**
+     * The tester is writing what the run means. Default empty because only a run
+     * has verdicts to analyse.
+     */
+    default void onToolBarResultAnalysisClicked() {
+    }
+
+    /**
      * Which project this editor is in, and which node it was opened on.
      * <p>
      * Asked rather than acted on, the way {@link #getAvailableModules()} is: the

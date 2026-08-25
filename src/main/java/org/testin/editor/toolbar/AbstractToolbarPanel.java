@@ -104,6 +104,18 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.NONE;
 
+        // What this toolbar alone puts on the right, before the button every
+        // toolbar has. Details stays last and stays here: both toolbars want it
+        // in the same place, and an override they would each fill in identically
+        // is a place for them to drift apart.
+        for (final ToolbarItem item : getTrailingComponents()) {
+            if (item instanceof JComponent component) {
+                toolbarItems.put(item.getClass(), item);
+                add(component, gbc);
+                gbc.gridx++;
+            }
+        }
+
         final @NotNull NodeDetailsBtn details = new NodeDetailsBtn(callbacks);
         add(details, gbc);
         toolbarItems.put(NodeDetailsBtn.class, details);
@@ -139,6 +151,14 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     }
 
     protected abstract @NotNull List<ToolbarItem> getCustomComponents();
+
+    /**
+     * What this toolbar puts between the search field and the Details button.
+     * Empty for a toolbar with nothing of its own to put there.
+     */
+    protected @NotNull List<ToolbarItem> getTrailingComponents() {
+        return List.of();
+    }
 
     @Override
     public void dispose() {
