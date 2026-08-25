@@ -76,16 +76,6 @@ public final class NameSanitizer {
                 .toString();
     }
 
-    public static @NotNull String projectNameFromUrl(final @NotNull String gitUrl) {
-        String name = gitUrl;
-        if (name.endsWith("/")) name = name.substring(0, name.length() - 1);
-        if (name.endsWith(".git")) name = name.substring(0, name.length() - 4);
-        final int splitIndex = Math.max(name.lastIndexOf('/'), name.lastIndexOf(':'));
-        return splitIndex >= 0 && splitIndex < name.length() - 1
-                ? name.substring(splitIndex + 1)
-                : "ImportedTestProject";
-    }
-
     private static boolean isSpecial(final char value) {
         return "!\"#$%&'()*+,./:;<=>?@[\\]^_`{|}~".indexOf(value) >= 0;
     }

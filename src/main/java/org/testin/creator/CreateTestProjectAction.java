@@ -9,11 +9,12 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.creator.dialogs.CreateProjectDialog;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.git.GitRefs;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.CreateTestProjectCloneAction;
 import org.testin.testproject.CreateTestProjectNewAction;
-import org.testin.util.NameSanitizer;
 import org.testin.util.OptionalPlugin;
 
 public class CreateTestProjectAction extends AbstractProjectAction {
@@ -44,7 +45,20 @@ public class CreateTestProjectAction extends AbstractProjectAction {
 
             if (!OptionalPlugin.GIT.isAvailableOrWarn(p)) return;
 
-            final @NotNull String projectName = NameSanitizer.projectNameFromUrl(name);
+            // The folder is named by testin.yml, never by the URL. A repository
+            // called nafath-test-case is a place to clone from; what the project
+            // is called is a decision, and it is written down once in the file
+            // that travels with the repository - so the tree, the reports and
+            // the server path all read the same name.
+            final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
+
+            if (projectName.isEmpty()) {
+                Services.getInstance(p, Notifier.class).warn(p, "No Test Project Named",
+                        "testin.yml must say which test project this repository is about before one can be "
+                                + "cloned. Set testinProject in it, or pick a project with Select Test Project.");
+                return;
+            }
+
             new CreateTestProjectCloneAction(p, name, projectName, pp).execute();
 
         }).show();

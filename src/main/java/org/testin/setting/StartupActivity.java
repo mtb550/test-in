@@ -78,9 +78,26 @@ public final class StartupActivity implements ProjectActivity {
         // project this repository exercises, and an index that started without it
         // would have to be thrown away and run again (#6).
         final @NotNull TestinProjectConfig config = Services.getInstance(p, TestinConfigService.class).get();
-        Logger.info(config.isBound()
-                ? "Bound to test project '" + config.projectName() + "'"
-                : "No test project bound to " + p.getName());
+
+        if (config.isBound()) {
+            Logger.info("Bound to test project '" + config.projectName() + "'");
+        } else {
+            // Said rather than only logged. The name is not optional: it is what
+            // the tree shows, what the reports are headed with, what a cloned
+            // folder is called and what the server path ends in - so a
+            // repository that has not been given one cannot do any of it, and
+            // the tester should hear that when the project opens rather than
+            // discover it at the first report.
+            Logger.warn("No test project named in testin.yml for " + p.getName());
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (p.isDisposed()) return;
+
+                Services.getInstance(p, Notifier.class).warn(p, "No Test Project Named",
+                        "testin.yml does not say which test project this repository is about. "
+                                + "Pick one in the Testin tool window, or set testinProject in the file.");
+            });
+        }
 
         if (TestinRoot.isConfigured(testinPath)) {
             Services.getInstance(p, ProjectIndexer.class).indexWithProgress();
