@@ -158,7 +158,7 @@ public class FilterPopupBtn extends AbstractButton implements ToolbarItem {
         if (callbacks instanceof RunEditor) {
             final @NotNull DefaultActionGroup filterStatusMenu = new DefaultActionGroup("Status", true);
             Arrays.stream(TestStatus.values()).forEach(s ->
-                    filterStatusMenu.add(new ToggleFilterAction<>(s.name(), null,
+                    filterStatusMenu.add(new ToggleFilterAction<>(s.getLabel(), null,
                             s, selectedStatus, FilterMembership.plain(), onChanged)));
             filterResetBtn.add(filterStatusMenu);
         }

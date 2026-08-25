@@ -55,7 +55,7 @@ public final class TestRunExcelGenerator {
 
             ws.value(2, 0, "Status:");
             ws.style(2, 0).bold().set();
-            ws.value(2, 1, trDir.getMarker().getStatus().name());
+            ws.value(2, 1, trDir.getMarker().getStatus().getLabel());
 
             // The same headline the other three formats print, from the same
             // summary, so a spreadsheet and a PDF of one run cannot disagree.
@@ -112,7 +112,7 @@ public final class TestRunExcelGenerator {
                 ws.value(row, 3, result.getActualResult());
                 ws.style(row, 3).wrapText(true).set();
 
-                ws.value(row, 4, result.getBugSeverity().name());
+                ws.value(row, 4, result.getBugSeverity().getName());
                 ws.style(row, 4).bold().set();
 
                 ws.value(row, 5, result.getBugPriority().getName());
