@@ -48,14 +48,6 @@ public final class TestRunWordGenerator {
     final String BORDER_GRAY = "D0D7E5";
     final String WHITE = "FFFFFF";
     final String BLACK = "000000";
-    private final @NotNull Map<BugPriority, String> PRIORITY_COLOR = Map.of(
-            BugPriority.HIGH, RED,
-            BugPriority.MEDIUM, DARK_YELLOW
-    );
-    private final @NotNull Map<BugSeverity, String> SEVERITY_COLOR = Map.of(
-            BugSeverity.BLOCKER, RED,
-            BugSeverity.MAJOR, DARK_YELLOW
-    );
 
     public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -307,7 +299,7 @@ public final class TestRunWordGenerator {
                 shadeCell(priCell, rowBg);
                 setCellPadding(priCell, 4, 6, 4, 6);
                 BugPriority pri = item.getBugPriority();
-                String priColor = PRIORITY_COLOR.getOrDefault(pri, DARK_GRAY);
+                String priColor = pri.getEmphasis().getHexColor();
                 setCellText(priCell, pri.getName(), ReportFont.BODY.ptRounded(), true, priColor);
             }
 
@@ -316,7 +308,7 @@ public final class TestRunWordGenerator {
                 shadeCell(sevCell, rowBg);
                 setCellPadding(sevCell, 4, 6, 4, 6);
                 BugSeverity sev = item.getBugSeverity();
-                String sevColor = SEVERITY_COLOR.getOrDefault(sev, DARK_GRAY);
+                String sevColor = sev.getEmphasis().getHexColor();
                 String sevText = sev.getName();
                 if (sevText.isEmpty()) sevText = "—";
                 setCellText(sevCell, sevText, ReportFont.BODY.ptRounded(), true, sevColor);

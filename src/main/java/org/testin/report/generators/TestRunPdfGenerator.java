@@ -54,14 +54,6 @@ public final class TestRunPdfGenerator {
     private final @NotNull DeviceRgb WHITE = new DeviceRgb(0xFF, 0xFF, 0xFF);
     private final @NotNull DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
     private final @NotNull DeviceRgb LINK_BLUE = new DeviceRgb(0x00, 0x52, 0xCC);
-    private final @NotNull Map<BugPriority, DeviceRgb> PRIORITY_COLOR = Map.of(
-            BugPriority.HIGH, RED,
-            BugPriority.MEDIUM, DARK_YELLOW
-    );
-    private final @NotNull Map<BugSeverity, DeviceRgb> SEVERITY_COLOR = Map.of(
-            BugSeverity.BLOCKER, RED,
-            BugSeverity.MAJOR, DARK_YELLOW
-    );
 
     public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         // try-with-resources: closing the Document also closes the PdfDocument and
@@ -331,7 +323,7 @@ public final class TestRunPdfGenerator {
 
             if (withFailureDetail) {
                 BugPriority pri = item.getBugPriority();
-                DeviceRgb priColor = PRIORITY_COLOR.getOrDefault(pri, DARK_GRAY);
+                DeviceRgb priColor = rgb(pri.getEmphasis().getHexColor());
                 String priText = pri.getName();
                 table.addCell(new Cell()
                         .setBackgroundColor(rowBg)
@@ -345,7 +337,7 @@ public final class TestRunPdfGenerator {
 
             if (withFailureDetail) {
                 BugSeverity sev = item.getBugSeverity();
-                DeviceRgb sevColor = SEVERITY_COLOR.getOrDefault(sev, DARK_GRAY);
+                DeviceRgb sevColor = rgb(sev.getEmphasis().getHexColor());
                 String sevText = sev.getName();
                 if (sevText.isEmpty()) sevText = "—";
                 table.addCell(new Cell()

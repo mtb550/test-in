@@ -34,18 +34,6 @@ public final class TestRunHtmlGenerator {
     final String LIGHT_BG = "#f2f5fa";
     final String BORDER_COLOR = "#d0d7e5";
 
-    /**
-     * The colors the PDF gives these two, named as tokens so they follow the
-     * skin. Anything not listed is muted, which is what an unset bug field is.
-     */
-    private final @NotNull Map<BugPriority, String> PRIORITY_COLOR = Map.of(
-            BugPriority.HIGH, "var(--verdict-failed)",
-            BugPriority.MEDIUM, "var(--verdict-blocked)"
-    );
-    private final @NotNull Map<BugSeverity, String> SEVERITY_COLOR = Map.of(
-            BugSeverity.BLOCKER, "var(--verdict-failed)",
-            BugSeverity.MAJOR, "var(--verdict-blocked)"
-    );
 
     public @NotNull String generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
 
@@ -228,10 +216,10 @@ public final class TestRunHtmlGenerator {
                         final @NotNull String severityText = severity.getName();
 
                         html.append("<td class='verdict' style='color: ")
-                                .append(PRIORITY_COLOR.getOrDefault(priority, "var(--muted)")).append("'>")
+                                .append(priority.getEmphasis().getCssToken()).append("'>")
                                 .append(escapedHtml(priority.getName())).append("</td>")
                                 .append("<td class='verdict' style='color: ")
-                                .append(SEVERITY_COLOR.getOrDefault(severity, "var(--muted)")).append("'>")
+                                .append(severity.getEmphasis().getCssToken()).append("'>")
                                 .append(escapedHtml(severityText.isEmpty() ? "—" : severityText)).append("</td>");
                     }
 

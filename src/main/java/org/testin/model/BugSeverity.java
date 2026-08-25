@@ -27,30 +27,39 @@ public enum BugSeverity {
      */
     EMPTY(
             "",
-            JBColor.background()
+            JBColor.background(),
+            ReportEmphasis.MUTED
     ),
 
     BLOCKER(
             "Blocker",
-            JBColor.RED
+            JBColor.RED,
+            ReportEmphasis.ALARMING
     ),
 
     MAJOR(
             "Major",
-            JBColor.ORANGE
+            JBColor.ORANGE,
+            ReportEmphasis.CAUTIONARY
     ),
 
     MINOR(
             "Minor",
-            JBColor.YELLOW
+            JBColor.YELLOW,
+            ReportEmphasis.MUTED
     ),
 
     ENHANCEMENT(
             "Enhancement",
-            JBColor.GREEN
+            JBColor.GREEN,
+            ReportEmphasis.MUTED
     );
 
     private final @NotNull String name;
     private final @NotNull Color color;
+    /**
+     * How loudly this reads in a report - see {@link ReportEmphasis}.
+     */
+    private final @NotNull ReportEmphasis emphasis;
 
 }

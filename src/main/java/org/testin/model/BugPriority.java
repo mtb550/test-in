@@ -16,7 +16,8 @@ public enum BugPriority {
             0,
             JBColor.background(),
             true,
-            Shortcuts.PriorityEmpty
+            Shortcuts.PriorityEmpty,
+            ReportEmphasis.MUTED
     ),
 
     HIGH(
@@ -24,7 +25,8 @@ public enum BugPriority {
             1,
             JBColor.RED.brighter().brighter(),
             true,
-            Shortcuts.PriorityHigh
+            Shortcuts.PriorityHigh,
+            ReportEmphasis.ALARMING
     ),
 
     MEDIUM(
@@ -32,7 +34,8 @@ public enum BugPriority {
             2,
             JBColor.BLUE.brighter(),
             true,
-            Shortcuts.PriorityMedium
+            Shortcuts.PriorityMedium,
+            ReportEmphasis.CAUTIONARY
     ),
 
     LOW(
@@ -40,7 +43,8 @@ public enum BugPriority {
             3,
             JBColor.GRAY.brighter(),
             true,
-            Shortcuts.PriorityLow
+            Shortcuts.PriorityLow,
+            ReportEmphasis.MUTED
     );
 
     private final @NotNull String name;
@@ -54,5 +58,9 @@ public enum BugPriority {
     // (#66, E3).
     private final boolean active;
     private final @NotNull Shortcuts shortcut;
+    /**
+     * How loudly this reads in a report - see {@link ReportEmphasis}.
+     */
+    private final @NotNull ReportEmphasis emphasis;
 
 }
