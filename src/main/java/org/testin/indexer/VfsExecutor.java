@@ -75,11 +75,11 @@ final class VfsExecutor {
                         } catch (final Exception ex) {
                             // A failed VFS operation is reported, never thrown into the
                             // EDT as an exception dialog (parity with the two-path form).
-                            Services.getInstance(p, Notifier.class).error(p, "Operation failed: " + ex.getMessage(), errorTitle);
+                            Services.getInstance(p, Notifier.class).error(p, errorTitle, "Operation failed: " + ex.getMessage());
                         }
                     }),
                     () -> Services.getInstance(p, Notifier.class)
-                            .error(p, "Could not find path on disk:\n" + path, errorTitle)));
+                            .error(p, errorTitle, "Could not find path on disk:\n" + path)));
         });
     }
 
@@ -94,7 +94,7 @@ final class VfsExecutor {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (sourceVf.isEmpty() || targetVf.isEmpty()) {
-                    Services.getInstance(p, Notifier.class).error(p, "Could not find source or target path on disk.", errorTitle);
+                    Services.getInstance(p, Notifier.class).error(p, errorTitle, "Could not find source or target path on disk.");
                     onFailure.run();
                     return;
                 }
@@ -104,7 +104,7 @@ final class VfsExecutor {
                         operation.execute(sourceVf.get(), targetVf.get());
                         onSuccess.run();
                     } catch (final Exception ex) {
-                        Services.getInstance(p, Notifier.class).error(p, "Operation failed: " + ex.getMessage(), errorTitle);
+                        Services.getInstance(p, Notifier.class).error(p, errorTitle, "Operation failed: " + ex.getMessage());
                         onFailure.run();
                     }
                 });
@@ -141,7 +141,7 @@ final class VfsExecutor {
                         if (vf.isPresent()) vf.get().delete(requester);
                     } catch (final IOException ex) {
                         deleted.set(false);
-                        Services.getInstance(p, Notifier.class).error(p, "Could not delete file: " + ex.getMessage(), "Error");
+                        Services.getInstance(p, Notifier.class).error(p, "Delete Failed", "Could not delete file: " + ex.getMessage());
                     }
                 });
 
