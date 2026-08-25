@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.nio.file.Path;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -96,7 +97,7 @@ public class GenerateReportAction extends AbstractProjectAction {
      */
     public void execute() {
         selectedRun.get().ifPresent(tr -> new GenerateReportDialog(p,
-                tr.getPath().getFileName().toString() + "_Report",
+                ReportFileName.suggestedFor(p, tr, ZonedDateTime.now()),
                 (format, file) -> processAndSave(p, tr, format, file)).show());
     }
 
