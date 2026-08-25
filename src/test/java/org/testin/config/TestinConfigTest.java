@@ -62,6 +62,11 @@ public class TestinConfigTest {
                 somethingFromALaterBuild: true
                 """, "unknown-key");
 
+        // The whole point of the test, and it was not being made: the parse
+        // reached the key it knew despite the one it did not. Without this the
+        // method could not fail, whatever the loader did with the unknown key.
+        assertEquals(config.projectName(), "checkout-regression",
+                "a key from a later build must not cost this one its binding");
     }
 
     /**
@@ -86,14 +91,6 @@ public class TestinConfigTest {
                 "git@github.com:acme/cases.git");
     }
 
-    /**
-     * A server address makes the channel available, and nothing else has to say
-     * so (#94).
-     * <p>
-     * There is deliberately no {@code connection: git|ssh} key. A mode word and
-     * an address are two facts about one thing, and the day they disagree
-     * something has to choose which half of the file to believe.
-     */
     /**
      * The mode decides, not the addresses (#94).
      * <p>

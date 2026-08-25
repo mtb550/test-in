@@ -7,6 +7,7 @@ import org.testin.setting.AppSettingsState;
 import org.testin.util.EditorUtil;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -68,8 +69,20 @@ public class ServiceRoutingTest {
      * that returns something different the second time would be worse than none.
      */
     @Test
-    public void theAnswerIsTheSameEveryTime() {
-        assertTrue(Services.isApplicationLevel(AppSettingsState.class) == Services.isApplicationLevel(AppSettingsState.class));
-        assertFalse(Services.isApplicationLevel(EditorUtil.class) || Services.isApplicationLevel(EditorUtil.class));
+    public void theCachedAnswerIsTheSameAnswer() {
+        // Held in locals and compared, rather than asked twice inside one
+        // assertion: written that way it compares an expression to itself, which
+        // is true whatever the cache does and so tests nothing at all.
+        final boolean first = Services.isApplicationLevel(AppSettingsState.class);
+        final boolean cached = Services.isApplicationLevel(AppSettingsState.class);
+
+        assertTrue(first, "the settings are the application's on the first ask");
+        assertEquals(cached, first, "the cache answered differently the second time");
+
+        final boolean firstProject = Services.isApplicationLevel(EditorUtil.class);
+        final boolean cachedProject = Services.isApplicationLevel(EditorUtil.class);
+
+        assertFalse(firstProject, "a project service stays with its project");
+        assertEquals(cachedProject, firstProject, "the cache answered differently the second time");
     }
 }

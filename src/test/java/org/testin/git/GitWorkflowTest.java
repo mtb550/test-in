@@ -56,7 +56,12 @@ public class GitWorkflowTest {
      * Runs Git and returns its output, or null when it failed - which is how the
      * plugin treats a failure too: no answer rather than an exception.
      */
-    private static String git(final Path directory, final String... arguments) {
+    /**
+     * What the command printed, and empty when it did not succeed - a git that
+     * is not installed and a git that returned non-zero are the same answer to
+     * the caller, and both are ordinary here.
+     */
+    private static Optional<String> git(final Path directory, final String... arguments) {
         final List<String> command = new ArrayList<>();
         command.add("git");
         command.addAll(List.of(arguments));
@@ -68,23 +73,22 @@ public class GitWorkflowTest {
                     .start();
 
             final String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            return process.waitFor() == 0 ? output : null;
+            return process.waitFor() == 0 ? Optional.of(output) : Optional.empty();
 
         } catch (final IOException | InterruptedException ex) {
-            return null;
+            return Optional.empty();
         }
     }
 
     private static String mustGit(final Path directory, final String... arguments) {
-        final String output = git(directory, arguments);
-        assertNotNull(output, "git " + String.join(" ", arguments) + " failed in " + directory);
-        return output;
+        return git(directory, arguments).orElseThrow(() -> new AssertionError(
+                "git " + String.join(" ", arguments) + " failed in " + directory));
     }
 
     @BeforeMethod
     public void createRepositories() {
         try {
-            if (git(Path.of("."), "--version") == null) {
+            if (git(Path.of("."), "--version").isEmpty()) {
                 throw new SkipException("Git is not on the PATH, so the workflow cannot be exercised");
             }
 
@@ -249,7 +253,11 @@ public class GitWorkflowTest {
                 .lines().filter(line -> !line.isBlank()).toList();
 
         return GitDiffProcessor.toDiffs(status, work, mapper(),
-                path -> git(work, "show", "HEAD:" + path));
+                // Empty rather than absent for a path HEAD does not hold, which is
+                // what production feeds this: GitRepositoryService.showAtHead ends
+                // in orElse(""). Handing it a null here tested a shape the plugin
+                // never produces.
+                path -> git(work, "show", "HEAD:" + path).orElse(""));
     }
 
     /**
@@ -305,7 +313,7 @@ public class GitWorkflowTest {
         assertTrue(pending.stream().allMatch(diff -> diff.type() == DiffType.ADDED));
 
         commit(stagedFor(pending), "the first commit");
-        assertNotNull(git(work, "push", "-u", "origin", "main"), "the push to an empty remote succeeded");
+        assertTrue(git(work, "push", "-u", "origin", "main").isPresent(), "the push to an empty remote succeeded");
 
         final Path colleague = cloneAsColleague();
         for (final TestCaseDto testCase : cases) {
@@ -491,7 +499,7 @@ public class GitWorkflowTest {
 
             // Git stops: one file, two commits, no way for it to know the two edits
             // are in different fields.
-            assertNull(git(work, "pull", "--rebase", "--autostash", "origin", "main"),
+            assertTrue(git(work, "pull", "--rebase", "--autostash", "origin", "main").isEmpty(),
                     "the pull is expected to stop on the conflict");
 
             final List<String> conflicting = GitRefs.unmergedPaths(
@@ -558,7 +566,7 @@ public class GitWorkflowTest {
             commit(stagedFor(review()), "added the sign out case");
 
             // No conflict to resolve: the pull rebases straight through.
-            assertNotNull(git(work, "pull", "--rebase", "--autostash", "origin", "main"),
+            assertTrue(git(work, "pull", "--rebase", "--autostash", "origin", "main").isPresent(),
                     "two appended cases touch two files and merge on their own");
 
             final List<TestCaseDto> after = new ArrayList<>();

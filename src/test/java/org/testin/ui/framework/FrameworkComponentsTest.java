@@ -5,6 +5,8 @@ import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Shortcuts;
 import org.testng.annotations.Test;
 
+import java.util.Optional;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -32,15 +34,22 @@ public class FrameworkComponentsTest {
         field.getActionMap().get(actionKey).actionPerformed(new ActionEvent(field, 0, ""));
     }
 
-    private static JList<?> findList(final Container container) {
+    /**
+     * The selection list somewhere under this container, and empty when there is
+     * none - which is a real answer for a component that has not been given one,
+     * not a failure. Empty rather than null so the walk itself is unconditional.
+     */
+    private static Optional<JList<?>> findList(final Container container) {
         for (final Component child : container.getComponents()) {
-            if (child instanceof JList<?> list) return list;
+            if (child instanceof JList<?> list) return Optional.of(list);
+
             if (child instanceof Container inner) {
-                final JList<?> found = findList(inner);
-                if (found != null) return found;
+                final Optional<JList<?>> found = findList(inner);
+                if (found.isPresent()) return found;
             }
         }
-        return null;
+
+        return Optional.empty();
     }
 
     private static int rowCount(final DialogMessage message) {
@@ -74,8 +83,8 @@ public class FrameworkComponentsTest {
     public void clearedSelectionFallsBackToTheFirstRow() {
         final TextFieldWithSelections<Integer> component = twoSelections();
 
-        final JList<?> list = findList(component.getPanel());
-        assertNotNull(list, "the selection list must be part of the component panel");
+        final JList<?> list = findList(component.getPanel())
+                .orElseThrow(() -> new AssertionError("the selection list must be part of the component panel"));
         list.clearSelection();
 
         // The Ctrl+click case: submitting with an emptied selection must not
