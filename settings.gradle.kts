@@ -8,7 +8,7 @@ pluginManagement {
 
 plugins {
     id("org.jetbrains.intellij.platform.settings") version "2.18.1"
-    id("com.gradle.develocity") version "4.4.2"
+    id("com.gradle.develocity") version "4.5.0"
 }
 
 rootProject.name = "Testin"
