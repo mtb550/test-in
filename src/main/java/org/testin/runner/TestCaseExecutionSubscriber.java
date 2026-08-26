@@ -12,31 +12,35 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 
 import java.time.Duration;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Marks the test case a run is reporting on, and tells one screen to redraw.
  * <p>
- * TestNG names the method it is running, and a Testin-generated method is named
- * by the test case's id - so the first report identifies the case outright. The
- * reports that follow name the same method by a name of TestNG's own, which is
- * why the first one is remembered against it: everything after it is matched
- * through that map.
+ * A Testin-generated method is named by its test case's id, so the name in the
+ * report is the answer: there is nothing to look up and nothing to remember
+ * between reports.
+ * <p>
+ * It used to remember more. The premise was that the platform reports a method
+ * once under the generated name and again under a name of its own, so the first
+ * report was recorded against that second name and everything after it was
+ * matched through the map. The log says otherwise - 2,827 reports, every one of
+ * them a bare id, and the map never written to once. What the map did instead
+ * was hold a fallback that attributed an unrecognized name to whichever case
+ * reported last, which was harmless while one case ran per process and became a
+ * way to mark an arbitrary case failed once fifty of them shared one (#66).
+ * <p>
+ * So an unrecognized name is now nobody's. That is the honest answer for a
+ * configuration method someone adds to a generated class, and for a framework
+ * whose naming this does not know yet - and it is logged, so the second case
+ * shows up as a line to read rather than as a verdict on the wrong case.
  * <p>
  * There were two of these, one for the test editor's list and one for the view
  * panel, with the same body and the same three fields (#66, finding 20). They
  * differed in what they redrew, which is the argument now.
  */
 public final class TestCaseExecutionSubscriber {
-
-    /**
-     * TestNG's name for a method, against the test case it turned out to be.
-     * Written from the runner's thread and read on the EDT.
-     */
-    private final @NotNull Map<String, UUID> uuidToDtoId = new ConcurrentHashMap<>();
 
     private final @NotNull Project p;
 
@@ -55,17 +59,12 @@ public final class TestCaseExecutionSubscriber {
      * editor needs more than "something changed" - it writes the verdict into
      * the run, times the case, and records what the framework said when one did
      * not pass - and having it re-derive that from the broadcast would put the
-     * uuid mapping and the stopped-is-not-failed rule in a second place.
+     * name matching and the stopped-is-not-failed rule in a second place.
      */
     @FunctionalInterface
     public interface Reported {
         void accept(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure);
     }
-
-    /**
-     * The case the run is on, empty until one reports itself.
-     */
-    private volatile @NotNull Optional<UUID> runningDtoId = Optional.empty();
 
     public TestCaseExecutionSubscriber(final @NotNull Project p, final @NotNull Disposable parentDisposable, final @NotNull Reported onUpdated) {
         this.p = p;
@@ -84,39 +83,26 @@ public final class TestCaseExecutionSubscriber {
     private void record(final @NotNull String testName, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         Logger.debug("Execution report: testName='" + testName + "', status='" + status + "'");
 
-        final @NotNull Optional<TestCaseDto> byId = parseUuid(testName).flatMap(indexer::findTestCase);
-        byId.ifPresent(tc -> runningDtoId = Optional.of(tc.getId()));
+        parseUuid(testName).flatMap(indexer::findTestCase).ifPresentOrElse(
+                tc -> report(tc, status, duration, failure),
+                () -> Logger.debug("  '" + testName + "' is not a generated test case - reported against none"));
+    }
 
-        final @NotNull Optional<TestCaseDto> reported = byId.isPresent()
-                ? byId
-                : Optional.ofNullable(uuidToDtoId.get(testName)).flatMap(indexer::findTestCase);
+    private void report(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
+        final @NotNull RunStatus reportedStatus = verdictFor(tc, status);
 
-        reported.ifPresent(tc -> {
-            final @NotNull RunStatus reportedStatus = verdictFor(tc, status);
+        Logger.debug("  reporting on '" + tc.getDescription() + "': " + reportedStatus + " " + failure.message());
 
-            Logger.debug("  reporting on '" + tc.getDescription() + "': " + reportedStatus + " " + failure.message());
+        // Recorded against the case's id rather than on the instance in hand.
+        // This one is replaced by the next rescan, and a verdict that lived on
+        // it went with it - which is how a case that had just passed lost its
+        // badge at the tester's next keystroke (#116).
+        Services.getInstance(p, TestNGExecution.class).reported(tc.getId(), reportedStatus);
 
-            // Recorded against the case's id rather than on the instance in
-            // hand. This one is replaced by the next rescan, and a verdict that
-            // lived on it went with it - which is how a case that had just
-            // passed lost its badge at the tester's next keystroke (#116).
-            Services.getInstance(p, TestNGExecution.class).reported(tc.getId(), reportedStatus);
-
-            // After the runner has been told, not before: a surface asked to
-            // redraw reads what is running from there, and would paint the
-            // state as it was a moment ago.
-            onUpdated.accept(tc, reportedStatus, duration, failure);
-        });
-
-        // The first report TestNG makes under a name of its own: it is about the
-        // case that was already running, so the name is remembered against it.
-        if (reported.isEmpty() && status == RunStatus.RUNNING && !uuidToDtoId.containsKey(testName)) {
-            runningDtoId.flatMap(indexer::findTestCase).ifPresent(tc -> {
-                Logger.debug("  mapping '" + testName + "' to '" + tc.getDescription() + "'");
-                uuidToDtoId.put(testName, tc.getId());
-            });
-        }
-
+        // After the runner has been told, not before: a surface asked to redraw
+        // reads what is running from there, and would paint the state as it was
+        // a moment ago.
+        onUpdated.accept(tc, reportedStatus, duration, failure);
     }
 
     /**
@@ -126,7 +112,7 @@ public final class TestCaseExecutionSubscriber {
      * which reads exactly like a failure. It is not one: nobody found a defect,
      * the case simply did not finish (#34). Decided here because this is the one
      * place that knows which case a report is about - the runner sees only the
-     * name TestNG chose for the method.
+     * name the framework chose for the method.
      */
     private @NotNull RunStatus verdictFor(final @NotNull TestCaseDto tc, final @NotNull RunStatus status) {
         final boolean stopped = status == RunStatus.FAILED
