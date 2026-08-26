@@ -116,16 +116,6 @@ public final class TestCaseDto {
     @Builder.Default
     private volatile String preConditions = "";
 
-    @JsonIgnore
-    @NonNull
-    @Builder.Default
-    private volatile RunStatus tempStatus = RunStatus.IDLE;
-
-    @JsonIgnore
-    @NonNull
-    @Builder.Default
-    private volatile String tempError = "";
-
     /**
      * The stand-in for a case a run refers to and the index no longer has.
      * <p>

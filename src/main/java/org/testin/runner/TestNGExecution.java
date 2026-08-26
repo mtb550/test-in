@@ -17,17 +17,12 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
- * The TestNG runs this plugin started: which cases are running under which
- * configuration, and how to stop the ones the tester asked to stop.
+ * The TestNG runs this plugin started: starting them and stopping them.
  * <p>
  * The runner used to call {@code ProgramRunnerUtil.executeConfiguration}
  * directly, which is fire-and-forget - nothing was kept, so nothing could be
@@ -46,12 +41,10 @@ import java.util.stream.Stream;
  * thread and back to the EDT before its process exists, and a tester who presses
  * Stop in that second means it.
  * <p>
- * <b>Everything here is keyed by the case's id, never by the DTO.</b> An indexer
- * rescan replaces every DTO instance mid-run, so a stop that keyed by instance
- * could no longer reach anything - the run kept going and nothing could kill it
- * (#116). The id survives the reload; {@link #isRunning} is the one answer to
- * "is this case running" for the same reason, because the fresh instances know
- * nothing.
+ * What is running and what each case last did is {@link RunRegistry}'s, which
+ * knows nothing of the platform. This class is the half that does: it launches,
+ * it kills, and it tells the editors what changed. Every question a surface asks
+ * goes to the registry through here.
  */
 @Service(Service.Level.PROJECT)
 public final class TestNGExecution {
@@ -59,30 +52,9 @@ public final class TestNGExecution {
     private final @NotNull Project p;
 
     /**
-     * The configurations this plugin launched, by name, so a stop kills what the
-     * tester started here and not a build they left going in another tab.
+     * What is running and what each case last did.
      */
-    private final @NotNull Set<String> launchedNames = ConcurrentHashMap.newKeySet();
-
-    /**
-     * Cases asked for whose launch has not reached the platform yet. A stop takes
-     * one out, and the launch finds it gone when its turn comes. An entry lives
-     * for the two thread hops between the click and the process.
-     */
-    private final @NotNull Set<UUID> pending = ConcurrentHashMap.newKeySet();
-
-    /**
-     * Which run each case is running under, by the configuration's name. This is
-     * what lets a stop reach one run without touching another, and what tells it
-     * which other cases go down with the process it kills.
-     */
-    private final @NotNull Map<UUID, String> configOf = new ConcurrentHashMap<>();
-
-    /**
-     * Cases the tester stopped, so a report arriving afterward is not read as a
-     * failure. Cleared by the next run of that case.
-     */
-    private final @NotNull Set<UUID> stopped = ConcurrentHashMap.newKeySet();
+    private final @NotNull RunRegistry registry = new RunRegistry();
 
     /**
      * Written out rather than generated: a project service's constructor is its
@@ -103,8 +75,7 @@ public final class TestNGExecution {
      * clicked.
      */
     public void starting(final @NotNull TestCaseDto tc) {
-        pending.add(tc.getId());
-        stopped.remove(tc.getId());
+        registry.starting(tc.getId());
 
         TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.RUNNING, "");
     }
@@ -118,15 +89,14 @@ public final class TestNGExecution {
      * then killed.
      */
     public @NotNull List<TestCaseDto> stillWanted(final @NotNull List<TestCaseDto> cases) {
-        return cases.stream().filter(tc -> pending.remove(tc.getId())).toList();
+        return cases.stream().filter(tc -> registry.take(tc.getId())).toList();
     }
 
     /**
      * Starts the configuration, and remembers which cases are running under it.
      */
     public void launch(final @NotNull List<TestCaseDto> cases, final @NotNull RunnerAndConfigurationSettings settings) {
-        cases.forEach(tc -> configOf.put(tc.getId(), settings.getName()));
-        launchedNames.add(settings.getName());
+        registry.launched(cases.stream().map(TestCaseDto::getId).toList(), settings.getName());
 
         Logger.info("Starting " + settings.getName() + " with " + cases.size() + " test case(s)");
         ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
@@ -138,8 +108,7 @@ public final class TestNGExecution {
      * the tester why in their own words.
      */
     public void notStarting(final @NotNull TestCaseDto tc) {
-        pending.remove(tc.getId());
-        configOf.remove(tc.getId());
+        registry.notStarting(tc.getId());
 
         TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.IDLE, "");
     }
@@ -162,98 +131,64 @@ public final class TestNGExecution {
     /**
      * Whether a report arriving for this case belongs to a run the tester
      * stopped.
-     * <p>
-     * A killed process reports its test as finished without having passed, which
-     * reads exactly like a failure. It is not one: nobody found a defect, the
-     * case simply did not finish.
      */
     public boolean isStopped(final @NotNull TestCaseDto tc) {
-        return stopped.contains(tc.getId());
+        return registry.isStopped(tc.getId());
     }
 
     /**
      * Whether a stop has something to reach for this case: a launch on its way
      * or a process it is running under.
      * <p>
-     * The one owner of that question. It used to be answered from the DTO's own
-     * temp status, in three places - the stop's filter, the run/stop slot and
-     * the double-run guard - and all three went blind together the moment a
-     * rescan handed the editors fresh instances (#116).
+     * The one answer to "is this case running", for the run/stop slot, the
+     * double-run guard and the stop itself. They each used to work it out from a
+     * field on the DTO, and all three went blind together the moment a rescan
+     * handed the editors fresh instances (#116).
      */
     public boolean isRunning(final @NotNull UUID id) {
-        return pending.contains(id) || configOf.containsKey(id);
+        return registry.isRunning(id);
     }
 
     /**
-     * The status a surface paints for this case: RUNNING while this service
-     * holds it, and whatever the last report wrote otherwise. The DTO's own
-     * answer alone is not enough - it dies with its instance on every rescan,
-     * which blanked the badge of a case mid-run.
+     * The status a surface paints for this case. Asked of the runner because the
+     * answer has to outlive a rescan: both the Running badge of a case mid-run
+     * and the verdict of one that has finished used to be dropped along with the
+     * DTO instance that carried them.
      */
     public @NotNull RunStatus statusOf(final @NotNull TestCaseDto tc) {
-        return isRunning(tc.getId()) ? RunStatus.RUNNING : tc.getTempStatus();
+        return registry.statusOf(tc.getId());
     }
 
     /**
-     * A report landed with this case's result, so its entry is spent. This is
-     * what keeps {@link #isRunning} honest - and what keeps a casemate that
-     * finished early out of the blast radius when the run they shared is
-     * stopped later.
+     * A report landed with this case's result: what every surface paints from
+     * now on, and the end of the case counting as running.
      */
-    void finished(final @NotNull UUID id) {
-        pending.remove(id);
-        configOf.remove(id);
+    void reported(final @NotNull UUID id, final @NotNull RunStatus status) {
+        registry.reported(id, status);
     }
 
     /**
      * Kills the runs these cases belong to and drops their launches that have not
      * started yet.
      * <p>
-     * Only the cases that are running: a selection can hold cases that passed an
-     * hour ago, and a stop is no reason to forget their verdicts.
+     * Silent: every path here has a tester watching the card they clicked, and
+     * the card changing is the answer.
      *
-     * @return how many cases were stopped, which is more than were asked for when
+     * @return how many cases were put back, which is more than were asked for when
      *         they share a run - the count the one notification reports
      */
     public int stop(final @NotNull List<TestCaseDto> cases) {
-        final @NotNull List<UUID> asked = cases.stream()
-                .map(TestCaseDto::getId)
-                .filter(this::isRunning)
-                .toList();
+        final @NotNull RunRegistry.Stop stop = registry.stopping(cases.stream().map(TestCaseDto::getId).toList());
+        if (stop.cases().isEmpty()) return 0;
 
-        if (asked.isEmpty()) return 0;
-
-        // One configuration is one process, however many cases it holds, so a
-        // case cannot be stopped without stopping the ones beside it. Leaving
-        // those showing Running would be the older bug in a smaller place.
-        final @NotNull Set<String> runs = asked.stream()
-                .map(id -> configOf.getOrDefault(id, ""))
-                .filter(name -> !name.isEmpty())
-                .collect(Collectors.toSet());
-
-        // The casemates come straight from the map: an entry there is a case
-        // whose result is not in, because a report retires its entry the moment
-        // it lands - so nothing here can sweep up a verdict already given.
-        final @NotNull List<UUID> stopping = Stream.concat(
-                        asked.stream(),
-                        configOf.entrySet().stream().filter(e -> runs.contains(e.getValue())).map(Map.Entry::getKey))
-                .distinct()
-                .toList();
-
-        stopping.forEach(id -> {
-            pending.remove(id);
-            configOf.remove(id);
-            stopped.add(id);
-        });
-
-        final @NotNull List<RunContentDescriptor> theirs = running(runs);
-        Logger.info("Stopping " + stopping.size() + " test case(s) in " + runs.size()
+        final @NotNull List<RunContentDescriptor> theirs = running(stop.runs());
+        Logger.info("Stopping " + stop.cases().size() + " test case(s) in " + stop.runs().size()
                 + " run(s): " + theirs.size() + " had reached a process");
 
         theirs.forEach(this::kill);
-        stopping.forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, ""));
+        stop.cases().forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, ""));
 
-        return stopping.size();
+        return stop.cases().size();
     }
 
     /**
@@ -300,7 +235,7 @@ public final class TestNGExecution {
      */
     private @NotNull List<RunContentDescriptor> running(final @NotNull Set<String> names) {
         return ExecutionManager.getInstance(p).getRunningDescriptors(
-                settings -> names.contains(settings.getName()) && launchedNames.contains(settings.getName()));
+                settings -> names.contains(settings.getName()) && registry.launchedHere(settings.getName()));
     }
 
     /**

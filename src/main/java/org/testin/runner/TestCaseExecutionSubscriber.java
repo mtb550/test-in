@@ -78,15 +78,13 @@ public final class TestCaseExecutionSubscriber {
         reported.ifPresent(tc -> {
             final @NotNull RunStatus reportedStatus = verdictFor(tc, status);
 
-            Logger.debug("  reporting on '" + tc.getDescription() + "', tempStatus='" + reportedStatus + "'");
-            tc.setTempStatus(reportedStatus);
-            tc.setTempError(error);
+            Logger.debug("  reporting on '" + tc.getDescription() + "': " + reportedStatus + " " + error);
 
-            // The result is in, so the runner lets go of the case: what keeps
-            // its answer to "is this running" true, and keeps a case that
-            // finished early out of a later stop of the run it shared (#116).
-            if (reportedStatus != RunStatus.RUNNING)
-                Services.getInstance(p, TestNGExecution.class).finished(tc.getId());
+            // Recorded against the case's id rather than on the instance in
+            // hand. This one is replaced by the next rescan, and a verdict that
+            // lived on it went with it - which is how a case that had just
+            // passed lost its badge at the tester's next keystroke (#116).
+            Services.getInstance(p, TestNGExecution.class).reported(tc.getId(), reportedStatus);
         });
 
         // The first report TestNG makes under a name of its own: it is about the
