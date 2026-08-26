@@ -70,6 +70,19 @@ public class TestRunItems {
     @Builder.Default
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
     private ZonedDateTime executedAt = Config.NOT_EXECUTED;
+    /**
+     * Everything the framework said, whole.
+     * <p>
+     * Never trimmed, sampled or capped on the way to disk. A stacktrace runs to
+     * a couple of kilobytes and a run where every case failed would be several
+     * times the size of one where none did - which is a decision that has been
+     * taken: the run file grows. A truncated stacktrace is missing exactly the
+     * frame nobody expected, and the tester who needs it is reading a bug report
+     * a week later with no way to get the rest back.
+     * <p>
+     * What a surface chooses to show of it is a different question, and one the
+     * details panel answers by drawing three lines and a link.
+     */
     @NotNull
     @Builder.Default
     private String stacktrace = "";
