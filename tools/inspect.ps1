@@ -21,7 +21,13 @@
     and it must never touch the developer's real settings.
 
     Costs one full indexing pass, so expect 10-20 minutes. A deliberate sweep, not
-    a per-commit gate.
+    a per-commit gate - .github/workflows/inspect.yml runs it every four days.
+
+    Exits non-zero for three findings and no others: DataFlowIssue, ReturnNull and
+    WrappedMethodDeclaration. The first two are the standing rule, a null contract
+    the checker can prove is broken. The third is this script's own check - a
+    method declaration belongs on one line, which no IntelliJ inspection says.
+    Everything else is listed for a person to judge.
 
 .EXAMPLE
     pwsh tools/inspect.ps1
@@ -51,12 +57,17 @@ function Resolve-Inspector {
     $props = Get-Content (Join-Path $repo 'gradle.properties')
     $version = ($props | Select-String -Pattern '^intellij\.version=(.+)$').Matches[0].Groups[1].Value
 
+    # Wherever Gradle keeps its caches. GitHub Actions points GRADLE_USER_HOME
+    # at the runner's workspace rather than at the profile, so looking only in
+    # the profile found nothing there and the scheduled run could not start.
+    $gradleHome = if ($env:GRADLE_USER_HOME) { $env:GRADLE_USER_HOME } else { Join-Path $env:USERPROFILE '.gradle' }
+
     # The Gradle transform path carries a content hash, so it is matched by shape rather than stored.
-    $ide = Get-ChildItem -Path "$env:USERPROFILE\.gradle\caches\*\transforms\*\transformed\idea-$version-win" `
+    $ide = Get-ChildItem -Path "$gradleHome\caches\*\transforms\*\transformed\idea-$version-win" `
         -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
 
     if (-not $ide) {
-        throw "No downloaded IDE $version found. Run './gradlew compileJava' first - it fetches the platform this script inspects with."
+        throw "No downloaded IDE $version found under $gradleHome. Run './gradlew compileJava' first - it fetches the platform this script inspects with."
     }
 
     $inspect = Join-Path $ide.FullName 'bin\inspect.bat'
@@ -119,6 +130,48 @@ function Read-Problems([string] $outPath) {
     }
 }
 
+function Read-WrappedDeclarations([string] $scope) {
+    <#
+        A method declaration is one line. A signature is one thing to read, and
+        split over four lines it is four things to put back together before the
+        first question about the method can be asked.
+
+        No IntelliJ inspection says this. The platform has code style settings
+        for how to wrap a signature and none for refusing to, so it is checked
+        here and reported beside the inspector's own findings - one list to
+        read, one gate to pass.
+
+        Matched on the modifiers rather than on the parenthesis, which is what
+        keeps a wrapped call - stream() on one line and .filter(..) on the next
+        - from being read as a declaration.
+    #>
+    $declaration = '^\s*(?:(?:public|protected|private|static|final|abstract|synchronized|native|default|strictfp)\s+)+[^;=()]*?\b\w+\s*\('
+
+    foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+        $number = 0
+        foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+            $number++
+
+            $trimmed = $text.Trim()
+            if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
+            if ($text -notmatch $declaration) { continue }
+
+            # Still open at the end of the line, so the signature carries on to
+            # the next one. A declaration that closes on its own line is fine,
+            # however long it is.
+            if ([regex]::Matches($text, '\(').Count -le [regex]::Matches($text, '\)').Count) { continue }
+
+            [pscustomobject]@{
+                Path       = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+                Line       = $number
+                Inspection = 'WrappedMethodDeclaration'
+                Severity   = 'ERROR'
+                Message    = "A method declaration belongs on one line: $trimmed"
+            }
+        }
+    }
+}
+
 function Write-Reports([object[]] $problems, [string] $outPath) {
     # A project model that did not resolve floods the output with unresolved
     # symbols and every other count becomes meaningless. Say so rather than
@@ -170,4 +223,32 @@ if (-not $ReportOnly) {
     Invoke-Inspector (Resolve-Inspector) $outPath
 }
 
-Write-Reports (Read-Problems $outPath) $outPath
+# The inspector's findings and this script's own, as one list. Write-Reports
+# groups by inspection name and knows nothing about where a finding came from,
+# which is why the wrapped-declaration check produces the same shape.
+$scope = if ($Subdirectory) { Join-Path $repo $Subdirectory } else { Join-Path $repo 'src' }
+$problems = @(Read-Problems $outPath) + @(Read-WrappedDeclarations $scope)
+
+Write-Reports $problems $outPath
+
+# The three that are not allowed to survive a sweep. The first two are the
+# project's standing rule - a null contract the checker can prove is broken is a
+# defect, not a style note. The third is the one-line signature.
+#
+# Everything else the inspector reports is a judgement call and needs a person,
+# so it is listed and not gated: this exits non-zero for these three only, which
+# is what lets the scheduled run in .github/workflows/inspect.yml mean something.
+$gate = @('DataFlowIssue', 'ReturnNull', 'WrappedMethodDeclaration')
+$breaches = @($problems | Where-Object { $gate -contains $_.Inspection })
+
+if ($breaches) {
+    Write-Host ''
+    Write-Host "$($breaches.Count) finding(s) the gate does not allow:" -ForegroundColor Red
+    $breaches | Sort-Object Path, Line | ForEach-Object {
+        Write-Host ('  {0}:{1} - [{2}] {3}' -f $_.Path, $_.Line, $_.Inspection, $_.Message)
+    }
+    exit 1
+}
+
+Write-Host ''
+Write-Host "Gate clear: no $($gate -join ', ')." -ForegroundColor Green

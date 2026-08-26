@@ -1,0 +1,76 @@
+# The IDE inspections, on a schedule rather than on every push.
+#
+# They cost a full indexing pass - fifteen to twenty minutes - which is why this
+# is not part of build.yml. Every four days is often enough that a finding is
+# still about code somebody remembers writing, and rare enough that nobody waits
+# on it.
+#
+# It gates on three findings and lists the rest. DataFlowIssue and ReturnNull are
+# the standing rule: a null contract the checker can prove is broken is a defect,
+# not a style note. WrappedMethodDeclaration is the script's own check - a method
+# declaration belongs on one line, which no IntelliJ inspection says, so
+# tools/inspect.ps1 says it. Everything else needs a person and is listed in the
+# artifact.
+name: Inspect
+
+on:
+  schedule:
+    # 02:00 UTC on the 1st, 5th, 9th ... of each month. Cron has no way to say
+    # "every four days" across a month boundary, and this is the usual reading
+    # of it: the gap stretches to five or six days once a month, in the small
+    # hours, which is not worth a workflow that computes its own dates.
+    - cron: '0 2 */4 * *'
+
+  # So it can be run against a branch on demand, without waiting for the date.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    name: Inspect src
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out the commit
+        uses: actions/checkout@v7
+
+      - name: Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # The inspector is the IDE the Gradle plugin downloads, pinned by
+      # intellij.version - so this step is what puts it on disk. inspect.ps1
+      # finds it under GRADLE_USER_HOME, which the action above sets.
+      - name: Fetch the IDE the inspector runs from
+        shell: bash
+        run: ./gradlew compileJava
+
+      # src, not src/main: the test tree had never been inspected until it was
+      # asked for by name, and the first run over it found three tests that
+      # could not fail. Never the project root - .sandbox holds a whole IDE
+      # installation, and inspecting it produced 74,803 spellcheck findings.
+      #
+      # Run as its own process so its exit code is this step's: the script
+      # exits 1 when the gate is breached.
+      - name: Inspect
+        shell: bash
+        run: pwsh -NoProfile -File tools/inspect.ps1 -Subdirectory src
+
+      # Always, because a breached gate is exactly when somebody wants the list.
+      - name: Keep the findings
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: inspection
+          if-no-files-found: ignore
+          path: |
+            .inspection/summary.txt
+            .inspection/findings.txt

@@ -90,6 +90,13 @@ be committed back into storage.
   needs `--no-build-cache`: Gradle restores the pre-rename casing and javac
   verifies classpath entries case-sensitively, which surfaces as a
   package-private class being invisible to a test in its own package.
+- **A method declaration is one line.** However many parameters it has, however
+  long the annotations make it - the signature does not wrap. A signature is one
+  thing to read, and split over four lines it is four things to reassemble before
+  the first question about the method can be asked. No IntelliJ inspection says
+  this, so `tools/inspect.ps1` does: it reports a wrapped signature as
+  `WrappedMethodDeclaration` and exits non-zero for one, alongside `DataFlowIssue`
+  and `ReturnNull`. `.github/workflows/inspect.yml` runs it every four days.
 - `final` on parameters and locals wherever possible.
 - Nullability: org.jetbrains `@NotNull`/`@Nullable` everywhere; Lombok
   `@NonNull` only on DTO/marker fields (it generates runtime checks there).

@@ -75,10 +75,7 @@ public final class TestNGExecution implements Disposable {
         p.getMessageBus().connect(this).subscribe(ExecutionManager.EXECUTION_TOPIC, new ExecutionListener() {
 
             @Override
-            public void processTerminated(final @NotNull String executorId,
-                                          final @NotNull ExecutionEnvironment env,
-                                          final @NotNull ProcessHandler handler,
-                                          final int exitCode) {
+            public void processTerminated(final @NotNull String executorId, final @NotNull ExecutionEnvironment env, final @NotNull ProcessHandler handler, final int exitCode) {
                 ended(env);
             }
 
