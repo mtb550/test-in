@@ -53,7 +53,14 @@ public final class DestinationForm implements DialogComponent {
         formatCombo.setSelectedItem(defaultFormat);
         // The combo holds the format itself and renders its label, so the
         // selection needs no lookup back from text.
-        formatCombo.setRenderer(SimpleListCellRenderer.create("", FileTypes::getLabel));
+        //
+        // The Customizer form rather than create(String, Function): the platform
+        // has that one scheduled for removal, which the Marketplace reports on
+        // the plugin page and which will one day simply stop compiling. The
+        // empty string is what an unselected combo renders, and the only reason
+        // this reads a null at all - the model holds no nulls of its own.
+        formatCombo.setRenderer(SimpleListCellRenderer.create(
+                (label, format, index) -> label.setText(format == null ? "" : format.getLabel())));
 
         final @NotNull FileChooserDescriptor descriptor = FileChooserDescriptorFactory
                 .createSingleFolderDescriptor()
