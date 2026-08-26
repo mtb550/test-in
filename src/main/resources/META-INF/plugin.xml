@@ -129,6 +129,38 @@
     <depends optional="true" config-file="testin-git.xml">Git4Idea</depends>
 
     <!-- ================================================================== -->
+    <!-- Content modules                                                    -->
+    <!-- Code that needs an optional plugin lives in a module of its own,   -->
+    <!-- which declares that dependency itself. The Plugin Verifier then    -->
+    <!-- checks the module only against IDEs that have it, instead of       -->
+    <!-- reporting 53 unresolved classes against every IDE without Java     -->
+    <!-- - which is what the Marketplace shows on the plugin page (#144).   -->
+    <!-- loading="optional": an IDE without the plugin skips the module.    -->
+    <!-- ================================================================== -->
+    <content>
+        <module name="Testin.testin-java" loading="optional"/>
+        <module name="Testin.testin-testng" loading="optional"/>
+    </content>
+
+    <!-- ================================================================== -->
+    <!-- What a content module contributes back                             -->
+    <!-- The core cannot call into a module, so a module hands its work     -->
+    <!-- over here. An IDE without the module leaves the list empty, which  -->
+    <!-- every reader treats as an answer rather than an absence (#144).    -->
+    <!-- ================================================================== -->
+    <extensionPoints>
+        <extensionPoint name="testRunners"
+                        interface="org.testin.run.TestRunner"
+                        dynamic="true"/>
+        <extensionPoint name="codeGenerators"
+                        interface="org.testin.codegen.CodeGenerators"
+                        dynamic="true"/>
+        <extensionPoint name="codeNavigation"
+                        interface="org.testin.navigate.CodeNavigation"
+                        dynamic="true"/>
+    </extensionPoints>
+
+    <!-- ================================================================== -->
     <!-- Extensions (platform-only; Java-dependent ones live in             -->
     <!-- testin-java.xml)                                                   -->
     <!-- ================================================================== -->

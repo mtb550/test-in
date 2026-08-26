@@ -32,7 +32,7 @@ public class NavigateToCodeAction extends AbstractProjectAction {
         if (!OptionalPlugin.JAVA.isAvailableOrWarn(p)) return;
 
         ArrayList<String> generatedFqcn = Fqcn.ofMethod(tc);
-        new CodeNavigator().toCode(p, generatedFqcn);
+        CodeNavigation.available().toCode(p, generatedFqcn);
     }
 
     @Override

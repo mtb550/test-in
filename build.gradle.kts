@@ -37,6 +37,18 @@ dependencies {
         pluginVerifier()
         zipSigner()
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
+
+        // Everything that needs the IntelliJ Java plugin lives here rather than
+        // in the core jar, so the verifier checks it only against IDEs that
+        // have com.intellij.java (#144).
+        //
+        // Packaged, not compiled against: the core calls the extension points it
+        // declares itself and never names a class in the module. Wrapping this
+        // in implementation(..) would put the module on the core's compile
+        // classpath and make the two projects depend on each other, since the
+        // module compiles against the core.
+        pluginModule(project(":testin-java"))
+        pluginModule(project(":testin-testng"))
     }
 
     // Lombok is a compile-time tool: annotations generate plain Java, nothing

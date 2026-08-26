@@ -1,0 +1,33 @@
+<!--
+  The descriptor for this content module. Its file name is the module name, and
+  plugin.xml names it in <content>.
+
+  The one line that matters is the dependency below: it is what tells the Plugin
+  Verifier to check these classes against IDEs that have the Java plugin and to
+  leave them alone everywhere else. In the core jar the same code produced 53
+  unresolved-class findings each against PyCharm, GoLand and WebStorm, which the
+  Marketplace publishes on the plugin page (#144).
+
+  loading="optional" is on the <content> entry in plugin.xml, so an IDE without
+  the Java plugin simply does not load this module.
+-->
+<idea-plugin>
+    <dependencies>
+        <plugin id="com.intellij.java"/>
+    </dependencies>
+
+    <!-- What this module hands back to the core. -->
+    <extensions defaultExtensionNs="org.testin">
+        <codeGenerators implementation="org.testin.java.codegen.GenRegistry"/>
+        <codeNavigation implementation="org.testin.java.navigate.CodeNavigator"/>
+    </extensions>
+
+    <!-- The gutter icon beside a generated @Test. It was declared in
+         testin-java.xml, the optional-dependency config file; it belongs here
+         now, with the class it points at. -->
+    <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.lineMarkerProvider
+                language="JAVA"
+                implementationClass="org.testin.java.gutter.TestMethodGutter"/>
+    </extensions>
+</idea-plugin>

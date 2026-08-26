@@ -1,0 +1,19 @@
+<!--
+  The descriptor for the TestNG content module. Both dependencies below are
+  required for it to load: starting a run needs a TestNGConfiguration and the
+  PsiClass holding the generated method.
+
+  Keeping these classes in the core jar is what made the verifier report
+  "Package 'com.theoryinpractice' is not found" against every IDE without
+  TestNG, which the Marketplace publishes on the plugin page (#144).
+-->
+<idea-plugin>
+    <dependencies>
+        <plugin id="com.intellij.java"/>
+        <plugin id="TestNG-J"/>
+    </dependencies>
+
+    <extensions defaultExtensionNs="org.testin">
+        <testRunners implementation="org.testin.testng.TestNGRunner"/>
+    </extensions>
+</idea-plugin>

@@ -11,9 +11,10 @@ import java.util.List;
 /**
  * Every automation-code operation the plugin can perform. Constants carry no
  * PSI-dependent classes: Java-backed actions are resolved lazily through
- * {@link GenRegistry}, which is only class-loaded when the Java plugin
- * is available — so this enum is safe to load in IDEs without Java support
- * (PyCharm, GoLand, WebStorm, ...).
+ * {@link CodeGenerators}, an extension point a content module contributes to -
+ * so this enum is safe to load in IDEs without Java support (PyCharm, GoLand,
+ * WebStorm, ...), and the classes that do the work are not in the core jar at
+ * all (#144).
  */
 @Getter
 public enum GenType {
@@ -173,7 +174,7 @@ public enum GenType {
     private void runJavaAction(final @NotNull Project p, final @NotNull Object obj) {
         if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
 
-        GenRegistry.actionFor(this).execute(p, obj);
+        CodeGenerators.find(this).execute(p, obj);
     }
 
     /**
@@ -185,6 +186,6 @@ public enum GenType {
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
         if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
 
-        GenRegistry.actionFor(this).executeAll(p, items);
+        CodeGenerators.find(this).executeAll(p, items);
     }
 }

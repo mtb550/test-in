@@ -13,7 +13,6 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.runner.TestNGRunner;
 import org.testin.services.Services;
 import org.testin.util.OptionalPlugin;
 
@@ -73,7 +72,7 @@ public class RunTestSetAction extends AbstractProjectTreeAction {
         }
 
         Logger.info("Running " + dir.getName() + " with " + cases.size() + " test case(s)");
-        Services.getInstance(p, TestNGRunner.class).run(p, cases);
+        TestRunner.available().run(p, cases);
 
         // The same word Run Test Case uses, for the same reason: the run starts
         // elsewhere and the tree gives no sign it was heard (#62).

@@ -1,10 +1,7 @@
-<!-- Loaded only when the Java plugin (com.intellij.modules.java) is present. -->
+<!-- Loaded only when the Java plugin (com.intellij.modules.java) is present.
+     Empty since #144: the gutter provider it declared moved into the
+     Testin.testin-java content module along with the class it names, and a
+     module declares its own extensions. Kept as the declaration point the
+     optional dependency needs. -->
 <idea-plugin>
-    <extensions defaultExtensionNs="com.intellij">
-        <!-- gutter icons on generated @Test methods -->
-        <codeInsight.lineMarkerProvider
-                language="JAVA"
-                implementationClass="org.testin.gutter.TestMethodGutter"
-        />
-    </extensions>
 </idea-plugin>
