@@ -35,7 +35,12 @@ $repo = Split-Path -Parent $PSScriptRoot
 
 # The prefix of a report folder - IU-261.25134.95 - is what stays the same when
 # the IDE version moves, so it is what the baseline is keyed on.
-$names = @{ IU = 'IntelliJ IDEA'; PY = 'PyCharm'; GO = 'GoLand'; WS = 'WebStorm' }
+$names = @{
+    'IU-261' = 'IntelliJ IDEA 2026.1'; 'IU-262' = 'IntelliJ IDEA 2026.2'
+    'PY-261' = 'PyCharm 2026.1';       'PY-262' = 'PyCharm 2026.2'
+    'GO-261' = 'GoLand 2026.1';        'GO-262' = 'GoLand 2026.2'
+    'WS-261' = 'WebStorm 2026.1';      'WS-262' = 'WebStorm 2026.2'
+}
 
 function Read-Baseline([string] $path) {
     $expected = [ordered]@{}
@@ -56,7 +61,13 @@ function Read-Verdicts([string] $path) {
     foreach ($file in Get-ChildItem -Path $path -Filter 'verification-verdict.txt' -Recurse -File) {
         # .../pluginVerifier/<IDE>/plugins/<id>/<version>/verification-verdict.txt
         $ide = $file.FullName.Substring($path.Length).TrimStart('\', '/') -split '[\\/]' | Select-Object -First 1
-        $prefix = ($ide -split '-')[0]
+        
+        # IU-261.25134.95 -> IU-261. Product and branch, because the sweep
+        # runs both ends of the range the plugin claims and the two must not
+        # collapse into one row - it was the 262 end that caught a method
+        # scheduled for removal which 261 still allows.
+        $parts = $ide -split '[-.]'
+        $prefix = '{0}-{1}' -f $parts[0], $parts[1]
 
         $first = (Get-Content -Path $file.FullName -TotalCount 1)
         $count = if ($first -match '^(\d+) compatibility problems') { [int] $Matches[1] }
