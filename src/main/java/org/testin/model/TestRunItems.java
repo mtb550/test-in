@@ -88,6 +88,26 @@ public class TestRunItems {
     }
 
     /**
+     * How long the case took, as the framework that ran it measured.
+     * <p>
+     * It overrides whatever the editor's own clock counted, because the two are
+     * not the same measurement and the framework's is the true one. That clock
+     * ticks once a second and truncates, so it reads a case that took 84ms as
+     * zero and one that finished before its first tick as never having been
+     * timed at all - it exists to time a tester reading a case by hand, where a
+     * second either way is nothing.
+     * <p>
+     * Zero means nothing was measured, so a report that carries no duration
+     * leaves what is already there alone. The one check lives here rather than
+     * at the call site, and every caller records unconditionally.
+     */
+    public void recordDuration(final @NotNull Duration measured) {
+        if (measured.isZero()) return;
+
+        duration = measured;
+    }
+
+    /**
      * Records a tester's verdict: the status, when it was reached, and by whom.
      * <p>
      * Passing clears everything a failure described - the bug severity and

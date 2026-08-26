@@ -2,6 +2,7 @@ package org.testin.util;
 
 import org.testng.annotations.Test;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
@@ -58,5 +59,31 @@ public class DisplayFormatTest {
                 "the actual result and the stacktrace");
         assertEquals(Display.andJoin(List.of("the actual result", "the stacktrace", "the bug severity")),
                 "the actual result, the stacktrace and the bug severity");
+    }
+
+    /**
+     * The clock used to be the only source and ticked once a second, so
+     * HH:MM:SS lost nothing. A test framework measures the method itself and
+     * reports in milliseconds, and the old format rendered every fast case as
+     * 00:00:00 - a duration that reads as no time at all.
+     */
+    @Test
+    public void aDurationUnderASecondReadsAsMilliseconds() {
+        assertEquals(Display.formatDuration(Duration.ofMillis(84)), "84ms");
+        assertEquals(Display.formatDuration(Duration.ofMillis(1)), "1ms");
+        assertEquals(Display.formatDuration(Duration.ofMillis(999)), "999ms");
+    }
+
+    @Test
+    public void aSecondAndOverKeepsTheClockFormatATesterAlreadyReads() {
+        assertEquals(Display.formatDuration(Duration.ofSeconds(1)), "00:00:01");
+        assertEquals(Display.formatDuration(Duration.ofMillis(1400)), "00:00:01", "the seconds format truncates, as it always did");
+        assertEquals(Display.formatDuration(Duration.ofMinutes(3).plusSeconds(7)), "00:03:07");
+        assertEquals(Display.formatDuration(Duration.ofHours(2).plusMinutes(5)), "02:05:00");
+    }
+
+    @Test
+    public void nothingMeasuredShowsNothing() {
+        assertEquals(Display.formatDuration(Duration.ZERO), "", "a case nobody ran has no duration line at all");
     }
 }

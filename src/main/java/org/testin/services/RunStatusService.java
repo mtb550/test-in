@@ -12,6 +12,7 @@ import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.model.Failure;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunStatus;
 import org.testin.model.TestStatus;
@@ -25,6 +26,7 @@ import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Display;
 
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -62,7 +64,7 @@ public final class RunStatusService {
         });
     }
 
-    public void executeManual(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
+    public void executeManual(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         if (!(ui instanceof RunEditor editor)) return;
 
         final @NotNull Optional<TestRunItems> found = editor.runItem(tc.getId());
@@ -74,6 +76,11 @@ public final class RunStatusService {
             editor.stopExecution();
         }
 
+        // Before the verdict, not after: passing clears everything a failure
+        // described, so a message written afterward would survive onto a case
+        // that passed. Written first, the verdict decides whether it stays.
+        item.recordDuration(duration);
+        failure.recordOn(item);
         item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
 
         Logger.trace("[RunStatusService]: Status updated -> " + tc.getDescription() + " = " + status);
@@ -157,7 +164,7 @@ public final class RunStatusService {
             if (globalIndex == editor.getCurrentlyExecutingIndex()) {
                 executeNext(p, ui, list, status);
             } else {
-                executeManual(p, ui, tc, status);
+                executeManual(p, ui, tc, status, Duration.ZERO, Failure.NONE);
             }
         } else {
             int recorded = 0;

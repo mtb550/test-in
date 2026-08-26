@@ -815,7 +815,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         launchedHere.add(caseId);
     }
 
-    private void executionReported(final @NotNull TestCaseDto tc, final @NotNull RunStatus status) {
+    private void executionReported(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         if (!launchedHere.contains(tc.getId())) return;
         if (runItem(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) return;
 
@@ -837,7 +837,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // so it takes the same path.
         status.getVerdict().ifPresent(verdict -> {
             launchedHere.remove(tc.getId());
-            Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict);
+            Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict, duration, failure);
         });
 
         // A model event, not a repaint: the card grows a Duration line the

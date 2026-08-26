@@ -6,10 +6,12 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.model.Failure;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,13 +53,13 @@ public final class TestCaseExecutionSubscriber {
      * <p>
      * A bare Runnable before, because both listeners only repainted. The run
      * editor needs more than "something changed" - it writes the verdict into
-     * the run and times the case - and having it re-derive that from the
-     * broadcast would put the uuid mapping and the stopped-is-not-failed rule
-     * in a second place.
+     * the run, times the case, and records what the framework said when one did
+     * not pass - and having it re-derive that from the broadcast would put the
+     * uuid mapping and the stopped-is-not-failed rule in a second place.
      */
     @FunctionalInterface
     public interface Reported {
-        void accept(final @NotNull TestCaseDto tc, final @NotNull RunStatus status);
+        void accept(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure);
     }
 
     /**
@@ -71,15 +73,15 @@ public final class TestCaseExecutionSubscriber {
         this.onUpdated = onUpdated;
 
         p.getMessageBus().connect(parentDisposable).subscribe(TestCaseExecutionListener.TOPIC,
-                (TestCaseExecutionListener) (testName, status, error) ->
+                (TestCaseExecutionListener) (testName, status, duration, failure) ->
                         // The runner reports from its own thread, and everything
                         // below writes fields a renderer reads - so it happens on
                         // the EDT, and the redraw needs no hop of its own.
                         ApplicationManager.getApplication().invokeLater(
-                                () -> record(testName, status, error)));
+                                () -> record(testName, status, duration, failure)));
     }
 
-    private void record(final @NotNull String testName, final @NotNull RunStatus status, final @NotNull String error) {
+    private void record(final @NotNull String testName, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         Logger.debug("Execution report: testName='" + testName + "', status='" + status + "'");
 
         final @NotNull Optional<TestCaseDto> byId = parseUuid(testName).flatMap(indexer::findTestCase);
@@ -92,7 +94,7 @@ public final class TestCaseExecutionSubscriber {
         reported.ifPresent(tc -> {
             final @NotNull RunStatus reportedStatus = verdictFor(tc, status);
 
-            Logger.debug("  reporting on '" + tc.getDescription() + "': " + reportedStatus + " " + error);
+            Logger.debug("  reporting on '" + tc.getDescription() + "': " + reportedStatus + " " + failure.message());
 
             // Recorded against the case's id rather than on the instance in
             // hand. This one is replaced by the next rescan, and a verdict that
@@ -103,7 +105,7 @@ public final class TestCaseExecutionSubscriber {
             // After the runner has been told, not before: a surface asked to
             // redraw reads what is running from there, and would paint the
             // state as it was a moment ago.
-            onUpdated.accept(tc, reportedStatus);
+            onUpdated.accept(tc, reportedStatus, duration, failure);
         });
 
         // The first report TestNG makes under a name of its own: it is about the

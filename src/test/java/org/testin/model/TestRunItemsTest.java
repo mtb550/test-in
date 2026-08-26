@@ -3,6 +3,7 @@ package org.testin.model;
 import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
+import java.time.Duration;
 import java.util.UUID;
 
 import static org.testng.Assert.*;
@@ -53,5 +54,39 @@ public class TestRunItemsTest {
         // FailedResultDialog renders "No longer in the test set" from exactly this.
         assertTrue(item.testCase().isEmpty());
         assertEquals(item.getStatus(), org.testin.model.TestStatus.PENDING, "an unrun item defaults to PENDING");
+    }
+
+    @Test
+    public void theFrameworksMeasurementOverridesWhatTheClockCounted() {
+        final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
+        item.setDuration(Duration.ofSeconds(3));
+
+        item.recordDuration(Duration.ofMillis(84));
+
+        assertEquals(item.getDuration(), Duration.ofMillis(84),
+                "the clock times a tester reading a case; the framework times the method");
+    }
+
+    @Test
+    public void nothingMeasuredLeavesWhatIsThereAlone() {
+        final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
+        item.setDuration(Duration.ofSeconds(3));
+
+        item.recordDuration(Duration.ZERO);
+
+        assertEquals(item.getDuration(), Duration.ofSeconds(3),
+                "a report carrying no duration must not erase one the clock counted");
+    }
+
+    @Test
+    public void passingKeepsTheDurationThoughItClearsTheFailure() {
+        final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
+        item.recordDuration(Duration.ofMillis(84));
+        item.setActualResult("expected [true] but found [false]");
+
+        item.recordVerdict(TestStatus.PASSED, "tester");
+
+        assertEquals(item.getActualResult(), "");
+        assertEquals(item.getDuration(), Duration.ofMillis(84), "a case that passed still took time");
     }
 }

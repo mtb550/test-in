@@ -3,18 +3,25 @@ package org.testin.runner;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.Failure;
 import org.testin.model.RunStatus;
+
+import java.time.Duration;
 
 public interface TestCaseExecutionListener {
 
     Topic<TestCaseExecutionListener> TOPIC = Topic.create("RunTestCaseNotification", TestCaseExecutionListener.class);
 
     /**
-     * @param error what went wrong, and empty when nothing did - every status
-     *              other than a failure carries it empty rather than absent, so
-     *              no listener has to ask whether there is a message at all
+     * @param duration how long the framework measured the case taking, and
+     *                 {@link Duration#ZERO} when it measured nothing - a case
+     *                 that has just started, or one a stop put back
+     * @param failure  what went wrong, and {@link Failure#NONE} when nothing did
+     *                 - every status other than a failure carries it empty rather
+     *                 than absent, so no listener has to ask whether there is
+     *                 anything to report at all
      */
-    void onStatusChanged(final @NotNull String testName, final @NotNull RunStatus status, final @NotNull String error);
+    void onStatusChanged(final @NotNull String testName, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure);
 
     /**
      * Tells every screen that a case changed status.
@@ -25,10 +32,10 @@ public interface TestCaseExecutionListener {
      * land while the project is closing, and it used to be written at only one
      * of the three.
      */
-    static void broadcast(final @NotNull Project p, final @NotNull String testName, final @NotNull RunStatus status, final @NotNull String error) {
+    static void broadcast(final @NotNull Project p, final @NotNull String testName, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         if (p.isDisposed()) return;
 
-        p.getMessageBus().syncPublisher(TOPIC).onStatusChanged(testName, status, error);
+        p.getMessageBus().syncPublisher(TOPIC).onStatusChanged(testName, status, duration, failure);
     }
 
 }

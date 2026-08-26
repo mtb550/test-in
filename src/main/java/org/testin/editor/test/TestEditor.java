@@ -172,7 +172,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         StatusBarListener.attach(this);
 
-        new TestCaseExecutionSubscriber(p, projectDisposable, (tc, status) -> list.repaint());
+        new TestCaseExecutionSubscriber(p, projectDisposable, (tc, status, duration, failure) -> list.repaint());
 
         // List view is the default mode when the editor opens.
         onToolBarSwitchedToListView();

@@ -82,6 +82,14 @@ public final class Display {
     public static @NotNull String formatDuration(final @NotNull Duration duration) {
         if (duration.isZero()) return "";
 
+        // Under a second reads as milliseconds, because the clock is no longer
+        // the only source. A tester working through a case by hand is timed to
+        // the second and never finishes one inside a second; a test framework
+        // measures the method itself and routinely reports 84ms - which this
+        // rendered as 00:00:00, a duration that reads as "no time at all" for
+        // something that did take time.
+        if (duration.toSeconds() == 0) return duration.toMillis() + "ms";
+
         return String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
     }
 

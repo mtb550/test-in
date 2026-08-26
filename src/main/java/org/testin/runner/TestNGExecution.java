@@ -14,11 +14,13 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.model.Failure;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -105,7 +107,7 @@ public final class TestNGExecution implements Disposable {
     public void starting(final @NotNull TestCaseDto tc) {
         registry.starting(tc.getId());
 
-        TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.RUNNING, "");
+        TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.RUNNING, Duration.ZERO, Failure.NONE);
     }
 
     /**
@@ -138,7 +140,7 @@ public final class TestNGExecution implements Disposable {
     public void notStarting(final @NotNull TestCaseDto tc) {
         registry.notStarting(tc.getId());
 
-        TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.IDLE, "");
+        TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.IDLE, Duration.ZERO, Failure.NONE);
     }
 
     /**
@@ -214,7 +216,7 @@ public final class TestNGExecution implements Disposable {
                 + " run(s): " + theirs.size() + " had reached a process");
 
         theirs.forEach(this::kill);
-        stop.cases().forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, ""));
+        stop.cases().forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, Duration.ZERO, Failure.NONE));
 
         return stop.cases().size();
     }
@@ -238,7 +240,7 @@ public final class TestNGExecution implements Disposable {
         if (abandoned.isEmpty()) return;
 
         Logger.info("'" + runName + "' ended with " + abandoned.size() + " test case(s) that never reported");
-        abandoned.forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, ""));
+        abandoned.forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, Duration.ZERO, Failure.NONE));
     }
 
     /**
