@@ -7,6 +7,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.CardHoverAction;
+import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Shortcuts;
 
@@ -28,10 +29,17 @@ public class RunTestCaseAction extends AbstractProjectAction {
 
     private final @NotNull JBList<TestCaseDto> list;
 
-    public RunTestCaseAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
+    /**
+     * The editor this entry belongs to, told before a run starts so an execution
+     * report can be traced back to the run the tester started it from.
+     */
+    private final @NotNull TestinEditor ui;
+
+    public RunTestCaseAction(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull JBList<TestCaseDto> list) {
         super(p, CardHoverAction.RUN_TEST_CASE.getTooltip(),
                 "Run the selected test cases, or stop a run that is going",
                 CardHoverAction.RUN_TEST_CASE.getIcon());
+        this.ui = ui;
         this.list = list;
         this.registerCustomShortcutSet(Shortcuts.RunTestCase.getCustomShortcut(), list);
     }
@@ -39,6 +47,11 @@ public class RunTestCaseAction extends AbstractProjectAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @NotNull List<TestCaseDto> selected = list.getSelectedValuesList();
+
+        // Which editor the tester asked from, the same thing a click on the
+        // card's run icon says. Without it a run started from the menu is a
+        // report nobody claims, and the run records nothing.
+        selected.forEach(tc -> ui.launching(tc.getId()));
 
         CardHoverAction.runSlot(p, selected).execute(p, selected);
     }

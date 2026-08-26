@@ -15,6 +15,21 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface TestinEditor extends Disposable {
+
+    /**
+     * A test case is being launched from this editor.
+     * <p>
+     * The execution reports that follow are broadcast to every listener, and a
+     * case can sit in several runs at once - so without this every open run
+     * editor holding that case wrote the verdict into its own run, including
+     * ones the tester was not looking at and ones already completed.
+     * <p>
+     * Nothing by default: the test editor draws a badge from the report and has
+     * no run to record into, so only the run editor has an answer to give.
+     */
+    default void launching(final @NotNull java.util.UUID caseId) {
+    }
+
     @NotNull DirectoryDto getParent();
 
     @NotNull StatusBar getStatusBar();

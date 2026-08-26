@@ -85,6 +85,15 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     private final @NotNull GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
     private final @NotNull Disposable projectDisposable;
     private final @NotNull RunExecutionTimer executionTimer = new RunExecutionTimer();
+
+    /**
+     * Cases launched from this editor and not yet reported on.
+     * <p>
+     * An execution report names the case and nothing else, and the same case can
+     * sit in several runs - so this is what tells this run that the tester
+     * started that case here and not in the tab beside it.
+     */
+    private final @NotNull Set<UUID> launchedHere = ConcurrentHashMap.newKeySet();
     /**
      * Guards against a stale in-flight load overwriting a newer one (e.g. double refresh).
      */
@@ -801,8 +810,20 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * can sit in several runs and be executed from any of them, and only the run
      * showing it records the result. A removed case records nothing at all.
      */
+    @Override
+    public void launching(final @NotNull UUID caseId) {
+        launchedHere.add(caseId);
+    }
+
     private void executionReported(final @NotNull TestCaseDto tc, final @NotNull RunStatus status) {
+        if (!launchedHere.contains(tc.getId())) return;
         if (runItem(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) return;
+
+        // A completed or closed run keeps what it recorded. It is signed off,
+        // and an execution started from somewhere else must not rewrite its
+        // history - which is the same rule that stops execution being started
+        // on one at all.
+        if (parent.getMarker().getStatus().isTerminal()) return;
 
         // Empty for a report that is not a verdict - a case that has just
         // started, or one a stop put back. A stop did not find a defect, so the
@@ -814,8 +835,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // refreshing whichever view is showing, and confirming to the tester. A
         // verdict TestNG reached is the same verdict a tester would have typed,
         // so it takes the same path.
-        status.getVerdict().ifPresent(verdict ->
-                Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict));
+        status.getVerdict().ifPresent(verdict -> {
+            launchedHere.remove(tc.getId());
+            Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict);
+        });
 
         // A model event, not a repaint: the card grows a Duration line the
         // moment that value stops being blank, and a JList re-measures a row

@@ -78,6 +78,10 @@ public class CardMouseListener extends MouseAdapter {
             final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
 
             Logger.trace(action.getTooltip() + ", tc: " + tc.getDescription());
+            // Which editor the tester clicked in. The reports that follow name
+            // only the case, and a case can be in several open runs.
+            editor.launching(tc.getId());
+
             action.execute(p, tc);
 
             e.consume();

@@ -50,7 +50,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         // offered rather than offered and refused (#66).
         if (OptionalPlugin.JAVA.isAvailable() || OptionalPlugin.TESTNG.isAvailable()) {
             addSeparator();
-            if (OptionalPlugin.TESTNG.isAvailable()) add(new RunTestCaseAction(p, list));
+            if (OptionalPlugin.TESTNG.isAvailable()) add(new RunTestCaseAction(p, ui, list));
             if (OptionalPlugin.JAVA.isAvailable()) add(new NavigateToCodeAction(p, list));
         }
 
