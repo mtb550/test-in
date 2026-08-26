@@ -118,15 +118,25 @@ public enum GenType {
             "Update Automation Test Method Group"
     ),
 
+    /**
+     * Priority writes nothing into the code any more. The generated method's
+     * priority attribute carries the case's position in its set, because that is
+     * what decides execution order; the case's own High/Medium/Low is a Testin
+     * field, shown and filtered and reported, and no concern of the automation.
+     */
     UPDATE_TEST_CASE_PRIORITY(
             "Update Test Case",
-            "Update Automation Test Method Priority"
+            "Update Automation Test Method Priority",
+            "priority"
     ),
 
+    /**
+     * And order is what does write, for the same reason: a test framework runs
+     * methods in the order the priority attribute gives them.
+     */
     UPDATE_TEST_CASE_ORDER(
             "Update Test Case",
-            "Update Automation Test Method Order",
-            "order"
+            "Update Automation Test Method Order"
     ),
 
     /**

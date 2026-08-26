@@ -8,10 +8,9 @@ import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.ExecutionPosition;
 import org.testin.codegen.Fqcn;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseOrder;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
 import org.testin.logger.Logger;
@@ -311,30 +310,6 @@ public class CreateTestMethod implements GenAction {
      * empty body. Written here for both ways of adding it - one at a time
      * through the PSI, and a whole set as text.
      */
-    /**
-     * Where this case sits in its test set, one-based, which is what its
-     * generated method carries as its TestNG priority.
-     * <p>
-     * Asked of the set rather than read off the case, because a case's order is
-     * a rank - a string with room between any two of them, so a drag rewrites
-     * one file instead of renumbering the set. TestNG wants an int, and the only
-     * int that means the same thing is the position that rank sorts into.
-     * <p>
-     * A case the index has not seen yet runs last: it is being created, and
-     * putting it at the end is where a tester looks for something that has just
-     * arrived.
-     */
-    private static int executionPriority(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        final @NotNull List<TestCaseDto> inSet = TestCaseOrder.ordered(
-                Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(tc.getParent().getPath()));
-
-        for (int position = 0; position < inSet.size(); position++) {
-            if (inSet.get(position).getId().equals(tc.getId())) return position + 1;
-        }
-
-        return inSet.size() + 1;
-    }
-
     private static @NotNull String methodText(final @NotNull Project p, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         final @NotNull StringBuilder attributes = new StringBuilder();
 
@@ -354,7 +329,7 @@ public class CreateTestMethod implements GenAction {
         // order the tester arranged - which is what the attribute is for here.
         // The case's own priority stays a Testin field, shown in the grid and
         // the reports; it decides nothing about execution.
-        attributes.append(", priority = ").append(executionPriority(p, tc));
+        attributes.append(", priority = ").append(ExecutionPosition.of(p, tc));
 
         final @NotNull String annotation = String.format("@Test(description = \"%s\", testName = \"%s\"%s)",
                 tc.getDescription().replace("\"", "\\\""),

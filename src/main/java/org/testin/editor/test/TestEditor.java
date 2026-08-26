@@ -27,6 +27,7 @@ import org.testin.editor.toolbar.TestToolbar;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.FilterPopupBtn;
 import org.testin.editor.toolbar.components.TestDetailsPopupBtn;
+import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
@@ -248,6 +249,17 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             final @NotNull List<TestCaseDto> moved = TestCaseOrder.place(snapshot);
 
             Services.getInstance(p, ProjectIndexer.class).updateSequence(dirPath, snapshot, moved);
+
+            // The generated methods carry the position, so a reorder has to
+            // rewrite them or the run keeps executing in the order before the
+            // drag. Every case in the set, not only the ones whose rank changed:
+            // moving one case past three others changes where all four sit, and
+            // a position is a number with no room between two of them.
+            //
+            // Skipped where there is nothing to write - an IDE with no Java
+            // plugin answers with a no-op, and a set nobody has generated code
+            // for has no methods to update.
+            if (!snapshot.isEmpty()) GenType.UPDATE_TEST_CASE_ORDER.executeAll(p, snapshot);
 
             ApplicationManager.getApplication().invokeLater(this::refreshView);
         });
