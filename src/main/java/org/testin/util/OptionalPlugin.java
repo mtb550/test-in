@@ -1,6 +1,6 @@
 package org.testin.util;
 
-import com.intellij.ide.plugins.PluginManager;
+import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
@@ -63,11 +63,21 @@ public enum OptionalPlugin {
     }
 
     /**
-     * Whether the IDE has this plugin enabled. The platform says it does not by
-     * finding no plugin, and this is the one place that reads that.
+     * Whether the IDE has this plugin enabled, asked as the two things that
+     * makes: it is installed, and it has not been switched off.
+     * <p>
+     * Said in two public questions rather than one internal one.
+     * {@code PluginManager.findEnabledPlugin} answers both at once and is
+     * marked internal on the 2026.2 branch, where the verifier reports it;
+     * {@code PluginManager.getPlugin} is deprecated and
+     * {@code PluginManagerCore.findPlugin} is internal too. These two are
+     * neither, and they return booleans - so the answer no longer arrives as a
+     * descriptor that has to be tested for null.
      */
     private boolean isEnabledInIde() {
-        return PluginManager.getInstance().findEnabledPlugin(PluginId.getId(pluginId)) != null;
+        final @NotNull PluginId id = PluginId.getId(pluginId);
+
+        return PluginManagerCore.isPluginInstalled(id) && !PluginManagerCore.isDisabled(id);
     }
 
     /**

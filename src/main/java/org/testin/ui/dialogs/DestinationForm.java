@@ -54,13 +54,21 @@ public final class DestinationForm implements DialogComponent {
         // The combo holds the format itself and renders its label, so the
         // selection needs no lookup back from text.
         //
-        // The Customizer form rather than create(String, Function): the platform
-        // has that one scheduled for removal, which the Marketplace reports on
-        // the plugin page and which will one day simply stop compiling. The
-        // empty string is what an unselected combo renders, and the only reason
-        // this reads a null at all - the model holds no nulls of its own.
-        formatCombo.setRenderer(SimpleListCellRenderer.create(
-                (label, format, index) -> label.setText(format == null ? "" : format.getLabel())));
+        // Subclassed rather than built by SimpleListCellRenderer.create: both
+        // factory overloads are deprecated on the 2026.2 branch and say they
+        // will be removed, so an earlier fix that swapped one for the other
+        // only moved the problem. The class is not going anywhere - customize
+        // is its one abstract method - so implementing it is the form that
+        // survives.
+        //
+        // The empty string is what an unselected combo renders, and the only
+        // reason this reads a null at all; the model holds no nulls of its own.
+        formatCombo.setRenderer(new SimpleListCellRenderer<FileTypes>() {
+            @Override
+            public void customize(final @NotNull JList<? extends FileTypes> list, final FileTypes format, final int index, final boolean selected, final boolean focused) {
+                setText(format == null ? "" : format.getLabel());
+            }
+        });
 
         final @NotNull FileChooserDescriptor descriptor = FileChooserDescriptorFactory
                 .createSingleFolderDescriptor()
