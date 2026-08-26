@@ -46,7 +46,10 @@ param(
     # against 33 in src. Pass '' to inspect the project root instead.
     [string] $Subdirectory = 'src/main',
 
-    # Reuse the XML already in $OutputDir and only rebuild the reports.
+    # Reuse the XML already in $OutputDir and only rebuild the reports. The
+    # line numbers in it are the ones the inspector saw, so a source edited
+    # since then reports against lines that have moved - fine for re-reading a
+    # run, wrong for judging the tree as it is now.
     [switch] $ReportOnly
 )
 
@@ -128,6 +131,107 @@ function Read-Problems([string] $outPath) {
             }
         }
     }
+}
+
+function Get-SourceRoots {
+    <#
+        Every production source tree, not just the core one.
+
+        The plugin is one module plus a content module per language, and the
+        checks below have to see all of them. A wrapped signature in
+        testin-java is exactly as unreadable as one in src, and it used to pass
+        the gate because nothing looked at it.
+
+        Only the ones that exist: a checkout mid-refactor, or a future module,
+        should not fail the run.
+    #>
+    return @('src/main', 'testin-java/src/main', 'testin-testng/src/main') |
+        ForEach-Object { Join-Path $repo $_ } |
+        Where-Object { Test-Path $_ }
+}
+
+function Resolve-CrossModuleUsages([object[]] $problems) {
+    <#
+        A method the inspector calls dead because the only calls to it are in a
+        content module.
+
+        The inspector is given src/main as its analysis scope - the whole
+        project is indexed, but the reference graph it builds for "is this ever
+        used" covers the scope only. So every method the core exposes for
+        testin-java or testin-testng to call reads as unused: four of them
+        today, all on TestNGExecution, all called from TestNGRunner.
+
+        They are relabelled rather than dropped. Nothing should vanish out of a
+        report silently - that is how the wildcard import in #61 turned 94
+        findings into 93 false ones without anyone noticing - and a group of its
+        own in the summary says the thing worth knowing: these are not dead, and
+        the unused count beside them is now about code that really is.
+
+        Matched by name, so a method sharing a name with one a module genuinely
+        calls would be spared wrongly. That is the safe direction to be wrong
+        in, and the finding is still in the list to read.
+    #>
+    $moduleRoots = @('testin-java/src/main', 'testin-testng/src/main') |
+        ForEach-Object { Join-Path $repo $_ } |
+        Where-Object { Test-Path $_ }
+
+    if (-not $moduleRoots) { return $problems }
+
+    $moduleText = (Get-ChildItem -Path $moduleRoots -Filter *.java -Recurse -File |
+        ForEach-Object { [System.IO.File]::ReadAllText($_.FullName) }) -join "`n"
+
+    foreach ($problem in $problems) {
+        if ($problem.Inspection -ne 'unused') { continue }
+        if ($problem.Message -notmatch '^Method .* never used') { continue }
+
+        $name = Get-DeclaredName $problem
+        if (-not $name) { continue }
+
+        # A call or a method reference, either way the module names it.
+        if ($moduleText -notmatch ("(\.|::)\s*" + [regex]::Escape($name) + "\s*[(:,)]")) { continue }
+
+        $problem.Inspection = 'UsedFromContentModule'
+        $problem.Message = "$($problem.Message) It is called from a content module, which is outside the inspector's analysis scope - not dead code."
+    }
+
+    return $problems
+}
+
+function Get-DeclaredName([object] $problem) {
+    <#
+        The method name a finding points at. Read from the source rather than
+        parsed out of the message, which names the method only in some of its
+        wordings.
+
+        Scanned forward a few lines rather than read off the one line, because
+        the line number can point just above the declaration - at the close of
+        its javadoc - when the file has been edited since the inspector ran.
+        The next declaration below a javadoc is the one that javadoc documents,
+        so this is the right answer for the case that actually happens, and a
+        few lines is not enough drift to reach a different method.
+
+        Empty when nothing there looks like a declaration, which leaves the
+        finding labelled as the inspector labelled it. Failing to recognize a
+        cross-module call is a report that says too much; recognizing one that
+        is not there would be a report that says too little.
+    #>
+    $file = Join-Path $repo $problem.Path
+    if (-not (Test-Path $file)) { return '' }
+
+    $lines = [System.IO.File]::ReadAllLines($file)
+    if ($problem.Line -lt 1 -or $problem.Line -gt $lines.Count) { return '' }
+
+    $last = [Math]::Min($problem.Line + 4, $lines.Count)
+    for ($n = $problem.Line; $n -le $last; $n++) {
+        $text = $lines[$n - 1]
+        $trimmed = $text.Trim()
+        if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
+        if ($trimmed.EndsWith('*/')) { continue }
+
+        if ($text -match '\b(\w+)\s*\(') { return $matches[1] }
+    }
+
+    return ''
 }
 
 function Read-WrappedDeclarations([string] $scope) {
@@ -226,8 +330,15 @@ if (-not $ReportOnly) {
 # The inspector's findings and this script's own, as one list. Write-Reports
 # groups by inspection name and knows nothing about where a finding came from,
 # which is why the wrapped-declaration check produces the same shape.
-$scope = if ($Subdirectory) { Join-Path $repo $Subdirectory } else { Join-Path $repo 'src' }
-$problems = @(Read-Problems $outPath) + @(Read-WrappedDeclarations $scope)
+# Every production source root, so the one-line-signature gate covers the
+# content modules too. An explicit -Subdirectory still wins, for the caller
+# narrowing a run to one place.
+$scopes = if ($Subdirectory) { @(Join-Path $repo $Subdirectory) } else { Get-SourceRoots }
+
+$problems = @(Read-Problems $outPath)
+foreach ($scope in $scopes) { $problems += @(Read-WrappedDeclarations $scope) }
+
+$problems = Resolve-CrossModuleUsages $problems
 
 Write-Reports $problems $outPath
 
