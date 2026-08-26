@@ -21,7 +21,7 @@
     and it must never touch the developer's real settings.
 
     Costs one full indexing pass, so expect 10-20 minutes. A deliberate sweep, not
-    a per-commit gate - .github/workflows/inspect.yml runs it every four days.
+    a per-commit gate - .github/workflows/inspect.yml runs it every two days.
 
     Exits non-zero for three findings and no others: DataFlowIssue, ReturnNull and
     WrappedMethodDeclaration. The first two are the standing rule, a null contract

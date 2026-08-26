@@ -1,7 +1,7 @@
 # The IDE inspections, on a schedule rather than on every push.
 #
 # They cost a full indexing pass - fifteen to twenty minutes - which is why this
-# is not part of build.yml. Every four days is often enough that a finding is
+# is not part of build.yml. Every two days is often enough that a finding is
 # still about code somebody remembers writing, and rare enough that nobody waits
 # on it.
 #
@@ -15,11 +15,11 @@ name: Inspect
 
 on:
   schedule:
-    # 02:00 UTC on the 1st, 5th, 9th ... of each month. Cron has no way to say
-    # "every four days" across a month boundary, and this is the usual reading
-    # of it: the gap stretches to five or six days once a month, in the small
-    # hours, which is not worth a workflow that computes its own dates.
-    - cron: '0 2 */4 * *'
+    # 02:00 UTC on every odd day of the month. Cron counts days within a month
+    # rather than continuously, so a month boundary is not exactly two days:
+    # after a 31-day month it fires again the next day. That errs towards
+    # running more often and never less, which is the right way round for a gate.
+    - cron: '0 2 */2 * *'
 
   # So it can be run against a branch on demand, without waiting for the date.
   workflow_dispatch:

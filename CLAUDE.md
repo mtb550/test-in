@@ -96,7 +96,7 @@ be committed back into storage.
   the first question about the method can be asked. No IntelliJ inspection says
   this, so `tools/inspect.ps1` does: it reports a wrapped signature as
   `WrappedMethodDeclaration` and exits non-zero for one, alongside `DataFlowIssue`
-  and `ReturnNull`. `.github/workflows/inspect.yml` runs it every four days.
+  and `ReturnNull`. `.github/workflows/inspect.yml` runs it every two days.
 - `final` on parameters and locals wherever possible.
 - Nullability: org.jetbrains `@NotNull`/`@Nullable` everywhere; Lombok
   `@NonNull` only on DTO/marker fields (it generates runtime checks there).
