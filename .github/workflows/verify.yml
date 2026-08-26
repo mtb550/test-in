@@ -1,0 +1,78 @@
+# The Plugin Verifier against every IDE the plugin claims to run in, on the same
+# two-day schedule as the inspections.
+#
+# build.yml verifies against IntelliJ IDEA only, because that is the one verdict
+# that can turn a pull request red for a real reason. This is the other half:
+# what the JetBrains Marketplace will say about the plugin when it is published.
+# The Marketplace runs this same verifier and shows its findings on the plugin
+# page, so the number here is the number a tester sees before installing.
+#
+# It is not always-green and is not meant to be yet. It fails when a count goes
+# up and reports when one goes down, against .github/verification-baseline.txt.
+# The target on every line of that file is 0.
+name: Verify
+
+on:
+  schedule:
+    # 03:00 UTC on every odd day - an hour after Inspect, so the two never
+    # compete for a runner or for the same Gradle cache entry.
+    - cron: '0 3 */2 * *'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify against every target IDE
+    runs-on: windows-latest
+    # Four IDEs to download and analyse. The first run took eighteen minutes
+    # with nothing cached.
+    timeout-minutes: 120
+
+    steps:
+      - name: Check out the commit
+        uses: actions/checkout@v7
+
+      - name: Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Roughly 3 GB across the four. Keyed on the file that names their
+      # versions, so the cache is rebuilt only when a version changes.
+      - name: Cache the IDEs the verifier runs against
+        uses: actions/cache@v6
+        with:
+          path: ~/.pluginVerifier
+          key: plugin-verifier-all-${{ hashFiles('build.gradle.kts', 'gradle.properties') }}
+          restore-keys: plugin-verifier-all-
+
+      # -PverifyAllIdes adds PyCharm, GoLand and WebStorm to the IntelliJ IDEA
+      # that build.gradle.kts verifies by default. It exits non-zero while any
+      # of them reports a problem, which is today - the step after this one is
+      # what decides whether that is news.
+      - name: Verify against all IDEs
+        id: verify
+        continue-on-error: true
+        shell: bash
+        run: ./gradlew verifyPlugin -PverifyAllIdes
+
+      # Beside inspect.ps1, because tools/ is where this repository keeps its
+      # scripts - and because .gitignore excludes *.py on purpose.
+      - name: Compare against the baseline
+        shell: bash
+        run: pwsh -NoProfile -File tools/verification-report.ps1
+
+      - name: Keep the verification reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: verification
+          if-no-files-found: ignore
+          path: build/reports/pluginVerifier

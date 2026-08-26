@@ -1,0 +1,20 @@
+# How many compatibility problems the Plugin Verifier currently reports for each
+# IDE, and therefore how many the Marketplace will show against the plugin page.
+#
+# verify.yml fails when a number goes up and tells you when one goes down. The
+# target for every line is 0: that is what "green on the Marketplace" means.
+#
+# IU is IntelliJ IDEA, which ships the Java and TestNG plugins, so it is already
+# there. The other three do not ship them, and every problem they report is an
+# unresolved com.intellij.psi.* or com.theoryinpractice.testng.* class in the
+# 38 files that need one. plugin.xml depends on both optionally and OptionalPlugin
+# guards the code at runtime, but the verifier reads bytecode and cannot see a
+# runtime guard - so the reports stand until that code moves into content
+# modules of its own (#144).
+#
+# Lower a number here the moment the work lowers it, or the gate stops meaning
+# anything.
+IU 0
+PY 53
+GO 53
+WS 53
