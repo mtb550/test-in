@@ -8,28 +8,33 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Optional;
 
 @Getter
 @AllArgsConstructor
 public enum RunStatus {
     IDLE(
             AllIcons.RunConfigurations.TestState.Run,
-            Badge.NONE
+            Badge.NONE,
+            Optional.empty()
     ),
 
     PASSED(
             AllIcons.RunConfigurations.TestPassed,
-            new Badge("Passed", new JBColor(new Color(100, 200, 100), new Color(50, 150, 50)))
+            new Badge("Passed", new JBColor(new Color(100, 200, 100), new Color(50, 150, 50))),
+            Optional.of(TestStatus.PASSED)
     ),
 
     FAILED(
             AllIcons.RunConfigurations.TestFailed,
-            new Badge("Failed", new JBColor(new Color(255, 100, 100), new Color(180, 50, 50)))
+            new Badge("Failed", new JBColor(new Color(255, 100, 100), new Color(180, 50, 50))),
+            Optional.of(TestStatus.FAILED)
     ),
 
     RUNNING(
             AllIcons.Actions.Suspend,
-            new Badge("Running", new JBColor(new Color(255, 200, 100), new Color(200, 150, 50)))
+            new Badge("Running", new JBColor(new Color(255, 200, 100), new Color(200, 150, 50))),
+            Optional.empty()
     );
 
     /**
@@ -47,6 +52,20 @@ public enum RunStatus {
      * up with a label and no color to draw it in.
      */
     private final @NotNull Badge badge;
+
+    /**
+     * The verdict this report writes into a test run, and empty for a report
+     * that is not one.
+     * <p>
+     * A case that has just started has no verdict yet, and one a stop put back
+     * did not fail - nobody found a defect, it simply did not finish (#34). So
+     * two of the four carry nothing, said with an empty value rather than a null
+     * the run editor would have to test for.
+     * <p>
+     * Declared here so the run editor never maps one vocabulary to the other by
+     * hand: what a TestNG report means for a run is this enum's to say.
+     */
+    private final @NotNull Optional<TestStatus> verdict;
 
     /**
      * Whether this status draws a badge at all. The one reader of what the badge

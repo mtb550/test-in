@@ -58,7 +58,7 @@ public class ViewPanel implements Disposable {
 
         refreshCurrentView();
 
-        new TestCaseExecutionSubscriber(p, this, this::refreshCurrentView);
+        new TestCaseExecutionSubscriber(p, this, (tc, status) -> refreshCurrentView());
     }
 
     private @NotNull JBScrollPane createScrollPane(final @NotNull Component view) {

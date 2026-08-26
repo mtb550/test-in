@@ -21,6 +21,7 @@ import org.testin.editor.list.ListView;
 import org.testin.editor.listeners.GridContextMenuListener;
 import org.testin.editor.listeners.GridSelectionListener;
 import org.testin.editor.listeners.RunGridEditListener;
+import org.testin.model.*;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.editor.listeners.RunListRenderer;
 import org.testin.editor.listeners.StatusBarListener;
@@ -34,15 +35,11 @@ import org.testin.editor.toolbar.components.StartExecutionBtn;
 import org.testin.editor.toolbar.components.StopExecutionBtn;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.RunEditorAttributes;
-import org.testin.model.TestRunItems;
-import org.testin.model.TestRunStatus;
-import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.TestRunSummary;
+import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.testrun.ResultAnalysisDialog;
 import org.testin.editor.toolbar.components.ResultAnalysisBtn;
 import org.testin.notifications.Notifier;
@@ -175,6 +172,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         this.currentTestCases = Collections.synchronizedList(new ArrayList<>());
 
         this.resultsMap = new ConcurrentHashMap<>();
+
+        // The run editor hears about executions for the first time here. The
+        // test editor and the view panel only ever repainted on a report; this
+        // one records what the report said, because a run is where a verdict
+        // belongs.
+        new TestCaseExecutionSubscriber(p, projectDisposable, this::executionReported);
 
         // Shared list-view construction (see ListPanelBuilder, the counterpart of
         // GridPanelBuilder). Built here rather than in buildOpeningPanel so the
@@ -776,6 +779,59 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             // fires with index -1 for one that is not, which invalidates the
             // layout of the whole list once a second for a row nobody can see.
             if (model.contains(currentTc)) model.contentsChanged(currentTc);
+            showExecutionTotal();
+        });
+    }
+
+    /**
+     * An execution reported on one of this run's cases.
+     * <p>
+     * Running starts the clock; a verdict stops it and is written into the run.
+     * The tester clicked the run icon on a card and the case now carries its own
+     * status, duration, who ran it and when - the same four fields a verdict
+     * given by hand fills in, through the same {@code recordVerdict}, so there
+     * is one way a run item learns what happened to it.
+     * <p>
+     * A report about a case this run does not hold is not ours: the same case
+     * can sit in several runs and be executed from any of them, and only the run
+     * showing it should record the result. A removed case records nothing at
+     * all.
+     */
+    private void executionReported(final @NotNull TestCaseDto tc, final @NotNull RunStatus status) {
+        runItem(tc.getId()).filter(item -> !item.isRemoved()).ifPresent(item -> {
+            if (status == RunStatus.RUNNING) {
+                // Counting on from what the case already carries, which is what
+                // the timer does for a manual run too - a case run twice is one
+                // case that took both.
+                executionTimer.start(item, () -> {
+                    if (model.contains(tc)) model.contentsChanged(tc);
+                    showExecutionTotal();
+                });
+                return;
+            }
+
+            // Stopped before the verdict is read, so the duration the case ends
+            // up carrying is the one the last tick wrote and not one more
+            // second of a run that has already finished.
+            executionTimer.stop();
+
+            // Empty for a report that is not a verdict - a case put back by a
+            // stop. It did not fail, so the run records nothing and the case
+            // keeps the status it had.
+            //
+            // Through RunStatusService rather than by writing the four fields
+            // here: it already owns recording a verdict, persisting the run,
+            // refreshing whichever view is showing and confirming to the
+            // tester. A verdict TestNG reached is the same verdict a tester
+            // would have typed, so it takes the same path - the method's name
+            // is about the gesture it was written for, not a second rule.
+            status.getVerdict().ifPresent(verdict ->
+                    Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict));
+
+            // The duration, which no verdict path touches: the card grows a
+            // Duration line the moment that value stops being blank, and a
+            // JList re-measures a row only when the model says it changed.
+            if (model.contains(tc)) model.contentsChanged(tc);
             showExecutionTotal();
         });
     }

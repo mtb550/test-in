@@ -44,14 +44,28 @@ public final class TestCaseExecutionSubscriber {
      * What to redraw once a report has landed: the editor's list, or the view
      * panel. Run on the EDT, because that is where the report is handled.
      */
-    private final @NotNull Runnable onUpdated;
+    private final @NotNull Reported onUpdated;
+
+    /**
+     * What a surface is told when a report lands: which case, and what it said.
+     * <p>
+     * A bare Runnable before, because both listeners only repainted. The run
+     * editor needs more than "something changed" - it writes the verdict into
+     * the run and times the case - and having it re-derive that from the
+     * broadcast would put the uuid mapping and the stopped-is-not-failed rule
+     * in a second place.
+     */
+    @FunctionalInterface
+    public interface Reported {
+        void accept(final @NotNull TestCaseDto tc, final @NotNull RunStatus status);
+    }
 
     /**
      * The case the run is on, empty until one reports itself.
      */
     private volatile @NotNull Optional<UUID> runningDtoId = Optional.empty();
 
-    public TestCaseExecutionSubscriber(final @NotNull Project p, final @NotNull Disposable parentDisposable, final @NotNull Runnable onUpdated) {
+    public TestCaseExecutionSubscriber(final @NotNull Project p, final @NotNull Disposable parentDisposable, final @NotNull Reported onUpdated) {
         this.p = p;
         this.indexer = Services.getInstance(p, ProjectIndexer.class);
         this.onUpdated = onUpdated;
@@ -85,6 +99,11 @@ public final class TestCaseExecutionSubscriber {
             // lived on it went with it - which is how a case that had just
             // passed lost its badge at the tester's next keystroke (#116).
             Services.getInstance(p, TestNGExecution.class).reported(tc.getId(), reportedStatus);
+
+            // After the runner has been told, not before: a surface asked to
+            // redraw reads what is running from there, and would paint the
+            // state as it was a moment ago.
+            onUpdated.accept(tc, reportedStatus);
         });
 
         // The first report TestNG makes under a name of its own: it is about the
@@ -96,7 +115,6 @@ public final class TestCaseExecutionSubscriber {
             });
         }
 
-        if (reported.isPresent()) onUpdated.run();
     }
 
     /**
