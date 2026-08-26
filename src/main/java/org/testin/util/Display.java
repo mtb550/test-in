@@ -90,7 +90,13 @@ public final class Display {
         // something that did take time.
         if (duration.toSeconds() == 0) return duration.toMillis() + "ms";
 
-        return String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
+        final @NotNull String clock = String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
+
+        // The milliseconds only when there are some. Whole seconds are what a
+        // case timed by hand mostly comes to, and 00:03:07.000 is three extra
+        // digits that say nothing; a case that took 1.4 seconds used to read
+        // 00:00:01, which said something untrue.
+        return duration.toMillisPart() == 0 ? clock : clock + String.format(".%03d", duration.toMillisPart());
     }
 
     /**

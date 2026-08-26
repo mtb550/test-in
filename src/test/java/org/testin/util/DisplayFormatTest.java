@@ -77,9 +77,21 @@ public class DisplayFormatTest {
     @Test
     public void aSecondAndOverKeepsTheClockFormatATesterAlreadyReads() {
         assertEquals(Display.formatDuration(Duration.ofSeconds(1)), "00:00:01");
-        assertEquals(Display.formatDuration(Duration.ofMillis(1400)), "00:00:01", "the seconds format truncates, as it always did");
         assertEquals(Display.formatDuration(Duration.ofMinutes(3).plusSeconds(7)), "00:03:07");
         assertEquals(Display.formatDuration(Duration.ofHours(2).plusMinutes(5)), "02:05:00");
+    }
+
+    /**
+     * The clock format on its own is a claim about a duration it cannot make.
+     * A case that took 1.4 seconds read as 00:00:01 - not rounded, not
+     * approximate, simply four hundred milliseconds that were measured and then
+     * not shown. Two runs differing by that much looked identical.
+     */
+    @Test
+    public void millisecondsShowWhenThereAreSome() {
+        assertEquals(Display.formatDuration(Duration.ofMillis(1400)), "00:00:01.400");
+        assertEquals(Display.formatDuration(Duration.ofMillis(11007)), "00:00:11.007");
+        assertEquals(Display.formatDuration(Duration.ofSeconds(45).plusMillis(237)), "00:00:45.237");
     }
 
     @Test
