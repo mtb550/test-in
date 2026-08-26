@@ -28,7 +28,7 @@ import java.util.List;
 @AllArgsConstructor
 public final class GitRepositoryService {
 
-    private final @NotNull Project project;
+    private final @NotNull Project p;
 
     /**
      * A filesystem question, not an IDE one - so this stays as it was.
@@ -340,7 +340,7 @@ public final class GitRepositoryService {
      */
     private @NotNull Optional<String> execute(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull String... command) {
         try {
-            return Optional.of(GitCommandRunner.executeRemote(project, path, remoteUrl, command));
+            return Optional.of(GitCommandRunner.executeRemote(p, path, remoteUrl, command));
         } catch (final RuntimeException ex) {
             Logger.debug("git " + String.join(" ", command) + " failed in " + path + ": " + ex.getMessage());
             return Optional.empty();

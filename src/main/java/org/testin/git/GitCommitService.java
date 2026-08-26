@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 public final class GitCommitService {
 
-    private final @NotNull Project project;
+    private final @NotNull Project p;
 
     /**
      * For the remote's URL, which the network commands need so {@code git4idea} can
@@ -27,9 +27,9 @@ public final class GitCommitService {
      */
     private final @NotNull GitRepositoryService repositories;
 
-    public GitCommitService(final @NotNull Project project) {
-        this.project = project;
-        this.repositories = new GitRepositoryService(project);
+    public GitCommitService(final @NotNull Project p) {
+        this.p = p;
+        this.repositories = new GitRepositoryService(p);
     }
 
     /**
@@ -54,7 +54,7 @@ public final class GitCommitService {
     }
 
     public void initialize(final @NotNull Path repositoryPath) {
-        GitCommandRunner.execute(project, repositoryPath, "git", "init");
+        GitCommandRunner.execute(p, repositoryPath, "git", "init");
     }
 
     /**
@@ -80,10 +80,10 @@ public final class GitCommitService {
 
         final @NotNull Set<String> stageable = stageable(repositoryPath, paths);
         if (!stageable.isEmpty()) {
-            GitCommandRunner.executeOverPaths(project, repositoryPath, stageable, "git", "add");
+            GitCommandRunner.executeOverPaths(p, repositoryPath, stageable, "git", "add");
         }
 
-        GitCommandRunner.executeOverPaths(project, repositoryPath, paths, "git", "commit", "--only", "-m", message);
+        GitCommandRunner.executeOverPaths(p, repositoryPath, paths, "git", "commit", "--only", "-m", message);
     }
 
     /**
@@ -120,7 +120,7 @@ public final class GitCommitService {
      */
     public @NotNull String headCommitId(final @NotNull Path repositoryPath) {
         try {
-            return GitCommandRunner.execute(project, repositoryPath, "git", "rev-parse", "--short", "HEAD").trim();
+            return GitCommandRunner.execute(p, repositoryPath, "git", "rev-parse", "--short", "HEAD").trim();
         } catch (final RuntimeException ex) {
             Logger.warn("Could not read the commit id: " + ex.getMessage());
             return "";
@@ -128,13 +128,13 @@ public final class GitCommitService {
     }
 
     public void configureRemote(final @NotNull Path repositoryPath, final @NotNull String remoteName, final @NotNull String remoteUrl) {
-        GitCommandRunner.execute(project, repositoryPath, "git", "remote", "add", remoteName, remoteUrl);
+        GitCommandRunner.execute(p, repositoryPath, "git", "remote", "add", remoteName, remoteUrl);
     }
 
     public void configureIdentity(final @NotNull Path repositoryPath, final @NotNull String name, final @NotNull String email, final boolean global) {
         final @NotNull String scope = global ? "--global" : "--local";
-        GitCommandRunner.execute(project, repositoryPath, "git", "config", scope, "user.name", name);
-        GitCommandRunner.execute(project, repositoryPath, "git", "config", scope, "user.email", email);
+        GitCommandRunner.execute(p, repositoryPath, "git", "config", scope, "user.name", name);
+        GitCommandRunner.execute(p, repositoryPath, "git", "config", scope, "user.email", email);
     }
 
     /**
@@ -152,7 +152,7 @@ public final class GitCommitService {
         final @NotNull String url = repositories.getRemoteUrl(repositoryPath, remote);
 
         if (remoteHasBranch(repositoryPath, remote, branch)) {
-            GitCommandRunner.executeRemote(project, repositoryPath, url, "git", "pull", "--rebase", "--autostash", remote, branch);
+            GitCommandRunner.executeRemote(p, repositoryPath, url, "git", "pull", "--rebase", "--autostash", remote, branch);
         } else {
             Logger.info("Remote " + remote + " has no branch " + branch + " yet; pushing without pulling first");
         }
@@ -169,7 +169,7 @@ public final class GitCommitService {
      */
     private boolean remoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
         try {
-            return !GitCommandRunner.executeRemote(project, repositoryPath, repositories.getRemoteUrl(repositoryPath, remote),
+            return !GitCommandRunner.executeRemote(p, repositoryPath, repositories.getRemoteUrl(repositoryPath, remote),
                     "git", "ls-remote", "--heads", remote, branch).isBlank();
         } catch (final RuntimeException ex) {
             Logger.debug("Could not list " + remote + " branches: " + ex.getMessage());
@@ -178,7 +178,7 @@ public final class GitCommitService {
     }
 
     public void push(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
-        GitCommandRunner.executeRemote(project, repositoryPath, repositories.getRemoteUrl(repositoryPath, remote),
+        GitCommandRunner.executeRemote(p, repositoryPath, repositories.getRemoteUrl(repositoryPath, remote),
                 "git", "push", "-u", remote, branch);
         Logger.info("Git push completed for " + repositoryPath);
     }

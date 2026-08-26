@@ -20,11 +20,11 @@ import java.util.List;
  * IntelliJ tree node whose children are resolved by StructureTreeModel in the background.
  */
 public final class ExplorerTreeNode extends AbstractTreeNode<Object> {
-    private final @NotNull Project project;
+    private final @NotNull Project p;
 
-    public ExplorerTreeNode(final @NotNull Project project, final @NotNull Object value) {
-        super(project, value);
-        this.project = project;
+    public ExplorerTreeNode(final @NotNull Project p, final @NotNull Object value) {
+        super(p, value);
+        this.p = p;
     }
 
     @Override
@@ -50,7 +50,7 @@ public final class ExplorerTreeNode extends AbstractTreeNode<Object> {
             // A node with nothing indexed under it yet answers with nothing, and
             // ExplorerPanel.refreshWhenIndexed draws it again when the index is
             // ready. That wait is on a pooled thread, holding no lock.
-            final @NotNull ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             final @NotNull List<ExplorerTreeNode> children = new ArrayList<>();
             for (final DirectoryDto child : indexer.getChildren(directory.getPath())) {
                 children.add(child(child));
@@ -64,7 +64,7 @@ public final class ExplorerTreeNode extends AbstractTreeNode<Object> {
     }
 
     private @NotNull ExplorerTreeNode child(final @NotNull Object value) {
-        final @NotNull ExplorerTreeNode child = new ExplorerTreeNode(project, value);
+        final @NotNull ExplorerTreeNode child = new ExplorerTreeNode(p, value);
         child.setParent(this);
         return child;
     }

@@ -27,7 +27,7 @@ public final class TestinTabColorProvider implements EditorTabColorProvider {
             ColorKey.createColorKey("TESTIN_TAB_FOREGROUND", JBColor.lazy(UIUtil::getLabelForeground));
 
     @Override
-    public @Nullable Color getEditorTabColor(final @NotNull Project project, final @NotNull VirtualFile file) {
+    public @Nullable Color getEditorTabColor(final @NotNull Project p, final @NotNull VirtualFile file) {
         // Background is left to the platform and to the user's File Colors.
         return null;
     }
@@ -43,7 +43,7 @@ public final class TestinTabColorProvider implements EditorTabColorProvider {
     // never being called.
     @SuppressWarnings("UnstableApiUsage")
     @Override
-    public @Nullable ColorKey getEditorTabForegroundColor(final @NotNull Project project, final @NotNull VirtualFile file) {
+    public @Nullable ColorKey getEditorTabForegroundColor(final @NotNull Project p, final @NotNull VirtualFile file) {
         return file instanceof UnifiedVirtualFile ? TAB_FOREGROUND : null;
     }
 }

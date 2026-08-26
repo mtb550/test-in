@@ -15,10 +15,10 @@ import java.nio.file.Path;
  */
 public final class GitSyncService {
 
-    private final @NotNull Project project;
+    private final @NotNull Project p;
 
-    public GitSyncService(final @NotNull Project project) {
-        this.project = project;
+    public GitSyncService(final @NotNull Project p) {
+        this.p = p;
     }
 
     /**
@@ -30,7 +30,7 @@ public final class GitSyncService {
      * IDE had already been given, or failed where every other command succeeded.
      */
     public void pull(final @NotNull Path repositoryPath, final @NotNull String remoteUrl, final @NotNull String remote, final @NotNull String branch) {
-        GitCommandRunner.executeRemote(project, repositoryPath, remoteUrl,
+        GitCommandRunner.executeRemote(p, repositoryPath, remoteUrl,
                 "git", "pull", "--rebase", "--autostash", remote, branch);
     }
 

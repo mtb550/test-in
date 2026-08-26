@@ -20,11 +20,11 @@ public final class ExplorerTreeStructure extends AbstractTreeStructure {
      */
     private static final @NotNull String NO_PROJECT = "Project";
 
-    private final @NotNull Project project;
+    private final @NotNull Project p;
     private volatile @NotNull ExplorerTreeNode root;
 
-    public ExplorerTreeStructure(final @NotNull Project project, final @NotNull Optional<TestProjectDirectoryDto> selectedProject) {
-        this.project = project;
+    public ExplorerTreeStructure(final @NotNull Project p, final @NotNull Optional<TestProjectDirectoryDto> selectedProject) {
+        this.p = p;
         this.root = createRoot(selectedProject);
     }
 
@@ -33,7 +33,7 @@ public final class ExplorerTreeStructure extends AbstractTreeStructure {
     }
 
     private @NotNull ExplorerTreeNode createRoot(final @NotNull Optional<TestProjectDirectoryDto> selectedProject) {
-        return new ExplorerTreeNode(project, selectedProject.map(Object.class::cast).orElse(NO_PROJECT));
+        return new ExplorerTreeNode(p, selectedProject.map(Object.class::cast).orElse(NO_PROJECT));
     }
 
     @Override

@@ -40,12 +40,12 @@ import java.util.function.Function;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GitDiffProcessor {
 
-    public static @NotNull List<PendingChange> getPendingChanges(final @NotNull Project project, final @NotNull Path repositoryRoot) {
+    public static @NotNull List<PendingChange> getPendingChanges(final @NotNull Project p, final @NotNull Path repositoryRoot) {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
-        final @NotNull GitRepositoryService repositories = new GitRepositoryService(project);
+        final @NotNull GitRepositoryService repositories = new GitRepositoryService(p);
 
         return toDiffs(repositories.status(root), root,
-                Services.getInstance(project, Mapper.class),
+                Services.getInstance(p, Mapper.class),
                 path -> repositories.showAtHead(root, path));
     }
 

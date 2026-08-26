@@ -23,8 +23,8 @@ import java.util.Collection;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class GitCommandRunner {
 
-    static @NotNull String execute(final @NotNull Project project, final @NotNull Path workingDirectory, final @NotNull String... command) {
-        return run(project, workingDirectory, "", command);
+    static @NotNull String execute(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String... command) {
+        return run(p, workingDirectory, "", command);
     }
 
     /**
@@ -38,8 +38,8 @@ final class GitCommandRunner {
      * is also how the IDE finds the credentials it already has for that host, so
      * a tester is asked once rather than on every push.
      */
-    static @NotNull String executeRemote(final @NotNull Project project, final @NotNull Path workingDirectory, final @NotNull String remoteUrl, final @NotNull String... command) {
-        return run(project, workingDirectory, remoteUrl, command);
+    static @NotNull String executeRemote(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String remoteUrl, final @NotNull String... command) {
+        return run(p, workingDirectory, remoteUrl, command);
     }
 
     /**
@@ -68,7 +68,7 @@ final class GitCommandRunner {
      * list are {@code add}, which prints nothing when it works, and
      * {@code commit}, whose summary nobody reads. A failure still raises.
      */
-    static void executeOverPaths(final @NotNull Project project, final @NotNull Path workingDirectory, final @NotNull Collection<String> paths, final @NotNull String... command) {
+    static void executeOverPaths(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull Collection<String> paths, final @NotNull String... command) {
         if (paths.isEmpty()) throw new IllegalArgumentException("Expected paths to run over");
 
         final @NotNull Path pathspec = writePathspec(paths);
@@ -77,7 +77,7 @@ final class GitCommandRunner {
             full[command.length] = "--pathspec-from-file=" + pathspec;
             full[command.length + 1] = "--pathspec-file-nul";
 
-            run(project, workingDirectory, "", full);
+            run(p, workingDirectory, "", full);
         } finally {
             try {
                 Files.deleteIfExists(pathspec);
@@ -117,14 +117,14 @@ final class GitCommandRunner {
         return String.join("\0", paths).getBytes(StandardCharsets.UTF_8);
     }
 
-    private static @NotNull String run(final @NotNull Project project, final @NotNull Path workingDirectory, final @NotNull String remoteUrl, final @NotNull String... command) {
+    private static @NotNull String run(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String remoteUrl, final @NotNull String... command) {
         if (command.length < 2 || !"git".equals(command[0])) {
             throw new IllegalArgumentException("Expected a git command");
         }
 
         final @NotNull GitCommand gitCommand = commandFor(command[1]);
 
-        final @NotNull GitLineHandler handler = new GitLineHandler(project, workingDirectory, gitCommand);
+        final @NotNull GitLineHandler handler = new GitLineHandler(p, workingDirectory, gitCommand);
 
         // Nothing the plugin runs is a conversation, so no command of it opens an
         // editor. `git rebase --continue` otherwise stops to have the replayed
