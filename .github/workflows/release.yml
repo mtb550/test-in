@@ -31,7 +31,7 @@ jobs:
           java-version: 21
 
       - name: Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       # The Marketplace takes a version string once and never again, so a tag
       # that disagrees with the version in build.gradle.kts is caught here

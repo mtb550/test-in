@@ -59,7 +59,7 @@ jobs:
       # Caches ~/.gradle, which is where the platform artifacts and every
       # dependency land. Without it each run downloads the whole IDE again.
       - name: Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       # The verifier runs the plugin against four IDEs and downloads each one.
       # They change only when build.gradle.kts names a different version, so
