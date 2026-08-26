@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.services.Services;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -71,6 +72,29 @@ public final class TestinRoot {
 
     public @NotNull Path getPath() {
         return normalize(Services.getInstance(p, AppSettingsState.class).rootTestinPath);
+    }
+
+    /**
+     * Where a node named by its place in the tree lives on disk.
+     * <p>
+     * The tree carries a node's path as the segments a tester reads - "test
+     * project", "Test Runs", "cycle 1" - and every surface handed one of those
+     * needs the same three steps to reach the file: fall back to the project
+     * directory when no root is configured, resolve a relative root against it,
+     * then walk the segments. Two places did it, and a third was about to.
+     */
+    public @NotNull Path resolve(final @NotNull List<String> segments) {
+        // The platform answers null for a project with no directory of its own.
+        final @NotNull Path basePath = Path.of(Objects.toString(p.getBasePath(), ""));
+
+        final @NotNull Path root = isConfigured(getPath()) ? getPath() : basePath;
+
+        Path resolved = root.isAbsolute() ? root : basePath.resolve(root);
+        for (final String segment : segments) {
+            resolved = resolved.resolve(segment);
+        }
+
+        return resolved;
     }
 
     public void setPath(final @NotNull Path path) {

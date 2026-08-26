@@ -318,6 +318,14 @@ public final class TestRunPdfGenerator {
                 if (actualResult.isEmpty()) actualResult = "—";
                 testCaseCell.add(new Paragraph("Actual result: " + actualResult)
                         .setFont(regularFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY));
+
+                // Only when there is one. The actual result prints an em dash
+                // for absent because a failure with nothing written about it is
+                // worth noticing; an absent stacktrace is not worth a line.
+                if (!item.getStacktrace().isBlank()) {
+                    testCaseCell.add(new Paragraph(item.getStacktrace())
+                            .setFont(regularFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY));
+                }
             }
             table.addCell(testCaseCell);
 

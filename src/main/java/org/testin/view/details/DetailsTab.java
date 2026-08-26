@@ -13,7 +13,9 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
@@ -31,7 +33,7 @@ import java.awt.*;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Stream;
 
 public class DetailsTab {
 
@@ -49,18 +51,18 @@ public class DetailsTab {
         detailsTab.setBorder(BorderFactory.createEmptyBorder());
 
         dto.ifPresentOrElse(
-                testCase -> renderCase(p, detailsTab, testCase, currentPath),
+                testCase -> renderCase(p, detailsTab, testCase, runItemFor(p, testCase, currentPath), currentPath),
                 () -> renderPlaceholder(detailsTab));
 
         detailsTab.revalidate();
         detailsTab.repaint();
     }
 
-    private void renderCase(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
+    private void renderCase(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab, final @NotNull TestCaseDto dto, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
         final @NotNull JBPanel<?> contentPanel = new JBPanel<>(new GridBagLayout());
         contentPanel.setOpaque(false);
 
-        renderStoneLayout(p, contentPanel, dto, currentPath);
+        renderStoneLayout(p, contentPanel, dto, runItem, currentPath);
 
         final @NotNull JBScrollPane scrollPane = new JBScrollPane(contentPanel);
         scrollPane.setBorder(null);
@@ -73,6 +75,28 @@ public class DetailsTab {
         registerEditShortcutOnce(p, detailsTab);
     }
 
+    /**
+     * The run's own record of this case, and empty when the case is not being
+     * viewed under one.
+     * <p>
+     * Found from the path rather than passed in, because the path is the only
+     * thing the two doors into this panel agree on - the run editor's context
+     * menu and its grid double-click both hand over the node the selection came
+     * from, and the test editor hands over a test set, which resolves to no run
+     * and is exactly the case that must show no run rows.
+     * <p>
+     * The row comes from the indexer, which is the same object the run editor
+     * loaded and writes verdicts into, so the panel shows what the run holds
+     * now rather than a copy of what it held when it was opened.
+     */
+    private static @NotNull Optional<TestRunItems> runItemFor(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
+        if (currentPath.isEmpty()) return Optional.empty();
+
+        return Services.getInstance(p, ProjectIndexer.class)
+                .findTestRun(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
+                .flatMap(run -> run.getResults().stream().filter(item -> item.getId().equals(dto.getId())).findFirst());
+    }
+
     private void renderPlaceholder(final @NotNull JBPanel<?> panel) {
         panel.setLayout(new BorderLayout());
         panel.setBorder(JBUI.Borders.empty(25, 16, 0, 0));
@@ -82,14 +106,14 @@ public class DetailsTab {
         panel.add(placeholder, BorderLayout.NORTH);
     }
 
-    private void renderStoneLayout(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
+    private void renderStoneLayout(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull TestCaseDto dto, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
         final @NotNull GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = JBUI.insets(INSETS_DEFAULT);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = WEIGHT_X;
 
-        final int row = setupFixedRows(p, panel, gbc, dto, currentPath);
+        final int row = setupFixedRows(p, panel, gbc, dto, runItem, currentPath);
         addVerticalSpacer(panel, row);
     }
 
@@ -97,13 +121,48 @@ public class DetailsTab {
      * Rows shown in the details panel, in display order. Rows with custom rendering
      * are dedicated components; plain label/value rows are table-driven.
      */
-    private @NotNull List<BaseDetails> detailRows(final @NotNull List<String> currentPath) {
-        return List.of(
-                new NavigationBar(currentPath),
-                new Id(),
-                new Title(),
-                new ActionIcons(),
-                new Badges(),
+    private @NotNull List<BaseDetails> detailRows(final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
+        return Stream.of(
+                Stream.<BaseDetails>of(
+                        new NavigationBar(currentPath),
+                        new Id(),
+                        new Title(),
+                        new ActionIcons(),
+                        new Badges()),
+                runItem.stream().flatMap(DetailsTab::runRows),
+                caseRows()
+        ).flatMap(rows -> rows).toList();
+    }
+
+    /**
+     * What one execution of this case recorded, in the order a tester asks it:
+     * the verdict, how long it took, what actually happened, why, and how bad
+     * the bug is.
+     * <p>
+     * Above the case's own attributes, because a tester who opened this panel
+     * during a run came for these. Below the badges, because the case still has
+     * to be identifiable first.
+     * <p>
+     * Present only when the case is being viewed under a run - opened from a run
+     * editor rather than from the test editor or a search result. A case nobody
+     * has run has no verdict and no duration, and six rows saying so with a dash
+     * are six lines read on every case to learn nothing.
+     */
+    private static @NotNull Stream<BaseDetails> runRows(final @NotNull TestRunItems item) {
+        return Stream.of(
+                new RunAttributeRow(RunEditorAttributes.RUN_STATUS, item),
+                new RunAttributeRow(RunEditorAttributes.DURATION, item),
+                new RunAttributeRow(RunEditorAttributes.ACTUAL_RESULT, item),
+                new StacktraceRow(item),
+                new RunAttributeRow(RunEditorAttributes.BUG_SEVERITY, item),
+                new RunAttributeRow(RunEditorAttributes.BUG_PRIORITY, item));
+    }
+
+    /**
+     * The case itself: the same rows wherever it is shown.
+     */
+    private static @NotNull Stream<BaseDetails> caseRows() {
+        return Stream.of(
                 new AttributeRow(TestEditorAttributes.EXPECTED_RESULT, (p, dto) -> Display.format(dto.getExpectedResult())),
                 new Steps(),
                 new AttributeRow(TestEditorAttributes.PRE_CONDITIONS, (p, dto) -> Display.format(dto.getPreConditions())),
@@ -123,9 +182,9 @@ public class DetailsTab {
         );
     }
 
-    private int setupFixedRows(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
+    private int setupFixedRows(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
         int row = 0;
-        for (final BaseDetails component : detailRows(currentPath)) {
+        for (final BaseDetails component : detailRows(runItem, currentPath)) {
             row = component.render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
         }
         return row;
@@ -187,16 +246,7 @@ public class DetailsTab {
 
         if (currentPath.isEmpty()) return Optional.empty();
 
-        // The platform answers null for a project with no directory of its own.
-        final @NotNull Path basePath = Path.of(Objects.toString(p.getBasePath(), ""));
-
-        Path root = Services.getInstance(p, TestinRoot.class).getPath();
-        if (root.toString().isEmpty()) root = basePath;
-
-        Path resolved = root.isAbsolute() ? root : basePath.resolve(root);
-        for (final String segment : currentPath) {
-            resolved = resolved.resolve(segment);
-        }
+        final @NotNull Path resolved = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
 
         return Optional.of(Services.getInstance(p, ProjectIndexer.class).getTestSetByPath(resolved).getPath());
     }

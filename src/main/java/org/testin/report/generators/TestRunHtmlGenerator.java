@@ -206,6 +206,15 @@ public final class TestRunHtmlGenerator {
                         html.append("<div class='actual'>Actual result: ")
                                 .append(escapedHtml(actual.isEmpty() ? "—" : actual))
                                 .append("</div>");
+
+                        // No em dash for an absent one, unlike the actual
+                        // result above it. A missing sentence is worth saying;
+                        // a missing stacktrace is not, and a row of dashes down
+                        // a failure table is noise a reader learns to skip.
+                        final @NotNull String stacktrace = item.getStacktrace();
+                        if (!stacktrace.isBlank()) {
+                            html.append("<div class='stacktrace'>").append(escapedHtml(stacktrace)).append("</div>");
+                        }
                     }
 
                     html.append("</td>");
@@ -327,6 +336,7 @@ public final class TestRunHtmlGenerator {
                 .append(".detail-table td.verdict { text-align: center; font-weight: bold; }")
                 .append(".detail-table td.seq, .detail-table th.seq { width: 1%; white-space: nowrap; }")
                 .append(".actual { font-size: ").append(ReportFont.SMALL.css()).append("; color: var(--muted); margin-top: 3px; white-space: pre-wrap; }")
+                .append(".stacktrace { font-family: ui-monospace, Consolas, monospace; font-size: ").append(ReportFont.SMALL.css()).append("; color: var(--muted); margin-top: 6px; white-space: pre-wrap; word-break: break-word; }")
 
                 // Footer
                 .append(".footer { margin-top: 30px; text-align: center; font-size: ").append(ReportFont.CAPTION.css()).append("; color: var(--footer-ink); border-top: 1px solid var(--line); padding-top: 14px; }")

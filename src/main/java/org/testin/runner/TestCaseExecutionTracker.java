@@ -3,6 +3,7 @@ package org.testin.runner;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsAdapter;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener;
 import com.intellij.execution.testframework.sm.runner.SMTestProxy;
+import com.intellij.execution.testframework.stacktrace.DiffHyperlink;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Failure;
@@ -75,8 +76,35 @@ public class TestCaseExecutionTracker {
      * skipped, or killed with its process. There is a status but no sentence,
      * and a blank one on the row would read as "this ran and nothing was
      * recorded" rather than as what happened.
+     * <p>
+     * The stacktrace is stripped because the platform hands it over with a blank
+     * first line, which renders as an empty row above the frames.
      */
     private static @NotNull Failure failureOf(final @NotNull SMTestProxy test, final @NotNull String fallback) {
-        return new Failure(Objects.toString(test.getErrorMessage(), fallback), Objects.toString(test.getStacktrace(), ""));
+        return new Failure(messageOf(test, fallback), Objects.toString(test.getStacktrace(), "").strip());
+    }
+
+    /**
+     * What went wrong, worded as the IDE's own test console words it.
+     * <p>
+     * A comparison failure is two facts the platform keeps apart: the message,
+     * which for an assertion is the bare exception name and nothing else, and
+     * the two values, which live on a {@link DiffHyperlink} so the console can
+     * offer to diff them. Asking only for the message gives
+     * "java.lang.AssertionError:" - true, and useless, because the whole content
+     * of the failure is the two values it does not mention.
+     * <p>
+     * Rejoined here rather than at each surface, and in the console's own layout
+     * - the colons line up under each other - so what a tester reads on the run
+     * row is what they read in the test window, and neither has to be translated
+     * into the other.
+     */
+    private static @NotNull String messageOf(final @NotNull SMTestProxy test, final @NotNull String fallback) {
+        final @NotNull String message = Objects.toString(test.getErrorMessage(), fallback).strip();
+
+        final DiffHyperlink comparison = test.getDiffViewerProvider();
+        if (comparison == null) return message;
+
+        return message + "\nExpected :" + comparison.getLeft() + "\nActual   :" + comparison.getRight();
     }
 }

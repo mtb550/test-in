@@ -94,6 +94,22 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             TestRunItems::setActualResult
     ),
 
+    /**
+     * The framework's own account of the failure, or whatever the tester pasted
+     * into the Error Capture box.
+     * <p>
+     * Off by default. It is the one run value measured in paragraphs rather than
+     * words, so a column of it crowds out every other column - but it was absent
+     * from this enum altogether until automation started filling the field on
+     * its own, which left it in the run JSON, in the failure dialog, in the
+     * Excel export alone, and nowhere a tester looks while executing.
+     */
+    STACKTRACE(
+            "Stacktrace",
+            ToolBarDefault.OFF,
+            (item, p) -> item.getStacktrace()
+    ),
+
     BUG_SEVERITY(
             "Bug Severity",
             ToolBarDefault.ON,
