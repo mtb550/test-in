@@ -44,7 +44,7 @@ jobs:
           java-version: 21
 
       - name: Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       # The inspector is the IDE the Gradle plugin downloads, pinned by
       # intellij.version - so this step is what puts it on disk. inspect.ps1

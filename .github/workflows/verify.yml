@@ -42,7 +42,7 @@ jobs:
           java-version: 21
 
       - name: Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       # Roughly 3 GB across the four. Keyed on the file that names their
       # versions, so the cache is rebuilt only when a version changes.
