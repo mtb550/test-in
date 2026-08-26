@@ -19,9 +19,11 @@ name: Build
 
 on:
   push:
-    # Every branch, and no tags - a tag is release.yml's, and running both would
-    # build the same commit twice.
-    branches: ['**']
+    # main only. A branch is built through its pull request, and listening for
+    # both here ran every Dependabot branch twice - once for the push that
+    # created it and once for the pull request that followed, thirteen minutes
+    # apiece. No tags either: a tag is release.yml's.
+    branches: [main]
   pull_request:
 
 # A second push to the same branch makes the first run's answer worthless, so it
