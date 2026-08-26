@@ -786,54 +786,42 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     /**
      * An execution reported on one of this run's cases.
      * <p>
-     * Running starts the clock; a verdict stops it and is written into the run.
-     * The tester clicked the run icon on a card and the case now carries its own
-     * status, duration, who ran it and when - the same four fields a verdict
-     * given by hand fills in, through the same {@code recordVerdict}, so there
-     * is one way a run item learns what happened to it.
+     * A verdict is written into the run: the case takes its status, who ran it
+     * and when. The tester clicked the run icon on a card and the run now holds
+     * what happened, instead of the result living only on the badge the test
+     * editor draws.
+     * <p>
+     * <b>The clock is not this method's.</b> Start Execution owns it, and it
+     * times the case the tester is walking. Starting it again here would move it
+     * onto whichever case the run icon was clicked on - and clicking one that is
+     * not the current one would have taken the timer off the case actually being
+     * executed and given its seconds to another.
      * <p>
      * A report about a case this run does not hold is not ours: the same case
      * can sit in several runs and be executed from any of them, and only the run
-     * showing it should record the result. A removed case records nothing at
-     * all.
+     * showing it records the result. A removed case records nothing at all.
      */
     private void executionReported(final @NotNull TestCaseDto tc, final @NotNull RunStatus status) {
-        runItem(tc.getId()).filter(item -> !item.isRemoved()).ifPresent(item -> {
-            if (status == RunStatus.RUNNING) {
-                // Counting on from what the case already carries, which is what
-                // the timer does for a manual run too - a case run twice is one
-                // case that took both.
-                executionTimer.start(item, () -> {
-                    if (model.contains(tc)) model.contentsChanged(tc);
-                    showExecutionTotal();
-                });
-                return;
-            }
+        if (runItem(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) return;
 
-            // Stopped before the verdict is read, so the duration the case ends
-            // up carrying is the one the last tick wrote and not one more
-            // second of a run that has already finished.
-            executionTimer.stop();
+        // Empty for a report that is not a verdict - a case that has just
+        // started, or one a stop put back. A stop did not find a defect, so the
+        // case keeps the status it had.
+        //
+        // Through RunStatusService rather than by writing the fields here: it
+        // already owns recording a verdict, persisting the run, ending the
+        // execution flow when the verdict is for the case being walked,
+        // refreshing whichever view is showing, and confirming to the tester. A
+        // verdict TestNG reached is the same verdict a tester would have typed,
+        // so it takes the same path.
+        status.getVerdict().ifPresent(verdict ->
+                Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict));
 
-            // Empty for a report that is not a verdict - a case put back by a
-            // stop. It did not fail, so the run records nothing and the case
-            // keeps the status it had.
-            //
-            // Through RunStatusService rather than by writing the four fields
-            // here: it already owns recording a verdict, persisting the run,
-            // refreshing whichever view is showing and confirming to the
-            // tester. A verdict TestNG reached is the same verdict a tester
-            // would have typed, so it takes the same path - the method's name
-            // is about the gesture it was written for, not a second rule.
-            status.getVerdict().ifPresent(verdict ->
-                    Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict));
-
-            // The duration, which no verdict path touches: the card grows a
-            // Duration line the moment that value stops being blank, and a
-            // JList re-measures a row only when the model says it changed.
-            if (model.contains(tc)) model.contentsChanged(tc);
-            showExecutionTotal();
-        });
+        // A model event, not a repaint: the card grows a Duration line the
+        // moment that value stops being blank, and a JList re-measures a row
+        // only when the model says that row changed.
+        if (model.contains(tc)) model.contentsChanged(tc);
+        showExecutionTotal();
     }
 
     /**
