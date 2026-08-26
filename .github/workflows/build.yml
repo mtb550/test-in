@@ -1,0 +1,88 @@
+# Every push and every pull request is compiled, tested and put through the
+# Plugin Verifier, so a red state is found by a robot rather than by whoever
+# pulls next. Work moves between machines here, and until now the only evidence
+# a commit worked was a build on whichever machine happened to write it.
+#
+# Deliberately not here, both with a reason and neither a matter of effort:
+#
+# The IDE inspection gate. tools/inspect.ps1 costs a full indexing pass and is
+# written for PowerShell only, so it joins CI after the cross-platform story
+# lands (#106). It stays a sweep gate run by hand.
+#
+# Coverage. JaCoCo measures nothing in this project: the platform test framework
+# runs the suite under com.intellij.util.lang.PathClassLoader, and the agent
+# never sees a class it loads. Applied and run, it recorded 342 classes of
+# Gradle's own worker and none of the plugin, and reported 0% of 577 classes
+# while 492 tests passed. Getting a real figure needs offline instrumentation
+# alongside the platform's own, which is a build change of its own (#130).
+name: Build
+
+on:
+  push:
+    # Every branch, and no tags - a tag is release.yml's, and running both would
+    # build the same commit twice.
+    branches: ['**']
+  pull_request:
+
+# A second push to the same branch makes the first run's answer worthless, so it
+# is cancelled rather than left to finish. Never cancels a run on main.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build, test and verify
+    # Windows because that is where this suite is known to pass. Three tests in
+    # the dialog framework build a real Swing text field, which asks the toolkit
+    # for the menu shortcut mask and throws HeadlessException where there is no
+    # display - so a Linux runner needs xvfb or a change in production code, and
+    # neither belongs in the commit that first turns CI on. It also matches the
+    # machines the plugin is developed on. The repository is public, so the
+    # minutes cost nothing.
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out the commit
+        uses: actions/checkout@v4
+
+      - name: Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # Caches ~/.gradle, which is where the platform artifacts and every
+      # dependency land. Without it each run downloads the whole IDE again.
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # The verifier runs the plugin against four IDEs and downloads each one.
+      # They change only when build.gradle.kts names a different version, so
+      # they are keyed on that file rather than on the commit.
+      - name: Cache the IDEs the verifier runs against
+        uses: actions/cache@v4
+        with:
+          path: ~/.pluginVerifier
+          key: plugin-verifier-${{ hashFiles('build.gradle.kts', 'gradle.properties') }}
+          restore-keys: plugin-verifier-
+
+      # One invocation, so it stops at the first thing that is wrong. The
+      # reports below are uploaded either way.
+      - name: Build, test and verify
+        shell: bash
+        run: ./gradlew compileJava test verifyPlugin
+
+      - name: Keep the reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          if-no-files-found: ignore
+          path: |
+            build/reports/tests/test
+            build/reports/pluginVerifier

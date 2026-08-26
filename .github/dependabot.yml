@@ -1,0 +1,41 @@
+# Dependency updates arrive as pull requests, and a pull request is built by
+# build.yml like any other - which is the point. An update that breaks the
+# plugin says so before it is merged rather than after.
+#
+# Not covered here: the Gradle wrapper. Dependabot's gradle ecosystem reads
+# build files and the version catalog, and does not touch
+# gradle/wrapper/gradle-wrapper.properties, so that one stays a hand edit.
+version: 2
+
+updates:
+  # Everything in gradle/libs.versions.toml, plus the plugin versions declared
+  # in settings.gradle.kts.
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # One pull request per library family. Jackson ships four artifacts from
+      # one version and POI two, and updating them separately produces builds
+      # against a mix of versions nobody intends to ship.
+      jackson:
+        patterns:
+          - com.fasterxml.jackson*
+      poi:
+        patterns:
+          - org.apache.poi:*
+      itext:
+        patterns:
+          - com.itextpdf:*
+      sshd:
+        patterns:
+          - org.apache.sshd:*
+
+  # The actions build.yml and release.yml pin. They are pinned to majors, so
+  # this is what moves them when a major lands.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

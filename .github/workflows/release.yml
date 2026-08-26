@@ -1,0 +1,71 @@
+# A tag publishes to the JetBrains Marketplace, signed, with no local machine
+# involved. The signing and publishing configuration already lives in
+# build.gradle.kts and reads four environment variables; this supplies them from
+# repository secrets.
+#
+# Required secrets, the same four names the build file reads:
+#   CERTIFICATE_CHAIN  PRIVATE_KEY  PRIVATE_KEY_PASSWORD  JETBRAINS_TOKEN
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Sign and publish
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out the tag
+        uses: actions/checkout@v4
+
+      - name: Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # The Marketplace takes a version string once and never again, so a tag
+      # that disagrees with the version in build.gradle.kts is caught here
+      # rather than by an upload that cannot be undone.
+      - name: The tag and the version agree
+        shell: bash
+        run: |
+          declared=$(sed -n 's/^version = "\(.*\)"$/\1/p' build.gradle.kts)
+          tagged=${GITHUB_REF_NAME#v}
+
+          if [ "$declared" != "$tagged" ]; then
+            echo "Tag $GITHUB_REF_NAME asks to publish $tagged, but build.gradle.kts declares $declared."
+            echo "Move the version in build.gradle.kts, or tag v$declared."
+            exit 1
+          fi
+
+          echo "Publishing $declared"
+
+      # Tested and verified before it is signed. publishPlugin builds and signs
+      # on its own but runs no tests, and a published version cannot be pulled
+      # back.
+      - name: Test, verify, sign and publish
+        shell: bash
+        run: ./gradlew test verifyPlugin publishPlugin
+        env:
+          CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
+          JETBRAINS_TOKEN: ${{ secrets.JETBRAINS_TOKEN }}
+
+      - name: Keep the signed distribution
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: distribution
+          if-no-files-found: ignore
+          path: build/distributions/*.zip
