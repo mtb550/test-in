@@ -11,9 +11,11 @@ import java.util.UUID;
 import static org.testng.Assert.*;
 
 /**
- * The runner's bookkeeping survives an editor reload (#116).
+ * The runner's bookkeeping survives an editor reload, and a run that ends
+ * without saying anything does not leave cases looking like they are still
+ * going (#116).
  * <p>
- * Two defects had the same shape: state kept against a {@code TestCaseDto}
+ * Both defects had the same shape: state kept against a {@code TestCaseDto}
  * instance, when an indexer rescan replaces every instance the editors hold. A
  * stop then found nothing to kill and the run carried on; a badge then found
  * nothing to paint and a case that had just passed went blank. The registry
@@ -171,5 +173,54 @@ public class RunRegistryTest {
         registry.reported(tc.getId(), RunStatus.RUNNING);
 
         assertTrue(registry.isRunning(tc.getId()), "a case does not stop running by saying that it is");
+    }
+
+    // ------------------------------------------- a run that ends without a word
+
+    @Test
+    public void aRunThatEndsWithoutReportingPutsItsCasesBack() {
+        final RunRegistry registry = new RunRegistry();
+        final TestCaseDto first = aCase("never reached");
+        final TestCaseDto second = aCase("never reached either");
+
+        registry.launched(List.of(first.getId(), second.getId()), RUN);
+
+        final List<UUID> abandoned = registry.ended(RUN);
+
+        assertEquals(abandoned.size(), 2, "a build that failed reports nothing, and both cases were waiting on it");
+        assertFalse(registry.isRunning(first.getId()), "so neither is left showing Running for the session");
+        assertFalse(registry.isRunning(second.getId()), "which is what the maps used to do");
+    }
+
+    @Test
+    public void aRunThatEndedWithEveryResultInLeavesNothingBehind() {
+        final RunRegistry registry = new RunRegistry();
+        final TestCaseDto tc = aCase("passes");
+
+        registry.launched(List.of(tc.getId()), RUN);
+        registry.reported(tc.getId(), RunStatus.PASSED);
+
+        assertTrue(registry.ended(RUN).isEmpty(), "nothing to put back, so no card is repainted");
+        assertEquals(registry.statusOf(tc.getId()), RunStatus.PASSED, "and the verdict is untouched by the run ending");
+    }
+
+    @Test
+    public void aRunThisPluginDidNotStartIsIgnored() {
+        final RunRegistry registry = new RunRegistry();
+
+        assertTrue(registry.ended("A build the tester left going").isEmpty(),
+                "a configuration of the tester's own is theirs, whatever it is called");
+    }
+
+    @Test
+    public void aRunStopsBeingHeldOnceItEnds() {
+        final RunRegistry registry = new RunRegistry();
+        final TestCaseDto tc = aCase("one run");
+
+        registry.launched(List.of(tc.getId()), RUN);
+        assertTrue(registry.launchedHere(RUN), "the stop may kill this one");
+
+        registry.ended(RUN);
+        assertFalse(registry.launchedHere(RUN), "and the name is not kept for the rest of the session");
     }
 }

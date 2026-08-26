@@ -1,12 +1,15 @@
 package org.testin.runner;
 
+import com.intellij.execution.ExecutionListener;
 import com.intellij.execution.ExecutionManager;
 import com.intellij.execution.KillableProcess;
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.ui.RunContentDescriptor;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +25,8 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * The TestNG runs this plugin started: starting them and stopping them.
+ * The TestNG runs this plugin started: starting them, stopping them, and hearing
+ * when one ends.
  * <p>
  * The runner used to call {@code ProgramRunnerUtil.executeConfiguration}
  * directly, which is fire-and-forget - nothing was kept, so nothing could be
@@ -43,11 +47,11 @@ import java.util.UUID;
  * <p>
  * What is running and what each case last did is {@link RunRegistry}'s, which
  * knows nothing of the platform. This class is the half that does: it launches,
- * it kills, and it tells the editors what changed. Every question a surface asks
- * goes to the registry through here.
+ * it kills, it listens for a process ending, and it tells the editors what
+ * changed. Every question a surface asks goes to the registry through here.
  */
 @Service(Service.Level.PROJECT)
-public final class TestNGExecution {
+public final class TestNGExecution implements Disposable {
 
     private final @NotNull Project p;
 
@@ -61,9 +65,36 @@ public final class TestNGExecution {
      * contract with the platform, which looks for exactly (Project) and refuses
      * to build the service otherwise. A generated one changes shape whenever a
      * field is added, and the platform only says so at runtime.
+     * <p>
+     * The subscription is the only way this service hears about a run that ended
+     * without saying anything - see {@link #ended}.
      */
     public TestNGExecution(final @NotNull Project p) {
         this.p = p;
+
+        p.getMessageBus().connect(this).subscribe(ExecutionManager.EXECUTION_TOPIC, new ExecutionListener() {
+
+            @Override
+            public void processTerminated(final @NotNull String executorId,
+                                          final @NotNull ExecutionEnvironment env,
+                                          final @NotNull ProcessHandler handler,
+                                          final int exitCode) {
+                ended(env);
+            }
+
+            @Override
+            public void processNotStarted(final @NotNull String executorId, final @NotNull ExecutionEnvironment env) {
+                ended(env);
+            }
+        });
+    }
+
+    /**
+     * The subscription above is parented here, so the platform takes it down
+     * when the project closes. Nothing else is held.
+     */
+    @Override
+    public void dispose() {
     }
 
     /**
@@ -189,6 +220,28 @@ public final class TestNGExecution {
         stop.cases().forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, ""));
 
         return stop.cases().size();
+    }
+
+    /**
+     * A run of this plugin's has ended, and the cases it never reported on are
+     * put back.
+     * <p>
+     * The only way this service hears about a process it did not kill itself. A
+     * build that fails before a single test reports, a crashed JVM and the IDE's
+     * own Stop button in the Run tool window all end a run without a verdict,
+     * and every case still recorded under it would otherwise read as running for
+     * the rest of the session.
+     * <p>
+     * Runs this plugin did not start are ignored, by the same name check the
+     * stop uses: a tester's own configuration is theirs.
+     */
+    private void ended(final @NotNull ExecutionEnvironment env) {
+        final @NotNull String runName = env.getRunProfile().getName();
+        final @NotNull List<UUID> abandoned = registry.ended(runName);
+        if (abandoned.isEmpty()) return;
+
+        Logger.info("'" + runName + "' ended with " + abandoned.size() + " test case(s) that never reported");
+        abandoned.forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, ""));
     }
 
     /**

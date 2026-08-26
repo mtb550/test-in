@@ -38,6 +38,7 @@ final class RunRegistry {
     /**
      * The configurations this plugin launched, by name, so a stop kills what the
      * tester started here and not a build they left going in another tab.
+     * Emptied by {@link #ended} as each run's process finishes.
      */
     private final @NotNull Set<String> launchedNames = ConcurrentHashMap.newKeySet();
 
@@ -109,8 +110,8 @@ final class RunRegistry {
     }
 
     /**
-     * Whether this plugin started the run of this name. A tester's own
-     * configuration of the same name is theirs to stop.
+     * Whether this plugin started the run of this name, and it has not ended.
+     * A tester's own configuration of the same name is theirs to stop.
      */
     boolean launchedHere(final @NotNull String runName) {
         return launchedNames.contains(runName);
@@ -203,6 +204,36 @@ final class RunRegistry {
         });
 
         return new Stop(runs, cases);
+    }
+
+    /**
+     * A run's process has ended: the cases still recorded under it are put back,
+     * and the run stops being one this plugin is holding.
+     * <p>
+     * Whatever ended it. A build that failed before a single test reported, a
+     * crashed JVM, or the IDE's own Stop button in the Run tool window all end a
+     * process without a verdict this registry would otherwise hear - and a case
+     * left in {@link #configOf} reads as running for the rest of the session,
+     * because a verdict and our own stop were the only two things that ever
+     * cleared it.
+     *
+     * @return the cases the run left behind, which is empty for a run that ended
+     *         with every result in - and for one this plugin did not start
+     */
+    @NotNull List<UUID> ended(final @NotNull String runName) {
+        if (!launchedNames.remove(runName)) return List.of();
+
+        final @NotNull List<UUID> abandoned = configOf.entrySet().stream()
+                .filter(e -> e.getValue().equals(runName))
+                .map(Map.Entry::getKey)
+                .toList();
+
+        abandoned.forEach(id -> {
+            pending.remove(id);
+            configOf.remove(id);
+        });
+
+        return abandoned;
     }
 
     /**
