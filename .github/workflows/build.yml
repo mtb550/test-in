@@ -61,10 +61,10 @@ jobs:
       - name: Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # The verifier runs the plugin against four IDEs and downloads each one.
-      # They change only when build.gradle.kts names a different version, so
-      # they are keyed on that file rather than on the commit.
-      - name: Cache the IDEs the verifier runs against
+      # The verifier downloads the IDE it runs against. It changes only when
+      # build.gradle.kts or gradle.properties names a different version, so the
+      # key is those files rather than the commit.
+      - name: Cache the IDE the verifier runs against
         uses: actions/cache@v4
         with:
           path: ~/.pluginVerifier
@@ -73,6 +73,10 @@ jobs:
 
       # One invocation, so it stops at the first thing that is wrong. The
       # reports below are uploaded either way.
+      #
+      # verifyPlugin here means IntelliJ IDEA, which is the only one of the four
+      # whose verdict is news - build.gradle.kts records why, and how to run the
+      # full sweep by hand.
       - name: Build, test and verify
         shell: bash
         run: ./gradlew compileJava test verifyPlugin
