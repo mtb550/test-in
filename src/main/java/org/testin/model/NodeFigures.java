@@ -52,4 +52,31 @@ public record NodeFigures(long testSets, long packages, long testCases, long tes
     public @NotNull String rateLabel() {
         return run.executed() == 0 ? "Not run" : run.passRate() + "%";
     }
+
+    /**
+     * The sentence a removal confirmation shows, blank when the node holds
+     * nothing - "and nothing else goes with it" is not worth a line.
+     * <p>
+     * On the counts rather than beside them, because there were two answers to
+     * "what does this node hold" and they disagreed. The other one filtered the
+     * index by path prefix, and a node's own path is a prefix of itself: so
+     * removing a test set holding twelve cases read "Holds 1 test set, 12 test
+     * cases and 0 test runs", and removing a run said it held one run. In the
+     * one dialog whose whole job is to say what an unrecoverable delete takes
+     * with it.
+     * <p>
+     * Packages are counted and deliberately not said. What a package holds is
+     * already in these numbers, and the line is about what the tester loses.
+     */
+    public @NotNull String describe() {
+        if (testSets == 0 && testCases == 0 && testRuns == 0) return "";
+
+        return "Holds " + testSets + " test set" + plural(testSets)
+                + ", " + testCases + " test case" + plural(testCases)
+                + " and " + testRuns + " test run" + plural(testRuns);
+    }
+
+    private @NotNull String plural(final long count) {
+        return count == 1 ? "" : "s";
+    }
 }

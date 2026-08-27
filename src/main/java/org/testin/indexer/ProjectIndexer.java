@@ -387,26 +387,6 @@ public final class ProjectIndexer {
         return store.getTestRunDirByPath(path);
     }
 
-    /**
-     * What a node holds, counted from the cache: test sets, test cases and test
-     * runs anywhere beneath it.
-     * <p>
-     * For the question a confirmation has to answer before a tester agrees to a
-     * removal - "and what goes with it?". Counted rather than guessed, because
-     * the number is the whole point: removing a test project with two sets is a
-     * different act from removing one with two hundred.
-     */
-    public @NotNull NodeContents contentsUnder(final @NotNull Path path) {
-        final long sets = store.getTestSetsDirByPath().values().stream()
-                .filter(set -> set.getPath().startsWith(path)).count();
-        final long runs = store.getTestRunsDirByPath().values().stream()
-                .filter(run -> run.getPath().startsWith(path)).count();
-        final long cases = store.getTestCasesById().values().stream()
-                .filter(tc -> tc.getParent().getPath().startsWith(path)).count();
-
-        return new NodeContents(sets, cases, runs);
-    }
-
     public @NotNull Map<String, TestProjectDirectoryDto> getTestProjectsByPath() {
         return store.getTestProjectsByPath();
     }
@@ -987,22 +967,4 @@ public final class ProjectIndexer {
     /**
      * How much a node holds, for a caller that has to say it out loud.
      */
-    public record NodeContents(long testSets, long testCases, long testRuns) {
-
-        /**
-         * The sentence a confirmation shows, or blank when the node holds
-         * nothing - "and nothing else goes with it" is not worth a line.
-         */
-        public @NotNull String describe() {
-            if (testSets == 0 && testCases == 0 && testRuns == 0) return "";
-
-            return "Holds " + testSets + " test set" + plural(testSets)
-                    + ", " + testCases + " test case" + plural(testCases)
-                    + " and " + testRuns + " test run" + plural(testRuns);
-        }
-
-        private @NotNull String plural(final long count) {
-            return count == 1 ? "" : "s";
-        }
-    }
 }

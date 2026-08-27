@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
+import org.testin.indexer.NodeCounter;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -56,7 +57,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
         // read as a destination. A test project takes every test set, case and run inside
         // it, and removal is not recorded by the undo service.
         final @NotNull String holds = nodesToRemove.size() == 1
-                ? Services.getInstance(p, ProjectIndexer.class).contentsUnder(nodesToRemove.getFirst().getPath()).describe()
+                ? NodeCounter.childCounts(p, nodesToRemove.getFirst()).describe()
                 : "";
 
         final @NotNull String msg = (nodesToRemove.size() == 1
