@@ -393,7 +393,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 TestRunSummary.of(runData.getResults()),
                 runData.getResultAnalysis(),
                 analysis -> {
-                    runData.setResultAnalysis(analysis);
+                    // Only the sections written in. Four empty strings were
+                    // stored for the ones left alone, which every reader then
+                    // treated as nothing anyway.
+                    runData.setResultAnalysis(ResultAnalysis.written(analysis));
                     Services.getInstance(p, ProjectIndexer.class).putTestRun(parent.getPath(), runData);
                     Services.getInstance(p, Notifier.class).softShow(p, Done.SAVED);
                 }).show());

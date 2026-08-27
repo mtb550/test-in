@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.EnumMap;
+import java.util.Objects;
 import java.util.Map;
 import java.util.function.ToLongFunction;
 
@@ -61,5 +63,31 @@ public enum ResultAnalysis {
         }
 
         return false;
+    }
+
+    /**
+     * The sections worth storing: the ones the tester actually wrote in.
+     * <p>
+     * A section left alone is absent from the file rather than present and
+     * empty. Every reader already treats the two the same - {@link #writtenIn}
+     * answers blank either way - so this changes nothing but what is on disk,
+     * where four empty strings under a heading nobody filled in are noise a
+     * colleague reads in a diff.
+     * <p>
+     * What is kept is kept as typed. Whitespace-only counts as nothing written,
+     * because that is what {@code writtenIn} already decides - but a value with
+     * text in it is stored exactly as the tester left it, since saving does not
+     * reformat.
+     */
+    public static @NotNull Map<ResultAnalysis, String> written(final @NotNull Map<ResultAnalysis, String> analysis) {
+        final @NotNull Map<ResultAnalysis, String> kept = new EnumMap<>(ResultAnalysis.class);
+
+        for (final ResultAnalysis section : values()) {
+            if (section.writtenIn(analysis).isEmpty()) continue;
+
+            kept.put(section, Objects.toString(analysis.get(section), ""));
+        }
+
+        return kept;
     }
 }
