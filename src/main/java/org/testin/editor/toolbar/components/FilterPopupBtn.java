@@ -139,7 +139,7 @@ public class FilterPopupBtn extends AbstractButton implements ToolbarItem {
         filterResetBtn.add(filterGroupMenu);
 
         // module menu is dynamic: modules come from the currently loaded test cases
-        final @NotNull ActionGroup filterModuleMenu = new ActionGroup("Module", true) {
+        final @NotNull ActionGroup filterModuleMenu = new ActionGroup(TestEditorAttributes.MODULE.getName(), true) {
             @Override
             public AnAction @NotNull [] getChildren(final @Nullable AnActionEvent e) {
                 final @NotNull List<String> orderedModules = new ArrayList<>(availableModulesSupplier.get());
@@ -156,7 +156,7 @@ public class FilterPopupBtn extends AbstractButton implements ToolbarItem {
         filterResetBtn.add(filterModuleMenu);
 
         if (callbacks instanceof RunEditor) {
-            final @NotNull DefaultActionGroup filterStatusMenu = new DefaultActionGroup("Status", true);
+            final @NotNull DefaultActionGroup filterStatusMenu = new DefaultActionGroup(TestEditorAttributes.STATUS.getName(), true);
             Arrays.stream(TestStatus.values()).forEach(s ->
                     filterStatusMenu.add(new ToggleFilterAction<>(s.getLabel(), null,
                             s, selectedStatus, FilterMembership.plain(), onChanged)));

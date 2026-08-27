@@ -1,5 +1,6 @@
 package org.testin.view.marker;
 
+import org.testin.model.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -52,10 +53,10 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
         final @NotNull ComponentDialogBase.DetailsBuilder details = ComponentDialogBase.details()
                 .row("Name", dto.getName())
                 .row("Path", dto.getPath().toString())
-                .row("Created By", marker.getCreatedBy())
-                .row("Created At", Display.formatDate(marker.getCreatedAt()))
-                .row("Modified By", marker.getModifiedBy())
-                .row("Modified At", Display.formatDate(marker.getModifiedAt()))
+                .row(TestEditorAttributes.CREATE_BY.getName(), marker.getCreatedBy())
+                .row(TestEditorAttributes.CREATE_AT.getName(), Display.formatDate(marker.getCreatedAt()))
+                .row(TestEditorAttributes.UPDATE_BY.getName(), marker.getModifiedBy())
+                .row(TestEditorAttributes.UPDATE_AT.getName(), Display.formatDate(marker.getModifiedAt()))
                 .row("Status", marker.getStatusLabel());
 
         // What the run has to say about its own execution, which the run file

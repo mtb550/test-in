@@ -1,5 +1,6 @@
 package org.testin.navigate;
 
+import org.testin.editor.CardHoverAction;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -18,7 +19,7 @@ public class NavigateToCodeAction extends AbstractProjectAction {
     private final @NotNull JBList<TestCaseDto> list;
 
     public NavigateToCodeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
-        super(p, "Navigate to Code", "Jump to the automated test case", AllIcons.General.ArrowRight);
+        super(p, CardHoverAction.NAVIGATE_TO_TEST_METHOD.getTooltip(), "Jump to the automated test case", AllIcons.General.ArrowRight);
         this.list = list;
         this.registerCustomShortcutSet(Shortcuts.NavigateToCode.getCustomShortcut(), list);
     }

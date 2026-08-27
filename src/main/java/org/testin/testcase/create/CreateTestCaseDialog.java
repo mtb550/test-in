@@ -1,5 +1,6 @@
 package org.testin.testcase.create;
 
+import org.testin.codegen.GenType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -95,7 +96,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
         final @NotNull JBPopup dialogPopup = ownPopup(JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, descriptionSection.getFocusComponent())
-                .setTitle("Create Test Case")
+                .setTitle(GenType.CREATE_TEST_CASE.getDescription())
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(false)

@@ -1,5 +1,6 @@
 package org.testin.importexport.exports;
 
+import org.testin.notifications.Done;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -76,7 +77,7 @@ final class ExportNotice {
     private static void show(final @NotNull Project p, final @NotNull File file, final @NotNull Runnable open) {
         ApplicationManager.getApplication().invokeLater(() -> {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-            notifier.infoWithActions(p, "Exported", file.getName(), notifier.action("Open file", open));
+            notifier.infoWithActions(p, Done.EXPORTED.getOutcome(), file.getName(), notifier.action("Open file", open));
         });
     }
 }

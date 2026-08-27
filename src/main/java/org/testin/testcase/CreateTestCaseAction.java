@@ -28,7 +28,7 @@ public class CreateTestCaseAction extends AbstractProjectAction {
     private final @NotNull TestSetDirectoryDto dir;
 
     public CreateTestCaseAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
-        super(p, "Create Test Case", "Create new test case", AllIcons.Actions.AddToDictionary);
+        super(p, GenType.CREATE_TEST_CASE.getDescription(), "Create new test case", AllIcons.Actions.AddToDictionary);
         this.editor = editor;
         this.dir = dir;
         this.registerCustomShortcutSet(Shortcuts.CreateItem.getCustomShortcut(), list);
