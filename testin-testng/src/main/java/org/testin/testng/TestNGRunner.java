@@ -140,7 +140,13 @@ public final class TestNGRunner implements TestRunner {
         final @NotNull RunManager runManager = RunManager.getInstance(p);
         final @NotNull TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
 
+        // Reused only when what carries that name is a TestNG configuration.
+        // findConfigurationByName answers with whatever holds the name - a
+        // JUnit run, a Gradle task, an Application the tester set up - and the
+        // cast below then threw, or worse, this quietly took a configuration of
+        // the tester's own and rewrote it into a TestNG pattern run.
         final @NotNull RunnerAndConfigurationSettings settings = Optional.ofNullable(runManager.findConfigurationByName(name))
+                .filter(existing -> existing.getConfiguration() instanceof TestNGConfiguration)
                 .orElseGet(() -> {
                     final @NotNull RunnerAndConfigurationSettings created =
                             runManager.createConfiguration(name, configType.getConfigurationFactories()[0]);
@@ -148,7 +154,15 @@ public final class TestNGRunner implements TestRunner {
                     return created;
                 });
 
-        final @NotNull TestNGConfiguration configuration = (TestNGConfiguration) settings.getConfiguration();
+        // Not a cast. What the factory above builds is a TestNG configuration,
+        // and if some future platform change means it is not, this says so
+        // instead of ending the run in a ClassCastException the tester sees as
+        // an IDE error report.
+        if (!(settings.getConfiguration() instanceof TestNGConfiguration configuration)) {
+            Logger.warn("'" + name + "' is not a TestNG configuration, so the run was not started");
+            return;
+        }
+
         configuration.getPersistantData().TEST_OBJECT = TestType.PATTERN.getType();
         configuration.getPersistantData().setPatterns(patterns);
         configuration.setAllowRunningInParallel(true);
