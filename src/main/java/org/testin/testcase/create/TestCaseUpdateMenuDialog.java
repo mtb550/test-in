@@ -3,7 +3,6 @@ package org.testin.testcase.create;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GenAction;
 import org.testin.codegen.GenType;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -38,11 +37,14 @@ public class TestCaseUpdateMenuDialog {
     public static void applyAftermath(final @NotNull Project p, final @NotNull List<TestCaseDto> updated, final @NotNull GenType gt) {
         ViewToolWindowFactory.panel().ifPresent(viewPanel -> viewPanel.refreshIfShowing(updated));
 
-        Logger.trace("Generating automation code: " + gt);
-        final @NotNull GenAction action = gt.getAction();
-        final @NotNull TestCaseDto first = updated.getFirst();
+        // Every case that was updated, not the first of them. This took the
+        // list and generated for one element of it, which was invisible while
+        // the only caller had a single case and became a bulk edit that wrote
+        // all the data and one method's worth of code - with one "Updated"
+        // covering both (#151).
+        Logger.trace("Generating automation code for " + updated.size() + ": " + gt);
 
-        ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(p, first));
+        ApplicationManager.getApplication().executeOnPooledThread(() -> gt.executeAll(p, updated));
     }
 
     public void show() {

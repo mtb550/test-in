@@ -172,7 +172,7 @@ public enum GenType {
     GenType(final @NotNull String description, final @NotNull String tooltip) {
         this.description = description;
         this.tooltip = tooltip;
-        this.action = this::runJavaAction;
+        this.action = new JavaCodeUpdate();
     }
 
     GenType(final @NotNull String description, final @NotNull String tooltip, final @NotNull String dataOnlyField) {
@@ -184,22 +184,43 @@ public enum GenType {
     /**
      * Runs the Java-backed generator for this operation - or, in an IDE with no
      * Java plugin, says so once per project and skips quietly.
+     * <p>
+     * A class rather than the method reference it used to be, so that it can
+     * answer for a list as well as for one item. A lambda cannot: it takes the
+     * interface's default {@code executeAll}, which is a loop, and the whole
+     * point of handing a generator the set is that it can do the per-class work
+     * once instead of per case.
      */
-    private void runJavaAction(final @NotNull Project p, final @NotNull Object obj) {
-        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+    private final class JavaCodeUpdate implements GenAction {
 
-        CodeGenerators.find(this).execute(p, obj);
+        @Override
+        public void execute(final @NotNull Project p, final @NotNull Object obj) {
+            if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+
+            CodeGenerators.find(GenType.this).execute(p, obj);
+        }
+
+        @Override
+        public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+            if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+
+            CodeGenerators.find(GenType.this).executeAll(p, items);
+        }
     }
 
     /**
-     * Generates for a whole list in one go, through the registry like the
-     * single-item form. A caller with a set in hand - an import, a copied test
-     * set - hands the set over rather than the cases one by one, so the
-     * generator can do the work that is per class once instead of per case.
+     * Generates for a whole list in one go. A caller with a set in hand - an
+     * import, a copied test set, a bulk edit - hands the set over rather than
+     * the cases one by one, so the generator can do the work that is per class
+     * once instead of per case.
+     * <p>
+     * Through the same action {@link #getAction()} returns, which it did not
+     * used to be: it went straight to the registry, so a data-only attribute
+     * asked for a Java generator it has no use for and warned about the missing
+     * Java plugin on the way. The two forms of the same operation now behave the
+     * same, because they are the same object.
      */
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
-
-        CodeGenerators.find(this).executeAll(p, items);
+        action.executeAll(p, items);
     }
 }
