@@ -29,7 +29,14 @@ public class MoveJavaPackage implements GenAction {
         if (!(obj instanceof Moved moved)) return;
 
         final @NotNull List<String> fqcn = Fqcn.ofPackage(moved.dir());
-        final @NotNull List<String> destination = moved.destinationPackage(p);
+
+        final @NotNull Optional<List<String>> destinationFound = moved.destinationPackage(p);
+        if (destinationFound.isEmpty()) {
+            Logger.info("Destination is not indexed, so package " + String.join(".", fqcn) + " is left where it is");
+            return;
+        }
+
+        final @NotNull List<String> destination = destinationFound.get();
 
         JavaSourceRoot.commandInRoot(p, "Move Test Package", "moving package", sourceRoot -> {
             final @NotNull Optional<VirtualFile> found = Optional.ofNullable(sourceRoot.findFileByRelativePath(String.join("/", fqcn)))

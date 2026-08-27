@@ -31,7 +31,13 @@ public class MoveJavaClass implements GenAction {
         final @NotNull List<String> fqcn = Fqcn.ofClass(p, moved.dir());
         if (fqcn.isEmpty()) return;
 
-        final @NotNull List<String> destination = moved.destinationPackage(p);
+        final @NotNull Optional<List<String>> found = moved.destinationPackage(p);
+        if (found.isEmpty()) {
+            Logger.info("Destination is not indexed, so " + String.join(".", fqcn) + " is left where it is");
+            return;
+        }
+
+        final @NotNull List<String> destination = found.get();
         final @NotNull String fileName = fqcn.getLast() + ".java";
 
         JavaSourceRoot.commandInRoot(p, "Move Test Class", "moving class", sourceRoot -> {
