@@ -98,14 +98,30 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
         return true;
     }
 
-    protected void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<EditedValue> newValues) {
+    /**
+     * Writes the rows the tester edited, and answers with the cases it actually
+     * wrote to.
+     * <p>
+     * The answer is the point. This has always skipped the untouched rows - the
+     * caller then handed the whole selection on to be saved, regenerated and
+     * counted, so fifty cases were written to disk and their automation
+     * rebuilt because one of them was edited, and the tester was told fifty had
+     * changed. Two rules for what a bulk edit touched, in two places, and only
+     * one of them was right.
+     */
+    protected @NotNull List<TestCaseDto> applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<EditedValue> newValues) {
+        final @NotNull List<TestCaseDto> written = new ArrayList<>();
+
         for (int i = 0; i < items.size(); i++) {
             final @NotNull EditedValue edited = newValues.get(i);
             if (!edited.changed()) continue;
             if (edited.value().isEmpty() && !acceptsBlank()) continue;
 
             setValue(items.get(i), edited.value());
+            written.add(items.get(i));
         }
+
+        return written;
     }
 
     // ------------------------------------------------------------------
@@ -141,9 +157,10 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
                     .orElse(EditedValue.UNCHANGED));
         }
 
-        applyValues(selectedItems, newValues);
-        // todo, apply update automation edit bulk test cases.
-        updatedItems.accept(selectedItems);
+        // Only the cases that were written. Handing on the whole selection
+        // saved and regenerated every one of them and reported a count nobody
+        // had earned.
+        updatedItems.accept(applyValues(selectedItems, newValues));
 
         closeOk();
     }

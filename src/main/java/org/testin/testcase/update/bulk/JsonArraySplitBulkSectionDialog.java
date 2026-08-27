@@ -130,9 +130,26 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
     @Override
     protected void submit() {
         readEditorIntoValues();
-        applyValues(selectedItems, activeValues);
-        // todo, apply update automation edit bulk test cases.
-        updatedItems.accept(selectedItems);
+
+        final @NotNull List<TestCaseDto> edited = new ArrayList<>();
+        final @NotNull List<List<String>> editedValues = new ArrayList<>();
+
+        // Against what the row started as, which this dialog has kept all along
+        // and never consulted. Without it every selected case is written back
+        // from the editor - and the editor shows a stored value with its
+        // newlines flattened, so a case the tester never opened comes back with
+        // its steps trimmed and its blank ones dropped.
+        for (int i = 0; i < selectedItems.size(); i++) {
+            if (activeValues.get(i).equals(originalValues.get(i))) continue;
+
+            edited.add(selectedItems.get(i));
+            editedValues.add(activeValues.get(i));
+        }
+
+        // Index-parallel, which is what applyValues expects.
+        if (!edited.isEmpty()) applyValues(edited, editedValues);
+
+        updatedItems.accept(edited);
 
         closeOk();
     }
