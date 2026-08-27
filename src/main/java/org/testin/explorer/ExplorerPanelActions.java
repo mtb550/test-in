@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.CollapseAllAction;
 import org.testin.explorer.toolbar.ExpandAllAction;
-import org.testin.explorer.toolbar.RefreshAction;
 import org.testin.setting.OpenSettingsAction;
 import org.testin.testproject.SelectTestProjectAction;
 
@@ -19,7 +18,7 @@ public class ExplorerPanelActions {
                 new OpenSettingsAction(p),
                 new ExpandAllAction(pp),
                 new CollapseAllAction(pp),
-                new RefreshAction(p, pp),
+                pp.getRefreshAction(),
                 new SelectTestProjectAction(p, pp),
                 new CreateTestProjectAction(p, pp)
         );

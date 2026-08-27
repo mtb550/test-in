@@ -52,6 +52,21 @@ public final class ExplorerPanel implements Disposable {
     private final @NotNull BranchSelector branchSelector;
 
     /**
+     * The one Refresh for this project, held here because the guard that stops
+     * two re-indexes overlapping is a field on it.
+     * <p>
+     * Every caller used to build its own, so the guard only ever stopped a
+     * second click on the same toolbar button. A branch switch landing while
+     * the tester pressed Refresh started a second re-index through the first:
+     * it wipes the cache the first pass is filling and replaces the latch the
+     * other pass counts down, so the tree can be drawn from a half-built index.
+     * The "already in progress, ignoring click" line could never appear for the
+     * one combination it was written for.
+     */
+    @Getter
+    private final @NotNull RefreshAction refreshAction;
+
+    /**
      * Asked for by every action that changes a node and has to redraw it.
      */
     @Getter
@@ -75,6 +90,7 @@ public final class ExplorerPanel implements Disposable {
         this.p = p;
         Logger.info("ExplorerPanel.ExplorerPanel()");
 
+        refreshAction = new RefreshAction(p, this);
         branchSelector = new BranchSelector(p, this, bound());
         projectTree = new ExplorerTree(p, this);
         Disposer.register(this, projectTree);
@@ -373,7 +389,7 @@ public final class ExplorerPanel implements Disposable {
      * rather than calling {@link #refresh()} directly.
      */
     public void reindex() {
-        new RefreshAction(p, this).execute();
+        refreshAction.execute();
     }
 
     /**
@@ -381,7 +397,7 @@ public final class ExplorerPanel implements Disposable {
      * refresh - a branch switch says which branch.
      */
     public void reindex(final @NotNull String outcome) {
-        new RefreshAction(p, this).execute(outcome);
+        refreshAction.execute(outcome);
     }
 
     @Override

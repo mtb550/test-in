@@ -25,6 +25,14 @@ public class RefreshAction extends AbstractProjectAction {
     private static final @NotNull String REFRESHED = "Refreshed";
 
     private final @NotNull ExplorerPanel pp;
+
+    /**
+     * Stops a second re-index starting through one already running.
+     * <p>
+     * It only works because there is one of these per project, held on
+     * {@link ExplorerPanel}. Constructing one to call {@code execute} gives it a
+     * guard nobody else can see, which is what this used to be.
+     */
     private final @NotNull AtomicBoolean refreshGuard = new AtomicBoolean(false);
 
     public RefreshAction(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
