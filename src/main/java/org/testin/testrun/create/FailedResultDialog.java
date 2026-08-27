@@ -1,5 +1,6 @@
 package org.testin.testrun.create;
 
+import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +44,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
                 .build();
         actualResult = actualResultField.getComponent();
 
-        final @NotNull ComponentDialogBase<RadioSelection<BugSeverity>> severityRadios = ComponentDialogBase.<BugSeverity>radios("Severity")
+        final @NotNull ComponentDialogBase<RadioSelection<BugSeverity>> severityRadios = ComponentDialogBase.<BugSeverity>radios(RunEditorAttributes.BUG_SEVERITY.getName())
                 .option(BugSeverity.BLOCKER.getName(), BugSeverity.BLOCKER)
                 .option(BugSeverity.MAJOR.getName(), BugSeverity.MAJOR)
                 .option(BugSeverity.MINOR.getName(), BugSeverity.MINOR)
@@ -52,7 +53,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
                 .build();
         severity = severityRadios.getComponent();
 
-        final @NotNull ComponentDialogBase<RadioSelection<BugPriority>> priorityRadios = ComponentDialogBase.<BugPriority>radios("Priority")
+        final @NotNull ComponentDialogBase<RadioSelection<BugPriority>> priorityRadios = ComponentDialogBase.<BugPriority>radios(RunEditorAttributes.BUG_PRIORITY.getName())
                 .option(BugPriority.HIGH.getName(), BugPriority.HIGH)
                 .option(BugPriority.MEDIUM.getName(), BugPriority.MEDIUM)
                 .option(BugPriority.LOW.getName(), BugPriority.LOW)

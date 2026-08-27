@@ -1,5 +1,6 @@
 package org.testin.explorer.tree;
 
+import org.testin.notifications.Done;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
@@ -316,7 +317,7 @@ public class TreeTransferHandler extends TransferHandler {
             Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), copied -> {
                 generateForCopies(sources, target);
                 refresh.run();
-                confirmLanded("Pasted", copied);
+                confirmLanded(Done.PASTED, copied);
             });
         }
 
@@ -328,7 +329,7 @@ public class TreeTransferHandler extends TransferHandler {
      * The count comes from the indexer, which reports how many of the operations
      * it ran succeeded (#66, F2).
      */
-    private void confirmLanded(final @NotNull String outcome, final int landed) {
+    private void confirmLanded(final @NotNull Done outcome, final int landed) {
         if (landed == 0) return;
 
         Services.getInstance(p, Notifier.class).softShowCounted(p, outcome, landed);
@@ -377,7 +378,7 @@ public class TreeTransferHandler extends TransferHandler {
                 .map(source -> target.getPath().resolve(source.getName()))
                 .toList();
 
-        moveBatch(oldPaths, newPaths, moved -> confirmLanded("Moved", moved));
+        moveBatch(oldPaths, newPaths, moved -> confirmLanded(Done.MOVED, moved));
 
         Services.getInstance(p, TreeUndoService.class).push(new TreeUndoService.TreeOperation(
                 "Move " + describe(sources),
@@ -504,7 +505,7 @@ public class TreeTransferHandler extends TransferHandler {
         // it, and which of the two it was. A copy changes nothing on screen, so
         // without this the tester has no way to tell it happened.
         Services.getInstance(p, Notifier.class)
-                .softShowCounted(p, cut ? "Cut" : "Copied", directories.size());
+                .softShowCounted(p, cut ? Done.CUT : Done.COPIED, directories.size());
     }
 
     public void pasteFromClipboard() {

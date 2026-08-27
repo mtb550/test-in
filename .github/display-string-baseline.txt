@@ -34,4 +34,12 @@
 # is worth less to the count than to the rule: CLAUDE.md has always said a
 # confirmation is the outcome in the past tense and nothing else, and until Done
 # there was nothing to say it to.
-191
+#
+# 186 after the four verbs the Done migration missed - they went through a
+# helper and a ternary rather than straight to softShow - and the two bug
+# captions in the failed-result dialog.
+#
+# Seven of what is left is machinery the filter cannot tell from a caption: a
+# font name and a date locale look exactly like one. They are a floor on this
+# number rather than work to do.
+186

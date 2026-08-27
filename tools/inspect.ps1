@@ -280,6 +280,84 @@ function Test-MachineString([string] $value) {
 }
 
 
+
+function Write-DisplayStringInventory([string[]] $scopes, [string] $outPath) {
+    <#
+        Every string a tester might read, and where it is written.
+
+        findings.txt lists the ones written in more than one file, because those
+        are the ones to act on. This is the whole set - including the strings
+        written once, which are the ones a new duplicate would be created from.
+        Read it when deciding whether a word already exists before adding it.
+
+        Grouped by the call the string is handed to, because the call says what
+        kind of word it is: one passed to softShow is a confirmation, one passed
+        to .column is a table heading, one passed to StatusBarShortcut.build is a
+        dialog key. A group with no owning enum is a vocabulary waiting for one -
+        which is how Done was found.
+    #>
+    $rows = @()
+
+    foreach ($scope in $scopes) {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+            $short = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+            $number = 0
+
+            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+                $number++
+
+                $trimmed = $text.Trim()
+                if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
+                if ($text -match 'Logger\.(trace|debug|info|warn|error|fatal)') { continue }
+
+                foreach ($match in [regex]::Matches($text, '"((?:[^"\\]|\\.)*)"')) {
+                    $value = $match.Groups[1].Value
+                    if (Test-MachineString $value) { continue }
+
+                    # The nearest identifier followed by '(' before the string.
+                    # Single-line calls only, which is nearly all of them; the
+                    # rest land under (unknown) and are still listed.
+                    $before = $text.Substring(0, $match.Index)
+                    $calls = [regex]::Matches($before, '([\w.]+)\s*\(')
+                    $call = if ($calls.Count -gt 0) { $calls[$calls.Count - 1].Groups[1].Value } else { '(unknown)' }
+
+                    $rows += [pscustomobject]@{ Value = $value; Call = $call; Where = "$short`:$number" }
+                }
+            }
+        }
+    }
+
+    $inventory = Join-Path $outPath 'display-strings.txt'
+    $lines = @(
+        'Every string a tester might read, and where it is written.',
+        '',
+        'Grouped by the call it is handed to - the call says what kind of word it',
+        'is, and a group with no owning enum is a vocabulary waiting for one.',
+        '',
+        "$($rows.Count) uses of $(@($rows | Select-Object -ExpandProperty Value -Unique).Count) distinct strings.",
+        '',
+        'The ones written in more than one file are also in findings.txt, as',
+        'DuplicatedDisplayString, which is what the ratchet counts.',
+        '')
+
+    foreach ($group in ($rows | Group-Object Call | Sort-Object Count -Descending)) {
+        $distinct = @($group.Group | Select-Object -ExpandProperty Value -Unique)
+        $lines += ''
+        $lines += ('=' * 78)
+        $lines += ('{0}   -   {1} use(s), {2} distinct' -f $group.Name, $group.Count, $distinct.Count)
+        $lines += ('=' * 78)
+
+        foreach ($value in ($distinct | Sort-Object)) {
+            $places = @($group.Group | Where-Object { $_.Value -eq $value } | Select-Object -ExpandProperty Where)
+            $lines += ('  "{0}"' -f $value)
+            foreach ($place in ($places | Sort-Object)) { $lines += ('        ' + $place) }
+        }
+    }
+
+    $lines | Set-Content -Path $inventory -Encoding utf8
+    Write-Host "Strings:   $inventory"
+}
+
 function Read-DriftedCaptions([string[]] $enums) {
     <#
         One concept, two words, in front of the same tester.
@@ -648,6 +726,10 @@ $problems += @(Read-DriftedCaptions @(
 $problems = Resolve-CrossModuleUsages $problems
 
 Write-Reports $problems $outPath
+
+# The whole vocabulary, beside the findings. findings.txt says what to act on;
+# this says what already exists, which is what stops the next duplicate.
+Write-DisplayStringInventory $scopes $outPath
 
 # The three that are not allowed to survive a sweep. The first two are the
 # project's standing rule - a null contract the checker can prove is broken is a
