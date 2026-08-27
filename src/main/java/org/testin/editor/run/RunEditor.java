@@ -49,7 +49,7 @@ import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.TestCaseOrder;
-import org.testin.testrun.UpdateTestRunStatusAction;
+import org.testin.testrun.TestRunStatusChange;
 import org.testin.util.Display;
 import org.testin.util.FontSync;
 import org.testin.view.GridViewDetailsAction;
@@ -512,6 +512,20 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * Redraws everything a run's status changes.
+     * <p>
+     * The cards carry the run's status, the page indicator is rebuilt with them,
+     * and Start and Stop depend on whether the run is in progress. Here rather
+     * than at the caller so the list stays this editor's own - the status change
+     * used to be handed the list to repaint.
+     */
+    public void refreshAfterRunStatusChanged() {
+        list.repaint();
+        statusBar.updatePaginationState(currentPage, getTotalPageCount());
+        refreshExecutionButtons();
+    }
+
+    /**
      * Records the selected test case (and grid column) before the data is reloaded.
      */
     private void rememberSelection() {
@@ -751,7 +765,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     public void startTimerForIndex(final int globalIndex) {
         if (globalIndex >= currentTestCases.size()) {
-            new UpdateTestRunStatusAction(p, this, list).onExecutionFinished(this);
+            Services.getInstance(p, TestRunStatusChange.class).apply(this, TestRunStatus.COMPLETED);
             return;
         }
 
@@ -840,7 +854,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         if (status == TestRunStatus.IN_PROGRESS || status.isTerminal()) return;
 
         run().ifPresent(TestRunDto::markExecutionStarted);
-        new UpdateTestRunStatusAction(p, this, list).applyStatusChange(this, TestRunStatus.IN_PROGRESS);
+        Services.getInstance(p, TestRunStatusChange.class).apply(this, TestRunStatus.IN_PROGRESS);
     }
 
     private void executionReported(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
@@ -902,7 +916,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     private void finishIfEverythingIsJudged() {
         if (run().filter(TestRunDto::isFullyJudged).isEmpty()) return;
 
-        new UpdateTestRunStatusAction(p, this, list).onExecutionFinished(this);
+        Services.getInstance(p, TestRunStatusChange.class).apply(this, TestRunStatus.COMPLETED);
     }
 
     /**
@@ -1055,7 +1069,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         // Before the status change, which is what persists the run.
         run.get().markExecutionStarted();
-        new UpdateTestRunStatusAction(p, this, list).applyStatusChange(this, TestRunStatus.IN_PROGRESS);
+        Services.getInstance(p, TestRunStatusChange.class).apply(this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(firstPendingIndex());
         refreshExecutionButtons();
     }

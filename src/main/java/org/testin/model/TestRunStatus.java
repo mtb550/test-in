@@ -10,8 +10,6 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * Lifecycle status of a test run. Constants carry their own icon, keyboard
@@ -54,11 +52,6 @@ public enum TestRunStatus {
             AllIcons.Actions.Cancel
     );
 
-    private static final @NotNull Map<TestRunStatus, TestRunStatus> TRANSITIONS = Map.of(
-            CREATED, IN_PROGRESS,
-            ASSIGNED, IN_PROGRESS,
-            IN_PROGRESS, COMPLETED
-    );
     private final @NotNull String label;
 
     /**
@@ -67,13 +60,6 @@ public enum TestRunStatus {
      */
     private final @NotNull KeyStroke shortcut;
     private final @NotNull Icon icon;
-
-    /**
-     * The status the advance action moves this run to, empty when terminal.
-     */
-    public @NotNull Optional<TestRunStatus> nextStatus() {
-        return Optional.ofNullable(TRANSITIONS.get(this));
-    }
 
     /**
      * True when the run has reached a terminal state (completed or closed).
