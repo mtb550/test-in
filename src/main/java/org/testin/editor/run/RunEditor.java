@@ -189,7 +189,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // test editor and the view panel only ever repainted on a report; this
         // one records what the report said, because a run is where a verdict
         // belongs.
-        new TestCaseExecutionSubscriber(p, projectDisposable, this::executionReported);
+        TestCaseExecutionSubscriber.onReported(p, projectDisposable, this::executionReported);
 
         // Shared list-view construction (see ListPanelBuilder, the counterpart of
         // GridPanelBuilder). Built here rather than in buildOpeningPanel so the

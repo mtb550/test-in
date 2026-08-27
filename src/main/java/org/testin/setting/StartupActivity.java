@@ -14,6 +14,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
+import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.runner.TestCaseExecutionTracker;
 import org.testin.services.Services;
 import org.testin.util.Once;
@@ -104,6 +105,11 @@ public final class StartupActivity implements ProjectActivity {
         }
 
         TestCaseExecutionTracker.initGlobalListener(p);
+
+        // Before any surface exists. Recording a verdict used to be something
+        // the open editors did on the side, so a run in a session where none
+        // had been opened stored nothing.
+        TestCaseExecutionSubscriber.initRecording(p);
     }
 
     /**
