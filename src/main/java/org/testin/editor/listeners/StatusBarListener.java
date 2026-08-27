@@ -7,29 +7,13 @@ import org.testin.editor.TestinEditor;
 public class StatusBarListener {
 
     public static void attach(final @NotNull TestinEditor editor) {
-        editor.getStatusBar().getFirstButton().addActionListener(e -> {
-            editor.setCurrentPage(1);
-            editor.refreshView();
-        });
-
-        editor.getStatusBar().getPrevButton().addActionListener(e -> {
-            if (editor.getCurrentPage() > 1) {
-                editor.setCurrentPage(editor.getCurrentPage() - 1);
-                editor.refreshView();
-            }
-        });
-
-        editor.getStatusBar().getNextButton().addActionListener(e -> {
-            if (editor.getCurrentPage() < editor.getTotalPageCount()) {
-                editor.setCurrentPage(editor.getCurrentPage() + 1);
-                editor.refreshView();
-            }
-        });
-
-        editor.getStatusBar().getLastButton().addActionListener(e -> {
-            editor.setCurrentPage(editor.getTotalPageCount());
-            editor.refreshView();
-        });
+        // All four are the editor's one page step with a different delta -
+        // first and last compute theirs from where the tester is now. The bounds
+        // check went with them: the step refuses to leave the range itself.
+        editor.getStatusBar().getFirstButton().addActionListener(e -> editor.stepPage(1 - editor.getCurrentPage()));
+        editor.getStatusBar().getPrevButton().addActionListener(e -> editor.stepPage(-1));
+        editor.getStatusBar().getNextButton().addActionListener(e -> editor.stepPage(1));
+        editor.getStatusBar().getLastButton().addActionListener(e -> editor.stepPage(editor.getTotalPageCount() - editor.getCurrentPage()));
 
         editor.getStatusBar().getPageSizeField().addActionListener(e -> {
             try {

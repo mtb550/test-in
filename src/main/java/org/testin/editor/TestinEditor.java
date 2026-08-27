@@ -56,6 +56,37 @@ public interface TestinEditor extends Disposable {
      * differently from the handler acting on them would be a quiet mismatch.
      */
     /**
+     * Whether turning this many pages would land on one that exists.
+     */
+    default boolean canStepPage(final int delta) {
+        final int target = getCurrentPage() + delta;
+
+        return target >= 1 && target <= getTotalPageCount();
+    }
+
+    /**
+     * Turns the page by this many, and does nothing when that would leave the
+     * range.
+     * <p>
+     * One implementation for one gesture. The status-bar arrows had their own
+     * bounds check and refresh and the context-menu entries and keyboard
+     * shortcuts had another, which agreed only because nobody had changed
+     * either - so remembering the selection across a page turn, notifying, or
+     * refusing while the editor is busy would have landed in one and not the
+     * other, and the arrow would have behaved differently from the shortcut
+     * with nothing failing.
+     * <p>
+     * First and last are this call with a computed delta, which is why there is
+     * no separate method for them.
+     */
+    default void stepPage(final int delta) {
+        if (!canStepPage(delta)) return;
+
+        setCurrentPage(getCurrentPage() + delta);
+        refreshView();
+    }
+
+    /**
      * Tells the status bar what is selected, converting the page row to its
      * position in the whole list on the way.
      * <p>

@@ -25,22 +25,14 @@ abstract class AbstractPageAction extends DumbAwareAction {
         registerCustomShortcutSet(shortcut.getCustomShortcut(), list);
     }
 
-    private boolean canNavigate() {
-        final int target = editor.getCurrentPage() + delta;
-        return target >= 1 && target <= editor.getTotalPageCount();
-    }
-
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (canNavigate()) {
-            editor.setCurrentPage(editor.getCurrentPage() + delta);
-            editor.refreshView();
-        }
+        editor.stepPage(delta);
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(canNavigate());
+        e.getPresentation().setEnabled(editor.canStepPage(delta));
     }
 
     @Override
