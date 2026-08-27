@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 
@@ -50,15 +51,22 @@ public class TreeTransferHandler extends TransferHandler {
     private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
     private final @NotNull Runnable refresh;
+
+    /**
+     * Rebuilds the tree and puts it on a node - what a paste and a drop want,
+     * because the node they made is the one the tester is looking for.
+     */
+    private final @NotNull Consumer<Path> refreshAndReveal;
     @Getter
     private final @NotNull Set<DirectoryDto> selectedNodes;
     private int clipboardAction = COPY;
 
-    public TreeTransferHandler(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull Set<DirectoryDto> selectedNodes, final @NotNull Runnable refresh) {
+    public TreeTransferHandler(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull Set<DirectoryDto> selectedNodes, final @NotNull Runnable refresh, final @NotNull Consumer<Path> refreshAndReveal) {
         this.p = p;
         this.tree = tree;
         this.selectedNodes = selectedNodes;
         this.refresh = refresh;
+        this.refreshAndReveal = refreshAndReveal;
     }
 
     /**
@@ -296,17 +304,24 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
-     * Small soft balloon naming what could not land because the name is taken.
+     * Small soft balloon naming what could not land because the name is taken,
+     * and whether there was anything to say.
+     * <p>
+     * The answer is the point: a paste that lands nothing has to tell the
+     * tester so, and must not tell them twice when this has already named the
+     * nodes it stopped.
      */
-    public void notifyNameCollisions(final DirectoryDto @NotNull [] nodes, final @NotNull DirectoryDto target) {
+    public boolean notifyNameCollisions(final DirectoryDto @NotNull [] nodes, final @NotNull DirectoryDto target) {
         final @NotNull List<DirectoryDto> collided = new ArrayList<>();
         for (final DirectoryDto source : nodes) {
             if (isNameCollision(source, target)) collided.add(source);
         }
-        if (collided.isEmpty()) return;
+        if (collided.isEmpty()) return false;
 
         final @NotNull String verb = collided.size() == 1 ? " already exists in '" : " already exist in '";
-        Services.getInstance(p, Notifier.class).softShow(p, describe(collided) + verb + target.getName() + "'");
+        Services.getInstance(p, Notifier.class).softRefuse(p, describe(collided) + verb + target.getName() + "'");
+
+        return true;
     }
 
     private void transfer(final int action, final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
@@ -316,7 +331,12 @@ public class TreeTransferHandler extends TransferHandler {
             final @NotNull List<Path> sourcePaths = sources.stream().map(DirectoryDto::getPath).toList();
             Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), copied -> {
                 generateForCopies(sources, target);
-                refresh.run();
+
+                // On the copy that arrived, so the tester sees what they made
+                // without going looking for it. One node: several copies land
+                // beside each other, and the first is where the eye goes.
+                refreshAndReveal.accept(target.getPath().resolve(sources.getFirst().getName()));
+
                 confirmLanded(Done.PASTED, copied);
             });
         }

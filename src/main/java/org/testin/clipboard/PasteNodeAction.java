@@ -12,6 +12,8 @@ import org.testin.explorer.tree.TreeTransferPayload;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.services.Services;
+import org.testin.notifications.Notifier;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.ClipboardContents;
 import org.testin.util.Shortcuts;
@@ -52,8 +54,20 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
                     .filter(node -> transferHandler.canTransferInto(node, target))
                     .toList();
 
-            transferHandler.notifyNameCollisions(payload.nodes(), target);
-            if (nodes.isEmpty()) return;
+            final boolean collisionsReported = transferHandler.notifyNameCollisions(payload.nodes(), target);
+
+            if (nodes.isEmpty()) {
+                // Said out loud. Pasting into the folder a node already sits in
+                // is refused - a copy beside itself has no name to take - and
+                // the refusal used to be a silent return, so the tester pressed
+                // Ctrl+V and the tree did not move. Not said twice: a name
+                // collision has already named the nodes it stopped.
+                if (!collisionsReported) {
+                    Services.getInstance(p, Notifier.class).softRefuse(p, "Select a folder");
+                }
+
+                return;
+            }
 
             // Cut-paste moves, copy-paste duplicates - each says what it does.
             final boolean move = payload.clipboardAction() == TransferHandler.MOVE;

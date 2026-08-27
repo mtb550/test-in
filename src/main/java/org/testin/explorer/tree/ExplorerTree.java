@@ -8,6 +8,7 @@ import com.intellij.ui.tree.AsyncTreeModel;
 import com.intellij.ui.tree.TreeVisitor;
 import com.intellij.ui.tree.StructureTreeModel;
 import com.intellij.ui.treeStructure.SimpleTree;
+import com.intellij.ide.util.treeView.TreeState;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -52,6 +53,16 @@ public class ExplorerTree implements Disposable {
     private volatile @NotNull String expandedProjectPath = "";
     private volatile boolean disposed;
 
+    /**
+     * A node to put the tree on once the next rebuild has finished.
+     * <p>
+     * Held rather than passed, because the rebuild the caller wants to follow
+     * may be one already scheduled: a paste refreshes through the indexer, and
+     * a second refresh arriving while the first is in flight is dropped by
+     * design. Whichever rebuild completes consumes this.
+     */
+    private @NotNull Optional<Path> revealAfterRebuild = Optional.empty();
+
     public ExplorerTree(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
         this.p = p;
         this.pp = pp;
@@ -73,7 +84,7 @@ public class ExplorerTree implements Disposable {
         final @NotNull Set<DirectoryDto> sharedCutNodes = new HashSet<>();
         mainTree.setCellRenderer(new TreeCellRenderer(sharedCutNodes));
 
-        final @NotNull TreeTransferHandler transferHandler = new TreeTransferHandler(p, mainTree, sharedCutNodes, this::refresh);
+        final @NotNull TreeTransferHandler transferHandler = new TreeTransferHandler(p, mainTree, sharedCutNodes, this::refresh, this::refreshAndReveal);
         mainTree.setTransferHandler(transferHandler);
         mainTree.setDragEnabled(true);
 
@@ -141,6 +152,18 @@ public class ExplorerTree implements Disposable {
     /**
      * Reloads the model from the current indexer state without mutating Swing tree nodes.
      */
+    /**
+     * Rebuilds from the indexer and then puts the tree on this node.
+     * <p>
+     * For anything that adds a node the tester is looking for - a paste, a
+     * drop. The tree stays as they left it and the new node is selected in it,
+     * rather than the tester hunting for what they just made.
+     */
+    public void refreshAndReveal(final @NotNull Path target) {
+        revealAfterRebuild = Optional.of(target);
+        refresh();
+    }
+
     public void refresh() {
         if (disposed || !refreshScheduled.compareAndSet(false, true)) return;
 
@@ -154,11 +177,26 @@ public class ExplorerTree implements Disposable {
                 final boolean projectChanged = !projectPath.isEmpty() && !projectPath.equals(expandedProjectPath);
                 expandedProjectPath = projectPath;
 
+                // What is open and what is selected, before the rebuild throws
+                // the nodes away. Invalidating builds new node objects, and a
+                // tree that cannot recognise them comes back collapsed - so a
+                // paste, a rename or a re-index folded the tree up under the
+                // tester and left them to find their way back down.
+                final @NotNull TreeState shape = TreeState.createOn(mainTree);
+
                 structureModel.invalidateAsync().thenRun(() -> {
-                    if (!disposed && projectChanged) {
-                        ApplicationManager.getApplication().invokeLater(() ->
-                                TreeUtil.promiseExpandAll(mainTree));
-                    }
+                    if (disposed) return;
+
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        if (disposed) return;
+
+                        // A different project is the one time the tree should
+                        // not be put back as it was: it is a different tree.
+                        if (projectChanged) TreeUtil.promiseExpandAll(mainTree);
+                        else shape.applyTo(mainTree);
+
+                        consumePendingReveal();
+                    });
                 });
 
                 mainTree.revalidate();
@@ -167,6 +205,16 @@ public class ExplorerTree implements Disposable {
                 refreshScheduled.set(false);
             }
         });
+    }
+
+    /**
+     * Puts the tree on whatever the last caller asked to be shown, once.
+     */
+    private void consumePendingReveal() {
+        final @NotNull Optional<Path> target = revealAfterRebuild;
+        revealAfterRebuild = Optional.empty();
+
+        target.ifPresent(this::reveal);
     }
 
     public void updateNodes() {

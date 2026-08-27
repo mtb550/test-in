@@ -32,11 +32,28 @@ public final class Notifier {
     private static final @NotNull String GROUP_ID = "testin.notifications";
 
     public void softShow(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
-        showBalloon(p, String.format("<html><b>%s</b><br>%s</html>", title, message));
+        showBalloon(p, String.format("<html><b>%s</b><br>%s</html>", title, message), MessageType.INFO);
     }
 
     public void softShow(final @NotNull Project p, final @NotNull String message) {
-        showBalloon(p, String.format("<html>%s</html>", message));
+        showBalloon(p, String.format("<html>%s</html>", message), MessageType.INFO);
+    }
+
+    /**
+     * The same balloon, in red, for an action that did not happen.
+     * <p>
+     * A confirmation and a refusal read identically at a glance when both carry
+     * the blue information icon, and a refusal is the one the tester has to act
+     * on - it is telling them to do something differently. It still fades: this
+     * is feedback on the gesture they just made, not a failure worth keeping
+     * beside real ones (#62).
+     */
+    public void softRefuse(final @NotNull Project p, final @NotNull String message) {
+        showBalloon(p, String.format("<html>%s</html>", message), MessageType.ERROR);
+    }
+
+    public void softRefuse(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
+        showBalloon(p, String.format("<html><b>%s</b><br>%s</html>", title, message), MessageType.ERROR);
     }
 
     /**
@@ -48,7 +65,7 @@ public final class Notifier {
      * typed, not a failure worth keeping beside real ones (#62).
      */
     public void softShowExists(final @NotNull Project p, final @NotNull String name) {
-        softShow(p, name + " Already Exists");
+        softRefuse(p, name + " Already Exists");
     }
 
     /**
@@ -64,7 +81,7 @@ public final class Notifier {
      * did, and the remedy - generate the code - is a keystroke away.
      */
     public void softShowNoGeneratedCode(final @NotNull Project p, final @NotNull String testCase) {
-        softShow(p, testCase + " has no generated code yet");
+        softRefuse(p, testCase + " has no generated code yet");
     }
 
     /**
@@ -95,7 +112,7 @@ public final class Notifier {
     /**
      * Lightweight fading balloon anchored to the IDE status bar.
      */
-    private void showBalloon(final @NotNull Project p, final @NotNull String htmlContent) {
+    private void showBalloon(final @NotNull Project p, final @NotNull String htmlContent, final @NotNull MessageType type) {
         ApplicationManager.getApplication().invokeLater(() -> {
             // A project window that is closing, or has not opened its frame yet,
             // has no status bar to anchor to - and a balloon nobody can see is
@@ -105,7 +122,7 @@ public final class Notifier {
                     .map(StatusBar::getComponent)
                     .ifPresent(statusBarComponent -> {
                         final @NotNull Balloon balloon = JBPopupFactory.getInstance()
-                                .createHtmlTextBalloonBuilder(htmlContent, MessageType.INFO, null)
+                                .createHtmlTextBalloonBuilder(htmlContent, type, null)
                                 .setFadeoutTime(5000)
                                 .setAnimationCycle(200)
                                 .createBalloon();
