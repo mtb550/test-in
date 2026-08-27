@@ -150,7 +150,6 @@ public final class SftpSync {
      */
     private static @NotNull Outcome inside(final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull ProgressIndicator indicator, final @NotNull SftpTransport transport, final @NotNull ProjectIndexer indexer, final @NotNull Mapper mapper, final @NotNull Path baselineFile, final @NotNull Map<String, byte[]> local, final @NotNull Baseline baseline) {
         indicator.setText("Asking the server what it has...");
-        final boolean serverKnowsThisProject = transport.exists(MANIFEST);
         final @NotNull Manifest remote = readManifest(transport, mapper);
 
         // A server with no manifest has never heard of this project - which
@@ -160,6 +159,18 @@ public final class SftpSync {
         // baseline keeps insisting the files were there. So when the server
         // knows nothing, neither does the baseline, and everything here is
         // simply sent.
+        //
+        // Read off the manifest rather than asked of the server a second time.
+        // It was two questions about one fact, and they disagreed in the case
+        // that matters most: a manifest present but unparsable answers yes to
+        // "does the file exist" and comes back empty from the read, which is
+        // every file the baseline knows classified as deleted on the server -
+        // exactly the offer this guard exists to prevent, and the one
+        // readManifest already says it treats as no manifest at all.
+        //
+        // An empty manifest counts as knowing nothing for the same reason: a
+        // server holding no files has nothing for anyone to have deleted.
+        final boolean serverKnowsThisProject = !remote.entries().isEmpty();
         final @NotNull Baseline against = serverKnowsThisProject ? baseline : Baseline.EMPTY;
         if (!serverKnowsThisProject && !baseline.contents().isEmpty()) {
             Logger.info("The server has no record of " + address.path() + ", so this is a first sync");
