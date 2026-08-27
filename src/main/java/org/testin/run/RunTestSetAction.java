@@ -1,6 +1,5 @@
 package org.testin.run;
 
-import org.testin.model.RunStatus;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -15,7 +14,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.OptionalPlugin;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,8 +61,6 @@ public class RunTestSetAction extends AbstractProjectTreeAction {
      * what is in it (#36).
      */
     private void run(final @NotNull DirectoryDto dir) {
-        if (!OptionalPlugin.TESTNG.isAvailableOrWarn(p)) return;
-
         final @NotNull List<TestCaseDto> cases = Services.getInstance(p, ProjectIndexer.class).getTestCasesUnder(dir);
 
         if (cases.isEmpty()) {
@@ -73,11 +69,17 @@ public class RunTestSetAction extends AbstractProjectTreeAction {
         }
 
         Logger.info("Running " + dir.getName() + " with " + cases.size() + " test case(s)");
-        TestRunner.available().run(p, cases);
 
-        // The same word Run Test Case uses, for the same reason: the run starts
-        // elsewhere and the tree gives no sign it was heard (#62).
-        Services.getInstance(p, Notifier.class).softShowCounted(p, RunStatus.RUNNING.getBadge().label(), cases.size());
+        // Through the class that owns starting a run, not straight to the
+        // runner. It drops the cases already going and counts what actually
+        // started; this went round it, so starting a case from the editor and
+        // then running its set launched that case a second time while the first
+        // was still running, and the balloon counted every case under the node
+        // whether it started or not.
+        //
+        // The TestNG guard and the notification went with it - both are that
+        // class's, and both were written out again here.
+        RunTestCases.run(p, cases);
     }
 
     @Override
