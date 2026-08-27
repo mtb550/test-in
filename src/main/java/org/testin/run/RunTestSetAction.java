@@ -64,7 +64,7 @@ public class RunTestSetAction extends AbstractProjectTreeAction {
         final @NotNull List<TestCaseDto> cases = Services.getInstance(p, ProjectIndexer.class).getTestCasesUnder(dir);
 
         if (cases.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softShow(p, dir.getName() + " has no test cases to run");
+            Services.getInstance(p, Notifier.class).softRefuse(p, dir.getName() + " has no test cases to run");
             return;
         }
 

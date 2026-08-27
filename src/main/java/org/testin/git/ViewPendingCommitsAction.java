@@ -228,7 +228,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
         if (unpushed == 0) {
-            notifier.softShow(p, "No changes");
+            notifier.softRefuse(p, "No changes");
             return;
         }
 

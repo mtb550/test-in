@@ -41,7 +41,7 @@ public class AutomateTestCaseAction extends AbstractProjectAction {
         // nothing, and silence here reads as a bug rather than as unbuilt: after
         // #62 every other action confirms itself, so the odd one out is the one
         // that answers with nothing at all (#66, F4).
-        Services.getInstance(p, Notifier.class).softShow(p, "Not built yet",
+        Services.getInstance(p, Notifier.class).softRefuse(p, "Not built yet",
                 "Generating automation code for a test case is coming in a later release.");
     }
 

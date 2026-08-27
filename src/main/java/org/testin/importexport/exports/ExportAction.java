@@ -56,7 +56,7 @@ public class ExportAction extends AbstractProjectTreeAction {
             final @NotNull Map<String, List<TestCaseDto>> sheets = gatherData(targetDir, dirDto);
             if (sheets.isEmpty()) {
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Services.getInstance(p, Notifier.class).softShow(p, "Export Empty", "No test cases found."));
+                        Services.getInstance(p, Notifier.class).softRefuse(p, "Export Empty", "No test cases found."));
                 return;
             }
 

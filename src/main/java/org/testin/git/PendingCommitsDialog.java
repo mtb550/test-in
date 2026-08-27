@@ -199,7 +199,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         // project was never archived. Only a test case reverts.
         if (!diff.isRevertible()) {
             Services.getInstance(p, Notifier.class)
-                    .softShow(p, "Only a test case change can be reverted");
+                    .softRefuse(p, "Only a test case change can be reverted");
             return;
         }
 
@@ -221,14 +221,14 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                     // the row sit there with nothing explaining why.
                     if (!changeType.isRevertable()) {
                         Services.getInstance(p, Notifier.class)
-                                .softShow(p, "A change to " + changeType.getLabel() + " cannot be reverted");
+                                .softRefuse(p, "A change to " + changeType.getLabel() + " cannot be reverted");
                         return;
                     }
 
                     final @NotNull Optional<TestCaseDto> current = indexer.findTestCase(testCaseId);
                     if (current.isEmpty()) {
                         Services.getInstance(p, Notifier.class)
-                                .softShow(p, "That test case is no longer in the project");
+                                .softRefuse(p, "That test case is no longer in the project");
                         return;
                     }
 

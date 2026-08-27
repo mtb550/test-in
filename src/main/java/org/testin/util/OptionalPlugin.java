@@ -113,6 +113,6 @@ public enum OptionalPlugin {
     }
 
     private void warn(final @NotNull Project p) {
-        Services.getInstance(p, Notifier.class).softShow(p, label + " Plugin Not Available", requirement);
+        Services.getInstance(p, Notifier.class).softRefuse(p, label + " Plugin Not Available", requirement);
     }
 }

@@ -96,7 +96,7 @@ public final class RunStatusService {
      * word it differently.
      */
     public void refuseRemoved(final @NotNull Project p) {
-        Services.getInstance(p, Notifier.class).softShow(p, "The test case was removed - the run keeps what it recorded");
+        Services.getInstance(p, Notifier.class).softRefuse(p, "The test case was removed - the run keeps what it recorded");
     }
 
     public void applyStatus(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {

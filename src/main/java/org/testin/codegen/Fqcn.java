@@ -63,7 +63,7 @@ public final class Fqcn {
         final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(dir.getPath2());
 
         if (generatedFqcn.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softShow(p, "Class Name Unknown",
+            Services.getInstance(p, Notifier.class).softRefuse(p, "Class Name Unknown",
                     "'" + dir.getName() + "' sits outside a test cases directory, so no automation class name could be built.");
             return List.of();
         }

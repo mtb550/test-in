@@ -84,7 +84,7 @@ public final class JavaSourceRoot {
     public static @NotNull Optional<VirtualFile> findOrWarn(final @NotNull Project p) {
         final @NotNull Optional<VirtualFile> root = find(p);
         if (root.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softShow(p,
+            Services.getInstance(p, Notifier.class).softRefuse(p,
                     "Java Test Source Not Found",
                     "Unable to find a Java test source package - automation code was not generated.");
         }

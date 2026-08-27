@@ -68,7 +68,7 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
         component().resolve().ifPresent(destination -> {
             final @NotNull Map<String, List<TestCaseDto>> selected = preview.selected();
             if (selected.isEmpty()) {
-                Services.getInstance(p, Notifier.class).softShow(p, "Export Empty", "Select at least one test case to export.");
+                Services.getInstance(p, Notifier.class).softRefuse(p, "Export Empty", "Select at least one test case to export.");
                 return;
             }
 

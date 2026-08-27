@@ -88,7 +88,7 @@ public final class CodeNavigator implements CodeNavigation {
 
                         if (found.isEmpty()) {
                             ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class)
-                                    .softShow(p, "Nothing to open", "No automation has been generated for '" + tc.getDescription() + "' yet"));
+                                    .softRefuse(p, "Nothing to open", "No automation has been generated for '" + tc.getDescription() + "' yet"));
                             return;
                         }
 

@@ -48,7 +48,7 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
                 // this one is the answer, so the message points at it rather
                 // than opening a dialog with no rows in it.
                 if (underRoot.isEmpty()) {
-                    Services.getInstance(p, Notifier.class).softShow(p, "No Test Projects",
+                    Services.getInstance(p, Notifier.class).softRefuse(p, "No Test Projects",
                             "Create one under the Testin root first");
                     return;
                 }

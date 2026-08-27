@@ -81,7 +81,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
         // logged warning would keep saying so afterwards, about a setup that is
         // correct.
         if (!address.isConfigured()) {
-            Services.getInstance(p, Notifier.class).softShow(p, "No SFTP Server Configured",
+            Services.getInstance(p, Notifier.class).softRefuse(p, "No SFTP Server Configured",
                     "Set connection: sftp and sftpHost in testin.yml");
             return;
         }

@@ -69,7 +69,7 @@ public class ImportAction extends AbstractProjectTreeAction {
         TreeValueUtil.directoryAt(tree.getSelectionPath())
                 .filter(DirectoryDto::isTestCaseContainer)
                 .ifPresentOrElse(this::openImportDialog, () ->
-                        Services.getInstance(p, Notifier.class).softShow(p, "Nothing to Import Into",
+                        Services.getInstance(p, Notifier.class).softRefuse(p, "Nothing to Import Into",
                                 "Select a Test Set, a Test Set Package, or the Test Cases directory."));
     }
 

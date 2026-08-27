@@ -51,7 +51,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         // project and where the repository comes from - the review is what
         // offers to create one.
         if (git.isNotRepository(repoPath)) {
-            Services.getInstance(p, Notifier.class).softShow(p, "Nothing to Sync",
+            Services.getInstance(p, Notifier.class).softRefuse(p, "Nothing to Sync",
                     "'" + repoPath.getFileName() + "' is not under Git yet. Open Pending Commits to create the repository.");
             return;
         }

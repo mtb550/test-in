@@ -78,7 +78,7 @@ public class CreateTestRun implements NodeCreator {
                     // The popup is not modal - the tree stays live while the
                     // dialog is open, so the parent may have been removed.
                     if (!Services.getInstance(p, ProjectIndexer.class).nodeExists(parentDir.getPath())) {
-                        Services.getInstance(p, Notifier.class).softShow(p, "'" + parentDir.getName() + "' no longer exists - test run not created");
+                        Services.getInstance(p, Notifier.class).softRefuse(p, "'" + parentDir.getName() + "' no longer exists - test run not created");
                         return;
                     }
 
