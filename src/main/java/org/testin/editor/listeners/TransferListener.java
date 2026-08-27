@@ -73,6 +73,12 @@ public class TransferListener extends TransferHandler {
 
     @Override
     public boolean importData(final TransferSupport support) {
+        // Asked before the transferable is, because getTransferData throws for a
+        // flavor it does not carry - and the exception's message is the flavor's
+        // own name, so the log read "Exception: List of TestCase" and said
+        // nothing about a drag that was simply not ours to take.
+        if (!support.isDataFlavorSupported(FLAVOR)) return false;
+
         try {
             final @NotNull Object data = support.getTransferable().getTransferData(FLAVOR);
             if (!(data instanceof List<?> rawList)) return false;
@@ -128,7 +134,7 @@ public class TransferListener extends TransferHandler {
 
             return true;
         } catch (final Exception ex) {
-            Logger.error("Exception: " + ex.getMessage());
+            Logger.error("Reordering the test cases failed: " + ex.getMessage());
             return false;
         }
     }
