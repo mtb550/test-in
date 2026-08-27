@@ -57,7 +57,7 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
                 .row(TestEditorAttributes.CREATE_AT.getName(), Display.formatDate(marker.getCreatedAt()))
                 .row(TestEditorAttributes.UPDATE_BY.getName(), marker.getModifiedBy())
                 .row(TestEditorAttributes.UPDATE_AT.getName(), Display.formatDate(marker.getModifiedAt()))
-                .row("Status", marker.getStatusLabel());
+                .row(TestEditorAttributes.STATUS.getName(), marker.getStatusLabel());
 
         // What the run has to say about its own execution, which the run file
         // records and the marker does not. Looked up rather than copied onto the
