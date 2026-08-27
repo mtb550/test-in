@@ -12,8 +12,6 @@ public final class Logger {
 
     private static final @NotNull StackWalker WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
-    private static volatile @NotNull Optional<LoggerService> backendService = Optional.empty();
-
     public static void setLogLevel(final @NotNull Level level) {
         getService().ifPresent(service -> service.setLogLevel(level));
     }
@@ -61,12 +59,15 @@ public final class Logger {
 
     /**
      * Empty before the application is up: the two callers fall back to stdout.
+     * <p>
+     * Asked each time rather than cached. The cache was a static mutable field -
+     * the last of its kind in the plugin - and it bought nothing: a service
+     * lookup is a map read, while holding one across the life of the class
+     * means a disposed application is still answered for, which is exactly what
+     * a test running two of them in one JVM would hit.
      */
     private static @NotNull Optional<LoggerService> getService() {
-        if (backendService.isEmpty()) {
-            backendService = Optional.ofNullable(ApplicationManager.getApplication())
-                    .map(application -> application.getService(LoggerService.class));
-        }
-        return backendService;
+        return Optional.ofNullable(ApplicationManager.getApplication())
+                .map(application -> application.getService(LoggerService.class));
     }
 }
