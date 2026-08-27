@@ -1,5 +1,6 @@
 package org.testin.testcase;
 
+import org.testin.model.TestEditorAttributes;
 import com.intellij.icons.AllIcons;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +28,7 @@ import static org.testin.testcase.TestCaseDialogKey.*;
 public enum CreateTestCaseFields implements StatusBarItem {
 
     DESCRIPTION(
-            "Description",
+            TestEditorAttributes.DESCRIPTION.getName(),
             Shortcuts.CreateTestCaseDescription,
             AllIcons.Actions.Edit,
             TestCaseBaseDialog::getDescriptionSection,
@@ -81,7 +82,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     ),
 
     PRIORITY(
-            "Priority",
+            TestEditorAttributes.PRIORITY.getName(),
             Shortcuts.CreateTestCasePriority,
             AllIcons.Nodes.Favorite,
             TestCaseBaseDialog::getPrioritySection,
@@ -90,7 +91,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     ),
 
     GROUP(
-            "Group",
+            TestEditorAttributes.GROUP.getName(),
             Shortcuts.CreateTestCaseGroup,
             AllIcons.Nodes.Tag,
             TestCaseBaseDialog::getGroupSection,

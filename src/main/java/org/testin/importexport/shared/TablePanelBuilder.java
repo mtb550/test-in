@@ -79,14 +79,18 @@ public class TablePanelBuilder {
         );
 
         try {
-            final @NotNull TableColumn priorityCol = table.getColumn("Priority");
+            // By the same name buildColumnNames wrote, not by a literal that has
+            // to match it. A rename of the attribute moved the column and left
+            // this lookup throwing into the catch below - logged, and the editor
+            // quietly without its dropdowns.
+            final @NotNull TableColumn priorityCol = table.getColumn(TestEditorAttributes.PRIORITY.getName());
             final @NotNull ComboBox<String> priorityBox = new ComboBox<>();
             for (final Priority pr : Priority.values()) {
                 priorityBox.addItem(pr.getName());
             }
             priorityCol.setCellEditor(new DefaultCellEditor(priorityBox));
 
-            final @NotNull TableColumn groupCol = table.getColumn("Group");
+            final @NotNull TableColumn groupCol = table.getColumn(TestEditorAttributes.GROUP.getName());
             groupCol.setCellEditor(new GroupMultiSelectEditor(p));
         } catch (final IllegalArgumentException ex) {
             Logger.error(ex.getMessage());

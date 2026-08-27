@@ -1,5 +1,6 @@
 package org.testin.testrun.create;
 
+import org.testin.model.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.BugPriority;
@@ -78,7 +79,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
 
         components = List.of(
                 ComponentDialogBase.details()
-                        .row("Description", description)
+                        .row(TestEditorAttributes.DESCRIPTION.getName(), description)
                         .row("Expected", expectedResult)
                         .build(),
                 actualResultField,

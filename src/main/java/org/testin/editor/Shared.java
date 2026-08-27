@@ -1,5 +1,6 @@
 package org.testin.editor;
 
+import org.testin.model.TestEditorAttributes;
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
@@ -63,7 +64,7 @@ public class Shared {
      * a position in the tree rather than a value, so it has no enum to live in.
      */
     public static @NotNull Badge createPriorityBadge(final @NotNull TestCaseDto tc) {
-        return captioned("Priority", tc.getPriority().getName(), tc.getPriority().getColor());
+        return captioned(TestEditorAttributes.PRIORITY.getName(), tc.getPriority().getName(), tc.getPriority().getColor());
     }
 
     /**

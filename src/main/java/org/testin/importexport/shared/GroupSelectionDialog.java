@@ -1,5 +1,6 @@
 package org.testin.importexport.shared;
 
+import org.testin.model.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Group;
@@ -36,7 +37,7 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
         title = "Select Groups";
 
         final @NotNull ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
-                .column("Group", 260)
+                .column(TestEditorAttributes.GROUP.getName(), 260)
                 .build();
 
         components = List.of(table);

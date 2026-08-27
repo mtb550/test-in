@@ -1,5 +1,6 @@
 package org.testin.git;
 
+import org.testin.model.TestEditorAttributes;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -18,10 +19,10 @@ final class TestCaseChangeComparator {
 
     static @NotNull List<FieldChange> compare(final @NotNull TestCaseDto oldState, final @NotNull TestCaseDto newState) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
-        addIfChanged(changes, "Description", oldState.getDescription(), newState.getDescription(), ChangeType.CHANGE_DESCRIPTION);
+        addIfChanged(changes, TestEditorAttributes.DESCRIPTION.getName(), oldState.getDescription(), newState.getDescription(), ChangeType.CHANGE_DESCRIPTION);
         addIfChanged(changes, "Expected Result", oldState.getExpectedResult(), newState.getExpectedResult(), ChangeType.CHANGE_EXPECTED_RESULT);
         addIfChanged(changes, "Steps", formatSteps(oldState), formatSteps(newState), ChangeType.CHANGE_STEPS);
-        addIfChanged(changes, "Priority", oldState.getPriority().name(), newState.getPriority().name(), ChangeType.CHANGE_PRIORITY);
+        addIfChanged(changes, TestEditorAttributes.PRIORITY.getName(), oldState.getPriority().name(), newState.getPriority().name(), ChangeType.CHANGE_PRIORITY);
         addIfChanged(changes, "Status", oldState.getStatus().name(), newState.getStatus().name(), ChangeType.CHANGE_STATUS);
         addIfChanged(changes, "Reference", oldState.getReference(), newState.getReference(), ChangeType.CHANGE_REFERENCE);
         addIfChanged(changes, "Module", oldState.getModule(), newState.getModule(), ChangeType.CHANGE_MODULE);
@@ -30,7 +31,7 @@ final class TestCaseChangeComparator {
 
         if (!Objects.equals(oldState.getGroup(), newState.getGroup())) {
             changes.add(new FieldChange(
-                    "Group", groupNames(oldState), groupNames(newState), ChangeType.CHANGE_GROUP));
+                    TestEditorAttributes.GROUP.getName(), groupNames(oldState), groupNames(newState), ChangeType.CHANGE_GROUP));
         }
         return changes;
     }

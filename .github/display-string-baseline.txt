@@ -18,4 +18,7 @@
 # 278 after StatusBarShortcut gained cancel() and confirm(). Twenty-one dialogs
 # declared Escape/"Cancel"/closeCancel identically and seven declared
 # Enter/"Confirm"/submit, which was the largest cluster in the plugin.
-278
+#
+# 262 after Priority, Group and Description started coming from
+# TestEditorAttributes, which owns what a test case's fields are called.
+262

@@ -1,5 +1,6 @@
 package org.testin.report.generators;
 
+import org.testin.model.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.dhatim.fastexcel.Workbook;
 import org.dhatim.fastexcel.Worksheet;
@@ -84,7 +85,7 @@ public final class TestRunExcelGenerator {
 
             int row = 7;
             ws.value(row, 0, "Test Case ID");
-            ws.value(row, 1, "Description");
+            ws.value(row, 1, RunEditorAttributes.DESCRIPTION.getName());
             ws.value(row, 2, "Status");
             ws.value(row, 3, "Actual Result");
             ws.value(row, 4, "Severity");

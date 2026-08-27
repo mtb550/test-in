@@ -1,5 +1,6 @@
 package org.testin.testcase;
 
+import org.testin.model.TestEditorAttributes;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -34,7 +35,7 @@ import static org.testin.testcase.TestCaseDialogKey.*;
 public enum UpdateTestCaseFields implements StatusBarItem {
 
     DESCRIPTION(
-            "Description",
+            TestEditorAttributes.DESCRIPTION.getName(),
             Shortcuts.UpdateTestCaseDescription,
             AllIcons.Actions.Edit,
             GenType.UPDATE_TEST_CASE_DESCRIPTION,
@@ -94,7 +95,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
     ),
 
     PRIORITY(
-            "Priority",
+            TestEditorAttributes.PRIORITY.getName(),
             Shortcuts.UpdateTestCasePriority,
             AllIcons.Nodes.Favorite,
             GenType.UPDATE_TEST_CASE_PRIORITY,
@@ -104,7 +105,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
     ),
 
     GROUP(
-            "Group",
+            TestEditorAttributes.GROUP.getName(),
             Shortcuts.UpdateTestCaseGroup,
             AllIcons.Nodes.Tag,
             GenType.UPDATE_TEST_CASE_GROUP,

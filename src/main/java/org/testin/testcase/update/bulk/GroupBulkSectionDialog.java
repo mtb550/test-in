@@ -1,5 +1,6 @@
 package org.testin.testcase.update.bulk;
 
+import org.testin.model.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
@@ -24,7 +25,7 @@ public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
 
     @Override
     protected @NotNull String getArrayFieldName() {
-        return "Group";
+        return TestEditorAttributes.GROUP.getName();
     }
 
     @Override
