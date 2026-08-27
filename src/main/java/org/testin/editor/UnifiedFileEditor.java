@@ -86,7 +86,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
         final @NotNull List<TestCaseDto> selected = editor.getSelectedTestCases();
 
         ViewToolWindowFactory.toolWindow(p)
-                .flatMap(tw -> ViewToolWindowFactory.panel())
+                .flatMap(tw -> ViewToolWindowFactory.panel(p))
                 .ifPresent(viewer -> {
 
                     if (!selected.isEmpty())

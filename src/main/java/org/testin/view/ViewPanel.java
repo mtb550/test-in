@@ -168,8 +168,6 @@ public class ViewPanel implements Disposable {
         historyTab.removeAll();
         openBugsTab.removeAll();
 
-        // Otherwise the static reference keeps this panel (and its project) alive
-        // after the project is closed, and other projects would operate on it.
-        ViewToolWindowFactory.onPanelDisposed(this);
+        ViewToolWindowFactory.onPanelDisposed(p, this);
     }
 }

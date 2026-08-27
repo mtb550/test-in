@@ -208,7 +208,7 @@ public class DetailsTab {
         new DumbAwareAction() {
             @Override
             public void actionPerformed(final @NotNull AnActionEvent e) {
-                ViewToolWindowFactory.panel().ifPresent(viewPanel -> viewPanel.getCurrentTestCase()
+                ViewToolWindowFactory.panel(p).ifPresent(viewPanel -> viewPanel.getCurrentTestCase()
                         .ifPresent(currentDto -> openUpdateMenu(p, currentDto, viewPanel.getPage().getCurrentPath())));
             }
 

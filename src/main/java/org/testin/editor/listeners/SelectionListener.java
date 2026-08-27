@@ -31,7 +31,7 @@ public class SelectionListener implements ListSelectionListener {
 
                 ViewToolWindowFactory.toolWindow(p)
                         .filter(ToolWindow::isVisible)
-                        .flatMap(tw -> ViewToolWindowFactory.panel())
+                        .flatMap(tw -> ViewToolWindowFactory.panel(p))
                         .ifPresent(viewer -> viewer.show(selected, path));
             }
 

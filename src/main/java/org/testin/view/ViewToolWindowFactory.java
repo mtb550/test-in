@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.setting.StartupActivity;
+import org.testin.services.Services;
 
 import java.util.Optional;
 import java.util.List;
@@ -20,27 +21,20 @@ import java.util.function.Consumer;
 public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     /**
-     * The panel, from the moment the tool window builds it. Static because the
-     * tool window is, and null only before that first build - which is why
-     * nothing outside asks for the field itself (#71).
-     */
-    private static @NotNull Optional<ViewPanel> viewPanel = Optional.empty();
-
-    /**
      * What a caller with nothing to do afterward passes.
      */
     private static final @NotNull Consumer<ViewPanel> NOTHING_AFTER = viewer -> {
     };
 
-    static void onPanelDisposed(final @NotNull ViewPanel panel) {
-        if (viewPanel.filter(held -> held == panel).isPresent()) viewPanel = Optional.empty();
+    static void onPanelDisposed(final @NotNull Project p, final @NotNull ViewPanel panel) {
+        Services.getInstance(p, ViewPanelHolder.class).release(panel);
     }
 
     /**
-     * The panel, once the tool window has built it.
+     * This project's panel, once its tool window has built it.
      */
-    public static @NotNull Optional<ViewPanel> panel() {
-        return viewPanel;
+    public static @NotNull Optional<ViewPanel> panel(final @NotNull Project p) {
+        return Services.getInstance(p, ViewPanelHolder.class).get();
     }
 
     /**
@@ -52,7 +46,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
     }
 
     public static void showPanel(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path, final @NotNull Consumer<ViewPanel> onReadyAction) {
-        toolWindow(p).ifPresent(tw -> tw.show(() -> panel().ifPresent(viewer -> {
+        toolWindow(p).ifPresent(tw -> tw.show(() -> panel(p).ifPresent(viewer -> {
             viewer.show(testCases, path);
             onReadyAction.accept(viewer);
         })));
@@ -72,7 +66,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
             }
 
             final @NotNull ViewPanel panel = new ViewPanel(p);
-            viewPanel = Optional.of(panel);
+            Services.getInstance(p, ViewPanelHolder.class).hold(panel);
 
             final @NotNull ContentFactory contentFactory = ContentFactory.getInstance();
 

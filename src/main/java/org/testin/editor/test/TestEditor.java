@@ -740,7 +740,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         // Swing answers null when the editor is closing with nothing selected,
         // and then there is no case whose view panel needs closing.
         Optional.ofNullable(list.getSelectedValue()).ifPresent(selectedInThisFile ->
-                ViewToolWindowFactory.panel().ifPresent(viewer -> viewer.hide(selectedInThisFile)));
+                ViewToolWindowFactory.panel(p).ifPresent(viewer -> viewer.hide(selectedInThisFile)));
 
         allTestCases.clear();
         currentTestCases.clear();

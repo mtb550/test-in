@@ -35,7 +35,7 @@ public class TestCaseUpdateMenuDialog {
      * a change to what an update entails had to be made once per call site.
      */
     public static void applyAftermath(final @NotNull Project p, final @NotNull List<TestCaseDto> updated, final @NotNull GenType gt) {
-        ViewToolWindowFactory.panel().ifPresent(viewPanel -> viewPanel.refreshIfShowing(updated));
+        ViewToolWindowFactory.panel(p).ifPresent(viewPanel -> viewPanel.refreshIfShowing(updated));
 
         // Every case that was updated, not the first of them. This took the
         // list and generated for one element of it, which was invisible while

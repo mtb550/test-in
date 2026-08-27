@@ -1,6 +1,7 @@
 package org.testin.editor;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
@@ -153,7 +154,16 @@ public interface TestinEditor extends Disposable {
 
     void setHoveredIndex(final int index);
 
+    /**
+     * The project this editor belongs to.
+     * <p>
+     * Declared because {@code dispose} needs it: the view panel is now asked
+     * for by project, and an editor closing in one project must not reset
+     * another project's panel.
+     */
+    @NotNull Project getP();
+
     default void dispose() {
-        ViewToolWindowFactory.panel().ifPresent(ViewPanel::reset);
+        ViewToolWindowFactory.panel(getP()).ifPresent(ViewPanel::reset);
     }
 }

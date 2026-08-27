@@ -66,6 +66,7 @@ import java.util.stream.Collectors;
 
 public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
+    @Getter
     private final @NotNull Project p;
 
     @Getter
