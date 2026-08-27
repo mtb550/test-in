@@ -3,7 +3,6 @@ package org.testin.editor.toolbar.components;
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
-import org.testin.editor.toolbar.Toolbar;
 import org.testin.model.TestRunStatus;
 
 /**
@@ -20,9 +19,9 @@ import org.testin.model.TestRunStatus;
  */
 public class ResultAnalysisBtn extends AbstractButton implements ToolbarItem {
 
-    private final @NotNull Toolbar callbacks;
+    private final @NotNull RunEditor editor;
 
-    public ResultAnalysisBtn(final @NotNull Toolbar callbacks, final @NotNull Runnable onResultAnalysisClicked) {
+    public ResultAnalysisBtn(final @NotNull RunEditor editor, final @NotNull Runnable onResultAnalysisClicked) {
         // The platform's own analysis icon. The one this was asked for -
         // ExceptionAnalyzerIcons expui/exceptionAnalyzer - ships with the
         // ExceptionAnalyzer plugin rather than the platform, so naming it would
@@ -32,15 +31,13 @@ public class ResultAnalysisBtn extends AbstractButton implements ToolbarItem {
         // green. Green on a toolbar reads as something being switched on, and
         // this is a button that opens a dialog.
         super("Result Analysis", AllIcons.Actions.ProjectWideAnalysisOff);
-        this.callbacks = callbacks;
+        this.editor = editor;
 
         addActionListener(e -> onResultAnalysisClicked.run());
         updateEnabledState();
     }
 
     public void updateEnabledState() {
-        if (!(callbacks instanceof RunEditor editor)) return;
-
         final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();
         final boolean completed = status == TestRunStatus.COMPLETED;
 

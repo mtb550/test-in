@@ -35,8 +35,7 @@ import java.util.UUID;
 @Service(Service.Level.PROJECT)
 public final class RunStatusService {
 
-    public void executeNext(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
-        if (!(ui instanceof RunEditor editor)) return;
+    public void executeNext(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
 
         final int executingIndex = editor.getCurrentlyExecutingIndex();
         if (executingIndex == -1) return;
@@ -49,7 +48,7 @@ public final class RunStatusService {
         Logger.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
 
         persistRun(p, editor);
-        triggerFilterRefresh(ui, list);
+        triggerFilterRefresh(editor, list);
 
         // Only when a verdict was actually recorded: a missing run item leaves
         // the status exactly as it was.
@@ -64,8 +63,7 @@ public final class RunStatusService {
         });
     }
 
-    public void executeManual(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
-        if (!(ui instanceof RunEditor editor)) return;
+    public void executeManual(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
 
         final @NotNull Optional<TestRunItems> found = editor.runItem(tc.getId());
         if (found.isEmpty()) return;
@@ -86,7 +84,7 @@ public final class RunStatusService {
         Logger.trace("[RunStatusService]: Status updated -> " + tc.getDescription() + " = " + status);
 
         persistRun(p, editor);
-        triggerFilterRefresh(ui);
+        triggerFilterRefresh(editor);
 
         confirmVerdict(p, status, 1);
     }
@@ -109,12 +107,12 @@ public final class RunStatusService {
 
         final @NotNull List<String> losing = wouldBeErased(editor, selectedItems, status);
         if (losing.isEmpty()) {
-            record(p, ui, list, status, editor, selectedItems);
+            record(p, list, status, editor, selectedItems);
             return;
         }
 
         new ConfirmDialog(p, status.getLabel(), erasureWarning(losing, selectedItems.size()), "", "",
-                status.getLabel(), () -> record(p, ui, list, status, editor, selectedItems)).show();
+                status.getLabel(), () -> record(p, list, status, editor, selectedItems)).show();
     }
 
     /**
@@ -152,7 +150,7 @@ public final class RunStatusService {
      * What {@link #applyStatus} does once the tester has nothing left to lose by
      * it - either because the verdict erases nothing, or because they said so.
      */
-    private void record(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+    private void record(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
         if (selectedItems.size() == 1) {
             final @NotNull TestCaseDto tc = selectedItems.getFirst();
             if (editor.runItem(tc.getId()).filter(TestRunItems::isRemoved).isPresent()) {
@@ -162,9 +160,9 @@ public final class RunStatusService {
 
             final int globalIndex = editor.getCurrentTestCases().indexOf(tc);
             if (globalIndex == editor.getCurrentlyExecutingIndex()) {
-                executeNext(p, ui, list, status);
+                executeNext(p, editor, list, status);
             } else {
-                executeManual(p, ui, tc, status, Duration.ZERO, Failure.NONE);
+                executeManual(p, editor, tc, status, Duration.ZERO, Failure.NONE);
             }
         } else {
             int recorded = 0;
@@ -185,7 +183,7 @@ public final class RunStatusService {
             }
 
             persistRun(p, editor);
-            triggerFilterRefresh(ui, list);
+            triggerFilterRefresh(editor, list);
 
             confirmVerdict(p, status, recorded);
         }

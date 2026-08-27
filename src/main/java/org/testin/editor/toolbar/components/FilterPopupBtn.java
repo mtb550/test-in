@@ -10,7 +10,6 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.model.Group;
 import org.testin.model.Priority;
@@ -155,7 +154,10 @@ public class FilterPopupBtn extends AbstractButton implements ToolbarItem {
         };
         filterResetBtn.add(filterModuleMenu);
 
-        if (callbacks instanceof RunEditor) {
+        // Asked of the toolbar rather than tested for a class. The event half
+        // of this interface already carries defaults for "only a run does it";
+        // the state half did not, so the buttons tested instead.
+        if (callbacks.hasRunStatuses()) {
             final @NotNull DefaultActionGroup filterStatusMenu = new DefaultActionGroup(TestEditorAttributes.STATUS.getName(), true);
             Arrays.stream(TestStatus.values()).forEach(s ->
                     filterStatusMenu.add(new ToggleFilterAction<>(s.getLabel(), null,

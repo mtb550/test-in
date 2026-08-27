@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.ViewMode;
 import org.testin.editor.toolbar.components.*;
+import org.testin.logger.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,6 +30,29 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
 
     @Getter
     private @NotNull ViewMode currentView = ViewMode.LIST_VIEW;
+
+    /**
+     * Lays out toolbar items and registers each one so it can be found again.
+     * <p>
+     * A toolbar item that is not a Swing component says so. The two copies of
+     * this loop skipped one silently and, because registering happens in the
+     * same branch, left it out of the lookup table too - so the wiring mistake
+     * surfaced later as an unrelated lookup throwing somewhere else. Nothing
+     * makes a ToolbarItem a component today; the interface is a marker, so this
+     * is the only place that can notice.
+     */
+    private void addItems(final @NotNull List<ToolbarItem> items, final @NotNull GridBagConstraints gbc) {
+        for (final ToolbarItem item : items) {
+            if (!(item instanceof JComponent component)) {
+                Logger.error(item.getClass().getSimpleName() + " is a toolbar item but not a Swing component, so it was left off the toolbar");
+                continue;
+            }
+
+            toolbarItems.put(item.getClass(), item);
+            add(component, gbc);
+            gbc.gridx++;
+        }
+    }
 
     public AbstractToolbarPanel(final @NotNull Toolbar callbacks) {
         super(new GridBagLayout());
@@ -81,13 +105,7 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0.0;
 
-        for (final ToolbarItem item : getCustomComponents()) {
-            if (item instanceof JComponent component) {
-                toolbarItems.put(item.getClass(), item);
-                add(component, gbc);
-                gbc.gridx++;
-            }
-        }
+        addItems(getCustomComponents(), gbc);
 
         // The search takes the slack, which is what puts everything before it on
         // the left and everything after it hard against the right edge.
@@ -108,13 +126,7 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         // toolbar has. Details stays last and stays here: both toolbars want it
         // in the same place, and an override they would each fill in identically
         // is a place for them to drift apart.
-        for (final ToolbarItem item : getTrailingComponents()) {
-            if (item instanceof JComponent component) {
-                toolbarItems.put(item.getClass(), item);
-                add(component, gbc);
-                gbc.gridx++;
-            }
-        }
+        addItems(getTrailingComponents(), gbc);
 
         final @NotNull NodeDetailsBtn details = new NodeDetailsBtn(callbacks);
         add(details, gbc);

@@ -7,11 +7,11 @@ import org.testin.model.TestRunStatus;
 
 public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
 
-    private final @NotNull Toolbar callbacks;
+    private final @NotNull RunEditor editor;
 
-    public StartExecutionBtn(final @NotNull Toolbar callbacks, final @NotNull Runnable onStartExecutionClicked) {
+    public StartExecutionBtn(final @NotNull RunEditor editor, final @NotNull Runnable onStartExecutionClicked) {
         super(Toolbar.START_MANUAL_EXECUTION, Toolbar.START_MANUAL_EXECUTION_ICON);
-        this.callbacks = callbacks;
+        this.editor = editor;
 
         addActionListener(e -> onStartExecutionClicked.run());
     }
@@ -26,8 +26,6 @@ public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
     }
 
     public void updateEnabledState() {
-        if (!(callbacks instanceof RunEditor editor)) return;
-
         setEnabled(editor.canStartExecution());
         setToolTipText(tooltipFor(editor));
     }

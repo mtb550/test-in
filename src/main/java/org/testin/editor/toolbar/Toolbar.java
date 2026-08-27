@@ -11,6 +11,19 @@ import java.util.Set;
 public interface Toolbar {
 
     /**
+     * Whether the cases on this toolbar's editor carry a run status worth
+     * filtering on.
+     * <p>
+     * A test case has no status; one executed in a run does. Declared here for
+     * the reason the no-op events are: what a run does and a test editor does
+     * not is this interface's to say, and the alternative was every button
+     * testing what class it had been handed.
+     */
+    default boolean hasRunStatuses() {
+        return false;
+    }
+
+    /**
      * What starting a manual execution is called, wherever it is offered.
      * <p>
      * "Manual" is in the name because the gesture runs no automation: it walks

@@ -519,6 +519,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * than at the caller so the list stays this editor's own - the status change
      * used to be handed the list to repaint.
      */
+    @Override
+    public boolean hasRunStatuses() {
+        return true;
+    }
+
     public void refreshAfterRunStatusChanged() {
         list.repaint();
         statusBar.updatePaginationState(currentPage, getTotalPageCount());
