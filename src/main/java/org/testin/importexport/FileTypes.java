@@ -26,11 +26,19 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public enum FileTypes {
+    /**
+     * Import only. The legacy workbook still has to be recognised by its
+     * extension so a tester can import one, but nothing here writes it: XLS was
+     * handed the xlsx exporter, so choosing it produced xlsx bytes in a file
+     * named .xls. Excel warned about the mismatch on every open and some tools
+     * refused the file outright, and because nothing in the plugin failed the
+     * complaint only ever came back from whoever received it.
+     */
     XLS(
             "XLS",
             ".xls",
             "",
-            (p, export, destFile, sheets) -> new ExportExcel(export).exportToFile(p, destFile, sheets),
+            ExportHandler.UNSUPPORTED,
             (p, imports, importFile) -> new ImportExcel(imports).processImport(p, importFile),
             ReportHandler.UNSUPPORTED
     ),
