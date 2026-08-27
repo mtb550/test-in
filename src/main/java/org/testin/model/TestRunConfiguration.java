@@ -9,7 +9,11 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestRunDto;
 
 import javax.swing.*;
+import org.testin.model.markers.DetailRow;
+
+import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -135,6 +139,22 @@ public enum TestRunConfiguration {
      */
     public @NotNull String valueIn(final @NotNull TestRunDto run) {
         return run.getConfiguration().getOrDefault(this, "");
+    }
+
+    /**
+     * Every question and what this run answered, in the order the form asked
+     * them.
+     * <p>
+     * The same shape {@link TestRunExecution#rowsOf} has, and for the same
+     * reason: the details popup should ask what a run has to say rather than
+     * naming the questions itself. A blank answer is dropped by the details
+     * builder, so a web run does not show an empty Device Type and nothing here
+     * has to know that it should not.
+     */
+    public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunDto run) {
+        return Arrays.stream(values())
+                .map(field -> new DetailRow(field.displayName, field.valueIn(run)))
+                .toList();
     }
 
     /**

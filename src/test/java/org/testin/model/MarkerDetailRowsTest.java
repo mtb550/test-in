@@ -1,6 +1,7 @@
 package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.dto.TestRunDto;
 import org.testin.model.markers.DetailRow;
 import org.testin.model.markers.Marker;
 import org.testin.model.markers.TestRunMarker;
@@ -20,9 +21,15 @@ import static org.testng.Assert.assertTrue;
  * <p>
  * It asks the node's marker what it has to say, and every marker answers -
  * because the question is on the {@link Marker} contract they all implement.
- * A run lists the configuration it was created with; a test set has nothing
- * extra and says so with an empty list rather than by the caller knowing not to
- * ask.
+ * <p>
+ * A run's configuration used to be among those answers, held on the marker.
+ * It is not any more: the run's own file owns it, and the popup looks the run
+ * up the same way it already looks up the execution timestamps beside it. The
+ * marker held a copy, so the reports read one store and the popup read the
+ * other, and two owners for one fact is one of them going stale.
+ * <p>
+ * What that guarantee was worth is asserted here still, against the owner it
+ * moved to.
  */
 public class MarkerDetailRowsTest {
 
@@ -33,12 +40,18 @@ public class MarkerDetailRowsTest {
     }
 
     @Test
+    public void aRunMarkerNoLongerAnswersForTheRun() {
+        assertTrue(new TestRunMarker().getDetailRows().isEmpty(),
+                "the configuration is the run file's; a marker that still offered it would be the second copy again");
+    }
+
+    @Test
     public void aRunListsWhatItWasCreatedWith() {
         final @NotNull Map<TestRunConfiguration, String> answers = new EnumMap<>(TestRunConfiguration.class);
         answers.put(TestRunConfiguration.PLATFORM, "Web");
         answers.put(TestRunConfiguration.BROWSER, "Firefox");
 
-        final @NotNull List<DetailRow> rows = new TestRunMarker().setConfiguration(answers).getDetailRows();
+        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(new TestRunDto().setConfiguration(answers));
 
         assertEquals(rows.size(), TestRunConfiguration.values().length,
                 "every question is offered; a blank answer is dropped when the row is drawn, not here");
@@ -53,7 +66,7 @@ public class MarkerDetailRowsTest {
      */
     @Test
     public void theCaptionsAreTheNamesTheFormUsed() {
-        final @NotNull List<DetailRow> rows = new TestRunMarker().getDetailRows();
+        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(new TestRunDto());
 
         for (int at = 0; at < TestRunConfiguration.values().length; at++) {
             assertEquals(rows.get(at).caption(), TestRunConfiguration.values()[at].getDisplayName());
@@ -66,7 +79,7 @@ public class MarkerDetailRowsTest {
      */
     @Test
     public void anOlderRunWithNoConfigurationStillAnswers() {
-        final @NotNull List<DetailRow> rows = new TestRunMarker().getDetailRows();
+        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(new TestRunDto());
 
         assertEquals(rows.size(), TestRunConfiguration.values().length);
         assertTrue(rows.stream().allMatch(row -> row.value().isEmpty()),

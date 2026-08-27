@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.model.NodeFigures;
+import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunExecution;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.markers.Marker;
@@ -72,13 +73,19 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
         // Unconditional: a node that is not a test run resolves to no run and
         // adds nothing, and a run that never started answers with two blank rows
         // that the details builder drops.
-        Services.getInstance(p, ProjectIndexer.class).findTestRun(dto.getPath())
-                .ifPresent(run -> TestRunExecution.rowsOf(run).forEach(extra -> details.row(extra.caption(), extra.value())));
+        Services.getInstance(p, ProjectIndexer.class).findTestRun(dto.getPath()).ifPresent(run -> {
+            TestRunExecution.rowsOf(run).forEach(extra -> details.row(extra.caption(), extra.value()));
 
-        // Whatever else the marker has to say about itself - a run lists the
-        // configuration it was created with. Added without asking what kind of
-        // marker this is, the same way the status row is: a marker with nothing
-        // to add returns nothing, and a blank value is dropped.
+            // The answers the tester gave when the run was created, from the
+            // same place and for the same reason. The marker held a copy of
+            // them, so the reports read one store and this read the other, and
+            // the two could only agree for as long as nothing edited either.
+            TestRunConfiguration.rowsOf(run).forEach(extra -> details.row(extra.caption(), extra.value()));
+        });
+
+        // Whatever else the marker has to say about itself. Added without asking
+        // what kind of marker this is, the same way the status row is: a marker
+        // with nothing to add returns nothing, and a blank value is dropped.
         marker.getDetailRows().forEach(extra -> details.row(extra.caption(), extra.value()));
 
         type.getCounts().forEach(count -> details.row(count.getCaption(), count.of(figures)));

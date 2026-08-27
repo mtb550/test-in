@@ -159,7 +159,7 @@ public class CreateTestRun implements NodeCreator {
             // The configuration goes on the marker too, so the node can describe
             // itself without its run file being opened: Details on a run, from
             // the tree or from the run's own toolbar, is then a lookup.
-            final @NotNull TestRunMarker marker = new TestRunMarker().setConfiguration(configuration);
+            final @NotNull TestRunMarker marker = new TestRunMarker();
             trDir.setMarker(marker);
 
             Services.getInstance(p, ProjectIndexer.class).addTestRunDir(trDir);
