@@ -75,7 +75,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
 
         shortcuts = List.of(
                 StatusBarShortcut.build(Shortcuts.Enter, "Keep Selected", this::submit),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+                StatusBarShortcut.cancel(this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(700), JBUI.scale(120 + (60 * questions.size())));
     }

@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.*;
-import org.testin.util.Shortcuts;
 
 import java.awt.*;
 import java.util.List;
@@ -35,7 +34,7 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunCon
         shortcuts = List.of(
                 StatusBarShortcut.hint("Tab", "Navigate"),
                 StatusBarShortcut.hint("Space", "Check"),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+                StatusBarShortcut.cancel(this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(900), JBUI.scale(600));
 

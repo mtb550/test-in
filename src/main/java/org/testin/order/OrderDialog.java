@@ -8,7 +8,6 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextInput;
-import org.testin.util.Shortcuts;
 
 import java.util.List;
 import java.util.function.IntConsumer;
@@ -43,8 +42,8 @@ final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
                         .build());
 
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, "Confirm", this::submit),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+                StatusBarShortcut.confirm(this::submit),
+                StatusBarShortcut.cancel(this::closeCancel));
     }
 
     /**

@@ -52,7 +52,7 @@ final class SftpAccountDialog extends AbstractFrameworkDialog<TextInput> {
 
         shortcuts = List.of(
                 StatusBarShortcut.build(Shortcuts.Enter, "Connect", this::submit),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+                StatusBarShortcut.cancel(this::closeCancel));
 
         userField = user.getComponent();
         passwordField = password.getComponent();

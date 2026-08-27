@@ -7,7 +7,6 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.SelectionTable;
 import org.testin.ui.framework.StatusBarShortcut;
-import org.testin.util.Shortcuts;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,9 +42,9 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
         components = List.of(table);
 
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, "Confirm", this::submit),
+                StatusBarShortcut.confirm(this::submit),
                 StatusBarShortcut.hint("Ctrl+Click", "Add"),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+                StatusBarShortcut.cancel(this::closeCancel));
 
         groups = table.getComponent();
         for (final Group group : Group.values()) {

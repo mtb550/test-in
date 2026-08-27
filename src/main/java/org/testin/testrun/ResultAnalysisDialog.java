@@ -9,7 +9,6 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextArea;
-import org.testin.util.Shortcuts;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -64,7 +63,7 @@ public final class ResultAnalysisDialog extends AbstractFrameworkDialog<TextArea
 
         shortcuts = List.of(
                 StatusBarShortcut.hint("Tab", "Navigate"),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+                StatusBarShortcut.cancel(this::closeCancel));
 
         // Sized rather than packed: four areas over four headings is a tall
         // dialog either way, and one that resizes as text is typed into it moves

@@ -3,7 +3,6 @@ package org.testin.git;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.*;
-import org.testin.util.Shortcuts;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -53,8 +52,8 @@ final class GitIdentityDialog extends AbstractFrameworkDialog<TextInput> {
                 where);
 
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, "Confirm", this::submit),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+                StatusBarShortcut.confirm(this::submit),
+                StatusBarShortcut.cancel(this::closeCancel));
 
         nameField = name.getComponent();
         emailField = email.getComponent();

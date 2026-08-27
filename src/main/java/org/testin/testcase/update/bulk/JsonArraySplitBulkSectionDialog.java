@@ -74,7 +74,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
                 StatusBarShortcut.build(Shortcuts.ArrowUp, "Previous", () -> editors.navigate(-1, true)),
                 StatusBarShortcut.build(Shortcuts.CaretOnEveryValue, "All Carets", this::caretOnEveryValue),
                 StatusBarShortcut.hint("Ctrl+Click", "Multi-Caret"),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+                StatusBarShortcut.cancel(this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(1100), JBUI.scale(550));
 

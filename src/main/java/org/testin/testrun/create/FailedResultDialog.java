@@ -88,7 +88,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
 
         shortcuts = List.of(
                 StatusBarShortcut.build(Shortcuts.Enter, "Save", this::submit),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+                StatusBarShortcut.cancel(this::closeCancel));
     }
 
     /**

@@ -56,7 +56,7 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
                 StatusBarShortcut.build(Shortcuts.ArrowUp, "Previous", () -> editors.navigate(-1, false)),
                 StatusBarShortcut.build(Shortcuts.CaretOnEveryValue, "All Carets", editors::caretOnEveryValue),
                 StatusBarShortcut.hint("Ctrl+Click", "Multi-Caret"),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+                StatusBarShortcut.cancel(this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(1000), JBUI.scale(450));
 

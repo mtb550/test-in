@@ -7,7 +7,6 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextFieldWithSelections;
-import org.testin.util.Shortcuts;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -36,9 +35,9 @@ public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWit
                         .build());
 
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, "Confirm", this::submit),
+                StatusBarShortcut.confirm(this::submit),
                 StatusBarShortcut.hint("↑ ↓", "Select"),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel)
+                StatusBarShortcut.cancel(this::closeCancel)
         );
     }
 

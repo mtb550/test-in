@@ -25,6 +25,35 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
     }
 
     /**
+     * Escape, called Cancel, closing without saving.
+     * <p>
+     * Twenty-one dialogs declared this identically - the same key, the same
+     * word, the same method - and the word was the most duplicated string in
+     * the plugin. It is a factory rather than a shared constant because the
+     * three parts belong together: a dialog that took the word and bound a
+     * different key, or bound Escape to something other than closing, would be
+     * a dialog that lies to the tester about what Escape does.
+     * <p>
+     * A dialog that needs Escape to do something else still calls
+     * {@link #build} and says so.
+     */
+    public static @NotNull StatusBarShortcut cancel(final @NotNull Runnable action) {
+        return build(Shortcuts.Escape, "Cancel", action);
+    }
+
+    /**
+     * Enter, called Confirm, submitting.
+     * <p>
+     * The counterpart of {@link #cancel}, and the same argument. Not every
+     * dialog uses this word - the test case dialogs say Save for the same key,
+     * because that is what it does there - so this is offered rather than
+     * imposed.
+     */
+    public static @NotNull StatusBarShortcut confirm(final @NotNull Runnable action) {
+        return build(Shortcuts.Enter, "Confirm", action);
+    }
+
+    /**
      * A display-only entry for keys the component binds itself.
      */
     public static @NotNull StatusBarShortcut hint(final @NotNull String displayText, final @NotNull String name) {

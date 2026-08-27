@@ -15,6 +15,7 @@
 # fixed by then: they spelled out Passed, Failed, Blocked, Untested and Removed
 # seventeen times between them, and now ask TestStatus.
 #
-# The biggest remaining cluster is the dialog keys - "Cancel" in 22 files,
-# "Confirm" in 7 - which ui.framework has no constant for.
-304
+# 278 after StatusBarShortcut gained cancel() and confirm(). Twenty-one dialogs
+# declared Escape/"Cancel"/closeCancel identically and seven declared
+# Enter/"Confirm"/submit, which was the largest cluster in the plugin.
+278

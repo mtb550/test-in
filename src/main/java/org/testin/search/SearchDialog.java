@@ -49,7 +49,7 @@ public final class SearchDialog extends AbstractFrameworkDialog<TextFieldWithSel
         shortcuts = List.of(
                 StatusBarShortcut.build(Shortcuts.Enter, "Go To", this::submit),
                 StatusBarShortcut.hint("↑ ↓", "Select"),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel)
+                StatusBarShortcut.cancel(this::closeCancel)
         );
 
         preferredSize = JBUI.size(700, 460);

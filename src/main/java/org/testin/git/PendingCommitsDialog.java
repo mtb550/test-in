@@ -8,7 +8,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.*;
-import org.testin.util.Shortcuts;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -102,7 +101,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
 
         shortcuts = List.of(
                 StatusBarShortcut.hint("Right click", "Revert a change"),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+                StatusBarShortcut.cancel(this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(1000), JBUI.scale(500));
 

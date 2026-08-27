@@ -52,7 +52,7 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
 
         shortcuts = List.of(
                 StatusBarShortcut.build(Shortcuts.Enter, "Select", this::submit),
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+                StatusBarShortcut.cancel(this::closeCancel));
 
         projects = table.getComponent();
 
