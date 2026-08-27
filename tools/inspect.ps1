@@ -182,13 +182,27 @@ function Resolve-CrossModuleUsages([object[]] $problems) {
 
     foreach ($problem in $problems) {
         if ($problem.Inspection -ne 'unused') { continue }
-        if ($problem.Message -notmatch '^Method .* never used') { continue }
+
+        # A method, a whole class, or an enum constant. It caught only the first
+        # to begin with, which left ExecutionPosition reported as a dead class
+        # while two files in testin-java were calling it.
+        if ($problem.Message -notmatch '^(Method|Class|Enum constant|Constructor) .* never used') { continue }
 
         $name = Get-DeclaredName $problem
         if (-not $name) { continue }
 
-        # A call or a method reference, either way the module names it.
-        if ($moduleText -notmatch ("(\.|::)\s*" + [regex]::Escape($name) + "\s*[(:,)]")) { continue }
+        # How a module would name it. A type is named outright, so a word match
+        # is enough and anything tighter would miss an import or a static call.
+        # A method or a constant is reached through something, so the dot or the
+        # method reference has to be there - a bare word match on a name like
+        # "run" would spare every finding in the report.
+        $pattern = if ($problem.Message -match '^Class ') {
+            '\b' + [regex]::Escape($name) + '\b'
+        } else {
+            '(\.|::)\s*' + [regex]::Escape($name) + '\s*[(:,)]'
+        }
+
+        if ($moduleText -notmatch $pattern) { continue }
 
         $problem.Inspection = 'UsedFromContentModule'
         $problem.Message = "$($problem.Message) It is called from a content module, which is outside the inspector's analysis scope - not dead code."
@@ -227,6 +241,12 @@ function Get-DeclaredName([object] $problem) {
         $trimmed = $text.Trim()
         if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
         if ($trimmed.EndsWith('*/')) { continue }
+
+        # A type first: "public final class ExecutionPosition {" has no
+        # parenthesis to find, and "record Moved(..)" has one that would give
+        # back the record name anyway - but only by accident, and not for a
+        # class or an interface.
+        if ($text -match '\b(?:class|interface|enum|record)\s+(\w+)') { return $matches[1] }
 
         if ($text -match '\b(\w+)\s*\(') { return $matches[1] }
     }
