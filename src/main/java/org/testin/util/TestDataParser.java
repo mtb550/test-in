@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
 import org.testin.model.Group;
 import org.testin.model.Priority;
+import org.testin.model.TestCaseStatus;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -50,6 +51,36 @@ public final class TestDataParser {
         } catch (final IllegalArgumentException ignored) {
             return Priority.LOW;
         }
+    }
+
+    /**
+     * Reads a test case status back out of the text a grid cell shows.
+     * <p>
+     * By the display text first, because that is what the cell printed and
+     * therefore what the tester is editing. The column used to render
+     * {@code getDisplayText()} and parse back with {@code valueOf}, which takes
+     * the constant name - so retyping the very word on screen threw an
+     * IllegalArgumentException that nothing caught, and the tester got an IDE
+     * internal-error report instead of an edit. "To Be Updated" was never a
+     * legal answer; "Disabled" was, only because that constant happens to be
+     * named in mixed case.
+     * <p>
+     * Anything unrecognized keeps the status the case already has, the way
+     * {@link #priority} falls back rather than throwing. The cell redraws with
+     * the old value, so a typo reads as "that did not take" instead of as a
+     * crash - and a status is never silently changed to a default the tester
+     * did not choose.
+     */
+    public static @NotNull TestCaseStatus testCaseStatus(final @NotNull String value, final @NotNull TestCaseStatus current) {
+        final @NotNull String wanted = value.trim();
+        if (wanted.isEmpty()) return current;
+
+        for (final TestCaseStatus status : TestCaseStatus.values()) {
+            if (status.getDisplayText().equalsIgnoreCase(wanted)) return status;
+            if (status.name().equalsIgnoreCase(wanted)) return status;
+        }
+
+        return current;
     }
 
     /**
