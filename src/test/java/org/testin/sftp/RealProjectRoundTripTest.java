@@ -86,7 +86,7 @@ public class RealProjectRoundTripTest {
     }
 
     private SftpTransport connect() {
-        return SftpTransport.open(new SftpAddress("127.0.0.1", server.port(), "/projects/test-01"),
+        return SftpTestServer.connect(new SftpAddress("127.0.0.1", server.port(), "/projects/test-01"),
                 SftpTestServer.USER, SftpAuth.withPassword(SftpTestServer.PASSWORD), knownHosts);
     }
 

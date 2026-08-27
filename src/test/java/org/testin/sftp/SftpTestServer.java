@@ -77,6 +77,37 @@ final class SftpTestServer implements AutoCloseable {
     }
 
     /**
+     * Opens a transport for a test that needs one, retrying once.
+     * <p>
+     * <b>Only where connecting is the setup, never where it is the subject.</b>
+     * A test asserting that a wrong password is refused must call
+     * {@link SftpTransport#open} directly, or it waits twice for the answer it
+     * wanted and reports the second failure.
+     * <p>
+     * The retry is a mitigation and not a diagnosis, which is worth saying
+     * plainly. {@code SyncLockTest} failed once in a full run with
+     * "Could not connect to [127.0.0.1]:55193: channel is not opened" - the SSH
+     * session was up and the SFTP channel on top of it was not - and passed on
+     * a rerun with no code change. Four of that class's five tests open two
+     * sessions to this server in one statement, which is the shape most likely
+     * to catch a server still settling; nothing has reproduced it on purpose.
+     * <p>
+     * What this buys is a suite that does not fail CI at random for a reason
+     * that has nothing to do with the code under test. If it fires twice the
+     * second failure is real and is reported as it was.
+     */
+    static SftpTransport connect(final SftpAddress address, final String user, final SftpAuth auth, final Path knownHosts) {
+        try {
+            return SftpTransport.open(address, user, auth, knownHosts);
+
+        } catch (final IllegalStateException firstAttempt) {
+            System.out.println("[SftpTestServer] connect failed, retrying once: " + firstAttempt.getMessage());
+
+            return SftpTransport.open(address, user, auth, knownHosts);
+        }
+    }
+
+    /**
      * Makes the server accept one public key, and nothing else.
      * <p>
      * Named rather than "accept any", so a test that authenticates with the
