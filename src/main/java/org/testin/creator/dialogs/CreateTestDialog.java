@@ -30,8 +30,8 @@ public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWit
                 ComponentDialogBase.<DirectoryType>textFieldWithSelections()
                         .icon(DirectoryType.TS.getIcon())
                         .placeholder("set name...")
-                        .selection(DirectoryType.TS.getIcon(), "Test Set", "Holds test cases", DirectoryType.TS)
-                        .selection(DirectoryType.TSP.getIcon(), "Test Set Package", "Groups test sets", DirectoryType.TSP)
+                        .selection(DirectoryType.TS.getIcon(), DirectoryType.TS.getDisplayedName(), "Holds test cases", DirectoryType.TS)
+                        .selection(DirectoryType.TSP.getIcon(), DirectoryType.TSP.getDisplayedName(), "Groups test sets", DirectoryType.TSP)
                         .build());
 
         shortcuts = List.of(

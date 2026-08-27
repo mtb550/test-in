@@ -1,5 +1,6 @@
 package org.testin.git;
 
+import org.testin.model.DirectoryType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,7 @@ public enum ChangeSubject {
     ),
 
     TEST_RUN(
-            "Test Run"
+            DirectoryType.TR.getDisplayedName()
     ),
 
     /**

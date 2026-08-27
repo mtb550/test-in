@@ -27,16 +27,25 @@ import java.util.function.ToLongFunction;
 @Getter
 @AllArgsConstructor
 public enum NodeCount {
+
+    // The node names below are literals and have to stay that way. DirectoryType
+    // names its counts - TRD declares List.of(NodeCount.PACKAGES, ...) - so this
+    // enum asking DirectoryType for a caption makes the two initialize each
+    // other. It compiles, and it throws ExceptionInInitializerError the first
+    // time either is touched.
+    //
+    // The verdict captions below are safe by the same test: TestStatus names
+    // nothing here, and this already read its colours from it.
     TEST_SETS("Test sets", NodeFigures::testSets, NodeCount::plain, Uncharted.COLOR),
     PACKAGES("Packages", NodeFigures::packages, NodeCount::plain, Uncharted.COLOR),
     TEST_CASES("Test cases", NodeFigures::testCases, NodeCount::plain, Uncharted.COLOR),
     TEST_RUNS("Test runs", NodeFigures::testRuns, NodeCount::plain, Uncharted.COLOR),
 
-    PASSED("Passed", figures -> figures.run().passed(), NodeCount::plain, TestStatus.PASSED.getRowColor()),
-    FAILED("Failed", figures -> figures.run().failed(), NodeCount::plain, TestStatus.FAILED.getRowColor()),
-    BLOCKED("Blocked", figures -> figures.run().blocked(), NodeCount::plain, TestStatus.BLOCKED.getRowColor()),
-    UNTESTED("Untested", figures -> figures.run().untested(), NodeCount::plain, TestStatus.UNTESTED.getRowColor()),
-    REMOVED("Removed", figures -> figures.run().removed(), NodeCount::plain, TestStatus.REMOVED.getRowColor()),
+    PASSED(TestStatus.PASSED.getLabel(), figures -> figures.run().passed(), NodeCount::plain, TestStatus.PASSED.getRowColor()),
+    FAILED(TestStatus.FAILED.getLabel(), figures -> figures.run().failed(), NodeCount::plain, TestStatus.FAILED.getRowColor()),
+    BLOCKED(TestStatus.BLOCKED.getLabel(), figures -> figures.run().blocked(), NodeCount::plain, TestStatus.BLOCKED.getRowColor()),
+    UNTESTED(TestStatus.UNTESTED.getLabel(), figures -> figures.run().untested(), NodeCount::plain, TestStatus.UNTESTED.getRowColor()),
+    REMOVED(TestStatus.REMOVED.getLabel(), figures -> figures.run().removed(), NodeCount::plain, TestStatus.REMOVED.getRowColor()),
     TOTAL("Total", figures -> figures.run().total(), NodeCount::plain, Uncharted.COLOR),
     PASS_RATE("Pass rate", figures -> figures.run().passRate(), NodeCount::percentage, Uncharted.COLOR);
 

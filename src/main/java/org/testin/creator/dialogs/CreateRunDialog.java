@@ -30,8 +30,8 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
                 ComponentDialogBase.<DirectoryType>textFieldWithSelections()
                         .icon(DirectoryType.TR.getIcon())
                         .placeholder("set name, like Sprint 3 Cycle 1...")
-                        .selection(DirectoryType.TR.getIcon(), "Test Run", "Records execution results", DirectoryType.TR)
-                        .selection(DirectoryType.TRP.getIcon(), "Test Run Package", "Groups test runs", DirectoryType.TRP)
+                        .selection(DirectoryType.TR.getIcon(), DirectoryType.TR.getDisplayedName(), "Records execution results", DirectoryType.TR)
+                        .selection(DirectoryType.TRP.getIcon(), DirectoryType.TRP.getDisplayedName(), "Groups test runs", DirectoryType.TRP)
                         .build());
 
         shortcuts = List.of(

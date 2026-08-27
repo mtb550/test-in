@@ -1,5 +1,6 @@
 package org.testin.report.generators;
 
+import org.testin.model.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.colors.DeviceRgb;
@@ -283,8 +284,8 @@ public final class TestRunPdfGenerator {
         // Header row
         addCaseTableHeader(table, "#", headerBg, headerFg, boldFont);
         addCaseTableHeader(table, "Test Case", headerBg, headerFg, boldFont);
-        if (withFailureDetail) addCaseTableHeader(table, "Priority", headerBg, headerFg, boldFont);
-        if (withFailureDetail) addCaseTableHeader(table, "Severity", headerBg, headerFg, boldFont);
+        if (withFailureDetail) addCaseTableHeader(table, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg, boldFont);
+        if (withFailureDetail) addCaseTableHeader(table, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg, boldFont);
 
         // Data rows — alternating LIGHT_BG / WHITE
         int idx = 1;

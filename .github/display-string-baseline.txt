@@ -24,4 +24,9 @@
 #
 # 246 after the rest followed: every caption the create dialog, the update
 # dialog and the run grid share with a test case attribute now asks for it.
-246
+#
+# 195 after the node names, the report headings, the two Git comparators and
+# the verdict words followed the same route. Two that could not: NodeCount
+# cannot ask DirectoryType for a node's name, because DirectoryType names its
+# counts and the two would initialize each other.
+195

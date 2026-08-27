@@ -1,5 +1,6 @@
 package org.testin.run;
 
+import org.testin.model.RunStatus;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -76,7 +77,7 @@ public class RunTestSetAction extends AbstractProjectTreeAction {
 
         // The same word Run Test Case uses, for the same reason: the run starts
         // elsewhere and the tree gives no sign it was heard (#62).
-        Services.getInstance(p, Notifier.class).softShowCounted(p, "Running", cases.size());
+        Services.getInstance(p, Notifier.class).softShowCounted(p, RunStatus.RUNNING.getBadge().label(), cases.size());
     }
 
     @Override

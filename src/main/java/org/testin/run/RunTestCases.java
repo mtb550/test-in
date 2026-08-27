@@ -1,5 +1,6 @@
 package org.testin.run;
 
+import org.testin.model.RunStatus;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -65,6 +66,6 @@ public final class RunTestCases {
         // Once for the click, not once per case: running a page of twelve used
         // to raise twelve balloons. Nothing is said when every case was already
         // running, because nothing was started.
-        Services.getInstance(p, Notifier.class).softShowCounted(p, "Running", starting.size());
+        Services.getInstance(p, Notifier.class).softShowCounted(p, RunStatus.RUNNING.getBadge().label(), starting.size());
     }
 }

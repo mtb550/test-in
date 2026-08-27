@@ -1,5 +1,6 @@
 package org.testin.report.generators;
 
+import org.testin.model.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.*;
@@ -259,8 +260,8 @@ public final class TestRunWordGenerator {
         XWPFTableRow headerRow = table.getRow(0);
         addCaseHeader(headerRow, 0, "#", headerBg, headerFg);
         addCaseHeader(headerRow, 1, "Test Case", headerBg, headerFg);
-        if (withFailureDetail) addCaseHeader(headerRow, 2, "Priority", headerBg, headerFg);
-        if (withFailureDetail) addCaseHeader(headerRow, 3, "Severity", headerBg, headerFg);
+        if (withFailureDetail) addCaseHeader(headerRow, 2, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg);
+        if (withFailureDetail) addCaseHeader(headerRow, 3, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg);
 
         int idx = 1;
         boolean alt = true;

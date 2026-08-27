@@ -86,13 +86,13 @@ public final class TestRunExcelGenerator {
             int row = 7;
             ws.value(row, 0, "Test Case ID");
             ws.value(row, 1, RunEditorAttributes.DESCRIPTION.getName());
-            ws.value(row, 2, "Status");
-            ws.value(row, 3, "Actual Result");
-            ws.value(row, 4, "Severity");
-            ws.value(row, 5, "Priority");
-            ws.value(row, 6, "Duration");
-            ws.value(row, 7, "Expected Result");
-            ws.value(row, 8, "Stacktrace");
+            ws.value(row, 2, RunEditorAttributes.RUN_STATUS.getName());
+            ws.value(row, 3, RunEditorAttributes.ACTUAL_RESULT.getName());
+            ws.value(row, 4, RunEditorAttributes.BUG_SEVERITY.getName());
+            ws.value(row, 5, RunEditorAttributes.BUG_PRIORITY.getName());
+            ws.value(row, 6, RunEditorAttributes.DURATION.getName());
+            ws.value(row, 7, RunEditorAttributes.EXPECTED_RESULT.getName());
+            ws.value(row, 8, RunEditorAttributes.STACKTRACE.getName());
 
             ws.range(row, 0, row, 8).style().bold().fillColor("E0E0E0").set();
 

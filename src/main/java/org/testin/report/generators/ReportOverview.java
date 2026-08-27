@@ -1,5 +1,6 @@
 package org.testin.report.generators;
 
+import org.testin.model.RunEditorAttributes;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -66,9 +67,9 @@ public final class ReportOverview {
 
         add(rows, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType());
 
-        rows.add(new DetailRow("Executed By", summary.executedBy()));
+        rows.add(new DetailRow(RunEditorAttributes.EXECUTED_BY.getName(), summary.executedBy()));
         rows.addAll(TestRunExecution.rowsOf(tr));
-        rows.add(new DetailRow("Run Status", trDir.getMarker().getStatus().getLabel()));
+        rows.add(new DetailRow(RunEditorAttributes.RUN_STATUS.getName(), trDir.getMarker().getStatus().getLabel()));
 
         return List.copyOf(rows);
     }

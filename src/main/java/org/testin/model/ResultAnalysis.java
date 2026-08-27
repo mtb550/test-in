@@ -26,10 +26,10 @@ import java.util.function.ToLongFunction;
 @AllArgsConstructor
 public enum ResultAnalysis {
 
-    PASSED("Passed", "2E7D32", TestRunSummary::passed),
-    FAILED("Failed", "C0392B", TestRunSummary::failed),
-    BLOCKED("Blocked", "B8860B", TestRunSummary::blocked),
-    UNTESTED("Untested", "595959", TestRunSummary::untested);
+    PASSED(TestStatus.PASSED.getLabel(), "2E7D32", TestRunSummary::passed),
+    FAILED(TestStatus.FAILED.getLabel(), "C0392B", TestRunSummary::failed),
+    BLOCKED(TestStatus.BLOCKED.getLabel(), "B8860B", TestRunSummary::blocked),
+    UNTESTED(TestStatus.UNTESTED.getLabel(), "595959", TestRunSummary::untested);
 
     private final @NotNull String label;
     private final @NotNull String hexColor;

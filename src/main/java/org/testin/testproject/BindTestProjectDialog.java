@@ -1,5 +1,6 @@
 package org.testin.testproject;
 
+import org.testin.model.DirectoryType;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ProjectStatus;
@@ -44,7 +45,7 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
         title = "Select Test Project";
 
         final @NotNull ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
-                .column("Test Project", 260)
+                .column(DirectoryType.TP.getDisplayedName(), 260)
                 .column("Status", 100)
                 .build();
 

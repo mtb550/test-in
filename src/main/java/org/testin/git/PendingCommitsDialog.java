@@ -1,5 +1,6 @@
 package org.testin.git;
 
+import org.testin.model.DirectoryType;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -67,7 +68,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
 
         final @NotNull ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
                 .column("Change Type", 150)
-                .column("Test Set", 150)
+                .column(DirectoryType.TS.getDisplayedName(), 150)
                 .column("Name", 240)
                 .column("Before", 180)
                 .column("After", 180)

@@ -21,13 +21,13 @@ public enum RunStatus {
 
     PASSED(
             AllIcons.RunConfigurations.TestPassed,
-            new Badge("Passed", new JBColor(new Color(100, 200, 100), new Color(50, 150, 50))),
+            new Badge(TestStatus.PASSED.getLabel(), new JBColor(new Color(100, 200, 100), new Color(50, 150, 50))),
             Optional.of(TestStatus.PASSED)
     ),
 
     FAILED(
             AllIcons.RunConfigurations.TestFailed,
-            new Badge("Failed", new JBColor(new Color(255, 100, 100), new Color(180, 50, 50))),
+            new Badge(TestStatus.FAILED.getLabel(), new JBColor(new Color(255, 100, 100), new Color(180, 50, 50))),
             Optional.of(TestStatus.FAILED)
     ),
 

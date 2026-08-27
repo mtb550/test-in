@@ -1,5 +1,6 @@
 package org.testin.editor;
 
+import org.testin.model.DirectoryType;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.ex.FakeFileType;
 import com.intellij.openapi.project.Project;
@@ -15,7 +16,7 @@ import java.util.function.BiFunction;
 public class EditorType extends FakeFileType {
 
     public static final @NotNull EditorType TEST_RUN = new EditorType(
-            "Test Run",
+            DirectoryType.TR.getDisplayedName(),
             "Test Run Editor",
             AllIcons.Nodes.Services,
             RunEditor::new

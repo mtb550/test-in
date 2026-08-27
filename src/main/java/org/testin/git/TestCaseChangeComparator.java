@@ -20,14 +20,14 @@ final class TestCaseChangeComparator {
     static @NotNull List<FieldChange> compare(final @NotNull TestCaseDto oldState, final @NotNull TestCaseDto newState) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
         addIfChanged(changes, TestEditorAttributes.DESCRIPTION.getName(), oldState.getDescription(), newState.getDescription(), ChangeType.CHANGE_DESCRIPTION);
-        addIfChanged(changes, "Expected Result", oldState.getExpectedResult(), newState.getExpectedResult(), ChangeType.CHANGE_EXPECTED_RESULT);
-        addIfChanged(changes, "Steps", formatSteps(oldState), formatSteps(newState), ChangeType.CHANGE_STEPS);
+        addIfChanged(changes, TestEditorAttributes.EXPECTED_RESULT.getName(), oldState.getExpectedResult(), newState.getExpectedResult(), ChangeType.CHANGE_EXPECTED_RESULT);
+        addIfChanged(changes, TestEditorAttributes.STEPS.getName(), formatSteps(oldState), formatSteps(newState), ChangeType.CHANGE_STEPS);
         addIfChanged(changes, TestEditorAttributes.PRIORITY.getName(), oldState.getPriority().name(), newState.getPriority().name(), ChangeType.CHANGE_PRIORITY);
-        addIfChanged(changes, "Status", oldState.getStatus().name(), newState.getStatus().name(), ChangeType.CHANGE_STATUS);
-        addIfChanged(changes, "Reference", oldState.getReference(), newState.getReference(), ChangeType.CHANGE_REFERENCE);
-        addIfChanged(changes, "Module", oldState.getModule(), newState.getModule(), ChangeType.CHANGE_MODULE);
-        addIfChanged(changes, "Test Data", oldState.getTestData(), newState.getTestData(), ChangeType.CHANGE_TEST_DATA);
-        addIfChanged(changes, "Preconditions", oldState.getPreConditions(), newState.getPreConditions(), ChangeType.CHANGE_PRECONDITIONS);
+        addIfChanged(changes, TestEditorAttributes.STATUS.getName(), oldState.getStatus().name(), newState.getStatus().name(), ChangeType.CHANGE_STATUS);
+        addIfChanged(changes, TestEditorAttributes.REFERENCE.getName(), oldState.getReference(), newState.getReference(), ChangeType.CHANGE_REFERENCE);
+        addIfChanged(changes, TestEditorAttributes.MODULE.getName(), oldState.getModule(), newState.getModule(), ChangeType.CHANGE_MODULE);
+        addIfChanged(changes, TestEditorAttributes.TEST_DATA.getName(), oldState.getTestData(), newState.getTestData(), ChangeType.CHANGE_TEST_DATA);
+        addIfChanged(changes, TestEditorAttributes.PRE_CONDITIONS.getName(), oldState.getPreConditions(), newState.getPreConditions(), ChangeType.CHANGE_PRECONDITIONS);
 
         if (!Objects.equals(oldState.getGroup(), newState.getGroup())) {
             changes.add(new FieldChange(
