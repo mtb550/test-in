@@ -49,23 +49,41 @@ public final class ReportOverview {
         rows.add(new DetailRow("Project", projectName));
         rows.add(new DetailRow("Test Run", trDir.getName()));
 
-        // The four that are only printed when the tester answered them. A row
-        // saying nothing is a row the reader has to look at to find out it says
-        // nothing.
-        add(rows, TestRunConfiguration.CHANGE_LOG.getDisplayName(), tr.getChangeLog());
+        // Every configuration field, walked rather than listed. Listed, it
+        // printed five of the eight: the language, the browser and the device
+        // type were asked of the tester, written to two files, and appeared in
+        // no report at all - and a ninth question would have been the fourth.
+        //
+        // Only what the tester answered. A row saying nothing is a row the
+        // reader has to look at to find out it says nothing.
+        for (final TestRunConfiguration field : TestRunConfiguration.values()) {
+            // The commit id is the one field whose blank is worth a row: it says
+            // whether the run is pinned to a commit, and an empty cell reads as
+            // a question the report forgot to answer.
+            if (field == TestRunConfiguration.COMMIT_ID) {
+                rows.add(new DetailRow(field.getDisplayName(),
+                        field.valueIn(tr).isEmpty() ? NOT_RECORDED : field.valueIn(tr)));
+                continue;
+            }
 
-        rows.add(new DetailRow(TestRunConfiguration.COMMIT_ID.getDisplayName(),
-                tr.getCommitId().isEmpty() ? NOT_RECORDED : tr.getCommitId()));
+            // The platform and the component are one row, captioned by whichever
+            // halves were answered - so a run with no platform reads
+            // "Component: Backend" rather than "Platform, Component: , Backend".
+            if (field == TestRunConfiguration.COMPONENT) continue;
 
-        // Whichever of the pair was answered, captioned by the same halves - so a
-        // run with no platform reads "Component: Backend" rather than
-        // "Platform, Component: , Backend".
-        add(rows, ReportText.joined(", ",
-                        tr.getPlatform().isEmpty() ? "" : TestRunConfiguration.PLATFORM.getDisplayName(),
-                        tr.getComponent().isEmpty() ? "" : TestRunConfiguration.COMPONENT.getDisplayName()),
-                ReportText.joined(", ", tr.getPlatform(), tr.getComponent()));
+            if (field == TestRunConfiguration.PLATFORM) {
+                final @NotNull String platform = TestRunConfiguration.PLATFORM.valueIn(tr);
+                final @NotNull String component = TestRunConfiguration.COMPONENT.valueIn(tr);
 
-        add(rows, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType());
+                add(rows, ReportText.joined(", ",
+                                platform.isEmpty() ? "" : TestRunConfiguration.PLATFORM.getDisplayName(),
+                                component.isEmpty() ? "" : TestRunConfiguration.COMPONENT.getDisplayName()),
+                        ReportText.joined(", ", platform, component));
+                continue;
+            }
+
+            add(rows, field.getDisplayName(), field.valueIn(tr));
+        }
 
         rows.add(new DetailRow(RunEditorAttributes.EXECUTED_BY.getName(), summary.executedBy()));
         rows.addAll(TestRunExecution.rowsOf(tr));

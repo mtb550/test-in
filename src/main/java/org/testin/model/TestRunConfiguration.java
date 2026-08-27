@@ -6,7 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import org.testin.model.dto.TestRunDto;
+
 import javax.swing.*;
+import java.util.function.Function;
 
 @Getter
 @AllArgsConstructor
@@ -16,42 +19,48 @@ public enum TestRunConfiguration {
             "Test Type",
             AllIcons.Nodes.Type,
             new String[]{"", "Functional Test", "Performance Test"},
-            ShownWhen.ALWAYS
+            ShownWhen.ALWAYS,
+            TestRunDto::getTestType
     ),
 
     CHANGE_LOG(
             "Change Log",
             AllIcons.Nodes.Type,
             Free.OPTIONS,
-            ShownWhen.ALWAYS
+            ShownWhen.ALWAYS,
+            TestRunDto::getChangeLog
     ),
 
     COMMIT_ID(
             "Commit ID",
             AllIcons.Nodes.Type,
             Free.OPTIONS,
-            ShownWhen.ALWAYS
+            ShownWhen.ALWAYS,
+            TestRunDto::getCommitId
     ),
 
     PLATFORM(
             "Platform",
             AllIcons.Nodes.PpLib,
             new String[]{"", Answer.WEB, Answer.MOBILE},
-            ShownWhen.ALWAYS
+            ShownWhen.ALWAYS,
+            TestRunDto::getPlatform
     ),
 
     COMPONENT(
             "Component",
             AllIcons.Nodes.PpLib,
             new String[]{"", Answer.FRONTEND, "Backend"},
-            ShownWhen.ALWAYS
+            ShownWhen.ALWAYS,
+            TestRunDto::getComponent
     ),
 
     LANGUAGE(
             "Language",
             AllIcons.Nodes.Lambda,
             new String[]{"", "English", "Arabic", "French"},
-            ShownWhen.ALWAYS
+            ShownWhen.ALWAYS,
+            TestRunDto::getLanguage
     ),
 
     /**
@@ -63,7 +72,8 @@ public enum TestRunConfiguration {
             "Browser",
             AllIcons.Nodes.WebFolder,
             new String[]{"", "Chrome", "Firefox", "Safari", "Edge"},
-            chosen -> chosen.is(PLATFORM, Answer.WEB) && chosen.is(COMPONENT, Answer.FRONTEND)
+            chosen -> chosen.is(PLATFORM, Answer.WEB) && chosen.is(COMPONENT, Answer.FRONTEND),
+            TestRunDto::getBrowser
     ),
 
     /**
@@ -74,7 +84,8 @@ public enum TestRunConfiguration {
             "Device Type",
             AllIcons.Nodes.Include,
             new String[]{"", "iPhone", "Samsung", "Huawei"},
-            chosen -> chosen.is(PLATFORM, Answer.MOBILE) && chosen.is(COMPONENT, Answer.FRONTEND)
+            chosen -> chosen.is(PLATFORM, Answer.MOBILE) && chosen.is(COMPONENT, Answer.FRONTEND),
+            TestRunDto::getDeviceType
     );
 
     private final @NotNull String displayName;
@@ -120,6 +131,26 @@ public enum TestRunConfiguration {
      */
     @Getter(AccessLevel.NONE)
     private final @NotNull ShownWhen shownWhen;
+
+    /**
+     * How to read this field off a run.
+     * <p>
+     * Not exposed, for the reason {@link TestRunExecution} keeps its own reader
+     * private: what a caller wants is the value, and handing out the getter
+     * lets each of them decide separately which fields exist. Two of them had
+     * decided differently - the report overview printed five of these eight, so
+     * the language, the browser and the device type were asked of the tester,
+     * written to two files, and appeared in no PDF, Word or HTML report at all.
+     */
+    @Getter(AccessLevel.NONE)
+    private final @NotNull Function<TestRunDto, String> reader;
+
+    /**
+     * This field of that run.
+     */
+    public @NotNull String valueIn(final @NotNull TestRunDto run) {
+        return reader.apply(run);
+    }
 
     /**
      * True when this field is a dropdown rather than a line to type in.

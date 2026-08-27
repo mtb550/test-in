@@ -30,14 +30,12 @@ final class TestRunChangeComparator {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
 
         addIfChanged(changes, "Results", verdictSummary(oldRun), verdictSummary(newRun));
-        addIfChanged(changes, TestRunConfiguration.CHANGE_LOG.getDisplayName(), oldRun.getChangeLog(), newRun.getChangeLog());
-        addIfChanged(changes, TestRunConfiguration.COMMIT_ID.getDisplayName(), oldRun.getCommitId(), newRun.getCommitId());
-        addIfChanged(changes, TestRunConfiguration.PLATFORM.getDisplayName(), oldRun.getPlatform(), newRun.getPlatform());
-        addIfChanged(changes, TestRunConfiguration.COMPONENT.getDisplayName(), oldRun.getComponent(), newRun.getComponent());
-        addIfChanged(changes, TestRunConfiguration.LANGUAGE.getDisplayName(), oldRun.getLanguage(), newRun.getLanguage());
-        addIfChanged(changes, TestRunConfiguration.BROWSER.getDisplayName(), oldRun.getBrowser(), newRun.getBrowser());
-        addIfChanged(changes, TestRunConfiguration.DEVICE_TYPE.getDisplayName(), oldRun.getDeviceType(), newRun.getDeviceType());
-        addIfChanged(changes, TestRunConfiguration.TEST_TYPE.getDisplayName(), oldRun.getTestType(), newRun.getTestType());
+        // Walked, not listed - the eight were written out here directly above
+        // a loop whose comment explains why walking is right.
+        for (final TestRunConfiguration field : TestRunConfiguration.values()) {
+            addIfChanged(changes, field.getDisplayName(), field.valueIn(oldRun), field.valueIn(newRun));
+        }
+
         // Through the same enum the Details popup and the report read, so a
         // change reads under the heading they show it under and in the format
         // they show it in. Not as rows: this compares two revisions, and a row
