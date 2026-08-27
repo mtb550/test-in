@@ -21,4 +21,7 @@
 #
 # 262 after Priority, Group and Description started coming from
 # TestEditorAttributes, which owns what a test case's fields are called.
-262
+#
+# 246 after the rest followed: every caption the create dialog, the update
+# dialog and the run grid share with a test case attribute now asks for it.
+246

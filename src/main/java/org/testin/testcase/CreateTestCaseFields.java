@@ -37,7 +37,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     ),
 
     EXPECTED_RESULT(
-            "Expected Results",
+            TestEditorAttributes.EXPECTED_RESULT.getName(),
             Shortcuts.CreateTestCaseExpectedResult,
             AllIcons.General.InspectionsOK,
             TestCaseBaseDialog::getExpectedResultSection,
@@ -46,7 +46,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     ),
 
     MODULE(
-            "Module",
+            TestEditorAttributes.MODULE.getName(),
             Shortcuts.CreateTestCaseModule,
             AllIcons.General.ContextHelp,
             TestCaseBaseDialog::getModuleSection,
@@ -55,7 +55,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     ),
 
     TEST_DATA(
-            "Test Data",
+            TestEditorAttributes.TEST_DATA.getName(),
             Shortcuts.EMPTY,
             AllIcons.Nodes.DataTables,
             TestCaseBaseDialog::getTestDataSection,
@@ -64,7 +64,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     ),
 
     PRE_CONDITIONS(
-            "Pre Conditions",
+            TestEditorAttributes.PRE_CONDITIONS.getName(),
             Shortcuts.EMPTY,
             AllIcons.Actions.StepOut,
             TestCaseBaseDialog::getPreConditionsSection,
@@ -73,7 +73,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     ),
 
     STEPS(
-            "Steps",
+            TestEditorAttributes.STEPS.getName(),
             Shortcuts.CreateTestCaseAddStep,
             AllIcons.Actions.ListFiles,
             TestCaseBaseDialog::getStepsSection,

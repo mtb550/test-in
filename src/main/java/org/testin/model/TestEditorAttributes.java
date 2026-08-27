@@ -69,6 +69,16 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.EXPORT
     ),
 
+    /**
+     * Singular, and the run grid, the create dialog and the update dialog all
+     * say it this way now because they ask here.
+     * <p>
+     * Two of them said "Expected Results" while the grid, the run editor and the
+     * details panel said "Expected Result" - the same field under two names, in
+     * front of the same tester, for as long as each was written out separately.
+     * Nothing failed and nothing could: a caption that has already drifted does
+     * not even look like a duplicated string.
+     */
     EXPECTED_RESULT(
             "Expected Result",
             "Expected Result:",

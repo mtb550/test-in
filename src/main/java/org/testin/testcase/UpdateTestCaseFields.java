@@ -45,7 +45,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
     ),
 
     EXPECTED_RESULT(
-            "Expected Results",
+            TestEditorAttributes.EXPECTED_RESULT.getName(),
             Shortcuts.UpdateTestCaseExpectedResult,
             AllIcons.General.InspectionsOK,
             GenType.UPDATE_TEST_CASE_EXPECTED_RESULT,
@@ -55,7 +55,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
     ),
 
     MODULE(
-            "Module",
+            TestEditorAttributes.MODULE.getName(),
             Shortcuts.UpdateTestCaseModule,
             AllIcons.General.ContextHelp,
             GenType.UPDATE_TEST_CASE_MODULE,
@@ -65,7 +65,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
     ),
 
     TEST_DATA(
-            "Test Data",
+            TestEditorAttributes.TEST_DATA.getName(),
             Shortcuts.UpdateTestCaseTestData,
             AllIcons.Nodes.DataTables,
             GenType.UPDATE_TEST_CASE_TEST_DATA,
@@ -75,7 +75,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
     ),
 
     PRE_CONDITIONS(
-            "Pre Conditions",
+            TestEditorAttributes.PRE_CONDITIONS.getName(),
             Shortcuts.UpdateTestCasePreConditions,
             AllIcons.Actions.StepOut,
             GenType.UPDATE_TEST_CASE_PRE_CONDITIONS,
@@ -85,7 +85,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
     ),
 
     STEPS(
-            "Steps",
+            TestEditorAttributes.STEPS.getName(),
             Shortcuts.UpdateTestCaseSteps,
             AllIcons.Actions.ListFiles,
             GenType.UPDATE_TEST_CASE_STEPS,

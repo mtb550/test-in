@@ -1,5 +1,6 @@
 package org.testin.model;
 
+import org.testin.model.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
      * the number in from the index it is already counting.
      */
     ORDER(
-            "Order",
+            TestEditorAttributes.ORDER.getName(),
             ToolBarDefault.ON,
             (item, p) -> ""
     ) {
@@ -35,7 +36,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     },
 
     DESCRIPTION(
-            "Description",
+            TestEditorAttributes.DESCRIPTION.getName(),
             ToolBarDefault.ON,
             (item, p) -> item.requireTc().getDescription()
     ) {
@@ -46,19 +47,19 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     },
 
     EXPECTED_RESULT(
-            "Expected Result",
+            TestEditorAttributes.EXPECTED_RESULT.getName(),
             ToolBarDefault.ON,
             (item, p) -> item.requireTc().getExpectedResult()
     ),
 
     STEPS(
-            "Steps",
+            TestEditorAttributes.STEPS.getName(),
             ToolBarDefault.OFF,
             (item, p) -> String.join(", ", item.requireTc().getSteps())
     ),
 
     PRIORITY(
-            "Priority",
+            TestEditorAttributes.PRIORITY.getName(),
             ToolBarDefault.OFF,
             (item, p) -> item.requireTc().getPriority().getName()
     ) {
@@ -69,7 +70,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     },
 
     GROUP(
-            "Group",
+            TestEditorAttributes.GROUP.getName(),
             ToolBarDefault.OFF,
             (item, p) -> item.requireTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", "))
     ) {
@@ -157,7 +158,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     ),
 
     PATH(
-            "Path",
+            TestEditorAttributes.PATH.getName(),
             ToolBarDefault.LOCKED_UNCHECKED,
             (item, p) -> Services.getInstance(p, ProjectIndexer.class).findTestCase(item.getId())
                     .map(tc -> String.join(" > ", tc.getParent().getPath2()))
@@ -165,7 +166,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     ),
 
     FQCN(
-            "FQCN",
+            TestEditorAttributes.FQCN.getName(),
             ToolBarDefault.LOCKED_UNCHECKED,
             (item, p) -> {
                 final @NotNull TestCaseDto tc = item.requireTc();

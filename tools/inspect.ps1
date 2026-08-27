@@ -279,6 +279,72 @@ function Test-MachineString([string] $value) {
     return $false
 }
 
+
+function Read-DriftedCaptions([string[]] $enums) {
+    <#
+        One concept, two words, in front of the same tester.
+
+        The enums that name a test case's fields declare the same constants -
+        EXPECTED_RESULT, STEPS, MODULE - and each used to spell its own caption.
+        Two of them said "Expected Results" while the grid, the run editor and
+        the details panel said "Expected Result", and it stayed that way for as
+        long as each was written out separately.
+
+        Read-DuplicatedDisplayStrings cannot see this. It matches literals that
+        are the same, and a caption that has already drifted is two different
+        strings - the check that exists to stop drift is blind to drift that has
+        already happened. So this one compares by constant name instead of by
+        text.
+
+        A constant whose caption comes from another enum is skipped: asking an
+        owner is the fix, not the finding.
+    #>
+    $captions = @{}
+
+    foreach ($file in $enums) {
+        if (-not (Test-Path $file)) { continue }
+
+        $lines = [System.IO.File]::ReadAllLines($file)
+        $short = (Split-Path $file -Leaf) -replace '\.java$', ''
+
+        for ($i = 0; $i -lt $lines.Count - 1; $i++) {
+            if ($lines[$i] -notmatch '^    ([A-Z][A-Z0-9_]+)\($') { continue }
+            $constant = $matches[1]
+
+            # The caption is the first argument, on the line below.
+            $argument = $lines[$i + 1].Trim()
+            if ($argument -notmatch '^"((?:[^"\\]|\\.)*)"') { continue }
+
+            $value = $matches[1]
+            if (-not $captions.ContainsKey($constant)) { $captions[$constant] = @() }
+            $captions[$constant] += [pscustomobject]@{
+                Value = $value
+                Where = $short
+                Path  = $file.Substring($repo.Length + 1) -replace '\\', '/'
+                Line  = $i + 2
+            }
+        }
+    }
+
+    foreach ($constant in $captions.Keys) {
+        $places = $captions[$constant]
+        $distinct = @($places | Select-Object -ExpandProperty Value -Unique)
+        if ($distinct.Count -lt 2) { continue }
+
+        $names = ($distinct | ForEach-Object { '"' + $_ + '"' }) -join ' and '
+
+        foreach ($place in $places) {
+            [pscustomobject]@{
+                Path       = $place.Path
+                Line       = $place.Line
+                Inspection = 'DriftedCaption'
+                Severity   = 'ERROR'
+                Message    = "$constant is called $names in different places. One concept, one word - ask the enum that owns it."
+            }
+        }
+    }
+}
+
 function Read-DuplicatedDisplayStrings([string[]] $scopes) {
     <#
         A user-facing string written in more than one file has no owner.
@@ -571,6 +637,14 @@ $problems += @(Read-DuplicatedDisplayStrings $scopes)
 $problems += @(Read-HandWrittenPrivateConstructors $scopes)
 $problems += @(Read-ModelStatics @((Join-Path $repo 'src/main/java/org/testin/model')))
 
+# The enums that name a test case's fields, compared against each other. Same
+# constant, same concept, so the caption is the same question.
+$problems += @(Read-DriftedCaptions @(
+        (Join-Path $repo 'src/main/java/org/testin/model/TestEditorAttributes.java'),
+        (Join-Path $repo 'src/main/java/org/testin/model/RunEditorAttributes.java'),
+        (Join-Path $repo 'src/main/java/org/testin/testcase/CreateTestCaseFields.java'),
+        (Join-Path $repo 'src/main/java/org/testin/testcase/UpdateTestCaseFields.java')))
+
 $problems = Resolve-CrossModuleUsages $problems
 
 Write-Reports $problems $outPath
@@ -586,7 +660,7 @@ Write-Reports $problems $outPath
 # they gate outright - the first one that appears is the one to look at.
 # DuplicatedDisplayString is not here: there were 136 when the check was
 # written, and it is ratcheted below instead.
-$gate = @('DataFlowIssue', 'ReturnNull', 'WrappedMethodDeclaration', 'StaticMutableState', 'HandWrittenPrivateConstructor')
+$gate = @('DataFlowIssue', 'ReturnNull', 'WrappedMethodDeclaration', 'StaticMutableState', 'HandWrittenPrivateConstructor', 'DriftedCaption')
 $breaches = @($problems | Where-Object { $gate -contains $_.Inspection })
 
 if ($breaches) {
