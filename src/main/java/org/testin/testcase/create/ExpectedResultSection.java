@@ -64,10 +64,22 @@ public class ExpectedResultSection implements CreateTestCaseSection {
     public void enableMultiLine(final @NotNull TestCaseBaseDialog base, final @NotNull Runnable onSave) {
         expectedResultField.setOneLineMode(false);
 
+        // Tab leaves the field instead of indenting inside it.
+        //
+        // A one-line EditorTextField gets this from the platform, which turns
+        // focus traversal back on for the editor it wraps; a multi-line one does
+        // not, so the editor keeps Tab for itself. Registering VK_TAB through
+        // the action system did nothing, because the editor has its own Tab
+        // action and the editor is where the key stops.
+        //
+        // Traversal keys are read by AWT before any of that, which is why this
+        // is the thing that works - and why the two Tab registrations that used
+        // to be here are gone rather than kept alongside it.
+        expectedResultField.addSettingsProvider(editor ->
+                editor.getContentComponent().setFocusTraversalKeysEnabled(true));
+
         base.registerShortcut(expectedResultField, Shortcuts.Enter.getCustomShortcut(), onSave::run);
         base.registerShortcut(expectedResultField, Shortcuts.InsertNewLine.getCustomShortcut(), this::insertNewLine);
-        base.registerShortcut(expectedResultField, Shortcuts.TabNext.getCustomShortcut(), expectedResultField::transferFocus);
-        base.registerShortcut(expectedResultField, Shortcuts.TabPrevious.getCustomShortcut(), expectedResultField::transferFocusBackward);
     }
 
     /**
