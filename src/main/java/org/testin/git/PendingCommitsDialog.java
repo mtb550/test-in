@@ -32,8 +32,6 @@ import java.util.function.Consumer;
  */
 public final class PendingCommitsDialog extends AbstractFrameworkDialog<SelectionTable> {
 
-    private static final int COLUMN_CHANGE_TYPE = 0;
-
     /**
      * The button's two answers. Push is first, so it is the default and what
      * Enter does.
@@ -41,7 +39,16 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     private static final @NotNull String PUSH = "Commit & Push";
     private static final @NotNull String COMMIT = "Commit";
 
-    private final @NotNull List<PendingChange> rowDifferences = new ArrayList<>();
+    /**
+     * One entry per table row, holding the change the row was drawn from.
+     * <p>
+     * The field change is kept, not just the pending change it belongs to. It
+     * used to be thrown away here and reconstructed in revert by parsing the
+     * change-kind caption back out of the table cell - so rewording any caption
+     * stopped revert working on that row, with no error, no balloon and no
+     * compile failure, on the one destructive button in this dialog.
+     */
+    private final @NotNull List<Row> rowDifferences = new ArrayList<>();
     private final @NotNull Path repoRoot;
     private final @NotNull SelectionTable changes;
     private final @NotNull ChoiceInput branch;
@@ -153,7 +160,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                         diff.name(),
                         change.oldValue(),
                         change.newValue());
-                rowDifferences.add(diff);
+                rowDifferences.add(new Row(diff, change));
             }
         }
     }
@@ -165,21 +172,27 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     private @NotNull List<PendingChange> selectedDifferences() {
         final @NotNull Set<PendingChange> selected = new LinkedHashSet<>();
         for (final int row : changes.getSelectedRows()) {
-            if (row < rowDifferences.size()) selected.add(rowDifferences.get(row));
+            if (row < rowDifferences.size()) selected.add(rowDifferences.get(row).diff());
         }
         return List.copyOf(selected);
     }
 
     /**
+     * One table row: the change to a file, and the one field of it this row is
+     * about. A test case with three edited fields contributes three rows, so the
+     * field cannot be read back off the pending change.
+     */
+    private record Row(@NotNull PendingChange diff, @NotNull FieldChange change) {
+    }
+
+    /**
      * Puts one field back to what was committed, and takes its row away.
-     * <p>
-     * The row's own change-type label says which field it reverts: one test case
-     * can contribute several rows, so the field cannot be read off the diff.
      */
     private void revertRow(final @NotNull Project p, final int row) {
         if (row >= rowDifferences.size()) return;
 
-        final @NotNull PendingChange diff = rowDifferences.get(row);
+        final @NotNull PendingChange diff = rowDifferences.get(row).diff();
+        final @NotNull ChangeType changeType = rowDifferences.get(row).change().changeType();
 
         // A run's verdicts and a node's marker are records of work rather than
         // edits: putting one back would say a case was never run, or that a
@@ -202,18 +215,25 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                 case ADDED -> indexer.removeTestCase(testSetPath, testCaseId);
                 case DELETED -> indexer.putTestCase(testSetPath, diff.committedState());
                 case MODIFIED -> {
-                    // The row's own label says which field it reverts; a label
-                    // that names no revertable field leaves the row alone.
-                    final @NotNull Optional<RevertAction> revert = ChangeType
-                            .fromLabel(changes.getValueAt(row, COLUMN_CHANGE_TYPE))
-                            .filter(ChangeType::isRevertable)
-                            .map(ChangeType::getRevertAction);
+                    // Both refusals say so now. They shared one silent return,
+                    // so a tester who pressed Revert on a field that cannot be
+                    // put back, or on a case that had since been deleted, saw
+                    // the row sit there with nothing explaining why.
+                    if (!changeType.isRevertable()) {
+                        Services.getInstance(p, Notifier.class)
+                                .softShow(p, "A change to " + changeType.getLabel() + " cannot be reverted");
+                        return;
+                    }
+
                     final @NotNull Optional<TestCaseDto> current = indexer.findTestCase(testCaseId);
+                    if (current.isEmpty()) {
+                        Services.getInstance(p, Notifier.class)
+                                .softShow(p, "That test case is no longer in the project");
+                        return;
+                    }
 
-                    if (revert.isEmpty() || current.isEmpty()) return;
-
-                    revert.get().apply(current.get(), diff.committedState());
-                    indexer.putTestCase(testSetPath, current.get());
+                    changeType.getRevertAction().apply(current.orElseThrow(), diff.committedState());
+                    indexer.putTestCase(testSetPath, current.orElseThrow());
                 }
             }
 

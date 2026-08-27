@@ -17,11 +17,9 @@ import static org.testng.Assert.*;
  * Revert is the one destructive button in the pending-commits review, and it is
  * driven entirely by data on this enum (#66).
  * <p>
- * Two ways it can go wrong without anything failing: a revert that writes the
+ * The way it can go wrong without anything failing is a revert that writes the
  * wrong field, which silently corrupts a test case the tester was trying to
- * restore; and two constants sharing a label, because the dialog turns the
- * label in the table back into a constant with {@code fromLabel} and a linear
- * search returns the first match. Both are asserted here.
+ * restore. That is what is asserted here.
  */
 public class ChangeTypeRevertTest {
 
@@ -129,8 +127,9 @@ public class ChangeTypeRevertTest {
     }
 
     /**
-     * {@code fromLabel} searches by label and returns the first match, so two
-     * constants sharing one would silently apply the wrong revert.
+     * Two constants sharing a label no longer misroutes a revert - the dialog
+     * carries the change rather than parsing its caption back - but two rows
+     * that read the same still leave the tester unable to tell them apart.
      */
     @Test
     public void noTwoChangeTypesShareALabel() {
@@ -140,16 +139,4 @@ public class ChangeTypeRevertTest {
         }
     }
 
-    @Test
-    public void everyLabelFindsItsOwnChangeTypeAgain() {
-        for (final ChangeType type : ChangeType.values()) {
-            assertEquals(ChangeType.fromLabel(type.getLabel()).orElseThrow(), type);
-        }
-    }
-
-    @Test
-    public void anUnknownLabelFindsNothing() {
-        assertTrue(ChangeType.fromLabel("Change Something That Does Not Exist").isEmpty());
-        assertTrue(ChangeType.fromLabel("").isEmpty(), "and no label at all names nothing either");
-    }
 }

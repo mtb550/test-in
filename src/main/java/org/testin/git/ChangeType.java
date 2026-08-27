@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Optional;
 
 @Getter
 @AllArgsConstructor
@@ -135,10 +133,4 @@ public enum ChangeType {
         return revertAction != RevertAction.NONE;
     }
 
-    /**
-     * The kind of change this label names, empty when nothing names it.
-     */
-    public static @NotNull Optional<ChangeType> fromLabel(final @NotNull String label) {
-        return Arrays.stream(values()).filter(type -> type.label.equals(label)).findFirst();
-    }
 }
