@@ -1,6 +1,5 @@
 package org.testin.editor.toolbar.components;
 
-import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
@@ -11,7 +10,7 @@ public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
     private final @NotNull Toolbar callbacks;
 
     public StartExecutionBtn(final @NotNull Toolbar callbacks, final @NotNull Runnable onStartExecutionClicked) {
-        super("Start Execution", AllIcons.Toolwindows.ToolWindowRun);
+        super(Toolbar.START_MANUAL_EXECUTION, Toolbar.START_MANUAL_EXECUTION_ICON);
         this.callbacks = callbacks;
 
         addActionListener(e -> onStartExecutionClicked.run());
@@ -23,7 +22,7 @@ public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
         final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();
         return status.isTerminal()
                 ? "Execution disabled — run status is " + status.getLabel()
-                : "Start Execution";
+                : Toolbar.START_MANUAL_EXECUTION;
     }
 
     public void updateEnabledState() {

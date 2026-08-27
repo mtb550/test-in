@@ -1,6 +1,5 @@
 package org.testin.run;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -12,7 +11,9 @@ public class StartExecutionAction extends DumbAwareAction {
     private final @NotNull Toolbar callbacks;
 
     public StartExecutionAction(final @NotNull Toolbar callbacks) {
-        super("Start Run", "Start execution of test cases", AllIcons.Actions.Execute);
+        super(Toolbar.START_MANUAL_EXECUTION,
+                "Walk this run a case at a time, timing each one. Runs no automation - Run Test Case does that",
+                Toolbar.START_MANUAL_EXECUTION_ICON);
         this.callbacks = callbacks;
     }
 

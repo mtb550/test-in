@@ -43,7 +43,6 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         add(new UpdateRunItemAction(p, ui, list));
         addSeparator();
         add(new ViewDetailsAction(p, list, dir.getPath2()));
-        add(new StartExecutionAction(ui.getToolBar().getCallbacks()));
         addSeparator();
         add(new CopyTestCaseAction(p, list));
         // See TestEditorContextMenu: an action the IDE cannot perform is not
@@ -53,6 +52,13 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
             if (OptionalPlugin.TESTNG.isAvailable()) add(new RunTestCaseAction(p, ui, list));
             if (OptionalPlugin.JAVA.isAvailable()) add(new NavigateToCodeAction(p, list));
         }
+
+        // Below the entry that runs the selection, and separated from it. Every
+        // other entry in this menu acts on the cases the tester highlighted;
+        // this one ignores them and walks the run from its first pending case,
+        // so it is the last thing offered rather than the first.
+        addSeparator();
+        add(new StartExecutionAction(ui.getToolBar().getCallbacks()));
 
         addSeparator();
         add(new NextPageAction(ui, list));
