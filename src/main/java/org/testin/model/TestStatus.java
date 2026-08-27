@@ -26,7 +26,6 @@ import java.awt.event.KeyEvent;
 public enum TestStatus {
     PASSED(
             "008000",
-            " [Passed]",
             new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GREEN),
             JBColor.GREEN,
             "Passed",
@@ -36,7 +35,6 @@ public enum TestStatus {
 
     FAILED(
             "FF0000",
-            " [Failed]",
             new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.RED),
             JBColor.RED.darker(),
             "Failed",
@@ -46,7 +44,6 @@ public enum TestStatus {
 
     BLOCKED(
             "FFA500",
-            " [Blocked]",
             new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.ORANGE),
             JBColor.ORANGE,
             "Blocked",
@@ -56,7 +53,6 @@ public enum TestStatus {
 
     PENDING(
             "808080",
-            " [Pending]",
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             // Lazy because it comes from the theme: resolved at class-load time it
             // would keep the color of whichever theme happened to be active then.
@@ -71,7 +67,6 @@ public enum TestStatus {
 
     REMOVED(
             "9E9E9E",
-            " [Removed]",
             SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES,
             JBColor.GRAY,
             "Removed",
@@ -86,7 +81,6 @@ public enum TestStatus {
 
     UNTESTED(
             "808080",
-            " [Untested]",
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             JBColor.GRAY.brighter(),
             "Untested",
@@ -100,7 +94,6 @@ public enum TestStatus {
     );
 
     private final @NotNull String hex;
-    private final @NotNull String treeSuffix;
     private final @NotNull SimpleTextAttributes style;
     private final @NotNull Color rowColor;
     private final @NotNull String label;

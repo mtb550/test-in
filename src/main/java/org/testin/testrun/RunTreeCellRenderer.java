@@ -44,7 +44,12 @@ public final class RunTreeCellRenderer {
                         Optional.ofNullable(resultsMap.get(tc.getId())).ifPresentOrElse(result -> {
                             final @NotNull TestStatus status = result.getStatus();
                             getTextRenderer().append(tc.getDescription(), status.getStyle());
-                            getTextRenderer().append(status.getTreeSuffix(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
+                            // Built from the label rather than stored beside it.
+                            // Every status carried its own " [Passed]" string, a
+                            // second caption that had to agree with the first -
+                            // and the brackets are this tree's decoration, not
+                            // a fact about the status.
+                            getTextRenderer().append(" [" + status.getLabel() + "]", SimpleTextAttributes.GRAYED_ATTRIBUTES);
                         }, () -> getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES));
 
                     } else if (userObj instanceof String str)
