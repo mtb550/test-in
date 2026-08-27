@@ -21,6 +21,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -208,7 +209,19 @@ public final class TestNGExecution implements Disposable {
      *         they share a run - the count the one notification reports
      */
     public int stop(final @NotNull List<TestCaseDto> cases) {
-        final @NotNull RunRegistry.Stop stop = registry.stopping(cases.stream().map(TestCaseDto::getId).toList());
+        return stopCases(cases.stream().map(TestCaseDto::getId).toList());
+    }
+
+    /**
+     * The same, for a caller that holds ids rather than cases.
+     * <p>
+     * The run editor is one: it remembers which cases it launched by id,
+     * because that is what an execution report names and the instance it held
+     * at launch is replaced by the next rescan. Only the ids were ever used
+     * here - the cases above are mapped to them on the way in.
+     */
+    public int stopCases(final @NotNull Collection<UUID> ids) {
+        final @NotNull RunRegistry.Stop stop = registry.stopping(List.copyOf(ids));
         if (stop.cases().isEmpty()) return 0;
 
         final @NotNull List<RunContentDescriptor> theirs = running(stop.runs());

@@ -40,6 +40,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
+import org.testin.runner.TestNGExecution;
 import org.testin.testrun.ResultAnalysisDialog;
 import org.testin.editor.toolbar.components.ResultAnalysisBtn;
 import org.testin.notifications.Notifier;
@@ -813,6 +814,31 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     @Override
     public void launching(final @NotNull UUID caseId) {
         launchedHere.add(caseId);
+
+        markStartedByAutomation();
+    }
+
+    /**
+     * A run with cases going has started, whoever started them.
+     * <p>
+     * The stamp used to belong to the Start Execution button, so a tester who
+     * ran a case straight from a card got verdicts and durations written into a
+     * run that still said it had never started - and every report printed a
+     * blank start time for a run that plainly ran.
+     * <p>
+     * Once, not once per case: a selection of twelve calls this twelve times.
+     * The stamp itself is idempotent, but the status change persists the marker
+     * and tells the tester "In Progress", and twelve of those is eleven too
+     * many. A run already in progress is left alone, and so is one signed off -
+     * the same two conditions {@link #canStartExecution()} refuses on, because
+     * this is the same question asked by a different gesture.
+     */
+    private void markStartedByAutomation() {
+        final @NotNull TestRunStatus status = parent.getMarker().getStatus();
+        if (status == TestRunStatus.IN_PROGRESS || status.isTerminal()) return;
+
+        run().ifPresent(TestRunDto::markExecutionStarted);
+        new UpdateTestRunStatusAction(p, this, list).applyStatusChange(this, TestRunStatus.IN_PROGRESS);
     }
 
     private void executionReported(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
@@ -845,6 +871,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // only when the model says that row changed.
         if (model.contains(tc)) model.contentsChanged(tc);
         showExecutionTotal();
+
+        // Every report changes whether anything is still running, which is what
+        // decides between Start and Stop. The first case reporting RUNNING is
+        // what puts Stop up; the last verdict is what takes it down again.
+        refreshExecutionButtons();
     }
 
     /**
@@ -863,11 +894,34 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * True while test cases are being executed: startTimerForIndex sets the
-     * index for each one and stopExecution clears it.
+     * True while test cases are being executed, by either of the two things
+     * that execute them: the tester walking the run by hand, and automation
+     * this editor started.
+     * <p>
+     * It meant only the first, so a run driven entirely by the run icon offered
+     * Start throughout - a button to begin something that was already going -
+     * and never offered Stop. It also left {@link #isBusy()} false, so a refresh
+     * from disk was free to reload the editor while its cases were still
+     * reporting into it.
+     * <p>
+     * Asked of the runner rather than kept as a flag here. The executing index
+     * and the runner's registry are each already the answer for their half, and
+     * a third copy would be the thing that drifts - which is how a Stop button
+     * comes to sit on a finished run.
      */
     public boolean isExecuting() {
-        return currentlyExecutingIndex >= 0;
+        return currentlyExecutingIndex >= 0 || isAutomationRunning();
+    }
+
+    /**
+     * Whether anything this editor launched is still going. Only what it
+     * launched: a case can be in several open runs, and another run's execution
+     * is not this one's to report or to stop.
+     */
+    private boolean isAutomationRunning() {
+        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
+
+        return launchedHere.stream().anyMatch(execution::isRunning);
     }
 
     /**
@@ -927,6 +981,27 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         tr.ifPresent(TestRunDto::markExecutionEnded);
 
         haltExecution();
+    }
+
+    /**
+     * Stops whatever automation this editor started, and says how much went
+     * back.
+     * <p>
+     * The button showed while automation ran and halted only the manual walk,
+     * which during an automated run is not going - so it was a Stop that did
+     * nothing when pressed, the same defect the card's own stop icon had (#34).
+     * <p>
+     * The runner reports more cases than were asked for when they share a
+     * process, which is the honest count: stopping one case of twelve in one
+     * configuration stops all twelve, and every one of them is put back.
+     */
+    private void stopAutomation() {
+        if (launchedHere.isEmpty()) return;
+
+        final int stopped = Services.getInstance(p, TestNGExecution.class).stopCases(launchedHere);
+        if (stopped == 0) return;
+
+        Logger.info("Stopped " + stopped + " test case(s) running from '" + parent.getName() + "'");
     }
 
     /**
@@ -994,6 +1069,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     @Override
     public void onStopExecutionClicked() {
+        // Before the walk is halted, because halting it is what stops this
+        // editor claiming to be executing - and the cases to stop are read from
+        // what it launched.
+        stopAutomation();
         stopExecution();
 
         // The other stop paths persist as part of the verdict or status change they
