@@ -104,17 +104,6 @@ public enum SftpSecret {
         }
     }
 
-    /**
-     * Removes it, for a tester who got it wrong or who wants it gone.
-     */
-    public void forget(final @NotNull SftpAddress address, final @NotNull String user) {
-        try {
-            PasswordSafe.getInstance().set(attributes(address, user), null);
-        } catch (final RuntimeException ex) {
-            Logger.warn("Could not remove the " + description + ": " + ex.getMessage());
-        }
-    }
-
     private @NotNull CredentialAttributes attributes(final @NotNull SftpAddress address, final @NotNull String user) {
         return new CredentialAttributes(
                 CredentialAttributesKt.generateServiceName(SUBSYSTEM, keyFor(address, user)), user);

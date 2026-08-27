@@ -335,11 +335,4 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
 
         return paths.size() > 3 ? first + " and " + (paths.size() - 3) + " more" : first;
     }
-
-    /**
-     * The action is offered only where there is a project to sync.
-     */
-    public static @NotNull Optional<Path> projectFor(final @NotNull SimpleTree tree) {
-        return TreeValueUtil.projectPath(tree);
-    }
 }
