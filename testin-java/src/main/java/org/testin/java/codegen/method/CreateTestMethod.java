@@ -1,5 +1,6 @@
 package org.testin.java.codegen.method;
 
+import org.testin.java.codegen.JavaLiteral;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
@@ -332,7 +333,7 @@ public class CreateTestMethod implements GenAction {
         attributes.append(", priority = ").append(ExecutionPosition.of(p, tc));
 
         final @NotNull String annotation = String.format("@Test(description = \"%s\", testName = \"%s\"%s)",
-                tc.getDescription().replace("\"", "\\\""),
+                JavaLiteral.of(tc.getDescription()),
                 tc.getId(),
                 attributes);
 

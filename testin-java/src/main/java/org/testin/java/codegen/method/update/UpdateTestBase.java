@@ -43,55 +43,34 @@ public class UpdateTestBase {
         return Optional.ofNullable(pm.getModifierList().findAnnotation(TEST_ANNOTATION));
     }
 
+    /**
+     * Sets one attribute of an annotation, through the PSI rather than by
+     * editing its text.
+     * <p>
+     * It used to find the attribute in the rendered text and splice the new
+     * value in over the old one, ending the old value at the first comma,
+     * bracket or newline it met - inside a quoted string as readily as outside
+     * one. A description reading "Login, then log out" or "Login (as admin)"
+     * spliced the annotation at the punctuation within the quotes, and the
+     * generated class stopped compiling or the reparse threw. Every case in
+     * that test set stopped running, and nothing told the tester.
+     * <p>
+     * setDeclaredAttributeValue is the platform's own answer and it replaces or
+     * adds without either branch being written here. The value is parsed from a
+     * throwaway annotation rather than as an expression, because an attribute
+     * can legally be an array initializer - the groups attribute is one - and
+     * {@code {"a", "b"}} is not a Java expression.
+     */
     protected void updateAnnotationAttribute(final @NotNull PsiElementFactory pf, final @NotNull PsiAnnotation pa, final @NotNull String attrName, final @NotNull String newValue) {
-        final @NotNull String annotationText = pa.getText();
+        final @NotNull PsiAnnotation parsed = pf.createAnnotationFromText("@A(v = " + newValue + ")", pa);
 
-        final @NotNull String attrPattern = attrName + " = ";
-        final int attrStart = annotationText.indexOf(attrPattern);
-
-        if (attrStart >= 0) {
-            final int valueStart = attrStart + attrPattern.length();
-            final int valueEnd = findValueEnd(annotationText, valueStart);
-            final @NotNull String newAnnotationText = annotationText.substring(0, valueStart) + newValue +
-                    annotationText.substring(valueEnd);
-            pa.replace(pf.createAnnotationFromText(newAnnotationText, null));
+        final PsiAnnotationMemberValue value = parsed.findDeclaredAttributeValue("v");
+        if (value == null) {
+            Logger.warn("Could not read '" + newValue + "' as a value for " + attrName);
             return;
         }
 
-        final int insertPos = annotationText.lastIndexOf(')');
-        if (insertPos <= 0) return;
-
-        final @NotNull String before = annotationText.substring(0, insertPos);
-        final @NotNull String after = annotationText.substring(insertPos);
-        final @NotNull String separator = before.contains("=") ? ", " : "";
-        pa.replace(pf.createAnnotationFromText(before + separator + attrName + " = " + newValue + after, null));
-    }
-
-    protected int findValueEnd(final @NotNull String s, final int start) {
-        if (start >= s.length()) return start;
-
-        final char first = s.charAt(start);
-        if (first == '{' || first == '[') {
-
-            int depth = 1;
-            for (int i = start + 1; i < s.length(); i++) {
-                final char c = s.charAt(i);
-                if (c == '{' || c == '[') depth++;
-                else if (c == '}' || c == ']') {
-                    depth--;
-                    if (depth == 0) return i + 1;
-                }
-            }
-            return s.length();
-        }
-
-        int end = start;
-        while (end < s.length()) {
-            final char c = s.charAt(end);
-            if (c == ',' || c == ')' || c == '\n') break;
-            end++;
-        }
-        return end;
+        pa.setDeclaredAttributeValue(attrName, value);
     }
 
     /**
