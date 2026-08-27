@@ -52,11 +52,7 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
 
         ApplicationManager.getApplication().invokeLater(() -> {
             list.repaint();
-            editor.getStatusBar().updatePaginationState(
-                    editor.getCurrentPage(),
-                    editor.getTotalPageCount(),
-                    editor.getTotalItemsCount()
-            );
+            editor.getStatusBar().updatePaginationState(editor.getCurrentPage(), editor.getTotalPageCount());
 
             editor.refreshExecutionButtons();
         });
@@ -76,7 +72,7 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
 
         ApplicationManager.getApplication().invokeLater(() -> {
             list.repaint();
-            editor.getStatusBar().updatePaginationState(editor.getCurrentPage(), editor.getTotalPageCount(), editor.getTotalItemsCount());
+            editor.getStatusBar().updatePaginationState(editor.getCurrentPage(), editor.getTotalPageCount());
             editor.refreshExecutionButtons();
         });
 

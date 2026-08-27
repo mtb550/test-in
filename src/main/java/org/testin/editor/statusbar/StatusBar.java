@@ -148,8 +148,22 @@ public class StatusBar extends JBPanel<StatusBar> {
         button.setFocusable(false);
     }
 
-    public void updatePaginationState(final int currentPage, final int totalPages, final int totalCount) {
-        statusLabel.setText(String.format(Locale.ENGLISH, "0 of %d test cases", totalCount));
+    /**
+     * The page indicator and the arrows. Not the left label.
+     * <p>
+     * It used to write that too, as "0 of N" against the filtered count, while
+     * the selection update writes it against the unfiltered total - and this one
+     * always landed last, because both editors called it after restoring the
+     * selection. So after any filter change, reload or status change the tester
+     * saw a highlighted row above a status bar reading "0 of 12 test cases", and
+     * clicking that same row changed it to "3 of 120": a different number and a
+     * different denominator for one screen.
+     * <p>
+     * That text is the no-selection branch of {@code updateSelectionState},
+     * which owns the label. The editors call that after restoring the selection
+     * now, so nothing here has to guess what is selected.
+     */
+    public void updatePaginationState(final int currentPage, final int totalPages) {
         currentPageLabel.setText(currentPage + " of " + Math.max(1, totalPages));
         syncLabel.setText("Last updated: " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
 
@@ -167,15 +181,22 @@ public class StatusBar extends JBPanel<StatusBar> {
         clockTimer.stop();
     }
 
-    public void updateSelectionState(final int @NotNull [] selectedIndices, final int currentPage, final int pageSize, final int totalCount) {
+    /**
+     * The one writer of the left label.
+     * <p>
+     * The row's position in the whole list is handed in rather than worked out
+     * here: this was a fourth copy of {@code (page - 1) * pageSize + row}, a
+     * conversion the editor interface owns because the card, the hover hit-test
+     * and the transfer handler all need the same answer.
+     */
+    public void updateSelectionState(final int @NotNull [] selectedIndices, final int firstSelectedPosition, final int totalCount) {
         final int selectedCount = selectedIndices.length;
 
         if (selectedCount > 1) {
             statusLabel.setText(String.format(Locale.ENGLISH, "%d selected of %d test cases", selectedCount, totalCount));
 
         } else if (selectedCount == 1) {
-            final int globalIndex = ((currentPage - 1) * pageSize) + selectedIndices[0];
-            statusLabel.setText(String.format(Locale.ENGLISH, "%d of %d test cases", globalIndex + 1, totalCount));
+            statusLabel.setText(String.format(Locale.ENGLISH, "%d of %d test cases", firstSelectedPosition + 1, totalCount));
 
         } else {
             statusLabel.setText(String.format(Locale.ENGLISH, "0 of %d test cases", totalCount));

@@ -492,7 +492,12 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
         showEmptyStateIfNothingToDraw(totalItems);
 
-        statusBar.updatePaginationState(page.page(), page.totalPages(), totalItems);
+        statusBar.updatePaginationState(page.page(), page.totalPages());
+
+        // After the selection has been restored above, which is the whole point:
+        // the label says what is selected, so it cannot be written before that
+        // is known.
+        refreshSelectionStatus(list.getSelectedIndices());
 
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");

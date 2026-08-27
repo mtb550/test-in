@@ -55,6 +55,21 @@ public interface TestinEditor extends Disposable {
      * transfer handler all convert the same way, and a card that numbered rows
      * differently from the handler acting on them would be a quiet mismatch.
      */
+    /**
+     * Tells the status bar what is selected, converting the page row to its
+     * position in the whole list on the way.
+     * <p>
+     * Here so the three callers - the selection listener and both editors after
+     * a redraw - make the same call with the same conversion, rather than the
+     * status bar doing the arithmetic a fourth time from two extra parameters.
+     */
+    default void refreshSelectionStatus(final int @NotNull [] selectedIndices) {
+        getStatusBar().updateSelectionState(
+                selectedIndices,
+                globalIndex(selectedIndices.length == 0 ? 0 : selectedIndices[0]),
+                getTotalItemsCount());
+    }
+
     default int globalIndex(final int rowIndex) {
         return ((getCurrentPage() - 1) * getPageSize()) + rowIndex;
     }

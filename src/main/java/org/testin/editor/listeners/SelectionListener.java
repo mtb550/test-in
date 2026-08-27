@@ -35,12 +35,7 @@ public class SelectionListener implements ListSelectionListener {
                         .ifPresent(viewer -> viewer.show(selected, path));
             }
 
-            editor.getStatusBar().updateSelectionState(
-                    list.getSelectedIndices(),
-                    editor.getCurrentPage(),
-                    editor.getPageSize(),
-                    editor.getTotalItemsCount()
-            );
+            editor.refreshSelectionStatus(list.getSelectedIndices());
         }
     }
 }

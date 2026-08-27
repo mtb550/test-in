@@ -496,7 +496,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         });
         selectionToRestore = Optional.empty();
 
-        statusBar.updatePaginationState(page.page(), page.totalPages(), total);
+        statusBar.updatePaginationState(page.page(), page.totalPages());
+
+        // After the selection has been restored above, which is the whole point:
+        // the label says what is selected, so it cannot be written before that
+        // is known.
+        refreshSelectionStatus(list.getSelectedIndices());
         showExecutionTotal();
 
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
