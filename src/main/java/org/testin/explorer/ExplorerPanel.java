@@ -147,11 +147,19 @@ public final class ExplorerPanel implements Disposable {
                 return;
             }
 
-            final @NotNull PanelState state = state(listing);
+            // Read once, on this thread, and carried to the draw. The draw
+            // used to ask again on the EDT a moment later, so a concurrent
+            // refresh emptying the index cache between the two reads left the
+            // state saying TREE while the second read said nothing was bound -
+            // and the welcome screen's TREE branch appends no links at all. The
+            // tester got the "Welcome to Testin" header with no Create, Clone or
+            // Select line, and no way out but pressing Refresh again.
+            final @NotNull Optional<TestProjectDirectoryDto> boundProject = bound();
+            final @NotNull PanelState state = state(listing, boundProject);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (p.isDisposed()) return;
-                draw(state);
+                draw(state, boundProject);
             });
         });
     }
@@ -159,13 +167,14 @@ public final class ExplorerPanel implements Disposable {
     /**
      * Draws the panel from an answer it was given. On the EDT, and reading
      * nothing: every question it could ask was answered by
-     * {@link #state(Map)} before it was called.
+     * {@link #state(Map, Optional)} before it was called - the bound project
+     * included, which is the one it used to go and read for itself.
      */
-    private void draw(final @NotNull PanelState state) {
+    private void draw(final @NotNull PanelState state, final @NotNull Optional<TestProjectDirectoryDto> boundProject) {
         panel.removeAll();
         panel.getEmptyText().clear();
 
-        bound().ifPresentOrElse(this::showTree, () -> showWelcome(state));
+        boundProject.ifPresentOrElse(this::showTree, () -> showWelcome(state));
 
         panel.revalidate();
         panel.repaint();
@@ -230,15 +239,16 @@ public final class ExplorerPanel implements Disposable {
      * {@link PanelState}. The root and the project listing are disk reads, so
      * they are asked for once per draw rather than once per branch.
      */
-    private @NotNull PanelState state(final @NotNull Map<String, ProjectStatus> listing) {
+    private @NotNull PanelState state(final @NotNull Map<String, ProjectStatus> listing, final @NotNull Optional<TestProjectDirectoryDto> boundProject) {
         // Handed in rather than read here: the caller has already walked the root
         // to decide whether there was one project to bind to, and that walk reads
-        // a marker per project.
+        // a marker per project. The bound project comes in for the same reason
+        // and one more - the draw forks on it, so the two must be one read.
         underRoot = listing;
 
         return PanelState.of(
                 !Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty(),
-                bound().isPresent(),
+                boundProject.isPresent(),
                 Services.getInstance(p, BoundTestProject.class).isMissing(underRoot),
                 Services.getInstance(p, TestinConfigService.class).get().hasRepoUrl(),
                 !underRoot.isEmpty());
@@ -376,8 +386,9 @@ public final class ExplorerPanel implements Disposable {
                         e -> new BindTestProjectDialog(p, underRoot, this::reindex).show());
             }
 
-            // Unreachable: the tree is drawn by showTree, and this method is only
-            // called when there is no project to draw.
+            // Unreachable, and now actually so: the state and the branch that
+            // chose this method come from one read of the bound project, so
+            // TREE here would mean the two disagreed about a single value.
             case TREE -> Logger.warn("Welcome screen asked to draw a resolved project");
         }
     }
