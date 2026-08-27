@@ -3,6 +3,7 @@ package org.testin.view.marker;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.model.NodeFigures;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -10,6 +11,7 @@ import org.testin.model.markers.Marker;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogDetails;
+import org.testin.services.Services;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Display;
 import org.testin.util.Shortcuts;
@@ -54,6 +56,20 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
                 .row("Modified By", marker.getModifiedBy())
                 .row("Modified At", Display.formatDate(marker.getModifiedAt()))
                 .row("Status", marker.getStatusLabel());
+
+        // When the run ran, which the run file records and the marker does not.
+        // Read from the indexer rather than copied onto the marker: two owners
+        // for one fact is one of them going stale, and the indexer holds every
+        // run in memory already, so this is a lookup and not a read from disk -
+        // the same property the marker was put here for.
+        //
+        // Unconditional, because a node that is not a test run resolves to no
+        // run and adds nothing. A run that never started formats to blank on
+        // both, and the details builder drops a blank row - so a run nobody has
+        // executed shows neither line rather than two empty ones.
+        Services.getInstance(p, ProjectIndexer.class).findTestRun(dto.getPath()).ifPresent(run -> details
+                .row("Execution Started", Display.formatDate(run.getExecutionStartedAt()))
+                .row("Execution Ended", Display.formatDate(run.getExecutionEndedAt())));
 
         // Whatever else the marker has to say about itself - a run lists the
         // configuration it was created with. Added without asking what kind of
