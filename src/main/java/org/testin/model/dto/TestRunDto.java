@@ -1,5 +1,6 @@
 package org.testin.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -111,6 +112,22 @@ public class TestRunDto {
     @NotNull
     @Builder.Default
     private List<TestRunItems> results = new ArrayList<>();
+
+    /**
+     * Whether every case in this run has been judged.
+     * <p>
+     * Asked of the run rather than counted at a call site, because the answer
+     * decides when a run is over and two places counting it would eventually
+     * disagree about a deleted case.
+     * <p>
+     * A run with no cases is not finished, it is empty - completing it the
+     * moment it is created would be the wrong answer to a question nobody
+     * asked.
+     */
+    @JsonIgnore
+    public boolean isFullyJudged() {
+        return !results.isEmpty() && results.stream().allMatch(TestRunItems::isJudged);
+    }
 
     /**
      * Stamps the first Start Execution press and keeps it. A tester who stops

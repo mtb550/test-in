@@ -16,7 +16,6 @@ import org.testin.navigate.NavigateToCodeAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.report.GenerateReportAction;
 import org.testin.run.RunTestCaseAction;
-import org.testin.run.StartExecutionAction;
 import org.testin.testrun.SetTestCaseStatusAction;
 import org.testin.testrun.UpdateRunItemAction;
 import org.testin.util.OptionalPlugin;
@@ -53,12 +52,11 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
             if (OptionalPlugin.JAVA.isAvailable()) add(new NavigateToCodeAction(p, list));
         }
 
-        // Below the entry that runs the selection, and separated from it. Every
-        // other entry in this menu acts on the cases the tester highlighted;
-        // this one ignores them and walks the run from its first pending case,
-        // so it is the last thing offered rather than the first.
-        addSeparator();
-        add(new StartExecutionAction(ui.getToolBar().getCallbacks()));
+        // No Start Manual Execution here. Every entry in this menu acts on the
+        // cases the tester highlighted, and that one ignores them - it walks the
+        // run from its first pending case whatever is selected. It belongs on
+        // the toolbar, where it is a press about the run as a whole rather than
+        // an answer to a right-click on a case.
 
         addSeparator();
         add(new NextPageAction(ui, list));

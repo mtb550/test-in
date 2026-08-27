@@ -876,6 +876,31 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // decides between Start and Stop. The first case reporting RUNNING is
         // what puts Stop up; the last verdict is what takes it down again.
         refreshExecutionButtons();
+
+        finishIfEverythingIsJudged();
+    }
+
+    /**
+     * A run whose every case has a verdict is over, whoever gave them.
+     * <p>
+     * Completing one used to be the manual walk's business alone: the walk ran
+     * off the end of the list and called it finished. So a tester who ran the
+     * whole run through automation watched every card fill in and then found the
+     * run still In Progress, with Start Execution offering to begin something
+     * that had already happened.
+     * <p>
+     * Asked of the run rather than of the walk, so the answer does not depend on
+     * which of the two executed it. A case deleted from the test set counts as
+     * judged - the run keeps what it recorded about it and it can never be run
+     * again, so waiting for it would be waiting forever.
+     * <p>
+     * A run already signed off is left alone: the report that reached this was
+     * refused above.
+     */
+    private void finishIfEverythingIsJudged() {
+        if (run().filter(TestRunDto::isFullyJudged).isEmpty()) return;
+
+        new UpdateTestRunStatusAction(p, this, list).onExecutionFinished(this);
     }
 
     /**

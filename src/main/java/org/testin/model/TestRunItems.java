@@ -121,6 +121,21 @@ public class TestRunItems {
     }
 
     /**
+     * Whether this row is finished with.
+     * <p>
+     * A verdict is finished with. So is a case that was deleted from the test
+     * set: the run keeps what it recorded about it, and it can never be run
+     * again, so waiting for it would be waiting forever.
+     * <p>
+     * Everything else - Pending, Untested - is a case the run is still expecting
+     * something about.
+     */
+    @JsonIgnore
+    public boolean isJudged() {
+        return status.isVerdict() || isRemoved();
+    }
+
+    /**
      * Records a tester's verdict: the status, when it was reached, and by whom.
      * <p>
      * Passing clears everything a failure described - the bug severity and
