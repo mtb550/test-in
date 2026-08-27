@@ -12,7 +12,6 @@ import org.testin.java.codegen.clazz.MoveJavaClass;
 import org.testin.java.codegen.clazz.RenameJavaClass;
 import org.testin.java.codegen.method.CreateTestMethod;
 import org.testin.java.codegen.method.RemoveTestMethod;
-import org.testin.java.codegen.method.RenameTestMethod;
 import org.testin.java.codegen.method.update.UpdateTestDescription;
 import org.testin.java.codegen.method.update.UpdateTestGroup;
 import org.testin.java.codegen.method.update.UpdateTestOrder;
@@ -56,7 +55,6 @@ public final class GenRegistry implements CodeGenerators {
         ACTIONS.put(GenType.MOVE_TEST_SET, new MoveJavaClass());
         ACTIONS.put(GenType.CREATE_TEST_CASE, new CreateTestMethod());
         ACTIONS.put(GenType.REMOVE_TEST_CASE, new RemoveTestMethod());
-        ACTIONS.put(GenType.RENAME_TEST_CASE, new RenameTestMethod());
         ACTIONS.put(GenType.UPDATE_TEST_CASE_DESCRIPTION, new UpdateTestDescription());
         ACTIONS.put(GenType.UPDATE_TEST_CASE_GROUP, new UpdateTestGroup());
         ACTIONS.put(GenType.UPDATE_TEST_CASE_ORDER, new UpdateTestOrder());

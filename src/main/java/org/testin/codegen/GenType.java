@@ -73,11 +73,15 @@ public enum GenType {
             "Remove Automation Test Method"
     ),
 
-    RENAME_TEST_CASE(
-            "Rename Test Case",
-            "Rename Automation Test Method"
-    ),
-
+    /**
+     * Renaming the generated method is part of this, not a step beside it: the
+     * method is named after the case's description, so a description that
+     * changed and a method that did not are the same edit half done.
+     * <p>
+     * There was a RENAME_TEST_CASE beside this one, with a handler that renamed
+     * and nothing else. Nothing ever dispatched it, and if anything had it would
+     * have left the @Test description saying what the case used to say.
+     */
     UPDATE_TEST_CASE_DESCRIPTION(
             "Update Test Case",
             "Update Automation Test Method Description & Name"
