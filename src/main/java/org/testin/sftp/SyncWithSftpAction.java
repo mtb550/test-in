@@ -161,9 +161,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
 
                     report(outcome, projectRoot, address, account, auth);
                 } catch (final Exception ex) {
-                    Logger.error("Sync with " + address.display() + " failed: " + ex.getMessage());
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(p, Notifier.class).error(p, "Sync Failed", ex.getMessage()));
+                    reportFailure(p, "Sync with " + address.display(), ex);
                 }
             }
         });
@@ -345,11 +343,24 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
             } catch (final Exception ex) {
                 // The same handling the sync itself has. Without it a connection
                 // that dropped while sending showed the tester nothing at all.
-                Logger.error("Settling with " + address.display() + " failed: " + ex.getMessage());
-                ApplicationManager.getApplication().invokeLater(() ->
-                        Services.getInstance(p, Notifier.class).error(p, "Sync Failed", ex.getMessage()));
+                reportFailure(p, "Settling with " + address.display(), ex);
             }
         });
+    }
+
+    /**
+     * Says a step of the sync failed, in the log and to the tester.
+     * <p>
+     * One reporter for both, because they are the same report: what was being
+     * done, and what went wrong. Written out at each site, the two had already
+     * started to differ in the log line while sharing the balloon title, and the
+     * title is the part a second copy quietly stops agreeing on.
+     */
+    private static void reportFailure(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull Exception ex) {
+        Logger.error(whatFailed + " failed: " + ex.getMessage());
+
+        ApplicationManager.getApplication().invokeLater(() ->
+                Services.getInstance(p, Notifier.class).error(p, "Sync Failed", ex.getMessage()));
     }
 
     /**
