@@ -50,6 +50,10 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
 
+        // Said once, before the loop: it greys the others out and records
+        // that only this one may write back.
+        onlyEditable(targetSection);
+
         for (final CreateTestCaseSection section : getAllSections()) {
             final @NotNull JBPanel<?> slot = new JBPanel<>(new BorderLayout());
             slot.setOpaque(false);
@@ -57,7 +61,6 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
             section.fillData(existingDto, repackPopup);
 
             final boolean isTarget = (section == targetSection);
-            section.setEditable(isTarget);
 
             if (isTarget && section instanceof StepsSection s) {
                 if (s.getStepFields().isEmpty()) {

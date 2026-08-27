@@ -175,6 +175,36 @@ public abstract class TestCaseBaseDialog {
         Disposer.dispose(dialogDisposable);
     }
 
+    /**
+     * The one section the tester may change, and empty when they may change all
+     * of them - which is what creating a test case means.
+     * <p>
+     * The update dialog opens on one field and shows the others greyed out, so
+     * "shown" and "may write" stopped being the same question. Only the save
+     * filtered, and it filtered on shown alone, so every greyed section wrote
+     * itself back over the case. One section had grown a guard of its own
+     * against exactly that and the rest had not - which is how editing a case's
+     * priority came to re-write its expected result as trimmed text, silently
+     * changing a stored value with leading or trailing whitespace, against the
+     * project's own rule that saving never reformats.
+     */
+    private @NotNull Optional<CreateTestCaseSection> editableSection = Optional.empty();
+
+    /**
+     * Greys out every section but this one, and records that only it may write.
+     */
+    protected void onlyEditable(final @NotNull CreateTestCaseSection target) {
+        editableSection = Optional.of(target);
+        getAllSections().forEach(section -> section.setEditable(section == target));
+    }
+
+    /**
+     * Whether this section may write what it holds back to the test case.
+     */
+    private boolean mayWrite(final @NotNull CreateTestCaseSection section) {
+        return section.isShown() && editableSection.map(target -> target == section).orElse(true);
+    }
+
     public @NotNull List<CreateTestCaseSection> getAllSections() {
         return cachedSections;
     }
@@ -218,9 +248,11 @@ public abstract class TestCaseBaseDialog {
     public @NotNull Runnable save(final @NotNull TestCaseDto dto, final @NotNull Consumer<@NotNull TestCaseDto> onSave, final @NotNull JBPopup[] popupWrapper) {
         return () -> {
             // A section the tester never opened holds its empty defaults, and
-            // writing those over the dto would erase what is already there. Asked
-            // here rather than at the top of all eight applyTo methods.
-            getAllSections().stream().filter(CreateTestCaseSection::isShown).forEach(section -> section.applyTo(dto));
+            // writing those over the dto would erase what is already there. A
+            // section shown but greyed out holds the stored value and must not
+            // write it back either, because writing it back trims it. Asked here
+            // rather than at the top of all eight applyTo methods.
+            getAllSections().stream().filter(this::mayWrite).forEach(section -> section.applyTo(dto));
 
             final @NotNull String title = dto.getDescription();
             if (!descriptionSection.isShown() || !title.trim().isEmpty()) {

@@ -60,7 +60,7 @@ public class DescriptionSection implements CreateTestCaseSection {
 
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        if (descriptionField.isEnabled()) dto.setDescription(descriptionField.getText().trim());
+        dto.setDescription(descriptionField.getText().trim());
     }
 
     @Override
