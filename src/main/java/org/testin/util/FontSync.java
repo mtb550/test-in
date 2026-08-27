@@ -1,6 +1,5 @@
 package org.testin.util;
 
-import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
@@ -8,19 +7,15 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.colors.EditorColorsListener;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.dialogs.ZoomIndicatorDialog;
 import org.testin.editor.grid.GridPanelBuilder;
-import org.testin.logger.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseWheelEvent;
 import java.util.Optional;
 
 public class FontSync {
@@ -32,8 +27,6 @@ public class FontSync {
      */
     private static final @NotNull String LAST_BASE_SIZE = "testin.fontSync.lastBaseSize";
 
-    private static boolean isGlobalWatcherActive = false;
-
     public static float getBaseFontSize() {
         return EditorColorsManager.getInstance().getGlobalScheme().getEditorFontSize();
     }
@@ -43,7 +36,7 @@ public class FontSync {
 
         ApplicationManager.getApplication().getMessageBus().connect(parentDisposable).subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) scheme -> updateComponentFontSize(component));
 
-        setupGlobalJavaEditorWatcher(p, parentDisposable);
+        NativeEditorZoom.ensureWatching();
 
         attachWheelZoom(p, component);
     }
@@ -57,50 +50,25 @@ public class FontSync {
         });
     }
 
-    private static void setupGlobalJavaEditorWatcher(final @NotNull Project p, final @NotNull Disposable parentDisposable) {
-        if (isGlobalWatcherActive) return;
-        isGlobalWatcherActive = true;
-
-        // Single debounce timer instead of allocating one per wheel event.
-        final @NotNull Timer debounce = new Timer(50, evt -> syncJavaEditorToGlobal(p));
-        debounce.setRepeats(false);
-
-        IdeEventQueue.getInstance().addPostprocessor(event -> {
-            if (event instanceof MouseWheelEvent e && (e.isControlDown() || e.isMetaDown())) {
-                debounce.restart();
-            }
-            return false;
-        }, parentDisposable);
-
-        // When the owning editor goes away, let the next editor re-register the watcher.
-        Disposer.register(parentDisposable, () -> {
-            debounce.stop();
-            isGlobalWatcherActive = false;
-        });
-    }
-
-    private static void syncJavaEditorToGlobal(final @NotNull Project p) {
-        try {
-            if (p.isDisposed()) return;
-
-            // No editor has focus in a project showing only the tree, and there
-            // is then no local font size to push out to the others.
-            Optional.ofNullable(FileEditorManager.getInstance(p).getSelectedTextEditor())
-                    .ifPresent(FontSync::pushEditorSizeToGlobal);
-        } catch (final Exception ex) {
-            Logger.error(ex.getMessage());
-        }
-    }
-
-    private static void pushEditorSizeToGlobal(final @NotNull Editor activeEditor) {
-        final float localSize = activeEditor.getColorsScheme().getEditorFontSize();
+    /**
+     * Puts a font size on the global scheme and on every open editor, and tells
+     * the IDE it changed.
+     * <p>
+     * The one place that does it. Wheel-zooming a Testin panel and following a
+     * zoom made in a Java editor both end here, and each had written the four
+     * steps out - so the two drifted: only one of them checked whether the size
+     * had actually changed, and the other republished the scheme on every wheel
+     * tick after the size had already hit its 8pt floor, walking every open
+     * editor each time.
+     */
+    static void applyGlobally(final float newSize) {
         final @NotNull EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
-        if (localSize == globalScheme.getEditorFontSize()) return;
+        if (globalScheme.getEditorFontSize() == newSize) return;
 
-        globalScheme.setEditorFontSize(localSize);
-        for (final Editor editor : EditorFactory.getInstance().getAllEditors()) {
-            editor.getColorsScheme().setEditorFontSize(localSize);
-        }
+        globalScheme.setEditorFontSize(newSize);
+        for (final Editor editor : EditorFactory.getInstance().getAllEditors())
+            editor.getColorsScheme().setEditorFontSize(newSize);
+
         ApplicationManager.getApplication().getMessageBus()
                 .syncPublisher(EditorColorsManager.TOPIC)
                 .globalSchemeChange(globalScheme);
@@ -108,17 +76,14 @@ public class FontSync {
 
     private static void zoomGlobalIdeEditors(final @NotNull Project p, final @NotNull JComponent component, final boolean zoomIn) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            final @NotNull EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
             final float newSize = Math.clamp(getBaseFontSize() + (zoomIn ? 1.0f : -1.0f), 8.0f, 72.0f);
 
-            globalScheme.setEditorFontSize(newSize);
-            for (final Editor editor : EditorFactory.getInstance().getAllEditors())
-                editor.getColorsScheme().setEditorFontSize(newSize);
+            applyGlobally(newSize);
 
-            ApplicationManager.getApplication().getMessageBus()
-                    .syncPublisher(EditorColorsManager.TOPIC)
-                    .globalSchemeChange(globalScheme);
-
+            // Outside applyGlobally, which does nothing once the size is at its
+            // limit. The indicator still has to appear then, or wheeling past
+            // the floor looks like the zoom stopped responding rather than like
+            // it has bottomed out.
             updateComponentFontSize(component);
             ZoomIndicatorDialog.show(p, component, newSize);
         });
