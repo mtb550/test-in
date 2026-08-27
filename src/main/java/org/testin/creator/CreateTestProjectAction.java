@@ -66,7 +66,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty())
+        if (!Services.getInstance(p, TestinRoot.class).isConfigured())
             e.getPresentation().setEnabled(false);
     }
 

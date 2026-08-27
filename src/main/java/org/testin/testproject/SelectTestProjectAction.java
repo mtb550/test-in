@@ -62,7 +62,7 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
     public void update(final @NotNull AnActionEvent e) {
         // There is nothing to choose from without a root. Both branches, so the
         // button comes back once one is configured.
-        e.getPresentation().setEnabled(!Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty());
+        e.getPresentation().setEnabled(Services.getInstance(p, TestinRoot.class).isConfigured());
     }
 
     @Override

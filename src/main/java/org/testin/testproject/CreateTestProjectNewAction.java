@@ -61,7 +61,7 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
     public void update(final @NotNull AnActionEvent e) {
         // Both branches, otherwise the action stays disabled for the whole session
         // once seen without a configured Testin root.
-        e.getPresentation().setEnabled(!Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty());
+        e.getPresentation().setEnabled(Services.getInstance(p, TestinRoot.class).isConfigured());
     }
 
     @Override

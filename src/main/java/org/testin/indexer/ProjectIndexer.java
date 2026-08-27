@@ -213,10 +213,7 @@ public final class ProjectIndexer {
      * the project listing can never disagree about where the root is.
      */
     private @NotNull Path absoluteRoot() {
-        final @NotNull Path rootPath = Services.getInstance(p, TestinRoot.class).getPath();
-        if (rootPath.toString().isEmpty() || rootPath.isAbsolute()) return rootPath;
-
-        return Optional.ofNullable(p.getBasePath()).map(base -> Path.of(base, rootPath.toString())).orElse(rootPath);
+        return Services.getInstance(p, TestinRoot.class).absolutePath();
     }
 
     /**

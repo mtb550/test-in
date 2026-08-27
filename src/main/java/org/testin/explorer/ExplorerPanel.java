@@ -111,7 +111,7 @@ public final class ExplorerPanel implements Disposable {
         // Nothing indexes without a root, so the wait would never end - and a
         // root configured later comes back through Apply, which refreshes every
         // open panel itself.
-        if (Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty()) return;
+        if (!Services.getInstance(p, TestinRoot.class).isConfigured()) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             Services.getInstance(p, ProjectIndexer.class).awaitIndexing();
@@ -247,7 +247,7 @@ public final class ExplorerPanel implements Disposable {
         underRoot = listing;
 
         return PanelState.of(
-                !Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty(),
+                Services.getInstance(p, TestinRoot.class).isConfigured(),
                 boundProject.isPresent(),
                 Services.getInstance(p, BoundTestProject.class).isMissing(underRoot),
                 Services.getInstance(p, TestinConfigService.class).get().hasRepoUrl(),

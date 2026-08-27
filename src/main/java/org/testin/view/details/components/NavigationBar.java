@@ -81,10 +81,16 @@ public class NavigationBar extends BaseDetails {
                     public void mouseClicked(final MouseEvent e) {
                         if (isLast) {
                             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                            Path testSetPath = Services.getInstance(p, TestinRoot.class).getPath();
-                            for (final String segment : currentPath) {
-                                testSetPath = testSetPath.resolve(segment);
-                            }
+
+                            // Resolved by the class that owns it. This walked the
+                            // segments off the raw stored root, which skips the
+                            // two steps that make it a real path - falling back
+                            // to the project directory when nothing is
+                            // configured, and resolving a relative root against
+                            // it. Either case yielded a relative path, the
+                            // indexer lookup then threw, and it threw out of a
+                            // Swing mouse listener.
+                            final @NotNull Path testSetPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
 
                             final @NotNull TestSetDirectoryDto ts = indexer.getTestSetByPath(testSetPath);
 

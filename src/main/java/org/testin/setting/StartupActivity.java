@@ -44,7 +44,15 @@ public final class StartupActivity implements ProjectActivity {
 
         final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
-        if (settings.rootTestinPath.isEmpty()) {
+        // An unconfigured root is the empty path, not the absence of one - and
+        // not the empty string either. This asked the stored value whether it
+        // was empty while the warning below asked the normalized path, so a root
+        // of nothing but spaces produced the setup warning and a log line
+        // announcing defaults were being saved, in the same startup.
+        final @NotNull Path testinPath = TestinRoot.normalize(settings.rootTestinPath);
+        final boolean rootConfigured = TestinRoot.isConfigured(testinPath);
+
+        if (!rootConfigured) {
             Logger.info("First run detected — saving default settings to testinSettings.xml");
         }
 
@@ -54,10 +62,7 @@ public final class StartupActivity implements ProjectActivity {
 
         Logger.info("StartupActivity.execute()");
 
-        // An unconfigured root is the empty path, not the absence of one.
-        final @NotNull Path testinPath = TestinRoot.normalize(settings.rootTestinPath);
-
-        if (!TestinRoot.isConfigured(testinPath)) {
+        if (!rootConfigured) {
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (!p.isDisposed()) {
                     Services.getInstance(p, Notifier.class).warnWithAction(p,

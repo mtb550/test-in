@@ -75,6 +75,42 @@ public final class TestinRoot {
     }
 
     /**
+     * Whether this project has a root configured.
+     * <p>
+     * Six call sites asked it as {@code getPath().toString().isEmpty()} and one
+     * asked the stored string directly - and those two are not the same
+     * question. A root of nothing but spaces is empty once normalized and not
+     * empty as stored, so the tester got the "configure the root" warning
+     * alongside a log line announcing that defaults were being saved.
+     */
+    public boolean isConfigured() {
+        return isConfigured(getPath());
+    }
+
+    /**
+     * The configured root as an absolute path, and {@link #NONE} when none is
+     * configured.
+     * <p>
+     * A relative root is resolved against the open project, which is how it has
+     * always been read. Here rather than at each caller: the indexer had its own
+     * copy of these four lines, and {@code resolve} below had a third.
+     */
+    public @NotNull Path absolutePath() {
+        final @NotNull Path root = getPath();
+        if (!isConfigured(root)) return NONE;
+
+        return root.isAbsolute() ? root : basePath().resolve(root);
+    }
+
+    /**
+     * The open project's own directory. The platform answers null for a project
+     * that has none, which is the empty path here.
+     */
+    private @NotNull Path basePath() {
+        return Path.of(Objects.toString(p.getBasePath(), ""));
+    }
+
+    /**
      * Where a node named by its place in the tree lives on disk.
      * <p>
      * The tree carries a node's path as the segments a tester reads - "test
@@ -84,12 +120,8 @@ public final class TestinRoot {
      * then walk the segments. Two places did it, and a third was about to.
      */
     public @NotNull Path resolve(final @NotNull List<String> segments) {
-        // The platform answers null for a project with no directory of its own.
-        final @NotNull Path basePath = Path.of(Objects.toString(p.getBasePath(), ""));
+        Path resolved = isConfigured() ? absolutePath() : basePath();
 
-        final @NotNull Path root = isConfigured(getPath()) ? getPath() : basePath;
-
-        Path resolved = root.isAbsolute() ? root : basePath.resolve(root);
         for (final String segment : segments) {
             resolved = resolved.resolve(segment);
         }
