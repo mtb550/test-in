@@ -27,7 +27,7 @@ public class UnifiedVirtualFile extends LightVirtualFile {
 
     @Override
     public @NotNull String getUrl() {
-        return "testin:///" + dir.getPath().toAbsolutePath().toString().replace("\\", "/");
+        return TestinFileSystem.PROTOCOL + ":///" + dir.getPath().toAbsolutePath().toString().replace("\\", "/");
     }
 
     @Override
@@ -35,9 +35,26 @@ public class UnifiedVirtualFile extends LightVirtualFile {
         return dir.getPath().toAbsolutePath().toString();
     }
 
+    /**
+     * Testin's own file system, and the light file's default when the platform
+     * cannot hand it over.
+     * <p>
+     * Never null, which is not what the lookup promises: {@code getFileSystem}
+     * answers null for a protocol the manager has no entry for, and this method
+     * is declared not-null and called by anything that meets one of these
+     * files. The Database plugin does, while working out an editor tab's title,
+     * and threw an IDE error report over a Testin tab - from a coroutine, so
+     * the report named Testin and pointed at their code.
+     * <p>
+     * A compiler cannot see this. The annotation is rewritten into a throw by
+     * the IDE's instrumenter, so it exists only in a running IDE, which is why
+     * this survived every build.
+     */
     @Override
     public @NotNull VirtualFileSystem getFileSystem() {
-        return VirtualFileManager.getInstance().getFileSystem("testin");
+        final VirtualFileSystem registered = VirtualFileManager.getInstance().getFileSystem(TestinFileSystem.PROTOCOL);
+
+        return registered != null ? registered : super.getFileSystem();
     }
 
     public @NotNull TestSetDirectoryDto getTestSet() {
