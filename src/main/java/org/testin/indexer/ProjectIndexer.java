@@ -512,8 +512,24 @@ public final class ProjectIndexer {
         });
     }
 
+    /**
+     * Registers the run and writes it, through the one writer that owns the file.
+     * <p>
+     * It used to write straight from the calling thread while
+     * {@link #persistRun} queued its writes - so the run JSON had two writers
+     * and no order between them. Saving Result Analysis took the direct path on
+     * the UI thread while a verdict recorded moments earlier could still be
+     * queued, holding a snapshot taken before the analysis existed; the queued
+     * write then landed second and silently restored the older file. The tester
+     * found their analysis gone after the next reload.
+     * <p>
+     * The registration stays immediate. Creating a run needs the index to know
+     * about it on the next line, and only the disk write belongs in the queue.
+     */
     public void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
-        store.putTestRun(testRunPath, tr);
+        store.registerTestRun(testRunPath, tr);
+
+        persistRun(testRunPath, tr);
     }
 
     /**
