@@ -1,5 +1,6 @@
 package org.testin.clipboard;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -35,7 +36,7 @@ public class RedoNodeAction extends AbstractProjectAction {
         if (!redo.canRedo()) return;
 
         redo.redo();
-        Services.getInstance(p, Notifier.class).softShow(p, "Redone");
+        Services.getInstance(p, Notifier.class).softShow(p, Done.REDONE);
     }
 
     @Override

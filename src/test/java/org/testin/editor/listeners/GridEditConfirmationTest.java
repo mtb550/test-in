@@ -99,12 +99,27 @@ public class GridEditConfirmationTest {
         }
     }
 
+    /**
+     * Both say it by naming the same outcome rather than by spelling the same
+     * word, which is what makes them unable to disagree.
+     * <p>
+     * This used to look for the literal {@code softShow(p, "Updated")} in both -
+     * true of the code at the time, and satisfied just as well by two files that
+     * happened to hold matching strings. {@code Done} now owns the past-tense
+     * vocabulary the whole plugin confirms in, so the thing worth asserting is
+     * that neither of these picks its own word.
+     */
     @Test
     public void theSharedOneSaysWhatTheUpdateDialogSays() {
         final String parent = sourceOf(LISTENERS.resolve(PARENT + ".java"));
+        final String dialog = sourceOf(Paths.get("src", "main", "java", "org", "testin", "testcase",
+                "UpdateTestCaseAction.java"));
 
-        assertTrue(parent.contains("softShow(p, \"Updated\")"),
-                "a grid edit and the update dialog change the same field on the same thing, so a tester "
-                        + "should not have to learn that they are called different things");
+        assertTrue(parent.contains("Done.UPDATED"),
+                PARENT + " confirms a grid edit in words of its own rather than naming the outcome");
+
+        assertTrue(dialog.contains("Done.UPDATED"),
+                "the update dialog names a different outcome from the grid edit, for the same act on the "
+                        + "same field - a tester should not have to learn that they are called different things");
     }
 }

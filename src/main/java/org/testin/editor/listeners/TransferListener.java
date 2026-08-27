@@ -1,5 +1,6 @@
 package org.testin.editor.listeners;
 
+import org.testin.notifications.Done;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
@@ -118,7 +119,7 @@ public class TransferListener extends TransferHandler {
 
             // After the save, inside the try: a drop that threw on the way here
             // is logged, not confirmed (#62).
-            Services.getInstance(p, Notifier.class).softShowCounted(p, "Re-sorted", itemsToMove.size());
+            Services.getInstance(p, Notifier.class).softShowCounted(p, Done.RE_SORTED, itemsToMove.size());
 
             itemsToMove.stream().findFirst().ifPresentOrElse(
                     editor::selectTestCase,

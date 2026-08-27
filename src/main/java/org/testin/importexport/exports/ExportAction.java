@@ -1,5 +1,6 @@
 package org.testin.importexport.exports;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -82,7 +83,7 @@ public class ExportAction extends AbstractProjectTreeAction {
                     destination.format().exportToFile(p, ExportAction.this, destination.file(), selected);
 
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(p, Notifier.class).softShowCounted(p, "Exported", cases));
+                            Services.getInstance(p, Notifier.class).softShowCounted(p, Done.EXPORTED, cases));
                 });
     }
 

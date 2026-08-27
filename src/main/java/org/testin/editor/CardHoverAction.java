@@ -1,5 +1,6 @@
 package org.testin.editor;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
@@ -107,7 +108,7 @@ public enum CardHoverAction {
     private static void stopRun(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
         final int stopped = Services.getInstance(p, TestNGExecution.class).stop(cases);
 
-        if (stopped > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, "Stopped", stopped);
+        if (stopped > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.STOPPED, stopped);
     }
 
     /**

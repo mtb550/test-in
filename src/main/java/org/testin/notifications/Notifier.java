@@ -73,6 +73,22 @@ public final class Notifier {
     }
 
     /**
+     * The same two, taking the outcome rather than a word for it.
+     * <p>
+     * Preferred over the String forms wherever the outcome is one of the
+     * {@link Done} constants, which is almost everywhere: the enum is what keeps
+     * the past-tense rule from being a thing each call site remembers on its
+     * own.
+     */
+    public void softShow(final @NotNull Project p, final @NotNull Done done) {
+        softShow(p, done.getOutcome());
+    }
+
+    public void softShowCounted(final @NotNull Project p, final @NotNull Done done, final int count) {
+        softShowCounted(p, done.getOutcome(), count);
+    }
+
+    /**
      * Lightweight fading balloon anchored to the IDE status bar.
      */
     private void showBalloon(final @NotNull Project p, final @NotNull String htmlContent) {

@@ -29,4 +29,9 @@
 # the verdict words followed the same route. Two that could not: NodeCount
 # cannot ask DirectoryType for a node's name, because DirectoryType names its
 # counts and the two would initialize each other.
-195
+#
+# 191 after Done gave the past-tense notification vocabulary an owner. That one
+# is worth less to the count than to the rule: CLAUDE.md has always said a
+# confirmation is the outcome in the past tense and nothing else, and until Done
+# there was nothing to say it to.
+191

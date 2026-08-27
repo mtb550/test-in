@@ -1,5 +1,6 @@
 package org.testin.git;
 
+import org.testin.notifications.Done;
 import org.testin.model.DirectoryType;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.JBUI;
@@ -217,7 +218,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             }
 
             removeRow(row);
-            Services.getInstance(p, Notifier.class).softShow(p, "Reverted");
+            Services.getInstance(p, Notifier.class).softShow(p, Done.REVERTED);
 
         } catch (final Exception ex) {
             Services.getInstance(p, Notifier.class).error(p, "Revert Failed", "Could not revert change: " + ex.getMessage());

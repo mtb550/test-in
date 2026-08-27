@@ -1,5 +1,6 @@
 package org.testin.order;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -45,7 +46,7 @@ public class OrderNodeAction extends AbstractProjectTreeAction {
         // The tree is drawn from the children index, which sorts on the way out
         // - so what redraws it is a refresh, not a re-index.
         pp.getProjectTree().refresh();
-        Services.getInstance(p, Notifier.class).softShow(p, "Ordered");
+        Services.getInstance(p, Notifier.class).softShow(p, Done.ORDERED);
     }
 
     /**

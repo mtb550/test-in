@@ -1,5 +1,6 @@
 package org.testin.clipboard;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -35,7 +36,7 @@ public class UndoNodeAction extends AbstractProjectAction {
         if (!undo.canUndo()) return;
 
         undo.undo();
-        Services.getInstance(p, Notifier.class).softShow(p, "Undone");
+        Services.getInstance(p, Notifier.class).softShow(p, Done.UNDONE);
     }
 
     @Override

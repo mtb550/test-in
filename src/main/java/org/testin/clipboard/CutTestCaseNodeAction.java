@@ -1,5 +1,6 @@
 package org.testin.clipboard;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -48,7 +49,7 @@ public class CutTestCaseNodeAction extends AbstractProjectAction {
 
                 list.repaint();
 
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Cut", selectedTestCases.size());
+                Services.getInstance(p, Notifier.class).softShowCounted(p, Done.CUT, selectedTestCases.size());
 
             } catch (final Exception ex) {
                 Logger.error("Exception: " + ex.getMessage());

@@ -1,5 +1,6 @@
 package org.testin.testcase;
 
+import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -48,7 +49,7 @@ public class UpdateTestCaseAction extends AbstractProjectAction {
             for (final TestCaseDto tc : updatedItems)
                 indexer.putTestCase(path, tc);
 
-            Services.getInstance(p, Notifier.class).softShow(p, "Updated");
+            Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
 
             if (editor instanceof Toolbar)
                 ((Toolbar) editor).onToolBarFilterSelectionChanged();

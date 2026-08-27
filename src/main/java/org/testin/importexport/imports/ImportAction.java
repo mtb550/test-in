@@ -1,5 +1,6 @@
 package org.testin.importexport.imports;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -133,7 +134,7 @@ public class ImportAction extends AbstractProjectTreeAction {
             }
 
             // The count is the news, whichever shape was imported into (#62).
-            Services.getInstance(p, Notifier.class).softShowCounted(p, "Imported", imported);
+            Services.getInstance(p, Notifier.class).softShowCounted(p, Done.IMPORTED, imported);
 
             report(total, startedAt, readyAt);
 

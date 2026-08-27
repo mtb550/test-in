@@ -1,5 +1,6 @@
 package org.testin.testcase;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -55,7 +56,7 @@ public class CreateTestCaseAction extends AbstractProjectAction {
             Services.getInstance(p, TestCaseCacheService.class).addNewItems(affectedNodes);
 
             Services.getInstance(p, TestCasePersistService.class).persist(dir.getPath(), affectedNodes);
-            Services.getInstance(p, Notifier.class).softShow(p, "Created");
+            Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
 
             GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
 

@@ -1,5 +1,6 @@
 package org.testin.clipboard;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -43,7 +44,7 @@ public class CopyTestCaseNodeAction extends AbstractProjectAction {
                 String json = Services.getInstance(p, Mapper.class).writeValueAsString(tcs);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Copied", tcs.size());
+                Services.getInstance(p, Notifier.class).softShowCounted(p, Done.COPIED, tcs.size());
 
             } catch (final Exception ex) {
                 Logger.error("Exception: " + ex.getMessage());

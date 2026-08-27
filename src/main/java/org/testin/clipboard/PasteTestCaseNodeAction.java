@@ -1,5 +1,6 @@
 package org.testin.clipboard;
 
+import org.testin.notifications.Done;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
@@ -87,7 +88,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
 
             // Inside the invokeLater and after the sequence is persisted: the
             // action itself returns long before the cases exist (#62).
-            if (pasted > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, "Pasted", pasted);
+            if (pasted > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.PASTED, pasted);
         });
     }
 

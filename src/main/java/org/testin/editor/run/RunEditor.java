@@ -1,5 +1,6 @@
 package org.testin.editor.run;
 
+import org.testin.notifications.Done;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -401,7 +402,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 analysis -> {
                     runData.setResultAnalysis(analysis);
                     Services.getInstance(p, ProjectIndexer.class).putTestRun(parent.getPath(), runData);
-                    Services.getInstance(p, Notifier.class).softShow(p, "Saved");
+                    Services.getInstance(p, Notifier.class).softShow(p, Done.SAVED);
                 }).show());
     }
 
@@ -1105,7 +1106,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // the case duration ticked so far and the end stamp would otherwise live only
         // until the editor closed.
         Services.getInstance(p, RunStatusService.class).persistRun(p, this);
-        Services.getInstance(p, Notifier.class).softShow(p, "Stopped");
+        Services.getInstance(p, Notifier.class).softShow(p, Done.STOPPED);
     }
 
 

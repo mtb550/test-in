@@ -1,5 +1,6 @@
 package org.testin.view.details;
 
+import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -227,7 +228,7 @@ public class DetailsTab {
             resolveEditPath(p, dto, currentPath).ifPresent(editPath ->
                     tcs.forEach(tc -> indexer.putTestCase(editPath, tc)));
 
-            Services.getInstance(p, Notifier.class).softShow(p, "Updated");
+            Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
 
             ApplicationManager.getApplication().invokeLater(() -> TestCaseUpdateMenuDialog.applyAftermath(p, tcs, gt));
         }).show();

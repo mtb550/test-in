@@ -1,5 +1,6 @@
 package org.testin.creator;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -63,7 +64,7 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
             // own follow-up once their dialog completes - including their own
             // confirmation, which is why this one is inside the ifPresent.
             created.ifPresent(dir -> {
-                Services.getInstance(p, Notifier.class).softShow(p, "Created");
+                Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
 
                 if (dt == DirectoryType.TS)
                     Services.getInstance(p, EditorUtil.class).open(p, dir);

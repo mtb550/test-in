@@ -1,5 +1,6 @@
 package org.testin.editor.listeners;
 
+import org.testin.notifications.Done;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
@@ -100,6 +101,6 @@ public abstract class AbstractGridEditListener implements TableModelListener {
      * same act: an existing thing now says something different.
      */
     private void confirmEdit() {
-        Services.getInstance(p, Notifier.class).softShow(p, "Updated");
+        Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
     }
 }

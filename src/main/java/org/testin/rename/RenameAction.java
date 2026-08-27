@@ -1,5 +1,6 @@
 package org.testin.rename;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -70,7 +71,7 @@ public class RenameAction extends AbstractProjectTreeAction {
         }
 
         final @NotNull String oldName = dir.getName();
-        applyRename(dir, newName, () -> Services.getInstance(p, Notifier.class).softShow(p, "Renamed"));
+        applyRename(dir, newName, () -> Services.getInstance(p, Notifier.class).softShow(p, Done.RENAMED));
 
         // The dto reference stays valid across renames, so undo and redo are
         // the same routine with the names swapped.

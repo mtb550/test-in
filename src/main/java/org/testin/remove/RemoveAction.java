@@ -1,5 +1,6 @@
 package org.testin.remove;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -89,7 +90,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
             Logger.info("Removed " + removed.get() + " of " + nodesToRemove.size() + " node(s).");
 
             if (removed.get() > 0) {
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Removed", removed.get());
+                Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, removed.get());
             }
         };
 

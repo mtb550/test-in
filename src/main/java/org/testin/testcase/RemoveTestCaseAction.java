@@ -1,5 +1,6 @@
 package org.testin.testcase;
 
+import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -62,7 +63,7 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
 
             // Inside the confirmation callback, not around actionPerformed: a
             // canceled dialog removes nothing and says nothing (#62).
-            Services.getInstance(p, Notifier.class).softShowCounted(p, "Removed", selectedItems.size());
+            Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, selectedItems.size());
         }).show();
     }
 
