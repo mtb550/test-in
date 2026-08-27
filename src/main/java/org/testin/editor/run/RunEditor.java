@@ -304,8 +304,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public void onToolBarSearchValueChanged() {
-        currentTestCases.clear();
-        currentTestCases.addAll(getFilteredList());
         currentPage = 1;
         refreshView();
     }
@@ -317,8 +315,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public void onToolBarFilterSelectionChanged() {
-        currentTestCases.clear();
-        currentTestCases.addAll(getFilteredList());
         currentPage = 1;
         refreshView();
     }
@@ -328,16 +324,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     public void refreshAfterStatusChange() {
         final int pageBeforeRefresh = currentPage;
-        currentTestCases.clear();
-        currentTestCases.addAll(getFilteredList());
         currentPage = pageBeforeRefresh;
         refreshView();
     }
 
     @Override
     public void onToolBarFilterResetButtonClicked() {
-        currentTestCases.clear();
-        currentTestCases.addAll(getFilteredList());
         currentPage = 1;
         refreshView();
     }
@@ -466,13 +458,16 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         return allTestCases.size();
     }
 
-    @Override
-    public void appendNewTestCase(final @NotNull TestCaseDto tc) {
-        this.allTestCases.add(tc);
-        refreshView();
-    }
-
     public void refreshView() {
+        // Recomputed here rather than by the callers, as the test editor does.
+        // The view is a filtered page of the master list, so anything that
+        // changes that list has to show at once - and leaving it to whoever
+        // changed the data means the one caller that forgets leaves a deleted
+        // test case on screen. Four callers hand-copied these two lines before
+        // every call, which is four chances to be the one that forgets.
+        currentTestCases.clear();
+        currentTestCases.addAll(getFilteredList());
+
         final int total = currentTestCases.size();
         final @NotNull PageWindow page = PageWindow.of(total, currentPage, pageSize);
         currentPage = page.page();
