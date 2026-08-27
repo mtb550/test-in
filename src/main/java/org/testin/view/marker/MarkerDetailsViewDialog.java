@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.model.NodeFigures;
+import org.testin.model.TestRunExecution;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.markers.Marker;
 import org.testin.ui.framework.AbstractFrameworkDialog;
@@ -71,7 +72,7 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
         // adds nothing, and a run that never started answers with two blank rows
         // that the details builder drops.
         Services.getInstance(p, ProjectIndexer.class).findTestRun(dto.getPath())
-                .ifPresent(run -> run.getExecutionRows().forEach(extra -> details.row(extra.caption(), extra.value())));
+                .ifPresent(run -> TestRunExecution.rowsOf(run).forEach(extra -> details.row(extra.caption(), extra.value())));
 
         // Whatever else the marker has to say about itself - a run lists the
         // configuration it was created with. Added without asking what kind of

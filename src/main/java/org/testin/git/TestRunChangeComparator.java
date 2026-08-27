@@ -5,8 +5,8 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
+import org.testin.model.TestRunExecution;
 import org.testin.model.dto.TestRunDto;
-import org.testin.util.Display;
 
 import java.util.*;
 
@@ -37,13 +37,13 @@ final class TestRunChangeComparator {
         addIfChanged(changes, "Browser", oldRun.getBrowser(), newRun.getBrowser());
         addIfChanged(changes, "Device Type", oldRun.getDeviceType(), newRun.getDeviceType());
         addIfChanged(changes, "Test Type", oldRun.getTestType(), newRun.getTestType());
-        // The captions come from the run, so a change here reads under the same
-        // heading the Details popup and the report show it under. The values
-        // cannot: this compares two revisions, and a row is one value.
-        addIfChanged(changes, TestRunDto.EXECUTION_STARTED, Display.formatDate(oldRun.getExecutionStartedAt()),
-                Display.formatDate(newRun.getExecutionStartedAt()));
-        addIfChanged(changes, TestRunDto.EXECUTION_ENDED, Display.formatDate(oldRun.getExecutionEndedAt()),
-                Display.formatDate(newRun.getExecutionEndedAt()));
+        // Through the same enum the Details popup and the report read, so a
+        // change reads under the heading they show it under and in the format
+        // they show it in. Not as rows: this compares two revisions, and a row
+        // carries one value.
+        for (final TestRunExecution field : TestRunExecution.values()) {
+            addIfChanged(changes, field.getDisplayName(), field.valueIn(oldRun), field.valueIn(newRun));
+        }
 
         // A run file that changed with nothing above different still changed -
         // an id, a field this comparator does not read - and it has to be

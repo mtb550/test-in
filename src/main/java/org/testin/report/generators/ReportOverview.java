@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunConfiguration;
+import org.testin.model.TestRunExecution;
 import org.testin.model.TestRunSummary;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -66,7 +67,7 @@ public final class ReportOverview {
         add(rows, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType());
 
         rows.add(new DetailRow("Executed By", summary.executedBy()));
-        rows.addAll(tr.getExecutionRows());
+        rows.addAll(TestRunExecution.rowsOf(tr));
         rows.add(new DetailRow("Run Status", trDir.getMarker().getStatus().getLabel()));
 
         return List.copyOf(rows);

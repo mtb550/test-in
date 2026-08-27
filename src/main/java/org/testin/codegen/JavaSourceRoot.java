@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.testin.logger.Logger;
-import org.testin.model.Config;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
@@ -58,7 +57,9 @@ public final class JavaSourceRoot {
      * root stopped being valid, which is what happens when the folder is deleted.
      */
     public static @NotNull Optional<VirtualFile> find(final @NotNull Project p) {
-        final @NotNull Optional<VirtualFile> cached = Config.testSourceRoot();
+        final @NotNull TestSourceRoot remembered = Services.getInstance(p, TestSourceRoot.class);
+
+        final @NotNull Optional<VirtualFile> cached = remembered.get();
         if (cached.isPresent()) return cached;
 
         for (final Module module : ModuleManager.getInstance(p).getModules()) {
@@ -67,7 +68,7 @@ public final class JavaSourceRoot {
 
             if (!sourceRoots.isEmpty()) {
                 Logger.debug("Found test source root: " + sourceRoots.getFirst());
-                Config.rememberTestSourceRoot(sourceRoots.getFirst());
+                remembered.set(sourceRoots.getFirst());
                 return Optional.of(sourceRoots.getFirst());
             }
         }
