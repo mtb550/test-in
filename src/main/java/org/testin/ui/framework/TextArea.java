@@ -61,6 +61,12 @@ public final class TextArea implements DialogComponent {
         area.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, null);
         area.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, null);
 
+        // Bound on the area itself, as the framework's single-line fields
+        // are. A popup or a dialog can eat Ctrl+V on the way here, and the
+        // paste action replaced below is only reached by whatever key is bound
+        // to it - so the image paste rested on a binding nothing here made.
+        FrameworkTextField.bindClipboard(area);
+
         installImagePaste();
 
         panel = new JBScrollPane(area);

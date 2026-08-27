@@ -1,15 +1,9 @@
 package org.testin.ui.framework;
 
-import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.SimpleTextAttributes;
-import com.intellij.ui.components.TextComponentEmptyText;
 import com.intellij.ui.components.fields.ExtendableTextField;
-import com.intellij.util.ui.JBFont;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
-import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
@@ -18,7 +12,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import javax.swing.event.DocumentEvent;
 
 /**
  * A large input field on its own — the component of the rename dialog and any
@@ -33,9 +26,8 @@ public final class TextInput implements DialogComponent {
      */
     static final @NotNull String ANYTHING = ".*";
 
+    private final @NotNull FrameworkTextField input;
     private final @NotNull ExtendableTextField textField;
-    private final @NotNull String placeHolderText;
-    private boolean emptyWarningShown;
 
     /**
      * @param accepts what the field is allowed to hold, as a regular expression
@@ -45,28 +37,8 @@ public final class TextInput implements DialogComponent {
      *                on submit and nothing to explain afterward
      */
     TextInput(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull String initialValue, final @NotNull String accepts) {
-        this.placeHolderText = placeHolderText;
-        textField = new ExtendableTextField(initialValue);
-        // Derived from the label font at construction, so every dialog open
-        // picks up the current IDE font-size setting.
-        textField.setFont(JBFont.label().biggerOn(6f));
-        textField.setBorder(JBUI.Borders.empty(10, 12));
-
-        if (!placeHolderText.isBlank()) {
-            textField.getEmptyText().setText(placeHolderText);
-            TextComponentEmptyText.setupPlaceholderVisibility(textField);
-            // Typing clears a red empty-submit warning back to the normal look.
-            textField.getDocument().addDocumentListener(new DocumentAdapter() {
-                @Override
-                protected void textChanged(final @NotNull DocumentEvent e) {
-                    if (emptyWarningShown) {
-                        emptyWarningShown = false;
-                        showPlaceholder(SimpleTextAttributes.GRAYED_ATTRIBUTES);
-                    }
-                }
-            });
-        }
-        DialogStyle.setLeadingIcon(textField, icon);
+        input = new FrameworkTextField(icon, placeHolderText, initialValue);
+        textField = input.component();
 
         if (!ANYTHING.equals(accepts)) accept(Pattern.compile(accepts));
     }
@@ -138,24 +110,11 @@ public final class TextInput implements DialogComponent {
     }
 
     public @NotNull String getText() {
-        return textField.getText();
+        return input.getText();
     }
 
-    /**
-     * Turns the placeholder red until the tester types — the empty-submit cue.
-     */
     public void showEmptyWarning() {
-        emptyWarningShown = true;
-        showPlaceholder(SimpleTextAttributes.ERROR_ATTRIBUTES);
-        textField.requestFocusInWindow();
-    }
-
-    private void showPlaceholder(final @NotNull SimpleTextAttributes attributes) {
-        if (placeHolderText.isBlank()) return;
-
-        textField.getEmptyText().clear();
-        textField.getEmptyText().appendText(placeHolderText, attributes);
-        textField.repaint();
+        input.showEmptyWarning();
     }
 
     @Override

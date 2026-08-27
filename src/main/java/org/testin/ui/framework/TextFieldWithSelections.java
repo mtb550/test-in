@@ -9,7 +9,6 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.TextComponentEmptyText;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
@@ -25,7 +24,6 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.text.DefaultEditorKit;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -49,11 +47,11 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
      */
     private static final int DEBOUNCE_MILLIS = 300;
 
+    private final @NotNull FrameworkTextField input;
     private final @NotNull ExtendableTextField textField;
     private final @NotNull CollectionListModel<SelectionList<T>> rowModel = new CollectionListModel<>();
     private final @NotNull JBList<SelectionList<T>> list;
     private final @NotNull JBPanel<?> panel;
-    private final @NotNull String placeHolderText;
     private final @NotNull Rows<T> rows;
     /**
      * Which query the rows on screen answer. Bumped on every request so a slow
@@ -62,7 +60,6 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
     private final @NotNull AtomicInteger queryGeneration = new AtomicInteger();
     private @NotNull Runnable submitRequest = () -> {
     };
-    private boolean emptyWarningShown;
     /**
      * Whether the opening rows have been asked for. Once, on the first time the
      * dialog is on screen - a hierarchy event can say "showing" more than once
@@ -71,30 +68,9 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
     private boolean askedOnce;
 
     TextFieldWithSelections(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull List<SelectionList<T>> shownBeforeAsking, final @NotNull Rows<T> rows, final int visibleRows) {
-        this.placeHolderText = placeHolderText;
         this.rows = rows;
-        textField = new ExtendableTextField("");
-        // Derived from the label font at construction, so every dialog open
-        // picks up the current IDE font-size setting.
-        textField.setFont(JBFont.label().biggerOn(6f));
-        // 12px left rhythm shared by the field text and the list rows below.
-        textField.setBorder(JBUI.Borders.empty(10, 12));
-
-        if (!placeHolderText.isBlank()) {
-            textField.getEmptyText().setText(placeHolderText);
-            TextComponentEmptyText.setupPlaceholderVisibility(textField);
-            // Typing clears a red empty-submit warning back to the normal look.
-            textField.getDocument().addDocumentListener(new DocumentAdapter() {
-                @Override
-                protected void textChanged(final @NotNull DocumentEvent e) {
-                    if (emptyWarningShown) {
-                        emptyWarningShown = false;
-                        showPlaceholder(SimpleTextAttributes.GRAYED_ATTRIBUTES);
-                    }
-                }
-            });
-        }
-        DialogStyle.setLeadingIcon(textField, icon);
+        input = new FrameworkTextField(icon, placeHolderText, "");
+        textField = input.component();
 
         list = new JBList<>(rowModel);
         list.setBorder(JBUI.Borders.empty(6));
@@ -121,7 +97,6 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
         });
 
         installNavigation();
-        installClipboard();
 
         final @NotNull JBPanel<?> listWrapper = new JBPanel<>(new BorderLayout());
         listWrapper.add(list, BorderLayout.CENTER);
@@ -254,21 +229,8 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
         return textField.getText();
     }
 
-    /**
-     * Turns the placeholder red until the tester types — the empty-submit cue.
-     */
     public void showEmptyWarning() {
-        emptyWarningShown = true;
-        showPlaceholder(SimpleTextAttributes.ERROR_ATTRIBUTES);
-        textField.requestFocusInWindow();
-    }
-
-    private void showPlaceholder(final @NotNull SimpleTextAttributes attributes) {
-        if (placeHolderText.isBlank()) return;
-
-        textField.getEmptyText().clear();
-        textField.getEmptyText().appendText(placeHolderText, attributes);
-        textField.repaint();
+        input.showEmptyWarning();
     }
 
     /**
@@ -316,19 +278,6 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
      * writing a second one - and a tester can paste a test case id or a ticket
      * number into the search instead of typing it out (#29).
      */
-    private void installClipboard() {
-        final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
-
-        bindEditorAction(KeyEvent.VK_V, menuMask, DefaultEditorKit.pasteAction);
-        bindEditorAction(KeyEvent.VK_C, menuMask, DefaultEditorKit.copyAction);
-        bindEditorAction(KeyEvent.VK_X, menuMask, DefaultEditorKit.cutAction);
-        bindEditorAction(KeyEvent.VK_A, menuMask, DefaultEditorKit.selectAllAction);
-    }
-
-    private void bindEditorAction(final int keyCode, final int modifiers, final @NotNull String actionName) {
-        textField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(keyCode, modifiers), actionName);
-    }
-
     private void installNavigation() {
         bindNavigationKey(KeyEvent.VK_DOWN, "testin.framework.selectionDown", 1);
         bindNavigationKey(KeyEvent.VK_UP, "testin.framework.selectionUp", -1);
