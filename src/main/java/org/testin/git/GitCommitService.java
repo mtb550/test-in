@@ -152,12 +152,29 @@ public final class GitCommitService {
         final @NotNull String url = repositories.getRemoteUrl(repositoryPath, remote);
 
         if (remoteHasBranch(repositoryPath, remote, branch)) {
-            GitCommandRunner.executeRemote(p, repositoryPath, url, "git", "pull", "--rebase", "--autostash", remote, branch);
+            pull(repositoryPath, url, remote, branch);
         } else {
             Logger.info("Remote " + remote + " has no branch " + branch + " yet; pushing without pulling first");
         }
 
         push(repositoryPath, remote, branch);
+    }
+
+    /**
+     * Pulls with a rebase, telling the handler which remote URL it is for.
+     * <p>
+     * The URL is what lets the IDE find the credentials it already holds for
+     * that host. This was the one network command in the plugin that did not
+     * pass it, so a sync against a private repository asked for credentials the
+     * IDE had already been given, or failed where every other command succeeded.
+     * <p>
+     * Here rather than on a service of its own. There were two pulls - this
+     * class's, inside pullAndPush, and a one-method GitSyncService holding the
+     * other - so the flags the two passed could drift with nothing failing.
+     */
+    public void pull(final @NotNull Path repositoryPath, final @NotNull String remoteUrl, final @NotNull String remote, final @NotNull String branch) {
+        GitCommandRunner.executeRemote(p, repositoryPath, remoteUrl,
+                "git", "pull", "--rebase", "--autostash", remote, branch);
     }
 
     /**

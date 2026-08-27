@@ -352,6 +352,11 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 indicator -> {
                     indicator.setText("Syncing with remote: pull --rebase, then push");
                     commits.pullAndPush(repoPath, remote, branch);
+
+                    // The pull above rebases a colleague's test cases into the
+                    // working tree. Without this the tester read pre-pull data
+                    // under a balloon saying the push had succeeded.
+                    RepositoryRefresh.after(p, repoPath);
                     // In the log for the same reason the sync is: the push
                     // finishes on its own time, not under the tester's hand -
                     // and it names the commit, so the tester can find it on the
@@ -380,16 +385,10 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
      * means asking Git for them.
      */
     private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
-        final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
-        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-
-        notifier.warnWithActions(
-                p,
-                "Git Conflicts",
-                GitRefs.conflictMessage(conflicting),
-                notifier.action("Resolve", () -> resolveConflicts(repoPath, remote, branch)),
-                notifier.action("Continue rebase", () -> finishRebase(repoPath, remote, branch, false)),
-                notifier.action("Abort rebase", () -> finishRebase(repoPath, remote, branch, true)));
+        GitConflictOffer.show(p, git.conflictingPaths(repoPath),
+                () -> resolveConflicts(repoPath, remote, branch),
+                () -> finishRebase(repoPath, remote, branch, false),
+                () -> finishRebase(repoPath, remote, branch, true));
     }
 
     /**
@@ -419,6 +418,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         GitBackgroundTask.run(p, "Pushing " + branch, false,
                 indicator -> {
                     commits.push(repoPath, remote, branch);
+                    RepositoryRefresh.after(p, repoPath);
+
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(p, Notifier.class).info(p, "Rebase continued",
                                     "Changes pushed to the remote"));
@@ -440,6 +441,13 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                             throw new IllegalStateException("Could not continue the rebase.");
                         commits.push(repoPath, remote, branch);
                     }
+
+                    // Both endings refresh. The rebase has just written a
+                    // colleague's test cases into the working tree, or rolled
+                    // the tree back, and neither showed until the IDE happened
+                    // to refresh on frame activation.
+                    RepositoryRefresh.after(p, repoPath);
+
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(p, Notifier.class).info(p,
                                     abort ? "Rebase aborted" : "Rebase continued",

@@ -77,7 +77,7 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         if (OptionalPlugin.GIT.isAvailable()) {
             addSeparator();
-            add(new SyncActionAction(p, tree, pp));
+            add(new SyncActionAction(p, tree));
             add(new ViewPendingCommitsAction(p, tree));
         }
 

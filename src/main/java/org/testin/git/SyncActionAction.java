@@ -1,19 +1,14 @@
 package org.testin.git;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.ui.treeStructure.SimpleTree;
-import git4idea.GitUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -25,9 +20,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class SyncActionAction extends AbstractProjectTreeAction {
-    private final @NotNull ExplorerPanel pp;
     private final @NotNull GitRepositoryService git;
-    private final @NotNull GitSyncService sync;
 
     /**
      * For the push at the end. The same service the review pushes through, so
@@ -35,11 +28,9 @@ public class SyncActionAction extends AbstractProjectTreeAction {
      */
     private final @NotNull GitCommitService commits;
 
-    public SyncActionAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ExplorerPanel pp) {
+    public SyncActionAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, tree, "Sync With Remote", "Pull the latest test cases, then push anything committed here", AllIcons.Actions.SyncPanels);
-        this.pp = pp;
         this.git = new GitRepositoryService(p);
-        this.sync = new GitSyncService(p);
         this.commits = new GitCommitService(p);
     }
 
@@ -95,7 +86,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                     }
 
                     indicator.setText("Pulling latest changes from " + branch + "...");
-                    sync.pull(repoPath, remoteUrl, remoteName, branch);
+                    commits.pull(repoPath, remoteUrl, remoteName, branch);
 
                     // Both directions, because the button says Sync. It used to
                     // pull and then report "Up to date with the remote" with the
@@ -133,22 +124,10 @@ public class SyncActionAction extends AbstractProjectTreeAction {
     }
 
     private void showConflictActions(final @NotNull Path repoPath, final @NotNull List<String> conflicting) {
-        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-
-        final @NotNull NotificationAction resolveAction = notifier.action(
-                "Resolve", () -> resolveConflicts(repoPath));
-        final @NotNull NotificationAction continueAction = notifier.action(
-                "Continue rebase", () -> finishRebase(repoPath, false));
-        final @NotNull NotificationAction abortAction = notifier.action(
-                "Abort rebase", () -> finishRebase(repoPath, true));
-
-        notifier.warnWithActions(
-                p,
-                "Git Conflicts",
-                GitRefs.conflictMessage(conflicting),
-                resolveAction,
-                continueAction,
-                abortAction);
+        GitConflictOffer.show(p, conflicting,
+                () -> resolveConflicts(repoPath),
+                () -> finishRebase(repoPath, false),
+                () -> finishRebase(repoPath, true));
     }
 
     /**
@@ -215,7 +194,13 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                         reportRebaseFailure(repoPath, failure);
                         return;
                     }
-                    refreshAfterSync(repoPath, 0);
+
+                    // The same ending Resolve already took on this route: push
+                    // what the rebase replayed, then refresh and re-index. It
+                    // used to refresh without pushing, so a tester who continued
+                    // had their colleague's cases on screen and their own still
+                    // only on this machine, with nothing saying so.
+                    finishSyncInBackground(repoPath);
                 },
                 // It had no error path at all. A throw in here left the tester
                 // with a task that stopped and a stack trace in the log.
@@ -290,7 +275,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
     }
 
     private void refreshAfterSync(final @NotNull Path repoPath, final int pushed) {
-        refreshRepository(repoPath);
+        RepositoryRefresh.after(p, repoPath);
         ApplicationManager.getApplication().invokeLater(() -> {
             // A balloon, not a log entry. A sync is pressed and watched: it
             // finishes in seconds with the tree rebuilding underneath it, and
@@ -300,14 +285,11 @@ public class SyncActionAction extends AbstractProjectTreeAction {
             Services.getInstance(p, Notifier.class).softShow(p, "Synced", pushed == 0
                     ? "Up to date with the remote"
                     : "Pushed " + pushed + (pushed == 1 ? " commit" : " commits"));
-            pp.getProjectTree().refresh();
         });
     }
 
     private void refreshRepository(final @NotNull Path repoPath) {
-        Optional.ofNullable(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(repoPath.toFile()))
-                .ifPresent(GitUtil::refreshVfsInRoot);
-        Services.getInstance(p, ProjectIndexer.class).scanSingleProject(repoPath);
+        RepositoryRefresh.after(p, repoPath);
     }
 
     /**
