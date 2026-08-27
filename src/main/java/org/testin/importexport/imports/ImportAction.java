@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.codegen.GenType;
 import org.testin.creator.CreateTestSet;
+import org.testin.model.DirectoryType;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
@@ -174,9 +175,23 @@ public class ImportAction extends AbstractProjectTreeAction {
             final @NotNull Path path = targetPath.resolve(name);
 
             // A test set creator always answers with the set it made.
-            sets.put(onEdtCompute(() -> (TestSetDirectoryDto) new CreateTestSet(p)
-                    .execute(name, selectedDirDto, path)
-                    .orElseThrow()), cases);
+            sets.put(onEdtCompute(() -> {
+                final @NotNull TestSetDirectoryDto made = (TestSetDirectoryDto) new CreateTestSet(p)
+                        .execute(name, selectedDirDto, path)
+                        .orElseThrow();
+
+                // Asked for here, because the creator no longer generates. The
+                // tree route runs the node type's generator after creating, and
+                // this route has no such follow-up - so without this line an
+                // imported set would arrive with no class at all.
+                try {
+                    DirectoryType.TS.getCodegen().execute(p, made);
+                } catch (final Exception ex) {
+                    Logger.error("Failed to create Java class: " + ex.getMessage());
+                }
+
+                return made;
+            }), cases);
         });
 
         return sets;
