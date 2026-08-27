@@ -1,5 +1,6 @@
 package org.testin.importexport.shared;
 
+import org.testin.editor.grid.GridPanelBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
@@ -12,12 +13,10 @@ import org.testin.model.dto.TestCaseDto;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class TablePanelBuilder {
 
@@ -96,40 +95,10 @@ public class TablePanelBuilder {
             Logger.error(ex.getMessage());
         }
 
-        autoSizeColumns(table);
+        GridPanelBuilder.autoSizeColumns(table);
 
         return table;
     }
 
-    public void autoSizeColumns(final @NotNull JBTable table) {
-        int tableTotalWidth = 0;
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            final @NotNull TableColumn col = table.getColumnModel().getColumn(i);
-
-            final @NotNull TableCellRenderer headerRenderer = Optional.ofNullable(col.getHeaderRenderer())
-                    .orElseGet(() -> table.getTableHeader().getDefaultRenderer());
-            final @NotNull Component headerComp = headerRenderer.getTableCellRendererComponent(
-                    table, col.getHeaderValue(), false, false, 0, i);
-            int maxWidth = headerComp.getPreferredSize().width;
-
-            for (int r = 0; r < table.getRowCount(); r++) {
-                final @NotNull TableCellRenderer renderer = table.getCellRenderer(r, i);
-                final @NotNull Component comp = table.prepareRenderer(renderer, r, i);
-                maxWidth = Math.max(comp.getPreferredSize().width, maxWidth);
-            }
-
-            maxWidth += 20;
-            col.setPreferredWidth(maxWidth);
-            tableTotalWidth += maxWidth;
-        }
-
-        final int tableTotalHeight = table.getRowHeight() * Math.max(3, table.getRowCount());
-        final @NotNull Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
-        table.setPreferredScrollableViewportSize(new Dimension(
-                Math.min(tableTotalWidth, (int) (screenSize.width * 0.85)),
-                Math.min(tableTotalHeight, (int) (screenSize.height * 0.70))
-        ));
-    }
 
 }

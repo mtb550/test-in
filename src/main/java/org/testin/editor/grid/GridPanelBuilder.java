@@ -230,7 +230,20 @@ public class GridPanelBuilder {
         table.scrollRectToVisible(table.getCellRect(selectedRow, column, true));
     }
 
-    private static void autoSizeColumns(final @NotNull JBTable table) {
+    /**
+     * Sizes every column to its content, capped, and sets the viewport to fit.
+     * <p>
+     * Public because the import and export preview had a copy of this without
+     * the cap and without the early exit. One long Steps or Description value
+     * made that column as wide as the text, so the tester scrolled sideways past
+     * one enormous column to reach the checkbox - and the measuring loop
+     * prepared a renderer for every cell of every row on the UI thread, roughly
+     * 5,500 preparations for a 550-case sheet before the dialog painted.
+     * <p>
+     * Safe on a table that is not a grid: the remembered widths are read under a
+     * key built from the table's kind, and a table carrying no kind has none.
+     */
+    public static void autoSizeColumns(final @NotNull JBTable table) {
         final @NotNull FontMetrics fm = table.getFontMetrics(table.getFont());
         int tableTotalWidth = 0;
         for (int i = 0; i < table.getColumnCount(); i++) {
