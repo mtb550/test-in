@@ -1,0 +1,5 @@
+│ /code-review    │ Deep multi-agent review of the current branch, run in the cloud. Built for exactly the class of thing you've been catching by     │
+│ ultra           │ hand — design inconsistency a compiler can't see. You launch it; I can't. Billed separately                                       │
+├─────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ "ultracode"     │ Put that word in a message and the session turns on multi-agent orchestration — work gets fanned out across agents and            │
+│                 │ adversarially verified rather than done in one pass. Costs a lot of tokens by design
