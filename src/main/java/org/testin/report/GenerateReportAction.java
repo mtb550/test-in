@@ -1,11 +1,8 @@
 package org.testin.report;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -21,12 +18,12 @@ import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.importexport.exports.ExportNotice;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.BackgroundWork;
 import org.testin.util.Shortcuts;
 
-import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Optional;
@@ -123,29 +120,23 @@ public class GenerateReportAction extends AbstractProjectAction {
 
                 Files.write(outputFile.toPath(), fileBytes);
 
+                // Both actions come from their owners now. Opening was a bare
+                // Desktop call here: no desktop-support check, on the UI thread
+                // where opening blocks until Acrobat or Word starts, and a
+                // failure that only reached the log - so on a machine that
+                // cannot open files the tester pressed Open report and nothing
+                // happened.
+                //
+                // The wording stays this action's own. A report is not an
+                // export, and "PDF Report Generated" says more to the tester
+                // than the export notice's sentence would.
                 final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-                final @NotNull NotificationAction openAction = notifier.action("Open report", () -> {
 
-                    try {
-                        java.awt.Desktop.getDesktop().open(outputFile);
-                    } catch (final Exception openEx) {
-                        Logger.error("Failed to open report: " + openEx.getMessage());
-                    }
-                });
-
-                final @NotNull NotificationAction copyAction = new NotificationAction("Copy path") {
-                    @Override
-                    public void actionPerformed(final @NotNull AnActionEvent e, final @NotNull Notification notification) {
-                        CopyPasteManager.getInstance().setContents(new StringSelection(outputFile.getAbsolutePath()));
-                    }
-                };
-                copyAction.getTemplatePresentation().setIcon(AllIcons.Actions.Copy);
-
-                Services.getInstance(p, Notifier.class).infoWithActions(p,
+                notifier.infoWithActions(p,
                         format.name() + " Report Generated",
                         "Saved successfully: " + outputFile.getName(),
-                        openAction,
-                        copyAction
+                        notifier.action("Open report", () -> ExportNotice.open(p, outputFile)),
+                        notifier.copyPath(outputFile)
                 );
 
             } catch (final Exception ex) {

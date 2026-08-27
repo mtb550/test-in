@@ -27,19 +27,31 @@ import java.io.IOException;
  * could each drift in one format without anyone noticing in the others.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class ExportNotice {
+public final class ExportNotice {
 
     /**
      * For a file the operating system knows how to open: a spreadsheet, a CSV,
      * a JSON document.
      */
     static void show(final @NotNull Project p, final @NotNull File file) {
-        show(p, file, () -> Optional
-                .ofNullable(LocalFileSystem.getInstance().findFileByPath(file.getAbsolutePath()))
+        show(p, file, () -> open(p, file));
+    }
+
+    /**
+     * Opens a file the plugin has just written, whatever wrote it.
+     * <p>
+     * Public because the report generator had its own copy of this - a bare
+     * {@code Desktop.getDesktop().open}, which skipped the desktop-support check
+     * below, ran on the UI thread where opening blocks until Acrobat or Word has
+     * started, and reported its failure only to the log. A tester on a machine
+     * that cannot open files pressed Open report and nothing happened at all.
+     */
+    public static void open(final @NotNull Project p, final @NotNull File file) {
+        Optional.ofNullable(LocalFileSystem.getInstance().findFileByPath(file.getAbsolutePath()))
                 .filter(VirtualFile::exists)
                 .ifPresentOrElse(found -> openWithAssociatedProgram(p, found),
                         () -> Services.getInstance(p, Notifier.class)
-                                .error(p, "Open Error", "The file does not exist.")));
+                                .error(p, "Open Error", "The file does not exist."));
     }
 
     /**
@@ -77,7 +89,8 @@ final class ExportNotice {
     private static void show(final @NotNull Project p, final @NotNull File file, final @NotNull Runnable open) {
         ApplicationManager.getApplication().invokeLater(() -> {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-            notifier.infoWithActions(p, Done.EXPORTED.getOutcome(), file.getName(), notifier.action("Open file", open));
+            notifier.infoWithActions(p, Done.EXPORTED.getOutcome(), file.getName(),
+                    notifier.action("Open file", open), notifier.copyPath(file));
         });
     }
 }

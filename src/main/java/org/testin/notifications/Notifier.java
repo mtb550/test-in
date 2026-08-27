@@ -1,5 +1,9 @@
 package org.testin.notifications;
 
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.ide.CopyPasteManager;
+import java.awt.datatransfer.StringSelection;
+import java.io.File;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationGroupManager;
@@ -149,6 +153,22 @@ public final class Notifier {
      */
     public @NotNull NotificationAction action(final @NotNull String name, final @NotNull Runnable action) {
         return NotificationAction.createSimpleExpiring(name, action);
+    }
+
+    /**
+     * Puts a written file's full path on the clipboard.
+     * <p>
+     * Here beside the other notification actions rather than hand-built at the
+     * one notification that offered it, so every notification about a file the
+     * plugin wrote can offer the same thing.
+     */
+    public @NotNull NotificationAction copyPath(final @NotNull File file) {
+        final @NotNull NotificationAction copy = action("Copy path",
+                () -> CopyPasteManager.getInstance().setContents(new StringSelection(file.getAbsolutePath())));
+
+        copy.getTemplatePresentation().setIcon(AllIcons.Actions.Copy);
+
+        return copy;
     }
 
     public void warnWithAction(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull String actionName, final @NotNull Runnable action) {
