@@ -1,0 +1,20 @@
+# How many places write a user-facing string that another file also writes.
+#
+# A caption, a status name, a button - each belongs to the type that owns the
+# concept, asked for as TestStatus.getLabel() or
+# TestRunConfiguration.getDisplayName(). A second file spelling it out is a
+# divergence nothing fails over: both read correctly alone, and they stop
+# agreeing the day one is renamed.
+#
+# tools/inspect.ps1 counts every place after the first, so this is "how many
+# places should be asking an owner instead". inspect.yml fails when it goes up
+# and says so when it goes down - update the number then, so the ratchet keeps
+# its meaning.
+#
+# 304 when the check was written. The four report generators had already been
+# fixed by then: they spelled out Passed, Failed, Blocked, Untested and Removed
+# seventeen times between them, and now ask TestStatus.
+#
+# The biggest remaining cluster is the dialog keys - "Cancel" in 22 files,
+# "Confirm" in 7 - which ui.framework has no constant for.
+304

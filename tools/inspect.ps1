@@ -46,6 +46,11 @@ param(
     # against 33 in src. Pass '' to inspect the project root instead.
     [string] $Subdirectory = 'src/main',
 
+    # How many display strings written in more than one place this tree is
+    # allowed to have. A ratchet rather than a gate: see
+    # Test-DisplayStringBaseline.
+    [string] $DisplayStringBaseline = '.github/display-string-baseline.txt',
+
     # Reuse the XML already in $OutputDir and only rebuild the reports. The
     # line numbers in it are the ones the inspector saw, so a source edited
     # since then reports against lines that have moved - fine for re-reading a
@@ -254,6 +259,207 @@ function Get-DeclaredName([object] $problem) {
     return ''
 }
 
+
+function Test-MachineString([string] $value) {
+    <#
+        Whether a literal is machinery rather than something a tester reads.
+
+        Deliberately generous about what it excludes. A check that cries wolf
+        gets switched off, and the ones it lets through - a caption, a status, a
+        button - are the ones worth arguing about.
+    #>
+    if ($value.Length -lt 2 -or $value.Length -gt 60) { return $true }
+    if ($value -notmatch '[A-Za-z]') { return $true }
+    # paths, ids, format strings, css, packages
+    if ($value -match '[/\\{}<>%$#=;|\[\]()*+^~`]') { return $true }
+    if ($value -match '\.' -and $value -notmatch ' ') { return $true }
+    if ($value -ne $value.Trim()) { return $true }
+    if ($value -cmatch '^[a-z0-9_-]+$') { return $true }
+    if ($value -cmatch '^[A-Z0-9_]+$') { return $true }
+    return $false
+}
+
+function Read-DuplicatedDisplayStrings([string[]] $scopes) {
+    <#
+        A user-facing string written in more than one file has no owner.
+
+        This is the check the rest of the design rests on. A caption, a status
+        name, a button - each belongs to the type that owns the concept, asked
+        for as TestStatus.getLabel() or TestRunConfiguration.getDisplayName().
+        A second file spelling it out is a divergence that nothing fails over:
+        both read correctly alone, and they stop agreeing the day one is
+        renamed.
+
+        Reported once per extra file rather than once per literal, so the count
+        is "how many places should be asking an owner instead" - which is the
+        number that has to come down.
+
+        Log lines are skipped. What a log says is not read by a tester and is
+        not worth centralizing.
+    #>
+    $found = @{}
+
+    foreach ($scope in $scopes) {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+            $number = 0
+            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+                $number++
+
+                $trimmed = $text.Trim()
+                if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
+                if ($text -match 'Logger\.(trace|debug|info|warn|error|fatal)') { continue }
+
+                foreach ($match in [regex]::Matches($text, '"((?:[^"\\]|\\.)*)"')) {
+                    $value = $match.Groups[1].Value
+                    if (Test-MachineString $value) { continue }
+
+                    if (-not $found.ContainsKey($value)) { $found[$value] = @() }
+                    $found[$value] += [pscustomobject]@{
+                        Path = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+                        Line = $number
+                    }
+                }
+            }
+        }
+    }
+
+    foreach ($value in $found.Keys) {
+        $places = $found[$value]
+        $files = @($places | Select-Object -ExpandProperty Path -Unique)
+        if ($files.Count -lt 2) { continue }
+
+        # Every place after the first: the first one is allowed to be where it
+        # lives, and the rest are the ones that should be asking it.
+        foreach ($place in ($places | Select-Object -Skip 1)) {
+            [pscustomobject]@{
+                Path       = $place.Path
+                Line       = $place.Line
+                Inspection = 'DuplicatedDisplayString'
+                Severity   = 'WARNING'
+                Message    = "`"$value`" is written in $($files.Count) files. A string a tester reads belongs to the type that owns the concept - ask it instead."
+            }
+        }
+    }
+}
+
+function Read-ModelStatics([string[]] $scopes) {
+    <#
+        Static mutable state, in the packages that model the data.
+
+        Never legitimate there. A static that is not final is one slot for the
+        whole IDE holding a value that belongs to something - Config kept the
+        cached Java test source root that way, so opening a second project
+        overwrote the first and generation could write into the wrong source
+        tree without saying anything.
+
+        A per-project value goes on a @Service(Service.Level.PROJECT), which the
+        caller gets and then reads or sets.
+
+        Only non-final statics. A static final is a constant or an empty value
+        of its own type, which is the pattern this codebase is built on.
+    #>
+    foreach ($scope in $scopes) {
+        if (-not (Test-Path $scope)) { continue }
+
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+            $number = 0
+            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+                $number++
+
+                $trimmed = $text.Trim()
+                if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
+
+                if ($text -notmatch '\bstatic\b') { continue }
+                if ($text -match '\bfinal\b') { continue }
+                if ($text -match '\bstatic\s+(final\s+)?(class|interface|enum|record)\b') { continue }
+                # a method, not a field
+                if ($text -match '\(') { continue }
+
+                [pscustomobject]@{
+                    Path       = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+                    Line       = $number
+                    Inspection = 'StaticMutableState'
+                    Severity   = 'ERROR'
+                    Message    = "One slot for the whole IDE: $trimmed - a value that belongs to a project goes on a project service the caller gets and sets."
+                }
+            }
+        }
+    }
+}
+
+function Read-HandWrittenPrivateConstructors([string[]] $scopes) {
+    <#
+        An empty private constructor, where the Lombok annotation says it better.
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE) is what this codebase
+        uses to say "not instantiable", and it says it on the class rather than
+        four lines down.
+
+        Only empty ones. A constructor with a real body - a super(..) call,
+        Swing setup - is a different thing entirely, and Lombok cannot express
+        it.
+    #>
+    foreach ($scope in $scopes) {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+            $lines = [System.IO.File]::ReadAllLines($file.FullName)
+
+            for ($i = 0; $i -lt $lines.Count; $i++) {
+                $text = $lines[$i]
+                if ($text -notmatch '^\s*private\s+[A-Z]\w*\s*\(\s*\)\s*\{') { continue }
+
+                # Empty when the brace closes on this line, or the next line is
+                # only the closing brace.
+                $empty = $text -match '\{\s*\}\s*$'
+                if (-not $empty -and $i + 1 -lt $lines.Count) { $empty = $lines[$i + 1].Trim() -eq '}' }
+                if (-not $empty) { continue }
+
+                [pscustomobject]@{
+                    Path       = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+                    Line       = $i + 1
+                    Inspection = 'HandWrittenPrivateConstructor'
+                    Severity   = 'ERROR'
+                    Message    = 'An empty private constructor: use @NoArgsConstructor(access = AccessLevel.PRIVATE) instead.'
+                }
+            }
+        }
+    }
+}
+
+function Test-DisplayStringBaseline([object[]] $problems, [string] $baselinePath) {
+    <#
+        The duplicated-string count can go down and must not go up.
+
+        Gating it outright would paint the build red today over work nobody has
+        scheduled - there were 136 of these when the check was written. A
+        ratchet is the same answer verify.yml already gives the Plugin Verifier:
+        the number is recorded, a rise fails, and a fall is reported so the
+        recorded number can follow it down.
+    #>
+    $now = @($problems | Where-Object { $_.Inspection -eq 'DuplicatedDisplayString' }).Count
+
+    if (-not (Test-Path $baselinePath)) {
+        Write-Host "No display-string baseline at $baselinePath - $now found. Write that number there to start the ratchet." -ForegroundColor Yellow
+        return $true
+    }
+
+    $expected = [int](((Get-Content $baselinePath) | Where-Object { $_ -notmatch '^\s*#' -and $_.Trim() } | Select-Object -First 1).Trim())
+
+    if ($now -gt $expected) {
+        Write-Host ''
+        Write-Host "Display strings written in more than one place: $now, up from $expected." -ForegroundColor Red
+        Write-Host 'A string a tester reads belongs to the type that owns the concept. See the findings list.'
+        return $false
+    }
+
+    if ($now -lt $expected) {
+        Write-Host "Display strings down to $now from $expected. Update $baselinePath so the ratchet keeps its meaning." -ForegroundColor Green
+    } else {
+        Write-Host "Display strings: $now, unchanged."
+    }
+
+    return $true
+}
+
 function Read-WrappedDeclarations([string] $scope) {
     <#
         A method declaration is one line. A signature is one thing to read, and
@@ -358,6 +564,13 @@ $scopes = if ($Subdirectory) { @(Join-Path $repo $Subdirectory) } else { Get-Sou
 $problems = @(Read-Problems $outPath)
 foreach ($scope in $scopes) { $problems += @(Read-WrappedDeclarations $scope) }
 
+# The design checks, which no IntelliJ inspection makes: a string a tester reads
+# written in two places, a static that is not final in the packages that model
+# the data, and an empty private constructor where the annotation says it better.
+$problems += @(Read-DuplicatedDisplayStrings $scopes)
+$problems += @(Read-HandWrittenPrivateConstructors $scopes)
+$problems += @(Read-ModelStatics @((Join-Path $repo 'src/main/java/org/testin/model')))
+
 $problems = Resolve-CrossModuleUsages $problems
 
 Write-Reports $problems $outPath
@@ -369,7 +582,11 @@ Write-Reports $problems $outPath
 # Everything else the inspector reports is a judgement call and needs a person,
 # so it is listed and not gated: this exits non-zero for these three only, which
 # is what lets the scheduled run in .github/workflows/inspect.yml mean something.
-$gate = @('DataFlowIssue', 'ReturnNull', 'WrappedMethodDeclaration')
+# StaticMutableState and HandWrittenPrivateConstructor are both at zero, so
+# they gate outright - the first one that appears is the one to look at.
+# DuplicatedDisplayString is not here: there were 136 when the check was
+# written, and it is ratcheted below instead.
+$gate = @('DataFlowIssue', 'ReturnNull', 'WrappedMethodDeclaration', 'StaticMutableState', 'HandWrittenPrivateConstructor')
 $breaches = @($problems | Where-Object { $gate -contains $_.Inspection })
 
 if ($breaches) {
@@ -383,3 +600,8 @@ if ($breaches) {
 
 Write-Host ''
 Write-Host "Gate clear: no $($gate -join ', ')." -ForegroundColor Green
+
+# And the one that is counted rather than forbidden. Reported after the gate so
+# a hard breach is the first thing read, and it fails the run in its own right:
+# the point of a ratchet is that it holds.
+if (-not (Test-DisplayStringBaseline $problems (Join-Path $repo $DisplayStringBaseline))) { exit 1 }

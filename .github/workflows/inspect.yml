@@ -5,12 +5,26 @@
 # still about code somebody remembers writing, and rare enough that nobody waits
 # on it.
 #
-# It gates on three findings and lists the rest. DataFlowIssue and ReturnNull are
-# the standing rule: a null contract the checker can prove is broken is a defect,
-# not a style note. WrappedMethodDeclaration is the script's own check - a method
-# declaration belongs on one line, which no IntelliJ inspection says, so
-# tools/inspect.ps1 says it. Everything else needs a person and is listed in the
-# artifact.
+# It gates on five findings, ratchets a sixth, and lists the rest.
+#
+# DataFlowIssue and ReturnNull are the standing rule: a null contract the checker
+# can prove is broken is a defect, not a style note.
+#
+# The other four are the script's own, because no IntelliJ inspection makes them.
+# WrappedMethodDeclaration - a method declaration belongs on one line.
+# StaticMutableState - a static that is not final in the packages that model the
+# data is one slot for the whole IDE, which is how a cached test source root came
+# to be shared between projects. HandWrittenPrivateConstructor - an empty one
+# where @NoArgsConstructor(access = PRIVATE) says it better. All three are at
+# zero, so the first one that appears is the one to look at.
+#
+# DuplicatedDisplayString is counted rather than forbidden: a string a tester
+# reads that another file also writes has no owner, and there were 304 of them
+# when the check was written. .github/display-string-baseline.txt records the
+# number, a rise fails the run and a fall is reported so the number can follow it
+# down - the same ratchet verify.yml gives the Plugin Verifier.
+#
+# Everything else needs a person and is listed in the artifact.
 name: Inspect
 
 on:
