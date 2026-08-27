@@ -39,7 +39,13 @@
 # helper and a ternary rather than straight to softShow - and the two bug
 # captions in the failed-result dialog.
 #
+# 182 after the Git conflict offer got one owner. Two routes raised the same
+# balloon with the same title and the same three captions - "Git Conflicts",
+# "Resolve", "Continue rebase", "Abort rebase" - and the middle button did
+# different things depending on which of them the tester was looking at. The
+# four strings are the smaller half of that finding (#158, item 9).
+#
 # Seven of what is left is machinery the filter cannot tell from a caption: a
 # font name and a date locale look exactly like one. They are a floor on this
 # number rather than work to do.
-186
+182
