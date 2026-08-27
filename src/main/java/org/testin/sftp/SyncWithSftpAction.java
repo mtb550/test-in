@@ -231,11 +231,17 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
             pp.getProjectTree().refresh();
             Services.getInstance(p, EditorUtil.class).refreshOpen(p);
 
-            if (outcome.conflicts() == 0 && outcome.removedOnServer().isEmpty()) {
+            // One notification, always, and it always carries what the sync
+            // actually did. The pair of conditions this replaces had a gap
+            // exactly where a tester most wants to hear something: deletions on
+            // the server with no conflicts matched neither branch, so twelve
+            // files uploaded and a question about removals arrived with nothing
+            // ever saying what had been sent.
+            if (outcome.conflicting().isEmpty()) {
                 notifier.softShow(p, "Synced", outcome.describe());
-            } else if (!outcome.conflicting().isEmpty()) {
+            } else {
                 notifier.warn(p, "Synced, with " + outcome.conflicts() + " left to you",
-                        "Both sides changed " + naming(outcome.conflicting())
+                        outcome.describe() + " Both sides changed " + naming(outcome.conflicting())
                                 + ". This machine kept its copies and sent nothing for them; "
                                 + "you'll be asked about anything that can be merged field by field.");
             }
@@ -314,13 +320,35 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
         if (answered.isEmpty()) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            SftpSync.finish(p, projectRoot, address, account.user(), auth, knownHosts(), answered);
+            try {
+                // Whether it sent, not whether it was called. finish returns
+                // early when another machine holds the sync lock - it writes a
+                // log line and nothing else - so a tester who had just answered
+                // six merge questions was told "Settled 6" when not a byte had
+                // left the machine, and met the same six questions on the next
+                // sync with no explanation.
+                final boolean sent = SftpSync.finish(p, projectRoot, address, account.user(), auth, knownHosts(), answered);
 
-            ApplicationManager.getApplication().invokeLater(() -> {
-                pp.getProjectTree().refresh();
-                Services.getInstance(p, EditorUtil.class).refreshOpen(p);
-                Services.getInstance(p, Notifier.class).softShow(p, "Settled " + answered.size());
-            });
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    pp.getProjectTree().refresh();
+                    Services.getInstance(p, EditorUtil.class).refreshOpen(p);
+
+                    if (sent) {
+                        Services.getInstance(p, Notifier.class).softShow(p, "Settled " + answered.size());
+                    } else {
+                        Services.getInstance(p, Notifier.class).warn(p, "Nothing Settled",
+                                "Somebody else is syncing this project, so your answers were not sent. "
+                                        + "You will be asked again on the next sync.");
+                    }
+                });
+
+            } catch (final Exception ex) {
+                // The same handling the sync itself has. Without it a connection
+                // that dropped while sending showed the tester nothing at all.
+                Logger.error("Settling with " + address.display() + " failed: " + ex.getMessage());
+                ApplicationManager.getApplication().invokeLater(() ->
+                        Services.getInstance(p, Notifier.class).error(p, "Sync Failed", ex.getMessage()));
+            }
         });
     }
 

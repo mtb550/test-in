@@ -283,8 +283,8 @@ public final class SftpSync {
      * machine's copy would leave the case unsettled on the server and ask the
      * same question again on the next sync, forever.
      */
-    public static void finish(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull String user, final @NotNull SftpAuth auth, final @NotNull Path knownHosts, final @NotNull Map<String, String> answered) {
-        if (answered.isEmpty()) return;
+    public static boolean finish(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull String user, final @NotNull SftpAuth auth, final @NotNull Path knownHosts, final @NotNull Map<String, String> answered) {
+        if (answered.isEmpty()) return false;
 
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
@@ -294,7 +294,7 @@ public final class SftpSync {
             final @NotNull SyncLock lock = new SyncLock(transport);
             if (lock.takenBy(Services.getInstance(AppSettingsState.class).testerName).isPresent()) {
                 Logger.warn("Somebody else is syncing " + address.path() + ", so the answers were not sent");
-                return;
+                return false;
             }
 
             try {
@@ -318,6 +318,7 @@ public final class SftpSync {
                 BaselineStore.write(mapper, baselineFile, new Baseline(agreed));
 
                 Logger.info("Settled " + answered.size() + " test cases on both sides of " + address.display());
+                return true;
             } finally {
                 lock.release();
             }
