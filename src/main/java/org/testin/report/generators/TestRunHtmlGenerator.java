@@ -434,10 +434,20 @@ public final class TestRunHtmlGenerator {
                 + "})();</script>";
     }
 
+    /**
+     * One card of the execution summary.
+     * <p>
+     * The value and the label are escaped like every other text this report
+     * writes. Both are the plugin's own today - a count and a status label - so
+     * nothing escapes to anything different, and that is the point: it was the
+     * one hole left after the escapers were unified, and it would have opened
+     * the first time somebody passed a value a tester had typed.
+     */
     private void summaryCard(final @NotNull StringBuilder html, final @NotNull String value, final @NotNull String label, final @NotNull String color) {
         html.append("<div class='summary-card'>")
-                .append("<div class='card-value' style='color: ").append(color).append(";'>").append(value).append("</div>")
-                .append("<div class='card-label'>").append(label).append("</div>")
+                .append("<div class='card-value' style='color: ").append(color).append(";'>")
+                .append(StringUtil.escapeXmlEntities(value)).append("</div>")
+                .append("<div class='card-label'>").append(StringUtil.escapeXmlEntities(label)).append("</div>")
                 .append("</div>");
     }
 }
