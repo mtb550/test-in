@@ -14,6 +14,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestRunItems;
@@ -225,12 +226,23 @@ public class DetailsTab {
         new TestCaseUpdateMenuDialog(p, items, (tcs, gt) -> {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            resolveEditPath(p, dto, currentPath).ifPresent(editPath ->
-                    tcs.forEach(tc -> indexer.putTestCase(editPath, tc)));
+            // Both inside the branch that wrote something. The confirmation and
+            // the code generation used to fire whatever happened, and there is a
+            // case where nothing happens by design: a test case opened from a
+            // search result has no path and no parent, so resolveEditPath is
+            // empty and not a byte reaches disk. The tester was told "Updated"
+            // and closed the dialog on an edit that was never saved.
+            resolveEditPath(p, dto, currentPath).ifPresentOrElse(editPath -> {
+                        tcs.forEach(tc -> indexer.putTestCase(editPath, tc));
 
-            Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
+                        Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
 
-            ApplicationManager.getApplication().invokeLater(() -> TestCaseUpdateMenuDialog.applyAftermath(p, tcs, gt));
+                        ApplicationManager.getApplication().invokeLater(() -> TestCaseUpdateMenuDialog.applyAftermath(p, tcs, gt));
+                    },
+                    // Said once, where it happened. A dropped edit that says
+                    // nothing anywhere is one nobody can explain afterwards.
+                    () -> Logger.warn("No test set to write '" + dto.getDescription()
+                            + "' to - the edit was not saved"));
         }).show();
     }
 
