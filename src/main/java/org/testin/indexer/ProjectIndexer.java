@@ -33,6 +33,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
@@ -646,11 +647,26 @@ public final class ProjectIndexer {
         final @NotNull AtomicInteger pending = new AtomicInteger(sourcePaths.size());
         final @NotNull AtomicInteger copied = new AtomicInteger();
 
+        // The subtrees that actually arrived, waiting to be given fresh ids.
+        // Collected rather than rewritten in place, because the rewrite is a
+        // directory walk plus a read, a write and a delete for every case in
+        // the copy - and the callback that used to do it runs on the UI thread
+        // inside the write action the copy holds. A test set of any size froze
+        // the whole IDE for as long as it took, with no progress bar and no way
+        // to cancel, while the much cheaper re-index beside it had already been
+        // moved off the UI thread.
+        final @NotNull List<Path> arrived = new CopyOnWriteArrayList<>();
+
         // Both outcomes drain the counter, so the tree is still rebuilt when a
         // copy fails; only the success path raises the count.
         final @NotNull Runnable operationFinished = () -> {
             if (pending.decrementAndGet() != 0) return;
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                // Before the re-index, which is the ordering that matters: the
+                // scanner takes a case's identity from its file name, so the
+                // new ids have to be on disk before the index reads them.
+                arrived.forEach(this::reidentifyCopiedCases);
+
                 refreshIndexedProject(targetPath);
                 ApplicationManager.getApplication().invokeLater(() -> onComplete.accept(copied.get()));
             });
@@ -664,7 +680,7 @@ public final class ProjectIndexer {
             final @NotNull Path copiedRoot = targetPath.resolve(sourcePath.getFileName());
 
             final @NotNull Runnable copySucceeded = () -> {
-                reidentifyCopiedCases(copiedRoot);
+                arrived.add(copiedRoot);
                 operationSucceeded.run();
             };
 
