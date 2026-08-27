@@ -4,6 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * What a test project is, as far as the tree is concerned.
+ * <p>
+ * There is no removed state, and deliberately: removing a test project deletes
+ * its directory and the automation package with it, so there is nothing left to
+ * carry a status. A REMOVED constant was declared here and never assigned by
+ * anything - kept for a while in case a marker already on disk held it, and no
+ * marker ever did. Its siblings {@link TestSetStatus} and {@link PackageStatus}
+ * have never had one.
+ */
 @Getter
 @AllArgsConstructor
 public enum ProjectStatus {
@@ -17,16 +27,6 @@ public enum ProjectStatus {
             "Inactive",
             "Deactivate",
             "Deactivate test project"
-    ),
-
-    // Reported as never used, and kept: the status is persisted in the test
-    // project marker, so a marker already on disk can hold "Removed" and
-    // deleting the constant makes it fail to deserialize. No inspection can see
-    // that, because the only reader is Jackson (#61).
-    REMOVED(
-            "Removed",
-            "Remove",
-            "Remove test project"
     ),
 
     ARCHIVED(
