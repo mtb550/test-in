@@ -34,14 +34,19 @@ import java.util.Optional;
  */
 public final class CodeNavigator implements CodeNavigation {
 
-    @Override
-    public @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+    /**
+     * The generated method that runs this case, and empty when there is none.
+     * <p>
+     * The class comes from the tree path, which is what names it; the method
+     * comes from the id in its {@code @Test} annotation, which is what
+     * identifies it. Both halves of this class ask this, so Run and Go-to-code
+     * cannot disagree about which method a case owns.
+     */
+    private @NotNull Optional<PsiMethod> resolve(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
         if (fqcn.size() < 2) return Optional.empty();
 
-        final @NotNull List<String> classSegments = fqcn.subList(0, fqcn.size() - 1);
-        final @NotNull String classFqcn = String.join(".", classSegments);
-
+        final @NotNull String classFqcn = String.join(".", fqcn.subList(0, fqcn.size() - 1));
         final @NotNull Optional<PsiClass> owner = Optional.ofNullable(
                 JavaPsiFacade.getInstance(p).findClass(classFqcn, GlobalSearchScope.projectScope(p)));
 
@@ -51,69 +56,53 @@ public final class CodeNavigator implements CodeNavigation {
         }
 
         final @NotNull Optional<PsiMethod> method = GeneratedMethod.forCase(owner.orElseThrow(), tc);
+        if (method.isEmpty()) Logger.warn("No generated method for '" + tc.getDescription() + "' in " + classFqcn);
 
-        if (method.isEmpty()) {
-            Logger.warn("No generated method for '" + tc.getDescription() + "' in " + classFqcn);
-            return Optional.empty();
-        }
-
-        final @NotNull List<String> found = new ArrayList<>(classSegments);
-        found.add(method.orElseThrow().getName());
-
-        return Optional.of(found);
+        return method;
     }
 
     @Override
-    public void toCode(final @NotNull Project p, final @NotNull List<String> fqcn) {
-        final @NotNull String className = String.join(".", fqcn.subList(0, fqcn.size() - 1));
-        final @NotNull String methodName = fqcn.getLast();
+    public @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        return resolve(p, tc).map(method -> {
+            final @NotNull List<String> named = new ArrayList<>(Fqcn.ofMethod(tc));
+            named.set(named.size() - 1, method.getName());
 
-        Logger.trace("org.testin.navigate to method, className: " + className + ", methodName: " + methodName);
+            return named;
+        });
+    }
+
+    @Override
+    public void toCode(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        Logger.trace("navigate to the method of '" + tc.getDescription() + "'");
 
         if (DumbService.isDumb(p)) {
             Logger.trace("dumb mode detected, deferring navigation");
-            DumbService.getInstance(p).runWhenSmart(() -> toCode(p, fqcn));
+            DumbService.getInstance(p).runWhenSmart(() -> toCode(p, tc));
             return;
         }
 
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
                     try {
-                        final @NotNull Optional<PsiClass> found = Optional.ofNullable(
-                                JavaPsiFacade.getInstance(p).findClass(className, GlobalSearchScope.projectScope(p)));
+                        final @NotNull Optional<PsiMethod> found = resolve(p, tc);
 
-                        if (found.isPresent()) {
-                            final @NotNull PsiClass targetClass = found.orElseThrow();
-                            Navigatable targetElement = targetClass;
+                        if (found.isEmpty()) {
+                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class)
+                                    .softShow(p, "Nothing to open", "No automation has been generated for '" + tc.getDescription() + "' yet"));
+                            return;
+                        }
 
-                            final PsiMethod @NotNull[] exactMethods = targetClass.findMethodsByName(methodName, false);
-
-                            if (exactMethods.length > 0)
-                                targetElement = exactMethods[0];
-
-                            else
-                                for (PsiMethod method : targetClass.getMethods()) {
-                                    if (method.getName().equalsIgnoreCase(methodName)) {
-                                        targetElement = method;
-                                        break;
-                                    }
-                                }
-
-                            final @NotNull Navigatable finalTarget = targetElement;
-                            ApplicationManager.getApplication().invokeLater(() -> {
-                                if (finalTarget.canNavigate())
-                                    finalTarget.navigate(true);
-                            });
-
-                        } else
-                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class).softShow(p, "Navigation Failed", "Class not found: " + className));
+                        final @NotNull Navigatable target = found.orElseThrow();
+                        ApplicationManager.getApplication().invokeLater(() -> {
+                            if (target.canNavigate()) target.navigate(true);
+                        });
 
                     } catch (final IndexNotReadyException ex) {
                         Logger.trace("index not ready, deferring navigation");
                         // Notifications must not be raised from inside a read action on a pooled thread.
                         ApplicationManager.getApplication().invokeLater(() ->
                                 Services.getInstance(p, Notifier.class).softShow(p, "Waiting for indexing"));
-                        DumbService.getInstance(p).runWhenSmart(() -> toCode(p, fqcn));
+                        DumbService.getInstance(p).runWhenSmart(() -> toCode(p, tc));
                     }
                 })
         );

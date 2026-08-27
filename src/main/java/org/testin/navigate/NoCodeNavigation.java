@@ -20,8 +20,8 @@ import java.util.Optional;
 public final class NoCodeNavigation implements CodeNavigation {
 
     @Override
-    public void toCode(final @NotNull Project p, final @NotNull List<String> fqcn) {
-        Logger.debug("No code navigation in this IDE; nothing opened for " + String.join(".", fqcn));
+    public void toCode(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        Logger.debug("No code navigation in this IDE; nothing opened for '" + tc.getDescription() + "'");
     }
 
     @Override

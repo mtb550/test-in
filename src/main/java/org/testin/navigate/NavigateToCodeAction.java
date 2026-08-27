@@ -8,12 +8,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.codegen.Fqcn;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.OptionalPlugin;
 import org.testin.util.Shortcuts;
 
-import java.util.ArrayList;
 
 public class NavigateToCodeAction extends AbstractProjectAction {
     private final @NotNull JBList<TestCaseDto> list;
@@ -32,8 +30,7 @@ public class NavigateToCodeAction extends AbstractProjectAction {
     public static void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         if (!OptionalPlugin.JAVA.isAvailableOrWarn(p)) return;
 
-        ArrayList<String> generatedFqcn = Fqcn.ofMethod(tc);
-        CodeNavigation.available().toCode(p, generatedFqcn);
+        CodeNavigation.available().toCode(p, tc);
     }
 
     @Override

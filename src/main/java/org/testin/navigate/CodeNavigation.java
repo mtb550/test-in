@@ -31,10 +31,16 @@ public interface CodeNavigation {
     @NotNull ExtensionPointName<CodeNavigation> EP = ExtensionPointName.create("org.testin.codeNavigation");
 
     /**
-     * Opens the generated method named by this fully qualified name, the last
-     * element being the method and the rest the class.
+     * Opens the generated method that runs this test case.
+     * <p>
+     * The case rather than a name worked out from it. Navigation used to be
+     * handed the method name the description sanitizes to and match on it, with
+     * a case-insensitive second pass when that missed - so a method a tester had
+     * renamed by hand was unreachable from the gutter while the updaters kept
+     * editing it happily, and two cases whose descriptions differ only in
+     * punctuation both opened the one method written for the pair.
      */
-    void toCode(final @NotNull Project p, final @NotNull List<String> fqcn);
+    void toCode(final @NotNull Project p, final @NotNull TestCaseDto tc);
 
     /**
      * The class and method that actually carry this case's id, and empty when
@@ -48,8 +54,8 @@ public interface CodeNavigation {
      * On this interface because the answer needs {@code PsiClass} and
      * {@code PsiMethod}, which exist only where the Java plugin does - the same
      * reason {@code toCode} is here. Finding the code and opening it are the two
-     * halves of one question, and the runner needs the first half without the
-     * second.
+     * halves of one question: {@code toCode} does both, and the runner needs the
+     * first half without the second.
      */
     @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc);
 
