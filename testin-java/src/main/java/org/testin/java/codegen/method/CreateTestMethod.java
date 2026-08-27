@@ -332,7 +332,12 @@ public class CreateTestMethod implements GenAction {
         // the reports; it decides nothing about execution.
         attributes.append(", priority = ").append(ExecutionPosition.of(p, tc));
 
-        final @NotNull String annotation = String.format("@Test(description = \"%s\", testName = \"%s\"%s)",
+        // No quotes around the description here: JavaLiteral.of returns a
+        // quoted literal, brackets included. Wrapping it again wrote
+        // description = ""verify login"", which is not a Java string - the
+        // parser kept the raw text, newlines and all, and the generated class
+        // did not compile.
+        final @NotNull String annotation = String.format("@Test(description = %s, testName = \"%s\"%s)",
                 JavaLiteral.of(tc.getDescription()),
                 tc.getId(),
                 attributes);
