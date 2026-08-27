@@ -1,5 +1,6 @@
 package org.testin.report.generators;
 
+import org.testin.model.TestRunConfiguration;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.DetailRow;
@@ -74,7 +75,7 @@ public final class TestRunHtmlGenerator {
         // HEADER
         html.append("<div class='report-title'>TEST SUMMARY REPORT</div>")
                 .append("<div class='report-subtitle'>")
-                .append(StringUtil.escapeXmlEntities(ReportText.joined("  |  ", projectName, ReportText.joined(", ", tr.getPlatform(), tr.getComponent())))).append("</div>")
+                .append(StringUtil.escapeXmlEntities(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(tr), TestRunConfiguration.COMPONENT.valueIn(tr))))).append("</div>")
                 .append("<div class='report-runname'>").append(StringUtil.escapeXmlEntities(runName)).append("</div>")
                 .append("<div class='report-conf'>Confidential — QA Test Execution Summary</div>");
 

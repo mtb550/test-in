@@ -1,5 +1,6 @@
 package org.testin.report.generators;
 
+import org.testin.model.TestRunConfiguration;
 import org.testin.model.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.dhatim.fastexcel.Workbook;
@@ -52,7 +53,7 @@ public final class TestRunExcelGenerator {
 
             ws.value(1, 0, "Platform:");
             ws.style(1, 0).bold().set();
-            ws.value(1, 1, tr.getPlatform());
+            ws.value(1, 1, TestRunConfiguration.PLATFORM.valueIn(tr));
 
             ws.value(2, 0, "Status:");
             ws.style(2, 0).bold().set();

@@ -1,5 +1,6 @@
 package org.testin.report.generators;
 
+import org.testin.model.TestRunConfiguration;
 import org.testin.model.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
 import com.itextpdf.io.font.constants.StandardFonts;
@@ -78,7 +79,7 @@ public final class TestRunPdfGenerator {
             // SUBTITLE - the project, and the run under it. Two lines rather
             // than one, because they answer different questions: which project
             // this is, and which run of it.
-            document.add(new Paragraph(ReportText.joined("  |  ", projectName, ReportText.joined(", ", tr.getPlatform(), tr.getComponent())))
+            document.add(new Paragraph(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(tr), TestRunConfiguration.COMPONENT.valueIn(tr))))
                     .setFont(regularFont).setFontSize(ReportFont.SUBTITLE.pt()).setFontColor(MEDIUM_BLUE)
                     .setMarginBottom(0));
 

@@ -135,14 +135,7 @@ public class CreateTestRun implements NodeCreator {
 
         final @NotNull TestRunDto tr = new TestRunDto()
                 .setCreatedBy(Services.getInstance(p, AppSettingsState.class).testerName)
-                .setChangeLog(configuration.get(TestRunConfiguration.CHANGE_LOG))
-                .setCommitId(configuration.get(TestRunConfiguration.COMMIT_ID))
-                .setPlatform(configuration.get(TestRunConfiguration.PLATFORM))
-                .setComponent(configuration.get(TestRunConfiguration.COMPONENT))
-                .setTestType(configuration.get(TestRunConfiguration.TEST_TYPE))
-                .setLanguage(configuration.get(TestRunConfiguration.LANGUAGE))
-                .setBrowser(configuration.get(TestRunConfiguration.BROWSER))
-                .setDeviceType(configuration.get(TestRunConfiguration.DEVICE_TYPE));
+                .setConfiguration(TestRunConfiguration.answered(configuration));
 
         final @NotNull List<TestRunItems> items = new ArrayList<>();
         selection.forEachChecked(checked -> {

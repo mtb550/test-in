@@ -1,5 +1,6 @@
 package org.testin.report.generators;
 
+import org.testin.model.TestRunConfiguration;
 import org.testin.model.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
@@ -61,7 +62,7 @@ public final class TestRunWordGenerator {
 
                 // The project, and the run under it - the same two lines the PDF
                 // prints, for the same reason.
-                addText(doc, ReportText.joined("  |  ", projectName, ReportText.joined(", ", tr.getPlatform(), tr.getComponent())),
+                addText(doc, ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(tr), TestRunConfiguration.COMPONENT.valueIn(tr))),
                         ReportFont.SUBTITLE.ptRounded(), false, MEDIUM_BLUE, NO_BORDER, 0);
                 // The rule closes the two names, above the notice.
                 addText(doc, trDir.getName(), ReportFont.LEAD.ptRounded(), false, MEDIUM_BLUE, DARK_NAVY, 1);

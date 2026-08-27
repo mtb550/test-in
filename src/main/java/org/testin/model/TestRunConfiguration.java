@@ -9,7 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestRunDto;
 
 import javax.swing.*;
-import java.util.function.Function;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
 
 @Getter
 @AllArgsConstructor
@@ -19,48 +21,42 @@ public enum TestRunConfiguration {
             "Test Type",
             AllIcons.Nodes.Type,
             new String[]{"", "Functional Test", "Performance Test"},
-            ShownWhen.ALWAYS,
-            TestRunDto::getTestType
+            ShownWhen.ALWAYS
     ),
 
     CHANGE_LOG(
             "Change Log",
             AllIcons.Nodes.Type,
             Free.OPTIONS,
-            ShownWhen.ALWAYS,
-            TestRunDto::getChangeLog
+            ShownWhen.ALWAYS
     ),
 
     COMMIT_ID(
             "Commit ID",
             AllIcons.Nodes.Type,
             Free.OPTIONS,
-            ShownWhen.ALWAYS,
-            TestRunDto::getCommitId
+            ShownWhen.ALWAYS
     ),
 
     PLATFORM(
             "Platform",
             AllIcons.Nodes.PpLib,
             new String[]{"", Answer.WEB, Answer.MOBILE},
-            ShownWhen.ALWAYS,
-            TestRunDto::getPlatform
+            ShownWhen.ALWAYS
     ),
 
     COMPONENT(
             "Component",
             AllIcons.Nodes.PpLib,
             new String[]{"", Answer.FRONTEND, "Backend"},
-            ShownWhen.ALWAYS,
-            TestRunDto::getComponent
+            ShownWhen.ALWAYS
     ),
 
     LANGUAGE(
             "Language",
             AllIcons.Nodes.Lambda,
             new String[]{"", "English", "Arabic", "French"},
-            ShownWhen.ALWAYS,
-            TestRunDto::getLanguage
+            ShownWhen.ALWAYS
     ),
 
     /**
@@ -72,8 +68,7 @@ public enum TestRunConfiguration {
             "Browser",
             AllIcons.Nodes.WebFolder,
             new String[]{"", "Chrome", "Firefox", "Safari", "Edge"},
-            chosen -> chosen.is(PLATFORM, Answer.WEB) && chosen.is(COMPONENT, Answer.FRONTEND),
-            TestRunDto::getBrowser
+            chosen -> chosen.is(PLATFORM, Answer.WEB) && chosen.is(COMPONENT, Answer.FRONTEND)
     ),
 
     /**
@@ -84,8 +79,7 @@ public enum TestRunConfiguration {
             "Device Type",
             AllIcons.Nodes.Include,
             new String[]{"", "iPhone", "Samsung", "Huawei"},
-            chosen -> chosen.is(PLATFORM, Answer.MOBILE) && chosen.is(COMPONENT, Answer.FRONTEND),
-            TestRunDto::getDeviceType
+            chosen -> chosen.is(PLATFORM, Answer.MOBILE) && chosen.is(COMPONENT, Answer.FRONTEND)
     );
 
     private final @NotNull String displayName;
@@ -133,23 +127,33 @@ public enum TestRunConfiguration {
     private final @NotNull ShownWhen shownWhen;
 
     /**
-     * How to read this field off a run.
+     * This field of that run, and blank when the tester did not answer it.
      * <p>
-     * Not exposed, for the reason {@link TestRunExecution} keeps its own reader
-     * private: what a caller wants is the value, and handing out the getter
-     * lets each of them decide separately which fields exist. Two of them had
-     * decided differently - the report overview printed five of these eight, so
-     * the language, the browser and the device type were asked of the tester,
-     * written to two files, and appeared in no PDF, Word or HTML report at all.
-     */
-    @Getter(AccessLevel.NONE)
-    private final @NotNull Function<TestRunDto, String> reader;
-
-    /**
-     * This field of that run.
+     * Blank rather than absent, so no reader has to hold a maybe-answer. A
+     * question that did not apply and a question left empty are the same thing
+     * to everything that shows one.
      */
     public @NotNull String valueIn(final @NotNull TestRunDto run) {
-        return reader.apply(run);
+        return run.getConfiguration().getOrDefault(this, "");
+    }
+
+    /**
+     * The answers worth storing: the ones the tester actually gave.
+     * <p>
+     * Here rather than at the one caller, because what counts as an answer is
+     * this enum's business. A run left with the defaults then stores no
+     * configuration at all, and a question that did not apply - a browser on a
+     * mobile run - is absent from the file rather than present and blank.
+     */
+    public static @NotNull Map<TestRunConfiguration, String> answered(final @NotNull Map<TestRunConfiguration, String> chosen) {
+        final @NotNull Map<TestRunConfiguration, String> stored = new EnumMap<>(TestRunConfiguration.class);
+
+        for (final TestRunConfiguration field : values()) {
+            final @NotNull String value = Objects.toString(chosen.get(field), "");
+            if (!value.isEmpty()) stored.put(field, value);
+        }
+
+        return stored;
     }
 
     /**

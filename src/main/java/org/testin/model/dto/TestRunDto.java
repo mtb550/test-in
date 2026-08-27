@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
 import org.testin.model.ResultAnalysis;
+import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
 
 import java.time.ZonedDateTime;
@@ -30,37 +31,31 @@ import java.util.List;
 // todo, put uuid for each test run.
 public class TestRunDto {
 
+    /**
+     * What the tester answered when the run was created, under the question it
+     * answers.
+     * <p>
+     * A map keyed by {@link TestRunConfiguration} rather than eight named
+     * fields, for the reason {@link #resultAnalysis} below is one: the
+     * questions, their captions, the rule for when each applies and how each is
+     * read all belong to that enum, so a ninth is asked, stored, compared and
+     * reported by declaring it there and nowhere else.
+     * <p>
+     * Eight fields could not do that, and had already failed to. The report
+     * overview listed five of them, so the language, the browser and the device
+     * type were asked of the tester, written to two files, and printed in no
+     * report at all; the Git comparator listed all eight directly above a loop
+     * that walks a sibling enum. Both are loops now, over this.
+     * <p>
+     * Only what was answered is stored, so a run left with the defaults writes
+     * no configuration at all rather than eight empty strings - and a question
+     * that did not apply, a browser on a mobile run, is absent rather than
+     * blank.
+     */
     @NotNull
     @Builder.Default
-    private String changeLog = "";
-
-    @NotNull
-    @Builder.Default
-    private String commitId = "";
-
-    @NotNull
-    @Builder.Default
-    private String platform = "";
-
-    @NotNull
-    @Builder.Default
-    private String component = "";
-
-    @NotNull
-    @Builder.Default
-    private String language = "";
-
-    @NotNull
-    @Builder.Default
-    private String browser = "";
-
-    @NotNull
-    @Builder.Default
-    private String deviceType = "";
-
-    @NotNull
-    @Builder.Default
-    private String testType = "";
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Map<TestRunConfiguration, String> configuration = new EnumMap<>(TestRunConfiguration.class);
 
     /**
      * What the tester wrote about each verdict after the run finished, under the
