@@ -181,10 +181,25 @@ public class TreeTransferHandler extends TransferHandler {
      * together. A menu entry deciding any part of that for itself would be a
      * second rule that agrees with this one until the day it does not.
      */
+    /**
+     * Whether Paste is worth offering on what is selected.
+     * <p>
+     * The clipboard holds Testin nodes and the selection is a place that can
+     * hold children. Deliberately not "do these particular nodes land here" -
+     * that is the paste's question, and it answers it out loud.
+     * <p>
+     * It used to be the same question, so a paste that could not land left the
+     * action grayed out. A grayed menu entry says something; Ctrl+V on a grayed
+     * action says nothing at all, and pasting a test set into the folder it
+     * already sits in did exactly nothing. The tester now gets a reason.
+     * <p>
+     * Still grayed where pasting has no meaning: a test project holds its two
+     * containers and nothing else, and no node is a child of one.
+     */
     public boolean canPasteFromClipboard() {
-        return ClipboardContents.current()
-                .map(contents -> canImport(new TransferSupport(tree, contents)))
-                .orElse(false);
+        if (ClipboardContents.withFlavor(NODE_FLAVOR).isEmpty()) return false;
+
+        return TreeValueUtil.selectedDirectory(tree).filter(DirectoryDto::isTransferTarget).isPresent();
     }
 
     private @NotNull List<DirectoryDto> transferableSelection() {

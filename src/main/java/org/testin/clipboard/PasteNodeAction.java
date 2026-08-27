@@ -89,12 +89,16 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
     }
 
     /**
-     * Greyed out where nothing can land: a test project holds its two
-     * containers and nothing else, so pasting into one has no meaning.
+     * Greyed out where pasting has no meaning: a test project holds its two
+     * containers and nothing else, so nothing is ever a child of one.
      * <p>
-     * Asked of the transfer handler, which is what the paste itself asks: the
-     * clipboard's flavor, the target, the family rules and the own-subtree
-     * check. Deciding any of it here would be a second rule to keep in step.
+     * Offered, though, where the nodes on the clipboard cannot land - into the
+     * folder they already sit in, or into the wrong family. Those are refusals
+     * with a reason, and {@link #paste} gives it. Graying them out instead is
+     * what made Ctrl+V do nothing at all and say nothing about why.
+     * <p>
+     * Asked of the transfer handler, which is what the paste itself asks.
+     * Deciding it here would be a second rule to keep in step.
      */
     @Override
     public void update(final @NotNull AnActionEvent e) {
