@@ -19,8 +19,8 @@ public class TestCaseStatusParseTest {
     @Test
     public void everyStatusCanBeTypedBackExactlyAsItIsShown() {
         for (final TestCaseStatus status : TestCaseStatus.values()) {
-            assertEquals(TestDataParser.testCaseStatus(status.getDisplayText(), TestCaseStatus.PENDING), status,
-                    status.getDisplayText() + " is what the cell prints, so it has to be what the cell accepts");
+            assertEquals(TestDataParser.testCaseStatus(status.getLabel(), TestCaseStatus.PENDING), status,
+                    status.getLabel() + " is what the cell prints, so it has to be what the cell accepts");
         }
     }
 

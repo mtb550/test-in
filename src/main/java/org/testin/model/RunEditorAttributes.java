@@ -114,29 +114,29 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     BUG_SEVERITY(
             "Bug Severity",
             ToolBarDefault.ON,
-            (item, p) -> item.getBugSeverity().getName()
+            (item, p) -> item.getBugSeverity().getLabel()
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            Shared.addBadge(badges, getName(), runItem.getBugSeverity().getName(), runItem.getBugSeverity().getColor());
+            Shared.addBadge(badges, getName(), runItem.getBugSeverity().getLabel(), runItem.getBugSeverity().getColor());
         }
     },
 
     BUG_PRIORITY(
             "Bug Priority",
             ToolBarDefault.ON,
-            (item, p) -> item.getBugPriority().getName()
+            (item, p) -> item.getBugPriority().getLabel()
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            Shared.addBadge(badges, getName(), runItem.getBugPriority().getName(), runItem.getBugPriority().getColor());
+            Shared.addBadge(badges, getName(), runItem.getBugPriority().getLabel(), runItem.getBugPriority().getColor());
         }
     },
 
     RUN_STATUS(
             "Run Status",
             ToolBarDefault.ON,
-            (item, p) -> item.getStatus().getDisplayText()
+            (item, p) -> item.getStatus().getLabel()
     ),
 
     DURATION(

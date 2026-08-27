@@ -76,7 +76,7 @@ public final class TestDataParser {
         if (wanted.isEmpty()) return current;
 
         for (final TestCaseStatus status : TestCaseStatus.values()) {
-            if (status.getDisplayText().equalsIgnoreCase(wanted)) return status;
+            if (status.getLabel().equalsIgnoreCase(wanted)) return status;
             if (status.name().equalsIgnoreCase(wanted)) return status;
         }
 

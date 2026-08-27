@@ -57,8 +57,8 @@ public class CardBadgeTest {
     public void aCaseThatNeverFailedDrawsNoPill() {
         final List<Shared.Badge> badges = new ArrayList<>();
 
-        Shared.addBadge(badges, "Bug Severity", BugSeverity.EMPTY.getName(), BugSeverity.EMPTY.getColor());
-        Shared.addBadge(badges, "Bug Priority", BugPriority.EMPTY.getName(), BugPriority.EMPTY.getColor());
+        Shared.addBadge(badges, "Bug Severity", BugSeverity.EMPTY.getLabel(), BugSeverity.EMPTY.getColor());
+        Shared.addBadge(badges, "Bug Priority", BugPriority.EMPTY.getLabel(), BugPriority.EMPTY.getColor());
 
         assertEquals(badges.size(), 0, "an empty value is not a badge with no text, it is no badge");
     }
@@ -76,8 +76,8 @@ public class CardBadgeTest {
         for (final BugSeverity severity : BugSeverity.values()) {
             if (severity == BugSeverity.EMPTY) continue;
 
-            assertFalse(severity.getName().isBlank(), severity + " is drawn, so it needs a name");
-            assertTrue(names.add(severity.getName()), severity + " repeats another severity's name");
+            assertFalse(severity.getLabel().isBlank(), severity + " is drawn, so it needs a name");
+            assertTrue(names.add(severity.getLabel()), severity + " repeats another severity's name");
             assertTrue(colours.add(new Color(severity.getColor().getRGB())), severity + " repeats another severity's colour");
         }
 

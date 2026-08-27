@@ -314,7 +314,7 @@ public final class TestRunWordGenerator {
                 setCellPadding(priCell, 4, 6, 4, 6);
                 BugPriority pri = item.getBugPriority();
                 String priColor = pri.getEmphasis().getHexColor();
-                setCellText(priCell, pri.getName(), ReportFont.BODY.ptRounded(), true, priColor);
+                setCellText(priCell, pri.getLabel(), ReportFont.BODY.ptRounded(), true, priColor);
             }
 
             if (withFailureDetail) {
@@ -323,7 +323,7 @@ public final class TestRunWordGenerator {
                 setCellPadding(sevCell, 4, 6, 4, 6);
                 BugSeverity sev = item.getBugSeverity();
                 String sevColor = sev.getEmphasis().getHexColor();
-                String sevText = sev.getName();
+                String sevText = sev.getLabel();
                 if (sevText.isEmpty()) sevText = "—";
                 setCellText(sevCell, sevText, ReportFont.BODY.ptRounded(), true, sevColor);
             }

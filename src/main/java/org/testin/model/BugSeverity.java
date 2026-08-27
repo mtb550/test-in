@@ -55,7 +55,7 @@ public enum BugSeverity {
             ReportEmphasis.MUTED
     );
 
-    private final @NotNull String name;
+    private final @NotNull String label;
     private final @NotNull Color color;
     /**
      * How loudly this reads in a report - see {@link ReportEmphasis}.

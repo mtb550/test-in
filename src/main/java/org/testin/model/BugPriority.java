@@ -47,7 +47,7 @@ public enum BugPriority {
             ReportEmphasis.MUTED
     );
 
-    private final @NotNull String name;
+    private final @NotNull String label;
     private final int value;
     private final @NotNull Color color;
     // Always true here, and still a real extension point rather than dead: it is

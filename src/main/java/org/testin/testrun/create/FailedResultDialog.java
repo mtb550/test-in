@@ -45,18 +45,18 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
         actualResult = actualResultField.getComponent();
 
         final @NotNull ComponentDialogBase<RadioSelection<BugSeverity>> severityRadios = ComponentDialogBase.<BugSeverity>radios(RunEditorAttributes.BUG_SEVERITY.getName())
-                .option(BugSeverity.BLOCKER.getName(), BugSeverity.BLOCKER)
-                .option(BugSeverity.MAJOR.getName(), BugSeverity.MAJOR)
-                .option(BugSeverity.MINOR.getName(), BugSeverity.MINOR)
-                .option(BugSeverity.ENHANCEMENT.getName(), BugSeverity.ENHANCEMENT)
+                .option(BugSeverity.BLOCKER.getLabel(), BugSeverity.BLOCKER)
+                .option(BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR)
+                .option(BugSeverity.MINOR.getLabel(), BugSeverity.MINOR)
+                .option(BugSeverity.ENHANCEMENT.getLabel(), BugSeverity.ENHANCEMENT)
                 .select(severityOf(runItem))
                 .build();
         severity = severityRadios.getComponent();
 
         final @NotNull ComponentDialogBase<RadioSelection<BugPriority>> priorityRadios = ComponentDialogBase.<BugPriority>radios(RunEditorAttributes.BUG_PRIORITY.getName())
-                .option(BugPriority.HIGH.getName(), BugPriority.HIGH)
-                .option(BugPriority.MEDIUM.getName(), BugPriority.MEDIUM)
-                .option(BugPriority.LOW.getName(), BugPriority.LOW)
+                .option(BugPriority.HIGH.getLabel(), BugPriority.HIGH)
+                .option(BugPriority.MEDIUM.getLabel(), BugPriority.MEDIUM)
+                .option(BugPriority.LOW.getLabel(), BugPriority.LOW)
                 .select(priorityOf(runItem))
                 .build();
         priority = priorityRadios.getComponent();

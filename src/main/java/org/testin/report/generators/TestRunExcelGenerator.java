@@ -109,16 +109,16 @@ public final class TestRunExcelGenerator {
                 ws.value(row, 1, title);
 
                 final @NotNull TestStatus statusEnum = result.getStatus();
-                ws.value(row, 2, statusEnum.name());
+                ws.value(row, 2, statusEnum.getLabel());
                 ws.style(row, 2).fontColor(statusEnum.getHex()).bold().set();
 
                 ws.value(row, 3, result.getActualResult());
                 ws.style(row, 3).wrapText(true).set();
 
-                ws.value(row, 4, result.getBugSeverity().getName());
+                ws.value(row, 4, result.getBugSeverity().getLabel());
                 ws.style(row, 4).bold().set();
 
-                ws.value(row, 5, result.getBugPriority().getName());
+                ws.value(row, 5, result.getBugPriority().getLabel());
                 ws.style(row, 5).bold().set();
 
                 final @NotNull String formattedDuration = Display.formatDuration(result.getDuration());

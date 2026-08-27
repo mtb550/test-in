@@ -224,11 +224,11 @@ public final class TestRunHtmlGenerator {
                     if (withFailureDetail) {
                         final @NotNull BugPriority priority = item.getBugPriority();
                         final @NotNull BugSeverity severity = item.getBugSeverity();
-                        final @NotNull String severityText = severity.getName();
+                        final @NotNull String severityText = severity.getLabel();
 
                         html.append("<td class='verdict' style='color: ")
                                 .append(priority.getEmphasis().getCssToken()).append("'>")
-                                .append(StringUtil.escapeXmlEntities(priority.getName())).append("</td>")
+                                .append(StringUtil.escapeXmlEntities(priority.getLabel())).append("</td>")
                                 .append("<td class='verdict' style='color: ")
                                 .append(severity.getEmphasis().getCssToken()).append("'>")
                                 .append(StringUtil.escapeXmlEntities(severityText.isEmpty() ? "—" : severityText)).append("</td>");

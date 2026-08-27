@@ -23,5 +23,5 @@ public enum TestCaseStatus {
             "To Be Updated"
     );
 
-    private final @NotNull String displayText;
+    private final @NotNull String label;
 }

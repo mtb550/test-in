@@ -100,7 +100,7 @@ public enum TestStatus {
     );
 
     private final @NotNull String hex;
-    private final @NotNull String displayText;
+    private final @NotNull String treeSuffix;
     private final @NotNull SimpleTextAttributes style;
     private final @NotNull Color rowColor;
     private final @NotNull String label;

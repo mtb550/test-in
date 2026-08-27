@@ -335,7 +335,7 @@ public final class TestRunPdfGenerator {
             if (withFailureDetail) {
                 BugPriority pri = item.getBugPriority();
                 DeviceRgb priColor = rgb(pri.getEmphasis().getHexColor());
-                String priText = pri.getName();
+                String priText = pri.getLabel();
                 table.addCell(new Cell()
                         .setBackgroundColor(rowBg)
                         .setBorder(new SolidBorder(BORDER_GRAY, 1))
@@ -349,7 +349,7 @@ public final class TestRunPdfGenerator {
             if (withFailureDetail) {
                 BugSeverity sev = item.getBugSeverity();
                 DeviceRgb sevColor = rgb(sev.getEmphasis().getHexColor());
-                String sevText = sev.getName();
+                String sevText = sev.getLabel();
                 if (sevText.isEmpty()) sevText = "—";
                 table.addCell(new Cell()
                         .setBackgroundColor(rowBg)

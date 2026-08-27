@@ -44,7 +44,7 @@ public final class RunTreeCellRenderer {
                         Optional.ofNullable(resultsMap.get(tc.getId())).ifPresentOrElse(result -> {
                             final @NotNull TestStatus status = result.getStatus();
                             getTextRenderer().append(tc.getDescription(), status.getStyle());
-                            getTextRenderer().append(status.getDisplayText(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
+                            getTextRenderer().append(status.getTreeSuffix(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
                         }, () -> getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES));
 
                     } else if (userObj instanceof String str)
