@@ -33,30 +33,37 @@ import java.util.Optional;
 public final class EditorUtil {
     private final @NotNull String OPEN_EDITORS_KEY = "testin.openEditors";
 
-    public boolean isOpen(final @NotNull Project p, final @NotNull String s) {
-        final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
-        final VirtualFile @NotNull[] openFiles = fed.getOpenFiles();
+    /**
+     * The open file showing this node, and empty when none is.
+     * <p>
+     * By path, which is the node's identity - the same match {@code openNow},
+     * {@code editorFor} and the rename listener already make, and the reason
+     * three of the five lookups in this class carried a comment saying so while
+     * two matched on the name. Two test sets both called "Login" in different
+     * packages are one name and two nodes, and the name answers for whichever
+     * happened to be open first.
+     */
+    private @NotNull Optional<VirtualFile> openFileFor(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+        for (final VirtualFile open : FileEditorManager.getInstance(p).getOpenFiles()) {
+            if (!(open instanceof UnifiedVirtualFile testinFile)) continue;
+            if (!testinFile.getDir().getPath().equals(dir.getPath())) continue;
 
-        for (final VirtualFile vf : openFiles) {
-            if (s.equals(vf.getName())) {
-                fed.openFile(vf, true);
-                return true;
-            }
+            return Optional.of(open);
         }
 
-        return false;
+        return Optional.empty();
     }
 
-    public void close(final @NotNull Project p, final @NotNull String s) {
-        final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
-        final VirtualFile @NotNull[] openFiles = fed.getOpenFiles();
-
-        for (final VirtualFile vf : openFiles) {
-            if (s.equals(vf.getName())) {
-                fed.closeFile(vf);
-                break;
-            }
-        }
+    /**
+     * Closes the editor showing this node, if one is open.
+     * <p>
+     * It took the node's name and closed whichever tab matched, so renaming or
+     * removing one of two same-named test sets closed the other's tab - and
+     * left the affected node's editor open, holding data that had just been
+     * renamed or deleted, for the next save to write back.
+     */
+    public void close(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+        openFileFor(p, dir).ifPresent(FileEditorManager.getInstance(p)::closeFile);
 
     }
 

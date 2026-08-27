@@ -87,8 +87,12 @@ public class NavigationBar extends BaseDetails {
                             }
 
                             final @NotNull TestSetDirectoryDto ts = indexer.getTestSetByPath(testSetPath);
-                            if (Services.getInstance(p, EditorUtil.class).isOpen(p, ts.getName())) return;
 
+                            // No is-open guard. Opening a node that is already
+                            // open focuses it, which is what the guard was for -
+                            // and the guard matched on the name, so with two test
+                            // sets called the same it focused the neighbour and
+                            // then returned without opening this one.
                             Services.getInstance(p, EditorUtil.class).open(p, ts);
                         }
                     }

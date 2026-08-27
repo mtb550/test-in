@@ -92,7 +92,7 @@ public class RenameAction extends AbstractProjectTreeAction {
      * was renamed would double-report one keystroke (#62).
      */
     private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName, final @NotNull Runnable onDone) {
-        Services.getInstance(p, EditorUtil.class).close(p, dir.getName());
+        Services.getInstance(p, EditorUtil.class).close(p, dir);
 
         // Before the data rename, while the old name is still what finds the
         // generated code. Which generator that is belongs to the node, not here.

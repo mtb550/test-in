@@ -99,7 +99,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
             // A node with an editor open has that editor closed with it. The
             // pair tested for here is exactly the pair that declares one.
             if (pkg.isOpenableInEditor())
-                Services.getInstance(p, EditorUtil.class).close(p, pkg.getName());
+                Services.getInstance(p, EditorUtil.class).close(p, pkg);
 
             pkg.getType().getRemoveHandler().remove(p, pkg, onRemoved);
         }
