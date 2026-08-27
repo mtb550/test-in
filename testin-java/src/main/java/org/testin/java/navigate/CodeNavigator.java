@@ -10,11 +10,15 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.Fqcn;
+import org.testin.java.codegen.GeneratedMethod;
 import org.testin.logger.Logger;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +33,35 @@ import java.util.Optional;
  * not.
  */
 public final class CodeNavigator implements CodeNavigation {
+
+    @Override
+    public @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
+        if (fqcn.size() < 2) return Optional.empty();
+
+        final @NotNull List<String> classSegments = fqcn.subList(0, fqcn.size() - 1);
+        final @NotNull String classFqcn = String.join(".", classSegments);
+
+        final @NotNull Optional<PsiClass> owner = Optional.ofNullable(
+                JavaPsiFacade.getInstance(p).findClass(classFqcn, GlobalSearchScope.projectScope(p)));
+
+        if (owner.isEmpty()) {
+            Logger.warn("No generated class " + classFqcn + " for '" + tc.getDescription() + "'");
+            return Optional.empty();
+        }
+
+        final @NotNull Optional<PsiMethod> method = GeneratedMethod.forCase(owner.orElseThrow(), tc);
+
+        if (method.isEmpty()) {
+            Logger.warn("No generated method for '" + tc.getDescription() + "' in " + classFqcn);
+            return Optional.empty();
+        }
+
+        final @NotNull List<String> found = new ArrayList<>(classSegments);
+        found.add(method.orElseThrow().getName());
+
+        return Optional.of(found);
+    }
 
     @Override
     public void toCode(final @NotNull Project p, final @NotNull List<String> fqcn) {

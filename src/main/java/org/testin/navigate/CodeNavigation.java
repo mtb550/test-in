@@ -3,9 +3,10 @@ package org.testin.navigate;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.logger.Logger;
+import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Jumping from a test case to the generated method that runs it.
@@ -36,6 +37,23 @@ public interface CodeNavigation {
     void toCode(final @NotNull Project p, final @NotNull List<String> fqcn);
 
     /**
+     * The class and method that actually carry this case's id, and empty when
+     * no generated method does.
+     * <p>
+     * Here rather than worked out from the description, because a name built
+     * from a description is not an identity: two cases whose descriptions differ
+     * only in punctuation or capitals sanitize to the same method name, and only
+     * one method is ever written for the pair.
+     * <p>
+     * On this interface because the answer needs {@code PsiClass} and
+     * {@code PsiMethod}, which exist only where the Java plugin does - the same
+     * reason {@code toCode} is here. Finding the code and opening it are the two
+     * halves of one question, and the runner needs the first half without the
+     * second.
+     */
+    @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc);
+
+    /**
      * Whoever can navigate here, and one that says it cannot when nobody can.
      * <p>
      * The empty case is a value of its own type rather than an absent one, so no
@@ -45,7 +63,6 @@ public interface CodeNavigation {
     static @NotNull CodeNavigation available() {
         return EP.getExtensionList().stream()
                 .findFirst()
-                .orElseGet(() -> (p, fqcn) -> Logger.debug(
-                        "No code navigation in this IDE; nothing opened for " + String.join(".", fqcn)));
+                .orElseGet(NoCodeNavigation::new);
     }
 }

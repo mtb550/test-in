@@ -7,40 +7,31 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
+import org.testin.java.codegen.GeneratedMethod;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class UpdateTestBase {
 
-    private static final @NotNull String TEST_ANNOTATION = "org.testng.annotations.Test";
-
     /**
      * The generated method for this test case, found by the id in its @Test
      * annotation - empty when the class holds no such method.
      */
     protected @NotNull Optional<PsiMethod> findMethodByTestName(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
-        final @NotNull String targetId = tc.getId().toString();
-
-        return Arrays.stream(pc.getMethods())
-                .filter(method -> getTestAnnotation(method)
-                        .map(PsiAnnotation::getText)
-                        .filter(text -> text.contains("testName") && text.contains(targetId))
-                        .isPresent())
-                .findFirst();
+        return GeneratedMethod.forCase(pc, tc);
     }
 
     /**
      * The method's @Test annotation, empty on a method that has none.
      */
     protected @NotNull Optional<PsiAnnotation> getTestAnnotation(final @NotNull PsiMethod pm) {
-        return Optional.ofNullable(pm.getModifierList().findAnnotation(TEST_ANNOTATION));
+        return GeneratedMethod.testAnnotationOf(pm);
     }
 
     /**
