@@ -6,6 +6,7 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.DetailRow;
 import org.testin.model.TestRunSummary;
+import org.testin.model.TestStatus;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.testin.logger.Logger;
 import org.testin.model.BugPriority;
@@ -106,12 +107,12 @@ public final class TestRunWordGenerator {
 
                 int tile = 0;
                 addStatCell(statsTable, tile++, String.valueOf(summary.total()), "Total Cases", DARK_NAVY);
-                addStatCell(statsTable, tile++, String.valueOf(summary.passed()), "Passed", GREEN);
-                addStatCell(statsTable, tile++, String.valueOf(summary.failed()), "Failed", RED);
-                addStatCell(statsTable, tile++, String.valueOf(summary.blocked()), "Blocked", DARK_YELLOW);
-                addStatCell(statsTable, tile++, String.valueOf(summary.untested()), "Untested", DARK_GRAY);
+                addStatCell(statsTable, tile++, String.valueOf(summary.passed()), TestStatus.PASSED.getLabel(), GREEN);
+                addStatCell(statsTable, tile++, String.valueOf(summary.failed()), TestStatus.FAILED.getLabel(), RED);
+                addStatCell(statsTable, tile++, String.valueOf(summary.blocked()), TestStatus.BLOCKED.getLabel(), DARK_YELLOW);
+                addStatCell(statsTable, tile++, String.valueOf(summary.untested()), TestStatus.UNTESTED.getLabel(), DARK_GRAY);
                 if (summary.hasRemoved()) {
-                    addStatCell(statsTable, tile++, String.valueOf(summary.removed()), "Removed", DARK_GRAY);
+                    addStatCell(statsTable, tile++, String.valueOf(summary.removed()), TestStatus.REMOVED.getLabel(), DARK_GRAY);
                 }
                 addStatCell(statsTable, tile, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE);
 

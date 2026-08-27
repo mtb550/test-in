@@ -61,7 +61,8 @@ public final class TestRunExcelGenerator {
             // summary, so a spreadsheet and a PDF of one run cannot disagree.
             final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
             final @NotNull List<String> headings = new ArrayList<>(
-                    List.of("Passed", "Failed", "Blocked", "Untested", "Executed", "Pass Rate"));
+                    List.of(TestStatus.PASSED.getLabel(), TestStatus.FAILED.getLabel(),
+                            TestStatus.BLOCKED.getLabel(), TestStatus.UNTESTED.getLabel(), "Executed", "Pass Rate"));
             final @NotNull List<String> values = new ArrayList<>(List.of(
                     String.valueOf(summary.passed()), String.valueOf(summary.failed()),
                     String.valueOf(summary.blocked()), String.valueOf(summary.untested()),
@@ -71,7 +72,7 @@ public final class TestRunExcelGenerator {
             // rows below already carry - a removed case is in the sheet either
             // way, and a headline that skips it explains nothing.
             if (summary.hasRemoved()) {
-                headings.add(4, "Removed");
+                headings.add(4, TestStatus.REMOVED.getLabel());
                 values.add(4, String.valueOf(summary.removed()));
             }
 

@@ -21,6 +21,7 @@ import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.DetailRow;
 import org.testin.model.TestRunSummary;
+import org.testin.model.TestStatus;
 import org.testin.logger.Logger;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
@@ -146,12 +147,12 @@ public final class TestRunPdfGenerator {
                     .setBorder(Border.NO_BORDER);
 
             addStatCell(statsTable, String.valueOf(summary.total()), "Total Cases", DARK_NAVY, boldFont);
-            addStatCell(statsTable, String.valueOf(summary.passed()), "Passed", GREEN, boldFont);
-            addStatCell(statsTable, String.valueOf(summary.failed()), "Failed", RED, boldFont);
-            addStatCell(statsTable, String.valueOf(summary.blocked()), "Blocked", DARK_YELLOW, boldFont);
-            addStatCell(statsTable, String.valueOf(summary.untested()), "Untested", DARK_GRAY, boldFont);
+            addStatCell(statsTable, String.valueOf(summary.passed()), TestStatus.PASSED.getLabel(), GREEN, boldFont);
+            addStatCell(statsTable, String.valueOf(summary.failed()), TestStatus.FAILED.getLabel(), RED, boldFont);
+            addStatCell(statsTable, String.valueOf(summary.blocked()), TestStatus.BLOCKED.getLabel(), DARK_YELLOW, boldFont);
+            addStatCell(statsTable, String.valueOf(summary.untested()), TestStatus.UNTESTED.getLabel(), DARK_GRAY, boldFont);
             if (summary.hasRemoved()) {
-                addStatCell(statsTable, String.valueOf(summary.removed()), "Removed", DARK_GRAY, boldFont);
+                addStatCell(statsTable, String.valueOf(summary.removed()), TestStatus.REMOVED.getLabel(), DARK_GRAY, boldFont);
             }
             addStatCell(statsTable, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE, boldFont);
 
