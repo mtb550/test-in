@@ -37,9 +37,12 @@ final class TestRunChangeComparator {
         addIfChanged(changes, "Browser", oldRun.getBrowser(), newRun.getBrowser());
         addIfChanged(changes, "Device Type", oldRun.getDeviceType(), newRun.getDeviceType());
         addIfChanged(changes, "Test Type", oldRun.getTestType(), newRun.getTestType());
-        addIfChanged(changes, "Execution Started", Display.formatDate(oldRun.getExecutionStartedAt()),
+        // The captions come from the run, so a change here reads under the same
+        // heading the Details popup and the report show it under. The values
+        // cannot: this compares two revisions, and a row is one value.
+        addIfChanged(changes, TestRunDto.EXECUTION_STARTED, Display.formatDate(oldRun.getExecutionStartedAt()),
                 Display.formatDate(newRun.getExecutionStartedAt()));
-        addIfChanged(changes, "Execution Ended", Display.formatDate(oldRun.getExecutionEndedAt()),
+        addIfChanged(changes, TestRunDto.EXECUTION_ENDED, Display.formatDate(oldRun.getExecutionEndedAt()),
                 Display.formatDate(newRun.getExecutionEndedAt()));
 
         // A run file that changed with nothing above different still changed -

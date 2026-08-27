@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunItems;
+import org.testin.model.markers.DetailRow;
+import org.testin.util.Display;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -112,6 +114,40 @@ public class TestRunDto {
     @NotNull
     @Builder.Default
     private List<TestRunItems> results = new ArrayList<>();
+
+    /**
+     * What a reader calls the moment this run started, wherever it is shown.
+     * <p>
+     * Three surfaces show it - the Details popup, the report overview, and the
+     * Git review naming what changed - and each used to spell the caption for
+     * itself. Three copies of one label is two chances for them to stop
+     * agreeing, and the one that drifts is the one nobody notices, because each
+     * reads correctly on its own.
+     */
+    public static final @NotNull String EXECUTION_STARTED = "Execution Started";
+
+    public static final @NotNull String EXECUTION_ENDED = "Execution Ended";
+
+    /**
+     * When this run ran, as the rows a reader shows.
+     * <p>
+     * On the run rather than at each renderer, which is the same argument
+     * {@code TestRunMarker.getDetailRows} makes for the configuration: what a
+     * node has to say about itself is the node's to say, and a surface that
+     * assembles it is a surface that has to know what kind of node it is
+     * looking at. The Details popup did, briefly, and it was the only line in
+     * that class naming a node kind.
+     * <p>
+     * A run that never started formats to blank on both, and every reader here
+     * drops a blank row - so this returns two rows and shows none of them,
+     * rather than deciding for the reader how many there are.
+     */
+    @JsonIgnore
+    public @NotNull List<DetailRow> getExecutionRows() {
+        return List.of(
+                new DetailRow(EXECUTION_STARTED, Display.formatDate(executionStartedAt)),
+                new DetailRow(EXECUTION_ENDED, Display.formatDate(executionEndedAt)));
+    }
 
     /**
      * Whether every case in this run has been judged.

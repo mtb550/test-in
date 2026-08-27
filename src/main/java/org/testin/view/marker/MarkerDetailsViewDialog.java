@@ -57,19 +57,21 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
                 .row("Modified At", Display.formatDate(marker.getModifiedAt()))
                 .row("Status", marker.getStatusLabel());
 
-        // When the run ran, which the run file records and the marker does not.
-        // Read from the indexer rather than copied onto the marker: two owners
-        // for one fact is one of them going stale, and the indexer holds every
-        // run in memory already, so this is a lookup and not a read from disk -
-        // the same property the marker was put here for.
+        // What the run has to say about its own execution, which the run file
+        // records and the marker does not. Looked up rather than copied onto the
+        // marker: two owners for one fact is one of them going stale, and the
+        // indexer holds every run in memory, so this is a lookup and not a read
+        // from disk - the property the marker was put on the node for.
         //
-        // Unconditional, because a node that is not a test run resolves to no
-        // run and adds nothing. A run that never started formats to blank on
-        // both, and the details builder drops a blank row - so a run nobody has
-        // executed shows neither line rather than two empty ones.
-        Services.getInstance(p, ProjectIndexer.class).findTestRun(dto.getPath()).ifPresent(run -> details
-                .row("Execution Started", Display.formatDate(run.getExecutionStartedAt()))
-                .row("Execution Ended", Display.formatDate(run.getExecutionEndedAt())));
+        // The rows are the run's, not this dialog's. Asking it for them is what
+        // keeps this class from naming a node kind, which is the same reason the
+        // status row and the counts arrive the way they do.
+        //
+        // Unconditional: a node that is not a test run resolves to no run and
+        // adds nothing, and a run that never started answers with two blank rows
+        // that the details builder drops.
+        Services.getInstance(p, ProjectIndexer.class).findTestRun(dto.getPath())
+                .ifPresent(run -> run.getExecutionRows().forEach(extra -> details.row(extra.caption(), extra.value())));
 
         // Whatever else the marker has to say about itself - a run lists the
         // configuration it was created with. Added without asking what kind of

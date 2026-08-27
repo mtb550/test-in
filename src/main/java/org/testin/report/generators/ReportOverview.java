@@ -8,7 +8,6 @@ import org.testin.model.TestRunSummary;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.DetailRow;
-import org.testin.util.Display;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,8 +66,7 @@ public final class ReportOverview {
         add(rows, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType());
 
         rows.add(new DetailRow("Executed By", summary.executedBy()));
-        rows.add(new DetailRow("Execution Started", Display.formatDate(tr.getExecutionStartedAt())));
-        rows.add(new DetailRow("Execution Ended", Display.formatDate(tr.getExecutionEndedAt())));
+        rows.addAll(tr.getExecutionRows());
         rows.add(new DetailRow("Run Status", trDir.getMarker().getStatus().getLabel()));
 
         return List.copyOf(rows);
