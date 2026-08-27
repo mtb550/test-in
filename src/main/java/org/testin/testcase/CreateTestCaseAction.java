@@ -15,9 +15,9 @@ import org.testin.editor.test.TestEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
-import org.testin.services.TestCasePersistService;
 import org.testin.testcase.create.CreateTestCaseDialog;
 import org.testin.util.Shortcuts;
 
@@ -55,7 +55,12 @@ public class CreateTestCaseAction extends AbstractProjectAction {
             final @NotNull List<TestCaseDto> affectedNodes = List.of(tc);
             Services.getInstance(p, TestCaseCacheService.class).addNewItems(affectedNodes);
 
-            Services.getInstance(p, TestCasePersistService.class).persist(dir.getPath(), affectedNodes);
+            // Directly, as the other three savers do. This went through a
+            // service that deferred the write behind an invokeLater and a write
+            // action, so everything below it - the code generation and the
+            // balloon saying the case exists - ran against a case the indexer
+            // had not been told about yet.
+            Services.getInstance(p, ProjectIndexer.class).putTestCase(dir.getPath(), tc);
             Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
 
             GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
