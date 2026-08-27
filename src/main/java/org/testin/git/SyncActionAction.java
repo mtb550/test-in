@@ -5,9 +5,6 @@ import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -68,12 +65,8 @@ public class SyncActionAction extends AbstractProjectTreeAction {
             return;
         }
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Syncing with remote", true) {
-            @Override
-            public void run(final @NotNull ProgressIndicator indicator) {
-                indicator.setIndeterminate(true);
-
-                try {
+        GitBackgroundTask.run(p, "Syncing with remote", true,
+                indicator -> {
                     indicator.setText("Checking remote configuration...");
                     final @NotNull String remoteName = git.getRemoteName(repoPath);
                     final @NotNull String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
@@ -115,12 +108,14 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                     indicator.setText("Refreshing files...");
                     refreshAfterSync(repoPath, pushed);
 
-                } catch (final Exception ex) {
+                },
+                ex -> {
                     Logger.error(ex.getMessage());
 
                     // Asked here, still on the background thread: answering it
                     // runs git status, and a git command on the EDT trips the
-                    // platform's own assertion.
+                    // platform's own assertion. The shared task hands the error
+                    // to this handler on that thread for exactly this reason.
                     final boolean conflicts = git.hasConflicts(repoPath);
 
                     // Asked here too, for the same reason: naming the files
@@ -131,12 +126,10 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                         if (conflicts) {
                             showConflictActions(repoPath, conflicting);
                         } else {
-                            Services.getInstance(p, Notifier.class).error(p, "Sync Failed", "Could not sync with the remote:\n" + ex.getMessage());
+                            reportSyncFailure("Could not sync with the remote:\n" + ex.getMessage());
                         }
                     });
-                }
-            }
-        });
+                });
     }
 
     private void showConflictActions(final @NotNull Path repoPath, final @NotNull List<String> conflicting) {
@@ -186,31 +179,50 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         });
     }
 
+    /**
+     * Says the sync failed, with what went wrong under it.
+     * <p>
+     * One method rather than the title written out beside each detail: the two
+     * handlers in this class both raise it, and a title spelled twice is a title
+     * that stops agreeing the day one is reworded.
+     */
+    private void reportSyncFailure(final @NotNull String detail) {
+        Services.getInstance(p, Notifier.class).error(p, "Sync Failed", detail);
+    }
+
     private void finishRebase(final @NotNull Path repoPath, final boolean abort) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, abort ? "Aborting rebase" : "Continuing rebase", false) {
-            @Override
-            public void run(final @NotNull ProgressIndicator indicator) {
-                // The reason is logged by the service; what is left here is the
-                // choice it cannot make - conflicts that remain are re-offered
-                // rather than reported as a plain failure (#63).
-                if (abort) {
-                    if (git.couldNotAbortRebase(repoPath)) {
-                        reportRebaseFailure(repoPath, "Could not abort the rebase.");
+        // One sentence for this attempt, whichever way it fails - the body's
+        // refusal and the handler's both say it.
+        final @NotNull String failure = abort ? "Could not abort the rebase." : "Could not continue the rebase.";
+
+        GitBackgroundTask.run(p, abort ? "Aborting rebase" : "Continuing rebase", false,
+                indicator -> {
+                    // The reason is logged by the service; what is left here is
+                    // the choice it cannot make - conflicts that remain are
+                    // re-offered rather than reported as a plain failure (#63).
+                    if (abort) {
+                        if (git.couldNotAbortRebase(repoPath)) {
+                            reportRebaseFailure(repoPath, failure);
+                            return;
+                        }
+                        refreshRepository(repoPath);
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                Services.getInstance(p, Notifier.class).info(p, "Rebase aborted", "The pull was rolled back"));
                         return;
                     }
-                    refreshRepository(repoPath);
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(p, Notifier.class).info(p, "Rebase aborted", "The pull was rolled back"));
-                    return;
-                }
 
-                if (git.couldNotContinueRebase(repoPath)) {
-                    reportRebaseFailure(repoPath, "Could not continue the rebase.");
-                    return;
-                }
-                refreshAfterSync(repoPath, 0);
-            }
-        });
+                    if (git.couldNotContinueRebase(repoPath)) {
+                        reportRebaseFailure(repoPath, failure);
+                        return;
+                    }
+                    refreshAfterSync(repoPath, 0);
+                },
+                // It had no error path at all. A throw in here left the tester
+                // with a task that stopped and a stack trace in the log.
+                ex -> {
+                    Logger.error(ex.getMessage());
+                    reportRebaseFailure(repoPath, failure);
+                });
     }
 
     /**
@@ -224,35 +236,41 @@ public class SyncActionAction extends AbstractProjectTreeAction {
      * this one has to ask.
      */
     private void finishSyncInBackground(final @NotNull Path repoPath) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Finishing sync", false) {
-            @Override
-            public void run(final @NotNull ProgressIndicator indicator) {
-                indicator.setIndeterminate(true);
-
-                // The same ending as a sync that never stopped: the commits the
-                // rebase just replayed are still only here, and a refresh that
-                // reported "up to date" over them would be the same untruth from
-                // the other door.
-                int pushed = 0;
-                try {
-                    final @NotNull String remoteName = git.getRemoteName(repoPath);
-                    if (!remoteName.isEmpty()) {
-                        indicator.setText("Pushing what is committed here...");
-                        pushed = pushUnpushed(repoPath, remoteName, git.syncBranch(repoPath));
+        GitBackgroundTask.run(p, "Finishing sync", false,
+                indicator -> {
+                    // The same ending as a sync that never stopped: the commits
+                    // the rebase just replayed are still only here, and a
+                    // refresh that reported "up to date" over them would be the
+                    // same untruth from the other door.
+                    int pushed = 0;
+                    try {
+                        final @NotNull String remoteName = git.getRemoteName(repoPath);
+                        if (!remoteName.isEmpty()) {
+                            indicator.setText("Pushing what is committed here...");
+                            pushed = pushUnpushed(repoPath, remoteName, git.syncBranch(repoPath));
+                        }
+                    } catch (final Exception ex) {
+                        // Caught in here rather than left to the handler: the
+                        // pull and the merge both worked, only the push did not,
+                        // and the tree still has to be rebuilt around what
+                        // arrived - so this is not the end of the work.
+                        Logger.error("Could not push after resolving: " + ex.getMessage());
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                Services.getInstance(p, Notifier.class).error(p, "Push Failed",
+                                        "The conflicts were resolved, but the push did not go through:\n" + ex.getMessage()));
                     }
-                } catch (final Exception ex) {
-                    // The pull and the merge both worked; only the push did not,
-                    // and the tree still has to be rebuilt around what arrived.
-                    Logger.error("Could not push after resolving: " + ex.getMessage());
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(p, Notifier.class).error(p, "Push Failed",
-                                    "The conflicts were resolved, but the push did not go through:\n" + ex.getMessage()));
-                }
 
-                indicator.setText("Refreshing files...");
-                refreshAfterSync(repoPath, pushed);
-            }
-        });
+                    indicator.setText("Refreshing files...");
+                    refreshAfterSync(repoPath, pushed);
+                },
+                // The refresh had no error path. A throw there left the tester
+                // with nothing said and a tree still showing what was there
+                // before the sync.
+                ex -> {
+                    Logger.error(ex.getMessage());
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            reportSyncFailure("The sync did not finish:\n" + ex.getMessage()));
+                });
     }
 
     /**
