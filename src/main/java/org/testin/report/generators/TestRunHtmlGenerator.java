@@ -74,8 +74,8 @@ public final class TestRunHtmlGenerator {
         // HEADER
         html.append("<div class='report-title'>TEST SUMMARY REPORT</div>")
                 .append("<div class='report-subtitle'>")
-                .append(escapedHtml(ReportText.joined("  |  ", projectName, ReportText.joined(", ", tr.getPlatform(), tr.getComponent())))).append("</div>")
-                .append("<div class='report-runname'>").append(escapedHtml(runName)).append("</div>")
+                .append(StringUtil.escapeXmlEntities(ReportText.joined("  |  ", projectName, ReportText.joined(", ", tr.getPlatform(), tr.getComponent())))).append("</div>")
+                .append("<div class='report-runname'>").append(StringUtil.escapeXmlEntities(runName)).append("</div>")
                 .append("<div class='report-conf'>Confidential — QA Test Execution Summary</div>");
 
         // SECTION 1: Report Overview
@@ -90,7 +90,7 @@ public final class TestRunHtmlGenerator {
         html.append("<div class='section-title-bar'><div class='section-title'>2. Execution Summary</div></div>");
 
         html.append("<div class='summary-text'>")
-                .append("<b>").append(runName).append("</b> holds <b>").append(total).append("</b> test cases, of which <b>")
+                .append("<b>").append(StringUtil.escapeXmlEntities(runName)).append("</b> holds <b>").append(total).append("</b> test cases, of which <b>")
                 .append(summary.executed()).append("</b> were executed. Of those, <b>").append(passRate).append("%</b> passed. ")
                 .append("The results below summarize the outcome.")
                 .append("</div>");
@@ -196,7 +196,7 @@ public final class TestRunHtmlGenerator {
 
                     html.append("<tr>")
                             .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
-                            .append("<td>").append(escapedHtml(desc.isEmpty() ? "—" : desc));
+                            .append("<td>").append(StringUtil.escapeXmlEntities(desc.isEmpty() ? "—" : desc));
 
                     if (withFailureDetail) {
                         // Under the case it belongs to rather than in a column of
@@ -205,7 +205,7 @@ public final class TestRunHtmlGenerator {
                         // in a strip. The PDF puts it in the same cell.
                         final @NotNull String actual = item.getActualResult();
                         html.append("<div class='actual'>Actual result: ")
-                                .append(escapedHtml(actual.isEmpty() ? "—" : actual))
+                                .append(StringUtil.escapeXmlEntities(actual.isEmpty() ? "—" : actual))
                                 .append("</div>");
 
                         // No em dash for an absent one, unlike the actual
@@ -214,7 +214,7 @@ public final class TestRunHtmlGenerator {
                         // a failure table is noise a reader learns to skip.
                         final @NotNull String stacktrace = item.getStacktrace();
                         if (!stacktrace.isBlank()) {
-                            html.append("<div class='stacktrace'>").append(escapedHtml(stacktrace)).append("</div>");
+                            html.append("<div class='stacktrace'>").append(StringUtil.escapeXmlEntities(stacktrace)).append("</div>");
                         }
                     }
 
@@ -227,10 +227,10 @@ public final class TestRunHtmlGenerator {
 
                         html.append("<td class='verdict' style='color: ")
                                 .append(priority.getEmphasis().getCssToken()).append("'>")
-                                .append(escapedHtml(priority.getName())).append("</td>")
+                                .append(StringUtil.escapeXmlEntities(priority.getName())).append("</td>")
                                 .append("<td class='verdict' style='color: ")
                                 .append(severity.getEmphasis().getCssToken()).append("'>")
-                                .append(escapedHtml(severityText.isEmpty() ? "—" : severityText)).append("</td>");
+                                .append(StringUtil.escapeXmlEntities(severityText.isEmpty() ? "—" : severityText)).append("</td>");
                     }
 
                     html.append("</tr>");
@@ -356,8 +356,8 @@ public final class TestRunHtmlGenerator {
 
     private void overviewRow(final @NotNull StringBuilder html, final @NotNull String label, final @NotNull String value) {
         html.append("<tr>")
-                .append("<td class='label'>").append(label).append("</td>")
-                .append("<td class='value'>").append(escapedHtml(value)).append("</td>")
+                .append("<td class='label'>").append(StringUtil.escapeXmlEntities(label)).append("</td>")
+                .append("<td class='value'>").append(StringUtil.escapeXmlEntities(value)).append("</td>")
                 .append("</tr>");
     }
 
@@ -438,9 +438,5 @@ public final class TestRunHtmlGenerator {
                 .append("<div class='card-value' style='color: ").append(color).append(";'>").append(value).append("</div>")
                 .append("<div class='card-label'>").append(label).append("</div>")
                 .append("</div>");
-    }
-
-    private @NotNull String escapedHtml(final @NotNull String text) {
-        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 }

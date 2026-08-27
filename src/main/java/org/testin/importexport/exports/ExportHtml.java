@@ -1,6 +1,7 @@
 package org.testin.importexport.exports;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
@@ -16,13 +17,6 @@ import java.util.Map;
 
 @AllArgsConstructor
 public class ExportHtml {
-    private static final @NotNull Map<Character, String> HTML_ESCAPES = Map.of(
-            '&', "&amp;",
-            '<', "&lt;",
-            '>', "&gt;",
-            '"', "&#34;",
-            '\'', "&#39;"
-    );
     private final @NotNull ExportAction exportAction;
 
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
@@ -86,7 +80,7 @@ public class ExportHtml {
 
                 if (testCases.isEmpty()) continue;
 
-                writer.write("<h2>" + htmlEscape(sheetName) + "</h2>");
+                writer.write("<h2>" + StringUtil.escapeXmlEntities(sheetName) + "</h2>");
                 writer.newLine();
 
                 writer.write("<table>");
@@ -94,7 +88,7 @@ public class ExportHtml {
 
                 writer.write("<tr>");
                 for (final TestEditorAttributes attr : exportAction.exportAttributes) {
-                    writer.write("<th>" + htmlEscape(attr.getName()) + "</th>");
+                    writer.write("<th>" + StringUtil.escapeXmlEntities(attr.getName()) + "</th>");
                 }
                 writer.write("</tr>");
                 writer.newLine();
@@ -102,7 +96,7 @@ public class ExportHtml {
                 for (final TestCaseDto tc : testCases) {
                     writer.write("<tr>");
                     for (final TestEditorAttributes attr : exportAction.exportAttributes) {
-                        writer.write("<td>" + htmlEscape(attr.getTestValueExtractor().execute(tc, p)) + "</td>");
+                        writer.write("<td>" + StringUtil.escapeXmlEntities(attr.getTestValueExtractor().execute(tc, p)) + "</td>");
                     }
                     writer.write("</tr>");
                     writer.newLine();
@@ -117,7 +111,7 @@ public class ExportHtml {
             writer.newLine();
 
             final @NotNull String exportDate = Display.formatDate(ZonedDateTime.now());
-            writer.write("<p><em>Exported on: " + htmlEscape(exportDate) + "</em></p>");
+            writer.write("<p><em>Exported on: " + StringUtil.escapeXmlEntities(exportDate) + "</em></p>");
             writer.newLine();
 
             writer.write("</body>");
@@ -128,15 +122,6 @@ public class ExportHtml {
             Logger.error(ex.getMessage());
             throw new RuntimeException(ex);
         }
-    }
-
-    private @NotNull String htmlEscape(final @NotNull String value) {
-        final @NotNull StringBuilder sb = new StringBuilder(value.length());
-        for (int i = 0; i < value.length(); i++) {
-            final char c = value.charAt(i);
-            sb.append(HTML_ESCAPES.getOrDefault(c, String.valueOf(c)));
-        }
-        return sb.toString();
     }
 }
 
