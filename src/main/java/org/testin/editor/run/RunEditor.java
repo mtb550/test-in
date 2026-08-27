@@ -1,6 +1,5 @@
 package org.testin.editor.run;
 
-import org.testin.notifications.Done;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -16,39 +15,32 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
 import org.testin.editor.*;
 import org.testin.editor.grid.GridPanelBuilder;
-import org.testin.editor.list.ListPanelBuilder;
 import org.testin.editor.grid.GridView;
+import org.testin.editor.list.ListPanelBuilder;
 import org.testin.editor.list.ListView;
-import org.testin.editor.listeners.GridContextMenuListener;
-import org.testin.editor.listeners.GridSelectionListener;
-import org.testin.editor.listeners.RunGridEditListener;
-import org.testin.model.*;
-import org.testin.open.OpenContextMenuAction;
-import org.testin.editor.listeners.RunListRenderer;
-import org.testin.editor.listeners.StatusBarListener;
+import org.testin.editor.listeners.*;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.editor.toolbar.RunToolbar;
 import org.testin.editor.toolbar.Toolbar;
-import org.testin.editor.toolbar.components.FilterPopupBtn;
-import org.testin.editor.toolbar.components.RunDetailsPopupBtn;
-import org.testin.editor.toolbar.components.StartExecutionBtn;
-import org.testin.editor.toolbar.components.StopExecutionBtn;
+import org.testin.editor.toolbar.components.*;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.model.*;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.TestRunDto;
+import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.notifications.Done;
+import org.testin.notifications.Notifier;
+import org.testin.open.OpenContextMenuAction;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.runner.TestNGExecution;
-import org.testin.testrun.ResultAnalysisDialog;
-import org.testin.editor.toolbar.components.ResultAnalysisBtn;
-import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.TestCaseOrder;
+import org.testin.testrun.ResultAnalysisDialog;
 import org.testin.testrun.TestRunStatusChange;
 import org.testin.util.Display;
 import org.testin.util.FontSync;
@@ -323,8 +315,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * Refreshes status-dependent filtering without losing the page the user is viewing.
      */
     public void refreshAfterStatusChange() {
-        final int pageBeforeRefresh = currentPage;
-        currentPage = pageBeforeRefresh;
         refreshView();
     }
 
