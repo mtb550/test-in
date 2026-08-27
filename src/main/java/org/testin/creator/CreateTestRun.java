@@ -20,7 +20,6 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.setting.AppSettingsState;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.RunConfigurationDialog;
 import org.testin.testrun.RunConfigurationForm;
@@ -133,8 +132,10 @@ public class CreateTestRun implements NodeCreator {
         // background write further down could not go back to it anyway (#87).
         final @NotNull Map<TestRunConfiguration, String> configuration = form.configuration();
 
+        // Who made it and when is the marker's, which every node carries and the
+        // details popup already reads. The run held a second copy that nothing
+        // ever read back.
         final @NotNull TestRunDto tr = new TestRunDto()
-                .setCreatedBy(Services.getInstance(p, AppSettingsState.class).testerName)
                 .setConfiguration(TestRunConfiguration.answered(configuration));
 
         final @NotNull List<TestRunItems> items = new ArrayList<>();

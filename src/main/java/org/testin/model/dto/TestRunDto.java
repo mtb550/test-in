@@ -75,15 +75,6 @@ public class TestRunDto {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<ResultAnalysis, String> resultAnalysis = new EnumMap<>(ResultAnalysis.class);
 
-    @NotNull
-    @Builder.Default
-    private String createdBy = "";
-
-    @NotNull
-    @Builder.Default
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
-    private ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-
     /**
      * When the tester first pressed Start Execution; {@link Config#NOT_EXECUTED}
      * until they do. Not {@code createdAt}: a run built in January and executed
