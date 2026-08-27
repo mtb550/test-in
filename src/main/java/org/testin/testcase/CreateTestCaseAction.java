@@ -41,14 +41,18 @@ public class CreateTestCaseAction extends AbstractProjectAction {
 
     public void openCreateDialog() {
         new CreateTestCaseDialog(p, tc -> {
-            final @NotNull List<TestCaseDto> tcs = editor.getAllTestCases();
-
-            // After the last one, and nothing else moves. The case that was last
-            // used to be rewritten to point at this one, which is what made a
-            // second tester adding a case at the same time conflict on a file
-            // neither of them had opened.
-            tc.setOrder(Rank.after(tcs.isEmpty() ? "" : tcs.getLast().getOrder()));
-
+            // No rank here. The case arrives unranked, which sorts it last -
+            // and the append path already ranks the list it just sorted, so it
+            // sees this case at the end and gives it a rank after everything.
+            //
+            // Computing it here got that wrong in exactly the sets that need it
+            // most. It read the rank off the last case on screen, and an
+            // unranked case sorts last: a set that had picked one up - imported,
+            // copied in by hand, or brought by a merge - answered with no rank
+            // at all, and "after nothing" resolves to the middle. The new case
+            // appeared in the middle of the set until the reorder that follows
+            // repaired it, writing a second version of a file written a moment
+            // earlier.
             tc.setParent(dir);
             editor.appendNewTestCase(tc);
 
