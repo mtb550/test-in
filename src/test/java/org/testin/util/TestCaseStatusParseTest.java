@@ -42,7 +42,7 @@ public class TestCaseStatusParseTest {
     @Test
     public void anythingElseKeepsTheStatusTheCaseAlreadyHad() {
         assertEquals(TestDataParser.testCaseStatus("Nonsense", TestCaseStatus.REVIEWED), TestCaseStatus.REVIEWED);
-        assertEquals(TestDataParser.testCaseStatus("", TestCaseStatus.Disabled), TestCaseStatus.Disabled);
+        assertEquals(TestDataParser.testCaseStatus("", TestCaseStatus.DISABLED), TestCaseStatus.DISABLED);
         assertEquals(TestDataParser.testCaseStatus("   ", TestCaseStatus.TO_BE_UPDATED), TestCaseStatus.TO_BE_UPDATED);
     }
 }

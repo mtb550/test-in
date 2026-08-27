@@ -15,7 +15,7 @@ public enum TestCaseStatus {
             "Pending"
     ),
 
-    Disabled(
+    DISABLED(
             "Disabled"
     ),
 
