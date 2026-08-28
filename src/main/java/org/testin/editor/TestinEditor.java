@@ -19,6 +19,57 @@ import java.util.UUID;
 public interface TestinEditor extends Disposable {
 
     /**
+     * How many test cases a page holds until the tester says otherwise.
+     * <p>
+     * Declared once because it was declared three times and the three agreed by
+     * luck: the run editor hard-coded fifty, the test case editor read fifty out
+     * of a stored property nothing ever wrote, and the status bar's field was
+     * built with the text "50" and never asked either editor what it actually
+     * was. Any one of them changing would have left the field stating a number
+     * the editor was not using.
+     */
+    int DEFAULT_PAGE_SIZE = 50;
+
+    /**
+     * The largest page a tester may ask for.
+     * <p>
+     * A ceiling rather than a warning, because the number is a view setting and
+     * not something anyone can get wrong in a way worth interrupting them over.
+     * A thousand cards is already far past what a page is for; five thousand is a
+     * typing mistake, and the answer to a typing mistake is the nearest number
+     * that works.
+     */
+    int MAX_PAGE_SIZE = 1000;
+
+    /**
+     * What a typed page size actually comes to.
+     * <p>
+     * Silent and total: whatever is in the field, this answers with a page size,
+     * and the field is then made to show that answer. Nothing is refused and
+     * nothing is announced - a tester who typed five thousand sees a thousand and
+     * has learned the limit, which is what a notification would have told them at
+     * the cost of a balloon on every mistyped keystroke.
+     * <p>
+     * Too small becomes the default rather than one, because zero, a minus sign
+     * and an empty field all mean the tester did not name a size - and one case
+     * per page is not what any of them were reaching for.
+     * <p>
+     * Digits are checked rather than parsed and caught: a key held down produces
+     * more digits than a long can hold, and that is still a tester asking for a
+     * very large page, which is the maximum. Catching the overflow would have
+     * answered fifty.
+     */
+    static int pageSizeOf(final @NotNull String typed) {
+        final @NotNull String asked = typed.trim();
+
+        if (asked.isEmpty() || !asked.chars().allMatch(Character::isDigit)) return DEFAULT_PAGE_SIZE;
+
+        final long size = asked.length() > 18 ? MAX_PAGE_SIZE : Long.parseLong(asked);
+
+        return size < 1 ? DEFAULT_PAGE_SIZE : (int) Math.min(size, MAX_PAGE_SIZE);
+    }
+
+    /**
      * A test case is being launched from this editor.
      * <p>
      * The execution reports that follow are broadcast to every listener, and a
@@ -46,15 +97,6 @@ public interface TestinEditor extends Disposable {
 
     void setPageSize(final int size);
 
-    /**
-     * The row's position in the whole list rather than on the page it is drawn
-     * on. The number the card shows, and what every lookup by index outside the
-     * page needs.
-     * <p>
-     * Default rather than repeated: the renderer, the hover hit-test and the
-     * transfer handler all convert the same way, and a card that numbered rows
-     * differently from the handler acting on them would be a quiet mismatch.
-     */
     /**
      * Whether turning this many pages would land on one that exists.
      */
@@ -98,14 +140,37 @@ public interface TestinEditor extends Disposable {
         getStatusBar().updateSelectionState(
                 selectedIndices,
                 globalIndex(selectedIndices.length == 0 ? 0 : selectedIndices[0]),
+                getShownItemsCount(),
                 getTotalItemsCount());
     }
 
+    /**
+     * The row's position in the whole list rather than on the page it is drawn
+     * on. The number the card shows, and what every lookup by index outside the
+     * page needs.
+     * <p>
+     * Default rather than repeated: the renderer, the hover hit-test and the
+     * transfer handler all convert the same way, and a card that numbered rows
+     * differently from the handler acting on them would be a quiet mismatch.
+     */
     default int globalIndex(final int rowIndex) {
         return ((getCurrentPage() - 1) * getPageSize()) + rowIndex;
     }
 
     int getTotalPageCount();
+
+    /**
+     * How many test cases the tester is paging through: the whole set, or what is
+     * left of it once the filters and the search have narrowed it.
+     * <p>
+     * Declared beside {@link #getTotalItemsCount()} because the status bar needs
+     * both and they are not the same number. It said "3 of 120 test cases" over
+     * twelve visible rows, taking the position from the narrowed list and the
+     * total from the whole one - two different lists in one sentence, and no way
+     * for the tester to tell whether the other hundred and eight were on later
+     * pages or filtered out.
+     */
+    int getShownItemsCount();
 
     int getTotalItemsCount();
 

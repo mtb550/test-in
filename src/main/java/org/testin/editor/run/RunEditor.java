@@ -111,7 +111,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Getter
     @Setter
-    private int pageSize = 50;
+    private int pageSize = TestinEditor.DEFAULT_PAGE_SIZE;
 
     @Getter
     private @NotNull StatusBar statusBar;
@@ -447,6 +447,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     @Override
+    public int getShownItemsCount() {
+        return currentTestCases.size();
+    }
+
+    @Override
     public int getTotalItemsCount() {
         return allTestCases.size();
     }
@@ -495,7 +500,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // the label says what is selected, so it cannot be written before that
         // is known.
         refreshSelectionStatus(list.getSelectedIndices());
-        showExecutionTotal();
+        showRunTotals();
 
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");
@@ -520,6 +525,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     public void refreshAfterRunStatusChanged() {
         list.repaint();
         statusBar.updatePaginationState(currentPage, getTotalPageCount());
+        // Not only the new status: completing a run turns every pending case into
+        // untested, so the verdict counts beside it changed too and would have
+        // stayed on the old numbers until the next redraw.
+        showRunTotals();
         refreshExecutionButtons();
     }
 
@@ -663,7 +672,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             list.removeMouseListener(listener);
 
         toolBar.dispose();
-        statusBar.dispose();
 
         allTestCases.clear();
         resultsMap.clear();
@@ -803,7 +811,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             // fires with index -1 for one that is not, which invalidates the
             // layout of the whole list once a second for a row nobody can see.
             if (model.contains(currentTc)) model.contentsChanged(currentTc);
-            showExecutionTotal();
+            showRunTotals();
         });
     }
 
@@ -884,7 +892,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // moment that value stops being blank, and a JList re-measures a row
         // only when the model says that row changed.
         if (model.contains(tc)) model.contentsChanged(tc);
-        showExecutionTotal();
+        showRunTotals();
 
         // Every report changes whether anything is still running, which is what
         // decides between Start and Stop. The first case reporting RUNNING is
@@ -918,13 +926,34 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * The run's total is the sum of what its cases measured, not a clock of its
-     * own: it counts only while a case is being timed, so a stop freezes it, a
-     * resuming continues it, and it is back after a reopen because the case
-     * durations are. A run judged from the context menu has measured nothing and shows blank,
-     * as its cases do.
+     * Puts what the run has done so far into the status bar: how many cases carry
+     * each verdict, and how long they took.
+     * <p>
+     * One method for the two figures because they have one set of call sites -
+     * the redraw, and the two points where a verdict lands - and a second figure
+     * pushed from a subset of them would be current on some screens and stale on
+     * others. That is the mistake {@code refreshView} records above, where four
+     * callers hand-copied the same two lines.
+     * <p>
+     * The counts are read from the live results rather than the run on disk, so
+     * the bar moves as the tester works rather than at the next save. The
+     * phrasing is not decided here: {@link ResultAnalysis#headline} owns it, so
+     * the bar and the reports cannot disagree about how many passed. It is given
+     * the run's status as well as its results, because one of the four buckets is
+     * named for it - untouched cases are pending until the run gives up on them.
+     * <p>
+     * The time is the sum of what the cases measured, not a clock of its own: it
+     * counts only while a case is being timed, so a stop freezes it, a resuming
+     * continues it, and it is back after a reopen because the case durations are.
+     * A run judged from the context menu has measured nothing and shows blank, as
+     * its cases do.
      */
-    private void showExecutionTotal() {
+    private void showRunTotals() {
+        final @NotNull TestRunStatus status = parent.getMarker().getStatus();
+
+        statusBar.showRunStatus(status);
+        statusBar.showVerdicts(ResultAnalysis.headline(TestRunSummary.of(List.copyOf(resultsMap.values())), status));
+
         final @NotNull Duration total = resultsMap.values().stream()
                 .map(TestRunItems::getDuration)
                 .reduce(Duration.ZERO, Duration::plus);

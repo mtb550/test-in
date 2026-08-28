@@ -1,6 +1,5 @@
 package org.testin.editor.test;
 
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -108,7 +107,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
     @Getter
     @Setter
-    private int pageSize;
+    private int pageSize = TestinEditor.DEFAULT_PAGE_SIZE;
 
     @Getter
     @Setter
@@ -152,8 +151,6 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         list.setDropMode(DropMode.INSERT);
         list.setTransferHandler(new TransferListener(p, this));
         list.setCellRenderer(new TestListRenderer(p, this));
-
-        this.pageSize = PropertiesComponent.getInstance().getInt("testin.pageSize", 50);
 
         this.toolBar = new TestToolbar(this);
         mainPanel.add(toolBar, BorderLayout.NORTH);
@@ -311,6 +308,11 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             refreshView();
             selectTestCase(tc);
         });
+    }
+
+    @Override
+    public int getShownItemsCount() {
+        return currentTestCases.size();
     }
 
     @Override
@@ -740,7 +742,6 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             list.removeMouseListener(listener);
 
         toolBar.dispose();
-        statusBar.dispose();
 
         // Swing answers null when the editor is closing with nothing selected,
         // and then there is no case whose view panel needs closing.

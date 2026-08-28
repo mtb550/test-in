@@ -19,6 +19,33 @@ import java.util.Optional;
 
 public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel> implements Disposable {
 
+    /**
+     * How tall an editor's bars are, top and bottom.
+     * <p>
+     * Declared here because the toolbar is the one the other matches: the status
+     * bar reads this rather than carrying a second number, so the two strips
+     * framing an editor cannot come to differ by two pixels that nobody can
+     * explain. Both are laid out north and south of a {@code BorderLayout}, which
+     * takes the height from the preferred size and stretches the width, so this
+     * is the whole of it.
+     */
+    public static final int BAR_HEIGHT = JBUI.scale(30);
+
+    /**
+     * The height a bar reports, given the height its contents actually need.
+     * <p>
+     * A floor, not a ceiling, and that distinction is the whole of it. Both bars
+     * used to state {@link #BAR_HEIGHT} flatly, which asked a swing grid bag
+     * layout for less room than its children wanted - and a grid bag given less
+     * than it needs abandons preferred sizes and lays every child out at its
+     * minimum instead. Anything with a natural minimum survived that; the two
+     * labels that had been given one by hand, to let them shorten on a narrow
+     * bar, were laid out at the height in it and disappeared.
+     */
+    public static int barHeight(final int naturalHeight) {
+        return Math.max(naturalHeight, BAR_HEIGHT);
+    }
+
     @Getter
     protected final @NotNull SearchTxt searchTxt;
 
@@ -59,7 +86,6 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         this.callbacks = callbacks;
 
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
-
         this.searchTxt = new SearchTxt(callbacks::onToolBarSearchValueChanged, callbacks::onToolBarSearchFocusReleased);
     }
 
@@ -96,6 +122,17 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
      */
     public void installSearchFocusShortcut(final @NotNull JComponent scope) {
         new FocusSearchAction(searchTxt, scope);
+    }
+
+    /**
+     * Width is the layout's own; the height is the shared bar height, or more if
+     * this toolbar's contents need more. See {@link #barHeight}.
+     */
+    @Override
+    public @NotNull Dimension getPreferredSize() {
+        final @NotNull Dimension natural = super.getPreferredSize();
+
+        return new Dimension(natural.width, barHeight(natural.height));
     }
 
     protected void layoutComponents() {
