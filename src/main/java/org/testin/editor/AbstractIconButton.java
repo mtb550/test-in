@@ -66,11 +66,14 @@ public abstract class AbstractIconButton extends JButton {
         // it left, re-laying out the whole toolbar and shifting the buttons out
         // from under the pointer.
         //
-        // Measured from a reference icon because every button in the plugin is
-        // then the same size whatever it draws. It used to measure its own, so
-        // the size was the icon's size plus insets and any icon a pixel wider
-        // than the rest made one button wider than the rest - which is how a
-        // status bar arrow and the toolbar button above it came to disagree.
+        // From a reference icon rather than this button's own, so the measurement
+        // does not vary with what the button happens to draw. How much that is
+        // worth depends on the look and feel - Darcula floors an icon-only button
+        // at a square of its own choosing, and would have made most of these
+        // agree anyway - so this is not the reason a status bar arrow and a
+        // toolbar button look alike. That is PageBtn extending this class at all.
+        // It is here so the answer stops depending on which look and feel is
+        // loaded, which is not something a screenshot would ever have shown.
         setIcon(IconManager.zoomStandardIcon(AllIcons.Actions.Refresh, this));
         final @NotNull Dimension size = getPreferredSize();
         setIcon(restIcon);
@@ -145,13 +148,31 @@ public abstract class AbstractIconButton extends JButton {
         repaint();
     }
 
+    /**
+     * A button that goes dead under the pointer stops looking live.
+     * <p>
+     * Hovering is driven by mouse events, and swing delivers none to a disabled
+     * component - so a button disabled while the pointer is on it never hears
+     * that the pointer left. In the toolbar that hardly happened; the page arrows
+     * are disabled on every page change, so paging onto the last page leaves the
+     * pointer sitting on a dead Next arrow still drawing its hover pill, and it
+     * keeps drawing it until the arrow comes back and the pointer crosses it
+     * again.
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+
+        if (!enabled && hovered) setHovered(false);
+    }
+
     @Override
     protected void paintComponent(final @NotNull Graphics g) {
         final @NotNull Container parent = getParent();
         g.setColor(Optional.ofNullable(parent).map(Container::getBackground).orElseGet(this::getBackground));
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        if (hovered) {
+        if (hovered && isEnabled()) {
             final @NotNull Graphics2D g2 = (Graphics2D) g.create();
             try {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
