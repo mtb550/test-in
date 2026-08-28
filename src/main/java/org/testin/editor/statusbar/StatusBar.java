@@ -31,6 +31,16 @@ public class StatusBar extends JBPanel<StatusBar> {
      */
     private static final int EDGE = 2;
 
+    /**
+     * The width the sentence on the left keeps whatever else needs room.
+     * <p>
+     * About what "12 of 340 test cases" comes to, so what survives a narrow bar is
+     * the numbers and the ellipsis falls on the words after them. A sentence cut
+     * short can still be read; one laid out at zero width is gone with nothing
+     * left to say it was ever there.
+     */
+    private static final int SENTENCE_FLOOR = JBUI.scale(150);
+
     private final @NotNull JBLabel statusLabel = new JBLabel();
 
     /**
@@ -60,7 +70,6 @@ public class StatusBar extends JBPanel<StatusBar> {
 
     private final @NotNull JBLabel currentPageLabel = new JBLabel("1 of 1");
 
-    @Getter
     /**
      * Empty until the editor says what its page size is - see
      * {@code StatusBarListener}. The four columns are for width, not content - a
@@ -68,6 +77,7 @@ public class StatusBar extends JBPanel<StatusBar> {
      * and four because {@link TestinEditor#MAX_PAGE_SIZE} is four digits, so the
      * largest page anyone can ask for fits without the field growing to show it.
      */
+    @Getter
     private final @NotNull JBTextField pageSizeField = new JBTextField("", 4);
 
     @Getter
@@ -89,14 +99,6 @@ public class StatusBar extends JBPanel<StatusBar> {
         ));
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
         statusLabel.setForeground(UIUtil.getContextHelpForeground());
-        // A label reports its preferred size as its minimum, which would make this
-        // sentence decide how narrow the editor may be - so it is told it can give
-        // room up. Not all of it: a minimum of zero let the layout take the whole
-        // label away on a tight bar, and a sentence that vanishes is worse than
-        // one cut short, because nothing is left to say it was ever there. This
-        // is about the width of "12 of 340 test cases", so what survives is the
-        // numbers, and the ellipsis falls on the words after them.
-
         runStatusLabel.setForeground(UIUtil.getContextHelpForeground());
         runStatusLabel.setBorder(JBUI.Borders.emptyRight(10));
         runStatusLabel.setIconTextGap(JBUI.scale(4));
@@ -105,10 +107,9 @@ public class StatusBar extends JBPanel<StatusBar> {
                 .installOn(runStatusLabel);
 
         verdictsLabel.setForeground(UIUtil.getInactiveTextColor());
-        // Second in line to give room up, after the sentence on the left has
-        // given all it can. Longest of the figures and the one that survives
-        // being cut best: it reads left to right in order of what a tester wants
-        // to know first, so what a narrow bar loses is the untouched count.
+        // First to give room up when the bar is short of it - see doLayout. It
+        // reads left to right in the order a tester wants to know things, so what
+        // a narrow bar loses off the end is the untouched count.
         verdictsLabel.setBorder(JBUI.Borders.emptyRight(10));
         new HelpTooltip()
                 .setDescription(HtmlChunk.text("How this run is going"))
@@ -169,15 +170,53 @@ public class StatusBar extends JBPanel<StatusBar> {
         final int left = insets.left;
         final int right = getWidth() - insets.right;
 
-        final int rightWidth = Math.min(rightRow.getPreferredSize().width, Math.max(0, right - left));
-        rightRow.setBounds(right - rightWidth, top, rightWidth, height);
+        final @NotNull Widths widths = budget(Math.max(0, right - left), navigationRow.getPreferredSize().width, rightRow.getPreferredSize().width);
 
-        final int navWidth = navigationRow.getPreferredSize().width;
-        final int centered = left + ((right - left) - navWidth) / 2;
-        final int navX = Math.max(left, Math.min(centered, right - rightWidth - navWidth));
-        navigationRow.setBounds(navX, top, navWidth, height);
+        rightRow.setBounds(right - widths.figures(), top, widths.figures(), height);
+        navigationRow.setBounds(left + widths.arrowsAt(), top, widths.arrows(), height);
+        statusLabel.setBounds(left, top, widths.arrowsAt(), height);
+    }
 
-        statusLabel.setBounds(left, top, Math.max(0, navX - left), height);
+    /**
+     * How the bar's width is shared out, and where the arrows sit in it.
+     *
+     * @param arrowsAt where the arrows begin, measured from the start of the
+     *                 content - which is also exactly how much room the sentence
+     *                 to their left is given
+     */
+    record Widths(int arrows, int arrowsAt, int figures) {
+    }
+
+    /**
+     * Shares the width out in the order of what a tester cannot do without.
+     * <p>
+     * Static and given plain numbers because this arithmetic has been wrong twice
+     * and neither time was visible in a screenshot until the window was made
+     * narrow. Every region used to be clamped on its own: the arrows were placed
+     * at their full width whatever the room, so once the figures and the arrows
+     * together outgrew the bar the arrows were pushed to the left edge with bounds
+     * that overlapped the figures - and a flat button fills its whole rectangle
+     * before it draws, so each arrow punched a hole through the text behind it.
+     * The sentence, taking whatever was left of nothing, was laid out at zero
+     * width and vanished.
+     * <p>
+     * The order is: the arrows first, because a control that cannot be hit is
+     * worse than a number that cannot be read; then a floor for the sentence; then
+     * the figures take what is left, which is what a narrow run editor loses off
+     * the end of its verdict counts.
+     * <p>
+     * The two ends cannot cross, and that is arithmetic rather than a promise:
+     * arrows plus figures is at most inner minus the floor, so the right-hand
+     * limit is never less than the floor itself.
+     */
+    static @NotNull Widths budget(final int inner, final int arrowsWanted, final int figuresWanted) {
+        final int arrows = Math.max(0, Math.min(arrowsWanted, inner));
+        final int floor = Math.max(0, Math.min(SENTENCE_FLOOR, inner - arrows));
+        final int figures = Math.max(0, Math.min(figuresWanted, inner - arrows - floor));
+
+        final int centered = (inner - arrows) / 2;
+
+        return new Widths(arrows, Math.max(floor, Math.min(centered, inner - figures - arrows)), figures);
     }
 
     /**
