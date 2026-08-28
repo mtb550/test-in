@@ -62,13 +62,20 @@ public final class TestNGRunner implements TestRunner {
     public void run(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
         if (cases.isEmpty()) return;
 
+        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
+
         if (DumbService.isDumb(p)) {
+            // Told to the execution service as well as to the tester. Whoever
+            // asked for these cases has already claimed them - that claim is what
+            // makes their verdicts land in the right test run - and a claim on a
+            // case that never starts is never released, so that run would go on
+            // recording the case's results from every other run it sits in.
+            cases.forEach(execution::notStarting);
+
             DumbService.getInstance(p).showDumbModeNotification(
                     "Cannot run tests while IntelliJ is indexing. Please wait a moment.");
             return;
         }
-
-        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         // Marked here, where the tester's gesture is. Everything below hops to a
         // pooled thread and back, and a card that only turned Running when the

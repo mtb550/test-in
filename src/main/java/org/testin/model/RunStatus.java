@@ -68,6 +68,23 @@ public enum RunStatus {
     private final @NotNull Optional<TestStatus> verdict;
 
     /**
+     * Whether this report says the case is still going.
+     * <p>
+     * Only {@code RUNNING} does. A verdict is the end of it, and {@code IDLE} is
+     * the runner saying the case never started or a stop putting it back - so
+     * every other report is the case leaving, which is what releases the claim
+     * held by the editor that launched it.
+     * <p>
+     * Asked of the status rather than tested for at the call site, for the
+     * reason {@link #verdict} is: what a report means is this enum's to say, and
+     * a reader that compares constants has to be found and changed when a fifth
+     * one arrives.
+     */
+    public boolean stillGoing() {
+        return this == RUNNING;
+    }
+
+    /**
      * Whether this status draws a badge at all. The one reader of what the badge
      * is, so no caller has to know that "nobody has run this" and "there is
      * nothing to draw" are the same fact.

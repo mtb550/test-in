@@ -865,6 +865,16 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     private void executionReported(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         if (!launchedHere.contains(tc.getId())) return;
+
+        // The claim is released by anything but "started": a verdict is the end
+        // of the case, and IDLE is the runner declining it - no generated
+        // method, indexing in the way - or a stop putting it back. Before the
+        // guards below, because a run that has since been signed off, or a case
+        // since deleted, still has to let go: a claim that outlives its
+        // execution hands this run the next verdict that case earns in any
+        // other run.
+        if (!status.stillGoing()) launchedHere.remove(tc.getId());
+
         if (runItem(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) return;
 
         // A completed or closed run keeps what it recorded. It is signed off,
@@ -883,10 +893,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // refreshing whichever view is showing, and confirming to the tester. A
         // verdict TestNG reached is the same verdict a tester would have typed,
         // so it takes the same path.
-        status.getVerdict().ifPresent(verdict -> {
-            launchedHere.remove(tc.getId());
-            Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict, duration, failure);
-        });
+        status.getVerdict().ifPresent(verdict ->
+                Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict, duration, failure));
 
         // A model event, not a repaint: the card grows a Duration line the
         // moment that value stops being blank, and a JList re-measures a row
