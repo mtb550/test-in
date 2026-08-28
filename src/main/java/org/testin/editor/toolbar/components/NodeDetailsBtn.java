@@ -1,5 +1,6 @@
 package org.testin.editor.toolbar.components;
 
+import org.testin.editor.AbstractIconButton;
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.toolbar.Toolbar;
@@ -23,7 +24,7 @@ import org.testin.view.marker.MarkerDetailsViewDialog;
  * {@link TestDetailsPopupBtn}, which despite the name choose which columns the
  * grid shows.
  */
-public class NodeDetailsBtn extends AbstractButton implements ToolbarItem {
+public class NodeDetailsBtn extends AbstractIconButton implements ToolbarItem {
 
     public NodeDetailsBtn(final @NotNull Toolbar editor) {
         // The icon the tree's Details action already uses, so one command does

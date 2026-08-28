@@ -1,5 +1,6 @@
 package org.testin.editor.toolbar.components;
 
+import org.testin.editor.AbstractIconButton;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
  * Toolbar button that shows a persistent check-box popup of editor detail attributes.
  * The concrete subclasses only supply the enum options and the persistence key.
  */
-public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribute> extends AbstractButton implements ToolbarItem {
+public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribute> extends AbstractIconButton implements ToolbarItem {
 
     @Getter
     private final @NotNull Set<E> selectedDetails = new HashSet<>();

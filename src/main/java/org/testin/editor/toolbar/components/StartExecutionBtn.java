@@ -1,11 +1,12 @@
 package org.testin.editor.toolbar.components;
 
+import org.testin.editor.AbstractIconButton;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.model.TestRunStatus;
 
-public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
+public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem {
 
     private final @NotNull RunEditor editor;
 

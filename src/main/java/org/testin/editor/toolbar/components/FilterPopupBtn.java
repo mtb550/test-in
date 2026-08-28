@@ -1,5 +1,6 @@
 package org.testin.editor.toolbar.components;
 
+import org.testin.editor.AbstractIconButton;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.*;
@@ -20,7 +21,7 @@ import org.testin.util.IconManager;
 import java.util.*;
 import java.util.function.Supplier;
 
-public class FilterPopupBtn extends AbstractButton implements ToolbarItem {
+public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     @Getter
     @NotNull
     private final Set<Group> selectedGroup = new HashSet<>();

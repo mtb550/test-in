@@ -1,5 +1,6 @@
 package org.testin.editor.toolbar.components;
 
+import org.testin.editor.AbstractIconButton;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -7,7 +8,7 @@ import org.testin.editor.run.RunEditor;
 import org.testin.report.GenerateReportAction;
 import org.testin.util.Shortcuts;
 
-public class GenerateReportBtn extends AbstractButton implements ToolbarItem {
+public class GenerateReportBtn extends AbstractIconButton implements ToolbarItem {
 
     public GenerateReportBtn(final @NotNull Project p, final @NotNull RunEditor editor) {
         super("Generate Test Summary Report", AllIcons.ToolbarDecorator.Export, Shortcuts.GenerateReport);

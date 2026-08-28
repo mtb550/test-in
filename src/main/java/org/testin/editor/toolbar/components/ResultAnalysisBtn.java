@@ -1,5 +1,6 @@
 package org.testin.editor.toolbar.components;
 
+import org.testin.editor.AbstractIconButton;
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
@@ -17,7 +18,7 @@ import org.testin.model.TestRunStatus;
  * Completed and not merely terminal: a closed run is finished with, and writing
  * an analysis into it is describing a run nobody will act on.
  */
-public class ResultAnalysisBtn extends AbstractButton implements ToolbarItem {
+public class ResultAnalysisBtn extends AbstractIconButton implements ToolbarItem {
 
     private final @NotNull RunEditor editor;
 

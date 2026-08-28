@@ -1,6 +1,7 @@
-package org.testin.editor.toolbar.components;
+package org.testin.editor;
 
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.application.WriteIntentReadAction;
 import com.intellij.openapi.util.IconLoader;
@@ -18,7 +19,7 @@ import java.awt.event.MouseEvent;
 import java.util.Optional;
 
 /**
- * A flat toolbar button: the icon alone at rest, a rounded hover pill and a
+ * A flat icon button: the icon alone at rest, a rounded hover pill and a
  * slightly larger icon under the pointer.
  * <p>
  * It paints its own background rather than leaving it to the look and feel. A
@@ -29,14 +30,14 @@ import java.util.Optional;
  * keep whatever was drawn there before. Filling from the toolbar's own color
  * keeps the promise and keeps the button invisible at rest.
  */
-public abstract class AbstractButton extends JButton {
+public abstract class AbstractIconButton extends JButton {
 
     private final @NotNull Icon restIcon;
     private final @NotNull Icon zoomedIcon;
 
     private boolean hovered;
 
-    public AbstractButton(final @NotNull String tooltip, final @NotNull Icon icon) {
+    public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon) {
         super(null, icon);
         // Swing's own contract: a null tooltip is no tooltip at all, and an
         // empty one is a small empty box that follows the pointer.
@@ -56,12 +57,21 @@ public abstract class AbstractButton extends JButton {
         this.restIcon = icon;
         this.zoomedIcon = IconManager.zoomStandardIcon(icon, this);
 
-        // Measured with the zoomed icon, then frozen. The look and feel keeps
-        // deciding the spacing, so the toolbar looks as it always has; freezing
-        // it stops setIcon() - which revalidates - from growing the button when
-        // the pointer arrives and shrinking it when it leaves, which re-laid out
-        // the whole toolbar and shifted the buttons under the pointer.
-        setIcon(zoomedIcon);
+        // Measured once, from a standard platform icon rather than from this
+        // button's own, then frozen.
+        //
+        // Frozen because the look and feel keeps deciding the spacing, so the
+        // toolbar looks as it always has, and because setIcon() revalidates -
+        // without this the button grew when the pointer arrived and shrank when
+        // it left, re-laying out the whole toolbar and shifting the buttons out
+        // from under the pointer.
+        //
+        // Measured from a reference icon because every button in the plugin is
+        // then the same size whatever it draws. It used to measure its own, so
+        // the size was the icon's size plus insets and any icon a pixel wider
+        // than the rest made one button wider than the rest - which is how a
+        // status bar arrow and the toolbar button above it came to disagree.
+        setIcon(IconManager.zoomStandardIcon(AllIcons.Actions.Refresh, this));
         final @NotNull Dimension size = getPreferredSize();
         setIcon(restIcon);
 
@@ -102,7 +112,7 @@ public abstract class AbstractButton extends JButton {
      * button carrying both shows the plain one on some paths and the rich one on
      * others.
      */
-    public AbstractButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Shortcuts shortcut) {
+    public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Shortcuts shortcut) {
         this("", icon);
 
         new HelpTooltip()
