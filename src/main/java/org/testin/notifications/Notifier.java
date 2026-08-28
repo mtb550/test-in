@@ -85,6 +85,29 @@ public final class Notifier {
     }
 
     /**
+     * The tester asked to run a node that has nothing left to run.
+     * <p>
+     * One sentence for two situations that read the same to them: a test set
+     * holding no cases at all, and a run whose cases have all been judged
+     * already. Both are the tree saying "there is nothing here for me to start",
+     * and neither is a failure worth keeping beside real ones.
+     */
+    public void softRefuseNothingToRun(final @NotNull Project p, final @NotNull String name) {
+        softRefuse(p, name + " has no test cases to run");
+    }
+
+    /**
+     * The tester asked to run something that is already running.
+     * <p>
+     * Its own sentence rather than the one below: a run with cases still going
+     * has plenty left to run, and telling them it has nothing would send them
+     * looking for cases that are on screen in front of them.
+     */
+    public void softRefuseAlreadyRunning(final @NotNull Project p, final @NotNull String name) {
+        softRefuse(p, name + " is already running");
+    }
+
+    /**
      * Confirms an operation that ran over a selection: "Node copied" for one,
      * "Nodes copied 3" for several. Here rather than at the call sites so that
      * every bulk action pluralizes and counts the same way (#62).

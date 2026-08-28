@@ -26,7 +26,7 @@ import org.testin.open.OpenContextMenuAction;
 import org.testin.remove.RemoveAction;
 import org.testin.rename.RenameAction;
 import org.testin.report.GenerateReportAction;
-import org.testin.run.RunTestSetAction;
+import org.testin.run.RunTestsAction;
 import org.testin.testproject.UpdateTestProjectStatusAction;
 import org.testin.testrun.SetTestRunStatusAction;
 import org.testin.testset.UpdateTestSetStatusAction;
@@ -66,7 +66,7 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         if (OptionalPlugin.TESTNG.isAvailable()) {
             addSeparator();
-            add(new RunTestSetAction(p, tree));
+            add(new RunTestsAction(p, tree));
         }
 
         addSeparator();

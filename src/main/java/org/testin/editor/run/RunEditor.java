@@ -34,6 +34,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.open.OpenContextMenuAction;
+import org.testin.run.RunTestCases;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.RunStatusService;
@@ -164,6 +165,23 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     private int gridColumnToRestore = -1;
 
+    /**
+     * Whether the cases have been read.
+     * <p>
+     * Not answerable from {@code tr}, which is set on the pooled thread before the
+     * cases it points at have been resolved - so an editor asked to start in that
+     * window would have found an empty list and started nothing.
+     */
+    private boolean loaded;
+
+    /**
+     * Whether something asked this editor to start as soon as it could, and has
+     * not been served yet. Cleared when it is served and when a load fails, so a
+     * request that could not be met does not sit armed and fire on the next
+     * unrelated reload - a toolbar Refresh, or a sync catching the editor up.
+     */
+    private boolean startWhenLoaded;
+
     public RunEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
         this.p = p;
         this.parent = vf.getTestRun();
@@ -222,6 +240,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     private void loadDataAsync() {
         final int generation = loadGeneration.incrementAndGet();
+        loaded = false;
         list.setPaintBusy(true);
         list.getEmptyText().setText("Loading...");
 
@@ -283,12 +302,18 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                     refreshExecutionButtons();
                     refreshView();
                     focusIfGoingTo();
+
+                    loaded = true;
+                    startIfAsked();
                 });
             } catch (final Exception ex) {
                 Logger.error("Failed to load Test Run data from disk: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
                     list.setPaintBusy(false);
                     list.getEmptyText().setText("Unable to load this test run.");
+
+                    // The request goes with the load that could not serve it.
+                    startWhenLoaded = false;
                 });
             }
         });
@@ -861,6 +886,70 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         run().ifPresent(TestRunDto::markExecutionStarted);
         Services.getInstance(p, TestRunStatusChange.class).apply(this, TestRunStatus.IN_PROGRESS);
+    }
+
+    /**
+     * Asked from outside to run what this run has left - see
+     * {@link TestinEditor#runWhenLoaded()}.
+     */
+    @Override
+    public void runWhenLoaded() {
+        startWhenLoaded = true;
+        startIfAsked();
+    }
+
+    private void startIfAsked() {
+        if (!startWhenLoaded || !loaded) return;
+
+        startWhenLoaded = false;
+        runPending();
+    }
+
+    /**
+     * Runs the cases this run has not reached yet, and records their verdicts into
+     * it.
+     * <p>
+     * Pending, not every case, and that is the same answer {@link #firstPendingIndex()}
+     * gives the Start button beside it: re-running cases already judged puts a
+     * tester back at the top of a run they were in the middle of, and it would
+     * overwrite a verdict they gave by hand with one nothing asked for. A run with
+     * nothing pending says so rather than quietly re-running all of it.
+     * <p>
+     * Cases already going are dropped here rather than left to {@link RunTestCases},
+     * which drops them too - but silently, and after this has already claimed them.
+     * A case claimed and then not started is a claim that never clears, so the next
+     * verdict it does report, in whatever run actually ran it, is written into this
+     * one as well.
+     */
+    private void runPending() {
+        if (!canStartExecution()) {
+            // The tree offers this because it cannot see inside the editor -
+            // whether a run is mid-execution is known here and nowhere else. Said
+            // rather than swallowed: the tab came forward and nothing happened,
+            // which reads as a menu entry that does not work.
+            if (isExecuting()) Services.getInstance(p, Notifier.class).softRefuseAlreadyRunning(p, parent.getName());
+            return;
+        }
+
+        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
+
+        final @NotNull List<TestCaseDto> pending = allTestCases.stream()
+                .filter(tc -> runItem(tc.getId()).filter(item -> item.getStatus() == TestStatus.PENDING).isPresent())
+                .filter(tc -> !execution.isRunning(tc.getId()))
+                .toList();
+
+        if (pending.isEmpty()) {
+            Services.getInstance(p, Notifier.class).softRefuseNothingToRun(p, parent.getName());
+            return;
+        }
+
+        Logger.info("Running " + parent.getName() + " with " + pending.size() + " pending test case(s)");
+
+        // Claimed before the launch, so every verdict that comes back lands in this
+        // run rather than in whichever run editor happens to hold the same case.
+        pending.forEach(tc -> launching(tc.getId()));
+
+        RunTestCases.run(p, pending);
     }
 
     private void executionReported(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {

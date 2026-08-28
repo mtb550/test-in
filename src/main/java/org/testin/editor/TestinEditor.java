@@ -267,6 +267,21 @@ public interface TestinEditor extends Disposable {
     void selectWhenLoaded(final @NotNull UUID id);
 
     /**
+     * Start this node's cases as soon as there is data to start (#36).
+     * <p>
+     * Told rather than done, the same promise {@link #selectWhenLoaded} makes and
+     * for the same reason: an editor opened a moment ago is still reading its
+     * cases on a pooled thread, so anything asked of it before that finds an
+     * empty list and quietly does nothing.
+     * <p>
+     * Nothing by default, the shape {@code launching} and {@code appendNewTestCase}
+     * already have: only a run has somewhere for the verdicts to land, so only the
+     * run editor has an answer to give.
+     */
+    default void runWhenLoaded() {
+    }
+
+    /**
      * Which action icon the pointer is over, by name, and empty for none.
      */
     @NotNull String getHoveredIconAction();

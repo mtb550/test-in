@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
@@ -127,33 +128,46 @@ public final class EditorUtil {
     }
 
     /**
+     * Opens a node's editor - or focuses the one already open - and hands it to
+     * whoever asked, once there is one to hand.
+     * <p>
+     * <b>One block and in order.</b> {@code openNow} blocks until the editor
+     * exists, so what follows has something to talk to. It cannot be a second
+     * {@code invokeLater}: the open pumps the event queue while it waits, so the
+     * second call runs <em>inside</em> the first and finds no editor - which is
+     * why a test case picked from the search opened its editor on page one with
+     * nothing selected (#29). Owning that ordering in one place is what this
+     * method is for, and why the two halves it uses stay private.
+     * <p>
+     * <b>What to say to the editor is the caller's.</b> A run says "start what
+     * you have left", a search result says "land on this case"; neither is
+     * knowledge a class named after editors should be carrying, and each lives
+     * in the package the sentence is about.
+     */
+    public void openThen(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull Consumer<TestinEditor> tell) {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (!openNow(p, dir)) return;
+
+            editorFor(p, dir).ifPresent(tell);
+        });
+    }
+
+    /**
      * Opens a node's editor and puts the cursor on one of its test cases (#29).
      * <p>
-     * The two halves are separate because opening is asynchronous: the editor is
-     * built when the platform gets round to it, so the case cannot be selected in
-     * the same breath. Waiting for the editor to appear rather than assuming it
-     * has is why this is here and not written out at the call site - the create
-     * action does the same thing today by holding the editor it already had, and
-     * a caller that only has a node has nothing to hold.
+     * Told to the editor rather than done to it: an editor that has just been
+     * built has no test cases yet - it reads them on a pooled thread - so it is
+     * asked to land on the case once it has one.
      *
      * @param tc the case to land on inside that editor
      */
     public void openAndSelect(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull TestCaseDto tc) {
-        ApplicationManager.getApplication().invokeLater(() -> {
-            // One block and in order, because openNow blocks until the editor
-            // exists - so the next line has something to talk to. Two separate
-            // invokeLater calls did not work: the open pumps the event queue
-            // while it waits, and the second call ran inside the first.
-            if (!openNow(p, dir)) return;
+        openThen(p, dir, editor -> {
+            editor.selectWhenLoaded(tc.getId());
 
-            // Told to the editor rather than done to it: an editor that has just
-            // been built has no test cases yet - it reads them on a pooled
-            // thread - so it is asked to land on the case once it has one.
-            editorFor(p, dir).ifPresent(editor -> editor.selectWhenLoaded(tc.getId()));
-
-            // Outside the editor's own business, and it works either way: the
-            // details panel is handed the case itself rather than asked to find
-            // it, so it fills in whether the editor is ready or not.
+            // Outside the editor's own business: the details panel is handed the
+            // case itself rather than asked to find it, so it fills in whether
+            // the editor has read its cases or not.
             ViewToolWindowFactory.showPanel(p, List.of(tc), dir.getPath2());
         });
     }
