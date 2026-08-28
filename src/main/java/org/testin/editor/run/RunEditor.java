@@ -811,7 +811,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             // fires with index -1 for one that is not, which invalidates the
             // layout of the whole list once a second for a row nobody can see.
             if (model.contains(currentTc)) model.contentsChanged(currentTc);
-            showRunTotals();
+            showElapsed();
         });
     }
 
@@ -954,6 +954,21 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         statusBar.showRunStatus(status);
         statusBar.showVerdicts(ResultAnalysis.headline(TestRunSummary.of(List.copyOf(resultsMap.values())), status));
 
+        showElapsed();
+    }
+
+    /**
+     * The running total, and nothing else.
+     * <p>
+     * Separate because it alone changes every second. The timer ticks once a
+     * second while a case is being timed, and it used to run the whole of
+     * {@link #showRunTotals()} on each tick - summarizing the results, building
+     * the verdict line and handing an html string to a label, which rebuilds its
+     * view tree to accept it, all on the painting thread, for two figures that
+     * cannot have changed since the tick before. A verdict is an event and is
+     * pushed as one; the clock is not.
+     */
+    private void showElapsed() {
         final @NotNull Duration total = resultsMap.values().stream()
                 .map(TestRunItems::getDuration)
                 .reduce(Duration.ZERO, Duration::plus);
