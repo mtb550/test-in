@@ -63,8 +63,34 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         updateToolBarFilterState();
     }
 
+    /**
+     * The four sets a tester can narrow the list with, as one list.
+     * <p>
+     * They were spelled out three times - counted for the badge, tested for the
+     * Reset action, cleared on reset - so a fifth kind of filter meant finding
+     * all three and a missed one showed as a badge that counted something the
+     * Reset button said was not there.
+     */
+    private @NotNull List<Set<?>> filters() {
+        return List.of(selectedPriority, selectedGroup, selectedModule, selectedStatus);
+    }
+
+    public int activeFilterCount() {
+        return filters().stream().mapToInt(Set::size).sum();
+    }
+
+    /**
+     * Whether the list on screen is narrowed. Asked by the Reset action, which
+     * hides itself when there is nothing to reset, and by the editor status bar,
+     * which says so beside the count - a bar reading "3 of 120" over twelve rows
+     * is the filter it does not mention.
+     */
+    public boolean hasActiveFilters() {
+        return activeFilterCount() > 0;
+    }
+
     public void updateToolBarFilterState() {
-        final int activeFiltersCount = selectedPriority.size() + selectedGroup.size() + selectedModule.size() + selectedStatus.size();
+        final int activeFiltersCount = activeFilterCount();
         if (activeFiltersCount == 0) {
             setText(null);
             setToolTipText("Filter");
@@ -85,10 +111,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
      * Clears the UI state without triggering a second editor refresh.
      */
     public void clearFilters() {
-        selectedPriority.clear();
-        selectedGroup.clear();
-        selectedModule.clear();
-        selectedStatus.clear();
+        filters().forEach(Set::clear);
         updateToolBarFilterState();
     }
 
@@ -103,8 +126,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         filterResetBtn.add(new DumbAwareAction("Reset Filters", "Clear active filters", AllIcons.Actions.Cancel) {
             @Override
             public void update(final @NotNull AnActionEvent e) {
-                final boolean hasActiveFilters = !selectedPriority.isEmpty() || !selectedGroup.isEmpty() || !selectedModule.isEmpty() || !selectedStatus.isEmpty();
-                e.getPresentation().setEnabledAndVisible(hasActiveFilters);
+                e.getPresentation().setEnabledAndVisible(hasActiveFilters());
             }
 
             @Override
