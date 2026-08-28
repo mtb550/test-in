@@ -80,10 +80,13 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     }
 
     /**
-     * Whether the list on screen is narrowed. Asked by the Reset action, which
-     * hides itself when there is nothing to reset, and by the editor status bar,
-     * which says so beside the count - a bar reading "3 of 120" over twelve rows
-     * is the filter it does not mention.
+     * Whether the tester has narrowed the list from this popup. Asked by the Reset
+     * action, which hides itself when there is nothing to reset.
+     * <p>
+     * Not the same question as "is the list on screen narrowed", which the status
+     * bar answers for itself by comparing the shown count with the total - that
+     * one also catches a search query and a filter that happens to match
+     * everything, and this one does not.
      */
     public boolean hasActiveFilters() {
         return activeFilterCount() > 0;

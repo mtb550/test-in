@@ -47,7 +47,8 @@
 #
 # Seven of what is left is machinery the filter cannot tell from a caption: a
 # font name and a date locale look exactly like one. They are a floor on this
-# number rather than work to do.#
+# number rather than work to do.
+#
 # 169 after the status bar work. The editor's own clock went - two labels wrote
 # the same corner with different meanings - and the flat hover button moved out
 # of the toolbar package to be shared with the status bar's page arrows, which
