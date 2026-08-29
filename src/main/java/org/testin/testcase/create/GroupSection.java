@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GroupSection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 1f);
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     private final @NotNull JBPanel<?> group;
     private final @NotNull JBPanel<?> wrapper;
 

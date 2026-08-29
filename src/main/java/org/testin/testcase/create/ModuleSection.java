@@ -20,15 +20,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ModuleSection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     @Getter
     private final @NotNull EditorTextField moduleField;
     private final @NotNull JBPanel<?> wrapper;
 
     public ModuleSection(final @NotNull Project p) {
-        this.moduleField = SpellChecker.createCompletionField(p,
-                new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getModules(), CreateTestCaseFields.MODULE.getIcon()),
-                "");
+        this.moduleField = SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getModules(), CreateTestCaseFields.MODULE.getIcon()), "");
         this.moduleField.setOneLineMode(true);
         this.moduleField.setFont(fieldFont);
         this.moduleField.setPlaceholder(CreateTestCaseFields.MODULE.getPlaceholder());

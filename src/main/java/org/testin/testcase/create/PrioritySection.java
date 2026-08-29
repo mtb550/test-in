@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class PrioritySection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     private final @NotNull ComboBox<Priority> priority;
     private final @NotNull JBPanel<?> wrapper;
 

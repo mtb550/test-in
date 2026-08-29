@@ -23,7 +23,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ExpectedResultSection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     private final @NotNull Project p;
     @Getter
     private final @NotNull EditorTextField expectedResultField;
@@ -31,9 +31,7 @@ public class ExpectedResultSection implements CreateTestCaseSection {
 
     public ExpectedResultSection(final @NotNull Project p) {
         this.p = p;
-        this.expectedResultField = SpellChecker.createCompletionField(p,
-                new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getExpectedResults(), CreateTestCaseFields.EXPECTED_RESULT.getIcon()),
-                "");
+        this.expectedResultField = SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getExpectedResults(), CreateTestCaseFields.EXPECTED_RESULT.getIcon()), "");
         this.expectedResultField.setFont(fieldFont);
         this.expectedResultField.setPlaceholder(CreateTestCaseFields.EXPECTED_RESULT.getPlaceholder());
         this.expectedResultField.setShowPlaceholderWhenFocused(true);

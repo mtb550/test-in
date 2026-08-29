@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class StepsSection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     private final @NotNull Project p;
     @Getter
     private final @NotNull List<EditorTextField> stepFields;

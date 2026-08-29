@@ -16,7 +16,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PreConditionsSection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     @Getter
     private final @NotNull EditorTextField preConditionsField;
     private final @NotNull JBPanel<?> wrapper;

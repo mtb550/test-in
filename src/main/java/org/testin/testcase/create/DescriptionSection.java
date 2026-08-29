@@ -28,9 +28,7 @@ public class DescriptionSection implements CreateTestCaseSection {
     private final @NotNull JBPanel<?> wrapper;
 
     public DescriptionSection(final @NotNull Project p) {
-        this.descriptionField = SpellChecker.createCompletionField(p,
-                new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()),
-                "");
+        this.descriptionField = SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), "");
         this.descriptionField.setOneLineMode(true);
         this.descriptionField.setFont(fieldFont);
         this.descriptionField.setPlaceholder(CreateTestCaseFields.DESCRIPTION.getPlaceholder());
