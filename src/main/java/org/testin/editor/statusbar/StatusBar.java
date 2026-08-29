@@ -215,15 +215,22 @@ public class StatusBar extends JBPanel<StatusBar> {
      * The two ends cannot cross, and that is arithmetic rather than a promise:
      * arrows plus figures is at most inner minus the floor, so the right-hand
      * limit is never less than the floor itself.
+     * <p>
+     * Said with {@code Math.clamp} rather than a max around a min, which is the
+     * same arithmetic while the bounds hold and not the same when they do not -
+     * clamp refuses an inverted range instead of quietly answering the lower
+     * bound. That is the paragraph above made enforceable: if the reasoning ever
+     * stops being true, the width sweep in {@code StatusBarWidthsTest} fails at
+     * the width where it broke rather than a tester finding a bar drawn wrong.
      */
     static @NotNull Widths budget(final int inner, final int arrowsWanted, final int figuresWanted) {
-        final int arrows = Math.max(0, Math.min(arrowsWanted, inner));
-        final int floor = Math.max(0, Math.min(SENTENCE_FLOOR, inner - arrows));
-        final int figures = Math.max(0, Math.min(figuresWanted, inner - arrows - floor));
+        final int arrows = Math.clamp(arrowsWanted, 0, inner);
+        final int floor = Math.clamp(SENTENCE_FLOOR, 0, inner - arrows);
+        final int figures = Math.clamp(figuresWanted, 0, inner - arrows - floor);
 
         final int centered = (inner - arrows) / 2;
 
-        return new Widths(arrows, Math.max(floor, Math.min(centered, inner - figures - arrows)), figures);
+        return new Widths(arrows, Math.clamp(centered, floor, inner - figures - arrows), figures);
     }
 
     /**
