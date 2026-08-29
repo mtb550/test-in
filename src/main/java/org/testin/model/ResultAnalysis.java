@@ -1,14 +1,17 @@
 package org.testin.model;
 
 import com.intellij.ui.JBColor;
+import com.intellij.util.ui.UIUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.Map;
-import java.util.StringJoiner;
 import java.util.function.ToLongFunction;
 
 /**
@@ -104,7 +107,8 @@ public enum ResultAnalysis {
     }
 
     /**
-     * How the run went on one line, for a status bar that has room for one.
+     * How the run is going, as the pieces a status bar draws: one per verdict any
+     * case carries, each with the color it is drawn in.
      * <p>
      * Here rather than on {@link TestRunSummary} because this is the enum that
      * already pairs a verdict with its name and its count, and a second pairing
@@ -115,8 +119,8 @@ public enum ResultAnalysis {
      * A verdict no case carries is left out, the rule {@link
      * TestRunSummary#hasRemoved()} already states: a run that blocked nothing
      * should not carry "Blocked 0" to explain something that did not happen. So
-     * a run nobody has judged says nothing at all, which is what the execution
-     * time beside it does with a duration of zero.
+     * a run nobody has judged answers with nothing at all, which is what the
+     * execution time beside it does with a duration of zero.
      * <p>
      * Removed is counted here although it is not one of the four - the total on
      * the other side of the bar counts those cases, so a line that left them out
@@ -125,35 +129,47 @@ public enum ResultAnalysis {
      * The run's status is handed in because one of the four buckets is named for
      * it: see {@link #labelIn}.
      */
-    public static @NotNull String headline(final @NotNull TestRunSummary summary, final @NotNull TestRunStatus run) {
-        final @NotNull StringJoiner line = new StringJoiner(" · ");
+    public static @NotNull List<Segment> segments(final @NotNull TestRunSummary summary, final @NotNull TestRunStatus run) {
+        final @NotNull List<Segment> segments = new ArrayList<>();
 
         for (final ResultAnalysis section : values()) {
             final long cases = section.count.applyAsLong(summary);
-            if (cases > 0) line.add(section.painted(section.labelIn(run) + " " + cases));
+            if (cases > 0) segments.add(new Segment(section.labelIn(run) + " " + cases, section.onScreen()));
         }
 
-        // Uncolored on purpose: a case deleted out from under the run is not a
-        // verdict anybody reached, and painting it like one would say it was.
-        if (summary.hasRemoved()) line.add(TestStatus.REMOVED.getLabel() + " " + summary.removed());
+        // In the bar's own text color rather than a verdict's: a case deleted out
+        // from under the run is not a verdict anybody reached, and painting it
+        // like one would say it was.
+        if (summary.hasRemoved()) {
+            segments.add(new Segment(TestStatus.REMOVED.getLabel() + " " + summary.removed(), UIUtil.getInactiveTextColor()));
+        }
 
-        // <nobr>, because a Swing label rendering html wraps its text to whatever
-        // width it is given - and given a narrow bar it broke this line in two and
-        // drew half of it below the other, inside a strip one line tall. Nothing
-        // here is a sentence: it is one row of figures, and a row that does not
-        // fit should be cut off at the edge rather than folded under itself.
-        return line.length() == 0 ? "" : "<html><nobr>" + line + "</nobr></html>";
+        return segments;
     }
 
     /**
-     * The text in this verdict's color, for a Swing label that renders HTML.
+     * One verdict as the bar draws it: what it says, and what color it says it
+     * in.
      * <p>
-     * The theme is read at the moment the line is built rather than baked in,
-     * because the same enum serves a report that is always read on white and a
-     * status bar that is read on whichever background the tester chose.
+     * A color rather than text carrying a color. The line used to be one html
+     * string with the hex written into it, picked from the theme at the moment
+     * the string was built - so the label held that hex until something handed
+     * it a new string, and a tester who switched theme kept the old palette until
+     * they turned a page. A {@link JBColor} is asked which theme it is in every
+     * time it paints, so the question cannot be answered once and go stale.
      */
-    private @NotNull String painted(final @NotNull String text) {
-        return "<span style=\"color:#" + (JBColor.isBright() ? hexColor : darkHexColor) + "\">" + text + "</span>";
+    public record Segment(@NotNull String text, @NotNull Color color) {
+    }
+
+    /**
+     * This verdict's color on screen, in both themes at once.
+     * <p>
+     * Built from the same two values the reports use rather than a third
+     * declaration: the light one is what a report prints on white, and the dark
+     * one is what the earlier of these two was too dim to be read against.
+     */
+    private @NotNull JBColor onScreen() {
+        return new JBColor(Color.decode("#" + hexColor), Color.decode("#" + darkHexColor));
     }
 
     /**

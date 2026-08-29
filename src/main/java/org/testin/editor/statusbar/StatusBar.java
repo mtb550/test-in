@@ -12,11 +12,13 @@ import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
+import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunStatus;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.util.Locale;
 
 public class StatusBar extends JBPanel<StatusBar> {
@@ -52,9 +54,17 @@ public class StatusBar extends JBPanel<StatusBar> {
 
     /**
      * How the run is going, in the same four verdicts the reports and the Result
-     * Analysis dialog use. Blank in the test case editor, for the reason above.
+     * Analysis dialog use. Empty in the test case editor, for the reason above.
+     * <p>
+     * A row of labels rather than one label holding html. The line used to be a
+     * single string with each verdict's color written into it as a hex literal,
+     * chosen from the theme at the moment the string was built - so switching
+     * theme repainted the bar around figures still in the old palette, and light
+     * to dark left the untouched count at a grey that is very nearly the
+     * background. A label is asked for its foreground every time it paints, so a
+     * {@link JBColor} on each one cannot go stale.
      */
-    private final @NotNull JBLabel verdictsLabel = new JBLabel();
+    private final @NotNull JBPanel<?> verdictsRow = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
     /**
      * The run's total execution time, ticking while a case is timed. Blank in the
@@ -106,14 +116,11 @@ public class StatusBar extends JBPanel<StatusBar> {
                 .setDescription(HtmlChunk.text("This run's status. A completed or closed run records no more verdicts"))
                 .installOn(runStatusLabel);
 
-        verdictsLabel.setForeground(UIUtil.getInactiveTextColor());
+        verdictsRow.setOpaque(false);
         // First to give room up when the bar is short of it - see doLayout. It
         // reads left to right in the order a tester wants to know things, so what
         // a narrow bar loses off the end is the untouched count.
-        verdictsLabel.setBorder(JBUI.Borders.emptyRight(10));
-        new HelpTooltip()
-                .setDescription(HtmlChunk.text("How this run is going"))
-                .installOn(verdictsLabel);
+        verdictsRow.setBorder(JBUI.Borders.emptyRight(10));
 
         executionTimeLabel.setForeground(UIUtil.getInactiveTextColor());
         executionTimeLabel.setBorder(JBUI.Borders.emptyRight(10));
@@ -128,7 +135,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         // front of the page size and put that field somewhere the run editor
         // never put it. The two bars now differ by exactly the run's figures.
         runStatusLabel.setVisible(false);
-        verdictsLabel.setVisible(false);
+        verdictsRow.setVisible(false);
         executionTimeLabel.setVisible(false);
 
         pageSizeField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -138,7 +145,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         pageSizeField.setToolTipText("Test cases per page");
 
         navigationRow = centeredRow(firstButton, prevButton, currentPageLabel, nextButton, lastButton);
-        rightRow = centeredRow(runStatusLabel, verdictsLabel, executionTimeLabel, pageSizeField);
+        rightRow = centeredRow(runStatusLabel, verdictsRow, executionTimeLabel, pageSizeField);
 
         add(statusLabel);
         add(navigationRow);
@@ -280,13 +287,50 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     /**
-     * How many cases carry each verdict, already phrased by
-     * {@code ResultAnalysis.headline}. Blank for a run with nothing recorded,
+     * How many cases carry each verdict, already phrased and colored by
+     * {@code ResultAnalysis.segments}. Empty for a run with nothing recorded,
      * which is the rule the execution time beside it already follows.
+     * <p>
+     * The labels are rebuilt rather than kept and re-titled: which verdicts
+     * appear changes with the run - a verdict no case carries is not drawn at all
+     * - so a fixed set of labels would need one hidden per verdict nobody gave,
+     * which is the arrangement the three run labels beside this one already show
+     * the cost of.
      */
-    public void showVerdicts(final @NotNull String formatted) {
-        verdictsLabel.setText(formatted);
-        verdictsLabel.setVisible(!formatted.isEmpty());
+    public void showVerdicts(final @NotNull List<ResultAnalysis.Segment> verdicts) {
+        verdictsRow.removeAll();
+
+        for (final ResultAnalysis.Segment verdict : verdicts) {
+            if (verdictsRow.getComponentCount() > 0) verdictsRow.add(painted(" · ", UIUtil.getInactiveTextColor()));
+
+            verdictsRow.add(painted(verdict.text(), verdict.color()));
+        }
+
+        verdictsRow.setVisible(!verdicts.isEmpty());
+
+        // On the bar, not the row: the bar places its three regions itself from
+        // their preferred widths, and the row just changed its own.
+        revalidate();
+        repaint();
+    }
+
+    /**
+     * One piece of the verdict line.
+     * <p>
+     * The tooltip goes on every one of them because it is the row's, not the
+     * label's: Swing offers a tooltip only for the component under the pointer,
+     * and a child that has none does not fall back to its parent - so a tooltip
+     * installed on the row alone would never be shown once the row had children.
+     */
+    private static @NotNull JBLabel painted(final @NotNull String text, final @NotNull Color color) {
+        final @NotNull JBLabel label = new JBLabel(text);
+
+        label.setForeground(color);
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text("How this run is going"))
+                .installOn(label);
+
+        return label;
     }
 
     /**

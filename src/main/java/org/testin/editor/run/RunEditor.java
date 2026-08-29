@@ -1049,7 +1049,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         final @NotNull TestRunStatus status = parent.getMarker().getStatus();
 
         statusBar.showRunStatus(status);
-        statusBar.showVerdicts(ResultAnalysis.headline(TestRunSummary.of(List.copyOf(resultsMap.values())), status));
+        statusBar.showVerdicts(ResultAnalysis.segments(TestRunSummary.of(List.copyOf(resultsMap.values())), status));
 
         showElapsed();
     }
