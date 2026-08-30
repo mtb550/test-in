@@ -102,15 +102,6 @@ public class OrderSection implements CreateTestCaseSection {
     }
 
     /**
-     * Ranks the case between the two it was asked to land between, as they sit
-     * in the set with this case taken out of it.
-     * <p>
-     * Taken out first because the tester reads positions on the list they are
-     * looking at: moving the third case of five to fourth means landing between
-     * the cases now at three and four, and counting this case among them would
-     * put it back where it was.
-     */
-    /**
      * Refuses a position the field cannot read as one, in the platform's own
      * words - "Value must be between 1 and 17" - rather than quietly leaving the
      * case where it is and reporting the edit as saved.
@@ -129,6 +120,15 @@ public class OrderSection implements CreateTestCaseSection {
         }
     }
 
+    /**
+     * Ranks the case between the two it was asked to land between, as they sit
+     * in the set with this case taken out of it.
+     * <p>
+     * Taken out first because the tester reads positions on the list they are
+     * looking at: moving the third case of five to fourth means landing between
+     * the cases now at three and four, and counting this case among them would
+     * put it back where it was.
+     */
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
         final @NotNull List<TestCaseDto> inSet = ExecutionPosition.setOf(p, dto);
