@@ -5,7 +5,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.hover.TableHoverListener;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.EditorColors;
@@ -466,15 +465,15 @@ public class GridPanelBuilder {
         // The IntelliJ table UI paints a rollover background over table rows.
         // The grid renderer owns all row colors, so use the standard table UI here.
         table.setUI(new BasicTableUI());
-        // Swapping the UI is not enough: JBTable also attaches a hover listener in
-        // its constructor, which keeps tracking the hovered row and repainting it.
-        //
-        // TableHoverListener is @ApiStatus.Experimental, and this is the only way
-        // to detach the listener the platform attached - the alternative is
-        // reimplementing hover painting to fight it. Accepted deliberately; if the
-        // API goes, this line fails to compile rather than failing quietly.
-        //noinspection UnstableApiUsage
-        TableHoverListener.DEFAULT.removeFrom(table);
+        // The hover listener JBTable attaches in its constructor is left where it
+        // is. It used to be detached here, through @ApiStatus.Experimental API,
+        // because swapping the UI alone did not stop the tint - but prepareRenderer
+        // above now sets every cell's background after super has run, which is
+        // where JBTable applies that tint, so the color it produces is overwritten
+        // for every cell on every paint. Detaching it was belt to a brace that
+        // already holds, and the platform's own switch for this
+        // (RenderingUtil.PAINT_HOVERED_BACKGROUND) is experimental too, so there
+        // was nothing stable to move to (#66).
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         // Excel/DataGrip-style selection and clipboard (multi-cell selection,

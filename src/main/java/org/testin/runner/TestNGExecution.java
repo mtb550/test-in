@@ -8,7 +8,6 @@ import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
@@ -23,9 +22,11 @@ import org.testin.services.Services;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * The TestNG runs this plugin started: starting them, stopping them, and hearing
@@ -64,6 +65,27 @@ public final class TestNGExecution implements Disposable {
     private final @NotNull RunRegistry registry = new RunRegistry();
 
     /**
+     * The live process behind each run this plugin started, and the name of the
+     * run it belongs to.
+     * <p>
+     * Kept because the platform's own way of answering "which processes are
+     * running" is {@code ExecutionManager.getRunningDescriptors}, which carries
+     * {@code @ApiStatus.Internal} - the load-bearing call in the only feature
+     * that can stop a run, on a method that can change or vanish in any release
+     * with no deprecation (#140). The public execution topic hands the handler
+     * over as the process starts, so what the stop needs is recorded when it is
+     * offered rather than searched for afterwards.
+     * <p>
+     * Keyed by handler rather than by run name: a Testin configuration allows
+     * running in parallel, so two processes can carry one name, and a map the
+     * other way round would lose one of them.
+     * <p>
+     * Only runs this plugin launched go in - a tester's own configuration of the
+     * same name is theirs to stop.
+     */
+    private final @NotNull Map<ProcessHandler, String> live = new ConcurrentHashMap<>();
+
+    /**
      * Written out rather than generated: a project service's constructor is its
      * contract with the platform, which looks for exactly (Project) and refuses
      * to build the service otherwise. A generated one changes shape whenever a
@@ -78,7 +100,14 @@ public final class TestNGExecution implements Disposable {
         p.getMessageBus().connect(this).subscribe(ExecutionManager.EXECUTION_TOPIC, new ExecutionListener() {
 
             @Override
+            public void processStarted(final @NotNull String executorId, final @NotNull ExecutionEnvironment env, final @NotNull ProcessHandler handler) {
+                final @NotNull String runName = env.getRunProfile().getName();
+                if (registry.launchedHere(runName)) live.put(handler, runName);
+            }
+
+            @Override
             public void processTerminated(final @NotNull String executorId, final @NotNull ExecutionEnvironment env, final @NotNull ProcessHandler handler, final int exitCode) {
+                live.remove(handler);
                 ended(env);
             }
 
@@ -224,7 +253,7 @@ public final class TestNGExecution implements Disposable {
         final @NotNull RunRegistry.Stop stop = registry.stopping(List.copyOf(ids));
         if (stop.cases().isEmpty()) return 0;
 
-        final @NotNull List<RunContentDescriptor> theirs = running(stop.runs());
+        final @NotNull Map<ProcessHandler, String> theirs = running(stop.runs());
         Logger.info("Stopping " + stop.cases().size() + " test case(s) in " + stop.runs().size()
                 + " run(s): " + theirs.size() + " had reached a process");
 
@@ -266,41 +295,43 @@ public final class TestNGExecution implements Disposable {
      * fourteen seconds later, having run to the end (#34).
      * <p>
      * Says which of the two it did, because the ways this can fail look
-     * identical from the outside: a descriptor whose process is already gone,
-     * and a live process that ignores the request.
+     * identical from the outside.
+     * <p>
+     * Given the handler rather than a descriptor to find one in: the handler is
+     * what the execution topic hands over when the process starts, and the
+     * descriptor with no handler behind it - which this used to have to refuse -
+     * is a state that can no longer arrive.
      */
-    private void kill(final @NotNull RunContentDescriptor descriptor) {
-        // Answered where it arrives. A descriptor with no handler has nothing
-        // behind it to stop, and saying so is the difference between a stop that
-        // could not act and one that silently did nothing.
-        final @NotNull Optional<ProcessHandler> found = Optional.ofNullable(descriptor.getProcessHandler());
-        if (found.isEmpty()) {
-            Logger.warn("Not stopping '" + descriptor.getDisplayName() + "': it has no process handler");
-            return;
-        }
-
-        final @NotNull ProcessHandler handler = found.orElseThrow();
-
+    private void kill(final @NotNull ProcessHandler handler, final @NotNull String runName) {
         handler.putUserData(ProcessHandler.TERMINATION_REQUESTED, Boolean.TRUE);
 
         if (handler instanceof KillableProcess killable && killable.canKillProcess()) {
-            Logger.info("Killing '" + descriptor.getDisplayName() + "'");
+            Logger.info("Killing '" + runName + "'");
             killable.killProcess();
 
         } else {
-            Logger.info("Destroying '" + descriptor.getDisplayName() + "', which cannot be killed");
+            Logger.info("Destroying '" + runName + "', which cannot be killed");
             handler.destroyProcess();
         }
     }
 
     /**
-     * The running processes started by these configurations, and only ones this
-     * plugin launched - a tester's own configuration of the same name is theirs
-     * to stop.
+     * The live processes of these runs, by the handler that stops each and the
+     * run it belongs to.
+     * <p>
+     * Read from what the execution topic recorded rather than asked of
+     * {@code ExecutionManager.getRunningDescriptors}, which is internal API.
+     * Only runs this plugin launched were ever recorded, so the check that used
+     * to be half of this filter has already been made.
+     * <p>
+     * Terminated all the same: a handler is dropped when its process ends, and
+     * this is the belt to that braces - a process that died between the
+     * bookkeeping and the stop is not something to ask to die again.
      */
-    private @NotNull List<RunContentDescriptor> running(final @NotNull Set<String> names) {
-        return ExecutionManager.getInstance(p).getRunningDescriptors(
-                settings -> names.contains(settings.getName()) && registry.launchedHere(settings.getName()));
+    private @NotNull Map<ProcessHandler, String> running(final @NotNull Set<String> names) {
+        return live.entrySet().stream()
+                .filter(one -> names.contains(one.getValue()) && !one.getKey().isProcessTerminated())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     /**

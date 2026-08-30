@@ -60,6 +60,13 @@
 ]]></description>
 
     <change-notes><![CDATA[
+    <b>2.9.1-alpha</b>
+    <ul>
+        <li><b>The stop no longer depends on internal API:</b> finding the process behind a run went through a method the platform marks internal, which can change or disappear in any release with no warning - and it was the load-bearing call in the only feature that can stop a run. The run now keeps the handle the IDE offers it as each process starts, so stopping uses what it was given rather than asking the platform to find it again.</li>
+        <li>The grid stopped detaching a hover listener it no longer needed: the cell colors are already set after the platform has had its turn, so the tint it was there to prevent could not appear anyway.</li>
+        <li>Every compatibility check the IntelliJ Plugin Verifier offers now fails the build, rather than the two it had been narrowed to.</li>
+    </ul>
+    <br/>
     <b>2.9.0-alpha</b>
     <ul>
         <li><b>Zero compatibility problems, on every IDE:</b> the Java and TestNG code moved into content modules the IDE loads only where they apply. The plugin page reported 159 problems on PyCharm, GoLand and WebStorm &mdash; 53 apiece &mdash; because the verifier could not see past a runtime guard. It now reports none, on all four.</li>

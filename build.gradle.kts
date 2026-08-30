@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "org.testin"
-version = "2.9.0-alpha"
+version = "2.9.1-alpha"
 
 /**
  * The newest IDE branch the plugin claims to support, verified alongside the
@@ -157,15 +157,40 @@ intellijPlatform {
             }
         }
 
-        // The default also fails on a call to an @ApiStatus.Internal method, and
-        // there is exactly one: ExecutionManager.getRunningDescriptors, which is
-        // how the stop finds the process behind a run (#140). Left out here so
-        // the gate reports the thing it exists for - a plugin that will not load
-        // in the IDE it ships for - rather than a known call that works.
+        // Every level the plugin passes, so the gate fails on anything new rather
+        // than on the two it was narrowed to.
+        //
+        // It was down to COMPATIBILITY_PROBLEMS and INVALID_PLUGIN while one
+        // internal-API call needed the exception - ExecutionManager
+        // .getRunningDescriptors, how the stop found the process behind a run.
+        // The stop now records the handler the execution topic hands it, so the
+        // plugin makes no internal call and the level goes back on (#140).
+        //
+        // EXPERIMENTAL_API_USAGES is the one level deliberately left off, for
+        // three usages that have no stable equivalent at all:
+        //
+        //   - EditorTabColorProvider.getEditorTabForegroundColor, overridden to
+        //     color a Testin tab's title. The stable half of that interface
+        //     colors the background, which is left to the user's File Colors.
+        //   - WriteIntentReadAction.run, twice, taking the lock the action system
+        //     itself takes before dispatching - a Swing click arrives without it.
+        //
+        // Each fails to compile if the platform drops it, which is the warning
+        // that matters. Turning this level on would fail the build for three
+        // decisions already made rather than for anything new.
         failureLevel.set(
             listOf(
+                org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.COMPATIBILITY_WARNINGS,
                 org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.COMPATIBILITY_PROBLEMS,
+                org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.DEPRECATED_API_USAGES,
+                org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.SCHEDULED_FOR_REMOVAL_API_USAGES,
+                org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INTERNAL_API_USAGES,
+                org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.OVERRIDE_ONLY_API_USAGES,
+                org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.NON_EXTENDABLE_API_USAGES,
+                org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.PLUGIN_STRUCTURE_WARNINGS,
+                org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.MISSING_DEPENDENCIES,
                 org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INVALID_PLUGIN,
+                org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.NOT_DYNAMIC,
             )
         )
     }
