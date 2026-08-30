@@ -120,24 +120,28 @@ intellijPlatform {
     }
 
     pluginVerification {
-        // IntelliJ IDEA alone by default, because it is the only one of the four
-        // whose verdict is news. Against PyCharm, GoLand and WebStorm the
-        // verifier reports every PSI and TestNG reference as unresolved - 53
-        // apiece, 159 in all - because those IDEs do not ship the Java and
-        // TestNG plugins. plugin.xml depends on both optionally, with a config
-        // file each, and the code behind them is guarded by OptionalPlugin
-        // (#41); the verifier's static analysis cannot see a runtime guard, so
-        // it reports what it cannot prove. A reference that genuinely escaped
-        // into core code looks identical here, which is why the runPyCharm
-        // smoke test is what catches that, and not this.
+        // IntelliJ IDEA and PyCharm, because both verdicts are now news.
+        //
+        // PyCharm used to be behind the flag below with GoLand and WebStorm: the
+        // verifier reported every PSI and TestNG reference as unresolved - 53
+        // apiece, 159 in all - because those IDEs do not ship the Java and TestNG
+        // plugins, and its static analysis cannot see that OptionalPlugin guards
+        // the code at run time (#41). Moving the Java and TestNG code into
+        // content modules the IDE loads only where they apply took that to zero,
+        // which the Marketplace confirmed on 2.9.0-alpha, so PyCharm's answer is
+        // a real answer again and belongs in the gate rather than behind a flag.
+        //
+        // GoLand and WebStorm stay behind it. Nothing targets them, PyCharm is
+        // the IDE without Java support that Testin is actually built for
+        // (#2, #148), and two more IDEs is two more downloads on every sweep.
         //
         // The full sweep is still one command away:
         //
         //     gradlew verifyPlugin -PverifyAllIdes
         //
-        // It reports those 159 and fails on them, which is the honest exit code
-        // for a question whose answer is "the verifier cannot tell" - the
-        // report is what the sweep is for.
+        // It adds GoLand and WebStorm, which report what the verifier cannot
+        // prove about an IDE nothing targets - the report is what the sweep is
+        // for.
         ides {
             // Two branches, not one. sinceBuild is 261 with no untilBuild, so
             // the plugin claims every build from 261 onward - and that is what
@@ -145,15 +149,16 @@ intellijPlatform {
             // compiles against hid a real defect: the Marketplace reported a
             // renderer scheduled for removal in 262 that our own sweep, running
             // against 261, could not see.
-            create(IntelliJPlatformType.IntellijIdea, providers.gradleProperty("intellij.version"))
-            create(IntelliJPlatformType.IntellijIdea, NEXT_BRANCH)
+            listOf(IntelliJPlatformType.IntellijIdea, IntelliJPlatformType.PyCharm).forEach { ide ->
+                create(ide, providers.gradleProperty("intellij.version"))
+                create(ide, NEXT_BRANCH)
+            }
 
             if (providers.gradleProperty("verifyAllIdes").isPresent) {
-                listOf(IntelliJPlatformType.PyCharm, IntelliJPlatformType.GoLand, IntelliJPlatformType.WebStorm)
-                    .forEach { ide ->
-                        create(ide, "2026.1.3")
-                        create(ide, NEXT_BRANCH)
-                    }
+                listOf(IntelliJPlatformType.GoLand, IntelliJPlatformType.WebStorm).forEach { ide ->
+                    create(ide, providers.gradleProperty("intellij.version"))
+                    create(ide, NEXT_BRANCH)
+                }
             }
         }
 
