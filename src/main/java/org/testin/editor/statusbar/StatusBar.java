@@ -386,10 +386,10 @@ public class StatusBar extends JBPanel<StatusBar> {
     /**
      * The one writer of the left label.
      * <p>
-     * The row's position in the whole list is handed in rather than worked out
-     * here: this was a fourth copy of {@code (page - 1) * pageSize + row}, a
-     * conversion the editor interface owns because the card, the hover hit-test
-     * and the transfer handler all need the same answer.
+     * The row's position in the list being paged through is handed in rather
+     * than worked out here: this was a third copy of
+     * {@code (page - 1) * pageSize + row}, and the editor interface owns it
+     * because the editors and the selection listener all need the same answer.
      * <p>
      * Both counts are handed in because they are not the same number when a
      * filter or a search is on. This read "3 of 120 test cases" over twelve

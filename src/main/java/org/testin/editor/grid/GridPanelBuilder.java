@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntPredicate;
+import java.util.function.ToIntFunction;
 
 public class GridPanelBuilder {
 
@@ -342,14 +343,13 @@ public class GridPanelBuilder {
                 && TestEditorAttributes.values()[modelColumn] == TestEditorAttributes.TEST_DATA;
     }
 
-    public @NotNull JBTable buildRunTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<RunEditorAttributes> attributes, final @NotNull Map<UUID, TestRunItems> resultsMap, final int firstItemIndex) {
+    public @NotNull JBTable buildRunTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<RunEditorAttributes> attributes, final @NotNull Map<UUID, TestRunItems> resultsMap, final @NotNull ToIntFunction<TestCaseDto> position) {
         Logger.debug("[GridPanelBuilder] buildRunTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final @NotNull List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
 
         final String @NotNull[] columns = buildColumns(ordered);
         final @NotNull List<String[]> rows = new ArrayList<>();
 
-        int index = firstItemIndex + 1;
         for (final TestCaseDto tc : testCases) {
             // Never skip rows: callers map grid rows back to testCases by index,
             // so a dropped row would make every following row act on the wrong test case.
@@ -357,13 +357,14 @@ public class GridPanelBuilder {
                     .orElseGet(() -> TestRunItems.builder().id(tc.getId()).tc(tc).build());
 
             final String @NotNull[] row = new String[columns.length];
-            final int rowNumber = index++;
+            final int rowNumber = position.applyAsInt(tc);
 
             for (int c = 0; c < ordered.size(); c++) {
                 final @NotNull RunEditorAttributes attr = ordered.get(c);
 
-                // ORDER is the one value the model cannot answer - it is the row's
-                // position on the page, which no run item carries. Recognized by
+                // ORDER is the one value the model cannot answer - it is the case's
+                // place in its set, which no run item carries. Counted on the page
+                // until a filter proved that wrong (#163). Recognized by
                 // the constant rather than by the column number, so moving ORDER
                 // within the enum moves its column and nothing else.
                 row[c] = attr == RunEditorAttributes.ORDER
@@ -381,23 +382,23 @@ public class GridPanelBuilder {
         return table;
     }
 
-    public @NotNull JBTable buildTestTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<TestEditorAttributes> attributes, final int firstItemIndex) {
+    public @NotNull JBTable buildTestTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<TestEditorAttributes> attributes, final @NotNull ToIntFunction<TestCaseDto> position) {
         Logger.debug("[GridPanelBuilder] buildTestTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final @NotNull List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values()).toList();
 
         final String @NotNull[] columns = buildColumns(ordered);
         final @NotNull List<String[]> rows = new ArrayList<>();
 
-        int index = firstItemIndex + 1;
         for (final TestCaseDto tc : testCases) {
             final String @NotNull[] row = new String[columns.length];
-            final int rowNumber = index++;
+            final int rowNumber = position.applyAsInt(tc);
 
             for (int c = 0; c < ordered.size(); c++) {
                 final @NotNull TestEditorAttributes attr = ordered.get(c);
 
-                // ORDER is the one value the model cannot answer - it is the row's
-                // position on the page, which no test case carries. Recognized by
+                // ORDER is the one value the model cannot answer - it is the case's
+                // place in its set, which no test case carries. Counted on the page
+                // until a filter proved that wrong (#163). Recognized by
                 // the constant rather than by the column number, so moving ORDER
                 // within the enum moves its column and nothing else.
                 row[c] = attr == TestEditorAttributes.ORDER

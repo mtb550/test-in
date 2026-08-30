@@ -18,9 +18,9 @@ public class TestListRenderer extends AbstractListRenderer<TestinEditor> {
     }
 
     @Override
-    protected @NotNull TestCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover) {
+    protected @NotNull TestCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int row, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover) {
 
-        card.updateData(globalIndex, tc, editor.getSelectedDetails(), editor.cardTitle(globalIndex, tc));
+        card.updateData(row, tc, editor.getSelectedDetails(), editor.cardTitle(tc));
         card.setActionsState(isSelected, isRowHovered, hover);
         card.applyListFont(list.getFont());
 

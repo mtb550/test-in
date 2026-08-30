@@ -20,18 +20,19 @@ public abstract class AbstractListRenderer<U extends TestinEditor> implements Li
 
     @Override
     public @NotNull BaseCard getListCellRendererComponent(final JList<? extends TestCaseDto> list, final TestCaseDto tc, final int index, final boolean isSelected, final boolean cellHasFocus) {
-        final int globalIndex = editor.globalIndex(index);
-
         final boolean isRowHovered = (index == editor.getHoveredIndex());
         final @NotNull String hover = isRowHovered ? editor.getHoveredIconAction() : "";
 
-        final @NotNull BaseCard card = bindDataAndGetCard(list, tc, globalIndex, isSelected, isRowHovered, hover);
+        // The row, not the case's position in the set: this is what stripes the
+        // cards, and stripes alternate down the screen. The number in the title
+        // is the position, and the editor is asked for that by name.
+        final @NotNull BaseCard card = bindDataAndGetCard(list, tc, index, isSelected, isRowHovered, hover);
 
         card.setBorder(isSelected ? SELECTED_BORDER : UNSELECTED_BORDER);
 
         return card;
     }
 
-    protected abstract @NotNull BaseCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover);
+    protected abstract @NotNull BaseCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int row, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover);
 }
 

@@ -156,7 +156,7 @@ public class CardMouseListener extends MouseAdapter {
         // the icons sit is asked of Shared, which paints them. Neither is worked
         // out here: both used to be, and both drifted.
         final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
-        final @NotNull String title = editor.cardTitle(editor.globalIndex(index), tc);
+        final @NotNull String title = editor.cardTitle(tc);
         final int titleWidth = list.getFontMetrics(titleFont).stringWidth(title);
 
         // The card draws the run button or the stop button by the same rule, so

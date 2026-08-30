@@ -453,10 +453,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     @Override
-    public @NotNull String cardTitle(final int globalIndex, final @NotNull TestCaseDto tc) {
+    public @NotNull String cardTitle(final @NotNull TestCaseDto tc) {
         final @NotNull Set<RunEditorAttributes> selected = getSelectedDetails();
 
-        return BaseCard.titleText(globalIndex,
+        return BaseCard.titleText(positionOf(tc),
                 selected.contains(RunEditorAttributes.ORDER),
                 selected.contains(RunEditorAttributes.DESCRIPTION) ? tc.getDescription() : "");
     }
@@ -593,7 +593,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         final @NotNull Set<RunEditorAttributes> attributes = getSelectedDetails();
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
         try {
-            final @NotNull JBTable table = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap, (currentPage - 1) * pageSize);
+            final @NotNull JBTable table = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap, this::positionOf);
 
             // The previous grid's subscription goes with the previous grid, so
             // they do not accumulate one per rebuild.

@@ -43,6 +43,31 @@ public final class TestCaseOrder {
     }
 
     /**
+     * Where a case sits in an ordered set, counting from one, and the end of it
+     * when the set does not hold the case yet.
+     * <p>
+     * One owner, because the number a card shows, the number a grid row shows
+     * and the number the generated method carries all have to be the same
+     * number. They were three separate sums, two of them counting rows on a
+     * page, so a filter renumbered the cards from one and a set of forty read as
+     * a set of twelve (#163).
+     * <p>
+     * Given the set rather than reading it, so a caller already holding the
+     * ordered list - an editor - answers from what it has instead of going back
+     * to the indexer for the same list.
+     * <p>
+     * By id rather than by object: a reload hands back new instances for the
+     * same test cases.
+     */
+    public static int positionOf(final @NotNull List<TestCaseDto> ordered, final @NotNull TestCaseDto tc) {
+        for (int i = 0; i < ordered.size(); i++) {
+            if (ordered.get(i).getId().equals(tc.getId())) return i + 1;
+        }
+
+        return ordered.size() + 1;
+    }
+
+    /**
      * Makes the list's own order the ranks, and answers which cases had to
      * change to say so.
      * <p>

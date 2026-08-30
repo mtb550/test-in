@@ -78,8 +78,8 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * mouse listener measures it to know where the hover icons start. Composing it
      * twice is how they drift.
      */
-    public static @NotNull String titleText(final int index, final boolean showOrder, final @NotNull String description) {
-        final @NotNull String order = showOrder ? String.format(Locale.ENGLISH, "%d.", index + 1) : "";
+    public static @NotNull String titleText(final int position, final boolean showOrder, final @NotNull String description) {
+        final @NotNull String order = showOrder ? String.format(Locale.ENGLISH, "%d.", position) : "";
 
         return order.isEmpty() || description.isEmpty() ? order + description : order + " " + description;
     }

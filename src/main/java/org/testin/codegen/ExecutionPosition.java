@@ -9,8 +9,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
 
-import java.util.List;
-
 /**
  * Where a test case sits in its test set, as the number its generated method
  * carries so a run executes in the order the tester arranged.
@@ -44,13 +42,7 @@ public final class ExecutionPosition {
      * end is where a tester looks for something that has just arrived.
      */
     public static int of(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        final @NotNull List<TestCaseDto> inSet = TestCaseOrder.ordered(
-                Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(tc.getParent().getPath()));
-
-        for (int position = 0; position < inSet.size(); position++) {
-            if (inSet.get(position).getId().equals(tc.getId())) return position + 1;
-        }
-
-        return inSet.size() + 1;
+        return TestCaseOrder.positionOf(TestCaseOrder.ordered(
+                Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(tc.getParent().getPath())), tc);
     }
 }

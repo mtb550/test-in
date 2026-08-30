@@ -8,6 +8,7 @@ import org.testin.logger.Logger;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -130,31 +131,46 @@ public interface TestinEditor extends Disposable {
 
     /**
      * Tells the status bar what is selected, converting the page row to its
-     * position in the whole list on the way.
+     * place in the list being paged through on the way.
+     * <p>
+     * A row, deliberately, and the only sum here that still is one: the bar
+     * reads "3 of 12 test cases (filtered from 120)", so its 3 counts in the
+     * narrowed list the tester is looking at. The number on a card is the
+     * case's place in the set instead - see {@link #positionOf}.
      * <p>
      * Here so the three callers - the selection listener and both editors after
      * a redraw - make the same call with the same conversion, rather than the
      * status bar doing the arithmetic a fourth time from two extra parameters.
      */
     default void refreshSelectionStatus(final int @NotNull [] selectedIndices) {
+        final int firstRow = selectedIndices.length == 0 ? 0 : selectedIndices[0];
+
         getStatusBar().updateSelectionState(
                 selectedIndices,
-                globalIndex(selectedIndices.length == 0 ? 0 : selectedIndices[0]),
+                ((getCurrentPage() - 1) * getPageSize()) + firstRow,
                 getShownItemsCount(),
                 getTotalItemsCount());
     }
 
     /**
-     * The row's position in the whole list rather than on the page it is drawn
-     * on. The number the card shows, and what every lookup by index outside the
-     * page needs.
+     * The case's place in the whole test set, counting from one - the number a
+     * card and a grid row show.
      * <p>
-     * Default rather than repeated: the renderer, the hover hit-test and the
-     * transfer handler all convert the same way, and a card that numbered rows
-     * differently from the handler acting on them would be a quiet mismatch.
+     * Not a row number. A row counts in the page of whatever the filter left, so
+     * the cards renumbered themselves from one whenever a filter was on and a
+     * case seventeenth in its set was drawn as third (#163). The set's own list
+     * is asked instead, which is the list the ranks were written along, so the
+     * number on screen is the number the generated method carries.
+     * <p>
+     * Default rather than repeated: both editors hold that list and neither has
+     * a different answer to give.
      */
-    default int globalIndex(final int rowIndex) {
-        return ((getCurrentPage() - 1) * getPageSize()) + rowIndex;
+    default int positionOf(final @NotNull TestCaseDto tc) {
+        final @NotNull List<TestCaseDto> all = getAllTestCases();
+
+        synchronized (all) {
+            return TestCaseOrder.positionOf(all, tc);
+        }
     }
 
     int getTotalPageCount();
@@ -227,16 +243,20 @@ public interface TestinEditor extends Disposable {
     @NotNull Set<?> getSelectedDetails();
 
     /**
-     * The title line of the card at this row, as it is drawn: the order number
-     * and the description, each present only while its attribute is ticked in
-     * the Details popup.
+     * The title line of a case's card, as it is drawn: the order number and the
+     * description, each present only while its attribute is ticked in the
+     * Details popup.
      * <p>
      * Lives here because the two editors hold different attribute enums, and only
      * they can read their own selection. The renderer asks for it to draw, and
      * the mouse listener asks for it to place the hover icons, so both are
      * looking at one answer.
+     * <p>
+     * The case rather than its row, because the number in the title is the case's
+     * place in the set and only the editor can say what that is - handing a row
+     * in was how a caller came to pass a filtered one (#163).
      */
-    @NotNull String cardTitle(final int globalIndex, final @NotNull TestCaseDto tc);
+    @NotNull String cardTitle(final @NotNull TestCaseDto tc);
 
     @NotNull List<TestCaseDto> getAllTestCases();
 
