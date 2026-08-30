@@ -342,7 +342,11 @@ public final class GitRepositoryService {
         try {
             return Optional.of(GitCommandRunner.executeRemote(p, path, remoteUrl, command));
         } catch (final RuntimeException ex) {
-            Logger.debug("git " + String.join(" ", command) + " failed in " + path + ": " + ex.getMessage());
+            // The command as well as the failure: "git remote add origin <url>"
+            // carries the URL as an argument, so the line naming it would print
+            // the token even though what Git said back has already been redacted.
+            Logger.debug("git " + GitSafeText.withoutCredentials(String.join(" ", command))
+                    + " failed in " + path + ": " + ex.getMessage());
             return Optional.empty();
         }
     }

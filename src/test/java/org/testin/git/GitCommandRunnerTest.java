@@ -42,4 +42,25 @@ public class GitCommandRunnerTest {
     public void onePathIsJustThatPath() {
         assertEquals(new String(GitCommandRunner.pathspecBytes(List.of("a.json")), StandardCharsets.UTF_8), "a.json");
     }
+
+    @Test
+    public void aTokenInARemoteUrlNeverReachesTheLogOrTheTester() {
+        assertEquals(GitSafeText.withoutCredentials(
+                        "fatal: could not read from https://ghp_secret@github.com/owner/repo.git"),
+                "fatal: could not read from https://***@github.com/owner/repo.git",
+                "a token used as the username is the common form, and it has no colon to find it by");
+
+        assertEquals(GitSafeText.withoutCredentials(
+                        "remote: https://user:p%40ss@example.com/x rejected"),
+                "remote: https://***@example.com/x rejected",
+                "an escaped at-sign in the password is not the one that introduces the host");
+    }
+
+    @Test
+    public void aUrlWithNothingToHideIsLeftAsItIs() {
+        final String said = "fatal: repository 'https://github.com/owner/repo.git' not found";
+
+        assertEquals(GitSafeText.withoutCredentials(said), said,
+                "redacting what carries no credentials would make every ordinary failure unreadable");
+    }
 }

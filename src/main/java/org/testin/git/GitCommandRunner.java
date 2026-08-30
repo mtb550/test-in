@@ -142,9 +142,16 @@ final class GitCommandRunner {
 
         final @NotNull GitCommandResult result = Git.getInstance().runCommand(handler);
         if (!result.success()) {
-            final @NotNull String details = result.getErrorOutputAsJoinedString().isBlank()
-                    ? result.getOutputAsJoinedString()
-                    : result.getErrorOutputAsJoinedString();
+            // Redacted once, here, rather than at each place this ends up: the
+            // same string is logged and thrown, and what catches it writes it
+            // into a balloon. Git names the remote it was working against in its
+            // own failure messages, and an HTTPS remote can carry a token in
+            // that URL (#66).
+            final @NotNull String details = GitSafeText.withoutCredentials(
+                    result.getErrorOutputAsJoinedString().isBlank()
+                            ? result.getOutputAsJoinedString()
+                            : result.getErrorOutputAsJoinedString());
+
             Logger.error("Git command failed: " + details);
             throw new IllegalStateException("Git command failed: " + details);
         }
