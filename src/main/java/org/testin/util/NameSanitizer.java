@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import javax.lang.model.SourceVersion;
 import java.util.regex.Pattern;
 
 /**
@@ -66,6 +67,25 @@ public final class NameSanitizer {
             }
         }
         return result.toString();
+    }
+
+    /**
+     * Whether a description can name a generated test method at all.
+     * <p>
+     * Asked by the dialogs before a description is stored, because the answer is
+     * no more often than it looks: {@code 4redxk,jfsdf} names
+     * {@code 4redxkJfsdf}, which cannot start with a digit; a description of
+     * only punctuation names nothing; and {@code New} names {@code new}, which
+     * Java keeps for itself. All three reached the generator, where renaming a
+     * method threw and writing one put uncompilable Java in the file (#66).
+     * <p>
+     * Asked of the JDK rather than answered here: {@code SourceVersion.isName}
+     * is exactly this question - a valid identifier that is not a keyword or a
+     * literal - and it is one call instead of a list of fifty words to keep in
+     * step with the language.
+     */
+    public static boolean canMakeMethodName(final @NotNull String description) {
+        return SourceVersion.isName(methodName(description));
     }
 
     public static @NotNull String removeSpecialChars(final @NotNull String value) {
