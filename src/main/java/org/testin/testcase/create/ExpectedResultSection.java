@@ -1,7 +1,14 @@
 package org.testin.testcase.create;
 
+
+import com.intellij.ide.ui.laf.darcula.ui.DarculaEditorTextFieldBorder;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.colors.EditorColorsManager;
+import com.intellij.openapi.editor.colors.EditorColorsScheme;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.TextFieldWithAutoCompletion;
@@ -28,6 +35,12 @@ public class ExpectedResultSection implements CreateTestCaseSection {
     @Getter
     private final @NotNull EditorTextField expectedResultField;
     private final @NotNull JBPanel<?> wrapper;
+
+    /**
+     * The field height the popup was last measured around - see the document
+     * listener in {@link #enableMultiLine}.
+     */
+    private int packedHeight;
 
     public ExpectedResultSection(final @NotNull Project p) {
         this.p = p;
@@ -62,19 +75,63 @@ public class ExpectedResultSection implements CreateTestCaseSection {
     public void enableMultiLine(final @NotNull TestCaseBaseDialog base, final @NotNull Runnable onSave) {
         expectedResultField.setOneLineMode(false);
 
-        // Tab leaves the field instead of indenting inside it.
+        // Three things EditorTextField.initOneLineMode does for a one-line field
+        // and not for a multi-line one, so the line above is what took each of
+        // them away. Settings providers run after initOneLineMode, which is why
+        // putting them back here is enough.
+        expectedResultField.addSettingsProvider(editor -> {
+
+            // Tab leaves the field instead of indenting inside it. Registering
+            // VK_TAB through the action system did nothing, because the editor
+            // has its own Tab action and the editor is where the key stops.
+            // Traversal keys are read by AWT before any of that, which is why
+            // this is the thing that works - and why the two Tab registrations
+            // that used to be here are gone rather than kept alongside it.
+            editor.getContentComponent().setFocusTraversalKeysEnabled(true);
+
+            // The frame and its blue focus ring - the platform's own border, so
+            // it follows the theme and repaints on focus by itself.
+            editor.setBorder(new DarculaEditorTextFieldBorder(expectedResultField, editor));
+
+            // The colors a dialog is read in rather than the ones a source file
+            // is: a one-line field is bound to the scheme of the current UI
+            // theme, a multi-line one to whatever scheme the editor is set to.
+            // A dark theme over a light editor scheme - the ordinary pairing -
+            // therefore drew this field's text black while every other field in
+            // the dialog was white.
+            //
+            // The font rides on the scheme, so the new one is given the dialog's
+            // font too; without that the field would come back at the editor's
+            // size while its neighbors keep the size every field is set in.
+            final @NotNull EditorColorsScheme themed = editor.createBoundColorSchemeDelegate(EditorColorsManager.getInstance().getSchemeForCurrentUITheme());
+            themed.setEditorFontName(fieldFont.getFontName());
+            themed.setEditorFontSize(fieldFont.getSize());
+            editor.setColorsScheme(themed);
+        });
+
+        // The dialog grows and shrinks with the text.
         //
-        // A one-line EditorTextField gets this from the platform, which turns
-        // focus traversal back on for the editor it wraps; a multi-line one does
-        // not, so the editor keeps Tab for itself. Registering VK_TAB through
-        // the action system did nothing, because the editor has its own Tab
-        // action and the editor is where the key stops.
+        // The field already reports the editor's height as its preferred size,
+        // but the editor sits in a scroll pane, and a scroll pane is a Swing
+        // validation root: the revalidation a new line causes stops there and
+        // never reaches the popup. So the popup is re-measured here instead.
         //
-        // Traversal keys are read by AWT before any of that, which is why this
-        // is the thing that works - and why the two Tab registrations that used
-        // to be here are gone rather than kept alongside it.
-        expectedResultField.addSettingsProvider(editor ->
-                editor.getContentComponent().setFocusTraversalKeysEnabled(true));
+        // Only when the height actually changed, because this fires on every
+        // keystroke and repacking also scrolls the focused component back into
+        // view - doing that per character would drag the caret around while a
+        // tester types.
+        expectedResultField.addDocumentListener(new DocumentListener() {
+            @Override
+            public void documentChanged(final @NotNull DocumentEvent event) {
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    final int height = expectedResultField.getPreferredSize().height;
+                    if (height == packedHeight) return;
+
+                    packedHeight = height;
+                    base.repack();
+                });
+            }
+        });
 
         base.registerShortcut(expectedResultField, Shortcuts.Enter.getCustomShortcut(), onSave::run);
         base.registerShortcut(expectedResultField, Shortcuts.InsertNewLine.getCustomShortcut(), this::insertNewLine);
