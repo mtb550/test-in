@@ -9,6 +9,8 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
 
+import java.util.List;
+
 /**
  * Where a test case sits in its test set, as the number its generated method
  * carries so a run executes in the order the tester arranged.
@@ -42,7 +44,19 @@ public final class ExecutionPosition {
      * end is where a tester looks for something that has just arrived.
      */
     public static int of(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        return TestCaseOrder.positionOf(TestCaseOrder.ordered(
-                Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(tc.getParent().getPath())), tc);
+        return TestCaseOrder.positionOf(setOf(p, tc), tc);
+    }
+
+    /**
+     * The cases of this case's test set, in the order a run executes them.
+     * <p>
+     * Here because everything that has to reason about a case's place needs the
+     * same list: the number to write into a generated method, the number a
+     * dialog offers to move it to, and the sweep that renumbers the rest after
+     * it moves. Asked of the index rather than of a caller's list, for the
+     * reason above - a caller can be holding a subset.
+     */
+    public static @NotNull List<TestCaseDto> setOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        return TestCaseOrder.ordered(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(tc.getParent().getPath()));
     }
 }

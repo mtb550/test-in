@@ -662,6 +662,11 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
      * where onDone continues (persisting, refreshing). Any newer sort or load
      * bumps the generation, so a stale result never overwrites a newer one.
      */
+    @Override
+    public void refreshOrdered() {
+        orderThen(this::refreshView);
+    }
+
     private void orderThen(final @NotNull Runnable onDone) {
         final List<TestCaseDto> snapshot;
         synchronized (allTestCases) {

@@ -258,6 +258,21 @@ public interface TestinEditor extends Disposable {
      */
     @NotNull String cardTitle(final @NotNull TestCaseDto tc);
 
+    /**
+     * Redraws what is on screen with the set's own order re-applied.
+     * <p>
+     * What follows an update that may have moved a case - the Order field, which
+     * writes a rank and so changes where every case after it is drawn (#162). A
+     * repaint alone would leave the cards in the order the list happened to be
+     * in and their numbers reading wrong until the next reload.
+     * <p>
+     * Ordinary redraw by default: only an editor that pages through a set the
+     * tester arranges has an order of its own to re-apply.
+     */
+    default void refreshOrdered() {
+        refreshView();
+    }
+
     @NotNull List<TestCaseDto> getAllTestCases();
 
     void updateSequenceAndSaveAll();

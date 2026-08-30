@@ -35,6 +35,21 @@ public interface CreateTestCaseSection {
         getFocusComponent().requestFocus();
     }
 
+    /**
+     * Whether what this section is holding can be written to the test case.
+     * <p>
+     * Asked before anything is applied, so a section that refuses stops the save
+     * whole: a refused edit that still reached the file would stamp the case as
+     * modified for a change nobody made.
+     * <p>
+     * A section that refuses says why itself - a balloon, a field marked in red
+     * - because only it knows what is wrong with what it holds. Yes by default:
+     * a section with nothing to check has nothing to refuse.
+     */
+    default boolean accepts() {
+        return true;
+    }
+
     void applyTo(final @NotNull TestCaseDto dto);
 
     void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction);

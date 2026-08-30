@@ -18,22 +18,24 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
+import org.testin.testcase.UpdateTestCaseFields;
 
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 public abstract class TestCaseBaseDialog {
     /**
      * Every section is a key in the status bar mapping, both being built from
-     * CreateTestCaseFields. This is what a section that somehow is not would
+     * the same two enums. This is what a section that somehow is not would
      * show: an empty bar rather than another section's items.
      */
     @Getter(AccessLevel.NONE)
@@ -48,6 +50,7 @@ public abstract class TestCaseBaseDialog {
     protected final @NotNull PrioritySection prioritySection;
     protected final @NotNull GroupSection groupSection;
     protected final @NotNull StepsSection stepsSection;
+    protected final @NotNull OrderSection orderSection;
     protected final @NotNull StatusBarSection statusBarSection;
     /**
      * Owns all global registrations of this dialog (application focus listener,
@@ -129,18 +132,35 @@ public abstract class TestCaseBaseDialog {
         this.stepsSection = new StepsSection(p, dialogDisposable);
         this.prioritySection = new PrioritySection();
         this.groupSection = new GroupSection();
+        this.orderSection = new OrderSection(p);
         this.statusBarSection = new StatusBarSection();
 
-        this.cachedSections = Arrays.stream(CreateTestCaseFields.values())
-                .map(field -> field.getSectionExtractor().apply(this))
+        // Every section either dialog offers, in the order the create dialog
+        // lays them out and then whatever only the update menu has.
+        //
+        // It used to be the create dialog's fields alone, which was the same
+        // list until Order arrived: a case being created has no position to
+        // choose, so Order is the first field one dialog offers and the other
+        // does not (#162). A section missing from here is invisible to the
+        // update dialog, to the focus-to-status-bar mapping and to the save.
+        this.cachedSections = Stream.concat(
+                        Arrays.stream(CreateTestCaseFields.values()).map(CreateTestCaseFields::getSectionExtractor),
+                        Arrays.stream(UpdateTestCaseFields.values()).map(UpdateTestCaseFields::getSectionExtractor))
+                .map(extractor -> extractor.apply(this))
+                .distinct()
                 .toList();
 
-        this.statusBarMapping = Arrays.stream(CreateTestCaseFields.values())
-                .collect(Collectors.toMap(
-                        field -> field.getSectionExtractor().apply(this),
-                        CreateTestCaseFields::getStatusBarItems
-                ));
+        final @NotNull Map<CreateTestCaseSection, StatusBarItem[]> bars = new LinkedHashMap<>();
+        for (final CreateTestCaseFields field : CreateTestCaseFields.values())
+            bars.put(field.getSectionExtractor().apply(this), field.getStatusBarItems());
 
+        // Only for the sections the create dialog has no entry for: where both
+        // enums name the same section, the create dialog's bar is the one this
+        // mapping has always shown.
+        for (final UpdateTestCaseFields field : UpdateTestCaseFields.values())
+            bars.putIfAbsent(field.getSectionExtractor().apply(this), field.getStatusBarItems());
+
+        this.statusBarMapping = Map.copyOf(bars);
     }
 
     /**
@@ -251,8 +271,15 @@ public abstract class TestCaseBaseDialog {
             // writing those over the dto would erase what is already there. A
             // section shown but greyed out holds the stored value and must not
             // write it back either, because writing it back trims it. Asked here
-            // rather than at the top of all eight applyTo methods.
-            getAllSections().stream().filter(this::mayWrite).forEach(section -> section.applyTo(dto));
+            // rather than at the top of every applyTo method.
+            final @NotNull List<CreateTestCaseSection> writers = getAllSections().stream().filter(this::mayWrite).toList();
+
+            // Before anything is applied, not after: a section that cannot write
+            // what it holds has already said so, and going on would save the
+            // case unchanged and stamp it as edited anyway.
+            if (!writers.stream().allMatch(CreateTestCaseSection::accepts)) return;
+
+            writers.forEach(section -> section.applyTo(dto));
 
             final @NotNull String title = dto.getDescription();
             if (!descriptionSection.isShown() || !title.trim().isEmpty()) {

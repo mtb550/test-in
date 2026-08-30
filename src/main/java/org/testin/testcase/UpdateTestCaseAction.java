@@ -20,6 +20,7 @@ import org.testin.util.Shortcuts;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class UpdateTestCaseAction extends AbstractProjectAction {
@@ -37,13 +38,31 @@ public class UpdateTestCaseAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        overSelection(TestCaseUpdateMenuDialog::show);
+    }
 
+    /**
+     * The same update, started at one field instead of at the menu - what a
+     * field's letter opens while a card is selected.
+     */
+    public void openField(final @NotNull UpdateTestCaseFields field) {
+        overSelection(menu -> menu.open(field));
+    }
+
+    /**
+     * The selected cases, and what follows an accepted update over them.
+     * <p>
+     * Both ways in need every line of it - the indexer, the balloon, the
+     * toolbar's filter, the repaint - and neither has a reason to differ, so
+     * the aftermath is written where they meet rather than in each of them.
+     */
+    private void overSelection(final @NotNull Consumer<TestCaseUpdateMenuDialog> open) {
         final @NotNull List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         Logger.trace("update test cases: " + selectedItems.stream().map(TestCaseDto::getDescription).collect(Collectors.joining(", ")));
 
-        new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> {
+        open.accept(new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> {
 
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             for (final TestCaseDto tc : updatedItems)
@@ -55,10 +74,12 @@ public class UpdateTestCaseAction extends AbstractProjectAction {
                 ((Toolbar) editor).onToolBarFilterSelectionChanged();
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                list.repaint();
+                // Ordered rather than repainted: the Order field writes a rank,
+                // which moves the case and renumbers every card after it.
+                editor.refreshOrdered();
                 TestCaseUpdateMenuDialog.applyAftermath(p, updatedItems, gt);
             });
-        }).show();
+        }));
     }
 
     @Override

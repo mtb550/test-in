@@ -48,33 +48,41 @@ public class TestCaseUpdateMenuDialog {
     }
 
     public void show() {
-        final boolean isSingle = items.size() == 1;
-        final @NotNull String title = isSingle ? "Update Test Case" : "Update " + items.size() + " Test Cases";
+        final @NotNull String title = items.size() == 1 ? "Update Test Case" : "Update " + items.size() + " Test Cases";
 
-        final UpdateTestCaseFields @NotNull[] fields = UpdateTestCaseFields.values();
-
-        new ShortcutMenuPopup<>(p, title, fields,
+        new ShortcutMenuPopup<>(p, title, UpdateTestCaseFields.values(),
                 UpdateTestCaseFields::getIcon,
                 UpdateTestCaseFields::getName,
                 UpdateTestCaseFields::getShortcutText,
                 UpdateTestCaseFields::bindShortcut,
-                selectedItem -> {
+                this::open).show();
+    }
 
-                    final @NotNull GenType gt = selectedItem.getGt();
-                    Logger.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + gt);
+    /**
+     * Opens one field's editor over the cases this dialog was given: what
+     * choosing a row on the menu does, and what a field's letter pressed on a
+     * selected card does with no menu in between.
+     * <p>
+     * A method rather than the lambda it used to be, so the second way in
+     * reaches the same code instead of a copy of it. The two differ only in
+     * whether the tester was shown the list to pick from.
+     */
+    public void open(final @NotNull UpdateTestCaseFields field) {
+        final @NotNull GenType gt = field.getGt();
+        Logger.trace("Update field -> " + field.getName() + " | changeType = " + gt);
 
-                    if (isSingle) {
-                        new UpdateTestCaseDialog(p, items.getFirst(), selectedItem, tc -> {
-                            Logger.trace("Single Edit Save -> changeType = " + gt);
-                            updatedItems.accept(items, gt);
-                        }).show();
+        if (items.size() == 1) {
+            new UpdateTestCaseDialog(p, items.getFirst(), field, tc -> {
+                Logger.trace("Single Edit Save -> changeType = " + gt);
+                updatedItems.accept(items, gt);
+            }).show();
 
-                    } else {
-                        selectedItem.getBulkAction().execute(p, items, list -> {
-                            Logger.trace("Bulk Edit Save -> changeType = " + gt);
-                            updatedItems.accept(list, gt);
-                        });
-                    }
-                }).show();
+            return;
+        }
+
+        field.getBulkAction().execute(p, items, list -> {
+            Logger.trace("Bulk Edit Save -> changeType = " + gt);
+            updatedItems.accept(list, gt);
+        });
     }
 }

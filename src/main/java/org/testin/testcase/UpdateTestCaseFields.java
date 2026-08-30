@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.testcase.create.CreateTestCaseSection;
 import org.testin.testcase.create.TestCaseBaseDialog;
@@ -112,6 +114,25 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             (p, items, updatedItems) -> new GroupBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getGroupSection,
             new TestCaseDialogKey[]{NAVIGATE_TAB, SELECT_GROUP}
+    ),
+
+    /**
+     * The one field with no bulk form. A position is a place between two other
+     * cases, and "move these eight to third" has no single meaning - so the
+     * bulk action says so rather than guessing, which is the same answer the
+     * tester would get from dragging eight cards onto one row.
+     * <p>
+     * Also the one field the create dialog does not offer: see
+     * {@link org.testin.testcase.create.OrderSection}.
+     */
+    ORDER(
+            TestEditorAttributes.ORDER.getName(),
+            Shortcuts.UpdateTestCaseOrder,
+            AllIcons.ObjectBrowser.Sorted,
+            GenType.UPDATE_TEST_CASE_ORDER,
+            (p, items, updatedItems) -> Services.getInstance(p, Notifier.class).softRefuse(p, "Order is set one test case at a time"),
+            TestCaseBaseDialog::getOrderSection,
+            new TestCaseDialogKey[]{}
     );
 
     private final @NotNull String name;

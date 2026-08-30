@@ -109,6 +109,7 @@ public enum Shortcuts {
     UpdateTestCaseSteps(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)),
     UpdateTestCasePriority(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
     UpdateTestCaseGroup(KeyStroke.getKeyStroke(KeyEvent.VK_G, 0)),
+    UpdateTestCaseOrder(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0)),
 
     // Priority selection (bug priority, test case priority, fields enums)
     PriorityEmpty(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)),
