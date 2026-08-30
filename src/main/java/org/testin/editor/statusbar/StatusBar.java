@@ -11,6 +11,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.TestinEditor;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunStatus;

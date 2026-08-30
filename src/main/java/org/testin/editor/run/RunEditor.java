@@ -1034,7 +1034,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * <p>
      * The counts are read from the live results rather than the run on disk, so
      * the bar moves as the tester works rather than at the next save. The
-     * phrasing is not decided here: {@link ResultAnalysis#headline} owns it, so
+     * phrasing is not decided here: {@link ResultAnalysis#segments} owns it, so
      * the bar and the reports cannot disagree about how many passed. It is given
      * the run's status as well as its results, because one of the four buckets is
      * named for it - untouched cases are pending until the run gives up on them.
