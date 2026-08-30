@@ -22,7 +22,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        applyUpdate(p, tc, "Update Test Case Order", pm ->
+        applyIfGenerated(p, tc, "Update Test Case Order", pm ->
                 updateTestAnnotationAttribute(p, pm, "priority", String.valueOf(ExecutionPosition.of(p, tc))));
     }
 }

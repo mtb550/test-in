@@ -99,12 +99,17 @@ public class UpdateTestBase {
     }
 
     /**
-     * The same, for removing the method: one that is not there needs no
-     * removing, so nothing is said. A balloon reading "has no generated code
-     * yet" while the tester deletes a case is a balloon about nothing.
+     * The same, where a case with no generated method is the normal state
+     * rather than news.
+     * <p>
+     * Removing a method that is not there needs no saying, and neither does
+     * renumbering one. The order rewrite sweeps every case in the set each time
+     * one is created or dragged, so a balloon per case without code turned
+     * creating a test case into a balloon about the case just created - and a
+     * set nobody has generated code for into one balloon per case it holds.
      */
-    protected void applyRemoval(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater) {
-        applyToMethod(p, tc, title, updater, detail -> Logger.debug("Remove: " + detail + ", so nothing to remove"));
+    protected void applyIfGenerated(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater) {
+        applyToMethod(p, tc, title, updater, detail -> Logger.debug("No generated method for '" + tc.getDescription() + "': " + detail));
     }
 
     // Shared boilerplate for all update actions: resolve the FQCN, locate the target class and
