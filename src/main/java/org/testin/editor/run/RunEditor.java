@@ -239,6 +239,16 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private void loadDataAsync() {
+        loadDataAsync(() -> {
+        });
+    }
+
+    /**
+     * The same, telling {@code onLoaded} once the run is on screen - which is
+     * the only moment a refresh can honestly be confirmed. The failure branch
+     * says nothing, because nothing was refreshed.
+     */
+    private void loadDataAsync(final @NotNull Runnable onLoaded) {
         final int generation = loadGeneration.incrementAndGet();
         loaded = false;
         list.setPaintBusy(true);
@@ -305,6 +315,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
                     loaded = true;
                     startIfAsked();
+                    onLoaded.run();
                 });
             } catch (final Exception ex) {
                 Logger.error("Failed to load Test Run data from disk: " + ex.getMessage());
@@ -421,7 +432,9 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
 
-        reload();
+        // Said when the run is back on screen, not when the button went down -
+        // the read waits for indexing and finishes on another thread (#62).
+        reload(() -> Services.getInstance(p, Notifier.class).softShow(p, Done.REFRESHED));
     }
 
 
@@ -432,9 +445,23 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     @Override
     public void reload() {
-        haltExecution();
+        reload(() -> {
+        });
+    }
 
+    private void reload(final @NotNull Runnable onLoaded) {
         toolBar.clearFiltersAndSearch();
+        reloadData(onLoaded);
+    }
+
+    @Override
+    public void reloadData() {
+        reloadData(() -> {
+        });
+    }
+
+    private void reloadData(final @NotNull Runnable onLoaded) {
+        haltExecution();
 
         rememberSelection();
 
@@ -449,7 +476,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         this.list.setPaintBusy(true);
         this.list.getEmptyText().setText("Refreshing...");
 
-        loadDataAsync();
+        loadDataAsync(onLoaded);
     }
 
     @Override

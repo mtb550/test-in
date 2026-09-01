@@ -41,6 +41,7 @@ public enum Done {
 
     ORDERED("Ordered"),
     RE_SORTED("Re-sorted"),
+    REFRESHED("Refreshed"),
 
     UNDONE("Undone"),
     REDONE("Redone"),

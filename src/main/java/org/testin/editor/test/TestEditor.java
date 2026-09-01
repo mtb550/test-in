@@ -29,6 +29,8 @@ import org.testin.editor.toolbar.components.TestDetailsPopupBtn;
 import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.notifications.Done;
+import org.testin.notifications.Notifier;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -178,6 +180,15 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private void loadDataAsync() {
+        loadDataAsync(() -> {
+        });
+    }
+
+    /**
+     * The same, telling {@code onLoaded} once the cases are on screen - which is
+     * the only moment a refresh can honestly be confirmed.
+     */
+    private void loadDataAsync(final @NotNull Runnable onLoaded) {
         final int generation = modelGeneration.incrementAndGet();
         loading = true;
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -196,6 +207,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
                     // The message comes from refreshView, which is the one place
                     // that knows what the page ended up holding.
                     refreshView();
+                    onLoaded.run();
                 });
                 return;
             }
@@ -221,6 +233,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
                 refreshView();
                 focusIfGoingTo();
+                onLoaded.run();
             });
         });
     }
@@ -414,13 +427,31 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
-        reload();
+
+        // Said when the data is back, not when the button went down: the read
+        // waits for indexing and finishes on another thread, so a balloon here
+        // would announce a refresh that has not happened yet (#62).
+        reload(() -> Services.getInstance(p, Notifier.class).softShow(p, Done.REFRESHED));
     }
 
     @Override
     public void reload() {
-        toolBar.clearFiltersAndSearch();
+        reload(() -> {
+        });
+    }
 
+    private void reload(final @NotNull Runnable onLoaded) {
+        toolBar.clearFiltersAndSearch();
+        reloadData(onLoaded);
+    }
+
+    @Override
+    public void reloadData() {
+        reloadData(() -> {
+        });
+    }
+
+    private void reloadData(final @NotNull Runnable onLoaded) {
         rememberSelection();
 
         this.allTestCases.clear();
@@ -429,7 +460,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         this.list.setPaintBusy(true);
         this.list.getEmptyText().setText("Refreshing...");
 
-        loadDataAsync();
+        loadDataAsync(onLoaded);
     }
 
     /**

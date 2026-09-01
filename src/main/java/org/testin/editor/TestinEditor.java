@@ -207,6 +207,17 @@ public interface TestinEditor extends Disposable {
     void reload();
 
     /**
+     * Reads the index again without touching the toolbar.
+     * <p>
+     * The difference from {@link #reload()} is the filters and the search.
+     * Dropping those is what Refresh means when a tester presses the button, and
+     * it is exactly wrong for anything the tester did not ask for - taking a
+     * change back should not also throw away what they had narrowed the view to
+     * (#165).
+     */
+    void reloadData();
+
+    /**
      * Whether this editor is in the middle of something a reload would ruin - a
      * run being executed, a grid cell open under the tester's cursor.
      * <p>
