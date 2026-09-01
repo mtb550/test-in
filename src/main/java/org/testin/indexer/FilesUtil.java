@@ -77,7 +77,11 @@ final class FilesUtil {
     void delete(final @NotNull Project p, final @NotNull Path path, final @NotNull Path stopAt) {
         try {
             Services.getInstance(OwnWrites.class).record(path);
-            Files.deleteIfExists(path);
+
+            // To the recycle bin, so a case removed by mistake is recovered the
+            // way every other file on this machine is. One JSON file, so the
+            // move is cheap enough for the thread the removal already runs on.
+            if (!Trash.accepted(path)) Files.deleteIfExists(path);
         } catch (final IOException ex) {
             Services.getInstance(p, Notifier.class).error(p, "unable to remove: " + ex.getMessage());
             Logger.error("unable to remove " + path + ": " + ex.getMessage());
@@ -100,6 +104,10 @@ final class FilesUtil {
                 if (inside.findAny().isPresent()) return;
 
                 Services.getInstance(OwnWrites.class).record(at);
+
+                // Deleted outright, not trashed: this folder is empty by the
+                // time it is reached, so there is nothing in the bin to recover
+                // and every removal would leave one there to tidy up.
                 Files.deleteIfExists(at);
             } catch (final IOException ex) {
                 Logger.warn("Left an empty folder behind at " + at + ": " + ex.getMessage());

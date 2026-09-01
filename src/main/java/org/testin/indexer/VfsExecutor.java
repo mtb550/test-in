@@ -130,6 +130,16 @@ final class VfsExecutor {
     void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onDeleted) {
         claim(path);
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
+
+            // The recycle bin first, and on this thread rather than in the write
+            // action below: trashing a whole test project is the platform
+            // walking it file by file, which is not work for the EDT. A desktop
+            // with no bin answers no and the VFS delete runs as it always did.
+            if (Trash.accepted(path)) {
+                ApplicationManager.getApplication().invokeLater(() -> onDeleted.accept(true));
+                return;
+            }
+
             final @NotNull Optional<VirtualFile> vf = find(path);
 
             ApplicationManager.getApplication().invokeLater(() -> {
