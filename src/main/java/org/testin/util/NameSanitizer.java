@@ -48,14 +48,36 @@ public final class NameSanitizer {
         return result.append("Test").toString();
     }
 
+    /**
+     * A description, cleaned of the characters a description may not carry - and
+     * nothing else.
+     * <p>
+     * It used to answer the literal {@code EMPTY_DESCRIPTION} for a blank one,
+     * and the DESCRIPTION setter runs every save through here, so the
+     * placeholder was <b>stored</b>. The tester then read it as the case's name
+     * on the card, in the grid, in the details panel, in every report and in the
+     * execution log, and the generated method was called {@code emptyDescription}
+     * - which is the rule in CLAUDE.md broken as plainly as it can be: the
+     * tester typed nothing and the file said something (#155).
+     * <p>
+     * A description nobody has written is empty, it is stored empty, and every
+     * surface draws it blank. {@link #className} keeps its fallback: a class
+     * name is derived from the tree and is never stored.
+     */
     public static @NotNull String description(final @NotNull String rawDescription) {
-        if (rawDescription.isBlank()) return "EMPTY_DESCRIPTION";
-        final @NotNull String cleaned = INVALID_NAME.matcher(rawDescription).replaceAll("").trim();
-        return cleaned.isEmpty() ? "EMPTY_DESCRIPTION" : cleaned;
+        return INVALID_NAME.matcher(rawDescription).replaceAll("").trim();
     }
 
+    /**
+     * The method name a description gives, and none when it gives none.
+     * <p>
+     * It used to answer {@code testMethod} for a case with no description, so a
+     * case nobody had finished writing got a method with a name nobody chose -
+     * and the second such case in a set collided with the first. Nothing is
+     * generated for a case that cannot name a method; the method is written the
+     * moment somebody gives it one (#155).
+     */
     public static @NotNull String methodName(final @NotNull String description) {
-        if (description.isEmpty()) return "testMethod";
         final @NotNull StringBuilder result = new StringBuilder();
         for (final String word : description.split("[^a-zA-Z0-9]+")) {
             if (word.isEmpty()) continue;

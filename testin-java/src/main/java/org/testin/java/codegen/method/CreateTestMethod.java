@@ -104,11 +104,25 @@ public class CreateTestMethod implements GenAction {
             final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
             parse(fqcn).ifPresentOrElse(
                     target -> byClass.computeIfAbsent(target.path(), ignored -> new ArrayList<>()).add(tc),
-                    () -> Logger.error("FQCN list is too short to generate a method: " + fqcn));
+                    () -> noMethodFor(tc, fqcn));
         }
 
         WriteCommandAction.runWriteCommandAction(p, "Create Test Methods", null,
                 () -> byClass.values().forEach(group -> createMethods(p, group)));
+    }
+
+    /**
+     * Why this case gets no method, and how loudly to say it.
+     * <p>
+     * Empty is ordinary and short is not. A case with no description names no
+     * method, and that is a case somebody has not finished writing rather than
+     * anything wrong - it gets its method the moment they give it a description
+     * (#155). A list that is short for any other reason is a tree this cannot
+     * read, which is the error the message was written for.
+     */
+    private void noMethodFor(final @NotNull TestCaseDto tc, final @NotNull List<String> fqcn) {
+        if (fqcn.isEmpty()) Logger.debug("No description yet, so no method to write for " + tc.getId());
+        else Logger.error("FQCN list is too short to generate a method: " + fqcn);
     }
 
     /**

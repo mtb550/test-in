@@ -8,6 +8,7 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
+import org.testin.codegen.GenType;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -113,6 +114,25 @@ public class UpdateTestBase {
      */
     protected void applyUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater) {
         applyToMethod(p, tc, title, updater, detail -> noCodeToUpdate(p, tc, detail));
+    }
+
+    /**
+     * The same, where a case with no generated method should be given one.
+     * <p>
+     * A description is what names a method, so a case saved without one has no
+     * method written for it at all. Filling the description in later is
+     * therefore not an update to make - it is the first thing that makes the
+     * method nameable - and the code follows the case (#155).
+     * <p>
+     * It replaces a balloon that told the tester there was no generated code and
+     * left them to do something about it. Writing the method is what they would
+     * have done.
+     */
+    protected void applyOrCreate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater) {
+        applyToMethod(p, tc, title, updater, detail -> {
+            Logger.info("Writing the method for '" + tc.getDescription() + "' now that it has a name: " + detail);
+            GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
+        });
     }
 
     /**
