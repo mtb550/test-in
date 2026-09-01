@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.JavaSourceRoot;
 import org.testin.config.TestinConfigService;
 import org.testin.config.TestinProjectConfig;
+import org.testin.indexer.DeletedNodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
@@ -61,6 +62,11 @@ public final class StartupActivity implements ProjectActivity {
         Logger.setLogLevel(Level.valueOf(settings.logLevel));
 
         Logger.info("StartupActivity.execute()");
+
+        // Whatever the last run kept for an undo nobody is coming back for. Here
+        // rather than at shutdown: the copies that matter are the ones a
+        // shutdown never reached.
+        Services.getInstance(DeletedNodes.class).sweep();
 
         if (!rootConfigured) {
             ApplicationManager.getApplication().invokeLater(() -> {

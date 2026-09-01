@@ -91,7 +91,7 @@ public class GridEditListener extends AbstractGridEditListener {
             Services.getInstance(p, ProjectIndexer.class).putTestCase(testSetPath, tc);
             generator.getAction().execute(p, tc);
 
-            TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Edit", List.of(tc)), undoFrom, TestCaseSnapshot.of(p, testSetPath, List.of(tc.getId())), onEdited);
+            TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Edit", List.of(tc)), undoFrom, TestCaseSnapshot.of(p, testSetPath, List.of(tc.getId())));
         });
     }
 }

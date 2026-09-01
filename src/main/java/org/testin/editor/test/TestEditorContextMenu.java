@@ -10,8 +10,9 @@ import org.testin.clipboard.CopyTestCaseAction;
 import org.testin.clipboard.CopyTestCaseNodeAction;
 import org.testin.clipboard.CutTestCaseNodeAction;
 import org.testin.clipboard.PasteTestCaseNodeAction;
-import org.testin.clipboard.RedoNodeAction;
-import org.testin.clipboard.UndoNodeAction;
+import org.testin.undo.UndoAction;
+import org.testin.undo.UndoDirection;
+import org.testin.undo.UndoScope;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.statusbar.NextPageAction;
@@ -58,11 +59,11 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
 
         addSeparator();
 
-        // The same two actions the tree offers, on the same stack, registered on
-        // this list as well - so CTRL+Z takes back the last thing the tester
-        // did, wherever they were standing when they did it (#165).
-        add(new UndoNodeAction(p, list));
-        add(new RedoNodeAction(p, list));
+        // This editor's own history, not the tree's and not another editor's:
+        // two cases removed here come back here, and the two removed in the
+        // editor beside it come back there (#165).
+        add(new UndoAction(p, list, UndoScope.of(dir.getPath()), UndoDirection.UNDO));
+        add(new UndoAction(p, list, UndoScope.of(dir.getPath()), UndoDirection.REDO));
 
         // Absent, not present and broken: in an IDE without the Java or TestNG
         // plugin these three cannot do anything, and a tester should not find

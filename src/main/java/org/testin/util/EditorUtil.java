@@ -56,6 +56,28 @@ public final class EditorUtil {
     }
 
     /**
+     * Re-reads whatever editor is open on this node, keeping the filters and the
+     * search the tester has narrowed it with. Nothing when none is open.
+     * <p>
+     * Found by path rather than held: an editor closed and opened again on the
+     * same node is a different object showing the same data, and an operation
+     * recorded before that would otherwise reload a disposed one - whose toolbar
+     * has been emptied, so the first thing it asks for is not there (#165).
+     */
+    public void reloadOpen(final @NotNull Project p, final @NotNull Path path) {
+        final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
+
+        for (final VirtualFile open : fed.getOpenFiles()) {
+            if (!(open instanceof UnifiedVirtualFile testinFile)) continue;
+            if (!testinFile.getDir().getPath().equals(path)) continue;
+
+            for (final FileEditor tab : fed.getAllEditors(open)) {
+                if (tab instanceof UnifiedFileEditor unified) unified.getEditor().reloadData();
+            }
+        }
+    }
+
+    /**
      * Closes the editor showing this node, if one is open.
      * <p>
      * It took the node's name and closed whichever tab matched, so renaming or

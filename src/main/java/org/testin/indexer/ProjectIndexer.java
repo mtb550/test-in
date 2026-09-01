@@ -742,6 +742,36 @@ public final class ProjectIndexer {
         }
     }
 
+    /**
+     * Keeps a copy of a node aside before it is removed, so the removal can be
+     * taken back, and answers where it was kept. Nothing when the copy could not
+     * be made, in which case the removal still happens and simply cannot be
+     * undone - which is what every removal did before (#165).
+     */
+    public @NotNull Optional<Path> keepAside(final @NotNull Path node) {
+        return Services.getInstance(DeletedNodes.class).keep(node);
+    }
+
+    /**
+     * Puts a removed node back from the copy kept aside for it, and re-reads the
+     * test project it landed in so the tree, the open editors and the caches all
+     * agree with the disk again.
+     */
+    public boolean restoreNode(final @NotNull Path kept, final @NotNull Path original) {
+        if (!Services.getInstance(DeletedNodes.class).putBack(kept, original)) return false;
+
+        refreshDirectory(original);
+        refreshIndexedProject(original);
+        return true;
+    }
+
+    /**
+     * Nobody can reach the operation that was holding this any more.
+     */
+    public void forgetKept(final @NotNull Path kept) {
+        Services.getInstance(DeletedNodes.class).forget(kept);
+    }
+
     private void refreshIndexedProject(final @NotNull Path changedPath) {
         store.getTestProjectsByPath().keySet().stream()
                 .map(Path::of)

@@ -248,8 +248,7 @@ public class DetailsTab {
             resolveEditPath(p, dto, currentPath).ifPresentOrElse(editPath -> {
                         tcs.forEach(tc -> indexer.putTestCase(editPath, tc));
 
-                        before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Update", tcs), taken, TestCaseSnapshot.of(p, editPath, ids),
-                                () -> ViewToolWindowFactory.panel(p).ifPresent(viewPanel -> viewPanel.refreshIfShowing(tcs))));
+                        before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Update", tcs), taken, TestCaseSnapshot.of(p, editPath, ids)));
 
                         Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
 

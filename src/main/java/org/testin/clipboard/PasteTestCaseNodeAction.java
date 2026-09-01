@@ -15,6 +15,7 @@ import org.testin.editor.test.TestEditor;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.testcase.TestCaseSnapshot;
+import org.testin.undo.UndoScope;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -110,7 +111,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
                 cutFrom.ifPresent(taken -> after.add(TestCaseSnapshot.of(p, taken.testSetPath(), taken.ids())));
                 after.add(TestCaseSnapshot.of(p, destPath, pastedIds));
 
-                TestCaseSnapshot.record(p, TestCaseSnapshot.describe(isCut ? "Move" : "Paste", pastedHere), before, after, destUI::reload);
+                TestCaseSnapshot.record(p, UndoScope.of(destPath), TestCaseSnapshot.describe(isCut ? "Move" : "Paste", pastedHere), before, after);
             });
 
             if (isCut) cutState.clear();

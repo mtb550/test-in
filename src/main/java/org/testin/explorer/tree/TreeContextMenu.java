@@ -30,6 +30,9 @@ import org.testin.run.RunTestsAction;
 import org.testin.testproject.UpdateTestProjectStatusAction;
 import org.testin.testrun.SetTestRunStatusAction;
 import org.testin.testset.UpdateTestSetStatusAction;
+import org.testin.undo.UndoAction;
+import org.testin.undo.UndoDirection;
+import org.testin.undo.UndoScope;
 import org.testin.util.OptionalPlugin;
 
 import java.util.List;
@@ -54,8 +57,8 @@ public class TreeContextMenu extends DefaultActionGroup {
                         new UpdateTestSetStatusAction(p, tree, TestSetStatus.DEPRECATED),
                         new UpdatePackageStatusAction(p, tree, PackageStatus.ACTIVE),
                         new UpdatePackageStatusAction(p, tree, PackageStatus.ARCHIVED),
-                        new UndoNodeAction(p, tree),
-                        new RedoNodeAction(p, tree),
+                        new UndoAction(p, tree, UndoScope.TREE, UndoDirection.UNDO),
+                        new UndoAction(p, tree, UndoScope.TREE, UndoDirection.REDO),
                         new RemoveAction(p, tree, pp),
                         new RenameAction(p, pp, tree),
                         new OrderNodeAction(p, pp, tree),

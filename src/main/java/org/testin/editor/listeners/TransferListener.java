@@ -118,7 +118,7 @@ public class TransferListener extends TransferHandler {
             final @NotNull Path setPath = editor.getParent().getPath();
             final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, setPath, ids);
 
-            editor.updateSequenceAndSaveAll(() -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Reorder", itemsToMove), before, TestCaseSnapshot.of(p, setPath, ids), editor::reload));
+            editor.updateSequenceAndSaveAll(() -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Reorder", itemsToMove), before, TestCaseSnapshot.of(p, setPath, ids)));
 
             // After the save, inside the try: a drop that threw on the way here
             // is logged, not confirmed (#62).

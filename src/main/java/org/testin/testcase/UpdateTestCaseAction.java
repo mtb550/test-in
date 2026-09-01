@@ -78,7 +78,7 @@ public class UpdateTestCaseAction extends AbstractProjectAction {
             // One operation for the whole selection, recorded outside the loop
             // above. Inside it, a bulk edit over forty cases would cost forty
             // presses of CTRL+Z to take back (#165).
-            TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Update", updatedItems), before, TestCaseSnapshot.of(p, path, ids), editor::reload);
+            TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Update", updatedItems), before, TestCaseSnapshot.of(p, path, ids));
 
             Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
 

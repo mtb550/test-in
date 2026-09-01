@@ -95,7 +95,7 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
             model.remove(model.getElementIndex(selectedItems.get(i)));
         }
 
-        TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Remove", selectedItems), before, TestCaseSnapshot.of(p, dir.getPath(), ids), editor::reload);
+        TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Remove", selectedItems), before, TestCaseSnapshot.of(p, dir.getPath(), ids));
     }
 
     @Override

@@ -7,8 +7,11 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.undo.UndoScope;
 import org.testin.undo.UndoService;
+import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
+import org.testin.view.ViewToolWindowFactory;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -75,20 +78,21 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
      * forty cases is one press to undo, because the snapshot either side of it
      * covers all forty. Pushing inside the loop is what would make it forty.
      * <p>
-     * {@code refresh} is the call site's own - it knows which editor, list or
-     * panel has to be told - and it runs after both directions, because a view
-     * that agrees with the data before an undo has to agree with it after.
+     * Whatever is on screen is told afterwards, by path - see
+     * {@link #tellTheSurfaces}.
      */
-    public static void record(final @NotNull Project p, final @NotNull String description, final @NotNull TestCaseSnapshot before, final @NotNull TestCaseSnapshot after, final @NotNull Runnable refresh) {
-        record(p, description, List.of(before), List.of(after), refresh);
+    public static void record(final @NotNull Project p, final @NotNull String description, final @NotNull TestCaseSnapshot before, final @NotNull TestCaseSnapshot after) {
+        record(p, UndoScope.of(before.testSetPath()), description, List.of(before), List.of(after));
     }
 
     /**
      * The same, for a gesture that touches more than one test set - a cut in
      * one and a paste into another is a single press of CTRL+Z, so it is a
-     * single operation over both sets rather than one operation each.
+     * single operation over both sets rather than one operation each. It lands
+     * in the editor the tester made the gesture in, which is the one they will
+     * press the key in.
      */
-    public static void record(final @NotNull Project p, final @NotNull String description, final @NotNull List<TestCaseSnapshot> before, final @NotNull List<TestCaseSnapshot> after, final @NotNull Runnable refresh) {
+    public static void record(final @NotNull Project p, final @NotNull UndoScope scope, final @NotNull String description, final @NotNull List<TestCaseSnapshot> before, final @NotNull List<TestCaseSnapshot> after) {
         // Nothing changed, so there is nothing to take back - and pushing it
         // anyway would spend a press of CTRL+Z on a gesture that did nothing
         // while dropping a real one off the end of a bounded stack.
@@ -98,10 +102,10 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         // update(), which the platform runs on the EDT, and a grid cell
         // persists from a pooled thread. Said in one place so that no call site
         // has to remember which thread it is on.
-        ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, UndoService.class).push(new UndoService.Operation(
+        ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, UndoService.class).push(scope, new UndoService.Operation(
                 description,
-                () -> restore(p, before, after, refresh),
-                () -> restore(p, after, before, refresh))));
+                () -> restore(p, before, after),
+                () -> restore(p, after, before))));
     }
 
     /**
@@ -112,7 +116,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
      * meantime, and their work is not this operation's to overwrite - so it
      * refuses and says so rather than writing.
      */
-    private static void restore(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> target, final @NotNull List<TestCaseSnapshot> expected, final @NotNull Runnable refresh) {
+    private static void restore(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> target, final @NotNull List<TestCaseSnapshot> expected) {
         if (!expected.stream().allMatch(TestCaseSnapshot::stillStands)) {
             Services.getInstance(p, Notifier.class).softRefuse(p,
                     "These test cases changed since",
@@ -121,7 +125,30 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         }
 
         target.forEach(TestCaseSnapshot::applyTo);
-        refresh.run();
+        tellTheSurfaces(p, target);
+    }
+
+    /**
+     * Brings whatever is on screen back in line with what was just written: the
+     * editor open on each set, and the details panel when it is showing one of
+     * these cases.
+     * <p>
+     * Found by path, not held. Every call site used to hand over its own refresh,
+     * which in practice meant handing over the editor it was standing in - and an
+     * editor closed and reopened between the change and the undo is a different
+     * object. The old one is disposed, its toolbar emptied with it, so reloading
+     * it threw on the first item it asked for.
+     * <p>
+     * The data only, so the filters and the search the tester narrowed the view
+     * with survive an undo. Refresh drops those because a tester pressing Refresh
+     * means it; nobody pressing CTRL+Z does.
+     */
+    private static void tellTheSurfaces(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> written) {
+        final @NotNull EditorUtil editors = Services.getInstance(p, EditorUtil.class);
+
+        written.forEach(snapshot -> editors.reloadOpen(p, snapshot.testSetPath()));
+
+        ViewToolWindowFactory.panel(p).ifPresent(panel -> written.forEach(snapshot -> panel.refreshIfShowing(snapshot.present())));
     }
 
     private static boolean same(final @NotNull List<TestCaseSnapshot> before, final @NotNull List<TestCaseSnapshot> after) {

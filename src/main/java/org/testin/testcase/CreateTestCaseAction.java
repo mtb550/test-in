@@ -67,7 +67,7 @@ public class CreateTestCaseAction extends AbstractProjectAction {
             // Recorded from the callback, because the rank arrives after the
             // save: the case is written here and placed by the sort that
             // follows, so what a redo would have to write is not readable yet.
-            editor.appendNewTestCase(tc, () -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Create", affectedNodes), before, TestCaseSnapshot.of(p, dir.getPath(), ids), editor::reload));
+            editor.appendNewTestCase(tc, () -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Create", affectedNodes), before, TestCaseSnapshot.of(p, dir.getPath(), ids)));
             Services.getInstance(p, TestCaseCacheService.class).addNewItems(affectedNodes);
 
             // Directly, as the other three savers do. This went through a
