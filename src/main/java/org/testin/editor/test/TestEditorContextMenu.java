@@ -10,6 +10,8 @@ import org.testin.clipboard.CopyTestCaseAction;
 import org.testin.clipboard.CopyTestCaseNodeAction;
 import org.testin.clipboard.CutTestCaseNodeAction;
 import org.testin.clipboard.PasteTestCaseNodeAction;
+import org.testin.clipboard.RedoNodeAction;
+import org.testin.clipboard.UndoNodeAction;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.statusbar.NextPageAction;
@@ -53,6 +55,14 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
         add(new CutTestCaseNodeAction(p, ui, list));
         add(new PasteTestCaseNodeAction(p, ui, list));
         add(new RemoveTestCaseAction(p, ui, dir, list, model));
+
+        addSeparator();
+
+        // The same two actions the tree offers, on the same stack, registered on
+        // this list as well - so CTRL+Z takes back the last thing the tester
+        // did, wherever they were standing when they did it (#165).
+        add(new UndoNodeAction(p, list));
+        add(new RedoNodeAction(p, list));
 
         // Absent, not present and broken: in an IDE without the Java or TestNG
         // plugin these three cannot do anything, and a tester should not find

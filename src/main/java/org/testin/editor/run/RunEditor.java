@@ -718,7 +718,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     @Override
-    public void updateSequenceAndSaveAll() {
+    public void updateSequenceAndSaveAll(final @NotNull Runnable onPersisted) {
+        // A run's order is the order it ran in, so there is nothing to write -
+        // but the caller is still owed its continuation.
+        onPersisted.run();
     }
 
     @Override

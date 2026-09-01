@@ -10,6 +10,7 @@ import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.testcase.TestCaseSnapshot;
 
 import javax.swing.table.DefaultTableModel;
 import java.nio.file.Path;
@@ -53,6 +54,10 @@ public class GridEditListener extends AbstractGridEditListener {
         // model's answer.
         if (!attr.can(Can.EDIT)) return false;
 
+        // Taken first of all: the setter below writes into the DTO the index is
+        // holding, so a snapshot after it would be a snapshot of the edit.
+        final @NotNull TestCaseSnapshot undoFrom = TestCaseSnapshot.of(p, testSetPath, List.of(tc.getId()));
+
         final @NotNull Object before = attr.gridValue(p, tc);
         attr.getImportSetter().execute(p, tc, String.valueOf(model.getValueAt(row, col)));
         final @NotNull Object after = attr.gridValue(p, tc);
@@ -63,7 +68,7 @@ public class GridEditListener extends AbstractGridEditListener {
 
         if (Objects.equals(before, after)) return false;
 
-        persistAndGenerate(tc, attr);
+        persistAndGenerate(tc, attr, undoFrom);
         onEdited.run();
 
         return true;
@@ -74,7 +79,7 @@ public class GridEditListener extends AbstractGridEditListener {
      * generated automation code for the edited attribute. Runs off the EDT — the
      * code generators schedule their own write command actions.
      */
-    private void persistAndGenerate(final @NotNull TestCaseDto tc, final @NotNull TestEditorAttributes attr) {
+    private void persistAndGenerate(final @NotNull TestCaseDto tc, final @NotNull TestEditorAttributes attr, final @NotNull TestCaseSnapshot undoFrom) {
         if (testSetPath.toString().isEmpty()) {
             Logger.warn("[grid] edit not persisted - the editor has no test set path");
             return;
@@ -85,6 +90,8 @@ public class GridEditListener extends AbstractGridEditListener {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             Services.getInstance(p, ProjectIndexer.class).putTestCase(testSetPath, tc);
             generator.getAction().execute(p, tc);
+
+            TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Edit", List.of(tc)), undoFrom, TestCaseSnapshot.of(p, testSetPath, List.of(tc.getId())), onEdited);
         });
     }
 }

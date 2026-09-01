@@ -233,6 +233,19 @@ public interface TestinEditor extends Disposable {
      * list without ranking the case or writing it anywhere.
      */
     default void appendNewTestCase(final @NotNull TestCaseDto tc) {
+        appendNewTestCase(tc, () -> {
+        });
+    }
+
+    /**
+     * The same, telling {@code onPersisted} once the case and the set's new
+     * order are both on disk.
+     * <p>
+     * A creation is ranked asynchronously - the case is saved first and given
+     * its position by the sort that follows - so the caller that wants to know
+     * what it would take to undo the creation cannot read it when this returns.
+     */
+    default void appendNewTestCase(final @NotNull TestCaseDto tc, final @NotNull Runnable onPersisted) {
         Logger.debug("This editor does not create test cases; '" + tc.getDescription() + "' was not added");
     }
 
@@ -275,7 +288,22 @@ public interface TestinEditor extends Disposable {
 
     @NotNull List<TestCaseDto> getAllTestCases();
 
-    void updateSequenceAndSaveAll();
+    /**
+     * Writes the set's order, and runs {@code onPersisted} once it is on disk.
+     * <p>
+     * The callback exists because the write is asynchronous and a caller that
+     * has to know what the set looks like afterwards - a drag recording what it
+     * would take to undo itself - cannot find out by returning.
+     */
+    void updateSequenceAndSaveAll(final @NotNull Runnable onPersisted);
+
+    /**
+     * The same write for the callers with nothing to do afterwards.
+     */
+    default void updateSequenceAndSaveAll() {
+        updateSequenceAndSaveAll(() -> {
+        });
+    }
 
     void selectTestCase(final @NotNull TestCaseDto tc);
 

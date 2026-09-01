@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.codegen.Renamed;
 import org.testin.explorer.ExplorerPanel;
-import org.testin.explorer.tree.TreeUndoService;
+import org.testin.undo.UndoService;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -75,7 +75,7 @@ public class RenameAction extends AbstractProjectTreeAction {
 
         // The dto reference stays valid across renames, so undo and redo are
         // the same routine with the names swapped.
-        Services.getInstance(p, TreeUndoService.class).push(new TreeUndoService.TreeOperation(
+        Services.getInstance(p, UndoService.class).push(new UndoService.Operation(
                 "Rename '" + oldName + "'",
                 () -> applyRename(dir, oldName),
                 () -> applyRename(dir, newName)));

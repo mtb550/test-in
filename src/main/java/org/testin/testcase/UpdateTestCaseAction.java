@@ -20,6 +20,7 @@ import org.testin.util.Shortcuts;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -62,11 +63,22 @@ public class UpdateTestCaseAction extends AbstractProjectAction {
 
         Logger.trace("update test cases: " + selectedItems.stream().map(TestCaseDto::getDescription).collect(Collectors.joining(", ")));
 
+        // Taken before the menu opens, not inside its callback: the menu edits
+        // the very DTOs it was handed, so by the time it says what changed, the
+        // values it changed them from are already gone.
+        final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(selectedItems);
+        final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, path, ids);
+
         open.accept(new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> {
 
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             for (final TestCaseDto tc : updatedItems)
                 indexer.putTestCase(path, tc);
+
+            // One operation for the whole selection, recorded outside the loop
+            // above. Inside it, a bulk edit over forty cases would cost forty
+            // presses of CTRL+Z to take back (#165).
+            TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Update", updatedItems), before, TestCaseSnapshot.of(p, path, ids), editor::reload);
 
             Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
 

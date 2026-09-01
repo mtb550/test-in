@@ -71,8 +71,9 @@ final class TestCaseSequenceStore {
     }
 
     /**
-     * The one save that stamps nothing: an import writes the audit the file
-     * brought with it.
+     * The save that stamps nothing, for the two callers whose audit is already
+     * decided: an import writes the audit the file brought with it, and an undo
+     * writes the audit the case had before the change being taken back.
      * <p>
      * The four audit attributes are mappable in the import wizard, so a
      * spreadsheet carrying a case's real author and date says who made it.
@@ -85,7 +86,7 @@ final class TestCaseSequenceStore {
      * audit columns produces cases with an empty creator, and empty means "the
      * file did not say" rather than a name nobody chose.
      */
-    void putImported(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
+    void putVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
         store(testSetPath, testCase);
     }
 

@@ -22,6 +22,7 @@ import org.testin.testcase.create.CreateTestCaseDialog;
 import org.testin.util.Shortcuts;
 
 import java.util.List;
+import java.util.UUID;
 
 public class CreateTestCaseAction extends AbstractProjectAction {
     private final @NotNull TestinEditor editor;
@@ -54,9 +55,19 @@ public class CreateTestCaseAction extends AbstractProjectAction {
             // repaired it, writing a second version of a file written a moment
             // earlier.
             tc.setParent(dir);
-            editor.appendNewTestCase(tc);
 
             final @NotNull List<TestCaseDto> affectedNodes = List.of(tc);
+
+            // Before the case exists anywhere: the index has never heard of this
+            // id, which is what the snapshot records and what undoing a creation
+            // puts back.
+            final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(affectedNodes);
+            final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, dir.getPath(), ids);
+
+            // Recorded from the callback, because the rank arrives after the
+            // save: the case is written here and placed by the sort that
+            // follows, so what a redo would have to write is not readable yet.
+            editor.appendNewTestCase(tc, () -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Create", affectedNodes), before, TestCaseSnapshot.of(p, dir.getPath(), ids), editor::reload));
             Services.getInstance(p, TestCaseCacheService.class).addNewItems(affectedNodes);
 
             // Directly, as the other three savers do. This went through a

@@ -287,7 +287,7 @@ public class ImportAction extends AbstractProjectTreeAction {
         // recorded as modified by whoever ran the import.
         int written = 0;
         for (final TestCaseDto tc : testCases) {
-            indexer.putImportedTestCase(dirPath, tc);
+            indexer.putTestCaseVerbatim(dirPath, tc);
 
             written++;
             indicator.setFraction((done + written) / (double) total);

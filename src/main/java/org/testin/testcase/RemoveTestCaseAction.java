@@ -68,6 +68,11 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
     }
 
     private void performDeletion(final @NotNull List<TestCaseDto> selectedItems) {
+        // The whole case, before it goes: its content, its id and its rank, which
+        // is what puts it back where it was rather than at the end of the set.
+        final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(selectedItems);
+        final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, dir.getPath(), ids);
+
         // Nothing is relinked. A case carries its own position, so removing one
         // leaves a gap in the ranks and no case anywhere pointing at it - which
         // used to be a walk over the whole set rewriting the survivors on either
@@ -89,6 +94,8 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
         for (int i = selectedItems.size() - 1; i >= 0; i--) {
             model.remove(model.getElementIndex(selectedItems.get(i)));
         }
+
+        TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Remove", selectedItems), before, TestCaseSnapshot.of(p, dir.getPath(), ids), editor::reload);
     }
 
     @Override

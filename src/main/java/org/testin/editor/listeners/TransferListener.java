@@ -6,6 +6,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.TestinEditor;
+import org.testin.testcase.TestCaseSnapshot;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -14,6 +15,7 @@ import org.testin.services.Services;
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -93,6 +95,7 @@ public class TransferListener extends TransferHandler {
             final @NotNull Optional<TestCaseDto> anchor = anchorBelowDrop(support, movedIds);
 
             final @NotNull List<TestCaseDto> allItems = editor.getAllTestCases();
+            final @NotNull List<UUID> ids;
 
             synchronized (allItems) {
                 // A drag that did not start on this list: there is nothing here
@@ -102,9 +105,20 @@ public class TransferListener extends TransferHandler {
 
                 allItems.removeIf(tc -> movedIds.contains(tc.getId()));
                 allItems.addAll(anchor.map(tc -> indexOfId(allItems, tc.getId())).orElse(allItems.size()), itemsToMove);
+                ids = TestCaseSnapshot.idsOf(allItems);
             }
 
-            editor.updateSequenceAndSaveAll();
+            // Every case in the set, not only the ones dragged: moving one case
+            // past three others rewrites the rank of all four, so all four are
+            // what putting the drag back has to restore.
+            //
+            // Taken before the write and again from its callback, because the
+            // write is asynchronous - a snapshot taken after the call returns
+            // would still be the order before the drag.
+            final @NotNull Path setPath = editor.getParent().getPath();
+            final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, setPath, ids);
+
+            editor.updateSequenceAndSaveAll(() -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Reorder", itemsToMove), before, TestCaseSnapshot.of(p, setPath, ids), editor::reload));
 
             // After the save, inside the try: a drop that threw on the way here
             // is logged, not confirmed (#62).

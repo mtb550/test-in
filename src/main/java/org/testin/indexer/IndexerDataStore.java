@@ -137,8 +137,8 @@ final class IndexerDataStore {
         markTestSetModified(testSetPath);
     }
 
-    void putImportedTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
-        testCaseStore.putImported(testSetPath, tc);
+    void putTestCaseVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
+        testCaseStore.putVerbatim(testSetPath, tc);
         markTestSetModified(testSetPath);
     }
 

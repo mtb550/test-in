@@ -23,6 +23,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
+import org.testin.testcase.TestCaseSnapshot;
 import org.testin.testcase.create.TestCaseUpdateMenuDialog;
 import org.testin.util.Display;
 import org.testin.util.FontSync;
@@ -35,6 +36,7 @@ import java.awt.*;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public class DetailsTab {
@@ -228,6 +230,12 @@ public class DetailsTab {
     private void openUpdateMenu(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
         final @NotNull List<TestCaseDto> items = List.of(dto);
 
+        // Before the menu, for the same reason the editor's own update takes it
+        // there: the dialog edits the DTO it was given.
+        final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(items);
+        final @NotNull Optional<Path> undoPath = resolveEditPath(p, dto, currentPath);
+        final @NotNull Optional<TestCaseSnapshot> before = undoPath.map(editPath -> TestCaseSnapshot.of(p, editPath, ids));
+
         new TestCaseUpdateMenuDialog(p, items, (tcs, gt) -> {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
@@ -239,6 +247,9 @@ public class DetailsTab {
             // and closed the dialog on an edit that was never saved.
             resolveEditPath(p, dto, currentPath).ifPresentOrElse(editPath -> {
                         tcs.forEach(tc -> indexer.putTestCase(editPath, tc));
+
+                        before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Update", tcs), taken, TestCaseSnapshot.of(p, editPath, ids),
+                                () -> ViewToolWindowFactory.panel(p).ifPresent(viewPanel -> viewPanel.refreshIfShowing(tcs))));
 
                         Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
 

@@ -14,6 +14,7 @@ import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.testcase.TestCaseSnapshot;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -28,7 +29,10 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -54,10 +58,15 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
             final @NotNull CutState cutState = Services.getInstance(p, CutState.class);
             final boolean isCut = cutState.isCutting();
 
-            cutState.source().ifPresent(sourceUI -> {
+            // What a CTRL+Z would have to put back on the source side, taken
+            // before the cut takes it away. Empty when this is a copy, which
+            // leaves the source alone and has nothing there to put back.
+            final @NotNull Optional<TestCaseSnapshot> cutFrom = cutState.source().map(sourceUI -> {
                 final @NotNull List<TestCaseDto> cutItems = sourceUI.getAllTestCases().stream()
                         .filter(tc -> cutState.isPending(tc.getId()))
                         .toList();
+
+                final @NotNull TestCaseSnapshot taken = TestCaseSnapshot.of(p, sourceUI.getParent().getPath(), TestCaseSnapshot.idsOf(cutItems));
 
                 ApplicationManager.getApplication().runWriteAction(() -> {
                     final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -70,19 +79,39 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
                 if (sourceUI != destUI && sourceUI instanceof TestEditor sourceEditor) {
                     sourceEditor.reorderAndPersist();
                 }
+
+                return taken;
             });
 
-            int pasted = 0;
+            final @NotNull List<TestCaseDto> pastedHere = new ArrayList<>(pastedCases.size());
 
             for (final TestCaseDto tc : pastedCases) {
                 final @NotNull TestCaseDto clonedTc = cloneForPasting(p, tc, isCut);
 
                 clonedTc.setParent(destUI.getParent());
                 destUI.getAllTestCases().add(clonedTc);
-                pasted++;
+                pastedHere.add(clonedTc);
             }
 
-            destUI.reorderAndPersist();
+            final int pasted = pastedHere.size();
+
+            // Both sides of the move in one operation, so a cut here and a paste
+            // there is one press of CTRL+Z rather than two (#165). Taken before
+            // the sequence write puts the pasted cases on disk, which is why
+            // they read as absent.
+            final @NotNull Path destPath = destUI.getParent().getPath();
+            final @NotNull List<UUID> pastedIds = TestCaseSnapshot.idsOf(pastedHere);
+            final @NotNull List<TestCaseSnapshot> before = new ArrayList<>();
+            cutFrom.ifPresent(before::add);
+            before.add(TestCaseSnapshot.of(p, destPath, pastedIds));
+
+            destUI.reorderAndPersist(() -> {
+                final @NotNull List<TestCaseSnapshot> after = new ArrayList<>();
+                cutFrom.ifPresent(taken -> after.add(TestCaseSnapshot.of(p, taken.testSetPath(), taken.ids())));
+                after.add(TestCaseSnapshot.of(p, destPath, pastedIds));
+
+                TestCaseSnapshot.record(p, TestCaseSnapshot.describe(isCut ? "Move" : "Paste", pastedHere), before, after, destUI::reload);
+            });
 
             if (isCut) cutState.clear();
 

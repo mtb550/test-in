@@ -230,7 +230,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     @Override
-    public void updateSequenceAndSaveAll() {
+    public void updateSequenceAndSaveAll(final @NotNull Runnable onPersisted) {
         final List<TestCaseDto> snapshot;
         synchronized (this.allTestCases) {
             snapshot = new ArrayList<>(this.allTestCases);
@@ -257,6 +257,8 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             // plugin answers with a no-op, and a set nobody has generated code
             // for has no methods to update.
             if (!snapshot.isEmpty()) GenType.UPDATE_TEST_CASE_ORDER.executeAll(p, snapshot);
+
+            onPersisted.run();
 
             ApplicationManager.getApplication().invokeLater(this::refreshView);
         });
@@ -296,10 +298,10 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     @Override
-    public void appendNewTestCase(final @NotNull TestCaseDto tc) {
+    public void appendNewTestCase(final @NotNull TestCaseDto tc, final @NotNull Runnable onPersisted) {
         this.allTestCases.add(tc);
         orderThen(() -> {
-            updateSequenceAndSaveAll();
+            updateSequenceAndSaveAll(onPersisted);
 
             // VFS refresh goes through the indexer - file access is the
             // indexer's alone (see CLAUDE.md).
@@ -653,7 +655,16 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
      * this instead of running the two steps sequentially themselves.
      */
     public void reorderAndPersist() {
-        orderThen(this::updateSequenceAndSaveAll);
+        reorderAndPersist(() -> {
+        });
+    }
+
+    /**
+     * The same, telling {@code onPersisted} when the new order is on disk - what
+     * a paste needs before it can record what undoing itself would take.
+     */
+    public void reorderAndPersist(final @NotNull Runnable onPersisted) {
+        orderThen(() -> updateSequenceAndSaveAll(onPersisted));
     }
 
     /**

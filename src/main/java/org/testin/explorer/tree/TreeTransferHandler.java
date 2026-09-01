@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.Moved;
 import org.testin.codegen.SubtreeCode;
+import org.testin.undo.UndoService;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -415,7 +416,7 @@ public class TreeTransferHandler extends TransferHandler {
 
         moveBatch(oldPaths, newPaths, moved -> confirmLanded(Done.MOVED, moved));
 
-        Services.getInstance(p, TreeUndoService.class).push(new TreeUndoService.TreeOperation(
+        Services.getInstance(p, UndoService.class).push(new UndoService.Operation(
                 "Move " + describe(sources),
                 () -> moveBatch(newPaths, oldPaths),
                 () -> moveBatch(oldPaths, newPaths)));

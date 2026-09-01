@@ -1,4 +1,4 @@
-package org.testin.explorer.tree;
+package org.testin.undo;
 
 import org.testng.annotations.Test;
 
@@ -10,15 +10,15 @@ import static org.testng.Assert.*;
  * The tree undo/redo contract: undo runs the reverse, redo runs the forward
  * again, a new operation clears the redo history, and the stack is bounded.
  */
-public class TreeUndoServiceTest {
+public class UndoServiceTest {
 
-    private static TreeUndoService.TreeOperation counting(final String description, final AtomicInteger undone, final AtomicInteger redone) {
-        return new TreeUndoService.TreeOperation(description, undone::incrementAndGet, redone::incrementAndGet);
+    private static UndoService.Operation counting(final String description, final AtomicInteger undone, final AtomicInteger redone) {
+        return new UndoService.Operation(description, undone::incrementAndGet, redone::incrementAndGet);
     }
 
     @Test
     public void undoRunsTheReverseAndEnablesRedo() {
-        final TreeUndoService service = new TreeUndoService();
+        final UndoService service = new UndoService();
         final AtomicInteger undone = new AtomicInteger();
         final AtomicInteger redone = new AtomicInteger();
 
@@ -38,7 +38,7 @@ public class TreeUndoServiceTest {
 
     @Test
     public void redoRunsTheForwardAgainAndRestoresUndo() {
-        final TreeUndoService service = new TreeUndoService();
+        final UndoService service = new UndoService();
         final AtomicInteger undone = new AtomicInteger();
         final AtomicInteger redone = new AtomicInteger();
 
@@ -54,7 +54,7 @@ public class TreeUndoServiceTest {
 
     @Test
     public void newOperationClearsTheRedoHistory() {
-        final TreeUndoService service = new TreeUndoService();
+        final UndoService service = new UndoService();
         final AtomicInteger ignored = new AtomicInteger();
 
         service.push(counting("first", ignored, ignored));
@@ -69,7 +69,7 @@ public class TreeUndoServiceTest {
 
     @Test
     public void historyIsBounded() {
-        final TreeUndoService service = new TreeUndoService();
+        final UndoService service = new UndoService();
         final AtomicInteger undone = new AtomicInteger();
 
         for (int i = 0; i < 30; i++) {
@@ -84,7 +84,7 @@ public class TreeUndoServiceTest {
 
     @Test
     public void undoAndRedoOnEmptyStacksDoNothing() {
-        final TreeUndoService service = new TreeUndoService();
+        final UndoService service = new UndoService();
 
         service.undo();
         service.redo();

@@ -401,12 +401,17 @@ public final class ProjectIndexer {
     }
 
     /**
-     * Saves a case exactly as the import produced it, audit included. Every other
-     * save stamps who did it and when; an import is the one case where that
-     * belongs to the file being imported.
+     * Saves a case exactly as it was given, audit included. Every ordinary save
+     * stamps who did it and when; these two are the saves where that would be a
+     * lie.
+     * <p>
+     * An import writes the audit the file being imported carries. An undo writes
+     * the audit the case had before the change it is taking back - stamping it
+     * would record the tester as having modified a case at the moment they
+     * un-modified it (#164, #165).
      */
-    public void putImportedTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
-        store.putImportedTestCase(testSetPath, tc);
+    public void putTestCaseVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
+        store.putTestCaseVerbatim(testSetPath, tc);
     }
 
     public void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
