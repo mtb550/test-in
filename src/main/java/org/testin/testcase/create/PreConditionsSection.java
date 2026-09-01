@@ -3,8 +3,6 @@ package org.testin.testcase.create;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
-import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
@@ -13,10 +11,8 @@ import org.testin.testcase.UIAction;
 import org.testin.util.SpellChecker;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class PreConditionsSection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     @Getter
     private final @NotNull EditorTextField preConditionsField;
     private final @NotNull JBPanel<?> wrapper;
@@ -24,17 +20,9 @@ public class PreConditionsSection implements CreateTestCaseSection {
     public PreConditionsSection(final @NotNull Project p) {
         this.preConditionsField = SpellChecker.createField(p);
         this.preConditionsField.setOneLineMode(true);
-        this.preConditionsField.setFont(fieldFont);
-        this.preConditionsField.setPlaceholder(CreateTestCaseFields.PRE_CONDITIONS.getPlaceholder());
-        this.preConditionsField.setShowPlaceholderWhenFocused(true);
-        this.preConditionsField.setBorder(JBUI.Borders.empty(10));
+        styleField(this.preConditionsField, CreateTestCaseFields.PRE_CONDITIONS);
 
-        this.wrapper = new JBPanel<>(new BorderLayout());
-        this.wrapper.setOpaque(false);
-        this.wrapper.add(createIconPanel(CreateTestCaseFields.PRE_CONDITIONS.getIcon()), BorderLayout.WEST);
-        this.wrapper.add(this.preConditionsField, BorderLayout.CENTER);
-        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
-
+        this.wrapper = createWrapper(CreateTestCaseFields.PRE_CONDITIONS.getIcon(), this.preConditionsField);
     }
 
     @Override

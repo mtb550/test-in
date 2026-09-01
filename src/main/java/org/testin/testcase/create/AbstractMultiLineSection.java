@@ -11,8 +11,6 @@ import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.testcase.CreateTestCaseFields;
@@ -33,13 +31,6 @@ import java.awt.*;
  */
 public abstract class AbstractMultiLineSection implements CreateTestCaseSection {
 
-    /**
-     * The size every field in the dialog is set in - held here rather than at
-     * the field, because a multi-line editor takes its font from its color
-     * scheme and the scheme is built in {@link #enableMultiLine}.
-     */
-    protected final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
-
     protected final @NotNull Project p;
 
     protected final @NotNull EditorTextField field;
@@ -55,16 +46,9 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
     protected AbstractMultiLineSection(final @NotNull Project p, final @NotNull EditorTextField field, final @NotNull CreateTestCaseFields describes) {
         this.p = p;
         this.field = field;
-        this.field.setFont(fieldFont);
-        this.field.setPlaceholder(describes.getPlaceholder());
-        this.field.setShowPlaceholderWhenFocused(true);
-        this.field.setBorder(JBUI.Borders.empty(10));
+        styleField(this.field, describes);
 
-        this.wrapper = new JBPanel<>(new BorderLayout());
-        this.wrapper.setOpaque(false);
-        this.wrapper.add(createIconPanel(describes.getIcon()), BorderLayout.WEST);
-        this.wrapper.add(this.field, BorderLayout.CENTER);
-        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
+        this.wrapper = createWrapper(describes.getIcon(), this.field);
     }
 
     /**
@@ -114,8 +98,11 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
             // font too; without that the field would come back at the editor's
             // size while its neighbors keep the size every field is set in.
             final @NotNull EditorColorsScheme themed = editor.createBoundColorSchemeDelegate(EditorColorsManager.getInstance().getSchemeForCurrentUITheme());
-            themed.setEditorFontName(fieldFont.getFontName());
-            themed.setEditorFontSize(fieldFont.getSize());
+            // The size the dialog's other fields are set in, asked for once
+            // and used for both halves of the scheme's font.
+            final @NotNull Font font = fieldFont();
+            themed.setEditorFontName(font.getFontName());
+            themed.setEditorFontSize(font.getSize());
             editor.setColorsScheme(themed);
         });
 

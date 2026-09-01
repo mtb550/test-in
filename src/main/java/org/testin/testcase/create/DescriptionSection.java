@@ -5,8 +5,6 @@ import com.intellij.ui.EditorTextField;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
-import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -21,10 +19,8 @@ import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class DescriptionSection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     private final @NotNull Project p;
     @Getter
     private final @NotNull EditorTextField descriptionField;
@@ -34,16 +30,9 @@ public class DescriptionSection implements CreateTestCaseSection {
         this.p = p;
         this.descriptionField = SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), "");
         this.descriptionField.setOneLineMode(true);
-        this.descriptionField.setFont(fieldFont);
-        this.descriptionField.setPlaceholder(CreateTestCaseFields.DESCRIPTION.getPlaceholder());
-        this.descriptionField.setShowPlaceholderWhenFocused(true);
-        this.descriptionField.setBorder(JBUI.Borders.empty(10));
+        styleField(this.descriptionField, CreateTestCaseFields.DESCRIPTION);
 
-        this.wrapper = new JBPanel<>(new BorderLayout());
-        this.wrapper.setOpaque(false);
-        this.wrapper.add(createIconPanel(CreateTestCaseFields.DESCRIPTION.getIcon()), BorderLayout.WEST);
-        this.wrapper.add(this.descriptionField, BorderLayout.CENTER);
-        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
+        this.wrapper = createWrapper(CreateTestCaseFields.DESCRIPTION.getIcon(), this.descriptionField);
     }
 
     public void setError(final boolean error) {

@@ -5,8 +5,6 @@ import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
@@ -16,13 +14,11 @@ import org.testin.util.IconManager;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
 public class PrioritySection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     private final @NotNull ComboBox<Priority> priority;
     private final @NotNull JBPanel<?> wrapper;
 
@@ -33,7 +29,7 @@ public class PrioritySection implements CreateTestCaseSection {
 
         this.priority = new ComboBox<>(activePriorities);
         this.priority.setSelectedItem(Priority.LOW);
-        this.priority.setFont(fieldFont);
+        this.priority.setFont(fieldFont());
 
         this.priority.setRenderer(new ColoredListCellRenderer<>() {
             @Override
@@ -49,11 +45,7 @@ public class PrioritySection implements CreateTestCaseSection {
             }
         });
 
-        this.wrapper = new JBPanel<>(new BorderLayout());
-        this.wrapper.setOpaque(false);
-        this.wrapper.add(createIconPanel(CreateTestCaseFields.PRIORITY.getIcon()), BorderLayout.WEST);
-        this.wrapper.add(this.priority, BorderLayout.CENTER);
-        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
+        this.wrapper = createWrapper(CreateTestCaseFields.PRIORITY.getIcon(), this.priority);
     }
 
     @Override

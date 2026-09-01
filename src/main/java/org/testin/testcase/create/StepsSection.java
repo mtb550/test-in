@@ -9,7 +9,6 @@ import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.TextFieldWithAutoCompletionListProvider;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class StepsSection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     private final @NotNull Project p;
     @Getter
     private final @NotNull List<EditorTextField> stepFields;
@@ -53,11 +51,7 @@ public class StepsSection implements CreateTestCaseSection {
         this.stepsContainer.setLayout(new BoxLayout(this.stepsContainer, BoxLayout.Y_AXIS));
         this.stepsContainer.setOpaque(false);
 
-        this.wrapper = new JBPanel<>(new BorderLayout());
-        this.wrapper.setOpaque(false);
-        this.wrapper.add(createIconPanel(CreateTestCaseFields.STEPS.getIcon()), BorderLayout.WEST);
-        this.wrapper.add(this.stepsContainer, BorderLayout.CENTER);
-        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
+        this.wrapper = createWrapper(CreateTestCaseFields.STEPS.getIcon(), this.stepsContainer);
     }
 
     @Override
@@ -90,7 +84,7 @@ public class StepsSection implements CreateTestCaseSection {
         final @NotNull EditorTextField stepField = SpellChecker.createCompletionField(p, provider, text);
 
         stepField.setOneLineMode(true);
-        stepField.setFont(fieldFont);
+        stepField.setFont(fieldFont());
         stepField.setPlaceholder(CreateTestCaseFields.STEPS.getPlaceholder() + (stepFields.size() + 1));
         stepField.setShowPlaceholderWhenFocused(true);
         stepField.setBorder(JBUI.Borders.empty(6, 10));

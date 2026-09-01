@@ -3,7 +3,6 @@ package org.testin.testcase.create;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
@@ -20,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GroupSection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     private final @NotNull JBPanel<?> group;
     private final @NotNull JBPanel<?> wrapper;
 
@@ -32,16 +30,12 @@ public class GroupSection implements CreateTestCaseSection {
                 .filter(Group::isActive)
                 .map(group -> {
                     final @NotNull JBCheckBox checkBox = new JBCheckBox(group.name());
-                    checkBox.setFont(fieldFont);
+                    checkBox.setFont(fieldFont());
                     return checkBox;
                 })
                 .forEach(this.group::add);
 
-        this.wrapper = new JBPanel<>(new BorderLayout());
-        this.wrapper.setOpaque(false);
-        this.wrapper.add(createIconPanel(CreateTestCaseFields.GROUP.getIcon()), BorderLayout.WEST);
-        this.wrapper.add(this.group, BorderLayout.CENTER);
-        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
+        this.wrapper = createWrapper(CreateTestCaseFields.GROUP.getIcon(), this.group);
     }
 
     @Override

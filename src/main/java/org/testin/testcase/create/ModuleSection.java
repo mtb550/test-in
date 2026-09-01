@@ -4,8 +4,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
-import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
@@ -17,10 +15,8 @@ import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class ModuleSection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     @Getter
     private final @NotNull EditorTextField moduleField;
     private final @NotNull JBPanel<?> wrapper;
@@ -28,16 +24,9 @@ public class ModuleSection implements CreateTestCaseSection {
     public ModuleSection(final @NotNull Project p) {
         this.moduleField = SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getModules(), CreateTestCaseFields.MODULE.getIcon()), "");
         this.moduleField.setOneLineMode(true);
-        this.moduleField.setFont(fieldFont);
-        this.moduleField.setPlaceholder(CreateTestCaseFields.MODULE.getPlaceholder());
-        this.moduleField.setShowPlaceholderWhenFocused(true);
-        this.moduleField.setBorder(JBUI.Borders.empty(10));
+        styleField(this.moduleField, CreateTestCaseFields.MODULE);
 
-        this.wrapper = new JBPanel<>(new BorderLayout());
-        this.wrapper.setOpaque(false);
-        this.wrapper.add(createIconPanel(CreateTestCaseFields.MODULE.getIcon()), BorderLayout.WEST);
-        this.wrapper.add(this.moduleField, BorderLayout.CENTER);
-        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
+        this.wrapper = createWrapper(CreateTestCaseFields.MODULE.getIcon(), this.moduleField);
     }
 
     @Override

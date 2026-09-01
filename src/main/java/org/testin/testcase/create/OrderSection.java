@@ -5,7 +5,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.fields.IntegerField;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -38,8 +37,6 @@ import java.util.List;
  */
 public class OrderSection implements CreateTestCaseSection {
 
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
-
     private final @NotNull Project p;
 
     @Getter
@@ -55,11 +52,11 @@ public class OrderSection implements CreateTestCaseSection {
         // write here for any of that - no filter on the document, no pattern,
         // no clamp on the way out - and the range is set when the set is known.
         this.position = new IntegerField("Position", 1, 1);
-        this.position.setFont(fieldFont);
+        this.position.setFont(fieldFont());
         this.position.setColumns(4);
 
         this.outOf = new JBLabel("of 1");
-        this.outOf.setFont(fieldFont);
+        this.outOf.setFont(fieldFont());
         this.outOf.setBorder(JBUI.Borders.emptyLeft(10));
 
         final @NotNull JBPanel<?> field = new JBPanel<>(new BorderLayout());
@@ -67,11 +64,7 @@ public class OrderSection implements CreateTestCaseSection {
         field.add(this.position, BorderLayout.WEST);
         field.add(this.outOf, BorderLayout.CENTER);
 
-        this.wrapper = new JBPanel<>(new BorderLayout());
-        this.wrapper.setOpaque(false);
-        this.wrapper.add(createIconPanel(UpdateTestCaseFields.ORDER.getIcon()), BorderLayout.WEST);
-        this.wrapper.add(field, BorderLayout.CENTER);
-        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
+        this.wrapper = createWrapper(UpdateTestCaseFields.ORDER.getIcon(), field);
     }
 
     @Override
