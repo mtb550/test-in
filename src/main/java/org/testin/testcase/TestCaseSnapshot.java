@@ -3,6 +3,7 @@ package org.testin.testcase;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -32,6 +33,12 @@ import java.util.UUID;
  * The cases are deep copies. Every write path hands the indexer the DTO it is
  * already holding and the indexer keeps that object, so a snapshot of
  * references would be a snapshot of whatever the change is about to do to them.
+ * <p>
+ * A case appearing or disappearing takes its generated method with it, the way
+ * the create and remove actions do. Restoring the JSON alone left the set and
+ * the generated class disagreeing - the case back on the card, no method to run
+ * it - until something else happened to regenerate. What a case's fields
+ * generate is a different question and stays with #153.
  */
 public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @NotNull List<TestCaseDto> present, @NotNull List<UUID> absent) {
 
@@ -202,12 +209,25 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         // A copy per write for the same reason the snapshot is a copy: the
         // indexer keeps the object it is given, and this snapshot may be
         // applied again by the next redo.
-        present.forEach(tc -> indexer.putTestCaseVerbatim(testSetPath, copy(p, tc)));
+        present.forEach(tc -> {
+            // A case the index has never heard of is one coming back from a
+            // removal rather than one being edited back, and only the first
+            // needs a method written. Asked before the save, because after it
+            // every case is there.
+            final boolean isComingBack = indexer.findTestCase(tc.getId()).isEmpty();
+
+            indexer.putTestCaseVerbatim(testSetPath, copy(p, tc));
+
+            if (isComingBack) GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
+        });
 
         // Only what is actually there. An id that is already gone is the state
         // this asks for, and deleting a file twice is a warning in the log for
         // a job already done.
-        absent.forEach(id -> indexer.findTestCase(id).ifPresent(tc -> indexer.removeTestCase(testSetPath, id)));
+        absent.forEach(id -> indexer.findTestCase(id).ifPresent(tc -> {
+            indexer.removeTestCase(testSetPath, id);
+            GenType.REMOVE_TEST_CASE.getAction().execute(p, tc);
+        }));
     }
 
     private static @NotNull TestCaseDto copy(final @NotNull Project p, final @NotNull TestCaseDto tc) {
