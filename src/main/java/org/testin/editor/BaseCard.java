@@ -1,5 +1,6 @@
 package org.testin.editor;
 
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
@@ -39,6 +40,17 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * otherwise, so a card whose state nobody tracks still offers the gesture.
      */
     protected @NotNull CardHoverAction runSlot = CardHoverAction.RUN_TEST_CASE;
+    /**
+     * The title as words, kept beside the label because a wrapped label holds
+     * markup instead - see {@link #layOutTitle}.
+     */
+    private @NotNull String plainTitle = "";
+    /**
+     * How wide the title may be drawn before it wraps, and the widest the hover
+     * icons may be pushed out. Unbounded until a list says otherwise, so a card
+     * measured before it is laid out reads as the one-line card it used to be.
+     */
+    private int titleColumnWidth = Integer.MAX_VALUE;
 
     public BaseCard() {
         setLayout(new BorderLayout());
@@ -84,7 +96,17 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         return order.isEmpty() || description.isEmpty() ? order + description : order + " " + description;
     }
 
-    public void applyListFont(final @NotNull Font listFont) {
+    /**
+     * Lays the card out for the list it is drawn in: the fonts every label takes
+     * from the list, and the width the title has before it wraps, which is the
+     * list's own less what the card spends on insets and hover icons.
+     * <p>
+     * After {@code updateData}, and it has to be: the title cannot be laid out
+     * until both the font it is measured in and the width it must fit are known,
+     * and the font arrives here.
+     */
+    public void applyListLayout(final @NotNull JList<?> list) {
+        final @NotNull Font listFont = list.getFont();
         final float baseSize = listFont.getSize2D();
 
         descriptionLabel.setFont(listFont.deriveFont(Font.BOLD, baseSize + TITLE_FONT_DELTA));
@@ -97,6 +119,32 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         for (final Component c : badgePanel.getComponents()) {
             c.setFont(listFont.deriveFont(Font.BOLD, badgeSize));
         }
+
+        titleColumnWidth = Shared.titleColumnWidth(list.getWidth());
+        layOutTitle();
+    }
+
+    /**
+     * Draws the title on one line while it fits, and over as many as it takes
+     * when it does not.
+     * <p>
+     * A label wraps only what it is given as HTML, and only against a width
+     * written into the markup - so the wrapping case is the only one that becomes
+     * HTML, and a title that fits is set as the plain string it always was. That
+     * keeps the common card exactly as it rendered before, and keeps the escaping
+     * off every title but the ones that need it: a description is a tester's
+     * sentence and may hold a {@code <}, which as markup would swallow the rest
+     * of the line.
+     */
+    private void layOutTitle() {
+        final int plainWidth = descriptionLabel.getFontMetrics(descriptionLabel.getFont()).stringWidth(plainTitle);
+
+        if (plainWidth <= titleColumnWidth) {
+            descriptionLabel.setText(plainTitle);
+            return;
+        }
+
+        descriptionLabel.setText("<html><body style='width:" + titleColumnWidth + "px'>" + StringUtil.escapeXmlEntities(plainTitle) + "</body></html>");
     }
 
     /**
@@ -105,7 +153,11 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * anything about it here.
      */
     protected void updateUI(final int index, final @NotNull String title, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details) {
-        descriptionLabel.setText(title);
+        // Kept as it arrived, and put on the label by applyListLayout once the
+        // font and the width it must fit are both known. Not set here as well:
+        // the label's text is markup when the title wraps, so one method composes
+        // it and everything that wants the words reads plainTitle instead.
+        plainTitle = title;
 
         final @NotNull Color currentRowColor = index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45);
         setBackground(currentRowColor);
@@ -149,9 +201,13 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * icons begin. Owned here because the text is composed here: either half of
      * it can be switched off in the Details popup, so anything that rebuilds the
      * string to measure it drifts away from what is on screen.
+     * <p>
+     * Capped at the title column, so a title that wrapped puts the icons at the
+     * end of its first line rather than off the card - which is what the width of
+     * the whole unwrapped string would ask for.
      */
     public int titleWidth() {
-        return descriptionLabel.getFontMetrics(descriptionLabel.getFont()).stringWidth(descriptionLabel.getText());
+        return Math.min(descriptionLabel.getFontMetrics(descriptionLabel.getFont()).stringWidth(plainTitle), titleColumnWidth);
     }
 
     @Override

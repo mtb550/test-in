@@ -22,7 +22,7 @@ public class TestListRenderer extends AbstractListRenderer<TestinEditor> {
 
         card.updateData(row, tc, editor.getSelectedDetails(), editor.cardTitle(tc));
         card.setActionsState(isSelected, isRowHovered, hover);
-        card.applyListFont(list.getFont());
+        card.applyListLayout(list);
 
         return card;
     }

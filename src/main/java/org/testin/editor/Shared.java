@@ -158,6 +158,34 @@ public class Shared {
     }
 
     /**
+     * How far a card title may run before it wraps, in a list this wide - and so
+     * also the widest {@code titleWidth} {@link #descriptionActionIcons} is ever
+     * given, since past it the icons would be drawn off the card.
+     * <p>
+     * The card's own insets on each side, and then the room the two icons need
+     * after the text. Both numbers are read off the icons and the same scaled
+     * inset the method above starts from, so the column ends exactly where the
+     * icons must still fit.
+     * <p>
+     * Here for the same reason the icon positions are: the card wraps its title
+     * at this width and caps the width it paints from, and the mouse listener
+     * caps the width it hit-tests with. A second copy of the arithmetic is a
+     * clickable band that stops covering the icon it belongs to.
+     */
+    public static int titleColumnWidth(final int listWidth) {
+        final @NotNull Icon icon = AllIcons.Nodes.Class;
+        final int forIcons = JBUI.scale(10) + icon.getIconWidth() + JBUI.scale(8) + icon.getIconWidth();
+        final int column = listWidth - JBUI.scale(16) * 2 - forIcons;
+
+        // No column is not a narrow column. A list that has not been laid out yet
+        // reports zero width, and a card asked to wrap inside nothing draws one
+        // character per line. So until there is more room for the words than the
+        // icons themselves take, the title runs as far as it likes - which is
+        // what every card did before it could wrap at all.
+        return column > forIcons ? column : Integer.MAX_VALUE;
+    }
+
+    /**
      * Draws the card's action icons: the navigate button, and whichever of the
      * run and stop buttons this card's state offers.
      */

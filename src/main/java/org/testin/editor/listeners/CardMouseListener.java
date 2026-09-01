@@ -163,7 +163,11 @@ public class CardMouseListener extends MouseAdapter {
         // out here: both used to be, and both drifted.
         final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
         final @NotNull String title = editor.cardTitle(tc);
-        final int titleWidth = list.getFontMetrics(titleFont).stringWidth(title);
+
+        // Capped at the title column exactly as the card caps what it paints, so
+        // a title long enough to wrap keeps the clickable band under the icons
+        // rather than out past the edge of the card.
+        final int titleWidth = Math.min(list.getFontMetrics(titleFont).stringWidth(title), Shared.titleColumnWidth(list.getWidth()));
 
         // The card draws the run button or the stop button by the same rule, so
         // the pointer is over whichever one this case is offering.

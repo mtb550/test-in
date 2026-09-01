@@ -20,6 +20,8 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.util.FontSync;
 
 import javax.swing.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -45,6 +47,26 @@ public final class ListPanelBuilder {
         list.setExpandableItemsEnabled(false);
 
         FontSync.syncWithNativeEditor(p, list, fontSyncDisposable);
+
+        // A narrower list wraps a title over more lines, so the rows are taller -
+        // and a JList in its default vertical orientation never finds that out.
+        // BasicListUI recomputes cell heights when the model, the font or the
+        // fixed height changes, and on a width change only for the two wrapping
+        // orientations; for this one it takes the width change and does nothing
+        // with it. So the rows are re-measured here, on the width alone: dragging
+        // the editor's height changes no title's wrapping and is not worth a
+        // full relayout of the page.
+        list.addComponentListener(new ComponentAdapter() {
+            private int lastWidth = -1;
+
+            @Override
+            public void componentResized(final @NotNull ComponentEvent e) {
+                if (list.getWidth() == lastWidth) return;
+
+                lastWidth = list.getWidth();
+                model.allContentsChanged();
+            }
+        });
 
         final @NotNull JBScrollPane scrollPane = new JBScrollPane(list);
         scrollPane.setOpaque(true);

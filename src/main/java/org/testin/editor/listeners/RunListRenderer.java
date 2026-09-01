@@ -27,7 +27,7 @@ public class RunListRenderer extends AbstractListRenderer<RunEditor> {
 
         card.updateData(row, editor.getSelectedDetails(), runItem, editor.cardTitle(tc));
         card.setActionsState(isSelected, isRowHovered, hover);
-        card.applyListFont(list.getFont());
+        card.applyListLayout(list);
 
         return card;
     }
