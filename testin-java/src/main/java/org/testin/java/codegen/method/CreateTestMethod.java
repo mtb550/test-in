@@ -17,6 +17,7 @@ import org.testin.codegen.JavaSourceRoot;
 import org.testin.logger.Logger;
 import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.NameSanitizer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -155,15 +156,19 @@ public class CreateTestMethod implements GenAction {
         // single edit below, so what it already holds is read once and what this
         // pass adds is remembered as it goes. That also catches a sheet listing
         // one description twice, which asking the class could not.
+        // Keys rather than names: a hand-written method differing only in
+        // casing or underscores is the same method, and the exact compare wrote
+        // a stub beside it (#66, finding 41).
         final @NotNull Set<String> taken = Arrays.stream(targetClass.getMethods())
                 .map(PsiMethod::getName)
+                .map(NameSanitizer::methodKey)
                 .collect(Collectors.toCollection(HashSet::new));
 
         final @NotNull StringBuilder methods = new StringBuilder();
         int alreadyThere = 0;
         for (final TestCaseDto tc : cases) {
             final @NotNull String methodName = Fqcn.methodNameOf(tc);
-            if (!taken.add(methodName)) {
+            if (!taken.add(NameSanitizer.methodKey(methodName))) {
                 alreadyThere++;
                 continue;
             }
@@ -361,11 +366,13 @@ public class CreateTestMethod implements GenAction {
 
             if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, factory);
 
-            // By name, not by walking every method the class already has. A
-            // generated set is one class, so the walk grew with it: importing a
-            // sheet of a thousand compared half a million names on the way
-            // through (#66, finding 23).
-            if (targetClass.findMethodsByName(methodName, false).length > 0) {
+            // The key compare has to see every method's name, so this walks the
+            // class - affordable only because this is the rare per-case
+            // fallback. The batch path above pays for its walk once per class,
+            // which is what the finding about half a million comparisons asked
+            // for (#66, finding 23).
+            final @NotNull String key = NameSanitizer.methodKey(methodName);
+            if (Arrays.stream(targetClass.getMethods()).map(PsiMethod::getName).map(NameSanitizer::methodKey).anyMatch(key::equals)) {
                 Logger.info("Method already exists: " + methodName);
                 return Optional.empty();
             }

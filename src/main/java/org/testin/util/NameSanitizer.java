@@ -70,6 +70,21 @@ public final class NameSanitizer {
     }
 
     /**
+     * The form of a method name used to decide whether two names are the same
+     * method: lowercase, underscores dropped.
+     * <p>
+     * {@link #methodName} flattens a description's inner capitals and
+     * underscores, so a hand-written {@code verifyNEXTDbValue} or
+     * {@code verifyOTP_Retry_Count} and the generated {@code verifyNextDbValue}
+     * or {@code verifyOtpRetryCount} are one method to a reader - and must be
+     * one to the generator, or an import writes an empty stub beside the real
+     * test (#66, finding 41).
+     */
+    public static @NotNull String methodKey(final @NotNull String methodName) {
+        return methodName.replace("_", "").toLowerCase();
+    }
+
+    /**
      * Whether a description can name a generated test method at all.
      * <p>
      * Asked by the dialogs before a description is stored, because the answer is
