@@ -1,10 +1,10 @@
 package org.testin.editor;
 
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.panels.VerticalLayout;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
@@ -24,7 +24,14 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * in {@code CardMouseListener} so hover targets line up with the painted icons.
      */
     public static final float TITLE_FONT_DELTA = 3.0f;
-    protected final @NotNull JBLabel descriptionLabel = new JBLabel();
+    /**
+     * The title, in a text area rather than a label because a label does not
+     * wrap. This is how the plugin wraps text everywhere else - the details rows
+     * and the grid's cell editor do the same three calls - and it keeps the
+     * title as the tester's own words rather than as markup they can break with
+     * a {@code <}.
+     */
+    protected final @NotNull JBTextArea titleArea = new JBTextArea();
     protected final @NotNull JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
     protected final @NotNull Map<String, JBLabel> attributeLabels = new HashMap<>();
     protected final @NotNull JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
@@ -56,7 +63,16 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         setLayout(new BorderLayout());
         setOpaque(true);
 
-        descriptionLabel.setForeground(UIUtil.getLabelForeground());
+        titleArea.setForeground(UIUtil.getLabelForeground());
+        titleArea.setLineWrap(true);
+        titleArea.setWrapStyleWord(true);
+
+        // A card is drawn, not edited: no caret, no selection, nothing in the
+        // focus order, and the card's own stripe showing through.
+        titleArea.setEditable(false);
+        titleArea.setFocusable(false);
+        titleArea.setOpaque(false);
+        titleArea.setBorder(JBUI.Borders.empty());
 
         badgePanel.setOpaque(false);
         badgePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -65,7 +81,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         titleLine.setLayout(new BoxLayout(titleLine, BoxLayout.X_AXIS));
         titleLine.setOpaque(false);
         titleLine.setAlignmentX(Component.LEFT_ALIGNMENT);
-        titleLine.add(descriptionLabel);
+        titleLine.add(titleArea);
 
         content.setOpaque(false);
         content.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -109,7 +125,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         final @NotNull Font listFont = list.getFont();
         final float baseSize = listFont.getSize2D();
 
-        descriptionLabel.setFont(listFont.deriveFont(Font.BOLD, baseSize + TITLE_FONT_DELTA));
+        titleArea.setFont(listFont.deriveFont(Font.BOLD, baseSize + TITLE_FONT_DELTA));
 
         for (final JBLabel lbl : attributeLabels.values()) {
             lbl.setFont(listFont.deriveFont(baseSize));
@@ -128,23 +144,20 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * Draws the title on one line while it fits, and over as many as it takes
      * when it does not.
      * <p>
-     * A label wraps only what it is given as HTML, and only against a width
-     * written into the markup - so the wrapping case is the only one that becomes
-     * HTML, and a title that fits is set as the plain string it always was. That
-     * keeps the common card exactly as it rendered before, and keeps the escaping
-     * off every title but the ones that need it: a description is a tester's
-     * sentence and may hold a {@code <}, which as markup would swallow the rest
-     * of the line.
+     * The size is set by hand because a card is a renderer: it is measured
+     * before it is ever laid out, and a text area only knows how tall its text
+     * is once it knows how wide it may be. Told the column, it answers with the
+     * number of lines the row has to be.
+     * <p>
+     * This was markup first - {@code <html><body style='width:818px'>}, the form
+     * everybody writes - and it measured 1063x22, the whole sentence on one line
+     * with the CSS width silently ignored by the stylesheet a JLabel renders
+     * through. Pinned by CardTitleWrapTest, which asks how tall the card ended
+     * up rather than what it was told to do.
      */
     private void layOutTitle() {
-        final int plainWidth = descriptionLabel.getFontMetrics(descriptionLabel.getFont()).stringWidth(plainTitle);
-
-        if (plainWidth <= titleColumnWidth) {
-            descriptionLabel.setText(plainTitle);
-            return;
-        }
-
-        descriptionLabel.setText("<html><body style='width:" + titleColumnWidth + "px'>" + StringUtil.escapeXmlEntities(plainTitle) + "</body></html>");
+        titleArea.setText(plainTitle);
+        titleArea.setSize(Math.min(titleColumnWidth, Short.MAX_VALUE), Short.MAX_VALUE);
     }
 
     /**
@@ -207,7 +220,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * the whole unwrapped string would ask for.
      */
     public int titleWidth() {
-        return Math.min(descriptionLabel.getFontMetrics(descriptionLabel.getFont()).stringWidth(plainTitle), titleColumnWidth);
+        return Math.min(titleArea.getFontMetrics(titleArea.getFont()).stringWidth(plainTitle), titleColumnWidth);
     }
 
     @Override
