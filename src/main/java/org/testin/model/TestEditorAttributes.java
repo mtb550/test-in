@@ -117,7 +117,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     FQCN(
             "FQCN",
             "FQCN:",
-            ToolBarDefault.LOCKED_UNCHECKED,
+            ToolBarDefault.OFF,
             (tc, p) -> String.join(" > ", Fqcn.ofMethod(tc)),
             (p, tc, v) -> {
             },
@@ -173,7 +173,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     PATH(
             "Path",
             "Path:",
-            ToolBarDefault.LOCKED_UNCHECKED,
+            ToolBarDefault.OFF,
             (tc, p) -> String.join(" > ", tc.getParent().getPath2()),
             (p, tc, v) -> {
             },
