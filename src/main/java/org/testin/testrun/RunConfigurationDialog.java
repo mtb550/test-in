@@ -7,6 +7,7 @@ import org.testin.ui.framework.*;
 
 import java.awt.*;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 /**
  * The run-creation working dialog: configuration form on top, test case
@@ -15,10 +16,17 @@ import java.util.List;
  */
 public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunConfigurationForm> {
 
-    private final @NotNull Runnable onCreate;
+    /**
+     * What creating does, and whether it happened. It was a {@code Runnable}
+     * while the name was decided before this dialog opened and could not be
+     * wrong by the time it got here. The name is typed here now, so creating can
+     * be refused - an empty one, or one already taken - and a dialog that closed
+     * anyway would take the tester's configuration with it (#9).
+     */
+    private final @NotNull BooleanSupplier onCreate;
     private final @NotNull SelectionTree selection;
 
-    public RunConfigurationDialog(final @NotNull Project p, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Runnable onCreate) {
+    public RunConfigurationDialog(final @NotNull Project p, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull BooleanSupplier onCreate) {
         super(p);
         this.onCreate = onCreate;
         this.selection = selection;
@@ -53,7 +61,9 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunCon
         // checked tree to build the run before it hands the writing off, and a
         // closed dialog has no components to read. It returns as soon as it has
         // them, so the dialog still goes on the button (#87).
-        onCreate.run();
-        closeOk();
+        //
+        // And only when it accepted. A refused name leaves the dialog where it
+        // is, with everything the tester typed still in it.
+        if (onCreate.getAsBoolean()) closeOk();
     }
 }

@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class CreateTestRun implements NodeCreator {
@@ -50,7 +52,7 @@ public class CreateTestRun implements NodeCreator {
         // nobody can click their way into the miss. It is checked because a run
         // written against no project would be a directory nothing owns.
         Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
-                tp -> configureRun(tp.getTestCasesDirectory(), name, parentDir, newDirPath),
+                tp -> configureRun(tp.getTestCasesDirectory(), name, parentDir, Set.of(), Map.of()),
                 () -> Logger.warn("Create test run: no test project is bound to " + p.getName()));
 
         return Optional.empty();
@@ -59,33 +61,85 @@ public class CreateTestRun implements NodeCreator {
     /**
      * The dialog the creator is: which test cases the run covers, chosen from
      * the bound project's own tree.
+     * <p>
+     * Also how a run is re-created for the next cycle. The two differ only in
+     * what the dialog opens holding - the previous cycle's cases ticked and its
+     * configuration filled in - and not at all in how the run is written, which
+     * is what keeps a re-created run from being a second kind of run (#9).
      */
-    private void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
+    public void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Set<UUID> sourceCases, final @NotNull Map<TestRunConfiguration, String> sourceConfiguration) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
 
             final @NotNull Path testCasesPath = testCasesRoot.getPath();
             final @NotNull DefaultMutableTreeNode fullModelNode = buildDirectoryTree(testCasesPath, testCasesRoot);
 
             final @NotNull CheckedTreeNode root = convertToCheckedNodes(fullModelNode);
+            if (!sourceCases.isEmpty()) checkOnly(root, sourceCases);
 
             ApplicationManager.getApplication().invokeLater(() -> {
 
                 final @NotNull RunConfigurationForm form = new RunConfigurationForm(name);
+                if (!sourceConfiguration.isEmpty()) form.fillFrom(sourceConfiguration);
+
                 final @NotNull SelectionTree selection = new SelectionTree(root, RunTreeCellRenderer.create(Collections.emptyMap()));
 
-                new RunConfigurationDialog(p, form, selection, () -> {
-                    // The popup is not modal - the tree stays live while the
-                    // dialog is open, so the parent may have been removed.
-                    if (!Services.getInstance(p, ProjectIndexer.class).nodeExists(parentDir.getPath())) {
-                        Services.getInstance(p, Notifier.class).softRefuse(p, "'" + parentDir.getName() + "' no longer exists - test run not created");
-                        return;
-                    }
-
-                    final @NotNull TestRunDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, newDirPath, parentDir);
-                    saveSelectedToJSON(form, selection, newDirPath, Services.getInstance(p, ExplorerPanel.class), tr);
-                }).show();
+                new RunConfigurationDialog(p, form, selection, () -> create(form, selection, parentDir)).show();
             });
         });
+    }
+
+    /**
+     * Writes the run, or refuses and says why - and answers which, because the
+     * dialog stays open on a refusal.
+     * <p>
+     * The name is resolved here rather than before the dialog opened, since here
+     * is where the tester finished deciding it. That also puts the two checks
+     * the name needs in one place: the tree's create action makes them for the
+     * name it asks for, and nothing made them for a name typed afterwards.
+     */
+    private boolean create(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull DirectoryDto parentDir) {
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+
+        final @NotNull String name = form.getRunName();
+        if (name.isEmpty()) {
+            notifier.softRefuse(p, "A test run needs a name");
+            return false;
+        }
+
+        // The popup is not modal - the tree stays live while the dialog is open,
+        // so the parent may have been removed.
+        if (!indexer.nodeExists(parentDir.getPath())) {
+            notifier.softRefuse(p, "'" + parentDir.getName() + "' no longer exists - test run not created");
+            return false;
+        }
+
+        final @NotNull Path savePath = parentDir.getPath().resolve(name);
+        if (indexer.nodeExists(savePath)) {
+            notifier.softShowExists(p, name);
+            return false;
+        }
+
+        final @NotNull TestRunDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, savePath, parentDir);
+        saveSelectedToJSON(form, selection, savePath, Services.getInstance(p, ExplorerPanel.class), tr);
+
+        return true;
+    }
+
+    /**
+     * Ticks the cases a previous run covered, and unticks everything else.
+     * <p>
+     * Both halves of that, because a node arrives ticked: {@code CheckedTreeNode}
+     * defaults to checked, which is why creating a run opens with the whole
+     * project selected. Re-creating a cycle means the scope the last one had, so
+     * everything outside it has to come off.
+     */
+    private void checkOnly(final @NotNull CheckedTreeNode node, final @NotNull Set<UUID> wanted) {
+        if (node.getUserObject() instanceof TestCaseDto tc) node.setChecked(wanted.contains(tc.getId()));
+
+        for (int i = 0; i < node.getChildCount(); i++) {
+            checkOnly((CheckedTreeNode) node.getChildAt(i), wanted);
+        }
     }
 
     /**

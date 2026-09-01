@@ -48,6 +48,18 @@ public class RunConfigurationForm implements DialogComponent {
     private final @NotNull JBPanel<?> wrapper;
     private final @NotNull JBTextArea changeLog;
     private final @NotNull JBTextField commitIdField;
+
+    /**
+     * The name the run will be created under.
+     * <p>
+     * Editable, and it was not. The name used to be decided by the dialog that
+     * asks for one before this one opens, so this field showed it greyed out and
+     * the tester could not change their mind without cancelling both. Re-creating
+     * a run has no first dialog at all - it starts from a run that already
+     * exists - so the name had to become something this form owns rather than
+     * something it displays (#9).
+     */
+    private final @NotNull JBTextField runNameField;
     private final @NotNull Map<TestRunConfiguration, JComponent> fieldMap = new EnumMap<>(TestRunConfiguration.class);
 
     /**
@@ -61,6 +73,7 @@ public class RunConfigurationForm implements DialogComponent {
     public RunConfigurationForm(final @NotNull String runName) {
         changeLog = new JBTextArea();
         commitIdField = new JBTextField();
+        runNameField = new JBTextField(runName);
 
         wrapper = new JBPanel<>(new BorderLayout());
         wrapper.setOpaque(false);
@@ -86,10 +99,8 @@ public class RunConfigurationForm implements DialogComponent {
         fieldGbc.anchor = GridBagConstraints.NORTHWEST;
         fieldGbc.insets = JBUI.insets(4, 0, 4, 4);
 
-        final @NotNull JBTextField runNameField = new JBTextField(runName);
-        runNameField.setEditable(false);
-        runNameField.setEnabled(false);
         runNameField.setColumns(50);
+        runNameField.getEmptyText().setText("Cycle-1");
         addLabeledRow(configurationPanel, labelGbc, fieldGbc, 0, "Test Run name:", runNameField);
 
         // Room for more than one story, because a run usually covers several.
@@ -229,20 +240,19 @@ public class RunConfigurationForm implements DialogComponent {
      * and every caller above this reads an answer rather than a component.
      */
     private static @NotNull String textIn(final @NotNull JComponent component) {
-        if (component instanceof JTextComponent typed) return typed.getText().trim();
+        return switch (component) {
+            case JTextComponent typed -> typed.getText().trim();
 
-        // A field too tall to sit in the row on its own is in a scroll pane, and
-        // what was typed is inside that. Unwrapped here so no caller has to know
-        // which fields are big enough to scroll.
-        if (component instanceof JScrollPane scroller && scroller.getViewport().getView() instanceof JComponent inner) {
-            return textIn(inner);
-        }
+            // A field too tall to sit in the row on its own is in a scroll pane, and
+            // what was typed is inside that. Unwrapped here so no caller has to know
+            // which fields are big enough to scroll.
+            case JScrollPane scroller when scroller.getViewport().getView() instanceof JComponent inner ->
+                    textIn(inner);
+            case ComboBox<?> picked ->
+                    Optional.ofNullable(picked.getSelectedItem()).map(Object::toString).map(String::trim).orElse("");
+            default -> "";
+        };
 
-        if (component instanceof ComboBox<?> picked) {
-            return Optional.ofNullable(picked.getSelectedItem()).map(Object::toString).map(String::trim).orElse("");
-        }
-
-        return "";
     }
 
     /**
@@ -262,6 +272,48 @@ public class RunConfigurationForm implements DialogComponent {
         }
 
         return answers;
+    }
+
+    /**
+     * The name typed into the form, trimmed. What the run is created as.
+     */
+    public @NotNull String getRunName() {
+        return runNameField.getText().trim();
+    }
+
+    /**
+     * Puts a previous run's answers into the form - the inverse of
+     * {@link #configuration()}, and it goes through the same two kinds of
+     * component so neither caller has to know which field is which.
+     * <p>
+     * The visibility pass runs afterwards, or a field that only applies to a web
+     * run would be filled in and left hidden: the rules read what is chosen, and
+     * nothing was chosen until this ran.
+     */
+    public void fillFrom(final @NotNull Map<TestRunConfiguration, String> answers) {
+        answers.forEach((field, value) -> Optional.ofNullable(fieldMap.get(field)).ifPresent(component -> textInto(component, value)));
+
+        applyVisibility();
+    }
+
+    /**
+     * The mirror of {@link #textIn}: puts a value into whichever kind of field
+     * asked the question.
+     */
+    private static void textInto(final @NotNull JComponent component, final @NotNull String value) {
+        switch (component) {
+            case JTextComponent typed -> typed.setText(value);
+
+            case JScrollPane scroller when scroller.getViewport().getView() instanceof JComponent inner ->
+                    textInto(inner, value);
+
+            // Editable, so a value the options never offered is still the answer
+            // the previous run was created with.
+            case ComboBox<?> picked -> picked.setSelectedItem(value);
+
+            default -> {
+            }
+        }
     }
 
     public @NotNull String getFieldValue(final @NotNull TestRunConfiguration field) {
