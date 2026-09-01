@@ -162,8 +162,9 @@ intellijPlatform {
             }
         }
 
-        // Every level the plugin passes, so the gate fails on anything new rather
-        // than on the two it was narrowed to.
+        // Ten of the twelve levels the verifier offers, so the gate fails on
+        // anything new rather than on the two it was narrowed to. Both of the
+        // levels that are off are named below, with what each would cost.
         //
         // It was down to COMPATIBILITY_PROBLEMS and INVALID_PLUGIN while one
         // internal-API call needed the exception - ExecutionManager
@@ -183,6 +184,20 @@ intellijPlatform {
         // Each fails to compile if the platform drops it, which is the warning
         // that matters. Turning this level on would fail the build for three
         // decisions already made rather than for anything new.
+        //
+        // MISSING_DEPENDENCIES is the second, and it is off for the opposite
+        // reason - not a decision to live with, but a report of the thing
+        // working. Testin declares com.intellij.java, com.intellij.modules.java
+        // and TestNG-J optional so the Java and TestNG code loads only in an IDE
+        // that has them, which is what took PyCharm from 159 compatibility
+        // problems to zero (#144). The verifier then lists all three as
+        // Unavailable on every PyCharm target and raises this level while
+        // reporting the plugin itself Compatible. Left on, the gate could never
+        // be green for the IDE it had just been widened to cover: main was red
+        // on every push from 2026-08-30 until this came off. A dependency that
+        // is genuinely required and genuinely missing still fails the build,
+        // through INVALID_PLUGIN and COMPATIBILITY_PROBLEMS, which are what a
+        // plugin that will not load reports.
         failureLevel.set(
             listOf(
                 org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.COMPATIBILITY_WARNINGS,
@@ -193,7 +208,6 @@ intellijPlatform {
                 org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.OVERRIDE_ONLY_API_USAGES,
                 org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.NON_EXTENDABLE_API_USAGES,
                 org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.PLUGIN_STRUCTURE_WARNINGS,
-                org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.MISSING_DEPENDENCIES,
                 org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INVALID_PLUGIN,
                 org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.NOT_DYNAMIC,
             )
