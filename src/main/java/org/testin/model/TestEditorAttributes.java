@@ -197,7 +197,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             ToolBarDefault.OFF,
             (tc, p) -> tc.getStatus().getLabel(),
             (p, tc, v) -> tc.setStatus(TestDataParser.testCaseStatus(v, tc.getStatus())),
-            GenType.NO_CODE_CHANGE,
+            GenType.UPDATE_TEST_CASE_STATUS,
             Can.EDIT, Can.EXPORT
     ),
 

@@ -144,6 +144,17 @@ public enum GenType {
     ),
 
     /**
+     * Whether the case runs at all. Disabled is the one status that says
+     * anything about that, and it used to say it to Testin alone: the card
+     * showed it, the JSON stored it, and the suite ran the case exactly as
+     * before (#166).
+     */
+    UPDATE_TEST_CASE_STATUS(
+            "Update Test Case",
+            "Update Automation Test Method Enabled"
+    ),
+
+    /**
      * The attributes that never reach the Java: ids, paths, the audit fields.
      * A constant rather than a null on the attribute, so an edit runs its
      * generator either way instead of asking whether it has one.

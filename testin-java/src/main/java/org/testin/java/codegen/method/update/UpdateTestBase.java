@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
@@ -71,6 +72,22 @@ public class UpdateTestBase {
     protected void updateTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String attrName, final @NotNull String newValue) {
         getTestAnnotation(pm).ifPresentOrElse(testAnnotation -> {
             updateAnnotationAttribute(JavaPsiFacade.getElementFactory(p), testAnnotation, attrName, newValue);
+            CodeStyleManager.getInstance(p).reformat(pm);
+        }, () -> Logger.warn("Update: method has no @Test annotation"));
+    }
+
+    /**
+     * Takes one attribute off the method's {@code @Test} annotation, leaving
+     * the rest of it alone.
+     * <p>
+     * A sibling of the method above rather than a value it could be passed: the
+     * platform removes an attribute when it is set to nothing, and nothing is
+     * not something {@code updateAnnotationAttribute} can parse out of an
+     * annotation it builds to read the value from.
+     */
+    protected void removeTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String attrName) {
+        getTestAnnotation(pm).ifPresentOrElse(testAnnotation -> {
+            testAnnotation.setDeclaredAttributeValue(attrName, null);
             com.intellij.psi.codeStyle.CodeStyleManager.getInstance(p).reformat(pm);
         }, () -> Logger.warn("Update: method has no @Test annotation"));
     }

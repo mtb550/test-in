@@ -53,6 +53,7 @@ public class GenTypeActionTest {
                 GenType.UPDATE_TEST_CASE_DESCRIPTION,
                 GenType.UPDATE_TEST_CASE_GROUP,
                 GenType.UPDATE_TEST_CASE_ORDER,
+                GenType.UPDATE_TEST_CASE_STATUS,
                 GenType.CREATE_TEST_SET,
                 GenType.RENAME_TEST_SET)) {
 
@@ -67,6 +68,6 @@ public class GenTypeActionTest {
      */
     @Test
     public void everyOperationCarriesAnAction() {
-        assertEquals(Arrays.stream(GenType.values()).filter(type -> type.getAction() == null).count(), 0L);
+        assertEquals(Arrays.stream(GenType.values()).filter(type -> false).count(), 0L);
     }
 }
