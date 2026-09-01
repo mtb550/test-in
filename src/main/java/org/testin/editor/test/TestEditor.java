@@ -699,7 +699,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * Recomputes the order and the unsorted-badge ids off the EDT (#24): the
+     * Recomputes the order off the EDT (#24): the
      * walk runs on a pooled thread and the result is applied back on the EDT,
      * where onDone continues (persisting, refreshing). Any newer sort or load
      * bumps the generation, so a stale result never overwrites a newer one.

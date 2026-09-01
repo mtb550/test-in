@@ -65,7 +65,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            badges.add(Shared.createPriorityBadge(runItem.requireTc()));
+            Shared.addPriorityBadge(badges, runItem.requireTc());
         }
     },
 
@@ -118,7 +118,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            Shared.addBadge(badges, getName(), runItem.getBugSeverity().getLabel(), runItem.getBugSeverity().getColor());
+            Shared.addBugBadge(badges, runItem.getBugSeverity(), runItem.getBugPriority());
         }
     },
 
@@ -129,7 +129,10 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            Shared.addBadge(badges, getName(), runItem.getBugPriority().getLabel(), runItem.getBugPriority().getColor());
+            // The same badge its other half asks for: severity and bug
+            // priority are one object, and whichever of the two the toolbar has
+            // ticked draws it (#89).
+            Shared.addBugBadge(badges, runItem.getBugSeverity(), runItem.getBugPriority());
         }
     },
 

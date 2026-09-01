@@ -11,7 +11,10 @@ import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.BugPriority;
+import org.testin.model.BugSeverity;
 import org.testin.model.Group;
+import org.testin.model.Priority;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.FontSync;
@@ -37,12 +40,37 @@ public class Shared {
     // all three at once and none of them can drift. Nothing outside this file
     // builds one.
     //
-    // Captioned or bare: a badge is captioned when another badge could be
-    // mistaken for it - the test case's priority and the bug's priority declare
-    // the same three colors, and severity sits beside both. A badge whose word
-    // is its own explanation stays bare.
+    // Four kinds of fact, told apart without a caption. A caption used to do
+    // that work - the
+    // test case's priority and the bug's priority declare the same three colors,
+    // so a card read "Priority: High" beside "Bug Priority: High" and half of
+    // each pill was spent saying which field it was. The shape says it now, and
+    // the words are back to being the value (#89):
+    //
+    //   priority   ( High )            a filled, rounded pill
+    //   group      [ Regression <      a ribbon, notched at its right end
+    //   bug        ( Major / High )    one pill, both halves of one fact
+    //
+    // The bug badge is a pill and not a shape of its own on purpose: two colored
+    // halves meant clipping, font metrics and two hand-drawn strings, which is
+    // twenty lines of painting that nothing tests and a font change breaks. Two
+    // words and a slash tell it from a priority, and cost nothing.
+    //
+    // The run status badge keeps the plain pill: its word is its own
+    // explanation and it collides with nothing.
 
     private static final int BADGE_RADIUS = 20;
+
+    /**
+     * How deep the notch is cut into a tag's right end, and the room left for it
+     * so the last letter does not sit in the cut.
+     */
+    private static final int TAG_NOTCH = 7;
+
+    /**
+     * What joins the two halves of a bug badge into one word to read.
+     */
+    private static final @NotNull String PAIR_JOIN = " / ";
 
     /**
      * Room around the text, inside the pill.
@@ -59,12 +87,28 @@ public class Shared {
     private static final @NotNull Color TEXT_ON_LIGHT = Gray._30;
 
     /**
-     * The only color a badge names here. Every other one comes from the enum of
-     * the value being shown, which is where a color belongs; this one describes
-     * a position in the tree rather than a value, so it has no enum to live in.
+     * One color for every group, because it is a property of the tag design
+     * rather than of any group: eight of these can sit on one row, and eight
+     * hues there is a wall rather than a row. What tells them apart is the word,
+     * which is the whole reason a tag is a tag.
      */
-    public static @NotNull Badge createPriorityBadge(final @NotNull TestCaseDto tc) {
-        return captioned(TestEditorAttributes.PRIORITY.getName(), tc.getPriority().getName(), tc.getPriority().getColor());
+    private static final @NotNull Color GROUP_COLOR = JBColor.darkGray;
+
+    /**
+     * The case's priority, and nothing at all when it is Low.
+     * <p>
+     * Low is what a case is unless somebody said otherwise, so a Low pill is a
+     * badge on almost every row saying what the absence of a badge already says.
+     * Dropping it leaves the row carrying only the priorities that were a
+     * decision (#89).
+     * <p>
+     * Added rather than returned, so the rule lives here and every caller stays
+     * unconditional - the same reason {@link #addBugBadge} is shaped this way.
+     */
+    public static void addPriorityBadge(final @NotNull List<Badge> badges, final @NotNull TestCaseDto tc) {
+        if (tc.getPriority() == Priority.LOW) return;
+
+        badges.add(new Pill(tc.getPriority().getName(), tc.getPriority().getColor()));
     }
 
     /**
@@ -72,33 +116,44 @@ public class Shared {
      * are the status's own.
      */
     public static @NotNull Badge createRunStatusBadge(final @NotNull RunStatus.Badge runStatus) {
-        return new Badge(runStatus.label(), runStatus.color());
+        return new Pill(runStatus.label(), runStatus.color());
     }
 
     /**
-     * Adds a captioned pill, and adds nothing when there is no value to show.
+     * How badly the case failed and how urgently the bug wants fixing, as one
+     * object.
      * <p>
-     * The caption is what makes the row readable: the test case's priority and
-     * the bug's priority declare the same three colors, so an uncaptioned
-     * "Low" beside another "Low" says two different things in the same pill.
+     * They are two halves of one fact and never appear apart, so they are one
+     * badge rather than two pills a tester has to pair up by eye. Severity's
+     * color, because severity is how bad it is and its palette is the traffic
+     * light built to be read at a glance.
      * <p>
-     * The blank rule lives here for the same reason {@code BaseCard} owns it for
-     * detail rows - a case that never failed has no severity and no bug
-     * priority, and an empty pill is worse than no pill. One place decides it,
-     * so every caller stays unconditional.
+     * Two words and a slash are also what tells this from a priority pill, which
+     * is the collision the old captions existed to prevent. A second color for
+     * the second half would say it better and costs a shape of its own to paint,
+     * which is more painting code than the difference is worth.
+     * <p>
+     * Nothing at all unless both halves have a value. A case that never failed
+     * has neither, and half a pair is not a thing this draws (#89).
+     * <p>
+     * Asked by both halves and answered once: whichever of the two attributes
+     * the toolbar has ticked draws the pair, and the second finds it already
+     * there. Neither owns it, so unticking one does not take the other's fact
+     * off the card.
      */
-    public static void addBadge(final @NotNull List<Badge> badges, final @NotNull String caption, final @NotNull String value, final @NotNull Color color) {
-        if (value.isBlank()) return;
+    public static void addBugBadge(final @NotNull List<Badge> badges, final @NotNull BugSeverity severity, final @NotNull BugPriority bugPriority) {
+        if (severity == BugSeverity.EMPTY || bugPriority == BugPriority.EMPTY) return;
+        if (badges.stream().anyMatch(badge -> badge instanceof Pill pill && pill.text().contains(PAIR_JOIN))) return;
 
-        badges.add(captioned(caption, value, color));
+        badges.add(new Pill(severity.getLabel() + PAIR_JOIN + bugPriority.getLabel(), severity.getColor()));
     }
 
-    private static @NotNull Badge captioned(final @NotNull String caption, final @NotNull String value, final @NotNull Color color) {
-        return new Badge(caption + ": " + value, color);
-    }
-
+    /**
+     * A group, as a tag: the ribbon shape is what says this is a label the
+     * tester put on the case rather than a state the case is in.
+     */
     public static @NotNull Badge createGroupBadge(final @NotNull Group group) {
-        return new Badge(group.getName(), JBColor.darkGray);
+        return new Tag(group.getName(), GROUP_COLOR);
     }
 
     /**
@@ -281,7 +336,20 @@ public class Shared {
      * one - it describes it, the way it already hands its detail row over as
      * text, and the panel that draws them owns the components.
      */
-    public record Badge(@NotNull String text, @NotNull Color color) {
+    public sealed interface Badge permits Pill, Tag {
+    }
+
+    /**
+     * A rounded, filled pill - the shape a badge has had all along. A priority
+     * and a run status.
+     */
+    public record Pill(@NotNull String text, @NotNull Color color) implements Badge {
+    }
+
+    /**
+     * A ribbon, notched at its right end. A group.
+     */
+    public record Tag(@NotNull String text, @NotNull Color color) implements Badge {
     }
 
     /**
@@ -290,6 +358,14 @@ public class Shared {
      * assembled by a caller - that is what keeps the look in one place.
      */
     private static final class BadgePill extends JBLabel {
+
+        /**
+         * What this pill is drawing. A pill outlives the row it was built for,
+         * so the shape is read at paint time rather than fixed at construction -
+         * the same reason the font is. An empty one until it is shown, so no
+         * reader has to ask whether it has been.
+         */
+        private @NotNull Badge badge = new Pill("", JBColor.GRAY);
 
         private BadgePill() {
             setOpaque(false);
@@ -302,13 +378,24 @@ public class Shared {
          * and the base size follows the tester's zoom.
          */
         private void show(final @NotNull Badge badge) {
-            setText(badge.text());
-            setBackground(badge.color());
+            this.badge = badge;
+
+            switch (badge) {
+                case Pill pill -> lay(pill.text(), pill.color(), BADGE_PAD_H);
+                // Room on the right for the notch, so the last letter is not cut.
+                case Tag tag -> lay(tag.text(), tag.color(), BADGE_PAD_H + TAG_NOTCH);
+            }
 
             final float badgeSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
             setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD, badgeSize));
 
             setVisible(true);
+        }
+
+        private void lay(final @NotNull String text, final @NotNull Color fill, final int rightPad) {
+            setText(text);
+            setBackground(fill);
+            setBorder(JBUI.Borders.empty(BADGE_PAD_V, BADGE_PAD_H, BADGE_PAD_V, rightPad));
         }
 
         /**
@@ -331,11 +418,35 @@ public class Shared {
         protected void paintComponent(final Graphics g) {
             final @NotNull Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(getBackground());
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), BADGE_RADIUS, BADGE_RADIUS);
+
+            switch (badge) {
+                case Pill pill -> fillPill(g2, pill.color());
+                case Tag tag -> fillTag(g2, tag.color());
+            }
+
             g2.dispose();
 
             super.paintComponent(g);
+        }
+
+        private void fillPill(final @NotNull Graphics2D g2, final @NotNull Color fill) {
+            g2.setColor(fill);
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), BADGE_RADIUS, BADGE_RADIUS);
+        }
+
+        /**
+         * The ribbon: square on the left, and a V cut into the right end.
+         */
+        private void fillTag(final @NotNull Graphics2D g2, final @NotNull Color fill) {
+            final int w = getWidth();
+            final int h = getHeight();
+            final int notch = JBUI.scale(TAG_NOTCH);
+
+            final int @NotNull [] x = {0, w, w - notch, w, 0};
+            final int @NotNull [] y = {0, 0, h / 2, h, h};
+
+            g2.setColor(fill);
+            g2.fillPolygon(x, y, x.length);
         }
     }
 

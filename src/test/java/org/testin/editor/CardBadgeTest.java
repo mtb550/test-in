@@ -2,6 +2,8 @@ package org.testin.editor;
 
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
+import org.testin.model.Priority;
+import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
 import java.awt.*;
@@ -57,10 +59,73 @@ public class CardBadgeTest {
     public void aCaseThatNeverFailedDrawsNoPill() {
         final List<Shared.Badge> badges = new ArrayList<>();
 
-        Shared.addBadge(badges, "Bug Severity", BugSeverity.EMPTY.getLabel(), BugSeverity.EMPTY.getColor());
-        Shared.addBadge(badges, "Bug Priority", BugPriority.EMPTY.getLabel(), BugPriority.EMPTY.getColor());
+        Shared.addBugBadge(badges, BugSeverity.EMPTY, BugPriority.EMPTY);
 
         assertEquals(badges.size(), 0, "an empty value is not a badge with no text, it is no badge");
+    }
+
+    /**
+     * Half a pair is not a thing to draw. The two are set together by the
+     * failure dialog, so one without the other is a case somebody stopped
+     * halfway through describing - and a lone half reads as the other field.
+     */
+    @Test
+    public void halfAPairIsNoPair() {
+        final List<Shared.Badge> withoutPriority = new ArrayList<>();
+        Shared.addBugBadge(withoutPriority, BugSeverity.MAJOR, BugPriority.EMPTY);
+        assertEquals(withoutPriority.size(), 0, "a severity with no bug priority draws nothing");
+
+        final List<Shared.Badge> withoutSeverity = new ArrayList<>();
+        Shared.addBugBadge(withoutSeverity, BugSeverity.EMPTY, BugPriority.HIGH);
+        assertEquals(withoutSeverity.size(), 0, "a bug priority with no severity draws nothing");
+    }
+
+    /**
+     * Both halves ask for it and one badge comes out. Severity and bug priority
+     * are two toolbar attributes drawing one object, so whichever is ticked
+     * draws it and the second finds it already there (#89).
+     */
+    @Test
+    public void bothHalvesAskAndOneBadgeIsDrawn() {
+        final List<Shared.Badge> badges = new ArrayList<>();
+
+        Shared.addBugBadge(badges, BugSeverity.MAJOR, BugPriority.HIGH);
+        Shared.addBugBadge(badges, BugSeverity.MAJOR, BugPriority.HIGH);
+
+        assertEquals(badges.size(), 1, "the pair is one badge however many of its halves ask for it");
+        assertTrue(badges.getFirst() instanceof Shared.Pill pill && pill.text().equals("Major / High"),
+                "both facts, one badge, severity first");
+    }
+
+    /**
+     * Low is what a case is unless somebody said otherwise, so a Low pill says
+     * on almost every row what the absence of a pill already says (#89).
+     */
+    @Test
+    public void lowPriorityDrawsNoPill() {
+        final List<Shared.Badge> badges = new ArrayList<>();
+
+        Shared.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.LOW));
+        assertEquals(badges.size(), 0, "Low is the default, and the default needs no badge");
+
+        Shared.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.HIGH));
+        Shared.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.MEDIUM));
+        assertEquals(badges.size(), 2, "a priority somebody chose is still drawn");
+    }
+
+    /**
+     * With the caption gone, color is the only thing keeping the three apart -
+     * so the three have to be three.
+     */
+    @Test
+    public void theThreePrioritiesAreThreeColours() {
+        final Set<Color> colours = new HashSet<>();
+
+        for (final Priority priority : Priority.values()) {
+            assertTrue(colours.add(new Color(priority.getColor().getRGB())), priority + " repeats another priority's colour");
+        }
+
+        assertEquals(colours.size(), 3, "three priorities, three colours, no caption to fall back on");
     }
 
     /**

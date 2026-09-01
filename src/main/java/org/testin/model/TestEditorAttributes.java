@@ -110,7 +110,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ) {
         @Override
         public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            badges.add(Shared.createPriorityBadge(tc));
+            Shared.addPriorityBadge(badges, tc);
         }
     },
 

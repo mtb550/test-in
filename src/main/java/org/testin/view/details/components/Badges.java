@@ -29,7 +29,7 @@ public class Badges extends BaseDetails {
         badgesPanel.setOpaque(false);
 
         final @NotNull List<Shared.Badge> badges = new ArrayList<>();
-        badges.add(Shared.createPriorityBadge(dto));
+        Shared.addPriorityBadge(badges, dto);
 
         for (final Group group : dto.getGroup()) {
             badges.add(Shared.createGroupBadge(group));
