@@ -14,6 +14,7 @@ import org.testin.util.Mapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
@@ -25,6 +26,31 @@ import java.util.stream.Stream;
 @Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class FilesUtil {
+
+    /**
+     * Whether the file already holds exactly what this content serializes to.
+     * <p>
+     * The file is the only record of what a test case looked like before an
+     * edit. The index hands its own objects out and the dialogs edit them in
+     * place, so by the time a save arrives the indexed case and the case being
+     * saved are the same object and there is nothing left in memory to compare
+     * against (#164).
+     * <p>
+     * Asked as bytes, through the mapper that wrote them, so the question is
+     * literally the rule in CLAUDE.md: would this write leave the file
+     * byte-identical.
+     * <p>
+     * A file that cannot be read is not identical. Missing is the ordinary case
+     * - a test case being created - and unreadable is a real problem, which the
+     * write that follows reports properly rather than this deciding on it.
+     */
+    <T> boolean alreadyHolds(final @NotNull Project p, final @NotNull Path path, final @NotNull T content) {
+        try {
+            return Arrays.equals(Files.readAllBytes(path), Services.getInstance(p, Mapper.class).writeValueAsBytes(content));
+        } catch (final IOException absentOrUnreadable) {
+            return false;
+        }
+    }
 
     <T> void write(final @NotNull Project p, final @NotNull Path path, final @NotNull T content) {
         writeBytes(p, path, Services.getInstance(p, Mapper.class).writeValueAsBytes(content));

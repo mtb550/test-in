@@ -246,7 +246,14 @@ public class DetailsTab {
             // empty and not a byte reaches disk. The tester was told "Updated"
             // and closed the dialog on an edit that was never saved.
             resolveEditPath(p, dto, currentPath).ifPresentOrElse(editPath -> {
-                        tcs.forEach(tc -> indexer.putTestCase(editPath, tc));
+                        boolean changed = false;
+                        for (final TestCaseDto tc : tcs) changed |= indexer.putTestCase(editPath, tc);
+
+                        // Nothing written, so nothing to confirm - the same
+                        // reason the branch above exists, one step further in:
+                        // a save that reached disk and changed nothing is as
+                        // little of an update as one that never got there (#164).
+                        if (!changed) return;
 
                         before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Update", tcs), taken, TestCaseSnapshot.of(p, editPath, ids)));
 

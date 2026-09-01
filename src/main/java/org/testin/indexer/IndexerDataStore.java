@@ -132,9 +132,14 @@ final class IndexerDataStore {
         throw new IllegalStateException("No " + kind + " indexed at " + path);
     }
 
-    void putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
-        testCaseStore.put(testSetPath, tc);
+    boolean putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
+        // The marker follows the write. A save that changed nothing did not
+        // modify the set, and stamping the set's marker for it would move the
+        // lie one level up (#164).
+        if (!testCaseStore.put(testSetPath, tc)) return false;
+
         markTestSetModified(testSetPath);
+        return true;
     }
 
     void putTestCaseVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {

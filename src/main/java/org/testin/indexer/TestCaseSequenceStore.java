@@ -53,13 +53,30 @@ final class TestCaseSequenceStore {
         return TestCaseOrder.ordered(cases);
     }
 
-    void put(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
-        // Every save of a test case arrives here - the update dialog, a grid cell,
-        // the details panel, a paste - so the audit is stamped once, here, instead
-        // of at each of them. Reading does not come through: the indexing scanner
-        // fills the maps straight from the JSON, so opening a project stamps
-        // nothing.
-        //
+    /**
+     * Saves a test case, and says whether it had anything to save.
+     * <p>
+     * Every save arrives here - the update dialog, a grid cell, the details
+     * panel, a paste - so the audit is stamped once, here, instead of at each of
+     * them. Reading does not come through: the indexing scanner fills the maps
+     * straight from the JSON, so opening a project stamps nothing.
+     * <p>
+     * Which is also why a save that changes nothing is refused here. Opening a
+     * field to read it and pressing Enter used to record the tester as having
+     * edited the case, because the stamp was written on the fact of a save
+     * rather than on anything having changed (#164). One funnel, one answer, and
+     * the four ways in are fixed together.
+     *
+     * @return false when the file already holds this case exactly - nothing
+     * stamped and nothing written, so the caller has nothing to confirm and
+     * nothing to take back.
+     */
+    boolean put(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
+        // Asked before the stamp, because the stamp is itself a change: touch()
+        // writes a new updatedAt, and anything compared after it differs by the
+        // one field this exists to avoid writing.
+        if (Services.getInstance(p, FilesUtil.class).alreadyHolds(p, fileOf(testSetPath, testCase.getId()), testCase)) return false;
+
         // Known to the index means the case already exists, whatever its fields
         // say - the one question that separates a creation from an update without
         // trusting a value a tester could have typed.
@@ -68,6 +85,16 @@ final class TestCaseSequenceStore {
         else testCase.stampCreated(tester);
 
         store(testSetPath, testCase);
+        return true;
+    }
+
+    /**
+     * Where a test case lives, from the set that holds it and its id. One owner,
+     * because three things ask - the save, the unchanged check that now precedes
+     * it, and the delete.
+     */
+    private static @NotNull Path fileOf(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
+        return testSetPath.resolve(testCaseId + ".json");
     }
 
     /**
@@ -98,7 +125,7 @@ final class TestCaseSequenceStore {
         if (!ids.contains(testCase.getId())) ids.add(testCase.getId());
 
         Services.getInstance(p, FilesUtil.class)
-                .write(p, testSetPath.resolve(testCase.getId() + ".json"), testCase);
+                .write(p, fileOf(testSetPath, testCase.getId()), testCase);
     }
 
     void remove(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
@@ -111,7 +138,7 @@ final class TestCaseSequenceStore {
         // change worth a rescan (#117). stopAt is the set itself: a set
         // outlives its last case, so nothing above the file is pruned.
         Services.getInstance(p, FilesUtil.class)
-                .delete(p, testSetPath.resolve(testCaseId + ".json"), testSetPath);
+                .delete(p, fileOf(testSetPath, testCaseId), testSetPath);
     }
 
     /**

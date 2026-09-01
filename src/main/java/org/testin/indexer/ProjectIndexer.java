@@ -396,8 +396,13 @@ public final class ProjectIndexer {
         return store.getChildren(parentPath);
     }
 
-    public void putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
-        store.putTestCase(testSetPath, tc);
+    /**
+     * Saves a test case, and says whether it had anything to save - false when
+     * the file already holds it exactly, which is a tester who opened a field,
+     * changed nothing and pressed Enter (#164).
+     */
+    public boolean putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
+        return store.putTestCase(testSetPath, tc);
     }
 
     /**

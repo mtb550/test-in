@@ -72,8 +72,16 @@ public class UpdateTestCaseAction extends AbstractProjectAction {
         open.accept(new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> {
 
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            boolean changed = false;
             for (final TestCaseDto tc : updatedItems)
-                indexer.putTestCase(path, tc);
+                changed |= indexer.putTestCase(path, tc);
+
+            // A save that changed nothing is not an update. Nothing was stamped
+            // and nothing was written, so there is nothing to confirm, nothing
+            // to take back and no method to regenerate - and saying "Updated"
+            // for it is how a tester came to be recorded as having edited a case
+            // they only looked at (#164).
+            if (!changed) return;
 
             // One operation for the whole selection, recorded outside the loop
             // above. Inside it, a bulk edit over forty cases would cost forty
