@@ -43,7 +43,7 @@ permissions:
 
 jobs:
   inspect:
-    name: Inspect src
+    name: Inspect
     runs-on: windows-latest
     timeout-minutes: 90
 
@@ -76,7 +76,13 @@ jobs:
       # exits 1 when the gate is breached.
       - name: Inspect
         shell: bash
-        run: pwsh -NoProfile -File tools/inspect.ps1 -Subdirectory src
+        # No -Subdirectory. It said 'src', which is not the source: it swept
+        # src/test in with src/main - 212 of 385 findings were test fixtures,
+        # where a literal expectation is the point rather than a divergence -
+        # and it left out testin-java and testin-testng altogether, which is
+        # the gap Get-SourceRoots was written to close. Without the argument
+        # the script uses those three production trees and nothing else.
+        run: pwsh -NoProfile -File tools/inspect.ps1
 
       # Always, because a breached gate is exactly when somebody wants the list.
       - name: Keep the findings

@@ -276,6 +276,12 @@ function Test-MachineString([string] $value) {
     if ($value -ne $value.Trim()) { return $true }
     if ($value -cmatch '^[a-z0-9_-]+$') { return $true }
     if ($value -cmatch '^[A-Z0-9_]+$') { return $true }
+    # An identifier, not a sentence. A hump inside a single word is how a JSON
+    # field, a config key or an inspection name is spelled - testinProject,
+    # RepoUrl, UnstableApiUsage - and none of them is read by a tester. A word
+    # they do read is a word, or words: Copy and Details have no hump, Git Error
+    # has a space.
+    if ($value -notmatch ' ' -and $value -cmatch '[a-z][A-Z]') { return $true }
     return $false
 }
 
