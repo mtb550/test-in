@@ -10,6 +10,7 @@ import org.testin.editor.*;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.*;
@@ -44,8 +45,13 @@ public class CardMouseListener extends MouseAdapter {
         final boolean isClickOnItem = index >= 0 && list.getCellBounds(index, index).contains(e.getPoint());
 
         if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
+            // Focused, not just shown: the details tab carries the F2 binding
+            // itself, so landing the focus there is what lets a tester open the
+            // update menu straight after the double-click. The same call the
+            // View Details actions make - the double-click was the one way in
+            // that showed the panel and left the focus behind.
             if (isClickOnItem)
-                Optional.ofNullable(model.getElementAt(index)).ifPresent(selected -> ViewToolWindowFactory.showPanel(p, List.of(selected), path));
+                Optional.ofNullable(model.getElementAt(index)).ifPresent(selected -> ViewToolWindowFactory.showPanel(p, List.of(selected), path, ViewPanel::focusDetailsTab));
 
             return;
         }
