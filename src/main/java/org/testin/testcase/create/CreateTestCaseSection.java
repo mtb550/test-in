@@ -96,22 +96,27 @@ public interface CreateTestCaseSection {
      * Every section is laid out this way, so it is laid out once. A section that
      * composed its own row is the one whose icon sits a few pixels off the
      * others the first time this spacing changes.
+     * <p>
+     * The icon panel is built here rather than in a method of its own. It had
+     * one, and making it private - correct, since this became its only caller -
+     * failed the Plugin Verifier: the call compiled to an {@code invokeinterface}
+     * against a private interface method, which is an
+     * {@code IncompatibleClassChangeError} waiting for a JVM that checks. Do not
+     * extract it again; five lines inline cost less than a method this interface
+     * cannot safely hold.
      */
     default @NotNull JBPanel<?> createWrapper(final @NotNull Icon icon, final @NotNull JComponent field) {
-        final @NotNull JBPanel<?> wrapper = new JBPanel<>(new BorderLayout());
-        wrapper.setOpaque(false);
-        wrapper.add(createIconPanel(icon), BorderLayout.WEST);
-        wrapper.add(field, BorderLayout.CENTER);
-        wrapper.setBorder(JBUI.Borders.emptyTop(8));
-        return wrapper;
-    }
-
-    private @NotNull JBPanel<?> createIconPanel(final @NotNull Icon icon) {
         final @NotNull JBPanel<?> iconPanel = new JBPanel<>(new GridBagLayout());
         iconPanel.setOpaque(false);
         final @NotNull JBLabel iconLabel = new JBLabel(icon);
         iconLabel.setBorder(JBUI.Borders.empty(0, 10, 0, 8));
         iconPanel.add(iconLabel);
-        return iconPanel;
+
+        final @NotNull JBPanel<?> wrapper = new JBPanel<>(new BorderLayout());
+        wrapper.setOpaque(false);
+        wrapper.add(iconPanel, BorderLayout.WEST);
+        wrapper.add(field, BorderLayout.CENTER);
+        wrapper.setBorder(JBUI.Borders.emptyTop(8));
+        return wrapper;
     }
 }
