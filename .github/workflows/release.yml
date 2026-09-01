@@ -9,7 +9,12 @@ name: Release
 
 on:
   push:
-    tags: ['v*']
+    # Every tag this project has ever carried is the bare version - 2.6,
+    # 2.8.0-alpha, 2.9.1-alpha. This pattern matched none of them: it wanted a
+    # leading v, so the only tag that ever reached this workflow was the one
+    # that broke the convention, and every release tagged the usual way did
+    # nothing at all.
+    tags: ['[0-9]*']
 
 permissions:
   contents: read
@@ -40,11 +45,11 @@ jobs:
         shell: bash
         run: |
           declared=$(sed -n 's/^version = "\(.*\)"$/\1/p' build.gradle.kts)
-          tagged=${GITHUB_REF_NAME#v}
+          tagged=$GITHUB_REF_NAME
 
           if [ "$declared" != "$tagged" ]; then
             echo "Tag $GITHUB_REF_NAME asks to publish $tagged, but build.gradle.kts declares $declared."
-            echo "Move the version in build.gradle.kts, or tag v$declared."
+            echo "Move the version in build.gradle.kts, or tag $declared."
             exit 1
           fi
 
