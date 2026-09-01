@@ -26,15 +26,57 @@ import java.util.List;
 final class BulkJsonEditor {
 
     /**
-     * Newlines flatten to spaces: the editor shows one value per line, so a
-     * multi-line value would otherwise break the JSON shape being edited.
+     * A value as it is written inside the JSON these dialogs show.
+     * <p>
+     * A line break becomes the two characters {@code \n}. It used to become a
+     * space, which was deliberate and lossy: the value sits on one line of the
+     * editor either way, so flattening it looked free. It was free only until
+     * the tester edited that row - then the flattened text was what got saved,
+     * and a multi-line expected result came back as one line with nothing said.
+     * Test Data became a multi-line field as well, which turned a rare loss
+     * into a likely one.
+     * <p>
+     * A carriage return is still dropped rather than escaped. That is a
+     * normalization to the one line ending the stored JSON uses, not content
+     * going missing.
      */
     static @NotNull String escapeJson(final @NotNull String str) {
-        return str.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
+        return str.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "");
     }
 
+    /**
+     * The inverse, read left to right in one pass.
+     * <p>
+     * Not a sequence of replaces, which is what it was and what a third escape
+     * broke. A value holding a backslash followed by an n is written as
+     * {@code \\n}, and a replace looking for {@code \n} finds it inside that
+     * pair and hands back a line break the tester never typed. Reading forward,
+     * the first backslash consumes the second and the n is only an n.
+     */
     static @NotNull String unescapeJson(final @NotNull String str) {
-        return str.replace("\\\"", "\"").replace("\\\\", "\\");
+        final @NotNull StringBuilder out = new StringBuilder(str.length());
+
+        for (int i = 0; i < str.length(); i++) {
+            final char current = str.charAt(i);
+
+            if (current != '\\' || i == str.length() - 1) {
+                out.append(current);
+                continue;
+            }
+
+            final char escaped = str.charAt(++i);
+
+            switch (escaped) {
+                case 'n' -> out.append('\n');
+                case '"' -> out.append('"');
+                case '\\' -> out.append('\\');
+                // Not an escape this writes, so it is the two characters the
+                // tester typed and it goes back as both.
+                default -> out.append(current).append(escaped);
+            }
+        }
+
+        return out.toString();
     }
 
     /**

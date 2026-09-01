@@ -42,28 +42,43 @@ public class BulkJsonEditorTest {
     }
 
     /**
-     * The one case that is deliberately lossy, and the reason an untouched row is
-     * never written back.
+     * The case that used to be lossy on purpose. A line break became a space,
+     * so a tester who edited one row of a multi-line expected result saved it
+     * as one line and was told nothing.
      */
     @Test
-    public void newlinesFlattenToSpacesAndDoNotComeBack() {
+    public void newlinesSurviveTheRoundTrip() {
         final String original = "first line\nsecond line";
 
         final String escaped = BulkJsonEditor.escapeJson(original);
-        assertEquals(escaped, "first line second line");
-        assertNotEquals(BulkJsonEditor.unescapeJson(escaped), original);
+        assertEquals(escaped, "first line\\nsecond line", "a line break is written as an escape, on one editor line");
+        assertEquals(BulkJsonEditor.unescapeJson(escaped), original);
+    }
+
+    /**
+     * The pair that decides whether the escape can be unescaped by replacing.
+     * It cannot: a backslash followed by an n is written as two backslashes and
+     * an n, and a replace looking for the escape finds it inside that.
+     */
+    @Test
+    public void aBackslashFollowedByAnNIsNotALineBreak() {
+        final String original = "a windows path C:\\next and a real\nbreak";
+
+        final String escaped = BulkJsonEditor.escapeJson(original);
+        assertEquals(BulkJsonEditor.unescapeJson(escaped), original);
+        assertNotEquals(BulkJsonEditor.unescapeJson("C:\\\\next"), "C:\\\next");
     }
 
     @Test
     public void carriageReturnsAreDropped() {
-        assertEquals(BulkJsonEditor.escapeJson("first\r\nsecond"), "first second");
+        assertEquals(BulkJsonEditor.escapeJson("first\r\nsecond"), "first\\nsecond");
     }
 
     @Test
     public void anUntouchedValueComparesEqualToItsEscapedSelf() {
         // How both dialogs decide a row was not edited. If this ever stops
         // holding, every row is written back and multi-line values flatten.
-        for (final String value : new String[]{"", "plain", "with \"quotes\"", "with \\ backslash", "trailing "}) {
+        for (final String value : new String[]{"", "plain", "with \"quotes\"", "with \\ backslash", "trailing ", "two\nlines", "a \\n that is not a break"}) {
             final String escaped = BulkJsonEditor.escapeJson(value);
             assertEquals(BulkJsonEditor.escapeJson(BulkJsonEditor.unescapeJson(escaped)), escaped, "for: " + value);
         }

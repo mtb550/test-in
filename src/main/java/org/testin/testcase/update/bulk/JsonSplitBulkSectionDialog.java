@@ -30,9 +30,9 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
     private final @NotNull BulkJsonEditors editors;
 
     /**
-     * The escaped text each value started as, by index. The editor shows
-     * newlines flattened to spaces, so this is what an untouched value looks
-     * like on screen - not what is in storage.
+     * The escaped text each value started as, by index - what an untouched
+     * value looks like on screen, which is not what is in storage: a line break
+     * is shown as the two characters that stand for it.
      */
     private final @NotNull List<String> originalEscaped = new ArrayList<>();
 

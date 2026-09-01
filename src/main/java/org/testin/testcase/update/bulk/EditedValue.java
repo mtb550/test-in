@@ -7,10 +7,10 @@ import org.jetbrains.annotations.NotNull;
  * they never touched it.
  * <p>
  * Untouched is not the same as emptied, and the difference matters in both
- * directions. The editor shows a stored value with its newlines flattened to
- * spaces, so writing an untouched row back would flatten it permanently - while
- * a row the tester deliberately cleared is a change to apply, when the section
- * accepts a blank one.
+ * directions. A value written back is trimmed on the way, so writing an
+ * untouched row back would edit a row nobody edited - while a row the tester
+ * deliberately cleared is a change to apply, when the section accepts a blank
+ * one.
  * <p>
  * That difference used to be carried by a null in a list of strings, which said
  * nothing about which of the two it meant and left every reader to remember.
