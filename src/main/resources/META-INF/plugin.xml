@@ -279,6 +279,7 @@
                 class="org.testin.search.SearchAction"
                 text="Search Test Project"
                 description="Find a test case, test set, package or run and go to it"
+                icon="AllIcons.Actions.Search"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt F"/>
             <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta alt F"/>

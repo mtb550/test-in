@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.CollapseAllAction;
 import org.testin.explorer.toolbar.ExpandAllAction;
+import org.testin.search.SearchAction;
 import org.testin.setting.OpenSettingsAction;
 import org.testin.testproject.SelectTestProjectAction;
 
@@ -15,6 +16,10 @@ public class ExplorerPanelActions {
 
     public @NotNull List<AnAction> create(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
         return List.of(
+                // The keystroke reaches the search from anywhere, which is the
+                // point of it - and is also why nothing on screen says the
+                // search exists. The button is where a tester finds out.
+                SearchAction.registered(),
                 new OpenSettingsAction(p),
                 new ExpandAllAction(pp),
                 new CollapseAllAction(pp),

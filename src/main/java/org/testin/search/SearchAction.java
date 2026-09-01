@@ -1,10 +1,13 @@
 package org.testin.search;
 
+import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -21,6 +24,23 @@ import java.util.Optional;
  * when it collides with something they already use.
  */
 public final class SearchAction extends DumbAwareAction {
+
+    private static final @NotNull String ID = "Testin.Search";
+
+    /**
+     * The one registered instance, for a toolbar that wants a button on it.
+     * <p>
+     * Fetched by id rather than constructed, so the button is the action and not
+     * a second copy of it: its text, its description and its icon are the ones
+     * declared in {@code plugin.xml}, and its tooltip carries whatever keystroke
+     * the keymap currently holds - including one the tester rebound. A
+     * {@code new SearchAction()} would be unregistered, so the platform could
+     * not name a shortcut for it and the button would quietly disagree with the
+     * key (#29).
+     */
+    public static @NotNull AnAction registered() {
+        return Objects.requireNonNull(ActionManager.getInstance().getAction(ID), ID + " is not registered");
+    }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
