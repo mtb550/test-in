@@ -127,7 +127,7 @@ public abstract class TestCaseBaseDialog {
         this.descriptionSection = new DescriptionSection(p);
         this.expectedResultSection = new ExpectedResultSection(p);
         this.moduleSection = new ModuleSection(p);
-        this.testDataSection = new TestDataSection();
+        this.testDataSection = new TestDataSection(p);
         this.preConditionsSection = new PreConditionsSection(p);
         this.stepsSection = new StepsSection(p, dialogDisposable);
         this.prioritySection = new PrioritySection();

@@ -115,10 +115,11 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
         final @NotNull Runnable saveAction = save(existingDto, onSave, new JBPopup[]{dialogPopup});
 
-        // The expected-result field is a multi-line text area: it rebinds Enter,
-        // Ctrl+Enter and Tab on itself, since a multi-line editor would otherwise
-        // swallow them.
+        // The expected-result and test-data fields are multi-line text areas:
+        // each rebinds Enter, Ctrl+Enter and Tab on itself, since a multi-line
+        // editor would otherwise swallow them.
         expectedResultSection.enableMultiLine(this, saveAction);
+        testDataSection.enableMultiLine(this, saveAction);
 
         registerShortcut(mainPanel, Shortcuts.Enter.getCustomShortcut(), saveAction::run);
 

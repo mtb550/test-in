@@ -168,7 +168,12 @@ public class DetailsTab {
                 new AttributeRow(TestEditorAttributes.EXPECTED_RESULT, (p, dto) -> Display.format(dto.getExpectedResult())),
                 new Steps(),
                 new AttributeRow(TestEditorAttributes.PRE_CONDITIONS, (p, dto) -> Display.format(dto.getPreConditions())),
-                new AttributeRow(TestEditorAttributes.TEST_DATA, (p, dto) -> Display.entriesOnLines(dto.getTestData())),
+                // Verbatim, and not through Display: test data is credentials, a
+                // query, a payload - values that are used, not read, so a
+                // character this panel decides to drop is a value that no longer
+                // works. The line breaks are the tester's own now that the field
+                // is multi-line, and the row renders them.
+                new AttributeRow(TestEditorAttributes.TEST_DATA, (p, dto) -> dto.getTestData()),
                 // No FQCN row. The fully qualified class and method name is how
                 // the plugin finds the generated code to navigate to and run -
                 // it is machinery, not something a tester reads while executing.

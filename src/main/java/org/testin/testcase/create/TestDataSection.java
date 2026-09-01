@@ -1,47 +1,39 @@
 package org.testin.testcase.create;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
-import com.intellij.util.ui.JBUI;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
 
 import javax.swing.*;
-import java.awt.*;
 
-public class TestDataSection implements CreateTestCaseSection {
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
-    @Getter
-    private final @NotNull EditorTextField testDataField;
-    private final @NotNull JBPanel<?> wrapper;
+/**
+ * Test data, typed over as many lines as it takes and stored exactly as typed.
+ * <p>
+ * Multi-line for the same reason Expected Result is, and by the same code. What
+ * a tester puts here is whatever the case needs to run - a username and a
+ * password, a query, a payload, a table of values - so this field cannot know
+ * what a character means and has no business changing any of them.
+ * <p>
+ * It was a one-line field, and the details panel and the grid made up for that by
+ * putting each comma-separated entry on its own line. That replaced the comma
+ * rather than breaking after it, so every comma inside a value disappeared on the
+ * way to the screen: a query lost the separators between its columns, and a list
+ * of values became a list of lines that could not be read back. Both surfaces now
+ * show what is stored, and what is stored is what was typed.
+ */
+public class TestDataSection extends AbstractMultiLineSection {
 
-    public TestDataSection() {
-        this.testDataField = new EditorTextField();
-        this.testDataField.setFont(fieldFont);
-        this.testDataField.setPlaceholder(CreateTestCaseFields.TEST_DATA.getPlaceholder());
-        this.testDataField.setShowPlaceholderWhenFocused(true);
-        this.testDataField.setBorder(JBUI.Borders.empty(10));
-
-        this.wrapper = new JBPanel<>(new BorderLayout());
-        this.wrapper.setOpaque(false);
-        this.wrapper.add(createIconPanel(CreateTestCaseFields.TEST_DATA.getIcon()), BorderLayout.WEST);
-        this.wrapper.add(this.testDataField, BorderLayout.CENTER);
-        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
-
-    }
-
-    @Override
-    public @NotNull JBPanel<?> getWrapper() {
-        return wrapper;
+    public TestDataSection(final @NotNull Project p) {
+        super(p, new EditorTextField(), CreateTestCaseFields.TEST_DATA);
     }
 
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        dto.setTestData(testDataField.getText().trim());
+        dto.setTestData(field.getText().trim());
     }
 
     @Override
@@ -52,17 +44,7 @@ public class TestDataSection implements CreateTestCaseSection {
     }
 
     @Override
-    public @NotNull JComponent getFocusComponent() {
-        return testDataField;
-    }
-
-    @Override
-    public void setEditable(final boolean editable) {
-        testDataField.setEnabled(editable);
-    }
-
-    @Override
     public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
-        testDataField.setText(dto.getTestData());
+        field.setText(dto.getTestData());
     }
 }
