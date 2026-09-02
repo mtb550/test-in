@@ -1,4 +1,6 @@
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
 
 plugins {
     id("java")
@@ -356,6 +358,85 @@ tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
                 )
                 println("Pointed a fresh sandbox at the sample data: " + options.parentFile.parentFile.name)
             }
+    }
+}
+
+/**
+ * Nothing from the test source root, and nothing compile-only, may reach the
+ * published plugin (#171).
+ *
+ * CLAUDE.md has said so in prose since the beginning, and nothing checked it. It
+ * holds today because Gradle's jar takes the main output and nothing has asked it
+ * for more - a default, not a decision. A sourceSets edit, a from(..) added to
+ * bundle a fixture, or a dependency moved off compileOnly would all change it
+ * without a word, and the artifact is public and downloaded rather than reviewed.
+ * This repository ships an SFTP server for its own tests; that must never be
+ * inside a plugin a tester installs.
+ *
+ * Matched on what compileTestJava actually produced, never on names. This plugin
+ * is about test cases, so a check that looked for the word "test" would fail on
+ * TestEditor, TestCard and sixty others, and be switched off within a week.
+ */
+// compileOnly cannot be resolved - it is a declaration bucket - so the check
+// resolves a configuration that extends it and can be.
+val compileOnlyArtifacts: Configuration = configurations.create("compileOnlyArtifacts") {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+    extendsFrom(configurations["compileOnly"])
+}
+
+tasks.register("verifyDistribution") {
+    group = "verification"
+    description = "Fails if a test class or a compile-only dependency reached the plugin distribution"
+
+    // Locals inside the block, deliberately: a script-level val referenced from a
+    // task action drags the whole build script into the configuration cache and
+    // fails with "cannot serialize Gradle script object references".
+    val distributionZip = tasks.named<Zip>("buildPlugin").flatMap { it.archiveFile }
+    val testClassDirs: FileCollection = sourceSets["test"].output.classesDirs
+    val forbiddenJars = compileOnlyArtifacts.elements.map { jars -> jars.map { it.asFile.name }.toSet() }
+
+    inputs.file(distributionZip)
+    inputs.files(testClassDirs)
+
+    doLast {
+        // Every path compileTestJava wrote, as it would appear inside a jar.
+        val testEntries = testClassDirs.files
+            .filter { it.isDirectory }
+            .flatMap { dir ->
+                dir.walkTopDown().filter { it.isFile }.map { it.relativeTo(dir).invariantSeparatorsPath }.toList()
+            }
+            .toSet()
+
+        val forbidden = forbiddenJars.get()
+        val offences = mutableListOf<String>()
+
+        ZipFile(distributionZip.get().asFile).use { outer ->
+            outer.entries().asSequence().filter { it.name.endsWith(".jar") }.toList().forEach { entry ->
+                // A compile-only dependency is named, so its jar arriving at all
+                // is the whole finding - Lombok is 2 MB of nothing anyone runs.
+                if (entry.name.substringAfterLast('/') in forbidden) {
+                    offences += "${entry.name} is a compileOnly dependency and must not be packaged"
+                }
+
+                // lib/ and lib/modules/ alike: the content modules are built by
+                // their own composedJar tasks and are just as able to carry a
+                // test class.
+                ZipInputStream(outer.getInputStream(entry)).use { jar ->
+                    generateSequence { jar.nextEntry }
+                        .filter { it.name in testEntries }
+                        .forEach { offences += "${entry.name} carries ${it.name} from the test source root" }
+                }
+            }
+        }
+
+        if (offences.isEmpty()) {
+            logger.lifecycle("Distribution is clean: no test classes, no compile-only dependencies.")
+            return@doLast
+        }
+
+        offences.forEach { logger.error("  $it") }
+        throw GradleException("${offences.size} thing(s) reached the distribution that must not be published. See above.")
     }
 }
 
