@@ -66,6 +66,36 @@ byte-identical to what the tester typed. Editable surfaces — grid cells, edito
 fields — load the **raw** value when editing begins, so formatted text can never
 be committed back into storage.
 
+### A setting is application level; project config is `testin.yml`
+
+There are two places configuration lives, and which one a value goes in is
+decided by who it belongs to, not by what it is about.
+
+- **The machine's settings are application level.** `AppSettingsState` is
+  `@Service(Service.Level.APP)` over one `testinSettings.xml` in the IDE's own
+  config directory, so every open project sees the same Testin root, tester name
+  and log level. These are facts about this machine and this person — a root
+  folder, a download folder, an account — and they are exactly the things that
+  must never be committed.
+- **The repository's config is `testin.yml`.** Which test project this
+  repository drives, and how it is shared. It is committed, so a clone needs no
+  setup, and it names no machine and no person.
+
+**Do not add a project-level `PersistentStateComponent`.** A value that differs
+per project belongs in `testin.yml`, where a colleague who clones the repository
+gets it too; a value that differs per machine belongs in the application
+settings, where it cannot be committed by accident. A third store would be a
+second answer to "where is this configured", and the two that already exist
+would start disagreeing with it.
+
+This has been tried and undone. `testin_example/.idea/` was found carrying both
+`testinSettings.xml` and `testinProjectSettings.xml`, each holding a
+`rootTestinPath`, and **neither was read by anything** — the first because the
+service is application level, the second because
+`testin.settings.ProjectSettingsState` does not exist in the source or anywhere
+in the git history. Both were deleted on 2026-09-02. A stale config file that
+silently does nothing costs more than the setting it was meant to hold.
+
 ## Code conventions
 
 - The `Project` object is always named `p`: `final @NotNull Project p`.
