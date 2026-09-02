@@ -81,7 +81,7 @@ jobs:
       # full sweep by hand.
       - name: Build, test and verify
         shell: bash
-        run: ./gradlew compileJava test verifyPlugin
+        run: ./gradlew compileJava test verifyPlugin verifyDistribution
 
       - name: Keep the reports
         if: always()

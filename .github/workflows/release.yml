@@ -58,9 +58,14 @@ jobs:
       # Tested and verified before it is signed. publishPlugin builds and signs
       # on its own but runs no tests, and a published version cannot be pulled
       # back.
-      - name: Test, verify, sign and publish
+      #
+      # verifyDistribution is in the same line and before publishPlugin on
+      # purpose: it opens the built zip and fails on a test class or a
+      # compile-only dependency, and the one moment that check is worth
+      # anything is the moment before an upload nobody can undo (#171).
+      - name: Test, verify the distribution, sign and publish
         shell: bash
-        run: ./gradlew test verifyPlugin publishPlugin
+        run: ./gradlew test verifyPlugin verifyDistribution publishPlugin
         env:
           CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
