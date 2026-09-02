@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "org.testin"
-version = "2.9.2-alpha"
+version = "2.9.3-alpha"
 
 /**
  * The newest IDE branch the plugin claims to support, verified alongside the
