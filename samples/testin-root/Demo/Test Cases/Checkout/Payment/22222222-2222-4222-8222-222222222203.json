@@ -1,0 +1,23 @@
+{
+  "order" : "t",
+  "id" : "22222222-2222-4222-8222-222222222203",
+  "description" : "Keep the basket when payment fails",
+  "expectedResult" : "The basket still holds the same item and the same quantity after a refused payment.",
+  "status" : "PENDING",
+  "steps" : [
+    "Fail a payment.",
+    "Return to the basket."
+  ],
+  "priority" : "LOW",
+  "reference" : "",
+  "group" : [
+    "REGRESSION"
+  ],
+  "createdBy" : "Testin Sample",
+  "updatedBy" : "Testin Sample",
+  "createdAt" : "Monday 05-01-2026 At 09:00:00 [UTC]",
+  "updatedAt" : "Wednesday 07-01-2026 At 14:30:00 [UTC]",
+  "module" : "Payments",
+  "testData" : "",
+  "preConditions" : "A payment has just been refused."
+}

@@ -1,0 +1,84 @@
+{
+  "configuration" : {
+    "TEST_TYPE" : "Regression",
+    "PLATFORM" : "Web",
+    "BROWSER" : "Firefox",
+    "COMPONENT" : "Storefront"
+  },
+  "resultAnalysis" : {
+    "PASSED" : "Sign-in and the happy path through checkout both hold.",
+    "FAILED" : "The lockout counter resets on a page reload, so the account never locks.",
+    "BLOCKED" : "The expired-card case needs a card the sandbox gateway will decline.",
+    "UNTESTED" : ""
+  },
+  "executionStartedAt" : "Wednesday 07-01-2026 At 10:00:00 [UTC]",
+  "executionEndedAt" : "Wednesday 07-01-2026 At 10:12:41 [UTC]",
+  "results" : [
+    {
+      "id" : "11111111-1111-4111-8111-111111111101",
+      "status" : "PASSED",
+      "actualResult" : "The dashboard opened and the header showed the account name.",
+      "bugSeverity" : "EMPTY",
+      "bugPriority" : "EMPTY",
+      "duration" : 4.12,
+      "executedBy" : "Testin Sample",
+      "executedAt" : "Wednesday 07-01-2026 At 10:00:12 [UTC]",
+      "stacktrace" : ""
+    },
+    {
+      "id" : "11111111-1111-4111-8111-111111111102",
+      "status" : "PASSED",
+      "actualResult" : "Refused, and the message named neither field.",
+      "bugSeverity" : "EMPTY",
+      "bugPriority" : "EMPTY",
+      "duration" : 3.48,
+      "executedBy" : "Testin Sample",
+      "executedAt" : "Wednesday 07-01-2026 At 10:02:05 [UTC]",
+      "stacktrace" : ""
+    },
+    {
+      "id" : "11111111-1111-4111-8111-111111111103",
+      "status" : "FAILED",
+      "actualResult" : "The sixth attempt was accepted. Reloading the page reset the counter to zero.",
+      "bugSeverity" : "MAJOR",
+      "bugPriority" : "HIGH",
+      "duration" : 12.905,
+      "executedBy" : "Testin Sample",
+      "executedAt" : "Wednesday 07-01-2026 At 10:05:30 [UTC]",
+      "stacktrace" : "java.lang.AssertionError: expected the account to be locked\n\tat org.example.LoginTest.locksAfterFiveRefusals(LoginTest.java:64)"
+    },
+    {
+      "id" : "22222222-2222-4222-8222-222222222201",
+      "status" : "PASSED",
+      "actualResult" : "Order confirmed, confirmation number shown.",
+      "bugSeverity" : "EMPTY",
+      "bugPriority" : "EMPTY",
+      "duration" : 8.771,
+      "executedBy" : "Testin Sample",
+      "executedAt" : "Wednesday 07-01-2026 At 10:08:02 [UTC]",
+      "stacktrace" : ""
+    },
+    {
+      "id" : "22222222-2222-4222-8222-222222222202",
+      "status" : "BLOCKED",
+      "actualResult" : "No declining test card is configured on the sandbox gateway.",
+      "bugSeverity" : "EMPTY",
+      "bugPriority" : "EMPTY",
+      "duration" : 2.01,
+      "executedBy" : "Testin Sample",
+      "executedAt" : "Wednesday 07-01-2026 At 10:10:44 [UTC]",
+      "stacktrace" : ""
+    },
+    {
+      "id" : "22222222-2222-4222-8222-222222222203",
+      "status" : "PASSED",
+      "actualResult" : "The basket still held one item.",
+      "bugSeverity" : "EMPTY",
+      "bugPriority" : "EMPTY",
+      "duration" : 5.226,
+      "executedBy" : "Testin Sample",
+      "executedAt" : "Wednesday 07-01-2026 At 10:12:41 [UTC]",
+      "stacktrace" : ""
+    }
+  ]
+}

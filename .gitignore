@@ -17,3 +17,7 @@ build/
 
 # Claude Code: share .claude/, keep per-machine overrides local
 .claude/settings.local.json
+# The sample project is opened by runIde, so the IDE writes its own files into
+# it. The sample is the committed part; what an IDE makes of it is not.
+samples/automation/.idea/
+samples/automation/target/

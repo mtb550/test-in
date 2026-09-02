@@ -1,0 +1,26 @@
+{
+  "order" : "h",
+  "id" : "22222222-2222-4222-8222-222222222201",
+  "description" : "Pay with a valid card",
+  "expectedResult" : "The order is confirmed and the confirmation number is shown.",
+  "status" : "PENDING",
+  "steps" : [
+    "Add one item to the basket.",
+    "Go to checkout.",
+    "Enter a valid card.",
+    "Press Pay."
+  ],
+  "priority" : "HIGH",
+  "reference" : "",
+  "group" : [
+    "SMOKE",
+    "FUNCTIONAL"
+  ],
+  "createdBy" : "Testin Sample",
+  "updatedBy" : "Testin Sample",
+  "createdAt" : "Monday 05-01-2026 At 09:00:00 [UTC]",
+  "updatedAt" : "Wednesday 07-01-2026 At 14:30:00 [UTC]",
+  "module" : "Payments",
+  "testData" : "4111 1111 1111 1111, 12/30, 123",
+  "preConditions" : "The basket is empty at the start."
+}

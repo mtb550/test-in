@@ -257,6 +257,47 @@ intellijPlatformTesting {
             version = "2026.1.3"
             task {
                 jvmArgs("--sun-misc-unsafe-memory-access=allow")
+
+                // The same sample, in the IDE where the tree has to work without
+                // any Java plugin behind it.
+                args(layout.projectDirectory.dir("samples/automation").asFile.absolutePath)
+
+                val sandboxes = layout.projectDirectory.dir(".sandbox/Testin").asFile
+                val sampleRoot = layout.projectDirectory.dir("samples/testin-root").asFile.absolutePath
+
+                doFirst {
+                    // Inlined rather than shared with the other run task: the configuration
+                    // cache cannot serialize a reference to a script-level function, so a helper
+                    // here fails the build with "cannot serialize Gradle script object
+                    // references". The duplication is what the cache costs.
+                    //
+                    // The sandbox directory is found rather than composed: the one under
+                    // .sandbox/Testin is named by the platform plugin from the IDE it
+                    // downloaded, so writing that name out would be a second place to update on
+                    // every version bump. prepareSandbox has run by now, so it exists.
+                    sandboxes.listFiles().orEmpty()
+                        .filter { it.resolve("config").isDirectory }
+                        .map { it.resolve("config/options") }
+                        .forEach { options ->
+                            val settings = options.resolve("testinSettings.xml")
+                            if (settings.exists()) return@forEach
+
+                            options.mkdirs()
+                            settings.writeText(
+                                """
+                                <application>
+                                  <component name="testin.settings.AppSettingsState">
+                                    <option name="rootTestinPath" value="$sampleRoot" />
+                                    <option name="logLevel" value="DEBUG" />
+                                    <option name="testerName" value="Testin Sample" />
+                                    <option name="testerRole" value="QA Engineer" />
+                                  </component>
+                                </application>
+                                """.trimIndent()
+                            )
+                            println("Pointed a fresh sandbox at the sample data: " + options.parentFile.parentFile.name)
+                        }
+                }
             }
         }
     }
@@ -271,6 +312,51 @@ configurations.all {
 
 tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
     jvmArgs("--sun-misc-unsafe-memory-access=allow")
+
+    // The sandbox opens onto the committed sample rather than onto nothing, so a
+    // fresh clone has a tree, a run and every marker format to look at without
+    // creating them by hand first. The path is an argument because that is how the
+    // IDE is told which project to open.
+    args(layout.projectDirectory.dir("samples/automation").asFile.absolutePath)
+
+    // Read at configuration time, so the configuration cache holds values rather
+    // than a reference to the project.
+    val sandboxes = layout.projectDirectory.dir(".sandbox/Testin").asFile
+    val sampleRoot = layout.projectDirectory.dir("samples/testin-root").asFile.absolutePath
+
+    doFirst {
+        // Inlined rather than shared with the other run task: the configuration
+        // cache cannot serialize a reference to a script-level function, so a helper
+        // here fails the build with "cannot serialize Gradle script object
+        // references". The duplication is what the cache costs.
+        //
+        // The sandbox directory is found rather than composed: the one under
+        // .sandbox/Testin is named by the platform plugin from the IDE it
+        // downloaded, so writing that name out would be a second place to update on
+        // every version bump. prepareSandbox has run by now, so it exists.
+        sandboxes.listFiles().orEmpty()
+            .filter { it.resolve("config").isDirectory }
+            .map { it.resolve("config/options") }
+            .forEach { options ->
+                val settings = options.resolve("testinSettings.xml")
+                if (settings.exists()) return@forEach
+
+                options.mkdirs()
+                settings.writeText(
+                    """
+                    <application>
+                      <component name="testin.settings.AppSettingsState">
+                        <option name="rootTestinPath" value="$sampleRoot" />
+                        <option name="logLevel" value="DEBUG" />
+                        <option name="testerName" value="Testin Sample" />
+                        <option name="testerRole" value="QA Engineer" />
+                      </component>
+                    </application>
+                    """.trimIndent()
+                )
+                println("Pointed a fresh sandbox at the sample data: " + options.parentFile.parentFile.name)
+            }
+    }
 }
 
 // A real SFTP server on localhost, for trying the server sync by hand (#94).

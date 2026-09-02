@@ -1,0 +1,15 @@
+# Which test project this repository drives. Committed, so a clone needs no setup.
+# No machine or person here: root folder, account and passwords live in Testin's
+# settings.
+
+location: local
+
+# location: remote             shared, then one of:
+# connection: git
+# RepoUrl: https://github.com/you/test-01.git
+# connection: sftp
+# sftpHost: 127.0.0.1
+# sftpPort: 22                 optional, 22
+# sftpPath: /Testin            the folder holding the projects
+# testinProject: test-01       which of them, in every case
+testinProject: Demo
