@@ -148,7 +148,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         // priority menu
         final @NotNull DefaultActionGroup filterPriorityMenu = new DefaultActionGroup(TestEditorAttributes.PRIORITY.getName(), true);
         Arrays.stream(Priority.values()).forEach(p ->
-                filterPriorityMenu.add(new ToggleFilterAction<>(p.getName(), IconManager.createIcon(p.getColor()),
+                filterPriorityMenu.add(new ToggleFilterAction<>(p.getLabel(), IconManager.createIcon(p.getColor()),
                         p, selectedPriority, FilterMembership.plain(), onChanged)));
         filterResetBtn.add(filterPriorityMenu);
 

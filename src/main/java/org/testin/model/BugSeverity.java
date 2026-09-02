@@ -51,7 +51,7 @@ public enum BugSeverity {
 
     ENHANCEMENT(
             "Enhancement",
-            JBColor.GREEN,
+            JBColor.GREEN.brighter().brighter(),
             ReportEmphasis.MUTED
     );
 

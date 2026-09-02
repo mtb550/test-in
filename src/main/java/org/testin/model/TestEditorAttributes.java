@@ -103,7 +103,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Priority",
             "Priority:",
             ToolBarDefault.ON,
-            (tc, p) -> tc.getPriority().getName(),
+            (tc, p) -> tc.getPriority().getLabel(),
             (p, tc, v) -> tc.setPriority(TestDataParser.priority(v)),
             GenType.UPDATE_TEST_CASE_PRIORITY,
             Can.EDIT, Can.IMPORT, Can.EXPORT

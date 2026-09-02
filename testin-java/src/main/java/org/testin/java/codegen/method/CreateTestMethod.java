@@ -1,6 +1,5 @@
 package org.testin.java.codegen.method;
 
-import org.testin.java.codegen.JavaLiteral;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
@@ -11,22 +10,15 @@ import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.ExecutionPosition;
 import org.testin.codegen.Fqcn;
-import org.testin.services.Services;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
+import org.testin.java.codegen.JavaLiteral;
 import org.testin.logger.Logger;
 import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.NameSanitizer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CreateTestMethod implements GenAction {
@@ -279,7 +271,7 @@ public class CreateTestMethod implements GenAction {
                 return;
             }
 
-            final PsiClass @NotNull[] classes = javaPsiFile.getClasses();
+            final PsiClass @NotNull [] classes = javaPsiFile.getClasses();
             if (classes.length == 0) {
                 Logger.error("retryInjectPhysically: no classes found in " + className + ".java for method '" + methodName + "'");
                 return;
@@ -394,7 +386,7 @@ public class CreateTestMethod implements GenAction {
             final @NotNull PsiMethod newMethod = factory.createMethodFromText(methodText(p, methodName, tc), targetClass);
             final @NotNull PsiElement addedElement = targetClass.add(newMethod);
 
-            Logger.info("Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());
+            Logger.info("Injected method: " + methodName + " with Priority: " + tc.getPriority().getLabel());
             return Optional.of(addedElement);
 
         } catch (final Exception ex) {

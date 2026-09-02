@@ -14,7 +14,6 @@ import org.testin.model.dto.TestCaseDto;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +84,7 @@ public class TablePanelBuilder {
             final @NotNull TableColumn priorityCol = table.getColumn(TestEditorAttributes.PRIORITY.getName());
             final @NotNull ComboBox<String> priorityBox = new ComboBox<>();
             for (final Priority pr : Priority.values()) {
-                priorityBox.addItem(pr.getName());
+                priorityBox.addItem(pr.getLabel());
             }
             priorityCol.setCellEditor(new DefaultCellEditor(priorityBox));
 

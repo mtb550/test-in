@@ -59,42 +59,47 @@ public class CardBadgeTest {
     public void aCaseThatNeverFailedDrawsNoPill() {
         final List<Shared.Badge> badges = new ArrayList<>();
 
-        Shared.addBugBadge(badges, BugSeverity.EMPTY, BugPriority.EMPTY);
+        Shared.addBugBadge(badges, BugSeverity.EMPTY.getLabel(), BugSeverity.EMPTY.getColor());
+        Shared.addBugBadge(badges, BugPriority.EMPTY.getLabel(), BugPriority.EMPTY.getColor());
 
         assertEquals(badges.size(), 0, "an empty value is not a badge with no text, it is no badge");
     }
 
     /**
-     * Half a pair is not a thing to draw. The two are set together by the
-     * failure dialog, so one without the other is a case somebody stopped
-     * halfway through describing - and a lone half reads as the other field.
+     * One half on its own is that half, because the Details toolbar ticks them
+     * separately - severity and bug priority are also two grid columns, so a
+     * tester who unticks Bug Priority wants the priority gone and not the badge.
      */
     @Test
-    public void halfAPairIsNoPair() {
-        final List<Shared.Badge> withoutPriority = new ArrayList<>();
-        Shared.addBugBadge(withoutPriority, BugSeverity.MAJOR, BugPriority.EMPTY);
-        assertEquals(withoutPriority.size(), 0, "a severity with no bug priority draws nothing");
+    public void oneHalfOnItsOwnIsThatHalf() {
+        final List<Shared.Badge> severityOnly = new ArrayList<>();
+        Shared.addBugBadge(severityOnly, BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
+        assertEquals(severityOnly.size(), 1);
+        assertTrue(severityOnly.getFirst() instanceof Shared.Bug bug && bug.text().equals("Major"));
 
-        final List<Shared.Badge> withoutSeverity = new ArrayList<>();
-        Shared.addBugBadge(withoutSeverity, BugSeverity.EMPTY, BugPriority.HIGH);
-        assertEquals(withoutSeverity.size(), 0, "a bug priority with no severity draws nothing");
+        final List<Shared.Badge> priorityOnly = new ArrayList<>();
+        Shared.addBugBadge(priorityOnly, BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
+        assertEquals(priorityOnly.size(), 1);
+        assertTrue(priorityOnly.getFirst() instanceof Shared.Bug bug && bug.text().equals("High"),
+                "the survivor keeps its own color, which is why BugPriority still declares one");
     }
 
     /**
-     * Both halves ask for it and one badge comes out. Severity and bug priority
-     * are two toolbar attributes drawing one object, so whichever is ticked
-     * draws it and the second finds it already there (#89).
+     * Both halves add themselves and one badge comes out: the second finds the
+     * first and joins it rather than sitting beside it (#89).
      */
     @Test
-    public void bothHalvesAskAndOneBadgeIsDrawn() {
+    public void bothHalvesJoinIntoOneBadge() {
         final List<Shared.Badge> badges = new ArrayList<>();
 
-        Shared.addBugBadge(badges, BugSeverity.MAJOR, BugPriority.HIGH);
-        Shared.addBugBadge(badges, BugSeverity.MAJOR, BugPriority.HIGH);
+        Shared.addBugBadge(badges, BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
+        Shared.addBugBadge(badges, BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
 
-        assertEquals(badges.size(), 1, "the pair is one badge however many of its halves ask for it");
-        assertTrue(badges.getFirst() instanceof Shared.Pill pill && pill.text().equals("Major / High"),
-                "both facts, one badge, severity first");
+        assertEquals(badges.size(), 1, "two halves, one badge");
+        assertTrue(badges.getFirst() instanceof Shared.Bug bug && bug.text().equals("Major / High"),
+                "severity first, because the enum offers it first");
+        assertEquals(((Shared.Bug) badges.getFirst()).color(), BugSeverity.MAJOR.getColor(),
+                "the color is the first half's");
     }
 
     /**

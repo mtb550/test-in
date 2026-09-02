@@ -39,7 +39,7 @@ public class PrioritySection implements CreateTestCaseSection {
                 Optional.ofNullable(value).ifPresent(priority -> {
                     setIcon(IconManager.createIcon(priority.getColor()));
                     append(" Priority:  ");
-                    append(priority.name());
+                    append(priority.getLabel());
                     append("    " + priority.getShortcut().getShortcutText(), new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GRAY));
                 });
             }

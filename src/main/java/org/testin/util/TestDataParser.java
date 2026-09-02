@@ -44,13 +44,32 @@ public final class TestDataParser {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Reads a priority back out of the text a cell or a sheet holds.
+     * <p>
+     * By the label first, because that is what the surface printed and therefore
+     * what the tester is editing - the same reason {@link #testCaseStatus} looks
+     * there first, and the same failure if it does not: the column shows P1 and
+     * {@code valueOf} takes the constant name, so retyping the very word on
+     * screen would quietly become P3.
+     * <p>
+     * Then the constant name, which is what a sheet exported before the labels
+     * became P1 to P3 still says - High, Medium, Low - so an older export
+     * imports as the priority it meant rather than as the fallback.
+     * <p>
+     * Blank or unrecognized is P3: a case with no priority stated is the lowest
+     * one, which is also what a new case starts as.
+     */
     public static @NotNull Priority priority(final @NotNull String value) {
-        if (value.isBlank()) return Priority.LOW;
-        try {
-            return Priority.valueOf(value.trim().toUpperCase(Locale.ROOT));
-        } catch (final IllegalArgumentException ignored) {
-            return Priority.LOW;
+        final @NotNull String wanted = value.trim();
+        if (wanted.isEmpty()) return Priority.LOW;
+
+        for (final Priority priority : Priority.values()) {
+            if (priority.getLabel().equalsIgnoreCase(wanted)) return priority;
+            if (priority.name().equalsIgnoreCase(wanted)) return priority;
         }
+
+        return Priority.LOW;
     }
 
     /**

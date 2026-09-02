@@ -1,6 +1,5 @@
 package org.testin.model;
 
-import org.testin.model.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +60,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     PRIORITY(
             TestEditorAttributes.PRIORITY.getName(),
             ToolBarDefault.OFF,
-            (item, p) -> item.requireTc().getPriority().getName()
+            (item, p) -> item.requireTc().getPriority().getLabel()
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
@@ -118,7 +117,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            Shared.addBugBadge(badges, runItem.getBugSeverity(), runItem.getBugPriority());
+            Shared.addBugBadge(badges, runItem.getBugSeverity().getLabel(), runItem.getBugSeverity().getColor());
         }
     },
 
@@ -129,10 +128,9 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            // The same badge its other half asks for: severity and bug
-            // priority are one object, and whichever of the two the toolbar has
-            // ticked draws it (#89).
-            Shared.addBugBadge(badges, runItem.getBugSeverity(), runItem.getBugPriority());
+            // Its own half of the badge severity started, or the whole of it
+            // when severity is not shown. One badge either way (#89).
+            Shared.addBugBadge(badges, runItem.getBugPriority().getLabel(), runItem.getBugPriority().getColor());
         }
     },
 

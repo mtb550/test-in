@@ -2,9 +2,8 @@ package org.testin.testcase.update.bulk;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.logger.Logger;
-import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.TestDataParser;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -32,15 +31,14 @@ public class PriorityBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
     @Override
     protected @NotNull String getOriginalValue(final @NotNull TestCaseDto tc) {
-        return tc.getPriority().name();
+        return tc.getPriority().getLabel();
     }
 
     @Override
     protected void setValue(final @NotNull TestCaseDto tc, final @NotNull String value) {
-        try {
-            tc.setPriority(Priority.valueOf(value.toUpperCase()));
-        } catch (final IllegalArgumentException ex) {
-            Logger.error(ex.getMessage());
-        }
+        // Through the parser, like every other reader of this text: it takes the
+        // label the tester is looking at, and valueOf took the constant name -
+        // so editing forty cases to P1 set forty of them to P3.
+        tc.setPriority(TestDataParser.priority(value));
     }
 }

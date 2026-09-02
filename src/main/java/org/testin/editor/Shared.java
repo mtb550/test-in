@@ -1,6 +1,5 @@
 package org.testin.editor;
 
-import org.testin.model.TestEditorAttributes;
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
@@ -11,8 +10,6 @@ import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.BugPriority;
-import org.testin.model.BugSeverity;
 import org.testin.model.Group;
 import org.testin.model.Priority;
 import org.testin.model.RunStatus;
@@ -47,7 +44,7 @@ public class Shared {
     // each pill was spent saying which field it was. The shape says it now, and
     // the words are back to being the value (#89):
     //
-    //   priority   ( High )            a filled, rounded pill
+    //   priority   ( P1 )              a filled, rounded pill
     //   group      [ Regression <      a ribbon, notched at its right end
     //   bug        ( Major / High )    one pill, both halves of one fact
     //
@@ -108,7 +105,7 @@ public class Shared {
     public static void addPriorityBadge(final @NotNull List<Badge> badges, final @NotNull TestCaseDto tc) {
         if (tc.getPriority() == Priority.LOW) return;
 
-        badges.add(new Pill(tc.getPriority().getName(), tc.getPriority().getColor()));
+        badges.add(new Pill(tc.getPriority().getLabel(), tc.getPriority().getColor()));
     }
 
     /**
@@ -133,19 +130,27 @@ public class Shared {
      * the second half would say it better and costs a shape of its own to paint,
      * which is more painting code than the difference is worth.
      * <p>
-     * Nothing at all unless both halves have a value. A case that never failed
-     * has neither, and half a pair is not a thing this draws (#89).
+     * One half each, and one badge either way. Severity and bug priority are
+     * two ticks on the Details toolbar because they are also two grid columns,
+     * so each has to be able to leave on its own - a tester who unticks Bug
+     * Priority wants the priority gone, not the whole badge. So each half adds
+     * itself, and the second finds the first and joins it.
      * <p>
-     * Asked by both halves and answered once: whichever of the two attributes
-     * the toolbar has ticked draws the pair, and the second finds it already
-     * there. Neither owns it, so unticking one does not take the other's fact
-     * off the card.
+     * The color is the first half's, which is severity's when both are shown and
+     * the survivor's when only one is. Nothing at all for a half with no value:
+     * a case that never failed has neither.
      */
-    public static void addBugBadge(final @NotNull List<Badge> badges, final @NotNull BugSeverity severity, final @NotNull BugPriority bugPriority) {
-        if (severity == BugSeverity.EMPTY || bugPriority == BugPriority.EMPTY) return;
-        if (badges.stream().anyMatch(badge -> badge instanceof Pill pill && pill.text().contains(PAIR_JOIN))) return;
+    public static void addBugBadge(final @NotNull List<Badge> badges, final @NotNull String value, final @NotNull Color color) {
+        if (value.isBlank()) return;
 
-        badges.add(new Pill(severity.getLabel() + PAIR_JOIN + bugPriority.getLabel(), severity.getColor()));
+        for (int i = 0; i < badges.size(); i++) {
+            if (badges.get(i) instanceof Bug(String text, Color color1)) {
+                badges.set(i, new Bug(text + PAIR_JOIN + value, color1));
+                return;
+            }
+        }
+
+        badges.add(new Bug(value, color));
     }
 
     /**
@@ -336,7 +341,7 @@ public class Shared {
      * one - it describes it, the way it already hands its detail row over as
      * text, and the panel that draws them owns the components.
      */
-    public sealed interface Badge permits Pill, Tag {
+    public sealed interface Badge permits Pill, Tag, Bug {
     }
 
     /**
@@ -350,6 +355,14 @@ public class Shared {
      * A ribbon, notched at its right end. A group.
      */
     public record Tag(@NotNull String text, @NotNull Color color) implements Badge {
+    }
+
+    /**
+     * The bug's badge, drawn as a pill. Its own type only so that the second
+     * half can find the first and join it rather than sitting beside it - a
+     * priority pill and a bug pill are otherwise the same thing to look at.
+     */
+    public record Bug(@NotNull String text, @NotNull Color color) implements Badge {
     }
 
     /**
@@ -382,6 +395,7 @@ public class Shared {
 
             switch (badge) {
                 case Pill pill -> lay(pill.text(), pill.color(), BADGE_PAD_H);
+                case Bug bug -> lay(bug.text(), bug.color(), BADGE_PAD_H);
                 // Room on the right for the notch, so the last letter is not cut.
                 case Tag tag -> lay(tag.text(), tag.color(), BADGE_PAD_H + TAG_NOTCH);
             }
@@ -421,6 +435,7 @@ public class Shared {
 
             switch (badge) {
                 case Pill pill -> fillPill(g2, pill.color());
+                case Bug bug -> fillPill(g2, bug.color());
                 case Tag tag -> fillTag(g2, tag.color());
             }
 
