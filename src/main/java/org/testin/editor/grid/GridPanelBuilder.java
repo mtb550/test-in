@@ -51,6 +51,28 @@ public class GridPanelBuilder {
     private static final @NotNull Color ODD_ROW_COLOR = new JBColor(Gray._230, Gray._45);
     private static final @NotNull Border FIRST_CELL_SELECTION_BORDER = new SelectionCellBorder(true);
     private static final @NotNull Border CELL_SELECTION_BORDER = new SelectionCellBorder(false);
+
+    /**
+     * The grid lines an unselected cell draws, in its two forms - the first
+     * column carries a pixel of padding on its left and no other column does.
+     * <p>
+     * Constants for the same reason the two selection borders above are. The
+     * renderer built all three of these objects on every call, and the renderer
+     * is called for every cell of every paint and again for every cell of every
+     * height measurement - so a single re-measure of a 50-row page allocated two
+     * thousand seven hundred borders that never differ (#168).
+     * <p>
+     * A {@link JBColor} inside a border resolves per paint, so one constant is
+     * still correct in both themes.
+     */
+    private static final @NotNull Border FIRST_CELL_BORDER = cellBorder(1);
+    private static final @NotNull Border CELL_BORDER = cellBorder(0);
+
+    private static @NotNull Border cellBorder(final int leftPadding) {
+        return BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(1, leftPadding, 0, 0),
+                BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR));
+    }
     /**
      * The model column ORDER occupies in both grids. A column carries its
      * attribute's ordinal as its model index, and ORDER is declared first in
@@ -107,9 +129,7 @@ public class GridPanelBuilder {
                     wrapper.setBorder(column == 0 ? FIRST_CELL_SELECTION_BORDER : CELL_SELECTION_BORDER);
 
                 } else {
-                    final @NotNull Border gridBorder = BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR);
-                    final @NotNull Border invisiblePadding = BorderFactory.createEmptyBorder(1, column == 0 ? 1 : 0, 0, 0);
-                    wrapper.setBorder(BorderFactory.createCompoundBorder(invisiblePadding, gridBorder));
+                    wrapper.setBorder(column == 0 ? FIRST_CELL_BORDER : CELL_BORDER);
                 }
 
                 final int width = table.getColumnModel().getColumn(column).getWidth();
@@ -120,10 +140,35 @@ public class GridPanelBuilder {
         };
     }
 
+    /**
+     * Every row, for the callers that changed something every row can feel - the
+     * font, or the table itself.
+     */
     private static void updateRowHeights(final @NotNull JBTable table) {
+        updateRowHeights(table, 0, Integer.MAX_VALUE);
+    }
+
+    /**
+     * The height of the rows between these two, measured by asking the renderer
+     * to lay out every cell in them.
+     * <p>
+     * A range rather than the page, because that is what the callers know and
+     * what they were throwing away. One cell edit used to re-measure all fifty
+     * rows: at eighteen columns that is nine hundred cell layouts, each one
+     * setting text, font, colors and three freshly built borders, for one row
+     * that could have changed height (#168).
+     * <p>
+     * Clamped here rather than by the callers, so {@code Integer.MAX_VALUE}
+     * means "to the end" and nobody has to know the row count to say it.
+     */
+    private static void updateRowHeights(final @NotNull JBTable table, final int firstRow, final int lastRow) {
         if (table.getRowCount() == 0) return;
+
+        final int from = Math.max(0, firstRow);
+        final int to = Math.min(lastRow, table.getRowCount() - 1);
+
         final int baseHeight = table.getRowHeight();
-        for (int r = 0; r < table.getRowCount(); r++) {
+        for (int r = from; r <= to; r++) {
             int maxHeight = baseHeight;
             for (int c = 0; c < table.getColumnCount(); c++) {
                 // Measure the normal cell layout. Selection is a visual state and must not
@@ -138,20 +183,80 @@ public class GridPanelBuilder {
     }
 
     /**
+     * When row heights are re-measured, and for which rows.
+     * <p>
+     * One owner, because four things ask and they used to answer differently: an
+     * edit coalesced its own bursts through a flag of its own, and the three
+     * column-model events each called straight through. A divider drag fires
+     * {@code columnMarginChanged} per pixel of movement, so dragging one column
+     * an inch was a full page of cell layouts per pixel (#168).
+     * <p>
+     * The range accumulates across the burst: two cells edited in one gesture
+     * are measured once, over both their rows.
+     */
+    private static final class RowHeights {
+
+        private final @NotNull JBTable table;
+        private final @NotNull AtomicBoolean pending = new AtomicBoolean();
+
+        /**
+         * The rows the burst has asked for so far. Inverted when nothing is
+         * pending, so the first request sets both ends.
+         */
+        private int from = Integer.MAX_VALUE;
+        private int to = -1;
+
+        private RowHeights(final @NotNull JBTable table) {
+            this.table = table;
+        }
+
+        /**
+         * Every row: a column appeared, moved or changed width, so anything on
+         * the page can wrap differently now.
+         */
+        private void scheduleAll() {
+            schedule(0, Integer.MAX_VALUE);
+        }
+
+        private void schedule(final int firstRow, final int lastRow) {
+            from = Math.min(from, firstRow);
+            to = Math.max(to, lastRow);
+
+            // Already queued: the range above is what the queued pass will read,
+            // so this request is in it and needs nothing of its own.
+            if (!pending.compareAndSet(false, true)) return;
+
+            SwingUtilities.invokeLater(() -> {
+                final int first = from;
+                final int last = to;
+                from = Integer.MAX_VALUE;
+                to = -1;
+                pending.set(false);
+
+                updateRowHeights(table, first, last);
+            });
+        }
+    }
+
+    /**
      * Re-measures row heights after cell values change (edit, paste, cut), so a
      * value that now wraps to more lines becomes fully visible immediately.
      * Coalesced via invokeLater: a block paste triggers one re-measure, not one per cell.
      */
-    private static void installAutoRowHeight(final @NotNull JBTable table, final @NotNull DefaultTableModel model) {
-        final @NotNull AtomicBoolean pending = new AtomicBoolean();
+    private static void installAutoRowHeight(final @NotNull DefaultTableModel model, final @NotNull RowHeights rowHeights) {
         model.addTableModelListener(e -> {
             if (e.getType() != TableModelEvent.UPDATE) return;
-            if (pending.compareAndSet(false, true)) {
-                SwingUtilities.invokeLater(() -> {
-                    pending.set(false);
-                    updateRowHeights(table);
-                });
-            }
+
+            // The event says which rows: one edited cell is one row, and a
+            // block paste is the rows it covered.
+            //
+            // A negative row is HEADER_ROW, which is how the model says the
+            // structure changed rather than a cell - every row, then, because
+            // any of them can wrap differently now. Read as a range it would be
+            // empty, and the pass would silently do nothing.
+            final int last = e.getLastRow() < 0 ? Integer.MAX_VALUE : e.getLastRow();
+
+            rowHeights.schedule(Math.max(0, e.getFirstRow()), last);
         });
     }
 
@@ -177,7 +282,7 @@ public class GridPanelBuilder {
                 .map(kind -> "testin.grid.colWidth." + kind + "." + column.getHeaderValue());
     }
 
-    private static void addColumnResizeListener(final @NotNull JBTable table) {
+    private static void addColumnResizeListener(final @NotNull JBTable table, final @NotNull RowHeights rowHeights) {
         table.getColumnModel().addColumnModelListener(new javax.swing.event.TableColumnModelListener() {
             @Override
             public void columnMarginChanged(final javax.swing.event.ChangeEvent e) {
@@ -188,7 +293,7 @@ public class GridPanelBuilder {
                         .ifPresent(resizing -> widthKey(table, resizing).ifPresent(key ->
                                 PropertiesComponent.getInstance().setValue(key, resizing.getWidth(), -1)));
 
-                updateRowHeights(table);
+                rowHeights.scheduleAll();
             }
 
             @Override
@@ -201,7 +306,7 @@ public class GridPanelBuilder {
 
             @Override
             public void columnMoved(final javax.swing.event.TableColumnModelEvent e) {
-                updateRowHeights(table);
+                rowHeights.scheduleAll();
             }
 
             @Override
@@ -474,9 +579,10 @@ public class GridPanelBuilder {
         table.setIntercellSpacing(new Dimension(0, 0));
         table.setBorder(BorderFactory.createLineBorder(GRID_COLOR, 1));
         table.setExpandableItemsEnabled(false);
-        addColumnResizeListener(table);
+        final @NotNull RowHeights rowHeights = new RowHeights(table);
+        addColumnResizeListener(table, rowHeights);
         addWheelScrollListener(table);
-        installAutoRowHeight(table, model);
+        installAutoRowHeight(model, rowHeights);
         // Installed either way: a cell the model refuses to edit never reaches an
         // editor, so there is no second place deciding what is editable.
         table.setDefaultEditor(Object.class, new GridCellEditor());
