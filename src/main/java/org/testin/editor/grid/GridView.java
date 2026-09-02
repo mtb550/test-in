@@ -27,4 +27,26 @@ public record GridView(@NotNull JBTable table, @NotNull JBScrollPane scrollPane,
     public boolean isCellOpen() {
         return table.isEditing();
     }
+
+    /**
+     * Commits what is being typed, before this view is thrown away.
+     * <p>
+     * A rebuild replaces the table, and an open editor goes with it - so a value
+     * the tester had typed and not yet committed was simply gone, with nothing
+     * said. {@link #isCellOpen} keeps an on-disk refresh from arriving mid-word
+     * (#20), and every menu action is refused while a cell is open
+     * ({@code NotWhileEditing}), but neither covers a rebuild that asks nobody:
+     * a page turned under a background run, or a column ticked while the caret
+     * sits in a cell.
+     * <p>
+     * Committing rather than cancelling, because that is what the tester's own
+     * gesture already does - clicking away commits, through
+     * {@code terminateEditOnFocusLost}. Losing the text was the outlier, not the
+     * rule (#74).
+     */
+    public void commitOpenCell() {
+        if (!isCellOpen()) return;
+
+        table.getCellEditor().stopCellEditing();
+    }
 }

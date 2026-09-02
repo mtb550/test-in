@@ -616,6 +616,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private void rebuildGrid() {
+        // Before the page is read, not after: the committed value has to be in
+        // the data the new grid is built from, or the tester watches their own
+        // sentence disappear and come back on the next refresh.
+        grid.ifPresent(GridView::commitOpenCell);
+
         final @NotNull List<TestCaseDto> pageItems = getCurrentPageItems();
         final @NotNull Set<RunEditorAttributes> attributes = getSelectedDetails();
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
