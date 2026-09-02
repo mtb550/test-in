@@ -31,9 +31,6 @@ public final class GitRepositoryService {
     private final @NotNull Project p;
 
     /**
-     * A filesystem question, not an IDE one - so this stays as it was.
-     */
-    /**
      * True when the directory is not a Git repository at all.
      * <p>
      * Asked in the negative because that is the only way it is ever asked - all

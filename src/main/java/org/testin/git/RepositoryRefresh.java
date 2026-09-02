@@ -46,7 +46,7 @@ final class RepositoryRefresh {
         Services.getInstance(p, ProjectIndexer.class).scanSingleProject(repoPath);
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (!Services.isCreated(p, ExplorerPanel.class)) return;
+            if (Services.isNotCreated(p, ExplorerPanel.class)) return;
 
             Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
         });

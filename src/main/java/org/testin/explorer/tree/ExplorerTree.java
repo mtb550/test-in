@@ -123,16 +123,13 @@ public class ExplorerTree implements Disposable {
     public void reveal(final @NotNull Path target, final @NotNull Runnable afterFound) {
         if (disposed) return;
 
-        TreeUtil.promiseSelect(mainTree, new TreeVisitor() {
-            @Override
-            public @NotNull Action visit(final @NotNull TreePath path) {
-                final @NotNull Optional<Path> at = TreeValueUtil.directoryAt(path).map(DirectoryDto::getPath);
-                if (at.isEmpty()) return Action.CONTINUE;
+        TreeUtil.promiseSelect(mainTree, (final @NotNull TreePath path) -> {
+            final @NotNull Optional<Path> at = TreeValueUtil.directoryAt(path).map(DirectoryDto::getPath);
+            if (at.isEmpty()) return TreeVisitor.Action.CONTINUE;
 
-                if (at.get().equals(target)) return Action.INTERRUPT;
+            if (at.get().equals(target)) return TreeVisitor.Action.INTERRUPT;
 
-                return target.startsWith(at.get()) ? Action.CONTINUE : Action.SKIP_CHILDREN;
-            }
+            return target.startsWith(at.get()) ? TreeVisitor.Action.CONTINUE : TreeVisitor.Action.SKIP_CHILDREN;
         }).onSuccess(found -> ApplicationManager.getApplication().invokeLater(() -> {
             if (disposed) return;
 
@@ -149,9 +146,6 @@ public class ExplorerTree implements Disposable {
         mainTree.requestFocusInWindow();
     }
 
-    /**
-     * Reloads the model from the current indexer state without mutating Swing tree nodes.
-     */
     /**
      * Rebuilds from the indexer and then puts the tree on this node.
      * <p>

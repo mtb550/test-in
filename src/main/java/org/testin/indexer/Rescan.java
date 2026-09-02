@@ -104,7 +104,7 @@ public final class Rescan {
      * cannot be stopped.
      */
     private void refresh(final @NotNull Project p, final @NotNull List<Path> testProjects) {
-        if (p.isDisposed() || !Services.isCreated(p, ExplorerPanel.class)) return;
+        if (p.isDisposed() || Services.isNotCreated(p, ExplorerPanel.class)) return;
 
         ProgressManager.getInstance().run(
                 new Task.Backgroundable(p, "Reading test data that changed on disk", true) {

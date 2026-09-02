@@ -251,7 +251,7 @@ public final class SftpTransport implements AutoCloseable {
                 walked.append('/');
                 continue;
             }
-            if (walked.length() > 0 && walked.charAt(walked.length() - 1) != '/') walked.append('/');
+            if (!walked.isEmpty() && walked.charAt(walked.length() - 1) != '/') walked.append('/');
             walked.append(part);
 
             if (!madeDirectories.add(walked.toString())) continue;

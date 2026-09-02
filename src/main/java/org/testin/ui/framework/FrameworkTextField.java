@@ -6,6 +6,7 @@ import com.intellij.ui.components.TextComponentEmptyText;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
+import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
 
@@ -14,6 +15,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 /**
@@ -112,7 +114,7 @@ final class FrameworkTextField {
         bind(component, KeyEvent.VK_A, menuMask, DefaultEditorKit.selectAllAction);
     }
 
-    private static void bind(final @NotNull JTextComponent component, final int keyCode, final int modifiers, final @NotNull String actionName) {
+    private static void bind(final @NotNull JTextComponent component, final int keyCode, @MagicConstant(flagsFromClass = InputEvent.class) final int modifiers, final @NotNull String actionName) {
         component.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(keyCode, modifiers), actionName);
     }
 }

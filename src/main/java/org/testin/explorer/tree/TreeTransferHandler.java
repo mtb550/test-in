@@ -176,14 +176,6 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
-     * Whether what is on the clipboard could land on what is selected.
-     * <p>
-     * The same question the paste itself asks, through the same method - the
-     * flavor, the target, the family rules and the own-subtree check all
-     * together. A menu entry deciding any part of that for itself would be a
-     * second rule that agrees with this one until the day it does not.
-     */
-    /**
      * Whether Paste is worth offering on what is selected.
      * <p>
      * The clipboard holds Testin nodes and the selection is a place that can

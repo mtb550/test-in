@@ -77,7 +77,7 @@ public class RunConfigurationForm implements DialogComponent {
 
         wrapper = new JBPanel<>(new BorderLayout());
         wrapper.setOpaque(false);
-        wrapper.add(CollapsiblePanel.build("Configuration details", buildConfigurationPanel(runName), EXPANDED), BorderLayout.CENTER);
+        wrapper.add(CollapsiblePanel.build("Configuration details", buildConfigurationPanel(), EXPANDED), BorderLayout.CENTER);
 
         // After the wrapper exists, because this asks it to lay itself out
         // again. Nothing is chosen yet, so the fields that wait on an answer
@@ -85,7 +85,7 @@ public class RunConfigurationForm implements DialogComponent {
         applyVisibility();
     }
 
-    private @NotNull JBPanel<?> buildConfigurationPanel(final @NotNull String runName) {
+    private @NotNull JBPanel<?> buildConfigurationPanel() {
         final @NotNull JBPanel<?> configurationPanel = new JBPanel<>(new GridBagLayout());
 
         final @NotNull GridBagConstraints labelGbc = new GridBagConstraints();

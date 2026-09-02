@@ -37,23 +37,33 @@ public class ImportCsv {
         return parseCsvFile(file, p);
     }
 
+    /**
+     * Which column each importable attribute sits in, keyed the way the reader
+     * below asks - lowercased, because a header is whatever the tester typed.
+     * <p>
+     * A header this import does not know is simply not in the map, and a column
+     * the file does not carry reads as blank at the row.
+     */
+    private @NotNull Map<String, Integer> headerIndexes(final String @NotNull [] headers) {
+        final @NotNull Map<String, Integer> byName = new HashMap<>();
+
+        for (int i = 0; i < headers.length; i++) {
+            final @NotNull String headerName = headers[i].trim();
+            for (final TestEditorAttributes reqCol : importAction.importAttributes) {
+                if (reqCol.getName().equalsIgnoreCase(headerName)) byName.put(reqCol.getName().toLowerCase(), i);
+            }
+        }
+
+        return byName;
+    }
+
     private @NotNull List<TestCaseDto> parseCsvFile(final @NotNull File file, final @NotNull Project p) {
         final @NotNull List<TestCaseDto> result = new ArrayList<>();
         final @NotNull List<String[]> records = parseCsvRecords(file);
 
         if (records.isEmpty()) return result;
 
-        final String @NotNull[] headers = records.getFirst();
-        final @NotNull Map<String, Integer> headerIndexMap = new HashMap<>();
-
-        for (int i = 0; i < headers.length; i++) {
-            final @NotNull String headerName = headers[i].trim();
-            for (final TestEditorAttributes reqCol : importAction.importAttributes) {
-                if (reqCol.getName().equalsIgnoreCase(headerName)) {
-                    headerIndexMap.put(reqCol.getName().toLowerCase(), i);
-                }
-            }
-        }
+        final @NotNull Map<String, Integer> headerIndexMap = headerIndexes(records.getFirst());
 
         for (int r = 1; r < records.size(); r++) {
             final String @NotNull[] values = records.get(r);

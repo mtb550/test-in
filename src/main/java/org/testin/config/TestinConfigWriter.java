@@ -24,19 +24,6 @@ import java.util.regex.Pattern;
 final class TestinConfigWriter {
 
     /**
-     * What a new file starts as. The comments say what the file is for and what
-     * must never go in it, because the next person to open it is a tester who did
-     * not write it.
-     */
-    /**
-     * What a file the plugin creates starts as.
-     * <p>
-     * One key and no explanation. The format is documented where a tester
-     * reads documentation, not in every repository that carries a copy of it -
-     * a comment block here is written once and then maintained forever, in
-     * files nobody remembers are theirs to update.
-     */
-    /**
      * What a file the plugin creates starts as.
      * <p>
      * Every key it can carry, listed once so a tester setting up a server months

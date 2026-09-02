@@ -131,7 +131,7 @@ public final class SettingsConfigurable implements Configurable {
      */
     private void refreshEveryOpenProject() {
         for (final Project open : ProjectManager.getInstance().getOpenProjects()) {
-            if (open.isDisposed() || !Services.isCreated(open, ExplorerPanel.class)) continue;
+            if (open.isDisposed() || Services.isNotCreated(open, ExplorerPanel.class)) continue;
 
             Services.getInstance(open, ExplorerPanel.class).reindex();
         }

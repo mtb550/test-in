@@ -26,13 +26,16 @@ public class ExportExcel {
     private final @NotNull ExportAction exportAction;
 
     /**
-     * Whether the workbook already carries a sheet of this name. POI says it
-     * does not by handing back no sheet, and this is the one place that reads
-     * that. Case does not count: Excel refuses "Login" beside "login", so
-     * neither does the lookup.
+     * Whether this name is still free in the workbook. POI answers with no
+     * sheet, and this is the one place that reads that. Case does not count:
+     * Excel refuses "Login" beside "login", so neither does the lookup.
+     * <p>
+     * Asked in the negative because that is the only way it is ever asked - both
+     * callers wrote {@code if (!hasSheet(...))} - and a question read one way at
+     * every call site should be named that way.
      */
-    private static boolean hasSheet(final @NotNull Workbook workbook, final @NotNull String name) {
-        return workbook.getSheet(name) != null;
+    private static boolean hasNoSheet(final @NotNull Workbook workbook, final @NotNull String name) {
+        return workbook.getSheet(name) == null;
     }
 
     /**
@@ -51,7 +54,7 @@ public class ExportExcel {
      */
     static @NotNull String uniqueSheetName(final @NotNull Workbook workbook, final @NotNull String proposal) {
         final @NotNull String safe = WorkbookUtil.createSafeSheetName(proposal, '_');
-        if (!hasSheet(workbook, safe)) return safe;
+        if (hasNoSheet(workbook, safe)) return safe;
 
         // The base is shortened by as much as the number needs, so a name
         // already at the limit still has somewhere to put it.
@@ -60,7 +63,7 @@ public class ExportExcel {
             final @NotNull String base = safe.substring(0, Math.min(safe.length(), MAX_SHEET_NAME - suffix.length()));
             final @NotNull String candidate = base + suffix;
 
-            if (!hasSheet(workbook, candidate)) return candidate;
+            if (hasNoSheet(workbook, candidate)) return candidate;
         }
     }
 

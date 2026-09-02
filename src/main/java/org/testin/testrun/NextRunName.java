@@ -43,9 +43,7 @@ public final class NextRunName {
         // A name with no number gets one, separated - "smoke" becomes "smoke-2"
         // rather than "smoke2", which reads as a different word.
         final @NotNull String stem = numbered ? trailing.group(1) : sourceName + "-";
-        final int first = numbered ? Integer.parseInt(trailing.group(2)) + 1 : 2;
-
-        int next = first;
+        int next = numbered ? Integer.parseInt(trailing.group(2)) + 1 : 2;
         while (taken.contains(stem + next)) next++;
 
         return stem + next;

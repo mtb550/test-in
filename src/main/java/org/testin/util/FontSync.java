@@ -91,31 +91,29 @@ public class FontSync {
 
     private static void updateComponentFontSize(final @NotNull JComponent component) {
         final float newSize = getBaseFontSize();
-        ApplicationManager.getApplication().invokeLater(() -> {
-            Optional.ofNullable(component.getFont()).ifPresent(currentFont -> {
-                // Each subscriber tracks its own last size, so a font change
-                // scales every synced component's children - not just the
-                // first one the message bus happens to notify.
-                final @NotNull Object stored = component.getClientProperty(LAST_BASE_SIZE);
-                final float lastSize = stored instanceof Float previous ? previous : newSize;
+        ApplicationManager.getApplication().invokeLater(() -> Optional.ofNullable(component.getFont()).ifPresent(currentFont -> {
+            // Each subscriber tracks its own last size, so a font change
+            // scales every synced component's children - not just the
+            // first one the message bus happens to notify.
+            final @NotNull Object stored = component.getClientProperty(LAST_BASE_SIZE);
+            final float lastSize = stored instanceof Float previous ? previous : newSize;
 
-                final float delta = newSize - lastSize;
-                final boolean rootNeedsUpdate = currentFont.getSize2D() != newSize;
-                if (delta != 0.0f || rootNeedsUpdate) {
-                    component.putClientProperty(LAST_BASE_SIZE, newSize);
-                    component.setFont(currentFont.deriveFont(newSize));
-                    if (component instanceof JBList) {
-                        component.updateUI();
-                    } else if (component instanceof JBTable table) {
-                        GridPanelBuilder.resizeToFont(table);
-                    } else {
-                        applyDeltaRecursively(component, delta);
-                    }
-                    component.revalidate();
-                    component.repaint();
+            final float delta = newSize - lastSize;
+            final boolean rootNeedsUpdate = currentFont.getSize2D() != newSize;
+            if (delta != 0.0f || rootNeedsUpdate) {
+                component.putClientProperty(LAST_BASE_SIZE, newSize);
+                component.setFont(currentFont.deriveFont(newSize));
+                if (component instanceof JBList) {
+                    component.updateUI();
+                } else if (component instanceof JBTable table) {
+                    GridPanelBuilder.resizeToFont(table);
+                } else {
+                    applyDeltaRecursively(component, delta);
                 }
-            });
-        });
+                component.revalidate();
+                component.repaint();
+            }
+        }));
     }
 
     private static void applyDeltaRecursively(final @NotNull Container container, final float delta) {

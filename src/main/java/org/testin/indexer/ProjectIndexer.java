@@ -1000,8 +1000,4 @@ public final class ProjectIndexer {
             onFinished.run();
         });
     }
-
-    /**
-     * How much a node holds, for a caller that has to say it out loud.
-     */
 }

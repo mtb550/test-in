@@ -79,7 +79,7 @@ public final class Services {
     }
 
     /**
-     * Whether this project has already built the service. Asking never builds
+     * Whether this project has yet to build the service. Asking never builds
      * one - which is the whole point, because {@link #getInstance} does: a
      * project that never opened the Testin tool window has no explorer panel,
      * and constructing one just to refresh it starts indexing in a project
@@ -87,9 +87,13 @@ public final class Services {
      * <p>
      * The platform answers with a null, and it stays in here so no caller has to
      * hold a maybe-a-service.
+     * <p>
+     * Asked in the negative because that is the only way it is ever asked - all
+     * three callers wrote {@code if (!isCreated(...))} - and a question read one
+     * way at every call site should be named that way.
      */
-    public static boolean isCreated(final @NotNull Project p, final @NotNull Class<?> clazz) {
-        return p.getServiceIfCreated(clazz) != null;
+    public static boolean isNotCreated(final @NotNull Project p, final @NotNull Class<?> clazz) {
+        return p.getServiceIfCreated(clazz) == null;
     }
 
 }

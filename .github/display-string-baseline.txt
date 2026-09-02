@@ -54,4 +54,9 @@
 # of the toolbar package to be shared with the status bar's page arrows, which
 # took its captions with it. The filter sets stopped being spelled out three
 # times over.
-169
+#
+# 166 after the badge work. A priority badge asks Priority for its label
+# instead of spelling one, and the two bug captions became one badge with one
+# caption. Counted rather than attributed: the check reports places, not which
+# three of them stopped writing a string somebody else already wrote.
+166

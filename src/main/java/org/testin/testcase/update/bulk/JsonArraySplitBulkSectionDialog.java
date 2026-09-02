@@ -48,7 +48,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         title = getPopupTitle();
 
         for (final List<String> values : extractOriginalValues(selectedItems)) {
-            final @NotNull List<String> current = new ArrayList<>(Objects.requireNonNullElse(values, List.<String>of()));
+            final @NotNull List<String> current = new ArrayList<>(Objects.requireNonNullElse(values, List.of()));
             // An empty list still needs one span, or there is nowhere to type.
             if (current.isEmpty()) current.add("");
 

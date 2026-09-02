@@ -127,7 +127,7 @@ public class DetailsTab {
      */
     private @NotNull List<BaseDetails> detailRows(final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
         return Stream.of(
-                Stream.<BaseDetails>of(
+                Stream.of(
                         new NavigationBar(currentPath),
                         new Id(),
                         new Title(),

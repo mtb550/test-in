@@ -63,7 +63,7 @@ public final class DestinationForm implements DialogComponent {
         //
         // The empty string is what an unselected combo renders, and the only
         // reason this reads a null at all; the model holds no nulls of its own.
-        formatCombo.setRenderer(new SimpleListCellRenderer<FileTypes>() {
+        formatCombo.setRenderer(new SimpleListCellRenderer<>() {
             @Override
             public void customize(final @NotNull JList<? extends FileTypes> list, final FileTypes format, final int index, final boolean selected, final boolean focused) {
                 setText(format == null ? "" : format.getLabel());
