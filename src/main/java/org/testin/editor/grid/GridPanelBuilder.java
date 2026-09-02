@@ -467,7 +467,7 @@ public class GridPanelBuilder {
         // Which columns can be typed into is the attribute's own declaration, the
         // same way the test grid asks its attributes (#74).
         final @NotNull JBTable table = buildTable(columns, rows,
-                column -> RunEditorAttributes.values()[column].isEdited(), "run");
+                column -> ordered.get(column).isEdited(), "run");
         applyColumnVisibility(table, RunEditorAttributes.class, attributes);
         return table;
     }
@@ -498,7 +498,7 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        final @NotNull JBTable table = buildTable(columns, rows, column -> TestEditorAttributes.values()[column].can(Can.EDIT), "test");
+        final @NotNull JBTable table = buildTable(columns, rows, column -> ordered.get(column).can(Can.EDIT), "test");
         applyColumnVisibility(table, TestEditorAttributes.class, attributes);
         return table;
     }
