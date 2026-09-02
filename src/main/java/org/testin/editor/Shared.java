@@ -7,6 +7,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IconUtil;
+import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,7 @@ public class Shared {
     //
     //   priority   ( P1 )              a filled, rounded pill
     //   group      [ Regression <      a ribbon, notched at its right end
-    //   bug        ( Major / High )    one pill, both halves of one fact
+    //   bug        ( * Major / High )  one pill, marked with the debugger's bug
     //
     // The bug badge is a pill and not a shape of its own on purpose: two colored
     // halves meant clipping, font metrics and two hand-drawn strings, which is
@@ -63,6 +64,11 @@ public class Shared {
      * so the last letter does not sit in the cut.
      */
     private static final int TAG_NOTCH = 7;
+
+    /**
+     * Between a badge's mark and its first word.
+     */
+    private static final int BADGE_ICON_GAP = 4;
 
     /**
      * What joins the two halves of a bug badge into one word to read.
@@ -358,12 +364,36 @@ public class Shared {
     }
 
     /**
-     * The bug's badge, drawn as a pill. Its own type only so that the second
-     * half can find the first and join it rather than sitting beside it - a
-     * priority pill and a bug pill are otherwise the same thing to look at.
+     * The bug's badge: a pill, marked with the platform's own debugger bug.
+     * <p>
+     * Its own type for two reasons. The second half finds the first by it and
+     * joins it rather than sitting beside it, and it is what carries the mark -
+     * a priority pill and a bug pill are otherwise the same thing to look at,
+     * and the mark is what says which one this is without a caption (#89).
      */
     public record Bug(@NotNull String text, @NotNull Color color) implements Badge {
     }
+
+    /**
+     * The mark on a bug badge: the platform's own debugger bug, at 20 pixels
+     * and solid black.
+     * <p>
+     * The platform's, so a tester reads it as the bug it means everywhere else
+     * in the IDE rather than as a shape this plugin invented. Twenty because it
+     * ships at 16 and the badge's text is smaller than the label font, so at its
+     * own size it disappears - and because 20 is a size this icon really has:
+     * it is what the New UI's tool window stripe draws.
+     * <p>
+     * Black in both themes, and {@link Gray} rather than {@link JBColor} for the
+     * same reason {@link #TEXT_ON_LIGHT} is: what it sits on is the badge's own
+     * fill, chosen by the severity being shown, so it does not follow the editor
+     * theme and neither should this. Untinted it ships in the platform's
+     * monochrome grey, which is what a Blocker's red would have swallowed.
+     * <p>
+     * Built once. It is the same mark on every row, and a colorize per bind is a
+     * cost the pooled pills exist to avoid.
+     */
+    private static final @NotNull Icon BUG_MARK = IconUtil.colorize(IconUtil.resizeSquared(AllIcons.Toolwindows.ToolWindowDebugger, 20), Gray._0);
 
     /**
      * The pill: a rounded label that draws its own background and picks its own
@@ -383,6 +413,9 @@ public class Shared {
         private BadgePill() {
             setOpaque(false);
             setBorder(JBUI.Borders.empty(BADGE_PAD_V, BADGE_PAD_H));
+            // Set once: a pill with no mark has a zero-width icon, so the gap
+            // costs it nothing.
+            setIconTextGap(JBUI.scale(BADGE_ICON_GAP));
         }
 
         /**
@@ -394,10 +427,10 @@ public class Shared {
             this.badge = badge;
 
             switch (badge) {
-                case Pill pill -> lay(pill.text(), pill.color(), BADGE_PAD_H);
-                case Bug bug -> lay(bug.text(), bug.color(), BADGE_PAD_H);
+                case Pill pill -> lay(pill.text(), pill.color(), BADGE_PAD_H, EmptyIcon.ICON_0);
+                case Bug bug -> lay(bug.text(), bug.color(), BADGE_PAD_H, BUG_MARK);
                 // Room on the right for the notch, so the last letter is not cut.
-                case Tag tag -> lay(tag.text(), tag.color(), BADGE_PAD_H + TAG_NOTCH);
+                case Tag tag -> lay(tag.text(), tag.color(), BADGE_PAD_H + TAG_NOTCH, EmptyIcon.ICON_0);
             }
 
             final float badgeSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
@@ -406,9 +439,15 @@ public class Shared {
             setVisible(true);
         }
 
-        private void lay(final @NotNull String text, final @NotNull Color fill, final int rightPad) {
+        /**
+         * {@code EmptyIcon.ICON_0} for a badge with no mark, rather than a null -
+         * it is the platform's own way of saying "no icon", it takes no room,
+         * and it keeps this method's contract the same for all three.
+         */
+        private void lay(final @NotNull String text, final @NotNull Color fill, final int rightPad, final @NotNull Icon icon) {
             setText(text);
             setBackground(fill);
+            setIcon(icon);
             setBorder(JBUI.Borders.empty(BADGE_PAD_V, BADGE_PAD_H, BADGE_PAD_V, rightPad));
         }
 
