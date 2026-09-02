@@ -62,7 +62,7 @@
     <change-notes><![CDATA[
     <b>2.10.0-alpha</b>
     <ul>
-        <li><b>A version cannot be skipped, and Testin now says so:</b> test cases used to store their order as a chain across their files, and 2.8 and 2.9 rewrote it as a rank each case carries, once, the first time they indexed a set. This build no longer carries that converter. A project last opened by 2.8 or earlier &mdash; a fresh install over an old checkout, or a colleague's repository nobody opened in 2.9 &mdash; still holds the chain, and its cases would otherwise come back oldest first with nothing to explain why, which reads as the plugin having shuffled a set somebody arranged by hand. Such a project now raises one notification naming itself and the fix: install 2.9, open the project once, then update again.</li>
+        <li><b>Order is the rank a test case carries, and nothing else:</b> cases used to store it as a chain across their files, and 2.8 and 2.9 rewrote that chain as a rank on each case the first time they indexed a set. The converter is gone, and with it the only place indexing wrote test data &mdash; a scan is a pure read again. A case that arrives with no rank, whether from an old project, an import or a file copied in by hand, sorts after the ranked ones and oldest first, which is what an unranked case has always done. Nothing is hidden and nothing is refused.</li>
     </ul>
     <br/>
     <b>2.9.3-alpha</b>
