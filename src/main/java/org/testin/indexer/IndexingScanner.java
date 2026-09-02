@@ -12,21 +12,27 @@ import org.testin.model.ProjectStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.*;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.LinkedHashMap;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 @AllArgsConstructor
 final class IndexingScanner {
+
+    /**
+     * The one key left of the order format this build no longer reads. Quoted,
+     * so it is the JSON field rather than the word.
+     */
+    private static final @NotNull String LEGACY_ORDER_KEY = "\"isHead\"";
 
     private final @NotNull Project p;
     private final @NotNull IndexerDataStore store;
@@ -64,7 +70,7 @@ final class IndexingScanner {
             final @NotNull TestCasesMainDirectoryDto tcd = tp.getTestCasesDirectory();
             store.getTestCasesMainDirsByPath().put(tcd.getPath().toString(), tcd);
             scanTestSets(tcd.getPath(), tcd, indicator);
-
+            reportUnreadableOrder(tp);
 
                 indicator.setFraction(0.5);
                 indicator.setText(tp.getName() + " - test runs...");
@@ -78,6 +84,58 @@ final class IndexingScanner {
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan project: " + projectPath.getFileName() + " - " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Says so, once per project, when this build cannot read the order the
+     * project was written in (#92).
+     * <p>
+     * Order used to be a chain across the files - {@code isHead} on one case,
+     * {@code next} on the rest - and 2.8 and 2.9 converted a set the first time
+     * they indexed it. 2.10 deleted that converter (#91), because by then every
+     * machine that had opened a project had run it.
+     * <p>
+     * Every machine that had opened one. A tester who was on 2.8 when 2.10
+     * arrived, or who installs fresh over an old checkout, or who clones a
+     * colleague's repository nobody opened in 2.9, still has the chain - and
+     * nothing about that fails loudly. The cases all show, in creation order,
+     * which reads as the plugin having shuffled a set somebody arranged by hand.
+     * <p>
+     * So it is said instead. The question is asked of the data rather than of the
+     * machine's install history, because a repository carries its files onto
+     * whatever machine clones it, however up to date that machine is.
+     * <p>
+     * One notification per project: a tester with fifty unconverted sets has one
+     * problem, not fifty.
+     */
+    private void reportUnreadableOrder(final @NotNull TestProjectDirectoryDto tp) {
+        final boolean unreadable = store.getTestCasesById().values().stream()
+                .filter(tc -> tc.getOrder().isEmpty())
+                .filter(tc -> tc.getParent().getPath().startsWith(tp.getPath()))
+                .anyMatch(IndexingScanner::carriesLegacyChain);
+
+        if (!unreadable) return;
+
+        Services.getInstance(p, Notifier.class).warn(p, "Test Cases Written by an Older Format",
+                tp.getName() + " was last written by Testin 2.8 or earlier, so the order of its test cases cannot be read and they are shown oldest first."
+                        + " Install Testin 2.9 once to convert them, then update again.");
+    }
+
+    /**
+     * Whether this case's file still carries the old chain.
+     * <p>
+     * Read as text, because the model dropped both keys - so the file is the only
+     * thing left that can answer. Only a case with no rank is ever read again,
+     * which is none at all in a project that has been through 2.9, and a case
+     * that arrives unranked for an ordinary reason - copied in by hand, imported
+     * by another tool - costs one read and answers no.
+     */
+    private static boolean carriesLegacyChain(final @NotNull TestCaseDto tc) {
+        try {
+            return Files.readString(tc.getParent().getPath().resolve(tc.getId() + ".json"), StandardCharsets.UTF_8).contains(LEGACY_ORDER_KEY);
+        } catch (final Exception unreadable) {
+            return false;
         }
     }
 
@@ -139,7 +197,6 @@ final class IndexingScanner {
             store.getTestSetsDirByPath().put(path.toString(), ts);
 
             final @NotNull List<UUID> caseIds = Collections.synchronizedList(new ArrayList<>());
-            final @NotNull Map<Path, TestCaseDto> loaded = Collections.synchronizedMap(new LinkedHashMap<>());
             final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
 
             try (Stream<Path> files = Files.list(path)) {
@@ -153,7 +210,6 @@ final class IndexingScanner {
                                 tc.setId(identityOf(filePath, tc));
                                 store.getTestCasesById().put(tc.getId(), tc);
                                 caseIds.add(tc.getId());
-                                loaded.put(filePath, tc);
                             } catch (final Exception ex) {
                                 Logger.error("Failed to read test case '" + filePath.toAbsolutePath() +
                                         "': " + ex.getMessage());
@@ -163,14 +219,7 @@ final class IndexingScanner {
 
             store.getTestSetCaseIds().put(path.toString(), caseIds);
 
-            // A set written before cases carried their own rank has its order in
-            // the old chain, and only here can it still be read - the model has
-            // dropped those keys. Converted once and written back, so the tester
-            // finds their set in the order they arranged it.
-            for (final TestCaseDto converted : LegacyChainOrder.apply(p, loaded)) {
-                store.putTestCase(path, converted);
-            }
-                indicator.setText("Test set: " + ts.getName() + " (" + caseIds.size() + " cases)");
+            indicator.setText("Test set: " + ts.getName() + " (" + caseIds.size() + " cases)");
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test set '" +

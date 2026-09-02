@@ -60,6 +60,11 @@
 ]]></description>
 
     <change-notes><![CDATA[
+    <b>2.10.0-alpha</b>
+    <ul>
+        <li><b>A version cannot be skipped, and Testin now says so:</b> test cases used to store their order as a chain across their files, and 2.8 and 2.9 rewrote it as a rank each case carries, once, the first time they indexed a set. This build no longer carries that converter. A project last opened by 2.8 or earlier &mdash; a fresh install over an old checkout, or a colleague's repository nobody opened in 2.9 &mdash; still holds the chain, and its cases would otherwise come back oldest first with nothing to explain why, which reads as the plugin having shuffled a set somebody arranged by hand. Such a project now raises one notification naming itself and the fix: install 2.9, open the project once, then update again.</li>
+    </ul>
+    <br/>
     <b>2.9.3-alpha</b>
     <ul>
         <li><b>A badge looks like what it is, instead of saying so:</b> a pill spent half its width naming the field its color already meant &mdash; "Priority: High" beside "Bug Priority: High" and "Bug Severity: Major". Priority is the value now, and it is <b>P1</b> and <b>P2</b> rather than High and Medium, so it cannot be read as the bug's. P3 draws nothing at all, because P3 is what a case is unless somebody said otherwise. Groups are ribbons rather than pills, since eight identical pills on one row was the hardest row in the plugin to read. Severity and bug priority are one badge carrying the IDE's own bug mark, and each half leaves on its own when its column is unticked.</li>
