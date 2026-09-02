@@ -62,7 +62,16 @@ public class UpdateRunItemAction extends AbstractProjectAction {
         // F2 edits without touching the status.
         new FailedResultDialog(p, runItem, () -> runEditor.run().ifPresentOrElse(tr -> {
             Services.getInstance(p, ProjectIndexer.class).persistRun(runEditor.getParent().getPath(), tr);
-            list.repaint();
+
+            // Whatever the tester is looking at, not the list alone. This
+            // repainted the JList, and the grid is a separate table built from a
+            // snapshot - so a stacktrace or an actual result typed here was on
+            // disk and correct while the grid went on showing the old value
+            // until something else happened to rebuild it.
+            //
+            // The same call the test-case update already makes, so the two
+            // update paths give one answer instead of two.
+            runEditor.refreshView();
 
             // After the persist: an edit that was dropped rather than saved must
             // not report itself as saved (#62).
