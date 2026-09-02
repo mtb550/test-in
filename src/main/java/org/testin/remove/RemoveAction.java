@@ -167,8 +167,16 @@ public class RemoveAction extends AbstractProjectTreeAction {
     private void restoreAll(final @NotNull List<Kept> kept) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-        kept.forEach(one -> indexer.restoreNode(one.copy(), one.original()));
+        final @NotNull List<Kept> lost = kept.stream().filter(one -> !indexer.restoreNode(one.copy(), one.original())).toList();
         pp.getProjectTree().updateNodes();
+
+        // What did not come back is the only thing worth saying. The tree used
+        // to be refreshed either way and nothing read the answer, so an undo
+        // whose copy was gone redrew exactly like one that worked - and the
+        // tester was told "Undone" over a node still missing.
+        if (!lost.isEmpty()) {
+            Services.getInstance(p, Notifier.class).softRefuse(p, "Undo Incomplete", lost.size() + " of " + kept.size() + " could not be put back");
+        }
     }
 
     /**

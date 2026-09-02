@@ -131,9 +131,15 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
                 indicator.setIndeterminate(true);
 
                 try {
-                    // Off the EDT, where writing to the keychain is allowed.
-                    if (!account.password().isEmpty()) {
-                        SftpSecret.ACCOUNT_PASSWORD.store(address, account.user(), account.password());
+                    // Off the EDT, where writing to the keychain is allowed. A
+                    // refusal is said once, here: nothing read the answer
+                    // before, so a keychain that would not take the password
+                    // asked the tester for it again every single sync with no
+                    // explanation - which is the outcome store's own contract
+                    // says must not happen.
+                    if (!account.password().isEmpty() && !SftpSecret.ACCOUNT_PASSWORD.store(address, account.user(), account.password())) {
+                        ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class)
+                                .softRefuse(p, "Password Not Kept", "This machine's keychain refused it, so the next sync asks again"));
                     }
 
                     final @NotNull SftpAuth auth = authFor(address, account, keyFile);
