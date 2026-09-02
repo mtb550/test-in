@@ -211,31 +211,24 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             final @NotNull UUID testCaseId = UUID.fromString(diff.testCaseId());
 
-            switch (diff.type()) {
-                case ADDED -> indexer.removeTestCase(testSetPath, testCaseId);
-                case DELETED -> indexer.putTestCase(testSetPath, diff.committedState());
-                case MODIFIED -> {
-                    // Both refusals say so now. They shared one silent return,
-                    // so a tester who pressed Revert on a field that cannot be
-                    // put back, or on a case that had since been deleted, saw
-                    // the row sit there with nothing explaining why.
-                    if (!changeType.isRevertable()) {
-                        Services.getInstance(p, Notifier.class)
-                                .softRefuse(p, "A change to " + changeType.getLabel() + " cannot be reverted");
-                        return;
-                    }
-
-                    final @NotNull Optional<TestCaseDto> current = indexer.findTestCase(testCaseId);
-                    if (current.isEmpty()) {
-                        Services.getInstance(p, Notifier.class)
-                                .softRefuse(p, "That test case is no longer in the project");
-                        return;
-                    }
-
-                    changeType.getRevertAction().apply(current.orElseThrow(), diff.committedState());
-                    indexer.putTestCase(testSetPath, current.orElseThrow());
+            // An expression rather than a statement, so a fourth DiffType fails
+            // to compile here until it says what reverting it means. Git has
+            // RENAMED and COPIED, so that is a real day: the statement this
+            // replaced would have matched no arm, done nothing, and still taken
+            // the row away under a "Reverted" balloon.
+            final boolean reverted = switch (diff.type()) {
+                case ADDED -> {
+                    indexer.removeTestCase(testSetPath, testCaseId);
+                    yield true;
                 }
-            }
+                case DELETED -> {
+                    indexer.putTestCase(testSetPath, diff.committedState());
+                    yield true;
+                }
+                case MODIFIED -> revertField(p, indexer, testSetPath, testCaseId, changeType, diff);
+            };
+
+            if (!reverted) return;
 
             removeRow(row);
             Services.getInstance(p, Notifier.class).softShow(p, Done.REVERTED);
@@ -243,6 +236,32 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         } catch (final Exception ex) {
             Services.getInstance(p, Notifier.class).error(p, "Revert Failed", "Could not revert change: " + ex.getMessage());
         }
+    }
+
+    /**
+     * Puts one edited field back to what was committed, and answers whether that
+     * happened - so the caller confirms a revert only when there was one.
+     * <p>
+     * Both refusals say so. They shared one silent return, so a tester who
+     * pressed Revert on a field that cannot be put back, or on a case that had
+     * since been deleted, saw the row sit there with nothing explaining why.
+     */
+    private boolean revertField(final @NotNull Project p, final @NotNull ProjectIndexer indexer, final @NotNull Path testSetPath, final @NotNull UUID testCaseId, final @NotNull ChangeType changeType, final @NotNull PendingChange diff) {
+        if (!changeType.isRevertable()) {
+            Services.getInstance(p, Notifier.class).softRefuse(p, "A change to " + changeType.getLabel() + " cannot be reverted");
+            return false;
+        }
+
+        final @NotNull Optional<TestCaseDto> current = indexer.findTestCase(testCaseId);
+        if (current.isEmpty()) {
+            Services.getInstance(p, Notifier.class).softRefuse(p, "That test case is no longer in the project");
+            return false;
+        }
+
+        changeType.getRevertAction().apply(current.orElseThrow(), diff.committedState());
+        indexer.putTestCase(testSetPath, current.orElseThrow());
+
+        return true;
     }
 
     private void removeRow(final int row) {

@@ -331,66 +331,96 @@ public final class ExplorerPanel implements Disposable {
 
         final @NotNull BoundTestProject boundProject = Services.getInstance(p, BoundTestProject.class);
 
-        switch (state) {
-            case NO_ROOT -> emptyText.appendLine(
-                    AllIcons.General.Settings,
-                    "Configure Testin settings",
-                    SimpleTextAttributes.LINK_ATTRIBUTES,
-                    e -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class));
-
-            case CLONE_BOUND -> {
-                final @NotNull String url = Services.getInstance(p, TestinConfigService.class).get().repoUrl();
-
-                emptyText.appendLine(boundProject.name() + " is not on this machine yet",
-                        SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
-                emptyText.appendLine("");
-                emptyText.appendLine(
-                        AllIcons.Vcs.Clone,
-                        "Clone " + boundProject.name(),
-                        SimpleTextAttributes.LINK_ATTRIBUTES,
-                        e -> new CreateTestProjectCloneAction(p, url, boundProject.name(), this).execute());
-            }
-
-            case NO_PROJECTS -> emptyText.appendLine(
-                    AllIcons.General.Add,
-                    "Create your first test project",
-                    SimpleTextAttributes.LINK_ATTRIBUTES,
-                    e -> new CreateTestProjectAction(p, this).execute());
-
-            case CHOOSE -> {
-                // Say why before offering the picker, so a binding that stopped
-                // resolving - a renamed folder, an archived project - reads as a
-                // fact and not as a first run.
-                final @NotNull String problem = boundProject.problem(underRoot);
-                if (!problem.isEmpty()) {
-                    emptyText.appendLine(problem, SimpleTextAttributes.ERROR_ATTRIBUTES, null);
-                    emptyText.appendLine("");
-                }
-
-                // Few enough to read at a glance: one line each, one click to
-                // bind. The dialog is for the root that holds more than a
-                // screenful, where a list in a status text stops being a list.
-                if (underRoot.size() <= INLINE_CHOICES) {
-                    underRoot.forEach((name, status) -> emptyText.appendLine(
-                            AllIcons.Actions.ModuleDirectory,
-                            name + "  " + status.getLabel(),
-                            SimpleTextAttributes.LINK_ATTRIBUTES,
-                            e -> bindTo(name)));
-                    return;
-                }
-
-                emptyText.appendLine(
-                        AllIcons.Actions.ModuleDirectory,
-                        "Select the test project for this repository",
-                        SimpleTextAttributes.LINK_ATTRIBUTES,
-                        e -> new BindTestProjectDialog(p, underRoot, this::reindex).show());
-            }
+        // Which offer to make is the state's answer; making it is still this
+        // panel's job, because every branch reaches back into it - to bind a
+        // project, to open settings, to index again. An expression rather than a
+        // statement, so a sixth PanelState fails to compile here: the statement
+        // it replaced would have drawn the header and then nothing at all.
+        final @NotNull Runnable offer = switch (state) {
+            case NO_ROOT -> () -> offerSettings(emptyText);
+            case CLONE_BOUND -> () -> offerClone(emptyText, boundProject);
+            case NO_PROJECTS -> () -> offerFirstProject(emptyText);
+            case CHOOSE -> () -> offerChoice(emptyText, boundProject);
 
             // Unreachable, and now actually so: the state and the branch that
             // chose this method come from one read of the bound project, so
             // TREE here would mean the two disagreed about a single value.
-            case TREE -> Logger.warn("Welcome screen asked to draw a resolved project");
+            case TREE -> () -> Logger.warn("Welcome screen asked to draw a resolved project");
+        };
+
+        offer.run();
+    }
+
+    /**
+     * No root is set, so the only step out of here is the settings page.
+     */
+    private void offerSettings(final @NotNull StatusText emptyText) {
+        emptyText.appendLine(
+                AllIcons.General.Settings,
+                "Configure Testin settings",
+                SimpleTextAttributes.LINK_ATTRIBUTES,
+                e -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class));
+    }
+
+    /**
+     * The repository names a project this machine does not hold yet, so the step
+     * out is to clone the one it names rather than to pick a different one.
+     */
+    private void offerClone(final @NotNull StatusText emptyText, final @NotNull BoundTestProject boundProject) {
+        final @NotNull String url = Services.getInstance(p, TestinConfigService.class).get().repoUrl();
+
+        emptyText.appendLine(boundProject.name() + " is not on this machine yet",
+                SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
+        emptyText.appendLine("");
+        emptyText.appendLine(
+                AllIcons.Vcs.Clone,
+                "Clone " + boundProject.name(),
+                SimpleTextAttributes.LINK_ATTRIBUTES,
+                e -> new CreateTestProjectCloneAction(p, url, boundProject.name(), this).execute());
+    }
+
+    /**
+     * The root is set and empty, so there is nothing to choose between yet.
+     */
+    private void offerFirstProject(final @NotNull StatusText emptyText) {
+        emptyText.appendLine(
+                AllIcons.General.Add,
+                "Create your first test project",
+                SimpleTextAttributes.LINK_ATTRIBUTES,
+                e -> new CreateTestProjectAction(p, this).execute());
+    }
+
+    /**
+     * The root holds projects and none of them is bound to this repository, so
+     * the step out is to say which.
+     */
+    private void offerChoice(final @NotNull StatusText emptyText, final @NotNull BoundTestProject boundProject) {
+        // Say why before offering the picker, so a binding that stopped
+        // resolving - a renamed folder, an archived project - reads as a
+        // fact and not as a first run.
+        final @NotNull String problem = boundProject.problem(underRoot);
+        if (!problem.isEmpty()) {
+            emptyText.appendLine(problem, SimpleTextAttributes.ERROR_ATTRIBUTES, null);
+            emptyText.appendLine("");
         }
+
+        // Few enough to read at a glance: one line each, one click to
+        // bind. The dialog is for the root that holds more than a
+        // screenful, where a list in a status text stops being a list.
+        if (underRoot.size() <= INLINE_CHOICES) {
+            underRoot.forEach((name, status) -> emptyText.appendLine(
+                    AllIcons.Actions.ModuleDirectory,
+                    name + "  " + status.getLabel(),
+                    SimpleTextAttributes.LINK_ATTRIBUTES,
+                    e -> bindTo(name)));
+            return;
+        }
+
+        emptyText.appendLine(
+                AllIcons.Actions.ModuleDirectory,
+                "Select the test project for this repository",
+                SimpleTextAttributes.LINK_ATTRIBUTES,
+                e -> new BindTestProjectDialog(p, underRoot, this::reindex).show());
     }
 
     /**

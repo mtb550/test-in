@@ -514,18 +514,31 @@ public final class SftpSync {
         private final @NotNull List<String> settled = new ArrayList<>();
 
         private void add(final @NotNull String path, final @NotNull TransferAction action) {
-            switch (action) {
-                case UPLOAD -> toUpload.add(path);
-                case DOWNLOAD -> toDownload.add(path);
-                case DELETE_REMOTE -> toDeleteRemotely.add(path);
-                case NOTHING -> unchangedPaths.add(path);
+            listFor(action).add(path);
+        }
+
+        /**
+         * Which list a path joins.
+         * <p>
+         * An expression rather than a statement, so a seventh
+         * {@link TransferAction} fails to compile here until it says where it
+         * goes. The statement this replaced accepted one in silence: the path
+         * matched no arm, joined no list, and dropped out of the sync
+         * altogether - not uploaded, not counted, not reported.
+         */
+        private @NotNull List<String> listFor(final @NotNull TransferAction action) {
+            return switch (action) {
+                case UPLOAD -> toUpload;
+                case DOWNLOAD -> toDownload;
+                case DELETE_REMOTE -> toDeleteRemotely;
+                case NOTHING -> unchangedPaths;
 
                 // Both keep what is on this machine and say so, because guessing
                 // loses work with no other copy - but they are different things
                 // and a tester told the wrong one goes looking in the wrong place.
-                case DELETE_LOCAL -> removedOnServer.add(path);
-                case RESOLVE -> conflicting.add(path);
-            }
+                case DELETE_LOCAL -> removedOnServer;
+                case RESOLVE -> conflicting;
+            };
         }
 
         private @NotNull Outcome outcome(final @NotNull List<Unsettled> unsettled) {

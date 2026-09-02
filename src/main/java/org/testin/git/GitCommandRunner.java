@@ -158,6 +158,16 @@ final class GitCommandRunner {
         return result.getOutputAsJoinedString();
     }
 
+    /**
+     * The platform's command object for the word a caller passed.
+     * <p>
+     * A switch on a {@code String} rather than on an enum, and it stays one:
+     * {@link GitCommand} is git4idea's, so there is no constant of ours to
+     * declare this on, and the input is a word rather than a type. The
+     * {@code default} is the point here rather than a gap - an unsupported word
+     * is a caller's mistake and says so, where an enum switch would be answering
+     * for a constant that cannot exist (#169).
+     */
     private static @NotNull GitCommand commandFor(final @NotNull String command) {
         return switch (command) {
             case "add" -> GitCommand.ADD;
