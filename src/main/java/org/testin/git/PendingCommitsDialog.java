@@ -225,7 +225,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                     indexer.putTestCase(testSetPath, diff.committedState());
                     yield true;
                 }
-                case MODIFIED -> revertField(p, indexer, testSetPath, testCaseId, changeType, diff);
+                case MODIFIED -> revertField(indexer, testSetPath, changeType, diff);
             };
 
             if (!reverted) return;
@@ -246,13 +246,13 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
      * pressed Revert on a field that cannot be put back, or on a case that had
      * since been deleted, saw the row sit there with nothing explaining why.
      */
-    private boolean revertField(final @NotNull Project p, final @NotNull ProjectIndexer indexer, final @NotNull Path testSetPath, final @NotNull UUID testCaseId, final @NotNull ChangeType changeType, final @NotNull PendingChange diff) {
+    private boolean revertField(final @NotNull ProjectIndexer indexer, final @NotNull Path testSetPath, final @NotNull ChangeType changeType, final @NotNull PendingChange diff) {
         if (!changeType.isRevertable()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, "A change to " + changeType.getLabel() + " cannot be reverted");
             return false;
         }
 
-        final @NotNull Optional<TestCaseDto> current = indexer.findTestCase(testCaseId);
+        final @NotNull Optional<TestCaseDto> current = indexer.findTestCase(UUID.fromString(diff.testCaseId()));
         if (current.isEmpty()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, "That test case is no longer in the project");
             return false;

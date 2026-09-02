@@ -331,24 +331,20 @@ public final class ExplorerPanel implements Disposable {
 
         final @NotNull BoundTestProject boundProject = Services.getInstance(p, BoundTestProject.class);
 
-        // Which offer to make is the state's answer; making it is still this
-        // panel's job, because every branch reaches back into it - to bind a
-        // project, to open settings, to index again. An expression rather than a
-        // statement, so a sixth PanelState fails to compile here: the statement
-        // it replaced would have drawn the header and then nothing at all.
-        final @NotNull Runnable offer = switch (state) {
-            case NO_ROOT -> () -> offerSettings(emptyText);
-            case CLONE_BOUND -> () -> offerClone(emptyText, boundProject);
-            case NO_PROJECTS -> () -> offerFirstProject(emptyText);
-            case CHOOSE -> () -> offerChoice(emptyText, boundProject);
+        // Which offer to make is the state's answer; making it is this panel's
+        // job, because every branch reaches back into it - to bind a project, to
+        // open settings, to index again.
+        switch (state) {
+            case NO_ROOT -> offerSettings(emptyText);
+            case CLONE_BOUND -> offerClone(emptyText, boundProject);
+            case NO_PROJECTS -> offerFirstProject(emptyText);
+            case CHOOSE -> offerChoice(emptyText, boundProject);
 
             // Unreachable, and now actually so: the state and the branch that
             // chose this method come from one read of the bound project, so
             // TREE here would mean the two disagreed about a single value.
-            case TREE -> () -> Logger.warn("Welcome screen asked to draw a resolved project");
-        };
-
-        offer.run();
+            case TREE -> Logger.warn("Welcome screen asked to draw a resolved project");
+        }
     }
 
     /**
