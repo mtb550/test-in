@@ -21,3 +21,10 @@ build/
 # it. The sample is the committed part; what an IDE makes of it is not.
 samples/automation/.idea/
 samples/automation/target/
+
+# Generated automation from a sandbox session. The sample's test source root is
+# where Testin writes a generated class, so opening the sample and pressing
+# Generate Code drops a real file into a committed folder - and the IDE's Git
+# integration stages it. The folder is kept by its .gitkeep; what lands in it is
+# not ours.
+samples/automation/src/test/java/**/*.java

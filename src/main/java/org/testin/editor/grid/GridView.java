@@ -49,4 +49,20 @@ public record GridView(@NotNull JBTable table, @NotNull JBScrollPane scrollPane,
 
         table.getCellEditor().stopCellEditing();
     }
+
+    /**
+     * Whether the tester's keyboard was in this grid.
+     * <p>
+     * Asked before a rebuild, so the grid that replaces this one can take the
+     * focus back - and only then. Setting a verdict rebuilds the whole grid, and
+     * the table that carried the keystroke is gone by the time the new one is
+     * drawn, so the arrow keys reached nothing and recording a run from the
+     * keyboard stopped after the first case (#74).
+     * <p>
+     * Conditional on purpose: a rebuild that happens while the tester is in the
+     * toolbar or the tree must not pull them back into the grid.
+     */
+    public boolean hasKeyboard() {
+        return table.hasFocus() || isCellOpen();
+    }
 }

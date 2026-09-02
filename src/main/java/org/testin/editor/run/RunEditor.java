@@ -616,6 +616,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private void rebuildGrid() {
+        // Asked before anything is committed or replaced, because both move the
+        // focus in their own right.
+        final boolean keepKeyboard = grid.map(GridView::hasKeyboard).orElse(false);
+
         // Before the page is read, not after: the committed value has to be in
         // the data the new grid is built from, or the tester watches their own
         // sentence disappear and come back on the next refresh.
@@ -654,6 +658,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             gridColumnToRestore = -1;
 
             grid = Optional.of(new GridView(table, new JBScrollPane(table), fontSync));
+
+            // Later, not here: this table is not in the window until the caller
+            // installs the scroll pane, and a focus request refused is a focus
+            // request lost.
+            if (keepKeyboard) ApplicationManager.getApplication().invokeLater(table::requestFocusInWindow);
             Logger.debug("[grid] rebuildGrid done, rows=" + table.getRowCount() + ", cols=" + table.getColumnCount());
         } catch (final Exception ex) {
             Logger.error("[grid] rebuildGrid FAILED: " + ex);
