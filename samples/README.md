@@ -34,14 +34,18 @@ examples from here.
 
     ./gradlew runIde
 
-The task opens `samples/automation`, and points a **fresh** sandbox at
-`samples/testin-root`.
+On a **fresh** sandbox the task points it at `samples/testin-root` and opens
+`samples/automation`. On a sandbox that already has Testin settings it does
+neither: it opens whatever that sandbox had, pointed wherever its owner pointed
+it.
 
-It will not touch a sandbox that already has settings. If you have pointed yours
-at your own test data, it stays pointed there — that is deliberate, because the
-alternative is a build task quietly rewriting where your work lives. To go back
-to the sample, delete `.sandbox` and run again, or set the Testin root to this
-folder in **Settings → Testin**.
+Both halves move together on purpose. Opening the sample against somebody else's
+Testin root does not resolve `testinProject: Demo`, so Testin rebinds the project
+and writes that root's project name into `testin.yml` - a committed file. That
+happened twice before `SampleProjectTest` started asserting the binding.
+
+To get the sample back, delete `.sandbox` and run again, or set the Testin root
+to this folder in **Settings → Testin**.
 
 ## Changing it
 

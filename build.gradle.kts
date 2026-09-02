@@ -261,8 +261,9 @@ intellijPlatformTesting {
                 jvmArgs("--sun-misc-unsafe-memory-access=allow")
 
                 // The same sample, in the IDE where the tree has to work without
-                // any Java plugin behind it.
-                args(layout.projectDirectory.dir("samples/automation").asFile.absolutePath)
+                // any Java plugin behind it - and on the same condition, so a
+                // sandbox with its own root is never rebound to the sample.
+                if (sampleSandbox()) args(layout.projectDirectory.dir("samples/automation").asFile.absolutePath)
 
                 val sandboxes = layout.projectDirectory.dir(".sandbox/Testin").asFile
                 val sampleRoot = layout.projectDirectory.dir("samples/testin-root").asFile.absolutePath
@@ -312,14 +313,30 @@ configurations.all {
     }
 }
 
+/**
+ * Whether a sandbox is empty enough to be pointed at the committed sample (#107).
+ *
+ * Read at configuration time, because it decides an argument. A sandbox that
+ * already holds Testin settings belongs to whoever set them: it keeps its own
+ * root and opens its own project, and the sample is not forced on it.
+ */
+fun sampleSandbox(): Boolean = layout.projectDirectory.dir(".sandbox/Testin").asFile
+    .listFiles().orEmpty()
+    .none { it.resolve("config/options/testinSettings.xml").exists() }
+
 tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
     jvmArgs("--sun-misc-unsafe-memory-access=allow")
 
-    // The sandbox opens onto the committed sample rather than onto nothing, so a
-    // fresh clone has a tree, a run and every marker format to look at without
-    // creating them by hand first. The path is an argument because that is how the
-    // IDE is told which project to open.
-    args(layout.projectDirectory.dir("samples/automation").asFile.absolutePath)
+    // Only a sandbox that has no Testin settings yet is sent to the sample - the
+    // same condition that decides whether the sample root is written below, and
+    // it has to be the same one.
+    //
+    // Opening the sample unconditionally was a bug: a sandbox pointed at a
+    // developer's own test data does not resolve the sample's testinProject, so
+    // Testin rebinds it and writes the developer's project name into a committed
+    // file. It happened twice before SampleProjectTest caught it. A sandbox with
+    // settings now opens whatever it had, which is what its owner set it to.
+    if (sampleSandbox()) args(layout.projectDirectory.dir("samples/automation").asFile.absolutePath)
 
     // Read at configuration time, so the configuration cache holds values rather
     // than a reference to the project.
