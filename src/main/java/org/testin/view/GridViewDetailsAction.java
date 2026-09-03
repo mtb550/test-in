@@ -73,9 +73,26 @@ public class GridViewDetailsAction extends AbstractProjectAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final boolean onOrderColumn = GridPanelBuilder.isOrderColumn(table, table.getSelectedColumn());
+        e.getPresentation().setEnabled(!table.isEditing() && table.getSelectedRow() >= 0 && onSequence());
+    }
 
-        e.getPresentation().setEnabled(!table.isEditing() && onOrderColumn && table.getSelectedRow() >= 0);
+    /**
+     * Whether the tester is on the sequence number.
+     * <p>
+     * Two ways to be, and asking only the first left ENTER doing nothing after
+     * the commonest one. Arrowing onto the column selects that cell, and
+     * {@code getSelectedColumn} names it. Clicking the number instead runs
+     * {@code SequenceColumnRowSelector}, which selects the whole row - every
+     * column of it, so the row copies as one line - and then
+     * {@code getSelectedColumn} answers 0, the leftmost column, which is only the
+     * sequence by coincidence and usually is not.
+     * <p>
+     * A selection covering every column is that gesture and no other: nothing
+     * else in the grid makes one.
+     */
+    private boolean onSequence() {
+        return GridPanelBuilder.isOrderColumn(table, table.getSelectedColumn())
+                || table.getSelectedColumnCount() == table.getColumnCount();
     }
 
     @Override
