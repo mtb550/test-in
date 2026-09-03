@@ -23,12 +23,8 @@ import java.util.List;
  * an IDE action rather than a Swing key binding, because the IDE dispatcher
  * handles registered shortcuts before a component's own ActionMap.
  * <p>
- * ENTER means one thing in a grid: edit this cell, or show me what I cannot
- * edit. So this is enabled on every cell that refuses editing - the order
- * column among them, since it is never editable - and disabled on the ones that
- * accept it, where ENTER falls through to the table's own binding and starts the
- * edit. A read-only cell used to do nothing at all unless it was the order
- * column.
+ * Enabled only on the order column, which is never editable; on every
+ * other cell the action stays disabled so ENTER keeps starting an edit.
  */
 public class GridViewDetailsAction extends AbstractProjectAction {
     private final @NotNull JBTable table;
@@ -77,23 +73,9 @@ public class GridViewDetailsAction extends AbstractProjectAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final int row = table.getSelectedRow();
+        final boolean onOrderColumn = GridPanelBuilder.isOrderColumn(table, table.getSelectedColumn());
 
-        if (row < 0 || table.isEditing()) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
-
-        // Every cell the tester cannot type into. An editable one leaves this
-        // disabled, and ENTER falls through to the table's own binding, which
-        // starts the edit - so one key means "edit this" where that is possible
-        // and "show me this" where it is not.
-        //
-        // No column selected is the row-selection the order column produces, and
-        // a row is exactly what the details show.
-        final int column = table.getSelectedColumn();
-
-        e.getPresentation().setEnabled(column < 0 || !table.isCellEditable(row, column));
+        e.getPresentation().setEnabled(!table.isEditing() && onOrderColumn && table.getSelectedRow() >= 0);
     }
 
     @Override
