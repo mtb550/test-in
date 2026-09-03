@@ -37,6 +37,7 @@ import org.testin.undo.UndoDirection;
 import org.testin.undo.UndoScope;
 import org.testin.util.OptionalPlugin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TreeContextMenu extends DefaultActionGroup {
@@ -51,14 +52,16 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         addSeparator();
 
-        add(actionsSubMenu(List.of(
-                        new UpdateTestProjectStatusAction(p, tree, ProjectStatus.ACTIVE),
-                        new UpdateTestProjectStatusAction(p, tree, ProjectStatus.INACTIVE),
-                        new UpdateTestProjectStatusAction(p, tree, ProjectStatus.ARCHIVED),
-                        new UpdateTestSetStatusAction(p, tree, TestSetStatus.ACTIVE),
-                        new UpdateTestSetStatusAction(p, tree, TestSetStatus.DEPRECATED),
-                        new UpdatePackageStatusAction(p, tree, PackageStatus.ACTIVE),
-                        new UpdatePackageStatusAction(p, tree, PackageStatus.ARCHIVED),
+        // Every status each kind has, rather than the seven that were listed here.
+        // A status is a constant on its enum and this menu is the only place a
+        // tester reaches it, so one added there and not here would be a status
+        // nothing could ever set - and nothing would have said so (#175, C9).
+        final @NotNull List<DumbAwareAction> statusActions = new ArrayList<>();
+        for (final ProjectStatus status : ProjectStatus.values()) statusActions.add(new UpdateTestProjectStatusAction(p, tree, status));
+        for (final TestSetStatus status : TestSetStatus.values()) statusActions.add(new UpdateTestSetStatusAction(p, tree, status));
+        for (final PackageStatus status : PackageStatus.values()) statusActions.add(new UpdatePackageStatusAction(p, tree, status));
+
+        add(actionsSubMenu(statusActions, List.of(
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.UNDO),
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.REDO),
                         new ReCreateTestRunAction(p, tree),
@@ -67,8 +70,7 @@ public class TreeContextMenu extends DefaultActionGroup {
                         new OrderNodeAction(p, pp, tree),
                         new CopyNodeAction(tree),
                         new CutNodeAction(tree),
-                        new PasteNodeAction(p, tree))
-        ));
+                        new PasteNodeAction(p, tree))));
 
         if (OptionalPlugin.TESTNG.isAvailable()) {
             addSeparator();
@@ -118,10 +120,18 @@ public class TreeContextMenu extends DefaultActionGroup {
      * one. Two lines of platform setup that only this menu needs; they used to
      * live in a shared utility class where this was the one caller.
      */
-    private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends DumbAwareAction> actions) {
+    /**
+     * The Actions submenu: every status each kind can be set to, then the rest.
+     * <p>
+     * Two lists rather than one because the first is generated from enums and the
+     * second is written out - and a generated group joined to a literal one reads
+     * better than either a stream of both or a list nobody can tell apart.
+     */
+    private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends DumbAwareAction> statusActions, final @NotNull List<? extends DumbAwareAction> rest) {
         final @NotNull DefaultActionGroup group = new DefaultActionGroup("Actions", true);
         group.getTemplatePresentation().setIcon(AllIcons.Actions.Edit);
-        actions.forEach(group::add);
+        statusActions.forEach(group::add);
+        rest.forEach(group::add);
         return group;
     }
 
