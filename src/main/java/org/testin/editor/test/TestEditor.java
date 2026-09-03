@@ -41,7 +41,7 @@ import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.util.FontSync;
-import org.testin.view.GridViewDetailsAction;
+import org.testin.editor.grid.GridEnterAction;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.*;
@@ -667,7 +667,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             // ESC in grid view behaves like ESC in the list: hide the view panel, then clear the selection.
             new EscapeAction(p, table);
             // ENTER on the non-editable sequence column opens the details view.
-            new GridViewDetailsAction(p, table, pageItems, parent.getPath2()).installDoubleClick();
+            new GridEnterAction(p, table, pageItems, parent.getPath2()).installDoubleClick();
             table.addMouseListener(new GridContextMenuListener(table, list, contextMenu, pageItems));
             // Every shortcut the menu offers, live on the grid too (#74).
             contextMenu.bindShortcutsTo(table);

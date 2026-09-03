@@ -7,14 +7,11 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import org.testin.util.Shortcuts;
 
-import java.util.Set;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,41 +58,11 @@ public final class GridExcelBehavior {
     // Clipboard (TSV, Excel-compatible)
     // ------------------------------------------------------------------
 
-    /**
-     * The keys a grid answers for itself, which the editor's context menu must
-     * not take back.
-     * <p>
-     * Every one of them means something different in a grid than on the list.
-     * Copy, cut and paste are the selected cells rather than the selected test
-     * case (#66, finding D1). ENTER edits the cell under the tester, or opens the
-     * details on the sequence, which is {@code GridViewDetailsAction}'s job and
-     * only its job.
-     * <p>
-     * The menu carries actions with these same keys, and
-     * {@code bindShortcutsTo} registers its children on the table as IDE actions
-     * - which the IDE dispatches before a component's own input map. So a menu
-     * entry bound here does not merely compete, it wins. ENTER was the case that
-     * proved it: the menu's ViewDetailsAction asks only whether the list has a
-     * selection, the grid mirrors its selection onto the list, so it was enabled
-     * on every cell and opened the details over the edit that should have
-     * started.
-     */
-    public static @NotNull Set<KeyStroke> keysTheGridKeeps() {
-        final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
-
-        return Set.of(
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask),
-                KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask),
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask),
-                Shortcuts.Enter.getKey());
-    }
-
     private static void installClipboardActions(final @NotNull JBTable table) {
-        final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+        // Bound from GridKeys, which is also what the context menu is kept out
+        // of - so a key cannot be bound here and forgotten there.
         final @NotNull InputMap inputMap = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask), "testin.grid.copy");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask), "testin.grid.cut");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask), "testin.grid.paste");
+        GridKeys.clipboard().forEach(inputMap::put);
 
         final @NotNull ActionMap actionMap = table.getActionMap();
         actionMap.put("testin.grid.copy", action(() -> copySelection(table, false)));

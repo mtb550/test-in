@@ -7,7 +7,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import org.testin.editor.grid.GridExcelBehavior;
+import org.testin.editor.grid.GridKeys;
 import java.util.Arrays;
 import org.testin.editor.grid.NotWhileEditing;
 import org.testin.model.dto.TestCaseDto;
@@ -58,7 +58,7 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
         return Arrays.stream(action.getShortcutSet().getShortcuts())
                 .filter(KeyboardShortcut.class::isInstance)
                 .map(shortcut -> ((KeyboardShortcut) shortcut).getFirstKeyStroke())
-                .anyMatch(GridExcelBehavior.keysTheGridKeeps()::contains);
+                .anyMatch(GridKeys.keptFromMenus()::contains);
     }
 
     @Override

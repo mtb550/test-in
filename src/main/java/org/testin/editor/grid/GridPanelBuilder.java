@@ -27,7 +27,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.util.*;
@@ -396,24 +395,6 @@ public class GridPanelBuilder {
         ));
     }
 
-    private static void installEnterToEdit(final @NotNull JBTable table) {
-        final @NotNull KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-        final @NotNull Action startEditing = new AbstractAction() {
-            @Override
-            public void actionPerformed(final java.awt.event.ActionEvent event) {
-                final int row = table.getSelectedRow();
-                final int column = table.getSelectedColumn();
-                if (row < 0 || column < 0 || !table.isCellEditable(row, column)) return;
-                if (table.editCellAt(row, column)) {
-                    Optional.ofNullable(table.getEditorComponent()).ifPresent(Component::requestFocusInWindow);
-                }
-            }
-        };
-        table.getInputMap(JComponent.WHEN_FOCUSED).put(enter, "startEditing");
-        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(enter, "startEditing");
-        table.getActionMap().put("startEditing", startEditing);
-    }
-
     /**
      * Whether a model column is the order column: the row number, the one column
      * that is never edited, and the target of the two gestures that are not edits
@@ -572,7 +553,6 @@ public class GridPanelBuilder {
         GridExcelBehavior.install(table);
         table.setSelectionBackground(SELECTION_BACKGROUND);
         table.setSelectionForeground(table.getForeground());
-        installEnterToEdit(table);
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         table.setDefaultRenderer(Object.class, wrappingRenderer());
         table.setShowGrid(false);
