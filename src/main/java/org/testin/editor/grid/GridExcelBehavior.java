@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.Set;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -57,6 +58,25 @@ public final class GridExcelBehavior {
     // ------------------------------------------------------------------
     // Clipboard (TSV, Excel-compatible)
     // ------------------------------------------------------------------
+
+    /**
+     * The keys the grid's clipboard claims: in a grid, they mean the selected
+     * cells rather than the selected test case (#66, finding D1).
+     * <p>
+     * Public because the context menu has to know. Its Copy, Cut and Paste carry
+     * the same keys and are registered as IDE actions on the same table, and the
+     * IDE dispatches a registered shortcut before a component's own input map -
+     * so binding them here would take the keys back and copy a description over
+     * the cell the tester had selected.
+     */
+    public static @NotNull Set<KeyStroke> clipboardKeys() {
+        final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+
+        return Set.of(
+                KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask),
+                KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask),
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask));
+    }
 
     private static void installClipboardActions(final @NotNull JBTable table) {
         final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
