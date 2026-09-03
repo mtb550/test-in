@@ -286,10 +286,11 @@ public final class ProjectIndexer {
 
         final @NotNull List<Path> valid = new ArrayList<>();
         Arrays.stream(projectPaths).forEach(p -> {
-            if (Files.exists(p.resolve(DirectoryType.TP.getMarker()))) {
+            if (store.hasMarker(p, DirectoryType.TP)) {
                 valid.add(p);
             } else {
-                Logger.warn("Skipping directory without .tp marker (not a test project): " + p);
+                Logger.warn("Skipping directory without a " + DirectoryType.TP.getMarker()
+                        + " marker (not a test project): " + p);
             }
         });
         return valid;
@@ -931,8 +932,8 @@ public final class ProjectIndexer {
      * missing or unreadable. The indexer owns both directions of the marker round
      * trip; nothing outside it opens a marker file (#49).
      */
-    public <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Class<M> type, final @NotNull String kind, final @NotNull String name) {
-        return store.readMarker(dirPath, markerFileName, type, kind, name);
+    public <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass, final @NotNull String name) {
+        return store.readMarker(dirPath, kind, markerClass, name);
     }
 
     /**

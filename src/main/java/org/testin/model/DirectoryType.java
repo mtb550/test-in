@@ -17,7 +17,9 @@ import org.testin.services.Services;
 
 import javax.swing.*;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
@@ -135,6 +137,43 @@ public enum DirectoryType {
             NodeStatistics.VERDICTS,
             List.of(NodeCount.TOTAL)
     );
+
+    /**
+     * What a directory directly under Test Cases may be marked as, and in which
+     * order to ask.
+     * <p>
+     * The order is the precedence, and it was written out at four call sites and
+     * written down at none: a directory carrying both markers is read as a test
+     * set, because a set is what holds cases and a package is what holds sets.
+     * Anyone probing in the other order would have got a different tree and no
+     * warning about it (#173).
+     */
+    public static final @NotNull List<DirectoryType> UNDER_TEST_CASES = List.of(TS, TSP);
+
+    /**
+     * The same question on the run side, with the same precedence rule.
+     */
+    public static final @NotNull List<DirectoryType> UNDER_TEST_RUNS = List.of(TR, TRP);
+
+    /**
+     * The markers a family is recognized by, joined the way a warning says them -
+     * {@code .ts/.tsp}. Asked rather than typed, so a marker renamed here does not
+     * leave a log line describing the name it used to have.
+     */
+    public static @NotNull String markerNames(final @NotNull List<DirectoryType> family) {
+        return family.stream().map(DirectoryType::getMarker).collect(Collectors.joining("/"));
+    }
+
+    /**
+     * What this kind is called in a log line - the description in lower case, so
+     * the word and its capitalized form cannot drift apart. Every reader of a
+     * marker used to be handed this word by hand, beside the marker's file name
+     * and the class it parses to: three facts about one thing, spelled out at
+     * seven call sites, and nothing checking they belonged together (#173).
+     */
+    public @NotNull String getMarkerKind() {
+        return description.toLowerCase(Locale.ROOT);
+    }
 
     private final @NotNull String description;
 

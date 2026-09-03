@@ -245,8 +245,8 @@ final class IndexerDataStore {
      * directory is a real node either way, and dropping the node out of the tree
      * would hide test cases over an unparsable audit stamp.
      */
-    <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Class<M> type, final @NotNull String kind, final @NotNull String name) {
-        final @NotNull Path markerFile = dirPath.resolve(markerFileName);
+    <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass, final @NotNull String name) {
+        final @NotNull Path markerFile = dirPath.resolve(kind.getMarker());
 
         // Asked before reading, because a marker that is not there yet is the
         // ordinary case: a node is created, its directory appears, and the marker
@@ -255,23 +255,42 @@ final class IndexerDataStore {
         // and those were the first thing a search for ERROR found. Now an ERROR
         // from the mapper means what it says: a file that is there and will not
         // parse (#66).
-        if (!Files.exists(markerFile)) return defaultMarker(type, kind);
+        if (!Files.exists(markerFile)) return defaultMarker(markerClass, kind);
 
         try {
-            return Services.getInstance(p, Mapper.class).readValue(markerFile.toFile(), type);
+            return Services.getInstance(p, Mapper.class).readValue(markerFile.toFile(), markerClass);
 
         } catch (final Exception ex) {
-            Logger.warn("Unreadable " + kind + " marker '" + name + "', using defaults: " + ex.getMessage());
-            return defaultMarker(type, kind);
+            Logger.warn("Unreadable " + kind.getMarkerKind() + " marker '" + name + "', using defaults: " + ex.getMessage());
+            return defaultMarker(markerClass, kind);
         }
     }
 
-    private <M> @NotNull M defaultMarker(final @NotNull Class<M> type, final @NotNull String kind) {
+    private <M> @NotNull M defaultMarker(final @NotNull Class<M> markerClass, final @NotNull DirectoryType kind) {
         try {
-            return type.getDeclaredConstructor().newInstance();
+            return markerClass.getDeclaredConstructor().newInstance();
         } catch (final Exception ex) {
-            throw new RuntimeException("Cannot create default " + kind + " marker", ex);
+            throw new RuntimeException("Cannot create default " + kind.getMarkerKind() + " marker", ex);
         }
+    }
+
+    /**
+     * Whether a directory carries one kind's marker.
+     */
+    boolean hasMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind) {
+        return Files.exists(dirPath.resolve(kind.getMarker()));
+    }
+
+    /**
+     * What kind a directory is marked as, asked once.
+     * <p>
+     * The probe lives here rather than on the enum because reading the disk is
+     * the indexer's alone (CLAUDE.md), and the order lives on the enum because
+     * the precedence is a fact about the kinds rather than about this scan - the
+     * split #173 asked for, so {@code model} stays a leaf (#111).
+     */
+    @NotNull Optional<DirectoryType> markedAs(final @NotNull Path dirPath, final @NotNull List<DirectoryType> family) {
+        return family.stream().filter(kind -> hasMarker(dirPath, kind)).findFirst();
     }
 
     /**

@@ -90,15 +90,13 @@ final class IndexingScanner {
                 // caller above to sort back out from a real failure.
                 if (indicator.isCanceled()) return;
 
-                if (Files.exists(dirPath.resolve(DirectoryType.TS.getMarker()))) {
-                    scanTestSet(dirPath, parent, indicator);
-
-                } else if (Files.exists(dirPath.resolve(DirectoryType.TSP.getMarker()))) {
-                    scanTestSetPackage(dirPath, parent, indicator);
-
-                } else {
-                    Logger.warn("Skipping unmarked directory under test cases (missing .ts/.tsp): " + dirPath);
-                }
+                store.markedAs(dirPath, DirectoryType.UNDER_TEST_CASES).ifPresentOrElse(
+                        marked -> {
+                            if (marked == DirectoryType.TS) scanTestSet(dirPath, parent, indicator);
+                            else scanTestSetPackage(dirPath, parent, indicator);
+                        },
+                        () -> Logger.warn("Skipping unmarked directory under test cases (missing "
+                                + DirectoryType.markerNames(DirectoryType.UNDER_TEST_CASES) + "): " + dirPath));
             }
         } catch (final Exception ex) {
             Logger.error("Failed to list test sets: " + ex.getMessage());
@@ -115,11 +113,10 @@ final class IndexingScanner {
             try (Stream<Path> subPaths = Files.list(path)) {
                 subPaths.filter(Files::isDirectory)
                         .forEach(subPath -> {
-                            if (Files.exists(subPath.resolve(DirectoryType.TS.getMarker()))) {
-                                scanTestSet(subPath, tsp, indicator);
-                            } else if (Files.exists(subPath.resolve(DirectoryType.TSP.getMarker()))) {
-                                scanTestSetPackage(subPath, tsp, indicator);
-                            }
+                            store.markedAs(subPath, DirectoryType.UNDER_TEST_CASES).ifPresent(marked -> {
+                                if (marked == DirectoryType.TS) scanTestSet(subPath, tsp, indicator);
+                                else scanTestSetPackage(subPath, tsp, indicator);
+                            });
                         });
             }
 
@@ -174,13 +171,13 @@ final class IndexingScanner {
                 // The same stopping point on the run side, for the same reason.
                 if (indicator.isCanceled()) return;
 
-                if (Files.exists(dirPath.resolve(DirectoryType.TR.getMarker()))) {
-                    scanTestRun(dirPath, parent, indicator);
-                } else if (Files.exists(dirPath.resolve(DirectoryType.TRP.getMarker()))) {
-                    scanTestRunPackageDir(dirPath, parent, indicator);
-                } else {
-                    Logger.warn("Skipping unmarked directory under test runs (missing .tr/.trp): " + dirPath);
-                }
+                store.markedAs(dirPath, DirectoryType.UNDER_TEST_RUNS).ifPresentOrElse(
+                        marked -> {
+                            if (marked == DirectoryType.TR) scanTestRun(dirPath, parent, indicator);
+                            else scanTestRunPackageDir(dirPath, parent, indicator);
+                        },
+                        () -> Logger.warn("Skipping unmarked directory under test runs (missing "
+                                + DirectoryType.markerNames(DirectoryType.UNDER_TEST_RUNS) + "): " + dirPath));
             }
         } catch (final Exception ex) {
             Logger.error("Failed to list test runs: " + ex.getMessage());
@@ -197,11 +194,10 @@ final class IndexingScanner {
             try (Stream<Path> subPaths = Files.list(path)) {
                 subPaths.filter(Files::isDirectory)
                         .forEach(subPath -> {
-                            if (Files.exists(subPath.resolve(DirectoryType.TR.getMarker()))) {
-                                scanTestRun(subPath, trp, indicator);
-                            } else if (Files.exists(subPath.resolve(DirectoryType.TRP.getMarker()))) {
-                                scanTestRunPackageDir(subPath, trp, indicator);
-                            }
+                            store.markedAs(subPath, DirectoryType.UNDER_TEST_RUNS).ifPresent(marked -> {
+                                if (marked == DirectoryType.TR) scanTestRun(subPath, trp, indicator);
+                                else scanTestRunPackageDir(subPath, trp, indicator);
+                            });
                         });
             }
 
