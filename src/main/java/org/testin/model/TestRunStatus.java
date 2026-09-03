@@ -6,6 +6,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.statusbar.MenuItem;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -21,7 +22,7 @@ import java.awt.event.KeyEvent;
  */
 @Getter
 @AllArgsConstructor
-public enum TestRunStatus {
+public enum TestRunStatus implements MenuItem {
     CREATED(
             "Created",
             Shortcuts.NO_KEY,
@@ -70,6 +71,18 @@ public enum TestRunStatus {
 
     public @NotNull String getShortcutText() {
         return Shortcuts.shortcutText(shortcut);
+    }
+
+    /**
+     * The same word {@link #getLabel()} gives, under the name a menu row is asked
+     * for. {@code getLabel} is what a hundred callers already say for a display
+     * word and {@code getName} is what {@link org.testin.statusbar.StatusBarItem}
+     * calls it, so one of the two has to bridge - and a status is read far more
+     * often than it is put on a menu.
+     */
+    @Override
+    public @NotNull String getName() {
+        return label;
     }
 
     public void bindShortcut(final @NotNull JComponent component, final @NotNull Runnable onAction) {

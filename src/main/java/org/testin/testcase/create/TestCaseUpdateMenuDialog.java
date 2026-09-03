@@ -50,12 +50,7 @@ public class TestCaseUpdateMenuDialog {
     public void show() {
         final @NotNull String title = items.size() == 1 ? "Update Test Case" : "Update " + items.size() + " Test Cases";
 
-        new ShortcutMenuPopup<>(p, title, UpdateTestCaseFields.values(),
-                UpdateTestCaseFields::getIcon,
-                UpdateTestCaseFields::getName,
-                UpdateTestCaseFields::getShortcutText,
-                UpdateTestCaseFields::bindShortcut,
-                this::open).show();
+        new ShortcutMenuPopup<>(p, title, UpdateTestCaseFields.values(), this::open).show();
     }
 
     /**

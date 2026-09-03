@@ -16,11 +16,6 @@ public class TestRunStatusMenuDialog {
     private final @NotNull Consumer<TestRunStatus> onStatusSelected;
 
     public void show() {
-        new ShortcutMenuPopup<>(p, "Set Test Run Status", TestRunStatus.values(),
-                TestRunStatus::getIcon,
-                TestRunStatus::getLabel,
-                TestRunStatus::getShortcutText,
-                TestRunStatus::bindShortcut,
-                onStatusSelected).show();
+        new ShortcutMenuPopup<>(p, "Set Test Run Status", TestRunStatus.values(), onStatusSelected).show();
     }
 }

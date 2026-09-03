@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.statusbar.MenuItem;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.testcase.create.CreateTestCaseSection;
 import org.testin.testcase.create.TestCaseBaseDialog;
@@ -34,7 +35,7 @@ import static org.testin.testcase.TestCaseDialogKey.*;
  */
 @Getter
 @AllArgsConstructor
-public enum UpdateTestCaseFields implements StatusBarItem {
+public enum UpdateTestCaseFields implements MenuItem {
 
     DESCRIPTION(
             TestEditorAttributes.DESCRIPTION.getName(),
