@@ -18,8 +18,10 @@ import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.testrun.create.FailedResultDialog;
+import org.testin.view.ViewToolWindowFactory;
 import org.testin.util.ListValue;
 
+import java.util.List;
 import java.util.Optional;
 import org.testin.util.Shortcuts;
 
@@ -72,6 +74,11 @@ public class UpdateRunItemAction extends AbstractProjectAction {
             // The same call the test-case update already makes, so the two
             // update paths give one answer instead of two.
             runEditor.refreshView();
+
+            // And the View panel, which holds its own copy of the case and is
+            // told by the test-case update path and not by this one - so the
+            // details a tester was reading kept the value they had just changed.
+            ViewToolWindowFactory.panel(p).ifPresent(view -> view.refreshIfShowing(List.of(testCase)));
 
             // After the persist: an edit that was dropped rather than saved must
             // not report itself as saved (#62).
