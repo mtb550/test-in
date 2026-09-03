@@ -101,6 +101,11 @@ dependencies {
     // thing that ruled it out as the client, does not matter on the server side.
     testImplementation(libs.sshd.core)
     testImplementation(libs.sshd.sftp)
+
+    // The architecture rules, read off the bytecode rather than off CLAUDE.md
+    // (#114). testImplementation only, like the SFTP server above: it never
+    // reaches the distribution.
+    testImplementation(libs.archunit)
 }
 
 intellijPlatform {
