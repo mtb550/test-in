@@ -19,8 +19,10 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class StatusBar extends JBPanel<StatusBar> {
 
@@ -73,11 +75,12 @@ public class StatusBar extends JBPanel<StatusBar> {
      */
     private final @NotNull JBLabel executionTimeLabel = new JBLabel();
 
-    @Getter
-    private final @NotNull PageBtn firstButton = new PageBtn("First page", AllIcons.Actions.Play_first);
-
-    @Getter
-    private final @NotNull PageBtn prevButton = new PageBtn("Previous page", AllIcons.Actions.Play_back, Shortcuts.PreviousTestCase);
+    /**
+     * One arrow per way of turning the page, built from the step itself. Held by
+     * step rather than as four named fields so that adding one is adding a
+     * constant (#175, C10).
+     */
+    private final @NotNull Map<PageStep, PageBtn> pageButtons = new EnumMap<>(PageStep.class);
 
     private final @NotNull JBLabel currentPageLabel = new JBLabel("1 of 1");
 
@@ -91,11 +94,6 @@ public class StatusBar extends JBPanel<StatusBar> {
     @Getter
     private final @NotNull JBTextField pageSizeField = new JBTextField("", 4);
 
-    @Getter
-    private final @NotNull PageBtn nextButton = new PageBtn("Next page", AllIcons.Actions.Play_forward, Shortcuts.NextTestCase);
-
-    @Getter
-    private final @NotNull PageBtn lastButton = new PageBtn("Last page", AllIcons.Actions.Play_last);
 
     /** The three regions, held because {@link #doLayout()} places them itself. */
     private final @NotNull JBPanel<?> navigationRow;
@@ -145,7 +143,10 @@ public class StatusBar extends JBPanel<StatusBar> {
         // margin belongs to the row, below.
         pageSizeField.setToolTipText("Test cases per page");
 
-        navigationRow = centeredRow(firstButton, prevButton, currentPageLabel, nextButton, lastButton);
+        for (final PageStep step : PageStep.values()) pageButtons.put(step, new PageBtn(step));
+
+        navigationRow = centeredRow(button(PageStep.FIRST), button(PageStep.PREVIOUS), currentPageLabel,
+                button(PageStep.NEXT), button(PageStep.LAST));
         rightRow = centeredRow(runStatusLabel, verdictsRow, executionTimeLabel, pageSizeField);
 
         add(statusLabel);
@@ -378,10 +379,17 @@ public class StatusBar extends JBPanel<StatusBar> {
     public void updatePaginationState(final int currentPage, final int totalPages) {
         currentPageLabel.setText(currentPage + " of " + Math.max(1, totalPages));
 
-        firstButton.setEnabled(currentPage > 1);
-        prevButton.setEnabled(currentPage > 1);
-        nextButton.setEnabled(currentPage < totalPages);
-        lastButton.setEnabled(currentPage < totalPages);
+        // Whether an arrow goes anywhere is the step's own answer, and the same
+        // one its keyboard shortcut asks - it used to be stated here four times
+        // and in the actions twice more (#175, C10).
+        pageButtons.forEach((step, button) -> button.setEnabled(step.isAvailable(currentPage, totalPages)));
+    }
+
+    /**
+     * The arrow that turns the page this way.
+     */
+    public @NotNull PageBtn button(final @NotNull PageStep step) {
+        return pageButtons.get(step);
     }
 
     /**

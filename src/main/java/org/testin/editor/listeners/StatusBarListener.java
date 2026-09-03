@@ -2,6 +2,7 @@ package org.testin.editor.listeners;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
+import org.testin.editor.statusbar.PageStep;
 
 
 public class StatusBarListener {
@@ -16,10 +17,13 @@ public class StatusBarListener {
         // All four are the editor's one page step with a different delta -
         // first and last compute theirs from where the tester is now. The bounds
         // check went with them: the step refuses to leave the range itself.
-        editor.getStatusBar().getFirstButton().addActionListener(e -> editor.stepPage(1 - editor.getCurrentPage()));
-        editor.getStatusBar().getPrevButton().addActionListener(e -> editor.stepPage(-1));
-        editor.getStatusBar().getNextButton().addActionListener(e -> editor.stepPage(1));
-        editor.getStatusBar().getLastButton().addActionListener(e -> editor.stepPage(editor.getTotalPageCount() - editor.getCurrentPage()));
+        // How far each arrow goes is the step's, not this listener's: the four
+        // deltas were computed here and two of them again in the page actions
+        // (#175, C10).
+        for (final PageStep step : PageStep.values()) {
+            editor.getStatusBar().button(step).addActionListener(
+                    e -> editor.stepPage(step.deltaFrom(editor.getCurrentPage(), editor.getTotalPageCount())));
+        }
 
         editor.getStatusBar().getPageSizeField().addActionListener(e -> {
             // Every value is accepted and corrected in place, so the field can

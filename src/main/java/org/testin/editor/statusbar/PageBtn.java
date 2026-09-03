@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.AbstractIconButton;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
 
 /**
  * A page arrow, drawn the way every other button in this plugin is drawn.
@@ -22,14 +21,11 @@ import javax.swing.*;
  */
 public class PageBtn extends AbstractIconButton {
 
-    public PageBtn(final @NotNull String tooltip, final @NotNull Icon icon) {
-        super(tooltip, icon);
-    }
-
     /**
-     * A page arrow whose command also has a keystroke, so the tooltip shows it.
+     * Everything an arrow looks like comes from the step it turns, keystroke
+     * included - {@link Shortcuts#EMPTY} prints none (#175, C10).
      */
-    public PageBtn(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Shortcuts shortcut) {
-        super(tooltip, icon, shortcut);
+    public PageBtn(final @NotNull PageStep step) {
+        super(step.getTooltip(), step.getIcon(), step.getShortcut());
     }
 }

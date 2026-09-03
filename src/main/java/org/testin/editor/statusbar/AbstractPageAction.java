@@ -7,32 +7,30 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.util.Shortcuts;
 
-import javax.swing.*;
 
 /**
  * Page navigation action for the editors; the subclasses only choose direction.
  */
 abstract class AbstractPageAction extends DumbAwareAction {
     protected final @NotNull TestinEditor editor;
-    private final int delta;
+    private final @NotNull PageStep step;
 
-    protected AbstractPageAction(final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull String title, final @NotNull String description, final @NotNull Icon icon, final @NotNull Shortcuts shortcut, final int delta) {
-        super(title, description, icon);
+    protected AbstractPageAction(final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull PageStep step) {
+        super(step.getTooltip(), step.getDescription(), step.getIcon());
         this.editor = editor;
-        this.delta = delta;
-        registerCustomShortcutSet(shortcut.getCustomShortcut(), list);
+        this.step = step;
+        registerCustomShortcutSet(step.getShortcut().getCustomShortcut(), list);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        editor.stepPage(delta);
+        editor.stepPage(step.deltaFrom(editor.getCurrentPage(), editor.getTotalPageCount()));
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(editor.canStepPage(delta));
+        e.getPresentation().setEnabled(step.isAvailable(editor.getCurrentPage(), editor.getTotalPageCount()));
     }
 
     @Override
