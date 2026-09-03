@@ -88,10 +88,12 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
 
-        // A test project holds its two fixed containers and nothing else, so
-        // there is nothing to create directly under it.
+        // A test project holds its two fixed containers and nothing else, so there
+        // is nothing to create directly under it - which is what it answers, so
+        // the capability flag is the whole question. It used to be asked twice,
+        // once by name and once by capability, and the instanceof never removed
+        // anything the flag would have kept.
         e.getPresentation().setEnabled(TreeValueUtil.selectedDirectory(tree)
-                .filter(parent -> !(parent instanceof TestProjectDirectoryDto))
                 .filter(DirectoryDto::canCreateChildren)
                 .isPresent());
     }

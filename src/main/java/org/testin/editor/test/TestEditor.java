@@ -33,6 +33,7 @@ import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.open.OpenContextMenuAction;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
@@ -667,6 +668,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             table.addMouseListener(new GridContextMenuListener(table, list, contextMenu, pageItems));
             // Every shortcut the menu offers, live on the grid too (#74).
             contextMenu.bindShortcutsTo(table);
+            new OpenContextMenuAction(table, contextMenu);
 
             grid = Optional.of(GridPanelBuilder.finishRebuild(table, list, pageItems, gridColumnToRestore, fontSync, keepKeyboard));
 
