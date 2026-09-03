@@ -2,8 +2,6 @@ package org.testin.explorer.tree;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -41,8 +39,9 @@ record NodesTransferable(@NotNull TreeTransferPayload payload) implements Transf
         if (DataFlavor.javaFileListFlavor.equals(flavor)) {
             final @NotNull List<File> files = new ArrayList<>();
             for (final DirectoryDto node : payload.nodes()) {
-                if (node instanceof TestSetDirectoryDto || node instanceof TestRunDirectoryDto)
-                    files.add(node.getPath().toFile());
+                // The nodes that hold test data rather than other nodes, which is
+                // the same question the node already answers for opening it (#175, C4).
+                if (node.isOpenableInEditor()) files.add(node.getPath().toFile());
             }
             return files;
         }

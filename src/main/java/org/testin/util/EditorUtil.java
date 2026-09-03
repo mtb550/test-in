@@ -18,7 +18,6 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -295,8 +294,7 @@ public final class EditorUtil {
         }
 
         Logger.info("Opening Editor: " + dir.getPath());
-        final @NotNull EditorType ft = dir instanceof TestRunDirectoryDto ? EditorType.TEST_RUN : EditorType.TEST_CASE;
-        fed.openFile(new UnifiedVirtualFile(dir, ft), true);
+        fed.openFile(new UnifiedVirtualFile(dir, EditorType.of(dir)), true);
 
         return true;
     }
