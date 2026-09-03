@@ -85,6 +85,25 @@ public class ViewPanel implements Disposable {
         this.show(p, testCases, path);
     }
 
+    /**
+     * Follows what is selected, and stays shut when the tester has shut it.
+     * <p>
+     * The difference between this and {@link #show} is who asked. Double-clicking
+     * a card or pressing ENTER on a sequence cell is a request for the details,
+     * and opens the panel. Changing the selection, or moving to another editor,
+     * is not - it is the tester doing something else, and a panel they closed
+     * must not reappear because they clicked a different tab.
+     * <p>
+     * The rule was in one of the two places that needed it. Selection changes
+     * checked; switching editors never did, so closing the panel lasted until the
+     * next editor tab.
+     */
+    public void showIfOpen(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
+        if (ViewToolWindowFactory.toolWindow(p).filter(ToolWindow::isVisible).isEmpty()) return;
+
+        this.show(testCases, path);
+    }
+
     public @NotNull ViewPanel hide() {
         ViewToolWindowFactory.toolWindow(p)
                 .filter(ToolWindow::isVisible)

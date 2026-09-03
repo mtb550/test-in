@@ -1,7 +1,6 @@
 package org.testin.editor.listeners;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -29,10 +28,7 @@ public class SelectionListener implements ListSelectionListener {
             if (!selected.isEmpty()) {
                 list.ensureIndexIsVisible(list.getSelectedIndex());
 
-                ViewToolWindowFactory.toolWindow(p)
-                        .filter(ToolWindow::isVisible)
-                        .flatMap(tw -> ViewToolWindowFactory.panel(p))
-                        .ifPresent(viewer -> viewer.show(selected, path));
+                ViewToolWindowFactory.panel(p).ifPresent(viewer -> viewer.showIfOpen(selected, path));
             }
 
             editor.refreshSelectionStatus(list.getSelectedIndices());

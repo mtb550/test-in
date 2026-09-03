@@ -85,14 +85,15 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
     public void selectNotify() {
         final @NotNull List<TestCaseDto> selected = editor.getSelectedTestCases();
 
-        ViewToolWindowFactory.toolWindow(p)
-                .flatMap(tw -> ViewToolWindowFactory.panel(p))
-                .ifPresent(viewer -> {
+        ViewToolWindowFactory.panel(p).ifPresent(viewer -> {
+            if (selected.isEmpty()) {
+                viewer.reset();
+                return;
+            }
 
-                    if (!selected.isEmpty())
-                        viewer.show(selected, vf.getDir().getPath2());
-
-                    else viewer.reset();
-                });
+            // Following, not asking: moving to another editor must not reopen a
+            // panel the tester closed.
+            viewer.showIfOpen(selected, vf.getDir().getPath2());
+        });
     }
 }
