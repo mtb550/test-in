@@ -260,45 +260,62 @@ intellijPlatformTesting {
             task {
                 jvmArgs("--sun-misc-unsafe-memory-access=allow")
 
-                // The same sample, in the IDE where the tree has to work without
-                // any Java plugin behind it - and on the same condition, so a
-                // sandbox with its own root is never rebound to the sample.
-                if (sampleSandbox()) args(layout.projectDirectory.dir("samples/automation").asFile.absolutePath)
-
                 val sandboxes = layout.projectDirectory.dir(".sandbox/Testin").asFile
                 val sampleRoot = layout.projectDirectory.dir("samples/testin-root").asFile.absolutePath
+                val sampleProject = layout.projectDirectory.dir("samples/automation").asFile.absolutePath
 
                 doFirst {
                     // Inlined rather than shared with the other run task: the configuration
-                    // cache cannot serialize a reference to a script-level function, so a helper
-                    // here fails the build with "cannot serialize Gradle script object
+                    // cache cannot serialize a reference to a script-level function, so a
+                    // helper here fails the build with "cannot serialize Gradle script object
                     // references". The duplication is what the cache costs.
+                    //
+                    // One branch decides both halves - the root this sandbox gets and whether
+                    // the sample is the project it opens - because deciding them apart is how
+                    // they came to disagree. The predicate that used to answer the second half
+                    // ran over the whole container at configuration time, so after a version
+                    // bump it saw the OLD sandbox's settings and refused the argument to a
+                    // brand-new sandbox it then seeded.
                     //
                     // The sandbox directory is found rather than composed: the one under
                     // .sandbox/Testin is named by the platform plugin from the IDE it
-                    // downloaded, so writing that name out would be a second place to update on
-                    // every version bump. prepareSandbox has run by now, so it exists.
+                    // downloaded, so writing that name out would be a second place to update
+                    // on every version bump. prepareSandbox has run by now, so it exists. The
+                    // config directory, though, carries this task's own suffix and is passed
+                    // in - a custom run task gets config_<taskName>, not config.
                     sandboxes.listFiles().orEmpty()
-                        .filter { it.resolve("config").isDirectory }
-                        .map { it.resolve("config/options") }
-                        .forEach { options ->
+                        .filter { it.resolve("config_runPyCharm").isDirectory }
+                        .forEach { sandbox ->
+                            val options = sandbox.resolve("config_runPyCharm/options")
                             val settings = options.resolve("testinSettings.xml")
-                            if (settings.exists()) return@forEach
 
-                            options.mkdirs()
-                            settings.writeText(
-                                """
-                                <application>
-                                  <component name="testin.settings.AppSettingsState">
-                                    <option name="rootTestinPath" value="$sampleRoot" />
-                                    <option name="logLevel" value="DEBUG" />
-                                    <option name="testerName" value="Testin Sample" />
-                                    <option name="testerRole" value="QA Engineer" />
-                                  </component>
-                                </application>
-                                """.trimIndent()
-                            )
-                            println("Pointed a fresh sandbox at the sample data: " + options.parentFile.parentFile.name)
+                            // A sandbox someone has pointed at their own test data keeps it, and
+                            // is not sent to the sample: opening the sample under another root
+                            // does not resolve its testinProject, so Testin rebinds it and
+                            // writes that root's project name into a committed file.
+                            if (settings.exists() && !settings.readText().contains(sampleRoot)) return@forEach
+
+                            if (!settings.exists()) {
+                                options.mkdirs()
+                                settings.writeText(
+                                    """
+                                    <application>
+                                      <component name="testin.settings.AppSettingsState">
+                                        <option name="rootTestinPath" value="$sampleRoot" />
+                                        <option name="logLevel" value="DEBUG" />
+                                        <option name="testerName" value="Testin Sample" />
+                                        <option name="testerRole" value="QA Engineer" />
+                                      </component>
+                                    </application>
+                                    """.trimIndent()
+                                )
+                                println("Pointed a fresh sandbox at the sample data: " + sandbox.name)
+                            }
+
+                            // Every run of a sample-rooted sandbox, not only the first: the IDE
+                            // reopens its last project on its own, and the argument is what makes
+                            // that the sample rather than whatever was open before.
+                            args(sampleProject)
                         }
                 }
             }
@@ -313,67 +330,65 @@ configurations.all {
     }
 }
 
-/**
- * Whether a sandbox is empty enough to be pointed at the committed sample (#107).
- *
- * Read at configuration time, because it decides an argument. A sandbox that
- * already holds Testin settings belongs to whoever set them: it keeps its own
- * root and opens its own project, and the sample is not forced on it.
- */
-fun sampleSandbox(): Boolean = layout.projectDirectory.dir(".sandbox/Testin").asFile
-    .listFiles().orEmpty()
-    .none { it.resolve("config/options/testinSettings.xml").exists() }
-
 tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
     jvmArgs("--sun-misc-unsafe-memory-access=allow")
 
-    // Only a sandbox that has no Testin settings yet is sent to the sample - the
-    // same condition that decides whether the sample root is written below, and
-    // it has to be the same one.
-    //
-    // Opening the sample unconditionally was a bug: a sandbox pointed at a
-    // developer's own test data does not resolve the sample's testinProject, so
-    // Testin rebinds it and writes the developer's project name into a committed
-    // file. It happened twice before SampleProjectTest caught it. A sandbox with
-    // settings now opens whatever it had, which is what its owner set it to.
-    if (sampleSandbox()) args(layout.projectDirectory.dir("samples/automation").asFile.absolutePath)
-
-    // Read at configuration time, so the configuration cache holds values rather
-    // than a reference to the project.
     val sandboxes = layout.projectDirectory.dir(".sandbox/Testin").asFile
     val sampleRoot = layout.projectDirectory.dir("samples/testin-root").asFile.absolutePath
+    val sampleProject = layout.projectDirectory.dir("samples/automation").asFile.absolutePath
 
     doFirst {
         // Inlined rather than shared with the other run task: the configuration
-        // cache cannot serialize a reference to a script-level function, so a helper
-        // here fails the build with "cannot serialize Gradle script object
+        // cache cannot serialize a reference to a script-level function, so a
+        // helper here fails the build with "cannot serialize Gradle script object
         // references". The duplication is what the cache costs.
+        //
+        // One branch decides both halves - the root this sandbox gets and whether
+        // the sample is the project it opens - because deciding them apart is how
+        // they came to disagree. The predicate that used to answer the second half
+        // ran over the whole container at configuration time, so after a version
+        // bump it saw the OLD sandbox's settings and refused the argument to a
+        // brand-new sandbox it then seeded.
         //
         // The sandbox directory is found rather than composed: the one under
         // .sandbox/Testin is named by the platform plugin from the IDE it
-        // downloaded, so writing that name out would be a second place to update on
-        // every version bump. prepareSandbox has run by now, so it exists.
+        // downloaded, so writing that name out would be a second place to update
+        // on every version bump. prepareSandbox has run by now, so it exists. The
+        // config directory, though, carries this task's own suffix and is passed
+        // in - a custom run task gets config_<taskName>, not config.
         sandboxes.listFiles().orEmpty()
             .filter { it.resolve("config").isDirectory }
-            .map { it.resolve("config/options") }
-            .forEach { options ->
+            .forEach { sandbox ->
+                val options = sandbox.resolve("config/options")
                 val settings = options.resolve("testinSettings.xml")
-                if (settings.exists()) return@forEach
 
-                options.mkdirs()
-                settings.writeText(
-                    """
-                    <application>
-                      <component name="testin.settings.AppSettingsState">
-                        <option name="rootTestinPath" value="$sampleRoot" />
-                        <option name="logLevel" value="DEBUG" />
-                        <option name="testerName" value="Testin Sample" />
-                        <option name="testerRole" value="QA Engineer" />
-                      </component>
-                    </application>
-                    """.trimIndent()
-                )
-                println("Pointed a fresh sandbox at the sample data: " + options.parentFile.parentFile.name)
+                // A sandbox someone has pointed at their own test data keeps it, and
+                // is not sent to the sample: opening the sample under another root
+                // does not resolve its testinProject, so Testin rebinds it and
+                // writes that root's project name into a committed file.
+                if (settings.exists() && !settings.readText().contains(sampleRoot)) return@forEach
+
+                if (!settings.exists()) {
+                    options.mkdirs()
+                    settings.writeText(
+                        """
+                        <application>
+                          <component name="testin.settings.AppSettingsState">
+                            <option name="rootTestinPath" value="$sampleRoot" />
+                            <option name="logLevel" value="DEBUG" />
+                            <option name="testerName" value="Testin Sample" />
+                            <option name="testerRole" value="QA Engineer" />
+                          </component>
+                        </application>
+                        """.trimIndent()
+                    )
+                    println("Pointed a fresh sandbox at the sample data: " + sandbox.name)
+                }
+
+                // Every run of a sample-rooted sandbox, not only the first: the IDE
+                // reopens its last project on its own, and the argument is what makes
+                // that the sample rather than whatever was open before.
+                args(sampleProject)
             }
     }
 }

@@ -34,7 +34,7 @@ import java.util.Optional;
  * binding that started the edit, and this action for the details, each with its
  * own idea of when it applied. They could not see each other, and the IDE
  * dispatches a registered action before a component's input map - so the split
- * was not a division of labour, it was a race that one side always won. It took
+ * was not a division of work, it was a race that one side always won. It took
  * four attempts to fix, three of them spent on the half that was already
  * behaving. A key with one handler cannot have that bug.
  * <p>
@@ -52,11 +52,13 @@ public final class GridEnterAction extends AbstractProjectAction {
     private final @NotNull ArrayList<String> path;
 
     public GridEnterAction(final @NotNull Project p, final @NotNull JBTable table, final @NotNull List<TestCaseDto> pageItems, final @NotNull ArrayList<String> path) {
-        super(p, "View Details", "Show the selected grid row in the details panel", AllIcons.Actions.PreviewDetails);
+        super(p, "Edit Cell Or Show Details", "Edit the selected grid cell, or show the row in the details panel", AllIcons.Actions.PreviewDetails);
         this.table = table;
         this.pageItems = pageItems;
         this.path = path;
         this.registerCustomShortcutSet(new CustomShortcutSet(GridKeys.enter()), table);
+
+        installDoubleClick();
     }
 
     @Override
@@ -64,14 +66,38 @@ public final class GridEnterAction extends AbstractProjectAction {
         final int row = table.getSelectedRow();
         if (row < 0) return;
 
-        final int column = table.getSelectedColumn();
+        final int column = selectedCell();
 
         if (column >= 0 && table.isCellEditable(row, column)) {
             startEditing(row, column);
             return;
         }
 
-        if (onSequence(column)) showDetails(row);
+        if (GridPanelBuilder.isOrderColumn(table, column)) showDetails(row);
+    }
+
+    /**
+     * The cell the tester means, as one value.
+     * <p>
+     * Usually the selected column. The exception is the gesture that deliberately
+     * destroys that answer: clicking the sequence number runs
+     * {@link SequenceColumnRowSelector}, which selects every column so the row
+     * copies as one line - and {@code getSelectedColumn} then reports the lowest
+     * index, which is the sequence only while nobody has dragged the Order column
+     * off the left edge. The anchor is where the click landed, and the selector
+     * puts it back for exactly this.
+     * <p>
+     * Trusted only under that gesture's whole fingerprint - every column selected
+     * <em>and</em> the anchor on the sequence - because an anchor left behind on
+     * its own would open the details over an editable cell, which is the report
+     * this method exists to answer.
+     */
+    private int selectedCell() {
+        final int anchor = table.getColumnModel().getSelectionModel().getAnchorSelectionIndex();
+
+        return table.getSelectedColumnCount() == table.getColumnCount() && GridPanelBuilder.isOrderColumn(table, anchor)
+                ? anchor
+                : table.getSelectedColumn();
     }
 
     /**
@@ -85,23 +111,9 @@ public final class GridEnterAction extends AbstractProjectAction {
     }
 
     /**
-     * Whether the tester is on the sequence number.
-     * <p>
-     * Two ways to be there, and both happen. Arrowing onto the column selects
-     * that cell and names it. Clicking the number runs
-     * {@link SequenceColumnRowSelector}, which selects every column so the row
-     * copies as one line - and then the anchor is the only record of where the
-     * click landed.
-     */
-    private boolean onSequence(final int column) {
-        return GridPanelBuilder.isOrderColumn(table, column)
-                || GridPanelBuilder.isOrderColumn(table, table.getColumnModel().getSelectionModel().getAnchorSelectionIndex());
-    }
-
-    /**
      * Opens the details view for a row; shared by ENTER and the double click.
      */
-    public void showDetails(final int row) {
+    private void showDetails(final int row) {
         if (row < 0 || row >= pageItems.size()) return;
 
         ViewToolWindowFactory.showPanel(p, List.of(pageItems.get(row)), path, ViewPanel::focusDetailsTab);
@@ -112,10 +124,10 @@ public final class GridEnterAction extends AbstractProjectAction {
      * offers the same two gestures as the list. Every other column is left to the
      * table, where a double click starts an edit if the cell allows one.
      */
-    public void installDoubleClick() {
+    private void installDoubleClick() {
         table.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(final MouseEvent e) {
+            public void mouseClicked(final @NotNull MouseEvent e) {
                 if (e.getClickCount() != 2 || !SwingUtilities.isLeftMouseButton(e)) return;
 
                 if (!GridPanelBuilder.isOrderColumn(table, table.columnAtPoint(e.getPoint()))) return;

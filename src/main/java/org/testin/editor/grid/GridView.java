@@ -65,4 +65,24 @@ public record GridView(@NotNull JBTable table, @NotNull JBScrollPane scrollPane,
     public boolean hasKeyboard() {
         return table.hasFocus() || isCellOpen();
     }
+
+    /**
+     * What a rebuild takes from the view it is replacing: whether the tester's
+     * keyboard was in it, asked before anything moves the focus, and then the
+     * half-typed cell committed.
+     * <p>
+     * The order is the whole of it, which is why both editors ask for it in one
+     * call rather than writing the two lines out. Committing an editor moves the
+     * focus in its own right, so asking afterwards answers about the commit
+     * rather than about the tester.
+     *
+     * @return whether the new grid should take the keyboard back
+     */
+    public boolean handOver() {
+        final boolean keyboard = hasKeyboard();
+
+        commitOpenCell();
+
+        return keyboard;
+    }
 }

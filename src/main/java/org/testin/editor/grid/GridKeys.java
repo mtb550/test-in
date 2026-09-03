@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.Shortcuts;
 
 import javax.swing.KeyStroke;
-import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Map;
@@ -39,17 +38,27 @@ import java.util.Set;
 public final class GridKeys {
 
     /**
+     * What each clipboard key runs, named here so the binding and its handler
+     * cannot be spelled differently in two files.
+     */
+    public static final @NotNull String COPY = "testin.grid.copy";
+    public static final @NotNull String CUT = "testin.grid.cut";
+    public static final @NotNull String PASTE = "testin.grid.paste";
+
+    /**
      * The clipboard keys and the {@code ActionMap} name each one runs.
      * <p>
-     * The menu mask rather than CTRL, so this is CMD on a Mac (#25).
+     * Through {@link Shortcuts#menuMask}, so this is CMD on a Mac (#25) and so
+     * the menu actions carrying the same keys are built from the same modifier -
+     * two sources for it is how one platform ended up with two copy gestures.
      */
     public static @NotNull Map<KeyStroke, String> clipboard() {
-        final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+        final int menuMask = Shortcuts.menuMask();
 
         return Map.of(
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask), "testin.grid.copy",
-                KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask), "testin.grid.cut",
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask), "testin.grid.paste");
+                KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask), COPY,
+                KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask), CUT,
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask), PASTE);
     }
 
     /**

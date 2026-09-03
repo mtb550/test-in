@@ -616,14 +616,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private void rebuildGrid() {
-        // Asked before anything is committed or replaced, because both move the
-        // focus in their own right.
-        final boolean keepKeyboard = grid.map(GridView::hasKeyboard).orElse(false);
-
-        // Before the page is read, not after: the committed value has to be in
-        // the data the new grid is built from, or the tester watches their own
+        // Before the page is read, not after: the committed value has to be in the
+        // data the new grid is built from, or the tester watches their own
         // sentence disappear and come back on the next refresh.
-        grid.ifPresent(GridView::commitOpenCell);
+        final boolean keepKeyboard = grid.map(GridView::handOver).orElse(false);
 
         final @NotNull List<TestCaseDto> pageItems = getCurrentPageItems();
         final @NotNull Set<RunEditorAttributes> attributes = getSelectedDetails();
@@ -643,8 +639,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                     new RunGridEditListener(p, this, pageItems, model::allContentsChanged));
             // ESC in grid view behaves like ESC in the list: hide the view panel, then clear the selection.
             new EscapeAction(p, table);
-            // ENTER on the non-editable sequence column opens the details view.
-            new GridEnterAction(p, table, pageItems, parent.getPath2()).installDoubleClick();
+            // Everything ENTER does in this grid, and the double click on the sequence.
+            new GridEnterAction(p, table, pageItems, parent.getPath2());
 
             table.addMouseListener(new GridContextMenuListener(table, list, contextMenu, pageItems));
             // Every shortcut the menu offers - the verdict keys above all -

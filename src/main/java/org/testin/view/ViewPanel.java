@@ -99,9 +99,18 @@ public class ViewPanel implements Disposable {
      * next editor tab.
      */
     public void showIfOpen(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
-        if (ViewToolWindowFactory.toolWindow(p).filter(ToolWindow::isVisible).isEmpty()) return;
+        if (!isOpen()) return;
 
         this.show(testCases, path);
+    }
+
+    /**
+     * Whether the tester has this panel on screen. Asked by everything that
+     * follows rather than asks - three places were spelling the same question
+     * out, which is two more than can be changed together.
+     */
+    private boolean isOpen() {
+        return ViewToolWindowFactory.toolWindow(p).filter(ToolWindow::isVisible).isPresent();
     }
 
     public @NotNull ViewPanel hide() {
@@ -135,7 +144,7 @@ public class ViewPanel implements Disposable {
      * elsewhere - an editor shutting down takes its own case off the screen.
      */
     public void hide(final @NotNull TestCaseDto testCaseDtoToMatch) {
-        if (ViewToolWindowFactory.toolWindow(p).filter(ToolWindow::isVisible).isEmpty()) return;
+        if (!isOpen()) return;
 
         getCurrentTestCase()
                 .filter(shown -> shown.getId().equals(testCaseDtoToMatch.getId()))

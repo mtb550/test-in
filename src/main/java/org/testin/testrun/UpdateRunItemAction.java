@@ -3,6 +3,7 @@ package org.testin.testrun;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
@@ -65,20 +66,25 @@ public class UpdateRunItemAction extends AbstractProjectAction {
         new FailedResultDialog(p, runItem, () -> runEditor.run().ifPresentOrElse(tr -> {
             Services.getInstance(p, ProjectIndexer.class).persistRun(runEditor.getParent().getPath(), tr);
 
-            // Whatever the tester is looking at, not the list alone. This
-            // repainted the JList, and the grid is a separate table built from a
-            // snapshot - so a stacktrace or an actual result typed here was on
-            // disk and correct while the grid went on showing the old value
-            // until something else happened to rebuild it.
-            //
-            // The same call the test-case update already makes, so the two
-            // update paths give one answer instead of two.
-            runEditor.refreshView();
+            // After the dialog has gone, not inside its submit. FailedResultDialog
+            // runs this callback before it closes, so a rebuild started here would
+            // ask the grid whether it has the keyboard while the modal dialog
+            // still owns it - answer no - and hand the focus nowhere, which is the
+            // defect the verdict path already had fixed.
+            ApplicationManager.getApplication().invokeLater(() -> {
+                // Whatever the tester is looking at, not the list alone. This
+                // repainted the JList, and the grid is a separate table built from
+                // a snapshot - so a stacktrace or an actual result typed here was
+                // on disk and correct while the grid went on showing the old value
+                // until something else happened to rebuild it. The same call the
+                // test-case update already makes.
+                runEditor.refreshView();
 
-            // And the View panel, which holds its own copy of the case and is
-            // told by the test-case update path and not by this one - so the
-            // details a tester was reading kept the value they had just changed.
-            ViewToolWindowFactory.refreshIfShowing(p, List.of(testCase));
+                // And the View panel, which holds its own copy of the case - so
+                // the details a tester was reading kept the value they had just
+                // changed.
+                ViewToolWindowFactory.refreshIfShowing(p, List.of(testCase));
+            });
 
             // After the persist: an edit that was dropped rather than saved must
             // not report itself as saved (#62).

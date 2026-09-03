@@ -65,7 +65,14 @@ public enum Shortcuts {
     // Item operations shared between the project tree, editors, and details panel
     CreateItem(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK)),
     UpdateItem(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0)),
-    CopyItem(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)),
+    /**
+     * The platform copy gesture, so it is CMD+C on a Mac like every other copy
+     * there (#25) - and so it matches the key a grid keeps for its own cells,
+     * which is built from the same modifier. Hard-coded CTRL made those two
+     * disagree on macOS only: the grid kept CMD+C and the menu still took CTRL+C,
+     * leaving one platform with two different copy gestures.
+     */
+    CopyItem(KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask())),
     DeletePackage(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)),
 
     // A confirmation's second answer - the one that is neither doing it nor
@@ -129,7 +136,7 @@ public enum Shortcuts {
      * as the other cross-platform shortcuts; plain Ctrl in headless test runs.
      */
     @MagicConstant(flagsFromClass = InputEvent.class)
-    private static int menuMask() {
+    public static int menuMask() {
         try {
             return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
         } catch (final HeadlessException ex) {

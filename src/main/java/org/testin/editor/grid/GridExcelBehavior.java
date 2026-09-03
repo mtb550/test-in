@@ -63,10 +63,12 @@ public final class GridExcelBehavior {
         final @NotNull InputMap inputMap = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         GridKeys.clipboard().forEach(inputMap::put);
 
+        // Handlers keyed by the same names GridKeys bound, so the two halves of a
+        // binding cannot be spelled differently in two files.
         final @NotNull ActionMap actionMap = table.getActionMap();
-        actionMap.put("testin.grid.copy", action(() -> copySelection(table, false)));
-        actionMap.put("testin.grid.cut", action(() -> copySelection(table, true)));
-        actionMap.put("testin.grid.paste", action(() -> pasteIntoSelection(table)));
+        actionMap.put(GridKeys.COPY, action(() -> copySelection(table, false)));
+        actionMap.put(GridKeys.CUT, action(() -> copySelection(table, true)));
+        actionMap.put(GridKeys.PASTE, action(() -> pasteIntoSelection(table)));
     }
 
     private static @NotNull Action action(final @NotNull Runnable body) {
