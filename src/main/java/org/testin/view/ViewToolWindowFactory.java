@@ -88,13 +88,12 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
 
             final @NotNull ContentFactory contentFactory = ContentFactory.getInstance();
 
-            final @NotNull Content detailsTab = contentFactory.createContent(panel.getDetailsScrollPane(), ViewTab.DETAILS.getDisplayName(), false);
-            final @NotNull Content historyTab = contentFactory.createContent(panel.getHistoryScrollPane(), ViewTab.HISTORY.getDisplayName(), false);
-            final @NotNull Content bugsTab = contentFactory.createContent(panel.getOpenBugsScrollPane(), ViewTab.OPEN_BUGS.getDisplayName(), false);
-
-            toolWindow.getContentManager().addContent(detailsTab);
-            toolWindow.getContentManager().addContent(historyTab);
-            toolWindow.getContentManager().addContent(bugsTab);
+            // In declaration order, which is the order they appear in - a tab
+            // added to the enum arrives here without this method changing.
+            for (final ViewTab tab : ViewTab.values()) {
+                toolWindow.getContentManager().addContent(
+                        contentFactory.createContent(tab.paneOf(panel), tab.getDisplayName(), false));
+            }
 
             toolWindow.setTitleActions(new ViewPanelActions().create(panel.getPage(), toolWindow.getComponent()));
         });
