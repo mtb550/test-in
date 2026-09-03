@@ -46,6 +46,14 @@ final class SequenceColumnRowSelector extends MouseAdapter {
         }
 
         table.setColumnSelectionInterval(0, table.getColumnCount() - 1);
+
+        // Every column is selected so the row copies as one line, which loses
+        // where the tester actually clicked - getSelectedColumn then answers 0,
+        // the leftmost column. The anchor is put back on the sequence, because
+        // that is the cell this gesture is about and something has to remember
+        // it (#74).
+        table.getColumnModel().getSelectionModel().setAnchorSelectionIndex(viewCol);
+
         table.requestFocusInWindow();
 
         // Consumed events are ignored by BasicTableUI, so the default

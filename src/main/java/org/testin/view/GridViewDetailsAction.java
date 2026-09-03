@@ -79,20 +79,19 @@ public class GridViewDetailsAction extends AbstractProjectAction {
     /**
      * Whether the tester is on the sequence number.
      * <p>
-     * Two ways to be, and asking only the first left ENTER doing nothing after
-     * the commonest one. Arrowing onto the column selects that cell, and
-     * {@code getSelectedColumn} names it. Clicking the number instead runs
-     * {@code SequenceColumnRowSelector}, which selects the whole row - every
-     * column of it, so the row copies as one line - and then
-     * {@code getSelectedColumn} answers 0, the leftmost column, which is only the
-     * sequence by coincidence and usually is not.
+     * The anchor rather than {@code getSelectedColumn}, because the two answer
+     * differently after the gesture that matters most. Clicking the number runs
+     * {@code SequenceColumnRowSelector}, which selects every column so the row
+     * copies as one line; {@code getSelectedColumn} then reports the lowest
+     * selected index - 0, the leftmost column, which is the sequence only by
+     * coincidence. The anchor is where the click landed, and the selector puts it
+     * back on the sequence for exactly this question.
      * <p>
-     * A selection covering every column is that gesture and no other: nothing
-     * else in the grid makes one.
+     * Every ordinary cell click sets the anchor to that cell, so a selected
+     * Actual Result answers no here and ENTER goes on to edit it.
      */
     private boolean onSequence() {
-        return GridPanelBuilder.isOrderColumn(table, table.getSelectedColumn())
-                || table.getSelectedColumnCount() == table.getColumnCount();
+        return GridPanelBuilder.isOrderColumn(table, table.getColumnModel().getSelectionModel().getAnchorSelectionIndex());
     }
 
     @Override
