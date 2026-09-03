@@ -1,7 +1,5 @@
 package org.testin.sftp;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,19 +17,26 @@ import org.jetbrains.annotations.NotNull;
  * {@link #of} is the only place the rule lives. It is total - every combination
  * of three hashes lands on exactly one constant - which is what lets the caller
  * be a loop with no branches in it.
+ * <p>
+ * These carry no display words. Each constant used to hold a caption - "Changed
+ * here", "Removed on the server" - for a screen listing what a sync was about to
+ * do, file by file. No such screen was ever built: a sync reports in counts
+ * ("Sent 3, took 2"), names the paths it could not settle, and asks about those.
+ * So the captions were six tester-facing phrases nobody could read, drifting
+ * away from the words the sync actually uses, and the only thing that ever read
+ * them was a test asserting they were not blank (#172). A preview screen can
+ * declare its own wording when there is one to write it for.
  */
-@Getter
-@AllArgsConstructor
 public enum TransferAction {
 
     /**
      * Both sides already hold the same bytes, or neither holds the file at all.
      */
-    NOTHING("Already the same"),
+    NOTHING,
 
-    UPLOAD("Changed here"),
+    UPLOAD,
 
-    DOWNLOAD("Changed on the server"),
+    DOWNLOAD,
 
     /**
      * Both sides moved since the last transfer, so nothing can be chosen without
@@ -41,22 +46,15 @@ public enum TransferAction {
      * A file deleted on one side and edited on the other lands here too. Which of
      * those a team meant is not a question about bytes.
      */
-    RESOLVE("Changed on both sides"),
+    RESOLVE,
 
     /**
      * Gone from the server, and untouched here since it was last transferred - so
      * somebody deleted it deliberately and this machine has nothing to lose.
      */
-    DELETE_LOCAL("Removed on the server"),
+    DELETE_LOCAL,
 
-    DELETE_REMOTE("Removed here");
-
-    /**
-     * What the tester reads beside the path when a sync says what it is about to
-     * do. Written from their side of the screen: "changed here" rather than
-     * "local modification".
-     */
-    private final @NotNull String caption;
+    DELETE_REMOTE;
 
     /**
      * What to do about one file, from where it stood and where it stands.

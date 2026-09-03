@@ -209,8 +209,9 @@ public class TestinConfigTest {
         final TestinProjectConfig onAServer = TestinConfigLoader.parse(
                 "location: remote\nconnection: sftp\nsftpHost: qa.internal\ntestinProject: test-01\n", "sftp");
 
-        assertFalse(onAServer.connection().isShowsBranches(), "there are no branches to choose");
-        assertFalse(onAServer.connection().isFetchesOnRefresh(), "and nothing here may reach a Git remote");
+        assertFalse(onAServer.connection().isShowsBranches(),
+                "there are no branches to choose, and nothing here may reach a Git remote - the fetch on refresh"
+                        + " sits behind this same flag, which is why the second one it used to have was deleted (#172)");
         assertTrue(onAServer.connection().isSyncsToServer(), "but there is a server to sync to");
     }
 

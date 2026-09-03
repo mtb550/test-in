@@ -19,32 +19,35 @@ public enum ConnectionType {
      * Not shared at all. What a project on this machine only reports, so every
      * reader has a value rather than a question about whether one was set.
      */
-    NONE(false, false, false),
+    NONE(false, false),
 
     /**
      * A Git repository. Branches mean something here, so the branch box is
      * shown and a refresh brings the remote up to date - and there is no server
      * to sync to, so that action is off.
      */
-    GIT(true, true, false),
+    GIT(true, false),
 
     /**
      * An SFTP server. There are no branches to choose and nothing to fetch, so
      * the branch box is not shown and nothing here ever reaches a Git remote.
      */
-    SFTP(false, false, true);
+    SFTP(false, true);
 
     /**
-     * Whether a branch box belongs on screen. A project with no branches showing
-     * a box that says it has none is a row of screen explaining something that
-     * was never true of it.
+     * Whether branches are this connection's business: the box belongs on screen,
+     * and redrawing the panel brings the remote up to date. A project with no
+     * branches showing a box that says it has none is a row of screen explaining
+     * something that was never true of it.
+     * <p>
+     * There was a second flag beside this one, {@code fetchesOnRefresh}, for the
+     * refresh half. It held the same answer as this one on every constant and
+     * nothing ever read it - the fetch in {@code BranchSelector} is reached only
+     * once this flag has already said yes (#172). Two names for one fact is not
+     * a distinction until something needs them to differ; a connection that shows
+     * branches without fetching them can declare that when it exists.
      */
     private final boolean showsBranches;
-
-    /**
-     * Whether redrawing the panel should bring a Git remote up to date.
-     */
-    private final boolean fetchesOnRefresh;
 
     /**
      * Whether there is a server to send this project to. What the sync action

@@ -117,12 +117,4 @@ public class TransferActionTest {
         assertEquals(TransferAction.of(OLD, GONE, THEIRS), TransferAction.RESOLVE,
                 "a colleague edited it, so deleting it on the server would lose their work");
     }
-
-    @Test
-    public void everyActionSaysWhatItIsInWordsATesterReads() {
-        for (final TransferAction action : TransferAction.values()) {
-            assertNotNull(action.getCaption());
-            assertEquals(action.getCaption().isBlank(), false, action + " has no caption");
-        }
-    }
 }
