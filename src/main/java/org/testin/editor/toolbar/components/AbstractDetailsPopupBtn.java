@@ -1,6 +1,7 @@
 package org.testin.editor.toolbar.components;
 
 import org.testin.editor.AbstractIconButton;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -107,7 +108,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
             // runs on the next pass instead, so the tick lands immediately, and
             // one refresh covers a burst of them rather than one refresh each.
             if (refreshQueued.compareAndSet(false, true)) {
-                SwingUtilities.invokeLater(() -> {
+                ApplicationManager.getApplication().invokeLater(() -> {
                     refreshQueued.set(false);
                     onToolBarDetailsSelectedChanged.run();
                 });

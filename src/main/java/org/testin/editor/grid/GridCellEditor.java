@@ -1,5 +1,6 @@
 package org.testin.editor.grid;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTextArea;
 import org.jetbrains.annotations.NotNull;
@@ -68,7 +69,7 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
         // rectangle, so the border outlines the cell. The old wrapper panel gave the
         // text area only its preferred height, leaving the border hugging a single
         // text line in the middle of tall (word-wrapped) rows.
-        SwingUtilities.invokeLater(textArea::requestFocusInWindow);
+        ApplicationManager.getApplication().invokeLater(textArea::requestFocusInWindow);
         return textArea;
     }
 

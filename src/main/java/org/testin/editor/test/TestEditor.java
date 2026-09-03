@@ -420,7 +420,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         // previous center stays visible instead of an NPE.
         grid.ifPresent(view -> {
             center.set(view.scrollPane());
-            SwingUtilities.invokeLater(view.table()::requestFocusInWindow);
+            ApplicationManager.getApplication().invokeLater(view.table()::requestFocusInWindow);
         });
     }
 

@@ -1,5 +1,6 @@
 package org.testin.editor.listeners;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import lombok.AllArgsConstructor;
@@ -51,7 +52,7 @@ public class GridSelectionListener implements ListSelectionListener {
 
         if (gridHadFocus) {
             // Selecting synchronizes the list and may move focus to it.
-            SwingUtilities.invokeLater(table::requestFocusInWindow);
+            ApplicationManager.getApplication().invokeLater(table::requestFocusInWindow);
         }
     }
 }

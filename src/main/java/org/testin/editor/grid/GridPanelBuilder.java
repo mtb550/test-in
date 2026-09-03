@@ -228,7 +228,7 @@ public class GridPanelBuilder {
             // so this request is in it and needs nothing of its own.
             if (!pending.compareAndSet(false, true)) return;
 
-            SwingUtilities.invokeLater(() -> {
+            ApplicationManager.getApplication().invokeLater(() -> {
                 final int first = from;
                 final int last = to;
                 from = Integer.MAX_VALUE;
