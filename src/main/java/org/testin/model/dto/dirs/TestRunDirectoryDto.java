@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.markers.TestRunMarker;
 
+import java.nio.file.Path;
+
 
 @Setter
 @Getter
@@ -47,6 +49,26 @@ public class TestRunDirectoryDto extends DirectoryDto {
     @Override
     public @NotNull DirectoryType getType() {
         return DirectoryType.TR;
+    }
+
+    /**
+     * Where a run's results live: {@code <run folder>/run.json}, whatever the
+     * folder is called.
+     * <p>
+     * The name used to be the folder's own - {@code Cycle-1/Cycle-1.json} - which
+     * made a run the only node in the tree whose contents were named after it, and
+     * so the only node a rename could empty. It did: the write derived that name
+     * and the scan's read derived it again, and neither told the rename, so
+     * renaming a cycle moved the folder, left the results behind under the old
+     * name, and the next index found nothing where a whole cycle had been (#177).
+     * <p>
+     * Fixing the rename would have kept the trap for whatever moved a node next.
+     * A fixed name has nothing to keep in step, so there is no longer a rule to
+     * forget - the run now behaves like every other node, whose contents are named
+     * independently of the folder ({@code <id>.json} for a test case).
+     */
+    public static @NotNull Path resultsFile(final @NotNull Path runPath) {
+        return runPath.resolve("run.json");
     }
 
     /**

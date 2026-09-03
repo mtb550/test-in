@@ -217,8 +217,7 @@ final class IndexingScanner {
 
             store.getTestRunsDirByPath().put(path.toString(), tr);
 
-            final @NotNull String fileName = path.getFileName().toString();
-            final @NotNull Path jsonPath = path.resolve(fileName + ".json");
+            final @NotNull Path jsonPath = TestRunDirectoryDto.resultsFile(path);
             if (Files.exists(jsonPath)) {
                 final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
                 final @NotNull TestRunDto trr = mapper.readValue(jsonPath.toFile(), TestRunDto.class);
@@ -226,7 +225,7 @@ final class IndexingScanner {
                 store.getTestRunsByPath().put(path.toString(), trr);
             }
 
-                indicator.setText("Test run: " + fileName);
+            indicator.setText("Test run: " + path.getFileName());
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test run '" +

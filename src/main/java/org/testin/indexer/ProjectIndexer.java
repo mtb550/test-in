@@ -469,7 +469,7 @@ public final class ProjectIndexer {
         runWriter.execute(() -> {
             try {
                 registerTestRun(runPath, tr);
-                Services.getInstance(p, FilesUtil.class).write(p, runPath.resolve(runPath.getFileName() + ".json"), snapshot);
+                Services.getInstance(p, FilesUtil.class).write(p, TestRunDirectoryDto.resultsFile(runPath), snapshot);
                 Logger.trace("Run results persisted for " + runPath.getFileName());
             } catch (final Exception ex) {
                 Logger.error("Failed to persist test run data: " + ex.getMessage());
@@ -982,6 +982,11 @@ public final class ProjectIndexer {
      * forms, this needs no success flag: the whole body is one VFS operation, and
      * {@code executeVfsAction} reports and swallows a failure before the cache
      * update and the callback are reached.
+     * <p>
+     * Nothing here knows what kind of node it is renaming, and nothing needs to.
+     * A test run briefly did - its results were named after the folder, so the
+     * rename had to carry them - and that special case went away when the name
+     * stopped depending on the folder (#177).
      */
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
         Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, vf -> {
@@ -1000,4 +1005,5 @@ public final class ProjectIndexer {
             onFinished.run();
         });
     }
+
 }

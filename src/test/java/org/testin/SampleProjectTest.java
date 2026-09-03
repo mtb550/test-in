@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.model.markers.TestSetMarker;
@@ -134,24 +135,55 @@ public class SampleProjectTest {
         }
     }
 
+    /**
+     * The runs parse, and each is where the plugin will look for it.
+     * <p>
+     * The folders are found by their marker and the results by
+     * {@link TestRunDirectoryDto#resultsFile}, so this asks where a run's results
+     * live rather than repeating the answer - repeating it is what lost them.
+     * The name used to be the folder's own, so renaming a cycle moved the folder
+     * and left the results behind, emptying the run at the next index (#177). A
+     * sample folder still carrying a {@code <name>.json} is one this rename never
+     * reached.
+     */
     @Test
     public void everyRunParsesAndItsResultsNameCasesThatExist() {
         final @NotNull List<String> caseIds = caseFiles().stream()
                 .map(file -> file.getFileName().toString().replace(".json", ""))
                 .toList();
 
-        final @NotNull List<Path> runs = filesNamed(demo(), "Cycle-1.json");
-        final @NotNull List<Path> more = filesNamed(demo(), "Cycle-2.json");
+        final @NotNull List<Path> runs = runFolders();
+        assertEquals(runs.size(), 2, "The sample is meant to carry two runs, and carries " + runs);
 
-        assertFalse(runs.isEmpty() || more.isEmpty(), "The sample is meant to carry two runs");
+        for (final Path folder : runs) {
+            final @NotNull Path file = TestRunDirectoryDto.resultsFile(folder);
 
-        for (final Path file : Stream.concat(runs.stream(), more.stream()).toList()) {
+            assertEquals(jsonFilesIn(folder), List.of(file),
+                    "A run folder holds exactly one .json, and its name does not depend on the folder's. A file named"
+                            + " after the folder is the old format, which no read has looked for since #177: " + folder);
+
             final @NotNull TestRunDto run = read(file, TestRunDto.class);
 
             assertFalse(run.getResults().isEmpty(), "A run with no results shows nothing: " + file);
 
             run.getResults().forEach(item -> assertTrue(caseIds.contains(item.getId().toString()),
                     "A result in " + file.getFileName() + " names a case the sample does not hold: " + item.getId()));
+        }
+    }
+
+    /**
+     * The sample's run folders, found by the marker that makes them runs rather
+     * than by the names they happen to have.
+     */
+    private static @NotNull List<Path> runFolders() {
+        return filesNamed(demo(), DirectoryType.TR.getMarker()).stream().map(Path::getParent).toList();
+    }
+
+    private static @NotNull List<Path> jsonFilesIn(final @NotNull Path folder) {
+        try (Stream<Path> children = Files.list(folder)) {
+            return children.filter(path -> path.getFileName().toString().endsWith(".json")).toList();
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not list the run folder " + folder + ": " + ex.getMessage(), ex);
         }
     }
 
