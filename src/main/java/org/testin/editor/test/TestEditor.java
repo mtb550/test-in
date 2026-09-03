@@ -672,17 +672,11 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             // Every shortcut the menu offers, live on the grid too (#74).
             contextMenu.bindShortcutsTo(table);
 
-            GridPanelBuilder.restoreSelection(table, list, pageItems, gridColumnToRestore);
+            grid = Optional.of(GridPanelBuilder.finishRebuild(table, list, pageItems, gridColumnToRestore, fontSync, keepKeyboard));
+
             // Cleared regardless of whether the row was found, so a stale column can
             // never be applied to an unrelated rebuild.
             gridColumnToRestore = -1;
-
-            grid = Optional.of(new GridView(table, new JBScrollPane(table), fontSync));
-
-            // Later, not here: this table is not in the window until the caller
-            // installs the scroll pane, and a focus request refused is a focus
-            // request lost.
-            if (keepKeyboard) ApplicationManager.getApplication().invokeLater(table::requestFocusInWindow);
             Logger.debug("[grid] rebuildGrid done, rows=" + table.getRowCount() + ", cols=" + table.getColumnCount());
         } catch (final Exception ex) {
             Logger.error("[grid] rebuildGrid FAILED: " + ex);

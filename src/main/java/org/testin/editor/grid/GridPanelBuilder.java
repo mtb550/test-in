@@ -5,6 +5,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBList;
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.EditorColors;
@@ -331,6 +334,27 @@ public class GridPanelBuilder {
 
         table.changeSelection(selectedRow, column, false, false);
         table.scrollRectToVisible(table.getCellRect(selectedRow, column, true));
+    }
+
+    /**
+     * How a rebuild ends, for both editors.
+     * <p>
+     * The selection goes back, the view is made, and the keyboard returns to the
+     * grid if it was there when the rebuild started - a request that has to come
+     * after the caller installs the scroll pane, because this table is not in the
+     * window yet and a focus request refused is a focus request lost.
+     * <p>
+     * One owner because the two editors were running the same five lines and
+     * drifting apart in the comments around them. Adding the focus hand-back to
+     * both is what tipped the inspector into calling it duplicate code, which was
+     * fair.
+     */
+    public static @NotNull GridView finishRebuild(final @NotNull JBTable table, final @NotNull JBList<TestCaseDto> list, final @NotNull List<TestCaseDto> pageItems, final int columnToRestore, final @NotNull Disposable fontSync, final boolean keepKeyboard) {
+        restoreSelection(table, list, pageItems, columnToRestore);
+
+        if (keepKeyboard) ApplicationManager.getApplication().invokeLater(table::requestFocusInWindow);
+
+        return new GridView(table, new JBScrollPane(table), fontSync);
     }
 
     /**

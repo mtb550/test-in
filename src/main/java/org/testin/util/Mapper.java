@@ -131,10 +131,6 @@ public final class Mapper {
         }
     }
 
-    public @NotNull ObjectNode createObjectNode() {
-        return mapper.createObjectNode();
-    }
-
     public @NotNull <T> T convertValue(final @NotNull Object fromValue, final @NotNull Class<T> toValueType) {
         try {
             return mapper.convertValue(fromValue, toValueType);
