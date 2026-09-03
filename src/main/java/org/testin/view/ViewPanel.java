@@ -9,6 +9,8 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.services.Services;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.util.FontSync;
@@ -130,7 +132,7 @@ public class ViewPanel implements Disposable {
     }
 
     public void refreshCurrentView() {
-        new DetailsTab().load(p, detailsTab, getCurrentTestCase(), page.getCurrentPath());
+        new DetailsTab().load(p, detailsTab, currentFromIndex(), page.getCurrentPath());
         new HistoryTab().load(historyTab);
         new OpenBugsTab().load(openBugsTab);
 
@@ -154,6 +156,25 @@ public class ViewPanel implements Disposable {
      */
     public @NotNull Optional<TestCaseDto> getCurrentTestCase() {
         return page.getCurrentItem();
+    }
+
+    /**
+     * The case on display as the indexer holds it now, rather than as this panel
+     * was handed it.
+     * <p>
+     * The panel is given cases when it is opened and keeps them while the tester
+     * pages through - so a redraw drew whatever it was holding, which is the
+     * value at the moment the panel opened. Every writer telling the panel to
+     * refresh was still not enough: it refreshed, and re-rendered the same stale
+     * object.
+     * <p>
+     * Falls back to the held copy when the indexer no longer has the case - a
+     * removal, a project reindexed underneath - because a panel that blanks is
+     * worse than one showing the last thing that was true.
+     */
+    private @NotNull Optional<TestCaseDto> currentFromIndex() {
+        return getCurrentTestCase()
+                .map(shown -> Services.getInstance(p, ProjectIndexer.class).findTestCase(shown.getId()).orElse(shown));
     }
 
     public void focusDetailsTab() {
