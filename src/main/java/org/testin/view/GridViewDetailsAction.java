@@ -77,21 +77,37 @@ public class GridViewDetailsAction extends AbstractProjectAction {
     }
 
     /**
-     * Whether the tester is on the sequence number.
+     * Whether the tester is on the sequence number, and so whether ENTER opens
+     * the details rather than starting an edit.
      * <p>
-     * The anchor rather than {@code getSelectedColumn}, because the two answer
-     * differently after the gesture that matters most. Clicking the number runs
-     * {@code SequenceColumnRowSelector}, which selects every column so the row
-     * copies as one line; {@code getSelectedColumn} then reports the lowest
-     * selected index - 0, the leftmost column, which is the sequence only by
-     * coincidence. The anchor is where the click landed, and the selector puts it
-     * back on the sequence for exactly this question.
+     * Written as a refusal first because that is the half a tester notices: an
+     * editable cell answers no, whatever the column selection happens to look
+     * like. Clicking a row number selects every column of that row so it copies
+     * as one line, and after that the selection alone cannot say which cell the
+     * tester meant - two attempts at reading it were both wrong. An editable
+     * cell is never the sequence, so the question does not need to be read that
+     * finely to answer it.
      * <p>
-     * Every ordinary cell click sets the anchor to that cell, so a selected
-     * Actual Result answers no here and ENTER goes on to edit it.
+     * Then the two ways of being on the sequence: arrowed onto it, so the column
+     * selection names it, or clicked on it, where the anchor is the only record
+     * of where the click landed.
      */
     private boolean onSequence() {
-        return GridPanelBuilder.isOrderColumn(table, table.getColumnModel().getSelectionModel().getAnchorSelectionIndex());
+        final int row = table.getSelectedRow();
+        final int column = table.getSelectedColumn();
+
+        // Asked first, and it settles the case that matters: a cell the tester
+        // can type into is never the sequence, and ENTER there belongs to the
+        // editor. Whatever the column selection looks like - and after a row
+        // click it looks like several things at once - an editable cell means
+        // this action stands down.
+        if (row >= 0 && column >= 0 && table.isCellEditable(row, column)) return false;
+
+        // Then either way of being on the sequence: arrowed onto it, so the
+        // column selection names it; or clicked on it, which selects the whole
+        // row and leaves the anchor behind as the only record of where.
+        return GridPanelBuilder.isOrderColumn(table, column)
+                || GridPanelBuilder.isOrderColumn(table, table.getColumnModel().getSelectionModel().getAnchorSelectionIndex());
     }
 
     @Override
