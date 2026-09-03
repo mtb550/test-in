@@ -10,7 +10,6 @@ import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.view.ViewToolWindowFactory;
 import org.testin.testcase.TestCaseSnapshot;
 
 import javax.swing.table.DefaultTableModel;
@@ -71,11 +70,6 @@ public class GridEditListener extends AbstractGridEditListener {
 
         persistAndGenerate(tc, attr, undoFrom);
         onEdited.run();
-
-        // The details panel keeps its own copy, so editing a description in a
-        // grid cell left the details beside it showing the previous one. The
-        // update dialog has always told it; neither grid's cell editor did.
-        ViewToolWindowFactory.refreshIfShowing(p, List.of(tc));
 
         return true;
     }

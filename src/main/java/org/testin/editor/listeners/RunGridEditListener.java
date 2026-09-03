@@ -8,7 +8,6 @@ import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
-import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
@@ -78,12 +77,6 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
         Services.getInstance(p, RunStatusService.class).persistRun(p, editor);
         onEdited.run();
-
-        // The details panel holds its own copy of the case, so typing into a
-        // cell left it showing the previous value beside the cell just changed.
-        // The test editor's dialog has always told it; the run editor's two
-        // write paths never did.
-        ViewToolWindowFactory.refreshIfShowing(p, List.of(onThisRow));
 
         return true;
     }

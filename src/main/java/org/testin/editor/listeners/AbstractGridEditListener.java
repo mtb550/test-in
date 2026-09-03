@@ -4,6 +4,7 @@ import org.testin.notifications.Done;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.view.ViewToolWindowFactory;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
@@ -69,9 +70,20 @@ public abstract class AbstractGridEditListener implements TableModelListener {
                 || col >= model.getColumnCount()
                 || col >= columnCount()) return;
 
+        final @NotNull TestCaseDto edited = pageItems.get(row);
+
         updating = true;
         try {
-            if (apply(model, pageItems.get(row), row, col)) confirmEdit();
+            if (!apply(model, edited, row, col)) return;
+
+            confirmEdit();
+
+            // Beside the confirmation, and for the same reason: the details panel
+            // keeps its own copy of the case, so a cell edited under an open
+            // panel left it showing the value that had just been replaced. Here
+            // rather than in each subclass - both were writing the line, which is
+            // how the run editor came to have it and the test editor not.
+            ViewToolWindowFactory.refreshIfShowing(p, List.of(edited));
         } finally {
             updating = false;
         }
