@@ -12,13 +12,17 @@ import org.testin.model.Config;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
+import org.testin.model.TestStatus;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -111,6 +115,43 @@ public class TestRunDto {
      * asked.
      */
     @JsonIgnore
+    /**
+     * The same run, covering exactly these cases (#96).
+     * <p>
+     * A case that stays keeps its result <b>whole</b> - the verdict, the actual
+     * result, the bug severity and priority, the duration, who executed it and
+     * when, and the stack trace - because the item is carried across rather than
+     * rebuilt from its id. A case that arrives is {@link TestStatus#PENDING}. A
+     * case that goes is dropped with everything it recorded.
+     * <p>
+     * Order is the run's own and is left alone: the cases it already covered stay
+     * in the order it had them, and new ones are appended. Re-covering a run is
+     * not a re-sort.
+     * <p>
+     * Returns a new run and leaves this one untouched, so the caller still holds
+     * what the run was - which is what an undo puts back.
+     */
+    public @NotNull TestRunDto coverOnly(final @NotNull Set<UUID> wanted) {
+        final @NotNull Map<UUID, TestRunItems> held = new LinkedHashMap<>();
+        results.forEach(item -> held.put(item.getId(), item));
+
+        final @NotNull List<TestRunItems> covered = new ArrayList<>();
+        held.forEach((id, item) -> {
+            if (wanted.contains(id)) covered.add(item);
+        });
+
+        wanted.stream()
+                .filter(id -> !held.containsKey(id))
+                .forEach(id -> covered.add(new TestRunItems().setId(id).setStatus(TestStatus.PENDING)));
+
+        return new TestRunDto()
+                .setConfiguration(configuration)
+                .setResultAnalysis(resultAnalysis)
+                .setExecutionStartedAt(executionStartedAt)
+                .setExecutionEndedAt(executionEndedAt)
+                .setResults(covered);
+    }
+
     public boolean isFullyJudged() {
         return !results.isEmpty() && results.stream().allMatch(TestRunItems::isJudged);
     }

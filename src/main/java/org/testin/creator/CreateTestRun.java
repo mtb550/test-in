@@ -2,7 +2,6 @@ package org.testin.creator;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.CheckedTreeNode;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.ExplorerPanel;
@@ -12,27 +11,23 @@ import org.testin.model.DirectoryMapper;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
-import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
-import org.testin.testrun.RunConfigurationDialog;
 import org.testin.testrun.RunConfigurationForm;
-import org.testin.testrun.RunTreeCellRenderer;
+import org.testin.testrun.RunForm;
+import org.testin.testrun.RunFormAction;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.util.BackgroundWork;
 import org.testin.util.EditorUtil;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,33 +54,15 @@ public class CreateTestRun implements NodeCreator {
     }
 
     /**
-     * The dialog the creator is: which test cases the run covers, chosen from
-     * the bound project's own tree.
-     * <p>
-     * Also how a run is re-created for the next cycle. The two differ only in
-     * what the dialog opens holding - the previous cycle's cases ticked and its
-     * configuration filled in - and not at all in how the run is written, which
-     * is what keeps a re-created run from being a second kind of run (#9).
+     * Opens the run form set to create, which is what makes a run and what makes
+     * the next cycle: they differ only in what the form opens holding - the
+     * previous cycle's cases ticked and its configuration filled in - and not at
+     * all in how the run is written, which is what keeps a re-created run from
+     * being a second kind of run (#9).
      */
     public void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Set<UUID> sourceCases, final @NotNull Map<TestRunConfiguration, String> sourceConfiguration) {
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-
-            final @NotNull Path testCasesPath = testCasesRoot.getPath();
-            final @NotNull DefaultMutableTreeNode fullModelNode = buildDirectoryTree(testCasesPath, testCasesRoot);
-
-            final @NotNull CheckedTreeNode root = convertToCheckedNodes(fullModelNode);
-            if (!sourceCases.isEmpty()) checkOnly(root, sourceCases);
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-
-                final @NotNull RunConfigurationForm form = new RunConfigurationForm(name);
-                if (!sourceConfiguration.isEmpty()) form.fillFrom(sourceConfiguration);
-
-                final @NotNull SelectionTree selection = new SelectionTree(root, RunTreeCellRenderer.create(Collections.emptyMap()));
-
-                new RunConfigurationDialog(p, form, selection, () -> create(form, selection, parentDir)).show();
-            });
-        });
+        new RunForm(p).open(testCasesRoot, name, sourceCases, sourceConfiguration,
+                new RunFormAction("Create Test Run", "Create", (form, selection) -> create(form, selection, parentDir)));
     }
 
     /**
@@ -126,59 +103,7 @@ public class CreateTestRun implements NodeCreator {
         return true;
     }
 
-    /**
-     * Ticks the cases a previous run covered, and unticks everything else.
-     * <p>
-     * Both halves of that, because a node arrives ticked: {@code CheckedTreeNode}
-     * defaults to checked, which is why creating a run opens with the whole
-     * project selected. Re-creating a cycle means the scope the last one had, so
-     * everything outside it has to come off.
-     */
-    private void checkOnly(final @NotNull CheckedTreeNode node, final @NotNull Set<UUID> wanted) {
-        if (node.getUserObject() instanceof TestCaseDto tc) node.setChecked(wanted.contains(tc.getId()));
 
-        for (int i = 0; i < node.getChildCount(); i++) {
-            checkOnly((CheckedTreeNode) node.getChildAt(i), wanted);
-        }
-    }
-
-    /**
-     * The node for a folder, with its test cases or its child folders under it.
-     * <p>
-     * Always returns a node. It used to return null for an empty test set or an
-     * empty container, and take an isRoot flag to exempt the top of the tree.
-     * That gave one method two contracts: the root could never be null and a
-     * child routinely was.
-     * <p>
-     * The caller below drops the empties instead - the same behavior, one rule.
-     */
-    private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder, final @NotNull DirectoryDto thisNodeDto) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        indexer.awaitIndexing();
-
-        final @NotNull DefaultMutableTreeNode node = new DefaultMutableTreeNode(thisNodeDto);
-
-        if (thisNodeDto instanceof TestSetDirectoryDto) {
-            for (final TestCaseDto tc : indexer.getTestCasesForTestSet(folder)) {
-                node.add(new DefaultMutableTreeNode(tc));
-            }
-            return node;
-        }
-
-        for (final DirectoryDto child : indexer.getChildren(folder)) {
-            // A deprecated test set, or anything under an archived package, is not
-            // offered for a new run: that is what retiring it means (#68).
-            if (child.isRetired()) continue;
-
-            final @NotNull DefaultMutableTreeNode childNode = buildDirectoryTree(child.getPath(), child);
-
-            // An empty test set, or a package holding only empty ones, would
-            // clutter the tree with a branch that cannot be ticked.
-            if (childNode.getChildCount() > 0) node.add(childNode);
-        }
-
-        return node;
-    }
 
     private void saveSelectedToJSON(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull ExplorerPanel pp, final @NotNull TestRunDirectoryDto trDir) {
         // Read once, here, while the dialog is still on screen. Everything below
@@ -193,14 +118,7 @@ public class CreateTestRun implements NodeCreator {
                 .setConfiguration(TestRunConfiguration.answered(configuration));
 
         final @NotNull List<TestRunItems> items = new ArrayList<>();
-        selection.forEachChecked(checked -> {
-            if (checked instanceof TestCaseDto tc) {
-                final @NotNull TestRunItems item = new TestRunItems();
-                item.setId(tc.getId());
-                item.setStatus(TestStatus.PENDING);
-                items.add(item);
-            }
-        });
+        RunForm.checkedCases(selection).forEach(id -> items.add(new TestRunItems().setId(id).setStatus(TestStatus.PENDING)));
         tr.setResults(items);
 
         // The form and the checked tree were read above, while the dialog was
@@ -210,10 +128,6 @@ public class CreateTestRun implements NodeCreator {
 
             // Defaults are correct (status CREATED); addTestRunDir stamps the
             // tester's audit info before the marker's first write.
-            //
-            // The configuration goes on the marker too, so the node can describe
-            // itself without its run file being opened: Details on a run, from
-            // the tree or from the run's own toolbar, is then a lookup.
             final @NotNull TestRunMarker marker = new TestRunMarker();
             trDir.setMarker(marker);
 
@@ -236,14 +150,6 @@ public class CreateTestRun implements NodeCreator {
         });
     }
 
-    private @NotNull CheckedTreeNode convertToCheckedNodes(final @NotNull DefaultMutableTreeNode node) {
-        final @NotNull Object userObj = node.getUserObject();
-        final @NotNull CheckedTreeNode newNode = new CheckedTreeNode(userObj);
-        for (int i = 0; i < node.getChildCount(); i++) {
-            newNode.add(convertToCheckedNodes((DefaultMutableTreeNode) node.getChildAt(i)));
-        }
-        return newNode;
-    }
 
 }
 

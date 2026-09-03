@@ -49,7 +49,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TreeValueUtil.selected(tree, TestRunDirectoryDto.class)
-                .filter(dir -> !dir.getMarker().getStatus().isTerminal())
+                .filter(TestRunDirectoryDto::isStillOpen)
                 .isPresent());
     }
 

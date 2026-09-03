@@ -26,6 +26,19 @@ public class TestRunDirectoryDto extends DirectoryDto {
         return true;
     }
 
+    /**
+     * Whether the run still accepts changes - a verdict, which cases it covers,
+     * its name, its configuration.
+     * <p>
+     * A completed or closed run has been signed off and reported on, and what a
+     * report says must not move underneath it afterwards (#84). Three actions
+     * asked this by spelling out {@code !getMarker().getStatus().isTerminal()};
+     * asking the node instead is what keeps them agreeing as statuses are added.
+     */
+    public boolean isStillOpen() {
+        return !marker.getStatus().isTerminal();
+    }
+
 
     @Override
     public boolean isAllowedInTestSetFamily() {

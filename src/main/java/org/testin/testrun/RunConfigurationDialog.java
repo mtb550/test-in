@@ -7,37 +7,35 @@ import org.testin.ui.framework.*;
 
 import java.awt.*;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 /**
- * The run-creation working dialog: configuration form on top, test case
- * selection tree filling the middle, a visible Create button at the bottom —
- * no Enter shortcut, a working dialog confirms by button; Escape cancels.
+ * The run working dialog: configuration form on top, test case selection tree
+ * filling the middle, a visible button at the bottom - no Enter shortcut, a
+ * working dialog confirms by button; Escape cancels.
+ * <p>
+ * What that button says, and what it does, comes from the {@link RunFormAction}
+ * it is opened with: creating a run and editing one are this dialog with two
+ * different answers to that (#96).
  */
 public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunConfigurationForm> {
 
-    /**
-     * What creating does, and whether it happened. It was a {@code Runnable}
-     * while the name was decided before this dialog opened and could not be
-     * wrong by the time it got here. The name is typed here now, so creating can
-     * be refused - an empty one, or one already taken - and a dialog that closed
-     * anyway would take the tester's configuration with it (#9).
-     */
-    private final @NotNull BooleanSupplier onCreate;
+    private final @NotNull RunFormAction action;
+    private final @NotNull RunConfigurationForm form;
     private final @NotNull SelectionTree selection;
 
-    public RunConfigurationDialog(final @NotNull Project p, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull BooleanSupplier onCreate) {
+    public RunConfigurationDialog(final @NotNull Project p, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull RunFormAction action) {
         super(p);
-        this.onCreate = onCreate;
+        this.action = action;
+        this.form = form;
         this.selection = selection;
 
-        title = "Create Test Run";
+        title = action.title();
 
-        final @NotNull ComponentDialogBase<DialogButton> create = ComponentDialogBase.button("Create");
+        final @NotNull ComponentDialogBase<DialogButton> confirm = ComponentDialogBase.button(action.button());
         components = List.of(
                 ComponentDialogBase.of(form),
                 ComponentDialogBase.of(selection),
-                create);
+                confirm);
 
         shortcuts = List.of(
                 StatusBarShortcut.hint("Tab", "Navigate"),
@@ -47,10 +45,11 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunCon
         preferredSize = new Dimension(JBUI.scale(900), JBUI.scale(600));
 
         // A run without test cases makes no sense - the button follows the
-        // checked state live.
-        final @NotNull DialogButton createButton = create.getComponent();
-        createButton.setEnabled(selection.hasChecked());
-        selection.onCheckChanged(() -> createButton.setEnabled(selection.hasChecked()));
+        // checked state live. Editing a run down to nothing is refused the same
+        // way creating an empty one is: the button simply goes dead.
+        final @NotNull DialogButton confirmButton = confirm.getComponent();
+        confirmButton.setEnabled(selection.hasChecked());
+        selection.onCheckChanged(() -> confirmButton.setEnabled(selection.hasChecked()));
     }
 
     @Override
@@ -64,6 +63,6 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunCon
         //
         // And only when it accepted. A refused name leaves the dialog where it
         // is, with everything the tester typed still in it.
-        if (onCreate.getAsBoolean()) closeOk();
+        if (action.submit().of(form, selection)) closeOk();
     }
 }

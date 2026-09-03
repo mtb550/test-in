@@ -10,6 +10,8 @@ import com.intellij.util.IconUtil;
 import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Group;
 import org.testin.model.Priority;
@@ -26,7 +28,8 @@ import java.util.List;
 // Explicit, because java.awt.* above also offers a List, and it takes no type
 // parameter - the resulting error names the wrong thing and cascades.
 
-public class Shared {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Shared {
 
     // ---------------------------------------------------------------- badges
     //

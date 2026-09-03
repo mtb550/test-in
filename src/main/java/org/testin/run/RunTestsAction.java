@@ -77,7 +77,7 @@ public class RunTestsAction extends AbstractProjectTreeAction {
      */
     private @NotNull Optional<TestRunDirectoryDto> selectedRun() {
         return TreeValueUtil.selected(tree, TestRunDirectoryDto.class)
-                .filter(run -> !run.getMarker().getStatus().isTerminal());
+                .filter(TestRunDirectoryDto::isStillOpen);
     }
 
     /**

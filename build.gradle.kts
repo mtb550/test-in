@@ -261,21 +261,30 @@ intellijPlatformTesting {
                 jvmArgs("--sun-misc-unsafe-memory-access=allow")
 
                 val sandboxes = layout.projectDirectory.dir(".sandbox/Testin").asFile
-                val sampleRoot = layout.projectDirectory.dir("samples/testin-root").asFile.absolutePath
-                val sampleProject = layout.projectDirectory.dir("samples/automation").asFile.absolutePath
+                val committedSample = layout.projectDirectory.dir("samples").asFile
+                val workingSample = layout.projectDirectory.dir(".sandbox/sample").asFile
+                val sampleRoot = workingSample.resolve("testin-root").absolutePath
+                val sampleProject = workingSample.resolve("automation").absolutePath
 
                 doFirst {
+                    // The sandbox opens a COPY of the sample, never the committed one. Opening
+                    // the committed sample is a write to this repository: the plugin binds a
+                    // project to the root it runs under, so a sandbox aimed at anyone's own test
+                    // data resolves nothing for `testinProject: Demo` and rebinds it - writing
+                    // that root's project name straight back into a committed file. It happened
+                    // twice; SampleProjectTest is what caught it.
+                    //
+                    // Copied once and then left alone, so runs created while testing survive to
+                    // the next launch. Deleting .sandbox/sample is how to get the sample back.
+                    if (!workingSample.exists()) {
+                        committedSample.copyRecursively(workingSample)
+                        println("Copied the sample into the sandbox, so the committed one stays clean: " + workingSample)
+                    }
+
                     // Inlined rather than shared with the other run task: the configuration
                     // cache cannot serialize a reference to a script-level function, so a
                     // helper here fails the build with "cannot serialize Gradle script object
                     // references". The duplication is what the cache costs.
-                    //
-                    // One branch decides both halves - the root this sandbox gets and whether
-                    // the sample is the project it opens - because deciding them apart is how
-                    // they came to disagree. The predicate that used to answer the second half
-                    // ran over the whole container at configuration time, so after a version
-                    // bump it saw the OLD sandbox's settings and refused the argument to a
-                    // brand-new sandbox it then seeded.
                     //
                     // The sandbox directory is found rather than composed: the one under
                     // .sandbox/Testin is named by the platform plugin from the IDE it
@@ -289,12 +298,9 @@ intellijPlatformTesting {
                             val options = sandbox.resolve("config_runPyCharm/options")
                             val settings = options.resolve("testinSettings.xml")
 
-                            // A sandbox someone has pointed at their own test data keeps it, and
-                            // is not sent to the sample: opening the sample under another root
-                            // does not resolve its testinProject, so Testin rebinds it and
-                            // writes that root's project name into a committed file.
-                            if (settings.exists() && !settings.readText().contains(sampleRoot)) return@forEach
-
+                            // Only a fresh sandbox is pointed at the sample data. One somebody
+                            // has aimed at their own test root keeps it, and opens the sample
+                            // copy against it - which rebinds the copy and harms nothing.
                             if (!settings.exists()) {
                                 options.mkdirs()
                                 settings.writeText(
@@ -312,9 +318,9 @@ intellijPlatformTesting {
                                 println("Pointed a fresh sandbox at the sample data: " + sandbox.name)
                             }
 
-                            // Every run of a sample-rooted sandbox, not only the first: the IDE
-                            // reopens its last project on its own, and the argument is what makes
-                            // that the sample rather than whatever was open before.
+                            // Every run, not only the first: the IDE reopens its last project on
+                            // its own, and the argument is what makes that the sample copy rather
+                            // than whatever was open before - the committed sample included.
                             args(sampleProject)
                         }
                 }
@@ -334,21 +340,30 @@ tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
     jvmArgs("--sun-misc-unsafe-memory-access=allow")
 
     val sandboxes = layout.projectDirectory.dir(".sandbox/Testin").asFile
-    val sampleRoot = layout.projectDirectory.dir("samples/testin-root").asFile.absolutePath
-    val sampleProject = layout.projectDirectory.dir("samples/automation").asFile.absolutePath
+    val committedSample = layout.projectDirectory.dir("samples").asFile
+    val workingSample = layout.projectDirectory.dir(".sandbox/sample").asFile
+    val sampleRoot = workingSample.resolve("testin-root").absolutePath
+    val sampleProject = workingSample.resolve("automation").absolutePath
 
     doFirst {
+        // The sandbox opens a COPY of the sample, never the committed one. Opening
+        // the committed sample is a write to this repository: the plugin binds a
+        // project to the root it runs under, so a sandbox aimed at anyone's own test
+        // data resolves nothing for `testinProject: Demo` and rebinds it - writing
+        // that root's project name straight back into a committed file. It happened
+        // twice; SampleProjectTest is what caught it.
+        //
+        // Copied once and then left alone, so runs created while testing survive to
+        // the next launch. Deleting .sandbox/sample is how to get the sample back.
+        if (!workingSample.exists()) {
+            committedSample.copyRecursively(workingSample)
+            println("Copied the sample into the sandbox, so the committed one stays clean: " + workingSample)
+        }
+
         // Inlined rather than shared with the other run task: the configuration
         // cache cannot serialize a reference to a script-level function, so a
         // helper here fails the build with "cannot serialize Gradle script object
         // references". The duplication is what the cache costs.
-        //
-        // One branch decides both halves - the root this sandbox gets and whether
-        // the sample is the project it opens - because deciding them apart is how
-        // they came to disagree. The predicate that used to answer the second half
-        // ran over the whole container at configuration time, so after a version
-        // bump it saw the OLD sandbox's settings and refused the argument to a
-        // brand-new sandbox it then seeded.
         //
         // The sandbox directory is found rather than composed: the one under
         // .sandbox/Testin is named by the platform plugin from the IDE it
@@ -362,12 +377,9 @@ tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
                 val options = sandbox.resolve("config/options")
                 val settings = options.resolve("testinSettings.xml")
 
-                // A sandbox someone has pointed at their own test data keeps it, and
-                // is not sent to the sample: opening the sample under another root
-                // does not resolve its testinProject, so Testin rebinds it and
-                // writes that root's project name into a committed file.
-                if (settings.exists() && !settings.readText().contains(sampleRoot)) return@forEach
-
+                // Only a fresh sandbox is pointed at the sample data. One somebody
+                // has aimed at their own test root keeps it, and opens the sample
+                // copy against it - which rebinds the copy and harms nothing.
                 if (!settings.exists()) {
                     options.mkdirs()
                     settings.writeText(
@@ -385,9 +397,9 @@ tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
                     println("Pointed a fresh sandbox at the sample data: " + sandbox.name)
                 }
 
-                // Every run of a sample-rooted sandbox, not only the first: the IDE
-                // reopens its last project on its own, and the argument is what makes
-                // that the sample rather than whatever was open before.
+                // Every run, not only the first: the IDE reopens its last project on
+                // its own, and the argument is what makes that the sample copy rather
+                // than whatever was open before - the committed sample included.
                 args(sampleProject)
             }
     }

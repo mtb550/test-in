@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.codegen.Renamed;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.undo.UndoScope;
 import org.testin.undo.UndoService;
@@ -16,11 +15,8 @@ import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.EditorUtil;
-import org.testin.util.OptionalPlugin;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -72,7 +68,7 @@ public class RenameAction extends AbstractProjectTreeAction {
         }
 
         final @NotNull String oldName = dir.getName();
-        applyRename(dir, newName, () -> Services.getInstance(p, Notifier.class).softShow(p, Done.RENAMED));
+        NodeRename.apply(p, pp, dir, newName, () -> Services.getInstance(p, Notifier.class).softShow(p, Done.RENAMED));
 
         // The dto reference stays valid across renames, so undo and redo are
         // the same routine with the names swapped.
@@ -82,43 +78,15 @@ public class RenameAction extends AbstractProjectTreeAction {
                 () -> applyRename(dir, newName)));
     }
 
-    private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName) {
-        applyRename(dir, newName, () -> {
-        });
-    }
-
     /**
      * The undo and redo reverses pass no {@code onDone}: they are confirmed as
      * "Undone" and "Redone" by their own actions, and a second balloon saying it
      * was renamed would double-report one keystroke (#62).
      */
-    private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName, final @NotNull Runnable onDone) {
-        Services.getInstance(p, EditorUtil.class).close(p, dir);
-
-        // Before the data rename, while the old name is still what finds the
-        // generated code. Which generator that is belongs to the node, not here.
-        if (OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) {
-            dir.getType().getRenameCodegen().execute(p, new Renamed(dir, newName));
-        }
-
-        final @NotNull Path oldPath = dir.getPath();
-        final @NotNull Path newPath = oldPath.getParent().resolve(newName);
-
-        // The tree refreshes only after the indexer finished the VFS rename
-        // and updated its cache - refreshing earlier shows stale state.
-        Services.getInstance(p, ProjectIndexer.class).renameNode(oldPath, newPath, () -> {
-            pp.getProjectTree().refresh();
-
-            if (dir instanceof TestProjectDirectoryDto) {
-                pp.refresh();
-            }
-
-            Logger.info("Success! Renamed to: " + newName);
-
-            onDone.run();
+    private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName) {
+        NodeRename.apply(p, pp, dir, newName, () -> {
         });
     }
-
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
