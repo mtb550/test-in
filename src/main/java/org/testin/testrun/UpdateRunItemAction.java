@@ -78,7 +78,7 @@ public class UpdateRunItemAction extends AbstractProjectAction {
             // And the View panel, which holds its own copy of the case and is
             // told by the test-case update path and not by this one - so the
             // details a tester was reading kept the value they had just changed.
-            ViewToolWindowFactory.panel(p).ifPresent(view -> view.refreshIfShowing(List.of(testCase)));
+            ViewToolWindowFactory.refreshIfShowing(p, List.of(testCase));
 
             // After the persist: an edit that was dropped rather than saved must
             // not report itself as saved (#62).

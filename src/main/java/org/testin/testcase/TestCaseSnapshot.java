@@ -155,7 +155,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
 
         written.forEach(snapshot -> editors.reloadOpen(p, snapshot.testSetPath()));
 
-        ViewToolWindowFactory.panel(p).ifPresent(panel -> written.forEach(snapshot -> panel.refreshIfShowing(snapshot.present())));
+        written.forEach(snapshot -> ViewToolWindowFactory.refreshIfShowing(p, snapshot.present()));
     }
 
     private static boolean same(final @NotNull List<TestCaseSnapshot> before, final @NotNull List<TestCaseSnapshot> after) {

@@ -15,6 +15,7 @@ import org.testin.setting.StartupActivity;
 import org.testin.services.Services;
 
 import java.util.Optional;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -43,6 +44,23 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
      */
     public static @NotNull Optional<ToolWindow> toolWindow(final @NotNull Project p) {
         return Optional.ofNullable(ToolWindowManager.getInstance(p).getToolWindow("testin.view"));
+    }
+
+    /**
+     * Tells the details panel that these cases were written, so it re-reads if it
+     * is showing one of them.
+     * <p>
+     * Here rather than at each writer. The panel keeps its own copy of the case,
+     * so every path that writes one has to say so - and they did not: the test
+     * case dialog and undo told it, the run item dialog and the run grid's cell
+     * editor did not, and a tester watched the value they had just typed sit
+     * unchanged in the details beside the cell they typed it into.
+     * <p>
+     * A project whose panel has never been built answers empty and nothing
+     * happens, which is why no caller checks first.
+     */
+    public static void refreshIfShowing(final @NotNull Project p, final @NotNull Collection<TestCaseDto> written) {
+        panel(p).ifPresent(view -> view.refreshIfShowing(written));
     }
 
     public static void showPanel(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path, final @NotNull Consumer<ViewPanel> onReadyAction) {
