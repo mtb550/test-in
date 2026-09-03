@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -46,6 +48,20 @@ public enum BugPriority {
             Shortcuts.PriorityLow,
             ReportEmphasis.MUTED
     );
+
+    /**
+     * What a tester can choose, in the order declared above - everything but
+     * EMPTY, for the reason {@link BugSeverity#CHOICES} gives (#175, C14).
+     */
+    public static final @NotNull List<BugPriority> CHOICES =
+            Arrays.stream(values()).filter(priority -> priority != EMPTY).toList();
+
+    /**
+     * What to show for a stored value, where EMPTY means nobody has chosen yet.
+     */
+    public static @NotNull BugPriority orDefault(final @NotNull BugPriority stored) {
+        return stored == EMPTY ? LOW : stored;
+    }
 
     private final @NotNull String label;
     private final int value;

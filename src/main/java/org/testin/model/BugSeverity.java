@@ -6,6 +6,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * How much a bug hurts, as the tester judged it when the case failed.
@@ -54,6 +56,29 @@ public enum BugSeverity {
             JBColor.GREEN.brighter().brighter(),
             ReportEmphasis.MUTED
     );
+
+    /**
+     * What a tester can choose, in the order declared above.
+     * <p>
+     * EMPTY is what a bug nobody filled in carries - a persistence default rather
+     * than a severity anyone means - so it is the one constant not offered.
+     * Derived rather than listed, because it was listed: the four choices were
+     * typed out in {@code FailedResultDialog}, so a fifth severity added here
+     * would have been missing from the only dialog that sets one, silently
+     * (#175, C14).
+     */
+    public static final @NotNull List<BugSeverity> CHOICES =
+            Arrays.stream(values()).filter(severity -> severity != EMPTY).toList();
+
+    /**
+     * What to show for a stored value, where EMPTY means nobody has chosen yet.
+     * <p>
+     * Enhancement, because it is the mildest thing a filed bug can be and a
+     * dialog that opens on the worst one invites a tester to leave it there.
+     */
+    public static @NotNull BugSeverity orDefault(final @NotNull BugSeverity stored) {
+        return stored == EMPTY ? ENHANCEMENT : stored;
+    }
 
     private final @NotNull String label;
     private final @NotNull Color color;

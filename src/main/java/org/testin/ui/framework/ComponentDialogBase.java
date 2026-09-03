@@ -12,6 +12,7 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * The typed content part of a framework dialog. Each component type gets its
@@ -203,6 +204,15 @@ public final class ComponentDialogBase<C extends DialogComponent> {
 
         public @NotNull RadioBuilder<T> option(final @NotNull String name, final @NotNull T value) {
             options.add(new RadioSelection.Option<>(name, value));
+            return this;
+        }
+
+        /**
+         * Every choice a kind offers, in its own order - so a constant added to
+         * the enum reaches the dialog without anybody remembering to list it.
+         */
+        public @NotNull RadioBuilder<T> options(final @NotNull List<T> values, final @NotNull Function<T, String> name) {
+            values.forEach(value -> option(name.apply(value), value));
             return this;
         }
 

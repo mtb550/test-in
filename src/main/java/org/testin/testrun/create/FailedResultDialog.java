@@ -45,19 +45,14 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
         actualResult = actualResultField.getComponent();
 
         final @NotNull ComponentDialogBase<RadioSelection<BugSeverity>> severityRadios = ComponentDialogBase.<BugSeverity>radios(RunEditorAttributes.BUG_SEVERITY.getName())
-                .option(BugSeverity.BLOCKER.getLabel(), BugSeverity.BLOCKER)
-                .option(BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR)
-                .option(BugSeverity.MINOR.getLabel(), BugSeverity.MINOR)
-                .option(BugSeverity.ENHANCEMENT.getLabel(), BugSeverity.ENHANCEMENT)
-                .select(severityOf(runItem))
+                .options(BugSeverity.CHOICES, BugSeverity::getLabel)
+                .select(BugSeverity.orDefault(runItem.getBugSeverity()))
                 .build();
         severity = severityRadios.getComponent();
 
         final @NotNull ComponentDialogBase<RadioSelection<BugPriority>> priorityRadios = ComponentDialogBase.<BugPriority>radios(RunEditorAttributes.BUG_PRIORITY.getName())
-                .option(BugPriority.HIGH.getLabel(), BugPriority.HIGH)
-                .option(BugPriority.MEDIUM.getLabel(), BugPriority.MEDIUM)
-                .option(BugPriority.LOW.getLabel(), BugPriority.LOW)
-                .select(priorityOf(runItem))
+                .options(BugPriority.CHOICES, BugPriority::getLabel)
+                .select(BugPriority.orDefault(runItem.getBugPriority()))
                 .build();
         priority = priorityRadios.getComponent();
 
@@ -91,22 +86,6 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
         shortcuts = List.of(
                 StatusBarShortcut.build(Shortcuts.Enter, "Save", this::submit),
                 StatusBarShortcut.cancel(this::closeCancel));
-    }
-
-    /**
-     * EMPTY is a persistence default, not a choice — Enhancement by default.
-     */
-    private static @NotNull BugSeverity severityOf(final @NotNull TestRunItems runItem) {
-        final @NotNull BugSeverity stored = runItem.getBugSeverity();
-        return stored == BugSeverity.EMPTY ? BugSeverity.ENHANCEMENT : stored;
-    }
-
-    /**
-     * EMPTY is a persistence default, not a choice — Low by default.
-     */
-    private static @NotNull BugPriority priorityOf(final @NotNull TestRunItems runItem) {
-        final @NotNull BugPriority stored = runItem.getBugPriority();
-        return stored == BugPriority.EMPTY ? BugPriority.LOW : stored;
     }
 
     @Override
