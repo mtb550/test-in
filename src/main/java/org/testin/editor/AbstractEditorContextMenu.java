@@ -44,22 +44,21 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
     }
 
     /**
-     * Whether this action's key belongs to the grid's own clipboard.
+     * Whether this action's key is one the grid answers for itself.
      * <p>
-     * Copy, Cut and Paste mean the selected cells in a grid and the selected test
-     * case on the list, and the same three keys carry both. Binding them here
-     * would settle it the wrong way round: the IDE dispatches a registered
-     * shortcut before a component's own input map, so CTRL+C copied the case's
-     * description over whichever cell the tester had picked (#66, finding D1).
+     * The same keystrokes carry different meanings on the two views, and binding
+     * a menu entry to the table settles it the wrong way round - the IDE
+     * dispatches a registered shortcut before a component's own input map, so
+     * the menu's version wins rather than competes.
      * <p>
-     * They stay on the menu, where they still act on the case - it is only the
-     * key that the grid keeps.
+     * Every action stays on the menu and still acts on the test case there. It is
+     * only the key the grid keeps, and only while a grid is on screen.
      */
     private static boolean claimedByTheGrid(final @NotNull AnAction action) {
         return Arrays.stream(action.getShortcutSet().getShortcuts())
                 .filter(KeyboardShortcut.class::isInstance)
                 .map(shortcut -> ((KeyboardShortcut) shortcut).getFirstKeyStroke())
-                .anyMatch(GridExcelBehavior.clipboardKeys()::contains);
+                .anyMatch(GridExcelBehavior.keysTheGridKeeps()::contains);
     }
 
     @Override

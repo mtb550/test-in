@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import org.testin.util.Shortcuts;
+
 import java.util.Set;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -60,22 +62,32 @@ public final class GridExcelBehavior {
     // ------------------------------------------------------------------
 
     /**
-     * The keys the grid's clipboard claims: in a grid, they mean the selected
-     * cells rather than the selected test case (#66, finding D1).
+     * The keys a grid answers for itself, which the editor's context menu must
+     * not take back.
      * <p>
-     * Public because the context menu has to know. Its Copy, Cut and Paste carry
-     * the same keys and are registered as IDE actions on the same table, and the
-     * IDE dispatches a registered shortcut before a component's own input map -
-     * so binding them here would take the keys back and copy a description over
-     * the cell the tester had selected.
+     * Every one of them means something different in a grid than on the list.
+     * Copy, cut and paste are the selected cells rather than the selected test
+     * case (#66, finding D1). ENTER edits the cell under the tester, or opens the
+     * details on the sequence, which is {@code GridViewDetailsAction}'s job and
+     * only its job.
+     * <p>
+     * The menu carries actions with these same keys, and
+     * {@code bindShortcutsTo} registers its children on the table as IDE actions
+     * - which the IDE dispatches before a component's own input map. So a menu
+     * entry bound here does not merely compete, it wins. ENTER was the case that
+     * proved it: the menu's ViewDetailsAction asks only whether the list has a
+     * selection, the grid mirrors its selection onto the list, so it was enabled
+     * on every cell and opened the details over the edit that should have
+     * started.
      */
-    public static @NotNull Set<KeyStroke> clipboardKeys() {
+    public static @NotNull Set<KeyStroke> keysTheGridKeeps() {
         final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
         return Set.of(
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask),
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask),
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask));
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask),
+                Shortcuts.Enter.getKey());
     }
 
     private static void installClipboardActions(final @NotNull JBTable table) {
