@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunSummary;
 import org.testin.logger.Logger;
 import org.testin.model.TestStatus;
+import org.testin.report.ReportTile;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -17,7 +18,6 @@ import org.testin.util.Display;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -62,26 +62,18 @@ public final class TestRunExcelGenerator {
             // The same headline the other three formats print, from the same
             // summary, so a spreadsheet and a PDF of one run cannot disagree.
             final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
-            final @NotNull List<String> headings = new ArrayList<>(
-                    List.of(TestStatus.PASSED.getLabel(), TestStatus.FAILED.getLabel(),
-                            TestStatus.BLOCKED.getLabel(), TestStatus.UNTESTED.getLabel(), "Executed", "Pass Rate"));
-            final @NotNull List<String> values = new ArrayList<>(List.of(
-                    String.valueOf(summary.passed()), String.valueOf(summary.failed()),
-                    String.valueOf(summary.blocked()), String.valueOf(summary.untested()),
-                    String.valueOf(summary.executed()), summary.passRate() + "%"));
+            // The sheet opened with Executed and no Total Cases while the other
+            // three formats opened with Total Cases and no Executed, so two
+            // reports of one run disagreed about what the run was. Decided a bug
+            // rather than a difference, 2026-09-04 (#174).
+            final @NotNull List<ReportTile> headline = ReportTile.shownFor(summary);
 
-            // Beside Untested, so the spreadsheet headline names what its own
-            // rows below already carry - a removed case is in the sheet either
-            // way, and a headline that skips it explains nothing.
-            if (summary.hasRemoved()) {
-                headings.add(4, TestStatus.REMOVED.getLabel());
-                values.add(4, String.valueOf(summary.removed()));
-            }
+            for (int col = 0; col < headline.size(); col++) {
+                final @NotNull ReportTile figure = headline.get(col);
 
-            for (int col = 0; col < headings.size(); col++) {
-                ws.value(4, col, headings.get(col));
+                ws.value(4, col, figure.getLabel());
                 ws.style(4, col).bold().set();
-                ws.value(5, col, values.get(col));
+                ws.value(5, col, figure.valueIn(summary));
             }
 
             int row = 7;

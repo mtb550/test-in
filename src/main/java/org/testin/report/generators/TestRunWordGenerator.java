@@ -8,7 +8,7 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.DetailRow;
 import org.testin.model.TestRunSummary;
-import org.testin.model.TestStatus;
+import org.testin.report.ReportTile;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.testin.logger.Logger;
 import org.testin.model.BugPriority;
@@ -96,10 +96,8 @@ public final class TestRunWordGenerator {
                         summary.total(), summary.executed(), summary.passRate()),
                         ReportFont.LEAD.ptRounded(), false, BLACK, NO_BORDER, 12);
 
-                // Seven tiles when the run has removed cases, six otherwise:
-                // the total counts them, so without a tile of their own the
-                // figures below the total do not add up to it.
-                final int tiles = summary.hasRemoved() ? 7 : 6;
+                final @NotNull List<ReportTile> headline = ReportTile.shownFor(summary);
+                final int tiles = headline.size();
 
                 XWPFTable statsTable = doc.createTable(1, tiles);
                 statsTable.setWidth("100%");
@@ -107,16 +105,10 @@ public final class TestRunWordGenerator {
                 setTableBorders(statsTable);
                 setTableWidths(statsTable, evenWidths(tiles));
 
-                int tile = 0;
-                addStatCell(statsTable, tile++, String.valueOf(summary.total()), "Total Cases", DARK_NAVY);
-                addStatCell(statsTable, tile++, String.valueOf(summary.passed()), TestStatus.PASSED.getLabel(), GREEN);
-                addStatCell(statsTable, tile++, String.valueOf(summary.failed()), TestStatus.FAILED.getLabel(), RED);
-                addStatCell(statsTable, tile++, String.valueOf(summary.blocked()), TestStatus.BLOCKED.getLabel(), DARK_YELLOW);
-                addStatCell(statsTable, tile++, String.valueOf(summary.untested()), TestStatus.UNTESTED.getLabel(), DARK_GRAY);
-                if (summary.hasRemoved()) {
-                    addStatCell(statsTable, tile++, String.valueOf(summary.removed()), TestStatus.REMOVED.getLabel(), DARK_GRAY);
+                for (int tile = 0; tile < tiles; tile++) {
+                    final @NotNull ReportTile figure = headline.get(tile);
+                    addStatCell(statsTable, tile, figure.valueIn(summary), figure.getLabel(), figure.getHex());
                 }
-                addStatCell(statsTable, tile, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE);
 
                 // Only what the tester wrote - see the PDF generator.
                 final boolean analysed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());

@@ -23,7 +23,7 @@ import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.DetailRow;
 import org.testin.model.TestRunSummary;
-import org.testin.model.TestStatus;
+import org.testin.report.ReportTile;
 import org.testin.logger.Logger;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
@@ -138,25 +138,18 @@ public final class TestRunPdfGenerator {
                     .setMarginBottom(12));
 
 
-            // Six tiles, or seven when the run has removed cases: the total
-            // counts them, so without a tile of their own the figures below the
-            // total do not add up to it.
-            final float[] tileWidths = new float[summary.hasRemoved() ? 7 : 6];
+            final @NotNull java.util.List<ReportTile> tiles = ReportTile.shownFor(summary);
+
+            final float[] tileWidths = new float[tiles.size()];
             Arrays.fill(tileWidths, 100f / tileWidths.length);
 
             Table statsTable = new Table(UnitValue.createPercentArray(tileWidths))
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
 
-            addStatCell(statsTable, String.valueOf(summary.total()), "Total Cases", DARK_NAVY, boldFont);
-            addStatCell(statsTable, String.valueOf(summary.passed()), TestStatus.PASSED.getLabel(), GREEN, boldFont);
-            addStatCell(statsTable, String.valueOf(summary.failed()), TestStatus.FAILED.getLabel(), RED, boldFont);
-            addStatCell(statsTable, String.valueOf(summary.blocked()), TestStatus.BLOCKED.getLabel(), DARK_YELLOW, boldFont);
-            addStatCell(statsTable, String.valueOf(summary.untested()), TestStatus.UNTESTED.getLabel(), DARK_GRAY, boldFont);
-            if (summary.hasRemoved()) {
-                addStatCell(statsTable, String.valueOf(summary.removed()), TestStatus.REMOVED.getLabel(), DARK_GRAY, boldFont);
+            for (final ReportTile tile : tiles) {
+                addStatCell(statsTable, tile.valueIn(summary), tile.getLabel(), rgb(tile.getHex()), boldFont);
             }
-            addStatCell(statsTable, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE, boldFont);
 
             document.add(statsTable);
 

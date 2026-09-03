@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.DetailRow;
 import org.testin.model.TestRunSummary;
 import org.testin.model.TestStatus;
+import org.testin.report.ReportTile;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
@@ -98,13 +99,9 @@ public final class TestRunHtmlGenerator {
 
         // Summary cards
         html.append("<div class='summary-cards'>");
-        summaryCard(html, String.valueOf(total), "Total Cases", "var(--heading)");
-        summaryCard(html, String.valueOf(passed), TestStatus.PASSED.getLabel(), "var(--verdict-passed)");
-        summaryCard(html, String.valueOf(failed), TestStatus.FAILED.getLabel(), "var(--verdict-failed)");
-        summaryCard(html, String.valueOf(blocked), TestStatus.BLOCKED.getLabel(), "var(--verdict-blocked)");
-        summaryCard(html, String.valueOf(untested), TestStatus.UNTESTED.getLabel(), "var(--verdict-untested)");
-        if (summary.hasRemoved()) summaryCard(html, String.valueOf(summary.removed()), TestStatus.REMOVED.getLabel(), "var(--verdict-removed)");
-        summaryCard(html, passRate + "%", "Pass Rate", "var(--heading)");
+        for (final ReportTile tile : ReportTile.shownFor(summary)) {
+            summaryCard(html, tile.valueIn(summary), tile.getLabel(), tile.getCssToken());
+        }
         html.append("</div>");
 
         // RESULT ANALYSIS - what the tester wrote about each verdict. This
