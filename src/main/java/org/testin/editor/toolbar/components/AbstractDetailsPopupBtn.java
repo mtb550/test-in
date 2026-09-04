@@ -21,8 +21,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
- * Toolbar button that shows a persistent check-box popup of editor detail attributes.
- * The concrete subclasses only supply the enum options and the persistence key.
+ * A button that shows a persistent check-box popup of what a view shows. The
+ * concrete subclasses supply the enum options, the persistence key, and what to
+ * call it.
+ * <p>
+ * The tooltip is the subclass's because the third caller is not a details popup:
+ * light mode's title bar opens the same list to choose which parts of its window
+ * are drawn, and a button labeled "Details" beside a Ctrl+D that means something
+ * else would have been two names for two things (#13).
  */
 public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribute> extends AbstractIconButton implements ToolbarItem {
 
@@ -37,11 +43,11 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
      */
     private final @NotNull AtomicBoolean refreshQueued = new AtomicBoolean();
 
-    protected AbstractDetailsPopupBtn(final @NotNull String propertyKey, final @NotNull Class<E> attributes, final @NotNull Runnable onToolBarDetailsSelectedChanged) {
+    protected AbstractDetailsPopupBtn(final @NotNull String tooltip, final @NotNull String propertyKey, final @NotNull Class<E> attributes, final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         // A checked box, matching the check-box list this button opens. The
         // previous icon was a framed panel with rules in it, which the New UI
         // draws almost identically to the List View button beside it.
-        super("Details", AllIcons.Actions.Selectall);
+        super(tooltip, AllIcons.Actions.Selectall);
 
         this.propertyKey = propertyKey;
         this.options = List.of(attributes.getEnumConstants());

@@ -118,6 +118,8 @@ final class LightModeWindow {
 
     private final @NotNull JBLabel caseClock = clock("Test case duration");
     private final @NotNull JBLabel runClock = clock("Test Run duration");
+    private final @NotNull JBPanel<?> strip = new JBPanel<>(new BorderLayout());
+    private final @NotNull JBPanel<?> setLine = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
     /**
      * The verdicts, the clocks and the keys, shown together or not at all.
@@ -139,6 +141,13 @@ final class LightModeWindow {
     private final @NotNull JComponent commitButtons = commitButtons();
 
     private final @NotNull StatusBarBase statusBar = new StatusBarBase(new StatusBarItem[0]);
+
+    /**
+     * The five checkboxes, and the memory of which are ticked. Asked rather than
+     * mirrored into fields here: the button is already the answer, and a copy of
+     * it would be the thing that goes stale.
+     */
+    private final @NotNull ViewMenuBtn viewMenu = new ViewMenuBtn(this::applyView);
 
     /**
      * Where in the title bar the drag started, and empty whenever no drag is
@@ -284,10 +293,6 @@ final class LightModeWindow {
         // Visibility is not touched here: rebuilding the rows does not change
         // whether they are shown, and showDetails is the one thing that decides.
         details.show(p, tc);
-
-        // The expected result is optional on a test case, and an empty paragraph
-        // leaves a gap the tester reads as something failing to load.
-        expected.setVisible(!expected.getText().isBlank());
     }
 
     /**
@@ -505,9 +510,60 @@ final class LightModeWindow {
         verdictRow.removeAll();
         verdictRow.add(writing ? commitButtons : verdictButtons, BorderLayout.CENTER);
 
-        chosen.setVisible(writing);
-
         statusBar.updateItems(writing ? commitKeys() : caseKeys());
+
+        applyParts();
+    }
+
+    /**
+     * What the view menu decided, applied to the window and the height re-fitted
+     * around it.
+     * <p>
+     * Called by the menu itself when a box is ticked. The redraw is the menu's
+     * to trigger and this one's to perform, which is the same split every
+     * details popup in the plugin already uses.
+     */
+    private void applyView() {
+        applyParts();
+        fitHeight();
+    }
+
+    /**
+     * Which parts are drawn, asked of the menu each time rather than remembered.
+     * <p>
+     * <b>Writing up a failure ignores all five.</b> A verdict that asks for
+     * detail cannot be trimmed to the point where the detail is unreachable, so
+     * while the form is open its two commands are shown whatever the tester
+     * ticked - hiding Save on a form that has to be saved would be a window that
+     * cannot finish what it started.
+     * <p>
+     * Nothing is left behind as an empty band: a hidden component takes no space
+     * in a border layout, so turning off the clocks closes the buttons up over
+     * them and turning off both leaves the case sitting on the status bar.
+     */
+    private void applyParts() {
+        final boolean writing = capture.isPresent();
+
+        // The set name and the verdict share a line, and either can carry it on
+        // its own: the tester may have turned the name off, and a failure being
+        // written up has to say so whatever they turned off. The separator is
+        // only drawn when there are two things to separate.
+        set.setVisible(shows(LightModePart.SET_NAME));
+        chosen.setVisible(writing);
+        chosen.setText(set.isVisible() ? " \u00b7 " + TestStatus.FAILED.getLabel() : TestStatus.FAILED.getLabel());
+        setLine.setVisible(set.isVisible() || chosen.isVisible());
+
+        // Two reasons it may not be drawn, and both have to hold for it to be:
+        // the tester asked for it, and the case actually has one.
+        expected.setVisible(shows(LightModePart.EXPECTED_RESULT) && !expected.getText().isBlank());
+
+        strip.setVisible(shows(LightModePart.DURATION));
+        verdictRow.setVisible(shows(LightModePart.VERDICT_BUTTONS) || writing);
+        statusBar.getPanel().setVisible(shows(LightModePart.STATUS_BAR));
+    }
+
+    private boolean shows(final @NotNull LightModePart part) {
+        return viewMenu.getSelectedDetails().contains(part);
     }
 
     /**
@@ -551,6 +607,7 @@ final class LightModeWindow {
         left.add(start);
         left.add(stop);
         left.add(pin());
+        left.add(viewMenu);
 
         counter.setFont(JBUI.Fonts.smallFont());
         counter.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
@@ -639,7 +696,6 @@ final class LightModeWindow {
         // drawn alike.
         chosen.setFont(JBUI.Fonts.smallFont());
         chosen.setForeground(TestStatus.FAILED.getRowColor());
-        chosen.setText(" \u00b7 " + TestStatus.FAILED.getLabel());
 
         final @NotNull JBPanel<?> text = new JBPanel<>(new BorderLayout(0, JBUI.scale(10)));
         text.setOpaque(false);
@@ -649,7 +705,6 @@ final class LightModeWindow {
         details.setBorder(JBUI.Borders.emptyTop(14));
         details.setVisible(detailsShown);
 
-        final @NotNull JBPanel<?> setLine = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         setLine.setOpaque(false);
         setLine.add(set);
         setLine.add(chosen);
@@ -751,7 +806,6 @@ final class LightModeWindow {
      * clocks the loudest thing in a window built to hold one sentence.
      */
     private @NotNull JComponent durationStrip() {
-        final @NotNull JBPanel<?> strip = new JBPanel<>(new BorderLayout());
         strip.setBorder(JBUI.Borders.empty(0, 10, 8, 10));
         strip.setOpaque(false);
         strip.add(caseClock, BorderLayout.WEST);
