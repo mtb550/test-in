@@ -11,8 +11,9 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.*;
 import org.testin.util.Shortcuts;
 
-import java.util.Optional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Collects the failure details when a test case is set to Failed: the actual
@@ -24,10 +25,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
 
     private final @NotNull TestRunItems runItem;
     private final @NotNull Runnable onSave;
-    private final @NotNull TextInput actualResult;
-    private final @NotNull RadioSelection<BugSeverity> severity;
-    private final @NotNull RadioSelection<BugPriority> priority;
-    private final @NotNull TextArea errorCapture;
+    private final @NotNull FailureFields fields;
 
     public FailedResultDialog(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull Runnable onSave) {
         super(p);
@@ -38,30 +36,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
         // no longer exists in the test set never gets one.
         final @NotNull Optional<TestCaseDto> tc = runItem.testCase();
 
-        final @NotNull ComponentDialogBase<TextInput> actualResultField = ComponentDialogBase.textField()
-                .placeholder("set actual result..")
-                .value(runItem.getActualResult())
-                .build();
-        actualResult = actualResultField.getComponent();
-
-        final @NotNull ComponentDialogBase<RadioSelection<BugSeverity>> severityRadios = ComponentDialogBase.<BugSeverity>radios(RunEditorAttributes.BUG_SEVERITY.getName())
-                .options(BugSeverity.CHOICES, BugSeverity::getLabel)
-                .select(BugSeverity.orDefault(runItem.getBugSeverity()))
-                .build();
-        severity = severityRadios.getComponent();
-
-        final @NotNull ComponentDialogBase<RadioSelection<BugPriority>> priorityRadios = ComponentDialogBase.<BugPriority>radios(RunEditorAttributes.BUG_PRIORITY.getName())
-                .options(BugPriority.CHOICES, BugPriority::getLabel)
-                .select(BugPriority.orDefault(runItem.getBugPriority()))
-                .build();
-        priority = priorityRadios.getComponent();
-
-        final @NotNull ComponentDialogBase<TextArea> errorCaptureArea = ComponentDialogBase.textArea()
-                .placeholder("paste error or exception or screenshot..")
-                .value(runItem.getStacktrace())
-                .rows(5)
-                .build();
-        errorCapture = errorCaptureArea.getComponent();
+        fields = new FailureFields(runItem);
 
         title = "Failed Test Case Details";
 
@@ -73,15 +48,14 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
         final @NotNull String description = tc.map(TestCaseDto::getDescription).orElse("No longer in the test set");
         final @NotNull String expectedResult = tc.map(TestCaseDto::getExpectedResult).orElse("");
 
-        components = List.of(
-                ComponentDialogBase.details()
-                        .row(TestEditorAttributes.DESCRIPTION.getName(), description)
-                        .row("Expected", expectedResult)
-                        .build(),
-                actualResultField,
-                severityRadios,
-                priorityRadios,
-                errorCaptureArea);
+        final @NotNull List<ComponentDialogBase<?>> all = new ArrayList<>();
+        all.add(ComponentDialogBase.details()
+                .row(TestEditorAttributes.DESCRIPTION.getName(), description)
+                .row("Expected", expectedResult)
+                .build());
+        all.addAll(fields.components());
+
+        components = all;
 
         shortcuts = List.of(
                 StatusBarShortcut.build(Shortcuts.Enter, "Save", this::submit),
@@ -91,10 +65,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
     @Override
     protected void submit() {
         // Applied only on save - Escape must never commit the edit.
-        runItem.setActualResult(actualResult.getText().trim());
-        runItem.setBugSeverity(severity.getSelected());
-        runItem.setBugPriority(priority.getSelected());
-        runItem.setStacktrace(errorCapture.getText().trim());
+        fields.applyTo(runItem);
 
         onSave.run();
         closeOk();

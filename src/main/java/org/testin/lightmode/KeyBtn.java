@@ -5,7 +5,6 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestStatus;
 import org.testin.ui.framework.Keycap;
 
 import javax.swing.*;
@@ -14,46 +13,43 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * One of light mode's three verdicts: the key that gives it, and the word for
- * what it means (#13).
+ * A key and what it does, offered as something to click as well (#13).
  * <p>
- * <b>All three are drawn the same.</b> A verdict color says a case has been
- * judged; a button offering to judge one has not, so painting Passed green and
- * Failed red here would put the answer on screen before the tester gave it.
- * Color returns on the failure form, where FAILED has been chosen.
+ * Light mode's two rows of buttons are the same object twice: the three
+ * verdicts, and the Cancel and Save that replace them while a failure is being
+ * written. Both are a keycap beside a word, and both exist so the tester can
+ * reach with the mouse what they would otherwise reach with the key - so
+ * neither has a look of its own to get out of step.
+ * <p>
+ * <b>No color.</b> A verdict color says a case has been judged; a button
+ * offering to judge one has not, so painting Passed green here would put the
+ * answer on screen before the tester gave it. The same restraint covers Save:
+ * emphasizing it would be pressing the tester toward one answer on a form whose
+ * whole point is that they choose.
  * <p>
  * A panel rather than a button, because a button draws one string and this is a
  * keycap beside a word - and the keycap is {@link Keycap}, the same one the
  * status bar of every dialog uses.
  */
-class VerdictBtn extends JBPanel<VerdictBtn> {
+class KeyBtn extends JBPanel<KeyBtn> {
 
-    private final @NotNull Runnable onChosen;
+    private final @NotNull Runnable onClick;
 
     private boolean hovered;
 
-    VerdictBtn(final @NotNull TestStatus status, final @NotNull Runnable onChosen) {
+    KeyBtn(final @NotNull String key, final @NotNull String text, final @NotNull String tooltip, final @NotNull Runnable onClick) {
         super(new FlowLayout(FlowLayout.CENTER, JBUI.scale(6), JBUI.scale(5)));
-        this.onChosen = onChosen;
+        this.onClick = onClick;
 
-        setToolTipText("Record " + status.getLabel().toLowerCase() + " for this test case");
+        setToolTipText(tooltip);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1));
         setOpaque(false);
 
-        add(Keycap.of(keyOf(status)));
-        add(new JBLabel(status.getLabel()));
+        add(Keycap.of(key));
+        add(new JBLabel(text));
 
         listen();
-    }
-
-    /**
-     * The letter the tester presses, taken from the status itself - the same
-     * declaration that binds the key in {@link LightModeWindow}, so the cap can
-     * never name a key that does nothing.
-     */
-    static @NotNull String keyOf(final @NotNull TestStatus status) {
-        return String.valueOf((char) status.getMenuEntry().shortcut().getKeyCode());
     }
 
     private void listen() {
@@ -72,7 +68,7 @@ class VerdictBtn extends JBPanel<VerdictBtn> {
 
             @Override
             public void mouseClicked(final @NotNull MouseEvent e) {
-                onChosen.run();
+                onClick.run();
             }
         });
     }

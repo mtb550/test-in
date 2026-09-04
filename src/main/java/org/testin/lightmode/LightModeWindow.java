@@ -9,6 +9,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
+import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -32,6 +33,7 @@ import java.awt.event.WindowEvent;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,8 +104,17 @@ final class LightModeWindow {
     private final @NotNull JTextArea expected = Prose.of(JBFont.label(), JBUI.CurrentTheme.ContextHelp.FOREGROUND);
     private final @NotNull JBLabel idle = new JBLabel("Press the play button to start test execution", SwingConstants.CENTER);
 
+    private final @NotNull JBLabel chosen = new JBLabel();
     private final @NotNull JBPanel<?> caseView = new JBPanel<>(new BorderLayout());
     private final @NotNull CaseDetails details = new CaseDetails();
+
+    /**
+     * The one box under the case. It holds the details that {@code Ctrl+D} fills
+     * with steps and tags, or the four fields a failure is written into - never
+     * both, and never one added below the other. There is one window and one box
+     * in it (#13).
+     */
+    private final @NotNull JBPanel<?> underCase = new JBPanel<>(new BorderLayout());
 
     private final @NotNull JBLabel caseClock = clock("Test case duration");
     private final @NotNull JBLabel runClock = clock("Test Run duration");
@@ -119,6 +130,17 @@ final class LightModeWindow {
     private final @NotNull JBPanel<?> footer = new JBPanel<>(new BorderLayout());
 
     /**
+     * The three verdicts, and the Cancel and Save that stand in their place
+     * while a failure is being written. Built once and swapped, so the row keeps
+     * its place and the window does not jump under the tester's hand.
+     */
+    private final @NotNull JBPanel<?> verdictRow = new JBPanel<>(new BorderLayout());
+    private final @NotNull JComponent verdictButtons = verdictButtons();
+    private final @NotNull JComponent commitButtons = commitButtons();
+
+    private final @NotNull StatusBarBase statusBar = new StatusBarBase(new StatusBarItem[0]);
+
+    /**
      * Where in the title bar the drag started, and empty whenever no drag is
      * under way.
      */
@@ -129,6 +151,16 @@ final class LightModeWindow {
      * a tester, so everything else starts out of the way.
      */
     private boolean detailsShown;
+
+    /**
+     * The failure being written up, and empty the rest of the time.
+     * <p>
+     * Every key in this window asks it first. While a form is waiting to be
+     * filled in, Escape belongs to the form rather than to the window, Enter
+     * means save, and the verdict keys mean nothing at all - a case whose
+     * failure is halfway written down is not one to give a second verdict to.
+     */
+    private @NotNull Optional<FailureForm> capture = Optional.empty();
 
     LightModeWindow(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
         this.p = p;
@@ -184,6 +216,13 @@ final class LightModeWindow {
         stop.setVisible(editor.isExecuting());
 
         if (executing) showCase(cases.get(index));
+
+        // Any execution-state change outdates a half-written failure: the case it
+        // describes is no longer the case in front of the tester. Dropped rather
+        // than carried over, because carrying it over would attach one case's
+        // failure to the next one's row.
+        capture = Optional.empty();
+        showCapture();
 
         tick();
 
@@ -281,16 +320,29 @@ final class LightModeWindow {
     }
 
     /**
-     * Escape closes; P, F and B judge the case on screen.
+     * Escape leaves whatever the tester is in; Enter commits it; P, F and B
+     * judge the case on screen.
      * <p>
      * Bound on the window rather than on a component inside it, because the
      * tester's hands are on the keyboard and nothing here is worth focusing.
      * Each verdict is bound from the keystroke the status itself declares - the
-     * same one {@link VerdictBtn} prints on its cap - so the key that works and
-     * the key that is advertised cannot come apart.
+     * same one {@link KeyBtn} prints on its cap - so the key that works and the
+     * key that is advertised cannot come apart.
+     * <p>
+     * <b>One handler per key, which then asks what is on screen.</b> Escape is
+     * the clear case: it means "leave this", and while a failure is being
+     * written the thing to leave is the form rather than the window. Two
+     * handlers racing for Escape would have been resolved by whichever the
+     * framework consulted first, silently.
+     * <p>
+     * A window binding is only reached by a key the focused component did not
+     * take, which is what makes typing safe: the error capture keeps Enter for
+     * its own newlines, and every letter typed into a field stays in the field
+     * rather than recording a verdict.
      */
     private void bindKeys() {
-        bind(Shortcuts.Escape.getKey(), "testin.lightMode.close", this::close);
+        bind(Shortcuts.Escape.getKey(), "testin.lightMode.escape", this::escape);
+        bind(Shortcuts.Enter.getKey(), "testin.lightMode.commit", this::saveCapture);
         bind(SHOW_DETAILS, "testin.lightMode.showDetails", () -> showDetails(true));
         bind(HIDE_DETAILS, "testin.lightMode.hideDetails", () -> showDetails(false));
 
@@ -331,6 +383,9 @@ final class LightModeWindow {
      * on every repeat.
      */
     private void showDetails(final boolean show) {
+        // A form cannot be collapsed while it is waiting to be filled in.
+        if (capture.isPresent()) return;
+
         if (detailsShown == show) return;
 
         detailsShown = show;
@@ -340,15 +395,132 @@ final class LightModeWindow {
     }
 
     /**
-     * Records a verdict on the case being executed - the one on screen.
+     * Takes a verdict on the case being executed - the one on screen.
      * <p>
-     * Through the same service call the grid makes, which advances to the next
-     * case, persists, completes the run if that was the last one, and tells the
-     * tester. It refuses on its own when nothing is being executed, which is
-     * what a key pressed on the idle window is.
+     * A verdict that collects failure details opens the form instead of
+     * recording anything; the record happens when the tester saves it. Which
+     * verdict that is comes from the status itself, so this does not name
+     * FAILED and would not have to be found again if a second such verdict were
+     * ever added.
      */
     private void judge(final @NotNull TestStatus status) {
+        if (capture.isPresent()) return;
+
+        if (status.isCollectsFailureDetails()) {
+            openCapture();
+            return;
+        }
+
+        record(status);
+    }
+
+    /**
+     * Writes the verdict down, through the same service call the grid makes -
+     * which advances to the next case, persists, completes the run if that was
+     * the last one, and tells the tester. It refuses on its own when nothing is
+     * being executed, which is what a key pressed on the idle window is.
+     */
+    private void record(final @NotNull TestStatus status) {
         Services.getInstance(p, RunStatusService.class).executeNext(p, editor, status);
+    }
+
+    /**
+     * Opens the failure form on the case being executed, and puts the caret in
+     * its first field.
+     * <p>
+     * Nothing happens if there is no row to write on - a case the run does not
+     * cover, or one removed from the test set. The window says nothing about it
+     * because the tester pressed a key rather than asking a question, and the
+     * form simply not opening is the answer.
+     */
+    private void openCapture() {
+        executingItem().ifPresent(item -> {
+            capture = Optional.of(new FailureForm(item));
+
+            showCapture();
+            fitHeight();
+
+            capture.ifPresent(FailureForm::focusFirstField);
+        });
+    }
+
+    /**
+     * Leaves the form with the case still unjudged and nothing written - which
+     * is the promise Escape makes everywhere else in this plugin.
+     */
+    private void cancelCapture() {
+        if (capture.isEmpty()) return;
+
+        capture = Optional.empty();
+
+        showCapture();
+        fitHeight();
+    }
+
+    /**
+     * Writes the four fields onto the run row and then records the verdict, in
+     * that order: a verdict is what decides whether what was typed survives, so
+     * it goes last. It is also the order {@code FailedResultDialog} uses.
+     */
+    private void saveCapture() {
+        capture.ifPresent(form -> {
+            form.save();
+            capture = Optional.empty();
+
+            showCapture();
+            fitHeight();
+
+            record(TestStatus.FAILED);
+        });
+    }
+
+    /**
+     * Escape means "leave what I am in": the form while one is open, and the
+     * window otherwise.
+     */
+    private void escape() {
+        if (capture.isPresent()) {
+            cancelCapture();
+            return;
+        }
+
+        close();
+    }
+
+    /**
+     * Draws whichever of the two states the window is in - the case with its
+     * details and three verdicts, or the case with a failure form and two
+     * commands under it.
+     * <p>
+     * One method, because the three things that change change together. Split
+     * across the places that trigger them, a window could show the commit bar
+     * over the details, or Escape's hint while Escape meant something else.
+     */
+    private void showCapture() {
+        final boolean writing = capture.isPresent();
+
+        underCase.removeAll();
+        underCase.add(capture.map(form -> (JComponent) form).orElse(details), BorderLayout.CENTER);
+
+        verdictRow.removeAll();
+        verdictRow.add(writing ? commitButtons : verdictButtons, BorderLayout.CENTER);
+
+        chosen.setVisible(writing);
+
+        statusBar.updateItems(writing ? commitKeys() : caseKeys());
+    }
+
+    /**
+     * The run row for the case being executed, and empty when there is none to
+     * write on.
+     */
+    private @NotNull Optional<TestRunItems> executingItem() {
+        final @NotNull List<TestCaseDto> cases = editor.getCurrentTestCases();
+        final int index = editor.getCurrentlyExecutingIndex();
+
+        if (index < 0 || index >= cases.size()) return Optional.empty();
+
+        return editor.runItem(cases.get(index).getId()).filter(item -> !item.isRemoved());
     }
 
     private @NotNull JComponent content() {
@@ -461,6 +633,14 @@ final class LightModeWindow {
         set.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         idle.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
+        // The one place a verdict is colored while the tester is still working:
+        // they have chosen Failed and are writing it up, so it is a state rather
+        // than an offer. Everywhere else in this window the three verdicts are
+        // drawn alike.
+        chosen.setFont(JBUI.Fonts.smallFont());
+        chosen.setForeground(TestStatus.FAILED.getRowColor());
+        chosen.setText(" \u00b7 " + TestStatus.FAILED.getLabel());
+
         final @NotNull JBPanel<?> text = new JBPanel<>(new BorderLayout(0, JBUI.scale(10)));
         text.setOpaque(false);
         text.add(description, BorderLayout.NORTH);
@@ -469,10 +649,17 @@ final class LightModeWindow {
         details.setBorder(JBUI.Borders.emptyTop(14));
         details.setVisible(detailsShown);
 
+        final @NotNull JBPanel<?> setLine = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        setLine.setOpaque(false);
+        setLine.add(set);
+        setLine.add(chosen);
+
+        underCase.setOpaque(false);
+
         caseView.setOpaque(false);
-        caseView.add(set, BorderLayout.NORTH);
+        caseView.add(setLine, BorderLayout.NORTH);
         caseView.add(text, BorderLayout.CENTER);
-        caseView.add(details, BorderLayout.SOUTH);
+        caseView.add(underCase, BorderLayout.SOUTH);
 
         // The width is this window's to choose and the height is the case's, so
         // the panel answers with one of each rather than taking a fixed size -
@@ -497,7 +684,7 @@ final class LightModeWindow {
      * tester reaching for one of them is not choosing between a default and two
      * exceptions.
      */
-    private @NotNull JComponent verdictBar() {
+    private @NotNull JComponent verdictButtons() {
         final @NotNull JBPanel<?> verdicts = new JBPanel<>(new GridLayout(1, 0, JBUI.scale(6), 0));
         verdicts.setBorder(JBUI.Borders.empty(0, 10, 10, 10));
         verdicts.setOpaque(false);
@@ -505,10 +692,41 @@ final class LightModeWindow {
         for (final TestStatus status : TestStatus.values()) {
             if (!status.isVerdict()) continue;
 
-            verdicts.add(new VerdictBtn(status, () -> judge(status)));
+            verdicts.add(new KeyBtn(keyOf(status), status.getLabel(),
+                    "Record " + status.getLabel().toLowerCase(Locale.ROOT) + " for this test case",
+                    () -> judge(status)));
         }
 
         return verdicts;
+    }
+
+    /**
+     * What replaces the verdicts while a failure is being written: leave it, or
+     * save it and move on.
+     * <p>
+     * Sized to their words and pushed right, where the verdicts are stretched
+     * equally across the window - these two are not a choice between equals, and
+     * laying them out as one would say they were.
+     */
+    private @NotNull JComponent commitButtons() {
+        final @NotNull JBPanel<?> commit = new JBPanel<>(new FlowLayout(FlowLayout.RIGHT, JBUI.scale(6), 0));
+        commit.setBorder(JBUI.Borders.empty(0, 10, 10, 10));
+        commit.setOpaque(false);
+
+        commit.add(new KeyBtn(Shortcuts.Escape.getShortcutText(), "Cancel",
+                "Leave the case unjudged and write nothing", this::cancelCapture));
+        commit.add(new KeyBtn(Shortcuts.Enter.getShortcutText(), "Save & next",
+                "Record the failure and move to the next test case", this::saveCapture));
+
+        return commit;
+    }
+
+    /**
+     * The letter that applies a status, read from the status itself so the cap
+     * and the binding cannot name different keys.
+     */
+    private static @NotNull String keyOf(final @NotNull TestStatus status) {
+        return Shortcuts.shortcutText(status.getMenuEntry().shortcut());
     }
 
     /**
@@ -520,9 +738,9 @@ final class LightModeWindow {
      */
     private @NotNull JComponent footer() {
         footer.setOpaque(false);
-        footer.add(verdictBar(), BorderLayout.NORTH);
+        footer.add(verdictRow, BorderLayout.NORTH);
         footer.add(durationStrip(), BorderLayout.CENTER);
-        footer.add(statusBar(), BorderLayout.SOUTH);
+        footer.add(statusBar.getPanel(), BorderLayout.SOUTH);
 
         return footer;
     }
@@ -552,17 +770,28 @@ final class LightModeWindow {
      * The letters still come from {@link TestStatus}, so the cap cannot name a
      * key that does nothing.
      */
-    private @NotNull JComponent statusBar() {
+    private StatusBarItem @NotNull [] caseKeys() {
         final @NotNull List<StatusBarItem> items = new ArrayList<>();
         items.add(StatusBarShortcut.hint(Shortcuts.shortcutText(SHOW_DETAILS), "Details"));
         items.add(StatusBarShortcut.hint(Shortcuts.shortcutText(HIDE_DETAILS), "Hide"));
         items.add(StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), "Close"));
 
         for (final TestStatus status : TestStatus.values()) {
-            if (status.isVerdict()) items.add(StatusBarShortcut.hint(VerdictBtn.keyOf(status), status.getLabel()));
+            if (status.isVerdict()) items.add(StatusBarShortcut.hint(keyOf(status), status.getLabel()));
         }
 
-        return new StatusBarBase(items.toArray(new StatusBarItem[0])).getPanel();
+        return items.toArray(new StatusBarItem[0]);
+    }
+
+    /**
+     * Two keys while a failure is being written, and neither of them is one of
+     * the four above: Ctrl+D cannot collapse a form waiting to be filled in, and
+     * Escape has stopped meaning close.
+     */
+    private StatusBarItem @NotNull [] commitKeys() {
+        return new StatusBarItem[]{
+                StatusBarShortcut.hint(Shortcuts.Enter.getShortcutText(), "Save & next"),
+                StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), "Cancel")};
     }
 
     private static @NotNull JBLabel clock(final @NotNull String meaning) {
