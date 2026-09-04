@@ -2,7 +2,9 @@ package org.testin.lightmode;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.run.RunEditor;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 
 import java.util.Optional;
@@ -14,7 +16,7 @@ import java.util.Optional;
  * {@link #isOpenOn} rather than holding a flag of its own, so Escape, the
  * window's own close button and the project closing all un-press it without
  * three handlers agreeing to. That is the rule
- * {@code RunEditor.refreshExecutionButtons} already follows for Start and Stop,
+ * {@code RunEditor.onExecutionStateChanged} already follows for Start and Stop,
  * and for the reason its javadoc gives: the second copy is always the one that
  * drifts.
  * <p>
@@ -43,19 +45,28 @@ public final class LightMode implements Disposable {
      * being touched, and a button that only redrew when it was clicked would sit
      * pressed over a window that had gone.
      */
-    public void toggle(final @NotNull TestRunDirectoryDto run, final @NotNull Runnable onChange) {
-        final boolean wasShowingThisRun = isOpenOn(run);
+    public void toggle(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull Runnable onChange) {
+        final boolean wasShowingThisRun = isOpenOn(editor.getParent());
 
         close();
 
         if (wasShowingThisRun) return;
 
-        window = Optional.of(new LightModeWindow(run, () -> {
+        window = Optional.of(new LightModeWindow(p, editor, () -> {
             window = Optional.empty();
             onChange.run();
         }));
 
         onChange.run();
+    }
+
+    /**
+     * Redraws the window if it is this run it is showing, and does nothing at
+     * all otherwise - which is every other run editor in the project, and the
+     * usual case.
+     */
+    public void refresh(final @NotNull TestRunDirectoryDto run) {
+        window.filter(open -> open.shows(run)).ifPresent(LightModeWindow::refresh);
     }
 
     public boolean isOpenOn(final @NotNull TestRunDirectoryDto run) {

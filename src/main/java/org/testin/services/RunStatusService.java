@@ -30,13 +30,21 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class RunStatusService {
 
-    public void executeNext(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
+    /**
+     * Judges the case the editor is executing, and moves on to the next.
+     * <p>
+     * No list, though it used to take one to repaint: the refresh that follows
+     * rebuilds the page model, which repaints for itself. Without that
+     * parameter the call says what it needs - a run being executed and a verdict
+     * - so light mode records exactly as the grid does rather than through a
+     * path of its own (#13).
+     */
+    public void executeNext(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestStatus status) {
 
         final int executingIndex = editor.getCurrentlyExecutingIndex();
         if (executingIndex == -1) return;
@@ -49,7 +57,7 @@ public final class RunStatusService {
         Logger.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
 
         persistRun(p, editor);
-        triggerFilterRefresh(editor, list);
+        triggerFilterRefresh(editor);
 
         // Only when a verdict was actually recorded: a missing run item leaves
         // the status exactly as it was.
@@ -149,12 +157,12 @@ public final class RunStatusService {
 
         final @NotNull List<String> losing = wouldBeErased(editor, selectedItems, status);
         if (losing.isEmpty()) {
-            record(p, list, status, editor, selectedItems);
+            record(p, status, editor, selectedItems);
             return;
         }
 
         new ConfirmDialog(p, status.getLabel(), erasureWarning(losing, selectedItems.size()), "", "",
-                status.getLabel(), () -> record(p, list, status, editor, selectedItems)).show();
+                status.getLabel(), () -> record(p, status, editor, selectedItems)).show();
     }
 
     /**
@@ -192,7 +200,7 @@ public final class RunStatusService {
      * What {@link #applyStatus} does once the tester has nothing left to lose by
      * it - either because the verdict erases nothing, or because they said so.
      */
-    private void record(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+    private void record(final @NotNull Project p, final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
         if (selectedItems.size() == 1) {
             final @NotNull TestCaseDto tc = selectedItems.getFirst();
             if (editor.runItem(tc.getId()).filter(TestRunItems::isRemoved).isPresent()) {
@@ -202,7 +210,7 @@ public final class RunStatusService {
 
             final int globalIndex = editor.getCurrentTestCases().indexOf(tc);
             if (globalIndex == editor.getCurrentlyExecutingIndex()) {
-                executeNext(p, editor, list, status);
+                executeNext(p, editor, status);
             } else {
                 executeManual(p, editor, tc, status, Duration.ZERO, Failure.NONE);
             }
@@ -225,7 +233,7 @@ public final class RunStatusService {
             }
 
             persistRun(p, editor);
-            triggerFilterRefresh(editor, list);
+            triggerFilterRefresh(editor);
 
             confirmVerdict(p, status, recorded);
         }
@@ -317,21 +325,18 @@ public final class RunStatusService {
     }
 
     /**
-     * The same refresh, for a caller with no list of its own to repaint.
+     * Shows what the verdict did, on the EDT.
+     * <p>
+     * One overload, where there were two: the second took the list and repainted
+     * it first, which the rebuild in {@link #refreshEditor} does again a line
+     * later.
      */
     private void triggerFilterRefresh(final @NotNull TestinEditor editor) {
         ApplicationManager.getApplication().invokeLater(() -> refreshEditor(editor));
     }
 
-    private void triggerFilterRefresh(final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
-        ApplicationManager.getApplication().invokeLater(() -> {
-            list.repaint();
-            refreshEditor(editor);
-        });
-    }
-
     /**
-     * What both refreshes do to the editor itself, on the EDT.
+     * What the refresh does to the editor itself, on the EDT.
      */
     private void refreshEditor(final @NotNull TestinEditor editor) {
         if (editor instanceof RunEditor runEditor) {
