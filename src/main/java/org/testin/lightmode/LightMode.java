@@ -69,6 +69,15 @@ public final class LightMode implements Disposable {
         window.filter(open -> open.shows(run)).ifPresent(LightModeWindow::refresh);
     }
 
+    /**
+     * Moves the clocks on, once a second, and touches nothing else - a full
+     * refresh re-measures and re-sizes the window, which is not something to do
+     * to a tester every second while they are reading.
+     */
+    public void tick(final @NotNull TestRunDirectoryDto run) {
+        window.filter(open -> open.shows(run)).ifPresent(LightModeWindow::tick);
+    }
+
     public boolean isOpenOn(final @NotNull TestRunDirectoryDto run) {
         return window.filter(open -> open.shows(run)).isPresent();
     }

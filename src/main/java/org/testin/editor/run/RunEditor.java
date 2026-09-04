@@ -1102,11 +1102,35 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * pushed as one; the clock is not.
      */
     private void showElapsed() {
-        final @NotNull Duration total = resultsMap.values().stream()
+        statusBar.showExecutionTime(Display.formatDuration(getElapsed()));
+
+        // The clocks and nothing else, for the reason above: light mode redraws
+        // its two figures here rather than through onExecutionStateChanged,
+        // which re-measures and re-sizes the whole window.
+        Services.getInstance(p, LightMode.class).tick(parent);
+    }
+
+    /**
+     * How long this run has taken: every case's duration added up, including
+     * the one being timed right now, which the timer writes to as it ticks.
+     */
+    public @NotNull Duration getElapsed() {
+        return resultsMap.values().stream()
                 .map(TestRunItems::getDuration)
                 .reduce(Duration.ZERO, Duration::plus);
+    }
 
-        statusBar.showExecutionTime(Display.formatDuration(total));
+    /**
+     * How long the case being executed has taken so far, and zero when none is
+     * - which is the honest answer rather than a missing one, and the same
+     * value a case that has just started carries.
+     */
+    public @NotNull Duration getCurrentCaseElapsed() {
+        if (currentlyExecutingIndex < 0 || currentlyExecutingIndex >= currentTestCases.size()) return Duration.ZERO;
+
+        return runItem(currentTestCases.get(currentlyExecutingIndex).getId())
+                .map(TestRunItems::getDuration)
+                .orElse(Duration.ZERO);
     }
 
     /**

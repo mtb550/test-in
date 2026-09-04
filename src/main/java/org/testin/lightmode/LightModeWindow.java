@@ -14,6 +14,9 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
+import org.testin.statusbar.StatusBarBase;
+import org.testin.statusbar.StatusBarItem;
+import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Display;
 import org.testin.util.Shortcuts;
 
@@ -24,6 +27,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,7 +90,19 @@ final class LightModeWindow {
     private final @NotNull JBLabel idle = new JBLabel("Press the play button to start test execution", SwingConstants.CENTER);
 
     private final @NotNull JBPanel<?> caseView = new JBPanel<>(new BorderLayout());
-    private final @NotNull JBPanel<?> verdicts = new JBPanel<>(new GridLayout(1, 0, JBUI.scale(6), 0));
+
+    private final @NotNull JBLabel caseClock = clock("Test case duration");
+    private final @NotNull JBLabel runClock = clock("Test Run duration");
+
+    /**
+     * The verdicts, the clocks and the keys, shown together or not at all.
+     * <p>
+     * All three answer questions about a case being executed, so before the run
+     * is started there is nothing for any of them to say - and one thing that
+     * appears and disappears is one thing to reason about, where three were
+     * three chances for the window to be caught half dressed.
+     */
+    private final @NotNull JBPanel<?> footer = new JBPanel<>(new BorderLayout());
 
     /**
      * Where in the title bar the drag started, and empty whenever no drag is
@@ -140,15 +158,42 @@ final class LightModeWindow {
 
         idle.setVisible(!executing);
         caseView.setVisible(executing);
-        verdicts.setVisible(executing);
+        footer.setVisible(executing);
 
         start.setVisible(!editor.isExecuting());
         stop.setVisible(editor.isExecuting());
 
         if (executing) showCase(cases.get(index));
 
+        tick();
+
         fitHeight();
         frame.repaint();
+    }
+
+    /**
+     * The two clocks, and only them.
+     * <p>
+     * Quiet and small, and never in the body: a number counting up in front of a
+     * tester is a stopwatch, and a stopwatch makes them hurry. That is why they
+     * are down here rather than beside the case, and why they are drawn in the
+     * hint color rather than the text color.
+     */
+    void tick() {
+        caseClock.setText(seconds(editor.getCurrentCaseElapsed()));
+        runClock.setText(seconds(editor.getElapsed()));
+    }
+
+    /**
+     * The same duration the editor's own status bar shows, to the second.
+     * <p>
+     * Truncated because these two tick in front of a tester who is reading:
+     * the timer writes milliseconds, so untruncated the clocks would end in
+     * three digits that change every second and take the number's width with
+     * them. Display only - what is stored keeps every millisecond it measured.
+     */
+    private static @NotNull String seconds(final @NotNull Duration duration) {
+        return Display.formatDuration(duration.truncatedTo(ChronoUnit.SECONDS));
     }
 
     /**
@@ -267,7 +312,7 @@ final class LightModeWindow {
         panel.setBorder(JBUI.Borders.customLine(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground()));
         panel.add(titleBar(), BorderLayout.NORTH);
         panel.add(body(), BorderLayout.CENTER);
-        panel.add(verdictBar(), BorderLayout.SOUTH);
+        panel.add(footer(), BorderLayout.SOUTH);
 
         return panel;
     }
@@ -405,6 +450,7 @@ final class LightModeWindow {
      * exceptions.
      */
     private @NotNull JComponent verdictBar() {
+        final @NotNull JBPanel<?> verdicts = new JBPanel<>(new GridLayout(1, 0, JBUI.scale(6), 0));
         verdicts.setBorder(JBUI.Borders.empty(0, 10, 10, 10));
         verdicts.setOpaque(false);
 
@@ -415,6 +461,67 @@ final class LightModeWindow {
         }
 
         return verdicts;
+    }
+
+    /**
+     * What sits under the case: the three verdicts, the two clocks, and the keys.
+     * <p>
+     * The verdicts and the clocks take the window's own background and the
+     * status bar takes the platform's advertiser tint, so the strip of keys
+     * reads as furniture and the two rows above it as part of the case.
+     */
+    private @NotNull JComponent footer() {
+        footer.setOpaque(false);
+        footer.add(verdictBar(), BorderLayout.NORTH);
+        footer.add(durationStrip(), BorderLayout.CENTER);
+        footer.add(statusBar(), BorderLayout.SOUTH);
+
+        return footer;
+    }
+
+    /**
+     * This case on the left, the whole run on the right. Neither is labeled: the
+     * tester learns which is which once, and a word beside each would make the
+     * clocks the loudest thing in a window built to hold one sentence.
+     */
+    private @NotNull JComponent durationStrip() {
+        final @NotNull JBPanel<?> strip = new JBPanel<>(new BorderLayout());
+        strip.setBorder(JBUI.Borders.empty(0, 10, 8, 10));
+        strip.setOpaque(false);
+        strip.add(caseClock, BorderLayout.WEST);
+        strip.add(runClock, BorderLayout.EAST);
+
+        return strip;
+    }
+
+    /**
+     * The keys, drawn by the same strip every dialog in the plugin uses - so
+     * light mode's keycaps are the plugin's keycaps, and the next change to them
+     * arrives here without being asked for.
+     * <p>
+     * Hints, every one: this window binds its own keys in {@link #bindKeys}, and
+     * an entry that claimed to bind them too would be a second claimant on P.
+     * The letters still come from {@link TestStatus}, so the cap cannot name a
+     * key that does nothing.
+     */
+    private @NotNull JComponent statusBar() {
+        final @NotNull List<StatusBarItem> items = new ArrayList<>();
+        items.add(StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), "Close"));
+
+        for (final TestStatus status : TestStatus.values()) {
+            if (status.isVerdict()) items.add(StatusBarShortcut.hint(VerdictBtn.keyOf(status), status.getLabel()));
+        }
+
+        return new StatusBarBase(items.toArray(new StatusBarItem[0])).getPanel();
+    }
+
+    private static @NotNull JBLabel clock(final @NotNull String meaning) {
+        final @NotNull JBLabel label = new JBLabel();
+        label.setToolTipText(meaning);
+        label.setFont(JBUI.Fonts.smallFont());
+        label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+
+        return label;
     }
 
     /**

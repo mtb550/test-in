@@ -12,11 +12,16 @@ import javax.swing.border.Border;
 import java.awt.*;
 
 /**
- * Shortcut-hint strip at the bottom of the dialogs, styled like the
- * platform's popup advertiser bar: tinted background, hairline on top, muted
- * hint text with the keystroke emphasized.
+ * Shortcut-hint strip at the bottom of a window, styled like the platform's
+ * popup advertiser bar: tinted background, hairline on top, muted hint text
+ * with the keystroke emphasized.
+ * <p>
+ * Usable as it stands, which is what its name says - {@code Base} is this
+ * project's word for a parent that is not abstract. It was abstract anyway,
+ * so light mode, which wants exactly this strip and adds nothing to it, would
+ * have had to declare an empty subclass to say so (#13).
  */
-public abstract class StatusBarBase {
+public class StatusBarBase {
     /**
      * Between a keystroke and its meaning.
      */
