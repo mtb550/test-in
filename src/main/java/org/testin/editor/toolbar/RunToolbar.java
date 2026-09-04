@@ -34,6 +34,7 @@ public class RunToolbar extends AbstractToolbarPanel {
                 // Laid out beside Start and never removed: RunEditor flips which of the
                 // two is visible, the way the list and grid view buttons already swap.
                 new StopExecutionBtn(getCallbacks()::onStopExecutionClicked),
+                new LightModeBtn(p, editor),
                 new GenerateReportBtn(p, editor),
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),
                 new RunDetailsPopupBtn(getCallbacks()::onToolBarDetailsSelectionChanged),

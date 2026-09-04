@@ -37,6 +37,16 @@ public abstract class AbstractIconButton extends JButton {
 
     private boolean hovered;
 
+    /**
+     * Whether this button is a toggle that is currently on.
+     * <p>
+     * Drawn as the platform draws a selected toolbar toggle, so a pressed Testin
+     * button and a pressed IDE one look the same. Here rather than on the one
+     * button that needed it first: a toolbar toggle showing its state is what
+     * every toolbar toggle will want (#13).
+     */
+    private boolean on;
+
     public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon) {
         super(null, icon);
         // Swing's own contract: a null tooltip is no tooltip at all, and an
@@ -166,17 +176,30 @@ public abstract class AbstractIconButton extends JButton {
         if (!enabled && hovered) setHovered(false);
     }
 
+    /**
+     * Turns the pressed look on or off. A button nobody calls this on is drawn
+     * exactly as before.
+     */
+    public void setOn(final boolean isOn) {
+        if (on == isOn) return;
+
+        this.on = isOn;
+        repaint();
+    }
+
     @Override
     protected void paintComponent(final @NotNull Graphics g) {
         final @NotNull Container parent = getParent();
         g.setColor(Optional.ofNullable(parent).map(Container::getBackground).orElseGet(this::getBackground));
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        if (hovered && isEnabled()) {
+        if ((on || hovered) && isEnabled()) {
             final @NotNull Graphics2D g2 = (Graphics2D) g.create();
             try {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(JBUI.CurrentTheme.ActionButton.hoverBackground());
+                g2.setColor(on
+                        ? JBUI.CurrentTheme.ActionButton.pressedBackground()
+                        : JBUI.CurrentTheme.ActionButton.hoverBackground());
                 final int arc = JBUI.scale(6);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), arc, arc);
             } finally {
