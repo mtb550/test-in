@@ -3,6 +3,8 @@ package org.testin.lightmode;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.WindowStateService;
+import com.intellij.ui.WindowMoveListener;
+import com.intellij.ui.WindowResizeListener;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
@@ -24,10 +26,10 @@ import org.testin.util.Shortcuts;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.Duration;
@@ -78,6 +80,23 @@ final class LightModeWindow {
      * whatever the case needs, which is what {@link #fitHeight} works out.
      */
     private static final int WIDTH = 420;
+
+    /**
+     * How narrow the tester may drag it. Not zero, and not the width of the
+     * widest label: a window too narrow to hold a sentence is not a smaller
+     * window, and one that cannot be made narrow enough to sit beside the
+     * application under test is not doing its job.
+     */
+    private static final int MIN_WIDTH = 280;
+
+    /**
+     * The strip down each side that grabs the edge, and the reason the window
+     * has visible rails at all. Only left and right are given a thickness, and
+     * that is the whole of "width only": the platform's resize listener reads
+     * this per side, so a top and bottom of zero mean there is no edge to take
+     * hold of there and no cursor offering one.
+     */
+    private static final int GRAB = 4;
 
     /**
      * Two keys for one state, because that is what the tester asked for: one
@@ -173,12 +192,6 @@ final class LightModeWindow {
     private final @NotNull ViewMenuBtn viewMenu = new ViewMenuBtn(this::applyView);
 
     /**
-     * Where in the title bar the drag started, and empty whenever no drag is
-     * under way.
-     */
-    private @NotNull Optional<Point> dragOrigin = Optional.empty();
-
-    /**
      * Closed until asked for. The window exists to put one sentence in front of
      * a tester, so everything else starts out of the way.
      */
@@ -205,6 +218,12 @@ final class LightModeWindow {
      */
     private float zoom = 1.0f;
 
+    /**
+     * The width the last resize left, so the height can be refitted for a change
+     * in width and ignored for the changes in height it makes itself.
+     */
+    private int lastWidth;
+
     LightModeWindow(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
         this.p = p;
         this.editor = editor;
@@ -219,11 +238,16 @@ final class LightModeWindow {
         // at all until it has a peer, and measuring a wrapped paragraph before
         // then measures it at no width.
         frame.pack();
+
+        // Before the first refresh, because the height is fitted to the width:
+        // restoring a wider window afterwards would leave it as tall as it would
+        // have been at the default one.
+        placeIt();
         refresh();
 
-        placeIt();
         bindKeys();
         bindWheel();
+        bindResize();
 
         frame.setVisible(true);
     }
@@ -351,10 +375,21 @@ final class LightModeWindow {
     void closeQuietly() {
         WindowStateService.getInstance().putLocation(PLACEMENT, frame.getLocation());
 
+        // Both stored, only the width read back. Where and how wide this window
+        // sits on this screen is one fact and belongs under one key; the height
+        // is not the tester's and is worked out from the case every time.
+        WindowStateService.getInstance().putSize(PLACEMENT, frame.getSize());
+
         frame.dispose();
     }
 
     private void placeIt() {
+        Optional.ofNullable(WindowStateService.getInstance().getSize(PLACEMENT))
+                .map(size -> Math.max(size.width, JBUI.scale(MIN_WIDTH)))
+                .ifPresent(width -> frame.setSize(width, frame.getHeight()));
+
+        lastWidth = frame.getWidth();
+
         final @NotNull Optional<Point> remembered = Optional.ofNullable(WindowStateService.getInstance().getLocation(PLACEMENT));
 
         remembered.ifPresentOrElse(frame::setLocation, () -> frame.setLocationRelativeTo(null));
@@ -664,7 +699,17 @@ final class LightModeWindow {
 
     private @NotNull JComponent content() {
         final @NotNull JBPanel<?> panel = new JBPanel<>(new BorderLayout());
-        panel.setBorder(JBUI.Borders.customLine(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground()));
+
+        // A hairline all round, and a rail down each side wide enough to take
+        // hold of. The rails are the window's own background rather than the
+        // body's, so they read as the frame they are - and they exist because an
+        // undecorated window has no edge the operating system would have given
+        // it (#13).
+        panel.setBackground(JBUI.CurrentTheme.CustomFrameDecorations.paneBackground());
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                JBUI.Borders.customLine(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground()),
+                JBUI.Borders.empty(0, GRAB)));
+
         panel.add(titleBar(), BorderLayout.NORTH);
         panel.add(body(), BorderLayout.CENTER);
         panel.add(footer(), BorderLayout.SOUTH);
@@ -734,33 +779,57 @@ final class LightModeWindow {
     }
 
     /**
-     * The cost of drawing our own title bar: the operating system is no longer
-     * moving the window, so this does. Only the offset within the bar is kept -
-     * everything else is arithmetic against where the pointer is now.
+     * Dragging the title bar moves the window, which the operating system would
+     * have done had the window been decorated.
+     * <p>
+     * The platform's own listener rather than the arithmetic this used to do by
+     * hand. Both work for the ordinary case; this one also knows about the
+     * button that started the drag, the screen the pointer crossed onto and the
+     * toolkit it is running under, which the hand-written version did not and
+     * would have had to learn one bug report at a time.
      */
     private void dragBy(final @NotNull JComponent bar) {
-        final @NotNull MouseAdapter drag = new MouseAdapter() {
-            @Override
-            public void mousePressed(final @NotNull MouseEvent e) {
-                dragOrigin = Optional.of(e.getPoint());
-            }
+        new WindowMoveListener(bar).installTo(bar);
+    }
 
-            @Override
-            public void mouseReleased(final @NotNull MouseEvent e) {
-                dragOrigin = Optional.empty();
-            }
+    /**
+     * The tester may make the window wider or narrower, and may never make it
+     * taller.
+     * <p>
+     * That is the whole rule, and it is stated once, as the left and right
+     * insets of {@link #GRAB} with nothing top or bottom: the platform's resize
+     * listener asks each side separately, so an edge with no thickness offers no
+     * cursor and takes no drag. The height is not the tester's to set - it is
+     * whatever the case needs, which is what {@link #fitHeight} decides and what
+     * {@code Ctrl+D} changes.
+     */
+    private void bindResize() {
+        frame.setMinimumSize(new Dimension(JBUI.scale(MIN_WIDTH), 0));
 
+        final @NotNull JComponent content = (JComponent) frame.getContentPane();
+        final @NotNull WindowResizeListener resize = new WindowResizeListener(content, JBUI.insets(0, GRAB), null) {
             @Override
-            public void mouseDragged(final @NotNull MouseEvent e) {
-                dragOrigin.ifPresent(origin -> {
-                    final @NotNull Point now = e.getLocationOnScreen();
-                    frame.setLocation(now.x - origin.x, now.y - origin.y);
-                });
+            protected @NotNull Insets getResizeBorder(final @NotNull Component component) {
+                return JBUI.insets(0, GRAB);
             }
         };
 
-        bar.addMouseListener(drag);
-        bar.addMouseMotionListener(drag);
+        content.addMouseListener(resize);
+        content.addMouseMotionListener(resize);
+
+        // A wider window wraps the case into fewer lines, so the height that was
+        // right before the drag is not right after it. Only on a width change:
+        // fitHeight sets the height itself, and reacting to that would be this
+        // method answering its own event.
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(final @NotNull ComponentEvent e) {
+                if (frame.getWidth() == lastWidth) return;
+
+                lastWidth = frame.getWidth();
+                fitHeight();
+            }
+        });
     }
 
     /**
