@@ -23,6 +23,8 @@ import org.testin.util.Shortcuts;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -75,6 +77,17 @@ final class LightModeWindow {
      */
     private static final int WIDTH = 420;
 
+    /**
+     * Two keys for one state, because that is what the tester asked for: one
+     * that opens the details and one that closes them, rather than a single key
+     * whose effect depends on what is already on screen.
+     * <p>
+     * Constants here rather than in {@link Shortcuts}, which holds the keys more
+     * than one class binds. These are this window's alone.
+     */
+    private static final @NotNull KeyStroke SHOW_DETAILS = KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK);
+    private static final @NotNull KeyStroke HIDE_DETAILS = KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK);
+
     private final @NotNull JFrame frame = new JFrame();
     private final @NotNull Project p;
     private final @NotNull RunEditor editor;
@@ -85,11 +98,12 @@ final class LightModeWindow {
     private final @NotNull JBLabel counter = new JBLabel();
 
     private final @NotNull JBLabel set = new JBLabel();
-    private final @NotNull JTextArea description = prose(JBFont.label().biggerOn(3).asBold(), JBUI.CurrentTheme.Label.foreground());
-    private final @NotNull JTextArea expected = prose(JBFont.label(), JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+    private final @NotNull JTextArea description = Prose.of(JBFont.label().biggerOn(3).asBold(), JBUI.CurrentTheme.Label.foreground());
+    private final @NotNull JTextArea expected = Prose.of(JBFont.label(), JBUI.CurrentTheme.ContextHelp.FOREGROUND);
     private final @NotNull JBLabel idle = new JBLabel("Press the play button to start test execution", SwingConstants.CENTER);
 
     private final @NotNull JBPanel<?> caseView = new JBPanel<>(new BorderLayout());
+    private final @NotNull CaseDetails details = new CaseDetails();
 
     private final @NotNull JBLabel caseClock = clock("Test case duration");
     private final @NotNull JBLabel runClock = clock("Test Run duration");
@@ -109,6 +123,12 @@ final class LightModeWindow {
      * under way.
      */
     private @NotNull Optional<Point> dragOrigin = Optional.empty();
+
+    /**
+     * Closed until asked for. The window exists to put one sentence in front of
+     * a tester, so everything else starts out of the way.
+     */
+    private boolean detailsShown;
 
     LightModeWindow(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
         this.p = p;
@@ -222,6 +242,10 @@ final class LightModeWindow {
         description.setText(Display.format(tc.getDescription()));
         expected.setText(Display.format(tc.getExpectedResult()));
 
+        // Visibility is not touched here: rebuilding the rows does not change
+        // whether they are shown, and showDetails is the one thing that decides.
+        details.show(p, tc);
+
         // The expected result is optional on a test case, and an empty paragraph
         // leaves a gap the tester reads as something failing to load.
         expected.setVisible(!expected.getText().isBlank());
@@ -267,6 +291,8 @@ final class LightModeWindow {
      */
     private void bindKeys() {
         bind(Shortcuts.Escape.getKey(), "testin.lightMode.close", this::close);
+        bind(SHOW_DETAILS, "testin.lightMode.showDetails", () -> showDetails(true));
+        bind(HIDE_DETAILS, "testin.lightMode.hideDetails", () -> showDetails(false));
 
         for (final TestStatus status : TestStatus.values()) {
             if (!status.isVerdict()) continue;
@@ -293,6 +319,24 @@ final class LightModeWindow {
                 action.run();
             }
         });
+    }
+
+    /**
+     * Opens or closes the case's other fields, and resizes the window to what is
+     * left.
+     * <p>
+     * Only the height moves: the tester chose the width and the details are not
+     * a reason to take it away from them. Doing nothing when it is already in
+     * the asked-for state keeps Ctrl+D held down from re-laying the window out
+     * on every repeat.
+     */
+    private void showDetails(final boolean show) {
+        if (detailsShown == show) return;
+
+        detailsShown = show;
+        details.setVisible(show);
+
+        fitHeight();
     }
 
     /**
@@ -422,9 +466,13 @@ final class LightModeWindow {
         text.add(description, BorderLayout.NORTH);
         text.add(expected, BorderLayout.CENTER);
 
+        details.setBorder(JBUI.Borders.emptyTop(14));
+        details.setVisible(detailsShown);
+
         caseView.setOpaque(false);
         caseView.add(set, BorderLayout.NORTH);
         caseView.add(text, BorderLayout.CENTER);
+        caseView.add(details, BorderLayout.SOUTH);
 
         // The width is this window's to choose and the height is the case's, so
         // the panel answers with one of each rather than taking a fixed size -
@@ -506,6 +554,8 @@ final class LightModeWindow {
      */
     private @NotNull JComponent statusBar() {
         final @NotNull List<StatusBarItem> items = new ArrayList<>();
+        items.add(StatusBarShortcut.hint(Shortcuts.shortcutText(SHOW_DETAILS), "Details"));
+        items.add(StatusBarShortcut.hint(Shortcuts.shortcutText(HIDE_DETAILS), "Hide"));
         items.add(StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), "Close"));
 
         for (final TestStatus status : TestStatus.values()) {
@@ -524,22 +574,4 @@ final class LightModeWindow {
         return label;
     }
 
-    /**
-     * A paragraph the tester reads: wrapped, unselectable furniture rather than
-     * a field. A label would print it on one line and let the window grow as
-     * wide as the sentence.
-     */
-    private static @NotNull JTextArea prose(final @NotNull Font font, final @NotNull Color color) {
-        final @NotNull JTextArea area = new JTextArea();
-        area.setFont(font);
-        area.setForeground(color);
-        area.setLineWrap(true);
-        area.setWrapStyleWord(true);
-        area.setOpaque(false);
-        area.setEditable(false);
-        area.setFocusable(false);
-        area.setBorder(null);
-
-        return area;
-    }
 }

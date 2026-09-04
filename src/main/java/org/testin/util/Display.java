@@ -66,6 +66,39 @@ public final class Display {
      * for, because the verdict came from the context menu, a bulk apply or the
      * failure dialog. Printing 00:00 for those claims a measurement nobody took.
      */
+    /**
+     * The steps, numbered the way this plugin numbers them, one per line.
+     * <p>
+     * A step is numbered by where it sits in the case, so the number a tester
+     * reads here is the number they see in the editor. A blank step is not
+     * drawn and its number is not reused, which is why a case with a gap in it
+     * reads 1, 2, 4 - the fourth step really is the fourth.
+     * <p>
+     * Here rather than beside either of the two things that draw steps - the
+     * details panel, which gives each step its own row, and light mode, which
+     * shows them as one paragraph - because "1- " is a decision about how a
+     * value reads, and this class owns those.
+     */
+    public static @NotNull String numberedSteps(final @NotNull List<String> steps) {
+        final @NotNull StringBuilder text = new StringBuilder();
+
+        for (int i = 0; i < steps.size(); i++) {
+            if (steps.get(i).isBlank()) continue;
+
+            if (!text.isEmpty()) text.append("\n");
+            text.append(numberedStep(i, steps.get(i)));
+        }
+
+        return text.toString();
+    }
+
+    /**
+     * One step, numbered from its position in the list.
+     */
+    public static @NotNull String numberedStep(final int index, final @NotNull String step) {
+        return (index + 1) + "- " + format(step);
+    }
+
     public static @NotNull String formatDuration(final @NotNull Duration duration) {
         if (duration.isZero()) return "";
 

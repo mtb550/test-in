@@ -31,7 +31,7 @@ public class Steps extends BaseDetails {
         for (int i = 0; i < steps.size(); i++) {
             if (steps.get(i).isBlank()) continue;
 
-            final @NotNull String stepText = (i + 1) + "- " + Display.format(steps.get(i));
+            final @NotNull String stepText = Display.numberedStep(i, steps.get(i));
             final int marginBottom = (i == steps.size() - 1) ? 0 : MARGIN_BOTTOM_PER_STEP;
             stepsContainer.add(createStepComponent(stepText, marginBottom));
         }
