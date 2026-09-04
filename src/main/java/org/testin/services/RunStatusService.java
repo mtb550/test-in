@@ -30,6 +30,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
@@ -64,14 +65,55 @@ public final class RunStatusService {
     }
 
     public void executeManual(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
-
-        final @NotNull Optional<TestRunItems> found = editor.runItem(tc.getId());
-        if (found.isEmpty()) return;
-        final @NotNull TestRunItems item = found.get();
-
+        // Stopping is the editor's own business - it owns the executing index -
+        // and it happens before the verdict, so the case being judged is no
+        // longer the one being timed.
         final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
         if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
             editor.stopExecution();
+        }
+
+        if (!recordVerdict(p, editor.getParent().getPath(), tc.getId(), status, duration, failure)) return;
+
+        triggerFilterRefresh(editor);
+    }
+
+    /**
+     * Records a verdict on one case of one run, with no editor in sight.
+     * <p>
+     * The recording never needed one. What {@link #executeManual} needs the
+     * editor for is stopping the execution it is timing and refreshing the grid
+     * it is drawing; everything between those two - find the item, write the
+     * duration, the failure and the verdict, persist, and tell the tester - is
+     * about the run and not about who is looking at it. So it is here, and the
+     * editor is one caller rather than the shape of the call (#13).
+     * <p>
+     * <b>Both views work on one object.</b> {@code getTestRunByPath} hands back
+     * the instance the indexer holds, and the run editor takes that same
+     * instance into its own field - so a verdict recorded here is already
+     * recorded in the grid behind it, with nothing to copy across and nothing
+     * that can disagree.
+     * <p>
+     * Reports whether it happened. A case the run does not hold, or one already
+     * removed, is refused rather than silently ignored: the caller has just told
+     * a tester something was about to be recorded.
+     */
+    public boolean recordVerdict(final @NotNull Project p, final @NotNull Path runPath, final @NotNull UUID caseId, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
+        final @NotNull TestRunDto run = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(runPath);
+
+        final @NotNull Optional<TestRunItems> found = run.getResults().stream()
+                .filter(item -> item.getId().equals(caseId))
+                .findFirst();
+
+        if (found.isEmpty()) {
+            Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' does not cover " + caseId + " - verdict not recorded");
+            return false;
+        }
+
+        final @NotNull TestRunItems item = found.get();
+        if (item.isRemoved()) {
+            refuseRemoved(p);
+            return false;
         }
 
         // Before the verdict, not after: passing clears everything a failure
@@ -81,12 +123,12 @@ public final class RunStatusService {
         failure.recordOn(item);
         item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
 
-        Logger.trace("[RunStatusService]: Status updated -> " + tc.getDescription() + " = " + status);
+        Logger.trace("[RunStatusService]: Status updated -> " + caseId + " = " + status);
 
-        persistRun(p, editor);
-        triggerFilterRefresh(editor);
+        Services.getInstance(p, ProjectIndexer.class).persistRun(runPath, run);
 
         confirmVerdict(p, status, 1);
+        return true;
     }
 
     /**
