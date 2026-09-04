@@ -1,9 +1,11 @@
 package org.testin.statusbar;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -36,6 +38,12 @@ public abstract class StatusBarBase {
 
     private final @NotNull Font font = JBUI.Fonts.smallFont();
     private final @NotNull Font shortcutFont = JBUI.Fonts.smallFont().asBold();
+
+    // A keystroke is drawn as a key. The heavier bottom edge is the whole
+    // trick: one pixel on three sides and two underneath reads as a keycap,
+    // where an even border reads as a box around some text.
+    private final @NotNull Color keyBorder = JBColor.border();
+    private final @NotNull Color keyBackground = UIUtil.getTextFieldBackground();
 
     // A keyboard: says "these are keys".
     private final @NotNull Icon icon = AllIcons.General.Keyboard;
@@ -81,10 +89,31 @@ public abstract class StatusBarBase {
         return label;
     }
 
+    /**
+     * The keystroke, drawn as a key rather than printed as text.
+     * <p>
+     * Here rather than in the window that wanted it: every framework dialog
+     * shows its shortcuts through this one method, so the keys look like keys in
+     * all twenty-five of them or in none. The light mode window's status bar
+     * (#13) asked for the treatment; the framework is where the treatment lives.
+     * <p>
+     * A blank keystroke is left as bare text. Some status bar items carry no key
+     * of their own - a create-dialog field with no letter - and an empty keycap
+     * is a box drawn around nothing.
+     */
     private @NotNull JBLabel createShortcut(final @NotNull String text) {
         final @NotNull JBLabel label = new JBLabel(text);
         label.setForeground(shortcutColor);
         label.setFont(shortcutFont);
+
+        if (text.isBlank()) return label;
+
+        label.setOpaque(true);
+        label.setBackground(keyBackground);
+        label.setBorder(BorderFactory.createCompoundBorder(
+                JBUI.Borders.customLine(keyBorder, 1, 1, 2, 1),
+                JBUI.Borders.empty(0, 5)));
+
         return label;
     }
 
