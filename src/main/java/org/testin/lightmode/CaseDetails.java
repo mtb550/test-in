@@ -16,6 +16,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * What the case says beyond its description: the steps, the data to use, what
@@ -38,14 +39,26 @@ class CaseDetails extends JBPanel<CaseDetails> {
 
     /**
      * The label column, in the design's own figure. Narrow because the window is
-     * narrow and the label is one word set small.
+     * narrow and the label is one word set small - and it grows with the zoom,
+     * because a label set larger in a column that did not would wrap.
      */
     private static final int LABEL_WIDTH = 92;
 
     private static final int GAP = 10;
 
-    CaseDetails() {
+    private final @NotNull Project p;
+
+    /**
+     * The case on screen, kept so the rows can be rebuilt without being handed
+     * it again - which is what a zoom is.
+     */
+    private @NotNull Optional<TestCaseDto> shown = Optional.empty();
+
+    private float zoom = 1.0f;
+
+    CaseDetails(final @NotNull Project p) {
         super(new GridBagLayout());
+        this.p = p;
         setOpaque(false);
     }
 
@@ -54,8 +67,34 @@ class CaseDetails extends JBPanel<CaseDetails> {
      * four of them, they change only when the case does, and a panel that
      * rebuilds cannot leave the previous case's steps under the new one's tags.
      */
-    void show(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+    void show(final @NotNull TestCaseDto tc) {
+        shown = Optional.of(tc);
+
+        render();
+    }
+
+    /**
+     * Scales the field labels and their values, and nothing else in the window.
+     * <p>
+     * The rows are rebuilt rather than walked and re-fonted: they are rebuilt on
+     * every case anyway, and a walk would have to know which of the components
+     * under here are text the tester reads and which are the badges, which are
+     * sized by the plugin rather than by this window.
+     */
+    void setZoom(final float zoom) {
+        if (this.zoom == zoom) return;
+
+        this.zoom = zoom;
+        render();
+    }
+
+    private void render() {
         removeAll();
+
+        shown.ifPresent(this::rows);
+    }
+
+    private void rows(final @NotNull TestCaseDto tc) {
 
         int row = 0;
         row = addRow(TestEditorAttributes.STEPS.getName(), Display.numberedSteps(tc.getSteps()), row);
@@ -67,7 +106,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
         row = addRow(TestEditorAttributes.TEST_DATA.getName(), tc.getTestData(), row);
         row = addRow(TestEditorAttributes.PRE_CONDITIONS.getName(), Display.format(tc.getPreConditions()), row);
 
-        addTags(p, tc, row);
+        addTags(tc, row);
     }
 
     private int addRow(final @NotNull String name, final @NotNull String value, final int row) {
@@ -101,7 +140,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
      * because the tester is running the case by hand, so a badge saying whether
      * automation reached it is answering a question nobody in front of it asked.
      */
-    private void addTags(final @NotNull Project p, final @NotNull TestCaseDto tc, final int row) {
+    private void addTags(final @NotNull TestCaseDto tc, final int row) {
         final @NotNull List<Shared.Badge> badges = new ArrayList<>();
         Shared.addPriorityBadge(badges, tc);
 
@@ -123,10 +162,10 @@ class CaseDetails extends JBPanel<CaseDetails> {
         // names, and a Turkish machine would render "Conditions" with a dotted
         // capital I.
         final @NotNull JBLabel label = new JBLabel(text.toUpperCase(Locale.ROOT));
-        label.setFont(JBUI.Fonts.smallFont());
+        label.setFont(scaled(JBUI.Fonts.smallFont()));
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
-        final @NotNull Dimension size = new Dimension(JBUI.scale(LABEL_WIDTH), label.getPreferredSize().height);
+        final @NotNull Dimension size = new Dimension(Math.round(JBUI.scale(LABEL_WIDTH) * zoom), label.getPreferredSize().height);
         label.setPreferredSize(size);
         label.setMinimumSize(size);
 
@@ -134,9 +173,13 @@ class CaseDetails extends JBPanel<CaseDetails> {
     }
 
     private @NotNull JTextArea prose(final @NotNull String text) {
-        final @NotNull JTextArea area = Prose.of(JBUI.Fonts.label(), JBUI.CurrentTheme.Label.foreground());
+        final @NotNull JTextArea area = Prose.of(scaled(JBUI.Fonts.label()), JBUI.CurrentTheme.Label.foreground());
         area.setText(text);
 
         return area;
+    }
+
+    private @NotNull Font scaled(final @NotNull Font base) {
+        return base.deriveFont(base.getSize2D() * zoom);
     }
 }

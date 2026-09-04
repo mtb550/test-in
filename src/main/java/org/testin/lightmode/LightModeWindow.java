@@ -87,6 +87,19 @@ final class LightModeWindow {
      * Constants here rather than in {@link Shortcuts}, which holds the keys more
      * than one class binds. These are this window's alone.
      */
+    /**
+     * How far the wheel takes the case, and in what steps.
+     * <p>
+     * Down as well as up: a tester who wants more of the case on screen at once
+     * is asking the same question as one who wants it bigger, from the other
+     * end. The floor is not zero - text nobody can read is not a smaller
+     * window, it is the same broken window the description toggle would have
+     * been.
+     */
+    private static final float ZOOM_STEP = 0.1f;
+    private static final float ZOOM_MIN = 0.8f;
+    private static final float ZOOM_MAX = 2.0f;
+
     private static final @NotNull KeyStroke SHOW_DETAILS = KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK);
     private static final @NotNull KeyStroke HIDE_DETAILS = KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK);
 
@@ -99,14 +112,24 @@ final class LightModeWindow {
     private final @NotNull TitleBarBtn stop = new TitleBarBtn("Stop test execution", AllIcons.Actions.Suspend);
     private final @NotNull JBLabel counter = new JBLabel();
 
+    /**
+     * The sizes the case is written at before any zoom, read once here rather
+     * than declared as constants: they come from the IDE's own font, and a
+     * constant would freeze whichever font happened to be set when this class
+     * was first loaded.
+     */
+    private final @NotNull Font setFont = JBUI.Fonts.smallFont();
+    private final @NotNull Font descriptionFont = JBFont.label().biggerOn(3).asBold();
+    private final @NotNull Font expectedFont = JBFont.label();
+
     private final @NotNull JBLabel set = new JBLabel();
-    private final @NotNull JTextArea description = Prose.of(JBFont.label().biggerOn(3).asBold(), JBUI.CurrentTheme.Label.foreground());
-    private final @NotNull JTextArea expected = Prose.of(JBFont.label(), JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+    private final @NotNull JTextArea description = Prose.of(descriptionFont, JBUI.CurrentTheme.Label.foreground());
+    private final @NotNull JTextArea expected = Prose.of(expectedFont, JBUI.CurrentTheme.ContextHelp.FOREGROUND);
     private final @NotNull JBLabel idle = new JBLabel("Press the play button to start test execution", SwingConstants.CENTER);
 
     private final @NotNull JBLabel chosen = new JBLabel();
     private final @NotNull JBPanel<?> caseView = new JBPanel<>(new BorderLayout());
-    private final @NotNull CaseDetails details = new CaseDetails();
+    private final @NotNull CaseDetails details;
 
     /**
      * The one box under the case. It holds the details that {@code Ctrl+D} fills
@@ -171,10 +194,22 @@ final class LightModeWindow {
      */
     private @NotNull Optional<FailureForm> capture = Optional.empty();
 
+    /**
+     * How much bigger the case is drawn than the window around it.
+     * <p>
+     * One number for the three paragraphs and the detail rows, because they are
+     * one thing being read. The title bar, the verdicts, the clocks and the keys
+     * are not part of it: zoom exists so the case can be read from where the
+     * tester is actually sitting, and making the furniture bigger would only
+     * cost them the screen space they were trying to free.
+     */
+    private float zoom = 1.0f;
+
     LightModeWindow(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
         this.p = p;
         this.editor = editor;
         this.onClosed = onClosed;
+        this.details = new CaseDetails(p);
 
         frame.setUndecorated(true);
         frame.setAlwaysOnTop(true);
@@ -188,6 +223,7 @@ final class LightModeWindow {
 
         placeIt();
         bindKeys();
+        bindWheel();
 
         frame.setVisible(true);
     }
@@ -292,7 +328,7 @@ final class LightModeWindow {
 
         // Visibility is not touched here: rebuilding the rows does not change
         // whether they are shown, and showDetails is the one thing that decides.
-        details.show(p, tc);
+        details.show(tc);
     }
 
     /**
@@ -364,6 +400,53 @@ final class LightModeWindow {
                 close();
             }
         });
+    }
+
+    /**
+     * The wheel resizes the case, and only inside this window.
+     * <p>
+     * Deliberately not {@code FontSync.attachWheelZoom}, which is the plugin's
+     * other wheel zoom and the wrong one here: it ends in a write to the global
+     * editor scheme and to every open IDE editor, so wheeling over this window
+     * would resize the tester's Java files behind it. What was asked for was to
+     * zoom light mode and nothing else (#13).
+     * <p>
+     * No modifier. The IDE's own convention is Ctrl and the wheel, but this
+     * window has nothing else a wheel could mean - and a scroll pane inside it,
+     * such as the error capture, takes the event before this does, because the
+     * event goes to the deepest component that handles it.
+     */
+    private void bindWheel() {
+        frame.getContentPane().addMouseWheelListener(e -> {
+            zoomBy(-e.getWheelRotation() * ZOOM_STEP);
+            e.consume();
+        });
+    }
+
+    /**
+     * Redraws the case at a new size, and refits the window around it - a
+     * paragraph set larger wraps to more lines, and the height is the content's.
+     * <p>
+     * Nothing happens at the ends of the range, so wheeling past the limit costs
+     * a comparison rather than a relayout on every tick.
+     */
+    private void zoomBy(final float delta) {
+        final float next = Math.clamp(zoom + delta, ZOOM_MIN, ZOOM_MAX);
+        if (next == zoom) return;
+
+        zoom = next;
+
+        set.setFont(scaled(setFont));
+        chosen.setFont(scaled(setFont));
+        description.setFont(scaled(descriptionFont));
+        expected.setFont(scaled(expectedFont));
+        details.setZoom(zoom);
+
+        fitHeight();
+    }
+
+    private @NotNull Font scaled(final @NotNull Font base) {
+        return base.deriveFont(base.getSize2D() * zoom);
     }
 
     private void bind(final @NotNull KeyStroke key, final @NotNull String name, final @NotNull Runnable action) {
@@ -686,7 +769,7 @@ final class LightModeWindow {
      * re-lay out the window.
      */
     private @NotNull JComponent body() {
-        set.setFont(JBUI.Fonts.smallFont());
+        set.setFont(scaled(setFont));
         set.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         idle.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
@@ -694,7 +777,9 @@ final class LightModeWindow {
         // they have chosen Failed and are writing it up, so it is a state rather
         // than an offer. Everywhere else in this window the three verdicts are
         // drawn alike.
-        chosen.setFont(JBUI.Fonts.smallFont());
+        // The same size as the set name it sits beside, zoom included: they are
+        // one line, and one half of it growing would read as a mistake.
+        chosen.setFont(scaled(setFont));
         chosen.setForeground(TestStatus.FAILED.getRowColor());
 
         final @NotNull JBPanel<?> text = new JBPanel<>(new BorderLayout(0, JBUI.scale(10)));
