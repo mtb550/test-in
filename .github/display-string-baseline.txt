@@ -59,4 +59,29 @@
 # instead of spelling one, and the two bug captions became one badge with one
 # caption. Counted rather than attributed: the check reports places, not which
 # three of them stopped writing a string somebody else already wrote.
-166
+#
+# 148 after light mode (#13), which is the largest single drop since the check
+# was written and almost none of it was aimed at this number. A window that shows
+# the same test case, offers the same verdicts and asks for the same failure
+# details as the run editor had every chance to spell all of it out a second
+# time, and the rule against that is what kept it from happening:
+#
+#   FailureFields    the four failure captions, their defaults and their wording,
+#                    declared once and filled in twice - the run editor's dialog
+#                    and light mode's own form
+#   Toolbar          START_MANUAL_EXECUTION and a new STOP_EXECUTION, so the
+#                    window's execution buttons read the toolbar's words instead
+#                    of inventing their own pair
+#   Display          numberedStep, so the details panel and light mode number a
+#                    step the same way
+#   Keycap           the look of a printed key, which is where 28 dialogs and
+#                    light mode's verdict buttons now agree
+#
+# Two of it came from deleting rather than sharing. Cancel and Save & next left
+# the failure form once Enter and Escape were found to be enough, and each of
+# those words had been written twice - on the button and again in the status bar
+# hint beside it. The expected result left the view menu for the same kind of
+# reason and took its caption with it.
+#
+# Counted rather than attributed, as above.
+148
