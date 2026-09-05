@@ -26,9 +26,10 @@ import java.awt.Font;
  * the details panel's rows, its steps and its title - five copies of one idea,
  * each free to be corrected without the others. They read from here now (#178).
  * <p>
- * Three of those copies left the tab stop in, so a paragraph nobody can type
- * into was still in the focus order - only the card and light mode had set it. Gathering them fixed that everywhere at
- * once, which is the argument for gathering them.
+ * Three of those copies left the tab stop in - only the card and light mode
+ * had set it - so a paragraph nobody can type into was still in the focus
+ * order. Gathering them fixed that everywhere at once, which is the argument
+ * for gathering them.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Prose {
