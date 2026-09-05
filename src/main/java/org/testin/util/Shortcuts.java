@@ -127,24 +127,6 @@ public enum Shortcuts {
     private final @NotNull KeyStroke key;
 
     /**
-     * What the JDK calls the Escape key, and what the keyboard prints on it.
-     * <p>
-     * {@code KeyEvent.getKeyText} spells it out and no keyboard does. A hint
-     * exists to be matched against the key under the tester's hand, so it uses
-     * the key's own word - and the pair is written here once and read by the one
-     * method that turns a keystroke into text, rather than spelled out at the
-     * places that show one.
-     * <p>
-     * Escape is the only key the plugin binds whose name disagrees with its cap.
-     * Enter, Tab, Space, Delete, the arrows and the function keys all already
-     * read as themselves, so this is one correction and not the first row of a
-     * table.
-     */
-    private static final @NotNull String ESCAPE_SPELLED = "Escape";
-
-    private static final @NotNull String ESCAPE_PRINTED = "Esc";
-
-    /**
      * No key, as a key: what a status or a field carries when nothing binds it.
      */
     public static final @NotNull KeyStroke NO_KEY = EMPTY.key;
@@ -193,14 +175,9 @@ public enum Shortcuts {
     /**
      * A keystroke as a tester reads it, and nothing at all for the key that
      * never arrives - what is bound to no key has no name to show (#71).
-     * <p>
-     * The one substitution is {@link #ESCAPE_SPELLED}, and it is a replacement
-     * rather than a special case on {@code VK_ESCAPE} so that a combination
-     * carries it too. It is a no-op on macOS, where the platform renders the
-     * symbol instead of any word.
      */
     public static @NotNull String shortcutText(final @NotNull KeyStroke key) {
-        return isNoKey(key) ? "" : KeymapUtil.getKeystrokeText(key).replace(ESCAPE_SPELLED, ESCAPE_PRINTED);
+        return isNoKey(key) ? "" : KeymapUtil.getKeystrokeText(key);
     }
 
     /**
