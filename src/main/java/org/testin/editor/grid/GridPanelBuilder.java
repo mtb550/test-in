@@ -2,7 +2,6 @@ package org.testin.editor.grid;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBList;
 import com.intellij.openapi.Disposable;
@@ -10,6 +9,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.framework.RowStripe;
 import org.testin.editor.EditorColors;
 import org.testin.editor.Shared;
 import org.testin.logger.Logger;
@@ -49,8 +49,6 @@ public class GridPanelBuilder {
      * persisted user column widths so they survive grid rebuilds and restarts.
      */
     private static final @NotNull String GRID_KIND_KEY = "testin.grid.kind";
-    private static final @NotNull Color EVEN_ROW_COLOR = new JBColor(Gray._245, Gray._60);
-    private static final @NotNull Color ODD_ROW_COLOR = new JBColor(Gray._230, Gray._45);
     private static final @NotNull Border FIRST_CELL_SELECTION_BORDER = new SelectionCellBorder(true);
     private static final @NotNull Border CELL_SELECTION_BORDER = new SelectionCellBorder(false);
 
@@ -82,10 +80,6 @@ public class GridPanelBuilder {
      * nothing else would fail if a constant were declared above it.
      */
     private static final int ORDER_COLUMN = 0;
-
-    static @NotNull Color rowColor(final int row) {
-        return row % 2 == 0 ? EVEN_ROW_COLOR : ODD_ROW_COLOR;
-    }
 
     public static void resizeToFont(final @NotNull JBTable table) {
         final @NotNull FontMetrics fm = table.getFontMetrics(table.getFont());
@@ -123,7 +117,7 @@ public class GridPanelBuilder {
                 textArea.setForeground(table.getForeground());
                 // Per-cell selection background (multi-interval selection: only the
                 // cells inside the selection are highlighted, like Excel/DataGrip).
-                wrapper.setBackground(isSelected ? SELECTION_BACKGROUND : rowColor(row));
+                wrapper.setBackground(isSelected ? SELECTION_BACKGROUND : RowStripe.of(row));
 
                 if (isSelected) {
                     // Keep the same insets as an unselected cell so selection never
@@ -553,7 +547,7 @@ public class GridPanelBuilder {
             @Override
             public @NotNull Component prepareRenderer(final @NotNull TableCellRenderer renderer, final int row, final int column) {
                 final @NotNull Component component = super.prepareRenderer(renderer, row, column);
-                component.setBackground(isCellSelected(row, column) ? SELECTION_BACKGROUND : rowColor(row));
+                component.setBackground(isCellSelected(row, column) ? SELECTION_BACKGROUND : RowStripe.of(row));
                 return component;
             }
         };

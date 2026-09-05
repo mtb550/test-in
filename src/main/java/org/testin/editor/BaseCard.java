@@ -1,6 +1,5 @@
 package org.testin.editor;
 
-import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -10,6 +9,7 @@ import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.Prose;
+import org.testin.ui.framework.RowStripe;
 
 import javax.swing.*;
 import java.awt.*;
@@ -163,8 +163,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         // it and everything that wants the words reads plainTitle instead.
         plainTitle = title;
 
-        final @NotNull Color currentRowColor = index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45);
-        setBackground(currentRowColor);
+        setBackground(RowStripe.of(index));
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
 
         Shared.showBadges(badgePanel, badges);
