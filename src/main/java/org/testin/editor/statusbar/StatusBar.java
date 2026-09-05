@@ -287,8 +287,8 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     /**
-     * Already formatted by the caller: the blank for "nothing measured" is
-     * decided by {@code Display.formatDuration}, not here.
+     * Already formatted by the caller: the blank for "not started" is decided
+     * by {@code Display.formatRunClock}, not here.
      */
     public void showExecutionTime(final @NotNull String formatted) {
         executionTimeLabel.setText(formatted);

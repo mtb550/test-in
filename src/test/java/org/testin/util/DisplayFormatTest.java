@@ -62,40 +62,68 @@ public class DisplayFormatTest {
     }
 
     /**
-     * The clock used to be the only source and ticked once a second, so
-     * HH:MM:SS lost nothing. A test framework measures the method itself and
-     * reports in milliseconds, and the old format rendered every fast case as
-     * 00:00:00 - a duration that reads as no time at all.
+     * A case is minutes and seconds, and grows an hours field only if one case
+     * somehow runs that long.
      */
     @Test
-    public void aDurationUnderASecondReadsAsMilliseconds() {
-        assertEquals(Display.formatDuration(Duration.ofMillis(84)), "84ms");
-        assertEquals(Display.formatDuration(Duration.ofMillis(1)), "1ms");
-        assertEquals(Display.formatDuration(Duration.ofMillis(999)), "999ms");
-    }
-
-    @Test
-    public void aSecondAndOverKeepsTheClockFormatATesterAlreadyReads() {
-        assertEquals(Display.formatDuration(Duration.ofSeconds(1)), "00:00:01");
-        assertEquals(Display.formatDuration(Duration.ofMinutes(3).plusSeconds(7)), "00:03:07");
-        assertEquals(Display.formatDuration(Duration.ofHours(2).plusMinutes(5)), "02:05:00");
+    public void aCaseClockIsMinutesAndSeconds() {
+        assertEquals(Display.formatCaseClock(Duration.ofSeconds(45)), "00:45");
+        assertEquals(Display.formatCaseClock(Duration.ofMinutes(3).plusSeconds(7)), "03:07");
+        assertEquals(Display.formatCaseClock(Duration.ofHours(2).plusMinutes(5)), "2:05:00");
     }
 
     /**
-     * The clock format on its own is a claim about a duration it cannot make.
-     * A case that took 1.4 seconds read as 00:00:01 - not rounded, not
-     * approximate, simply four hundred milliseconds that were measured and then
-     * not shown. Two runs differing by that much looked identical.
+     * A running clock never blinks out. Zero on a case in front of a tester means
+     * they have just arrived at it, not that nothing was measured.
      */
     @Test
-    public void millisecondsShowWhenThereAreSome() {
-        assertEquals(Display.formatDuration(Duration.ofMillis(1400)), "00:00:01.400");
-        assertEquals(Display.formatDuration(Duration.ofMillis(11007)), "00:00:11.007");
-        assertEquals(Display.formatDuration(Duration.ofSeconds(45).plusMillis(237)), "00:00:45.237");
+    public void aCaseClockAlwaysShowsANumber() {
+        assertEquals(Display.formatCaseClock(Duration.ZERO), "00:00");
+        assertEquals(Display.formatCaseClock(Duration.ofMillis(84)), "00:00");
+    }
+
+    /**
+     * A run carries its hours from the start rather than growing the field at
+     * 01:00:00 - and in light mode that is also what keeps it the larger-looking
+     * of two unlabelled clocks.
+     */
+    @Test
+    public void aRunClockAlwaysCarriesItsHours() {
+        assertEquals(Display.formatRunClock(Duration.ofSeconds(45)), "00:00:45");
+        assertEquals(Display.formatRunClock(Duration.ofMinutes(3).plusSeconds(7)), "00:03:07");
+        assertEquals(Display.formatRunClock(Duration.ofHours(2).plusMinutes(5)), "02:05:00");
+    }
+
+    @Test
+    public void aRunNobodyStartedShowsNothing() {
+        assertEquals(Display.formatRunClock(Duration.ZERO), "", "the status bar hides the label rather than showing zero");
+    }
+
+    /**
+     * The recorded value is the case clock plus one guard, and the guard is the
+     * reason it is a separate method.
+     */
+    @Test
+    public void aRecordedDurationReadsAsTheCaseClock() {
+        assertEquals(Display.formatDuration(Duration.ofSeconds(45)), "00:45");
+        assertEquals(Display.formatDuration(Duration.ofMinutes(3).plusSeconds(7)), "03:07");
+        assertEquals(Display.formatDuration(Duration.ofHours(2).plusMinutes(5)), "2:05:00");
     }
 
     @Test
     public void nothingMeasuredShowsNothing() {
         assertEquals(Display.formatDuration(Duration.ZERO), "", "a case nobody ran has no duration line at all");
+    }
+
+    /**
+     * Milliseconds are measured and stored and never drawn. This used to print
+     * "84ms" and a ".400" tail; a fast automated case now reads 00:00 and its
+     * real figure stays in the file.
+     */
+    @Test
+    public void millisecondsAreNeverShown() {
+        assertEquals(Display.formatDuration(Duration.ofMillis(84)), "00:00");
+        assertEquals(Display.formatDuration(Duration.ofMillis(1400)), "00:01");
+        assertEquals(Display.formatDuration(Duration.ofSeconds(45).plusMillis(237)), "00:45");
     }
 }
