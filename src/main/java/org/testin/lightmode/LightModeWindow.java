@@ -745,9 +745,18 @@ final class LightModeWindow {
     }
 
     /**
-     * The window's own title bar: start or stop, the pin, which run this is, how
-     * far through it the tester is, and the close. Dragging is bound here
-     * because this is the strip a tester expects to drag.
+     * The window's own title bar: start or stop, the pin, which run this is and
+     * how far through it the tester is. Dragging is bound here because this is
+     * the strip a tester expects to drag.
+     * <p>
+     * <b>No close button.</b> An undecorated window has no chrome the operating
+     * system drew, so one was added back - and it was furniture the design never
+     * asked for, on the one strip that is meant to hold only what the tester
+     * works with. Three routes out are already there and every one of them is
+     * announced: Escape, named in the status bar; the toolbar's Light Mode
+     * button, which is a toggle and stays pressed for as long as this window
+     * exists; and the run finishing, which closes it. A fourth control for a
+     * gesture already covered three times is a control to remove.
      */
     private @NotNull JComponent titleBar() {
         final @NotNull JBPanel<?> bar = new JBPanel<>(new BorderLayout(JBUI.scale(6), 0));
@@ -770,7 +779,6 @@ final class LightModeWindow {
         final @NotNull JBPanel<?> right = new JBPanel<>(new FlowLayout(FlowLayout.RIGHT, JBUI.scale(6), 0));
         right.setOpaque(false);
         right.add(counter);
-        right.add(closeButton());
 
         bar.add(left, BorderLayout.WEST);
         bar.add(new JBLabel(editor.getParent().getName()), BorderLayout.CENTER);
@@ -793,14 +801,6 @@ final class LightModeWindow {
             frame.setAlwaysOnTop(!frame.isAlwaysOnTop());
             button.setOn(frame.isAlwaysOnTop());
         });
-
-        return button;
-    }
-
-    private @NotNull TitleBarBtn closeButton() {
-        final @NotNull TitleBarBtn button = new TitleBarBtn("Close light mode", AllIcons.Actions.Close);
-
-        button.addActionListener(e -> close());
 
         return button;
     }
