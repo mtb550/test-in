@@ -3,6 +3,7 @@ package org.testin.lightmode;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -57,6 +58,11 @@ public final class LightMode implements Disposable {
             onChange.run();
         }));
 
+        // The editor going takes the window with it: this window reads that
+        // editor every time it draws. Asked rather than remembered, so a
+        // registration left by an earlier open does nothing to a later window.
+        Disposer.register(editor, () -> closeIfShowing(editor.getParent()));
+
         onChange.run();
     }
 
@@ -74,14 +80,20 @@ public final class LightMode implements Disposable {
      * changing.
      */
     public void refresh(final @NotNull TestRunDirectoryDto run) {
-        final @NotNull Optional<LightModeWindow> showing = window.filter(open -> open.shows(run));
-
-        if (run.isStillOpen()) {
-            showing.ifPresent(LightModeWindow::refresh);
+        if (!run.isStillOpen()) {
+            closeIfShowing(run);
             return;
         }
 
-        showing.ifPresent(LightModeWindow::close);
+        window.filter(open -> open.shows(run)).ifPresent(LightModeWindow::refresh);
+    }
+
+    /**
+     * The one way a run takes its window down, so the two that need it - a run
+     * signed off and its editor closing - cannot decide it differently.
+     */
+    private void closeIfShowing(final @NotNull TestRunDirectoryDto run) {
+        window.filter(open -> open.shows(run)).ifPresent(LightModeWindow::close);
     }
 
     /**
