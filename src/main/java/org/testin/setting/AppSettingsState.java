@@ -51,6 +51,25 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
      */
     public @NotNull String sftpKeyFile = "";
 
+    /**
+     * Whether Testin's dialogs draw the strip of keyboard shortcuts along the
+     * bottom (#13).
+     * <p>
+     * On until a tester says otherwise, because it is what teaches the keys. A
+     * tester who has learned them is reading a row that tells them nothing and
+     * costs a line of every dialog, so this turns it off everywhere at once
+     * rather than dialog by dialog - the knowledge is theirs, not the dialog's.
+     * <p>
+     * A machine setting, because that is what it is about: this person, on this
+     * screen, knows these keys. Nothing about it belongs to a project or to a
+     * repository, so it is not in testin.yml.
+     * <p>
+     * No normalizing in loadState: a primitive cannot arrive null, and a settings
+     * file written before this field existed simply leaves it at the default,
+     * because the serializer only writes a value that differs from one.
+     */
+    public boolean showShortcutHints = true;
+
     private static @NotNull String orEmpty(final @Nullable String value) {
         return Objects.requireNonNullElse(value, "");
     }

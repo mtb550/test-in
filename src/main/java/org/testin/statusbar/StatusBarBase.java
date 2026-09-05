@@ -5,6 +5,8 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.services.Services;
+import org.testin.setting.AppSettingsState;
 import org.testin.ui.framework.Keycap;
 
 import javax.swing.*;
@@ -52,6 +54,25 @@ public class StatusBarBase {
         this.statusBar.setBackground(JBUI.CurrentTheme.Advertiser.background());
 
         updateItems(items);
+        setShown(true);
+    }
+
+    /**
+     * Whether this strip is drawn, with the tester's standing answer folded in.
+     * <p>
+     * <b>One owner, because there are two questions and one strip.</b> A surface
+     * may have its own reason to hide the keys - light mode's view menu is the
+     * only one today - and a tester may have said once that they never want to
+     * see them. Asked separately at each call site, a dialog would have to know
+     * about a setting it has no other business with, and the ones that never ask
+     * would quietly ignore it. Asked here, every strip in the plugin obeys the
+     * setting without a single dialog being touched.
+     * <p>
+     * Read as the strip is drawn rather than cached, so turning the setting off
+     * takes effect on the next dialog rather than the next IDE.
+     */
+    public void setShown(final boolean wanted) {
+        statusBar.setVisible(wanted && Services.getInstance(AppSettingsState.class).showShortcutHints);
     }
 
     public void updateItems(final StatusBarItem @NotNull [] items) {
