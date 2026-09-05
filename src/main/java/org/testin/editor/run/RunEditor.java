@@ -25,6 +25,7 @@ import org.testin.editor.toolbar.RunToolbar;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.*;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.lightmode.LightMode;
 import org.testin.logger.Logger;
 import org.testin.model.*;
 import org.testin.model.dto.TestCaseDto;
@@ -309,7 +310,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                     }
                     // Also the first paint's answer: Stop starts hidden because a run
                     // that has just loaded is not executing.
-                    refreshExecutionButtons();
+                    onExecutionStateChanged();
                     refreshView();
                     focusIfGoingTo();
 
@@ -581,7 +582,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // untested, so the verdict counts beside it changed too and would have
         // stayed on the old numbers until the next redraw.
         showRunTotals();
-        refreshExecutionButtons();
+        onExecutionStateChanged();
     }
 
     /**
@@ -871,6 +872,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             if (model.contains(currentTc)) model.contentsChanged(currentTc);
             showElapsed();
         });
+
+        onExecutionStateChanged();
     }
 
     /**
@@ -1027,7 +1030,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // Every report changes whether anything is still running, which is what
         // decides between Start and Stop. The first case reporting RUNNING is
         // what puts Stop up; the last verdict is what takes it down again.
-        refreshExecutionButtons();
+        onExecutionStateChanged();
 
         finishIfEverythingIsJudged();
     }
@@ -1099,11 +1102,35 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * pushed as one; the clock is not.
      */
     private void showElapsed() {
-        final @NotNull Duration total = resultsMap.values().stream()
+        statusBar.showExecutionTime(Display.formatRunClock(getElapsed()));
+
+        // The clocks and nothing else, for the reason above: light mode redraws
+        // its two figures here rather than through onExecutionStateChanged,
+        // which re-measures and re-sizes the whole window.
+        Services.getInstance(p, LightMode.class).tick(parent);
+    }
+
+    /**
+     * How long this run has taken: every case's duration added up, including
+     * the one being timed right now, which the timer writes to as it ticks.
+     */
+    public @NotNull Duration getElapsed() {
+        return resultsMap.values().stream()
                 .map(TestRunItems::getDuration)
                 .reduce(Duration.ZERO, Duration::plus);
+    }
 
-        statusBar.showExecutionTime(Display.formatDuration(total));
+    /**
+     * How long the case being executed has taken so far, and zero when none is
+     * - which is the honest answer rather than a missing one, and the same
+     * value a case that has just started carries.
+     */
+    public @NotNull Duration getCurrentCaseElapsed() {
+        if (currentlyExecutingIndex < 0 || currentlyExecutingIndex >= currentTestCases.size()) return Duration.ZERO;
+
+        return runItem(currentTestCases.get(currentlyExecutingIndex).getId())
+                .map(TestRunItems::getDuration)
+                .orElse(Duration.ZERO);
     }
 
     /**
@@ -1156,7 +1183,9 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * The one place that decides which of the two execution buttons is showing.
+     * The one place that reacts to this run's execution changing: which of the
+     * two execution buttons is showing, and what the light mode window is
+     * drawing.
      * <p>
      * Start when idle, Stop while a run is under way, exactly as the list and grid
      * view buttons swap. It reads {@link #isExecuting()} rather than a flag of its
@@ -1164,9 +1193,15 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * second thing to keep in step - the one that drifted would leave a Stop button
      * on a finished run.
      * <p>
+     * Named for the event rather than for the buttons since light mode joined it
+     * (#13). A second window showing the case being executed needs telling at
+     * exactly the moments the buttons do, and the alternative was a second hook
+     * beside this one that the next change to the execution flow would update
+     * only one of.
+     * <p>
      * Called after every execution-state change, so nowhere else asks.
      */
-    public void refreshExecutionButtons() {
+    public void onExecutionStateChanged() {
         final boolean executing = isExecuting();
 
         final @NotNull StartExecutionBtn startBtn = toolBar.getToolbarItem(StartExecutionBtn.class);
@@ -1176,9 +1211,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         stopBtn.setVisible(executing);
         startBtn.updateEnabledState();
         toolBar.getToolbarItem(ResultAnalysisBtn.class).updateEnabledState();
+        toolBar.getToolbarItem(LightModeBtn.class).updateState();
 
         toolBar.revalidate();
         toolBar.repaint();
+
+        Services.getInstance(p, LightMode.class).refresh(parent);
     }
 
     /**
@@ -1231,7 +1269,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     private void haltExecution() {
         executionTimer.stop();
         currentlyExecutingIndex = -1;
-        refreshExecutionButtons();
+        onExecutionStateChanged();
     }
 
     @Override
@@ -1243,7 +1281,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         run.get().markExecutionStarted();
         Services.getInstance(p, TestRunStatusChange.class).apply(this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(firstPendingIndex());
-        refreshExecutionButtons();
     }
 
     /**

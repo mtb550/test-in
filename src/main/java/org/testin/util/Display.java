@@ -60,30 +60,101 @@ public final class Display {
     }
 
     /**
-     * A measured duration as HH:MM:SS, and blank when nothing was measured.
+     * The steps, numbered the way this plugin numbers them, one per line.
+     * <p>
+     * A step is numbered by where it sits in the case, so the number a tester
+     * reads here is the number they see in the editor. A blank step is not
+     * drawn and its number is not reused, which is why a case with a gap in it
+     * reads 1, 2, 4 - the fourth step really is the fourth.
+     * <p>
+     * Here rather than beside either of the two things that draw steps - the
+     * details panel, which gives each step its own row, and light mode, which
+     * shows them as one paragraph - because "1- " is a decision about how a
+     * value reads, and this class owns those.
+     */
+    public static @NotNull String numberedSteps(final @NotNull List<String> steps) {
+        final @NotNull StringBuilder text = new StringBuilder();
+
+        for (int i = 0; i < steps.size(); i++) {
+            if (steps.get(i).isBlank()) continue;
+
+            if (!text.isEmpty()) text.append("\n");
+            text.append(numberedStep(i, steps.get(i)));
+        }
+
+        return text.toString();
+    }
+
+    /**
+     * One step, numbered from its position in the list.
+     */
+    public static @NotNull String numberedStep(final int index, final @NotNull String step) {
+        return (index + 1) + "- " + format(step);
+    }
+
+    /**
+     * How long the tester has been on this case, as a clock that is running:
+     * minutes and seconds, and hours only once there are some.
+     * <p>
+     * <b>Always a number, which is the difference from {@link #formatDuration}.</b>
+     * A case in front of a tester has been going for however long they have been
+     * looking at it, so a zero here means "just started" - and a clock that blinks
+     * out for its first second is telling them about the formatter rather than
+     * about the case. A recorded zero means something else entirely, which is why
+     * the stored value is a separate method.
+     */
+    public static @NotNull String formatCaseClock(final @NotNull Duration duration) {
+        final @NotNull String minutes = String.format("%02d:%02d", duration.toMinutesPart(), duration.toSecondsPart());
+
+        return duration.toHours() == 0 ? minutes : duration.toHours() + ":" + minutes;
+    }
+
+    /**
+     * How long a run has been going: hours, minutes and seconds, with the hours
+     * always in front.
+     * <p>
+     * A run is the length of a testing session and a tester wants the hours on
+     * it, so the field is there from the start rather than appearing at 01:00:00
+     * - a number that grows a field is a number that jumps. Both places that show
+     * a run total read it here: the run editor's own status bar and light mode.
+     * <p>
+     * <b>Always carrying the hours is also what keeps light mode's strip
+     * readable.</b> Its two clocks have no labels, because the right-hand figure
+     * is always the larger of the two and that says which is which faster than a
+     * word would. Showing the run in hours and minutes alone broke exactly that:
+     * a run at five minutes read 00:05 beside a case at four and a half reading
+     * 04:30, and the smaller number was the longer time. With the seconds kept
+     * and the hours always present, the run clock is the wider and the larger of
+     * the pair whatever either of them holds.
+     * <p>
+     * Blank for a run nobody has started, which is the rule the editor's status
+     * bar already draws on - it hides the label when there is nothing to show.
+     */
+    public static @NotNull String formatRunClock(final @NotNull Duration duration) {
+        return duration.isZero() ? "" : String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
+    }
+
+    /**
+     * A case's recorded duration, as the grid and an exported sheet show it: the
+     * same minutes and seconds {@link #formatCaseClock} draws, and blank when
+     * nothing was measured.
      * <p>
      * Zero is not a case that took no time - it is a case the timer never ran
      * for, because the verdict came from the context menu, a bulk apply or the
      * failure dialog. Printing 00:00 for those claims a measurement nobody took.
+     * That guard is the whole of what this adds to the clock it delegates to.
+     * <p>
+     * <b>No milliseconds, on any surface.</b> They are still measured and still
+     * stored - what is written to disk keeps every one of them - and they are
+     * simply not drawn. This used to print "84ms" under a second and a ".400"
+     * tail above it, on the argument that a framework-timed case reporting 84ms
+     * should not read as no time at all. What that cost was three digits on every
+     * hand-timed case that changed nothing a tester could act on, and a column
+     * whose shape depended on how fast the case had been. An automated case under
+     * a second now reads 00:00 here, and its measurement is in the file.
      */
     public static @NotNull String formatDuration(final @NotNull Duration duration) {
-        if (duration.isZero()) return "";
-
-        // Under a second reads as milliseconds, because the clock is no longer
-        // the only source. A tester working through a case by hand is timed to
-        // the second and never finishes one inside a second; a test framework
-        // measures the method itself and routinely reports 84ms - which this
-        // rendered as 00:00:00, a duration that reads as "no time at all" for
-        // something that did take time.
-        if (duration.toSeconds() == 0) return duration.toMillis() + "ms";
-
-        final @NotNull String clock = String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
-
-        // The milliseconds only when there are some. Whole seconds are what a
-        // case timed by hand mostly comes to, and 00:03:07.000 is three extra
-        // digits that say nothing; a case that took 1.4 seconds used to read
-        // 00:00:01, which said something untrue.
-        return duration.toMillisPart() == 0 ? clock : clock + String.format(".%03d", duration.toMillisPart());
+        return duration.isZero() ? "" : formatCaseClock(duration);
     }
 
     /**

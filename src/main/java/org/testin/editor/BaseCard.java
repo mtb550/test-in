@@ -4,12 +4,12 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.panels.VerticalLayout;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.framework.Prose;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,7 +31,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * title as the tester's own words rather than as markup they can break with
      * a {@code <}.
      */
-    protected final @NotNull JBTextArea titleArea = new JBTextArea();
+    protected final @NotNull JTextArea titleArea = Prose.of("");
     protected final @NotNull JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
     protected final @NotNull Map<String, JBLabel> attributeLabels = new HashMap<>();
     protected final @NotNull JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
@@ -64,15 +64,6 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         setOpaque(true);
 
         titleArea.setForeground(UIUtil.getLabelForeground());
-        titleArea.setLineWrap(true);
-        titleArea.setWrapStyleWord(true);
-
-        // A card is drawn, not edited: no caret, no selection, nothing in the
-        // focus order, and the card's own stripe showing through.
-        titleArea.setEditable(false);
-        titleArea.setFocusable(false);
-        titleArea.setOpaque(false);
-        titleArea.setBorder(JBUI.Borders.empty());
 
         badgePanel.setOpaque(false);
         badgePanel.setAlignmentX(Component.LEFT_ALIGNMENT);

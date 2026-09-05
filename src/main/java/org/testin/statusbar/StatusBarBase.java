@@ -5,17 +5,25 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.services.Services;
+import org.testin.setting.AppSettingsState;
+import org.testin.ui.framework.Keycap;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 
 /**
- * Shortcut-hint strip at the bottom of the dialogs, styled like the
- * platform's popup advertiser bar: tinted background, hairline on top, muted
- * hint text with the keystroke emphasized.
+ * Shortcut-hint strip at the bottom of a window, styled like the platform's
+ * popup advertiser bar: tinted background, hairline on top, muted hint text
+ * with the keystroke emphasized.
+ * <p>
+ * Usable as it stands, which is what its name says - {@code Base} is this
+ * project's word for a parent that is not abstract. It was abstract anyway,
+ * so light mode, which wants exactly this strip and adds nothing to it, would
+ * have had to declare an empty subclass to say so (#13).
  */
-public abstract class StatusBarBase {
+public class StatusBarBase {
     /**
      * Between a keystroke and its meaning.
      */
@@ -29,13 +37,11 @@ public abstract class StatusBarBase {
 
     // Keystroke and its meaning read clearly in light and dark; only the
     // separators stay muted.
-    private final @NotNull Color shortcutColor = JBUI.CurrentTheme.Label.foreground();
     private final @NotNull Color labelColor = JBUI.CurrentTheme.Label.foreground();
     private final @NotNull Color dotColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
     private final @NotNull Color separatorColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
 
     private final @NotNull Font font = JBUI.Fonts.smallFont();
-    private final @NotNull Font shortcutFont = JBUI.Fonts.smallFont().asBold();
 
     // A keyboard: says "these are keys".
     private final @NotNull Icon icon = AllIcons.General.Keyboard;
@@ -48,6 +54,25 @@ public abstract class StatusBarBase {
         this.statusBar.setBackground(JBUI.CurrentTheme.Advertiser.background());
 
         updateItems(items);
+        setShown(true);
+    }
+
+    /**
+     * Whether this strip is drawn, with the tester's standing answer folded in.
+     * <p>
+     * <b>One owner, because there are two questions and one strip.</b> A surface
+     * may have its own reason to hide the keys - light mode's view menu is the
+     * only one today - and a tester may have said once that they never want to
+     * see them. Asked separately at each call site, a dialog would have to know
+     * about a setting it has no other business with, and the ones that never ask
+     * would quietly ignore it. Asked here, every strip in the plugin obeys the
+     * setting without a single dialog being touched.
+     * <p>
+     * Read as the strip is drawn rather than cached, so turning the setting off
+     * takes effect on the next dialog rather than the next IDE.
+     */
+    public void setShown(final boolean wanted) {
+        statusBar.setVisible(wanted && Services.getInstance(AppSettingsState.class).showShortcutHints);
     }
 
     public void updateItems(final StatusBarItem @NotNull [] items) {
@@ -60,7 +85,7 @@ public abstract class StatusBarBase {
 
         for (int i = 0; i < items.length; i++) {
             final @NotNull StatusBarItem item = items[i];
-            contentPanel.add(createShortcut(item.getShortcutText()));
+            contentPanel.add(Keycap.of(item.getShortcutText()));
             contentPanel.add(createDot());
             contentPanel.add(createLabel(item.getName()));
 
@@ -78,13 +103,6 @@ public abstract class StatusBarBase {
     private @NotNull JBLabel setStatusBarIcon() {
         final @NotNull JBLabel label = new JBLabel(icon);
         label.setBorder(border);
-        return label;
-    }
-
-    private @NotNull JBLabel createShortcut(final @NotNull String text) {
-        final @NotNull JBLabel label = new JBLabel(text);
-        label.setForeground(shortcutColor);
-        label.setFont(shortcutFont);
         return label;
     }
 

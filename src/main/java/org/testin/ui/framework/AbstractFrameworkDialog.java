@@ -6,7 +6,7 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.ui.components.JBPanel;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
-import org.testin.statusbar.DialogStatusBar;
+import org.testin.statusbar.StatusBarBase;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.ui.dialogs.DialogStyle;
 
@@ -228,8 +228,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
             stack.add(verticalStack(all.subList(fillIndex + 1, all.size())), BorderLayout.SOUTH);
         }
 
-        final @NotNull DialogStatusBar statusBar = new DialogStatusBar();
-        statusBar.updateItems(dto().shortcuts().toArray(StatusBarItem[]::new));
+        final @NotNull StatusBarBase statusBar = new StatusBarBase(dto().shortcuts().toArray(StatusBarItem[]::new));
 
         final @NotNull JBPanel<?> contentPanel = DialogStyle.styleContent(new JBPanel<>(new BorderLayout()));
         contentPanel.setBorder(BorderFactory.createEmptyBorder());

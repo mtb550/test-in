@@ -11,7 +11,8 @@ public class RunDetailsPopupBtn extends AbstractDetailsPopupBtn<RunEditorAttribu
         // was Executed By and Executed At joining (#27), v7 the curated defaults
         // (#80). Order needed none - it is LOCKED_CHECKED, and a locked attribute
         // is forced into whatever was stored when the popup loads it.
-        super("testin.selectedDetails.run.v7",
+        super("Details",
+                "testin.selectedDetails.run.v7",
                 RunEditorAttributes.class,
                 onToolBarDetailsSelectedChanged);
     }
