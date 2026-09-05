@@ -672,11 +672,13 @@ final class LightModeWindow {
     /**
      * Which parts are drawn, asked of the menu each time rather than remembered.
      * <p>
-     * <b>Writing up a failure overrides one of the four.</b> The verdicts go,
+     * <b>Writing up a failure overrides two of the five.</b> The verdicts go,
      * because the case is already judged and the form is the only thing left to
-     * do. The status bar is not on the list at all - it is what tells the tester
-     * that Enter saves and Escape leaves, and a form that cannot say how to
-     * finish it is a trap.
+     * do; the status bar comes back whatever the tester ticked, because with no
+     * buttons on the form it is the only place Enter and Escape are written
+     * down, and a form that cannot say how to finish it is a trap. Hiding the
+     * row is theirs to choose on a case they are reading - not on a form they
+     * have to finish.
      * <p>
      * Nothing is left behind as an empty band: a hidden component takes no space
      * in a border layout, so turning off the clocks closes the buttons up over
@@ -700,6 +702,7 @@ final class LightModeWindow {
 
         strip.setVisible(shows(LightModePart.DURATION));
         verdictRow.setVisible(shows(LightModePart.VERDICT_BUTTONS) && !writing);
+        statusBar.getPanel().setVisible(shows(LightModePart.STATUS_BAR) || writing);
     }
 
     private boolean shows(final @NotNull LightModePart part) {
