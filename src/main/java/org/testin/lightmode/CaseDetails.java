@@ -162,7 +162,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
         // names, and a Turkish machine would render "Conditions" with a dotted
         // capital I.
         final @NotNull JBLabel label = new JBLabel(text.toUpperCase(Locale.ROOT));
-        label.setFont(scaled(JBUI.Fonts.smallFont()));
+        label.setFont(scaled(CaseFont.label()));
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
         final @NotNull Dimension size = new Dimension(Math.round(JBUI.scale(LABEL_WIDTH) * zoom), label.getPreferredSize().height);
@@ -173,7 +173,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
     }
 
     private @NotNull JTextArea prose(final @NotNull String text) {
-        final @NotNull JTextArea area = Prose.of(scaled(JBUI.Fonts.label()), JBUI.CurrentTheme.Label.foreground());
+        final @NotNull JTextArea area = Prose.of(scaled(CaseFont.body()), JBUI.CurrentTheme.Label.foreground());
         area.setText(text);
 
         return area;

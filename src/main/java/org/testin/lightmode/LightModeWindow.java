@@ -7,10 +7,10 @@ import com.intellij.ui.WindowMoveListener;
 import com.intellij.ui.WindowResizeListener;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
+import org.testin.editor.toolbar.Toolbar;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -99,14 +99,6 @@ final class LightModeWindow {
     private static final int GRAB = 4;
 
     /**
-     * Two keys for one state, because that is what the tester asked for: one
-     * that opens the details and one that closes them, rather than a single key
-     * whose effect depends on what is already on screen.
-     * <p>
-     * Constants here rather than in {@link Shortcuts}, which holds the keys more
-     * than one class binds. These are this window's alone.
-     */
-    /**
      * How far the wheel takes the case, and in what steps.
      * <p>
      * Down as well as up: a tester who wants more of the case on screen at once
@@ -119,6 +111,14 @@ final class LightModeWindow {
     private static final float ZOOM_MIN = 0.8f;
     private static final float ZOOM_MAX = 2.0f;
 
+    /**
+     * Two keys for one state, because that is what the tester asked for: one
+     * that opens the details and one that closes them, rather than a single key
+     * whose effect depends on what is already on screen.
+     * <p>
+     * Constants here rather than in {@link Shortcuts}, which holds the keys more
+     * than one class binds. These are this window's alone.
+     */
     private static final @NotNull KeyStroke SHOW_DETAILS = KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK);
     private static final @NotNull KeyStroke HIDE_DETAILS = KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK);
 
@@ -127,19 +127,29 @@ final class LightModeWindow {
     private final @NotNull RunEditor editor;
     private final @NotNull Runnable onClosed;
 
-    private final @NotNull TitleBarBtn start = new TitleBarBtn("Start test execution", AllIcons.Actions.Execute);
-    private final @NotNull TitleBarBtn stop = new TitleBarBtn("Stop test execution", AllIcons.Actions.Suspend);
+    /**
+     * The run editor's own execution buttons, drawn with its icons. A tester who
+     * presses Start in the toolbar and then Stop in this window is pressing the
+     * same two buttons, so they look like the same two buttons - and light mode
+     * stops drawing the platform's run-code arrow, which the toolbar had already
+     * moved away from because manual execution runs no code.
+     */
+    private final @NotNull TitleBarBtn start = new TitleBarBtn(Toolbar.START_MANUAL_EXECUTION, Toolbar.START_MANUAL_EXECUTION_ICON);
+    private final @NotNull TitleBarBtn stop = new TitleBarBtn(Toolbar.STOP_EXECUTION, Toolbar.STOP_EXECUTION_ICON);
     private final @NotNull JBLabel counter = new JBLabel();
 
     /**
-     * The sizes the case is written at before any zoom, read once here rather
-     * than declared as constants: they come from the IDE's own font, and a
-     * constant would freeze whichever font happened to be set when this class
-     * was first loaded.
+     * The sizes the case is written at before any zoom, read once here as the
+     * window opens - so it opens at whatever the tester has the editor font set
+     * to now, and the wheel takes it from there.
+     * <p>
+     * The expected result takes the same size as every attribute in the details
+     * panel, because they are the same kind of thing being read; only the
+     * description is set apart, and the test set name sits below both as a label.
      */
-    private final @NotNull Font setFont = JBUI.Fonts.smallFont();
-    private final @NotNull Font descriptionFont = JBFont.label().biggerOn(3).asBold();
-    private final @NotNull Font expectedFont = JBFont.label();
+    private final @NotNull Font setFont = CaseFont.label();
+    private final @NotNull Font descriptionFont = CaseFont.description();
+    private final @NotNull Font expectedFont = CaseFont.body();
 
     private final @NotNull JBLabel set = new JBLabel();
     private final @NotNull JTextArea description = Prose.of(descriptionFont, JBUI.CurrentTheme.Label.foreground());
@@ -174,13 +184,12 @@ final class LightModeWindow {
     private final @NotNull JBPanel<?> footer = new JBPanel<>(new BorderLayout());
 
     /**
-     * The three verdicts, and the Cancel and Save that stand in their place
-     * while a failure is being written. Built once and swapped, so the row keeps
-     * its place and the window does not jump under the tester's hand.
+     * The three verdicts, and nothing while a failure is being written - the
+     * form is the only thing to look at then, and Enter and Escape are what
+     * finish it.
      */
     private final @NotNull JBPanel<?> verdictRow = new JBPanel<>(new BorderLayout());
     private final @NotNull JComponent verdictButtons = verdictButtons();
-    private final @NotNull JComponent commitButtons = commitButtons();
 
     private final @NotNull StatusBarBase statusBar = new StatusBarBase(new StatusBarItem[0]);
 
@@ -612,23 +621,17 @@ final class LightModeWindow {
 
     /**
      * Draws whichever of the two states the window is in - the case with its
-     * details and three verdicts, or the case with a failure form and two
-     * commands under it.
+     * details and three verdicts, or the case with a failure form under it.
      * <p>
-     * One method, because the three things that change change together. Split
-     * across the places that trigger them, a window could show the commit bar
-     * over the details, or Escape's hint while Escape meant something else.
+     * One method, because the two things that change change together. Split
+     * across the places that trigger them, a window could show the form over
+     * the details, or Escape's hint while Escape meant something else.
      */
     private void showCapture() {
-        final boolean writing = capture.isPresent();
-
         underCase.removeAll();
         underCase.add(capture.map(form -> (JComponent) form).orElse(details), BorderLayout.CENTER);
 
-        verdictRow.removeAll();
-        verdictRow.add(writing ? commitButtons : verdictButtons, BorderLayout.CENTER);
-
-        statusBar.updateItems(writing ? commitKeys() : caseKeys());
+        statusBar.updateItems(capture.isPresent() ? commitKeys() : caseKeys());
 
         applyParts();
     }
@@ -649,11 +652,11 @@ final class LightModeWindow {
     /**
      * Which parts are drawn, asked of the menu each time rather than remembered.
      * <p>
-     * <b>Writing up a failure ignores all five.</b> A verdict that asks for
-     * detail cannot be trimmed to the point where the detail is unreachable, so
-     * while the form is open its two commands are shown whatever the tester
-     * ticked - hiding Save on a form that has to be saved would be a window that
-     * cannot finish what it started.
+     * <b>Writing up a failure overrides two of the five.</b> The verdicts go,
+     * because the case is already judged and the form is the only thing left to
+     * do; the status bar comes back whatever the tester ticked, because with no
+     * buttons on the form it is the only place Enter and Escape are written
+     * down, and a form that cannot say how to finish it is a trap.
      * <p>
      * Nothing is left behind as an empty band: a hidden component takes no space
      * in a border layout, so turning off the clocks closes the buttons up over
@@ -676,8 +679,8 @@ final class LightModeWindow {
         expected.setVisible(shows(LightModePart.EXPECTED_RESULT) && !expected.getText().isBlank());
 
         strip.setVisible(shows(LightModePart.DURATION));
-        verdictRow.setVisible(shows(LightModePart.VERDICT_BUTTONS) || writing);
-        statusBar.getPanel().setVisible(shows(LightModePart.STATUS_BAR));
+        verdictRow.setVisible(shows(LightModePart.VERDICT_BUTTONS) && !writing);
+        statusBar.getPanel().setVisible(shows(LightModePart.STATUS_BAR) || writing);
     }
 
     private boolean shows(final @NotNull LightModePart part) {
@@ -910,27 +913,6 @@ final class LightModeWindow {
     }
 
     /**
-     * What replaces the verdicts while a failure is being written: leave it, or
-     * save it and move on.
-     * <p>
-     * Sized to their words and pushed right, where the verdicts are stretched
-     * equally across the window - these two are not a choice between equals, and
-     * laying them out as one would say they were.
-     */
-    private @NotNull JComponent commitButtons() {
-        final @NotNull JBPanel<?> commit = new JBPanel<>(new FlowLayout(FlowLayout.RIGHT, JBUI.scale(6), 0));
-        commit.setBorder(JBUI.Borders.empty(0, 10, 10, 10));
-        commit.setOpaque(false);
-
-        commit.add(new KeyBtn(Shortcuts.Escape.getShortcutText(), "Cancel",
-                "Leave the case unjudged and write nothing", this::cancelCapture));
-        commit.add(new KeyBtn(Shortcuts.Enter.getShortcutText(), "Save & next",
-                "Record the failure and move to the next test case", this::saveCapture));
-
-        return commit;
-    }
-
-    /**
      * The letter that applies a status, read from the status itself so the cap
      * and the binding cannot name different keys.
      */
@@ -947,6 +929,7 @@ final class LightModeWindow {
      */
     private @NotNull JComponent footer() {
         footer.setOpaque(false);
+        verdictRow.add(verdictButtons, BorderLayout.CENTER);
         footer.add(verdictRow, BorderLayout.NORTH);
         footer.add(durationStrip(), BorderLayout.CENTER);
         footer.add(statusBar.getPanel(), BorderLayout.SOUTH);

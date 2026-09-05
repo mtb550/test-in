@@ -43,6 +43,19 @@ public interface Toolbar {
      * in the one way that mattered and disagreed in every other.
      */
     @NotNull Icon START_MANUAL_EXECUTION_ICON = AllIcons.Toolwindows.ToolWindowRun;
+
+    /**
+     * What stops it, and the icon that draws it.
+     * <p>
+     * Beside the two above for the reason they are there: two surfaces show
+     * these controls now - the run editor's toolbar and light mode's title bar
+     * (#13) - and a tester looking at one and then the other has to see the
+     * same pair of buttons. Light mode drew the platform's run arrow, which is
+     * the very icon the comment above records as the wrong one.
+     */
+    @NotNull String STOP_EXECUTION = "Stop Execution";
+
+    @NotNull Icon STOP_EXECUTION_ICON = AllIcons.Debugger.ThreadFrozen;
     /**
      * The query is deliberately not a parameter: both editors rebuild their
      * filtered list through {@code EditorFilters.of(toolBar)}, which reads the
