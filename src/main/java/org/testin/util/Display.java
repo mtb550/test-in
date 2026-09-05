@@ -93,7 +93,7 @@ public final class Display {
     }
 
     /**
-     * How long the tester has been on this case: minutes and seconds, and hours
+     * A duration as a clock somebody is watching: minutes and seconds, and hours
      * only once there are some.
      * <p>
      * <b>Not {@link #formatDuration}, and the difference is the point.</b> That
@@ -103,33 +103,14 @@ public final class Display {
      * that blinks out under a second, or reads 00:00:41 for forty-one seconds,
      * is telling them about the formatter rather than about the case.
      * <p>
-     * Seconds, because this is the figure that moves while somebody watches it.
-     * The duration still arrives measured to the millisecond and the digits are
-     * dropped at the last moment, so nothing is lost from what gets stored - and
-     * nothing here reaches a report or an exported sheet, which keep every
-     * measurement they were given.
+     * The seconds are still measured to the millisecond - light mode's clocks
+     * are fed the timer's own duration and this drops the digits at the last
+     * moment, so nothing is lost from what gets stored.
      */
-    public static @NotNull String formatCaseClock(final @NotNull Duration duration) {
+    public static @NotNull String formatClock(final @NotNull Duration duration) {
         final @NotNull String minutes = String.format("%02d:%02d", duration.toMinutesPart(), duration.toSecondsPart());
 
         return duration.toHours() == 0 ? minutes : duration.toHours() + ":" + minutes;
-    }
-
-    /**
-     * How long the run has been going: hours and minutes, and no seconds.
-     * <p>
-     * A test run is measured in the time somebody spends on it, and at that
-     * length the seconds are two digits that change every second and say nothing
-     * - they take the number's width with them and pull the eye to the corner of
-     * a window built to hold one sentence. The case clock beside it keeps its
-     * seconds, because that is the figure a tester is actually watching move.
-     * <p>
-     * Display only, and only where a clock is shown. What is recorded against
-     * the run is untouched, so the report and the details popup still say
-     * exactly when it started and ended.
-     */
-    public static @NotNull String formatRunClock(final @NotNull Duration duration) {
-        return String.format("%02d:%02d", duration.toHours(), duration.toMinutesPart());
     }
 
     /**

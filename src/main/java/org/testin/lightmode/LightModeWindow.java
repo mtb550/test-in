@@ -334,8 +334,8 @@ final class LightModeWindow {
      * hint color rather than the text color.
      */
     void tick() {
-        caseClock.setText(Display.formatCaseClock(editor.getCurrentCaseElapsed()));
-        runClock.setText(Display.formatRunClock(editor.getElapsed()));
+        caseClock.setText(Display.formatClock(editor.getCurrentCaseElapsed()));
+        runClock.setText(Display.formatClock(editor.getElapsed()));
     }
 
     /**
