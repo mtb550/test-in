@@ -1,6 +1,7 @@
 package org.testin.lightmode;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.WindowStateService;
 import com.intellij.ui.WindowMoveListener;
@@ -32,8 +33,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.List;
@@ -74,6 +73,14 @@ final class LightModeWindow {
      * somewhere that no longer makes sense.
      */
     private static final @NotNull String PLACEMENT = "testin.lightMode.v1";
+
+    /**
+     * And one for the zoom, which is the same kind of fact and kept in the same
+     * place: how this tester wants this window on this screen. A different store
+     * because a zoom is not a position - WindowStateService holds where and how
+     * big, and this is neither.
+     */
+    private static final @NotNull String ZOOM = "testin.lightMode.zoom.v1";
 
     /**
      * How wide the window opens. Only the width is a number: the height is
@@ -224,8 +231,14 @@ final class LightModeWindow {
      * are not part of it: zoom exists so the case can be read from where the
      * tester is actually sitting, and making the furniture bigger would only
      * cost them the screen space they were trying to free.
+     * <p>
+     * Remembered per machine, beside the position, the width and the view menu's
+     * ticks: how large a tester needs the case drawn is a fact about their screen
+     * and their eyes, not about the run they happen to have open. Clamped on the
+     * way in as well as on the way out, so a hand-edited properties file cannot
+     * open a window nobody can read.
      */
-    private float zoom = 1.0f;
+    private float zoom = Math.clamp(PropertiesComponent.getInstance().getFloat(ZOOM, 1.0f), ZOOM_MIN, ZOOM_MAX);
 
     /**
      * The width the last resize left, so the height can be refitted for a change
@@ -237,11 +250,15 @@ final class LightModeWindow {
         this.p = p;
         this.editor = editor;
         this.onClosed = onClosed;
-        this.details = new CaseDetails(p);
+        this.details = new CaseDetails();
 
         frame.setUndecorated(true);
         frame.setAlwaysOnTop(true);
         frame.setContentPane(content());
+
+        // Before the frame is packed, because the height is measured from the
+        // case and the case is drawn at the zoom this tester left it at.
+        applyZoom();
 
         // Before the first refresh, not instead of it: a frame is not laid out
         // at all until it has a peer, and measuring a wrapped paragraph before
@@ -317,20 +334,8 @@ final class LightModeWindow {
      * hint color rather than the text color.
      */
     void tick() {
-        caseClock.setText(seconds(editor.getCurrentCaseElapsed()));
-        runClock.setText(seconds(editor.getElapsed()));
-    }
-
-    /**
-     * The same duration the editor's own status bar shows, to the second.
-     * <p>
-     * Truncated because these two tick in front of a tester who is reading:
-     * the timer writes milliseconds, so untruncated the clocks would end in
-     * three digits that change every second and take the number's width with
-     * them. Display only - what is stored keeps every millisecond it measured.
-     */
-    private static @NotNull String seconds(final @NotNull Duration duration) {
-        return Display.formatDuration(duration.truncatedTo(ChronoUnit.SECONDS));
+        caseClock.setText(Display.formatClock(editor.getCurrentCaseElapsed()));
+        runClock.setText(Display.formatClock(editor.getElapsed()));
     }
 
     /**
@@ -479,14 +484,29 @@ final class LightModeWindow {
         if (next == zoom) return;
 
         zoom = next;
+        PropertiesComponent.getInstance().setValue(ZOOM, zoom, 1.0f);
 
+        applyZoom();
+        fitHeight();
+    }
+
+    /**
+     * Draws everything the tester reads at the current zoom - the three
+     * paragraphs, the detail rows and the failure form if one is open.
+     * <p>
+     * Called by the wheel and once as the window opens, because a remembered
+     * zoom is nothing until something applies it. One method for both, so the
+     * size a window opens at and the size the wheel takes it to cannot come from
+     * two different lists of components.
+     */
+    private void applyZoom() {
         set.setFont(scaled(setFont));
         chosen.setFont(scaled(setFont));
         description.setFont(scaled(descriptionFont));
         expected.setFont(scaled(expectedFont));
-        details.setZoom(zoom);
 
-        fitHeight();
+        details.setZoom(zoom);
+        capture.ifPresent(form -> form.setZoom(zoom));
     }
 
     private @NotNull Font scaled(final @NotNull Font base) {
@@ -567,7 +587,7 @@ final class LightModeWindow {
      */
     private void openCapture() {
         executingItem().ifPresent(item -> {
-            capture = Optional.of(new FailureForm(item));
+            capture = Optional.of(new FailureForm(item, zoom));
 
             showCapture();
             fitHeight();
@@ -652,11 +672,11 @@ final class LightModeWindow {
     /**
      * Which parts are drawn, asked of the menu each time rather than remembered.
      * <p>
-     * <b>Writing up a failure overrides two of the five.</b> The verdicts go,
+     * <b>Writing up a failure overrides one of the four.</b> The verdicts go,
      * because the case is already judged and the form is the only thing left to
-     * do; the status bar comes back whatever the tester ticked, because with no
-     * buttons on the form it is the only place Enter and Escape are written
-     * down, and a form that cannot say how to finish it is a trap.
+     * do. The status bar is not on the list at all - it is what tells the tester
+     * that Enter saves and Escape leaves, and a form that cannot say how to
+     * finish it is a trap.
      * <p>
      * Nothing is left behind as an empty band: a hidden component takes no space
      * in a border layout, so turning off the clocks closes the buttons up over
@@ -671,7 +691,7 @@ final class LightModeWindow {
         // only drawn when there are two things to separate.
         set.setVisible(shows(LightModePart.SET_NAME));
         chosen.setVisible(writing);
-        chosen.setText(set.isVisible() ? " \u00b7 " + TestStatus.FAILED.getLabel() : TestStatus.FAILED.getLabel());
+        chosen.setText(set.isVisible() ? " · " + TestStatus.FAILED.getLabel() : TestStatus.FAILED.getLabel());
         setLine.setVisible(set.isVisible() || chosen.isVisible());
 
         // Two reasons it may not be drawn, and both have to hold for it to be:
@@ -680,7 +700,6 @@ final class LightModeWindow {
 
         strip.setVisible(shows(LightModePart.DURATION));
         verdictRow.setVisible(shows(LightModePart.VERDICT_BUTTONS) && !writing);
-        statusBar.getPanel().setVisible(shows(LightModePart.STATUS_BAR) || writing);
     }
 
     private boolean shows(final @NotNull LightModePart part) {

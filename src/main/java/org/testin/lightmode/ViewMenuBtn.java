@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.toolbar.components.AbstractDetailsPopupBtn;
 
 /**
- * The light mode window's view menu: five checkboxes for what it shows (#13).
+ * The light mode window's view menu: four checkboxes for what it shows (#13).
  * <p>
  * The same button the two editors put on their toolbars, which is what its own
  * javadoc anticipated - "a third editor needs no new plumbing". The popup, the
@@ -14,11 +14,13 @@ import org.testin.editor.toolbar.components.AbstractDetailsPopupBtn;
 class ViewMenuBtn extends AbstractDetailsPopupBtn<LightModePart> {
 
     ViewMenuBtn(final @NotNull Runnable onChanged) {
-        // v1, and the same versioning rule the editors follow: bump the key only
-        // when a stored selection would be answering an older question, because
-        // bumping discards what every tester ticked.
+        // v2: the status bar left the list, so a v1 selection is answering an
+        // older question - it holds an option that no longer exists, and reading
+        // it back would log an unknown-attribute error on every open. That is
+        // exactly what the editors' versioning rule is for, and nothing is lost
+        // by discarding it here because this window has never shipped.
         super("Choose what the window shows",
-                "testin.lightMode.parts.v1",
+                "testin.lightMode.parts.v2",
                 LightModePart.class,
                 onChanged);
     }

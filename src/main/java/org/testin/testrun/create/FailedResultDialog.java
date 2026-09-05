@@ -1,11 +1,8 @@
 package org.testin.testrun.create;
 
-import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.BugPriority;
-import org.testin.model.BugSeverity;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.*;

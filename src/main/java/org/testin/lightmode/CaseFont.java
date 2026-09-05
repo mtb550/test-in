@@ -3,6 +3,7 @@ package org.testin.lightmode;
 import com.intellij.util.ui.JBFont;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.FontSync;
 
@@ -69,7 +70,7 @@ final class CaseFont {
         return at(FontSync.getBaseFontSize() - SMALLER, Font.PLAIN);
     }
 
-    private static @NotNull Font at(final float size, final int style) {
+    private static @NotNull Font at(final float size, @MagicConstant(flagsFromClass = Font.class) final int style) {
         return JBFont.label().deriveFont(style, Math.max(FLOOR, size));
     }
 }

@@ -9,13 +9,16 @@ import org.testin.model.ToolBarDefault;
 /**
  * The parts of the light mode window a tester can turn off (#13).
  * <p>
- * <b>Five, and it cannot grow past what the window holds.</b> Every one of
+ * <b>Four, and it cannot grow past what the window holds.</b> Every one of
  * these is a thing already on screen, so this is a menu on the title bar rather
  * than a page in Settings - there is nothing here to configure that is not
  * visible from the window it configures.
  * <p>
- * <b>The description is not among them.</b> A window showing no test case is not
- * a smaller window, it is a broken one. It is left off the list entirely rather
+ * <b>Neither the description nor the status bar is among them.</b> A window
+ * showing no test case is not a smaller window, it is a broken one; and a window
+ * that has stopped saying what P, F and B do is one a tester cannot use without
+ * already knowing it. The design's own "everything off" mock keeps the strip of
+ * keys, which is what settled it. Both are left off the list entirely rather
  * than listed and locked, because a checkbox that cannot be unticked invites the
  * tester to try.
  * <p>
@@ -35,8 +38,7 @@ public enum LightModePart implements ToolBarAttribute {
     SET_NAME("Test set name"),
     EXPECTED_RESULT("Expected result"),
     DURATION("Duration"),
-    VERDICT_BUTTONS("Verdict buttons"),
-    STATUS_BAR("Status bar");
+    VERDICT_BUTTONS("Verdict buttons");
 
     private final @NotNull String name;
 

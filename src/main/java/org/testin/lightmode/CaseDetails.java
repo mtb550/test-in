@@ -1,6 +1,5 @@
 package org.testin.lightmode;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
@@ -46,8 +45,6 @@ class CaseDetails extends JBPanel<CaseDetails> {
 
     private static final int GAP = 10;
 
-    private final @NotNull Project p;
-
     /**
      * The case on screen, kept so the rows can be rebuilt without being handed
      * it again - which is what a zoom is.
@@ -56,9 +53,8 @@ class CaseDetails extends JBPanel<CaseDetails> {
 
     private float zoom = 1.0f;
 
-    CaseDetails(final @NotNull Project p) {
+    CaseDetails() {
         super(new GridBagLayout());
-        this.p = p;
         setOpaque(false);
     }
 

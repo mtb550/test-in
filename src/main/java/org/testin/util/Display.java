@@ -60,13 +60,6 @@ public final class Display {
     }
 
     /**
-     * A measured duration as HH:MM:SS, and blank when nothing was measured.
-     * <p>
-     * Zero is not a case that took no time - it is a case the timer never ran
-     * for, because the verdict came from the context menu, a bulk apply or the
-     * failure dialog. Printing 00:00 for those claims a measurement nobody took.
-     */
-    /**
      * The steps, numbered the way this plugin numbers them, one per line.
      * <p>
      * A step is numbered by where it sits in the case, so the number a tester
@@ -99,6 +92,34 @@ public final class Display {
         return (index + 1) + "- " + format(step);
     }
 
+    /**
+     * A duration as a clock somebody is watching: minutes and seconds, and hours
+     * only once there are some.
+     * <p>
+     * <b>Not {@link #formatDuration}, and the difference is the point.</b> That
+     * one is the measurement - it prints milliseconds, drops to "84ms" under a
+     * second, and is blank when nothing was measured. All three are right for a
+     * stored result and wrong for a number ticking in front of a tester: a clock
+     * that blinks out under a second, or reads 00:00:41 for forty-one seconds,
+     * is telling them about the formatter rather than about the case.
+     * <p>
+     * The seconds are still measured to the millisecond - light mode's clocks
+     * are fed the timer's own duration and this drops the digits at the last
+     * moment, so nothing is lost from what gets stored.
+     */
+    public static @NotNull String formatClock(final @NotNull Duration duration) {
+        final @NotNull String minutes = String.format("%02d:%02d", duration.toMinutesPart(), duration.toSecondsPart());
+
+        return duration.toHours() == 0 ? minutes : duration.toHours() + ":" + minutes;
+    }
+
+    /**
+     * A measured duration as HH:MM:SS, and blank when nothing was measured.
+     * <p>
+     * Zero is not a case that took no time - it is a case the timer never ran
+     * for, because the verdict came from the context menu, a bulk apply or the
+     * failure dialog. Printing 00:00 for those claims a measurement nobody took.
+     */
     public static @NotNull String formatDuration(final @NotNull Duration duration) {
         if (duration.isZero()) return "";
 
