@@ -283,6 +283,19 @@ intellijPlatformTesting {
                     // the next launch. Deleting .sandbox/sample is how to get the sample back.
                     if (!workingSample.exists()) {
                         committedSample.copyRecursively(workingSample)
+
+                        // Everything in the sample's .idea is the IDE's rather than the
+                        // sample's - .gitignore says exactly that - but only vcs.xml is
+                        // written relative to where the project sits. It maps
+                        // $PROJECT_DIR$/../.. to a Git root, which is this repository from
+                        // samples/automation and is .sandbox from the copy, where there is
+                        // no repository and the IDE reports an invalid VCS root on every
+                        // launch. The rest of .idea is path-independent and is kept, so the
+                        // copy opens as an imported Maven project rather than re-importing.
+                        workingSample.walkTopDown()
+                            .filter { it.name == "vcs.xml" && it.parentFile.name == ".idea" }
+                            .toList()
+                            .forEach { it.delete() }
                         println("Copied the sample into the sandbox, so the committed one stays clean: " + workingSample)
                     }
 
@@ -362,6 +375,19 @@ tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
         // the next launch. Deleting .sandbox/sample is how to get the sample back.
         if (!workingSample.exists()) {
             committedSample.copyRecursively(workingSample)
+
+            // Everything in the sample's .idea is the IDE's rather than the
+            // sample's - .gitignore says exactly that - but only vcs.xml is
+            // written relative to where the project sits. It maps
+            // $PROJECT_DIR$/../.. to a Git root, which is this repository from
+            // samples/automation and is .sandbox from the copy, where there is
+            // no repository and the IDE reports an invalid VCS root on every
+            // launch. The rest of .idea is path-independent and is kept, so the
+            // copy opens as an imported Maven project rather than re-importing.
+            workingSample.walkTopDown()
+                .filter { it.name == "vcs.xml" && it.parentFile.name == ".idea" }
+                .toList()
+                .forEach { it.delete() }
             println("Copied the sample into the sandbox, so the committed one stays clean: " + workingSample)
         }
 
