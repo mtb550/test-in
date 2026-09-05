@@ -93,7 +93,7 @@ public final class Display {
     }
 
     /**
-     * A duration as a clock somebody is watching: minutes and seconds, and hours
+     * How long the tester has been on this case: minutes and seconds, and hours
      * only once there are some.
      * <p>
      * <b>Not {@link #formatDuration}, and the difference is the point.</b> That
@@ -107,10 +107,30 @@ public final class Display {
      * are fed the timer's own duration and this drops the digits at the last
      * moment, so nothing is lost from what gets stored.
      */
-    public static @NotNull String formatClock(final @NotNull Duration duration) {
+    public static @NotNull String formatCaseClock(final @NotNull Duration duration) {
         final @NotNull String minutes = String.format("%02d:%02d", duration.toMinutesPart(), duration.toSecondsPart());
 
         return duration.toHours() == 0 ? minutes : duration.toHours() + ":" + minutes;
+    }
+
+    /**
+     * How long the run has been going, with its hours always in front.
+     * <p>
+     * A run is the length of a testing session and a tester wants to see the
+     * hours on it, so the field is always there rather than appearing once the
+     * first hour passes - a number that grows a field is a number that jumps.
+     * <p>
+     * <b>Always, and that is what makes the strip readable.</b> The two clocks
+     * carry no labels because the right-hand figure is always the larger of the
+     * two, which says which is which faster than a word would. An earlier attempt
+     * at this showed the run in hours and minutes only, and broke exactly that: a
+     * run at five minutes read 00:05 beside a case at four and a half reading
+     * 04:30, and the smaller number was the longer time. Keeping the seconds and
+     * always carrying the hours makes the run's clock the wider and the larger of
+     * the pair whatever either of them holds.
+     */
+    public static @NotNull String formatRunClock(final @NotNull Duration duration) {
+        return String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
     }
 
     /**
