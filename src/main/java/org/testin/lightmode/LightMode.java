@@ -64,9 +64,24 @@ public final class LightMode implements Disposable {
      * Redraws the window if it is this run it is showing, and does nothing at
      * all otherwise - which is every other run editor in the project, and the
      * usual case.
+     * <p>
+     * <b>A run that has been signed off closes it instead.</b> Completed and
+     * Closed are the end: there is no case left to execute, no verdict left to
+     * give, and a window offering three of them over a run that has stopped
+     * asking is worse than no window. The same question already greys the
+     * toolbar button out, and closing here is what un-presses it - the button
+     * reads whether the window exists, so the window going is the button
+     * changing.
      */
     public void refresh(final @NotNull TestRunDirectoryDto run) {
-        window.filter(open -> open.shows(run)).ifPresent(LightModeWindow::refresh);
+        final @NotNull Optional<LightModeWindow> showing = window.filter(open -> open.shows(run));
+
+        if (run.isStillOpen()) {
+            showing.ifPresent(LightModeWindow::refresh);
+            return;
+        }
+
+        showing.ifPresent(LightModeWindow::close);
     }
 
     /**
