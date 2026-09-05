@@ -7,6 +7,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
@@ -43,6 +44,15 @@ public final class SettingsConfigurable implements Configurable {
     private final @NotNull TextFieldWithBrowseButton sftpKeyFileField = new TextFieldWithBrowseButton();
     private final @NotNull ComboBox<String> logLevelComboBox;
 
+    /**
+     * The strip of keys along the bottom of every Testin dialog (#13).
+     * <p>
+     * A checkbox rather than a per-dialog control: it is one answer about the
+     * tester, not twenty-eight answers about dialogs, and a tester who has
+     * learned the keys wants the row gone from all of them at once.
+     */
+    private final @NotNull JBCheckBox showShortcutHintsBox = new JBCheckBox("Show keyboard shortcuts in dialogs");
+
     public SettingsConfigurable() {
         testinPathPanel = new TestinPathPanel();
         this.logLevelComboBox = new ComboBox<>(Arrays.stream(Level.values()).map(Level::name).toArray(String[]::new));
@@ -78,6 +88,8 @@ public final class SettingsConfigurable implements Configurable {
                 .addLabeledComponent(new JBLabel("SFTP account: "), sftpUserField, 1, false)
                 .addVerticalGap(5)
                 .addLabeledComponent(new JBLabel("SFTP key file: "), sftpKeyFileField, 1, false)
+                .addVerticalGap(5)
+                .addComponent(showShortcutHintsBox)
                 .addComponentFillVertically(new JBPanel<>(), 0)
                 .getPanel();
     }
@@ -92,6 +104,7 @@ public final class SettingsConfigurable implements Configurable {
         modified |= !downloadFolderField.getText().equals(settings.defaultDownloadFolder);
         modified |= !sftpUserField.getText().equals(settings.sftpUser);
         modified |= !sftpKeyFileField.getText().equals(settings.sftpKeyFile);
+        modified |= showShortcutHintsBox.isSelected() != settings.showShortcutHints;
         return modified;
     }
 
@@ -112,6 +125,7 @@ public final class SettingsConfigurable implements Configurable {
         settings.defaultDownloadFolder = downloadFolderField.getText();
         settings.sftpUser = sftpUserField.getText().trim();
         settings.sftpKeyFile = sftpKeyFileField.getText().trim();
+        settings.showShortcutHints = showShortcutHintsBox.isSelected();
 
         Logger.setLogLevel(Level.valueOf(settings.logLevel));
 
@@ -148,6 +162,7 @@ public final class SettingsConfigurable implements Configurable {
         downloadFolderField.setText(settings.defaultDownloadFolder);
         sftpUserField.setText(settings.sftpUser);
         sftpKeyFileField.setText(settings.sftpKeyFile);
+        showShortcutHintsBox.setSelected(settings.showShortcutHints);
     }
 
 }
