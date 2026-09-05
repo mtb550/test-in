@@ -4,6 +4,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.framework.Prose;
 import org.testin.editor.Shared;
 import org.testin.model.Group;
 import org.testin.model.TestEditorAttributes;

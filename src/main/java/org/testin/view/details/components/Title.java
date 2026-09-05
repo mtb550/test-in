@@ -6,6 +6,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.ui.framework.Prose;
 import org.testin.util.Display;
 import org.testin.util.FontSync;
 
@@ -25,16 +26,10 @@ public class Title extends BaseDetails {
         final @NotNull String titleText = Display.format(dto.getDescription());
         final @NotNull String finalValue = titleText.trim().isEmpty() ? "-" : titleText;
 
-        final @NotNull JTextArea mainTitleArea = new JTextArea(finalValue);
+        final @NotNull JTextArea mainTitleArea = Prose.of(finalValue);
 
         final float titleFontSize = FontSync.getBaseFontSize();
         mainTitleArea.setFont(JBFont.label().deriveFont(Font.BOLD, titleFontSize));
-
-        mainTitleArea.setLineWrap(true);
-        mainTitleArea.setWrapStyleWord(true);
-        mainTitleArea.setOpaque(false);
-        mainTitleArea.setEditable(false);
-        mainTitleArea.setBorder(null);
 
         gbc.gridx = 0;
         gbc.gridy = currentRow;

@@ -6,6 +6,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestEditorAttributes;
+import org.testin.ui.framework.Prose;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Display;
 
@@ -40,12 +41,10 @@ public class Steps extends BaseDetails {
     }
 
     private @NotNull JTextArea createStepComponent(final @NotNull String text, final int marginBottom) {
-        final @NotNull JTextArea stepArea = new JTextArea(text);
+        final @NotNull JTextArea stepArea = Prose.of(text);
         stepArea.setFont(JBFont.label().deriveFont(Font.PLAIN, getValueFontSize()));
-        stepArea.setLineWrap(true);
-        stepArea.setWrapStyleWord(true);
-        stepArea.setOpaque(false);
-        stepArea.setEditable(false);
+
+        // The one place prose carries a border: the gap between two steps.
         stepArea.setBorder(JBUI.Borders.emptyBottom(marginBottom));
         return stepArea;
     }

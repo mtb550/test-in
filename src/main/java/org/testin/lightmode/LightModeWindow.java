@@ -20,6 +20,7 @@ import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.statusbar.StatusBarBase;
 import org.testin.statusbar.StatusBarItem;
+import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Display;
 import org.testin.util.Shortcuts;

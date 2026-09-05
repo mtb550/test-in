@@ -8,6 +8,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.framework.Prose;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,13 +42,8 @@ public final class LabelValueRow {
 
         if (valueText.trim().isEmpty()) return row;
 
-        final @NotNull JTextArea valueArea = new JTextArea(valueText);
+        final @NotNull JTextArea valueArea = Prose.of(valueText);
         valueArea.setFont(JBFont.label().deriveFont(Font.PLAIN, valueFontSize));
-        valueArea.setLineWrap(true);
-        valueArea.setWrapStyleWord(true);
-        valueArea.setOpaque(false);
-        valueArea.setEditable(false);
-        valueArea.setBorder(null);
 
         return add(panel, gbc, labelText, valueArea, labelFontSize, row);
     }
