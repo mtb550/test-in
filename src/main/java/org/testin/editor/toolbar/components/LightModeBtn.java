@@ -30,7 +30,8 @@ public class LightModeBtn extends AbstractIconButton implements ToolbarItem {
     private final @NotNull RunEditor editor;
 
     public LightModeBtn(final @NotNull Project p, final @NotNull RunEditor editor) {
-        super("Light Mode - one test case, above other windows", AllIcons.Actions.MoveToWindow);
+        // https://intellij-icons.jetbrains.design/
+        super("Light Mode - one test case, above other windows", AllIcons.MeetNewUi.LightTheme);
         this.p = p;
         this.editor = editor;
 
