@@ -704,7 +704,7 @@ final class LightModeWindow {
 
         strip.setVisible(shows(LightModePart.DURATION));
         verdictRow.setVisible(shows(LightModePart.VERDICT_BUTTONS) && !writing);
-        statusBar.getPanel().setVisible(shows(LightModePart.STATUS_BAR) || writing);
+        statusBar.setShown(shows(LightModePart.STATUS_BAR) || writing);
     }
 
     private boolean shows(final @NotNull LightModePart part) {
