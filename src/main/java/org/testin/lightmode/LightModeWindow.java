@@ -696,9 +696,11 @@ final class LightModeWindow {
         chosen.setText(set.isVisible() ? " · " + TestStatus.FAILED.getLabel() : TestStatus.FAILED.getLabel());
         setLine.setVisible(set.isVisible() || chosen.isVisible());
 
-        // Two reasons it may not be drawn, and both have to hold for it to be:
-        // the tester asked for it, and the case actually has one.
-        expected.setVisible(shows(LightModePart.EXPECTED_RESULT) && !expected.getText().isBlank());
+        // One reason it may not be drawn: the case does not have one. It is not
+        // on the view menu - it is the other half of the description, and a
+        // tester who can see what to do but not what should happen cannot judge
+        // the case in front of them.
+        expected.setVisible(!expected.getText().isBlank());
 
         strip.setVisible(shows(LightModePart.DURATION));
         verdictRow.setVisible(shows(LightModePart.VERDICT_BUTTONS) && !writing);
