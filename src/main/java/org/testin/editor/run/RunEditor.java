@@ -1102,7 +1102,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * pushed as one; the clock is not.
      */
     private void showElapsed() {
-        statusBar.showExecutionTime(Display.formatDuration(getElapsed()));
+        statusBar.showExecutionTime(Display.formatRunClock(getElapsed()));
 
         // The clocks and nothing else, for the reason above: light mode redraws
         // its two figures here rather than through onExecutionStateChanged,
