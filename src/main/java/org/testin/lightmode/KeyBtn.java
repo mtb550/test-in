@@ -15,17 +15,13 @@ import java.awt.event.MouseEvent;
 /**
  * A key and what it does, offered as something to click as well (#13).
  * <p>
- * Light mode's two rows of buttons are the same object twice: the three
- * verdicts, and the Cancel and Save that replace them while a failure is being
- * written. Both are a keycap beside a word, and both exist so the tester can
- * reach with the mouse what they would otherwise reach with the key - so
- * neither has a look of its own to get out of step.
+ * A keycap beside a word: the three verdicts, and nothing else. It exists so
+ * the tester can reach with the mouse what they would otherwise reach with the
+ * key, which is why the cap on it is the key that works.
  * <p>
  * <b>No color.</b> A verdict color says a case has been judged; a button
  * offering to judge one has not, so painting Passed green here would put the
- * answer on screen before the tester gave it. The same restraint covers Save:
- * emphasizing it would be pressing the tester toward one answer on a form whose
- * whole point is that they choose.
+ * answer on screen before the tester gave it.
  * <p>
  * A panel rather than a button, because a button draws one string and this is a
  * keycap beside a word - and the keycap is {@link Keycap}, the same one the
