@@ -28,12 +28,20 @@ import java.awt.event.MouseEvent;
  */
 class KeyBtn extends JBPanel<KeyBtn> {
 
+    /**
+     * Above and below the key and its word. The three verdicts are the largest
+     * thing a tester clicks in this window and the only thing they click under
+     * time pressure, so the box is worth more than the text needs - which is
+     * what the design drew and what a row of thin strips was not.
+     */
+    private static final int PADDING = 9;
+
     private final @NotNull Runnable onClick;
 
     private boolean hovered;
 
     KeyBtn(final @NotNull String key, final @NotNull String text, final @NotNull String tooltip, final @NotNull Runnable onClick) {
-        super(new FlowLayout(FlowLayout.CENTER, JBUI.scale(6), JBUI.scale(5)));
+        super(new FlowLayout(FlowLayout.CENTER, JBUI.scale(6), JBUI.scale(PADDING)));
         this.onClick = onClick;
 
         setToolTipText(tooltip);

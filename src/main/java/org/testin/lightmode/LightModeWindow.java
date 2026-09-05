@@ -762,7 +762,11 @@ final class LightModeWindow {
     private @NotNull JComponent titleBar() {
         final @NotNull JBPanel<?> bar = new JBPanel<>(new BorderLayout(JBUI.scale(6), 0));
         bar.setBorder(JBUI.Borders.empty(4, 6));
-        bar.setBackground(JBUI.CurrentTheme.CustomFrameDecorations.paneBackground());
+
+        // The same tint the status bar takes, from the same platform token, so
+        // the window is a case between two rails of furniture rather than a case
+        // with a strip under it and something else over it.
+        bar.setBackground(JBUI.CurrentTheme.Advertiser.background());
 
         start.addActionListener(e -> editor.onStartExecutionClicked());
         stop.addActionListener(e -> editor.onStopExecutionClicked());
@@ -774,7 +778,11 @@ final class LightModeWindow {
         left.add(pin());
         left.add(viewMenu);
 
-        counter.setFont(JBUI.Fonts.smallFont());
+        // A step up from the small font both of these used to take. The case
+        // grows with the wheel and this row deliberately does not, so at any
+        // zoom past the first click the run's name and how far through it the
+        // tester is were the smallest things on a window they head.
+        counter.setFont(JBUI.Fonts.label());
         counter.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
         final @NotNull JBPanel<?> right = new JBPanel<>(new FlowLayout(FlowLayout.RIGHT, JBUI.scale(6), 0));
@@ -782,7 +790,10 @@ final class LightModeWindow {
         right.add(counter);
 
         bar.add(left, BorderLayout.WEST);
-        bar.add(new JBLabel(editor.getParent().getName()), BorderLayout.CENTER);
+        final @NotNull JBLabel runName = new JBLabel(editor.getParent().getName());
+        runName.setFont(JBUI.Fonts.label().biggerOn(1f));
+
+        bar.add(runName, BorderLayout.CENTER);
         bar.add(right, BorderLayout.EAST);
 
         dragBy(bar);

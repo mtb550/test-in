@@ -1,13 +1,16 @@
 package org.testin.lightmode;
 
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.ComponentWithEmptyText;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.testrun.create.FailureFields;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.RowStripe;
 
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
@@ -30,6 +33,16 @@ import java.util.Map;
  * steps and tags, and a failure fills it with these four instead. Nothing is
  * added to the window and nothing is taken away.
  * <p>
+ * <b>The two fields are wells, not lines on the window.</b> A dialog gets that
+ * for free: its own background is the theme's panel color and a text field's is
+ * the theme's field color, and the pair is what makes an input look like
+ * somewhere to type. This window is painted as frame decoration instead, which
+ * in some themes sits close enough to the field color that the two fields
+ * disappeared into it - a caret blinking on a flat surface with no edge. They
+ * take {@link RowStripe#odd()} here - the grey the grid and the card list
+ * already draw every other row in, so the window borrows a color the tester has
+ * been looking at all along rather than introducing one.
+ * <p>
  * <b>It zooms with the case.</b> The wheel exists so a tester can read the
  * window from where they are sitting, and a form they then have to lean in to
  * type into would have moved the problem rather than solved it. The fields are
@@ -47,6 +60,14 @@ class FailureForm extends JBPanel<FailureForm> {
      * multiplies.
      */
     private final @NotNull Map<Component, Font> baseFonts = new HashMap<>();
+
+    /**
+     * How much smaller a placeholder is than the value it stands in for. A hint
+     * about an empty field is not the field's content, and at this window's font
+     * size - the framework's input font, then the wheel on top of it - one set
+     * at the same size read as text somebody had already typed.
+     */
+    private static final float PLACEHOLDER_SCALE = 0.7f;
 
     FailureForm(final @NotNull TestRunItems runItem, final float zoom) {
         this.runItem = runItem;
@@ -71,7 +92,16 @@ class FailureForm extends JBPanel<FailureForm> {
      * built at.
      */
     void setZoom(final float zoom) {
-        baseFonts.forEach((component, base) -> component.setFont(base.deriveFont(base.getSize2D() * zoom)));
+        baseFonts.forEach((component, base) -> {
+            final @NotNull Font scaled = base.deriveFont(base.getSize2D() * zoom);
+            component.setFont(scaled);
+
+            // Re-derived on every zoom rather than set once: empty text keeps
+            // whatever font it was last given, so a placeholder set at the size
+            // the form was built at would stay there while the field grew.
+            if (component instanceof ComponentWithEmptyText hinted)
+                hinted.getEmptyText().setFont(scaled.deriveFont(scaled.getSize2D() * PLACEHOLDER_SCALE));
+        });
     }
 
     /**
@@ -85,6 +115,11 @@ class FailureForm extends JBPanel<FailureForm> {
     private void remember(final @NotNull Container parent) {
         for (final Component child : parent.getComponents()) {
             if (child.getFont() != null) baseFonts.put(child, child.getFont());
+
+            // Asked of the component rather than of our own four field types:
+            // what a framework field is made of is the framework's, and a list
+            // of classes here would go stale the first time one of them changed.
+            if (child instanceof JTextComponent typed) typed.setBackground(RowStripe.odd());
 
             if (child instanceof Container container) remember(container);
         }
