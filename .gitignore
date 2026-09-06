@@ -12,8 +12,12 @@
 .run/
 .sandbox/
 build/
+# Generated report output and scratch scripts, which land wherever they are run.
 *.html
 *.py
+# Except the documentation, where a drawn page is the content rather than a
+# by-product. Markdown owns the words; the one HTML page there owns the pictures.
+!docs/**/*.html
 
 # Claude Code: share .claude/, keep per-machine overrides local
 .claude/settings.local.json

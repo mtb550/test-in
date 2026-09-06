@@ -1,0 +1,1109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark }
+  body { margin:0; padding:0; font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#F2F3F5; color:#1B1E23 }
+  img { max-width:100% }
+  [hidden] { display:none !important }
+</style>
+</head>
+<body>
+<title>Light Mode Screens</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+  :root {
+    --ground: #F2F3F5;
+    --surface: #FFFFFF;
+    --panel: #FFFFFF;
+    --panel-bar: #ECEEF1;
+    --ink: #1B1E23;
+    --ink-2: #4A5261;
+    --ink-3: #79828F;
+    --line: #D6DAE0;
+    --line-soft: #E6E9ED;
+    --accent: #2E5496;
+    --accent-soft: #E7EDF7;
+    --pass: #008000;
+    --fail: #D02525;
+    --blocked: #C77700;
+    --pass-soft: #E4F1E4;
+    --fail-soft: #FBE6E6;
+    --blocked-soft: #FBF0DF;
+    --shadow: 0 1px 2px rgba(20,26,38,.08), 0 8px 28px rgba(20,26,38,.10);
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #17181B;
+      --surface: #1E1F22;
+      --panel: #2B2D30;
+      --panel-bar: #313438;
+      --ink: #E4E6EA;
+      --ink-2: #B4BAC4;
+      --ink-3: #858C98;
+      --line: #3C4045;
+      --line-soft: #303337;
+      --accent: #8CB0E8;
+      --accent-soft: #23304A;
+      --pass: #5FB45F;
+      --fail: #E86A6A;
+      --blocked: #E0A34A;
+      --pass-soft: #1E2C1E;
+      --fail-soft: #33201F;
+      --blocked-soft: #332A1A;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.45);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #17181B;
+    --surface: #1E1F22;
+    --panel: #2B2D30;
+    --panel-bar: #313438;
+    --ink: #E4E6EA;
+    --ink-2: #B4BAC4;
+    --ink-3: #858C98;
+    --line: #3C4045;
+    --line-soft: #303337;
+    --accent: #8CB0E8;
+    --accent-soft: #23304A;
+    --pass: #5FB45F;
+    --fail: #E86A6A;
+    --blocked: #E0A34A;
+    --pass-soft: #1E2C1E;
+    --fail-soft: #33201F;
+    --blocked-soft: #332A1A;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.45);
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 44px 28px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 52px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  h1 {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    margin: 10px 0 0;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -.005em;
+    margin: 0;
+  }
+
+  .lede {
+    margin: 14px 0 0;
+    max-width: 62ch;
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+
+  section { display: flex; flex-direction: column; gap: 18px; }
+
+  .sec-head { display: flex; flex-direction: column; gap: 4px; }
+  .sec-head p { margin: 0; color: var(--ink-2); font-size: 14px; max-width: 66ch; }
+
+  /* ---- the IDE toolbar strip ---- */
+  .toolbar {
+    background: var(--panel-bar);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 7px 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+  }
+
+  .tb {
+    font-size: 12px;
+    color: var(--ink-2);
+    padding: 5px 9px;
+    border-radius: 4px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+  }
+
+  /* The pressed look IntelliJ gives a selected toolbar toggle, and the same
+     treatment the pin uses inside the window: one accent, meaning "on". */
+  .tb.active { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); font-weight: 500; }
+
+  .tb.lm { display: inline-flex; align-items: center; gap: 6px; }
+  .tb.lm svg { width: 15px; height: 15px; flex: none; }
+
+  .tb-states { display: flex; flex-direction: column; gap: 12px; }
+  .tb-row { display: flex; flex-direction: column; gap: 5px; }
+  .tb-row .cap-note { font-family: var(--mono); font-size: 10px; color: var(--ink-3); padding-left: 2px; }
+
+  .btn-study { display: flex; gap: 26px; flex-wrap: wrap; align-items: flex-start; }
+
+  .btn-one { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+
+  .btn-big {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: var(--ink-2);
+  }
+
+  .btn-big svg { width: 20px; height: 20px; }
+
+  .btn-big.pressed { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); }
+  .btn-big.off { color: var(--ink-3); opacity: .45; }
+
+  .btn-one .cap-note { font-family: var(--mono); font-size: 10px; color: var(--ink-3); text-align: center; }
+
+  .tb-sep { width: 1px; align-self: stretch; background: var(--line); margin: 0 5px; }
+  .tb-spacer { flex: 1; min-width: 12px; }
+
+  /* ---- the window ---- */
+  .states {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 26px;
+    align-items: start;
+  }
+
+  .state { display: flex; flex-direction: column; gap: 10px; }
+
+  .state-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .win {
+    width: 100%;
+    max-width: 400px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .win-bar {
+    background: var(--panel-bar);
+    border-bottom: 1px solid var(--line-soft);
+    padding: 7px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .win-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-2);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .win-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 1px 5px;
+    background: var(--surface);
+  }
+
+  .win-btn.on { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+  .win-btn.icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .win-btn.icon svg { width: 14px; height: 14px; display: block; }
+
+  /* Shown inline in the notes below, so the two pin states can be compared. */
+  .glyph {
+    display: inline-flex;
+    vertical-align: -3px;
+    width: 15px;
+    height: 15px;
+    color: var(--ink-2);
+  }
+
+  .glyph svg { width: 15px; height: 15px; }
+
+  /* Start is the one thing in the window wearing the accent, and only while the
+     run is idle. Once it is running the accent leaves and the window goes quiet
+     again - which is also how a tester notices they never pressed it. Same
+     twenty pixels as the pin and the details icon: it is the first of three
+     equals, not a bigger thing sitting beside them. */
+  .win-btn.run { color: #FFFFFF; background: var(--accent); border-color: var(--accent); }
+
+  .win-btn.stop { color: var(--ink-2); background: var(--surface); border-color: var(--line); }
+
+  .pin-states { display: flex; flex-direction: column; gap: 10px; max-width: 400px; }
+
+  .pin-row { display: flex; flex-direction: column; gap: 4px; }
+
+  .pin-row .win-bar { border: 1px solid var(--line); border-radius: 6px; }
+
+  .pin-row .cap-note { font-family: var(--mono); font-size: 10px; color: var(--ink-3); padding-left: 2px; }
+
+  .win-body.idle { padding: 26px 14px; }
+
+  /* The details component: the same box that holds steps and test data, holding
+     the failure fields instead. One component, two sets of contents. */
+  .win-body.details { border-top: 1px solid var(--line-soft); padding-top: 14px; }
+
+  .idle-note {
+    font-size: 12px;
+    color: var(--ink-3);
+    border: 1px dashed var(--line);
+    border-radius: 5px;
+    padding: 8px 9px;
+    text-align: center;
+  }
+
+  .counter {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-3);
+  }
+
+  .win-body { padding: 16px 14px 14px; display: flex; flex-direction: column; gap: 14px; }
+
+  .case-set {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .case-desc {
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  /* The clocks sit here, quiet and small. Never in the body, never in the
+     accent colour, never larger than the hint beside them - a number counting
+     up in front of a tester is a stopwatch, and a stopwatch makes them hurry. */
+  .strip {
+    background: var(--panel);
+    padding: 0 10px 10px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-3);
+  }
+
+  .strip .clocks { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+
+  /* A key is bold and its meaning is not, and that is the whole difference.
+     It was a drawn cap - a filled box with a heavier bottom edge - and a row of
+     those over the status bar's tint was the brightest thing in the window,
+     ahead of the case the window exists to show. Used everywhere a shortcut is
+     shown, so removing the box removed it from 28 dialogs at once. */
+  .cap {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.4;
+    padding: 0 4px;
+    color: var(--ink-2);
+  }
+
+  /* Every shortcut the window answers to, in one row - the same thing
+     ui.framework's StatusBarShortcut puts on every other Testin dialog. It is
+     what teaches Ctrl+D and Ctrl+H, which have no button to be learned from. */
+  .status-bar {
+    border-top: 1px solid var(--line);
+    background: var(--panel-bar);
+    padding: 6px 10px 7px;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    gap: 12px;
+    font-size: 10px;
+    color: var(--ink-3);
+  }
+
+  .sc { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; flex: none; }
+
+  .expected-text {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .win.zoomed .expected-text { font-size: 17px; }
+
+  /* Zoom moves the case, never the furniture. The title bar, the verdict bar
+     and the clocks keep the IDE's UI font; only what the tester is reading
+     changes size. */
+  .win.zoomed .case-set { font-size: 12px; }
+  .win.zoomed .case-desc { font-size: 23px; }
+  .win.zoomed .field dt { font-size: 11px; }
+  .win.zoomed .field dd { font-size: 17px; }
+  .win.zoomed .field { grid-template-columns: 110px 1fr; }
+
+  .fields { display: flex; flex-direction: column; gap: 9px; }
+
+  .field { display: grid; grid-template-columns: 92px 1fr; gap: 10px; align-items: start; }
+
+  .field dt {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-top: 3px;
+  }
+
+  .field dd { margin: 0; font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+
+  .field ol { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 2px; }
+
+  .chips { display: flex; gap: 5px; flex-wrap: wrap; }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .04em;
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+  }
+
+  .win-status {
+    border-top: 1px solid var(--line);
+    background: var(--panel);
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .verdict {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 4px;
+    border-radius: 5px;
+    border: 1px solid;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* The same key, on a button. It is ui.framework.Keycap in both places, so
+     the two cannot get out of step. */
+  .verdict .key {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0 3px;
+    opacity: .85;
+  }
+
+  /* One colour, because these are three actions rather than three states. A
+     verdict colour means a case has been judged; a button offering to judge one
+     has not. Colour returns on the failure form, where FAILED has been chosen. */
+  .v-pass, .v-fail, .v-block { color: var(--ink-2); border-color: var(--line); background: var(--surface); }
+
+  /* ---- the view menu ---- */
+  .win-wrap { position: relative; max-width: 400px; }
+
+  .menu {
+    position: absolute;
+    top: 34px;
+    left: 34px;
+    z-index: 5;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 6px;
+    min-width: 196px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .menu-k {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 4px 8px 5px;
+  }
+
+  .menu-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    color: var(--ink);
+  }
+
+  .menu-row.off { color: var(--ink-3); }
+
+  .box {
+    width: 13px;
+    height: 13px;
+    flex: none;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    color: transparent;
+  }
+
+  .box.on { background: var(--accent); border-color: var(--accent); color: #FFFFFF; }
+
+  /* ---- failure capture ---- */
+  .flow { display: flex; align-items: stretch; gap: 10px; flex-wrap: wrap; }
+
+  .step {
+    flex: 1;
+    min-width: 190px;
+    border: 1px solid var(--line-soft);
+    border-radius: 6px;
+    padding: 11px 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    background: var(--surface);
+  }
+
+  .step-k {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .step-k.pass { color: var(--pass); }
+  .step-k.fail { color: var(--fail); }
+  .step-k.block { color: var(--blocked); }
+  .step p { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+
+  .fail-split { display: grid; grid-template-columns: minmax(320px, 400px) 1fr; gap: 28px; align-items: start; }
+
+  .input {
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 7px 9px;
+    font-size: 13px;
+    color: var(--ink-3);
+    background: var(--surface);
+  }
+
+  .input.filled { color: var(--ink); }
+  .input.area { min-height: 54px; }
+
+  .radio-row { display: flex; flex-direction: column; gap: 5px; }
+
+  .radio-k {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .opts { display: flex; gap: 5px; flex-wrap: wrap; }
+
+  .opt {
+    font-size: 11.5px;
+    padding: 3px 8px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: var(--ink-3);
+    background: var(--surface);
+  }
+
+  .opt.sel { color: var(--fail); border-color: var(--fail); background: var(--fail-soft); font-weight: 500; }
+
+  .verdict-chosen { color: var(--fail); }
+
+  @media (max-width: 900px) { .fail-split { grid-template-columns: 1fr; } }
+
+  /* ---- callouts ---- */
+  .marks { display: flex; flex-direction: column; gap: 0; }
+
+  .mark {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    gap: 12px;
+    padding: 11px 0;
+    border-top: 1px solid var(--line-soft);
+    align-items: start;
+  }
+
+  .mark:first-child { border-top: none; }
+
+  .mark .n {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    text-align: center;
+    padding: 1px 0;
+    background: var(--accent-soft);
+  }
+
+  .mark .t { font-size: 13px; color: var(--ink-2); }
+  .mark .t b { color: var(--ink); font-weight: 600; }
+
+  code {
+    font-family: var(--mono);
+    font-size: .92em;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  /* ---- tables ---- */
+  .tw { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 500;
+    background: var(--panel-bar);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  td b { font-weight: 600; }
+
+  .q { border-left: 2px solid var(--accent); padding: 2px 0 2px 14px; display: flex; flex-direction: column; gap: 5px; }
+  .q h3 { margin: 0; font-size: 14px; font-weight: 600; }
+  .q p { margin: 0; font-size: 13px; color: var(--ink-2); max-width: 68ch; }
+  .qs { display: flex; flex-direction: column; gap: 20px; }
+
+  footer {
+    border-top: 1px solid var(--line-soft);
+    padding-top: 18px;
+    font-size: 12px;
+    color: var(--ink-3);
+    max-width: 70ch;
+  }
+
+  @media (max-width: 620px) {
+    .page { padding: 32px 18px 60px; gap: 40px; }
+    h1 { font-size: 25px; }
+    .field { grid-template-columns: 1fr; gap: 2px; }
+  }
+</style>
+
+<div class="page">
+
+  <header>
+    <div class="eyebrow">Testin &middot; issue #13 &middot; as built</div>
+    <h1>Light Mode Screens</h1>
+    <p class="lede">
+      Every state of the standalone always-on-top window, drawn at its real size. This page is
+      the pictures only &mdash; what each part is, why it is that way, and every decision behind
+      it are in <a href="light-mode.html"><b>the design document</b></a>, which is the one place
+      the reasoning is written. Two pages so that neither repeats the other and neither can
+      quietly stop agreeing with it.
+    </p>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <h2>Where it opens from</h2>
+      <p>One new button on the run editor toolbar, beside the execution controls it belongs with. Its icon is a sun, <code>AllIcons.MeetNewUi.LightTheme</code> &mdash; it names the mode rather than the gesture. The design asked for a window holding a smaller window in its corner and no stock icon draws that: <code>General.OpenInToolWindow</code> points its arrow into the frame rather than out of it, and <code>General.ExpandComponent</code> ships at half opacity, so it would have looked permanently disabled beside the buttons it sits with. Borrowed rather than drawn, which is what <b>&ldquo;Four plugin logos and no action icons: a Testin icon set for menus, nodes and toolbars&rdquo;</b> tracks. It is a <b>toggle</b>: press to open light mode, press again to close it and carry on in the editor, and it stays pressed for as long as the window is there. It is enabled only while the run is open, and greys out the moment the run reaches Completed or Closed &mdash; the same question that disables Start, and the same one that closes the window if it is open.</p>
+    </div>
+    <div class="tb-states">
+        <div class="tb-row">
+    <div class="toolbar">
+      <span class="tb">Refresh</span>
+      <span class="tb">List</span>
+      <span class="tb">Grid</span>
+      <span class="tb-sep"></span>
+      <span class="tb">Start Execution</span>
+      <span class="tb">Stop</span>
+      <span class="tb lm"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.3"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M8 1v2.1M8 12.9V15M1 8h2.1M12.9 8H15M3.05 3.05l1.5 1.5M11.45 11.45l1.5 1.5M12.95 3.05l-1.5 1.5M4.55 11.45l-1.5 1.5"/></g></svg>Light Mode</span>
+      <span class="tb-sep"></span>
+      <span class="tb">Filter</span>
+      <span class="tb">Search</span>
+      <span class="tb-spacer"></span>
+      <span class="tb">Result Analysis</span>
+      <span class="tb">Report</span>
+      <span class="tb">Details</span>
+    </div>
+          <span class="cap-note">closed &mdash; an ordinary toolbar button</span>
+        </div>
+        <div class="tb-row">
+    <div class="toolbar">
+      <span class="tb">Refresh</span>
+      <span class="tb">List</span>
+      <span class="tb">Grid</span>
+      <span class="tb-sep"></span>
+      <span class="tb">Start Execution</span>
+      <span class="tb">Stop</span>
+      <span class="tb active lm"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.3"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M8 1v2.1M8 12.9V15M1 8h2.1M12.9 8H15M3.05 3.05l1.5 1.5M11.45 11.45l1.5 1.5M12.95 3.05l-1.5 1.5M4.55 11.45l-1.5 1.5"/></g></svg>Light Mode</span>
+      <span class="tb-sep"></span>
+      <span class="tb">Filter</span>
+      <span class="tb">Search</span>
+      <span class="tb-spacer"></span>
+      <span class="tb">Result Analysis</span>
+      <span class="tb">Report</span>
+      <span class="tb">Details</span>
+    </div>
+          <span class="cap-note">open &mdash; pressed, so a glance at the toolbar says which mode you are in</span>
+        </div>
+      </div>
+
+      <div class="btn-study">
+        <div class="btn-one">
+          <span class="btn-big"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.3"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M8 1v2.1M8 12.9V15M1 8h2.1M12.9 8H15M3.05 3.05l1.5 1.5M11.45 11.45l1.5 1.5M12.95 3.05l-1.5 1.5M4.55 11.45l-1.5 1.5"/></g></svg></span>
+          <span class="cap-note">idle</span>
+        </div>
+        <div class="btn-one">
+          <span class="btn-big pressed"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.3"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M8 1v2.1M8 12.9V15M1 8h2.1M12.9 8H15M3.05 3.05l1.5 1.5M11.45 11.45l1.5 1.5M12.95 3.05l-1.5 1.5M4.55 11.45l-1.5 1.5"/></g></svg></span>
+          <span class="cap-note">light mode open</span>
+        </div>
+        <div class="btn-one">
+          <span class="btn-big off"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.3"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M8 1v2.1M8 12.9V15M1 8h2.1M12.9 8H15M3.05 3.05l1.5 1.5M11.45 11.45l1.5 1.5M12.95 3.05l-1.5 1.5M4.55 11.45l-1.5 1.5"/></g></svg></span>
+          <span class="cap-note">run completed &mdash; disabled</span>
+        </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>The window</h2>
+      <p>Shown at its real size, in both states. Content is the sample project's Login case, mid&nbsp;way through Cycle&nbsp;2.</p>
+    </div>
+
+    <div class="states">
+
+      <div class="state">
+        <div class="state-name">Before Start &mdash; nothing to judge yet</div>
+        <div class="win">
+          <div class="win-bar">
+            <span class="win-btn icon run" title="Start execution"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.2 3.4l7 4.6-7 4.6z" fill="currentColor"/></svg></span>
+            <span class="win-btn icon on" title="Pinned - stays above other applications"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4l-.5 4 2 2v1H8.5v4L8 14l-.5-1v-4H4V8l2-2z" fill="currentColor"/></svg></span>
+            <span class="win-btn icon" title="Choose what the window shows"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.6" y="2.6" width="10.8" height="10.8" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.6 8.2l1.9 1.9 3.4-3.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="win-title">Cycle-2</span>
+            <span class="counter">6 cases</span>
+          </div>
+          <div class="win-body idle">
+            <div class="idle-note">Press the play button to start test execution</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="state">
+        <div class="state-name">Executing &mdash; the case alone</div>
+        <div class="win">
+          <div class="win-bar">
+            <span class="win-btn icon stop" title="Stop execution"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.9" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/><rect x="9.1" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/></svg></span>
+            <span class="win-btn icon on" title="Pinned - stays above other applications"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4l-.5 4 2 2v1H8.5v4L8 14l-.5-1v-4H4V8l2-2z" fill="currentColor"/></svg></span>
+            <span class="win-btn icon" title="Choose what the window shows"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.6" y="2.6" width="10.8" height="10.8" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.6 8.2l1.9 1.9 3.4-3.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="win-title">Cycle-2</span>
+            <span class="counter">3 / 6</span>
+          </div>
+          <div class="win-body">
+            <div class="case-set">Login</div>
+            <p class="case-desc">Sign in with a correct username and password</p>
+            <p class="expected-text">The dashboard opens and the account name is shown in the header.</p>
+          </div>
+          <div class="win-status">
+            <span class="verdict v-pass"><span class="key">P</span>Passed</span>
+            <span class="verdict v-fail"><span class="key">F</span>Failed</span>
+            <span class="verdict v-block"><span class="key">B</span>Blocked</span>
+          </div>
+          <div class="strip">
+            <span class="clocks">00:41</span>
+            <span class="clocks">00:12:41</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="state">
+        <div class="state-name">Executing &mdash; details open</div>
+        <div class="win">
+          <div class="win-bar">
+            <span class="win-btn icon stop" title="Stop execution"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.9" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/><rect x="9.1" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/></svg></span>
+            <span class="win-btn icon on" title="Pinned - stays above other applications"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4l-.5 4 2 2v1H8.5v4L8 14l-.5-1v-4H4V8l2-2z" fill="currentColor"/></svg></span>
+            <span class="win-btn icon" title="Choose what the window shows"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.6" y="2.6" width="10.8" height="10.8" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.6 8.2l1.9 1.9 3.4-3.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="win-title">Cycle-2</span>
+            <span class="counter">3 / 6</span>
+          </div>
+          <div class="win-body">
+            <div class="case-set">Login</div>
+            <p class="case-desc">Sign in with a correct username and password</p>
+            <p class="expected-text">The dashboard opens and the account name is shown in the header.</p>
+            <dl class="fields">
+              <div class="field">
+                <dt>Steps</dt>
+                <dd>
+                  <ol>
+                    <li>Open the sign-in page.</li>
+                    <li>Type the username.</li>
+                    <li>Type the password.</li>
+                    <li>Press Sign in.</li>
+                  </ol>
+                </dd>
+              </div>
+              <div class="field">
+                <dt>Test data</dt>
+                <dd>sample.user@example.com / correct-horse</dd>
+              </div>
+              <div class="field">
+                <dt>Pre-conditions</dt>
+                <dd>The account exists and is not locked.</dd>
+              </div>
+              <div class="field">
+                <dt>Tags</dt>
+                <dd class="chips">
+                  <span class="chip">HIGH</span>
+                  <span class="chip">Accounts</span>
+                  <span class="chip">SMOKE</span>
+                  <span class="chip">FUNCTIONAL</span>
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <div class="win-status">
+            <span class="verdict v-pass"><span class="key">P</span>Passed</span>
+            <span class="verdict v-fail"><span class="key">F</span>Failed</span>
+            <span class="verdict v-block"><span class="key">B</span>Blocked</span>
+          </div>
+          <div class="strip">
+            <span class="clocks">00:41</span>
+            <span class="clocks">00:12:41</span>
+          </div>
+          <div class="status-bar">
+            <span class="sc"><span class="cap">Ctrl+D</span>Details</span>
+            <span class="sc"><span class="cap">Ctrl+H</span>Hide</span>
+            <span class="sc"><span class="cap">Escape</span>Close</span>
+            <span class="sc"><span class="cap">P</span>Passed</span>
+            <span class="sc"><span class="cap">F</span>Failed</span>
+            <span class="sc"><span class="cap">B</span>Blocked</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Choosing what shows</h2>
+      <p>A second icon beside the pin, opening four checkboxes. Everything but the description and the expected result can be turned off, and the window shrinks to what is left.</p>
+    </div>
+
+    <div class="states">
+
+      <div class="state">
+        <div class="state-name">The view menu</div>
+        <div class="win-wrap">
+          <div class="win">
+            <div class="win-bar">
+              <span class="win-btn icon stop" title="Stop execution"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.9" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/><rect x="9.1" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/></svg></span>
+              <span class="win-btn icon on" title="Pinned - stays above other applications"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4l-.5 4 2 2v1H8.5v4L8 14l-.5-1v-4H4V8l2-2z" fill="currentColor"/></svg></span>
+              <span class="win-btn icon on" title="Choose what the window shows"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.6" y="2.6" width="10.8" height="10.8" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.6 8.2l1.9 1.9 3.4-3.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="win-title">Cycle-2</span>
+              <span class="counter">3 / 6</span>
+            </div>
+            <div class="win-body">
+              <div class="case-set">Login</div>
+              <p class="case-desc">Sign in with a correct username and password</p>
+            </div>
+          </div>
+          <div class="menu">
+            <span class="menu-k">Show</span>
+            <span class="menu-row off"><span class="box">&check;</span>Test set name</span>
+            <span class="menu-row off"><span class="box">&check;</span>Duration</span>
+            <span class="menu-row off"><span class="box">&check;</span>Verdict buttons</span>
+            <span class="menu-row off"><span class="box">&check;</span>Status bar</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="state">
+        <div class="state-name">All four off &mdash; the smallest it goes</div>
+        <div class="win">
+          <div class="win-bar">
+            <span class="win-btn icon stop" title="Stop execution"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.9" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/><rect x="9.1" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/></svg></span>
+            <span class="win-btn icon on" title="Pinned - stays above other applications"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4l-.5 4 2 2v1H8.5v4L8 14l-.5-1v-4H4V8l2-2z" fill="currentColor"/></svg></span>
+            <span class="win-btn icon" title="Choose what the window shows"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.6" y="2.6" width="10.8" height="10.8" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.6 8.2l1.9 1.9 3.4-3.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="win-title">Cycle-2</span>
+            <span class="counter">3 / 6</span>
+          </div>
+          <div class="win-body">
+            <p class="case-desc">Sign in with a correct username and password</p>
+          </div>
+          <div class="status-bar">
+            <span class="sc"><span class="cap">Ctrl+D</span>Details</span>
+            <span class="sc"><span class="cap">Ctrl+H</span>Hide</span>
+            <span class="sc"><span class="cap">Escape</span>Close</span>
+            <span class="sc"><span class="cap">P</span>Passed</span>
+            <span class="sc"><span class="cap">F</span>Failed</span>
+            <span class="sc"><span class="cap">B</span>Blocked</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Zoom</h2>
+      <p>The scroll wheel over the window, with no modifier. It changes the size of this window and nothing else &mdash; not the grid behind it, not the details panel, not the IDE's editors.</p>
+    </div>
+
+    <div class="states">
+      <div class="state">
+        <div class="state-name">As opened</div>
+        <div class="win">
+          <div class="win-bar">
+            <span class="win-btn icon stop"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.9" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/><rect x="9.1" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/></svg></span>
+            <span class="win-btn icon on"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4l-.5 4 2 2v1H8.5v4L8 14l-.5-1v-4H4V8l2-2z" fill="currentColor"/></svg></span>
+            <span class="win-btn icon"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.6" y="2.6" width="10.8" height="10.8" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.6 8.2l1.9 1.9 3.4-3.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="win-title">Cycle-2</span>
+            <span class="counter">3 / 6</span>
+          </div>
+          <div class="win-body">
+            <div class="case-set">Login</div>
+            <p class="case-desc">Sign in with a correct username and password</p>
+            <p class="expected-text">The dashboard opens and the account name is shown in the header.</p>
+          </div>
+          <div class="win-status">
+            <span class="verdict v-pass"><span class="key">P</span>Passed</span>
+            <span class="verdict v-fail"><span class="key">F</span>Failed</span>
+            <span class="verdict v-block"><span class="key">B</span>Blocked</span>
+          </div>
+          <div class="strip">
+            <span class="clocks">00:41</span>
+            <span class="clocks">00:12:41</span>
+          </div>
+          <div class="status-bar">
+            <span class="sc"><span class="cap">Ctrl+D</span>Details</span>
+            <span class="sc"><span class="cap">Ctrl+H</span>Hide</span>
+            <span class="sc"><span class="cap">Escape</span>Close</span>
+            <span class="sc"><span class="cap">P</span>Passed</span>
+            <span class="sc"><span class="cap">F</span>Failed</span>
+            <span class="sc"><span class="cap">B</span>Blocked</span>
+          </div>
+        </div>
+      </div>
+      <div class="state">
+        <div class="state-name">Zoomed in &mdash; only the case grew</div>
+        <div class="win zoomed">
+          <div class="win-bar">
+            <span class="win-btn icon stop"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.9" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/><rect x="9.1" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/></svg></span>
+            <span class="win-btn icon on"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4l-.5 4 2 2v1H8.5v4L8 14l-.5-1v-4H4V8l2-2z" fill="currentColor"/></svg></span>
+            <span class="win-btn icon"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.6" y="2.6" width="10.8" height="10.8" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.6 8.2l1.9 1.9 3.4-3.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="win-title">Cycle-2</span>
+            <span class="counter">3 / 6</span>
+          </div>
+          <div class="win-body">
+            <div class="case-set">Login</div>
+            <p class="case-desc">Sign in with a correct username and password</p>
+            <p class="expected-text">The dashboard opens and the account name is shown in the header.</p>
+          </div>
+          <div class="win-status">
+            <span class="verdict v-pass"><span class="key">P</span>Passed</span>
+            <span class="verdict v-fail"><span class="key">F</span>Failed</span>
+            <span class="verdict v-block"><span class="key">B</span>Blocked</span>
+          </div>
+          <div class="strip">
+            <span class="clocks">00:41</span>
+            <span class="clocks">00:12:41</span>
+          </div>
+          <div class="status-bar">
+            <span class="sc"><span class="cap">Ctrl+D</span>Details</span>
+            <span class="sc"><span class="cap">Ctrl+H</span>Hide</span>
+            <span class="sc"><span class="cap">Escape</span>Close</span>
+            <span class="sc"><span class="cap">P</span>Passed</span>
+            <span class="sc"><span class="cap">F</span>Failed</span>
+            <span class="sc"><span class="cap">B</span>Blocked</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Pressing F</h2>
+      <p>Passed and Blocked are one keystroke &mdash; recorded, and on to the next case. Failed is the one verdict that asks for something back, because a failure nobody described is a failure nobody can act on.</p>
+    </div>
+
+    <div class="flow">
+      <div class="step">
+        <span class="step-k pass">P &mdash; Passed</span>
+        <p>Recorded. Advances immediately. There is nothing to say about a case that worked.</p>
+      </div>
+      <div class="step">
+        <span class="step-k block">B &mdash; Blocked</span>
+        <p>Recorded. Advances immediately &mdash; why a case was blocked belongs in Result Analysis, on the run.</p>
+      </div>
+      <div class="step">
+        <span class="step-k fail">F &mdash; Failed</span>
+        <p>The window becomes the capture below. Enter saves and advances; Escape returns the case unjudged.</p>
+      </div>
+    </div>
+
+    <div class="fail-split">
+      <div class="state">
+        <div class="state-name">After F &mdash; failure capture</div>
+        <div class="win">
+          <div class="win-bar">
+            <span class="win-btn icon stop" title="Stop execution"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.9" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/><rect x="9.1" y="2.9" width="3" height="10.2" rx=".5" fill="none" stroke="currentColor" stroke-width="1.1"/></svg></span>
+            <span class="win-btn icon on" title="Pinned - stays above other applications"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2h4l-.5 4 2 2v1H8.5v4L8 14l-.5-1v-4H4V8l2-2z" fill="currentColor"/></svg></span>
+            <span class="win-btn icon" title="Choose what the window shows"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.6" y="2.6" width="10.8" height="10.8" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.6 8.2l1.9 1.9 3.4-3.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="win-title">Cycle-2</span>
+            <span class="counter">3 / 6</span>
+          </div>
+          <div class="win-body">
+            <div class="case-set">Login &middot; <span class="verdict-chosen">Failed</span></div>
+            <p class="case-desc">Sign in with a correct username and password</p>
+            <p class="expected-text">The dashboard opens and the account name is shown in the header.</p>
+          </div>
+          <div class="win-body details">
+            <div class="radio-row">
+              <span class="radio-k">Actual result</span>
+              <div class="input filled">Sign in returned a 500 and the header stayed empty.</div>
+            </div>
+
+            <div class="radio-row">
+              <span class="radio-k">Bug severity</span>
+              <div class="opts">
+                <span class="opt">Blocker</span>
+                <span class="opt sel">Major</span>
+                <span class="opt">Minor</span>
+                <span class="opt">Enhancement</span>
+              </div>
+            </div>
+
+            <div class="radio-row">
+              <span class="radio-k">Bug priority</span>
+              <div class="opts">
+                <span class="opt sel">High</span>
+                <span class="opt">Medium</span>
+                <span class="opt">Low</span>
+              </div>
+            </div>
+
+            <div class="radio-row">
+              <span class="radio-k">Error capture</span>
+              <div class="input area">paste error or exception or screenshot..</div>
+            </div>
+          </div>
+          <div class="strip">
+            <span class="clocks">00:41</span>
+            <span class="clocks">00:12:41</span>
+          </div>
+          <div class="status-bar">
+            <span class="sc"><span class="cap">Enter</span>Save &amp; next</span>
+            <span class="sc"><span class="cap">Escape</span>Cancel</span>
+          </div>
+        </div>
+      </div>
+
+  </section>
+
+
+  <footer>
+    The words that went with these screens live in
+    <a href="light-mode.html"><b>the design document</b></a>. Drawn against the build on
+    6 September 2026, after a sandbox pass and a class-by-class read of the code against every
+    claim made about it. Colors are the plugin's own: <code>008000</code>, <code>FF0000</code>
+    and <code>FFA500</code> from <code>TestStatus</code>, accent <code>2E5496</code> from the
+    report generators. Type is JetBrains Mono and Inter, the faces the IDE itself renders.
+  </footer>
+
+</div>
+
+</body>
+</html>
