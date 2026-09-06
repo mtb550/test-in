@@ -9,9 +9,9 @@ import javax.swing.Icon;
  * A button in light mode's own title bar, drawn the way every other button in
  * this plugin is drawn.
  * <p>
- * One class for the pin and the close, for the reason {@code PageBtn} gives:
- * the toolbar's one-class-per-button exists so {@code getToolbarItem} can find
- * them by type, and nothing looks these two up.
+ * One class for all three of them - start, stop and the pin - for the reason
+ * {@code PageBtn} gives: the toolbar's one-class-per-button exists so
+ * {@code getToolbarItem} can find a button by type, and nothing looks these up.
  */
 class TitleBarBtn extends AbstractIconButton {
 

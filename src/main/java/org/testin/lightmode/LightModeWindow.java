@@ -27,15 +27,8 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,8 +77,9 @@ final class LightModeWindow {
     private static final @NotNull String ZOOM = "testin.lightMode.zoom.v1";
 
     /**
-     * How wide the window opens. Only the width is a number: the height is
-     * whatever the case needs, which is what {@link #fitHeight} works out.
+     * How wide the window opens, before the tester drags it or a remembered
+     * width replaces it. Only the width is a number: the height is whatever the
+     * case needs, which is what {@link #fitHeight} works out.
      */
     private static final int WIDTH = 420;
 
@@ -131,7 +125,6 @@ final class LightModeWindow {
     private static final @NotNull KeyStroke HIDE_DETAILS = KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK);
 
     private final @NotNull JFrame frame = new JFrame();
-    private final @NotNull Project p;
     private final @NotNull RunEditor editor;
     private final @NotNull Runnable onClosed;
 
@@ -166,7 +159,7 @@ final class LightModeWindow {
 
     private final @NotNull JBLabel chosen = new JBLabel();
     private final @NotNull JBPanel<?> caseView = new JBPanel<>(new BorderLayout());
-    private final @NotNull CaseDetails details;
+    private final @NotNull CaseDetails details = new CaseDetails();
 
     /**
      * The one box under the case. It holds the details that {@code Ctrl+D} fills
@@ -196,23 +189,16 @@ final class LightModeWindow {
      * form is the only thing to look at then, and Enter and Escape are what
      * finish it.
      */
-    private final @NotNull JBPanel<?> verdictRow = new JBPanel<>(new BorderLayout());
-    private final @NotNull JComponent verdictButtons = verdictButtons();
+    private final @NotNull JComponent verdictRow = verdictButtons();
 
     private final @NotNull StatusBarBase statusBar = new StatusBarBase(new StatusBarItem[0]);
 
     /**
-     * The five checkboxes, and the memory of which are ticked. Asked rather than
+     * The checkboxes, and the memory of which are ticked. Asked rather than
      * mirrored into fields here: the button is already the answer, and a copy of
      * it would be the thing that goes stale.
      */
     private final @NotNull ViewMenuBtn viewMenu = new ViewMenuBtn(this::applyView);
-
-    /**
-     * Closed until asked for. The window exists to put one sentence in front of
-     * a tester, so everything else starts out of the way.
-     */
-    private boolean detailsShown;
 
     /**
      * The failure being written up, and empty the rest of the time.
@@ -247,11 +233,9 @@ final class LightModeWindow {
      */
     private int lastWidth;
 
-    LightModeWindow(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
-        this.p = p;
+    LightModeWindow(final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
         this.editor = editor;
         this.onClosed = onClosed;
-        this.details = new CaseDetails();
 
         frame.setUndecorated(true);
         frame.setAlwaysOnTop(true);
@@ -267,7 +251,7 @@ final class LightModeWindow {
         frame.pack();
 
         // Before the first refresh, because the height is fitted to the width:
-        // restoring a wider window afterwards would leave it as tall as it would
+        // restoring a wider window afterward would leave it as tall as it would
         // have been at the default one.
         placeIt();
         refresh();
@@ -349,15 +333,12 @@ final class LightModeWindow {
      * <p>
      * The width is applied before the height is asked for, and that order is the
      * whole method. A wrapped paragraph reports the height it needs for the
-     * width it currently has, so measuring first and sizing afterwards would
+     * width it currently has, so measuring first and sizing afterward would
      * measure the width it is about to stop having.
      */
     private void fitHeight() {
-        final int width = frame.getWidth() > 0 ? frame.getWidth() : JBUI.scale(WIDTH);
-
-        frame.setSize(width, frame.getHeight());
         frame.validate();
-        frame.setSize(width, frame.getPreferredSize().height);
+        frame.setSize(frame.getWidth(), frame.getPreferredSize().height);
     }
 
     private void showCase(final @NotNull TestCaseDto tc) {
@@ -405,9 +386,8 @@ final class LightModeWindow {
 
         lastWidth = frame.getWidth();
 
-        final @NotNull Optional<Point> remembered = Optional.ofNullable(WindowStateService.getInstance().getLocation(PLACEMENT));
-
-        remembered.ifPresentOrElse(frame::setLocation, () -> frame.setLocationRelativeTo(null));
+        Optional.ofNullable(WindowStateService.getInstance().getLocation(PLACEMENT))
+                .ifPresentOrElse(frame::setLocation, () -> frame.setLocationRelativeTo(null));
     }
 
     /**
@@ -502,6 +482,9 @@ final class LightModeWindow {
      */
     private void applyZoom() {
         set.setFont(scaled(setFont));
+
+        // The same size as the set name: the two share a line, and either can
+        // carry it alone when the other is hidden.
         chosen.setFont(scaled(setFont));
         description.setFont(scaled(descriptionFont));
         expected.setFont(scaled(expectedFont));
@@ -511,7 +494,7 @@ final class LightModeWindow {
     }
 
     private @NotNull Font scaled(final @NotNull Font base) {
-        return base.deriveFont(base.getSize2D() * zoom);
+        return CaseFont.zoomed(base, zoom);
     }
 
     private void bind(final @NotNull KeyStroke key, final @NotNull String name, final @NotNull Runnable action) {
@@ -539,9 +522,8 @@ final class LightModeWindow {
         // A form cannot be collapsed while it is waiting to be filled in.
         if (capture.isPresent()) return;
 
-        if (detailsShown == show) return;
+        if (details.isVisible() == show) return;
 
-        detailsShown = show;
         details.setVisible(show);
 
         fitHeight();
@@ -574,6 +556,8 @@ final class LightModeWindow {
      * being executed, which is what a key pressed on the idle window is.
      */
     private void record(final @NotNull TestStatus status) {
+        final @NotNull Project p = editor.getProject();
+
         Services.getInstance(p, RunStatusService.class).executeNext(p, editor, status);
     }
 
@@ -602,8 +586,6 @@ final class LightModeWindow {
      * is the promise Escape makes everywhere else in this plugin.
      */
     private void cancelCapture() {
-        if (capture.isEmpty()) return;
-
         capture = Optional.empty();
 
         showCapture();
@@ -644,7 +626,7 @@ final class LightModeWindow {
      * Draws whichever of the two states the window is in - the case with its
      * details and three verdicts, or the case with a failure form under it.
      * <p>
-     * One method, because the two things that change change together. Split
+     * One method, because the two things that change do so together. Split
      * across the places that trigger them, a window could show the form over
      * the details, or Escape's hint while Escape meant something else.
      */
@@ -782,19 +764,14 @@ final class LightModeWindow {
         // grows with the wheel and this row deliberately does not, so at any
         // zoom past the first click the run's name and how far through it the
         // tester is were the smallest things on a window they head.
-        counter.setFont(JBUI.Fonts.label());
         counter.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
-
-        final @NotNull JBPanel<?> right = new JBPanel<>(new FlowLayout(FlowLayout.RIGHT, JBUI.scale(6), 0));
-        right.setOpaque(false);
-        right.add(counter);
 
         bar.add(left, BorderLayout.WEST);
         final @NotNull JBLabel runName = new JBLabel(editor.getParent().getName());
         runName.setFont(JBUI.Fonts.label().biggerOn(1f));
 
         bar.add(runName, BorderLayout.CENTER);
-        bar.add(right, BorderLayout.EAST);
+        bar.add(counter, BorderLayout.EAST);
 
         dragBy(bar);
 
@@ -824,7 +801,7 @@ final class LightModeWindow {
      * The platform's own listener rather than the arithmetic this used to do by
      * hand. Both work for the ordinary case; this one also knows about the
      * button that started the drag, the screen the pointer crossed onto and the
-     * toolkit it is running under, which the hand-written version did not and
+     * toolkit it is running under, which the handwritten version did not and
      * would have had to learn one bug report at a time.
      */
     private void dragBy(final @NotNull JComponent bar) {
@@ -846,12 +823,9 @@ final class LightModeWindow {
         frame.setMinimumSize(new Dimension(JBUI.scale(MIN_WIDTH), 0));
 
         final @NotNull JComponent content = (JComponent) frame.getContentPane();
-        final @NotNull WindowResizeListener resize = new WindowResizeListener(content, JBUI.insets(0, GRAB), null) {
-            @Override
-            protected @NotNull Insets getResizeBorder(final @NotNull Component component) {
-                return JBUI.insets(0, GRAB);
-            }
-        };
+        // The insets are the constructor's second argument; the override that
+        // returned them again allocated a fresh Insets on every mouse move.
+        final @NotNull WindowResizeListener resize = new WindowResizeListener(content, JBUI.insets(0, GRAB), null);
 
         content.addMouseListener(resize);
         content.addMouseMotionListener(resize);
@@ -877,7 +851,6 @@ final class LightModeWindow {
      * re-lay out the window.
      */
     private @NotNull JComponent body() {
-        set.setFont(scaled(setFont));
         set.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         idle.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
@@ -885,9 +858,6 @@ final class LightModeWindow {
         // they have chosen Failed and are writing it up, so it is a state rather
         // than an offer. Everywhere else in this window the three verdicts are
         // drawn alike.
-        // The same size as the set name it sits beside, zoom included: they are
-        // one line, and one half of it growing would read as a mistake.
-        chosen.setFont(scaled(setFont));
         chosen.setForeground(TestStatus.FAILED.getRowColor());
 
         final @NotNull JBPanel<?> text = new JBPanel<>(new BorderLayout(0, JBUI.scale(10)));
@@ -896,7 +866,9 @@ final class LightModeWindow {
         text.add(expected, BorderLayout.CENTER);
 
         details.setBorder(JBUI.Borders.emptyTop(14));
-        details.setVisible(detailsShown);
+        // Closed until asked for. The window exists to put one sentence in front
+        // of a tester, so everything else starts out of the way.
+        details.setVisible(false);
 
         setLine.setOpaque(false);
         setLine.add(set);
@@ -940,9 +912,7 @@ final class LightModeWindow {
         for (final TestStatus status : TestStatus.values()) {
             if (!status.isVerdict()) continue;
 
-            verdicts.add(new KeyBtn(keyOf(status), status.getLabel(),
-                    "Record " + status.getLabel().toLowerCase(Locale.ROOT) + " for this test case",
-                    () -> judge(status)));
+            verdicts.add(new KeyBtn(keyOf(status), status.getLabel(), () -> judge(status)));
         }
 
         return verdicts;
@@ -965,7 +935,6 @@ final class LightModeWindow {
      */
     private @NotNull JComponent footer() {
         footer.setOpaque(false);
-        verdictRow.add(verdictButtons, BorderLayout.CENTER);
         footer.add(verdictRow, BorderLayout.NORTH);
         footer.add(durationStrip(), BorderLayout.CENTER);
         footer.add(statusBar.getPanel(), BorderLayout.SOUTH);

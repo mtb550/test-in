@@ -6,14 +6,12 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.Prose;
 import org.testin.editor.Shared;
-import org.testin.model.Group;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Display;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +34,12 @@ import java.util.Optional;
  * with a dash after it is a line read on every case to learn nothing.
  */
 class CaseDetails extends JBPanel<CaseDetails> {
+
+    /**
+     * What the last row is called. Not GROUP: it draws the priority badge as
+     * well, so a High-priority case in no group read "GROUP: High".
+     */
+    private static final @NotNull String TAGS = "Tags";
 
     /**
      * The label column, in the design's own figure. Narrow because the window is
@@ -73,7 +77,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
     /**
      * Scales the field labels and their values, and nothing else in the window.
      * <p>
-     * The rows are rebuilt rather than walked and re-fonted: they are rebuilt on
+     * The rows are rebuilt rather than walked and re-sized: they are rebuilt on
      * every case anyway, and a walk would have to know which of the components
      * under here are text the tester reads and which are the badges, which are
      * sized by the plugin rather than by this window.
@@ -92,29 +96,30 @@ class CaseDetails extends JBPanel<CaseDetails> {
     }
 
     private void rows(final @NotNull TestCaseDto tc) {
-
-        int row = 0;
-        row = addRow(TestEditorAttributes.STEPS.getName(), Display.numberedSteps(tc.getSteps()), row);
+        addRow(TestEditorAttributes.STEPS.getName(), Display.numberedSteps(tc.getSteps()));
 
         // Verbatim, and not through Display: test data is credentials, a query, a
         // payload - values that are used rather than read, so a character this
         // window decides to drop is a value that no longer works. The same rule
         // the details panel states, for the same reason.
-        row = addRow(TestEditorAttributes.TEST_DATA.getName(), tc.getTestData(), row);
-        row = addRow(TestEditorAttributes.PRE_CONDITIONS.getName(), Display.format(tc.getPreConditions()), row);
+        addRow(TestEditorAttributes.TEST_DATA.getName(), tc.getTestData());
+        addRow(TestEditorAttributes.PRE_CONDITIONS.getName(), Display.format(tc.getPreConditions()));
 
-        addTags(tc, row);
+        addTags(tc);
     }
 
-    private int addRow(final @NotNull String name, final @NotNull String value, final int row) {
-        if (value.isBlank()) return row;
+    private void addRow(final @NotNull String name, final @NotNull String value) {
+        if (value.isBlank()) return;
 
-        return addRow(name, prose(value), row);
+        addRow(name, prose(value));
     }
 
-    private int addRow(final @NotNull String name, final @NotNull JComponent value, final int row) {
+    private void addRow(final @NotNull String name, final @NotNull JComponent value) {
         final @NotNull GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridy = row;
+
+        // RELATIVE, so the layout counts the rows rather than this class
+        // threading a number through four methods to tell it what it knows.
+        gbc.gridy = GridBagConstraints.RELATIVE;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = JBUI.insets(0, 0, GAP, 0);
@@ -127,8 +132,6 @@ class CaseDetails extends JBPanel<CaseDetails> {
         gbc.weightx = 1;
         gbc.insets = JBUI.insets(0, GAP, GAP, 0);
         add(value, gbc);
-
-        return row + 1;
     }
 
     /**
@@ -137,13 +140,8 @@ class CaseDetails extends JBPanel<CaseDetails> {
      * because the tester is running the case by hand, so a badge saying whether
      * automation reached it is answering a question nobody in front of it asked.
      */
-    private void addTags(final @NotNull TestCaseDto tc, final int row) {
-        final @NotNull List<Shared.Badge> badges = new ArrayList<>();
-        Shared.addPriorityBadge(badges, tc);
-
-        for (final Group group : tc.getGroup()) {
-            badges.add(Shared.createGroupBadge(group));
-        }
+    private void addTags(final @NotNull TestCaseDto tc) {
+        final @NotNull List<Shared.Badge> badges = Shared.caseBadges(tc);
 
         if (badges.isEmpty()) return;
 
@@ -151,7 +149,9 @@ class CaseDetails extends JBPanel<CaseDetails> {
         chips.setOpaque(false);
         Shared.showBadges(chips, badges);
 
-        addRow(TestEditorAttributes.GROUP.getName(), chips, row);
+        // Labeled for what the row holds rather than for the groups alone: a
+        // High-priority case in no group drew a row reading GROUP: High.
+        addRow(TAGS, chips);
     }
 
     private @NotNull JBLabel label(final @NotNull String text) {
@@ -159,7 +159,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
         // names, and a Turkish machine would render "Conditions" with a dotted
         // capital I.
         final @NotNull JBLabel label = new JBLabel(text.toUpperCase(Locale.ROOT));
-        label.setFont(scaled(CaseFont.label()));
+        label.setFont(CaseFont.zoomed(CaseFont.label(), zoom));
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
         final @NotNull Dimension size = new Dimension(Math.round(JBUI.scale(LABEL_WIDTH) * zoom), label.getPreferredSize().height);
@@ -170,13 +170,10 @@ class CaseDetails extends JBPanel<CaseDetails> {
     }
 
     private @NotNull JTextArea prose(final @NotNull String text) {
-        final @NotNull JTextArea area = Prose.of(scaled(CaseFont.body()), JBUI.CurrentTheme.Label.foreground());
+        final @NotNull JTextArea area = Prose.of(CaseFont.zoomed(CaseFont.body(), zoom), JBUI.CurrentTheme.Label.foreground());
         area.setText(text);
 
         return area;
     }
 
-    private @NotNull Font scaled(final @NotNull Font base) {
-        return base.deriveFont(base.getSize2D() * zoom);
-    }
 }

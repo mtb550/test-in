@@ -23,6 +23,7 @@ import javax.swing.*;
 import java.util.Optional;
 import java.awt.*;
 import java.awt.event.MouseWheelEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 // Explicit, because java.awt.* above also offers a List, and it takes no type
@@ -111,6 +112,22 @@ public final class Shared {
      * Added rather than returned, so the rule lives here and every caller stays
      * unconditional - the same reason {@link #addBugBadge} is shaped this way.
      */
+    /**
+     * The badges a test case carries on its own: its priority, then one per
+     * group. Not its run status - that belongs to a run rather than to the case,
+     * so the surfaces that want it add it after these.
+     */
+    public static @NotNull List<Badge> caseBadges(final @NotNull TestCaseDto tc) {
+        final @NotNull List<Badge> badges = new ArrayList<>();
+        addPriorityBadge(badges, tc);
+
+        for (final Group group : tc.getGroup()) {
+            badges.add(createGroupBadge(group));
+        }
+
+        return badges;
+    }
+
     public static void addPriorityBadge(final @NotNull List<Badge> badges, final @NotNull TestCaseDto tc) {
         if (tc.getPriority() == Priority.LOW) return;
 

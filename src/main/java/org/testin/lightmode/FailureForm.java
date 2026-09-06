@@ -39,8 +39,8 @@ import java.util.Map;
  * somewhere to type. This window is painted as frame decoration instead, which
  * in some themes sits close enough to the field color that the two fields
  * disappeared into it - a caret blinking on a flat surface with no edge. They
- * take {@link RowStripe#odd()} here - the grey the grid and the card list
- * already draw every other row in, so the window borrows a color the tester has
+ * take {@link RowStripe#odd()} here - the gray the grid and the card list
+ * already draw every other row in, so the window borrows a gray the tester has
  * been looking at all along rather than introducing one.
  * <p>
  * <b>It zooms with the case.</b> The wheel exists so a tester can read the
@@ -93,14 +93,14 @@ class FailureForm extends JBPanel<FailureForm> {
      */
     void setZoom(final float zoom) {
         baseFonts.forEach((component, base) -> {
-            final @NotNull Font scaled = base.deriveFont(base.getSize2D() * zoom);
+            final @NotNull Font scaled = CaseFont.zoomed(base, zoom);
             component.setFont(scaled);
 
             // Re-derived on every zoom rather than set once: empty text keeps
             // whatever font it was last given, so a placeholder set at the size
             // the form was built at would stay there while the field grew.
             if (component instanceof ComponentWithEmptyText hinted)
-                hinted.getEmptyText().setFont(scaled.deriveFont(scaled.getSize2D() * PLACEHOLDER_SCALE));
+                hinted.getEmptyText().setFont(CaseFont.zoomed(scaled, PLACEHOLDER_SCALE));
         });
     }
 

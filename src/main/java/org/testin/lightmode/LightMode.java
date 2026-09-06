@@ -2,7 +2,6 @@ package org.testin.lightmode;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
@@ -18,7 +17,7 @@ import java.util.Optional;
  * window's own close button and the project closing all un-press it without
  * three handlers agreeing to. That is the rule
  * {@code RunEditor.onExecutionStateChanged} already follows for Start and Stop,
- * and for the reason its javadoc gives: the second copy is always the one that
+ * and for the reason its Javadoc gives: the second copy is always the one that
  * drifts.
  * <p>
  * <b>One window, and it knows whose run it shows.</b> Several run editors are
@@ -46,23 +45,27 @@ public final class LightMode implements Disposable {
      * being touched, and a button that only redrew when it was clicked would sit
      * pressed over a window that had gone.
      */
-    public void toggle(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull Runnable onChange) {
+    public void toggle(final @NotNull RunEditor editor, final @NotNull Runnable onChange) {
         final boolean wasShowingThisRun = isOpenOn(editor.getParent());
 
-        close();
+        window.ifPresent(LightModeWindow::close);
 
-        if (wasShowingThisRun) return;
+        if (!wasShowingThisRun) {
+            window = Optional.of(new LightModeWindow(editor, () -> {
+                window = Optional.empty();
+                onChange.run();
+            }));
 
-        window = Optional.of(new LightModeWindow(p, editor, () -> {
-            window = Optional.empty();
-            onChange.run();
-        }));
+            // The editor going takes the window with it: this window reads that
+            // editor every time it draws. Asked rather than remembered, so a
+            // registration left by an earlier open does nothing to a later one.
+            Disposer.register(editor, () -> closeIfShowing(editor.getParent()));
+        }
 
-        // The editor going takes the window with it: this window reads that
-        // editor every time it draws. Asked rather than remembered, so a
-        // registration left by an earlier open does nothing to a later window.
-        Disposer.register(editor, () -> closeIfShowing(editor.getParent()));
-
+        // On every path, not only the opening one. Closing runs the lambda the
+        // window was built with, which belongs to whichever button opened it -
+        // so with the run split across two editors, the button actually pressed
+        // was left drawn as pressed over a window that had gone.
         onChange.run();
     }
 
@@ -109,15 +112,10 @@ public final class LightMode implements Disposable {
         return window.filter(open -> open.shows(run)).isPresent();
     }
 
-    public void close() {
-        window.ifPresent(LightModeWindow::close);
-    }
-
     @Override
     public void dispose() {
         // The project is going and the editor that would be told is going with
         // it, so this is the one close that announces nothing.
         window.ifPresent(LightModeWindow::closeQuietly);
-        window = Optional.empty();
     }
 }

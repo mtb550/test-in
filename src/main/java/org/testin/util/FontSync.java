@@ -21,6 +21,13 @@ import java.util.Optional;
 public class FontSync {
 
     /**
+     * Nothing in the plugin is drawn below this, however small the editor font
+     * is set. One owner: it was written as a literal twice in here and a third
+     * time in light mode's own font class.
+     */
+    public static final float FLOOR = 8.0f;
+
+    /**
      * Base size this component was last scaled to. Held per component: a single
      * shared value let whichever component updated first consume the change,
      * leaving every other subscriber's children at the old size.
@@ -76,7 +83,7 @@ public class FontSync {
 
     private static void zoomGlobalIdeEditors(final @NotNull Project p, final @NotNull JComponent component, final boolean zoomIn) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            final float newSize = Math.clamp(getBaseFontSize() + (zoomIn ? 1.0f : -1.0f), 8.0f, 72.0f);
+            final float newSize = Math.clamp(getBaseFontSize() + (zoomIn ? 1.0f : -1.0f), FLOOR, 72.0f);
 
             applyGlobally(newSize);
 
@@ -119,7 +126,7 @@ public class FontSync {
     private static void applyDeltaRecursively(final @NotNull Container container, final float delta) {
         for (final Component child : container.getComponents()) {
             Optional.ofNullable(child.getFont()).ifPresent(font ->
-                    child.setFont(font.deriveFont(Math.max(8.0f, font.getSize2D() + delta))));
+                    child.setFont(font.deriveFont(Math.max(FLOOR, font.getSize2D() + delta))));
 
             if (child instanceof Container)
                 applyDeltaRecursively((Container) child, delta);

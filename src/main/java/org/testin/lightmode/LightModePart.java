@@ -49,11 +49,6 @@ public enum LightModePart implements ToolBarAttribute {
 
     private final @NotNull String name;
 
-    /**
-     * Every part starts shown and every part can be hidden. Nothing here is
-     * locked: the one thing that must never go is the description, and that is
-     * not on this list at all.
-     */
     @Override
     public @NotNull ToolBarDefault getToolBarDefault() {
         return ToolBarDefault.ON;

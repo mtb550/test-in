@@ -21,21 +21,21 @@ import org.testin.services.Services;
  * Escape, its own close button, another run taking it over, the project
  * shutting - un-presses this without anybody writing a third handler.
  * <p>
- * Enabled on the same question that enables Start: a run that has been signed
- * off has nothing left to record, so there is nothing to open light mode for.
+ * Enabled while the run is still open: a run that has been signed off has
+ * nothing left to record, so there is nothing to open light mode for.
  */
 public class LightModeBtn extends AbstractIconButton implements ToolbarItem {
 
     private final @NotNull Project p;
     private final @NotNull RunEditor editor;
 
-    public LightModeBtn(final @NotNull Project p, final @NotNull RunEditor editor) {
+    public LightModeBtn(final @NotNull RunEditor editor) {
         // https://intellij-icons.jetbrains.design/
         super("Light Mode - one test case, above other windows", AllIcons.MeetNewUi.LightTheme);
-        this.p = p;
+        this.p = editor.getProject();
         this.editor = editor;
 
-        addActionListener(e -> Services.getInstance(p, LightMode.class).toggle(p, editor, this::updateState));
+        addActionListener(e -> Services.getInstance(p, LightMode.class).toggle(editor, this::updateState));
     }
 
     public void updateState() {

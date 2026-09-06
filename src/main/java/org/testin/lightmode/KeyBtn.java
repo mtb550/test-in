@@ -7,9 +7,11 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.Keycap;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Locale;
 
 /**
  * A key and what it does, offered as something to click as well (#13).
@@ -40,11 +42,11 @@ class KeyBtn extends JBPanel<KeyBtn> {
 
     private boolean hovered;
 
-    KeyBtn(final @NotNull String key, final @NotNull String text, final @NotNull String tooltip, final @NotNull Runnable onClick) {
+    KeyBtn(final @NotNull String key, final @NotNull String text, final @NotNull Runnable onClick) {
         super(new FlowLayout(FlowLayout.CENTER, JBUI.scale(6), JBUI.scale(PADDING)));
         this.onClick = onClick;
 
-        setToolTipText(tooltip);
+        setToolTipText("Record " + text.toLowerCase(Locale.ROOT) + " for this test case");
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1));
         setOpaque(false);
@@ -71,6 +73,11 @@ class KeyBtn extends JBPanel<KeyBtn> {
 
             @Override
             public void mouseClicked(final @NotNull MouseEvent e) {
+                // A verdict is a left click. Without this, a right click on the
+                // button recorded one and then opened nothing, which is a
+                // verdict the tester did not ask for.
+                if (!SwingUtilities.isLeftMouseButton(e)) return;
+
                 onClick.run();
             }
         });

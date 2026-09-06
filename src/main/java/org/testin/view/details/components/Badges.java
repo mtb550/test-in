@@ -28,12 +28,7 @@ public class Badges extends BaseDetails {
         final @NotNull JBPanel<?> badgesPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
         badgesPanel.setOpaque(false);
 
-        final @NotNull List<Shared.Badge> badges = new ArrayList<>();
-        Shared.addPriorityBadge(badges, dto);
-
-        for (final Group group : dto.getGroup()) {
-            badges.add(Shared.createGroupBadge(group));
-        }
+        final @NotNull List<Shared.Badge> badges = Shared.caseBadges(dto);
 
         // Last, the way a card orders them. None for a case nobody has run.
         final @NotNull RunStatus tempStatus = Services.getInstance(p, TestNGExecution.class).statusOf(dto);
