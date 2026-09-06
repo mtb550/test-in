@@ -38,7 +38,7 @@ happens when the tester presses one.
 
 | | Button | Hovering says | Where it is written |
 |---|---|---|---|
-| 1 | **Search Test Project** | *Find a test case, test set, package or run and go to it* | [UC-TREE-PANEL-024](searchProject.md) |
+| 1 | **Search Test Project** | *Find a test case, test set, package or run and go to it* | [UC-INTERNAL-001](../internal/globalSearch.md) |
 | 2 | **Settings** | *Configure Testin settings* | Below |
 | 3 | **Expand All** | *Expand all nodes* | Below |
 | 4 | **Collapse All** | *Collapse all nodes* | Below |

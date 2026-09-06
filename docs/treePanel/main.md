@@ -9,7 +9,7 @@ set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The tree panel |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are UC-TREE-PANEL-001 to UC-TREE-PANEL-028. Rules are numbered 1 to 90. They belong to the tree panel. Every other part of Testin starts its own numbers again |
+| **Numbering** | Use cases are UC-TREE-PANEL-001 to UC-TREE-PANEL-028. Rules are numbered 1 to 90, apart from 66 and 67, which went with the search. They belong to the tree panel. Every other part of Testin starts its own numbers again |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code |
 | **Written to** | [How a document is written](../standard.md) |
@@ -50,7 +50,6 @@ Each one is a page of its own: the story, its rules, its screens and its steps.
 | **UC-TREE-PANEL-022** | [Edit a test run](editTestRun.md) | |
 | | **Working from the tree** | |
 | **UC-TREE-PANEL-023** | [Run the automation for everything a node holds](runTests.md) | |
-| **UC-TREE-PANEL-024** | [Find anything in the project](searchProject.md) | |
 | **UC-TREE-PANEL-025** | [Refresh the tree from disk](refreshTree.md) | |
 | **UC-TREE-PANEL-026** | [Switch the Git branch of the test project](switchBranch.md) | |
 | **UC-TREE-PANEL-027** | [See what a node holds](nodeDetails.md) | |
@@ -227,7 +226,7 @@ its status bar, at the foot of the dialog.
 | `Ctrl+Z` | Undoes the last tree change | [UC-TREE-PANEL-016](undoChange.md) |
 | `Ctrl+Y` | Redoes it | [UC-TREE-PANEL-017](redoChange.md) |
 | `1` `2` `3` | Inside the status popup: Assigned, Completed, Closed | [UC-TREE-PANEL-020](setTestRunStatus.md) |
-| `Ctrl+Alt+F`, `Cmd+Alt+F` on a Mac | Opens search, from anywhere in the IDE | [UC-TREE-PANEL-024](searchProject.md) |
+| `Ctrl+Alt+F`, `Cmd+Alt+F` on a Mac | Opens search, from anywhere in the IDE | [UC-INTERNAL-001](../internal/globalSearch.md) |
 | `Ctrl+P` | Generates a report on the selected node | Reports, export, import and sync, not written yet |
 | The menu key, beside the right `Ctrl` | Opens the node menu | Below, under **What the tree shows** |
 

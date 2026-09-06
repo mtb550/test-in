@@ -1,28 +1,28 @@
-[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-024
+[Documentation](../README.md) › [Inside Testin](main.md) › UC-INTERNAL-001
 
-# UC-TREE-PANEL-024: Find anything in the project
+# UC-INTERNAL-001: Find anything in the test project
 
 > **`Ctrl+Alt+F`**, and **`Cmd+Alt+F`** on a Mac. It works anywhere in the
 > IDE, not only in the tree. There is also a **Search Test Project** button
-> at the top of the panel.
+> at the top of the tree panel.
 
 **As a** tester, **I want** to type part of a name, a step or a test case number
 and jump to it, **so that** a large tree is never a place to scroll.
 
 ## Rules
 
-- **Rule 66** — Nodes are found by name, from the first character typed. Test
+- **Rule 1** — Nodes are found by name, from the first character typed. Test
   cases are found from the second character, and every field of the test case is
   searched: its description, its id, its steps, its expected result, its
   priority, its status, its groups, its module, its preconditions, its
   reference, its test data, its place in the tree, its generated code, and who
   created or last changed it and when. Case does not matter, and spaces at
   either end are dropped.
-- **Rule 67** — Choosing a result always takes the tree to it. Only a test set
+- **Rule 2** — Choosing a result always takes the tree to it. Only a test set
   and a test run open an editor.
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+The rules that hold everywhere in the tree panel do not govern this dialog.
+It opens from anywhere in the IDE, and the tree is only where it lands.
 
 ## The Search Test Project dialog
 
@@ -86,4 +86,4 @@ to it and nothing opens. Testin says nothing.
 
 ---
 
-[Documentation](../README.md) › [The tree panel](main.md)
+[Documentation](../README.md) › [Inside Testin](main.md)
