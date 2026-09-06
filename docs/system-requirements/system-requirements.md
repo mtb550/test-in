@@ -59,7 +59,7 @@ empty until it is written. A heading with nothing under it says nothing.
 | Section | What it will state |
 |---|---|
 | **Functional** | One scenario per capability. What the input is, what the software does with it, and what must be true afterward. Grouped the way the capabilities are: writing, running, and getting work in and out |
-| **Data** | What is written to disk, in what format, and what must survive a round trip. The byte-identical rule is a business promise. The file formats behind it belong here |
+| **Data** | What is written to disk, and in what format. What must still be the same after Testin saves it and reads it back. The promise that stored data matches what was typed is a business rule. The file formats behind it belong here |
 | **Behavior under failure** | What must happen when a file is missing, a remote refuses, a plugin is absent, or two writers disagree |
 | **Performance** | The numbers a build must meet. How many test cases the tree holds before it slows, how long an index takes, and what a report costs |
 | **Compatibility** | Which IDEs and which platform versions, and what the plugin must do on one it does not support |

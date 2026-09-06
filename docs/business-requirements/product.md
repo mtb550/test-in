@@ -146,24 +146,24 @@ a tree, and the tree is the product's vocabulary.
 ```
 Test Project
 ├── Test Cases                (fixed container)
-│   ├── Test Set Package      (foldable, nestable)
+│   ├── Test Set Package      (can hold another package)
 │   └── Test Set
 │       └── Test Case
 └── Test Runs                 (fixed container)
-    ├── Test Run Package      (foldable, nestable)
+    ├── Test Run Package      (can hold another package)
     └── Test Run
-        └── Test Run Result   (one per case the run holds)
+        └── Test Run Result   (one per test case in the run)
 ```
 
 | Thing | What it is | Notes |
 |---|---|---|
 | **Test Project** | The top of one tree, and one folder on disk | Carries a status. Removing it removes everything beneath it |
-| **Test Cases** | The fixed container for everything testable | Cannot be created, renamed, moved or removed |
-| **Test Runs** | The fixed container for every execution record | Cannot be created, renamed, moved or removed |
-| **Test Set Package** | A folder grouping test sets, nestable | Carries a status |
+| **Test Cases** | The fixed folder holding everything there is to test | Cannot be created, renamed, moved or removed |
+| **Test Runs** | The fixed folder holding every test run | Cannot be created, renamed, moved or removed |
+| **Test Set Package** | A folder that groups test sets. One package can hold another | Carries a status |
 | **Test Set** | A named group of test cases. A test run is built from one | Carries a status |
 | **Test Case** | One thing to test: description, preconditions, steps, expected result, test data, module, group, priority | The only thing in the tree a tester writes |
-| **Test Run Package** | A folder grouping runs, nestable | Carries a status |
+| **Test Run Package** | A folder that groups test runs. One package can hold another | Carries a status |
 | **Test Run** | One pass through a chosen set of test cases, at one moment | Carries a status. Holds one result per test case |
 | **Test Run Result** | What happened to one case in one run: verdict, who recorded it, when, how long it took, and the failure detail if it failed | Belongs to the run, not to the case |
 
@@ -372,7 +372,7 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 > what is true afterward). Each one named the key that starts it.
 >
 > **Mouse needed** is the column to scan. Anything in the execution flow that is
-> not **No** is a breach of **BR-40**, not a detail.
+> not **No** breaks **BR-40**. That is not a detail.
 
 ---
 
@@ -389,7 +389,7 @@ Numbered so an issue or a commit can cite one.
 > by number. **BR-12** says a deprecated test set is not deleted. **BR-13** says
 > Active and Archived mean the same thing for both kinds of package.
 >
-> **Known breaches were stated, not hidden.** Two rules were broken by the
+> **Rules the product broke were written down, not hidden.** Two were broken by the
 > product at `0becc8b2`, and each was cited to the issue that tracks it. Those
 > citations are also not in what arrived.
 
