@@ -1,9 +1,5 @@
 # Light mode
 
-> **[Screens](https://mtb550.github.io/test-in/design/light-mode-screens.html)** &mdash; every
-> state drawn at its real size, in the plugin's own colors and fonts.
-> This document is the words; that one is the pictures.
-
 A separate always-on-top window that shows **one test case at a time**, so a
 tester can exercise the application under test with IntelliJ minimized and still
 record a verdict without switching windows.
@@ -57,10 +53,6 @@ closes the window if it is open.
 
 Shown at its real size. Content is the sample project's Login case, mid-way
 through Cycle 2. 420px wide by default.
-
-The sketches below say where things sit. For the same states drawn properly —
-real colors, real fonts, the keycaps and the badges — see
-**[Screens](https://mtb550.github.io/test-in/design/light-mode-screens.html)**.
 
 ### Before Start — nothing to judge yet
 

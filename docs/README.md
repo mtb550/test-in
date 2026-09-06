@@ -43,7 +43,7 @@ no page, because it is believed.
 
 | Document | What it answers | State |
 |---|---|---|
-| **[Light mode](design/light-mode.md)** | The standalone always-on-top window that shows one test case at a time, so a tester can work with IntelliJ minimized and still record a verdict. Its states are drawn in **[Screens](https://mtb550.github.io/test-in/design/light-mode-screens.html)**. | **Written** — [#13](https://github.com/mtb550/test-in/issues/13), closed |
+| **[Light mode](design/light-mode.md)** | The standalone always-on-top window that shows one test case at a time, so a tester can work with IntelliJ minimized and still record a verdict. | **Written** — [#13](https://github.com/mtb550/test-in/issues/13), closed |
 | **Test case editor** | The grid, the card list, the details panel and the toolbar that drives them. | Not written |
 | **The dialog framework** | `ui.framework` is the design system in code — the dialog shell, the status bar strip, the keycap, the prose paragraph, the row striping. What a new dialog gets for free. | Not written — [#11](https://github.com/mtb550/test-in/issues/11), [#69](https://github.com/mtb550/test-in/issues/69) |
 
@@ -68,10 +68,8 @@ being built or published.
 
 **One document, one owner.** A BRD and a BRS are the same document under two
 names, so there is one of them. Where two documents would answer the same
-question, there is one document and the other links to it. The one page here
-that is HTML rather than Markdown — light mode's Screens — exists because a
-drawn window is content Markdown cannot carry; it holds no prose, so it cannot
-disagree with the document beside it.
+question, there is one document and the other links to it. Every page here is
+Markdown, so there is no second format for a document to exist in.
 
 **A page says where it disagrees with the build.** Design documents are checked
 against the code and record any place the two differ, rather than describing an

@@ -103,9 +103,7 @@ or in this repository under [`docs/`](docs/README.md).
   that triggers it, all 26 statuses, and what is still undecided. **Start here to
   understand what Testin is.**
 - **[Light mode](docs/design/light-mode.md)** — the always-on-top window that
-  shows one test case at a time, so a run can be executed with the IDE minimized.
-  Its states are drawn in
-  [Screens](https://mtb550.github.io/test-in/design/light-mode-screens.html)
+  shows one test case at a time, so a run can be executed with the IDE minimized
 
 **Being written**, each listed in [the index](docs/README.md) against the issue
 that will write it: the keyboard reference, a first-run walkthrough, the formats
