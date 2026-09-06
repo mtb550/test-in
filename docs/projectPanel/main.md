@@ -59,23 +59,28 @@ docked on the right.
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  Testin  -  IntelliJ IDEA                                       - □ ×      │
-├──────────────────┬─────────────────────────────────┬───────────────────────┤
-│  Testin     (1)  │                             (2) │                  (3)  │
-│                  │                                 │                       │
-│  [ main     v ]  │                                 │                       │
-│                  │                                 │                       │
-│  v Demo          │                                 │                       │
-│    v Test Cases  │                                 │                       │
-│      v Accounts  │         Editor panel            │      View panel       │
-│          Login   │                                 │                       │
-│        Checkout  │                                 │                       │
-│    v Test Runs   │                                 │                       │
-│      v Sprint 7  │                                 │                       │
-│          cycle-2 │                                 │                       │
-└──────────────────┴─────────────────────────────────┴───────────────────────┘
+├──────────────────────────────────┬──────────────────────┬──────────────────┤
+│  Testin                     (1)  │                 (2)  │             (3)  │
+│                                  │                      │                  │
+│  [ main                 v ]      │                      │                  │
+│                                  │                      │                  │
+│  v Demo                          │                      │                  │
+│    v Test Cases                  │                      │                  │
+│      v Accounts                  │                      │                  │
+│          Login                   │                      │                  │
+│          Registration            │    Editor panel      │    View panel    │
+│        Checkout                  │                      │                  │
+│        Legacy sign-in            │                      │                  │
+│    v Test Runs                   │                      │                  │
+│      v Sprint 7                  │                      │                  │
+│          + cycle-1  Created      │                      │                  │
+│          @ cycle-2  In Progress  │                      │                  │
+│          * cycle-3  Completed    │                      │                  │
+└──────────────────────────────────┴──────────────────────┴──────────────────┘
 ```
 
-1. **The project panel** — the tree. Everything on this page is about it.
+1. **The project panel** — the tree. Everything on this page is about it. It is
+   drawn wide here so the tree can be read. In the IDE the tester sets its width.
 2. **Editor panel** — where a test set or a test run opens when the tester opens
    one from the tree. The project panel itself never shows a test case.
 3. **View panel** — details, history and open bugs for the test case the tester
