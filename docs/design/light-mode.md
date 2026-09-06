@@ -57,14 +57,13 @@ through Cycle 2. 420px wide by default.
 ### Before Start — nothing to judge yet
 
 ```
-┌────────────────────────────────────────────────┐
-│  [>]  [pin] [view]     Cycle-2       6 cases   │
-├────────────────────────────────────────────────┤
-│                                                │
-│     Press the play button to start test        │
-│     execution                                  │
-│                                                │
-└────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│  [ >]  [pin]  [view]            Cycle-2                      6 cases       │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│            Press the play button to start test execution                   │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 No test case at all: the run name, how many cases it holds, and the prompt. No
@@ -80,50 +79,43 @@ cannot happen, because there is nothing to judge until the run is going.
 ### Executing — the case alone
 
 ```
-┌────────────────────────────────────────────────┐
-│  [||] [pin] [view]     Cycle-2         3 / 6   │
-├────────────────────────────────────────────────┤
-│  LOGIN                                         │
-│  Sign in with a correct username and           │
-│  password                                      │
-│  The dashboard opens and the account name      │
-│  is shown in the header.                       │
-├────────────────────────────────────────────────┤
-│   P Passed       F Failed       B Blocked      │
-│  00:41                            00:12:41     │
-├────────────────────────────────────────────────┤
-│  Ctrl+D Details  Ctrl+H Hide  Esc Close        │
-│  P Passed   F Failed   B Blocked               │
-└────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│  [||]  [pin]  [view]            Cycle-2                        3 / 6       │
+├────────────────────────────────────────────────────────────────────────────┤
+│  LOGIN                                                                     │
+│  Sign in with a correct username and password                              │
+│  The dashboard opens and the account name is shown in the header.          │
+├────────────────────────────────────────────────────────────────────────────┤
+│      P Passed              F Failed              B Blocked                 │
+│  00:41                                                    00:12:41         │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Ctrl+D Details  Ctrl+H Hide  Esc Close  P Passed  F Failed  B Blocked     │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Executing — details open
 
 ```
-┌────────────────────────────────────────────────┐
-│  [||] [pin] [view]     Cycle-2         3 / 6   │
-├────────────────────────────────────────────────┤
-│  LOGIN                                         │
-│  Sign in with a correct username and           │
-│  password                                      │
-│  The dashboard opens and the account name      │
-│  is shown in the header.                       │
-│                                                │
-│  STEPS         1. Open the sign-in page.       │
-│                2. Type the username.           │
-│                3. Type the password.           │
-│                4. Press Sign in.               │
-│  TEST DATA     sample.user@example.com /       │
-│                correct-horse                   │
-│  PRE CONDIT.   The account exists, not locked. │
-│  TAGS          [HIGH] [Accounts]               │
-├────────────────────────────────────────────────┤
-│   P Passed       F Failed       B Blocked      │
-│  00:41                            00:12:41     │
-├────────────────────────────────────────────────┤
-│  Ctrl+D Details  Ctrl+H Hide  Esc Close        │
-│  P Passed   F Failed   B Blocked               │
-└────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│  [||]  [pin]  [view]            Cycle-2                        3 / 6       │
+├────────────────────────────────────────────────────────────────────────────┤
+│  LOGIN                                                                     │
+│  Sign in with a correct username and password                              │
+│  The dashboard opens and the account name is shown in the header.          │
+│                                                                            │
+│  STEPS           1. Open the sign-in page.                                 │
+│                  2. Type the username.                                     │
+│                  3. Type the password.                                     │
+│                  4. Press Sign in.                                         │
+│  TEST DATA       sample.user@example.com / correct-horse                   │
+│  PRE CONDITIONS  The account exists and is not locked.                     │
+│  TAGS            [ HIGH ]  [ Accounts ]                                    │
+├────────────────────────────────────────────────────────────────────────────┤
+│      P Passed              F Failed              B Blocked                 │
+│  00:41                                                    00:12:41         │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Ctrl+D Details  Ctrl+H Hide  Esc Close  P Passed  F Failed  B Blocked     │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -348,32 +340,29 @@ the one verdict that asks for something back, because a failure nobody described
 a failure nobody can act on.
 
 ```
-┌────────────────────────────────────────────────┐
-│  [||] [pin] [view]     Cycle-2         3 / 6   │
-├────────────────────────────────────────────────┤
-│  LOGIN · Failed                                │
-│  Sign in with a correct username and           │
-│  password                                      │
-│  The dashboard opens and the account name      │
-│  is shown in the header.                       │
-│                                                │
-│  ┌──────────────────────────────────────────┐  │
-│  │ set actual result..                      │  │
-│  └──────────────────────────────────────────┘  │
-│                                                │
-│  Bug Severity  ( ) Blocker   ( ) Major         │
-│                ( ) Minor     (•) Enhancement   │
-│  Bug Priority  ( ) High  ( ) Medium  (•) Low   │
-│                                                │
-│  ┌──────────────────────────────────────────┐  │
-│  │ paste error or exception or screenshot.. │  │
-│  │                                          │  │
-│  └──────────────────────────────────────────┘  │
-│                                                │
-│  00:41                            00:12:41     │
-├────────────────────────────────────────────────┤
-│  Enter Save & next            Esc Cancel       │
-└────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│  [||]  [pin]  [view]            Cycle-2                        3 / 6       │
+├────────────────────────────────────────────────────────────────────────────┤
+│  LOGIN · Failed                                                            │
+│  Sign in with a correct username and password                              │
+│  The dashboard opens and the account name is shown in the header.          │
+│                                                                            │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │ set actual result..                                                  │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                            │
+│  Bug Severity    ( ) Blocker   ( ) Major   ( ) Minor   (•) Enhancement     │
+│  Bug Priority    ( ) High   ( ) Medium   (•) Low                           │
+│                                                                            │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │ paste error or exception or screenshot..                             │  │
+│  │                                                                      │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                            │
+│  00:41                                                    00:12:41         │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Enter Save & next                                      Esc Cancel         │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### A. The case stays above them
