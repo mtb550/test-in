@@ -96,18 +96,21 @@ full statement is in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 Read it on the web at **[mtb550.github.io/test-in](https://mtb550.github.io/test-in/)**,
 or in this repository under [`docs/`](docs/README.md).
 
-**Written today:**
+Three specifications, read in this order — what is promised, what must be true
+for the promise to hold, and what the tester sees:
 
-- **[Business requirements](docs/business-requirements.md)** — what Testin
-  promises: who uses it, the things they work with, every capability and the key
-  that triggers it, all 26 statuses, and what is still undecided. **Start here to
-  understand what Testin is.**
-- **[Light mode](docs/design/light-mode.md)** — the always-on-top window that
-  shows one test case at a time, so a run can be executed with the IDE minimized
+- **[Business requirements](docs/business-requirements/business-requirements.md)**
+  — what Testin promises: who uses it, the things they work with, every
+  capability and the key that triggers it, all 26 statuses, and what is still
+  undecided. **Start here to understand what Testin is**
+- **[System requirements](docs/system-requirements/system-requirements.md)** —
+  what the software must do to keep those promises
+- **[Design](docs/design/design.md)** — one document per screen.
+  [Light mode](docs/design/light-mode.md) is written
 
-**Being written**, each listed in [the index](docs/README.md) against the issue
-that will write it: the keyboard reference, a first-run walkthrough, the formats
-on disk, the architecture, contributing, and the standing decisions.
+Alongside them: the keyboard reference, a first-run walkthrough, the formats on
+disk, the architecture, contributing and the standing decisions — each listed in
+[the index](docs/README.md) against the issue that will write it.
 
 Questions, ideas and feedback are welcome in
 [Discussions](https://github.com/mtb550/test-in/discussions).

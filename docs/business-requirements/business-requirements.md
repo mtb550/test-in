@@ -23,7 +23,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 >   this draft — 29 commits — and is a whole execution capability: a standalone
 >   always-on-top window showing one case at a time, with `P`, `F` and `B` on it.
 >   Section 6.2 is incomplete without it. See
->   [the design document](design/light-mode.md).
+>   [the design document](../design/light-mode.md).
 > - **#74 is closed.** Section 8 names the grid view's missing keyboard path as a
 >   live gap tracked by it. That needs re-checking.
 > - **#68 is closed.** `Q-02` cites it as open.
@@ -328,7 +328,7 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 > with the IDE minimized and still record a verdict — `P`, `F`, `B`, `Ctrl+D` for
 > the rest of the case, `Escape` to close. It is the purest expression of section
 > 2's premise and it is not described here. See
-> [the design document](design/light-mode.md).
+> [the design document](../design/light-mode.md).
 
 ### 6.3 Evidence and exchange
 

@@ -4,11 +4,16 @@ A separate always-on-top window that shows **one test case at a time**, so a
 tester can exercise the application under test with IntelliJ minimized and still
 record a verdict without switching windows.
 
-Built and shipped — [#13](https://github.com/mtb550/test-in/issues/13), merged in
-`4730de57`, cleaned in `206c9744`. This document describes the window as built and
-says where it differs from what was originally drawn.
+| | |
+|---|---|
+| **Area** | [Design](design.md) |
+| **Answers** | Why this window is shaped the way it is, and what every part of it does |
+| **State** | **Written.** Built and shipped — [#13](https://github.com/mtb550/test-in/issues/13), closed |
+| **Checked against** | `main` at `206c9744`, 6 September 2026 — read class by class against the built code |
+| **Cites** | No `BR` or `SR` yet; the business requirements do not describe this window ([#72](https://github.com/mtb550/test-in/issues/72)) |
 
-Package: `org.testin.lightmode`, 10 classes.
+This document describes the window as built and says where it differs from what
+was originally drawn. Package: `org.testin.lightmode`, 10 classes.
 
 ---
 
