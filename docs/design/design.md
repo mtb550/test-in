@@ -7,7 +7,8 @@ choice on it.
 |---|---|
 | **Answers** | Why this surface is shaped the way it is, and what every part of it does |
 | **For** | Anyone changing a screen, and anyone deciding whether a change is allowed |
-| **Owns** | No identifiers. A design document cites `BR-nn` and `UC-nn`; it does not create them |
+| **Owns** | No identifiers. A design document cites `BR` and `UC`; it does not create them |
+| **Written to** | [How a document is written](../standard.md) — a numbered sketch per screen |
 
 ---
 

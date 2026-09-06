@@ -17,6 +17,10 @@ Each is a folder with its own index. Read them in this order: the first says wha
 is promised, the second what must be true for the promise to hold, the third what
 the tester actually sees.
 
+**Writing one?** Read **[How a document is written](standard.md)** first. It says
+which of the three a fact belongs in, the form each takes, and the identifiers
+that link them — so the same fact is never written twice.
+
 | | Answers | Owns | State |
 |---|---|---|---|
 | **[Business requirements](business-requirements/business-requirements.md)** | What Testin promises, and to whom | `BR-nn` `UC-nn` `Q-nn` | **Draft 1** — [#72](https://github.com/mtb550/test-in/issues/72) |

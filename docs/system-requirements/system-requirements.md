@@ -6,7 +6,8 @@ What the software must do, stated so that each requirement can be checked.
 |---|---|
 | **Answers** | What the product must do to keep the promises the business requirements make |
 | **For** | Anyone deciding whether a change is correct, and anyone writing a test that proves it |
-| **Owns** | `SR-nn` — one identifier per requirement, citable from an issue, a commit or a test |
+| **Owns** | `SR` — one identifier per scenario, citable from an issue, a commit or a test |
+| **Written to** | [How a document is written](../standard.md) — Given / When / Then, one behaviour per scenario, every key named here and nowhere else |
 | **State** | **Not written** — [#180](https://github.com/mtb550/test-in/issues/180) |
 
 ---
