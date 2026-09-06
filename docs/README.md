@@ -89,7 +89,7 @@ the promise is written in the business requirements first.
 
 ## How these documents stay true
 
-- Every sentence can be checked against the plugin. Planned behaviour is marked as planned.
+- Every sentence can be checked against the plugin. Planned behavior is marked as planned.
 - Known defects are named, not hidden.
 - Rules and use cases are numbered, so an issue or a commit can cite one.
 - When the plugin changes, the document changes in the same commit.

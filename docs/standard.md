@@ -2,10 +2,10 @@
 
 # How a document is written
 
-Every module of Testin gets three documents, and each one answers a different
-question. This page says which question, what goes in each, and the form it
-takes — so the same fact is written once, in the one place a reader would look
-for it.
+Every module of Testin gets three documents. Each one answers a different
+question. This page says which question, what goes in each document, and the
+form it takes. So the same fact is written once, in the one place a reader
+would look for it.
 
 Read this before writing or changing any page under `docs/`.
 
@@ -16,11 +16,11 @@ Read this before writing or changing any page under `docs/`.
 | | Business requirements | System requirements | Design |
 |---|---|---|---|
 | **The question** | Why does this exist, and what must always hold? | What exactly happens, step by step? | What does the tester see? |
-| **The form** | One user story per use case, then numbered rules | Given / When / Then scenarios, one per behaviour | A sketch of every screen, with its parts numbered |
+| **The form** | One user story per use case, then numbered rules | Given / When / Then scenarios, one per behavior | A sketch of every screen, with its parts numbered |
 | **Written for** | A lead deciding whether Testin fits. A tester learning what a thing is *for* | A tester learning how to do it. Anyone checking whether a build is right | Anyone changing a screen, or judging a change to one |
-| **Names keys** | **Never** | **Always** — every key, once, in the step that presses it | Only where a key is drawn on a sketch |
-| **Holds validations** | **Yes** — as rules. *"A test set cannot be dropped among test runs"* | Shows each rule as a scenario that ends in a refusal, and cites the rule | No |
-| **Names screens** | No | Yes — links the design | **Owns** them |
+| **Names keys** | **Never** | **Always.** Every key, once, in the step that presses it | Only where a key is drawn on a sketch |
+| **Holds validations** | **Yes**, as rules. *"A test set cannot be dropped among test runs"* | Shows each rule as a scenario that ends in a refusal, and cites the rule | No |
+| **Names screens** | No | Yes. It links the design | **Owns** them |
 | **Says how it is built** | Never | Never | A class name only where it names who owns a decision |
 
 **One fact, one home.** A key is stated in the system requirements and nowhere
@@ -32,52 +32,52 @@ would say the same thing, one says it and the other links.
 
 ## Why these three forms
 
-**A user story for the business requirements**, because it forces the *who* and
-the *why* into one sentence and leaves no room for the *how*:
+**A user story for the business requirements.** It forces the *who* and the
+*why* into one sentence. It leaves no room for the *how*.
 
 > **As a** tester, **I want** to create a test project from the tree, **so that**
 > a new product under test has a place for its cases before any are written.
 
-**Given / When / Then for the system requirements**, because it is the language
-testers already write tests in, because each scenario is something a person can
-check against a build, and because *"When the tester presses `Ctrl+M`"* puts the
-key exactly where it is a fact rather than a footnote:
+**Given / When / Then for the system requirements**, for three reasons. It is
+the language testers already write tests in. Each scenario is something a
+person can check against a build. And *"When the tester presses `Ctrl+M`"* puts
+the key exactly where it is a fact, rather than in a footnote.
 
 > **Given** a test project is selected in the tree
 > **When** the tester presses `Ctrl+M`
 > **Then** the create dialog opens, offering a test set package or a test set
 
-**A numbered sketch for the design**, because a screen is a picture, and a
-paragraph describing where the buttons are is worse than a drawing of them. The
-light mode document is the pattern.
+**A numbered sketch for the design.** A screen is a picture. A paragraph
+describing where the buttons are is worse than a drawing of them. The light
+mode document is the pattern.
 
 ---
 
 ## Identifiers
 
 Everything a reader might cite has a number. **Cite the number, never the
-sentence** — a number survives the text being reworded.
+sentence.** A number survives the text being reworded.
 
 | Id | Is | Lives in | Example |
 |---|---|---|---|
-| `UC-PP-01` | A **use case** — one thing a tester does | Business requirements *and* system requirements, **same id in both**. The story is in one, the scenarios in the other, and the shared id is what links them | *Create a test project* |
-| `BR-PP-01` | A **business rule** — something that must always hold | Business requirements | *Test Cases and Test Runs are fixed containers* |
-| `SR-PP-01` | A **scenario** — one Given / When / Then | System requirements | *Create from the tree* |
-| `Q-PP-01` | An **open question** — genuinely undecided, listed rather than guessed | Business requirements | |
+| `UC-PP-01` | A **use case**. One thing a tester does | Business requirements *and* system requirements, **same id in both**. The story is in one. The scenarios are in the other. The shared id links them | *Create a test project* |
+| `BR-PP-01` | A **business rule**. Something that must always hold | Business requirements | *Test Cases and Test Runs are fixed containers* |
+| `SR-PP-01` | A **scenario**. One Given / When / Then | System requirements | *Create from the tree* |
+| `Q-PP-01` | An **open question**. Genuinely undecided, so listed instead of guessed | Business requirements | |
 
 The middle letters name the module:
 
 | Code | Module |
 |---|---|
-| `PP` | Project panel — the tree |
+| `PP` | Project panel, the tree |
 | `TE` | Test case editor |
 | `RE` | Test run editor, including light mode |
 | `VP` | View panel |
 | `ST` | Settings |
-| `EX` | Evidence and exchange — reports, export, import, sync |
+| `EX` | Evidence and exchange: reports, export, import, sync |
 
-Rules that hold for the whole product, not one module, carry no module code:
-`BR-11`. Those live in [the product's own document](business-requirements/product.md).
+A rule that holds for the whole product carries no module code: `BR-11`. Those
+rules live in [the product's own document](business-requirements/product.md).
 
 **The chain, read downward:**
 
@@ -89,9 +89,9 @@ UC-PP-01   the use case          named once, in both specifications
   └── a screen   what the tester sees    design/project-panel.md
 ```
 
-A design cites `UC` and `BR` and creates neither. A scenario cites the `BR` it
+A design cites `UC` and `BR`. It creates neither. A scenario cites the `BR` it
 exercises. If a scenario needs a rule nobody has written, the rule is written
-first, in the business requirements, and the scenario cites it.
+first, in the business requirements. Then the scenario cites it.
 
 ---
 
@@ -130,8 +130,8 @@ Screen: [The create dialog](../design/project-panel.md#the-create-dialog)
 > **Then** the dialog stays open and the name field is marked
 ```
 
-One scenario, one behaviour. A refusal is its own scenario, and it names the rule
-it enforces in its title line.
+One scenario, one behavior. A refusal is its own scenario. It names the rule it
+enforces, in its title line.
 
 ### Design — per screen
 
@@ -179,6 +179,9 @@ These documents are for testers. Every sentence is checked against that reader.
 - **Numbers: words below 10, digits from 10 up.** *five statuses*, *50 rows*,
   *13 keys*. A key is written as the key: `1` `2` `3`. A quoted message keeps
   the product's own digits: *Removed 4*.
+- **American English.** *Behavior*, not *behaviour*. *Gray*, not *grey*. The
+  platform the plugin is written against is American, so anything else puts two
+  dialects in one page.
 
 **Exact words for exact things.**
 
@@ -206,11 +209,11 @@ These documents are for testers. Every sentence is checked against that reader.
 | **Module** | Which module code |
 | **Read with** | The same module in the other two specifications, linked |
 | **Answers** | One sentence |
-| **State** | Written · Draft · Not written — with the issue |
+| **State** | Written, Draft or Not written, with the issue |
 | **Checked against** | The commit on `main`, and the date |
 
-So a reader can tell what the page is, whether it is finished, and how far it
-might have drifted — before reading a word of it.
+So a reader can tell three things before reading a word of it: what the page
+is, whether it is finished, and how far it might have drifted.
 
 ---
 
@@ -230,12 +233,12 @@ A reader is never more than one click from an index.
 
 ---
 
-## When behaviour changes
+## When behavior changes
 
 The document changes **in the same commit** as the code. A commit that changes
-what a key does and does not change the scenario that names it is incomplete,
-and the review should say so. This is the whole reason the documentation lives
-in this repository rather than beside it.
+what a key does, and does not change the scenario that names it, is
+incomplete. The review should say so. This is the whole reason the
+documentation lives in this repository, rather than beside it.
 
 ---
 
