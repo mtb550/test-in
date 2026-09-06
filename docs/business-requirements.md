@@ -11,8 +11,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 
 ---
 
-> [!WARNING]
-> ### The state of this draft
+> ### ⚠️ The state of this draft
 >
 > Moved here from Notion on 6 September 2026, unchanged. **It has not been
 > re-checked against the product since it was written**, and `main` has moved
@@ -114,8 +113,7 @@ would be describing behaviour that does not exist. See **Appendix A** and **Q-04
 Planned actors are in **Appendix A**, kept separate so the main body stays
 checkable against the product.
 
-> [!NOTE]
-> The use case diagram (`testin-use-cases.png`) has not been moved. It was an
+> ℹ️ The use case diagram (`testin-use-cases.png`) has not been moved. It was an
 > image in the Notion page and did not come across with the text.
 
 ---
@@ -163,8 +161,7 @@ independent on purpose: a run's lifecycle is a different question from a case's
 verdict, which is a different question again from what the team thinks of the case
 itself.
 
-> [!IMPORTANT]
-> Issue [#72](https://github.com/mtb550/test-in/issues/72) counts 22 constants
+> ❗ Issue [#72](https://github.com/mtb550/test-in/issues/72) counts 22 constants
 > across 6 dimensions. Measured against the product, **it is 26 across 7**. Two
 > corrections: "Removed" moved from the project dimension to the test-case verdict
 > dimension, because a project has no removed state — removing one deletes it —
@@ -236,8 +233,7 @@ stateDiagram-v2
     Closed --> [*]
 ```
 
-> [!WARNING]
-> **Undecided — see section 9.** The diagram shows what the product *allows*, and
+> **⚠️ Undecided — see section 9.** The diagram shows what the product *allows*, and
 > it currently allows every move, including Completed back to In Progress.
 > **Nothing enforces the run lifecycle at all.** Whether a terminal run may be
 > reopened is question **Q-01**.
@@ -275,8 +271,7 @@ itself, across every run it is ever in.
 | **Disabled** | The case exists but is not to be used |
 | **To Be Updated** | The case is known to be out of date |
 
-> [!WARNING]
-> **Nothing in the product uses this today.** It can be set in exactly one place —
+> **⚠️ Nothing in the product uses this today.** It can be set in exactly one place —
 > by switching on the **Status** column in the grid view, which is hidden by
 > default, and typing the label — and there is no menu entry and no key for it. It
 > is written into an export and **not read back by an import**, so a case exported
@@ -328,8 +323,7 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 | Jump to the generated automation method | `Shift+F5` | |
 | Generate the automation method | `Ctrl+F12` | |
 
-> [!NOTE]
-> **Light mode is missing from this table.** It was built after this draft: a
+> **ℹ️ Light mode is missing from this table.** It was built after this draft: a
 > standalone always-on-top window showing one case at a time, so a tester can work
 > with the IDE minimized and still record a verdict — `P`, `F`, `B`, `Ctrl+D` for
 > the rest of the case, `Escape` to close. It is the purest expression of section
@@ -349,8 +343,7 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 
 ### 6.4 Use cases
 
-> [!IMPORTANT]
-> **Not moved yet.** This was a Notion database — one row per capability a tester
+> **❗ Not moved yet.** This was a Notion database — one row per capability a tester
 > triggers, each in the usual form (actor, precondition, main flow, alternatives,
 > postcondition) and each naming the key that starts it, numbered `UC-nn`.
 >
@@ -363,8 +356,7 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 
 Numbered so an issue or a commit can cite one.
 
-> [!IMPORTANT]
-> **Partially moved: 21 of 33 rules, and without their numbers.** This was a
+> **❗ Partially moved: 21 of 33 rules, and without their numbers.** This was a
 > Notion database; the text of 21 rules came across and the `BR-nn` column did
 > not. The numbers are the point of the database — an issue cannot cite a rule
 > that has none — so they are left blank rather than invented.
@@ -466,8 +458,7 @@ Listed rather than guessed. Each is a real question the product has not answered
 
 ## Appendix A — Planned actors
 
-> [!WARNING]
-> **Nothing in this appendix exists.** It is kept separate so the main body stays
+> **⚠️ Nothing in this appendix exists.** It is kept separate so the main body stays
 > true and checkable against the product.
 
 | Planned actor | What they would do | Tracked in |

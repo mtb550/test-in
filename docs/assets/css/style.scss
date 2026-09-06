@@ -1,0 +1,143 @@
+---
+# Front matter, deliberately empty. Jekyll only processes a file that has it, and
+# without processing this would be served as literal SCSS.
+---
+
+@import "{{ site.theme }}";
+
+/* ---------------------------------------------------------------------------
+   Dark mode.
+
+   Two ways in, because one is not enough. The media query follows whatever the
+   reader's system is set to, which is right for most people and costs them
+   nothing. The [data-theme] attribute is the toggle in the corner, for a reader
+   whose system is light and who still wants to read a long document on a dark
+   ground - and it wins over the media query in both directions, so the choice
+   sticks either way.
+
+   Every colour is a token on :root, and the blocks below redefine only the
+   tokens. A colour defined for the first time inside a media query is the
+   classic unreadable-page bug: it exists in one state and not the other.
+   --------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light;
+
+  --ground: #ffffff;
+  --surface: #f6f8fa;
+  --ink: #24292f;
+  --ink-2: #57606a;
+  --ink-3: #6e7781;
+  --line: #d0d7de;
+  --line-soft: #eaeef2;
+  --accent: #0969da;
+  --code-ink: #24292f;
+}
+
+@mixin dark-tokens {
+  color-scheme: dark;
+
+  --ground: #0d1117;
+  --surface: #161b22;
+  --ink: #e6edf3;
+  --ink-2: #adbac7;
+  --ink-3: #8b949e;
+  --line: #30363d;
+  --line-soft: #21262d;
+  --accent: #4493f8;
+  --code-ink: #e6edf3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { @include dark-tokens; }
+}
+
+:root[data-theme="dark"] { @include dark-tokens; }
+
+/* Painted through the tokens only, so both themes come from one set of rules. */
+body {
+  background: var(--ground);
+  color: var(--ink);
+}
+
+.markdown-body {
+  color: var(--ink);
+  background: transparent;
+
+  h1, h2, h3, h4, h5, h6, strong, b { color: var(--ink); }
+
+  h1, h2 { border-bottom-color: var(--line); }
+
+  a { color: var(--accent); }
+
+  hr { background-color: var(--line); }
+
+  /* A blockquote carries the asides this documentation leans on, so it needs to
+     read as a distinct surface rather than as indented body text. */
+  blockquote {
+    color: var(--ink-2);
+    border-left-color: var(--accent);
+    background: var(--surface);
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+
+    > :first-child { margin-top: 0; }
+    > :last-child { margin-bottom: 0; }
+  }
+
+  table {
+    th, td { border-color: var(--line); }
+    th { background: var(--surface); color: var(--ink); }
+    tr { background: var(--ground); border-top-color: var(--line); }
+    tr:nth-child(2n) { background: var(--surface); }
+  }
+
+  code, tt {
+    background: var(--surface);
+    color: var(--code-ink);
+  }
+
+  /* The window sketches live in these. They are drawn with box characters and
+     have to stay on one line each, so the block scrolls rather than wraps. */
+  pre {
+    background: var(--surface);
+    color: var(--code-ink);
+    overflow-x: auto;
+  }
+
+  pre code { background: transparent; }
+
+  img { background: transparent; }
+}
+
+.highlight, .highlighter-rouge .highlight { background: var(--surface); }
+
+.footer {
+  color: var(--ink-3) !important;
+  border-top-color: var(--line) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   The toggle. One button, no label, no library.
+   --------------------------------------------------------------------------- */
+
+#theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  width: 34px;
+  height: 34px;
+  line-height: 1;
+  font-size: 15px;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink-2);
+}
+
+#theme-toggle:hover { color: var(--ink); border-color: var(--accent); }
+#theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media print { #theme-toggle { display: none; } }
