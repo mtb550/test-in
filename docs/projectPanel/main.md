@@ -60,32 +60,27 @@ docked on the right.
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  Testin  -  IntelliJ IDEA                                       - □ ×      │
 ├──────────────────┬─────────────────────────────────┬───────────────────────┤
-│  Testin     (1)  │  Accounts  ×  cycle-2  ×   (2)  │  Testin        (3)    │
-│                  ├─────────────────────────────────┤  Details  History     │
-│  [ main     v ]  │                                 │  Open Bugs            │
+│  Testin     (1)  │                             (2) │                  (3)  │
+│                  │                                 │                       │
+│  [ main     v ]  │                                 │                       │
 │                  │                                 │                       │
 │  v Demo          │                                 │                       │
 │    v Test Cases  │                                 │                       │
-│      v Accounts  │         Editor panel            │                       │
+│      v Accounts  │         Editor panel            │      View panel       │
 │          Login   │                                 │                       │
 │        Checkout  │                                 │                       │
 │    v Test Runs   │                                 │                       │
 │      v Sprint 7  │                                 │                       │
 │          cycle-2 │                                 │                       │
-├──────────────────┴─────────────────────────────────┴───────────────────────┤
-│  Testin   Git   Terminal   Problems                             (4)        │
-└────────────────────────────────────────────────────────────────────────────┘
+└──────────────────┴─────────────────────────────────┴───────────────────────┘
 ```
 
 1. **The project panel** — the tree. Everything on this page is about it.
-2. **Editor panel** — where a test set or a test run opens when the tester
-   opens one from the tree. One tab each. The project panel itself never shows a
-   test case.
-3. **The view panel** — details, history and open bugs for the test case the
-   tester has selected. It is a part of Testin of its own, and its pages are not
-   written yet.
-4. **The tool window bar** — the tester clicks **Testin** here to show and hide
-   a panel.
+2. **Editor panel** — where a test set or a test run opens when the tester opens
+   one from the tree. The project panel itself never shows a test case.
+3. **View panel** — details, history and open bugs for the test case the tester
+   has selected. It is a part of Testin of its own, and its pages are not written
+   yet.
 
 ---
 
