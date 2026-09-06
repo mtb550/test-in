@@ -52,36 +52,40 @@ Each one is a page of its own: the story, its rules, its screens and its steps.
 
 ## Where the panel sits in the IDE
 
-Testin is a tool window, docked on the left of IntelliJ IDEA, beside the places
-the IDE keeps its own trees.
+Testin puts two tool windows in IntelliJ IDEA. The project panel is docked on
+the left, beside the places the IDE keeps its own trees. The view panel is
+docked on the right.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  Testin  -  IntelliJ IDEA                                       - □ ×      │
-├──────────────────────┬─────────────────────────────────────────────────────┤
-│  Testin         (1)  │  cycle-2  ×   LoginTest.java                  (2)   │
-│                      ├─────────────────────────────────────────────────────┤
-│  [ main       v ]    │                                                     │
-│                      │   3 / 6      Sign in with a correct username        │
-│  v Demo              │              and password                           │
-│    v Test Cases      │                                                     │
-│      v Accounts      │   #  Description            Priority   Verdict      │
-│          Login       │   1  Sign in, correct pass  High       Passed       │
-│          Registrati  │   2  Sign in, wrong pass    High       Failed       │
-│        Checkout      │   3  Locked account         Medium     Pending      │
-│    v Test Runs       │                                                     │
-│      v Sprint 7      │                                                     │
-│          cycle-2     │                                                     │
-├──────────────────────┴─────────────────────────────────────────────────────┤
-│  Testin   Git   Terminal   Problems                             (3)        │
+├──────────────────┬─────────────────────────────────┬───────────────────────┤
+│  Testin     (1)  │  Accounts  ×  cycle-2  ×   (2)  │  Testin        (3)    │
+│                  ├─────────────────────────────────┤  Details  History     │
+│  [ main     v ]  │                                 │  Open Bugs            │
+│                  │                                 │                       │
+│  v Demo          │                                 │                       │
+│    v Test Cases  │                                 │                       │
+│      v Accounts  │       The editor panel          │                       │
+│          Login   │                                 │                       │
+│        Checkout  │                                 │                       │
+│    v Test Runs   │                                 │                       │
+│      v Sprint 7  │                                 │                       │
+│          cycle-2 │                                 │                       │
+├──────────────────┴─────────────────────────────────┴───────────────────────┤
+│  Testin   Git   Terminal   Problems                             (4)        │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
 1. **The project panel** — the tree. Everything on this page is about it.
-2. **The editor area** — where a test set or a test run opens when the tester
-   opens one from the tree. The panel itself never shows a test case.
-3. **The tool window bar** — the tester clicks **Testin** here to show and hide
-   the panel.
+2. **The editor panel** — where a test set or a test run opens when the tester
+   opens one from the tree. One tab each. The project panel itself never shows a
+   test case.
+3. **The view panel** — details, history and open bugs for the test case the
+   tester has selected. It is a part of Testin of its own, and its pages are not
+   written yet.
+4. **The tool window bar** — the tester clicks **Testin** here to show and hide
+   a panel.
 
 ---
 
