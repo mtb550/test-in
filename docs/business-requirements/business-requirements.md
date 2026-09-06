@@ -40,7 +40,7 @@ same name and number. That document says what happens step by step. The
 
 Every rule has a number. Point at the number, not the sentence, because the
 number survives a reworded rule. How the numbering works is in
-[How a document is written](../standard.md#identifiers).
+[How a document is written](../standard.md#how-things-are-numbered).
 
 ---
 

@@ -9,7 +9,8 @@
 | | |
 |---|---|
 | **Area** | [Business requirements](business-requirements.md) |
-| **Module** | None. These rules hold for the whole product. Each module has its own document, listed in [the index](business-requirements.md) |
+| **Part of Testin** | All of it. These rules hold everywhere. Each part also has a document of its own, listed in [the index](business-requirements.md) |
+| **Numbering** | Its rules carry no letters, only a number, as in `BR-11`. Letters say which part of Testin a rule belongs to, and these rules belong to all of it |
 | **Answers** | Who uses Testin, what they work with, every status, the rules for the whole product, and what is undecided |
 | **State** | **Draft 1** — moved from Notion, not re-checked. Correcting it is [#72](https://github.com/mtb550/test-in/issues/72) |
 | **Checked against** | `main` at `0becc8b2`, 29 August 2026 |
@@ -76,23 +77,23 @@ survive a rewrite of the product.
 
 ---
 
-## 2. The premise: the keyboard is the product
+## 2. The idea: the keyboard is the product
 
 > This is the section to read if only one section is read.
 
 Testin's competitors are web applications: Jira, Azure DevOps and TestRail.
-That is not an implementation detail. It is a ceiling on how fast anyone can
-work in them.
+That is not a small detail of how they are built. It is a limit on how fast
+anyone can work in them.
 
 | | A browser-based tool | Testin |
 |---|---|---|
 | **Who owns the keyboard** | The browser. `Ctrl+N`, `Ctrl+W`, `Ctrl+T`, `F5`, `F6` and `F12` are already taken, and what is left works only while no text field has focus | The IDE, which hands its key map to the plugin |
-| **Cost of a state change** | A network round trip: click the dropdown, wait, click the option, wait for the save | A local write, immediately |
-| **Whether work composes** | It does not. There is no keyboard path to a verdict, so eight rows cannot be judged in one gesture | Selection plus one key, on any number of rows |
+| **What one change costs** | A trip to the server. Click the dropdown, wait, click the option, wait for the save | A write on this machine, straight away |
+| **Whether work stacks up** | It does not. There is no way to reach a verdict from the keyboard, so eight rows cannot be judged in one go | Select the rows, press one key. Any number of rows |
 
 So a tester executing a 200 test case run in a browser tool does it with the
-mouse, one test case at a time. The tool's speed is bounded by the browser it
-is trapped in.
+mouse, one test case at a time. The tool can never be faster than the browser
+it is trapped in.
 
 **A tester using Testin can execute a whole test run without touching the
 mouse.** Move to the test case, read it, press one key for the verdict, move
@@ -100,12 +101,11 @@ on. Every other capability is a reason to be in Testin: the tree, the grid, the
 reports, the Git integration. The keyboard is the reason the work is faster
 once the tester is there.
 
-That premise is stated here as a capability with rules behind it, **BR-40** to
-**BR-44**, rather than left as an emergent property of whichever bindings happen
-to exist.
+That idea is written down here as a capability, with rules behind it, **BR-40**
+to **BR-44**. It is not left to fall out of whichever keys happen to be bound.
 
 **62 keys are bound**, counted against the product at `0becc8b2`. Of those, 40
-are shared across surfaces, so the same gesture means the same thing
+are shared across screens, so the same gesture means the same thing
 everywhere. The other 22 belong to a single capability. Standard text editing
 inside dialogs is restored on top of those, and is not counted. That is the
 platform's behavior, not Testin's.
@@ -161,44 +161,46 @@ Test Project
 | **Test Cases** | The fixed container for everything testable | Cannot be created, renamed, moved or removed |
 | **Test Runs** | The fixed container for every execution record | Cannot be created, renamed, moved or removed |
 | **Test Set Package** | A folder grouping test sets, nestable | Carries a status |
-| **Test Set** | A named group of test cases; the unit a run is configured from | Carries a status |
-| **Test Case** | One testable thing: description, preconditions, steps, expected result, test data, module, group, priority | The only leaf a tester authors |
+| **Test Set** | A named group of test cases. A test run is built from one | Carries a status |
+| **Test Case** | One thing to test: description, preconditions, steps, expected result, test data, module, group, priority | The only thing in the tree a tester writes |
 | **Test Run Package** | A folder grouping runs, nestable | Carries a status |
-| **Test Run** | One execution of a chosen set of cases at a point in time | Carries a status. Holds one result per case |
+| **Test Run** | One pass through a chosen set of test cases, at one moment | Carries a status. Holds one result per test case |
 | **Test Run Result** | What happened to one case in one run: verdict, who recorded it, when, how long it took, and the failure detail if it failed | Belongs to the run, not to the case |
 
-> **The distinction that matters most.** A test case is the *question*; a test run
-> result is one *answer*, at one moment, by one person. A case can be in many runs
-> and carry a different result in each. This is why deleting a test case does
+> **The difference that matters most.** A test case is the *question*. A test
+> run result is one *answer*, at one moment, by one person. A test case can be
+> in many test runs, and carry a different result in each. This is why deleting a test case does
 > not erase history. See **BR-11**.
 
 ---
 
 ## 5. Statuses and transitions
 
-Seven independent status dimensions, **26 constants** in total. They are
-independent on purpose. A test run's lifecycle is one question. A test case's
-verdict is another. What the team thinks of the test case itself is a third.
+There are seven kinds of status, and **26 values** in all. The seven do not
+affect each other, and that is on purpose. Where a test run has got to is one
+question. The verdict a test case got is another. What the team thinks of the
+test case itself is a third.
 
-> ❗ Issue [#72](https://github.com/mtb550/test-in/issues/72) counts 22 constants
-> across 6 dimensions. Measured against the product, **it is 26 across 7**. Two
-> corrections. First, "Removed" moved from the test project dimension to the
-> test case verdict dimension. A test project has no removed state, because
-> removing one deletes it. A test case deleted out from under a test run leaves
-> a row the test run still owns. Second, a **seventh dimension was missed
-> entirely**. A test case carries its own status, separate from any verdict. It
-> is section 5.7, and it is the one worth reading.
+> ❗ Issue [#72](https://github.com/mtb550/test-in/issues/72) counts 22 values
+> across 6 kinds of status. Measured against the product, **it is 26 across
+> 7**. Two corrections. First, "Removed" moved. It used to sit with a test
+> project's status, and it belongs with the verdict a test case gets. A test
+> project has no removed state, because removing one deletes it. A test case
+> deleted out from under a test run leaves a row the test run still owns.
+> Second, a **seventh kind of status was missed entirely**. A test case carries
+> its own status, separate from any verdict. It is section 5.7, and it is the
+> one worth reading.
 
-### 5.1 Test case verdict, within one run — 6 constants
+### 5.1 The verdict a test case gets in one test run — six values
 
 | Verdict | Meaning | Who sets it | Key |
 |---|---|---|---|
-| **Pending** | Queued: this run holds the case and has not reached it | The run, when it is created | — |
-| **Passed** | The case behaved as expected | Tester | `P` |
-| **Failed** | The case did not; failure detail is collected in the same gesture | Tester | `F` |
+| **Pending** | Waiting. This test run holds the test case and has not reached it | The test run, when it is created | — |
+| **Passed** | The test case behaved as expected | Tester | `P` |
+| **Failed** | It did not. The failure detail is collected in the same gesture | Tester | `F` |
 | **Blocked** | The test case could not be judged. Something outside it prevented the test | Tester | `B` |
-| **Untested** | The run ended without ever reaching this case | The run, on completion or closure | — |
-| **Removed** | The test case itself has been deleted; the row is history | The run, when it notices | — |
+| **Untested** | The test run ended without ever reaching this test case | The test run, when it ends | — |
+| **Removed** | The test case itself has been deleted. The row is history now | The test run, when it notices | — |
 
 **Three verdicts are a tester's to give, and exactly those three carry a key.**
 The other three are the test run's record of its own state. They have no key on
@@ -220,13 +222,13 @@ stateDiagram-v2
     Failed --> Removed: test case deleted
 ```
 
-### 5.2 Test run lifecycle — 5 constants
+### 5.2 Where a test run has got to — five values
 
-| Status | Meaning | Key | Terminal |
+| Status | Meaning | Key | Signed off |
 |---|---|---|---|
-| **Created** | Configured, never started | — | no |
-| **In Progress** | At least one case has been executed | — | no |
-| **Assigned** | Handed to someone to execute | `1` | no |
+| **Created** | Set up, never started | — | no |
+| **In Progress** | At least one test case has been run | — | no |
+| **Assigned** | Handed to someone to run | `1` | no |
 | **Completed** | Finished and signed off | `2` | **yes** |
 | **Closed** | Ended without being finished | `3` | **yes** |
 
@@ -234,9 +236,8 @@ Created and In Progress carry no key, because the product sets them itself. A
 test run is Created when it is made. It moves to In Progress the moment
 anything in it is executed, however it was started.
 
-**A terminal test run records nothing further.** Its verdicts are history.
-Execution cannot be started on it, and any result arriving from elsewhere is
-refused.
+**A signed-off test run records nothing further.** Its verdicts are history.
+It cannot be started, and any result arriving from anywhere else is refused.
 
 ```mermaid
 stateDiagram-v2
@@ -256,38 +257,38 @@ stateDiagram-v2
 
 > **⚠️ Undecided. See section 9.** The diagram shows what the product *allows*.
 > It currently allows every move, including Completed back to In Progress.
-> **Nothing enforces the run lifecycle at all.** Whether a terminal run may be
-> reopened is question **Q-01**.
+> **Nothing stops a test run moving anywhere at all.** Whether a signed-off test
+> run may be reopened is question **Q-01**.
 
-### 5.3 Live execution state — 4 constants
+### 5.3 What a card shows while tests are running — four values
 
-This dimension is not persisted. It is what a card shows while tests are
-actually running: *idle*, *running*, *passed*, *failed*. It lives only as long
-as the IDE session. The test run's own record is the durable one.
+These four are never saved to disk. They are what a card shows while tests are
+actually running: *idle*, *running*, *passed*, *failed*. They last only as long
+as the IDE is open. The test run's own record is the one that is kept.
 
-### 5.4 Test project — 3 constants
+### 5.4 A test project's status — three values
 
 **Active**, **Inactive**, **Archived**. There is no removed state, because removing
 a test project deletes it.
 
-### 5.5 Test set — 2 constants
+### 5.5 A test set's status — two values
 
 **Active** and **Deprecated**. Deprecated is not deleted. See **BR-12**.
 
-### 5.6 Package — 2 constants
+### 5.6 A package's status — two values
 
 **Active** and **Archived**. Shared by test set packages and test run packages,
 because it means the same thing in both. See **BR-13**.
 
-### 5.7 A test case's own status — 4 constants
+### 5.7 A test case's own status — four values
 
-Separate from the verdict, and easy to confuse with it. A **verdict** says what
-happened to the case in one run. **This** says what the team thinks of the case
-itself, across every run it is ever in.
+This is separate from the verdict, and easy to confuse with it. A **verdict**
+says what happened to the test case in one test run. **This** says what the
+team thinks of the test case itself, across every test run it is ever in.
 
 | Status | What it means |
 |---|---|
-| **Pending** | The default. Authored, and nobody has said whether it is any good |
+| **Pending** | The default. Written, and nobody has said whether it is any good |
 | **Reviewed** | Someone has checked the case is correct |
 | **Disabled** | The case exists but is not to be used |
 | **To Be Updated** | The case is known to be out of date |
@@ -348,7 +349,7 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 > standalone always-on-top window showing one case at a time, so a tester can work
 > with the IDE minimized and still record a verdict. The keys are `P`, `F` and
 > `B`, with `Ctrl+D` for the rest of the test case and `Escape` to close. It is
-> the purest expression of section 2's premise, and it is not described here.
+> the clearest example of section 2's idea, and it is not described here.
 > See
 > [the design document](../design/light-mode.md).
 
@@ -367,8 +368,8 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 
 > **❗ Not moved yet.** This was a Notion database. It held one row per
 > capability a tester triggers, numbered `UC-nn`. Each row was in the usual form
-> (actor, precondition, main flow, alternatives, postcondition), and each named
-> the key that starts it.
+> (who does it, what must be true first, the main flow, the alternatives, and
+> what is true afterward). Each one named the key that starts it.
 >
 > **Mouse needed** is the column to scan. Anything in the execution flow that is
 > not **No** is a breach of **BR-40**, not a detail.
@@ -505,7 +506,7 @@ Listed rather than guessed. Each is a real question the product has not answered
 | **Pending** | This run holds the case and has not reached it yet |
 | **Untested** | The run ended without ever reaching the case |
 | **Removed** | The test case has been deleted; the run keeps what it recorded |
-| **Terminal** | Completed or Closed. A terminal run records nothing further |
+| **Signed off** | Completed or Closed. A signed-off test run records nothing further |
 | **Deprecated** | A test set kept for its history but no longer offered for new runs |
 | **Archived** | A package kept but moved out of the way |
 | **Automation** | The generated test method that executes a case without a person |
@@ -519,4 +520,4 @@ Listed rather than guessed. Each is a real question the product has not answered
 
 ---
 
-[Documentation](../README.md) › [Business requirements](business-requirements.md) › **The product** — each module's own promises: [Project panel](project-panel.md)
+[Documentation](../README.md) › [Business requirements](business-requirements.md) › **The product** — each part's own promises: [The project panel](project-panel.md)

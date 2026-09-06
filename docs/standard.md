@@ -2,7 +2,7 @@
 
 # How a document is written
 
-Every module of Testin gets three documents. Each one answers a different
+Every part of Testin gets three documents. Each one answers a different
 question. This page says which question, what goes in each document, and the
 form it takes. So the same fact is written once, in the one place a reader
 would look for it.
@@ -53,45 +53,49 @@ mode document is the pattern.
 
 ---
 
-## Identifiers
+## How things are numbered
 
-Everything a reader might cite has a number. **Cite the number, never the
-sentence.** A number survives the text being reworded.
+Everything a reader might point at has a number. **Point at the number, never
+the sentence.** A number survives the text being reworded.
 
-| Id | Is | Lives in | Example |
-|---|---|---|---|
-| `UC-PP-01` | A **use case**. One thing a tester does | Business requirements *and* system requirements, **same id in both**. The story is in one. The scenarios are in the other. The shared id links them | *Create a test project* |
-| `BR-PP-01` | A **business rule**. Something that must always hold | Business requirements | *Test Cases and Test Runs are fixed containers* |
-| `SR-PP-01` | A **scenario**. One Given / When / Then | System requirements | *Create from the tree* |
-| `Q-PP-01` | An **open question**. Genuinely undecided, so listed instead of guessed | Business requirements | |
+Four things are numbered:
 
-The middle letters name the module:
+| Number | What it is | Which document it lives in |
+|---|---|---|
+| `UC-PP-01` | A **use case**. One thing a tester does, such as creating a test project | Both the business requirements and the system requirements, under the same number. The story is in one. The steps are in the other. The number is what joins them |
+| `BR-PP-01` | A **rule**. Something that must always be true | The business requirements |
+| `SR-PP-01` | A **scenario**. One Given, When, Then | The system requirements |
+| `Q-PP-01` | A **question** nobody has answered yet, listed instead of guessed | The business requirements |
 
-| Code | Module |
+The two letters in the middle say which part of Testin the number belongs to.
+They keep a rule about the tree from being confused with a rule about the
+editor:
+
+| Letters | Part of Testin |
 |---|---|
-| `PP` | Project panel, the tree |
-| `TE` | Test case editor |
-| `RE` | Test run editor, including light mode |
-| `VP` | View panel |
-| `ST` | Settings |
-| `EX` | Evidence and exchange: reports, export, import, sync |
+| `PP` | The project panel, the tree on the left |
+| `TE` | The test case editor |
+| `RE` | The test run editor, including light mode |
+| `VP` | The view panel |
+| `ST` | The settings page |
+| `EX` | Reports, export, import and sync |
 
-A rule that holds for the whole product carries no module code: `BR-11`. Those
-rules live in [the product's own document](business-requirements/product.md).
+**Every document spells out its own two letters at the top**, so a reader never
+has to come here to work out what they mean.
 
-**The chain, read downward:**
+A rule that holds everywhere, not in one part of Testin, has no letters at all:
+`BR-11`. Those rules live in
+[the product's own document](business-requirements/product.md).
 
-```
-UC-PP-01   the use case          named once, in both specifications
-  │
-  ├── BR-PP-nn   what must hold          business-requirements/project-panel.md
-  ├── SR-PP-nn   what happens, and when  system-requirements/project-panel.md
-  └── a screen   what the tester sees    design/project-panel.md
-```
+**One use case, read from the top down.** Take `UC-PP-01`. Its story and its
+rules are in the business requirements. Its steps, and every key it answers to,
+are in the system requirements under the same number. Its screen is drawn in the
+design.
 
-A design cites `UC` and `BR`. It creates neither. A scenario cites the `BR` it
-exercises. If a scenario needs a rule nobody has written, the rule is written
-first, in the business requirements. Then the scenario cites it.
+A design points at a use case and a rule. It invents neither. A scenario names
+the rule it puts to work. If a scenario needs a rule nobody has written, the
+rule is written first, in the business requirements. Then the scenario names
+it.
 
 ---
 
@@ -158,7 +162,7 @@ These documents are for testers. Every sentence is checked against that reader.
   sentences. The one exception is the user story, which is one sentence in
   three fixed parts however long it runs.
 - **No dashes and no semicolons in a sentence.** A dash joins two ideas. Split
-  them. A dash may only separate an identifier from its text: *BR-PP-08 — …*
+  them. A dash may only separate a number from the text after it: *BR-PP-08 — …*
 - **A list, not a sentence with parts.** Three or more things go in a list when
   each one needs more than a word or two. Steps go in a numbered list. A short
   series stays in the sentence: *create, name, group, order, retire and
@@ -205,9 +209,10 @@ These documents are for testers. Every sentence is checked against that reader.
 
 | | |
 |---|---|
-| **Area** | Which of the three specifications, linked |
-| **Module** | Which module code |
-| **Read with** | The same module in the other two specifications, linked |
+| **Area** | Which of the three documents this is, linked |
+| **Part of Testin** | Which part this document covers |
+| **Numbering** | The two letters this document's numbers carry, and what they stand for |
+| **Read with** | The same part of Testin in the other two documents, linked |
 | **Answers** | One sentence |
 | **State** | Written, Draft or Not written, with the issue |
 | **Checked against** | The commit on `main`, and the date |
@@ -229,7 +234,7 @@ A reader is never more than one click from an index.
 - **The line above every title is a breadcrumb.** Each step is a link:
   *Documentation › Business requirements › Project panel*.
 - **The last line of every document is the same breadcrumb, plus its twins.**
-  The twins are the same module in the other two specifications.
+  The twins are the same part of Testin in the other two documents.
 
 ---
 

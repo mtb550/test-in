@@ -8,7 +8,8 @@ set and test run. Everything in Testin starts here.
 | | |
 |---|---|
 | **Area** | [Business requirements](business-requirements.md) |
-| **Module** | `PP` — Project panel |
+| **Part of Testin** | The project panel, the tree on the left |
+| **Numbering** | Its rules are numbered `BR-PP-01` and up, and its use cases `UC-PP-01` and up. The `PP` is short for the project panel, so a number from this document can never be confused with one from another |
 | **Answers** | What the panel is for, what a tester can do in it, and the rules that always hold |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule read from the code that enforces it |
@@ -398,14 +399,15 @@ at a glance.
 
 ## Also on this menu
 
-Six items on the tree's menu belong to another module. They are documented there:
+Six items on the tree's menu belong to another part of Testin. They are
+documented there:
 
-| Item | Module |
+| Item | Belongs to |
 |---|---|
-| **Export**, **Import** | `EX` — evidence and exchange |
-| **Generate Report** | `EX` |
-| **Sync With Remote**, **View Pending Commits** | `EX` — Git |
-| **Sync With SFTP** | `EX` — SFTP |
+| **Export**, **Import** | Reports, export, import and sync |
+| **Generate Report** | The same |
+| **Sync With Remote**, **View Pending Commits** | The same, the Git half |
+| **Sync With SFTP** | The same, the SFTP half |
 
 ---
 

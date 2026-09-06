@@ -14,7 +14,7 @@ Each screen is drawn. Its parts are numbered.
 | | |
 |---|---|
 | **Area** | [Design](design.md) |
-| **Module** | `PP` — Project panel |
+| **Part of Testin** | The project panel, the tree on the left |
 | **Answers** | Where every part of the panel sits, what it looks like, and why it is shaped that way |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every label and layout read from the code that draws it |
@@ -185,7 +185,7 @@ which optional plugins are installed.
    Status entries appear only for the kind selected. The three rows shown are a
    test project's.
 3. **Run Tests** — only when the automation plugin is present.
-4. **Export**, **Import** — module `EX`.
+4. **Export**, **Import** — these belong to reports, export, import and sync.
 5. **Sync With Remote**, **View Pending Commits** — only when the Git plugin is
    present. Otherwise the whole section is absent, separator included.
 6. **Sync With SFTP** — always present. Grayed unless the test project is
@@ -522,7 +522,7 @@ named for the verb. Nothing in the tree changes until the tester presses
 ### The menu is short at the top and deep in Actions
 
 The top level holds what is done often: open and create. It also holds what
-belongs to other modules. Everything that changes a node in place is one level
+belongs to other parts of Testin. Everything that changes a node in place is one level
 down, under **Actions**. So the first thing the tester sees is short. The
 dangerous things take a deliberate second step.
 

@@ -9,7 +9,7 @@ with IntelliJ minimized, and still record a verdict without switching windows.
 | | |
 |---|---|
 | **Area** | [Design](design.md) |
-| **Module** | `RE` — Test run editor. Light mode is one of its windows |
+| **Part of Testin** | The test run editor. Light mode is one of its windows |
 | **Read with** | Nothing yet. The test run editor's business and system requirements are not written — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Answers** | Why this window is shaped the way it is, and what every part of it does |
 | **State** | **Written.** Built and shipped — [#13](https://github.com/mtb550/test-in/issues/13), closed |
@@ -142,12 +142,12 @@ Numbered left to right along the title bar, then down the window.
 
 It is on by default, because that is the point of the window.
 
-This design drew one glyph that fills in. It was an outline when the window may
+This design drew one icon that fills in. It was an outline when the window may
 fall behind other applications, and solid when it stays on top. The build draws
-the platform's own pressed toolbar toggle instead. It is
-`AllIcons.General.Pin_tab`, unchanged, on a rounded pill of
+the IDE's own pressed toolbar button instead. It is `AllIcons.General.Pin_tab`,
+unchanged, on a rounded gray patch, the IDE's own
 `ActionButton.pressedBackground()`. The idea is the same. The shape is the
-platform's rather than ours. That is why it is not two glyphs that swap.
+IDE's, rather than ours. That is why it is not two icons that swap.
 
 The window is a real top-level frame, not a tool window. So it survives IntelliJ
 being minimized.
@@ -156,16 +156,16 @@ being minimized.
 
 One control that swaps. It draws the run editor's toolbar icons rather than
 pictures of its own. They are `Toolbar.START_MANUAL_EXECUTION_ICON` and
-`Toolbar.STOP_EXECUTION_ICON`. They are read from the same two constants
-`StopExecutionBtn` reads, so the two surfaces cannot drift. A tester who presses
+`Toolbar.STOP_EXECUTION_ICON`. The run editor's own Stop button reads the same
+two, so the toolbar and this window can never drift apart. A tester who presses
 Start in the toolbar and Stop in this window is pressing the same two buttons.
 They should be looking at them.
 
-It had drawn `AllIcons.Actions.Execute`. The javadoc on the toolbar's own
-constant records that as the icon the toolbar had already moved away from. It is
-the platform's run-*code* arrow, and manual execution runs no code. Stop is a
-pause glyph rather than a square, because that is what `Debugger.ThreadFrozen`
-draws.
+It had drawn `AllIcons.Actions.Execute`. A comment beside the toolbar's own icon
+records that as the one the toolbar had already moved away from. It is the
+IDE's arrow for running *code*, and a tester running a test case by hand runs
+no code. Stop is a pause symbol rather than a square, because that is what the
+icon `Debugger.ThreadFrozen` draws.
 
 ### 3. Details selection
 
@@ -245,8 +245,8 @@ argument that kept the description off the list from the start.
 
 `Ctrl+D` shows the four remaining fields: steps, test data, pre-conditions and
 tags. `Ctrl+H` hides them. There is no button. A control that sits on screen
-permanently, to be pressed twice a session, is furniture. This window is built
-to have none.
+permanently, to be pressed twice a session, is clutter. This window is built to
+have none.
 
 **Two keys rather than one toggle.** A toggle key does whatever the current
 state is not. So the tester has to know what the window is showing before they
@@ -265,11 +265,11 @@ of the change, and this row pays it back. The row is not a new idea.
 `ui.framework.StatusBarShortcut` already puts exactly this on every dialog in
 the plugin. That is where the wording and the spacing come from.
 
-**It sits on the title bar's ground, not the body's.** The window has two tones,
-and they mean something. The working area is the pale one. That is the test
-case, the verdict buttons and the clocks. The frame around it is the gray one.
-That is the title bar and this row. So the verdict component and the status bar
-look like the two separate things they are, rather than one band divided by a
+**Its background is the title bar's, not the body's.** The window uses two
+shades, and they mean something. The working area is the pale one. That is the
+test case, the verdict buttons and the clocks. The frame around it is the gray
+one. That is the title bar and this row. So the verdict row and the status bar
+look like the two separate things they are, rather than one band split by a
 hairline.
 
 **It can be turned off in two places.** It is a checkbox in the view menu, so a
@@ -319,11 +319,12 @@ rather than a page in Settings.
 one and keeping the other would leave a lopsided row. It would also leave a
 toggle nobody would reach for twice.
 
-**The verdict buttons and the durations are one component, with two halves that
-switch.** Turn the buttons off, and the clocks stay where they are. Turn the
-durations off, and the buttons close up over them. Turn both off, and the
-component is gone, leaving the body sitting directly on the status bar. Nothing
-is left behind as an empty band, because the window's height is its content.
+**The verdict buttons and the clocks are one strip, with two halves that switch
+on and off.** Turn the buttons off, and the clocks stay where they are. Turn
+the clocks off, and the buttons close up over them. Turn both off, and the
+whole strip is gone, leaving the body sitting directly on the status bar.
+Nothing is left behind as an empty band, because the window's height is its
+content.
 
 **Hiding the verdict buttons costs nothing, because the status bar still names
 the keys.** That is what makes the smallest window usable, rather than merely
@@ -401,10 +402,10 @@ waiting to be filled in.
 
 **The form zooms with it.** The wheel exists so the window can be read from
 where the tester is sitting. A form they then had to lean in to type into would
-have moved the problem, not solved it. The fields are framework components with
-fonts of their own. So the size each part was built at is taken once, and every
-zoom multiplies that size. Measured from what is on screen instead, a second
-wheel click would compound the first.
+have moved the problem, not solved it. The fields are shared parts with fonts
+of their own. So the size each one was built at is read once, and every zoom
+multiplies that size. Measured from what is on screen instead, a second wheel
+click would multiply the first all over again.
 
 ### B. The same four fields the IDE asks for
 
@@ -413,18 +414,18 @@ the error capture. They are exactly what `FailedResultDialog` collects today,
 with the same defaults and the same wording. A failure recorded here and one
 recorded in the run editor are the same record. They are not two shapes of one.
 
-### C. Inside the window, in a component it already has
+### C. Inside the window, in a box it already has
 
-There is no second dialog. `Ctrl+D` fills the details component with steps, test
-data, pre-conditions and tags. While a failure is being written, that same
-component holds these four fields instead. Nothing is added to the window, and
-nothing is taken away. One component swaps what it is showing, and so does the
-verdict component below it.
+There is no second dialog. `Ctrl+D` fills the details box with steps, test data,
+pre-conditions and tags. While a failure is being written, that same box holds
+these four fields instead. Nothing is added to the window, and nothing is taken
+away. One box swaps what it is showing, and so does the verdict strip below it.
 
-That is also the decision the `F` key forces. `FailedResultDialog` is modal, and
-owned by the IDE frame. Opening it would raise IntelliJ. That would put the
-tester back where this window exists to keep them from. The feature would defeat
-itself on its most common verdict.
+That is also the decision the `F` key forces. The run editor's own failure
+dialog, `FailedResultDialog`, belongs to the IDE window and blocks it until it
+is closed. Opening it would bring IntelliJ to the front. That would put the
+tester back where this window exists to keep them from. The feature would
+defeat itself on its most common verdict.
 
 ### D. Radio buttons, from the framework
 
@@ -433,8 +434,8 @@ captions would not fit in 400px. The build uses `RadioSelection` unchanged. The
 fields are declared once in `FailureFields`, and shared with the run editor's
 own dialog. A second look for the same four fields is the divergence that rule
 exists to prevent. The row does fit. The choices still come from
-`BugSeverity.CHOICES` and `BugPriority.CHOICES`. So a constant added to either
-one appears here on its own.
+`BugSeverity.CHOICES` and `BugPriority.CHOICES`. So a new choice added to
+either one appears here on its own.
 
 ### E. Ctrl+V belongs here and nowhere else
 
@@ -501,10 +502,10 @@ tester's own. It is remembered per machine, alongside the position, the width
 and the four view toggles. It used to reset to 1× on every open, which meant
 setting it again every time.
 
-The sizes are read as methods, not frozen into constants. The plugin already had
-the reason written down beside `TestStatus`'s lazy colors. The editor font is a
-setting that changes while the IDE runs. A constant freezes whichever size was
-in force when the class was first loaded.
+The sizes are asked for each time, not fixed once. The plugin already had the
+reason written down beside the colors in `TestStatus`. The editor font is a
+setting, and a tester can change it while the IDE is running. A fixed size
+would freeze whichever size was in force when the window's code first loaded.
 
 **Everything in the body is that number, plus or minus a little.**
 
@@ -520,10 +521,10 @@ they were not.
 
 **No modifier, in the end.** This design argued for `Ctrl` and the wheel, on
 convention. That is what the IDE means by zoom, and what every other Testin
-surface listens for. The build went the other way, for three reasons. The window
+screen listens for. The build went the other way, for three reasons. The window
 has nothing else a wheel could mean. Its height is fixed to its content, so
 there is nothing to scroll. A scroll pane inside it takes the event first
-anyway, because an event goes to the deepest component that handles it. So this
+anyway, because a scroll goes to the innermost thing that handles it. So this
 is the one window in the plugin where zoom needs no modifier.
 
 ---
@@ -550,7 +551,7 @@ is the one window in the plugin where zoom needs no modifier.
 | **Last test case judged** | The test run completes itself. `RunEditor.finishIfEverythingIsJudged` applies Completed the moment nothing is left pending. So this is not something the window decides. The window is gone by then, so there is no bar left to announce it. |
 | **Wrong verdict recorded** | Press Light Mode to return to the editor. Correct the test case there. Press it again to carry on. The window advances only forward. The grid is where a test run is edited. |
 | **Test run reaches Completed or Closed** | The window closes, and the Light Mode button goes gray. Both ask the same question Start already asks. So a signed-off test run cannot be reopened in light mode, and cannot be started. |
-| **Project or IDE closes** | The window is disposed with the project. No leaked frames, no leaked listeners. |
+| **Project or IDE closes** | The window closes with the project. Nothing is left running behind it. |
 | **A clock is read** | There are two formats across the whole plugin, not four. A test run total is `HH:MM:SS`, with the hours always in front. That is true here and in the run editor's own status bar, because a field that appears at 01:00:00 is a number that jumps. A test case duration is `MM:SS`, here, in the grid and in an exported sheet. Milliseconds are measured, stored and never drawn. So a fast automated test case reads `00:00` in the grid where it used to read `84ms`. The figure is still in the file. |
 | **A test case nobody timed** | Blank, in the grid and the sheet. A verdict that came from the context menu or a bulk apply was never timed, and `00:00` would claim a measurement nobody took. A test case in front of a tester at zero is the opposite. It has just been arrived at. So light mode's clock shows `00:00`, rather than blinking out for its first second. |
 
@@ -616,8 +617,8 @@ needs no confirmation.
 
 A test run that has judged every test case completes itself.
 `finishIfEverythingIsJudged` applies Completed as soon as nothing is pending.
-Completed is terminal, and three things already ask whether a test run is
-terminal:
+Completed is the end, and three things already ask whether a test run has
+reached it:
 
 - Start refuses
 - the Light Mode button grays out
@@ -625,7 +626,7 @@ terminal:
 
 One question, three answers. There is no fourth state to draw, and no "well
 done" screen to write. A window that outlived its test run would offer verdicts
-that nothing could accept.
+that nothing could take.
 
 ### The view menu chooses parts, not fields
 
@@ -650,7 +651,7 @@ tester who did not read the documentation would never have found them.
 
 **Note for whoever binds them:** `Ctrl+D` is already
 `Shortcuts.CreateTestCaseDescription` in the create-test-case dialog. It is a
-different window and a different component, so no handler competes. But the two
+different window and a different field, so the two never compete. But they
 now mean different things. The keyboard reference should say so, rather than
 leave a tester to discover it.
 
@@ -724,7 +725,7 @@ of those classes should know why they are shaped the way they are.
 | Every status method on `RunStatusService` took a `RunEditor` and a `JBList`. `applyStatus` opened by refusing anything that was not the editor. | A verdict path that takes a test run, a test case and a status. The editor is one caller of it, rather than its shape. |
 | A shortcut was drawn as a filled keycap, spelled out wherever one appeared. Whether the hint strip showed was each dialog's own business. | `ui.framework.Keycap` draws a key for all **28 files** that declare one. `StatusBarBase` answers "is this strip shown" once. So one setting reaches every Testin dialog, without one being touched. |
 | The five settings that turn a text area into a paragraph a tester reads were written out five times. They were in the card, the details rows, the steps, the title and here. | `ui.framework.Prose` owns them. Gathering the five found a tab stop on three paragraphs nobody can type into. Tab landed on them and nothing happened. It was fixed everywhere at once. |
-| The two grays a list alternates between were constants in the grid. The same two colors were written inline again in the card. | `ui.framework.RowStripe` owns them. The failure form's two fields borrow its odd row, rather than introducing a fifth gray. That is why they read as wells, on a window painted as frame decoration. |
+| The two grays a list alternates between were written once in the grid, and written again in the card. | `ui.framework.RowStripe` owns them. The failure form's two fields borrow its odd row, rather than introducing a fifth gray. That is why they read as wells, on a window painted as frame decoration. |
 | Four duration formats: milliseconds under a second, a millisecond tail above it, `hh:mm:ss` for a run and the same for a case. | Two formats. A test run total is `HH:MM:SS`, with the hours always in front. A test case is `MM:SS`. Milliseconds are still measured and stored, and never drawn. |
 | Nothing in the plugin had ever opened a top-level window. There was no `JFrame`, and no `setAlwaysOnTop`. | One disposal pattern, written once. It is owned by the project and closed with it. It is correct on multi-monitor and high-DPI. |
 | Every zoom in the plugin was the IDE's editor font size. `FontSync.attachWheelZoom` ends in `applyGlobally`, which puts a size on the global scheme and on every open editor. | A font scale this window owns, so the wheel here changes nothing outside it. |
@@ -738,7 +739,7 @@ of those classes should know why they are shaped the way they are.
 |---|---|
 | The failure form's status bar offered `Ctrl+V` Paste evidence | Not shown. The error capture's own placeholder already says it. `Ctrl+V` still works, because it is the text area's own paste. |
 | Chips for severity and priority | Real radio buttons, from `RadioSelection`, shared with the run editor's dialog. |
-| A pin glyph that fills in | The platform's pressed toolbar toggle. |
+| A pin icon that fills in | The IDE's own pressed toolbar button. |
 | `Ctrl` and the wheel | The wheel alone. |
 | The counter counts every test case in the test run | It counts the editor's filtered view, which is the same list the grid walks. |
 | The title bar had a close button | Removed. Three routes out already exist, and every one is announced. |

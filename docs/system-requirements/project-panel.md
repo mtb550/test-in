@@ -8,7 +8,8 @@ answers to is named here, once, in the step that presses it.
 | | |
 |---|---|
 | **Area** | [System requirements](system-requirements.md) |
-| **Module** | `PP` — Project panel |
+| **Part of Testin** | The project panel, the tree on the left |
+| **Numbering** | Its scenarios are numbered `SR-PP-01` and up. The `PP` is short for the project panel, so a number from this document can never be confused with one from another |
 | **Answers** | Exactly what happens, and what the tester sees, for every gesture in the tree |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every key, label and message read from the code that shows it |
@@ -407,7 +408,7 @@ to earn a key. `F2` renames in the editors, not here.
 
 **SR-PP-46 · Drag and drop** — BR-PP-40, BR-PP-43
 > **Given** the tester drags one or more nodes
-> **Then** a small pill follows the pointer, reading *'\<name\>'* or *N items*
+> **Then** a small rounded label follows the pointer, reading *'\<name\>'* or *N items*
 > **And** over a row where nothing being dragged can land, the pointer shows no-drop, and no row highlights
 > **When** the tester releases on a folder that can hold them
 > **Then** the **Move** dialog asks the same question as [SR-PP-42](#uc-pp-09--move-or-copy-nodes), and `Enter` moves them
@@ -694,10 +695,10 @@ to earn a key. `F2` renames in the editors, not here.
 
 ## Also on this menu
 
-Six items on the tree's menu belong to module `EX`, evidence and exchange.
-Their scenarios live there. They are **Export**, **Import**, **Generate Report**
-(`Ctrl+P`), **Sync With Remote**, **View Pending Commits** and
-**Sync With SFTP**.
+Six items on the tree's menu belong to another part of Testin: reports, export,
+import and sync. Their scenarios live there. They are **Export**, **Import**,
+**Generate Report** (`Ctrl+P`), **Sync With Remote**, **View Pending Commits**
+and **Sync With SFTP**.
 
 ---
 

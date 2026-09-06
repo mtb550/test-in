@@ -41,7 +41,7 @@ The two are easy to confuse. A document that blurs them says everything twice.
 |---|---|---|
 | **Asks** | What does Testin promise, and to whom | What must the software do to keep that promise |
 | **Voice** | A tester or a lead reads it | Someone deciding whether a build is correct reads it |
-| **Example rule** | *A tester may record exactly three verdicts* | *The verdict control accepts P, F and B, and no other key records a verdict on any surface* |
+| **Example rule** | *A tester may record exactly three verdicts* | *Only `P`, `F` and `B` record a verdict, and they do it on every screen that offers one* |
 | **Verifiable by** | Asking whether the product behaves that way | A test that passes or fails |
 | **What it numbers** | Rules, use cases and open questions | Scenarios |
 
@@ -54,8 +54,7 @@ needs. Both are worth finding before the code is written.
 ## What the product's document will hold
 
 These sections are planned, in the order they are worth writing. Each one is
-empty until it is written. A heading with nothing under it is not a
-specification.
+empty until it is written. A heading with nothing under it says nothing.
 
 | Section | What it will state |
 |---|---|

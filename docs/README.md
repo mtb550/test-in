@@ -52,7 +52,7 @@ You installed the plugin and want to use it well.
 
 | Document | What it answers | Where it stands |
 |---|---|---|
-| **Keyboard reference** | Every key Testin answers to, on every surface | Not written — [#73](https://github.com/mtb550/test-in/issues/73) |
+| **Keyboard reference** | Every key Testin answers to, on every screen | Not written — [#73](https://github.com/mtb550/test-in/issues/73) |
 | **First run** | From installing the plugin to a first verdict, in ten minutes | Not written — [#104](https://github.com/mtb550/test-in/issues/104) |
 
 ## For contributors

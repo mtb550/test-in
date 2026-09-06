@@ -7,7 +7,7 @@ choice on it was made.
 
 | | |
 |---|---|
-| **Answers** | Why this surface is shaped the way it is, and what every part of it does |
+| **Answers** | Why this screen is shaped the way it is, and what every part of it does |
 | **For** | Anyone changing a screen, and anyone deciding whether a change is allowed |
 | **Owns** | Nothing of its own. A design document points at the rules and use cases. It never invents one |
 | **Written to** | [How a document is written](../standard.md). One numbered sketch per screen |
