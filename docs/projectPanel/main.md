@@ -66,7 +66,7 @@ docked on the right.
 │                  │                                 │                       │
 │  v Demo          │                                 │                       │
 │    v Test Cases  │                                 │                       │
-│      v Accounts  │       The editor panel          │                       │
+│      v Accounts  │         Editor panel            │                       │
 │          Login   │                                 │                       │
 │        Checkout  │                                 │                       │
 │    v Test Runs   │                                 │                       │
@@ -78,7 +78,7 @@ docked on the right.
 ```
 
 1. **The project panel** — the tree. Everything on this page is about it.
-2. **The editor panel** — where a test set or a test run opens when the tester
+2. **Editor panel** — where a test set or a test run opens when the tester
    opens one from the tree. One tab each. The project panel itself never shows a
    test case.
 3. **The view panel** — details, history and open bugs for the test case the
