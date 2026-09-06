@@ -13,17 +13,16 @@ It says what Testin is and how to install it.
 
 ## The documents
 
-Testin has six parts. Each part gets one document, and that document holds
-everything about it: what the part is for, what a tester can do in it, the rules
-that always hold, exactly what happens step by step, every key it answers to,
-and every screen drawn.
+Testin has six parts. Each part gets a folder, and every thing a tester does in
+it gets a page of its own: the story, its rules, its screens, what happens step
+by step, and every way it can be refused.
 
 | Document | What it covers | Where it stands |
 |---|---|---|
-| **[The product](system-requirements/product.md)** | What is true of all six parts: who uses Testin, what they work with, every status, and the rules that hold everywhere | A draft, moved from Notion, not re-checked against today's plugin — [#72](https://github.com/mtb550/test-in/issues/72) |
-| **[The project panel](system-requirements/project-panel.md)** | The tree on the left. 20 use cases, 76 rules, 75 scenarios, 13 screens | **Written** |
+| **[The product](product.md)** | What is true of all six parts: who uses Testin, what they work with, every status, and the rules that hold everywhere | A draft, moved from Notion, not re-checked against today's plugin — [#72](https://github.com/mtb550/test-in/issues/72) |
+| **[The project panel](projectPanel/main.md)** | The tree on the left. 20 use cases, 76 rules, 14 screens | **Written** |
 | The test case editor | Writing and reading test cases: the grid, the card list and the details panel | Not written |
-| The test run editor | Running tests and recording verdicts. **[Light mode](system-requirements/light-mode.md)** is one of its windows, and is written | Not written, except light mode |
+| The test run editor | Running tests and recording verdicts. **[Light mode](lightMode.md)** is one of its windows, and is written | Not written, except light mode |
 | The view panel | Details, history and bugs of the selected test case | Not written |
 | The settings page | Everything set once per machine | Not written |
 | Reports, export, import and sync | Getting work in and out of Testin | Not written |

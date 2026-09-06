@@ -1,4 +1,4 @@
-[Documentation](../README.md) › The product
+[Documentation](README.md) › The product
 
 # The product — business requirements
 
@@ -8,12 +8,12 @@
 
 | | |
 |---|---|
-| **Part of Testin** | All of it. These rules hold everywhere. Each part also has a document of its own, listed on [the home page](../README.md) |
+| **Part of Testin** | All of it. These rules hold everywhere. Each part also has a document of its own, listed on [the home page](README.md) |
 | **Numbering** | These rules belong to no single part of Testin, so they are the one set that holds everywhere. Section 7 is missing its numbers, which is explained there |
 | **Answers** | Who uses Testin, what they work with, every status, the rules for the whole product, and what is undecided |
 | **State** | **Draft 1** — moved from Notion, not re-checked. Correcting it is [#72](https://github.com/mtb550/test-in/issues/72) |
 | **Checked against** | `main` at `0becc8b2`, 29 August 2026 |
-| **Written to** | Written before [the standard](../standard.md). It names keys and has no user stories. [#72](https://github.com/mtb550/test-in/issues/72) brings it in line |
+| **Written to** | Written before [the standard](standard.md). It names keys and has no user stories. [#72](https://github.com/mtb550/test-in/issues/72) brings it in line |
 
 Every rule in the main body was true of the product on that commit. Where a rule
 is genuinely undecided it is listed as undecided rather than invented.
@@ -23,7 +23,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 > ### ⚠️ The state of this draft
 >
 > Moved here from Notion on 6 September 2026. Its facts are unchanged. Only the
-> wording was made plain, to [the standard](../standard.md). **It has not been
+> wording was made plain, to [the standard](standard.md). **It has not been
 > re-checked against the product since it was written.** `main` has moved
 > **127 commits**: 208 files, 8,974 insertions, 2,100 deletions.
 >
@@ -34,7 +34,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 >   standalone always-on-top window, showing one test case at a time, with `P`,
 >   `F` and `B` on it.
 >   Section 6.2 is incomplete without it. See
->   [the light mode document](light-mode.md).
+>   [the light mode document](lightMode.md).
 > - **#74 is closed.** Section 8 names the grid view's missing keyboard path as a
 >   live gap tracked by it. That needs re-checking.
 > - **#68 is closed.** Question 2 still calls it open.
@@ -350,7 +350,7 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 > `B`, with `Ctrl+D` for the rest of the test case and `Escape` to close. It is
 > the clearest example of section 2's idea, and it is not described here.
 > See
-> [the light mode document](light-mode.md).
+> [the light mode document](lightMode.md).
 
 ### 6.3 Evidence and exchange
 
@@ -526,4 +526,4 @@ Listed rather than guessed. Each is a real question the product has not answered
 
 ---
 
-[Documentation](../README.md) › **The product** — the parts have documents of their own, starting with [the project panel](project-panel.md)
+[Documentation](README.md) › **The product** — the parts have documents of their own, starting with [the project panel](projectPanel/main.md)

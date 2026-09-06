@@ -2,57 +2,71 @@
 
 # How a document is written
 
-Testin has six parts, and each part gets one document. That document holds
-everything about the part. This page says what goes in it, in what order, and
-how it is written.
+Testin has six parts. Each part gets a folder, and each thing a tester does in
+it gets a page of its own. This page says how those pages are written.
 
 Read this before writing or changing any page under `docs/`.
 
 ---
 
-## One part, one document
+## One page per thing the tester does
 
-There used to be three documents per part: what it promises, what it does, and
-what it looks like. A reader had to hold all three open to answer one question.
-Now there is one, and it answers the question in the order the question comes
-up.
+A part of Testin is a folder. `main.md` is its front page, and every use case is
+a page beside it, named after what the tester does: `createTestProject.md`.
+
+**`main.md` holds what is true of the whole part:**
 
 | In this order | Holds |
 |---|---|
+| **The use cases** | A table linking every page, grouped the way the work groups |
 | **What the part is for** | Why it exists, in a few sentences |
 | **The words it uses** | Any word the rules lean on, explained before they use it |
-| **How to read this document** | What Given, When and Then mean, and what the marks in the drawings stand for |
+| **How to read these pages** | The shape of a use case page, and what the marks in the drawings stand for |
 | **The rules that hold everywhere** | Numbered rules that apply to the whole part |
-| **Every key, in one place** | One table: the key, what it does, and the scenario that owns it |
+| **Every key, in one place** | One table: the key, what it does, and the page that owns it |
 | **The screens that belong to no single use case** | The panel, or the window itself, drawn |
-| **One section per use case** | The story, its rules, its screens and its scenarios, together |
 | **Why it is built this way** | The decisions worth not re-arguing |
 | **Where the plugin breaks its own rules** | Numbered differences a tester can hit today |
 | **Not decided** | Numbered questions, listed instead of guessed |
 
-**One fact, one place.** A key is written once, in the scenario that presses it.
-A rule is written once and pointed at by number everywhere else. A screen is
-drawn once, in the use case that opens it, and pointed at from any other use
-case that shares it.
+**A use case page holds one thing the tester does:**
+
+| In this order | Holds |
+|---|---|
+| **The story** | One sentence: as a tester, I want, so that |
+| **Rules** | The numbered rules this use case needs, and a line pointing at the ones that hold everywhere |
+| **The screens** | Each one drawn, with its parts numbered |
+| **Main flow** | What happens, step by step, when nothing goes wrong |
+| **What Testin refuses** | Every way it can go wrong, and what the tester sees each time |
+
+**One fact, one place.** A key is written once, in the step that presses it. A
+rule is written once and pointed at by number everywhere else. A screen is drawn
+once, on the page that opens it, and pointed at from any other page that shares
+it.
 
 ---
 
 ## The three forms
 
-**A user story opens each use case**, because it forces the *who* and the *why*
-into one sentence and leaves no room for the *how*:
+**A user story opens each page**, because it forces the *who* and the *why* into
+one sentence and leaves no room for the *how*:
 
 > **As a** tester, **I want** to create a test project from the tree, **so that**
 > a new product under test has a place for its cases before any are written.
 
-**Given / When / Then for each scenario**, because it is the language testers
-already write tests in, because each scenario is something a person can check
-against a build, and because *"When the tester presses `Ctrl+M`"* puts the key
+**Numbered steps for the main flow**, because that is the order the tester does
+it in, and because a step that says *"The tester presses `Ctrl+M`"* puts the key
 where it is a fact, not a footnote:
 
-> **Given** a test project is selected in the tree
-> **When** the tester presses `Ctrl+M`
-> **Then** the create dialog opens, offering a test set package or a test set
+> 1. The tester selects **Test Cases** or a test set package.
+> 2. The tester presses `Ctrl+M`, or chooses **Create**.
+> 3. The **Create Test Node** dialog opens with two kinds to pick from.
+
+**An "If" line for each refusal**, because a tester meets a refusal by
+recognizing the situation, not by reading a numbered flow:
+
+> **If the name is empty** — the dialog stays open, the gray hint text turns red,
+> and the cursor stays in the box.
 
 **A numbered drawing for each screen**, because a screen is a picture, and a
 paragraph describing where the buttons are is worse than a drawing of them.
@@ -65,13 +79,12 @@ Everything a reader might point at is numbered. **Point at the number, never
 the sentence.** A number still means the same thing after the words are
 rewritten.
 
-Five things are numbered. Each one is written the way it is read:
+Four things are numbered. Each one is written the way it is read:
 
 | Written | What it is |
 |---|---|
-| **Use case 1** | One thing a tester does, such as creating a test project |
+| **UC-001** | One thing a tester does, such as creating a test project. It is the title of its own page |
 | **Rule 1** | Something that must always be true |
-| **Scenario 1** | One Given, When, Then |
 | **Question 1** | Something nobody has answered yet, listed instead of guessed |
 | **Difference 1** | A place where the plugin does not do what its own rules say |
 
@@ -80,47 +93,55 @@ rule 4, and so will the test case editor. Inside one document, "rule 4" is
 enough. Anywhere else, say which part it belongs to: *the project panel's rule
 4*. A bug report says *project panel, rule 4*.
 
-The one exception is [the product's own document](system-requirements/product.md).
+The one exception is [the product's own document](product.md).
 Its rules hold everywhere, so they belong to no part, and it says so at the top.
 
-A scenario names the rule it puts to work, on the line under its title: *Keeps
-rule 8*. If a scenario needs a rule nobody has written, the rule is written
-first.
+A use case page lists the rules it needs under **Rules**. If it needs a rule
+nobody has written, the rule is written first.
 
 ---
 
 ## The template
 
+`projectPanel/createTestProject.md` looks like this:
+
 ```markdown
-### Use case 1 · Create a test project
+[Documentation](../README.md) › [The project panel](main.md) › UC-002
+
+# UC-002: Create a test project
 
 **As a** tester, **I want** …, **so that** ….
 
-**Rules**
+## Rules
 
-- **Rule 1** — …
-- **Rule 2** — …
+- **Rule 16** — …
+- **Rule 17** — …
 
-#### The create dialog
+Rules 1 to 13 hold everywhere in the panel. They are on
+[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+
+## The create dialog
 
 (drawing, 76 columns wide, box characters)
 
 1. **The kind** — …
 2. **The name** — …
 
-**Scenario 1 · From the tree**
-> **Given** a test project is selected in the tree
-> **When** the tester presses `Ctrl+M`
-> **Then** the create dialog opens, offering a test set package or a test set
+## Main flow
 
-**Scenario 2 · A name is required**
-Keeps rule 2.
-> **Given** the create dialog is open with an empty name
-> **When** the tester presses `Enter`
-> **Then** the dialog stays open and the name field is marked
+1. The tester presses …
+2. Testin creates …
+
+## What Testin refuses
+
+**If the name is empty** — …
+
+---
+
+[Documentation](../README.md) › [The project panel](main.md)
 ```
 
-One scenario, one behavior. A refusal is its own scenario.
+One page, one thing the tester does. Every refusal is an **If** line.
 
 ---
 
@@ -184,11 +205,13 @@ These documents are for testers. Every sentence is checked against that reader.
 
 | | |
 |---|---|
-| **Part of Testin** | Which part this document covers |
+| **Part of Testin** | Which part this covers |
 | **Answers** | One sentence |
-| **Numbering** | Where this document's numbers start, and what they count |
+| **Numbering** | Where this part's numbers start, and what they count |
 | **State** | Written, Draft or Not written, with the issue |
 | **Checked against** | The commit on `main`, and the date |
+
+Only `main.md` carries the header. A use case page starts with its story.
 
 So a reader can tell three things before reading a word of it: what the page
 is, whether it is finished, and how far it might have drifted.
@@ -199,19 +222,20 @@ is, whether it is finished, and how far it might have drifted.
 
 A reader is never more than one click from the index.
 
-- **[The home page](README.md) is the only index.** It lists every document,
-  written or not, with the issue that will write it.
+- **[The home page](README.md) lists the parts.** Every part, written or not,
+  with the issue that will write it.
+- **Each part's `main.md` lists its use cases.** Every one, in a table at the
+  top.
 - **The line above every title is a breadcrumb.** Each step is a link:
-  *Documentation › System requirements › The project panel*.
-- **The last line of every document is the same breadcrumb.**
+  *Documentation › The project panel › UC-002*.
+- **The last line of every page is the same breadcrumb.**
 
 ---
 
 ## When behavior changes
 
-The document changes **in the same commit** as the code. A commit that changes
-what a key does, and does not change the scenario that names it, is
-incomplete. The review should say so. This is the whole reason the
+The page changes **in the same commit** as the code. A commit that changes what
+a key does, and does not change the step that names it, is incomplete. The review should say so. This is the whole reason the
 documentation lives in this repository, rather than beside it.
 
 ---

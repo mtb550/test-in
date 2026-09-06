@@ -1,4 +1,4 @@
-[Documentation](../README.md) › Light mode
+[Documentation](README.md) › Light mode
 
 # Light mode
 
@@ -713,4 +713,4 @@ use everywhere else, and the same blue the reports use.*
 
 ---
 
-[Documentation](../README.md) › **Light mode**
+[Documentation](README.md) › **Light mode**

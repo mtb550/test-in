@@ -96,15 +96,15 @@ full statement is in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 Read it on the web at **[mtb550.github.io/test-in](https://mtb550.github.io/test-in/)**,
 or in this repository under [`docs/`](docs/README.md).
 
-Testin has six parts, and each part gets one document. It holds everything
-about that part: what it is for, what a tester can do in it, the rules, exactly
-what happens step by step, every key, and every screen drawn.
+Testin has six parts. Each part gets a folder, and every thing a tester does in
+it gets a page of its own: the story, its rules, its screens, what happens step
+by step, and every way it can be refused.
 
 | Document | Covers | Where it stands |
 |---|---|---|
-| **[The product](docs/system-requirements/product.md)** | What is true of all six parts | A draft |
-| **[The project panel](docs/system-requirements/project-panel.md)** | The tree on the left | **Written** |
-| **[Light mode](docs/system-requirements/light-mode.md)** | The always-on-top window that shows one test case | **Written** |
+| **[The product](docs/product.md)** | What is true of all six parts | A draft |
+| **[The project panel](docs/projectPanel/main.md)** | The tree on the left | **Written** |
+| **[Light mode](docs/lightMode.md)** | The always-on-top window that shows one test case | **Written** |
 
 The rest — the other five parts, the keyboard reference, a first-run
 walkthrough, the formats on disk, the architecture — is listed on
