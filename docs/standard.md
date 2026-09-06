@@ -152,17 +152,40 @@ Used by UC-PP-01, UC-PP-04.
 
 These documents are for testers. Every sentence is checked against that reader.
 
-- **Short sentences, present tense.** *"The dialog opens."* Not *"The dialog will
+**Plain words, short sentences.**
+
+- **One idea per sentence.** About 15 words. A sentence with two ideas is two
+  sentences.
+- **No dashes and no semicolons in a sentence.** A dash joins two ideas. Split
+  them. A dash may only separate an identifier from its text: *BR-PP-08 — …*
+- **A list, not a sentence with parts.** Three or more things go in a list.
+  Steps go in a numbered list.
+- **Say the thing.** No metaphors, no figures of speech. *"The panel is the tree
+  on the left."* Not *"The panel is that tree, drawn where the IDE keeps every
+  other tree."*
+- **The same word for the same thing.** *Test set*, never *set*. *Test run*,
+  never *run* on its own. *Test case*, *test project*, *package*.
+- **Say who does what.** *"The tester presses `Enter`. The editor opens."* Not
+  *"Pressing `Enter` results in the editor being opened."*
+- **Present tense, active voice.** *"The dialog opens."* Not *"The dialog will
   be opened."*
+- **Explain a word the first time, then use it.** *"Retired means a Deprecated
+  test set or an Archived package."*
+- **A heading says what the section is, in plain words.** *What it is for*. Not
+  *Why it exists*.
+- **Numbers as digits.** *5 statuses*, not *five statuses*.
+
+**Exact words for exact things.**
+
 - **"The tester", never "the user".** It is who the product is for.
 - **A key is written as the plugin shows it**, in backticks: `Ctrl+M`, `F2`,
   `Shift+F6`, `Delete`, `Enter`. Not "control-M", not "the F2 key".
 - **A menu label is written exactly**, in bold: **Create**, **Rename**, **Remove**.
   If the label changes, the document changes in the same commit.
-- **A notification is quoted exactly**: the tester sees *Removed 4*, so the
-  scenario says *Removed 4*.
+- **A notification is quoted exactly**, in italics: the tester sees *Removed 4*,
+  so the scenario says *Removed 4*.
 - **No class names** in the business or system requirements. A tester does not
-  need them and they date the document the first time the code is refactored.
+  need them, and they date the document the first time the code is refactored.
 - **What is refused is stated as plainly as what is allowed.** *"The two fixed
   containers cannot be removed. The menu does not offer it."*
 - **One idea per scenario.** If a **Then** has two unrelated outcomes, it is two
