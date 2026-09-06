@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.config.TestinConfigService;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
@@ -24,20 +24,20 @@ public class RefreshAction extends AbstractProjectAction {
      */
     private static final @NotNull String REFRESHED = "Refreshed";
 
-    private final @NotNull ExplorerPanel pp;
+    private final @NotNull TreePanel tp;
 
     /**
      * Stops a second re-index starting through one already running.
      * <p>
      * It only works because there is one of these per project, held on
-     * {@link ExplorerPanel}. Constructing one to call {@code execute} gives it a
+     * {@link TreePanel}. Constructing one to call {@code execute} gives it a
      * guard nobody else can see, which is what this used to be.
      */
     private final @NotNull AtomicBoolean refreshGuard = new AtomicBoolean(false);
 
-    public RefreshAction(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
+    public RefreshAction(final @NotNull Project p, final @NotNull TreePanel tp) {
         super(p, "Refresh", "Re-index and reload tree", AllIcons.Actions.Refresh);
-        this.pp = pp;
+        this.tp = tp;
     }
 
     public void execute() {
@@ -90,7 +90,7 @@ public class RefreshAction extends AbstractProjectAction {
                 // re-index either can be data that is gone.
                 Services.getInstance(p, EditorUtil.class).refreshOpen(p);
 
-                pp.refresh();
+                tp.refresh();
 
                 refreshGuard.set(false);
                 Logger.info("Refresh: tree rebuilt");

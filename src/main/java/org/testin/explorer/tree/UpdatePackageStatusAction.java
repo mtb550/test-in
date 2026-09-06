@@ -9,7 +9,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.PackageStatus;
@@ -59,7 +59,7 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
             marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
             Services.getInstance(p, ProjectIndexer.class).persistMarker(dir);
 
-            Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
+            Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
 
             // The status names itself: "Archived", "Active" (#62).
             Services.getInstance(p, Notifier.class).softShow(p, status.getLabel());

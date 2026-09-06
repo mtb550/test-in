@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.creator.dialogs.CreateRunDialog;
 import org.testin.creator.dialogs.CreateTestDialog;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
@@ -58,7 +58,7 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
             }
 
             final @NotNull Optional<DirectoryDto> created = dt.getAction().apply(p).execute(s, pDir, newDirPath);
-            Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
+            Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
 
             // Asynchronous creators (test runs) answer with nothing and run their
             // own follow-up once their dialog completes - including their own

@@ -37,7 +37,7 @@ public final class TreeValueUtil {
      * which asks both questions at once.
      */
     public static @Nullable Object valueOf(final @Nullable Object component) {
-        if (component instanceof ExplorerTreeNode node) {
+        if (component instanceof TreePanelNode node) {
             return node.getValue();
         }
         if (component instanceof DefaultMutableTreeNode node) {

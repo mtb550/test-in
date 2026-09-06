@@ -5,8 +5,8 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.explorer.ExplorerPanel;
-import org.testin.explorer.tree.ExplorerTree;
+import org.testin.explorer.TreePanel;
+import org.testin.explorer.tree.TreePanelTree;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
@@ -93,11 +93,11 @@ public final class GoTo {
      * @param withFocus whether the tool window takes the keyboard as it opens.
      *                  False when an editor is about to want it
      */
-    private static void showTree(final @NotNull Project p, final boolean withFocus, final @NotNull Consumer<ExplorerTree> onShown) {
+    private static void showTree(final @NotNull Project p, final boolean withFocus, final @NotNull Consumer<TreePanelTree> onShown) {
         Optional.ofNullable(ToolWindowManager.getInstance(p).getToolWindow(TREE))
                 .ifPresentOrElse(
                         tw -> tw.activate(() -> onShown.accept(
-                                Services.getInstance(p, ExplorerPanel.class).getProjectTree()), withFocus),
+                                Services.getInstance(p, TreePanel.class).getProjectTree()), withFocus),
                         () -> Logger.warn("The Testin tool window is not registered, so there is no tree to reveal in"));
     }
 }

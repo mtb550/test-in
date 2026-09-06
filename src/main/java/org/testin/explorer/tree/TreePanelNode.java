@@ -19,10 +19,10 @@ import java.util.List;
 /**
  * IntelliJ tree node whose children are resolved by StructureTreeModel in the background.
  */
-public final class ExplorerTreeNode extends AbstractTreeNode<Object> {
+public final class TreePanelNode extends AbstractTreeNode<Object> {
     private final @NotNull Project p;
 
-    public ExplorerTreeNode(final @NotNull Project p, final @NotNull Object value) {
+    public TreePanelNode(final @NotNull Project p, final @NotNull Object value) {
         super(p, value);
         this.p = p;
     }
@@ -48,10 +48,10 @@ public final class ExplorerTreeNode extends AbstractTreeNode<Object> {
             // froze the whole IDE and killed it (#89).
             //
             // A node with nothing indexed under it yet answers with nothing, and
-            // ExplorerPanel.refreshWhenIndexed draws it again when the index is
+            // TreePanel.refreshWhenIndexed draws it again when the index is
             // ready. That wait is on a pooled thread, holding no lock.
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-            final @NotNull List<ExplorerTreeNode> children = new ArrayList<>();
+            final @NotNull List<TreePanelNode> children = new ArrayList<>();
             for (final DirectoryDto child : indexer.getChildren(directory.getPath())) {
                 children.add(child(child));
             }
@@ -63,8 +63,8 @@ public final class ExplorerTreeNode extends AbstractTreeNode<Object> {
         }
     }
 
-    private @NotNull ExplorerTreeNode child(final @NotNull Object value) {
-        final @NotNull ExplorerTreeNode child = new ExplorerTreeNode(p, value);
+    private @NotNull TreePanelNode child(final @NotNull Object value) {
+        final @NotNull TreePanelNode child = new TreePanelNode(p, value);
         child.setParent(this);
         return child;
     }

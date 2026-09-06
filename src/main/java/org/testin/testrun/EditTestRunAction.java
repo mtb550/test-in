@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -64,11 +64,11 @@ import java.util.stream.Collectors;
  */
 public class EditTestRunAction extends AbstractProjectTreeAction {
 
-    private final @NotNull ExplorerPanel pp;
+    private final @NotNull TreePanel tp;
 
-    public EditTestRunAction(final @NotNull Project p, final @NotNull ExplorerPanel pp, final @NotNull SimpleTree tree) {
+    public EditTestRunAction(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull SimpleTree tree) {
         super(p, tree, "Edit Run", "Change which test cases this run covers, its name and its configuration", AllIcons.Actions.Edit);
-        this.pp = pp;
+        this.tp = tp;
     }
 
     @Override
@@ -175,7 +175,7 @@ public class EditTestRunAction extends AbstractProjectTreeAction {
             return;
         }
 
-        NodeRename.apply(p, pp, run, toName, () -> write(from.getParent().resolve(toName), content, onDone));
+        NodeRename.apply(p, tp, run, toName, () -> write(from.getParent().resolve(toName), content, onDone));
     }
 
     private void write(final @NotNull Path runPath, final @NotNull TestRunDto content, final @NotNull Runnable onDone) {
@@ -186,7 +186,7 @@ public class EditTestRunAction extends AbstractProjectTreeAction {
             Services.getInstance(p, ProjectIndexer.class).refreshDirectory(runPath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                pp.getProjectTree().refresh();
+                tp.getProjectTree().refresh();
 
                 // Nothing to reload when the name changed - the rename closed the
                 // editor before the node moved.

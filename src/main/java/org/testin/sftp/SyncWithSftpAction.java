@@ -12,7 +12,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.config.TestinConfigService;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -43,12 +43,12 @@ import java.util.Optional;
  */
 public final class SyncWithSftpAction extends AbstractProjectTreeAction {
 
-    private final @NotNull ExplorerPanel pp;
+    private final @NotNull TreePanel tp;
 
-    public SyncWithSftpAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ExplorerPanel pp) {
+    public SyncWithSftpAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull TreePanel tp) {
         super(p, tree, "Sync With SFTP", "Send this test project to its server and take what is there",
                 AllIcons.Actions.Upload);
-        this.pp = pp;
+        this.tp = tp;
     }
 
     /**
@@ -232,7 +232,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
             // The pair the Refresh button makes: the tree for the structure and
             // the open editors for their contents, because a sync can rewrite a
             // case an editor is showing (#118).
-            pp.getProjectTree().refresh();
+            tp.getProjectTree().refresh();
             Services.getInstance(p, EditorUtil.class).refreshOpen(p);
 
             // One notification, always, and it always carries what the sync
@@ -280,7 +280,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
                             .removeIncoming(projectRoot, outcome.removedOnServer());
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        pp.getProjectTree().refresh();
+                        tp.getProjectTree().refresh();
                         Services.getInstance(p, EditorUtil.class).refreshOpen(p);
                         Services.getInstance(p, Notifier.class).softShow(p, "Removed " + count);
                     });
@@ -334,7 +334,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
                 final boolean sent = SftpSync.finish(p, projectRoot, address, account.user(), auth, knownHosts(), answered);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    pp.getProjectTree().refresh();
+                    tp.getProjectTree().refresh();
                     Services.getInstance(p, EditorUtil.class).refreshOpen(p);
 
                     if (sent) {

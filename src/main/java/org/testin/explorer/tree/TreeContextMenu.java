@@ -12,7 +12,7 @@ import org.testin.EscapeAction;
 import org.testin.ShowNodeDetailsAction;
 import org.testin.clipboard.*;
 import org.testin.creator.CreateTreeNodeAction;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.git.SyncActionAction;
 import org.testin.git.ViewPendingCommitsAction;
 import org.testin.importexport.exports.ExportAction;
@@ -43,7 +43,7 @@ import java.util.List;
 public class TreeContextMenu extends DefaultActionGroup {
     private final @NotNull Project p;
 
-    public TreeContextMenu(final @NotNull Project p, final @NotNull ExplorerPanel pp, final @NotNull SimpleTree tree) {
+    public TreeContextMenu(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull SimpleTree tree) {
         super("Tree Popup Menu", true);
         this.p = p;
 
@@ -65,9 +65,9 @@ public class TreeContextMenu extends DefaultActionGroup {
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.UNDO),
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.REDO),
                         new ReCreateTestRunAction(p, tree),
-                        new RemoveAction(p, tree, pp),
-                        new RenameAction(p, pp, tree),
-                        new OrderNodeAction(p, pp, tree),
+                        new RemoveAction(p, tree, tp),
+                        new RenameAction(p, tp, tree),
+                        new OrderNodeAction(p, tp, tree),
                         new CopyNodeAction(tree),
                         new CutNodeAction(tree),
                         new PasteNodeAction(p, tree))));
@@ -90,10 +90,10 @@ public class TreeContextMenu extends DefaultActionGroup {
         }
 
         addSeparator();
-        add(new SyncWithSftpAction(p, tree, pp));
+        add(new SyncWithSftpAction(p, tree, tp));
 
         addSeparator();
-        add(new EditTestRunAction(p, pp, tree));
+        add(new EditTestRunAction(p, tp, tree));
         add(new SetTestRunStatusAction(p, tree));
         addSeparator();
 

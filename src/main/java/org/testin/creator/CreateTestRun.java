@@ -4,7 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryMapper;
@@ -98,14 +98,14 @@ public class CreateTestRun implements NodeCreator {
         }
 
         final @NotNull TestRunDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, savePath, parentDir);
-        saveSelectedToJSON(form, selection, savePath, Services.getInstance(p, ExplorerPanel.class), tr);
+        saveSelectedToJSON(form, selection, savePath, Services.getInstance(p, TreePanel.class), tr);
 
         return true;
     }
 
 
 
-    private void saveSelectedToJSON(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull ExplorerPanel pp, final @NotNull TestRunDirectoryDto trDir) {
+    private void saveSelectedToJSON(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull TreePanel tp, final @NotNull TestRunDirectoryDto trDir) {
         // Read once, here, while the dialog is still on screen. Everything below
         // works from this map rather than going back to the form, and the
         // background write further down could not go back to it anyway (#87).
@@ -138,7 +138,7 @@ public class CreateTestRun implements NodeCreator {
             Services.getInstance(p, ProjectIndexer.class).refreshDirectory(savePath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                pp.getProjectTree().refresh();
+                tp.getProjectTree().refresh();
                 Services.getInstance(p, EditorUtil.class).open(p, trDir);
 
                 // Here rather than in CreateTreeNodeAction: creating a run is

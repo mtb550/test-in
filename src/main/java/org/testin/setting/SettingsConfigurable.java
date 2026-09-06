@@ -13,7 +13,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
@@ -145,9 +145,9 @@ public final class SettingsConfigurable implements Configurable {
      */
     private void refreshEveryOpenProject() {
         for (final Project open : ProjectManager.getInstance().getOpenProjects()) {
-            if (open.isDisposed() || Services.isNotCreated(open, ExplorerPanel.class)) continue;
+            if (open.isDisposed() || Services.isNotCreated(open, TreePanel.class)) continue;
 
-            Services.getInstance(open, ExplorerPanel.class).reindex();
+            Services.getInstance(open, TreePanel.class).reindex();
         }
     }
 

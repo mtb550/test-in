@@ -12,7 +12,7 @@ import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.config.TestinConfigService;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -202,7 +202,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     }
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        final @NotNull ExplorerPanel panel = Services.getInstance(p, ExplorerPanel.class);
+                        final @NotNull TreePanel panel = Services.getInstance(p, TreePanel.class);
 
                         if (request.newBranch()) panel.refresh();
                         else panel.reindex("Switched to " + target);

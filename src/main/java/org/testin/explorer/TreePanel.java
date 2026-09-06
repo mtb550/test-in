@@ -17,7 +17,7 @@ import org.testin.config.ConnectionType;
 import org.testin.config.TestinConfigService;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.RefreshAction;
-import org.testin.explorer.tree.ExplorerTree;
+import org.testin.explorer.tree.TreePanelTree;
 import org.testin.explorer.toolbar.BranchSelector;
 import org.testin.git.GitRepositoryService;
 import org.testin.indexer.ProjectIndexer;
@@ -40,7 +40,7 @@ import java.util.Optional;
 import java.util.Map;
 
 @Service(Service.Level.PROJECT)
-public final class ExplorerPanel implements Disposable {
+public final class TreePanel implements Disposable {
     private final @NotNull Project p;
 
     /**
@@ -70,7 +70,7 @@ public final class ExplorerPanel implements Disposable {
      * Asked for by every action that changes a node and has to redraw it.
      */
     @Getter
-    private final @NotNull ExplorerTree projectTree;
+    private final @NotNull TreePanelTree projectTree;
 
     /**
      * What is under the Testin root, as the last draw read it. Held for the one
@@ -86,13 +86,13 @@ public final class ExplorerPanel implements Disposable {
      */
     private static final int INLINE_CHOICES = 6;
 
-    public ExplorerPanel(final @NotNull Project p) {
+    public TreePanel(final @NotNull Project p) {
         this.p = p;
-        Logger.info("ExplorerPanel.ExplorerPanel()");
+        Logger.info("TreePanel.TreePanel()");
 
         refreshAction = new RefreshAction(p, this);
         branchSelector = new BranchSelector(p, this, bound());
-        projectTree = new ExplorerTree(p, this);
+        projectTree = new TreePanelTree(p, this);
         Disposer.register(this, projectTree);
 
         refresh();
@@ -255,7 +255,7 @@ public final class ExplorerPanel implements Disposable {
     }
 
     private void showTree(final @NotNull TestProjectDirectoryDto tp) {
-        Logger.info("ExplorerPanel.refresh(): showing '" + tp.getName() + "'");
+        Logger.info("TreePanel.refresh(): showing '" + tp.getName() + "'");
 
         panel.setLayout(new BorderLayout());
 

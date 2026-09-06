@@ -15,7 +15,7 @@ import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.codegen.GenType;
 import org.testin.creator.CreateTestSet;
 import org.testin.model.DirectoryType;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -145,7 +145,7 @@ public class ImportAction extends AbstractProjectTreeAction {
             // included, off the EDT.
             Services.getInstance(p, ProjectIndexer.class).refreshDirectory(targetPath);
             ApplicationManager.getApplication().invokeLater(() ->
-                    Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh());
+                    Services.getInstance(p, TreePanel.class).getProjectTree().refresh());
         });
     }
 

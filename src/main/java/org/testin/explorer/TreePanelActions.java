@@ -12,20 +12,20 @@ import org.testin.testproject.SelectTestProjectAction;
 
 import java.util.List;
 
-public class ExplorerPanelActions {
+public class TreePanelActions {
 
-    public @NotNull List<AnAction> create(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
+    public @NotNull List<AnAction> create(final @NotNull Project p, final @NotNull TreePanel tp) {
         return List.of(
                 // The keystroke reaches the search from anywhere, which is the
                 // point of it - and is also why nothing on screen says the
                 // search exists. The button is where a tester finds out.
                 SearchAction.registered(),
                 new OpenSettingsAction(p),
-                new ExpandAllAction(pp),
-                new CollapseAllAction(pp),
-                pp.getRefreshAction(),
-                new SelectTestProjectAction(p, pp),
-                new CreateTestProjectAction(p, pp)
+                new ExpandAllAction(tp),
+                new CollapseAllAction(tp),
+                tp.getRefreshAction(),
+                new SelectTestProjectAction(p, tp),
+                new CreateTestProjectAction(p, tp)
         );
     }
 }

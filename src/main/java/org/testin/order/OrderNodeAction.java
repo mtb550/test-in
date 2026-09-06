@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
@@ -27,11 +27,11 @@ import java.util.Optional;
  */
 public class OrderNodeAction extends AbstractProjectTreeAction {
 
-    private final @NotNull ExplorerPanel pp;
+    private final @NotNull TreePanel tp;
 
-    public OrderNodeAction(final @NotNull Project p, final @NotNull ExplorerPanel pp, final @NotNull SimpleTree tree) {
+    public OrderNodeAction(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull SimpleTree tree) {
         super(p, tree, "Order", "Set where this node sits among its siblings", AllIcons.ObjectBrowser.Sorted);
-        this.pp = pp;
+        this.tp = tp;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class OrderNodeAction extends AbstractProjectTreeAction {
 
         // The tree is drawn from the children index, which sorts on the way out
         // - so what redraws it is a refresh, not a re-index.
-        pp.getProjectTree().refresh();
+        tp.getProjectTree().refresh();
         Services.getInstance(p, Notifier.class).softShow(p, Done.ORDERED);
     }
 

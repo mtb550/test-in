@@ -12,7 +12,7 @@ import git4idea.commands.Git;
 import git4idea.commands.GitCommandResult;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -23,13 +23,13 @@ import java.nio.file.Path;
 public class CreateTestProjectCloneAction extends AbstractProjectAction {
     private final @NotNull String gitUrl;
     private final @NotNull String projectName;
-    private final @NotNull ExplorerPanel pp;
+    private final @NotNull TreePanel tp;
 
-    public CreateTestProjectCloneAction(final @NotNull Project p, final @NotNull String gitUrl, final @NotNull String name, final @NotNull ExplorerPanel pp) {
+    public CreateTestProjectCloneAction(final @NotNull Project p, final @NotNull String gitUrl, final @NotNull String name, final @NotNull TreePanel tp) {
         super(p, "Clone Git Project", "Import an existing test project from Git", AllIcons.Vcs.Clone);
         this.gitUrl = gitUrl;
         this.projectName = name;
-        this.pp = pp;
+        this.tp = tp;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
                         // project is: this repository asked for it (#8).
                         Services.getInstance(p, BoundTestProject.class).bind(projectName);
 
-                        pp.refresh();
+                        tp.refresh();
                         Services.getInstance(p, Notifier.class).softShow(p, "Project cloned");
                     });
 

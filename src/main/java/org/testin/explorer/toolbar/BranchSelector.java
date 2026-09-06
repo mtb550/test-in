@@ -9,7 +9,7 @@ import com.intellij.openapi.ui.ComboBox;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.ConnectionType;
 import org.testin.config.TestinConfigService;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.ViewPendingCommitsAction;
 import org.testin.indexer.ProjectIndexer;
@@ -29,7 +29,7 @@ import java.util.List;
 
 public class BranchSelector {
     private final @NotNull Project p;
-    private final @NotNull ExplorerPanel pp;
+    private final @NotNull TreePanel tp;
     private final @NotNull GitRepositoryService git;
     private final @NotNull ComboBox<String> comboBox;
     private final @NotNull DefaultComboBoxModel<String> model;
@@ -66,9 +66,9 @@ public class BranchSelector {
      */
     private boolean showingPlaceholder = false;
 
-    public BranchSelector(final @NotNull Project p, final @NotNull ExplorerPanel pp, final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
+    public BranchSelector(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
         this.p = p;
-        this.pp = pp;
+        this.tp = tp;
         this.git = new GitRepositoryService(p);
         this.model = new DefaultComboBoxModel<>();
         this.comboBox = new ComboBox<>(model);
@@ -222,7 +222,7 @@ public class BranchSelector {
                 currentBranch, targetBranch,
                 "Switch Anyway", () -> checkout(repositoryPath, targetBranch),
                 List.of(new ConfirmDialog.Alternative(Shortcuts.ConfirmAlternative, "Review Changes",
-                        () -> new ViewPendingCommitsAction(p, pp.getProjectTree().getMainTree()).openFor(repositoryPath))))
+                        () -> new ViewPendingCommitsAction(p, tp.getProjectTree().getMainTree()).openFor(repositoryPath))))
                 .show();
     }
 
@@ -248,7 +248,7 @@ public class BranchSelector {
                 // which owns file access, and before the re-index reads them.
                 Services.getInstance(p, ProjectIndexer.class).refreshDirectory(repositoryPath);
 
-                ApplicationManager.getApplication().invokeLater(() -> pp.reindex("Switched to " + checkedOut));
+                ApplicationManager.getApplication().invokeLater(() -> tp.reindex("Switched to " + checkedOut));
             }
         });
     }
@@ -270,7 +270,7 @@ public class BranchSelector {
                 // Built on the panel's own tree: the review belongs to the
                 // project the tree is showing, which is the one whose branch
                 // would not switch.
-                () -> new ViewPendingCommitsAction(p, pp.getProjectTree().getMainTree()).openFor(repositoryPath));
+                () -> new ViewPendingCommitsAction(p, tp.getProjectTree().getMainTree()).openFor(repositoryPath));
     }
 
     /**

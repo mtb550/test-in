@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.undo.UndoScope;
 import org.testin.undo.UndoService;
 import org.testin.explorer.tree.TreeValueUtil;
@@ -28,11 +28,11 @@ import java.util.Optional;
 public class RenameAction extends AbstractProjectTreeAction {
 
     private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK);
-    private final @NotNull ExplorerPanel pp;
+    private final @NotNull TreePanel tp;
 
-    public RenameAction(final @NotNull Project p, final @NotNull ExplorerPanel pp, final @NotNull SimpleTree tree) {
+    public RenameAction(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull SimpleTree tree) {
         super(p, tree, "Rename", "Rename selected node", AllIcons.Actions.Edit);
-        this.pp = pp;
+        this.tp = tp;
         this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
     }
 
@@ -68,7 +68,7 @@ public class RenameAction extends AbstractProjectTreeAction {
         }
 
         final @NotNull String oldName = dir.getName();
-        NodeRename.apply(p, pp, dir, newName, () -> Services.getInstance(p, Notifier.class).softShow(p, Done.RENAMED));
+        NodeRename.apply(p, tp, dir, newName, () -> Services.getInstance(p, Notifier.class).softShow(p, Done.RENAMED));
 
         // The dto reference stays valid across renames, so undo and redo are
         // the same routine with the names swapped.
@@ -84,7 +84,7 @@ public class RenameAction extends AbstractProjectTreeAction {
      * was renamed would double-report one keystroke (#62).
      */
     private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName) {
-        NodeRename.apply(p, pp, dir, newName, () -> {
+        NodeRename.apply(p, tp, dir, newName, () -> {
         });
     }
 

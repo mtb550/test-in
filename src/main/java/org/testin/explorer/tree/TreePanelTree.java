@@ -12,7 +12,7 @@ import com.intellij.ide.util.treeView.TreeState;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ExplorerTree implements Disposable {
+public class TreePanelTree implements Disposable {
 
     /**
      * What a reveal does afterward when the caller wants nothing - the same
@@ -36,10 +36,10 @@ public class ExplorerTree implements Disposable {
     };
 
     private final @NotNull Project p;
-    private final @NotNull ExplorerPanel pp;
+    private final @NotNull TreePanel tp;
     private final @NotNull JBScrollPane scrollPane;
-    private final @NotNull ExplorerTreeStructure treeStructure;
-    private final @NotNull StructureTreeModel<ExplorerTreeStructure> structureModel;
+    private final @NotNull TreePanelStructure treeStructure;
+    private final @NotNull StructureTreeModel<TreePanelStructure> structureModel;
     private final @NotNull AsyncTreeModel treeModel;
     @Getter
     private final @NotNull SimpleTree mainTree;
@@ -63,11 +63,11 @@ public class ExplorerTree implements Disposable {
      */
     private @NotNull Optional<Path> revealAfterRebuild = Optional.empty();
 
-    public ExplorerTree(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
+    public TreePanelTree(final @NotNull Project p, final @NotNull TreePanel tp) {
         this.p = p;
-        this.pp = pp;
+        this.tp = tp;
 
-        this.treeStructure = new ExplorerTreeStructure(p, bound());
+        this.treeStructure = new TreePanelStructure(p, bound());
         this.structureModel = new StructureTreeModel<>(treeStructure, this);
         this.treeModel = new AsyncTreeModel(structureModel, this);
         this.mainTree = new SimpleTree(treeModel);
@@ -88,7 +88,7 @@ public class ExplorerTree implements Disposable {
         mainTree.setTransferHandler(transferHandler);
         mainTree.setDragEnabled(true);
 
-        final @NotNull TreeContextMenu treeContextMenu = new TreeContextMenu(p, pp, mainTree);
+        final @NotNull TreeContextMenu treeContextMenu = new TreeContextMenu(p, tp, mainTree);
         mainTree.addMouseListener(new TreeMouseListener(p, mainTree, treeContextMenu));
         treeContextMenu.registerShortcuts(mainTree, transferHandler);
     }
@@ -212,7 +212,7 @@ public class ExplorerTree implements Disposable {
     }
 
     public void updateNodes() {
-        pp.refresh();
+        tp.refresh();
     }
 
     /**

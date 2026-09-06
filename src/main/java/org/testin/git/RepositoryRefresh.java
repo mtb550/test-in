@@ -7,7 +7,7 @@ import git4idea.GitUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.services.Services;
 
@@ -46,9 +46,9 @@ final class RepositoryRefresh {
         Services.getInstance(p, ProjectIndexer.class).scanSingleProject(repoPath);
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (Services.isNotCreated(p, ExplorerPanel.class)) return;
+            if (Services.isNotCreated(p, TreePanel.class)) return;
 
-            Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
+            Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
         });
     }
 }

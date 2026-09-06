@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.creator.dialogs.CreateProjectDialog;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.git.GitRefs;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -18,11 +18,11 @@ import org.testin.testproject.CreateTestProjectNewAction;
 import org.testin.util.OptionalPlugin;
 
 public class CreateTestProjectAction extends AbstractProjectAction {
-    private final @NotNull ExplorerPanel pp;
+    private final @NotNull TreePanel tp;
 
-    public CreateTestProjectAction(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
+    public CreateTestProjectAction(final @NotNull Project p, final @NotNull TreePanel tp) {
         super(p, "New Test Project", "Create or Clone test project", AllIcons.General.Add);
-        this.pp = pp;
+        this.tp = tp;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
     }
 
     /**
-     * Direct entry point for the project panel's empty state — no AnActionEvent required.
+     * Direct entry point for the tree panel's empty state — no AnActionEvent required.
      */
     public void execute() {
 
@@ -39,7 +39,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
             // What was typed decides: a repository URL is cloned, anything else
             // is a name for a new project.
             if (!GitRefs.isRepositoryUrl(name)) {
-                new CreateTestProjectNewAction(p, pp, name).execute();
+                new CreateTestProjectNewAction(p, tp, name).execute();
                 return;
             }
 
@@ -59,7 +59,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
                 return;
             }
 
-            new CreateTestProjectCloneAction(p, name, projectName, pp).execute();
+            new CreateTestProjectCloneAction(p, name, projectName, tp).execute();
 
         }).show();
     }

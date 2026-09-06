@@ -9,7 +9,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.NodeCounter;
 import org.testin.indexer.ProjectIndexer;
@@ -32,11 +32,11 @@ import java.util.function.IntConsumer;
 import static org.testin.util.Shortcuts.DeletePackage;
 
 public class RemoveAction extends AbstractProjectTreeAction {
-    private final @NotNull ExplorerPanel pp;
+    private final @NotNull TreePanel tp;
 
-    public RemoveAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ExplorerPanel pp) {
+    public RemoveAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull TreePanel tp) {
         super(p, tree, "Remove", "Remove selected nodes", AllIcons.Actions.GC);
-        this.pp = pp;
+        this.tp = tp;
         this.registerCustomShortcutSet(DeletePackage.getCustomShortcut(), tree);
     }
 
@@ -132,7 +132,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
                 if (wasRemoved) removed.incrementAndGet();
                 if (pending.decrementAndGet() != 0) return;
 
-                pp.getProjectTree().updateNodes();
+                tp.getProjectTree().updateNodes();
                 whenAllGone.accept(removed.get());
             });
         }
@@ -168,7 +168,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         final @NotNull List<Kept> lost = kept.stream().filter(one -> !indexer.restoreNode(one.copy(), one.original())).toList();
-        pp.getProjectTree().updateNodes();
+        tp.getProjectTree().updateNodes();
 
         // What did not come back is the only thing worth saying. The tree used
         // to be refreshed either way and nothing read the answer, so an undo

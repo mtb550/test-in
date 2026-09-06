@@ -23,13 +23,13 @@ public class Main implements ToolWindowFactory, DumbAware {
             if (!p.isDisposed())
                 StartupActivity.execute(p);
 
-            final @NotNull ExplorerPanel pp = Services.getInstance(p, ExplorerPanel.class);
-            final @NotNull Content content = ContentFactory.getInstance().createContent(pp.getPanel(), null, false);
+            final @NotNull TreePanel tp = Services.getInstance(p, TreePanel.class);
+            final @NotNull Content content = ContentFactory.getInstance().createContent(tp.getPanel(), null, false);
 
-            tw.setTitleActions(new ExplorerPanelActions().create(p, pp));
+            tw.setTitleActions(new TreePanelActions().create(p, tp));
             tw.getContentManager().addContent(content);
 
-            Disposer.register(content, pp);
+            Disposer.register(content, tp);
         });
     }
 }

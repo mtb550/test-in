@@ -11,7 +11,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 /**
  * Supplies the selected project hierarchy to IntelliJ's asynchronous tree models.
  */
-public final class ExplorerTreeStructure extends AbstractTreeStructure {
+public final class TreePanelStructure extends AbstractTreeStructure {
 
     /**
      * The root the tree draws when the repository is bound to no project - a
@@ -21,9 +21,9 @@ public final class ExplorerTreeStructure extends AbstractTreeStructure {
     private static final @NotNull String NO_PROJECT = "Project";
 
     private final @NotNull Project p;
-    private volatile @NotNull ExplorerTreeNode root;
+    private volatile @NotNull TreePanelNode root;
 
-    public ExplorerTreeStructure(final @NotNull Project p, final @NotNull Optional<TestProjectDirectoryDto> selectedProject) {
+    public TreePanelStructure(final @NotNull Project p, final @NotNull Optional<TestProjectDirectoryDto> selectedProject) {
         this.p = p;
         this.root = createRoot(selectedProject);
     }
@@ -32,8 +32,8 @@ public final class ExplorerTreeStructure extends AbstractTreeStructure {
         root = createRoot(selectedProject);
     }
 
-    private @NotNull ExplorerTreeNode createRoot(final @NotNull Optional<TestProjectDirectoryDto> selectedProject) {
-        return new ExplorerTreeNode(p, selectedProject.map(Object.class::cast).orElse(NO_PROJECT));
+    private @NotNull TreePanelNode createRoot(final @NotNull Optional<TestProjectDirectoryDto> selectedProject) {
+        return new TreePanelNode(p, selectedProject.map(Object.class::cast).orElse(NO_PROJECT));
     }
 
     @Override
@@ -43,7 +43,7 @@ public final class ExplorerTreeStructure extends AbstractTreeStructure {
 
     @Override
     public Object @NotNull [] getChildElements(final @NotNull Object element) {
-        if (!(element instanceof ExplorerTreeNode node)) return new Object[0];
+        if (!(element instanceof TreePanelNode node)) return new Object[0];
         return node.getChildren().toArray();
     }
 
@@ -53,12 +53,12 @@ public final class ExplorerTreeStructure extends AbstractTreeStructure {
      */
     @Override
     public @Nullable Object getParentElement(final @NotNull Object element) {
-        return element instanceof ExplorerTreeNode node ? node.getParent() : null;
+        return element instanceof TreePanelNode node ? node.getParent() : null;
     }
 
     @Override
     public @NotNull NodeDescriptor<?> createDescriptor(final @NotNull Object element, final @Nullable NodeDescriptor parentDescriptor) {
-        return (ExplorerTreeNode) element;
+        return (TreePanelNode) element;
     }
 
     @Override
@@ -77,6 +77,6 @@ public final class ExplorerTreeStructure extends AbstractTreeStructure {
 
     @Override
     public boolean isValid(final @NotNull Object element) {
-        return element instanceof ExplorerTreeNode;
+        return element instanceof TreePanelNode;
     }
 }

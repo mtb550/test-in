@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryMapper;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -17,12 +17,12 @@ import org.testin.setting.TestinRoot;
 import java.nio.file.Path;
 
 public class CreateTestProjectNewAction extends AbstractProjectAction {
-    private final @NotNull ExplorerPanel pp;
+    private final @NotNull TreePanel tp;
     private final @NotNull String tpName;
 
-    public CreateTestProjectNewAction(final @NotNull Project p, final @NotNull ExplorerPanel pp, final @NotNull String name) {
+    public CreateTestProjectNewAction(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull String name) {
         super(p, "New Test Project", "Create a new test project", AllIcons.General.Add);
-        this.pp = pp;
+        this.tp = tp;
         this.tpName = name;
     }
 
@@ -43,16 +43,16 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
             return;
         }
 
-        final @NotNull TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).setTestProjectNode(p, tpPath);
+        final @NotNull TestProjectDirectoryDto created = Services.getInstance(p, DirectoryMapper.class).setTestProjectNode(p, tpPath);
 
-        Services.getInstance(p, ProjectIndexer.class).addTestProject(tp);
+        Services.getInstance(p, ProjectIndexer.class).addTestProject(created);
 
         // A repository asks for exactly one test project, so the one it just made
         // is the one it is about. Writing it here is what makes the next clone of
         // this repository open on it without being asked (#8).
-        Services.getInstance(p, BoundTestProject.class).bind(tp.getName());
+        Services.getInstance(p, BoundTestProject.class).bind(created.getName());
 
-        pp.refresh();
+        tp.refresh();
         Services.getInstance(p, Notifier.class).softShow(p, "Project created");
     }
 

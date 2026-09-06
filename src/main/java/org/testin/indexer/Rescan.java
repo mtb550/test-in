@@ -11,7 +11,7 @@ import com.intellij.util.concurrency.AppExecutorUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
@@ -104,7 +104,7 @@ public final class Rescan {
      * cannot be stopped.
      */
     private void refresh(final @NotNull Project p, final @NotNull List<Path> testProjects) {
-        if (p.isDisposed() || Services.isNotCreated(p, ExplorerPanel.class)) return;
+        if (p.isDisposed() || Services.isNotCreated(p, TreePanel.class)) return;
 
         ProgressManager.getInstance().run(
                 new Task.Backgroundable(p, "Reading test data that changed on disk", true) {
@@ -132,7 +132,7 @@ public final class Rescan {
                         ApplicationManager.getApplication().invokeLater(() -> {
                             if (p.isDisposed()) return;
 
-                            Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
+                            Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
 
                             // The tree is not the only thing showing what a file used
                             // to say. An editor holds the node it was opened on and

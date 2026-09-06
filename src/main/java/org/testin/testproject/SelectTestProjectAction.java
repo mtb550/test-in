@@ -7,7 +7,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.ProjectStatus;
 import org.testin.notifications.Notifier;
@@ -27,11 +27,11 @@ import java.util.Map;
  */
 public final class SelectTestProjectAction extends AbstractProjectAction {
 
-    private final @NotNull ExplorerPanel pp;
+    private final @NotNull TreePanel tp;
 
-    public SelectTestProjectAction(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
+    public SelectTestProjectAction(final @NotNull Project p, final @NotNull TreePanel tp) {
         super(p, "Select Test Project", "Choose the test project this repository exercises", AllIcons.Actions.ModuleDirectory);
-        this.pp = pp;
+        this.tp = tp;
     }
 
     @Override
@@ -53,7 +53,7 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
                     return;
                 }
 
-                new BindTestProjectDialog(p, underRoot, pp::reindex).show();
+                new BindTestProjectDialog(p, underRoot, tp::reindex).show();
             });
         });
     }

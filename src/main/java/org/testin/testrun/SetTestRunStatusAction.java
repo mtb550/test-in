@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -38,7 +38,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
             Services.getInstance(p, RunStatusService.class).persistMarker(
                     p, testRunDto.getPath(), selectedStatus);
 
-            Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
+            Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
 
             // The status names itself, as verdicts do: "Completed", "Closed".
             // Inside the menu callback, so a dismissed menu says nothing (#62).

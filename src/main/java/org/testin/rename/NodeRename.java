@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Renamed;
-import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -38,7 +38,7 @@ public final class NodeRename {
      * The callback runs when the rename has finished and the tree has caught up,
      * never if it failed - {@code renameNode} reports and swallows that.
      */
-    public static void apply(final @NotNull Project p, final @NotNull ExplorerPanel pp, final @NotNull DirectoryDto dir, final @NotNull String newName, final @NotNull Runnable onDone) {
+    public static void apply(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull DirectoryDto dir, final @NotNull String newName, final @NotNull Runnable onDone) {
         Services.getInstance(p, EditorUtil.class).close(p, dir);
 
         // Before the data rename, while the old name is still what finds the
@@ -53,10 +53,10 @@ public final class NodeRename {
         // The tree refreshes only after the indexer finished the VFS rename
         // and updated its cache - refreshing earlier shows stale state.
         Services.getInstance(p, ProjectIndexer.class).renameNode(oldPath, newPath, () -> {
-            pp.getProjectTree().refresh();
+            tp.getProjectTree().refresh();
 
             if (dir instanceof TestProjectDirectoryDto) {
-                pp.refresh();
+                tp.refresh();
             }
 
             Logger.info("Success! Renamed to: " + newName);
