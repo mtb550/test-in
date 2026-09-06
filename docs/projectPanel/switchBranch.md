@@ -2,6 +2,8 @@
 
 # UC-019: Switch the Git branch of the test project
 
+> **No key.** Pick a branch from the box above the tree.
+
 **As a** tester, **I want** to switch the test project's branch from the panel,
 **so that** the tree follows the branch I am testing.
 

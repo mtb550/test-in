@@ -2,6 +2,9 @@
 
 # UC-008: Remove a node
 
+> **`Delete`**, with one or more nodes selected. On the menu:
+> **Actions → Remove**.
+
 **As a** tester, **I want** to remove a test set, a package, a test run or a
 whole test project, **so that** the tree holds only what is current.
 

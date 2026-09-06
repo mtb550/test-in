@@ -2,6 +2,10 @@
 
 # UC-009: Move or copy nodes
 
+> **`Ctrl+C`** copies, **`Ctrl+X`** cuts, **`Ctrl+V`** pastes, and
+> **`Escape`** takes the gray off. Dragging works too. On the menu:
+> **Actions → Copy**, **Cut** and **Paste**.
+
 **As a** tester, **I want** to move a node into another package, or copy it,
 by cutting and pasting or by dragging, **so that** the tree can be reorganized
 without recreating anything.

@@ -2,6 +2,8 @@
 
 # UC-020: See what a node holds
 
+> **No key.** On the menu: **Details**.
+
 **As a** tester, **I want** to see a node's counts, dates, status and verdict
 breakdown without opening anything, **so that** I can see how big a part of the
 tree is at a glance.

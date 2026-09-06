@@ -2,6 +2,8 @@
 
 # UC-010: Order nodes among their siblings
 
+> **No key.** On the menu: **Actions → Order**.
+
 **As a** tester, **I want** to give a node a number that fixes its place among
 its siblings, **so that** the tree reads in the order the work is done.
 

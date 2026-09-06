@@ -2,6 +2,9 @@
 
 # UC-001: Open the panel and reach the tree
 
+> **No key.** The panel opens from the **Testin** button on the IDE's tool
+> window bar, on the left.
+
 **As a** tester, **I want** the panel to show my tree, or tell me what to do
 first, **so that** I am never stuck on an empty window.
 

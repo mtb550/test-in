@@ -2,6 +2,10 @@
 
 # UC-017: Find anything in the project
 
+> **`Ctrl+Alt+F`**, and **`Cmd+Alt+F`** on a Mac. It works anywhere in the
+> IDE, not only in the tree. There is also a **Search Test Project** button
+> at the top of the panel.
+
 **As a** tester, **I want** to type part of a name, a step or a test case number
 and jump to it, **so that** a large tree is never a place to scroll.
 

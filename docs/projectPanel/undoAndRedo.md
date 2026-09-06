@@ -2,6 +2,9 @@
 
 # UC-011: Undo and redo a change to the tree
 
+> **`Ctrl+Z`** undoes, **`Ctrl+Y`** redoes. On the menu: **Actions → Undo**
+> and **Redo**, each naming what it will do.
+
 **As a** tester, **I want** to take back the last change I made to the tree,
 **so that** a wrong move, rename or removal costs nothing.
 

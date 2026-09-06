@@ -2,6 +2,8 @@
 
 # UC-014: Re-create a test run
 
+> **No key.** On the menu: **Actions → Re-create**.
+
 **As a** tester, **I want** to make the next cycle from a finished test run, with
 the same test cases and settings and no verdicts, **so that** starting the next
 round of testing takes one step, instead of building the whole test run again by

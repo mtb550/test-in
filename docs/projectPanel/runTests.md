@@ -2,6 +2,8 @@
 
 # UC-016: Run the automation for everything a node holds
 
+> **No key.** On the menu: **Run Tests**.
+
 **As a** tester, **I want** to run every automated test case under a test set, a
 package or **Test Cases**, **so that** a whole area runs in one gesture.
 

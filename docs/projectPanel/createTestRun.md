@@ -2,6 +2,9 @@
 
 # UC-006: Create a test run or a test run package
 
+> **`Ctrl+M`**, with **Test Runs** or a test run package selected. On the
+> menu: **Create**.
+
 **As a** tester, **I want** to start a test run over the test cases I choose,
 **so that** a pass through the product is recorded on its own.
 

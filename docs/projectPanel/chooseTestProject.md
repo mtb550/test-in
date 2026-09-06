@@ -2,6 +2,8 @@
 
 # UC-003: Choose which test project this code project uses
 
+> **No key.** Press **Select Test Project** at the top of the panel.
+
 **As a** tester, **I want** to point this code project at a different test
 project in the same Testin folder, **so that** one machine can serve several
 products.

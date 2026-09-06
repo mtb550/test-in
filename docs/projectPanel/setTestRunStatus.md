@@ -2,6 +2,10 @@
 
 # UC-013: Set a test run's status
 
+> **No key opens it.** On the menu: **Set Status**. Inside the popup,
+> **`1`** is **Assigned**, **`2`** is **Completed** and **`3`** is
+> **Closed**.
+
 **As a** tester, **I want** to mark a test run **Assigned**, **Completed** or
 **Closed** from the tree, **so that** the test run's place in its life is visible
 without opening it.

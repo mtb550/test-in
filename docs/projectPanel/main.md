@@ -194,10 +194,11 @@ does not repeat them.
 
 ---
 
-## Every key, in one place
+## Every key the tree answers to
 
 A key works only while the tester is clicked into the tree. The search key is
-the exception. It works anywhere in the IDE.
+the exception. It works anywhere in the IDE. A dialog's own keys are drawn on
+its status bar, at the foot of the dialog.
 
 | Key | Does | Page |
 |---|---|---|
@@ -220,6 +221,87 @@ statuses, **Re-create**, **Edit Run**, **Run Tests** and **Details** are menu
 items only. The panel's own buttons have no keys either, except search, and
 they are [UC-021](panelToolbar.md). Each one is a decision the tester thinks about, not a reflex, and
 none is used often enough to need a key. `F2` renames in the editors, not here.
+
+---
+
+## Every message, and the use case it belongs to
+
+**This is the exit criteria.** A tester knows an action finished by the message
+Testin shows, and knows it did not by the refusal. Every message the panel can
+show is here, quoted as the plugin writes it. A word in angle brackets is
+filled in with whatever the tester is working on, and *N* with a count.
+
+### When it worked
+
+A success message fades on the status bar and leaves no trace. It is one word
+in the past tense wherever one word will do. (rule 7)
+
+| Message | Means | Use case |
+|---|---|---|
+| *Created* | A node was created | [UC-005](createTestSet.md), [UC-006](createTestRun.md) |
+| *Project created* | A test project was created | [UC-002](createTestProject.md) |
+| *Project cloned* | A test project was brought down from Git | [UC-022](importTestProject.md) |
+| *Bound* | This code project now uses that test project. The name follows | [UC-003](chooseTestProject.md) |
+| *Run created* | A test run was created | [UC-006](createTestRun.md), [UC-014](reCreateTestRun.md) |
+| *Renamed* | A node was renamed | [UC-007](renameNode.md) |
+| *Removed*, *Removed N* | One or more nodes went to the recycle bin | [UC-008](removeNode.md) |
+| *Copied*, *Copied N* | Nodes are on the clipboard, to copy | [UC-009](moveOrCopyNodes.md) |
+| *Cut*, *Cut N* | Nodes are on the clipboard, to move | [UC-009](moveOrCopyNodes.md) |
+| *Moved*, *Moved N* | The cut nodes have moved | [UC-009](moveOrCopyNodes.md) |
+| *Pasted*, *Pasted N* | The copied nodes have been duplicated | [UC-009](moveOrCopyNodes.md) |
+| *Ordered* | A node's number was set or cleared | [UC-010](orderNodes.md) |
+| *Undone* | The last change was taken back | [UC-011](undoAndRedo.md) |
+| *Redone* | The undone change was put back | [UC-011](undoAndRedo.md) |
+| *Active*, *Inactive*, *Archived*, *Deprecated* | The new status of a test project, package or test set | [UC-012](retireAndReactivate.md) |
+| *Assigned*, *Completed*, *Closed* | The new status of a test run | [UC-013](setTestRunStatus.md) |
+| *Updated* | A test run's name, test cases or settings were saved | [UC-015](editTestRun.md) |
+| *Running*, *Running N* | The automation started | [UC-016](runTests.md) |
+| *Refreshed* | The tree was read again from disk | [UC-018](refreshTree.md) |
+| *Switched to \<branch\>* | The test project is on another branch | [UC-019](switchBranch.md) |
+
+### When it refused
+
+A refusal fades too. It says what stopped the action, and nothing was changed.
+
+| Message | Means | Use case |
+|---|---|---|
+| *\<name\> Already Exists* | The name is taken where it was going | [UC-002](createTestProject.md), [UC-005](createTestSet.md), [UC-006](createTestRun.md), [UC-007](renameNode.md), [UC-014](reCreateTestRun.md), [UC-015](editTestRun.md) |
+| *Select a folder* | The selected place cannot take what is on the clipboard | [UC-009](moveOrCopyNodes.md) |
+| *'\<name\>' already exists in '\<folder\>'*, *N items already exist in '\<folder\>'* | The destination already holds that name. The rest of the paste still moves | [UC-009](moveOrCopyNodes.md) |
+| *A test run needs a name* | The name box was emptied | [UC-006](createTestRun.md), [UC-014](reCreateTestRun.md), [UC-015](editTestRun.md) |
+| *'\<parent\>' no longer exists - test run not created* | The folder went away while the dialog was open | [UC-006](createTestRun.md) |
+| *'\<run\>' no longer exists - nothing saved* | The test run went away while the dialog was open | [UC-015](editTestRun.md) |
+| *'\<run\>' was \<status\> while this was open - nothing saved* | Someone signed the test run off while the dialog was open | [UC-015](editTestRun.md) |
+| *\<name\> has no test cases to run* | Nothing under the node can be run | [UC-016](runTests.md) |
+| *No Test Projects* | There is nothing to choose. It adds *Create one under the Testin root first* | [UC-003](chooseTestProject.md) |
+| *Java Test Source Not Found* | The IDE project has no Java test folder, so no automation code is written | [UC-005](createTestSet.md) |
+
+### When something failed
+
+These stay in the IDE's notification log, because they are real failures rather
+than feedback on what the tester just typed.
+
+| Message | Means | Use case |
+|---|---|---|
+| *Not Bound* | The choice could not be written into the code project, so it will not be remembered | [UC-003](chooseTestProject.md) |
+| *No Test Project Named* | The code project does not say which test project it is about, so nothing can be cloned | [UC-022](importTestProject.md) |
+| *Clone Failed* | The repository could not be cloned. The reason follows | [UC-022](importTestProject.md) |
+| *Clone Error* | Something needed for the clone was missing | [UC-022](importTestProject.md) |
+| *Rename Failed* | The folder could not be renamed on disk. The reason follows | [UC-007](renameNode.md) |
+| *Undo Incomplete* | Some removed nodes could not be put back. It says how many of how many | [UC-011](undoAndRedo.md) |
+| *Unable to update status to \<status\>* | A test project's status could not be written | [UC-012](retireAndReactivate.md) |
+| *Unable to mark test set \<status\>* | A test set's status could not be written | [UC-012](retireAndReactivate.md) |
+| *Unable to mark package \<status\>* | A package's status could not be written | [UC-012](retireAndReactivate.md) |
+| *Git Error* | The branches could not be read. The reason follows | [UC-019](switchBranch.md) |
+| *Git Fetch Warning* | The branch list may be out of date | [UC-019](switchBranch.md) |
+
+### Shown in the tree itself, not as a message
+
+| What the tester sees | Means |
+|---|---|
+| *Could not load '\<folder name\>'*, in red, as a child row | That folder's contents could not be read |
+| *\<name\> is archived, so it is not opened*, in red, above the list of test projects | The bound test project is **Archived**. See [UC-001](reachTheTree.md) |
+| *testin.yml names \<name\>, which is not under the Testin root*, in red | The code project names a test project the Testin folder does not hold. See [UC-001](reachTheTree.md) |
 
 ---
 

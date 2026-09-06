@@ -2,6 +2,9 @@
 
 # UC-021: Use the buttons at the top of the panel
 
+> **Only one of the seven buttons has a key.** Search is **`Ctrl+Alt+F`**,
+> and **`Cmd+Alt+F`** on a Mac.
+
 **As a** tester, **I want** the panel's own buttons within reach of the tree,
 **so that** the things I do to the whole panel are not hidden in a menu
 somewhere else.

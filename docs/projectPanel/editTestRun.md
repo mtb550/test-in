@@ -2,6 +2,9 @@
 
 # UC-015: Edit a test run
 
+> **No key.** On the menu: **Edit Run**. **`Ctrl+Z`** in the tree takes the
+> edit back.
+
 **As a** tester, **I want** to change which test cases a test run covers, its
 name and its configuration, **so that** a test run can be corrected without being
 recreated.

@@ -2,6 +2,8 @@
 
 # UC-018: Refresh the tree from disk
 
+> **No key.** Press **Refresh** at the top of the panel.
+
 **As a** tester, **I want** to reload the tree after something changed outside
 the IDE, **so that** the tree shows what is on disk. Getting changes from Git,
 running a sync, or editing files by hand all change the tree from outside.

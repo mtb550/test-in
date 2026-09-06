@@ -2,6 +2,9 @@
 
 # UC-005: Create a test set or a test set package
 
+> **`Ctrl+M`**, with **Test Cases** or a test set package selected. On the
+> menu: **Create**.
+
 **As a** tester, **I want** to add a test set, or a package to group test sets,
 under **Test Cases** or under another package, **so that** the tree grows the way
 the product is organized.

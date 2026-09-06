@@ -2,6 +2,9 @@
 
 # UC-004: Open a test set or a test run
 
+> **`Enter`**, with a test set or a test run selected. Double-clicking the row
+> does the same. On the menu: **Open**.
+
 **As a** tester, **I want** to open a test set or a test run from the tree,
 **so that** I can read and work its test cases.
 

@@ -2,6 +2,9 @@
 
 # UC-007: Rename a node
 
+> **`Shift+F6`**, with a test set, a package or a test run selected. On the
+> menu: **Actions → Rename**.
+
 **As a** tester, **I want** to rename a test set, a package or a test run,
 **so that** the tree says what things are called now.
 

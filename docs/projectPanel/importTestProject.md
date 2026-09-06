@@ -2,6 +2,9 @@
 
 # UC-022: Import a test project that already exists
 
+> **No key.** Press **New Test Project** at the top of the panel, and paste
+> the address instead of a name.
+
 **As a** tester, **I want** to bring a test project that already exists
 somewhere else onto this machine, **so that** I can work on it without building
 it again by hand.

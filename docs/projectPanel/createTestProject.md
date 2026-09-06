@@ -2,6 +2,9 @@
 
 # UC-002: Create a test project
 
+> **No key.** Press **New Test Project** at the top of the panel, or the
+> welcome link **Create your first test project**.
+
 **As a** tester, **I want** to create a test project by name, **so that** a new
 product under test has a place before any test is written.
 

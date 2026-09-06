@@ -2,6 +2,11 @@
 
 # UC-012: Retire and reactivate
 
+> **No key.** On the menu: **Actions**, then the status. A test project has
+> **Activate**, **Deactivate** and **Archive**. A test set has **Mark
+> Active** and **Mark Deprecated**. A package has **Mark Active** and
+> **Archive**.
+
 **As a** tester, **I want** to mark a test set **Deprecated**, a package
 **Archived**, or a whole test project **Inactive** or **Archived**, **so that**
 old work stays for its history without getting in the way of current work.
