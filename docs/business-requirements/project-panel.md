@@ -386,7 +386,7 @@ this document; none has an issue yet.
 
 | | Question | Why it is open |
 |---|---|---|
-| **Q-PP-01** | May a run go backwards — **Assigned** to **Created**, **In Progress** to **Created**? | Nothing prevents it today (D5). The product-wide question of the run lifecycle is [Q-01 in the main specification](business-requirements.md#9-undecided). |
+| **Q-PP-01** | May a run go backwards — **Assigned** to **Created**, **In Progress** to **Created**? | Nothing prevents it today (D5). The product-wide question of the run lifecycle is [Q-01 in the product's own document](product.md#9-undecided). |
 | **Q-PP-02** | Should a signed-off run be locked in the tree as well as in its editor? | Today it is not (D3). Its own description says its name must not change; the tree's rename does not check. |
 | **Q-PP-03** | What should the paste refusal say? | *Select a folder* is shown for six different reasons — wrong family, own subtree, another project, a test run — and only one of them is cured by selecting a different folder. |
 | **Q-PP-04** | On a Mac, should the tree's cut, paste, undo and redo keys follow the platform key the way copy does? | Today copy follows it and the other four do not. |

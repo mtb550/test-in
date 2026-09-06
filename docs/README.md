@@ -23,7 +23,7 @@ that link them — so the same fact is never written twice.
 
 | | Answers | Owns | State |
 |---|---|---|---|
-| **[Business requirements](business-requirements/business-requirements.md)** | What Testin promises, and to whom | `BR` `UC` `Q` | Product-wide: **Draft 1** — [#72](https://github.com/mtb550/test-in/issues/72). By module: **1 of 6** |
+| **[Business requirements](business-requirements/business-requirements.md)** | What Testin promises, and to whom | `BR` `UC` `Q` | The product: **[Draft 1](business-requirements/product.md)** — [#72](https://github.com/mtb550/test-in/issues/72). By module: **1 of 6** |
 | **[System requirements](system-requirements/system-requirements.md)** | What the software must do to keep those promises | `SR` | Product-wide: not written — [#180](https://github.com/mtb550/test-in/issues/180). By module: **1 of 6** |
 | **[Design](design/design.md)** | What the tester sees on each screen, and why | cites the above | By module: **1 of 6**, plus light mode |
 

@@ -75,7 +75,7 @@ The middle letters name the module:
 | `EX` | Evidence and exchange — reports, export, import, sync |
 
 Rules that hold for the whole product, not one module, carry no module code:
-`BR-11`. Those live in the main business requirements document.
+`BR-11`. Those live in [the product's own document](business-requirements/product.md).
 
 **The chain, read downward:**
 
