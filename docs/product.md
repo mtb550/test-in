@@ -34,7 +34,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 >   standalone always-on-top window, showing one test case at a time, with `P`,
 >   `F` and `B` on it.
 >   Section 6.2 is incomplete without it. See
->   [the light mode document](lightMode.md).
+>   [the light mode document](editorPanel/lightMode.md).
 > - **#74 is closed.** Section 8 names the grid view's missing keyboard path as a
 >   live gap tracked by it. That needs re-checking.
 > - **#68 is closed.** Question 2 still calls it open.
@@ -350,7 +350,7 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 > `B`, with `Ctrl+D` for the rest of the test case and `Escape` to close. It is
 > the clearest example of section 2's idea, and it is not described here.
 > See
-> [the light mode document](lightMode.md).
+> [the light mode document](editorPanel/lightMode.md).
 
 ### 6.3 Evidence and exchange
 

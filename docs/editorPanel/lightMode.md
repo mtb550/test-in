@@ -1,4 +1,4 @@
-[Documentation](README.md) › Light mode
+[Documentation](../README.md) › [The editor panel](main.md) › UC-EDITOR-PANEL-046
 
 # Light mode
 
@@ -8,12 +8,12 @@ with IntelliJ minimized, and still record a verdict without switching windows.
 
 | | |
 |---|---|
-| **Part of Testin** | The test run editor. Light mode is one of its windows |
-| **Answers for** | This one window. The rest of the test run editor is not written yet — [#181](https://github.com/mtb550/test-in/issues/181) |
+| **Part of Testin** | The editor panel. Light mode is one of its windows |
+| **Answers for** | This one window. The rest of the editor panel is [on its own pages](main.md) |
 | **Answers** | Why this window is shaped the way it is, and what every part of it does |
 | **State** | **Written.** Built and shipped — [#13](https://github.com/mtb550/test-in/issues/13), closed |
 | **Checked against** | `main` at `206c9744`, 6 September 2026 — read class by class against the built code |
-| **Numbering** | No rules or scenarios are numbered yet. This document describes the window; the numbers come when the rest of the test run editor is written |
+| **Numbering** | `UC-EDITOR-PANEL-046`. Its rules are not numbered yet, because this page was written before the rest of the part |
 
 This document describes the window as it was built.
 
@@ -713,4 +713,4 @@ use everywhere else, and the same blue the reports use.*
 
 ---
 
-[Documentation](README.md) › **Light mode**
+[Documentation](../README.md) › [The editor panel](main.md)

@@ -28,7 +28,7 @@ Rules 1 to 6 hold everywhere on the page. They are on
 ## What Testin refuses
 
 Nothing on this page. Every refusal happens at the sync, and those are on
-[UC-SHARE-016](../share/syncWithServer.md).
+[UC-SHARE-019](../share/syncWithServer.md).
 
 ## The address is not here
 
@@ -44,7 +44,7 @@ person's.
 
 There is no password row. The sync asks for a password when nothing else can
 prove who this is, and keeps it in the IDE's password store. That is
-[UC-SHARE-017](../share/keepServerPassword.md).
+[UC-SHARE-020](../share/keepServerPassword.md).
 
 ---
 

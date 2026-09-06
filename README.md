@@ -96,19 +96,25 @@ full statement is in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 Read it on the web at **[mtb550.github.io/test-in](https://mtb550.github.io/test-in/)**,
 or in this repository under [`docs/`](docs/README.md).
 
-Testin has six parts. Each part gets a folder, and every thing a tester does in
-it gets a page of its own: the story, its rules, its screens, what happens step
-by step, and every way it can be refused.
+Testin has eight parts. Each part gets a folder, and every thing a tester does
+in it gets a page of its own: the story, its rules, its screens, what happens
+step by step, and every way it can be refused. 151 use cases and 608 rules, each
+checked against the code it describes.
 
-| Document | Covers | Where it stands |
-|---|---|---|
-| **[The product](docs/product.md)** | What is true of all six parts | A draft |
-| **[The tree panel](docs/treePanel/main.md)** | The tree on the left | **Written** |
-| **[Light mode](docs/lightMode.md)** | The always-on-top window that shows one test case | **Written** |
+| Document | Covers |
+|---|---|
+| **[The tree panel](docs/treePanel/main.md)** | The tree on the left |
+| **[The editor panel](docs/editorPanel/main.md)** | Writing test cases, and executing a test run |
+| **[The view panel](docs/viewPanel/main.md)** | One test case in full, on the right |
+| **[The settings page](docs/setting/main.md)** | Everything set once per machine |
+| **[Automation code and the gutter](docs/codegen/main.md)** | The test methods Testin writes |
+| **[Reports](docs/report/main.md)** | A test run written out as a document |
+| **[Sharing work with the team](docs/share/main.md)** | Export, import, Git and a server |
+| **[Inside Testin](docs/internal/main.md)** | The search, and the one thing that owns every file |
 
-The rest — the other five parts, the keyboard reference, a first-run
-walkthrough, the formats on disk, the architecture — is listed on
-[the home page](docs/README.md) with the issue that will write it.
+The keyboard reference, a first-run walkthrough, the formats on disk and the
+architecture are listed on [the home page](docs/README.md) with the issue that
+will write each one.
 
 Questions, ideas and feedback are welcome in
 [Discussions](https://github.com/mtb550/test-in/discussions).
