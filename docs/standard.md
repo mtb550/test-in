@@ -155,11 +155,14 @@ These documents are for testers. Every sentence is checked against that reader.
 **Plain words, short sentences.**
 
 - **One idea per sentence.** About 15 words. A sentence with two ideas is two
-  sentences.
+  sentences. The one exception is the user story, which is one sentence in
+  three fixed parts however long it runs.
 - **No dashes and no semicolons in a sentence.** A dash joins two ideas. Split
   them. A dash may only separate an identifier from its text: *BR-PP-08 — …*
-- **A list, not a sentence with parts.** Three or more things go in a list.
-  Steps go in a numbered list.
+- **A list, not a sentence with parts.** Three or more things go in a list when
+  each one needs more than a word or two. Steps go in a numbered list. A short
+  series stays in the sentence: *create, name, group, order, retire and
+  remove*.
 - **Say the thing.** No metaphors, no figures of speech. *"The panel is the tree
   on the left."* Not *"The panel is that tree, drawn where the IDE keeps every
   other tree."*
