@@ -23,11 +23,22 @@ Each screen is drawn. Its parts are numbered.
 
 ---
 
+## How to read these drawings
+
+Each screen is drawn with text, so it can live beside the words that explain
+it. In every drawing:
+
+- `v` is the little triangle that opens and closes a row
+- `+` `@` `*` are the status icons a test run shows
+- `[set]`, `[dir]`, `[edit]`, `[find]` and the like stand for icons
+- `(1)` `(2)` `(3)` point at the numbered notes under the drawing
+
+---
+
 ## The panel
 
-The panel is the Testin tool window. It sits on the left. The header buttons
-belong to the IDE's own tool-window header. The branch box and the tree belong
-to Testin.
+The panel is the Testin window that sits on the left of the IDE. The buttons
+along its top are the IDE's own. The branch box and the tree are Testin's.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
@@ -54,30 +65,30 @@ to Testin.
 1. **Search Test Project** — opens search. It is the only header button with a
    key. The key works anywhere in the IDE.
 2. **Settings** — the Testin page of the IDE settings.
-3. **Expand All** and **Collapse All** — on expand, retired branches stay
-   collapsed. On collapse, the project and its two containers stay visible.
-   Part 10 says what retired means.
-4. **Refresh** — re-reads which test project the repository is bound to. Then
-   it re-indexes from disk.
+3. **Expand All** and **Collapse All** — **Expand All** leaves retired rows
+   closed. Retired means a **Deprecated** test set or an **Archived** package.
+   **Collapse All** leaves the test project and its two folders visible.
+4. **Refresh** — checks again which test project this code project uses, then
+   reads it again from the folder.
 5. **Select Test Project** and **New Test Project** — grayed until a Testin
    folder is set.
 6. **The branch box** — shown only for a test project shared through Git. Its
    placeholder reads *Loading branches...* until Git answers.
-7. **The project row** — drawn bold, with the IDE's project icon. The 2
-   containers under it are bold too. There are always exactly two containers.
-8. **A package** — folder icon. **A test set** — changelist icon. Neither is
-   bold.
+7. **The test project row** — drawn bold, with the IDE's project icon. The two
+   folders under it are bold too, and there are always exactly two.
+8. **A package** — a folder icon. **A test set** — the icon the IDE uses for a
+   changelist. Neither is bold.
 9. **A test run** — draws its **status** as its icon. The status word follows
    the name in gray. So the tester reads the status of every test run without
    opening one. A test run never draws a kind icon.
-10. **Gray text** — means retired, or cut and not yet pasted. Retired means a
-    **Deprecated** test set or an **Archived** package. Both look the same on
-    purpose. Both mean "not part of current work right now".
+10. **Gray text** — means retired, or cut and not yet pasted. Both look the
+    same on purpose. Both mean the same thing to a tester: not part of the work
+    in front of them.
 
 Retired nodes sit at the bottom of their folder. Their number does not change
 that.
 
-Used by every use case. The rendering rules are scenario 1 to scenario 4.
+Used by every use case. Scenario 1 to scenario 4 say how each row is drawn.
 
 ---
 
@@ -122,15 +133,15 @@ that situation.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The reason** — in red. It is shown when the repository named a test
-   project it could not use. The reason is one of:
+1. **The reason** — in red. It is shown when this code project named a test
+   project Testin could not use. The reason is one of:
    - *not under the Testin root*
    - *archived*
    - *could not be read*
-2. **One link per project** — name, then status. The tester clicks a link.
-   That binds this repository to the test project and shows its tree. With
-   more than six test projects, the list becomes one link. That link opens the
-   **Select Test Project** dialog.
+2. **One link per test project** — the name, then the status. The tester
+   clicks a link. This code project is then set to use that test project, and
+   the tree appears. If there are more than six test projects, Testin shows one
+   link instead of a list. That link opens the **Select Test Project** dialog.
 
 The other two screens follow the same shape: a gray line saying what is true,
 then the one link. They are:
@@ -144,9 +155,9 @@ Used by use case 1, use case 2, use case 3.
 
 ## The menu
 
-The tester right-clicks any row, or presses the keyboard's Context Menu key.
-The menu opens. What is grayed depends on the row. What is absent depends on
-which optional plugins are installed.
+The tester right-clicks any row, or presses the menu key beside the right
+`Ctrl`. The menu opens. Which items are gray depends on the row. Which items
+appear at all depends on which plugins are installed.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
@@ -187,7 +198,7 @@ which optional plugins are installed.
 3. **Run Tests** — only when the automation plugin is present.
 4. **Export**, **Import** — these belong to reports, export, import and sync.
 5. **Sync With Remote**, **View Pending Commits** — only when the Git plugin is
-   present. Otherwise the whole section is absent, separator included.
+   present. Otherwise the whole section disappears, dividing line included.
 6. **Sync With SFTP** — always present. Grayed unless the test project is
    shared over SFTP.
 7. **Edit Run** and **Set Status** — a test run's own two entries. Grayed once
@@ -227,17 +238,17 @@ bar.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **The name** — placeholder *set name...*. The tester presses `Enter` with
-   the field empty. The placeholder turns red. Focus stays here.
-2. **The two kinds** — each with a hint. `↑` `↓` move between them. The field's
-   leading icon follows. The tester clicks a row. The dialog submits with that
-   kind.
+1. **The name** — its gray hint text reads *set name...*. If the tester presses
+   `Enter` with the box empty, the hint turns red and the cursor stays here.
+2. **The two kinds** — each with a hint beside it. `↑` `↓` move between them,
+   and the icon at the front of the name box changes to match. Clicking a row
+   confirms straight away.
 3. **The status bar** — every key this dialog answers to.
 
 **Create Run Node** is the twin dialog on the test run side. It is identical
-except for two things. Its kinds are *test run* (*Records execution results*) and
-*test run package* (*Groups test runs*). Its placeholder is *set name, like
-Sprint 3 Cycle 1...*.
+except for two things. Its kinds are *test run* (*Records execution results*)
+and *test run package* (*Groups test runs*). Its hint text reads *set name,
+like Sprint 3 Cycle 1...*.
 
 > **Today the two kind names are blank.** The rows show only their hints.
 > This is difference 4 in the business requirements.
@@ -282,7 +293,7 @@ Used by use case 7.
 1. **The question** — names the node.
 2. **What it holds** — the line the tester reads before pressing `Enter`. It
    is omitted when every count is zero.
-3. **Where it is** — muted.
+3. **Where it is** — in gray.
 4. The confirm key is named for what it does. It reads **Remove**, not **OK**.
 
 For several nodes, the question is *Remove these N items?*. It shows no counts
@@ -309,8 +320,8 @@ Used by use case 8.
 
 1. **The question** — says the verb and the names. The verb is *Move* after a
    cut. It is *Copy* after a copy.
-2. **From** and **To** — muted. They let the tester catch a wrong drop before
-   pressing `Enter`.
+2. **From** and **To** — in gray. They let the tester catch a wrong drop
+   before pressing `Enter`.
 3. The confirm key is named for the verb.
 
 From a paste, the title is **Paste**. From a drop, the title is the verb:
@@ -356,9 +367,10 @@ Used by use case 10.
 
 1. **Five rows, one per status** — each with its icon. It is the same icon the
    tree draws for a test run in that status.
-2. **A key beside three of them** — *Created* and *In Progress* have none. They
-   are the test run's own record. The keys read `2` `1` `3` down the list. The
-   rows are in the product's status order, not key order.
+2. **A key beside three of them** — *Created* and *In Progress* have none,
+   because they are the test run's own record. The keys are not in order down
+   the list, because the rows follow the status order instead: **Assigned** is
+   `1`, **Completed** is `2`, **Closed** is `3`.
 3. The first row is selected when the popup opens. The tester chooses in one
    of three ways:
    - `↑` `↓` and `Enter`
@@ -393,19 +405,20 @@ Used by use case 13.
 ```
 
 1. **The name** — prefilled from the create dialog. Placeholder *Cycle-1*.
-2. **Configuration details** — a collapsible form. Its fields are:
+2. **Configuration details** — a section the tester can open and close. Its
+   fields are:
    - change log
    - commit id
    - test type
    - platform
    - component
    - language
-   - browser or device, only when platform and component call for it
-3. **The cases** — a checkbox tree of every live, non-empty test set. For a
-   new test run, all are checked. For a re-creation, only the previous cycle's
-   test cases are checked.
-4. **Create** — enabled only while at least one test case is checked. There is
-   no `Enter` to submit. The button is the only way to submit.
+   - browser or device, only when the platform and component make it relevant
+3. **The test cases** — a tree with a tick box for every test set still in use
+   that has test cases in it. For a new test run, all are ticked. For a
+   re-creation, only the ones the last cycle used.
+4. **Create** — enabled only while at least one test case is ticked. `Enter`
+   does nothing here. The button is the only way to confirm.
 
 **Edit Test Run** is this same dialog with the button **Save**. It opens filled
 with the test run's own:
@@ -437,8 +450,8 @@ Used by use case 6, use case 14, use case 15.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The field** — placeholder *Go to a test set or run, or search for
-   anything...*. Before the tester types, the list holds every test set and
+1. **The field** — its gray hint text reads *Go to a test set or run, or search
+   for anything...*. Before the tester types, the list holds every test set and
    test run.
 2. **A result row** — shows:
    - the icon
@@ -480,27 +493,27 @@ Used by use case 19.
 
 ---
 
-## Decisions this design takes
+## Why the panel is built this way
 
-### One project in the tree, not a project list
+### The tree shows one test project, not a list of them
 
-The panel shows the test project this repository is bound to, and no other.
-With a list of test projects in the tree, three things could disagree about which
-test project is open:
+The panel shows the one test project this code project is set to use, and no
+other. With a list of test projects in the tree, three things could disagree
+about which one is open:
 
 - the tree
 - the reports
 - the test runs
 
-The binding lives in the repository. So a colleague who clones the repository
-lands on the same test project, with no setup.
+The choice is written into the code project. So a colleague who copies that
+project down gets the same test project, with no setup.
 
-### A run is drawn as its status
+### A test run shows its status instead of a plain icon
 
-Every other node draws what it *is*. A test run draws where it *stands*: its
-status icon and the status word. That is the one thing a tester scanning the
-tree wants to know about a test run. Without it, the tester opens each test run
-to find out. This design saves that cost.
+Every other row shows what it *is*. A test run shows how far it has *got*: its
+status icon, and the status word. That is the one thing a tester scanning the
+tree wants to know about a test run. Without it, they would open each one to
+find out.
 
 ### Retired and cut look the same
 
@@ -522,31 +535,33 @@ named for the verb. Nothing in the tree changes until the tester presses
 ### The menu is short at the top and deep in Actions
 
 The top level holds what is done often: open and create. It also holds what
-belongs to other parts of Testin. Everything that changes a node in place is one level
-down, under **Actions**. So the first thing the tester sees is short. The
-dangerous things take a deliberate second step.
+belongs to other parts of Testin. Everything that changes a node where it sits
+is one level down, under **Actions**. So the first thing the tester sees is
+short, and anything that removes or moves something takes a second, deliberate
+step.
 
 ### Order is a dialog, not a drag
 
-Dropping between rows to reorder is not offered. A number:
+Dropping between rows to reorder is not offered. A number is better in three
+ways:
 
-- is explicit
-- survives a re-index
-- is the same number the generated automation carries as its execution order
+- it is written down
+- it stays right when Testin reads the folder again
+- it is the same number the automation uses to decide the running order
 
-A drag would be faster. It would say nothing.
+Dragging would be quicker, but it would leave nothing written down.
 
 ---
 
-## Where the build differs from this design
+## Where the plugin does not match this design
 
 | Drawn | Built |
 |---|---|
-| The create dialog's rows show a kind name and a hint | The names are blank. Only the hints show. Difference 4 in the business requirements |
+| The create dialog's rows show a kind name and a hint | The names are blank. Only the hints show. This is difference 4 in the business requirements |
 | **Paste** grayed on a test run, as on a test set | Enabled. It always refuses. Difference 2 |
 | The status popup offers the three statuses a tester sets | It offers all five. It lets a test run go backwards. Difference 5 |
-| **New Test Project** re-enables once a Testin folder is set | It stays grayed until the IDE project is reopened |
-| **Select Test Project** has a column heading over the names | The heading is blank. It is the same caption sweep as difference 4 |
+| **New Test Project** works again once a Testin folder is set | It stays gray until the tester closes and reopens the code project |
+| **Select Test Project** has a column heading over the names | The heading is blank. The label went missing in the same tidy-up as difference 4 |
 
 ---
 

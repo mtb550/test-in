@@ -10,7 +10,7 @@ answers to is named here, once, in the step that presses it.
 | **Area** | [System requirements](system-requirements.md) |
 | **Part of Testin** | The project panel, the tree on the left |
 | **Numbering** | Scenarios are numbered 1 to 75. The use cases carry the same numbers as in the [business requirements](../business-requirements/project-panel.md) |
-| **Answers** | Exactly what happens, and what the tester sees, for every gesture in the tree |
+| **Answers** | Exactly what happens, and what the tester sees, for everything the tester does in the tree |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every key, label and message read from the code that shows it |
 | **Read with** | [Business requirements](../business-requirements/project-panel.md) — why, and every rule cited here · [Design](../design/project-panel.md) — every screen |
@@ -21,7 +21,8 @@ answers to is named here, once, in the step that presses it.
 ## Every key, in one place
 
 Each row links to the scenario that owns the key. A key works only while the
-tree has focus. The search key is the exception. It works anywhere in the IDE.
+tester is clicked into the tree. The search key is the exception. It works
+anywhere in the IDE.
 
 | Key | Does | Scenario |
 |---|---|---|
@@ -32,17 +33,33 @@ tree has focus. The search key is the exception. It works anywhere in the IDE.
 | `Ctrl+C` | Copies the selected nodes | [scenario 40](#use-case-9--move-or-copy-nodes) |
 | `Ctrl+X` | Cuts the selected nodes | [scenario 41](#use-case-9--move-or-copy-nodes) |
 | `Ctrl+V` | Pastes into the selected node | [scenario 42](#use-case-9--move-or-copy-nodes) |
-| `Escape` | Clears the gray from cut nodes | [scenario 47](#use-case-9--move-or-copy-nodes) |
+| `Escape` | Takes the gray off nodes the tester cut | [scenario 47](#use-case-9--move-or-copy-nodes) |
 | `Ctrl+Z` | Undoes the last tree change | [scenario 51](#use-case-11--undo-and-redo-a-change-to-the-tree) |
 | `Ctrl+Y` | Redoes it | [scenario 52](#use-case-11--undo-and-redo-a-change-to-the-tree) |
 | `1` `2` `3` | Inside the status popup: Assigned, Completed, Closed | [scenario 57](#use-case-13--set-a-test-runs-status) |
 | `Ctrl+Alt+F` | Opens search, from anywhere in the IDE | [scenario 67](#use-case-17--find-anything-in-the-project) |
-| Context Menu key | Opens the node menu | [scenario 9](#the-tree-itself) |
+| The menu key, beside the right `Ctrl` | Opens the node menu | [scenario 9](#the-tree-itself) |
 
-Six things a tester might expect have **no key** on the tree. Order, the
-statuses, Re-create, Edit Run, Run Tests and Details are menu items only. Each
-one is a considered choice, not a reflex. None of them is pressed often enough
-to earn a key. `F2` renames in the editors, not here.
+Six things a tester might expect have **no key** on the tree. **Order**, the
+statuses, **Re-create**, **Edit Run**, **Run Tests** and **Details** are menu
+items only. Each one is a decision the tester thinks about, not a reflex, and
+none is used often enough to need a key. `F2` renames in the editors, not here.
+
+---
+
+## How to read a scenario
+
+Each scenario has a number and a name, and says what happens in three steps:
+**Given** what is true first, **When** what the tester does, and **Then** what
+happens. **And** adds a line to whichever step it follows.
+
+- A scenario with no **When** describes what the tester sees, without doing
+  anything.
+- The line under the name, *Keeps rule 8*, is the rule from the
+  [business requirements](../business-requirements/project-panel.md) that the
+  scenario holds up.
+- Words like *\<name\>* stand for whatever the tester is working on. Testin puts
+  the real name there.
 
 ---
 
@@ -53,8 +70,8 @@ to earn a key. `F2` renames in the editors, not here.
 > **Then** the test project is the top row, drawn bold, with the IDE's project icon
 > **And** under it sit exactly two bold rows, **Test Cases** and **Test Runs**, each with a bookmark icon
 > **And** a package shows a folder icon
-> **And** a test set shows a changelist icon
-> **And** a test run shows the icon of its status, instead of a kind icon
+> **And** a test set shows the icon the IDE uses for a changelist
+> **And** a test run shows the icon of its status, instead of an icon for what it is
 > **And** after a test run's name comes its status word in gray: *Created*, *In Progress*, *Assigned*, *Completed* or *Closed*
 
 **Scenario 2 · A retired or cut node is gray**
@@ -104,7 +121,7 @@ Keeps rule 52.
 
 **Scenario 9 · The keyboard opens the menu**
 > **Given** a row is selected and the tree has focus
-> **When** the tester presses the keyboard's Context Menu key
+> **When** the tester presses the menu key, the one beside the right `Ctrl`
 > **Then** the node menu opens over the selected row
 
 ---
@@ -122,9 +139,9 @@ Keeps rule 14.
 > |---|---|
 > | No Testin folder is set | *Welcome to Testin* and the link **Configure Testin settings** |
 > | The bound test project is found | The tree |
-> | This repository names a test project that is not on disk, and knows its Git address | *\<name\> is not on this machine yet* and the link **Clone \<name\>** |
+> | This code project names a test project that is not on this machine, and gives its Git address | *\<name\> is not on this machine yet* and the link **Clone \<name\>** |
 > | No test project exists under the Testin folder | The link **Create your first test project** |
-> | Otherwise | One link per test project, reading *\<name\>  \<Active\|Inactive\|Archived\>*. With more than six test projects, one link instead: **Select the test project for this repository** |
+> | Otherwise | One link per test project, showing its name and then **Active**, **Inactive** or **Archived**. With more than six test projects, one link instead: **Select the test project for this repository** |
 
 **Scenario 11 · One test project binds itself**
 Keeps rule 15.
@@ -227,7 +244,7 @@ Keeps rule 23.
 > **Given** **Test Cases** or a test set package is selected
 > **When** the tester presses `Ctrl+M`, or chooses **Create**
 > **Then** the **Create Test Node** dialog opens, with two kinds to pick from
-> **And** the kinds are a test set, hinted *Holds test cases*, and a test set package, hinted *Groups test sets*
+> **And** beside *test set* it says *Holds test cases*, and beside *test set package* it says *Groups test sets*
 > **And** the first kind is selected
 
 **Scenario 23 · Name it and pick the kind**
@@ -248,8 +265,8 @@ Keeps rule 5.
 > **Given** the name field is empty
 > **When** the tester presses `Enter`
 > **Then** the dialog stays open
-> **And** the placeholder turns red
-> **And** focus stays in the field
+> **And** the gray hint text turns red
+> **And** the cursor stays in the box
 
 **Scenario 26 · A sibling with that name refuses it**
 Keeps rule 4.
@@ -270,7 +287,7 @@ Keeps rule 26.
 > **Given** **Test Runs** or a test run package is selected
 > **When** the tester presses `Ctrl+M`, or chooses **Create**
 > **Then** the **Create Run Node** dialog opens, with two kinds
-> **And** the kinds are a test run, hinted *Records execution results*, and a test run package, hinted *Groups test runs*
+> **And** beside *test run* it says *Records execution results*, and beside *test run package* it says *Groups test runs*
 > **When** the kind is a package, and the tester presses `Enter`
 > **Then** the package is created, and *Created* is shown
 
@@ -298,7 +315,7 @@ Keeps rule 27 and rule 5.
 > **Then** the dialog stays open
 > **And** *A test run needs a name* is shown in red
 
-**Scenario 31 · The world moved while the dialog was open**
+**Scenario 31 · The parent folder was removed while the dialog was open**
 > **Given** the parent folder was removed while the dialog was open
 > **When** the tester presses **Create**
 > **Then** the dialog stays open
@@ -322,10 +339,10 @@ Keeps rule 31.
 > **Then** its automation code is renamed before the folder is
 > **And** its open editor, if it has one, is closed first
 
-**Scenario 34 · Refusals**
+**Scenario 34 · When Testin will not rename**
 Keeps rule 4, rule 5 and rule 30.
 > **Given** the name is empty
-> **Then** the placeholder turns red, and the dialog stays open
+> **Then** the gray hint text turns red, and the dialog stays open
 >
 > **Given** the name is unchanged
 > **Then** the dialog closes and nothing happens, silently
@@ -340,7 +357,7 @@ Keeps rule 4, rule 5 and rule 30.
 > **Then** nothing is renamed, and no *Renamed* is shown
 > **And** an error titled *Rename Failed* says why
 
-**Scenario 35 · Undoable**
+**Scenario 35 · The tester can undo a rename**
 Keeps rule 32.
 > **Given** a node was just renamed
 > **When** the tester presses `Ctrl+Z`
@@ -353,8 +370,10 @@ Keeps rule 6 and rule 33.
 > **Given** one or more removable nodes are selected
 > **When** the tester presses `Delete`, or chooses **Actions → Remove**
 > **Then** the **Confirm Removing** dialog opens
-> **And** for one node it asks *Remove '\<name\>'?*, says *Holds N test sets, N test cases and N test runs*, and shows *From: \<path\>*
-> **And** for several nodes it asks *Remove these N items?*
+> **And** for one node it asks *Remove '\<name\>'?*
+> **And** it says how many test sets, test cases and test runs that node holds
+> **And** it shows where the node is, after *From:*
+> **And** for several nodes it asks *Remove these N items?*, where N is how many
 
 **Scenario 37 · Confirm**
 Keeps rule 11 and rule 34.
@@ -429,7 +448,7 @@ Keeps rule 37, rule 38, rule 39 and rule 13.
 > **When** the tester presses `Ctrl+V`
 > **Then** nothing moves
 > **And** *Select a folder* is shown in red
-> **And** on the test project or a test set, **Paste** is grayed before that
+> **And** on a test project or a test set, **Paste** is gray already, so nothing happens at all
 
 **Scenario 45 · Refused: name taken**
 Keeps rule 4.
@@ -437,13 +456,13 @@ Keeps rule 4.
 > **When** the tester presses `Ctrl+V`
 > **Then** that node stays where it is
 > **And** *'\<name\>' already exists in '\<folder\>'* is shown in red, or *N items already exist in '\<folder\>'*
-> **And** other nodes in the same paste that can land still do
+> **And** the other nodes in the same paste still move
 
 **Scenario 46 · Drag and drop**
 Keeps rule 40 and rule 43.
 > **Given** the tester drags one or more nodes
 > **Then** a small rounded label follows the pointer, reading *'\<name\>'* or *N items*
-> **And** over a row where nothing being dragged can land, the pointer shows no-drop, and no row highlights
+> **And** over a row that cannot take them, the mouse shows the no-entry pointer, and the row does not light up
 > **When** the tester releases on a folder that can hold them
 > **Then** the **Move** dialog asks the same question as [scenario 42](#use-case-9--move-or-copy-nodes), and `Enter` moves them
 > **When** the tester holds `Ctrl` while releasing
@@ -455,7 +474,7 @@ Keeps rule 40 and rule 43.
 > **When** the tester presses `Escape` in the tree
 > **Then** the gray is removed
 > **But** the nodes stay on the clipboard
-> **And** a later `Ctrl+V` still offers to move them. This is difference 6 in the business requirements
+> **And** a later `Ctrl+V` still offers to move them, which is difference 6 in the business requirements
 
 **Scenario 48 · Only one test project**
 Keeps rule 13.
@@ -476,7 +495,7 @@ Keeps rule 44.
 > **When** the tester empties the field and presses `Enter`
 > **Then** the number is removed, the node returns to date order, and *Ordered* is shown
 
-**Scenario 50 · The field refuses as you type**
+**Scenario 50 · The field refuses the wrong characters as the tester types**
 Keeps rule 44.
 > **Given** the field is focused
 > **When** the tester types a leading zero, a letter or a space
@@ -517,7 +536,7 @@ Keeps rule 11.
 > **Given** some removed nodes can no longer be put back
 > **When** the tester presses `Ctrl+Z`
 > **Then** the rest are restored
-> **And** *Undo Incomplete*, with the line *N of M could not be put back*, is shown in red
+> **And** *Undo Incomplete* is shown in red, with a line saying how many of them could not be put back
 
 ---
 
@@ -525,7 +544,7 @@ Keeps rule 11.
 
 ### Use case 12 · Retire and reactivate
 
-**Scenario 55 · A status is one of a fixed few, set from the menu**
+**Scenario 55 · The tester picks a status from a short list on the menu**
 Keeps rule 54.
 > **Given** exactly one node is selected
 > **When** the tester opens **Actions**
@@ -568,7 +587,7 @@ Keeps rule 56.
 > **When** the tester presses that key, or moves with `↑` `↓` and presses `Enter`, or clicks a row
 > **Then** the test run's status is written
 > **And** its icon and its gray status word in the tree both change
-> **And** the status word is shown
+> **And** Testin shows the new status word
 > **When** the tester clicks outside the popup
 > **Then** it closes, and nothing changes
 
@@ -576,7 +595,7 @@ Keeps rule 56.
 Keeps rule 55 and rule 9.
 > **When** the status set is **Completed** or **Closed**
 > **Then** every test case still **Pending** in the test run becomes **Untested**
-> **And** the test run's end time is stamped
+> **And** Testin records the time the test run finished
 > **And** from then on **Set Status**, **Edit Run** and **Run Tests** are grayed on it
 
 ### Use case 14 · Re-create a test run
@@ -593,9 +612,18 @@ Keeps rule 57, rule 58 and rule 59.
 > **And** its editor opens
 > **And** *Run created* is shown
 
-**Scenario 60 · The same refusals as creating**
+**Scenario 60 · The same three refusals as creating a test run**
 Keeps rule 27, rule 5 and rule 4.
-> The same three refusals apply here as when a test run is created. With no test case checked, the **Create** button is disabled. An empty name shows *A test run needs a name*. A name already used shows *\<name\> Already Exists*. Each one leaves the dialog open, with everything typed still in it.
+> **Given** no test case is checked
+> **Then** the **Create** button is disabled
+>
+> **Given** the name is empty
+> **When** the tester presses **Create**
+> **Then** *A test run needs a name* is shown, and the dialog stays open with everything typed still in it
+>
+> **Given** the name is already used
+> **When** the tester presses **Create**
+> **Then** *\<name\> Already Exists* is shown, and the dialog stays open with everything typed still in it
 
 ### Use case 15 · Edit a test run
 
@@ -607,18 +635,18 @@ Keeps rule 61.
 > **And** test cases added to a test set since the test run was created appear unchecked
 > **When** the tester changes any of it and presses **Save**
 > **Then** the test run is rewritten
-> **And** an unchecked test case is dropped, with everything it recorded
+> **And** Testin removes any test case the tester unticked, with everything the test run recorded about it
 > **And** a newly checked test case is added as **Pending**
 > **And** the tree refreshes, and *Updated* is shown
 
 **Scenario 62 · A rename here renames the folder too**
 Keeps rule 31.
 > **Given** the name was changed
-> **Then** the test run's editor is closed
-> **And** its folder is renamed
-> **And** only then is the test run written
+> **Then** Testin closes the test run's editor
+> **And** renames its folder
+> **And** only then saves the test run
 
-**Scenario 63 · Refusals**
+**Scenario 63 · When Testin will not edit a test run**
 Keeps rule 60 and rule 9.
 > **Given** the test run is **Completed** or **Closed**
 > **Then** **Edit Run** is grayed
@@ -670,8 +698,8 @@ Keeps rule 66.
 > **Then** the **Search Test Project** dialog opens
 > **And** before anything is typed, it lists every test set and test run
 > **When** the tester types
-> **Then** nodes whose name contains the text are listed, matched from the first character
-> **And** test cases are listed too, matched from the second character, in any field they have
+> **Then** Testin lists every node whose name contains what was typed, starting from the first character typed
+> **And** it lists test cases too, starting from the second character, matching any part of the test case
 > **And** at most 50 rows are shown
 > **And** each row shows the icon, the name, and under it the path *\<project\> > Test Cases > …*
 
@@ -690,7 +718,7 @@ Keeps rule 67.
 Keeps rule 68 and rule 69.
 > **When** the tester presses the **Refresh** button in the panel header
 > **Then** the repository's binding is re-read
-> **And** the test project is re-indexed, under a progress bar reading *Testin indexing - \<project\>*
+> **And** Testin reads the test project again, showing a progress bar reading *Testin indexing - \<project\>*
 > **And** editors on nodes that are gone are closed, and the rest are reloaded
 > **And** the tree redraws, with the same rows expanded
 > **And** *Refreshed* is shown when it finishes
@@ -729,12 +757,12 @@ Keeps rule 73.
 Keeps rule 72.
 > **Given** the test project has uncommitted changes
 > **When** the tester picks another branch
-> **Then** the box snaps back
-> **And** the **Uncommitted Changes** dialog says how many changes there are, and that they would come along
+> **Then** the box goes back to the branch the tester was on
+> **And** the **Uncommitted Changes** dialog says how many changes there are, and that they would move to the new branch too
 > **When** the tester presses `Enter`, which is **Switch Anyway**
 > **Then** the switch runs as above
 > **When** the tester presses `Shift+Enter`, which is **Review Changes**
-> **Then** the pending-commits review opens instead
+> **Then** the list of changes not yet committed opens instead
 > **When** the tester presses `Escape`
 > **Then** nothing changes
 
@@ -756,9 +784,9 @@ Keeps rule 74 and rule 75.
 ## Also on this menu
 
 Six items on the tree's menu belong to another part of Testin: reports, export,
-import and sync. Their scenarios live there. They are **Export**, **Import**,
-**Generate Report** (`Ctrl+P`), **Sync With Remote**, **View Pending Commits**
-and **Sync With SFTP**.
+import and sync. They are **Export**, **Import**, **Generate Report**
+(`Ctrl+P`), **Sync With Remote**, **View Pending Commits** and
+**Sync With SFTP**. That document is not written yet.
 
 ---
 

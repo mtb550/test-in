@@ -20,7 +20,7 @@ set and test run. Everything in Testin starts here.
 
 ## What the panel is for
 
-A tester's work is a tree:
+A tester's work is arranged like a tree:
 
 - a test project holds test sets
 - a test set holds test cases
@@ -29,9 +29,19 @@ A tester's work is a tree:
 The panel is that tree. It sits on the left, where the IDE keeps every other
 tree. It is always one click away.
 
-Its job is small and strict. The panel shows one test project. It is the one
-this repository is bound to. The panel lets the tester shape that test project:
-create, name, group, order, retire and remove the things in it.
+**Three words, before the rules use them.**
+
+- A **node** is anything the tree shows: a test project, a folder, a test set or
+  a test run. A test case is not a node, because the tree does not show one.
+- **Bound** means this code project is set to use one test project. The choice
+  is written into the code project, so everyone who opens it gets the same test
+  project.
+- **Signed off** means a test run is **Completed** or **Closed**. Nothing in it
+  can change again.
+
+The panel's job is small and strict. It shows one test project, the one this
+code project is bound to. It lets the tester shape that test project: create,
+name, group, order, retire and remove the things in it.
 
 Reading and executing test cases happens in editors. The panel opens those
 editors. The panel itself never shows a test case.
@@ -40,23 +50,24 @@ editors. The panel itself never shows a test case.
 
 ## Rules that hold everywhere in the panel
 
-These apply to every use case below. A use case cites them. It does not repeat
-them.
+These apply to every use case below. A use case points at them by number. It
+does not repeat them.
 
 - **Rule 1** — The panel shows exactly one test project. It is the one this
   repository is bound to. There is no list of test projects in the tree.
 - **Rule 2** — **Test Cases** and **Test Runs** are fixed containers. They
   cannot be created, renamed, moved, copied or removed. They come with the test
   project and go with it.
-- **Rule 3** — A node has a family and never leaves it. Test sets and test set
-  packages live under **Test Cases**. Test runs and test run packages live under
-  **Test Runs**. Nothing crosses.
+- **Rule 3** — The tree has two sides, and nothing moves between them. Test sets
+  and test set packages live under **Test Cases**. Test runs and test run
+  packages live under **Test Runs**.
 - **Rule 4** — Two nodes under one parent cannot share a name. This holds
   whether the node is created, renamed, pasted or dropped.
 - **Rule 5** — A node name is never empty.
 - **Rule 6** — Removing, moving or copying asks first. Nothing in the tree
   changes until the tester confirms.
-- **Rule 7** — A change confirms itself once, in the past tense. The tester
+- **Rule 7** — When something changes, Testin says so once, in the past tense.
+  The tester
   sees *Created*, *Renamed* or *Removed*. Several changes at once confirm once,
   with a count: the tester sees *Removed 4*, never four messages. Looking at
   something confirms nothing.
@@ -102,9 +113,9 @@ The panel shows one of five things. It checks in this order:
 **Rules**
 
 - **Rule 14** — The panel never opens on its own when the IDE starts.
-- **Rule 15** — A repository can name no test project. If exactly one test
-  project exists under the Testin folder, the repository is bound to it without
-  asking.
+- **Rule 15** — A code project does not have to name a test project. If it names
+  none, and exactly one test project exists in the Testin folder, Testin binds it
+  to that one without asking.
 
 #### Use case 2 · Create a test project
 
@@ -247,7 +258,8 @@ its siblings, **so that** the tree reads in the order the work is done.
 
 **Rules**
 
-- **Rule 44** — A number is 1 or higher. An empty number means date order.
+- **Rule 44** — A number is 1 or higher. Leave it empty and Testin sorts by date
+  instead.
 - **Rule 45** — Two siblings may carry the same number. The older one comes
   first.
 - **Rule 46** — A retired node sorts after every live sibling. Its number does
@@ -305,8 +317,9 @@ without opening it.
 #### Use case 14 · Re-create a test run
 
 **As a** tester, **I want** to make the next cycle from a finished test run, with
-the same test cases, the same configuration and no verdicts, **so that** a
-regression pass takes one step instead of a rebuild.
+the same test cases and settings and no verdicts, **so that** starting the next
+round of testing takes one step, instead of building the whole test run again by
+hand.
 
 **Rules**
 
@@ -394,8 +407,10 @@ at a glance.
 
 **Rules**
 
-- **Rule 74** — Details changes nothing, and confirms nothing. (rule 7)
-- **Rule 75** — Counts are counted when asked. They are never stored.
+- **Rule 74** — Opening **Details** changes nothing, so Testin says nothing.
+  (rule 7)
+- **Rule 75** — Testin counts what a node holds when the tester asks. It never
+  saves the number.
 
 ---
 
@@ -416,14 +431,14 @@ documented there:
 ## Where the product breaks its own rules today
 
 Stated, not hidden. Each one is a real gap, found while reading the code for
-this document. None of them has an issue yet.
+this document. None of them has a bug report yet.
 
-| | Rule broken | What a tester sees |
+| | The rule it breaks | What a tester sees |
 |---|---|---|
 | **Difference 1** | Rule 7 — one past-tense word | Creating a test run says *Run created*. Creating a test project says *Project created* or *Project cloned*. Every other creation says *Created*. |
 | **Difference 2** | Rule 38 — nothing lands in a test run | **Paste** is offered on a test run. It always refuses, with *Select a folder*. It should be grayed, as it is on a test set. |
 | **Difference 3** | Rule 9 — a signed-off test run does not change | A **Completed** or **Closed** test run can still be renamed, moved, reordered and removed from the tree. Only editing, running and its status are blocked. |
-| **Difference 4** | Rule 23, rule 26 — the dialog offers the kinds | The create dialog's two rows show no kind name. They show only their hints, *Holds test cases* and *Groups test sets*. The names went missing in a caption sweep, and nobody noticed. |
+| **Difference 4** | Rule 23, rule 26 — the dialog offers the kinds | The create dialog's two rows show no kind name. They show only their hints, *Holds test cases* and *Groups test sets*. Someone removed them while tidying up the labels, and nobody noticed. |
 | **Difference 5** | Rule 56 — Created and In Progress are the test run's own | The status popup offers **Created** and **In Progress** as choices. It also lets a test run go backwards, from **Assigned** to **Created**. |
 | **Difference 6** | Rule 76 — canceling a cut empties the clipboard | The tester cuts nodes, then presses the key that clears the gray. The nodes stay on the clipboard. The next paste still moves them, though the tester canceled the cut. |
 
@@ -435,8 +450,8 @@ this document. None of them has an issue yet.
 |---|---|---|
 | **Question 1** | May a test run go backwards, from **Assigned** to **Created**, or from **In Progress** to **Created**? | Nothing prevents it today (difference 5). The same question for the whole product is [question 1 in the product's own document](product.md#9-undecided). |
 | **Question 2** | Should a signed-off test run be locked in the tree, as well as in its editor? | Today it is not (difference 3). Its own description says its name must not change. The tree's rename does not check. |
-| **Question 3** | What should the paste refusal say? | *Select a folder* is shown for six different reasons. Among them: the wrong family, its own subtree, another test project, and a test run. Only one of the six is cured by selecting a different folder. |
-| **Question 4** | On a Mac, should the tree's cut, paste, undo and redo keys follow the platform key the way copy does? | Today copy follows it. The other four do not. |
+| **Question 3** | What should the paste refusal say? | *Select a folder* is shown for six different reasons. Four of them are: the wrong side of the tree, the node itself, another test project, and a test run. Choosing a different folder only fixes one of the six. |
+| **Question 4** | On a Mac, should cut, paste, undo and redo in the tree use the Mac's own key for those actions, the way copy already does? | Today copy does. The other four do not. The [system requirements](../system-requirements/project-panel.md) name the keys. |
 
 ---
 
