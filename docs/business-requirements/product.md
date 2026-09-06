@@ -361,8 +361,8 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 | Export | — | CSV, Excel, HTML, JSON |
 | Import | — | CSV, Excel, JSON |
 | Show node details | — | Counts for a container, a verdict breakdown for a run |
-| Synchronise with Git | — | Requires the Git plugin |
-| Synchronise over SFTP | — | Credentials live in the IDE's password store, never in a file |
+| Sync with Git | — | Needs the Git plugin |
+| Sync over SFTP | — | Passwords live in the IDE's own password store, never in a file |
 
 ### 6.4 Use cases
 
@@ -399,7 +399,7 @@ Numbered so an issue or a commit can cite one.
 |---|---|
 | — | All data is files on the tester's own disk, in a folder they chose. |
 | — | A test project is one folder. Everything belonging to it lives beneath that folder and nowhere else. |
-| — | What is stored is byte-identical to what the tester typed. Displaying a value may reformat it; saving never does. |
+| — | What is stored is exactly what the tester typed, character for character. Showing a value on screen may tidy it up. Saving never does. |
 | — | Secrets are never written to a file the repository carries. They are held in the IDE's own password store. |
 
 ### Structure
@@ -424,13 +424,13 @@ Numbered so an issue or a commit can cite one.
 | BR | Rule |
 |---|---|
 | — | A tester may record exactly three verdicts: Passed, Failed, Blocked. |
-| — | Pending and Untested are the run's own record and cannot be applied by a person. Pending means not reached yet; Untested means never reached, and never will be. |
+| — | Pending and Untested are the test run's own record, and a person cannot apply them. Pending means not reached yet. Untested means never reached, and never will be. |
 
 ### Feedback
 
 | BR | Rule |
 |---|---|
-| — | Every state-changing action confirms itself once, in the past tense, and a bulk action confirms once with a count — never once per item. |
+| — | Every action that changes something confirms itself once, in the past tense. An action on several things confirms once, with a count, never once per thing. |
 
 ### The keyboard
 
@@ -441,28 +441,28 @@ Numbered so an issue or a commit can cite one.
 | — | A capability with no key says so rather than being silently unreachable. |
 | — | One key means one thing. The same keystroke does not do different jobs in different places. |
 
-### Degradation
+### When a plugin is missing
 
 | BR | Rule |
 |---|---|
-| — | Testin installs and runs in any JetBrains IDE. Where an optional plugin is absent, the capabilities that need it are withheld and the reason is stated — never a failure. |
-| — | Java absent: no automation code is generated and no navigation to it. Everything else works. |
-| — | Git absent: no synchronisation or cloning. The data is still on disk and still usable. |
+| — | Testin installs and runs in any JetBrains IDE. Where an optional plugin is missing, the features that need it are withheld, and Testin says why. It never fails. |
+| — | Without Java: no automation code is written, and no jumping to it. Everything else works. |
+| — | Without Git: no sync and no cloning. The data is still on disk, and still usable. |
 
 ---
 
-## 8. Non-functional expectations
+## 8. Promises about the product as a whole
 
-These are already promises, not aspirations.
+These are promises already kept, not hopes.
 
-| Expectation | What it means |
+| Promise | What it means |
 |---|---|
-| **Data stays local** | Everything is files under a folder the tester chose. Nothing is uploaded |
-| **Zero telemetry** | The product makes no network calls of its own. The only traffic that exists is the tester's own Git or SFTP synchronisation, which they configure and trigger |
-| **Fidelity** | Stored data is byte-identical to what was typed — **BR-31** |
-| **Graceful degradation** | A missing optional plugin removes capability and states why. It never produces an error — **BR-50** |
-| **Keyboard completeness** | A full execution cycle is completable from the keyboard alone. **True of the list view; the grid view was a gap tracked as #74 — which is now closed, so this needs re-checking** |
-| **Cross-IDE** | Runs in IntelliJ IDEA, PyCharm, GoLand, WebStorm and the rest of the family |
+| **The data stays on your machine** | Everything is files under a folder the tester chose. Nothing is uploaded |
+| **Nothing is sent anywhere** | Testin makes no network calls of its own. The only traffic is the tester's own Git or SFTP sync, which they set up and start |
+| **What you typed is what is stored** | Stored data matches what was typed, character for character — **BR-31** |
+| **A missing plugin removes a feature, not the product** | Testin withholds the feature and says why. It never shows an error — **BR-50** |
+| **The keyboard is enough** | A tester can run a whole test run without the mouse. **True of the list view. The grid view was a gap, tracked as #74, which is now closed, so this needs re-checking** |
+| **It runs in every JetBrains IDE** | IntelliJ IDEA, PyCharm, GoLand, WebStorm and the rest of the family |
 
 ---
 
@@ -472,11 +472,11 @@ Listed rather than guessed. Each is a real question the product has not answered
 
 | | Question | Why it is open |
 |---|---|---|
-| **Q-01** | May a Completed or Closed run be reopened? | **Nothing enforces the run lifecycle at all today** — any status can be set from any other. Section 5.2 describes what is *allowed*, which is everything. The transition table that once declared a lifecycle was deleted and never replaced. Tracked in [#10](https://github.com/mtb550/test-in/issues/10) |
-| **Q-02** | Is a deprecated test set hidden, or merely not offered? | Today it is shown, greyed, and not offered. Whether it should disappear from the tree entirely is not settled. Tracked in [#68](https://github.com/mtb550/test-in/issues/68) — **now closed; re-check** |
-| **Q-03** | What happens to a run when the test set behind it is deleted wholesale? | The per-case answer is **BR-11**. The whole-set answer has never been stated. Tracked in [#71](https://github.com/mtb550/test-in/issues/71) — **now closed; re-check** |
+| **Q-01** | May a Completed or Closed test run be reopened? | **Nothing stops a test run moving anywhere at all today.** Any status can be set from any other. Section 5.2 describes what is *allowed*, which is everything. The table that once said which moves were legal was deleted, and never replaced. Tracked in [#10](https://github.com/mtb550/test-in/issues/10) |
+| **Q-02** | Is a deprecated test set hidden, or just not offered? | Today it is shown, drawn gray, and not offered. Whether it should disappear from the tree entirely is not settled. Tracked in [#68](https://github.com/mtb550/test-in/issues/68), **now closed, so re-check** |
+| **Q-03** | What happens to a test run when the whole test set behind it is deleted? | The answer for one test case is **BR-11**. The answer for a whole test set has never been stated. Tracked in [#71](https://github.com/mtb550/test-in/issues/71), **now closed, so re-check** |
 | **Q-04** | What are the roles, and what does each one permit? | The field is reserved, not dead: role-based permissions are planned, and will read it to decide **who may approve a test case** and **who may remove a test project**. What is undecided is the list of roles and the permission each carries — and free text cannot answer "may this person approve", so the field will need a fixed set behind it. It is also application-level today, meaning one role per IDE installation rather than one per team member. Tracked in [#14](https://github.com/mtb550/test-in/issues/14) |
-| **Q-05** | What does a test case's own status do? | Four states exist on every test case — Pending, Reviewed, Disabled, To Be Updated — and **not one of them changes anything**. A Disabled case is still offered to a run; a To Be Updated case is still executed; a Reviewed case is treated exactly like an unreviewed one. The state is settable only in a hidden grid column, and an import drops it. Deciding what each state *does* is the same decision as **Q-04**: Reviewed is approval, and approval means nothing until something is withheld from an unapproved case |
+| **Q-05** | What does a test case's own status do? | Every test case has four states: Pending, Reviewed, Disabled and To Be Updated. **Not one of them changes anything.** A Disabled test case is still offered to a test run. A To Be Updated test case is still run. A Reviewed test case is treated exactly like an unreviewed one. The state can be set only in a hidden grid column, and an import drops it. Deciding what each state *does* is the same decision as **Q-04**. Reviewed means approved, and approval means nothing until something is withheld from a test case that is not approved |
 
 ---
 
@@ -497,15 +497,15 @@ Listed rather than guessed. Each is a real question the product has not answered
 
 | Term | Definition |
 |---|---|
-| **Test Project** | The top of one tree; one folder holding everything below it |
-| **Test Set** | A named group of test cases; what a run is configured from |
+| **Test Project** | The top of one tree. One folder, holding everything below it |
+| **Test Set** | A named group of test cases. A test run is built from one |
 | **Test Case** | One testable thing, with its steps and expected result. The question |
 | **Test Run** | One execution of a chosen set of cases at a point in time |
 | **Test Run Result** | What happened to one case in one run. The answer |
 | **Verdict** | Passed, Failed or Blocked — the three a tester can give |
 | **Pending** | This run holds the case and has not reached it yet |
 | **Untested** | The run ended without ever reaching the case |
-| **Removed** | The test case has been deleted; the run keeps what it recorded |
+| **Removed** | The test case has been deleted. The test run keeps what it recorded |
 | **Signed off** | Completed or Closed. A signed-off test run records nothing further |
 | **Deprecated** | A test set kept for its history but no longer offered for new runs |
 | **Archived** | A package kept but moved out of the way |
@@ -513,10 +513,10 @@ Listed rather than guessed. Each is a real question the product has not answered
 
 ---
 
-> **How to keep this true.** Every rule above is checkable against the product.
-> When behaviour changes, change the rule in the same breath and cite its number in
-> the commit. A rule that quietly stops being true is worse than no rule, because
-> someone will plan against it.
+> **How to keep this true.** Every rule above can be checked against the product.
+> When the plugin changes, change the rule in the same breath, and put its number
+> in the commit message. A rule that quietly stops being true is worse than no
+> rule, because someone will plan against it.
 
 ---
 

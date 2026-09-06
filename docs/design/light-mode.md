@@ -14,7 +14,7 @@ with IntelliJ minimized, and still record a verdict without switching windows.
 | **Answers** | Why this window is shaped the way it is, and what every part of it does |
 | **State** | **Written.** Built and shipped — [#13](https://github.com/mtb550/test-in/issues/13), closed |
 | **Checked against** | `main` at `206c9744`, 6 September 2026 — read class by class against the built code |
-| **Cites** | No `BR` or `SR` yet; the business requirements do not describe this window ([#72](https://github.com/mtb550/test-in/issues/72)) |
+| **Points at** | No rules yet. The business requirements do not describe this window ([#72](https://github.com/mtb550/test-in/issues/72)) |
 
 This document describes the window as it was built. It also says where the build
 differs from what was first drawn. The package is `org.testin.lightmode`, and it
