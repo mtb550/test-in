@@ -1,3 +1,5 @@
+[Documentation](../README.md) › [Design](design.md) › Project panel
+
 # Project panel — design
 
 What the tester sees: the panel, the tree, the menu, and every dialog the panel
@@ -10,7 +12,8 @@ opens. Each screen is drawn, and its parts are numbered.
 | **Answers** | Where every part of the panel sits, what it looks like, and why it is shaped that way |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every label and layout read from the code that draws it |
-| **Written to** | [How a document is written](../standard.md). Behaviour is in the [system requirements](../system-requirements/project-panel.md); the rules in the [business requirements](../business-requirements/project-panel.md). Keys appear here only where a screen draws them |
+| **Read with** | [Business requirements](../business-requirements/project-panel.md) — the rules · [System requirements](../system-requirements/project-panel.md) — what happens, step by step |
+| **Written to** | [How a document is written](../standard.md). A key appears only where a screen draws it |
 
 ---
 
@@ -478,3 +481,7 @@ execution order. A drag would be faster and would say nothing.
 | The status popup offers the three statuses a tester sets | It offers all five, and lets a run go backwards. D5 |
 | **New Test Project** re-enables once a Testin folder is set | It stays greyed until the IDE project is reopened |
 | **Select Test Project** has a column heading over the names | The heading is blank — the same caption sweep as D4 |
+
+---
+
+[Documentation](../README.md) › [Design](design.md) › **Project panel** — read with the [business requirements](../business-requirements/project-panel.md) and the [system requirements](../system-requirements/project-panel.md)

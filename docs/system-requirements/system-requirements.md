@@ -1,3 +1,5 @@
+[Documentation](../README.md) › System requirements
+
 # System Requirement Specification
 
 What the software must do, stated so that each requirement can be checked.
@@ -12,15 +14,22 @@ What the software must do, stated so that each requirement can be checked.
 
 ---
 
-## By module
+## Documents
 
-Each module's scenarios are a document of their own. Every key that module
-answers to is named there, once, in the scenario that presses it.
+Each module has its own document. It has the same use cases, with the same
+`UC` ids, as the [business requirements](../business-requirements/business-requirements.md).
+Every key is named here, once. Every screen is drawn in the
+[design](../design/design.md).
 
-| Module | |
-|---|---|
-| **[Project panel](project-panel.md)** `PP` | **Written** — 63 scenarios, 13 keys |
-| Test case editor `TE` · Test run editor `RE` · View panel `VP` · Settings `ST` · Evidence and exchange `EX` | Not yet — [#181](https://github.com/mtb550/test-in/issues/181) |
+| Document | Holds | State |
+|---|---|---|
+| The product | Disk formats, failure, performance, compatibility, security | Not written — [#180](https://github.com/mtb550/test-in/issues/180) |
+| **[Project panel](project-panel.md)** `PP` | The tree: 75 scenarios, 13 keys | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
+| Test case editor `TE` | Writing test cases | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| Test run editor `RE` | Running tests and recording verdicts. Light mode | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| View panel `VP` | Details, history and bugs of one test case | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| Settings `ST` | The settings page | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| Evidence and exchange `EX` | Reports, export, import, sync | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
 
 ## How this differs from the business requirements
 
@@ -41,7 +50,7 @@ finding before the code is.
 
 ---
 
-## What will be in it
+## What the product's document will hold
 
 Sections planned, in the order they are worth writing. Each is empty until it is
 written; a heading with nothing under it is not a specification.
@@ -80,3 +89,7 @@ requirement being reworded; a quoted sentence does not.
 > what it owns, so the identifier space and its relationship to the business
 > requirements are settled before anybody writes an `SR-01` that means something
 > else. Writing it is [#180](https://github.com/mtb550/test-in/issues/180).
+
+---
+
+[Documentation](../README.md) › **System requirements** — the other two: [business requirements](../business-requirements/business-requirements.md) · [design](../design/design.md)

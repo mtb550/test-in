@@ -1,3 +1,5 @@
+[Documentation](../README.md) › Design
+
 # Design
 
 One document per screen: what it looks like, and the reasoning behind every
@@ -16,12 +18,14 @@ choice on it.
 
 | Document | The surface | State |
 |---|---|---|
-| **[Project panel](project-panel.md)** `PP` | The tree on the left, its header, its menu and every dialog it opens — 13 screens | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **[Light mode](light-mode.md)** `RE` | The standalone always-on-top window that shows one test case at a time | **Written** — [#13](https://github.com/mtb550/test-in/issues/13), closed |
-| Test case editor `TE` | The grid, the card list, the details panel and the toolbar that drives them | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
-| The dialog framework | `ui.framework` — the dialog shell, the status bar strip, the keycap, the prose paragraph, the row striping. What a new dialog gets for free | Not written — [#11](https://github.com/mtb550/test-in/issues/11), [#69](https://github.com/mtb550/test-in/issues/69) |
-| The project tree | The explorer: what each node offers, what may be dropped where, and the markers on disk behind it | Not written |
-| Reports | What a generated report contains, and why each figure is on it | Not written |
+| **[Project panel](project-panel.md)** `PP` | The tree, its menu and every dialog it opens. 13 screens | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
+| Test case editor `TE` | The grid, the card list, the details panel, the toolbar | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| Test run editor `RE` | The run editor: execution, verdicts, the failure form | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| **[Light mode](light-mode.md)** `RE` | The always-on-top window that shows one test case at a time | **Written** — [#13](https://github.com/mtb550/test-in/issues/13), closed |
+| View panel `VP` | The view panel: details, history and bugs | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| Settings `ST` | The settings page | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| Evidence and exchange `EX` | The report, export, import and sync dialogs | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| The dialog framework | What every dialog gets for free: the shell, the status bar, the keycap, the row striping | Not written — [#11](https://github.com/mtb550/test-in/issues/11), [#69](https://github.com/mtb550/test-in/issues/69) |
 
 ---
 
@@ -65,3 +69,7 @@ So a design document may cite a rule and must not invent one. If a screen needs 
 promise nothing has made, that promise is a change to the
 [business requirements](../business-requirements/business-requirements.md), and
 the screen waits for it.
+
+---
+
+[Documentation](../README.md) › **Design** — the other two: [business requirements](../business-requirements/business-requirements.md) · [system requirements](../system-requirements/system-requirements.md)

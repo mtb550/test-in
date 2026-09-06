@@ -1,3 +1,5 @@
+[Documentation](../README.md) › [System requirements](system-requirements.md) › Project panel
+
 # Project panel — system requirements
 
 What the panel does, step by step, when the tester does something. Every key
@@ -10,7 +12,8 @@ the panel answers to is named here, once, in the step that presses it.
 | **Answers** | Exactly what happens, and what the tester sees, for every gesture in the tree |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every key, label and message read from the code that shows it |
-| **Written to** | [How a document is written](../standard.md). The *why* and the rules are in the [business requirements](../business-requirements/project-panel.md); every `BR-PP` cited below is defined there. The screens are in the [design](../design/project-panel.md) |
+| **Read with** | [Business requirements](../business-requirements/project-panel.md) — why, and every rule cited here · [Design](../design/project-panel.md) — every screen |
+| **Written to** | [How a document is written](../standard.md). Every key the panel answers to is here, once |
 
 ---
 
@@ -577,3 +580,7 @@ key. `F2` renames in the editors, not here.
 **Export**, **Import**, **Generate Report** (`Ctrl+P`), **Sync With Remote**,
 **View Pending Commits** and **Sync With SFTP** are on the tree's menu and
 belong to module `EX`. Their scenarios live there.
+
+---
+
+[Documentation](../README.md) › [System requirements](system-requirements.md) › **Project panel** — read with the [business requirements](../business-requirements/project-panel.md) and the [design](../design/project-panel.md)

@@ -1,3 +1,5 @@
+[Documentation](../README.md) › [Design](design.md) › Light mode
+
 # Light mode
 
 A separate always-on-top window that shows **one test case at a time**, so a
@@ -7,6 +9,8 @@ record a verdict without switching windows.
 | | |
 |---|---|
 | **Area** | [Design](design.md) |
+| **Module** | `RE` — Test run editor. Light mode is one of its windows |
+| **Read with** | Nothing yet. The test run editor's business and system requirements are not written — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Answers** | Why this window is shaped the way it is, and what every part of it does |
 | **State** | **Written.** Built and shipped — [#13](https://github.com/mtb550/test-in/issues/13), closed |
 | **Checked against** | `main` at `206c9744`, 6 September 2026 — read class by class against the built code |
@@ -726,3 +730,7 @@ across two editors the toggle updated the wrong button.
 
 *Colors are the plugin's own: `008000`, `FF0000` and `FFA500` from `TestStatus`,
 accent `2E5496` from the report generators.*
+
+---
+
+[Documentation](../README.md) › [Design](design.md) › **Light mode** — the test run editor's business and system requirements are not written yet: [#181](https://github.com/mtb550/test-in/issues/181)

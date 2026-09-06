@@ -1,3 +1,5 @@
+[Documentation](README.md) › How a document is written
+
 # How a document is written
 
 Every module of Testin gets three documents, and each one answers a different
@@ -174,6 +176,7 @@ These documents are for testers. Every sentence is checked against that reader.
 |---|---|
 | **Area** | Which of the three specifications, linked |
 | **Module** | Which module code |
+| **Read with** | The same module in the other two specifications, linked |
 | **Answers** | One sentence |
 | **State** | Written · Draft · Not written — with the issue |
 | **Checked against** | The commit on `main`, and the date |
@@ -183,9 +186,29 @@ might have drifted — before reading a word of it.
 
 ---
 
+## The same way in, and the same way out
+
+A reader is never more than one click from an index.
+
+- **An index is a list of documents, and nothing else.** Each folder has one:
+  [`business-requirements.md`](business-requirements/business-requirements.md),
+  [`system-requirements.md`](system-requirements/system-requirements.md),
+  [`design.md`](design/design.md). It lists every document, written or not,
+  with the issue that will write it. [The home page](README.md) lists the three.
+- **The line above every title is a breadcrumb.** Each step is a link:
+  *Documentation › Business requirements › Project panel*.
+- **The last line of every document is the same breadcrumb, plus its twins.**
+  The twins are the same module in the other two specifications.
+
+---
+
 ## When behaviour changes
 
 The document changes **in the same commit** as the code. A commit that changes
 what a key does and does not change the scenario that names it is incomplete,
 and the review should say so. This is the whole reason the documentation lives
 in this repository rather than beside it.
+
+---
+
+[Documentation](README.md) › **How a document is written**

@@ -1,3 +1,5 @@
+[Documentation](../README.md) › [Business requirements](business-requirements.md) › Project panel
+
 # Project panel — business requirements
 
 The tree on the left of the IDE, where every test project, test set and test run
@@ -10,7 +12,8 @@ lives. Everything in Testin starts here.
 | **Answers** | What the panel is for, what a tester can do in it, and the rules that always hold |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule read from the code that enforces it |
-| **Written to** | [How a document is written](../standard.md). No keys here; those are in the [system requirements](../system-requirements/project-panel.md). Screens are in the [design](../design/project-panel.md) |
+| **Read with** | [System requirements](../system-requirements/project-panel.md) — the same use cases, step by step, with every key · [Design](../design/project-panel.md) — every screen |
+| **Written to** | [How a document is written](../standard.md). No keys here. Keys are in the system requirements |
 
 ---
 
@@ -390,3 +393,7 @@ this document; none has an issue yet.
 | **Q-PP-02** | Should a signed-off run be locked in the tree as well as in its editor? | Today it is not (D3). Its own description says its name must not change; the tree's rename does not check. |
 | **Q-PP-03** | What should the paste refusal say? | *Select a folder* is shown for six different reasons — wrong family, own subtree, another project, a test run — and only one of them is cured by selecting a different folder. |
 | **Q-PP-04** | On a Mac, should the tree's cut, paste, undo and redo keys follow the platform key the way copy does? | Today copy follows it and the other four do not. |
+
+---
+
+[Documentation](../README.md) › [Business requirements](business-requirements.md) › **Project panel** — read with the [system requirements](../system-requirements/project-panel.md) and the [design](../design/project-panel.md)
