@@ -31,7 +31,7 @@ The product, described for someone who does not read Java.
 
 | Document | What it answers | State |
 |---|---|---|
-| **Business requirements** | The actors, the use cases and the rules. Who Testin is for, what problem it solves, and what it deliberately does not do. | Not written — [#72](https://github.com/mtb550/test-in/issues/72) |
+| **[Business requirements](business-requirements.md)** | The actors, the things a tester works with, every capability with its key, the numbered rules, all 26 status constants, and what is still undecided. | **Draft 1**, moved from Notion — two databases still partial, [#72](https://github.com/mtb550/test-in/issues/72) |
 | **Formats on disk** | The seven marker formats, `testin.yml` and the sequence store. The document that lets somebody read a test project without the plugin installed. | Not written — [#100](https://github.com/mtb550/test-in/issues/100) |
 
 ## Design
