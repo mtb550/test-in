@@ -9,7 +9,7 @@ set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The project panel, the tree on the left |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are UC-001 to UC-021. Rules are numbered 1 to 78. They belong to the project panel. Every other part of Testin starts its own numbers again |
+| **Numbering** | Use cases are UC-001 to UC-022. Rules are numbered 1 to 79. They belong to the project panel. Every other part of Testin starts its own numbers again |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code |
 | **Written to** | [How a document is written](../standard.md) |
@@ -25,6 +25,7 @@ Each one is a page of its own: the story, its rules, its screens and its steps.
 | | **Getting to the tree** | |
 | **UC-001** | [Open the panel and reach the tree](reachTheTree.md) | |
 | **UC-002** | [Create a test project](createTestProject.md) | |
+| **UC-022** | [Import a test project that already exists](importTestProject.md) | |
 | **UC-003** | [Choose which test project this code project uses](chooseTestProject.md) | |
 | | **Nodes** | |
 | **UC-004** | [Open a test set or a test run](openNode.md) | |

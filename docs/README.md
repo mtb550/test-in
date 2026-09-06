@@ -20,7 +20,7 @@ by step, and every way it can be refused.
 | Document | What it covers | Where it stands |
 |---|---|---|
 | **[The product](product.md)** | What is true of all six parts: who uses Testin, what they work with, every status, and the rules that hold everywhere | A draft, moved from Notion, not re-checked against today's plugin — [#72](https://github.com/mtb550/test-in/issues/72) |
-| **[The project panel](projectPanel/main.md)** | The tree on the left. 21 use cases, 78 rules, 15 screens | **Written** |
+| **[The project panel](projectPanel/main.md)** | The tree on the left. 22 use cases, 79 rules, 16 screens | **Written** |
 | The test case editor | Writing and reading test cases: the grid, the card list and the details panel | Not written |
 | The test run editor | Running tests and recording verdicts. **[Light mode](lightMode.md)** is one of its windows, and is written | Not written, except light mode |
 | The view panel | Details, history and bugs of the selected test case | Not written |
