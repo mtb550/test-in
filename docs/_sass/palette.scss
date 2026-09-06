@@ -1,0 +1,64 @@
+// ---------------------------------------------------------------------------
+// The palette. Every colour on the documentation site is here and nowhere else.
+//
+// To change how the site looks, change a value in this file. Nothing below is a
+// selector, so there is no CSS to understand and nothing to break: each name is
+// a role, and every rule elsewhere asks for the role rather than the colour.
+//
+//   ground      the page itself
+//   surface     anything raised off it - code blocks, table headers, asides
+//   ink         body text and headings
+//   ink-2       secondary text, quotes
+//   ink-3       footers, captions
+//   line        borders that should be seen
+//   line-soft   borders that should barely be
+//   accent      links, and the bar down the left of an aside
+//   code-ink    the window sketches and inline code
+//
+// Both themes define all nine. A colour that exists in one and not the other is
+// how a page ends up readable in daylight and invisible at night, so the two
+// blocks below are kept the same length on purpose.
+// ---------------------------------------------------------------------------
+
+@mixin palette-light {
+  color-scheme: light;
+
+  --ground:     #ffffff;
+  --surface:    #f6f8fa;
+  --ink:        #24292f;
+  --ink-2:      #57606a;
+  --ink-3:      #6e7781;
+  --line:       #d0d7de;
+  --line-soft:  #eaeef2;
+  --accent:     #0969da;
+  --code-ink:   #24292f;
+}
+
+@mixin palette-dark {
+  color-scheme: dark;
+
+  --ground:     #0d1117;
+  --surface:    #161b22;
+  --ink:        #e6edf3;
+  --ink-2:      #adbac7;
+  --ink-3:      #8b949e;
+  --line:       #30363d;
+  --line-soft:  #21262d;
+  --accent:     #4493f8;
+  --code-ink:   #e6edf3;
+}
+
+// ---------------------------------------------------------------------------
+// Which palette applies, and in what order. Three states, not two: a reader who
+// has chosen nothing gets whatever their system is set to, and a reader who has
+// pressed the toggle gets their choice in both directions.
+// ---------------------------------------------------------------------------
+
+:root { @include palette-light; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { @include palette-dark; }
+}
+
+:root[data-theme="dark"]  { @include palette-dark; }
+:root[data-theme="light"] { @include palette-light; }

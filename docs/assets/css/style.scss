@@ -6,53 +6,12 @@
 @import "{{ site.theme }}";
 
 /* ---------------------------------------------------------------------------
-   Dark mode.
-
-   Two ways in, because one is not enough. The media query follows whatever the
-   reader's system is set to, which is right for most people and costs them
-   nothing. The [data-theme] attribute is the toggle in the corner, for a reader
-   whose system is light and who still wants to read a long document on a dark
-   ground - and it wins over the media query in both directions, so the choice
-   sticks either way.
-
-   Every colour is a token on :root, and the blocks below redefine only the
-   tokens. A colour defined for the first time inside a media query is the
-   classic unreadable-page bug: it exists in one state and not the other.
+   Every colour lives in _sass/palette.scss and nowhere else. This file is the
+   rules; that one is the colours. To change how the site looks, edit that file
+   and nothing here.
    --------------------------------------------------------------------------- */
 
-:root {
-  color-scheme: light;
-
-  --ground: #ffffff;
-  --surface: #f6f8fa;
-  --ink: #24292f;
-  --ink-2: #57606a;
-  --ink-3: #6e7781;
-  --line: #d0d7de;
-  --line-soft: #eaeef2;
-  --accent: #0969da;
-  --code-ink: #24292f;
-}
-
-@mixin dark-tokens {
-  color-scheme: dark;
-
-  --ground: #0d1117;
-  --surface: #161b22;
-  --ink: #e6edf3;
-  --ink-2: #adbac7;
-  --ink-3: #8b949e;
-  --line: #30363d;
-  --line-soft: #21262d;
-  --accent: #4493f8;
-  --code-ink: #e6edf3;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { @include dark-tokens; }
-}
-
-:root[data-theme="dark"] { @include dark-tokens; }
+@import "palette";
 
 /* Painted through the tokens only, so both themes come from one set of rules. */
 body {
@@ -98,19 +57,36 @@ body {
   }
 
   /* The window sketches live in these. They are drawn with box characters and
-     have to stay on one line each, so the block scrolls rather than wraps. */
+     have to stay on one line each, so the block scrolls rather than wraps.
+
+     Selector matched to the theme's own, deliberately. The theme styles these
+     as `.markdown-body .highlight pre` - two classes and an element - so a rule
+     written as `.markdown-body pre` loses on specificity and only the colour
+     lands. That is worse than doing nothing: the block keeps the theme's light
+     background and takes the dark theme's light text, which is unreadable. */
+  .highlight pre,
   pre {
-    background: var(--surface);
+    background-color: var(--surface);
     color: var(--code-ink);
     overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 6px;
   }
 
-  pre code { background: transparent; }
+  /* The sketch is one drawing, so nothing inside it takes a colour of its own. */
+  pre > code,
+  pre code,
+  pre code span {
+    background: transparent;
+    color: inherit;
+  }
 
   img { background: transparent; }
 }
 
-.highlight, .highlighter-rouge .highlight { background: var(--surface); }
+.highlight,
+.highlighter-rouge .highlight,
+div.highlighter-rouge { background-color: var(--surface); }
 
 .footer {
   color: var(--ink-3) !important;
