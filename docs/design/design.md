@@ -9,23 +9,23 @@ choice on it was made.
 |---|---|
 | **Answers** | Why this surface is shaped the way it is, and what every part of it does |
 | **For** | Anyone changing a screen, and anyone deciding whether a change is allowed |
-| **Owns** | No identifiers. A design document cites `BR` and `UC`. It never creates one |
+| **Owns** | Nothing of its own. A design document points at the rules and use cases. It never invents one |
 | **Written to** | [How a document is written](../standard.md). One numbered sketch per screen |
 
 ---
 
 ## Documents
 
-| Document | The surface | State |
+| Document | The screens it draws | Where it stands |
 |---|---|---|
-| **[Project panel](project-panel.md)** `PP` | The tree, its menu and every dialog it opens. 13 screens | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| Test case editor `TE` | The grid, the card list, the details panel, the toolbar | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
-| Test run editor `RE` | The run editor: execution, verdicts, the failure form | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **[Light mode](light-mode.md)** `RE` | The always-on-top window that shows one test case at a time | **Written** — [#13](https://github.com/mtb550/test-in/issues/13), closed |
-| View panel `VP` | The view panel: details, history and bugs | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
-| Settings `ST` | The settings page | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
-| Evidence and exchange `EX` | The report, export, import and sync dialogs | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
-| The dialog framework | What every dialog gets for free: the shell, the status bar, the keycap, the row striping | Not written — [#11](https://github.com/mtb550/test-in/issues/11), [#69](https://github.com/mtb550/test-in/issues/69) |
+| **[The project panel](project-panel.md)** | The tree, its menu and every dialog it opens. 13 screens | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
+| The test case editor | The grid, the card list, the details panel and the toolbar | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| The test run editor | Execution, verdicts and the failure form | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| **[Light mode](light-mode.md)** | The always-on-top window that shows one test case at a time. Part of the test run editor | **Written** — [#13](https://github.com/mtb550/test-in/issues/13), closed |
+| The view panel | Details, history and bugs | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| The settings page | The settings page | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| Reports, export, import and sync | The report, export, import and sync dialogs | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| The dialog framework | What every dialog gets for free: the shell, the status bar, the key caps, the row striping | Not written — [#11](https://github.com/mtb550/test-in/issues/11), [#69](https://github.com/mtb550/test-in/issues/69) |
 
 ---
 
@@ -50,22 +50,15 @@ survive a refactor of what it describes.
 
 ## Where a design document sits
 
-A screen is designed here. The promise it keeps is written one level up:
+A screen is designed here. The promise it keeps is written one level up.
 
-```
-business-requirements/   what the product promises        BR-nn, UC-nn, Q-nn
-        │
-        ▼
-system-requirements/     what the software must do        SR-nn
-        │
-        ▼
-design/                  what the tester sees, and why    cites the above
-        │
-        ▼
-the code                 the javadoc says how
-```
+The [business requirements](../business-requirements/business-requirements.md)
+say what the product promises. The
+[system requirements](../system-requirements/system-requirements.md) say what
+the software must do to keep that promise. These design documents say what the
+tester sees, and why. The code says how, in its own comments.
 
-So a design document may cite a rule. It must never invent one. If a screen
+So a design document may point at a rule. It must never invent one. If a screen
 needs a promise nobody has made, that promise is a change to the
 [business requirements](../business-requirements/business-requirements.md). The
 screen waits for it.

@@ -9,28 +9,29 @@ build.
 |---|---|
 | **Answers** | What the product must do to keep the promises the business requirements make |
 | **For** | Anyone deciding whether a change is correct, and anyone writing a test that proves it |
-| **Owns** | `SR` — one number per scenario. An issue, a commit or a test can cite it |
-| **Written to** | [How a document is written](../standard.md). Given / When / Then, one behavior per scenario. Every key is named here, and nowhere else |
-| **State** | Product-wide sections: **not written** — [#180](https://github.com/mtb550/test-in/issues/180). By module: **1 of 6** |
+| **Owns** | The scenarios. Each one has a number, so an issue, a commit or a test can point at it |
+| **Written to** | [How a document is written](../standard.md). Given, When, Then, one behavior per scenario. Every key is named here, and nowhere else |
+| **Where it stands** | The product-wide sections are not written, [#180](https://github.com/mtb550/test-in/issues/180). One part of six is written |
 
 ---
 
 ## Documents
 
-Each module has its own document. It has the same use cases, with the same
-`UC` ids, as the [business requirements](../business-requirements/business-requirements.md).
+Each part of Testin has its own document. It covers the same use cases, under
+the same names and numbers, as the
+[business requirements](../business-requirements/business-requirements.md).
 Every key is named here, once. Every screen is drawn in the
 [design](../design/design.md).
 
-| Document | Holds | State |
+| Document | Holds | Where it stands |
 |---|---|---|
-| The product | Disk formats, failure, performance, compatibility, security | Not written — [#180](https://github.com/mtb550/test-in/issues/180) |
-| **[Project panel](project-panel.md)** `PP` | The tree: 75 scenarios, 13 keys | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| Test case editor `TE` | Writing test cases | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
-| Test run editor `RE` | Running tests and recording verdicts. Light mode | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
-| View panel `VP` | Details, history and bugs of one test case | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
-| Settings `ST` | The settings page | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
-| Evidence and exchange `EX` | Reports, export, import, sync | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| The product | What is on disk, what happens when something fails, performance, compatibility, security | Not written — [#180](https://github.com/mtb550/test-in/issues/180) |
+| **[The project panel](project-panel.md)** | The tree on the left: 75 scenarios, 13 keys | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
+| The test case editor | Writing test cases | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| The test run editor | Running tests and recording verdicts, including light mode | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| The view panel | Details, history and bugs of one test case | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| The settings page | Everything set once per machine | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| Reports, export, import and sync | Getting work in and out of Testin | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
 
 ## How this differs from the business requirements
 
@@ -42,10 +43,10 @@ The two are easy to confuse. A document that blurs them says everything twice.
 | **Voice** | A tester or a lead reads it | Someone deciding whether a build is correct reads it |
 | **Example rule** | *A tester may record exactly three verdicts* | *The verdict control accepts P, F and B, and no other key records a verdict on any surface* |
 | **Verifiable by** | Asking whether the product behaves that way | A test that passes or fails |
-| **Identifiers** | `BR-nn`, `UC-nn`, `Q-nn` | `SR-nn` |
+| **What it numbers** | Rules, use cases and open questions | Scenarios |
 
-**Every `SR` cites the `BR` it serves.** A requirement that serves no promise is
-one of two things. It is a promise nobody wrote down, or it is work nobody
+**Every scenario names the rule it serves.** A scenario that serves no promise
+is one of two things. It is a promise nobody wrote down, or it is work nobody
 needs. Both are worth finding before the code is written.
 
 ---
@@ -58,7 +59,7 @@ specification.
 
 | Section | What it will state |
 |---|---|
-| **Functional** | One `SR` per capability. What the input is, what the software does with it, and what must be true afterward. Grouped as the capabilities are: authoring, execution, evidence and exchange |
+| **Functional** | One scenario per capability. What the input is, what the software does with it, and what must be true afterward. Grouped the way the capabilities are: writing, running, and getting work in and out |
 | **Data** | What is written to disk, in what format, and what must survive a round trip. The byte-identical rule is a business promise. The file formats behind it belong here |
 | **Behavior under failure** | What must happen when a file is missing, a remote refuses, a plugin is absent, or two writers disagree |
 | **Performance** | The numbers a build must meet. How many test cases the tree holds before it slows, how long an index takes, and what a report costs |
@@ -67,30 +68,23 @@ specification.
 
 ---
 
-## Traceability
+## Following one scenario
 
-The chain each requirement sits in:
+A scenario sits in the middle of a chain. Above it is the promise it keeps,
+which is a rule in the
+[business requirements](../business-requirements/business-requirements.md).
+Below it are two things: the screen it happens on, drawn in the
+[design](../design/design.md), and the test that proves it, under `src/test`.
 
-```
-BR-nn   the promise            business-requirements/
-  │
-  ▼
-SR-nn   what must be true      here
-  │
-  ├──▶  a design document      design/          how the tester meets it
-  └──▶  a test                 src/test/        what proves it
-```
-
-**Cite the number, not the sentence.** `SR-12` in a commit message survives the
-requirement being reworded. A quoted sentence does not.
+**Point at the number, not the sentence.** A number in a commit message
+survives the scenario being reworded. A quoted sentence does not.
 
 ---
 
 > **⚠️ The product's own sections are not written yet.** This page says what that
-> document will be, and what it owns. So the numbers, and how they relate to the
-> business requirements, are settled before anybody writes an `SR-01` that means
-> something else. Writing it is
-> [#180](https://github.com/mtb550/test-in/issues/180).
+> document will be, and what it owns. So the numbering is settled before anybody
+> starts writing, and two scenarios cannot end up with the same number. Writing
+> it is [#180](https://github.com/mtb550/test-in/issues/180).
 
 ---
 
