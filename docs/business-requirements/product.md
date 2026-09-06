@@ -38,8 +38,8 @@ is genuinely undecided it is listed as undecided rather than invented.
 >   [the design document](../design/light-mode.md).
 > - **#74 is closed.** Section 8 names the grid view's missing keyboard path as a
 >   live gap tracked by it. That needs re-checking.
-> - **#68 is closed.** `question 2` cites it as open.
-> - **#71 is closed.** `question 3` cites it as open.
+> - **#68 is closed.** Question 2 still calls it open.
+> - **#71 is closed.** Question 3 still calls it open.
 >
 > Nothing above has been corrected in the text below, deliberately: this is
 > Draft 1 as written, and correcting it is [#72](https://github.com/mtb550/test-in/issues/72).
