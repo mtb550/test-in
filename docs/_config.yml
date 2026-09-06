@@ -1,0 +1,27 @@
+# GitHub Pages renders every .md in this folder as a styled HTML page, so the
+# Markdown files stay the one source and the HTML version cannot drift from
+# them. Nothing here is built by hand and nothing is committed twice.
+#
+# Enable it once, in the repository: Settings -> Pages -> Source: Deploy from a
+# branch -> Branch: main, folder: /docs. The site is then served at
+# https://mtb550.github.io/test-in/
+#
+# docs/README.md becomes the site's front page. Links between .md files keep
+# working in both places: GitHub Pages runs jekyll-relative-links, which
+# rewrites a link to another .md so it resolves to that page's rendered URL.
+
+title: Testin
+description: Test case management inside the IDE, next to the automation it drives.
+
+# The theme closest to GitHub's own rendering, so a page reads the same way
+# whether somebody opens the .md in the repository or the site.
+theme: jekyll-theme-primer
+
+# The site lives under the repository name, not at the domain root.
+baseurl: /test-in
+
+# Keep the plugin out of the site. Only this folder is published, but being
+# explicit costs nothing and says what is deliberate.
+exclude:
+  - Gemfile
+  - Gemfile.lock

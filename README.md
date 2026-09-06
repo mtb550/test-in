@@ -91,6 +91,21 @@ disk or in your own version control, and the plugin embeds no telemetry, no
 analytics, and never uploads your source, test data or credentials anywhere. The
 full statement is in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 
+## Documentation
+
+Full documentation lives in [`docs/`](docs/README.md) — start there and it will
+point you at the right page.
+
+- **Using Testin** — the keyboard reference and a first-run walkthrough
+- **What Testin is for** — the business requirements, and the formats it writes
+  to disk
+- **Design** — one page per screen, with the reasoning behind every choice on
+  it. [Light mode](docs/design/light-mode.md) is written
+- **Contributing** — architecture, setup and the standing decisions
+
+Questions, ideas and feedback are welcome in
+[Discussions](https://github.com/mtb550/test-in/discussions).
+
 ## Contributing
 
 Issues and plans live in [GitHub issues](https://github.com/mtb550/test-in/issues).
