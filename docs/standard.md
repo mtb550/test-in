@@ -173,7 +173,9 @@ These documents are for testers. Every sentence is checked against that reader.
   test set or an Archived package."*
 - **A heading says what the section is, in plain words.** *What it is for*. Not
   *Why it exists*.
-- **Numbers as digits.** *5 statuses*, not *five statuses*.
+- **Numbers: words below 10, digits from 10 up.** *five statuses*, *50 rows*,
+  *13 keys*. A key is written as the key: `1` `2` `3`. A quoted message keeps
+  the product's own digits: *Removed 4*.
 
 **Exact words for exact things.**
 
