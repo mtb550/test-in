@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-025
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-025
 
-# UC-025: Refresh the tree from disk
+# UC-TREE-PANEL-025: Refresh the tree from disk
 
 > **No key.** Press **Refresh** at the top of the panel.
 
@@ -19,7 +19,7 @@ running a sync, or editing files by hand all change the tree from outside.
   running is ignored.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 
@@ -38,4 +38,4 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

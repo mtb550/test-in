@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-003
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-003
 
-# UC-003: Import a test project that already exists
+# UC-TREE-PANEL-003: Import a test project that already exists
 
 > **No key.** Press **New Test Project** at the top of the panel, and paste
 > the address instead of a name.
@@ -20,15 +20,15 @@ it again by hand.
   name.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
-The dialog is drawn under [UC-002](createTestProject.md).
+The dialog is drawn under [UC-TREE-PANEL-002](createTestProject.md).
 
 ## Main flow
 
 There is a second way in. When the code project names a test project that is not
 on this machine, the panel offers the link **Clone \<name\>**, drawn under
-[UC-001](reachTheTree.md). It does exactly the same thing.
+[UC-TREE-PANEL-001](reachTheTree.md). It does exactly the same thing.
 
 **From a Git address**
 
@@ -74,4 +74,4 @@ else, so in an IDE without Git the tester never sees *No Test Project Named*.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

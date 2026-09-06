@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-019
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-019
 
-# UC-019: Bring a retired node back
+# UC-TREE-PANEL-019: Bring a retired node back
 
 > **No key.** On the menu: **Actions → Activate** for a test project, or
 > **Mark Active** for a test set or a package.
@@ -15,10 +15,10 @@ again.
   inside it is exactly as it was left.
 
 Rule 54 holds here too. It says a status is set on one node at a time, and it is
-on [UC-018](retireNode.md).
+on [UC-TREE-PANEL-018](retireNode.md).
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 
@@ -33,15 +33,15 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 
 An **Archived** test project cannot be brought back from the tree, because the
 tree does not open it. The panel offers it in the list of test projects, and
-choosing it is [UC-004](chooseTestProject.md).
+choosing it is [UC-TREE-PANEL-004](chooseTestProject.md).
 
 ## What Testin refuses
 
 **If the node is already Active** — the entry is gray. (rule 54)
 
 **If the status could not be written** — Testin says it could not, and nothing
-changes. The messages are on [UC-018](retireNode.md).
+changes. The messages are on [UC-TREE-PANEL-018](retireNode.md).
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

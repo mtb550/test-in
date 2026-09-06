@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-012
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-012
 
-# UC-012: Remove a node
+# UC-TREE-PANEL-012: Remove a node
 
 > **`Delete`**, with one or more nodes selected. On the menu:
 > **Actions → Remove**.
@@ -19,7 +19,7 @@ whole test project, **so that** the tree holds only what is current.
   are selected together with nodes that are removed.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Confirm Removing dialog
 
@@ -87,4 +87,4 @@ reason.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

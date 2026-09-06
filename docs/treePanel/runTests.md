@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-023
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-023
 
-# UC-023: Run the automation for everything a node holds
+# UC-TREE-PANEL-023: Run the automation for everything a node holds
 
 > **No key.** On the menu: **Run Tests**.
 
@@ -19,7 +19,7 @@ package or **Test Cases**, **so that** a whole area runs in one gesture.
   **Test Runs**, or on a test run package.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 
@@ -67,4 +67,4 @@ menu.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

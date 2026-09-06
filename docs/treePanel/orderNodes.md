@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-015
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-015
 
-# UC-015: Order nodes among their siblings
+# UC-TREE-PANEL-015: Order nodes among their siblings
 
 > **No key.** On the menu: **Actions → Order**.
 
@@ -18,7 +18,7 @@ its siblings, **so that** the tree reads in the order the work is done.
 - **Rule 47** — The test project and the two containers cannot be ordered.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Order dialog
 
@@ -69,4 +69,4 @@ them, saying nothing about the rest.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

@@ -103,7 +103,7 @@ by step, and every way it can be refused.
 | Document | Covers | Where it stands |
 |---|---|---|
 | **[The product](docs/product.md)** | What is true of all six parts | A draft |
-| **[The project panel](docs/projectPanel/main.md)** | The tree on the left | **Written** |
+| **[The tree panel](docs/treePanel/main.md)** | The tree on the left | **Written** |
 | **[Light mode](docs/lightMode.md)** | The always-on-top window that shows one test case | **Written** |
 
 The rest — the other five parts, the keyboard reference, a first-run

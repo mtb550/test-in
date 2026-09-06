@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-001
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-001
 
-# UC-001: Open the panel and reach the tree
+# UC-TREE-PANEL-001: Open the panel and reach the tree
 
 > **No key.** The panel opens from the **Testin** button on the IDE's tool
 > window bar, on the left.
@@ -16,10 +16,10 @@ first, **so that** I am never stuck on an empty window.
   to that one without asking.
 
 Rule 53 also holds here. It says an **Archived** test project is not opened on
-the next load, and it is on [UC-018](retireNode.md).
+the next load, and it is on [UC-TREE-PANEL-018](retireNode.md).
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## No Testin folder
 
@@ -115,4 +115,4 @@ no explanation.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

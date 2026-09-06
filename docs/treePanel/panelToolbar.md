@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-028
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-028
 
-# UC-028: Use the buttons at the top of the panel
+# UC-TREE-PANEL-028: Use the buttons at the top of the panel
 
 > **Only one of the seven buttons has a key.** Search is **`Ctrl+Alt+F`**,
 > and **`Cmd+Alt+F`** on a Mac.
@@ -16,7 +16,7 @@ somewhere else.
 - **Rule 78** — Every button says what it does when the tester hovers over it.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The toolbar
 
@@ -38,13 +38,13 @@ happens when the tester presses one.
 
 | | Button | Hovering says | Where it is written |
 |---|---|---|---|
-| 1 | **Search Test Project** | *Find a test case, test set, package or run and go to it* | [UC-024](searchProject.md) |
+| 1 | **Search Test Project** | *Find a test case, test set, package or run and go to it* | [UC-TREE-PANEL-024](searchProject.md) |
 | 2 | **Settings** | *Configure Testin settings* | Below |
 | 3 | **Expand All** | *Expand all nodes* | Below |
 | 4 | **Collapse All** | *Collapse all nodes* | Below |
-| 5 | **Refresh** | *Re-index and reload tree* | [UC-025](refreshTree.md) |
-| 6 | **Select Test Project** | *Choose the test project this repository exercises* | [UC-004](chooseTestProject.md) |
-| 7 | **New Test Project** | *Create or Clone test project* | [UC-002](createTestProject.md) |
+| 5 | **Refresh** | *Re-index and reload tree* | [UC-TREE-PANEL-025](refreshTree.md) |
+| 6 | **Select Test Project** | *Choose the test project this repository exercises* | [UC-TREE-PANEL-004](chooseTestProject.md) |
+| 7 | **New Test Project** | *Create or Clone test project* | [UC-TREE-PANEL-002](createTestProject.md) |
 
 **Only the search button has a key.** It is `Ctrl+Alt+F`, and `Cmd+Alt+F` on a
 Mac, and it works anywhere in the IDE. The button is how a tester finds out the
@@ -77,4 +77,4 @@ Project** are gray. The other five still work.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

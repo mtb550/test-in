@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-008
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-008
 
-# UC-008: Create a test set package
+# UC-TREE-PANEL-008: Create a test set package
 
 > **`Ctrl+M`**, with **Test Cases** or another test set package selected, then
 > pick *Test Set Package*. On the menu: **Create**.
@@ -16,12 +16,12 @@ many test sets still reads the way the product is organized.
   the tester needs.
 
 Rules 23 and 24 hold here too. They say what can be created where, and they are
-on [UC-007](createTestSet.md).
+on [UC-TREE-PANEL-007](createTestSet.md).
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
-The dialog is drawn under [UC-007](createTestSet.md).
+The dialog is drawn under [UC-TREE-PANEL-007](createTestSet.md).
 
 ## Main flow
 
@@ -47,4 +47,4 @@ gray, and `Ctrl+M` does nothing.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

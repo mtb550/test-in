@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-014
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-014
 
-# UC-014: Copy nodes
+# UC-TREE-PANEL-014: Copy nodes
 
 > **`Ctrl+C`** copies and **`Ctrl+V`** pastes. Dragging with `Ctrl` held copies
 > too. On the menu: **Actions → Copy** and **Paste**.
@@ -13,19 +13,19 @@ start from something that already exists instead of writing it again.
 - **Rule 41** — A copied test case is a new test case, with its own id. Editing
   the copy never changes the original.
 - **Rule 84** — A copy cannot be undone. To take one back, remove it, which is
-  [UC-012](removeNode.md).
+  [UC-TREE-PANEL-012](removeNode.md).
 - **Rule 87** — A copy carries everything the original had beside its test
   cases: its order number, and its **Deprecated** or **Archived** status. A copy
   of a retired test set is retired too. A copied test run keeps the results the
   original recorded.
 
 Rules 37, 38, 39 and 43 hold here too. They say where a node can land, and they
-are on [UC-013](moveNodes.md).
+are on [UC-TREE-PANEL-013](moveNodes.md).
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
-The dialog is drawn under [UC-013](moveNodes.md). After a copy its title is
+The dialog is drawn under [UC-TREE-PANEL-013](moveNodes.md). After a copy its title is
 **Paste**, and it asks *Copy N items into '\<folder\>'?*.
 
 ## Main flow
@@ -47,7 +47,7 @@ The dialog is drawn under [UC-013](moveNodes.md). After a copy its title is
 ## What Testin refuses
 
 The same refusals as a move, and they are on
-[UC-013](moveNodes.md#what-testin-refuses).
+[UC-TREE-PANEL-013](moveNodes.md#what-testin-refuses).
 
 **If the copy fails on disk** — an IDE notification titled *Copy Failed* stays in
 the notification log, with the reason under it.
@@ -58,4 +58,4 @@ copy. Without it, the copy has none, and the first copy in the project says
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

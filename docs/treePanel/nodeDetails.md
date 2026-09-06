@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-027
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-027
 
-# UC-027: See what a node holds
+# UC-TREE-PANEL-027: See what a node holds
 
 > **No key.** On the menu: **Details**.
 
@@ -16,7 +16,7 @@ tree is at a glance.
   saves the number.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 
@@ -62,4 +62,4 @@ several rows selected it opens on the first of them without saying so.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

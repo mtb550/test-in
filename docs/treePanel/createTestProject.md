@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-002
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-002
 
-# UC-002: Create a test project
+# UC-TREE-PANEL-002: Create a test project
 
 > **No key.** Press **New Test Project** at the top of the panel, or the
 > welcome link **Create your first test project**.
@@ -15,7 +15,7 @@ product under test has a place before any test is written.
 - **Rule 17** — Creating a test project binds this code project to it.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Create Project dialog
 
@@ -33,13 +33,13 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 
 1. **One field** — its gray hint text reads *set name or paste url...*. What the
    tester types decides what happens. A Git address is cloned, which is
-   [UC-003](importTestProject.md). Anything else is the name of a new test
+   [UC-TREE-PANEL-003](importTestProject.md). Anything else is the name of a new test
    project. There is no list to pick from, because the tester would only be
    saying twice what they already typed.
 2. **The status bar** — every key this dialog answers to.
 
 The **New Test Project** button opens it. So does the welcome link **Create your
-first test project**, which is drawn under [UC-001](reachTheTree.md).
+first test project**, which is drawn under [UC-TREE-PANEL-001](reachTheTree.md).
 
 ## Main flow
 
@@ -51,7 +51,7 @@ first test project**, which is drawn under [UC-001](reachTheTree.md).
 5. Testin shows *Project created*.
 
 To bring down a test project that already exists somewhere else, paste its
-address instead of a name. That is [UC-003](importTestProject.md).
+address instead of a name. That is [UC-TREE-PANEL-003](importTestProject.md).
 
 ## What Testin refuses
 
@@ -66,4 +66,4 @@ created, and *\<name\> Already Exists* is shown in red.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

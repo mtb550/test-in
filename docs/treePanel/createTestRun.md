@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-009
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-009
 
-# UC-009: Create a test run
+# UC-TREE-PANEL-009: Create a test run
 
 > **`Ctrl+M`**, with **Test Runs** or a test run package selected, then pick
 > *test run*. On the menu: **Create**.
@@ -19,10 +19,10 @@
   starts **Pending**.
 
 Rule 26 holds here too. It says what can be created under **Test Runs**, and it
-is on [UC-010](createTestRunPackage.md).
+is on [UC-TREE-PANEL-010](createTestRunPackage.md).
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Create Test Run dialog
 
@@ -129,4 +129,4 @@ Created* stays in the notification log, with the reason under it.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

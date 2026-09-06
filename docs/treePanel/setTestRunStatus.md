@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-020
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-020
 
-# UC-020: Set a test run's status
+# UC-TREE-PANEL-020: Set a test run's status
 
 > **No key opens it.** On the menu: **Set Status**. Inside the popup,
 > **`1`** is **Assigned**, **`2`** is **Completed** and **`3`** is
@@ -19,7 +19,7 @@ without opening it.
   **Created** and **In Progress** are the test run's own record of itself.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Set Test Run Status popup
 
@@ -82,8 +82,8 @@ last row the tester clicked.
 > status, and the rows that just became **Untested**, until it is reopened.
 
 **Not decided** — see question 1 and question 2 on
-[the project panel page](main.md#not-decided).
+[the tree panel page](main.md#not-decided).
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

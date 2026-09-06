@@ -526,4 +526,4 @@ Listed rather than guessed. Each is a real question the product has not answered
 
 ---
 
-[Documentation](README.md) › **The product** — the parts have documents of their own, starting with [the project panel](projectPanel/main.md)
+[Documentation](README.md) › **The product** — the parts have documents of their own, starting with [the tree panel](treePanel/main.md)

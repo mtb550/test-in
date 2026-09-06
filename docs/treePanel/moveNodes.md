@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-013
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-013
 
-# UC-013: Move nodes
+# UC-TREE-PANEL-013: Move nodes
 
 > **`Ctrl+X`** cuts, **`Ctrl+V`** pastes, and **`Escape`** takes the gray off.
 > Dragging a node onto a folder moves it too. On the menu: **Actions → Cut** and
@@ -20,17 +20,17 @@ tree can be reorganized without building anything again.
 - **Rule 39** — A node cannot land on itself, inside itself, or in the folder it
   already sits in.
 - **Rule 40** — Cut then paste moves. Dragging moves. Dragging with the copy key
-  held copies instead, which is [UC-014](copyNodes.md).
+  held copies instead, which is [UC-TREE-PANEL-014](copyNodes.md).
 - **Rule 42** — A move can be undone.
 - **Rule 86** — Moving a test set or a test set package moves its automation
   code with it, so the test cases stay runnable.
 - **Rule 43** — Nodes drop onto a node, never between two. Position is set by
-  ordering, in [UC-015](orderNodes.md), not by dragging.
+  ordering, in [UC-TREE-PANEL-015](orderNodes.md), not by dragging.
 - **Rule 76** — Canceling a cut empties the clipboard. Nothing is left waiting
   to be pasted.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Paste, Move and Copy dialog
 
@@ -124,8 +124,8 @@ first of them.
 
 > **After `Escape`, the nodes stay on the clipboard.** A later `Ctrl+V` still
 > offers to move them. This breaks rule 76, and is difference 6 on
-> [the project panel page](main.md#where-the-plugin-breaks-its-own-rules).
+> [the tree panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

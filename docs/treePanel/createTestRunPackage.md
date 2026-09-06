@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-010
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-010
 
-# UC-010: Create a test run package
+# UC-TREE-PANEL-010: Create a test run package
 
 > **`Ctrl+M`**, with **Test Runs** or another test run package selected, then
 > pick *test run package*. On the menu: **Create**.
@@ -17,9 +17,9 @@ cycles does not sit in one flat list.
   the tester needs.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
-The dialog is drawn under [UC-007](createTestSet.md). The test run side of it
+The dialog is drawn under [UC-TREE-PANEL-007](createTestSet.md). The test run side of it
 carries the same two rows, reading *test run* and *test run package*, and its
 gray hint text reads *set name, like Sprint 3 Cycle 1...*.
 
@@ -46,4 +46,4 @@ gray, and `Ctrl+M` does nothing.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

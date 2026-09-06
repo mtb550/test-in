@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-018
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-018
 
-# UC-018: Retire a test project, a test set or a package
+# UC-TREE-PANEL-018: Retire a test project, a test set or a package
 
 > **No key.** On the menu: **Actions**, then the status. A test project has
 > **Deactivate** and **Archive**. A test set has **Mark Deprecated**. A package
@@ -19,7 +19,7 @@ its history without getting in the way of what I am testing now.
   has is not offered.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 
@@ -44,9 +44,9 @@ Nothing inside it is deleted.
 
 **What an inactive test project does.** Its row shows no children. If it is
 **Archived**, the next load skips it, and the panel shows *\<name\> is archived,
-so it is not opened*. That screen is drawn under [UC-001](reachTheTree.md).
+so it is not opened*. That screen is drawn under [UC-TREE-PANEL-001](reachTheTree.md).
 
-To bring one back, see [UC-019](reactivateNode.md).
+To bring one back, see [UC-TREE-PANEL-019](reactivateNode.md).
 
 ## What Testin refuses
 
@@ -58,4 +58,4 @@ set, or *Unable to mark package \<status\>* for a package. Nothing changes.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

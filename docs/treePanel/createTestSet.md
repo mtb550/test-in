@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-007
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-007
 
-# UC-007: Create a test set
+# UC-TREE-PANEL-007: Create a test set
 
 > **`Ctrl+M`**, with **Test Cases** or a test set package selected, then pick
 > *Test Set*. On the menu: **Create**.
@@ -18,7 +18,7 @@ package, **so that** the test cases I am about to write have somewhere to live.
   is written where the Java plugin allows it.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Create Test Node dialog
 
@@ -50,7 +50,7 @@ and *test run package* (*Groups test runs*). Its hint text reads *set name,
 like Sprint 3 Cycle 1...*.
 
 > **Today the two kind names are blank.** The rows show only their hints.
-> This is difference 4 on [the project panel page](main.md#where-the-plugin-breaks-its-own-rules).
+> This is difference 4 on [the tree panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ## Main flow
 
@@ -65,7 +65,7 @@ like Sprint 3 Cycle 1...*.
 7. Where the Java plugin is installed, Testin also writes its automation code.
 
 To group test sets instead of adding one, see
-[UC-008](createTestSetPackage.md).
+[UC-TREE-PANEL-008](createTestSetPackage.md).
 
 ## What Testin refuses
 
@@ -94,4 +94,4 @@ it.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

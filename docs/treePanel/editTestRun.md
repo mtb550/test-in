@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-022
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-022
 
-# UC-022: Edit a test run
+# UC-TREE-PANEL-022: Edit a test run
 
 > **No key.** On the menu: **Edit Run**. **`Ctrl+Z`** in the tree takes the
 > edit back.
@@ -20,9 +20,9 @@ recreated.
   recorded about it.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
-The dialog is drawn under [UC-009](createTestRun.md).
+The dialog is drawn under [UC-TREE-PANEL-009](createTestRun.md).
 
 ## Main flow
 
@@ -71,4 +71,4 @@ a clash.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

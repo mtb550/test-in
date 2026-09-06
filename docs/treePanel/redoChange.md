@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-017
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-017
 
-# UC-017: Redo a change to the tree
+# UC-TREE-PANEL-017: Redo a change to the tree
 
 > **`Ctrl+Y`**. On the menu: **Actions → Redo**, which names what it will put
 > back.
@@ -13,10 +13,10 @@ mind twice costs no more than changing it once.
 - **Rule 50** — Making a new change forgets everything that was undone.
 
 Rules 48 and 49 hold here too. They say what the tree remembers and what can be
-taken back, and they are on [UC-016](undoChange.md).
+taken back, and they are on [UC-TREE-PANEL-016](undoChange.md).
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 
@@ -33,4 +33,4 @@ is forgotten. (rule 50)
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

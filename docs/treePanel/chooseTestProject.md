@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-004
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-004
 
-# UC-004: Choose which test project this code project uses
+# UC-TREE-PANEL-004: Choose which test project this code project uses
 
 > **No key.** Press **Select Test Project** at the top of the panel.
 
@@ -16,7 +16,7 @@ products.
   reports the choice as saved.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Select Test Project dialog
 
@@ -72,4 +72,4 @@ reads that file when the project opens, and again only when the tester presses
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

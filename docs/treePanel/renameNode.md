@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-011
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-011
 
-# UC-011: Rename a node
+# UC-TREE-PANEL-011: Rename a node
 
 > **`Shift+F6`**, with a test set, a package or a test run selected. On the
 > menu: **Actions → Rename**.
@@ -17,7 +17,7 @@
 - **Rule 32** — A rename can be undone.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Rename dialog
 
@@ -85,4 +85,4 @@ happens. It is said once per project.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

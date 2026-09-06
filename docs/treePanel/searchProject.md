@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-024
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-024
 
-# UC-024: Find anything in the project
+# UC-TREE-PANEL-024: Find anything in the project
 
 > **`Ctrl+Alt+F`**, and **`Cmd+Alt+F`** on a Mac. It works anywhere in the
 > IDE, not only in the tree. There is also a **Search Test Project** button
@@ -22,7 +22,7 @@ and jump to it, **so that** a large tree is never a place to scroll.
   and a test run open an editor.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Search Test Project dialog
 
@@ -86,4 +86,4 @@ to it and nothing opens. Testin says nothing.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-016
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-016
 
-# UC-016: Undo a change to the tree
+# UC-TREE-PANEL-016: Undo a change to the tree
 
 > **`Ctrl+Z`**. On the menu: **Actions → Undo**, which names what it will undo,
 > as in *Undo Move 'Login'* or *Undo Remove 3 items*.
@@ -19,7 +19,7 @@
   and a status change.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 
@@ -31,7 +31,7 @@ Rules 1 to 13 hold everywhere in the panel. They are on
    gets its previous name, test cases and settings.
 4. Testin shows *Undone*.
 
-To put an undone change back, see [UC-017](redoChange.md).
+To put an undone change back, see [UC-TREE-PANEL-017](redoChange.md).
 
 ## What Testin refuses
 
@@ -51,4 +51,4 @@ That happens when something already sits where the node used to be.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

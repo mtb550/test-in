@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-026
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-026
 
-# UC-026: Switch the Git branch of the test project
+# UC-TREE-PANEL-026: Switch the Git branch of the test project
 
 > **No key.** Pick a branch from the box above the tree.
 
@@ -19,7 +19,7 @@
   editor, and **closes any editor whose node the new branch does not have**.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Uncommitted Changes dialog
 
@@ -97,4 +97,4 @@ and cannot be opened.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)

@@ -11,8 +11,9 @@ Read this before writing or changing any page under `docs/`.
 
 ## One page per thing the tester does
 
-A part of Testin is a folder. `main.md` is its front page, and every use case is
-a page beside it, named after what the tester does: `createTestProject.md`.
+A part of Testin is a folder, named after the part: `treePanel`. `main.md` is its
+front page, and every use case is a page beside it, named after what the tester
+does: `createTestProject.md`.
 
 **`main.md` holds what is true of the whole part:**
 
@@ -83,15 +84,26 @@ Four things are numbered. Each one is written the way it is read:
 
 | Written | What it is |
 |---|---|
-| **UC-001** | One thing a tester does, such as creating a test project. It is the title of its own page |
+| **UC-TREE-PANEL-001** | One thing a tester does, such as creating a test project. It is the title of its own page |
 | **Rule 1** | Something that must always be true |
 | **Question 1** | Something nobody has answered yet, listed instead of guessed |
 | **Difference 1** | A place where the plugin does not do what its own rules say |
 
-**The numbers start again in each part of Testin.** The project panel has a
-rule 4, and so will the test case editor. Inside one document, "rule 4" is
-enough. Anywhere else, say which part it belongs to: *the project panel's rule
-4*. A bug report says *project panel, rule 4*.
+**A use case carries the part of Testin it belongs to**, so a number read on its
+own still says where to look:
+
+| Part of Testin | Its use cases |
+|---|---|
+| The tree panel | `UC-TREE-PANEL-001` to `UC-TREE-PANEL-999` |
+| The editor panel | `UC-EDITOR-PANEL-001` and up |
+| The view panel | `UC-VIEW-PANEL-001` and up |
+| The settings page | `UC-SETTING-001` and up |
+| Automation code and the gutter | `UC-CODEGEN-001` and up |
+
+**The other numbers start again in each part.** The tree panel has a rule 4, and
+so will the editor panel. Inside one document, "rule 4" is enough. Anywhere
+else, say which part it belongs to: *the tree panel's rule 4*. A bug report says
+*tree panel, rule 4*.
 
 The one exception is [the product's own document](product.md).
 Its rules hold everywhere, so they belong to no part, and it says so at the top.
@@ -103,12 +115,12 @@ nobody has written, the rule is written first.
 
 ## The template
 
-`projectPanel/createTestProject.md` looks like this:
+`treePanel/createTestProject.md` looks like this:
 
 ```markdown
-[Documentation](../README.md) › [The project panel](main.md) › UC-002
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-002
 
-# UC-002: Create a test project
+# UC-TREE-PANEL-002: Create a test project
 
 **As a** tester, **I want** …, **so that** ….
 
@@ -118,7 +130,7 @@ nobody has written, the rule is written first.
 - **Rule 17** — …
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The create dialog
 
@@ -138,7 +150,7 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)
 ```
 
 One page, one thing the tester does. Every refusal is an **If** line.
@@ -227,7 +239,7 @@ A reader is never more than one click from the index.
 - **Each part's `main.md` lists its use cases.** Every one, in a table at the
   top.
 - **The line above every title is a breadcrumb.** Each step is a link:
-  *Documentation › The project panel › UC-002*.
+  *Documentation › The tree panel › UC-TREE-PANEL-002*.
 - **The last line of every page is the same breadcrumb.**
 
 ---

@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-021
+[Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-021
 
-# UC-021: Re-create a test run
+# UC-TREE-PANEL-021: Re-create a test run
 
 > **No key.** On the menu: **Actions → Re-create**.
 
@@ -22,9 +22,9 @@ hand.
   was made from.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
-[the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
-The dialog is drawn under [UC-009](createTestRun.md).
+The dialog is drawn under [UC-TREE-PANEL-009](createTestRun.md).
 
 ## Main flow
 
@@ -58,4 +58,4 @@ exists - test run not created* is shown in red.
 
 ---
 
-[Documentation](../README.md) › [The project panel](main.md)
+[Documentation](../README.md) › [The tree panel](main.md)
