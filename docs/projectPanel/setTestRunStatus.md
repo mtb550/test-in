@@ -32,8 +32,6 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 │    *  Completed                                     2   (2)  │
 │    !  Assigned                                      1        │
 │    x  Closed                                        3        │
-├──────────────────────────────────────────────────────────────┤
-│  ↑ ↓ Select    Enter Choose    Escape Cancel            (3)  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -43,11 +41,10 @@ Rules 1 to 13 hold everywhere in the panel. They are on
    because they are the test run's own record. The keys are not in order down
    the list, because the rows follow the status order instead: **Assigned** is
    `1`, **Completed** is `2`, **Closed** is `3`.
-3. The first row is selected when the popup opens. The tester chooses in one
-   of three ways:
-   - `↑` `↓` and `Enter`
-   - a key
-   - a click
+3. The popup opens in the middle of the IDE window, not at the pointer, with
+   the first row selected. The tester chooses with `↑` `↓` and `Enter`, with a
+   key, or with a click. **Nothing on screen says so**: the popup has no status
+   bar.
 
 ## Main flow
 
@@ -61,13 +58,28 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 5. Testin writes the status. The test run's icon and its gray status word in the
    tree both change, and Testin shows the new status word.
 6. Setting **Completed** or **Closed** signs the test run off. Every test case
-   still **Pending** becomes **Untested**, and Testin records the time the test
-   run finished. From then on **Set Status**, **Edit Run** and **Run Tests** are
-   gray on it.
+   still **Pending** becomes **Untested**. Testin records the time the test run
+   finished, but only if it had been started. From then on **Set Status**,
+   **Edit Run** and **Run Tests** are gray on it.
+
+**Signing a test run off cannot be undone.** A status change is not on the tree's
+history (rule 49), and there is no confirmation before it. Every **Pending**
+verdict becomes **Untested** at that moment.
 
 ## What Testin refuses
 
 **If the tester clicks outside the popup** — it closes, and nothing changes.
+
+**If several rows are selected** — **Set Status** stays black and acts on the
+last row the tester clicked.
+
+> **The popup offers the status the test run already has.** Choosing it rewrites
+> the record, stamps who changed it and when, and confirms with that word. Rule
+> 54, which keeps the current status off the menu, holds for retiring and not
+> here.
+
+> **An open editor of that test run is not told.** It keeps showing the old
+> status, and the rows that just became **Untested**, until it is reopened.
 
 **Not decided** — see question 1 and question 2 on
 [the project panel page](main.md#not-decided).

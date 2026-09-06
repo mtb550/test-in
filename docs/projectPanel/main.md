@@ -62,7 +62,8 @@ Each one is a page of its own: the story, its rules, its screens and its steps.
 
 Testin puts two tool windows in IntelliJ IDEA. The project panel is docked on
 the left, beside the places the IDE keeps its own trees. The view panel is
-docked on the right.
+docked on the right. **Both stripes read Testin**, so the side they are on is
+the only thing that tells them apart.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
@@ -118,8 +119,15 @@ tree. It is always one click away.
 - **Bound** means this code project is set to use one test project. The choice
   is written into the code project, so everyone who opens it gets the same test
   project.
-- **Signed off** means a test run is **Completed** or **Closed**. Nothing in it
-  can change again.
+- **Signed off** means a test run is **Completed** or **Closed**. Its test
+  cases, verdicts and settings can no longer change, though the tree can still
+  rename, move and remove it.
+- A **container** is **Test Cases** or **Test Runs**. There are always exactly
+  two, and they come with the test project.
+- A **verdict** is what a tester records against one test case in one test
+  run: **Passed**, **Failed** or **Blocked**. **Pending** means the test run
+  has not reached that test case yet. **Untested** means it never will,
+  because the test run was signed off first.
 
 The panel's job is small and strict. It shows one test project, the one this
 code project is bound to. It lets the tester shape that test project: create,
@@ -220,6 +228,7 @@ its status bar, at the foot of the dialog.
 | `Ctrl+Y` | Redoes it | [UC-017](redoChange.md) |
 | `1` `2` `3` | Inside the status popup: Assigned, Completed, Closed | [UC-020](setTestRunStatus.md) |
 | `Ctrl+Alt+F`, `Cmd+Alt+F` on a Mac | Opens search, from anywhere in the IDE | [UC-024](searchProject.md) |
+| `Ctrl+P` | Generates a report on the selected node | Reports, export, import and sync, not written yet |
 | The menu key, beside the right `Ctrl` | Opens the node menu | Below, under **What the tree shows** |
 
 Six things a tester might expect have **no key** on the tree. **Order**, the
@@ -308,6 +317,7 @@ than feedback on what the tester just typed.
 | *Could not load '\<folder name\>'*, in red, as a child row | That folder's contents could not be read |
 | *\<name\> is archived, so it is not opened*, in red, above the list of test projects | The bound test project is **Archived**. See [UC-001](reachTheTree.md) |
 | *testin.yml names \<name\>, which is not under the Testin root*, in red | The code project names a test project the Testin folder does not hold. See [UC-001](reachTheTree.md) |
+| *testin.yml names \<name\>, which could not be read*, in red | The test project's folder is there, but Testin could not read it |
 
 ---
 
@@ -318,38 +328,40 @@ along its top are the IDE's own. The branch box and the tree are Testin's.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  Testin                    [1] [2] [3] [3] [4] [5] [5]                     │
+│  Testin              [1] [2] [3] [4] [5] [6] [7]                           │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  [ main            v ]                                             (6)     │
+│  [ main            v ]                                             (8)     │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  v Demo                                                            (7)     │
+│  v Demo                                                            (9)     │
 │    v Test Cases                                                            │
-│      v Accounts                                                    (8)     │
+│      v Accounts                                                   (10)     │
 │          Login                                                             │
 │          Registration                                                      │
 │        Checkout                                                            │
-│        Legacy sign-in                            (deprecated: gray) (10)   │
+│        Legacy sign-in                            (deprecated: gray) (12)   │
 │    v Test Runs                                                             │
 │      v Sprint 7                                                            │
-│          + cycle-1  Created                                        (9)     │
+│          + cycle-1  Created                                       (11)     │
 │          @ cycle-2  In Progress                                            │
 │          * cycle-3  Completed                                              │
 │        2025                                        (archived: gray)        │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. to 5. **The toolbar** — seven buttons. Each one, and what it does, is
+1. to 7. **The toolbar** — seven buttons, left to right: **Search Test
+   Project**, **Settings**, **Expand All**, **Collapse All**, **Refresh**,
+   **Select Test Project** and **New Test Project**. Each one is
    [UC-028](panelToolbar.md).
-6. **The branch box** — shown only for a test project shared through Git. Its
+8. **The branch box** — shown only for a test project shared through Git. Its
    placeholder reads *Loading branches...* until Git answers.
-7. **The test project row** — drawn bold, with the IDE's project icon. The two
+9. **The test project row** — drawn bold, with the IDE's project icon. The two
    folders under it are bold too, and there are always exactly two.
-8. **A package** — a folder icon. **A test set** — the icon the IDE uses for a
+10. **A package** — a folder icon. **A test set** — the icon the IDE uses for a
    changelist. Neither is bold.
-9. **A test run** — draws its **status** as its icon. The status word follows
+11. **A test run** — draws its **status** as its icon. The status word follows
    the name in gray. So the tester reads the status of every test run without
    opening one. A test run never draws a kind icon.
-10. **Gray text** — means retired, or cut and not yet pasted. Both look the
+12. **Gray text** — means retired, or cut and not yet pasted. Both look the
     same on purpose. Both mean the same thing to a tester: not part of the work
     in front of them.
 
@@ -378,7 +390,17 @@ come the nodes without a number, by the date they were created. Then by name.
 
 **Right-click.** Right-clicking a row that is not selected makes it the only
 selection, and opens the menu at the pointer. Right-clicking inside a
-multi-selection keeps the selection, and the menu acts on all of it.
+multi-selection keeps the selection. Right-clicking below the last row, or on
+a row that could not be read, opens no menu at all.
+
+**What the menu does with several rows selected.** Three different things, and
+two of them are quiet:
+
+- **Open**, **Remove**, **Copy** and **Cut** act on all of them.
+- **Rename**, **Order**, **Paste**, **Create** and **Details** stay black and
+  act on the first row alone, saying nothing about the rest.
+- **Re-create**, **Edit Run**, **Set Status**, **Export**, **Import** and every
+  status entry go gray instead.
 
 **The menu key**, the one beside the right `Ctrl`, opens the node menu over the
 selected row.
@@ -403,19 +425,20 @@ appear at all depends on which plugins are installed.
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  Open                     Enter  (1)   ┌ Actions ───────────────────┐      │
 │  Create                  Ctrl+M        │  Activate                  │      │
-│  Actions                     >   (2)   │  Deactivate                │      │
-│  ──────────────────────────────        │  Archive                   │      │
-│  Run Tests                       (3)   │  ──────────────────────    │      │
+│  ──────────────────────────────        │  Deactivate                │      │
+│  Actions                     >   (2)   │  Archive                   │      │
 │  ──────────────────────────────        │  Undo Move 'Login'  Ctrl+Z │      │
-│  Export                          (4)   │  Redo               Ctrl+Y │      │
-│  Import                                │  Re-create                 │      │
-│  ──────────────────────────────        │  Remove             Delete │      │
-│  Sync With Remote                (5)   │  Rename           Shift+F6 │      │
-│  View Pending Commits                  │  Order                     │      │
-│  ──────────────────────────────        │  Copy               Ctrl+C │      │
-│  Sync With SFTP                  (6)   │  Cut                Ctrl+X │      │
+│  Run Tests                       (3)   │  Redo               Ctrl+Y │      │
+│  ──────────────────────────────        │  Re-create                 │      │
+│  Export                          (4)   │  Remove             Delete │      │
+│  Import                                │  Rename           Shift+F6 │      │
+│  ──────────────────────────────        │  Order                     │      │
+│  Sync With Remote                (5)   │  Copy               Ctrl+C │      │
+│  View Pending Commits                  │  Cut                Ctrl+X │      │
 │  ──────────────────────────────        │  Paste              Ctrl+V │      │
-│  Edit Run                        (7)   └────────────────────────────┘      │
+│  Sync With SFTP                  (6)   └────────────────────────────┘      │
+│  ──────────────────────────────                                            │
+│  Edit Run                        (7)                                       │
 │  Set Status                                                                │
 │  ──────────────────────────────                                            │
 │  Generate Report          Ctrl+P (8)                                       │
@@ -424,6 +447,7 @@ appear at all depends on which plugins are installed.
 ```
 
 1. **Open** and **Create** — first, because they are the two things done most.
+   A dividing line follows them.
 2. **Actions** — a submenu. It holds everything that changes a node in place:
    - its status
    - undo and redo
@@ -433,9 +457,10 @@ appear at all depends on which plugins are installed.
    - order
    - the clipboard
 
-   Status entries appear only for the kind selected. The three rows shown are a
-   test project's.
-3. **Run Tests** — only when the automation plugin is present.
+   The submenu is one unbroken list. Status entries appear only for the kind
+   selected, and the other kinds' entries are not there at all. The three rows
+   shown are a test project's.
+3. **Run Tests** — only when the TestNG plugin is present.
 4. **Export**, **Import** — these belong to reports, export, import and sync.
 5. **Sync With Remote**, **View Pending Commits** — only when the Git plugin is
    present. Otherwise the whole section disappears, dividing line included.
@@ -526,17 +551,26 @@ Dragging would be quicker, but it would leave nothing written down.
 
 ## Where the plugin breaks its own rules
 
-Stated, not hidden. Each one is a real gap, found while reading the code for
-this document. None of them has a bug report yet.
+Stated, not hidden. Each one is a real gap, found by reading the code this
+documentation describes. None of them has a bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
 | **Difference 1** | Rule 7 — one past-tense word | Creating a test run says *Run created*. Creating a test project says *Project created* or *Project cloned*. Every other creation says *Created*. |
 | **Difference 2** | Rule 38 — nothing lands in a test run | **Paste** is offered on a test run. It always refuses, with *Select a folder*. It should be grayed, as it is on a test set. |
 | **Difference 3** | Rule 9 — a signed-off test run does not change | A **Completed** or **Closed** test run can still be renamed, moved, reordered and removed from the tree. Only editing, running and its status are blocked. |
-| **Difference 4** | Rule 23, rule 26 — the dialog offers the kinds | The create dialog's two rows show no kind name. They show only their hints, *Holds test cases* and *Groups test sets*. Someone removed them while tidying up the labels, and nobody noticed. |
+| **Difference 4** | Rule 23, rule 26 — the dialog offers the kinds | Neither create dialog names its two kinds. Both rows show only their hints: *Holds test cases* and *Groups test sets* on the test case side, *Records execution results* and *Groups test runs* on the test run side. Someone removed the names while tidying up the labels, and nobody noticed. |
 | **Difference 5** | Rule 56 — Created and In Progress are the test run's own | The status popup offers **Created** and **In Progress** as choices. It also lets a test run go backwards, from **Assigned** to **Created**. |
-| **Difference 6** | Rule 76 — canceling a cut empties the clipboard | The tester cuts nodes, then presses the key that clears the gray. The nodes stay on the clipboard. The next paste still moves them, though the tester canceled the cut. |
+| **Difference 6** | Rule 76 — canceling a cut empties the clipboard | The tester cuts nodes, then presses the key that clears the gray. The nodes stay on the clipboard. The next paste still moves them, though the tester canceled the cut. A paste that worked does not empty it either, so the same nodes can be offered again. |
+| **Difference 7** | Rule 20 — a choice that was not saved is not reported as saved | Only the **Select Test Project** dialog checks. Creating a test project, cloning one, and clicking a test project on the welcome screen all report success without looking. If the write failed, the tester is told the work is done and the choice is gone next time the project opens. |
+| **Difference 8** | Rule 77 — the two buttons come back once a Testin folder is set | **New Test Project** never comes back. Once it has been drawn without a folder it stays gray for the rest of the IDE session, however the setting changes. **Select Test Project** does come back. |
+| **Difference 9** | Rule 89 — an edit changes what the tester chose | Saving an edit also deletes the rows of test cases that were deleted from their test set after the test run was made, with their verdicts and failure detail. The rows are not in the dialog, so the tester cannot see them or keep them, and it happens even when nothing else was changed. |
+| **Difference 10** | Rule 7 — a change confirms itself once | Setting a test run's status from the tree does not tell that test run's open editor. It keeps showing the old status, and the rows that just became **Untested**, until it is reopened. |
+| **Difference 11** | Rule 6 — nothing changes until the tester confirms | **Rename**, **Order**, **Paste**, **Create** and **Details** stay black with several rows selected, and act on the first row alone. Nothing says the other rows were passed over. |
+| **Difference 12** | Rule 44 — a number is 1 or higher | A number too large to hold silently clears the order and puts the node back into date order, while Testin still says *Ordered*. |
+| **Difference 13** | Rule 33 — the confirmation says what will go | The **Select Test Project** dialog's first column has no heading. The same caption sweep as difference 4. |
+| **Difference 14** | Rule 7 — a change confirms itself once | The **Uncommitted Changes** dialog reads *1 change in this test project are not committed* when there is exactly one. |
+| **Difference 15** | Rule 35 — a removal can be undone | A node whose copy could not be kept aside is still removed, and is not on the undo history. Nothing says so, and `Ctrl+Z` then takes back whatever change came before it. |
 
 ---
 

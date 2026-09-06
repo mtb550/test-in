@@ -26,6 +26,10 @@ The dialog is drawn under [UC-002](createTestProject.md).
 
 ## Main flow
 
+There is a second way in. When the code project names a test project that is not
+on this machine, the panel offers the link **Clone \<name\>**, drawn under
+[UC-001](reachTheTree.md). It does exactly the same thing.
+
 **From a Git address**
 
 1. The Git plugin is installed, and this code project already names the test
@@ -34,7 +38,8 @@ The dialog is drawn under [UC-002](createTestProject.md).
 3. The tester pastes the repository address instead of a name, and presses
    `Enter`.
 4. Testin clones the repository into the Testin folder, under the name the code
-   project gives.
+   project gives. A progress bar reads *Cloning repository*, with the line
+   *Cloning into \<name\>...*, and it cannot be canceled.
 5. Testin binds this code project to it, and the tree appears.
 6. Testin shows *Project cloned*.
 
@@ -45,8 +50,10 @@ titled *No Test Project Named* says that the project file must say which test
 project this code project is about before one can be cloned, and that the
 tester can set it there or pick a project with **Select Test Project**.
 
-**If the Git plugin is not installed** — nothing is cloned, and Testin says the
-plugin is needed.
+**If the Git plugin is not installed** — nothing is cloned. Testin shows *Git
+Plugin Not Available*, reading *Git synchronization and cloning require the Git
+plugin, which is not available in this IDE.* This is checked before anything
+else, so in an IDE without Git the tester never sees *No Test Project Named*.
 
 **If no Testin folder is set** — the **New Test Project** button is gray.
 (rule 77)

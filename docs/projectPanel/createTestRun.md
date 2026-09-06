@@ -30,54 +30,70 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  Create Test Run                                                           │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  Test Run name:  [ cycle-2                            ]         (1)        │
+│  v Configuration details                                 Collapse   (1)    │
+│     Test Run name   [ cycle-2                              ]       (2)     │
+│     Change Log      [ Story-002 (register new user), Sto...]               │
+│     Commit ID       [ Commit hash, like 9f3c1ab...         ]               │
+│     Test Type       [                                    v ]               │
+│     Platform        [ Web                                 v ]              │
+│     Component       [ Frontend                            v ]              │
+│     Language        [                                     v ]              │
+│     Browser         [                                     v ]       (3)    │
 │                                                                            │
-│  v Configuration details                                        (2)        │
-│    Change Log  [ Story-002 (register new user)...   ]                      │
-│    Commit ID   [ 9f3c1ab                            ]                      │
-│    Test Type   [ Functional Test  v ]   Platform  [ Web  v ]               │
-│    Component   [ Frontend         v ]   Browser   [ Chrome v ]             │
+│  [x] v Test Cases                                                  (4)     │
+│  [x]   v Accounts                                                          │
+│  [x]       Login                                                           │
+│  [x]       Registration                                                    │
+│  [ ]     Checkout                                                          │
 │                                                                            │
-│  [x] v Accounts                                                 (3)        │
-│  [x]     Login                                                             │
-│  [x]     Registration                                                      │
-│  [ ]   Checkout                                                            │
-│                                                                            │
-│                                                    [ Create ]   (4)        │
+│                                                     [ Create ]      (5)    │
 ├────────────────────────────────────────────────────────────────────────────┤
 │  Tab Navigate    Space Check    Escape Cancel                              │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The name** — prefilled from the create dialog. Placeholder *Cycle-1*.
-2. **Configuration details** — a section the tester can open and close. Its
-   fields are:
-   - change log
-   - commit id
-   - test type
-   - platform
-   - component
-   - language
-   - browser or device, only when the platform and component make it relevant
-3. **The test cases** — a tree with a tick box for every test set still in use
-   that has test cases in it. For a new test run, all are ticked. For a
-   re-creation, only the ones the last cycle used.
-4. **Create** — enabled only while at least one test case is ticked. `Enter`
-   does nothing here. The button is the only way to confirm.
+1. **Configuration details** — a section the tester can open and close. The gray
+   hint on its right reads *Collapse*, and *Expand* once it is closed. Closing it
+   takes every field below with it, the name included.
+2. **Test Run name** — filled in with what the tester typed in the create dialog.
+   Emptied, its gray hint text reads *Cycle-1*. The keyboard does not start here:
+   it starts in **Change Log**.
+3. **The fields** — one to a row. Every dropdown starts blank, which means
+   unanswered, and every one can be typed into, so a value the list does not
+   offer is still saved. **Browser** is on the form only while *Platform* is
+   **Web** and *Component* is **Frontend**. **Device Type** replaces it only
+   while *Platform* is **Mobile** and *Component* is **Frontend**. A field that
+   is not on the form is saved empty, so switching *Platform* from **Web** to
+   **Mobile** drops the browser that was picked. The lists are:
+
+   | Field | Offers |
+   |---|---|
+   | Test Type | *Functional Test*, *Performance Test* |
+   | Platform | *Web*, *Mobile* |
+   | Component | *Frontend*, *Backend* |
+   | Language | *English*, *Arabic*, *French* |
+   | Browser | *Chrome*, *Firefox*, *Safari*, *Edge* |
+   | Device Type | *iPhone*, *Samsung*, *Huawei* |
+
+4. **The test cases** — the whole folder tree, each row with a tick box: a
+   **Test Cases** row at the top, then each package, each test set, and each
+   test case under it. It opens fully expanded. Ticking a folder ticks
+   everything under it. A test set with no test cases, and a package holding
+   only such test sets, is left out.
+5. **Create** — enabled only while at least one test case is ticked. `Enter`
+   does nothing here. The button is the only way to confirm. A click outside the
+   dialog does not close it either; only `Escape` does.
 
 **Edit Test Run** is this same dialog with the button **Save**. It opens filled
-with the test run's own:
-
-- name
-- test cases
-- configuration
+with the test run's own name, test cases and settings.
 
 ## Main flow
 
 1. The tester selects **Test Runs** or a test run package.
 2. The tester presses `Ctrl+M`, or chooses **Create**.
-3. The **Create Run Node** dialog opens. *test run* is selected, and beside it
-   the dialog says *Records execution results*.
+3. The **Create Run Node** dialog opens. Its first row is selected, and reads
+   *Records execution results*. Its gray hint text reads *set name, like Sprint
+   3 Cycle 1...*.
 4. The tester types a name and presses `Enter`.
 5. The **Create Test Run** dialog opens. It holds the typed name in *Test Run
    name*, a *Configuration details* form, and a tree of every live, non-empty
@@ -85,8 +101,9 @@ with the test run's own:
    **Archived** package, and empty test sets are not in that tree.
 6. The tester ticks and unticks with `Space`, moves with `Tab`, and presses
    **Create**.
-7. Testin writes the test run, with every ticked test case **Pending** and the
-   status **Created**.
+7. Testin writes the test run under a progress bar reading *Creating test run
+   \<name\>*, which cannot be canceled. Every ticked test case is **Pending**,
+   and the status is **Created**.
 8. Its editor opens, and Testin shows *Run created*.
 
 ## What Testin refuses
@@ -97,11 +114,18 @@ with the test run's own:
 name* is shown in red.
 
 **If a test run with that name already exists** — *\<name\> Already Exists* is
-shown in red.
+shown in red. Typing it in the first dialog closes that dialog and the second
+one never opens. Typing it in **Create Test Run** leaves the dialog open with
+everything still in it.
 
 **If the parent folder was removed while the dialog was open** — the dialog stays
 open, and *'\<parent\>' no longer exists - test run not created* is shown in
 red.
+
+**If writing the test run fails** — an IDE notification titled *Test Run Not
+Created* stays in the notification log, with the reason under it.
+
+**If several nodes are selected** — **Create** works on the first of them.
 
 ---
 

@@ -15,6 +15,9 @@ recreated.
 - **Rule 61** — Removing a test case from a test run drops everything that test
   case recorded in that test run. Adding a test case adds it as **Pending**.
 - **Rule 62** — An edit can be undone, as one step. (rule 49)
+- **Rule 89** — A test case that was deleted from its test set after the test
+  run was made is not in this dialog, and saving drops what the test run
+  recorded about it.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
 [the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
@@ -47,6 +50,24 @@ nothing saved* is shown in red.
 
 **If the test run was removed while the dialog was open** — *'\<run\>' no longer
 exists - nothing saved* is shown in red.
+
+**If the name is emptied** — *A test run needs a name* is shown in red, and the
+dialog stays open.
+
+**If the new name is already used by a sibling** — *\<name\> Already Exists* is
+shown in red, and the dialog stays open. Keeping the test run's own name is not
+a clash.
+
+**If the last test case is unticked** — **Save** goes dead, the same way
+**Create** does on an empty new test run.
+
+**If several rows are selected** — **Edit Run** is gray. It needs exactly one.
+
+> **Saving quietly drops the rows of deleted test cases.** A test run keeps a row
+> at **Removed** for a test case deleted from its test set. That row is not in
+> this dialog, cannot be ticked, and pressing **Save** deletes it with its
+> verdict, its duration and its failure detail. It happens even when the tester
+> changed nothing else.
 
 ---
 

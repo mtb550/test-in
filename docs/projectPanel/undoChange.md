@@ -10,11 +10,13 @@
 
 ## Rules
 
-- **Rule 48** — The tree remembers its own last 20 changes. It remembers them
-  separately from any editor.
+- **Rule 48** — The tree keeps one history of its last 20 changes, per code
+  project and separate from any editor. It is held in memory, so closing the
+  IDE loses it, and the copies kept aside for restoring removed nodes are
+  deleted at the next start.
 - **Rule 49** — Four things can be undone: a move, a rename, a removal, and an
-  edit of a test run. Three cannot: an order number, a copy, and a status
-  change.
+  edit of a test run. Four cannot: creating anything, an order number, a copy,
+  and a status change.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
 [the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
@@ -37,8 +39,15 @@ To put an undone change back, see [UC-017](redoChange.md).
 `Ctrl+Z` does nothing.
 
 **If some removed nodes can no longer be put back** — the rest are restored, and
-*Undo Incomplete* is shown in red, with a line saying how many of them could not
-be put back.
+*Undo Incomplete* is shown in red, with the line *N of M could not be put back*.
+That happens when something already sits where the node used to be.
+
+> **A rename or a move that failed on disk is still on the history.** The menu
+> offers to undo it, and undoing does nothing useful.
+
+> **After the IDE restarts, nothing can be undone.** The history and the copies
+> behind it are both gone. A removed node is still in the desktop's recycle
+> bin.
 
 ---
 

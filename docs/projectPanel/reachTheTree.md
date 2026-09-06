@@ -39,8 +39,10 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. The one link. Nothing else is offered, because nothing else can work yet.
-   **Select Test Project** and **New Test Project** in the header are grayed.
+1. **The header** — every welcome screen starts with these five lines, whichever
+   of the five it is.
+2. **The one link.** Nothing else is offered, because nothing else can work yet.
+   **Select Test Project** and **New Test Project** in the toolbar are gray.
 
 ## Choose a project
 
@@ -66,17 +68,20 @@ Rules 1 to 13 hold everywhere in the panel. They are on
    the tree appears. If there are more than six test projects, Testin shows one
    link instead of a list. That link opens the **Select Test Project** dialog.
 
-The other two screens follow the same shape: a gray line saying what is true,
-then the one link. They are:
+Two more screens follow. The fifth is the tree itself.
 
-- *\<name\> is not on this machine yet*, with **Clone \<name\>**
-- **Create your first test project**
+- *\<name\> is not on this machine yet*, a gray line, then the link
+  **Clone \<name\>**.
+- **Create your first test project**, a link with no gray line above it.
 
 ## Main flow
 
-The panel shows one of five screens, and checks for them in this order. Each
-screen holds exactly one link, and that link is the only way out of the
-situation.
+The panel shows one of five screens, and checks for them in this order. Every
+one of them opens with the same header, drawn below, and then its own line and
+its own links.
+
+The choose screen holds one link per test project, up to six of them. The others
+hold one link each.
 
 | If | The panel shows |
 |---|---|
@@ -88,12 +93,25 @@ situation.
 
 ## What Testin refuses
 
-**If this code project names no test project, and exactly one exists** — Testin
-binds it to that one without asking, and shows its tree.
-
 **If the bound test project is Archived** — the panel shows, in red, *\<name\> is
 archived, so it is not opened*. Under that line sits the list of test projects to
 choose from.
+
+**If the project file cannot be read** — the panel shows, in red, *testin.yml
+names \<name\>, which could not be read*.
+
+**If the project file is malformed** — Testin reads it as naming nothing. There
+is no red line at all, and the tester gets the plain list of test projects with
+no explanation.
+
+> **The one project it binds to may be Archived.** Rule 15 does not look at the
+> status, so a tester with a single archived test project is bound to it and
+> then told it is not opened, above a list holding only that one project.
+
+> **Showing a Git-shared test project writes to the code project.** The first
+> time the panel draws one, Testin asks Git for the remote address and writes it
+> into the project file. There is no dialog and no message, and that file is one
+> the tester commits.
 
 ---
 

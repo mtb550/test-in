@@ -16,7 +16,10 @@ hand.
 - **Rule 58** — Only the test cases and the configuration are carried over.
   Verdicts, durations and failure details start fresh.
 - **Rule 59** — The next name is suggested by counting up. *cycle-1* becomes
-  *cycle-2*. A name already taken is skipped.
+  *cycle-2*, and a name with no number on it gets one: *smoke* becomes
+  *smoke-2*. A name already taken is skipped.
+- **Rule 88** — The new test run is created in the same folder as the one it
+  was made from.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
 [the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
@@ -38,7 +41,7 @@ The dialog is drawn under [UC-009](createTestRun.md).
 
 ## What Testin refuses
 
-The same three refusals apply as when a test run is created.
+The same four refusals apply as when a test run is created.
 
 **If no test case is ticked** — the **Create** button is disabled.
 
@@ -47,6 +50,11 @@ stays open with everything typed still in it.
 
 **If the name is already used** — *\<name\> Already Exists* is shown, and the
 dialog stays open with everything typed still in it.
+
+**If the folder was removed while the dialog was open** — *'\<parent\>' no longer
+exists - test run not created* is shown in red.
+
+**If several rows are selected** — **Re-create** is gray. It needs exactly one.
 
 ---
 

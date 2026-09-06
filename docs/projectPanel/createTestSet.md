@@ -56,8 +56,8 @@ like Sprint 3 Cycle 1...*.
 
 1. The tester selects **Test Cases** or a test set package.
 2. The tester presses `Ctrl+M`, or chooses **Create**.
-3. The **Create Test Node** dialog opens. *Test Set* is selected, and beside it
-   the dialog says *Holds test cases*.
+3. The **Create Test Node** dialog opens. Its first row is selected, and reads
+   *Holds test cases*.
 4. The tester types a name and presses `Enter`.
 5. Testin creates the test set under the selected parent, refreshes the tree,
    and shows *Created*.
@@ -80,6 +80,17 @@ gray, and `Ctrl+M` does nothing.
 
 **If the IDE project has no Java test folder** — *Java Test Source Not Found*
 says no automation code will be written. The test set is still created.
+
+**If the Java plugin is not installed** — *Java Plugin Not Available* says
+automation code and navigation need it. It is said once per project, and the
+test set is still created.
+
+**If several rows are selected** — **Create** stays black and creates under the
+first of them.
+
+**If the selected package is retired** — **Create** is not gray. The test set is
+created inside an **Archived** package, where no test run will ever be offered
+it.
 
 ---
 

@@ -31,7 +31,7 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 │  Remove 'Accounts'?                                     (1)  │
 │  Holds 2 test sets, 14 test cases and 0 test runs       (2)  │
 │                                                              │
-│  From:  Demo > Test Cases > Accounts                    (3)  │
+│  From:  C:\Testin\Demo\Test Cases\Accounts             (3)   │
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤
 │  Enter Remove    Escape Cancel                          (4)  │
@@ -39,9 +39,11 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 ```
 
 1. **The question** — names the node.
-2. **What it holds** — the line the tester reads before pressing `Enter`. It
-   is omitted when every count is zero.
-3. **Where it is** — in gray.
+2. **What it holds** — the line the tester reads before pressing `Enter`. It is
+   left out when the node holds no test sets, no test cases and no test runs.
+   Packages it holds are counted nowhere and never keep the line on screen.
+3. **Where it is** — in gray. It is the node's full path on disk, with the
+   operating system's own separators, not a trail of node names.
 4. The confirm key is named for what it does. It reads **Remove**, not **OK**.
 
 For several nodes, the question is *Remove these N items?*. It shows no counts
@@ -58,7 +60,7 @@ and no path.
 4. The tester presses `Enter`.
 5. Testin closes each node's editor and keeps a copy for undo.
 6. The node goes to the desktop's recycle bin, and its automation code goes with
-   it.
+   it. On a desktop with no recycle bin the node is deleted outright.
 7. The tree rebuilds, and Testin shows *Removed*, or *Removed N* for several,
    counting only what actually went.
 
@@ -71,6 +73,17 @@ and no path.
 
 **If a container is selected together with a test set** — only the test set is
 removed. The container is left out, and not counted.
+
+**If nothing could be removed** — the tree rebuilds and Testin says nothing at
+all.
+
+**If a node cannot be deleted on disk** — an IDE notification titled *Delete
+Failed* stays in the notification log, reading *Could not delete file:* and the
+reason.
+
+> **A node whose copy could not be kept aside is still removed, and cannot be
+> undone.** Nothing says so at the time. `Ctrl+Z` then takes back whatever
+> change came before the removal instead.
 
 ---
 

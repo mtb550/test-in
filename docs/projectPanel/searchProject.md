@@ -12,9 +12,14 @@ and jump to it, **so that** a large tree is never a place to scroll.
 ## Rules
 
 - **Rule 66** — Nodes are found by name, from the first character typed. Test
-  cases are searched from the second character, in every part of the test case.
-- **Rule 67** — Choosing a result opens the tree at it, and opens its editor
-  too.
+  cases are found from the second character, and every field of the test case is
+  searched: its description, its id, its steps, its expected result, its
+  priority, its status, its groups, its module, its preconditions, its
+  reference, its test data, its place in the tree, its generated code, and who
+  created or last changed it and when. Case does not matter, and spaces at
+  either end are dropped.
+- **Rule 67** — Choosing a result always takes the tree to it. Only a test set
+  and a test run open an editor.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
 [the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
@@ -41,13 +46,15 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 ```
 
 1. **The field** — its gray hint text reads *Go to a test set or run, or search
-   for anything...*. Before the tester types, the list holds every test set and
-   test run.
-2. **A result row** — shows:
-   - the icon
-   - the name
-   - under them, the path through the tree
-3. At most 50 rows.
+   for anything...*. With nothing typed the list holds test sets and test runs only, the
+   places there is something to open. Once the tester types, packages, the two
+   containers and the test project row match by name too.
+2. **A result row** — one line: the icon, the name, then the path after it in
+   gray. Twelve rows are visible and the rest scroll. The icon at the front of
+   the field changes to the icon of whichever row is selected.
+3. **At most 50 rows in all.** Nodes are taken first, so 50 matching nodes leave
+   no room for test cases. The top row is selected as soon as the list refills,
+   so `Enter` goes there without pressing `↓`. `↑` and `↓` stop at the ends.
 
 ## Main flow
 
@@ -56,16 +63,26 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 2. The **Search Test Project** dialog opens. Before anything is typed, it lists
    every test set and test run.
 3. The tester types.
-4. Testin lists every node whose name contains what was typed, starting from the
-   first character typed. It lists test cases too, starting from the second
-   character, matching any part of the test case.
-5. At most 50 rows are shown. Each row shows the icon, the name, and under it the
-   path *\<project\> > Test Cases > …*.
-6. The tester moves with `↑` `↓` and presses `Enter`.
-7. The panel comes forward, the tree expands to that node and selects it, and its
-   editor opens.
-8. If the row was a test case, its test set's editor opens with that test case
-   selected.
+4. Testin lists every node whose name contains what was typed, from the first
+   character. It lists test cases from the second character. The list is ordered
+   nodes first, shortest name first, then test cases.
+5. The tester moves with `↑` `↓` and presses `Enter`, or clicks a row.
+6. The panel comes forward, and the tree expands to that node and selects it.
+7. A test set or a test run opens in its editor. Any other node is only revealed
+   in the tree.
+8. A test case opens its test set's editor with that test case selected, and
+   fills the view panel on the right with it.
+
+## What Testin refuses
+
+**If nothing matches** — the list is empty. `Enter` does nothing, and the dialog
+stays open.
+
+**If no Testin folder is set, or nothing is indexed yet** — the dialog still
+opens. It lists nothing. The key and the button are never gray.
+
+**If a package, a container or the test project row is chosen** — the tree goes
+to it and nothing opens. Testin says nothing.
 
 ---
 

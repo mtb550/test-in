@@ -18,6 +18,28 @@ products.
 Rules 1 to 13 hold everywhere in the panel. They are on
 [the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
+## The Select Test Project dialog
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Select Test Project                                         │
+├──────────────────────────────────────────────────────────────┤
+│                                       Status            (1)  │
+│  Demo                                 Active            (2)  │
+│  Mobile                               Active                 │
+│  Legacy                               Archived               │
+├──────────────────────────────────────────────────────────────┤
+│  Enter Select    Escape Cancel                          (3)  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **Two columns.** The second is headed **Status**. The first has no heading at
+   all, which is difference 7 below.
+2. **One row per test project** in the Testin folder, whatever its status. The
+   one this code project already uses is selected.
+3. **The status bar** — every key this dialog answers to. A click selects a row
+   but never confirms; only `Enter` does.
+
 ## Main flow
 
 1. The tester presses the **Select Test Project** button in the panel header.
@@ -36,6 +58,17 @@ first*, is shown in red.
 
 **If the code project's configuration file cannot be written** — an error titled
 *Not Bound* says the choice will not be remembered, and the dialog stays open.
+
+**If no row is selected** — `Enter` does nothing, and says nothing. That happens
+when nothing is bound yet, or when the bound name matches no row.
+
+**If the chosen test project is Archived** — Testin binds to it and says *Bound*
+all the same. The panel then shows *\<name\> is archived, so it is not opened*
+instead of a tree.
+
+**If the project file is edited by hand** — the tree does not notice. Testin
+reads that file when the project opens, and again only when the tester presses
+**Refresh**.
 
 ---
 

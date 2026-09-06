@@ -22,6 +22,8 @@ tree can be reorganized without building anything again.
 - **Rule 40** — Cut then paste moves. Dragging moves. Dragging with the copy key
   held copies instead, which is [UC-014](copyNodes.md).
 - **Rule 42** — A move can be undone.
+- **Rule 86** — Moving a test set or a test set package moves its automation
+  code with it, so the test cases stay runnable.
 - **Rule 43** — Nodes drop onto a node, never between two. Position is set by
   ordering, in [UC-015](orderNodes.md), not by dragging.
 - **Rule 76** — Canceling a cut empties the clipboard. Nothing is left waiting
@@ -39,8 +41,8 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 │                                                              │
 │  Move 'Login' into 'Smoke'?                             (1)  │
 │                                                              │
-│  From:  Demo > Test Cases > Accounts                    (2)  │
-│  To:    Demo > Test Cases > Smoke                            │
+│  From:  C:\Testin\Demo\Test Cases\Accounts             (2)   │
+│  To:    C:\Testin\Demo\Test Cases\Smoke                      │
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤
 │  Enter Move    Escape Cancel                            (3)  │
@@ -49,8 +51,10 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 
 1. **The question** — says the verb and the names. The verb is *Move* after a
    cut. It is *Copy* after a copy.
-2. **From** and **To** — in gray. They let the tester catch a wrong drop
-   before pressing `Enter`.
+2. **From** and **To** — in gray. They are full paths on disk, not trails of
+   node names, and they let the tester catch a wrong drop before pressing
+   `Enter`. With nodes cut from several folders, **From** names only the first
+   one's folder.
 3. The confirm key is named for the verb.
 
 From a paste, the title is **Paste**. From a drop, the title is the verb:
@@ -101,6 +105,22 @@ still move.
 
 **If nodes were cut in one test project and the code project was then bound to
 another** — *Select a folder* is shown, and nothing moves.
+
+**If the move fails on disk** — an IDE notification titled *Move Failed* stays in
+the notification log, reading *Operation failed:* and the reason, or *Could not
+find source or target path on disk.*
+
+**If the test project or a container is selected** — **Copy** and **Cut** are
+gray. Neither can be moved or copied.
+
+**If several rows are selected** — **Paste** stays black and pastes into the
+first of them.
+
+**If the Java plugin is not installed** — the first move in the project shows
+*Java Plugin Not Available*. The move still happens.
+
+> **A paste does not empty the clipboard.** After moving nodes, **Paste** stays
+> live, and `Ctrl+V` on another folder offers to move the same nodes again.
 
 > **After `Escape`, the nodes stay on the clipboard.** A later `Ctrl+V` still
 > offers to move them. This breaks rule 76, and is difference 6 on

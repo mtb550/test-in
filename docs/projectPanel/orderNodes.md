@@ -36,7 +36,9 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 
 1. **One field** — shows the node's current number, or nothing. It accepts
    digits only, with no leading zero. Anything else is refused as it is typed.
-   Empty means date order.
+   Empty means date order. The cursor sits after the number, so typing **adds
+   to it**: a node numbered 3 whose tester types 5 ends up at 35. `Ctrl+A`
+   selects it all.
 
 ## Main flow
 
@@ -57,6 +59,13 @@ not appear.
 
 **If the test project or a container is selected** — **Order** is gray. (rule
 47)
+
+**If several rows are selected** — **Order** stays black and orders the first of
+them, saying nothing about the rest.
+
+> **A number too large to hold silently clears the order.** Typing
+> 99999999999 puts the node back into date order, and Testin still says
+> *Ordered*.
 
 ---
 
