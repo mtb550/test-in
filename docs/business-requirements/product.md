@@ -3,8 +3,8 @@
 # The product — business requirements
 
 > Testin is test case management that lives inside the IDE instead of inside a
-> browser tab. A tester can execute a whole run without touching the mouse — that
-> is the product, not a feature of it.
+> browser tab. A tester can execute a whole test run without touching the
+> mouse. That is the product, not a feature of it.
 
 | | |
 |---|---|
@@ -22,15 +22,17 @@ is genuinely undecided it is listed as undecided rather than invented.
 
 > ### ⚠️ The state of this draft
 >
-> Moved here from Notion on 6 September 2026, unchanged. **It has not been
-> re-checked against the product since it was written**, and `main` has moved
-> **127 commits** — 208 files, 8,974 insertions, 2,100 deletions.
+> Moved here from Notion on 6 September 2026. Its facts are unchanged. Only the
+> wording was made plain, to [the standard](../standard.md). **It has not been
+> re-checked against the product since it was written.** `main` has moved
+> **127 commits**: 208 files, 8,974 insertions, 2,100 deletions.
 >
 > What is known to have changed, and is therefore not reflected below:
 >
 > - **Light mode does not appear in this document at all.** It was built after
->   this draft — 29 commits — and is a whole execution capability: a standalone
->   always-on-top window showing one case at a time, with `P`, `F` and `B` on it.
+>   this draft, 29 commits later. It is a whole execution capability. It is a
+>   standalone always-on-top window, showing one test case at a time, with `P`,
+>   `F` and `B` on it.
 >   Section 6.2 is incomplete without it. See
 >   [the design document](../design/light-mode.md).
 > - **#74 is closed.** Section 8 names the grid view's missing keyboard path as a
@@ -41,11 +43,12 @@ is genuinely undecided it is listed as undecided rather than invented.
 > Nothing above has been corrected in the text below, deliberately: this is
 > Draft 1 as written, and correcting it is [#72](https://github.com/mtb550/test-in/issues/72).
 > The document's own rule is that a rule which quietly stops being true is worse
-> than no rule — so the staleness is stated instead of patched over.
+> than no rule. So the staleness is stated, instead of patched over.
 >
 > **Two databases are not fully moved.** Section 7 has 21 of its 33 business
-> rules and none of their `BR-nn` numbers; section 6.4, the use cases, has none of
-> its rows. Both were Notion databases, which a copy of the page does not carry.
+> rules, and none of their `BR-nn` numbers. Section 6.4, the use cases, has none
+> of its rows. Both were Notion databases, and a copy of the page does not carry
+> those.
 
 ---
 
@@ -54,17 +57,22 @@ is genuinely undecided it is listed as undecided rather than invented.
 Testin is test case management that lives inside the IDE instead of inside a
 browser tab.
 
-This document states what the product **promises**: who uses it, what they work
-with, what they can do, and the rules that govern all of it.
+This document states what the product **promises**. It says who uses Testin,
+what they work with, what they can do, and the rules that govern all of it.
 
-**In scope** — actors, the things they work with, the capabilities they can
-trigger, the numbered rules, every status and its transitions, and the
-expectations that are already promises.
+**In scope:**
 
-**Out of scope** — how any of it is built. Class names, packages and architecture
-are deliberately absent: a reader does not need them, and they date the document
-the first time the code is refactored. This document should survive a rewrite of
-the product.
+- the actors
+- the things they work with
+- the capabilities they can trigger
+- the numbered rules
+- every status, and its transitions
+- the expectations that are already promises
+
+**Out of scope: how any of it is built.** Class names, packages and
+architecture are deliberately absent. A reader does not need them, and they
+date the document the first time the code is refactored. This document should
+survive a rewrite of the product.
 
 ---
 
@@ -72,33 +80,35 @@ the product.
 
 > This is the section to read if only one section is read.
 
-Testin's competitors — Jira, Azure DevOps, TestRail — are web applications. That
-is not an implementation detail; it is a ceiling on how fast anyone can work in
-them.
+Testin's competitors are web applications: Jira, Azure DevOps and TestRail.
+That is not an implementation detail. It is a ceiling on how fast anyone can
+work in them.
 
 | | A browser-based tool | Testin |
 |---|---|---|
 | **Who owns the keyboard** | The browser. `Ctrl+N`, `Ctrl+W`, `Ctrl+T`, `F5`, `F6` and `F12` are already taken, and what is left works only while no text field has focus | The IDE, which hands its key map to the plugin |
 | **Cost of a state change** | A network round trip: click the dropdown, wait, click the option, wait for the save | A local write, immediately |
-| **Whether work composes** | It does not — there is no keyboard path to a verdict, so eight rows cannot be judged in one gesture | Selection plus one key, on any number of rows |
+| **Whether work composes** | It does not. There is no keyboard path to a verdict, so eight rows cannot be judged in one gesture | Selection plus one key, on any number of rows |
 
-So a tester executing a two hundred case run in a browser tool does it with the
-mouse, one case at a time, and the tool's speed is bounded by the browser it is
-trapped in.
+So a tester executing a 200 test case run in a browser tool does it with the
+mouse, one test case at a time. The tool's speed is bounded by the browser it
+is trapped in.
 
-**A tester using Testin can execute a whole run without touching the mouse:** move
-to the case, read it, press one key for the verdict, move on. Every other
-capability — the tree, the grid, the reports, the Git integration — is a reason to
-be in Testin. The keyboard is the reason the work is faster once you are.
+**A tester using Testin can execute a whole test run without touching the
+mouse.** Move to the test case, read it, press one key for the verdict, move
+on. Every other capability is a reason to be in Testin: the tree, the grid, the
+reports, the Git integration. The keyboard is the reason the work is faster
+once the tester is there.
 
 That premise is stated here as a capability with rules behind it, **BR-40** to
 **BR-44**, rather than left as an emergent property of whichever bindings happen
 to exist.
 
-**62 keys are bound**, counted against the product at `0becc8b2`: 40 shared across
-surfaces so the same gesture means the same thing everywhere, and 22 belonging to
-a single capability. Standard text editing inside dialogs is restored on top of
-those and is not counted — that is the platform's behaviour, not Testin's.
+**62 keys are bound**, counted against the product at `0becc8b2`. Of those, 40
+are shared across surfaces, so the same gesture means the same thing
+everywhere. The other 22 belong to a single capability. Standard text editing
+inside dialogs is restored on top of those, and is not counted. That is the
+platform's behavior, not Testin's.
 
 ---
 
@@ -106,18 +116,19 @@ those and is not counted — that is the platform's behaviour, not Testin's.
 
 > **There is exactly one actor today: the Tester.**
 
-The product stores a tester's **name** and a tester's **role**. The name is real:
-it is stamped on every verdict and on every record the tester touches, so a run
-always says who judged it. **The role is read by nothing at all today** — it is
-typed into the settings page, written to disk, and never used again. The HTML
-report once printed it above the footer; that line was removed and nothing
-replaced it.
+The product stores a tester's **name** and a tester's **role**. The name is
+real. It is stamped on every verdict, and on every record the tester touches,
+so a test run always says who judged it. **The role is read by nothing at all
+today.** It is typed into the settings page, written to disk, and never used
+again. The HTML report once printed it above the footer. That line was removed,
+and nothing replaced it.
 
-It is **reserved rather than abandoned**: a planned feature will read it to decide
-who may approve a test case and who may remove a test project. Until that ships,
-no permission depends on either field, nothing is assigned by them, and no
-capability is withheld because of them — so describing a "Lead" as an actor today
-would be describing behaviour that does not exist. See **Appendix A** and **Q-04**.
+It is **reserved rather than abandoned**. A planned feature will read it to
+decide who may approve a test case, and who may remove a test project. Until
+that ships, three things are true. No permission depends on either field.
+Nothing is assigned by them. No capability is withheld because of them. So
+describing a "Lead" as an actor today would describe behavior that does not
+exist. See **Appendix A** and **Q-04**.
 
 Planned actors are in **Appendix A**, kept separate so the main body stays
 checkable against the product.
@@ -158,25 +169,25 @@ Test Project
 
 > **The distinction that matters most.** A test case is the *question*; a test run
 > result is one *answer*, at one moment, by one person. A case can be in many runs
-> and carry a different result in each. This is why deleting a case does not erase
-> history — see **BR-11**.
+> and carry a different result in each. This is why deleting a test case does
+> not erase history. See **BR-11**.
 
 ---
 
 ## 5. Statuses and transitions
 
 Seven independent status dimensions, **26 constants** in total. They are
-independent on purpose: a run's lifecycle is a different question from a case's
-verdict, which is a different question again from what the team thinks of the case
-itself.
+independent on purpose. A test run's lifecycle is one question. A test case's
+verdict is another. What the team thinks of the test case itself is a third.
 
 > ❗ Issue [#72](https://github.com/mtb550/test-in/issues/72) counts 22 constants
 > across 6 dimensions. Measured against the product, **it is 26 across 7**. Two
-> corrections: "Removed" moved from the project dimension to the test-case verdict
-> dimension, because a project has no removed state — removing one deletes it —
-> while a case deleted out from under a run leaves a row the run still owns; and a
-> **seventh dimension was missed entirely** — a test case carries its own status,
-> separate from any verdict. It is section 5.7, and it is the one worth reading.
+> corrections. First, "Removed" moved from the test project dimension to the
+> test case verdict dimension. A test project has no removed state, because
+> removing one deletes it. A test case deleted out from under a test run leaves
+> a row the test run still owns. Second, a **seventh dimension was missed
+> entirely**. A test case carries its own status, separate from any verdict. It
+> is section 5.7, and it is the one worth reading.
 
 ### 5.1 Test case verdict, within one run — 6 constants
 
@@ -185,13 +196,13 @@ itself.
 | **Pending** | Queued: this run holds the case and has not reached it | The run, when it is created | — |
 | **Passed** | The case behaved as expected | Tester | `P` |
 | **Failed** | The case did not; failure detail is collected in the same gesture | Tester | `F` |
-| **Blocked** | The case could not be judged — something outside it prevented the test | Tester | `B` |
+| **Blocked** | The test case could not be judged. Something outside it prevented the test | Tester | `B` |
 | **Untested** | The run ended without ever reaching this case | The run, on completion or closure | — |
 | **Removed** | The test case itself has been deleted; the row is history | The run, when it notices | — |
 
-**Three verdicts are a tester's to give, and exactly those three carry a key.** The
-other three are the run's record of its own state and have no key on purpose —
-there is nothing for a person to apply.
+**Three verdicts are a tester's to give, and exactly those three carry a key.**
+The other three are the test run's record of its own state. They have no key on
+purpose, because there is nothing for a person to apply.
 
 ```mermaid
 stateDiagram-v2
@@ -219,12 +230,13 @@ stateDiagram-v2
 | **Completed** | Finished and signed off | `2` | **yes** |
 | **Closed** | Ended without being finished | `3` | **yes** |
 
-Created and In Progress carry no key because the product sets them itself: a run is
-Created when it is made, and moves to In Progress the moment anything in it is
-executed, however it was started.
+Created and In Progress carry no key, because the product sets them itself. A
+test run is Created when it is made. It moves to In Progress the moment
+anything in it is executed, however it was started.
 
-**A terminal run records nothing further.** Its verdicts are history: execution
-cannot be started on it, and any result arriving from elsewhere is refused.
+**A terminal test run records nothing further.** Its verdicts are history.
+Execution cannot be started on it, and any result arriving from elsewhere is
+refused.
 
 ```mermaid
 stateDiagram-v2
@@ -242,16 +254,16 @@ stateDiagram-v2
     Closed --> [*]
 ```
 
-> **⚠️ Undecided — see section 9.** The diagram shows what the product *allows*, and
-> it currently allows every move, including Completed back to In Progress.
+> **⚠️ Undecided. See section 9.** The diagram shows what the product *allows*.
+> It currently allows every move, including Completed back to In Progress.
 > **Nothing enforces the run lifecycle at all.** Whether a terminal run may be
 > reopened is question **Q-01**.
 
 ### 5.3 Live execution state — 4 constants
 
-Not persisted. This is what a card shows while tests are actually running: *idle*,
-*running*, *passed*, *failed*. It lives only as long as the IDE session; the run's
-own record is the durable one.
+This dimension is not persisted. It is what a card shows while tests are
+actually running: *idle*, *running*, *passed*, *failed*. It lives only as long
+as the IDE session. The test run's own record is the durable one.
 
 ### 5.4 Test project — 3 constants
 
@@ -260,12 +272,12 @@ a test project deletes it.
 
 ### 5.5 Test set — 2 constants
 
-**Active** and **Deprecated**. Deprecated is not deleted — see **BR-12**.
+**Active** and **Deprecated**. Deprecated is not deleted. See **BR-12**.
 
 ### 5.6 Package — 2 constants
 
 **Active** and **Archived**. Shared by test set packages and test run packages,
-because it means the same thing in both — see **BR-13**.
+because it means the same thing in both. See **BR-13**.
 
 ### 5.7 A test case's own status — 4 constants
 
@@ -280,12 +292,12 @@ itself, across every run it is ever in.
 | **Disabled** | The case exists but is not to be used |
 | **To Be Updated** | The case is known to be out of date |
 
-> **⚠️ Nothing in the product uses this today.** It can be set in exactly one place —
-> by switching on the **Status** column in the grid view, which is hidden by
-> default, and typing the label — and there is no menu entry and no key for it. It
-> is written into an export and **not read back by an import**, so a case exported
-> as Reviewed comes back Pending. No filter, badge, report, count or rule reads it,
-> and no capability is withheld because of it.
+> **⚠️ Nothing in the product uses this today.** It can be set in exactly one
+> place. The tester switches on the **Status** column in the grid view, which is
+> hidden by default, and types the label. There is no menu entry, and no key. It
+> is written into an export and **not read back by an import**, so a test case
+> exported as Reviewed comes back Pending. No filter, badge, report, count or
+> rule reads it, and no capability is withheld because of it.
 >
 > That matters because **Reviewed is the "approved" state the planned role
 > permissions describe.** The state already exists on every test case. What does
@@ -303,7 +315,7 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 
 | Capability | Key | Notes |
 |---|---|---|
-| Create a node — project, package, set, case | `Ctrl+M` | The dialog offers only what is legal in the selected place |
+| Create a node: test project, package, test set or test case | `Ctrl+M` | The dialog offers only what is legal in the selected place |
 | Open the selected node | `Enter` | |
 | Rename | `F2` | |
 | Rename, carrying the automation code with it | `Shift+F6` | Renames the generated method too, so the case stays runnable |
@@ -334,9 +346,10 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 
 > **ℹ️ Light mode is missing from this table.** It was built after this draft: a
 > standalone always-on-top window showing one case at a time, so a tester can work
-> with the IDE minimized and still record a verdict — `P`, `F`, `B`, `Ctrl+D` for
-> the rest of the case, `Escape` to close. It is the purest expression of section
-> 2's premise and it is not described here. See
+> with the IDE minimized and still record a verdict. The keys are `P`, `F` and
+> `B`, with `Ctrl+D` for the rest of the test case and `Escape` to close. It is
+> the purest expression of section 2's premise, and it is not described here.
+> See
 > [the design document](../design/light-mode.md).
 
 ### 6.3 Evidence and exchange
@@ -352,11 +365,12 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 
 ### 6.4 Use cases
 
-> **❗ Not moved yet.** This was a Notion database — one row per capability a tester
-> triggers, each in the usual form (actor, precondition, main flow, alternatives,
-> postcondition) and each naming the key that starts it, numbered `UC-nn`.
+> **❗ Not moved yet.** This was a Notion database. It held one row per
+> capability a tester triggers, numbered `UC-nn`. Each row was in the usual form
+> (actor, precondition, main flow, alternatives, postcondition), and each named
+> the key that starts it.
 >
-> **Mouse needed** is the column to scan: anything in the execution flow that is
+> **Mouse needed** is the column to scan. Anything in the execution flow that is
 > not **No** is a breach of **BR-40**, not a detail.
 
 ---
@@ -366,17 +380,17 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 Numbered so an issue or a commit can cite one.
 
 > **❗ Partially moved: 21 of 33 rules, and without their numbers.** This was a
-> Notion database; the text of 21 rules came across and the `BR-nn` column did
-> not. The numbers are the point of the database — an issue cannot cite a rule
-> that has none — so they are left blank rather than invented.
+> Notion database. The text of 21 rules came across. The `BR-nn` column did not.
+> The numbers are the point of the database, because an issue cannot cite a rule
+> that has none. So they are left blank rather than invented.
 >
-> Twelve rules are missing entirely, among them the two the text above cites by
-> number: **BR-12** (a deprecated test set is not deleted) and **BR-13** (Active
-> and Archived mean the same thing for both kinds of package).
+> Twelve rules are missing entirely. Among them are the two the text above cites
+> by number. **BR-12** says a deprecated test set is not deleted. **BR-13** says
+> Active and Archived mean the same thing for both kinds of package.
 >
-> **Known breaches were stated rather than hidden.** Two rules were broken by the
-> product at `0becc8b2`, each cited to the issue that tracks it. Those citations
-> are also not in what arrived.
+> **Known breaches were stated, not hidden.** Two rules were broken by the
+> product at `0becc8b2`, and each was cited to the issue that tracks it. Those
+> citations are also not in what arrived.
 
 ### Data and storage
 
