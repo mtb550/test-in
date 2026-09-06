@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-015
+[Documentation](../README.md) › [The project panel](main.md) › UC-022
 
-# UC-015: Edit a test run
+# UC-022: Edit a test run
 
 > **No key.** On the menu: **Edit Run**. **`Ctrl+Z`** in the tree takes the
 > edit back.
@@ -19,7 +19,7 @@ recreated.
 Rules 1 to 13 hold everywhere in the panel. They are on
 [the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
-The dialog is drawn under [UC-006](createTestRun.md).
+The dialog is drawn under [UC-009](createTestRun.md).
 
 ## Main flow
 

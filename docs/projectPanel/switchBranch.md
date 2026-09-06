@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-019
+[Documentation](../README.md) › [The project panel](main.md) › UC-026
 
-# UC-019: Switch the Git branch of the test project
+# UC-026: Switch the Git branch of the test project
 
 > **No key.** Pick a branch from the box above the tree.
 

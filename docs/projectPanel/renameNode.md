@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-007
+[Documentation](../README.md) › [The project panel](main.md) › UC-011
 
-# UC-007: Rename a node
+# UC-011: Rename a node
 
 > **`Shift+F6`**, with a test set, a package or a test run selected. On the
 > menu: **Actions → Rename**.

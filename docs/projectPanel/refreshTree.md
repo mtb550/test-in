@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-018
+[Documentation](../README.md) › [The project panel](main.md) › UC-025
 
-# UC-018: Refresh the tree from disk
+# UC-025: Refresh the tree from disk
 
 > **No key.** Press **Refresh** at the top of the panel.
 

@@ -1,9 +1,9 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-011
+[Documentation](../README.md) › [The project panel](main.md) › UC-016
 
-# UC-011: Undo and redo a change to the tree
+# UC-016: Undo a change to the tree
 
-> **`Ctrl+Z`** undoes, **`Ctrl+Y`** redoes. On the menu: **Actions → Undo**
-> and **Redo**, each naming what it will do.
+> **`Ctrl+Z`**. On the menu: **Actions → Undo**, which names what it will undo,
+> as in *Undo Move 'Login'* or *Undo Remove 3 items*.
 
 **As a** tester, **I want** to take back the last change I made to the tree,
 **so that** a wrong move, rename or removal costs nothing.
@@ -13,8 +13,8 @@
 - **Rule 48** — The tree remembers its own last 20 changes. It remembers them
   separately from any editor.
 - **Rule 49** — Four things can be undone: a move, a rename, a removal, and an
-  edit of a test run. Three cannot: an order number, a copy, and a status change.
-- **Rule 50** — Making a new change forgets everything that was undone.
+  edit of a test run. Three cannot: an order number, a copy, and a status
+  change.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
 [the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
@@ -23,18 +23,15 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 
 1. The last change to the tree was a move, a rename, a removal or an edit of a
    test run.
-2. The tester presses `Ctrl+Z`, or chooses **Actions → Undo \<what\>**. The menu
-   entry names what it will undo, as in *Undo Move 'Login'* or *Undo Remove 3
-   items*.
+2. The tester presses `Ctrl+Z`, or chooses **Actions → Undo \<what\>**.
 3. Testin reverses the change. Moved nodes go back. A renamed node gets its old
-   name. Removed nodes are restored from the copy kept aside.
+   name. Removed nodes are restored from the copy kept aside. An edited test run
+   gets its previous name, test cases and settings.
 4. Testin shows *Undone*.
-5. The tester presses `Ctrl+Y`, or chooses **Actions → Redo \<what\>**.
-6. Testin re-applies the change, and shows *Redone*.
+
+To put an undone change back, see [UC-017](redoChange.md).
 
 ## What Testin refuses
-
-**If a new change was made after the undo** — **Redo** is gray.
 
 **If the tree's history is empty** — the entry reads plain **Undo**, and is gray.
 `Ctrl+Z` does nothing.

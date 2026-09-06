@@ -9,7 +9,7 @@ set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The project panel, the tree on the left |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are UC-001 to UC-022. Rules are numbered 1 to 79. They belong to the project panel. Every other part of Testin starts its own numbers again |
+| **Numbering** | Use cases are UC-001 to UC-028. Rules are numbered 1 to 85. They belong to the project panel. Every other part of Testin starts its own numbers again |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code |
 | **Written to** | [How a document is written](../standard.md) |
@@ -25,30 +25,36 @@ Each one is a page of its own: the story, its rules, its screens and its steps.
 | | **Getting to the tree** | |
 | **UC-001** | [Open the panel and reach the tree](reachTheTree.md) | |
 | **UC-002** | [Create a test project](createTestProject.md) | |
-| **UC-022** | [Import a test project that already exists](importTestProject.md) | |
-| **UC-003** | [Choose which test project this code project uses](chooseTestProject.md) | |
+| **UC-003** | [Import a test project that already exists](importTestProject.md) | |
+| **UC-004** | [Choose which test project this code project uses](chooseTestProject.md) | |
 | | **Nodes** | |
-| **UC-004** | [Open a test set or a test run](openNode.md) | |
-| **UC-005** | [Create a test set or a test set package](createTestSet.md) | |
-| **UC-006** | [Create a test run or a test run package](createTestRun.md) | |
-| **UC-007** | [Rename a node](renameNode.md) | |
-| **UC-008** | [Remove a node](removeNode.md) | |
+| **UC-005** | [Open a test set](openTestSet.md) | |
+| **UC-006** | [Open a test run](openTestRun.md) | |
+| **UC-007** | [Create a test set](createTestSet.md) | |
+| **UC-008** | [Create a test set package](createTestSetPackage.md) | |
+| **UC-009** | [Create a test run](createTestRun.md) | |
+| **UC-010** | [Create a test run package](createTestRunPackage.md) | |
+| **UC-011** | [Rename a node](renameNode.md) | |
+| **UC-012** | [Remove a node](removeNode.md) | |
 | | **Arranging the tree** | |
-| **UC-009** | [Move or copy nodes](moveOrCopyNodes.md) | |
-| **UC-010** | [Order nodes among their siblings](orderNodes.md) | |
-| **UC-011** | [Undo and redo a change to the tree](undoAndRedo.md) | |
+| **UC-013** | [Move nodes](moveNodes.md) | |
+| **UC-014** | [Copy nodes](copyNodes.md) | |
+| **UC-015** | [Order nodes among their siblings](orderNodes.md) | |
+| **UC-016** | [Undo a change to the tree](undoChange.md) | |
+| **UC-017** | [Redo a change to the tree](redoChange.md) | |
 | | **Statuses** | |
-| **UC-012** | [Retire and reactivate](retireAndReactivate.md) | |
-| **UC-013** | [Set a test run's status](setTestRunStatus.md) | |
-| **UC-014** | [Re-create a test run](reCreateTestRun.md) | |
-| **UC-015** | [Edit a test run](editTestRun.md) | |
+| **UC-018** | [Retire a test project, a test set or a package](retireNode.md) | |
+| **UC-019** | [Bring a retired node back](reactivateNode.md) | |
+| **UC-020** | [Set a test run's status](setTestRunStatus.md) | |
+| **UC-021** | [Re-create a test run](reCreateTestRun.md) | |
+| **UC-022** | [Edit a test run](editTestRun.md) | |
 | | **Working from the tree** | |
-| **UC-016** | [Run the automation for everything a node holds](runTests.md) | |
-| **UC-017** | [Find anything in the project](searchProject.md) | |
-| **UC-018** | [Refresh the tree from disk](refreshTree.md) | |
-| **UC-019** | [Switch the Git branch of the test project](switchBranch.md) | |
-| **UC-020** | [See what a node holds](nodeDetails.md) | |
-| **UC-021** | [Use the buttons at the top of the panel](panelToolbar.md) | |
+| **UC-023** | [Run the automation for everything a node holds](runTests.md) | |
+| **UC-024** | [Find anything in the project](searchProject.md) | |
+| **UC-025** | [Refresh the tree from disk](refreshTree.md) | |
+| **UC-026** | [Switch the Git branch of the test project](switchBranch.md) | |
+| **UC-027** | [See what a node holds](nodeDetails.md) | |
+| **UC-028** | [Use the buttons at the top of the panel](panelToolbar.md) | |
 
 ---
 
@@ -202,24 +208,24 @@ its status bar, at the foot of the dialog.
 
 | Key | Does | Page |
 |---|---|---|
-| `Enter` | Opens the selected test set or test run | [UC-004](openNode.md) |
-| `Ctrl+M` | Creates a node under the selected one | [UC-005](createTestSet.md) |
-| `Shift+F6` | Renames the selected node | [UC-007](renameNode.md) |
-| `Delete` | Removes the selected nodes | [UC-008](removeNode.md) |
-| `Ctrl+C` | Copies the selected nodes | [UC-009](moveOrCopyNodes.md) |
-| `Ctrl+X` | Cuts the selected nodes | [UC-009](moveOrCopyNodes.md) |
-| `Ctrl+V` | Pastes into the selected node | [UC-009](moveOrCopyNodes.md) |
-| `Escape` | Takes the gray off nodes the tester cut | [UC-009](moveOrCopyNodes.md) |
-| `Ctrl+Z` | Undoes the last tree change | [UC-011](undoAndRedo.md) |
-| `Ctrl+Y` | Redoes it | [UC-011](undoAndRedo.md) |
-| `1` `2` `3` | Inside the status popup: Assigned, Completed, Closed | [UC-013](setTestRunStatus.md) |
-| `Ctrl+Alt+F`, `Cmd+Alt+F` on a Mac | Opens search, from anywhere in the IDE | [UC-017](searchProject.md) |
+| `Enter` | Opens the selected test set or test run | [UC-005](openTestSet.md) |
+| `Ctrl+M` | Creates a node under the selected one | [UC-007](createTestSet.md) |
+| `Shift+F6` | Renames the selected node | [UC-011](renameNode.md) |
+| `Delete` | Removes the selected nodes | [UC-012](removeNode.md) |
+| `Ctrl+X` | Cuts the selected nodes, to move them | [UC-013](moveNodes.md) |
+| `Ctrl+C` | Copies the selected nodes | [UC-014](copyNodes.md) |
+| `Ctrl+V` | Pastes into the selected node | [UC-013](moveNodes.md) |
+| `Escape` | Takes the gray off nodes the tester cut | [UC-013](moveNodes.md) |
+| `Ctrl+Z` | Undoes the last tree change | [UC-016](undoChange.md) |
+| `Ctrl+Y` | Redoes it | [UC-017](redoChange.md) |
+| `1` `2` `3` | Inside the status popup: Assigned, Completed, Closed | [UC-020](setTestRunStatus.md) |
+| `Ctrl+Alt+F`, `Cmd+Alt+F` on a Mac | Opens search, from anywhere in the IDE | [UC-024](searchProject.md) |
 | The menu key, beside the right `Ctrl` | Opens the node menu | Below, under **What the tree shows** |
 
 Six things a tester might expect have **no key** on the tree. **Order**, the
 statuses, **Re-create**, **Edit Run**, **Run Tests** and **Details** are menu
 items only. The panel's own buttons have no keys either, except search, and
-they are [UC-021](panelToolbar.md). Each one is a decision the tester thinks about, not a reflex, and
+they are [UC-028](panelToolbar.md). Each one is a decision the tester thinks about, not a reflex, and
 none is used often enough to need a key. `F2` renames in the editors, not here.
 
 ---
@@ -238,26 +244,26 @@ in the past tense wherever one word will do. (rule 7)
 
 | Message | Means | Use case |
 |---|---|---|
-| *Created* | A node was created | [UC-005](createTestSet.md), [UC-006](createTestRun.md) |
+| *Created* | A node was created | [UC-007](createTestSet.md), [UC-009](createTestRun.md) |
 | *Project created* | A test project was created | [UC-002](createTestProject.md) |
-| *Project cloned* | A test project was brought down from Git | [UC-022](importTestProject.md) |
-| *Bound* | This code project now uses that test project. The name follows | [UC-003](chooseTestProject.md) |
-| *Run created* | A test run was created | [UC-006](createTestRun.md), [UC-014](reCreateTestRun.md) |
-| *Renamed* | A node was renamed | [UC-007](renameNode.md) |
-| *Removed*, *Removed N* | One or more nodes went to the recycle bin | [UC-008](removeNode.md) |
-| *Copied*, *Copied N* | Nodes are on the clipboard, to copy | [UC-009](moveOrCopyNodes.md) |
-| *Cut*, *Cut N* | Nodes are on the clipboard, to move | [UC-009](moveOrCopyNodes.md) |
-| *Moved*, *Moved N* | The cut nodes have moved | [UC-009](moveOrCopyNodes.md) |
-| *Pasted*, *Pasted N* | The copied nodes have been duplicated | [UC-009](moveOrCopyNodes.md) |
-| *Ordered* | A node's number was set or cleared | [UC-010](orderNodes.md) |
-| *Undone* | The last change was taken back | [UC-011](undoAndRedo.md) |
-| *Redone* | The undone change was put back | [UC-011](undoAndRedo.md) |
-| *Active*, *Inactive*, *Archived*, *Deprecated* | The new status of a test project, package or test set | [UC-012](retireAndReactivate.md) |
-| *Assigned*, *Completed*, *Closed* | The new status of a test run | [UC-013](setTestRunStatus.md) |
-| *Updated* | A test run's name, test cases or settings were saved | [UC-015](editTestRun.md) |
-| *Running*, *Running N* | The automation started | [UC-016](runTests.md) |
-| *Refreshed* | The tree was read again from disk | [UC-018](refreshTree.md) |
-| *Switched to \<branch\>* | The test project is on another branch | [UC-019](switchBranch.md) |
+| *Project cloned* | A test project was brought down from Git | [UC-003](importTestProject.md) |
+| *Bound* | This code project now uses that test project. The name follows | [UC-004](chooseTestProject.md) |
+| *Run created* | A test run was created | [UC-009](createTestRun.md), [UC-021](reCreateTestRun.md) |
+| *Renamed* | A node was renamed | [UC-011](renameNode.md) |
+| *Removed*, *Removed N* | One or more nodes went to the recycle bin | [UC-012](removeNode.md) |
+| *Copied*, *Copied N* | Nodes are on the clipboard, to copy | [UC-013](moveNodes.md) |
+| *Cut*, *Cut N* | Nodes are on the clipboard, to move | [UC-013](moveNodes.md) |
+| *Moved*, *Moved N* | The cut nodes have moved | [UC-013](moveNodes.md) |
+| *Pasted*, *Pasted N* | The copied nodes have been duplicated | [UC-013](moveNodes.md) |
+| *Ordered* | A node's number was set or cleared | [UC-015](orderNodes.md) |
+| *Undone* | The last change was taken back | [UC-016](undoChange.md) |
+| *Redone* | The undone change was put back | [UC-016](undoChange.md) |
+| *Active*, *Inactive*, *Archived*, *Deprecated* | The new status of a test project, package or test set | [UC-018](retireNode.md) |
+| *Assigned*, *Completed*, *Closed* | The new status of a test run | [UC-020](setTestRunStatus.md) |
+| *Updated* | A test run's name, test cases or settings were saved | [UC-022](editTestRun.md) |
+| *Running*, *Running N* | The automation started | [UC-023](runTests.md) |
+| *Refreshed* | The tree was read again from disk | [UC-025](refreshTree.md) |
+| *Switched to \<branch\>* | The test project is on another branch | [UC-026](switchBranch.md) |
 
 ### When it refused
 
@@ -265,16 +271,16 @@ A refusal fades too. It says what stopped the action, and nothing was changed.
 
 | Message | Means | Use case |
 |---|---|---|
-| *\<name\> Already Exists* | The name is taken where it was going | [UC-002](createTestProject.md), [UC-005](createTestSet.md), [UC-006](createTestRun.md), [UC-007](renameNode.md), [UC-014](reCreateTestRun.md), [UC-015](editTestRun.md) |
-| *Select a folder* | The selected place cannot take what is on the clipboard | [UC-009](moveOrCopyNodes.md) |
-| *'\<name\>' already exists in '\<folder\>'*, *N items already exist in '\<folder\>'* | The destination already holds that name. The rest of the paste still moves | [UC-009](moveOrCopyNodes.md) |
-| *A test run needs a name* | The name box was emptied | [UC-006](createTestRun.md), [UC-014](reCreateTestRun.md), [UC-015](editTestRun.md) |
-| *'\<parent\>' no longer exists - test run not created* | The folder went away while the dialog was open | [UC-006](createTestRun.md) |
-| *'\<run\>' no longer exists - nothing saved* | The test run went away while the dialog was open | [UC-015](editTestRun.md) |
-| *'\<run\>' was \<status\> while this was open - nothing saved* | Someone signed the test run off while the dialog was open | [UC-015](editTestRun.md) |
-| *\<name\> has no test cases to run* | Nothing under the node can be run | [UC-016](runTests.md) |
-| *No Test Projects* | There is nothing to choose. It adds *Create one under the Testin root first* | [UC-003](chooseTestProject.md) |
-| *Java Test Source Not Found* | The IDE project has no Java test folder, so no automation code is written | [UC-005](createTestSet.md) |
+| *\<name\> Already Exists* | The name is taken where it was going | [UC-002](createTestProject.md), [UC-007](createTestSet.md), [UC-009](createTestRun.md), [UC-011](renameNode.md), [UC-021](reCreateTestRun.md), [UC-022](editTestRun.md) |
+| *Select a folder* | The selected place cannot take what is on the clipboard | [UC-013](moveNodes.md) |
+| *'\<name\>' already exists in '\<folder\>'*, *N items already exist in '\<folder\>'* | The destination already holds that name. The rest of the paste still moves | [UC-013](moveNodes.md) |
+| *A test run needs a name* | The name box was emptied | [UC-009](createTestRun.md), [UC-021](reCreateTestRun.md), [UC-022](editTestRun.md) |
+| *'\<parent\>' no longer exists - test run not created* | The folder went away while the dialog was open | [UC-009](createTestRun.md) |
+| *'\<run\>' no longer exists - nothing saved* | The test run went away while the dialog was open | [UC-022](editTestRun.md) |
+| *'\<run\>' was \<status\> while this was open - nothing saved* | Someone signed the test run off while the dialog was open | [UC-022](editTestRun.md) |
+| *\<name\> has no test cases to run* | Nothing under the node can be run | [UC-023](runTests.md) |
+| *No Test Projects* | There is nothing to choose. It adds *Create one under the Testin root first* | [UC-004](chooseTestProject.md) |
+| *Java Test Source Not Found* | The IDE project has no Java test folder, so no automation code is written | [UC-007](createTestSet.md) |
 
 ### When something failed
 
@@ -283,17 +289,17 @@ than feedback on what the tester just typed.
 
 | Message | Means | Use case |
 |---|---|---|
-| *Not Bound* | The choice could not be written into the code project, so it will not be remembered | [UC-003](chooseTestProject.md) |
-| *No Test Project Named* | The code project does not say which test project it is about, so nothing can be cloned | [UC-022](importTestProject.md) |
-| *Clone Failed* | The repository could not be cloned. The reason follows | [UC-022](importTestProject.md) |
-| *Clone Error* | Something needed for the clone was missing | [UC-022](importTestProject.md) |
-| *Rename Failed* | The folder could not be renamed on disk. The reason follows | [UC-007](renameNode.md) |
-| *Undo Incomplete* | Some removed nodes could not be put back. It says how many of how many | [UC-011](undoAndRedo.md) |
-| *Unable to update status to \<status\>* | A test project's status could not be written | [UC-012](retireAndReactivate.md) |
-| *Unable to mark test set \<status\>* | A test set's status could not be written | [UC-012](retireAndReactivate.md) |
-| *Unable to mark package \<status\>* | A package's status could not be written | [UC-012](retireAndReactivate.md) |
-| *Git Error* | The branches could not be read. The reason follows | [UC-019](switchBranch.md) |
-| *Git Fetch Warning* | The branch list may be out of date | [UC-019](switchBranch.md) |
+| *Not Bound* | The choice could not be written into the code project, so it will not be remembered | [UC-004](chooseTestProject.md) |
+| *No Test Project Named* | The code project does not say which test project it is about, so nothing can be cloned | [UC-003](importTestProject.md) |
+| *Clone Failed* | The repository could not be cloned. The reason follows | [UC-003](importTestProject.md) |
+| *Clone Error* | Something needed for the clone was missing | [UC-003](importTestProject.md) |
+| *Rename Failed* | The folder could not be renamed on disk. The reason follows | [UC-011](renameNode.md) |
+| *Undo Incomplete* | Some removed nodes could not be put back. It says how many of how many | [UC-016](undoChange.md) |
+| *Unable to update status to \<status\>* | A test project's status could not be written | [UC-018](retireNode.md) |
+| *Unable to mark test set \<status\>* | A test set's status could not be written | [UC-018](retireNode.md) |
+| *Unable to mark package \<status\>* | A package's status could not be written | [UC-018](retireNode.md) |
+| *Git Error* | The branches could not be read. The reason follows | [UC-026](switchBranch.md) |
+| *Git Fetch Warning* | The branch list may be out of date | [UC-026](switchBranch.md) |
 
 ### Shown in the tree itself, not as a message
 
@@ -333,7 +339,7 @@ along its top are the IDE's own. The branch box and the tree are Testin's.
 ```
 
 1. to 5. **The toolbar** — seven buttons. Each one, and what it does, is
-   [UC-021](panelToolbar.md).
+   [UC-028](panelToolbar.md).
 6. **The branch box** — shown only for a test project shared through Git. Its
    placeholder reads *Loading branches...* until Git answers.
 7. **The test project row** — drawn bold, with the IDE's project icon. The two

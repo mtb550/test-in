@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-017
+[Documentation](../README.md) › [The project panel](main.md) › UC-024
 
-# UC-017: Find anything in the project
+# UC-024: Find anything in the project
 
 > **`Ctrl+Alt+F`**, and **`Cmd+Alt+F`** on a Mac. It works anywhere in the
 > IDE, not only in the tree. There is also a **Search Test Project** button

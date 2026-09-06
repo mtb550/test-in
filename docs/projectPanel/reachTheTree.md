@@ -14,8 +14,9 @@ first, **so that** I am never stuck on an empty window.
 - **Rule 15** — A code project does not have to name a test project. If it names
   none, and exactly one test project exists in the Testin folder, Testin binds it
   to that one without asking.
-- **Rule 53** — An **Archived** test project is not opened at all on the next
-  load. The panel says so, and offers the other test projects.
+
+Rule 53 also holds here. It says an **Archived** test project is not opened on
+the next load, and it is on [UC-018](retireNode.md).
 
 Rules 1 to 13 hold everywhere in the panel. They are on
 [the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).

@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-021
+[Documentation](../README.md) › [The project panel](main.md) › UC-028
 
-# UC-021: Use the buttons at the top of the panel
+# UC-028: Use the buttons at the top of the panel
 
 > **Only one of the seven buttons has a key.** Search is **`Ctrl+Alt+F`**,
 > and **`Cmd+Alt+F`** on a Mac.
@@ -38,12 +38,12 @@ happens when the tester presses one.
 
 | | Button | Hovering says | Where it is written |
 |---|---|---|---|
-| 1 | **Search Test Project** | *Find a test case, test set, package or run and go to it* | [UC-017](searchProject.md) |
+| 1 | **Search Test Project** | *Find a test case, test set, package or run and go to it* | [UC-024](searchProject.md) |
 | 2 | **Settings** | *Configure Testin settings* | Below |
 | 3 | **Expand All** | *Expand all nodes* | Below |
 | 4 | **Collapse All** | *Collapse all nodes* | Below |
-| 5 | **Refresh** | *Re-index and reload tree* | [UC-018](refreshTree.md) |
-| 6 | **Select Test Project** | *Choose the test project this repository exercises* | [UC-003](chooseTestProject.md) |
+| 5 | **Refresh** | *Re-index and reload tree* | [UC-025](refreshTree.md) |
+| 6 | **Select Test Project** | *Choose the test project this repository exercises* | [UC-004](chooseTestProject.md) |
 | 7 | **New Test Project** | *Create or Clone test project* | [UC-002](createTestProject.md) |
 
 **Only the search button has a key.** It is `Ctrl+Alt+F`, and `Cmd+Alt+F` on a

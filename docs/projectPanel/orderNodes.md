@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-010
+[Documentation](../README.md) › [The project panel](main.md) › UC-015
 
-# UC-010: Order nodes among their siblings
+# UC-015: Order nodes among their siblings
 
 > **No key.** On the menu: **Actions → Order**.
 

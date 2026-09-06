@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-020
+[Documentation](../README.md) › [The project panel](main.md) › UC-027
 
-# UC-020: See what a node holds
+# UC-027: See what a node holds
 
 > **No key.** On the menu: **Details**.
 

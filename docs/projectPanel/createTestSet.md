@@ -1,13 +1,12 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-005
+[Documentation](../README.md) › [The project panel](main.md) › UC-007
 
-# UC-005: Create a test set or a test set package
+# UC-007: Create a test set
 
-> **`Ctrl+M`**, with **Test Cases** or a test set package selected. On the
-> menu: **Create**.
+> **`Ctrl+M`**, with **Test Cases** or a test set package selected, then pick
+> *Test Set*. On the menu: **Create**.
 
-**As a** tester, **I want** to add a test set, or a package to group test sets,
-under **Test Cases** or under another package, **so that** the tree grows the way
-the product is organized.
+**As a** tester, **I want** to add a test set under **Test Cases** or under a
+package, **so that** the test cases I am about to write have somewhere to live.
 
 ## Rules
 
@@ -16,7 +15,7 @@ the product is organized.
 - **Rule 24** — Nothing can be created directly under the test project, under a
   test set, or under a test run.
 - **Rule 25** — A new test set opens in its editor at once. Its automation code
-  is written where the Java plugin allows it. A new package does neither.
+  is written where the Java plugin allows it.
 
 Rules 1 to 13 hold everywhere in the panel. They are on
 [the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
@@ -57,15 +56,16 @@ like Sprint 3 Cycle 1...*.
 
 1. The tester selects **Test Cases** or a test set package.
 2. The tester presses `Ctrl+M`, or chooses **Create**.
-3. The **Create Test Node** dialog opens with two kinds to pick from. Beside
-   *test set* it says *Holds test cases*. Beside *test set package* it says
-   *Groups test sets*. The first kind is selected.
-4. The tester types a name, moves between the kinds with `↑` and `↓`, and
-   presses `Enter`.
-5. Testin creates the node under the selected parent, refreshes the tree, and
-   shows *Created*.
-6. If the kind was a test set, it opens in its editor at once. Where the Java
-   plugin is installed, Testin also writes its automation code.
+3. The **Create Test Node** dialog opens. *Test Set* is selected, and beside it
+   the dialog says *Holds test cases*.
+4. The tester types a name and presses `Enter`.
+5. Testin creates the test set under the selected parent, refreshes the tree,
+   and shows *Created*.
+6. The test set opens in its editor at once.
+7. Where the Java plugin is installed, Testin also writes its automation code.
+
+To group test sets instead of adding one, see
+[UC-008](createTestSetPackage.md).
 
 ## What Testin refuses
 
@@ -77,6 +77,9 @@ nothing is created, and *\<name\> Already Exists* is shown in red.
 
 **If the test project, a test set or a test run is selected** — **Create** is
 gray, and `Ctrl+M` does nothing.
+
+**If the IDE project has no Java test folder** — *Java Test Source Not Found*
+says no automation code will be written. The test set is still created.
 
 ---
 

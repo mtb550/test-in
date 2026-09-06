@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-022
+[Documentation](../README.md) › [The project panel](main.md) › UC-003
 
-# UC-022: Import a test project that already exists
+# UC-003: Import a test project that already exists
 
 > **No key.** Press **New Test Project** at the top of the panel, and paste
 > the address instead of a name.

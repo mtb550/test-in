@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-014
+[Documentation](../README.md) › [The project panel](main.md) › UC-021
 
-# UC-014: Re-create a test run
+# UC-021: Re-create a test run
 
 > **No key.** On the menu: **Actions → Re-create**.
 
@@ -21,7 +21,7 @@ hand.
 Rules 1 to 13 hold everywhere in the panel. They are on
 [the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
-The dialog is drawn under [UC-006](createTestRun.md).
+The dialog is drawn under [UC-009](createTestRun.md).
 
 ## Main flow
 

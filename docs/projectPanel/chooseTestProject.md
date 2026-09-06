@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-003
+[Documentation](../README.md) › [The project panel](main.md) › UC-004
 
-# UC-003: Choose which test project this code project uses
+# UC-004: Choose which test project this code project uses
 
 > **No key.** Press **Select Test Project** at the top of the panel.
 

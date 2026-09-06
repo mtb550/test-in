@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-008
+[Documentation](../README.md) › [The project panel](main.md) › UC-012
 
-# UC-008: Remove a node
+# UC-012: Remove a node
 
 > **`Delete`**, with one or more nodes selected. On the menu:
 > **Actions → Remove**.

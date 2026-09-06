@@ -1,17 +1,15 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-006
+[Documentation](../README.md) › [The project panel](main.md) › UC-009
 
-# UC-006: Create a test run or a test run package
+# UC-009: Create a test run
 
-> **`Ctrl+M`**, with **Test Runs** or a test run package selected. On the
-> menu: **Create**.
+> **`Ctrl+M`**, with **Test Runs** or a test run package selected, then pick
+> *test run*. On the menu: **Create**.
 
 **As a** tester, **I want** to start a test run over the test cases I choose,
 **so that** a pass through the product is recorded on its own.
 
 ## Rules
 
-- **Rule 26** — Under **Test Runs** or a test run package, only a test run or a
-  test run package can be created.
 - **Rule 27** — A test run needs at least one test case. It cannot be created
   empty.
 - **Rule 28** — Three things are not offered when a test run is created: a
@@ -19,6 +17,9 @@
   set. (rule 8)
 - **Rule 29** — A new test run starts as **Created**. Every test case in it
   starts **Pending**.
+
+Rule 26 holds here too. It says what can be created under **Test Runs**, and it
+is on [UC-010](createTestRunPackage.md).
 
 Rules 1 to 13 hold everywhere in the panel. They are on
 [the project panel page](main.md#rules-that-hold-everywhere-in-the-panel).
@@ -75,21 +76,18 @@ with the test run's own:
 
 1. The tester selects **Test Runs** or a test run package.
 2. The tester presses `Ctrl+M`, or chooses **Create**.
-3. The **Create Run Node** dialog opens with two kinds. Beside *test run* it says
-   *Records execution results*. Beside *test run package* it says *Groups test
-   runs*.
-4. The tester types a name, picks a kind, and presses `Enter`.
-5. For a package, Testin creates it and shows *Created*. That is the end.
-6. For a test run, the **Create Test Run** dialog opens instead. It holds the
-   typed name in *Test Run name*, a *Configuration details* form, and a tree of
-   every live, non-empty test set with all test cases ticked. Retired test sets,
-   anything under an **Archived** package, and empty test sets are not in that
-   tree.
-7. The tester ticks and unticks with `Space`, moves with `Tab`, and presses
+3. The **Create Run Node** dialog opens. *test run* is selected, and beside it
+   the dialog says *Records execution results*.
+4. The tester types a name and presses `Enter`.
+5. The **Create Test Run** dialog opens. It holds the typed name in *Test Run
+   name*, a *Configuration details* form, and a tree of every live, non-empty
+   test set with all test cases ticked. Retired test sets, anything under an
+   **Archived** package, and empty test sets are not in that tree.
+6. The tester ticks and unticks with `Space`, moves with `Tab`, and presses
    **Create**.
-8. Testin writes the test run, with every ticked test case **Pending** and the
+7. Testin writes the test run, with every ticked test case **Pending** and the
    status **Created**.
-9. Its editor opens, and Testin shows *Run created*.
+8. Its editor opens, and Testin shows *Run created*.
 
 ## What Testin refuses
 
@@ -97,6 +95,9 @@ with the test run's own:
 
 **If the name has been emptied** — the dialog stays open, and *A test run needs a
 name* is shown in red.
+
+**If a test run with that name already exists** — *\<name\> Already Exists* is
+shown in red.
 
 **If the parent folder was removed while the dialog was open** — the dialog stays
 open, and *'\<parent\>' no longer exists - test run not created* is shown in

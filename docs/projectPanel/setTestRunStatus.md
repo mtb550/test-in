@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-013
+[Documentation](../README.md) › [The project panel](main.md) › UC-020
 
-# UC-013: Set a test run's status
+# UC-020: Set a test run's status
 
 > **No key opens it.** On the menu: **Set Status**. Inside the popup,
 > **`1`** is **Assigned**, **`2`** is **Completed** and **`3`** is

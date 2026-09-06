@@ -1,14 +1,13 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-009
+[Documentation](../README.md) › [The project panel](main.md) › UC-013
 
-# UC-009: Move or copy nodes
+# UC-013: Move nodes
 
-> **`Ctrl+C`** copies, **`Ctrl+X`** cuts, **`Ctrl+V`** pastes, and
-> **`Escape`** takes the gray off. Dragging works too. On the menu:
-> **Actions → Copy**, **Cut** and **Paste**.
+> **`Ctrl+X`** cuts, **`Ctrl+V`** pastes, and **`Escape`** takes the gray off.
+> Dragging a node onto a folder moves it too. On the menu: **Actions → Cut** and
+> **Paste**.
 
-**As a** tester, **I want** to move a node into another package, or copy it,
-by cutting and pasting or by dragging, **so that** the tree can be reorganized
-without recreating anything.
+**As a** tester, **I want** to move a node into another folder, **so that** the
+tree can be reorganized without building anything again.
 
 ## Rules
 
@@ -20,14 +19,11 @@ without recreating anything.
   run. Neither of them holds nodes.
 - **Rule 39** — A node cannot land on itself, inside itself, or in the folder it
   already sits in.
-- **Rule 40** — Dragging moves a node. Dragging with the copy key held copies
-  it. Cut then paste moves. Copy then paste copies.
-- **Rule 41** — A copied test case is a new test case, with its own id. Editing
-  the copy never changes the original.
-- **Rule 42** — A move can be undone. A copy cannot. To take back a copy, remove
-  it.
+- **Rule 40** — Cut then paste moves. Dragging moves. Dragging with the copy key
+  held copies instead, which is [UC-014](copyNodes.md).
+- **Rule 42** — A move can be undone.
 - **Rule 43** — Nodes drop onto a node, never between two. Position is set by
-  ordering, in [UC-010](orderNodes.md), not by dragging.
+  ordering, in [UC-015](orderNodes.md), not by dragging.
 - **Rule 76** — Canceling a cut empties the clipboard. Nothing is left waiting
   to be pasted.
 
@@ -62,25 +58,18 @@ From a paste, the title is **Paste**. From a drop, the title is the verb:
 
 ## Main flow
 
-**Cut or copy, then paste**
+**Cut and paste**
 
 1. The tester selects one or more test sets, packages or test runs.
-2. The tester presses `Ctrl+C` to copy, or `Ctrl+X` to cut. The menu offers
-   **Actions → Copy** and **Actions → Cut**.
-3. After a copy, nothing in the tree changes, and Testin shows *Copied*, or
-   *Copied N* for several. After a cut, the nodes are drawn gray, and Testin
-   shows *Cut*, or *Cut N*.
-4. The tester selects a folder that can hold them: **Test Cases**, **Test
+2. The tester presses `Ctrl+X`, or chooses **Actions → Cut**. The nodes are
+   drawn gray, and Testin shows *Cut*, or *Cut N* for several.
+3. The tester selects a folder that can hold them: **Test Cases**, **Test
    Runs**, or a package of the right family.
-5. The tester presses `Ctrl+V`, or chooses **Actions → Paste**.
-6. The **Paste** dialog opens with *From* and *To* rows. After a cut it asks
-   *Move '\<name\>' into '\<folder\>'?*. After a copy it asks *Copy N items
-   into '\<folder\>'?*.
-7. The tester presses `Enter`. After a cut the nodes move, and Testin shows
-   *Moved*, or *Moved N*. After a copy they are duplicated, and Testin shows
-   *Pasted*, or *Pasted N*.
-8. A pasted copy of a test set gets a new id for every test case in it, and the
-   copy is selected in the tree.
+4. The tester presses `Ctrl+V`, or chooses **Actions → Paste**.
+5. The **Paste** dialog asks *Move '\<name\>' into '\<folder\>'?*, with *From*
+   and *To* rows.
+6. The tester presses `Enter`. The nodes move, and Testin shows *Moved*, or
+   *Moved N*.
 
 **Drag and drop**
 
@@ -89,10 +78,8 @@ From a paste, the title is **Paste**. From a drop, the title is the verb:
 2. Over a row that cannot take them, the mouse shows the no-entry pointer, and
    the row does not light up.
 3. The tester releases on a folder that can hold them. The **Move** dialog asks
-   the same question as a paste, and `Enter` moves them.
-4. Holding `Ctrl` while releasing titles the dialog **Copy**, and `Enter` copies
-   them instead.
-5. Nothing can be dropped between two rows.
+   the same question, and `Enter` moves them.
+4. Nothing can be dropped between two rows.
 
 **Canceling a cut**
 

@@ -1,6 +1,6 @@
-[Documentation](../README.md) › [The project panel](main.md) › UC-016
+[Documentation](../README.md) › [The project panel](main.md) › UC-023
 
-# UC-016: Run the automation for everything a node holds
+# UC-023: Run the automation for everything a node holds
 
 > **No key.** On the menu: **Run Tests**.
 

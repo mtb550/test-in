@@ -33,7 +33,7 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 
 1. **One field** — its gray hint text reads *set name or paste url...*. What the
    tester types decides what happens. A Git address is cloned, which is
-   [UC-022](importTestProject.md). Anything else is the name of a new test
+   [UC-003](importTestProject.md). Anything else is the name of a new test
    project. There is no list to pick from, because the tester would only be
    saying twice what they already typed.
 2. **The status bar** — every key this dialog answers to.
@@ -51,7 +51,7 @@ first test project**, which is drawn under [UC-001](reachTheTree.md).
 5. Testin shows *Project created*.
 
 To bring down a test project that already exists somewhere else, paste its
-address instead of a name. That is [UC-022](importTestProject.md).
+address instead of a name. That is [UC-003](importTestProject.md).
 
 ## What Testin refuses
 
