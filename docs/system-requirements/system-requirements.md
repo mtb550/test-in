@@ -8,9 +8,19 @@ What the software must do, stated so that each requirement can be checked.
 | **For** | Anyone deciding whether a change is correct, and anyone writing a test that proves it |
 | **Owns** | `SR` — one identifier per scenario, citable from an issue, a commit or a test |
 | **Written to** | [How a document is written](../standard.md) — Given / When / Then, one behaviour per scenario, every key named here and nowhere else |
-| **State** | **Not written** — [#180](https://github.com/mtb550/test-in/issues/180) |
+| **State** | Product-wide sections: **not written** — [#180](https://github.com/mtb550/test-in/issues/180). By module: **1 of 6** |
 
 ---
+
+## By module
+
+Each module's scenarios are a document of their own. Every key that module
+answers to is named there, once, in the scenario that presses it.
+
+| Module | |
+|---|---|
+| **[Project panel](project-panel.md)** `PP` | **Written** — 63 scenarios, 13 keys |
+| Test case editor `TE` · Test run editor `RE` · View panel `VP` · Settings `ST` · Evidence and exchange `EX` | Not yet — [#181](https://github.com/mtb550/test-in/issues/181) |
 
 ## How this differs from the business requirements
 

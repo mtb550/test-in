@@ -23,9 +23,23 @@ that link them — so the same fact is never written twice.
 
 | | Answers | Owns | State |
 |---|---|---|---|
-| **[Business requirements](business-requirements/business-requirements.md)** | What Testin promises, and to whom | `BR-nn` `UC-nn` `Q-nn` | **Draft 1** — [#72](https://github.com/mtb550/test-in/issues/72) |
-| **[System requirements](system-requirements/system-requirements.md)** | What the software must do to keep those promises | `SR-nn` | Not written — [#180](https://github.com/mtb550/test-in/issues/180) |
-| **[Design](design/design.md)** | What the tester sees on each screen, and why | cites the above | **1 of 5 written** |
+| **[Business requirements](business-requirements/business-requirements.md)** | What Testin promises, and to whom | `BR` `UC` `Q` | Product-wide: **Draft 1** — [#72](https://github.com/mtb550/test-in/issues/72). By module: **1 of 6** |
+| **[System requirements](system-requirements/system-requirements.md)** | What the software must do to keep those promises | `SR` | Product-wide: not written — [#180](https://github.com/mtb550/test-in/issues/180). By module: **1 of 6** |
+| **[Design](design/design.md)** | What the tester sees on each screen, and why | cites the above | By module: **1 of 6**, plus light mode |
+
+**By module**, three documents each — the same use case carries the same `UC`
+id across the first two, and the design cites both:
+
+| Module | Business requirements | System requirements | Design |
+|---|---|---|---|
+| **Project panel** `PP` | [Written](business-requirements/project-panel.md) | [Written](system-requirements/project-panel.md) | [Written](design/project-panel.md) |
+| Test case editor `TE` | — | — | — |
+| Test run editor `RE` | — | — | [Light mode](design/light-mode.md) |
+| View panel `VP` | — | — | — |
+| Settings `ST` | — | — | — |
+| Evidence and exchange `EX` | — | — | — |
+
+The plan and the order are [#181](https://github.com/mtb550/test-in/issues/181).
 
 ## For testers
 

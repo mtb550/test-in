@@ -6,6 +6,15 @@
 
 **Draft 1** · Written against `main` at commit `0becc8b2`, 29 August 2026.
 
+> **By module.** This document holds the promises that span the whole product.
+> Each module's own promises — its use cases and the rules beneath them — are a
+> document of their own, written to [the standard](../standard.md):
+>
+> | Module | |
+> |---|---|
+> | **[Project panel](project-panel.md)** `PP` | **Written** — 20 use cases, 75 rules, 4 open questions |
+> | Test case editor `TE` · Test run editor `RE` · View panel `VP` · Settings `ST` · Evidence and exchange `EX` | Not yet — [#181](https://github.com/mtb550/test-in/issues/181) |
+
 Every rule in the main body was true of the product on that commit. Where a rule
 is genuinely undecided it is listed as undecided rather than invented.
 

@@ -16,8 +16,9 @@ choice on it.
 
 | Document | The surface | State |
 |---|---|---|
-| **[Light mode](light-mode.md)** | The standalone always-on-top window that shows one test case at a time | **Written** — [#13](https://github.com/mtb550/test-in/issues/13), closed |
-| Test case editor | The grid, the card list, the details panel and the toolbar that drives them | Not written |
+| **[Project panel](project-panel.md)** `PP` | The tree on the left, its header, its menu and every dialog it opens — 13 screens | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
+| **[Light mode](light-mode.md)** `RE` | The standalone always-on-top window that shows one test case at a time | **Written** — [#13](https://github.com/mtb550/test-in/issues/13), closed |
+| Test case editor `TE` | The grid, the card list, the details panel and the toolbar that drives them | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
 | The dialog framework | `ui.framework` — the dialog shell, the status bar strip, the keycap, the prose paragraph, the row striping. What a new dialog gets for free | Not written — [#11](https://github.com/mtb550/test-in/issues/11), [#69](https://github.com/mtb550/test-in/issues/69) |
 | The project tree | The explorer: what each node offers, what may be dropped where, and the markers on disk behind it | Not written |
 | Reports | What a generated report contains, and why each figure is on it | Not written |
