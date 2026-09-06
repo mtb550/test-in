@@ -22,7 +22,7 @@ Read the product first, then the part of Testin you work in.
 | Document | Holds | Where it stands |
 |---|---|---|
 | **[The product](product.md)** | Who uses Testin, what they work with, every status, and the rules that hold everywhere | A draft, not re-checked — [#72](https://github.com/mtb550/test-in/issues/72) |
-| **[The project panel](project-panel.md)** | The tree on the left: 20 use cases, 75 rules, 4 open questions | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
+| **[The project panel](project-panel.md)** | The tree on the left: 20 use cases, 76 rules, 4 open questions | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | The test case editor | Writing test cases | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
 | The test run editor | Running tests and recording verdicts, including light mode | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |
 | The view panel | Details, history and bugs of one test case | Not written — [#181](https://github.com/mtb550/test-in/issues/181) |

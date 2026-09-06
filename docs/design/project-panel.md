@@ -77,7 +77,7 @@ to Testin.
 Retired nodes sit at the bottom of their folder. Their number does not change
 that.
 
-Used by every use case. The rendering rules are SR-PP-01 to SR-PP-04.
+Used by every use case. The rendering rules are scenario 1 to scenario 4.
 
 ---
 
@@ -138,7 +138,7 @@ then the one link. They are:
 - *\<name\> is not on this machine yet*, with **Clone \<name\>**
 - **Create your first test project**
 
-Used by UC-PP-01, UC-PP-02, UC-PP-03.
+Used by use case 1, use case 2, use case 3.
 
 ---
 
@@ -240,9 +240,9 @@ except for two things. Its kinds are *test run* (*Records execution results*) an
 Sprint 3 Cycle 1...*.
 
 > **Today the two kind names are blank.** The rows show only their hints.
-> This is D4 in the business requirements.
+> This is difference 4 in the business requirements.
 
-Used by UC-PP-05, UC-PP-06.
+Used by use case 5, use case 6.
 
 ### Rename
 
@@ -260,7 +260,7 @@ Used by UC-PP-05, UC-PP-06.
 
 1. The current name, filled in and selected. Typing replaces it.
 
-Used by UC-PP-07.
+Used by use case 7.
 
 ### Confirm Removing
 
@@ -288,7 +288,7 @@ Used by UC-PP-07.
 For several nodes, the question is *Remove these N items?*. It shows no counts
 and no path.
 
-Used by UC-PP-08.
+Used by use case 8.
 
 ### Paste, Move and Copy
 
@@ -316,7 +316,7 @@ Used by UC-PP-08.
 From a paste, the title is **Paste**. From a drop, the title is the verb:
 **Move** or **Copy**. The dialog is the same otherwise.
 
-Used by UC-PP-09.
+Used by use case 9.
 
 ### Order
 
@@ -336,7 +336,7 @@ Used by UC-PP-09.
    digits only, with no leading zero. Anything else is refused as it is typed.
    Empty means date order.
 
-Used by UC-PP-10.
+Used by use case 10.
 
 ### Set Test Run Status
 
@@ -365,7 +365,7 @@ Used by UC-PP-10.
    - a key
    - a click
 
-Used by UC-PP-13.
+Used by use case 13.
 
 ### Create Test Run
 
@@ -414,7 +414,7 @@ with the test run's own:
 - test cases
 - configuration
 
-Used by UC-PP-06, UC-PP-14, UC-PP-15.
+Used by use case 6, use case 14, use case 15.
 
 ### Search Test Project
 
@@ -446,7 +446,7 @@ Used by UC-PP-06, UC-PP-14, UC-PP-15.
    - under them, the path through the tree
 3. At most 50 rows.
 
-Used by UC-PP-17.
+Used by use case 17.
 
 ### Uncommitted Changes
 
@@ -476,7 +476,7 @@ Used by UC-PP-17.
 3. **Two confirms** — `Enter` switches anyway. `Shift+Enter` opens the review
    instead.
 
-Used by UC-PP-19.
+Used by use case 19.
 
 ---
 
@@ -542,11 +542,11 @@ A drag would be faster. It would say nothing.
 
 | Drawn | Built |
 |---|---|
-| The create dialog's rows show a kind name and a hint | The names are blank. Only the hints show. D4 in the business requirements |
-| **Paste** grayed on a test run, as on a test set | Enabled. It always refuses. D2 |
-| The status popup offers the three statuses a tester sets | It offers all five. It lets a test run go backwards. D5 |
+| The create dialog's rows show a kind name and a hint | The names are blank. Only the hints show. Difference 4 in the business requirements |
+| **Paste** grayed on a test run, as on a test set | Enabled. It always refuses. Difference 2 |
+| The status popup offers the three statuses a tester sets | It offers all five. It lets a test run go backwards. Difference 5 |
 | **New Test Project** re-enables once a Testin folder is set | It stays grayed until the IDE project is reopened |
-| **Select Test Project** has a column heading over the names | The heading is blank. It is the same caption sweep as D4 |
+| **Select Test Project** has a column heading over the names | The heading is blank. It is the same caption sweep as difference 4 |
 
 ---
 

@@ -55,42 +55,33 @@ mode document is the pattern.
 
 ## How things are numbered
 
-Everything a reader might point at has a number. **Point at the number, never
-the sentence.** A number survives the text being reworded.
+Everything a reader might point at is numbered. **Point at the number, never
+the sentence.** A number still means the same thing after the words are
+rewritten.
 
-Four things are numbered:
+Five things are numbered. Each one is written the way it is read:
 
-| Number | What it is | Which document it lives in |
+| Written | What it is | Which document it is in |
 |---|---|---|
-| `UC-PP-01` | A **use case**. One thing a tester does, such as creating a test project | Both the business requirements and the system requirements, under the same number. The story is in one. The steps are in the other. The number is what joins them |
-| `BR-PP-01` | A **rule**. Something that must always be true | The business requirements |
-| `SR-PP-01` | A **scenario**. One Given, When, Then | The system requirements |
-| `Q-PP-01` | A **question** nobody has answered yet, listed instead of guessed | The business requirements |
+| **Use case 1** | One thing a tester does, such as creating a test project | Both the business requirements and the system requirements, under the same number. The story is in one. The steps are in the other. The number is what joins them |
+| **Rule 1** | Something that must always be true | The business requirements |
+| **Scenario 1** | One Given, When, Then | The system requirements |
+| **Question 1** | Something nobody has answered yet, listed instead of guessed | The business requirements |
+| **Difference 1** | A place where the plugin does not do what its own rules say | The business requirements |
 
-The two letters in the middle say which part of Testin the number belongs to.
-They keep a rule about the tree from being confused with a rule about the
-editor:
+**The numbers start again in each part of Testin.** The project panel has a
+rule 4, and so will the test case editor. Inside one document, "rule 4" is
+enough. Anywhere else, say which part it belongs to: *the project panel's rule
+4*. A bug report says *project panel, rule 4*.
 
-| Letters | Part of Testin |
-|---|---|
-| `PP` | The project panel, the tree on the left |
-| `TE` | The test case editor |
-| `RE` | The test run editor, including light mode |
-| `VP` | The view panel |
-| `ST` | The settings page |
-| `EX` | Reports, export, import and sync |
+The one exception is [the product's own document](business-requirements/product.md).
+Its rules hold everywhere, so they belong to no part of Testin, and it says so
+at the top.
 
-**Every document spells out its own two letters at the top**, so a reader never
-has to come here to work out what they mean.
-
-A rule that holds everywhere, not in one part of Testin, has no letters at all:
-`BR-11`. Those rules live in
-[the product's own document](business-requirements/product.md).
-
-**One use case, read from the top down.** Take `UC-PP-01`. Its story and its
+**One use case, read from the top down.** Take use case 1. Its story and its
 rules are in the business requirements. Its steps, and every key it answers to,
-are in the system requirements under the same number. Its screen is drawn in the
-design.
+are in the system requirements, under the same number. Its screen is drawn in
+the design.
 
 A design points at a use case and a rule. It invents neither. A scenario names
 the rule it puts to work. If a scenario needs a rule nobody has written, the
@@ -104,38 +95,39 @@ it.
 ### Business requirements — per use case
 
 ```markdown
-### UC-PP-01 · Create a test project
+### Use case 1 · Create a test project
 
 **As a** tester, **I want** …, **so that** ….
 
 **Rules**
 
-- **BR-PP-01** — …
-- **BR-PP-02** — …
+- **Rule 1** — …
+- **Rule 2** — …
 
-**Not decided** — Q-PP-01: …           ← only if something genuinely is
+**Not decided** — question 1: …           ← only if something genuinely is
 ```
 
 ### System requirements — per use case
 
 ```markdown
-### UC-PP-01 · Create a test project
+### Use case 1 · Create a test project
 
 Screen: [The create dialog](../design/project-panel.md#the-create-dialog)
 
-**SR-PP-01 · From the tree**
+**Scenario 1 · From the tree**
 > **Given** a test project is selected in the tree
 > **When** the tester presses `Ctrl+M`
 > **Then** the create dialog opens, offering a test set package or a test set
 
-**SR-PP-02 · A name is required** — BR-PP-02
+**Scenario 2 · A name is required**
+Keeps rule 2.
 > **Given** the create dialog is open with an empty name
 > **When** the tester presses `Enter`
 > **Then** the dialog stays open and the name field is marked
 ```
 
-One scenario, one behavior. A refusal is its own scenario. It names the rule it
-enforces, in its title line.
+One scenario, one behavior. A refusal is its own scenario. The line under its
+title names the rule it keeps.
 
 ### Design — per screen
 
@@ -147,7 +139,7 @@ enforces, in its title line.
 1. **The kind** — …
 2. **The name** — …
 
-Used by UC-PP-01, UC-PP-04.
+Used by use case 1 and use case 4.
 ```
 
 ---
@@ -162,7 +154,7 @@ These documents are for testers. Every sentence is checked against that reader.
   sentences. The one exception is the user story, which is one sentence in
   three fixed parts however long it runs.
 - **No dashes and no semicolons in a sentence.** A dash joins two ideas. Split
-  them. A dash may only separate a number from the text after it: *BR-PP-08 — …*
+  them. A dash may only separate a number from the text after it: *rule 8 — …*
 - **A list, not a sentence with parts.** Three or more things go in a list when
   each one needs more than a word or two. Steps go in a numbered list. A short
   series stays in the sentence: *create, name, group, order, retire and
@@ -211,7 +203,7 @@ These documents are for testers. Every sentence is checked against that reader.
 |---|---|
 | **Area** | Which of the three documents this is, linked |
 | **Part of Testin** | Which part this document covers |
-| **Numbering** | The two letters this document's numbers carry, and what they stand for |
+| **Numbering** | Where this document's numbers start, and what they count |
 | **Read with** | The same part of Testin in the other two documents, linked |
 | **Answers** | One sentence |
 | **State** | Written, Draft or Not written, with the issue |
