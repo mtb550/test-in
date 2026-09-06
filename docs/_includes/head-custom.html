@@ -1,0 +1,103 @@
+<!--
+  Pulled into every page by the theme's own layout. Two jobs, and neither is
+  worth a build step:
+
+  1. The theme decision, applied before the page paints. Reading it in the body
+     would show the light page for one frame and then swap, which is the flash
+     every dark-mode implementation is judged by.
+  2. Mermaid. GitHub renders a ```mermaid block as a diagram; Jekyll does not,
+     and leaves it as a code block full of stateDiagram-v2. This turns those
+     blocks back into diagrams, so a page reads the same on the site as it does
+     in the repository.
+-->
+
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('testin-theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    } catch (e) {
+      // Private windows and blocked site data throw on read. The media query
+      // still decides; only the remembered override is lost.
+    }
+  })();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // ---- the toggle -------------------------------------------------------
+    var root = document.documentElement;
+
+    function dark() {
+      var set = root.getAttribute('data-theme');
+      if (set) return set === 'dark';
+
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    var button = document.createElement('button');
+    button.id = 'theme-toggle';
+    button.type = 'button';
+
+    function draw() {
+      var isDark = dark();
+      button.textContent = isDark ? '☀' : '☽';
+      button.title = isDark ? 'Switch to light' : 'Switch to dark';
+      button.setAttribute('aria-label', button.title);
+    }
+
+    button.addEventListener('click', function () {
+      var next = dark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try {
+        localStorage.setItem('testin-theme', next);
+      } catch (e) {
+        // The choice still applies to this page; it just is not remembered.
+      }
+      draw();
+      render();
+    });
+
+    draw();
+    document.body.appendChild(button);
+
+    // ---- mermaid ----------------------------------------------------------
+    // Jekyll emits <pre class="highlight"><code class="language-mermaid">, so the
+    // source has to be lifted out of that and put into a plain element mermaid
+    // will look at.
+    var sources = [];
+
+    Array.prototype.forEach.call(
+      document.querySelectorAll('code.language-mermaid'),
+      function (code) {
+        var host = document.createElement('div');
+        host.className = 'mermaid';
+        host.textContent = code.textContent;
+
+        var block = code.closest('div.highlighter-rouge') || code.closest('pre');
+        if (!block || !block.parentNode) return;
+
+        block.parentNode.replaceChild(host, block);
+        sources.push({ node: host, text: code.textContent });
+      });
+
+    if (!sources.length || typeof mermaid === 'undefined') return;
+
+    function render() {
+      if (typeof mermaid === 'undefined') return;
+
+      mermaid.initialize({ startOnLoad: false, theme: dark() ? 'dark' : 'default' });
+
+      sources.forEach(function (entry) {
+        entry.node.removeAttribute('data-processed');
+        entry.node.textContent = entry.text;
+      });
+
+      mermaid.run({ nodes: sources.map(function (entry) { return entry.node; }) });
+    }
+
+    render();
+  });
+</script>

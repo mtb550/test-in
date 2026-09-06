@@ -15,6 +15,11 @@ build/
 # Generated report output and scratch scripts, which land wherever they are run.
 *.html
 *.py
+# docs/ is exempt, always. It is a website: its Jekyll includes, layouts and any
+# page that has to be hand-written are .html by definition. This exception has
+# been deleted twice and both times the file it covered vanished silently - git
+# add reports nothing, git status shows nothing, and the site ships broken.
+!docs/**/*.html
 
 # Claude Code: share .claude/, keep per-machine overrides local
 .claude/settings.local.json
