@@ -9,7 +9,7 @@ set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The project panel, the tree on the left |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are UC-001 to UC-020. Rules are numbered 1 to 76. They belong to the project panel. Every other part of Testin starts its own numbers again |
+| **Numbering** | Use cases are UC-001 to UC-021. Rules are numbered 1 to 78. They belong to the project panel. Every other part of Testin starts its own numbers again |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code |
 | **Written to** | [How a document is written](../standard.md) |
@@ -47,6 +47,7 @@ Each one is a page of its own: the story, its rules, its screens and its steps.
 | **UC-018** | [Refresh the tree from disk](refreshTree.md) | |
 | **UC-019** | [Switch the Git branch of the test project](switchBranch.md) | |
 | **UC-020** | [See what a node holds](nodeDetails.md) | |
+| **UC-021** | [Use the buttons at the top of the panel](panelToolbar.md) | |
 
 ---
 
@@ -210,12 +211,13 @@ the exception. It works anywhere in the IDE.
 | `Ctrl+Z` | Undoes the last tree change | [UC-011](undoAndRedo.md) |
 | `Ctrl+Y` | Redoes it | [UC-011](undoAndRedo.md) |
 | `1` `2` `3` | Inside the status popup: Assigned, Completed, Closed | [UC-013](setTestRunStatus.md) |
-| `Ctrl+Alt+F` | Opens search, from anywhere in the IDE | [UC-017](searchProject.md) |
+| `Ctrl+Alt+F`, `Cmd+Alt+F` on a Mac | Opens search, from anywhere in the IDE | [UC-017](searchProject.md) |
 | The menu key, beside the right `Ctrl` | Opens the node menu | Below, under **What the tree shows** |
 
 Six things a tester might expect have **no key** on the tree. **Order**, the
 statuses, **Re-create**, **Edit Run**, **Run Tests** and **Details** are menu
-items only. Each one is a decision the tester thinks about, not a reflex, and
+items only. The panel's own buttons have no keys either, except search, and
+they are [UC-021](panelToolbar.md). Each one is a decision the tester thinks about, not a reflex, and
 none is used often enough to need a key. `F2` renames in the editors, not here.
 
 ---
@@ -247,16 +249,8 @@ along its top are the IDE's own. The branch box and the tree are Testin's.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **Search Test Project** — opens search. It is the only header button with a
-   key. The key works anywhere in the IDE.
-2. **Settings** — the Testin page of the IDE settings.
-3. **Expand All** and **Collapse All** — **Expand All** leaves retired rows
-   closed. Retired means a **Deprecated** test set or an **Archived** package.
-   **Collapse All** leaves the test project and its two folders visible.
-4. **Refresh** — checks again which test project this code project uses, then
-   reads it again from the folder.
-5. **Select Test Project** and **New Test Project** — grayed until a Testin
-   folder is set.
+1. to 5. **The toolbar** — seven buttons. Each one, and what it does, is
+   [UC-021](panelToolbar.md).
 6. **The branch box** — shown only for a test project shared through Git. Its
    placeholder reads *Loading branches...* until Git answers.
 7. **The test project row** — drawn bold, with the IDE's project icon. The two

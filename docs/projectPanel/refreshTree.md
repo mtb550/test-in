@@ -29,9 +29,6 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 5. The tree redraws, with the same rows expanded.
 6. Testin shows *Refreshed* when it finishes.
 
-**Expand and collapse.** **Expand All** opens every node except retired ones,
-which stay closed. **Collapse All** closes every row under the test project, and
-leaves the test project, **Test Cases** and **Test Runs** visible.
 
 ## What Testin refuses
 

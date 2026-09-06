@@ -47,8 +47,8 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 
 ## Main flow
 
-1. The tester presses `Ctrl+Alt+F` anywhere in the IDE, or presses the **Search
-   Test Project** button in the panel header.
+1. The tester presses `Ctrl+Alt+F` anywhere in the IDE, or `Cmd+Alt+F` on a
+   Mac, or presses the **Search Test Project** button in the panel header.
 2. The **Search Test Project** dialog opens. Before anything is typed, it lists
    every test set and test run.
 3. The tester types.
