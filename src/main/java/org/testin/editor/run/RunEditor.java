@@ -560,6 +560,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             rebuildGrid();
             grid.ifPresent(view -> center.set(view.scrollPane()));
         }
+
+        // What there is to walk is this list, so a filter that empties it grays
+        // Start on the same redraw rather than at whatever happens next. Through
+        // the one method that owns the buttons, so light mode's copy of them is
+        // told at the same moment (Rule-EDITOR-PANEL-190).
+        onExecutionStateChanged();
     }
 
     /**
@@ -707,17 +713,29 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public void dispose() {
-        // Closing the tab mid-execution is a stop the tester did not press: the
-        // seconds ticked onto the in-flight case and the run's end stamp would
-        // otherwise live only in this editor. Guarded because the project itself
-        // may be closing, and a service asked for during that throws.
-        if (isExecuting()) {
-            try {
+        // Closing the tab is the same gesture as pressing Stop, so it does the
+        // same thing: the automation this editor launched is ended, the walk is
+        // halted, and the run is written. Stopping the automation first, because
+        // halting the walk is what stops this editor claiming to execute, and the
+        // cases to stop are read from that claim.
+        //
+        // Without the first line the TestNG process outlived the tab, the cards
+        // kept filling in, and every verdict it went on to report was written
+        // into no run at all - the only subscription that could have recorded
+        // them went with this editor (#222).
+        //
+        // The guard is inside the try, not around it: isExecuting() asks the
+        // service container for TestNGExecution, and during a project close that
+        // is exactly the call that throws. Outside, it threw past the catch and
+        // skipped every teardown line below.
+        try {
+            if (isExecuting()) {
+                stopAutomation();
                 stopExecution();
                 Services.getInstance(p, RunStatusService.class).persistRun(p, this);
-            } catch (final Exception ex) {
-                Logger.warn("Run not persisted on editor close: " + ex.getMessage());
             }
+        } catch (final Exception ex) {
+            Logger.warn("Run not persisted on editor close: " + ex.getMessage());
         }
 
         // Releases the message-bus subscriptions (font sync) registered against this editor's lifetime.
@@ -828,9 +846,18 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         return list.getSelectedValuesList();
     }
 
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-131
     public void startTimerForIndex(final int globalIndex) {
         if (globalIndex >= currentTestCases.size()) {
-            Services.getInstance(p, TestRunStatusChange.class).apply(this, TestRunStatus.COMPLETED);
+            // The end of this list is the end of the walk, and nothing more. The
+            // list is the filtered one, so a tester who narrowed 120 cases to
+            // three and judged all three used to complete the whole run and turn
+            // the other 117 untested, with one balloon reading Completed (#214).
+            // Whether the run is over is the run's own question, and it is asked
+            // in one place.
+            stopExecution();
+            finishIfEverythingIsJudged();
+            Services.getInstance(p, RunStatusService.class).persistRun(p, this);
             return;
         }
 
@@ -1018,8 +1045,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // refreshing whichever view is showing, and confirming to the tester. A
         // verdict TestNG reached is the same verdict a tester would have typed,
         // so it takes the same path.
-        status.getVerdict().ifPresent(verdict ->
-                Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict, duration, failure));
+        status.getVerdict().ifPresent(verdict -> {
+            sayWhatTheVerdictCleared(tc, verdict);
+
+            Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict, duration, failure);
+        });
 
         // A model event, not a repaint: the card grows a Duration line the
         // moment that value stops being blank, and a JList re-measures a row
@@ -1033,6 +1063,35 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         onExecutionStateChanged();
 
         finishIfEverythingIsJudged();
+    }
+
+    /**
+     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-178.
+     * <p>
+     * Says what an automated verdict threw away, when it threw anything away.
+     * <p>
+     * A tester who fails a case and writes up why - the actual result, the
+     * stacktrace, how bad the bug is - and then re-runs it, used to watch all
+     * four fields vanish on a pass with nothing said. There is no copy of them
+     * anywhere: not in the undo history, which records no run-item write, and not
+     * on disk, which is overwritten a line later.
+     * <p>
+     * The keyboard path asks first and names exactly what is at stake. Automation
+     * cannot ask: this runs on the EDT while the test process is still reporting,
+     * so a modal here stalls it mid-run, and fifty cases would raise fifty dialogs
+     * with nobody in front of them. So it says what it did instead (#220).
+     * <p>
+     * A notification rather than a balloon, because a run finishes on its own
+     * time: a balloon fades while the tester is reading something else, and this
+     * is the only record that the work existed.
+     */
+    private void sayWhatTheVerdictCleared(final @NotNull TestCaseDto tc, final @NotNull TestStatus verdict) {
+        final @NotNull List<String> cleared = runItem(tc.getId()).map(item -> item.wouldClear(verdict)).orElseGet(List::of);
+        if (cleared.isEmpty()) return;
+
+        Services.getInstance(p, Notifier.class).info(p, "Failure detail cleared",
+                "'" + tc.getDescription() + "' " + verdict.getLabel().toLowerCase(Locale.ROOT) + " when it ran, which cleared "
+                        + Display.andJoin(cleared) + ". There is no copy of it anywhere else.");
     }
 
     /**
@@ -1183,6 +1242,35 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-190.
+     * <p>
+     * Whether the walk would land anywhere at all.
+     * <p>
+     * The walk goes along this list, so an empty one is a walk that ends on the
+     * step it starts. Two things arrive here and they are the same thing to the
+     * walk: a test run holding no test cases, and a filter that matches nothing.
+     * <p>
+     * Asked of the filtered list because that is what the walk reads. Deliberately
+     * not folded into {@link #canStartExecution()}, which the automation asks too -
+     * automation runs the whole run rather than the filtered page, so a filter
+     * hiding everything must not stop it (#215).
+     */
+    public boolean hasSomethingToWalk() {
+        return !currentTestCases.isEmpty();
+    }
+
+    /**
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-190.
+     * <p>
+     * The manual button's whole question, in one place, so the toolbar and light
+     * mode cannot answer it differently - which is the mistake
+     * {@link #canStartExecution()} above already records.
+     */
+    public boolean canStartManualExecution() {
+        return canStartExecution() && hasSomethingToWalk();
+    }
+
+    /**
      * The one place that reacts to this run's execution changing: which of the
      * two execution buttons is showing, and what the light mode window is
      * drawing.
@@ -1272,10 +1360,21 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         onExecutionStateChanged();
     }
 
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-190
     @Override
     public void onStartExecutionClicked() {
         final @NotNull Optional<TestRunDto> run = run();
         if (run.isEmpty()) return;
+
+        // Said rather than swallowed, and here rather than only on the button:
+        // light mode's own start button calls this straight, and it grays
+        // nothing. Pressing start with nothing to walk used to mark the test run
+        // In Progress, stamp when execution began, and - until #214 - complete
+        // the whole run at once (#215).
+        if (!hasSomethingToWalk()) {
+            Services.getInstance(p, Notifier.class).softRefuseNothingShowing(p, parent.getName());
+            return;
+        }
 
         // Before the status change, which is what persists the run.
         run.get().markExecutionStarted();

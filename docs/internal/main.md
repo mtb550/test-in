@@ -13,7 +13,8 @@ up here rather than left to the code.
 |---|---|
 | **Part of Testin** | The parts that belong to no panel |
 | **Answers** | What the search finds, and what Testin does with the files under the Testin folder |
-| **Numbering** | Use cases are `UC-INTERNAL-001` and up. Rules are numbered 1 and up, and belong to this part |
+| **Numbering** | Use cases are `UC-INTERNAL-001` and up. Rules are `Rule-INTERNAL-001` and up, and belong to this part |
+| **Last rule** | `Rule-INTERNAL-052`. The next rule written here is `Rule-INTERNAL-053` |
 | **State** | **Written** |
 | **Checked against** | `main` at `2cb8c1dc`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -24,12 +25,12 @@ up here rather than left to the code.
 
 | | What the tester does | Where its rules are |
 |---|---|---|
-| **UC-INTERNAL-001** | [Find anything in the test project](globalSearch.md) | Rules 1 to 2 |
-| **UC-INTERNAL-002** | [Read a test project from disk](readTestProject.md) | Rules 3 to 14 |
-| **UC-INTERNAL-003** | [Pick up a change made outside the IDE](noticeOutsideChange.md) | Rules 15 to 23 |
-| **UC-INTERNAL-004** | [Give a test case its number](numberTestCase.md) | Rules 24 to 34 |
-| **UC-INTERNAL-005** | [Keep a removed node so it can come back](keepRemovedNode.md) | Rules 35 to 44 |
-| **UC-INTERNAL-006** | [Count what a node holds](countNodeContents.md) | Rules 45 to 51 |
+| **UC-INTERNAL-001** | [Find anything in the test project](globalSearch.md) | Rule-INTERNAL-001 to Rule-INTERNAL-002 |
+| **UC-INTERNAL-002** | [Read a test project from disk](readTestProject.md) | Rule-INTERNAL-003 to Rule-INTERNAL-014 |
+| **UC-INTERNAL-003** | [Pick up a change made outside the IDE](noticeOutsideChange.md) | Rule-INTERNAL-015 to Rule-INTERNAL-023 |
+| **UC-INTERNAL-004** | [Give a test case its number](numberTestCase.md) | Rule-INTERNAL-024 to Rule-INTERNAL-034 |
+| **UC-INTERNAL-005** | [Keep a removed node so it can come back](keepRemovedNode.md) | Rule-INTERNAL-035 to Rule-INTERNAL-044 |
+| **UC-INTERNAL-006** | [Count what a node holds](countNodeContents.md) | Rule-INTERNAL-045 to Rule-INTERNAL-051 |
 
 ---
 
@@ -100,16 +101,22 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule 46 — a container is the sum of everything beneath it | Details counts retired test sets. Making a test run on the same node leaves them out. A test project whose Details says 40 test cases can offer 31, and nothing explains the difference. |
-| **Difference 2** | Rule 39 — one press puts back what one removal took | A failed undo shows two messages on one press. *Undone* arrives first, then **Undo Incomplete**. A tester who reads only the first believes a node is back. |
-| **Difference 3** | Rule 8 — a folder is read only if it holds a marker | Test cases inside an unmarked folder are in no panel, no search and no report. Nothing anywhere says they exist. Four of them sat in a real test project this way. |
-| **Difference 4** | Rule 14 — nothing that cannot be read stops the rest | A damaged marker file leaves its node drawn with default values. Its number, its status and who made it are silently wrong, and only the log says so. |
-| **Difference 5** | Rule 18 — Testin ignores its own writes for five seconds | A tester who edits a file by hand within five seconds of Testin saving it is ignored too. The edit is on disk and not on screen until **Refresh**. |
+| **Difference 1** | Rule-INTERNAL-046 — a container is the sum of everything beneath it | Details counts retired test sets. Making a test run on the same node leaves them out. A test project whose Details says 40 test cases can offer 31, and nothing explains the difference. |
+| **Difference 2** | Rule-INTERNAL-039 — one press puts back what one removal took | A failed undo shows two messages on one press. *Undone* arrives first, then **Undo Incomplete**. A tester who reads only the first believes a node is back. |
+| **Difference 4** | Rule-INTERNAL-014 — nothing that cannot be read stops the rest | A damaged marker file leaves its node drawn with default values. Its number, its status and who made it are silently wrong, and only the log says so. |
+| **Difference 5** | Rule-INTERNAL-018 — Testin ignores its own writes for five seconds | A tester who edits a file by hand within five seconds of Testin saving it is ignored too. The edit is on disk and not on screen until **Refresh**. |
 
 A sixth belongs to the tree panel and is written there. A removal whose copy
 could not be kept aside still happens, is not undoable, and says nothing. That
 is difference 15 on
 [the tree panel page](../treePanel/main.md#where-the-plugin-breaks-its-own-rules).
+
+**Fixed since this list was written.** The numbers are left out rather than
+closed up, so an issue that quotes one still points at the right thing.
+
+| Gone | Was |
+|---|---|
+| **Difference 3** | Test cases in an unmarked folder were invisible everywhere, and nothing said so. Fixed 7 September 2026, [#276](https://github.com/mtb550/test-in/issues/276) |
 
 ---
 

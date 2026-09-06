@@ -31,6 +31,7 @@ import org.testin.util.Mapper;
 
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -61,6 +62,11 @@ import java.util.stream.Collectors;
  * a recommendation to refuse the untick instead. The undo below is what that
  * decision leans on: the whole edit is one entry, so a mis-click is one Ctrl+Z
  * rather than a loss.
+ * <p>
+ * <b>A case the dialog cannot show is kept.</b> That decision is about unticking,
+ * and a case deleted from its test set has no row to untick - it is not in the
+ * tree this dialog builds from the index. Reading its absence as an untick threw
+ * away what the run recorded about it, on a Save that changed nothing (#190).
  */
 public class EditTestRunAction extends AbstractProjectTreeAction {
 
@@ -101,6 +107,8 @@ public class EditTestRunAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-TREE-PANEL-022, Rule-TREE-PANEL-061 and Rule-TREE-PANEL-089.
+     * <p>
      * Writes the change, or refuses and says why - and answers which, because the
      * dialog stays open on a refusal with everything the tester typed still in it.
      */
@@ -134,7 +142,24 @@ public class EditTestRunAction extends AbstractProjectTreeAction {
             return false;
         }
 
-        final @NotNull TestRunDto after = current.coverOnly(RunForm.checkedCases(selection))
+        // The dialog's tree is built from the test cases that still exist, so a
+        // case deleted from its test set has no row in it. It could not be ticked,
+        // which means it cannot have been unticked either, and the dialog's answer
+        // says nothing about it. Taken as an answer it used to delete the verdict,
+        // the actual result, the stacktrace, the bug severity, the bug priority
+        // and the duration the run had recorded - on a Save that changed nothing,
+        // with no row to see it go and no copy anywhere (#190).
+        //
+        // A run outlives the test cases it was made from, and keeps what it
+        // recorded about them (#71). Unticking a case the tester could see still
+        // discards its result, which is what unticking is for.
+        final @NotNull Set<UUID> wanted = new LinkedHashSet<>(RunForm.checkedCases(selection));
+        current.getResults().stream()
+                .map(TestRunItems::getId)
+                .filter(id -> indexer.findTestCase(id).isEmpty())
+                .forEach(wanted::add);
+
+        final @NotNull TestRunDto after = current.coverOnly(wanted)
                 .setConfiguration(TestRunConfiguration.answered(form.configuration()));
 
         // Copied rather than held: the run in the indexer's cache shares its

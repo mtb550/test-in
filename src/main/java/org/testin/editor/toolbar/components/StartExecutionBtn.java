@@ -17,17 +17,27 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
         addActionListener(e -> onStartExecutionClicked.run());
     }
 
+    /**
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-190.
+     * <p>
+     * Why the button is gray, in the order the reasons matter: a walk already
+     * going, then a run that records nothing more, then a walk with nowhere to
+     * land. The last one is new - a test run holding no test cases, and a filter
+     * matching nothing, both left the button live and startable (#215).
+     */
     private static @NotNull String tooltipFor(final @NotNull RunEditor editor) {
         if (editor.isExecuting()) return "Execution in progress";
 
         final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();
-        return status.isTerminal()
-                ? "Execution disabled — run status is " + status.getLabel()
-                : Toolbar.START_MANUAL_EXECUTION;
+        if (status.isTerminal()) return "Execution disabled — run status is " + status.getLabel();
+
+        return editor.hasSomethingToWalk()
+                ? Toolbar.START_MANUAL_EXECUTION
+                : "Nothing to execute — no test case is showing";
     }
 
     public void updateEnabledState() {
-        setEnabled(editor.canStartExecution());
+        setEnabled(editor.canStartManualExecution());
         setToolTipText(tooltipFor(editor));
     }
 }

@@ -97,6 +97,21 @@ public final class Notifier {
     }
 
     /**
+     * The tester pressed start on a walk with nowhere to land.
+     * <p>
+     * Its own sentence rather than the one above: that one is for a test run
+     * with nothing left in it, and this one is usually a filter with everything
+     * still behind it. Telling a tester their test run has no test cases when a
+     * filter is what emptied the screen sends them looking for cases that are
+     * still there (#215).
+     * <p>
+     * It fades, like every other answer to a gesture the tester just made.
+     */
+    public void softRefuseNothingShowing(final @NotNull Project p, final @NotNull String name) {
+        softRefuse(p, "Nothing is showing in " + name + " to execute");
+    }
+
+    /**
      * The tester asked to run something that is already running.
      * <p>
      * Its own sentence rather than the one below: a run with cases still going

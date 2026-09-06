@@ -10,15 +10,15 @@ what the machine can judge.
 
 ## Rules
 
-- **Rule 176** — This editor claims each test case first, so the verdict comes
+- **Rule-EDITOR-PANEL-176** — This editor claims each test case first, so the verdict comes
   back to this test run and not to another editor showing the same test case.
-- **Rule 177** — Claiming marks the test run **In Progress** if it is not
+- **Rule-EDITOR-PANEL-177** — Claiming marks the test run **In Progress** if it is not
   already.
-- **Rule 178** — A verdict from the automation is written the same way a
+- **Rule-EDITOR-PANEL-178** — A verdict from the automation is written the same way a
   keyboard verdict is.
-- **Rule 179** — The framework's own timing replaces whatever the clock counted.
+- **Rule-EDITOR-PANEL-179** — The framework's own timing replaces whatever the clock counted.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel. They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
@@ -62,16 +62,18 @@ messages reading *Passed* or *Failed*. Every other bulk gesture in Testin raises
 one with a count. That is difference 25 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
 
-**An automated pass clears the tester's notes with no warning.** That is
-difference 26.
+**An automated pass still clears the tester's notes.** It now says so
+afterwards, in a message titled **Failure detail cleared** that names what went
+and stays in the notification list. The dialog that asks first is still on the
+keyboard path only. That is difference 26.
 
 **Pressing `F5` to stop marks the test run In Progress.** Every selected test
 case is claimed before Testin asks whether this is a run or a stop, and claiming
 starts the test run. That is difference 27.
 
-**Closing the tab while automation is running leaves it running.** The process
-keeps going, the cards keep changing, and every verdict it produces is written
-into no test run at all. That is difference 28.
+**Closing the tab stops the automation this editor started.** It is the same
+gesture as pressing **Stop Execution**, so the results of tests still running
+are lost, exactly as a stop loses them.
 
 ---
 

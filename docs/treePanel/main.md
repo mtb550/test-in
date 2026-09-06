@@ -9,7 +9,8 @@ set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The tree panel |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are UC-TREE-PANEL-001 to UC-TREE-PANEL-028, apart from 024. Rules are numbered 1 to 90, apart from 66 and 67. The search took all three, and is now [UC-INTERNAL-001](../internal/globalSearch.md). They belong to the tree panel. Every other part of Testin starts its own numbers again |
+| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-028`, apart from 024. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-090`, apart from 066 and 067. The search took all three, and is now [UC-INTERNAL-001](../internal/globalSearch.md). Every other part of Testin starts its own numbers again |
+| **Last rule** | `Rule-TREE-PANEL-090`. The next rule written here is `Rule-TREE-PANEL-091` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code |
 | **Written to** | [How a document is written](../standard.md) |
@@ -164,41 +165,41 @@ it. In every drawing:
 These apply to every use case below. A use case points at them by number. It
 does not repeat them.
 
-- **Rule 1** — The panel shows exactly one test project. It is the one this
+- **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the one this
   repository is bound to. There is no list of test projects in the tree.
-- **Rule 2** — **Test Cases** and **Test Runs** are fixed containers. They
+- **Rule-TREE-PANEL-002** — **Test Cases** and **Test Runs** are fixed containers. They
   cannot be created, renamed, moved, copied or removed. They come with the test
   project and go with it.
-- **Rule 3** — The tree has two sides, and nothing moves between them. Test sets
+- **Rule-TREE-PANEL-003** — The tree has two sides, and nothing moves between them. Test sets
   and test set packages live under **Test Cases**. Test runs and test run
   packages live under **Test Runs**.
-- **Rule 4** — Two nodes under one parent cannot share a name. This holds
+- **Rule-TREE-PANEL-004** — Two nodes under one parent cannot share a name. This holds
   whether the node is created, renamed, pasted or dropped.
-- **Rule 5** — A node name is never empty.
-- **Rule 6** — Removing, moving or copying asks first. Nothing in the tree
+- **Rule-TREE-PANEL-005** — A node name is never empty.
+- **Rule-TREE-PANEL-006** — Removing, moving or copying asks first. Nothing in the tree
   changes until the tester confirms.
-- **Rule 7** — When something changes, Testin says so once, in the past tense.
+- **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the past tense.
   The tester
   sees *Created*, *Renamed* or *Removed*. Several changes at once confirm once,
   with a count: the tester sees *Removed 4*, never four messages. Looking at
   something confirms nothing.
-- **Rule 8** — A retired node keeps everything inside it. Retired means a
+- **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired means a
   **Deprecated** test set or an **Archived** package. It is drawn gray. It sorts
   after live nodes. It is not offered when a test run is created.
-- **Rule 9** — A test run that is **Completed** or **Closed** is signed off.
+- **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is signed off.
   Its test cases, verdicts and configuration can no longer change.
-- **Rule 10** — Siblings are shown in one order:
+- **Rule-TREE-PANEL-010** — Siblings are shown in one order:
   1. live nodes, then retired ones
   2. the number the tester gave the node
   3. the date the node was created
   4. the name
 
   A node with no number comes after every node with one.
-- **Rule 11** — A removed node goes to the desktop's recycle bin. It can be put
+- **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It can be put
   back from the tree.
-- **Rule 12** — A test case is not a node in this tree. It is reached by opening
+- **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is reached by opening
   its test set.
-- **Rule 13** — Nodes move only within one test project. Nothing cut in one test
+- **Rule-TREE-PANEL-013** — Nodes move only within one test project. Nothing cut in one test
   project can be pasted into another.
 
 ---
@@ -247,7 +248,7 @@ filled in with whatever the tester is working on, and *N* with a count.
 ### When it worked
 
 A success message fades on the status bar and leaves no trace. It is one word
-in the past tense wherever one word will do. (rule 7)
+in the past tense wherever one word will do. (Rule-TREE-PANEL-007)
 
 | Message | Means | Use case |
 |---|---|---|
@@ -377,14 +378,14 @@ of an icon for what it is, and after its name comes its status word in gray:
 
 **Gray text.** A **Deprecated** test set, an **Archived** package, or a node cut
 and not yet pasted, is drawn in gray. A retired node sits after every live
-sibling. (rule 8)
+sibling. (Rule-TREE-PANEL-008)
 
 **The order of siblings.** Live nodes come first, and retired ones last. Inside
 each of those two groups, nodes with a number come first, smallest first. Then
 come the nodes without a number, by the date they were created. Then by name.
-(rule 10)
+(Rule-TREE-PANEL-010)
 
-**A test project that is not Active** shows no children at all. (rule 52)
+**A test project that is not Active** shows no children at all. (Rule-TREE-PANEL-052)
 
 **Right-click.** Right-clicking a row that is not selected makes it the only
 selection, and opens the menu at the pointer. Right-clicking inside a
@@ -554,21 +555,27 @@ documentation describes. None of them has a bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule 7 — one past-tense word | Creating a test run says *Run created*. Creating a test project says *Project created* or *Project cloned*. Every other creation says *Created*. |
-| **Difference 2** | Rule 38 — nothing lands in a test run | **Paste** is offered on a test run. It always refuses, with *Select a folder*. It should be grayed, as it is on a test set. |
-| **Difference 3** | Rule 9 — a signed-off test run does not change | A **Completed** or **Closed** test run can still be renamed, moved, reordered and removed from the tree. Only editing, running and its status are blocked. |
-| **Difference 4** | Rule 23, rule 26 — the dialog offers the kinds | Neither create dialog names its two kinds. Both rows show only their hints: *Holds test cases* and *Groups test sets* on the test case side, *Records execution results* and *Groups test runs* on the test run side. Someone removed the names while tidying up the labels, and nobody noticed. |
-| **Difference 5** | Rule 56 — Created and In Progress are the test run's own | The status popup offers **Created** and **In Progress** as choices. It also lets a test run go backwards, from **Assigned** to **Created**. |
-| **Difference 6** | Rule 76 — canceling a cut empties the clipboard | The tester cuts nodes, then presses the key that clears the gray. The nodes stay on the clipboard. The next paste still moves them, though the tester canceled the cut. A paste that worked does not empty it either, so the same nodes can be offered again. |
-| **Difference 7** | Rule 20 — a choice that was not saved is not reported as saved | Only the **Select Test Project** dialog checks. Creating a test project, cloning one, and clicking a test project on the welcome screen all report success without looking. If the write failed, the tester is told the work is done and the choice is gone next time the project opens. |
-| **Difference 8** | Rule 77 — the two buttons come back once a Testin folder is set | **New Test Project** never comes back. Once it has been drawn without a folder it stays gray for the rest of the IDE session, however the setting changes. **Select Test Project** does come back. |
-| **Difference 9** | Rule 89 — an edit changes what the tester chose | Saving an edit also deletes the rows of test cases that were deleted from their test set after the test run was made, with their verdicts and failure detail. The rows are not in the dialog, so the tester cannot see them or keep them, and it happens even when nothing else was changed. |
-| **Difference 10** | Rule 7 — a change confirms itself once | Setting a test run's status from the tree does not tell that test run's open editor. It keeps showing the old status, and the rows that just became **Untested**, until it is reopened. |
-| **Difference 11** | Rule 6 — nothing changes until the tester confirms | **Rename**, **Order**, **Paste**, **Create** and **Details** stay black with several rows selected, and act on the first row alone. Nothing says the other rows were passed over. |
-| **Difference 12** | Rule 44 — a number is 1 or higher | A number too large to hold silently clears the order and puts the node back into date order, while Testin still says *Ordered*. |
-| **Difference 13** | Rule 33 — the confirmation says what will go | The **Select Test Project** dialog's first column has no heading. The same caption sweep as difference 4. |
-| **Difference 14** | Rule 7 — a change confirms itself once | The **Uncommitted Changes** dialog reads *1 change in this test project are not committed* when there is exactly one. |
-| **Difference 15** | Rule 35 — a removal can be undone | A node whose copy could not be kept aside is still removed, and is not on the undo history. Nothing says so, and `Ctrl+Z` then takes back whatever change came before it. |
+| **Difference 1** | Rule-TREE-PANEL-007 — one past-tense word | Creating a test run says *Run created*. Creating a test project says *Project created* or *Project cloned*. Every other creation says *Created*. |
+| **Difference 2** | Rule-TREE-PANEL-038 — nothing lands in a test run | **Paste** is offered on a test run. It always refuses, with *Select a folder*. It should be grayed, as it is on a test set. |
+| **Difference 3** | Rule-TREE-PANEL-009 — a signed-off test run does not change | A **Completed** or **Closed** test run can still be renamed, moved, reordered and removed from the tree. Only editing, running and its status are blocked. |
+| **Difference 4** | Rule-TREE-PANEL-023, Rule-TREE-PANEL-026 — the dialog offers the kinds | Neither create dialog names its two kinds. Both rows show only their hints: *Holds test cases* and *Groups test sets* on the test case side, *Records execution results* and *Groups test runs* on the test run side. Someone removed the names while tidying up the labels, and nobody noticed. |
+| **Difference 5** | Rule-TREE-PANEL-056 — Created and In Progress are the test run's own | The status popup offers **Created** and **In Progress** as choices. It also lets a test run go backwards, from **Assigned** to **Created**. |
+| **Difference 6** | Rule-TREE-PANEL-076 — canceling a cut empties the clipboard | The tester cuts nodes, then presses the key that clears the gray. The nodes stay on the clipboard. The next paste still moves them, though the tester canceled the cut. A paste that worked does not empty it either, so the same nodes can be offered again. |
+| **Difference 7** | Rule-TREE-PANEL-020 — a choice that was not saved is not reported as saved | Only the **Select Test Project** dialog checks. Creating a test project, cloning one, and clicking a test project on the welcome screen all report success without looking. If the write failed, the tester is told the work is done and the choice is gone next time the project opens. |
+| **Difference 8** | Rule-TREE-PANEL-077 — the two buttons come back once a Testin folder is set | **New Test Project** never comes back. Once it has been drawn without a folder it stays gray for the rest of the IDE session, however the setting changes. **Select Test Project** does come back. |
+| **Difference 10** | Rule-TREE-PANEL-007 — a change confirms itself once | Setting a test run's status from the tree does not tell that test run's open editor. It keeps showing the old status, and the rows that just became **Untested**, until it is reopened. |
+| **Difference 11** | Rule-TREE-PANEL-006 — nothing changes until the tester confirms | **Rename**, **Order**, **Paste**, **Create** and **Details** stay black with several rows selected, and act on the first row alone. Nothing says the other rows were passed over. |
+| **Difference 12** | Rule-TREE-PANEL-044 — a number is 1 or higher | A number too large to hold silently clears the order and puts the node back into date order, while Testin still says *Ordered*. |
+| **Difference 13** | Rule-TREE-PANEL-033 — the confirmation says what will go | The **Select Test Project** dialog's first column has no heading. The same caption sweep as difference 4. |
+| **Difference 14** | Rule-TREE-PANEL-007 — a change confirms itself once | The **Uncommitted Changes** dialog reads *1 change in this test project are not committed* when there is exactly one. |
+| **Difference 15** | Rule-TREE-PANEL-035 — a removal can be undone | A node whose copy could not be kept aside is still removed, and is not on the undo history. Nothing says so, and `Ctrl+Z` then takes back whatever change came before it. |
+
+**Fixed since this list was written.** The numbers are left out rather than
+closed up, so an issue that quotes one still points at the right thing.
+
+| Gone | Was |
+|---|---|
+| **Difference 9** | An edit deleted the verdicts of test cases removed from their test set. Fixed 7 September 2026, [#190](https://github.com/mtb550/test-in/issues/190) |
 
 ---
 

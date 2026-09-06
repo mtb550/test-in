@@ -12,6 +12,7 @@ import org.testin.model.ProjectStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.*;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @AllArgsConstructor
@@ -59,26 +61,34 @@ final class IndexingScanner {
                 indicator.setFraction(0.1);
                 indicator.setText(tp.getName() + " - test sets...");
 
+            // Per scan, not a field: one scanner is built per project and reused
+            // for every rescan, so a field would carry the last pass's folders
+            // into this one.
+            final @NotNull List<Path> unread = new ArrayList<>();
+
             final @NotNull TestCasesMainDirectoryDto tcd = tp.getTestCasesDirectory();
             store.getTestCasesMainDirsByPath().put(tcd.getPath().toString(), tcd);
-            scanTestSets(tcd.getPath(), tcd, indicator);
+            scanTestSets(tcd.getPath(), tcd, indicator, unread);
 
                 indicator.setFraction(0.5);
                 indicator.setText(tp.getName() + " - test runs...");
 
             final @NotNull TestRunsMainDirectoryDto trd = tp.getTestRunsDirectory();
             store.getTestRunsMainDirsByPath().put(trd.getPath().toString(), trd);
-            scanTestRunDirs(trd.getPath(), trd, indicator);
+            scanTestRunDirs(trd.getPath(), trd, indicator, unread);
 
                 indicator.setFraction(1.0);
                 indicator.setText(tp.getName() + " - done.");
+
+            reportUnread(tp.getName(), unread);
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan project: " + projectPath.getFileName() + " - " + ex.getMessage());
         }
     }
 
-    private void scanTestSets(final @NotNull Path tcDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
+    // UC-INTERNAL-002, Rule-INTERNAL-008 and Rule-INTERNAL-052
+    private void scanTestSets(final @NotNull Path tcDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
         try (Stream<Path> paths = Files.list(tcDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
@@ -93,17 +103,17 @@ final class IndexingScanner {
                 store.markedAs(dirPath, DirectoryType.UNDER_TEST_CASES).ifPresentOrElse(
                         marked -> {
                             if (marked == DirectoryType.TS) scanTestSet(dirPath, parent, indicator);
-                            else scanTestSetPackage(dirPath, parent, indicator);
+                            else scanTestSetPackage(dirPath, parent, indicator, unread);
                         },
-                        () -> Logger.warn("Skipping unmarked directory under test cases (missing "
-                                + DirectoryType.markerNames(DirectoryType.UNDER_TEST_CASES) + "): " + dirPath));
+                        () -> skipped(dirPath, DirectoryType.UNDER_TEST_CASES, "test cases", unread));
             }
         } catch (final Exception ex) {
             Logger.error("Failed to list test sets: " + ex.getMessage());
         }
     }
 
-    private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
+    // UC-INTERNAL-002, Rule-INTERNAL-008 and Rule-INTERNAL-052
+    private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final @NotNull TestSetPackageDirectoryDto tsp = dirMapper.getTestSetPackageNode(p, path, parent);
@@ -113,10 +123,12 @@ final class IndexingScanner {
             try (Stream<Path> subPaths = Files.list(path)) {
                 subPaths.filter(Files::isDirectory)
                         .forEach(subPath -> {
-                            store.markedAs(subPath, DirectoryType.UNDER_TEST_CASES).ifPresent(marked -> {
+                            // The else was missing here, so a folder skipped one
+                            // level down said nothing at all, not even to the log.
+                            store.markedAs(subPath, DirectoryType.UNDER_TEST_CASES).ifPresentOrElse(marked -> {
                                 if (marked == DirectoryType.TS) scanTestSet(subPath, tsp, indicator);
-                                else scanTestSetPackage(subPath, tsp, indicator);
-                            });
+                                else scanTestSetPackage(subPath, tsp, indicator, unread);
+                            }, () -> skipped(subPath, DirectoryType.UNDER_TEST_CASES, "test cases", unread));
                         });
             }
 
@@ -163,7 +175,8 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestRunDirs(final @NotNull Path trDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
+    // UC-INTERNAL-002, Rule-INTERNAL-010 and Rule-INTERNAL-052
+    private void scanTestRunDirs(final @NotNull Path trDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
         try (Stream<Path> paths = Files.list(trDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
@@ -174,17 +187,17 @@ final class IndexingScanner {
                 store.markedAs(dirPath, DirectoryType.UNDER_TEST_RUNS).ifPresentOrElse(
                         marked -> {
                             if (marked == DirectoryType.TR) scanTestRun(dirPath, parent, indicator);
-                            else scanTestRunPackageDir(dirPath, parent, indicator);
+                            else scanTestRunPackageDir(dirPath, parent, indicator, unread);
                         },
-                        () -> Logger.warn("Skipping unmarked directory under test runs (missing "
-                                + DirectoryType.markerNames(DirectoryType.UNDER_TEST_RUNS) + "): " + dirPath));
+                        () -> skipped(dirPath, DirectoryType.UNDER_TEST_RUNS, "test runs", unread));
             }
         } catch (final Exception ex) {
             Logger.error("Failed to list test runs: " + ex.getMessage());
         }
     }
 
-    private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
+    // UC-INTERNAL-002, Rule-INTERNAL-010 and Rule-INTERNAL-052
+    private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final @NotNull TestRunPackageDirectoryDto trp = dirMapper.getTestRunPackageNode(p, path, parent);
@@ -194,16 +207,73 @@ final class IndexingScanner {
             try (Stream<Path> subPaths = Files.list(path)) {
                 subPaths.filter(Files::isDirectory)
                         .forEach(subPath -> {
-                            store.markedAs(subPath, DirectoryType.UNDER_TEST_RUNS).ifPresent(marked -> {
+                            // The else was missing here too.
+                            store.markedAs(subPath, DirectoryType.UNDER_TEST_RUNS).ifPresentOrElse(marked -> {
                                 if (marked == DirectoryType.TR) scanTestRun(subPath, trp, indicator);
-                                else scanTestRunPackageDir(subPath, trp, indicator);
-                            });
+                                else scanTestRunPackageDir(subPath, trp, indicator, unread);
+                            }, () -> skipped(subPath, DirectoryType.UNDER_TEST_RUNS, "test runs", unread));
                         });
             }
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test run package: " + path.getFileName());
         }
+    }
+
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-052.
+     * <p>
+     * A folder with no marker is not a node, so the scan cannot read it or
+     * anything under it. Most of them are nothing: a folder somebody made beside
+     * the test sets, a working directory, something a tool left behind. Those are
+     * the ordinary case and saying anything about them would be noise.
+     * <p>
+     * A folder holding test cases is not the ordinary case. Those cases are on
+     * disk and in no panel, no search, no report and no export, and until now the
+     * only trace was one line in a log nothing points at - four of them sat in the
+     * sandbox project that way, and one in a real data root (#276).
+     * <p>
+     * So the log line is kept for every skip, and the folder is remembered only
+     * when it holds something the tester would miss.
+     */
+    private void skipped(final @NotNull Path dirPath, final @NotNull List<DirectoryType> family, final @NotNull String where, final @NotNull List<Path> unread) {
+        Logger.warn("Skipping unmarked directory under " + where + " (missing " + DirectoryType.markerNames(family) + "): " + dirPath);
+
+        if (holdsTestCases(dirPath)) unread.add(dirPath);
+    }
+
+    /**
+     * One listing of a folder the scan was about to throw away, so it costs
+     * nothing on the folders that are really nodes.
+     */
+    private boolean holdsTestCases(final @NotNull Path dirPath) {
+        try (Stream<Path> files = Files.list(dirPath)) {
+            return files.filter(Files::isRegularFile).anyMatch(ProjectIndexer::isCaseFile);
+        } catch (final Exception unreadable) {
+            // A folder that will not even list is a bigger problem than a missing
+            // marker, and the line above already said the scan skipped it.
+            return false;
+        }
+    }
+
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-052.
+     * <p>
+     * One notification for the whole project, not one per folder, and it stays in
+     * the log rather than fading: a scan finishes on its own time, and a balloon
+     * that fades while the tester is reading something else is no better than the
+     * silence it replaced.
+     */
+    private void reportUnread(final @NotNull String projectName, final @NotNull List<Path> unread) {
+        if (unread.isEmpty()) return;
+
+        final @NotNull String named = unread.stream().limit(5).map(path -> path.getFileName().toString()).collect(Collectors.joining(", "));
+        final @NotNull String rest = unread.size() > 5 ? ", and " + (unread.size() - 5) + " more" : "";
+        final @NotNull String count = unread.size() == 1 ? "One folder holds" : unread.size() + " folders hold";
+
+        Services.getInstance(p, Notifier.class).warn(p, "Folders not read in " + projectName,
+                count + " test cases and carry no marker, so nothing in them was read: " + named + rest
+                        + ". Create a test set of that name, or move the test cases into one.");
     }
 
     private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {

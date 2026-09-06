@@ -23,15 +23,15 @@ step, and every way it can be refused.
 |---|---|---|---|
 | **[The product](product.md)** | What is true of all of it: who uses Testin, what they work with, every status, and the rules that hold everywhere | — | — |
 | **[The tree panel](treePanel/main.md)** | The tree on the left. Test projects, test sets, test runs, and everything done to them | 27 | 88 |
-| **[The editor panel](editorPanel/main.md)** | Writing test cases, and executing a test run. Both editors, and [light mode](editorPanel/lightMode.md) | 46 | 189 |
+| **[The editor panel](editorPanel/main.md)** | Writing test cases, and executing a test run. Both editors, and [light mode](editorPanel/lightMode.md) | 46 | 190 |
 | **[The view panel](viewPanel/main.md)** | The panel on the right. One test case in full, and what a test run recorded about it | 15 | 59 |
 | **[The settings page](setting/main.md)** | Everything set once per machine, and where each value is kept | 11 | 39 |
 | **[Automation code and the gutter](codegen/main.md)** | The test methods Testin writes, and how they are kept in step with the tree | 20 | 66 |
 | **[Reports](report/main.md)** | Writing a test run out as a document, in four formats | 3 | 15 |
 | **[Sharing work with the team](share/main.md)** | Export, import, Git and a server. Every way test data leaves and arrives | 23 | 101 |
-| **[Inside Testin](internal/main.md)** | The parts that belong to no panel: the search, and the one thing that owns every file | 6 | 51 |
+| **[Inside Testin](internal/main.md)** | The parts that belong to no panel: the search, and the one thing that owns every file | 6 | 52 |
 
-**151 use cases and 608 rules**, each one checked against the code it describes.
+**151 use cases and 610 rules**, each one checked against the code it describes.
 Every part also lists where the plugin breaks its own rules, and what nobody has
 decided yet.
 

@@ -10,27 +10,30 @@ There is no key for this. It starts on its own.
 
 ## Rules
 
-- **Rule 3** — A folder is a test project only if it holds a file named `.tp`.
-- **Rule 4** — Only the folders directly inside the Testin folder are looked at.
+- **Rule-INTERNAL-003** — A folder is a test project only if it holds a file named `.tp`.
+- **Rule-INTERNAL-004** — Only the folders directly inside the Testin folder are looked at.
   A test project one level deeper is not found.
-- **Rule 5** — An archived test project is not read at all.
-- **Rule 6** — When `testin.yml` names a test project, only that one is read.
-- **Rule 7** — Inside a test project, Testin reads two folders. They are named
+- **Rule-INTERNAL-005** — An archived test project is not read at all.
+- **Rule-INTERNAL-006** — When `testin.yml` names a test project, only that one is read.
+- **Rule-INTERNAL-007** — Inside a test project, Testin reads two folders. They are named
   `Test Cases` and `Test Runs`. Nothing else is read.
-- **Rule 8** — A folder inside `Test Cases` is read only if it holds a file
+- **Rule-INTERNAL-008** — A folder inside `Test Cases` is read only if it holds a file
   named `.ts` or a file named `.tsp`. The first makes it a test set. The second
   makes it a test set package.
-- **Rule 9** — A folder holding both is read as a test set.
-- **Rule 10** — A folder inside `Test Runs` is read the same way, from a file
+- **Rule-INTERNAL-009** — A folder holding both is read as a test set.
+- **Rule-INTERNAL-010** — A folder inside `Test Runs` is read the same way, from a file
   named `.tr` or a file named `.trp`.
-- **Rule 11** — Every file ending in `.json` directly inside a test set is a
+- **Rule-INTERNAL-011** — Every file ending in `.json` directly inside a test set is a
   test case.
-- **Rule 12** — A test case is known by its file name. What the file says its
+- **Rule-INTERNAL-012** — A test case is known by its file name. What the file says its
   own name is does not decide.
-- **Rule 13** — Each test project is read by its own background job. The tester
+- **Rule-INTERNAL-013** — Each test project is read by its own background job. The tester
   can cancel it, and the IDE stays usable while it runs.
-- **Rule 14** — One thing that cannot be read never stops the rest. Testin skips
+- **Rule-INTERNAL-014** — One thing that cannot be read never stops the rest. Testin skips
   it and carries on.
+- **Rule-INTERNAL-052** — A folder skipped for having no marker is reported when it holds
+  test cases. A folder holding none is skipped in silence, because a folder that
+  is deliberately not a test set is the ordinary case.
 
 ## What starts a read
 
@@ -104,8 +107,14 @@ values. Its number, its status and who made it are lost. Nothing on screen says
 so.
 
 **If a folder under `Test Cases` holds no `.ts` and no `.tsp` file** — the
-folder is skipped, and so is every test case inside it. Those test cases are in
-no panel, no search and no report. Nothing on screen says they exist.
+folder is skipped, and so is everything inside it. When it holds test cases,
+Testin says so when the read finishes. One message names the folders, and it
+stays in the notification list rather than fading, because a read finishes on
+its own time.
+
+**If such a folder holds no test cases** — it is skipped without a word. Most
+folders that are not test sets are nothing, and reporting each one would be
+noise.
 
 **If one test case file cannot be read** — that one test case is left out of its
 test set. The others are read. The set is drawn one row shorter, and nothing

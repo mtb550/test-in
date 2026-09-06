@@ -722,7 +722,7 @@ public final class ProjectIndexer {
      * A test case is the file whose name is an id. A marker is named for its
      * kind and a run for its folder, so neither answers true.
      */
-    private static boolean isCaseFile(final @NotNull Path file) {
+    static boolean isCaseFile(final @NotNull Path file) {
         final @NotNull String name = file.getFileName().toString();
         if (!name.endsWith(".json")) return false;
 
