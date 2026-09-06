@@ -29,10 +29,13 @@ A tester's work is arranged like a tree:
 The panel is that tree. It sits on the left, where the IDE keeps every other
 tree. It is always one click away.
 
-**Three words, before the rules use them.**
+**Four words, before the rules use them.**
 
 - A **node** is anything the tree shows: a test project, a folder, a test set or
   a test run. A test case is not a node, because the tree does not show one.
+- The **Testin folder** is the one folder that holds every test project. The
+  settings page calls it *Testin source root*, and two of Testin's own messages
+  call it *the Testin root*.
 - **Bound** means this code project is set to use one test project. The choice
   is written into the code project, so everyone who opens it gets the same test
   project.
