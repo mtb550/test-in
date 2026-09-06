@@ -55,7 +55,8 @@
 
     <b>Support</b>
     <ul>
-        <li>How Testin works: <a href="https://torch-peach-e46.notion.site/Testin-Business-Requirement-Specification-3ca81a9fcbc281ebb6f3fe416ff334f5">the product specification</a> &mdash; what it does, and the rules it keeps</li>
+        <li>How Testin works: <a href="https://mtb550.github.io/test-in/">mtb550.github.io/test-in</a> &mdash; what it does, how each screen works and the rules it keeps</li>
+        <li>Questions and ideas: <a href="https://github.com/mtb550/test-in/discussions">github.com/mtb550/test-in/discussions</a></li>
         <li>Issues and feature requests: <a href="https://github.com/mtb550/test-in/issues">github.com/mtb550/test-in/issues</a></li>
     </ul>
 ]]></description>
