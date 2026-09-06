@@ -9,7 +9,7 @@ set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The tree panel |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are UC-TREE-PANEL-001 to UC-TREE-PANEL-028. Rules are numbered 1 to 90, apart from 66 and 67, which went with the search. They belong to the tree panel. Every other part of Testin starts its own numbers again |
+| **Numbering** | Use cases are UC-TREE-PANEL-001 to UC-TREE-PANEL-028, apart from 024. Rules are numbered 1 to 90, apart from 66 and 67. The search took all three, and is now [UC-INTERNAL-001](../internal/globalSearch.md). They belong to the tree panel. Every other part of Testin starts its own numbers again |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code |
 | **Written to** | [How a document is written](../standard.md) |
@@ -137,10 +137,6 @@ editors. The panel itself never shows a test case.
 
 ---
 
----
-
----
-
 ## How to read these pages
 
 Each use case page has the same shape. **Rules** are the things that must always
@@ -216,6 +212,7 @@ its status bar, at the foot of the dialog.
 | Key | Does | Page |
 |---|---|---|
 | `Enter` | Opens the selected test set or test run | [UC-TREE-PANEL-005](openTestSet.md) |
+| `Context Menu` | Opens the menu on the selected node, without the mouse | [The menu](#the-menu) |
 | `Ctrl+M` | Creates a node under the selected one | [UC-TREE-PANEL-007](createTestSet.md) |
 | `Shift+F6` | Renames the selected node | [UC-TREE-PANEL-011](renameNode.md) |
 | `Delete` | Removes the selected nodes | [UC-TREE-PANEL-012](removeNode.md) |
