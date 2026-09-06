@@ -2,8 +2,8 @@
 
 # How a document is written
 
-Testin has six parts. Each part gets a folder, and each thing a tester does in
-it gets a page of its own. This page says how those pages are written.
+Testin has eight parts. Each part gets a folder, and each thing a tester does
+in it gets a page of its own. This page says how those pages are written.
 
 Read this before writing or changing any page under `docs/`.
 
@@ -99,6 +99,9 @@ own still says where to look:
 | The view panel | `UC-VIEW-PANEL-001` and up |
 | The settings page | `UC-SETTING-001` and up |
 | Automation code and the gutter | `UC-CODEGEN-001` and up |
+| Reports | `UC-REPORT-001` and up |
+| Sharing work with the team | `UC-SHARE-001` and up |
+| Inside Testin | `UC-INTERNAL-001` and up |
 
 **The other numbers start again in each part.** The tree panel has a rule 4, and
 so will the editor panel. Inside one document, "rule 4" is enough. Anywhere

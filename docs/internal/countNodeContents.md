@@ -1,0 +1,95 @@
+[Documentation](../README.md) › [Inside Testin](main.md) › UC-INTERNAL-006
+
+# UC-INTERNAL-006: Count what a node holds
+
+**As a** tester, **I want** the numbers on a node to be true at the moment I
+read them, **so that** I can decide from them, especially in the dialog that
+asks me to confirm a removal.
+
+There is no key for this. The counts are worked out when a screen that shows
+them opens.
+
+## Rules
+
+- **Rule 45** — A count is worked out when it is asked for, and stored nowhere.
+  A number that is never saved cannot be stale.
+- **Rule 46** — A container is the sum of everything beneath it, at any depth.
+- **Rule 47** — A test run is counted from the verdicts it recorded, not from
+  the test cases it was made from.
+- **Rule 48** — A test run's numbers come from one place, so its Details and its
+  report can never disagree.
+- **Rule 49** — Retired test sets and archived packages are counted. That a
+  branch is out of current work is already visible in the tree, which draws it
+  gray and sorts it last.
+- **Rule 50** — A test run that could not be read counts as nothing, rather than
+  failing. The tree already draws the node, so its Details still says what the
+  node is.
+- **Rule 51** — A test run nobody has judged shows *Not run*, never *0%*.
+
+## Where the counts appear
+
+| Screen | What it shows |
+|---|---|
+| The Details popup on a tree node | A row for each count, and a ring for a test run. Drawn on [UC-TREE-PANEL-027](../treePanel/nodeDetails.md) |
+| The removal confirmation | One line saying what goes with the node. Drawn on [UC-TREE-PANEL-012](../treePanel/removeNode.md) |
+
+## What each node counts
+
+| The node | The counts it shows |
+|---|---|
+| A test project | Test sets, Packages, Test cases, Test runs |
+| **Test Cases** | Test sets, Packages, Test cases |
+| **Test Runs** | Packages, Test runs |
+| A test set package | Test sets, Packages, Test cases |
+| A test run package | Packages, Test runs |
+| A test set | Test cases |
+| A test run | Total, and a ring of its verdicts |
+
+The verdicts on the ring are **Passed**, **Failed**, **Blocked**, **Untested**
+and **Removed**. The pass rate sits in the middle of it.
+
+## Main flow
+
+1. The tester opens Details on a node, or presses `Delete` on it.
+2. Testin walks everything beneath that node, in memory.
+3. Testin groups what it finds by kind, and adds up each kind.
+4. Test cases are counted from how many the test set holds, not by sorting them.
+   Sorting 2,770 test cases to produce a number nobody reads is work for
+   nothing.
+5. A test run is not walked. Its recorded verdicts are added up instead.
+6. The screen draws the rows. The removal confirmation draws one line, reading
+   *Holds*, then the test sets, the test cases and the test runs.
+7. Nothing is saved. The next screen that asks counts again.
+
+## What Testin refuses
+
+**If the node holds nothing** — the removal confirmation shows no *Holds* line
+at all, rather than a line of zeros.
+
+**If a test run has no verdicts yet** — the middle of the ring reads *Not run*.
+A *0%* there would read as every test case having failed.
+
+**If a test run cannot be read** — every count is zero and nothing fails. The
+node is still in the tree, so Details still opens on it.
+
+**If the branch holds retired test sets** — they are counted. A deprecated test
+set still holds its test cases.
+
+## Where the plugin breaks its own rules
+
+**A count can be larger than what a test run will offer.** Details counts
+retired test sets. Choosing test cases for a new test run leaves them out. So a
+test project whose Details says 40 test cases can offer 31 when a test run is
+made on it, and nothing explains the difference.
+
+## Why it works this way
+
+The counts used to be found by matching the start of each path against the
+node's own path. A node's path starts with itself. So removing a test set
+holding 12 test cases read *Holds 1 test set, 12 test cases and 0 test runs*,
+and removing a test run said it held one test run. That was in the one dialog
+whose whole job is to say what an unrecoverable removal takes with it.
+
+---
+
+[Documentation](../README.md) › [Inside Testin](main.md)
