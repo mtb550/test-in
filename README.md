@@ -96,21 +96,17 @@ full statement is in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 Read it on the web at **[mtb550.github.io/test-in](https://mtb550.github.io/test-in/)**,
 or in this repository under [`docs/`](docs/README.md).
 
-Three specifications, read in this order — what is promised, what must be true
-for the promise to hold, and what the tester sees:
+Three specifications. Read them in this order.
 
-- **[Business requirements](docs/business-requirements/business-requirements.md)**
-  — what Testin promises: who uses it, the things they work with, every
-  capability and the key that triggers it, all 26 statuses, and what is still
-  undecided. **Start here to understand what Testin is**
-- **[System requirements](docs/system-requirements/system-requirements.md)** —
-  what the software must do to keep those promises
-- **[Design](docs/design/design.md)** — one document per screen.
-  [Light mode](docs/design/light-mode.md) is written
+| | Answers | Written so far |
+|---|---|---|
+| **[Business requirements](docs/business-requirements/business-requirements.md)** | Why each thing exists, and the rules that always hold | [The product](docs/business-requirements/product.md) · [Project panel](docs/business-requirements/project-panel.md) |
+| **[System requirements](docs/system-requirements/system-requirements.md)** | What happens, step by step, and every key | [Project panel](docs/system-requirements/project-panel.md) |
+| **[Design](docs/design/design.md)** | Every screen, drawn | [Project panel](docs/design/project-panel.md) · [Light mode](docs/design/light-mode.md) |
 
-Alongside them: the keyboard reference, a first-run walkthrough, the formats on
-disk, the architecture, contributing and the standing decisions — each listed in
-[the index](docs/README.md) against the issue that will write it.
+The rest — the keyboard reference, a first-run walkthrough, the formats on disk,
+the architecture — is listed in [the index](docs/README.md) with the issue that
+will write it.
 
 Questions, ideas and feedback are welcome in
 [Discussions](https://github.com/mtb550/test-in/discussions).
