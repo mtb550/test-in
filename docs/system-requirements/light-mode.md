@@ -1,4 +1,4 @@
-[Documentation](../README.md) › [Design](design.md) › Light mode
+[Documentation](../README.md) › Light mode
 
 # Light mode
 
@@ -8,16 +8,14 @@ with IntelliJ minimized, and still record a verdict without switching windows.
 
 | | |
 |---|---|
-| **Area** | [Design](design.md) |
 | **Part of Testin** | The test run editor. Light mode is one of its windows |
-| **Read with** | Nothing yet. The test run editor's business and system requirements are not written — [#181](https://github.com/mtb550/test-in/issues/181) |
+| **Answers for** | This one window. The rest of the test run editor is not written yet — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Answers** | Why this window is shaped the way it is, and what every part of it does |
 | **State** | **Written.** Built and shipped — [#13](https://github.com/mtb550/test-in/issues/13), closed |
 | **Checked against** | `main` at `206c9744`, 6 September 2026 — read class by class against the built code |
-| **Points at** | No rules yet. The business requirements do not describe this window ([#72](https://github.com/mtb550/test-in/issues/72)) |
+| **Numbering** | No rules or scenarios are numbered yet. This document describes the window; the numbers come when the rest of the test run editor is written |
 
-This document describes the window as it was built. It also says where the
-build differs from what was first drawn.
+This document describes the window as it was built.
 
 ---
 
@@ -141,11 +139,8 @@ Numbered left to right along the title bar, then down the window.
 
 It is on by default, because that is the point of the window.
 
-This design drew one icon that fills in. It was an outline when the window may
-fall behind other applications, and solid when it stays on top. The build uses
-the IDE's own pin icon instead, on the rounded gray patch the IDE draws behind
-any pressed toolbar button. The meaning is the same. The shape is the IDE's.
-That is why it is not two icons that swap.
+It is the IDE's own pin icon, on the rounded gray patch the IDE draws behind
+any pressed toolbar button.
 
 The window is a real top-level frame, not a tool window. So it survives IntelliJ
 being minimized.
@@ -157,10 +152,8 @@ own two icons, read from one place, so the toolbar and this window can never
 end up different. A tester who presses Start in the toolbar and Stop in this
 window is pressing the same two buttons, and should be looking at them.
 
-It had drawn the IDE's arrow for running *code*. The toolbar had already moved
-away from that icon, because a tester running a test case by hand runs no code.
-Stop is a pause symbol rather than a square, because a paused test run is what
-Stop leaves behind.
+The icon is not the IDE's arrow for running *code*, because a tester running a
+test case by hand runs no code. Stop is a pause symbol rather than a square.
 
 ### 3. The menu that chooses what the window shows
 
@@ -202,9 +195,8 @@ The test case reads `00:41`. The test run reads `00:12:41`. They sit in the
 bottom strip, small, one at each end, with no labels. The test case duration
 is on the left. The test run duration is on the right.
 
-They were first drawn as two large boxes, with the running one in the highlight
-color. That turns them into a stopwatch. A tester watching a number climb
-hurries, and a hurried tester is what this window exists to prevent.
+They are small and gray, never large and never in the highlight color. A large
+clock is a stopwatch, and a tester watching a number climb hurries.
 
 **They carry no labels.** The right-hand figure is always the larger of the two.
 That tells the tester which is which faster than a word would. A label that
@@ -424,12 +416,10 @@ avoid. The feature would defeat itself on its most common verdict.
 
 ### 15. Real radio buttons, the same ones the run editor uses
 
-This design drew small rounded buttons instead. The argument was that seven
-radio buttons and their labels would not fit across 400 pixels. They do fit.
-The build uses real radio buttons, and the four fields are written down once
-and shared with the run editor's own dialog. Two looks for the same four fields
-is exactly what that sharing exists to prevent. The choices come from one list
-each, so a new severity or priority appears here on its own.
+Real radio buttons, not something smaller. The four fields are written down
+once and shared with the run editor's own dialog, so the same four fields can
+never end up looking different in the two places. The choices come from one
+list each, so a new severity or priority appears here on its own.
 
 ### 16. Ctrl+V belongs here and nowhere else
 
@@ -445,10 +435,9 @@ inside a form that `Enter` saves and `Escape` throws away.
 
 ### 17. The verdict buttons disappear while the form is open
 
-They were first replaced by a **Cancel** button and a **Save & next** button.
-Those are gone too. `Enter` and `Escape` already do the same, and two buttons
-repeating them cost a row, in a window whose whole argument is that it is
-small. The clocks keep running, because the tester is still on this test case
+There is no **Cancel** button and no **Save & next** button. `Enter` and
+`Escape` already do the same, and two buttons repeating them would cost a row
+in a window whose whole argument is that it is small. The clocks keep running, because the tester is still on this test case
 while they write the failure up. The status bar names the two keys that work
 here.
 
@@ -512,9 +501,9 @@ nobody tested. The expected result and the detail values share a size on
 purpose. They are the same kind of thing being read, and setting them apart said
 they were not.
 
-**No modifier, in the end.** This design argued for `Ctrl` and the wheel, on
-convention. That is what the IDE means by zoom, and what every other Testin
-screen listens for. The build went the other way, for three reasons. The window
+**No other key held down.** Everywhere else in the IDE, and on every other
+Testin screen, zoom is `Ctrl` and the wheel. Here it is the wheel alone, for
+three reasons. The window
 has nothing else a wheel could mean. Its height is fixed to what it shows, so
 there is nothing to scroll. Anything inside it that does scroll would take the
 wheel first anyway. So this is the one window in the plugin where zoom needs no
@@ -656,10 +645,8 @@ shorter than what it shows needs a scrollbar, and a scrollbar in a window
 showing one test case means scrolling to read the thing you came for. Neither
 happens, because the tester cannot set the height.
 
-**Nothing stops the window growing past the screen, and this document used to
-promise it would.** It said the window would stop at the edge of the screen and
-let the test case scroll. Nothing does that. The window simply grows to fit what
-it holds, so a very long description at a large size makes a window taller than
+**Nothing stops the window growing past the screen.** It grows to fit what it
+holds, so a very long description at a large size makes a window taller than
 the screen. Stopping it would cut the test case off, which is worse. Letting it
 scroll puts a scrollbar in the one window built so nothing has to be scrolled.
 So it is written down rather than fixed, as finding 54 in
@@ -702,41 +689,6 @@ nothing else for color to say.
 
 ---
 
-## What this window changed in the rest of Testin
-
-> **This one section is for whoever changes the code.** A tester can skip it.
-> Everything above is about what the tester sees. This is about what building
-> the window forced other parts of Testin to share, so the next person to open
-> those parts knows why they are shaped the way they are.
-
-| Before | Now |
-|---|---|
-| Setting a verdict only worked from the run editor, and refused anything else. | Setting a verdict takes a test run, a test case and a status. The editor is one caller among others. |
-| Every dialog drew its own key caps, and decided for itself whether to show the row of shortcuts. | One piece of code draws a key cap for all **28 files** that name one, and one place answers "is this row shown". So one setting reaches every Testin dialog. |
-| The five settings that turn a text box into a paragraph a tester reads were written out five times: in the card, the details rows, the steps, the title and here. | One place owns them. Gathering the five turned up a bug: `Tab` stopped on three paragraphs nobody can type into, and did nothing. It was fixed everywhere at once. |
-| The two grays a list alternates between were written once in the grid, and written again in the card. | One place owns them. The failure form's two boxes borrow the darker of the two, rather than adding a fifth gray. That is why they look sunken against the gray frame. |
-| Four ways of writing a duration: milliseconds under a second, milliseconds after the seconds above it, and two different clock formats. | Two. A test run shows hours, minutes and seconds. A test case shows minutes and seconds. Milliseconds are still measured and saved, and never shown. |
-| Nothing in the plugin had ever opened a window of its own, so nothing knew how to close one properly. | One way of closing a window, written once. It belongs to the project and closes with it, and it is correct on several monitors and on high-resolution screens. |
-| Every zoom in the plugin changed the IDE's editor font, which changes every open editor. | A text size this window owns, so the wheel here changes nothing outside it. |
-| Nothing was announced inside the plugin when a tester recorded a verdict by hand. | **Still not built.** A verdict is still a direct call from the run editor, and this window is refreshed by it. This row is what the window would have wanted, not what it got. |
-
----
-
-## Where the plugin does not match this design
-
-| Drawn | Built |
-|---|---|
-| The failure form's status bar offered `Ctrl+V` Paste evidence | Not shown. The error box's own hint text already says it, and `Ctrl+V` still works, because pasting into a text box works anyway. |
-| Small rounded buttons for severity and priority | Real radio buttons, shared with the run editor's dialog. |
-| A pin icon that fills in | The IDE's own pressed-button look. |
-| `Ctrl` and the wheel | The wheel alone. |
-| The counter counts every test case in the test run | It counts what the filter left, which is the same list the grid shows. |
-| The title bar had a close button | Removed. Three routes out already exist, and every one is announced. |
-| Every change animated | Everything changes instantly. **Decided against**: [#178](https://github.com/mtb550/test-in/issues/178), closed after watching real use. |
-| The window stops at the edge of the screen, and the test case scrolls | Nothing does that. Open as finding 54 in [#66](https://github.com/mtb550/test-in/issues/66). |
-
----
-
 ## How it was tested
 
 Almost nothing in this window can be tested automatically. It is a window of
@@ -761,4 +713,4 @@ use everywhere else, and the same blue the reports use.*
 
 ---
 
-[Documentation](../README.md) › [Design](design.md) › **Light mode** — the test run editor's business and system requirements are not written yet: [#181](https://github.com/mtb550/test-in/issues/181)
+[Documentation](../README.md) › **Light mode**

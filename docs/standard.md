@@ -2,54 +2,60 @@
 
 # How a document is written
 
-Every part of Testin gets three documents. Each one answers a different
-question. This page says which question, what goes in each document, and the
-form it takes. So the same fact is written once, in the one place a reader
-would look for it.
+Testin has six parts, and each part gets one document. That document holds
+everything about the part. This page says what goes in it, in what order, and
+how it is written.
 
 Read this before writing or changing any page under `docs/`.
 
 ---
 
-## Three documents, three questions
+## One part, one document
 
-| | Business requirements | System requirements | Design |
-|---|---|---|---|
-| **The question** | Why does this exist, and what must always hold? | What exactly happens, step by step? | What does the tester see? |
-| **The form** | One user story per use case, then numbered rules | Given / When / Then scenarios, one per behavior | A sketch of every screen, with its parts numbered |
-| **Written for** | A lead deciding whether Testin fits. A tester learning what a thing is *for* | A tester learning how to do it. Anyone checking whether a build is right | Anyone changing a screen, or judging a change to one |
-| **Names keys** | **Never** | **Always.** Every key, once, in the step that presses it | Only where a key is drawn on a sketch |
-| **Holds validations** | **Yes**, as rules. *"A test set cannot be dropped among test runs"* | Shows each rule as a scenario that ends in a refusal, and cites the rule | No |
-| **Names screens** | No | Yes. It links the design | **Owns** them |
-| **Says how it is built** | Never | Never | A class name only where it names who owns a decision |
+There used to be three documents per part: what it promises, what it does, and
+what it looks like. A reader had to hold all three open to answer one question.
+Now there is one, and it answers the question in the order the question comes
+up.
 
-**One fact, one home.** A key is stated in the system requirements and nowhere
-else. A rule is stated in the business requirements and cited everywhere else. A
-screen is drawn in the design and linked from everywhere else. When two documents
-would say the same thing, one says it and the other links.
+| In this order | Holds |
+|---|---|
+| **What the part is for** | Why it exists, in a few sentences |
+| **The words it uses** | Any word the rules lean on, explained before they use it |
+| **How to read this document** | What Given, When and Then mean, and what the marks in the drawings stand for |
+| **The rules that hold everywhere** | Numbered rules that apply to the whole part |
+| **Every key, in one place** | One table: the key, what it does, and the scenario that owns it |
+| **The screens that belong to no single use case** | The panel, or the window itself, drawn |
+| **One section per use case** | The story, its rules, its screens and its scenarios, together |
+| **Why it is built this way** | The decisions worth not re-arguing |
+| **Where the plugin breaks its own rules** | Numbered differences a tester can hit today |
+| **Not decided** | Numbered questions, listed instead of guessed |
+
+**One fact, one place.** A key is written once, in the scenario that presses it.
+A rule is written once and pointed at by number everywhere else. A screen is
+drawn once, in the use case that opens it, and pointed at from any other use
+case that shares it.
 
 ---
 
-## Why these three forms
+## The three forms
 
-**A user story for the business requirements.** It forces the *who* and the
-*why* into one sentence. It leaves no room for the *how*.
+**A user story opens each use case**, because it forces the *who* and the *why*
+into one sentence and leaves no room for the *how*:
 
 > **As a** tester, **I want** to create a test project from the tree, **so that**
 > a new product under test has a place for its cases before any are written.
 
-**Given / When / Then for the system requirements**, for three reasons. It is
-the language testers already write tests in. Each scenario is something a
-person can check against a build. And *"When the tester presses `Ctrl+M`"* puts
-the key exactly where it is a fact, rather than in a footnote.
+**Given / When / Then for each scenario**, because it is the language testers
+already write tests in, because each scenario is something a person can check
+against a build, and because *"When the tester presses `Ctrl+M`"* puts the key
+where it is a fact, not a footnote:
 
 > **Given** a test project is selected in the tree
 > **When** the tester presses `Ctrl+M`
 > **Then** the create dialog opens, offering a test set package or a test set
 
-**A numbered sketch for the design.** A screen is a picture. A paragraph
-describing where the buttons are is worse than a drawing of them. The light
-mode document is the pattern.
+**A numbered drawing for each screen**, because a screen is a picture, and a
+paragraph describing where the buttons are is worse than a drawing of them.
 
 ---
 
@@ -61,38 +67,29 @@ rewritten.
 
 Five things are numbered. Each one is written the way it is read:
 
-| Written | What it is | Which document it is in |
-|---|---|---|
-| **Use case 1** | One thing a tester does, such as creating a test project | Both the business requirements and the system requirements, under the same number. The story is in one. The steps are in the other. The number is what joins them |
-| **Rule 1** | Something that must always be true | The business requirements |
-| **Scenario 1** | One Given, When, Then | The system requirements |
-| **Question 1** | Something nobody has answered yet, listed instead of guessed | The business requirements |
-| **Difference 1** | A place where the plugin does not do what its own rules say | The business requirements |
+| Written | What it is |
+|---|---|
+| **Use case 1** | One thing a tester does, such as creating a test project |
+| **Rule 1** | Something that must always be true |
+| **Scenario 1** | One Given, When, Then |
+| **Question 1** | Something nobody has answered yet, listed instead of guessed |
+| **Difference 1** | A place where the plugin does not do what its own rules say |
 
 **The numbers start again in each part of Testin.** The project panel has a
 rule 4, and so will the test case editor. Inside one document, "rule 4" is
 enough. Anywhere else, say which part it belongs to: *the project panel's rule
 4*. A bug report says *project panel, rule 4*.
 
-The one exception is [the product's own document](business-requirements/product.md).
-Its rules hold everywhere, so they belong to no part of Testin, and it says so
-at the top.
+The one exception is [the product's own document](system-requirements/product.md).
+Its rules hold everywhere, so they belong to no part, and it says so at the top.
 
-**One use case, read from the top down.** Take use case 1. Its story and its
-rules are in the business requirements. Its steps, and every key it answers to,
-are in the system requirements, under the same number. Its screen is drawn in
-the design.
-
-A design points at a use case and a rule. It invents neither. A scenario names
-the rule it puts to work. If a scenario needs a rule nobody has written, the
-rule is written first, in the business requirements. Then the scenario names
-it.
+A scenario names the rule it puts to work, on the line under its title: *Keeps
+rule 8*. If a scenario needs a rule nobody has written, the rule is written
+first.
 
 ---
 
-## The templates
-
-### Business requirements — per use case
+## The template
 
 ```markdown
 ### Use case 1 · Create a test project
@@ -104,15 +101,12 @@ it.
 - **Rule 1** — …
 - **Rule 2** — …
 
-**Not decided** — question 1: …           ← only if something genuinely is
-```
+#### The create dialog
 
-### System requirements — per use case
+(drawing, 76 columns wide, box characters)
 
-```markdown
-### Use case 1 · Create a test project
-
-Screen: [The create dialog](../design/project-panel.md#the-create-dialog)
+1. **The kind** — …
+2. **The name** — …
 
 **Scenario 1 · From the tree**
 > **Given** a test project is selected in the tree
@@ -126,21 +120,7 @@ Keeps rule 2.
 > **Then** the dialog stays open and the name field is marked
 ```
 
-One scenario, one behavior. A refusal is its own scenario. The line under its
-title names the rule it keeps.
-
-### Design — per screen
-
-```markdown
-## The create dialog
-
-(sketch, 76 columns wide, box characters)
-
-1. **The kind** — …
-2. **The name** — …
-
-Used by use case 1 and use case 4.
-```
+One scenario, one behavior. A refusal is its own scenario.
 
 ---
 
@@ -154,7 +134,7 @@ These documents are for testers. Every sentence is checked against that reader.
   sentences. The one exception is the user story, which is one sentence in
   three fixed parts however long it runs.
 - **No dashes and no semicolons in a sentence.** A dash joins two ideas. Split
-  them. A dash may only separate a number from the text after it: *rule 8 — …*
+  them. A dash may only separate a number from the text after it: *Rule 8 — …*
 - **A list, not a sentence with parts.** Three or more things go in a list when
   each one needs more than a word or two. Steps go in a numbered list. A short
   series stays in the sentence: *create, name, group, order, retire and
@@ -178,6 +158,11 @@ These documents are for testers. Every sentence is checked against that reader.
 - **American English.** *Behavior*, not *behaviour*. *Gray*, not *grey*. The
   platform the plugin is written against is American, so anything else puts two
   dialects in one page.
+- **No class, method or package names.** A tester does not need them, and they
+  date the document the first time the code is refactored. Name one only where
+  it is the shortest way to say which thing owns a decision.
+- **No history.** The document says what the plugin does now. It does not say
+  what an earlier design drew, or what was tried and dropped.
 
 **Exact words for exact things.**
 
@@ -188,8 +173,6 @@ These documents are for testers. Every sentence is checked against that reader.
   If the label changes, the document changes in the same commit.
 - **A notification is quoted exactly**, in italics: the tester sees *Removed 4*,
   so the scenario says *Removed 4*.
-- **No class names** in the business or system requirements. A tester does not
-  need them, and they date the document the first time the code is refactored.
 - **What is refused is stated as plainly as what is allowed.** *"The two fixed
   containers cannot be removed. The menu does not offer it."*
 - **One idea per scenario.** If a **Then** has two unrelated outcomes, it is two
@@ -201,11 +184,9 @@ These documents are for testers. Every sentence is checked against that reader.
 
 | | |
 |---|---|
-| **Area** | Which of the three documents this is, linked |
 | **Part of Testin** | Which part this document covers |
-| **Numbering** | Where this document's numbers start, and what they count |
-| **Read with** | The same part of Testin in the other two documents, linked |
 | **Answers** | One sentence |
+| **Numbering** | Where this document's numbers start, and what they count |
 | **State** | Written, Draft or Not written, with the issue |
 | **Checked against** | The commit on `main`, and the date |
 
@@ -216,17 +197,13 @@ is, whether it is finished, and how far it might have drifted.
 
 ## The same way in, and the same way out
 
-A reader is never more than one click from an index.
+A reader is never more than one click from the index.
 
-- **An index is a list of documents, and nothing else.** Each folder has one:
-  [`business-requirements.md`](business-requirements/business-requirements.md),
-  [`system-requirements.md`](system-requirements/system-requirements.md),
-  [`design.md`](design/design.md). It lists every document, written or not,
-  with the issue that will write it. [The home page](README.md) lists the three.
+- **[The home page](README.md) is the only index.** It lists every document,
+  written or not, with the issue that will write it.
 - **The line above every title is a breadcrumb.** Each step is a link:
-  *Documentation › Business requirements › Project panel*.
-- **The last line of every document is the same breadcrumb, plus its twins.**
-  The twins are the same part of Testin in the other two documents.
+  *Documentation › System requirements › The project panel*.
+- **The last line of every document is the same breadcrumb.**
 
 ---
 

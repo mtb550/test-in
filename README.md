@@ -96,17 +96,19 @@ full statement is in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 Read it on the web at **[mtb550.github.io/test-in](https://mtb550.github.io/test-in/)**,
 or in this repository under [`docs/`](docs/README.md).
 
-Three specifications. Read them in this order.
+Testin has six parts, and each part gets one document. It holds everything
+about that part: what it is for, what a tester can do in it, the rules, exactly
+what happens step by step, every key, and every screen drawn.
 
-| | Answers | Written so far |
+| Document | Covers | Where it stands |
 |---|---|---|
-| **[Business requirements](docs/business-requirements/business-requirements.md)** | Why each thing exists, and the rules that always hold | [The product](docs/business-requirements/product.md) · [Project panel](docs/business-requirements/project-panel.md) |
-| **[System requirements](docs/system-requirements/system-requirements.md)** | What happens, step by step, and every key | [Project panel](docs/system-requirements/project-panel.md) |
-| **[Design](docs/design/design.md)** | Every screen, drawn | [Project panel](docs/design/project-panel.md) · [Light mode](docs/design/light-mode.md) |
+| **[The product](docs/system-requirements/product.md)** | What is true of all six parts | A draft |
+| **[The project panel](docs/system-requirements/project-panel.md)** | The tree on the left | **Written** |
+| **[Light mode](docs/system-requirements/light-mode.md)** | The always-on-top window that shows one test case | **Written** |
 
-The rest — the keyboard reference, a first-run walkthrough, the formats on disk,
-the architecture — is listed in [the index](docs/README.md) with the issue that
-will write it.
+The rest — the other five parts, the keyboard reference, a first-run
+walkthrough, the formats on disk, the architecture — is listed on
+[the home page](docs/README.md) with the issue that will write it.
 
 Questions, ideas and feedback are welcome in
 [Discussions](https://github.com/mtb550/test-in/discussions).

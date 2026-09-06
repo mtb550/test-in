@@ -1,4 +1,4 @@
-[Documentation](../README.md) › [Business requirements](business-requirements.md) › The product
+[Documentation](../README.md) › The product
 
 # The product — business requirements
 
@@ -8,8 +8,7 @@
 
 | | |
 |---|---|
-| **Area** | [Business requirements](business-requirements.md) |
-| **Part of Testin** | All of it. These rules hold everywhere. Each part also has a document of its own, listed in [the index](business-requirements.md) |
+| **Part of Testin** | All of it. These rules hold everywhere. Each part also has a document of its own, listed on [the home page](../README.md) |
 | **Numbering** | These rules belong to no single part of Testin, so they are the one set that holds everywhere. Section 7 is missing its numbers, which is explained there |
 | **Answers** | Who uses Testin, what they work with, every status, the rules for the whole product, and what is undecided |
 | **State** | **Draft 1** — moved from Notion, not re-checked. Correcting it is [#72](https://github.com/mtb550/test-in/issues/72) |
@@ -35,7 +34,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 >   standalone always-on-top window, showing one test case at a time, with `P`,
 >   `F` and `B` on it.
 >   Section 6.2 is incomplete without it. See
->   [the design document](../design/light-mode.md).
+>   [the light mode document](light-mode.md).
 > - **#74 is closed.** Section 8 names the grid view's missing keyboard path as a
 >   live gap tracked by it. That needs re-checking.
 > - **#68 is closed.** Question 2 still calls it open.
@@ -351,7 +350,7 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 > `B`, with `Ctrl+D` for the rest of the test case and `Escape` to close. It is
 > the clearest example of section 2's idea, and it is not described here.
 > See
-> [the design document](../design/light-mode.md).
+> [the light mode document](light-mode.md).
 
 ### 6.3 Evidence and exchange
 
@@ -527,4 +526,4 @@ Listed rather than guessed. Each is a real question the product has not answered
 
 ---
 
-[Documentation](../README.md) › [Business requirements](business-requirements.md) › **The product** — each part's own promises: [The project panel](project-panel.md)
+[Documentation](../README.md) › **The product** — the parts have documents of their own, starting with [the project panel](project-panel.md)

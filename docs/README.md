@@ -4,47 +4,34 @@
 > **[mtb550.github.io/test-in](https://mtb550.github.io/test-in/)**.
 
 Everything about the plugin that is not the code: what it is for, what it does,
-how each screen looks, and how to work on it.
+what every screen looks like, and how to work on it.
 
 New here? Start with the [project README](https://github.com/mtb550/test-in#readme).
 It says what Testin is and how to install it.
 
 ---
 
-## The three documents
+## The documents
 
-Testin is described three times. Each one answers a different question. Read
-them in this order.
+Testin has six parts. Each part gets one document, and that document holds
+everything about it: what the part is for, what a tester can do in it, the rules
+that always hold, exactly what happens step by step, every key it answers to,
+and every screen drawn.
 
-| | Answers | Where it stands |
+| Document | What it covers | Where it stands |
 |---|---|---|
-| **[Business requirements](business-requirements/business-requirements.md)** | Why each thing exists, and the rules that always hold | One part of six is written. The product-wide document is a draft |
-| **[System requirements](system-requirements/system-requirements.md)** | What happens, step by step, and every key | One part of six is written |
-| **[Design](design/design.md)** | Every screen, drawn, and why it looks that way | One part of six, plus light mode |
+| **[The product](system-requirements/product.md)** | What is true of all six parts: who uses Testin, what they work with, every status, and the rules that hold everywhere | A draft, moved from Notion, not re-checked against today's plugin — [#72](https://github.com/mtb550/test-in/issues/72) |
+| **[The project panel](system-requirements/project-panel.md)** | The tree on the left. 20 use cases, 76 rules, 75 scenarios, 13 screens | **Written** |
+| The test case editor | Writing and reading test cases: the grid, the card list and the details panel | Not written |
+| The test run editor | Running tests and recording verdicts. **[Light mode](system-requirements/light-mode.md)** is one of its windows, and is written | Not written, except light mode |
+| The view panel | Details, history and bugs of the selected test case | Not written |
+| The settings page | Everything set once per machine | Not written |
+| Reports, export, import and sync | Getting work in and out of Testin | Not written |
 
-Each of the three has an index page that lists its documents.
+The plan, and the order the parts are written in, is
+[#181](https://github.com/mtb550/test-in/issues/181).
 
 Writing one? Read **[How a document is written](standard.md)** first.
-
-## What is written so far
-
-Testin has six parts. Each part gets all three documents. One part is finished.
-
-| Part of Testin | Business requirements | System requirements | Design |
-|---|---|---|---|
-| **The project panel**, the tree on the left | [Written](business-requirements/project-panel.md) | [Written](system-requirements/project-panel.md) | [Written](design/project-panel.md) |
-| The test case editor | Not written | Not written | Not written |
-| The test run editor | Not written | Not written | [Light mode](design/light-mode.md) |
-| The view panel | Not written | Not written | Not written |
-| The settings page | Not written | Not written | Not written |
-| Reports, export, import and sync | Not written | Not written | Not written |
-
-There is one more document above the six: **[the product](business-requirements/product.md)**,
-which holds what is true of all of them. It is a draft, moved from Notion, and it
-has not been checked against today's plugin.
-
-The plan, and the order the six are written in, is
-[#181](https://github.com/mtb550/test-in/issues/181).
 
 ## For testers
 
@@ -72,8 +59,8 @@ What a person needs before their first change.
 
 - Every sentence can be checked against the plugin. Planned behavior is marked as planned.
 - Known defects are named, not hidden.
-- Every rule and every use case has a number, so an issue or a commit can point at one. The numbering is explained in [How a document is written](standard.md).
+- Every rule, use case and scenario has a number, so an issue or a commit can point at one. The numbering is explained in [How a document is written](standard.md).
 - When the plugin changes, the document changes in the same commit.
 - Every document says which version of the plugin it was checked against.
 - Not written is a state. Every missing document is listed with the issue that will write it.
-- One fact, one home. When two documents would say the same thing, one says it and the other links to it.
+- One fact, one place. Nothing is written twice.

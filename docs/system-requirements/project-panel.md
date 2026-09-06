@@ -1,20 +1,120 @@
-[Documentation](../README.md) › [System requirements](system-requirements.md) › Project panel
+[Documentation](../README.md) › The project panel
 
-# Project panel — system requirements
+# The project panel
 
-This document says what the panel does, step by step. Every key the panel
-answers to is named here, once, in the step that presses it.
+The panel is the tree on the left of the IDE. It holds every test project, test
+set and test run. Everything in Testin starts here.
 
 | | |
 |---|---|
-| **Area** | [System requirements](system-requirements.md) |
 | **Part of Testin** | The project panel, the tree on the left |
-| **Numbering** | Scenarios are numbered 1 to 75. The use cases carry the same numbers as in the [business requirements](../business-requirements/project-panel.md) |
-| **Answers** | Exactly what happens, and what the tester sees, for everything the tester does in the tree |
+| **Answers** | What the panel is for, what a tester can do in it, exactly what happens for every gesture, and what every screen looks like |
+| **Numbering** | Rules are numbered 1 to 76, use cases 1 to 20, and scenarios 1 to 75. They belong to the project panel. Every other part of Testin starts its own numbers again |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **Checked against** | `main` at `cddad453`, 6 September 2026 — every key, label and message read from the code that shows it |
-| **Read with** | [Business requirements](../business-requirements/project-panel.md) — why, and every rule cited here · [Design](../design/project-panel.md) — every screen |
-| **Written to** | [How a document is written](../standard.md). Every key the panel answers to is here, once |
+| **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code |
+| **Written to** | [How a document is written](../standard.md) |
+
+---
+## What the panel is for
+
+A tester's work is arranged like a tree:
+
+- a test project holds test sets
+- a test set holds test cases
+- a test run records one pass through some of those test cases
+
+The panel is that tree. It sits on the left, where the IDE keeps every other
+tree. It is always one click away.
+
+**Four words, before the rules use them.**
+
+- A **node** is anything the tree shows: a test project, a folder, a test set or
+  a test run. A test case is not a node, because the tree does not show one.
+- The **Testin folder** is the one folder that holds every test project. The
+  settings page calls it *Testin source root*, and two of Testin's own messages
+  call it *the Testin root*.
+- **Bound** means this code project is set to use one test project. The choice
+  is written into the code project, so everyone who opens it gets the same test
+  project.
+- **Signed off** means a test run is **Completed** or **Closed**. Nothing in it
+  can change again.
+
+The panel's job is small and strict. It shows one test project, the one this
+code project is bound to. It lets the tester shape that test project: create,
+name, group, order, retire and remove the things in it.
+
+Reading and executing test cases happens in editors. The panel opens those
+editors. The panel itself never shows a test case.
+
+---
+
+---
+
+## How to read a scenario
+
+Each scenario has a number and a name, and says what happens in three steps:
+**Given** what is true first, **When** what the tester does, and **Then** what
+happens. **And** adds a line to whichever step it follows.
+
+- A scenario with no **When** describes what the tester sees, without doing
+  anything.
+- The line under the name, *Keeps rule 8*, names the rule the scenario holds up.
+- Words like *\<name\>* stand for whatever the tester is working on. Testin puts
+  the real name there.
+
+## How to read these drawings
+
+Each screen is drawn with text, so it can live beside the words that explain
+it. In every drawing:
+
+- `v` is the little triangle that opens and closes a row
+- `+` `@` `*` are the status icons a test run shows
+- `[set]`, `[dir]`, `[edit]`, `[find]` and the like stand for icons
+- `(1)` `(2)` `(3)` point at the numbered notes under the drawing
+
+---
+
+## Rules that hold everywhere in the panel
+
+These apply to every use case below. A use case points at them by number. It
+does not repeat them.
+
+- **Rule 1** — The panel shows exactly one test project. It is the one this
+  repository is bound to. There is no list of test projects in the tree.
+- **Rule 2** — **Test Cases** and **Test Runs** are fixed containers. They
+  cannot be created, renamed, moved, copied or removed. They come with the test
+  project and go with it.
+- **Rule 3** — The tree has two sides, and nothing moves between them. Test sets
+  and test set packages live under **Test Cases**. Test runs and test run
+  packages live under **Test Runs**.
+- **Rule 4** — Two nodes under one parent cannot share a name. This holds
+  whether the node is created, renamed, pasted or dropped.
+- **Rule 5** — A node name is never empty.
+- **Rule 6** — Removing, moving or copying asks first. Nothing in the tree
+  changes until the tester confirms.
+- **Rule 7** — When something changes, Testin says so once, in the past tense.
+  The tester
+  sees *Created*, *Renamed* or *Removed*. Several changes at once confirm once,
+  with a count: the tester sees *Removed 4*, never four messages. Looking at
+  something confirms nothing.
+- **Rule 8** — A retired node keeps everything inside it. Retired means a
+  **Deprecated** test set or an **Archived** package. It is drawn gray. It sorts
+  after live nodes. It is not offered when a test run is created.
+- **Rule 9** — A test run that is **Completed** or **Closed** is signed off.
+  Its test cases, verdicts and configuration can no longer change.
+- **Rule 10** — Siblings are shown in one order:
+  1. live nodes, then retired ones
+  2. the number the tester gave the node
+  3. the date the node was created
+  4. the name
+
+  A node with no number comes after every node with one.
+- **Rule 11** — A removed node goes to the desktop's recycle bin. It can be put
+  back from the tree.
+- **Rule 12** — A test case is not a node in this tree. It is reached by opening
+  its test set.
+- **Rule 13** — Nodes move only within one test project. Nothing cut in one test
+  project can be pasted into another.
 
 ---
 
@@ -47,21 +147,58 @@ none is used often enough to need a key. `F2` renames in the editors, not here.
 
 ---
 
-## How to read a scenario
+## The panel
 
-Each scenario has a number and a name, and says what happens in three steps:
-**Given** what is true first, **When** what the tester does, and **Then** what
-happens. **And** adds a line to whichever step it follows.
+The panel is the Testin window that sits on the left of the IDE. The buttons
+along its top are the IDE's own. The branch box and the tree are Testin's.
 
-- A scenario with no **When** describes what the tester sees, without doing
-  anything.
-- The line under the name, *Keeps rule 8*, is the rule from the
-  [business requirements](../business-requirements/project-panel.md) that the
-  scenario holds up.
-- Words like *\<name\>* stand for whatever the tester is working on. Testin puts
-  the real name there.
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│  Testin                    [1] [2] [3] [3] [4] [5] [5]                     │
+├────────────────────────────────────────────────────────────────────────────┤
+│  [ main            v ]                                             (6)     │
+├────────────────────────────────────────────────────────────────────────────┤
+│  v Demo                                                            (7)     │
+│    v Test Cases                                                            │
+│      v Accounts                                                    (8)     │
+│          Login                                                             │
+│          Registration                                                      │
+│        Checkout                                                            │
+│        Legacy sign-in                            (deprecated: gray) (10)   │
+│    v Test Runs                                                             │
+│      v Sprint 7                                                            │
+│          + cycle-1  Created                                        (9)     │
+│          @ cycle-2  In Progress                                            │
+│          * cycle-3  Completed                                              │
+│        2025                                        (archived: gray)        │
+└────────────────────────────────────────────────────────────────────────────┘
+```
 
----
+1. **Search Test Project** — opens search. It is the only header button with a
+   key. The key works anywhere in the IDE.
+2. **Settings** — the Testin page of the IDE settings.
+3. **Expand All** and **Collapse All** — **Expand All** leaves retired rows
+   closed. Retired means a **Deprecated** test set or an **Archived** package.
+   **Collapse All** leaves the test project and its two folders visible.
+4. **Refresh** — checks again which test project this code project uses, then
+   reads it again from the folder.
+5. **Select Test Project** and **New Test Project** — grayed until a Testin
+   folder is set.
+6. **The branch box** — shown only for a test project shared through Git. Its
+   placeholder reads *Loading branches...* until Git answers.
+7. **The test project row** — drawn bold, with the IDE's project icon. The two
+   folders under it are bold too, and there are always exactly two.
+8. **A package** — a folder icon. **A test set** — the icon the IDE uses for a
+   changelist. Neither is bold.
+9. **A test run** — draws its **status** as its icon. The status word follows
+   the name in gray. So the tester reads the status of every test run without
+   opening one. A test run never draws a kind icon.
+10. **Gray text** — means retired, or cut and not yet pasted. Both look the
+    same on purpose. Both mean the same thing to a tester: not part of the work
+    in front of them.
+
+Retired nodes sit at the bottom of their folder. Their number does not change
+that.
 
 ## The tree itself
 
@@ -126,9 +263,140 @@ Keeps rule 52.
 
 ---
 
+## The menu
+
+The tester right-clicks any row, or presses the menu key beside the right
+`Ctrl`. The menu opens. Which items are gray depends on the row. Which items
+appear at all depends on which plugins are installed.
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│  Open                     Enter  (1)   ┌ Actions ───────────────────┐      │
+│  Create                  Ctrl+M        │  Activate                  │      │
+│  Actions                     >   (2)   │  Deactivate                │      │
+│  ──────────────────────────────        │  Archive                   │      │
+│  Run Tests                       (3)   │  ──────────────────────    │      │
+│  ──────────────────────────────        │  Undo Move 'Login'  Ctrl+Z │      │
+│  Export                          (4)   │  Redo               Ctrl+Y │      │
+│  Import                                │  Re-create                 │      │
+│  ──────────────────────────────        │  Remove             Delete │      │
+│  Sync With Remote                (5)   │  Rename           Shift+F6 │      │
+│  View Pending Commits                  │  Order                     │      │
+│  ──────────────────────────────        │  Copy               Ctrl+C │      │
+│  Sync With SFTP                  (6)   │  Cut                Ctrl+X │      │
+│  ──────────────────────────────        │  Paste              Ctrl+V │      │
+│  Edit Run                        (7)   └────────────────────────────┘      │
+│  Set Status                                                                │
+│  ──────────────────────────────                                            │
+│  Generate Report          Ctrl+P (8)                                       │
+│  Details                                                                   │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **Open** and **Create** — first, because they are the two things done most.
+2. **Actions** — a submenu. It holds everything that changes a node in place:
+   - its status
+   - undo and redo
+   - re-create
+   - remove
+   - rename
+   - order
+   - the clipboard
+
+   Status entries appear only for the kind selected. The three rows shown are a
+   test project's.
+3. **Run Tests** — only when the automation plugin is present.
+4. **Export**, **Import** — these belong to reports, export, import and sync.
+5. **Sync With Remote**, **View Pending Commits** — only when the Git plugin is
+   present. Otherwise the whole section disappears, dividing line included.
+6. **Sync With SFTP** — always present. Grayed unless the test project is
+   shared over SFTP.
+7. **Edit Run** and **Set Status** — a test run's own two entries. Grayed once
+   the test run is signed off.
+8. **Generate Report** and **Details** — last.
+
+Every entry that changes something confirms itself once. The confirmation is
+one past-tense word. Every entry that only shows something confirms nothing.
+
+---
+
 ## Getting to the tree
 
 ### Use case 1 · Open the panel and reach the tree
+
+**As a** tester, **I want** the panel to show my tree, or tell me what to do
+first, **so that** I am never stuck on an empty window.
+
+The panel shows one of five things. It checks in this order:
+
+1. No Testin folder is set. The panel shows a link to the settings.
+2. The test project is found. The panel shows the tree.
+3. The test project is missing, and it can be cloned. The panel shows a link to
+   clone it.
+4. There is no test project yet. The panel shows a link to create the first one.
+5. Otherwise, the panel shows a list of test projects to choose from.
+
+**Rules**
+
+- **Rule 14** — The panel never opens on its own when the IDE starts.
+- **Rule 15** — A code project does not have to name a test project. If it names
+  none, and exactly one test project exists in the Testin folder, Testin binds it
+  to that one without asking.
+
+Before there is a tree, the panel shows one of five screens. The screens come
+in a fixed order. Each screen holds exactly one link. The link is the only step out of
+that situation.
+
+#### No Testin folder
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│                                                                            │
+│  Welcome to Testin                                                         │
+│                                                                            │
+│  The new awesome test management tool                                      │
+│                                                                            │
+│  By                                                                        │
+│  Muteb almughyiri                                                          │
+│                                                                            │
+│                                                                            │
+│  [gear]  Configure Testin settings                                 (1)     │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+1. The one link. Nothing else is offered, because nothing else can work yet.
+   **Select Test Project** and **New Test Project** in the header are grayed.
+
+#### Choose a project
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│                                                                            │
+│  testin.yml names Payments, which is not under the Testin root      (1)    │
+│                                                                            │
+│  [dir]  Demo  Active                                                (2)    │
+│  [dir]  Mobile  Active                                                     │
+│  [dir]  Legacy  Archived                                                   │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The reason** — in red. It is shown when this code project named a test
+   project Testin could not use. The reason is one of:
+   - *not under the Testin root*
+   - *archived*
+   - *could not be read*
+2. **One link per test project** — the name, then the status. The tester
+   clicks a link. This code project is then set to use that test project, and
+   the tree appears. If there are more than six test projects, Testin shows one
+   link instead of a list. That link opens the **Select Test Project** dialog.
+
+The other two screens follow the same shape: a gray line saying what is true,
+then the one link. They are:
+
+- *\<name\> is not on this machine yet*, with **Clone \<name\>**
+- **Create your first test project**
 
 **Scenario 10 · One of five screens, in a fixed order**
 Keeps rule 14.
@@ -156,6 +424,20 @@ Keeps rule 53.
 > **And** under that line sits the list of test projects to choose from
 
 ### Use case 2 · Create a test project
+
+**As a** tester, **I want** to create a test project by name, or clone one from
+a Git address, **so that** a new product under test has a place before any test
+is written.
+
+**Rules**
+
+- **Rule 16** — A test project is a folder directly under the Testin folder.
+  Any other folder there is ignored.
+- **Rule 17** — Creating a test project binds this repository to it.
+- **Rule 18** — Cloning needs two things. It needs the Git plugin. It also needs
+  this repository to already name the test project it is cloning.
+
+The screens are drawn under [use case 1](#use-case-1--open-the-panel-and-reach-the-tree).
 
 **Scenario 13 · By name**
 > **Given** the Testin folder is set
@@ -188,6 +470,18 @@ Keeps rule 18.
 
 ### Use case 3 · Choose which test project this repository uses
 
+**As a** tester, **I want** to point this repository at a different test project
+under the same Testin folder, **so that** one machine can serve several products.
+
+**Rules**
+
+- **Rule 19** — The binding is written into the repository. A colleague who
+  clones the repository gets the same test project, with no setup.
+- **Rule 20** — If the binding cannot be written, Testin says so. It never
+  reports the choice as saved.
+
+The screens are drawn under [use case 1](#use-case-1--open-the-panel-and-reach-the-tree).
+
 **Scenario 16 · Choose from the list**
 Keeps rule 19.
 > **Given** the Testin folder is set
@@ -218,6 +512,17 @@ Keeps rule 20.
 
 ### Use case 4 · Open a test set or a test run
 
+**As a** tester, **I want** to open a test set or a test run from the tree,
+**so that** I can read and work its test cases.
+
+**Rules**
+
+- **Rule 21** — Only a test set and a test run open in an editor. A package has
+  nothing to open. A container has nothing to open. Neither of them says
+  anything.
+- **Rule 22** — The tester opens a node that is already open. Its tab comes
+  forward. It does not open a second time.
+
 **Scenario 19 · Open with Enter**
 Keeps rule 21.
 > **Given** a test set or a test run is selected
@@ -238,6 +543,51 @@ Keeps rule 21.
 > **Then** **Open** is grayed, and `Enter` does nothing
 
 ### Use case 5 · Create a test set or a test set package
+
+**As a** tester, **I want** to add a test set, or a package to group test sets,
+under **Test Cases** or under another package, **so that** the tree grows the way
+the product is organized.
+
+**Rules**
+
+- **Rule 23** — Under **Test Cases** or a test set package, only a test set or a
+  test set package can be created. The dialog offers nothing else.
+- **Rule 24** — Nothing can be created directly under the test project, under a
+  test set, or under a test run.
+- **Rule 25** — A new test set opens in its editor at once. Its automation class
+  is generated where the Java plugin allows it. A new package does neither.
+
+#### Create Test Node
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Create Test Node                                            │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  [set]  set name...                                     (1)  │
+│                                                              │
+│  [set]  Test Set          Holds test cases              (2)  │
+│  [pkg]  Test Set Package  Groups test sets                   │
+│                                                              │
+├──────────────────────────────────────────────────────────────┤
+│  Enter Confirm    ↑ ↓ Select    Escape Cancel           (3)  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **The name** — its gray hint text reads *set name...*. If the tester presses
+   `Enter` with the box empty, the hint turns red and the cursor stays here.
+2. **The two kinds** — each with a hint beside it. `↑` `↓` move between them,
+   and the icon at the front of the name box changes to match. Clicking a row
+   confirms straight away.
+3. **The status bar** — every key this dialog answers to.
+
+**Create Run Node** is the twin dialog on the test run side. It is identical
+except for two things. Its kinds are *test run* (*Records execution results*)
+and *test run package* (*Groups test runs*). Its hint text reads *set name,
+like Sprint 3 Cycle 1...*.
+
+> **Today the two kind names are blank.** The rows show only their hints.
+> This is difference 4 in the business requirements.
 
 **Scenario 22 · From the tree**
 Keeps rule 23.
@@ -282,6 +632,69 @@ Keeps rule 24.
 
 ### Use case 6 · Create a test run or a test run package
 
+**As a** tester, **I want** to start a test run over the test cases I choose,
+**so that** a pass through the product is recorded on its own.
+
+**Rules**
+
+- **Rule 26** — Under **Test Runs** or a test run package, only a test run or a
+  test run package can be created.
+- **Rule 27** — A test run needs at least one test case. It cannot be created
+  empty.
+- **Rule 28** — Three things are not offered when a test run is created: a
+  retired test set, anything under an **Archived** package, and an empty test
+  set. (rule 8)
+- **Rule 29** — A new test run starts as **Created**. Every test case in it
+  starts **Pending**.
+
+#### Create Test Run
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│  Create Test Run                                                           │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Test Run name:  [ cycle-2                            ]         (1)        │
+│                                                                            │
+│  v Configuration details                                        (2)        │
+│    Change Log  [ Story-002 (register new user)...   ]                      │
+│    Commit ID   [ 9f3c1ab                            ]                      │
+│    Test Type   [ Functional Test  v ]   Platform  [ Web  v ]               │
+│    Component   [ Frontend         v ]   Browser   [ Chrome v ]             │
+│                                                                            │
+│  [x] v Accounts                                                 (3)        │
+│  [x]     Login                                                             │
+│  [x]     Registration                                                      │
+│  [ ]   Checkout                                                            │
+│                                                                            │
+│                                                    [ Create ]   (4)        │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Tab Navigate    Space Check    Escape Cancel                              │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The name** — prefilled from the create dialog. Placeholder *Cycle-1*.
+2. **Configuration details** — a section the tester can open and close. Its
+   fields are:
+   - change log
+   - commit id
+   - test type
+   - platform
+   - component
+   - language
+   - browser or device, only when the platform and component make it relevant
+3. **The test cases** — a tree with a tick box for every test set still in use
+   that has test cases in it. For a new test run, all are ticked. For a
+   re-creation, only the ones the last cycle used.
+4. **Create** — enabled only while at least one test case is ticked. `Enter`
+   does nothing here. The button is the only way to confirm.
+
+**Edit Test Run** is this same dialog with the button **Save**. It opens filled
+with the test run's own:
+
+- name
+- test cases
+- configuration
+
 **Scenario 28 · From the tree**
 Keeps rule 26.
 > **Given** **Test Runs** or a test run package is selected
@@ -322,6 +735,33 @@ Keeps rule 27 and rule 5.
 > **And** *'\<parent\>' no longer exists - test run not created* is shown in red
 
 ### Use case 7 · Rename a node
+
+**As a** tester, **I want** to rename a test set, a package or a test run,
+**so that** the tree says what things are called now.
+
+**Rules**
+
+- **Rule 30** — The test project and the two containers cannot be renamed from
+  the tree.
+- **Rule 31** — Renaming a test set or a test set package renames its automation
+  code with it. The test case stays runnable.
+- **Rule 32** — A rename can be undone.
+
+#### Rename
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Rename                                                      │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  [edit]  Accounts                                       (1)  │
+│                                                              │
+├──────────────────────────────────────────────────────────────┤
+│  Enter Confirm    Escape Cancel                              │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. The current name, filled in and selected. Typing replaces it.
 
 **Scenario 32 · Rename with Shift+F6**
 > **Given** a test set, a package or a test run is selected
@@ -365,6 +805,45 @@ Keeps rule 32.
 
 ### Use case 8 · Remove a node
 
+**As a** tester, **I want** to remove a test set, a package, a test run or a
+whole test project, **so that** the tree holds only what is current.
+
+**Rules**
+
+- **Rule 33** — The confirmation says what will go. For one node, it says what
+  the node holds and where it is. For several nodes, it says how many.
+- **Rule 34** — Removing a test set, a test set package or a test project
+  removes its automation code with it.
+- **Rule 35** — A removal can be undone. (rule 11)
+- **Rule 36** — The two containers are never removed. This holds even when they
+  are selected together with nodes that are removed.
+
+#### Confirm Removing
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Confirm Removing                                            │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  Remove 'Accounts'?                                     (1)  │
+│  Holds 2 test sets, 14 test cases and 0 test runs       (2)  │
+│                                                              │
+│  From:  Demo > Test Cases > Accounts                    (3)  │
+│                                                              │
+├──────────────────────────────────────────────────────────────┤
+│  Enter Remove    Escape Cancel                          (4)  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **The question** — names the node.
+2. **What it holds** — the line the tester reads before pressing `Enter`. It
+   is omitted when every count is zero.
+3. **Where it is** — in gray.
+4. The confirm key is named for what it does. It reads **Remove**, not **OK**.
+
+For several nodes, the question is *Remove these N items?*. It shows no counts
+and no path.
+
 **Scenario 36 · Remove asks first**
 Keeps rule 6 and rule 33.
 > **Given** one or more removable nodes are selected
@@ -403,6 +882,57 @@ Keeps rule 36.
 ## Arranging the tree
 
 ### Use case 9 · Move or copy nodes
+
+**As a** tester, **I want** to move a node into another package, or copy it,
+by cutting and pasting or by dragging, **so that** the tree can be reorganized
+without recreating anything.
+
+**Rules**
+
+- **Rule 37** — A node lands only where its kind belongs. A test set or a test
+  set package lands under **Test Cases** or under a test set package. A test run
+  or a test run package lands under **Test Runs** or under a test run package.
+  (rule 3)
+- **Rule 38** — Nothing can be pasted or dropped into a test set or into a test
+  run. Neither of them holds nodes.
+- **Rule 39** — A node cannot land on itself, inside itself, or in the folder it
+  already sits in.
+- **Rule 40** — Dragging moves a node. Dragging with the copy key held copies
+  it. Cut then paste moves. Copy then paste copies.
+- **Rule 41** — A copied test case is a new test case, with a new identity.
+  Editing the copy never changes the original.
+- **Rule 42** — A move can be undone. A copy cannot. To take back a copy, remove
+  it.
+- **Rule 43** — Nodes drop onto a node, never between two. Position is set by
+  ordering (use case 10), not by dragging.
+- **Rule 76** — Canceling a cut empties the clipboard. Nothing is left waiting
+  to be pasted.
+
+#### Paste, Move and Copy
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Paste                                                       │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  Move 'Login' into 'Smoke'?                             (1)  │
+│                                                              │
+│  From:  Demo > Test Cases > Accounts                    (2)  │
+│  To:    Demo > Test Cases > Smoke                            │
+│                                                              │
+├──────────────────────────────────────────────────────────────┤
+│  Enter Move    Escape Cancel                            (3)  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **The question** — says the verb and the names. The verb is *Move* after a
+   cut. It is *Copy* after a copy.
+2. **From** and **To** — in gray. They let the tester catch a wrong drop
+   before pressing `Enter`.
+3. The confirm key is named for the verb.
+
+From a paste, the title is **Paste**. From a drop, the title is the verb:
+**Move** or **Copy**. The dialog is the same otherwise.
 
 **Scenario 40 · Copy**
 Keeps rule 7.
@@ -484,6 +1014,37 @@ Keeps rule 13.
 
 ### Use case 10 · Order nodes among their siblings
 
+**As a** tester, **I want** to give a node a number that fixes its place among
+its siblings, **so that** the tree reads in the order the work is done.
+
+**Rules**
+
+- **Rule 44** — A number is 1 or higher. Leave it empty and Testin sorts by date
+  instead.
+- **Rule 45** — Two siblings may carry the same number. The older one comes
+  first.
+- **Rule 46** — A retired node sorts after every live sibling. Its number does
+  not change that. (rule 8, rule 10)
+- **Rule 47** — The test project and the two containers cannot be ordered.
+
+#### Order
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Order                                                       │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  [edit]  1, 2, 3... or empty for date order             (1)  │
+│                                                              │
+├──────────────────────────────────────────────────────────────┤
+│  Enter Confirm    Escape Cancel                              │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **One field** — shows the node's current number, or nothing. It accepts
+   digits only, with no leading zero. Anything else is refused as it is typed.
+   Empty means date order.
+
 **Scenario 49 · Give a node its number**
 Keeps rule 44.
 > **Given** a test set, a package or a test run is selected
@@ -505,6 +1066,17 @@ Keeps rule 44.
 > **Then** **Order** is grayed (rule 47)
 
 ### Use case 11 · Undo and redo a change to the tree
+
+**As a** tester, **I want** to take back the last change I made to the tree,
+**so that** a wrong move, rename or removal costs nothing.
+
+**Rules**
+
+- **Rule 48** — The tree remembers its own last 20 changes. It remembers them
+  separately from any editor.
+- **Rule 49** — Four things can be undone: a move, a rename, a removal, and an
+  edit of a test run. Three cannot: an order number, a copy, and a status change.
+- **Rule 50** — Making a new change forgets everything that was undone.
 
 **Scenario 51 · Undo**
 Keeps rule 48 and rule 49.
@@ -544,6 +1116,19 @@ Keeps rule 11.
 
 ### Use case 12 · Retire and reactivate
 
+**As a** tester, **I want** to mark a test set **Deprecated**, a package
+**Archived**, or a whole test project **Inactive** or **Archived**, **so that**
+old work stays for its history without getting in the way of current work.
+
+**Rules**
+
+- **Rule 51** — Retiring deletes nothing. (rule 8)
+- **Rule 52** — A test project that is not **Active** shows nothing under it.
+- **Rule 53** — An **Archived** test project is not opened at all on the next
+  load. The panel says so, and offers the other test projects.
+- **Rule 54** — A status is set on one node at a time. The status a node already
+  has is not offered.
+
 **Scenario 55 · The tester picks a status from a short list on the menu**
 Keeps rule 54.
 > **Given** exactly one node is selected
@@ -578,6 +1163,48 @@ Keeps rule 8, rule 51, rule 52 and rule 53.
 
 ### Use case 13 · Set a test run's status
 
+**As a** tester, **I want** to mark a test run **Assigned**, **Completed** or
+**Closed** from the tree, **so that** the test run's place in its life is visible
+without opening it.
+
+**Rules**
+
+- **Rule 55** — **Completed** and **Closed** are final. The test run accepts no
+  more verdicts. Every test case still **Pending** becomes **Untested**.
+  (rule 9)
+- **Rule 56** — A tester sets **Assigned**, **Completed** and **Closed**.
+  **Created** and **In Progress** are the test run's own record of itself.
+
+**Not decided** — see question 1 and question 2.
+
+#### Set Test Run Status
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Set Test Run Status                                         │
+├──────────────────────────────────────────────────────────────┤
+│  > +  Created                                           (1)  │
+│    @  In Progress                                            │
+│    *  Completed                                     2   (2)  │
+│    !  Assigned                                      1        │
+│    x  Closed                                        3        │
+├──────────────────────────────────────────────────────────────┤
+│  ↑ ↓ Select    Enter Choose    Escape Cancel            (3)  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **Five rows, one per status** — each with its icon. It is the same icon the
+   tree draws for a test run in that status.
+2. **A key beside three of them** — *Created* and *In Progress* have none,
+   because they are the test run's own record. The keys are not in order down
+   the list, because the rows follow the status order instead: **Assigned** is
+   `1`, **Completed** is `2`, **Closed** is `3`.
+3. The first row is selected when the popup opens. The tester chooses in one
+   of three ways:
+   - `↑` `↓` and `Enter`
+   - a key
+   - a click
+
 **Scenario 57 · Pick a status, by key or by row**
 Keeps rule 56.
 > **Given** a test run that is **Created**, **In Progress** or **Assigned** is selected
@@ -599,6 +1226,22 @@ Keeps rule 55 and rule 9.
 > **And** from then on **Set Status**, **Edit Run** and **Run Tests** are grayed on it
 
 ### Use case 14 · Re-create a test run
+
+**As a** tester, **I want** to make the next cycle from a finished test run, with
+the same test cases and settings and no verdicts, **so that** starting the next
+round of testing takes one step, instead of building the whole test run again by
+hand.
+
+**Rules**
+
+- **Rule 57** — Re-create works on a test run in any status, including a
+  signed-off one. That is what it is for.
+- **Rule 58** — Only the test cases and the configuration are carried over.
+  Verdicts, durations and failure details start fresh.
+- **Rule 59** — The next name is suggested by counting up. *cycle-1* becomes
+  *cycle-2*. A name already taken is skipped.
+
+The dialog is drawn under [use case 6](#use-case-6--create-a-test-run-or-a-test-run-package).
 
 **Scenario 59 · The next cycle from the last**
 Keeps rule 57, rule 58 and rule 59.
@@ -626,6 +1269,19 @@ Keeps rule 27, rule 5 and rule 4.
 > **Then** *\<name\> Already Exists* is shown, and the dialog stays open with everything typed still in it
 
 ### Use case 15 · Edit a test run
+
+**As a** tester, **I want** to change which test cases a test run covers, its
+name and its configuration, **so that** a test run can be corrected without being
+recreated.
+
+**Rules**
+
+- **Rule 60** — A signed-off test run cannot be edited. (rule 9)
+- **Rule 61** — Removing a test case from a test run drops everything that test
+  case recorded in that test run. Adding a test case adds it as **Pending**.
+- **Rule 62** — An edit can be undone, as one step. (rule 49)
+
+The dialog is drawn under [use case 6](#use-case-6--create-a-test-run-or-a-test-run-package).
 
 **Scenario 61 · Change its test cases, name or configuration**
 Keeps rule 61.
@@ -672,6 +1328,17 @@ Keeps rule 62.
 
 ### Use case 16 · Run the automation for everything a node holds
 
+**As a** tester, **I want** to run every automated test case under a test set, a
+package or **Test Cases**, **so that** a whole area runs in one gesture.
+
+**Rules**
+
+- **Rule 63** — Running from a parent skips retired branches. Running a retired
+  test set directly still runs it. (rule 8)
+- **Rule 64** — A node with no test cases to run says so. It runs nothing.
+- **Rule 65** — Running needs the automation plugin. Without it, the item is
+  not offered.
+
 **Scenario 65 · Run from a node**
 Keeps rule 63.
 > **Given** **Test Cases**, a test set package or a test set is selected, and the automation plugin is present
@@ -691,6 +1358,45 @@ Keeps rule 64 and rule 65.
 > **Then** **Run Tests** is not in the menu
 
 ### Use case 17 · Find anything in the project
+
+**As a** tester, **I want** to type part of a name, a step or an id and jump to
+it, **so that** a large tree is never a place to scroll.
+
+**Rules**
+
+- **Rule 66** — Nodes are found by name, from the first character. Test cases
+  are searched from the second character, in every field they have.
+- **Rule 67** — Choosing a result opens the tree at it. It opens its editor too.
+
+#### Search Test Project
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│  Search Test Project                                                       │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  [find]  Go to a test set or run, or search for anything...      (1)       │
+│                                                                            │
+│  [set]  Login                                                    (2)       │
+│         Demo > Test Cases > Accounts > Login                               │
+│  [run]  cycle-2                                                            │
+│         Demo > Test Runs > Sprint 7 > cycle-2                              │
+│  [tc]   Sign in with a correct username and password                       │
+│         Demo > Test Cases > Accounts > Login                               │
+│                                                                            │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Enter Go To    ↑ ↓ Select    Escape Cancel                                │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The field** — its gray hint text reads *Go to a test set or run, or search
+   for anything...*. Before the tester types, the list holds every test set and
+   test run.
+2. **A result row** — shows:
+   - the icon
+   - the name
+   - under them, the path through the tree
+3. At most 50 rows.
 
 **Scenario 67 · Search from anywhere**
 Keeps rule 66.
@@ -713,6 +1419,19 @@ Keeps rule 67.
 > **Then** its test set's editor opens, with that test case selected
 
 ### Use case 18 · Refresh the tree from disk
+
+**As a** tester, **I want** to reload the tree after something changed outside
+the IDE, **so that** the tree shows what is on disk. A pull, a sync or a hand
+edit all change the tree from outside.
+
+**Rules**
+
+- **Rule 68** — Refresh re-reads the repository's binding first. So a test
+  project changed by hand, or changed by a branch switch, is picked up.
+- **Rule 69** — Editors on a node that no longer exists are closed. The other
+  editors are reloaded, unless they are busy.
+- **Rule 70** — Only one refresh runs at a time. A second request while one is
+  running is ignored.
 
 **Scenario 69 · Refresh**
 Keeps rule 68 and rule 69.
@@ -737,6 +1456,45 @@ Keeps rule 70.
 > **And** the test project, **Test Cases** and **Test Runs** stay visible
 
 ### Use case 19 · Switch the Git branch of the test project
+
+**As a** tester, **I want** to switch the test project's branch from the panel,
+**so that** the tree follows the branch I am testing.
+
+**Rules**
+
+- **Rule 71** — The branch box appears only for a test project shared through
+  Git.
+- **Rule 72** — Switching with uncommitted changes asks first. Switching never
+  loses them.
+- **Rule 73** — A switch that succeeds reloads the tree from the new branch.
+
+#### Uncommitted Changes
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Uncommitted Changes                                         │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  3 changes in this test project are not committed.       (1) │
+│  Switching does not leave them behind - they come with       │
+│  you, and can be committed onto release by mistake.          │
+│                                                              │
+│  From:  main                                             (2) │
+│  To:    release                                              │
+│                                                              │
+├──────────────────────────────────────────────────────────────┤
+│  Enter Switch Anyway   Shift+Enter Review Changes        (3) │
+│  Escape Cancel                                               │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **How many changes** — and the one sentence that matters. Switching does
+   not leave the changes behind. They come with the tester. They can be
+   committed onto the wrong branch by mistake.
+2. **From** and **To** — the branch the tester is on, and the branch they
+   picked.
+3. **Two confirms** — `Enter` switches anyway. `Shift+Enter` opens the review
+   instead.
 
 **Scenario 72 · The branch box**
 Keeps rule 71.
@@ -768,6 +1526,17 @@ Keeps rule 72.
 
 ### Use case 20 · See what a node holds
 
+**As a** tester, **I want** to see a node's counts, dates, status and verdict
+breakdown without opening anything, **so that** I can size a branch of the tree
+at a glance.
+
+**Rules**
+
+- **Rule 74** — Opening **Details** changes nothing, so Testin says nothing.
+  (rule 7)
+- **Rule 75** — Testin counts what a node holds when the tester asks. It never
+  saves the number.
+
 **Scenario 75 · Details**
 Keeps rule 74 and rule 75.
 > **Given** any node is selected
@@ -783,11 +1552,103 @@ Keeps rule 74 and rule 75.
 
 ## Also on this menu
 
-Six items on the tree's menu belong to another part of Testin: reports, export,
-import and sync. They are **Export**, **Import**, **Generate Report**
-(`Ctrl+P`), **Sync With Remote**, **View Pending Commits** and
-**Sync With SFTP**. That document is not written yet.
+Six items on the tree's menu belong to another part of Testin. They are
+documented there:
+
+| Item | Belongs to |
+|---|---|
+| **Export**, **Import** | Reports, export, import and sync |
+| **Generate Report** (`Ctrl+P`) | The same |
+| **Sync With Remote**, **View Pending Commits** | The same, the Git half |
+| **Sync With SFTP** | The same, the SFTP half |
 
 ---
 
-[Documentation](../README.md) › [System requirements](system-requirements.md) › **Project panel** — read with the [business requirements](../business-requirements/project-panel.md) and the [design](../design/project-panel.md)
+## Why the panel is built this way
+
+### The tree shows one test project, not a list of them
+
+The panel shows the one test project this code project is set to use, and no
+other. With a list of test projects in the tree, three things could disagree
+about which one is open:
+
+- the tree
+- the reports
+- the test runs
+
+The choice is written into the code project. So a colleague who copies that
+project down gets the same test project, with no setup.
+
+### A test run shows its status instead of a plain icon
+
+Every other row shows what it *is*. A test run shows how far it has *got*: its
+status icon, and the status word. That is the one thing a tester scanning the
+tree wants to know about a test run. Without it, they would open each one to
+find out.
+
+### Retired and cut look the same
+
+Both are gray. These three all mean "not part of current work right now":
+
+- a **Deprecated** test set
+- an **Archived** package
+- a node cut but not yet pasted
+
+One color for one meaning is easier to learn than three.
+
+### Every removal, move and copy asks first
+
+The confirmation names what will happen, as in *Remove 'Login'?* or *Move
+'Login' into 'Smoke'?*. It shows where from and where to. The confirm key is
+named for the verb. Nothing in the tree changes until the tester presses
+`Enter`.
+
+### The menu is short at the top and deep in Actions
+
+The top level holds what is done often: open and create. It also holds what
+belongs to other parts of Testin. Everything that changes a node where it sits
+is one level down, under **Actions**. So the first thing the tester sees is
+short, and anything that removes or moves something takes a second, deliberate
+step.
+
+### Order is a dialog, not a drag
+
+Dropping between rows to reorder is not offered. A number is better in three
+ways:
+
+- it is written down
+- it stays right when Testin reads the folder again
+- it is the same number the automation uses to decide the running order
+
+Dragging would be quicker, but it would leave nothing written down.
+
+---
+
+## Where the plugin breaks its own rules
+
+Stated, not hidden. Each one is a real gap, found while reading the code for
+this document. None of them has a bug report yet.
+
+| | The rule it breaks | What a tester sees |
+|---|---|---|
+| **Difference 1** | Rule 7 — one past-tense word | Creating a test run says *Run created*. Creating a test project says *Project created* or *Project cloned*. Every other creation says *Created*. |
+| **Difference 2** | Rule 38 — nothing lands in a test run | **Paste** is offered on a test run. It always refuses, with *Select a folder*. It should be grayed, as it is on a test set. |
+| **Difference 3** | Rule 9 — a signed-off test run does not change | A **Completed** or **Closed** test run can still be renamed, moved, reordered and removed from the tree. Only editing, running and its status are blocked. |
+| **Difference 4** | Rule 23, rule 26 — the dialog offers the kinds | The create dialog's two rows show no kind name. They show only their hints, *Holds test cases* and *Groups test sets*. Someone removed them while tidying up the labels, and nobody noticed. |
+| **Difference 5** | Rule 56 — Created and In Progress are the test run's own | The status popup offers **Created** and **In Progress** as choices. It also lets a test run go backwards, from **Assigned** to **Created**. |
+| **Difference 6** | Rule 76 — canceling a cut empties the clipboard | The tester cuts nodes, then presses the key that clears the gray. The nodes stay on the clipboard. The next paste still moves them, though the tester canceled the cut. |
+
+---
+
+## Not decided
+
+| | Question | Why it is open |
+|---|---|---|
+| **Question 1** | May a test run go backwards, from **Assigned** to **Created**, or from **In Progress** to **Created**? | Nothing prevents it today (difference 5). The same question for the whole product is [question 1 in the product's own document](product.md#9-undecided). |
+| **Question 2** | Should a signed-off test run be locked in the tree, as well as in its editor? | Today it is not (difference 3). Its own description says its name must not change. The tree's rename does not check. |
+| **Question 3** | What should the paste refusal say? | *Select a folder* is shown for six different reasons. Four of them are: the wrong side of the tree, the node itself, another test project, and a test run. Choosing a different folder only fixes one of the six. |
+| **Question 4** | On a Mac, should cut, paste, undo and redo in the tree use the Mac's own key for those actions, the way copy already does? | Today copy does. The other four do not. The keys are named in the key table above. |
+
+---
+
+[Documentation](../README.md) › **The project panel**
