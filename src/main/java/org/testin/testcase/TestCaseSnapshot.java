@@ -228,6 +228,24 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
             indexer.removeTestCase(testSetPath, id);
             GenType.REMOVE_TEST_CASE.getAction().execute(p, tc);
         }));
+
+        // UC-CODEGEN-011, Rule-CODEGEN-042 and Rule-CODEGEN-045.
+        //
+        // The order the cases came back in, written into the code they came back
+        // with. Restoring a case put its data back and left every method
+        // carrying the position it had after the change being undone - so
+        // undoing a drag moved the card and left the run executing in the order
+        // the tester had just taken back.
+        //
+        // It was one stale number in an annotation until the methods started
+        // being moved to match; now it is the file's layout too, which is the
+        // half a tester can see.
+        //
+        // Run on every restore rather than only after a reorder, because a
+        // snapshot does not know which kind it is - and it costs nothing when
+        // nothing moved: the sweep writes the position a method already carries
+        // and leaves a method already in its place alone.
+        if (!present.isEmpty()) GenType.UPDATE_TEST_CASE_ORDER.executeAll(p, present);
     }
 
     private static @NotNull TestCaseDto copy(final @NotNull Project p, final @NotNull TestCaseDto tc) {
