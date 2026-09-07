@@ -101,17 +101,23 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
         if (target.isEmpty()) return;
 
         final @NotNull PsiClass pc = target.get();
+
+        // Read once for the set, not once per case. Asking the class per case
+        // walked every method in it for every case, which is the whole class
+        // squared for one drag.
+        final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byCaseId(pc);
+
         @Nullable PsiElement after = null;
         int position = 0;
 
         for (final TestCaseDto tc : inSet) {
             position++;
 
-            final @NotNull Optional<PsiMethod> found = GeneratedMethod.forCase(pc, tc);
-            if (found.isEmpty()) continue;
+            final @Nullable PsiMethod pm = methods.get(tc.getId().toString());
+            if (pm == null) continue;
 
-            updateTestAnnotationAttribute(p, found.get(), "priority", String.valueOf(position));
-            after = place(pc, found.get(), after);
+            updateTestAnnotationAttribute(p, pm, "priority", String.valueOf(position));
+            after = place(pc, pm, after);
         }
     }
 

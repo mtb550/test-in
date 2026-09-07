@@ -1,14 +1,17 @@
 package org.testin.java.codegen;
 
 import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiLiteralValue;
 import com.intellij.psi.PsiMethod;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 
-import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -35,18 +38,56 @@ import java.util.Optional;
 public final class GeneratedMethod {
 
     /**
+     * The attribute carrying the case's id, which is the only part of a
+     * generated method that must never be edited.
+     */
+    private static final @NotNull String TEST_NAME = "testName";
+
+    /**
      * The method in this class carrying this case's id, and empty when none
      * does.
      */
     public static @NotNull Optional<PsiMethod> forCase(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
-        final @NotNull String targetId = tc.getId().toString();
+        return Optional.ofNullable(byCaseId(pc).get(tc.getId().toString()));
+    }
 
-        return Arrays.stream(pc.getMethods())
-                .filter(method -> testAnnotationOf(method)
-                        .map(PsiAnnotation::getText)
-                        .filter(text -> text.contains("testName") && text.contains(targetId))
-                        .isPresent())
-                .findFirst();
+    /**
+     * Every generated method in the class, by the case id it carries.
+     * <p>
+     * One pass for a caller with a set to place rather than one scan per case.
+     * The order sweep asks for all of them - the position of every case in the
+     * set, and where each method goes - so asking per case walked every method
+     * in the class for every case in the set: 120 cases in one class is 14,400
+     * scans of the same list for one drag.
+     */
+    public static @NotNull Map<String, PsiMethod> byCaseId(final @NotNull PsiClass pc) {
+        final @NotNull Map<String, PsiMethod> byId = new LinkedHashMap<>();
+
+        for (final PsiMethod pm : pc.getMethods()) {
+            caseIdOf(pm).ifPresent(id -> byId.putIfAbsent(id, pm));
+        }
+
+        return byId;
+    }
+
+    /**
+     * The case id in a method's {@code @Test}, and empty on a method that
+     * carries none.
+     * <p>
+     * Read as the attribute rather than found in the annotation's text. It used
+     * to ask whether the rendered annotation contained the word {@code testName}
+     * and contained the id, which is true of an annotation that merely mentions
+     * either - a description holding an id pasted into it answered for a case
+     * that is not this one. It also rendered the whole annotation to a string
+     * for every method of the class, for every case being asked about.
+     */
+    public static @NotNull Optional<String> caseIdOf(final @NotNull PsiMethod pm) {
+        return testAnnotationOf(pm)
+                .map(annotation -> annotation.findDeclaredAttributeValue(TEST_NAME))
+                .filter(PsiLiteralValue.class::isInstance)
+                .map(value -> ((PsiLiteralValue) value).getValue())
+                .filter(String.class::isInstance)
+                .map(String.class::cast);
     }
 
     /**
