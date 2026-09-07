@@ -149,6 +149,19 @@ public enum GenType {
      * showed it, the JSON stored it, and the suite ran the case exactly as
      * before (#166).
      */
+    /**
+     * Everything Testin writes about a case, written again from the case.
+     * <p>
+     * For CTRL+Z, which restores the case and knows nothing about the code. A
+     * snapshot is the case as it was rather than a list of what changed, so
+     * there is no one field to update - this writes them all, which is right
+     * whichever one moved.
+     */
+    RECONCILE_TEST_CASE(
+            "Restore Test Case",
+            "Restore Automation Test Method"
+    ),
+
     UPDATE_TEST_CASE_STATUS(
             "Update Test Case",
             "Update Automation Test Method Enabled"

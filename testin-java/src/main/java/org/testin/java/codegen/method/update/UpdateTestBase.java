@@ -11,7 +11,11 @@ import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenType;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.logger.Logger;
+import org.testin.java.codegen.JavaLiteral;
+import org.testin.model.Group;
+import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.NameSanitizer;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
@@ -64,6 +68,68 @@ public class UpdateTestBase {
         }
 
         pa.setDeclaredAttributeValue(attrName, value);
+    }
+
+    /**
+     * UC-CODEGEN-002, Rule-CODEGEN-013.
+     * <p>
+     * The description onto the method: into the annotation, and into the
+     * method's name.
+     * <p>
+     * Here rather than in the updater that used to hold it, because the restore
+     * writes the same thing and two copies of "what a description does to a
+     * method" is how the two come to disagree.
+     */
+    protected void writeDescription(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
+        updateTestAnnotationAttribute(p, pm, "description", JavaLiteral.of(tc.getDescription()));
+
+        // A method cannot be nameless, so a description cleared to nothing
+        // leaves the method under the name it already has - the same reason
+        // className keeps its fallback. The annotation still records that the
+        // description is now empty, which is what the case says (#155).
+        final @NotNull String newMethodName = NameSanitizer.methodName(tc.getDescription());
+        if (!newMethodName.isEmpty() && !pm.getName().equals(newMethodName)) {
+            pm.setName(newMethodName);
+        }
+    }
+
+    /**
+     * UC-CODEGEN-002, Rule-CODEGEN-015.
+     * <p>
+     * The case's groups onto the method, and the whole attribute rewritten
+     * because a group taken away has to go as well as one added.
+     */
+    protected void writeGroups(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
+        final @NotNull List<String> active = tc.getGroup().stream()
+                .filter(g -> g != Group.UNASSIGNED)
+                .map(g -> "\"" + g.getName() + "\"")
+                .toList();
+
+        updateTestAnnotationAttribute(p, pm, "groups", "{" + String.join(", ", active) + "}");
+    }
+
+    /**
+     * UC-CODEGEN-002, Rule-CODEGEN-012.
+     * <p>
+     * Disabled writes the attribute; anything else takes it off rather than
+     * writing true, so a case that was once disabled does not carry a word that
+     * says nothing.
+     */
+    protected void writeEnabled(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
+        if (tc.getStatus() == TestCaseStatus.DISABLED) updateTestAnnotationAttribute(p, pm, "enabled", "false");
+        else removeTestAnnotationAttribute(p, pm, "enabled");
+    }
+
+    /**
+     * The class a case generates into, resolved from its own path.
+     */
+    protected static @NotNull Optional<PsiClass> classOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
+        if (fqcn.size() < 2) return Optional.empty();
+
+        final @NotNull String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
+
+        return Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)));
     }
 
     /**

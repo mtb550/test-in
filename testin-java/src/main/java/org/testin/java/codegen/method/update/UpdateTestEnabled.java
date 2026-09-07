@@ -26,11 +26,6 @@ public class UpdateTestEnabled extends UpdateTestBase implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        applyUpdate(p, tc, "Update Test Case Enabled", pm -> updateEnabled(p, pm, tc));
-    }
-
-    private void updateEnabled(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
-        if (tc.getStatus() == TestCaseStatus.DISABLED) updateTestAnnotationAttribute(p, pm, "enabled", "false");
-        else removeTestAnnotationAttribute(p, pm, "enabled");
+        applyUpdate(p, tc, "Update Test Case Enabled", pm -> writeEnabled(p, pm, tc));
     }
 }

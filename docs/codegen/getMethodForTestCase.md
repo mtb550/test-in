@@ -39,6 +39,10 @@ There is no key for this. It happens when a test case is created, which is
 - **Rule-CODEGEN-017** — A test case created with no description gets no method.
 - **Rule-CODEGEN-018** — A whole sheet of test cases is written as one change,
   so it is one undo and one write.
+- **Rule-CODEGEN-068** — Undoing a change to a test case writes the case's code
+  again, in every part Testin owns: the description, the method name, the
+  groups, whether it is enabled, and where it sits. A case with no method is
+  passed over, and none is created.
 
 ## What is written
 

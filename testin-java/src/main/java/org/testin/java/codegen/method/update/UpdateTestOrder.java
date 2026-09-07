@@ -180,19 +180,4 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
         return next;
     }
 
-    /**
-     * The class these cases generate into, resolved once for the set.
-     */
-    private static @NotNull Optional<PsiClass> classOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
-        if (fqcn.size() < 2) return Optional.empty();
-
-        final @NotNull String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
-        final @NotNull Optional<PsiClass> found =
-                Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)));
-
-        if (found.isEmpty()) Logger.info("Order not written: no class " + path);
-
-        return found;
-    }
 }
