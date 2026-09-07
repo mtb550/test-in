@@ -9,8 +9,7 @@ test set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The tree panel |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-028`, apart from 024. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-088`, with no gaps. The search used to be UC-TREE-PANEL-024 and two rules here, and is now [UC-INTERNAL-001](../internal/globalSearch.md); the numbers it left were taken back when the rules were put in reading order. Every other part of Testin starts its own numbers again |
-| **Last rule** | `Rule-TREE-PANEL-088`. The next rule written here is `Rule-TREE-PANEL-089` |
+| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-028`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-088` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code |
 | **Written to** | [How a document is written](../standard.md) |

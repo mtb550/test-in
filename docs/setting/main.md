@@ -9,8 +9,7 @@ where the test data lives, who is using it, and how to reach the team's server.
 |---|---|
 | **Part of Testin** | The settings page |
 | **Answers** | What every setting does, where each one is kept, and what happens when one is wrong |
-| **Numbering** | Use cases are `UC-SETTING-001` to `UC-SETTING-011`. Rules are `Rule-SETTING-001` and up, and belong to the settings page |
-| **Last rule** | `Rule-SETTING-039`. The next rule written here is `Rule-SETTING-040` |
+| **Numbering** | Use cases are `UC-SETTING-001` to `UC-SETTING-011`. Rules are `Rule-SETTING-001` to `Rule-SETTING-039` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |

@@ -128,10 +128,10 @@ this repository does not control, in an old issue or an old commit, names the
 number as it was that day. The words of a rule are what to match on when a
 number no longer leads anywhere.
 
-**Each part's page says its last number.** The **Last rule** row of every
-`main.md` carries the highest number written in that part and the next one to
-use, so a new rule is numbered without reading the whole part first. Writing a
-rule and moving that row on is one job, not two.
+**Each part's page says its last number.** The **Numbering** row of every
+`main.md` gives the range that part's use cases and rules cover, so the next rule
+is the number after the end of it and nobody reads the whole part to find out.
+Writing a rule and moving that row on is one job, not two.
 
 **The other numbers still start again in each part.** *Question 1* and
 *Difference 1* are read beside the part they are listed in, so they are left

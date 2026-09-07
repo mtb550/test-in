@@ -9,8 +9,7 @@ in a tab. It is where test cases are written, and where a test run is executed.
 |---|---|
 | **Part of Testin** | The editor panel |
 | **Answers** | What a tester can do to test cases and to a test run, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-046`. Rules are `Rule-EDITOR-PANEL-001` and up, and belong to the editor panel |
-| **Last rule** | `Rule-EDITOR-PANEL-190`. The next rule written here is `Rule-EDITOR-PANEL-191` |
+| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-046`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-190` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |

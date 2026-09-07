@@ -101,8 +101,9 @@ is wrong. Three of the six critical defects found in September 2026 were code
 that contradicted a rule the codebase had already written down somewhere else.
 
 If the behavior is genuinely new, add the rule to the part's page and give it
-the next number. Each part's `main.md` carries a **Last rule** row saying what
-that number is; move it on in the same commit, and cite the rule from the code.
+the next number. Each part's `main.md` carries a **Numbering** row giving the
+range its rules cover, so the next number is the one after the end of it; move
+that row on in the same commit, and cite the rule from the code.
 
 ## When a method carries no rule
 

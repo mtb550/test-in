@@ -10,8 +10,7 @@ to somebody who does not have the IDE.
 |---|---|
 | **Part of Testin** | Reports |
 | **Answers** | How a report is made, what it contains, and what each format holds |
-| **Numbering** | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` and up, and belong to reports |
-| **Last rule** | `Rule-REPORT-015`. The next rule written here is `Rule-REPORT-016` |
+| **Numbering** | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` to `Rule-REPORT-015` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
