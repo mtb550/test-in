@@ -21,6 +21,7 @@ step, and every way it can be refused.
 
 | Document | What it covers | Use cases | Rules |
 |---|---|---|---|
+| **[Every shortcut](shortcuts.md)** | Every key Testin answers to, what it does, and which module it belongs to | — | — |
 | **[The product](product.md)** | What is true of all of it: who uses Testin, what they work with, every status, and the rules that hold everywhere | — | — |
 | **[The tree panel](treePanel/main.md)** | The tree on the left. Test projects, test sets, test runs, and everything done to them | 27 | 90 |
 | **[The editor panel](editorPanel/main.md)** | Writing test cases, and executing a test run. Both editors, and [light mode](editorPanel/lightMode.md) | 46 | 193 |

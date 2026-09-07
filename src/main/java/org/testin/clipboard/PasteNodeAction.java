@@ -20,8 +20,6 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -29,11 +27,10 @@ import java.util.Objects;
 
 public class PasteNodeAction extends AbstractProjectTreeAction {
 
-    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK);
 
     public PasteNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, tree, "Paste", "Paste items", AllIcons.Actions.MenuPaste);
-        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
+        this.registerCustomShortcutSet(Shortcuts.PasteItem.getCustomShortcut(), tree);
     }
 
     @Override

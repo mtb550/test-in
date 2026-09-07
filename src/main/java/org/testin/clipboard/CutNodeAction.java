@@ -10,18 +10,15 @@ import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 
 public class CutNodeAction extends DumbAwareAction {
 
-    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK);
     private final @NotNull SimpleTree tree;
 
     public CutNodeAction(final @NotNull SimpleTree tree) {
         super("Cut", "Cut selected items", AllIcons.Actions.MenuCut);
         this.tree = tree;
-        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
+        this.registerCustomShortcutSet(Shortcuts.CutItem.getCustomShortcut(), tree);
     }
 
     @Override
@@ -30,7 +27,6 @@ public class CutNodeAction extends DumbAwareAction {
             transferHandler.copySelectionToClipboard(true);
         }
     }
-
 
     /**
      * Greyed out where there is nothing to copy: a test project and the two

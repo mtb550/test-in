@@ -1,5 +1,6 @@
 package org.testin.undo;
 
+import org.testin.util.Shortcuts;
 import com.intellij.icons.AllIcons;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Done;
 
 import javax.swing.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 
 /**
  * Which way through a history a key goes, and everything that differs between
@@ -23,7 +22,7 @@ import java.awt.event.KeyEvent;
 @AllArgsConstructor
 public enum UndoDirection {
 
-    UNDO("Undo", AllIcons.Actions.Undo, KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), Done.UNDONE) {
+    UNDO("Undo", AllIcons.Actions.Undo, Shortcuts.Undo.getKey(), Done.UNDONE) {
         @Override
         public boolean can(final @NotNull UndoService service, final @NotNull UndoScope scope) {
             return service.canUndo(scope);
@@ -40,7 +39,7 @@ public enum UndoDirection {
         }
     },
 
-    REDO("Redo", AllIcons.Actions.Redo, KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK), Done.REDONE) {
+    REDO("Redo", AllIcons.Actions.Redo, Shortcuts.Redo.getKey(), Done.REDONE) {
         @Override
         public boolean can(final @NotNull UndoService service, final @NotNull UndoScope scope) {
             return service.canRedo(scope);

@@ -73,6 +73,10 @@ public enum Shortcuts {
      * leaving one platform with two different copy gestures.
      */
     CopyItem(KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask())),
+    CutItem(KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask())),
+    PasteItem(KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask())),
+    Undo(KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuMask())),
+    Redo(KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuMask())),
     DeletePackage(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)),
 
     // A confirmation's second answer - the one that is neither doing it nor
