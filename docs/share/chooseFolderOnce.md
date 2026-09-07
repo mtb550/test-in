@@ -9,10 +9,10 @@ There is no key for this. It is a tick box on the export and import dialogs.
 
 ## Rules
 
-- **Rule-SHARE-099** — The tick box is drawn only while no folder has been set
+- **Rule-SHARE-102** — The tick box is drawn only while no folder has been set
   yet.
-- **Rule-SHARE-100** — One folder is remembered, and every dialog uses it.
-- **Rule-SHARE-101** — The export dialog remembers the folder in its box. The
+- **Rule-SHARE-103** — One folder is remembered, and every dialog uses it.
+- **Rule-SHARE-104** — The export dialog remembers the folder in its box. The
   import dialog remembers the folder holding the file that was chosen.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on

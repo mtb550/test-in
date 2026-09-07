@@ -9,9 +9,9 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-140** — **Blocked** means the test case was attempted and
+- **Rule-EDITOR-PANEL-141** — **Blocked** means the test case was attempted and
   could not finish, usually because of the environment or the data.
-- **Rule-EDITOR-PANEL-141** — Recording blocked clears nothing. Anything already
+- **Rule-EDITOR-PANEL-142** — Recording blocked clears nothing. Anything already
   written about the test case stays.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.

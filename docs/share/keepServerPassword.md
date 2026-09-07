@@ -9,13 +9,13 @@ Nothing starts this. It happens when a password is typed in the account window.
 
 ## Rules
 
-- **Rule-SHARE-089** — A password is kept in the IDE's own password store. Never
+- **Rule-SHARE-092** — A password is kept in the IDE's own password store. Never
   in `testin.yml`, never on a marker file, never in the log.
-- **Rule-SHARE-090** — It is kept for one server and one account, so two
+- **Rule-SHARE-093** — It is kept for one server and one account, so two
   servers, or two accounts on one, do not overwrite each other.
-- **Rule-SHARE-091** — The name it is kept under says which server and which
+- **Rule-SHARE-094** — The name it is kept under says which server and which
   account, and holds no part of the secret.
-- **Rule-SHARE-092** — A password the tester has just typed is preferred over
+- **Rule-SHARE-095** — A password the tester has just typed is preferred over
   one kept from before, so a corrected password works on the attempt it was
   corrected on.
 

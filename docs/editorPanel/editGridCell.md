@@ -15,9 +15,11 @@
 - **Rule-EDITOR-PANEL-049** — Clicking away from an open cell saves it.
 - **Rule-EDITOR-PANEL-050** — What is stored is what Testin made of what was
   typed, and the cell is redrawn to match.
-- **Rule-EDITOR-PANEL-051** — A cell that ends up the same as it started writes
+- **Rule-EDITOR-PANEL-051** — A cell that no longer shows what was typed into it
+  says so, whether or not anything was saved.
+- **Rule-EDITOR-PANEL-052** — A cell that ends up the same as it started writes
   nothing and says nothing.
-- **Rule-EDITOR-PANEL-052** — Every cell saved is one entry on the undo history,
+- **Rule-EDITOR-PANEL-053** — Every cell saved is one entry on the undo history,
   named after the test case.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.

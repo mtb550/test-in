@@ -42,7 +42,7 @@ that wraps it.
 | A rule that holds across a whole part | `// Rule-TREE-PANEL-007` |
 | Several use cases | `// UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033` |
 
-**A rule name carries its part.** `Rule-TREE-PANEL-044` says where it lives, so
+**A rule name carries its part.** `Rule-TREE-PANEL-045` says where it lives, so
 the marker needs nothing else to be findable. It was not always so: rules were
 bare numbers until 7 September 2026, and there were eight different Rule44s. A
 marker still reading `Rule44` is from before that and names nothing.
@@ -57,7 +57,7 @@ Where the method has javadoc, the marker is a line of its own inside it, first:
 
 ```java
 /**
- * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-143.
+ * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-144.
  * <p>
  * Escape records nothing at all, neither the detail nor the verdict, because a
  * half-written failure is worse than no failure.

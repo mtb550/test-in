@@ -190,6 +190,13 @@ public final class ConflictResolution {
         final @NotNull Pending next = pending.getFirst();
         final @NotNull List<Pending> rest = pending.subList(1, pending.size());
 
+        final @NotNull Runnable skipped = () -> {
+            final @NotNull List<String> stillLeft = new ArrayList<>(leftOver);
+            stillLeft.add(next.relativePath());
+
+            ask(p, git, mapper, repositoryPath, new ArrayList<>(rest), stillLeft, onResolved, onLeftOver);
+        };
+
         new ResolveConflictDialog(p, next.name(), next.questions(), takeTheirs -> {
             for (final TestCaseMerge.Question question : next.questions()) {
                 TestCaseMerge.answer(mapper, next.merged(), question, takeTheirs.contains(question.field()),
@@ -204,7 +211,7 @@ public final class ConflictResolution {
                 ApplicationManager.getApplication().invokeLater(() ->
                         ask(p, git, mapper, repositoryPath, new ArrayList<>(rest), stillLeft, onResolved, onLeftOver));
             });
-        }).show();
+        }, skipped).show();
     }
 
     /**
@@ -212,6 +219,7 @@ public final class ConflictResolution {
      * is over. Answers whether both halves worked - a file written and not
      * staged would stop the rebase again with no conflict left to see.
      */
+    // UC-SHARE-017, Rule-SHARE-003
     private static boolean keep(final @NotNull Project p, final @NotNull GitRepositoryService git, final @NotNull Path repositoryPath, final @NotNull String relativePath, final @NotNull ObjectNode merged) {
         try {
             Files.writeString(repositoryPath.resolve(relativePath), merged.toPrettyString(), StandardCharsets.UTF_8);
@@ -225,7 +233,13 @@ public final class ConflictResolution {
 
         if (git.stageResolved(repositoryPath, relativePath)) return true;
 
+        // Said, not only logged. A merged file Git will not take stops the pull
+        // again with no conflict on screen to explain it, so the tester saw a
+        // sync that simply refused to finish and nothing about why (#259).
         Logger.error("Merged but could not stage " + relativePath);
+        Services.getInstance(p, Notifier.class).error(p, "Merge Not Accepted",
+                "Testin merged " + relativePath + " but Git would not stage it, so the sync cannot go on. "
+                        + "Resolve that file in Git yourself, then sync again.");
         return false;
     }
 

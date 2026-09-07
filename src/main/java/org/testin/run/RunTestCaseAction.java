@@ -44,7 +44,7 @@ public class RunTestCaseAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.RunTestCase.getCustomShortcut(), list);
     }
 
-    // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-149
+    // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-150
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @NotNull List<TestCaseDto> selected = list.getSelectedValuesList();

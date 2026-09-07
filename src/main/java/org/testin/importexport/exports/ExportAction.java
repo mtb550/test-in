@@ -17,11 +17,11 @@ import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.ui.dialogs.DestinationForm;
+import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.BackgroundWork;
 import org.testin.util.Mapper;
 
@@ -53,7 +53,8 @@ public class ExportAction extends AbstractProjectTreeAction {
         final @NotNull VirtualFile targetDir = resolved.get();
 
         BackgroundWork.run(p, "Reading test cases in " + dirDto.getName(), "Export Failed", gathering -> {
-            final @NotNull Map<String, List<TestCaseDto>> sheets = gatherData(targetDir, dirDto);
+            final @NotNull Gathered gathered = gather(targetDir);
+            final @NotNull Map<String, List<TestCaseDto>> sheets = gathered.sheets();
             if (sheets.isEmpty()) {
                 ApplicationManager.getApplication().invokeLater(() ->
                         Services.getInstance(p, Notifier.class).softRefuse(p, "Export Empty", "No test cases found."));
@@ -61,13 +62,43 @@ public class ExportAction extends AbstractProjectTreeAction {
             }
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                // The framework dialog reports through this callback rather
-                // than a return code, so the destination is never read back
-                // out of a dialog that was canceled. It hands back the cases
-                // the tester left ticked, not the ones gathered above.
-                new ExportDialog(p, exportAttributes, sheets, targetDir, this::writeExport).show();
+                if (gathered.unreadable().isEmpty()) {
+                    chooseWhatToExport(sheets, targetDir);
+                    return;
+                }
+
+                // Before the file is written, not after: an export missing test
+                // cases looks exactly like a whole one, and the count in the
+                // Exported message counts what was gathered, so it looks right
+                // too (#263).
+                new ConfirmDialog(p, "Some test cases could not be read", unreadableWarning(gathered.unreadable()),
+                        "", "", "Export anyway", () -> chooseWhatToExport(sheets, targetDir)).show();
             });
         });
+    }
+
+    /**
+     * The framework dialog reports through this callback rather than a return
+     * code, so the destination is never read back out of a dialog that was
+     * canceled. It hands back the cases the tester left ticked, not the ones
+     * gathered above.
+     */
+    private void chooseWhatToExport(final @NotNull Map<String, List<TestCaseDto>> sheets, final @NotNull VirtualFile targetDir) {
+        new ExportDialog(p, exportAttributes, sheets, targetDir, this::writeExport).show();
+    }
+
+    /**
+     * UC-SHARE-002, Rule-SHARE-001.
+     * <p>
+     * What is about to be missing, named rather than counted: a tester who
+     * recognises the file knows whether the export is worth sending.
+     */
+    private static @NotNull String unreadableWarning(final @NotNull List<String> unreadable) {
+        final @NotNull String named = String.join(", ", unreadable.subList(0, Math.min(5, unreadable.size())));
+        final @NotNull String rest = unreadable.size() > 5 ? ", and " + (unreadable.size() - 5) + " more" : "";
+        final @NotNull String count = unreadable.size() == 1 ? "One test case file" : unreadable.size() + " test case files";
+
+        return count + " could not be read and will not be in the export: " + named + rest + ".";
     }
 
     /**
@@ -87,22 +118,75 @@ public class ExportAction extends AbstractProjectTreeAction {
                 });
     }
 
-    public @NotNull Map<String, List<TestCaseDto>> gatherData(final @NotNull VirtualFile targetDirectory, final @NotNull DirectoryDto dirDto) {
-        final @NotNull Map<String, List<TestCaseDto>> allSheets = new LinkedHashMap<>();
+    /**
+     * What a walk of the exported node found: one sheet per folder holding test
+     * cases, and the test case files it could not read.
+     */
+    public record Gathered(@NotNull Map<String, List<TestCaseDto>> sheets, @NotNull List<String> unreadable) {
+    }
 
-        if (dirDto instanceof TestSetDirectoryDto) {
-            allSheets.put(targetDirectory.getName(), loadTestCasesInOrder(p, targetDirectory));
-        } else {
-            for (final VirtualFile child : childrenOf(targetDirectory)) {
-                if (child.isDirectory()) {
-                    final @NotNull List<TestCaseDto> tcs = loadTestCasesInOrder(p, child);
-                    if (!tcs.isEmpty()) {
-                        allSheets.put(child.getName(), tcs);
-                    }
-                }
-            }
+    /**
+     * UC-SHARE-002, Rule-SHARE-001.
+     * <p>
+     * Every test set beneath the node, however deep.
+     * <p>
+     * It used to look one level down and no further, so exporting a package
+     * whose test sets sit inside sub-packages gathered nothing from them - and
+     * said nothing, so the tester sent a file missing most of what they meant to
+     * send (#262).
+     * <p>
+     * One walk for both kinds of node. A test set holds its cases directly and
+     * has no folders under it, so the recursion simply stops - which is what the
+     * two branches here used to say the long way.
+     */
+    private @NotNull Gathered gather(final @NotNull VirtualFile targetDirectory) {
+        final @NotNull List<Sheet> found = new ArrayList<>();
+        final @NotNull List<String> unreadable = new ArrayList<>();
+
+        walk(targetDirectory, List.of(targetDirectory.getName()), found, unreadable);
+
+        final @NotNull Map<String, List<TestCaseDto>> sheets = new LinkedHashMap<>();
+        for (final Sheet sheet : found) sheets.put(uniqueKey(sheets, sheet.path()), sheet.cases());
+
+        return new Gathered(sheets, unreadable);
+    }
+
+    /**
+     * One folder that holds test cases, and where it sits under the node being
+     * exported. The path is kept rather than a name because two test sets in
+     * different sub-packages can share one.
+     */
+    private record Sheet(@NotNull List<String> path, @NotNull List<TestCaseDto> cases) {
+    }
+
+    private void walk(final @NotNull VirtualFile dir, final @NotNull List<String> path, final @NotNull List<Sheet> found, final @NotNull List<String> unreadable) {
+        final @NotNull List<TestCaseDto> here = loadTestCasesInOrder(p, dir, unreadable);
+        if (!here.isEmpty()) found.add(new Sheet(path, here));
+
+        for (final VirtualFile child : childrenOf(dir)) {
+            if (!child.isDirectory()) continue;
+
+            final @NotNull List<String> under = new ArrayList<>(path);
+            under.add(child.getName());
+            walk(child, under, found, unreadable);
         }
-        return allSheets;
+    }
+
+    /**
+     * The shortest tail of a test set's path that no earlier sheet has taken -
+     * its own name where that is free, and its parent's name in front of it
+     * where it is not.
+     * <p>
+     * A name rather than a number, because the tester reads these as sheet
+     * titles and has to tell two same-named test sets apart by where they live.
+     */
+    private static @NotNull String uniqueKey(final @NotNull Map<String, ?> taken, final @NotNull List<String> path) {
+        for (int from = path.size() - 1; from >= 0; from--) {
+            final @NotNull String key = String.join(" - ", path.subList(from, path.size()));
+            if (!taken.containsKey(key)) return key;
+        }
+
+        return String.join(" - ", path) + " (" + (taken.size() + 1) + ")";
     }
 
     /**
@@ -122,7 +206,14 @@ public class ExportAction extends AbstractProjectTreeAction {
         return Objects.requireNonNullElse(dir.getChildren(), VirtualFile.EMPTY_ARRAY);
     }
 
-    public @NotNull List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project p, final @NotNull VirtualFile dir) {
+    /**
+     * UC-SHARE-002, Rule-SHARE-001.
+     * <p>
+     * The test cases in one folder, and the names of the files that would not
+     * read. The failures used to go to the log alone, where nothing points at
+     * them (#263).
+     */
+    public @NotNull List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project p, final @NotNull VirtualFile dir, final @NotNull List<String> unreadable) {
         final @NotNull List<TestCaseDto> loaded = new ArrayList<>();
 
         for (final VirtualFile file : childrenOf(dir)) {
@@ -131,6 +222,7 @@ public class ExportAction extends AbstractProjectTreeAction {
                     loaded.add(Services.getInstance(p, Mapper.class).readValue(is, TestCaseDto.class));
                 } catch (final Exception ex) {
                     Logger.error("Loading test cases failed: " + ex.getMessage());
+                    unreadable.add(file.getName());
                 }
             }
         }

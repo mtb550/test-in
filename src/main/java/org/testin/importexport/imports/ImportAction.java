@@ -112,20 +112,41 @@ public class ImportAction extends AbstractProjectTreeAction {
             final long readyAt = System.currentTimeMillis();
 
             int imported = 0;
-            for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set
-                    : targetSets(p, selectedDirDto, targetPath, selectedCasesBySheet).entrySet()) {
+            try {
+                for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set
+                        : targetSets(p, selectedDirDto, targetPath, selectedCasesBySheet).entrySet()) {
 
-                final @NotNull TestSetDirectoryDto into = set.getKey();
-                final @NotNull List<TestCaseDto> cases = set.getValue();
-                final @NotNull Path setPath = into.getPath();
+                    final @NotNull TestSetDirectoryDto into = set.getKey();
+                    final @NotNull List<TestCaseDto> cases = set.getValue();
+                    final @NotNull Path setPath = into.getPath();
 
-                linkAndSaveTestCases(p, setPath, cases, rankOfTail(p, setPath), indicator, imported, total);
+                    linkAndSaveTestCases(p, setPath, cases, rankOfTail(p, setPath), indicator, imported, total);
 
-                for (final TestCaseDto tc : cases) tc.setParent(into);
+                    for (final TestCaseDto tc : cases) tc.setParent(into);
 
-                if (generateCode) generateTestMethods(p, cases, into.getName(), indicator);
+                    if (generateCode) generateTestMethods(p, cases, into.getName(), indicator);
 
-                imported += cases.size();
+                    imported += cases.size();
+                }
+            } catch (final Exception ex) {
+                // UC-SHARE-007, Rule-SHARE-002.
+                //
+                // Caught here rather than left to BackgroundWork, which reports
+                // the reason and knows nothing about the count. An import writes
+                // a file per test case, so a failure part way leaves what it
+                // already wrote - and the tester was told only that it failed,
+                // with nothing to say whether there was anything to clean up
+                // (#260).
+                //
+                // "At least", because the set being written when it stopped may
+                // have got some of the way through. It is the number the tester
+                // can act on: the sets before it are whole.
+                Logger.error("Import failed after at least " + imported + " of " + total + ": " + ex.getMessage());
+
+                Services.getInstance(p, Notifier.class).error(p, "Import Failed",
+                        "At least " + imported + " of " + total + " test cases were written before it stopped, and "
+                                + "they are still there. " + ex.getMessage());
+                return;
             }
 
             // The set the tester was standing on is reopened, so what they just

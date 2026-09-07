@@ -10,9 +10,9 @@ There is no key that works here. The button's tooltip names `Shift+F5`, and
 
 ## Rules
 
-- **Rule-VIEW-PANEL-055** — The button is drawn only where the IDE has the Java
+- **Rule-VIEW-PANEL-056** — The button is drawn only where the IDE has the Java
   plugin.
-- **Rule-VIEW-PANEL-056** — The button is the first of the two, before the run
+- **Rule-VIEW-PANEL-057** — The button is the first of the two, before the run
   button.
 
 Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They

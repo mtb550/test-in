@@ -59,7 +59,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
-    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-143
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-144
     @Override
     protected boolean holdsUnsavedInput() {
         return fields.changedFrom(runItem);

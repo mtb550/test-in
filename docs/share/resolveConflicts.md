@@ -9,15 +9,18 @@ There is no key for this. The offer appears on the message.
 
 ## Rules
 
-- **Rule-SHARE-072** — A pull that stops leaves the repository part way through,
+- **Rule-SHARE-074** — A merged test case Git will not stage is reported to the
+  tester, with what to do about it. The sync cannot go on without it.
+
+- **Rule-SHARE-075** — A pull that stops leaves the repository part way through,
   and Testin says so rather than leaving the tester to find out.
-- **Rule-SHARE-073** — Two answers are offered: carry on once it is settled, or
+- **Rule-SHARE-076** — Two answers are offered: carry on once it is settled, or
   roll the whole pull back.
-- **Rule-SHARE-074** — Rolling back keeps everything that was here before the
+- **Rule-SHARE-077** — Rolling back keeps everything that was here before the
   pull.
-- **Rule-SHARE-075** — Where both sides changed different fields of one test
+- **Rule-SHARE-078** — Where both sides changed different fields of one test
   case, Testin merges them and asks only about the fields that really disagree.
-- **Rule-SHARE-076** — A pull that will not move on is reported only to the log.
+- **Rule-SHARE-079** — A pull that will not move on is reported only to the log.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).

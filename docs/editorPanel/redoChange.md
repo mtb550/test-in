@@ -9,9 +9,9 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-070** — The menu entry says what the next press would put
+- **Rule-EDITOR-PANEL-071** — The menu entry says what the next press would put
   back.
-- **Rule-EDITOR-PANEL-071** — Making any new change clears everything waiting to
+- **Rule-EDITOR-PANEL-072** — Making any new change clears everything waiting to
   be put back.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.

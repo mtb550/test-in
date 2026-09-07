@@ -10,18 +10,18 @@ There is no key for this. The menu entry is **Import**.
 
 ## Rules
 
-- **Rule-SHARE-023** — Every imported test case is new, with a new identity. An
+- **Rule-SHARE-024** — Every imported test case is new, with a new identity. An
   import never overwrites a test case that is already there.
-- **Rule-SHARE-024** — Imported test cases land after everything already in the
+- **Rule-SHARE-025** — Imported test cases land after everything already in the
   test set. Nothing already there is touched.
-- **Rule-SHARE-025** — An imported test case keeps the audit the file carried,
+- **Rule-SHARE-026** — An imported test case keeps the audit the file carried,
   rather than being stamped as written now.
-- **Rule-SHARE-026** — Every sheet in the file goes into this one test set.
-- **Rule-SHARE-027** — The file is read as soon as the box holds a path Testin
+- **Rule-SHARE-027** — Every sheet in the file goes into this one test set.
+- **Rule-SHARE-028** — The file is read as soon as the box holds a path Testin
   recognizes.
-- **Rule-SHARE-028** — Thirteen columns are read. **Order**, **ID**, **FQCN**,
+- **Rule-SHARE-029** — Thirteen columns are read. **Order**, **ID**, **FQCN**,
   **Path** and **Status** are not.
-- **Rule-SHARE-029** — Importing the same file twice makes two copies of
+- **Rule-SHARE-030** — Importing the same file twice makes two copies of
   everything.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on

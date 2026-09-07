@@ -9,9 +9,9 @@ There is no key for this. The links are on the message.
 
 ## Rules
 
-- **Rule-SHARE-021** — A web page export opens in the browser. Every other
+- **Rule-SHARE-022** — A web page export opens in the browser. Every other
   format is handed to whatever application claims it.
-- **Rule-SHARE-022** — Clicking either link makes the message go.
+- **Rule-SHARE-023** — Clicking either link makes the message go.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).

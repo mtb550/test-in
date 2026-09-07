@@ -227,6 +227,7 @@ public class DetailsTab {
         }.registerCustomShortcutSet(Shortcuts.UpdateItem.getCustomShortcut(), detailsTab);
     }
 
+    // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007
     private void openUpdateMenu(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
         final @NotNull List<TestCaseDto> items = List.of(dto);
 
@@ -261,10 +262,19 @@ public class DetailsTab {
 
                         ApplicationManager.getApplication().invokeLater(() -> TestCaseUpdateMenuDialog.applyAftermath(p, tcs, gt));
                     },
-                    // Said once, where it happened. A dropped edit that says
-                    // nothing anywhere is one nobody can explain afterwards.
-                    () -> Logger.warn("No test set to write '" + dto.getDescription()
-                            + "' to - the edit was not saved"));
+                    // Said once, where it happened, and said to the tester as
+                    // well as to the log. An edit that reaches no disk and no
+                    // screen is one the tester believes they made - and they
+                    // find out at the next open, with no idea which change went
+                    // (#234).
+                    () -> {
+                        Logger.warn("No test set to write '" + dto.getDescription()
+                                + "' to - the edit was not saved");
+
+                        Services.getInstance(p, Notifier.class).softRefuse(p, "Not Saved",
+                                "This test case was opened without its test set, so there is nowhere to write the "
+                                        + "change. Open it from the tree and edit it there.");
+                    });
         }).show();
     }
 

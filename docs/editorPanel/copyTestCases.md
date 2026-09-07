@@ -10,11 +10,11 @@ tests.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-074** — Copying puts the test cases themselves on the
+- **Rule-EDITOR-PANEL-075** — Copying puts the test cases themselves on the
   clipboard, not their text.
-- **Rule-EDITOR-PANEL-075** — Copying calls off any cut that was waiting, and
+- **Rule-EDITOR-PANEL-076** — Copying calls off any cut that was waiting, and
   the faded cards come back.
-- **Rule-EDITOR-PANEL-076** — The key works in both views.
+- **Rule-EDITOR-PANEL-077** — The key works in both views.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on

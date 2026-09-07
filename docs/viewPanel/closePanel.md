@@ -9,12 +9,12 @@
 
 ## Rules
 
-- **Rule-VIEW-PANEL-057** — `Escape` in the editor does three things in order.
+- **Rule-VIEW-PANEL-058** — `Escape` in the editor does three things in order.
   It drops a pending cut, then closes the panel, then clears the selection. One
   press does one of them.
-- **Rule-VIEW-PANEL-058** — A panel the tester closed stays closed. Moving the
+- **Rule-VIEW-PANEL-059** — A panel the tester closed stays closed. Moving the
   selection does not open it again.
-- **Rule-VIEW-PANEL-059** — Closing the editor a test case came from closes the
+- **Rule-VIEW-PANEL-060** — Closing the editor a test case came from closes the
   panel too.
 
 Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They

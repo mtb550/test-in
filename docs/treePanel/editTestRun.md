@@ -11,14 +11,14 @@ being recreated.
 
 ## Rules
 
-- **Rule-TREE-PANEL-071** — A signed-off test run cannot be edited.
+- **Rule-TREE-PANEL-073** — A signed-off test run cannot be edited.
   (Rule-TREE-PANEL-009)
-- **Rule-TREE-PANEL-072** — Removing a test case from a test run drops
+- **Rule-TREE-PANEL-074** — Removing a test case from a test run drops
   everything that test case recorded in that test run. Adding a test case adds
   it as **Pending**.
-- **Rule-TREE-PANEL-073** — An edit can be undone, as one step.
-  (Rule-TREE-PANEL-058)
-- **Rule-TREE-PANEL-074** — A test case that was deleted from its test set after
+- **Rule-TREE-PANEL-075** — An edit can be undone, as one step.
+  (Rule-TREE-PANEL-060)
+- **Rule-TREE-PANEL-076** — A test case that was deleted from its test set after
   the test run was made is not in this dialog. What the test run recorded about
   it is kept, because a row that cannot be shown cannot have been unticked.
 

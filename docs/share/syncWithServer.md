@@ -10,18 +10,18 @@ There is no key for this. The menu entry is **Sync With SFTP**.
 
 ## Rules
 
-- **Rule-SHARE-082** — The server's address comes from `testin.yml`, which the
+- **Rule-SHARE-085** — The server's address comes from `testin.yml`, which the
   team shares. The account comes from this machine's settings.
-- **Rule-SHARE-083** — An account is never written into the shared file. If one
+- **Rule-SHARE-086** — An account is never written into the shared file. If one
   is found there it is ignored, and the log says so.
-- **Rule-SHARE-084** — Only one machine syncs a test project at a time. A second
+- **Rule-SHARE-087** — Only one machine syncs a test project at a time. A second
   is told who is syncing.
-- **Rule-SHARE-085** — The server must already be known to this machine. One
+- **Rule-SHARE-088** — The server must already be known to this machine. One
   that is not is refused rather than trusted.
-- **Rule-SHARE-086** — The sync sends and takes in one gesture.
-- **Rule-SHARE-087** — A file both sides changed is kept as it is here, and
+- **Rule-SHARE-089** — The sync sends and takes in one gesture.
+- **Rule-SHARE-090** — A file both sides changed is kept as it is here, and
   nothing is sent for it.
-- **Rule-SHARE-088** — Testin reads the test project again itself after a sync,
+- **Rule-SHARE-091** — Testin reads the test project again itself after a sync,
   because it ignores its own writes.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on

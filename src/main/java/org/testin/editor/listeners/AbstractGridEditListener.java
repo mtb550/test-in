@@ -74,7 +74,21 @@ public abstract class AbstractGridEditListener implements TableModelListener {
 
         updating = true;
         try {
-            if (!apply(model, edited, row, col)) return;
+            // Read before apply, which is what replaces it: both grids write the
+            // stored form back into the cell, so the tester can be left looking
+            // at a value they did not type.
+            final @NotNull String typed = String.valueOf(model.getValueAt(row, col));
+
+            final boolean changed = apply(model, edited, row, col);
+
+            // Before the question of whether anything was saved, and asked even
+            // when nothing was. A description that loses the characters Testin
+            // will not keep can come back as the value the row already had, so
+            // nothing is written, nothing is confirmed - and the tester watches
+            // their own text change with nothing said about it (#203).
+            sayIfRewritten(typed, String.valueOf(model.getValueAt(row, col)));
+
+            if (!changed) return;
 
             confirmEdit();
 
@@ -114,5 +128,37 @@ public abstract class AbstractGridEditListener implements TableModelListener {
      */
     private void confirmEdit() {
         Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
+    }
+
+    /**
+     * UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-005.
+     * <p>
+     * What the cell holds now, when that is not what was typed into it.
+     * <p>
+     * Testin stores what the tester typed, or refuses it and says why. The third
+     * answer - store something else and say nothing - is the one they cannot
+     * argue with, because they are never told it happened.
+     * <p>
+     * Here rather than in either grid, for the same reason the confirmation is:
+     * two copies is how the two grids come to say different things about one
+     * act. Only on a real difference, so the ordinary edit is silent - a value
+     * that survives the setter unchanged, which is almost every value, never
+     * reaches this.
+     */
+    private void sayIfRewritten(final @NotNull String typed, final @NotNull String stored) {
+        if (typed.equals(stored)) return;
+
+        Services.getInstance(p, Notifier.class).softShow(p, "Adjusted",
+                "Testin stored '" + shortened(stored) + "' rather than '" + shortened(typed) + "'.");
+    }
+
+    /**
+     * Enough of a value to recognise it. A steps list runs to paragraphs, and a
+     * balloon holding two of them is one nobody reads.
+     */
+    private static @NotNull String shortened(final @NotNull String value) {
+        final @NotNull String oneLine = value.replace('\n', ' ').trim();
+
+        return oneLine.length() <= 60 ? oneLine : oneLine.substring(0, 59) + "\u2026";
     }
 }

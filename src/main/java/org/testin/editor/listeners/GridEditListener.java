@@ -1,5 +1,6 @@
 package org.testin.editor.listeners;
 
+import org.testin.notifications.Notifier;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +64,9 @@ public class GridEditListener extends AbstractGridEditListener {
         final @NotNull Object after = attr.gridValue(p, tc);
 
         // Always write the normalized value back to the cell - it renumbers
-        // steps and drops blank entries even when nothing really changed.
+        // steps and drops blank entries even when nothing really changed. That
+        // the cell may now differ from what was typed is said by the parent,
+        // which both grids run through (#203).
         model.setValueAt(after, row, col);
 
         if (Objects.equals(before, after)) return false;

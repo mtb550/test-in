@@ -9,13 +9,13 @@ There is no key for this. The table is in the export dialog.
 
 ## Rules
 
-- **Rule-SHARE-016** — Every test case arrives ticked.
-- **Rule-SHARE-017** — The box in the first column's heading ticks or unticks
+- **Rule-SHARE-017** — Every test case arrives ticked.
+- **Rule-SHARE-018** — The box in the first column's heading ticks or unticks
   the whole tab.
-- **Rule-SHARE-018** — Every column but the number can be typed into.
-- **Rule-SHARE-019** — A correction made here changes the file, and never the
+- **Rule-SHARE-019** — Every column but the number can be typed into.
+- **Rule-SHARE-020** — A correction made here changes the file, and never the
   test case itself.
-- **Rule-SHARE-020** — Moving away from a cell saves what was typed in it.
+- **Rule-SHARE-021** — Moving away from a cell saves what was typed in it.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).

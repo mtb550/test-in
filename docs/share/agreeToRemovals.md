@@ -9,10 +9,10 @@ There is no key for this. The question comes after the sync.
 
 ## Rules
 
-- **Rule-SHARE-096** — A sync never deletes anything on its own. It asks.
-- **Rule-SHARE-097** — Only files this machine has not touched since are offered
+- **Rule-SHARE-099** — A sync never deletes anything on its own. It asks.
+- **Rule-SHARE-100** — Only files this machine has not touched since are offered
   for removal.
-- **Rule-SHARE-098** — Saying no offers the same choice again on the next sync.
+- **Rule-SHARE-101** — Saying no offers the same choice again on the next sync.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).

@@ -39,7 +39,16 @@ public class OrderNodeAction extends AbstractProjectTreeAction {
         selected().ifPresent(node -> new OrderDialog(p, node.getOrder(), order -> apply(node, order)).show());
     }
 
+    /**
+     * UC-TREE-PANEL-015, Rule-TREE-PANEL-055.
+     * <p>
+     * Ordered is said when the node moved, and not when it did not. Re-typing
+     * the number a node already has writes the same marker and used to raise the
+     * same message, which reads as an answer to a change nobody made (#193).
+     */
     private void apply(final @NotNull DirectoryDto node, final int order) {
+        if (node.getOrder() == order) return;
+
         node.getMarker().setOrder(order);
         Services.getInstance(p, ProjectIndexer.class).persistMarker(node);
 

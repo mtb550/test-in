@@ -9,11 +9,11 @@ There is no key for this. The questions come after the sync.
 
 ## Rules
 
-- **Rule-SHARE-093** — A file both sides changed is kept as it is here, and
+- **Rule-SHARE-096** — A file both sides changed is kept as it is here, and
   nothing is sent for it, until the tester answers.
-- **Rule-SHARE-094** — The tester is asked only about the fields that really
+- **Rule-SHARE-097** — The tester is asked only about the fields that really
   disagree.
-- **Rule-SHARE-095** — The answers are sent on the same sync, if nobody else has
+- **Rule-SHARE-098** — The answers are sent on the same sync, if nobody else has
   taken the lock in the meantime.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on

@@ -9,14 +9,14 @@ There is no key for this. **Commit** is behind the arrow of the split button.
 
 ## Rules
 
-- **Rule-SHARE-052** — The marker files above every committed test case are
+- **Rule-SHARE-054** — The marker files above every committed test case are
   committed too, whether they were ticked or not.
-- **Rule-SHARE-053** — Only a path that is really on disk is added. A path that
+- **Rule-SHARE-055** — Only a path that is really on disk is added. A path that
   is gone is committed as the removal it is.
-- **Rule-SHARE-054** — No Git command Testin runs may open an editor.
-- **Rule-SHARE-055** — A password inside a remote address is never written to
+- **Rule-SHARE-056** — No Git command Testin runs may open an editor.
+- **Rule-SHARE-057** — A password inside a remote address is never written to
   the log or shown.
-- **Rule-SHARE-056** — The list of paths reaches Git in a file, not on the
+- **Rule-SHARE-058** — The list of paths reaches Git in a file, not on the
   command line, so a very large commit does not fail for length.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on

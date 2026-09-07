@@ -10,9 +10,9 @@ repository.
 
 ## Rules
 
-- **Rule-SHARE-040** — Testin offers to make the repository at the moment it
+- **Rule-SHARE-042** — Testin offers to make the repository at the moment it
   finds there is none.
-- **Rule-SHARE-041** — Nothing is committed by making the repository. Only the
+- **Rule-SHARE-043** — Nothing is committed by making the repository. Only the
   repository itself is made.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on

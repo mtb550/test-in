@@ -179,7 +179,7 @@ public class TransferListener extends TransferHandler {
      * after the card it was dropped under, which is the one position the tester
      * can actually point at.
      */
-    // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-058
+    // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-059
     private @NotNull Optional<TestCaseDto> anchorAboveDrop(final @NotNull TransferSupport support, final @NotNull Set<UUID> movedIds) {
         if (!(support.getComponent() instanceof JBList<?> target)) return Optional.empty();
 

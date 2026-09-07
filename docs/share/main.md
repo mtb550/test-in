@@ -10,7 +10,7 @@ team pulls, or a server the plugin syncs with.
 |---|---|
 | **Part of Testin** | Sharing work with the team |
 | **Answers** | How test cases leave Testin and come back, and how a test project is kept in step with a team |
-| **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` to `Rule-SHARE-101` |
+| **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` to `Rule-SHARE-104` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -186,12 +186,7 @@ bug report yet.
 |---|---|---|
 | **Difference 1** | Rule-SHARE-005 — a refusal is stated | Leaving the folder, the file name or the format empty in the export or report dialog says nothing at all. The cursor moves and the dialog stays open. |
 | **Difference 2** | Rule-SHARE-006 — a dialog answers `Enter` | `Enter` does nothing in the export, import and review dialogs. Only a button confirms them. |
-| **Difference 3** | Rule-SHARE-002 — an answer the tester gave is used | `Escape` on a merge question throws away every answer already given for that sync, with no message, and nothing more is asked. |
-| **Difference 4** | Rule-SHARE-003 — the tester knows what happened | A merged file Git will not take is reported only to the log. The pull stops again with no conflict on screen to explain it. |
-| **Difference 5** | Rule-SHARE-002 — an import is all or nothing | An import that fails part way leaves what it already wrote. Nothing says how many landed. |
 | **Difference 6** | Rule-SHARE-003 — a conflict is put to the tester | Two fields are settled without asking. The order always takes the other side's value, and who changed it last always takes the later edit. |
-| **Difference 7** | Rule-SHARE-001 — an export writes what is there | Exporting a package walks only one level down. A test set nested two levels deep contributes nothing, and nothing says so. |
-| **Difference 8** | Rule-SHARE-001 — the same | A test case file that cannot be read is left out of an export in silence, and the count in the message is of what was gathered. |
 | **Difference 9** | Rule-SHARE-002 — a value the tester typed is kept or refused | An unreadable value is quietly replaced in four different ways. A priority becomes the lowest, a group is dropped, a date becomes blank, a status keeps its old value. |
 | **Difference 10** | Rule-SHARE-002 — what is offered can be used | **No Group** is offered in the group picker and cannot be imported back. It is dropped without a word. |
 | **Difference 11** | Rule-SHARE-005 — long work is watched | Parsing an import file has no progress bar at all, and runs on every keystroke in the source box. A large workbook makes the dialog look frozen. |
@@ -199,10 +194,22 @@ bug report yet.
 | **Difference 13** | Rule-SHARE-006 — one look for one thing | Choosing a file Testin cannot import does nothing and says nothing. |
 | **Difference 14** | Rule-SHARE-003 — one word for one outcome | A Git sync says *Synced* and fades. A Git push says *Pushed* and stays in the notification list. A server sync says *Synced* and fades, unless there were conflicts, when it stays. |
 | **Difference 15** | Rule-SHARE-003 — a count reads as a count | A message about one thing reads *Exported*. A message about none reads *Exported 0*. |
+
 | **Difference 16** | Rule-SHARE-003 — the tester is told | A message can be shown to nobody. When the code project's window has no status bar, the message is dropped and nothing is reported. Every success here is that kind of message. |
 | **Difference 17** | Rule-SHARE-006 — a refusal that cannot happen is not written | The import refusal naming which nodes can be imported into can never be seen. The menu entry is already gray in exactly that case. |
 | **Difference 18** | Rule-SHARE-004 — a value is checked before it is used | Neither the remote address nor the Git email address is checked. Any text is taken, and the failure arrives later in Git's own words. |
 | **Difference 19** | Rule-SHARE-006 — a missing feature says so | Sync with a server is offered in every IDE. The two Git entries vanish with no word, so a tester has no way to learn the Git plugin is why. |
+
+**Fixed since this list was written.** The numbers are left out rather than
+closed up, so an issue that quotes one still points at the right thing.
+
+| Gone | Was |
+|---|---|
+| **Difference 3** | Escape on a merge question ended the whole sync and threw away every answer already given. Fixed 7 September 2026, [#258](https://github.com/mtb550/test-in/issues/258) |
+| **Difference 4** | A merged file Git would not stage was reported only to the log. Fixed 7 September 2026, [#259](https://github.com/mtb550/test-in/issues/259) |
+| **Difference 5** | An import that failed part way left what it had written and said nothing about how much. Fixed 7 September 2026, [#260](https://github.com/mtb550/test-in/issues/260) |
+| **Difference 7** | Exporting a package walked only one level down, so nested test sets contributed nothing. Fixed 7 September 2026, [#262](https://github.com/mtb550/test-in/issues/262) |
+| **Difference 8** | A test case file that would not read was dropped from an export in silence. Fixed 7 September 2026, [#263](https://github.com/mtb550/test-in/issues/263) |
 
 ---
 

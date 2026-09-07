@@ -9,9 +9,9 @@ There is no key for this. The button is at the far right of the toolbar.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-120** — The dialog is about the node the editor is
+- **Rule-EDITOR-PANEL-121** — The dialog is about the node the editor is
   showing, not about the test case that is selected.
-- **Rule-EDITOR-PANEL-121** — The counts are worked out as the dialog opens and
+- **Rule-EDITOR-PANEL-122** — The counts are worked out as the dialog opens and
   stored nowhere.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.

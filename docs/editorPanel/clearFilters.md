@@ -10,9 +10,9 @@ There is no key for this. The entry is at the top of the filter menu.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-098** — **Reset Filters** clears the priority, the group,
+- **Rule-EDITOR-PANEL-099** — **Reset Filters** clears the priority, the group,
   the module and the run status together.
-- **Rule-EDITOR-PANEL-099** — It does not clear the search text.
+- **Rule-EDITOR-PANEL-100** — It does not clear the search text.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on

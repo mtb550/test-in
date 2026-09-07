@@ -1,6 +1,7 @@
 package org.testin.editor.toolbar.components;
 
 import org.testin.editor.AbstractIconButton;
+import org.testin.editor.EditorColors;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.*;
@@ -92,8 +93,23 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         return activeFilterCount() > 0;
     }
 
+    /**
+     * UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-009.
+     * <p>
+     * What the button says while a filter is on: the count beside the icon, in
+     * the color that means a filter is on, and the button drawn as held down.
+     * <p>
+     * Held down rather than merely tinted, and by the same painter light mode's
+     * pin uses, because that is the look this plugin already gives a button that
+     * is doing something rather than waiting to. A tester who leaves a filter on
+     * and comes back to a screen missing most of its test cases has to see the
+     * reason without looking for it.
+     */
     public void updateToolBarFilterState() {
         final int activeFiltersCount = activeFilterCount();
+
+        setOn(activeFiltersCount > 0);
+
         if (activeFiltersCount == 0) {
             setText(null);
             setToolTipText("Filter");
@@ -101,7 +117,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         } else {
             setText("(" + activeFiltersCount + ")");
             setToolTipText("Filter [" + activeFiltersCount + " active]");
-            setForeground(JBUI.CurrentTheme.Link.Foreground.ENABLED);
+            setForeground(EditorColors.FILTER_ACTIVE);
         }
     }
 

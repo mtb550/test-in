@@ -9,11 +9,13 @@ There is no key for this. The table is in the import dialog.
 
 ## Rules
 
-- **Rule-SHARE-033** — The table holds the 13 columns that can be imported, not
+- **Rule-SHARE-034** — The table holds the 13 columns that can be imported, not
   the 17 that can be exported.
-- **Rule-SHARE-034** — The table is empty until a file is chosen.
-- **Rule-SHARE-035** — Choosing a second file replaces every tab.
-- **Rule-SHARE-036** — A correction made here changes what is written, and the
+- **Rule-SHARE-035** — The table is empty until a file is chosen.
+- **Rule-SHARE-036** — Choosing a second file replaces every tab.
+- **Rule-SHARE-037** — An import that stops part way says how many test cases
+  were written before it did. They are still there.
+- **Rule-SHARE-038** — A correction made here changes what is written, and the
   file on disk is never touched.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on

@@ -10,7 +10,7 @@ it.
 |---|---|
 | **Part of Testin** | The view panel |
 | **Answers** | What the panel shows, how a test case gets into it, and what a tester can do from it |
-| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-015`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-059` |
+| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-015`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-060` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -196,9 +196,15 @@ bug report yet.
 | **Difference 7** | Rule-VIEW-PANEL-001 — a tester can tell the two panels apart | Both Testin tool windows are named **Testin**. This is the tree panel's difference too. |
 | **Difference 8** | Rule-VIEW-PANEL-006 — one look for one kind of thing | In one column of one panel, the run captions have no colon and the test case captions do. |
 | **Difference 9** | Rule-VIEW-PANEL-009 — closing an editor empties the panel | It empties the panel whichever editor closed. A tester reading a test case from the first editor, who closes the second, watches the panel go blank for no reason they can see. |
-| **Difference 10** | Rule-VIEW-PANEL-007 — a change confirms itself once | An edit made with `F2` that Testin cannot find a place to write is dropped. No message, no balloon, nothing on screen. Only the log says so. |
 | **Difference 11** | Rule-VIEW-PANEL-008 — the panel redraws when its test case changes | Every result a running test reports redraws the whole panel, whichever test case reported. A test run of 50 test cases rebuilds the panel 50 times, including the two tabs that never change. |
 | **Difference 12** | Rule-VIEW-PANEL-003 — the panel opens when the tester asks for a test case | Opening the view panel first, before anything else in Testin, can raise *Testin Setup Required*. The tester asked to read a test case and was handed a settings notification. |
+
+**Fixed since this list was written.** The numbers are left out rather than
+closed up, so an issue that quotes one still points at the right thing.
+
+| Gone | Was |
+|---|---|
+| **Difference 10** | An F2 edit that Testin could find no place to write was dropped in silence. Fixed 7 September 2026, [#234](https://github.com/mtb550/test-in/issues/234) |
 
 ---
 

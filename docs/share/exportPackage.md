@@ -9,10 +9,13 @@ There is no key for this. The same **Export** entry, on a package.
 
 ## Rules
 
-- **Rule-SHARE-013** — Each test set directly under the package becomes one
-  sheet, named after itself.
+- **Rule-SHARE-013** — Every test set beneath the package becomes one sheet,
+  however deep it sits. A sheet takes the test set's own name, and the name of
+  the package above it as well when two would otherwise read the same.
 - **Rule-SHARE-014** — A test set holding no test cases produces no sheet.
-- **Rule-SHARE-015** — Two sheets that would take the same name are numbered.
+- **Rule-SHARE-015** — A test case file that cannot be read is named before the
+  export is written, and the tester decides whether to send it anyway.
+- **Rule-SHARE-016** — Two sheets that would take the same name are numbered.
   The first keeps the name, and the rest get a number in brackets.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on

@@ -13,10 +13,13 @@
   does nothing while the panel is empty.
 - **Rule-VIEW-PANEL-045** — The panel always changes exactly one test case,
   because it only ever shows one.
-- **Rule-VIEW-PANEL-046** — A save that would leave the file as it is writes
+- **Rule-VIEW-PANEL-046** — An edit Testin can find no test set to write to is
+  refused and says so. A test case opened without its test set - from a search
+  result - is the one that reaches this.
+- **Rule-VIEW-PANEL-047** — A save that would leave the file as it is writes
   nothing, and raises no message.
-- **Rule-VIEW-PANEL-047** — A saved change is one entry on the undo history.
-- **Rule-VIEW-PANEL-048** — Saving a change rewrites the automation code for
+- **Rule-VIEW-PANEL-048** — A saved change is one entry on the undo history.
+- **Rule-VIEW-PANEL-049** — Saving a change rewrites the automation code for
   that field, where the field has any.
 
 Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They

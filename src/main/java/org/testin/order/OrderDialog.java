@@ -1,5 +1,8 @@
 package org.testin.order;
 
+import org.testin.services.Services;
+import org.testin.notifications.Notifier;
+import java.util.OptionalInt;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -57,22 +60,47 @@ final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
         return order == Marker.NOT_ORDERED ? "" : String.valueOf(order);
     }
 
+    /**
+     * UC-TREE-PANEL-015, Rule-TREE-PANEL-055.
+     * <p>
+     * Refuses a number too large and stays open, rather than writing something
+     * the tester did not type.
+     * <p>
+     * A value that will not fit used to come back as "no position at all", so
+     * typing a long number took the node's position off, dropped it back into
+     * date order, and confirmed with Ordered. Three wrong answers to one typo,
+     * and the only one the tester saw was the one saying it worked (#193).
+     */
     @Override
     protected void submit() {
-        onSubmit.accept(typed(component().getText().trim()));
+        final @NotNull String text = component().getText().trim();
+        final @NotNull OptionalInt number = typed(text);
+
+        if (number.isEmpty()) {
+            Services.getInstance(p, Notifier.class).softRefuse(p, "Too Large",
+                    "A position has to be a whole number below " + Marker.NOT_ORDERED + ".");
+            return;
+        }
+
+        onSubmit.accept(number.getAsInt());
         closeOk();
     }
 
     /**
-     * What the tester typed, as a number. Empty takes the number off again; so
-     * does a value too large to be an {@code int}, which the field's digits let
-     * through and which means nothing as a position anyway.
+     * What the tester typed, as a number. Empty takes the number off again,
+     * which is the one way a position is meant to be cleared. Anything the field
+     * let through that is not a position - a number too large to hold, and the
+     * sentinel that means "none" - is nothing, and the caller refuses it.
      */
-    private static int typed(final @NotNull String text) {
+    private static @NotNull OptionalInt typed(final @NotNull String text) {
+        if (text.isEmpty()) return OptionalInt.of(Marker.NOT_ORDERED);
+
         try {
-            return Integer.parseInt(text);
+            final int number = Integer.parseInt(text);
+
+            return number < Marker.NOT_ORDERED ? OptionalInt.of(number) : OptionalInt.empty();
         } catch (final NumberFormatException ex) {
-            return Marker.NOT_ORDERED;
+            return OptionalInt.empty();
         }
     }
 }

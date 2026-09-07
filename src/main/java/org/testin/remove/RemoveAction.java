@@ -106,6 +106,18 @@ public class RemoveAction extends AbstractProjectTreeAction {
             recordRemoval(nodesToRemove, List.copyOf(kept));
 
             if (count > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, count);
+
+            // At the moment it happens, not when the tester presses CTRL+Z and
+            // finds out. A removal whose copy could not be kept aside is still a
+            // removal; what it is not is undoable, and that is the half nothing
+            // used to say (#196).
+            final int lost = count - kept.size();
+            if (lost > 0) {
+                Services.getInstance(p, Notifier.class).softRefuse(p, "Cannot Be Undone",
+                        lost == 1
+                                ? "One of these could not be copied aside first, so CTRL+Z cannot put it back."
+                                : lost + " of these could not be copied aside first, so CTRL+Z cannot put them back.");
+            }
         });
     }
 
@@ -149,13 +161,14 @@ public class RemoveAction extends AbstractProjectTreeAction {
      * the surface the tester was standing on when they removed it, and the one
      * they will press CTRL+Z on (#165).
      * <p>
-     * Only what was actually kept. A node whose copy could not be made is
-     * removed exactly as it always was, and is simply not part of the operation.
+     * Pushed even when nothing could be kept aside. The entry then puts nothing
+     * back and says why - which is what the tester needs CTRL+Z to do here.
+     * Pushing nothing meant the next CTRL+Z reached the change before this one
+     * and took that back instead, which they never asked for (#196).
      */
+    // UC-TREE-PANEL-012, Rule-TREE-PANEL-040
     private void recordRemoval(final @NotNull List<DirectoryDto> asked, final @NotNull List<Kept> kept) {
-        if (kept.isEmpty()) return;
-
-        final @NotNull String what = asked.size() == 1 ? "Remove '" + asked.getFirst().getName() + "'" : "Remove " + kept.size() + " items";
+        final @NotNull String what = asked.size() == 1 ? "Remove '" + asked.getFirst().getName() + "'" : "Remove " + asked.size() + " items";
 
         Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
                 what,
@@ -165,6 +178,13 @@ public class RemoveAction extends AbstractProjectTreeAction {
     }
 
     private void restoreAll(final @NotNull List<Kept> kept) {
+        if (kept.isEmpty()) {
+            Services.getInstance(p, Notifier.class).softRefuse(p, "Cannot Be Undone",
+                    "No copy of what was removed could be kept aside, so there is nothing to put back. "
+                            + "The recycle bin may still have it.");
+            return;
+        }
+
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         final @NotNull List<Kept> lost = kept.stream().filter(one -> !indexer.restoreNode(one.copy(), one.original())).toList();

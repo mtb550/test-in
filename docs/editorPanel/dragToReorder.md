@@ -9,14 +9,14 @@ There is no key for this. Drag the cards.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-056** — Dragging works on cards only. The grid cannot be
+- **Rule-EDITOR-PANEL-057** — Dragging works on cards only. The grid cannot be
   dragged.
-- **Rule-EDITOR-PANEL-057** — A drag is always a move, never a copy.
-- **Rule-EDITOR-PANEL-058** — A card lands directly under the card it was dropped
+- **Rule-EDITOR-PANEL-058** — A drag is always a move, never a copy.
+- **Rule-EDITOR-PANEL-059** — A card lands directly under the card it was dropped
   on. Under a filter that is the card the tester can see, so test cases the
   filter is hiding between the two move down rather than staying above it.
-- **Rule-EDITOR-PANEL-059** — Only the test cases that really moved are written.
-- **Rule-EDITOR-PANEL-060** — The whole drag is one entry on the undo history.
+- **Rule-EDITOR-PANEL-060** — Only the test cases that really moved are written.
+- **Rule-EDITOR-PANEL-061** — The whole drag is one entry on the undo history.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on

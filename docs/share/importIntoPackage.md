@@ -9,11 +9,11 @@ There is no key for this. The same **Import** entry, on a package.
 
 ## Rules
 
-- **Rule-SHARE-030** — One new test set is made for each sheet, named after the
+- **Rule-SHARE-031** — One new test set is made for each sheet, named after the
   sheet with special characters removed.
-- **Rule-SHARE-031** — The test sets are made before any test case is written,
+- **Rule-SHARE-032** — The test sets are made before any test case is written,
   because making one generates a Java class.
-- **Rule-SHARE-032** — No editor is opened afterwards, because a package has no
+- **Rule-SHARE-033** — No editor is opened afterwards, because a package has no
   editor of its own.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on

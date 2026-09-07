@@ -39,6 +39,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
     private final @NotNull List<TestCaseMerge.Question> questions;
     private final @NotNull List<RadioSelection<Boolean>> answers = new ArrayList<>();
     private final @NotNull Consumer<Set<String>> onResolved;
+    private final @NotNull Runnable onSkipped;
 
     /**
      * @param testCase   what the case is called, for the title - a tester
@@ -48,10 +49,11 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
      *                   Named rather than numbered, so the caller applies them by
      *                   field and never by row order
      */
-    public ResolveConflictDialog(final @NotNull Project p, final @NotNull String testCase, final @NotNull List<TestCaseMerge.Question> questions, final @NotNull Consumer<Set<String>> onResolved) {
+    public ResolveConflictDialog(final @NotNull Project p, final @NotNull String testCase, final @NotNull List<TestCaseMerge.Question> questions, final @NotNull Consumer<Set<String>> onResolved, final @NotNull Runnable onSkipped) {
         super(p);
         this.questions = questions;
         this.onResolved = onResolved;
+        this.onSkipped = onSkipped;
 
         title = "Both Changed " + testCase;
 
@@ -73,9 +75,13 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
 
         components = List.copyOf(rows);
 
+        // Skip rather than Cancel, and it says so on the status bar. Escape
+        // used to end the whole sync: the rest of the conflicting test cases
+        // were never asked about, and the tester was left mid-rebase with no
+        // word about any of it (#258).
         shortcuts = List.of(
                 StatusBarShortcut.build(Shortcuts.Enter, "Keep Selected", this::submit),
-                StatusBarShortcut.cancel(this::closeCancel));
+                StatusBarShortcut.build(Shortcuts.Escape, "Skip This One", this::skip));
 
         preferredSize = new Dimension(JBUI.scale(700), JBUI.scale(120 + (60 * questions.size())));
     }
@@ -101,6 +107,19 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
         if (oneLine.isEmpty()) return "(empty)";
 
         return oneLine.length() <= SHOWN ? oneLine : oneLine.substring(0, SHOWN - 1) + "…";
+    }
+
+    /**
+     * UC-SHARE-018, Rule-SHARE-002.
+     * <p>
+     * This test case is left as Git has it, and the sync goes on to the next
+     * one. What the tester already answered is written and staged before each
+     * question closes, so it stays; this one is reported at the end with
+     * everything else that could not be resolved here.
+     */
+    private void skip() {
+        closeCancel();
+        onSkipped.run();
     }
 
     @Override

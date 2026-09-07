@@ -1,5 +1,7 @@
 package org.testin.editor.statusbar;
 
+import org.testin.editor.EditorColors;
+
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.util.text.HtmlChunk;
@@ -414,16 +416,35 @@ public class StatusBar extends JBPanel<StatusBar> {
     public void updateSelectionState(final int @NotNull [] selectedIndices, final int firstSelectedPosition, final int shownCount, final int totalCount) {
         final int selectedCount = selectedIndices.length;
         final @NotNull String cases = shownCount + (shownCount == 1 ? " test case" : " test cases");
-        final @NotNull String of = cases + (shownCount == totalCount ? "" : " (filtered from " + totalCount + ")");
+        final @NotNull String of = cases + narrowedFrom(shownCount, totalCount);
 
         if (selectedCount > 1) {
-            statusLabel.setText(String.format(Locale.ENGLISH, "%d selected of %s", selectedCount, of));
+            statusLabel.setText(String.format(Locale.ENGLISH, "<html>%d selected of %s</html>", selectedCount, of));
 
         } else if (selectedCount == 1) {
-            statusLabel.setText(String.format(Locale.ENGLISH, "%d of %s", firstSelectedPosition + 1, of));
+            statusLabel.setText(String.format(Locale.ENGLISH, "<html>%d of %s</html>", firstSelectedPosition + 1, of));
 
         } else {
-            statusLabel.setText(String.format(Locale.ENGLISH, "0 of %s", of));
+            statusLabel.setText(String.format(Locale.ENGLISH, "<html>0 of %s</html>", of));
         }
+    }
+
+    /**
+     * UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-009.
+     * <p>
+     * How many test cases the filter is holding back, in the color that means a
+     * filter is on - the same color the filter button wears, so the two are one
+     * fact rather than two.
+     * <p>
+     * Colored rather than merely present because this is the sentence a tester
+     * reads to find out why their test set looks short, and in the plain gray of
+     * the rest of the line it was read past. Empty when nothing is narrowed, and
+     * then the sentence is the one it always was.
+     */
+    private static @NotNull String narrowedFrom(final int shownCount, final int totalCount) {
+        if (shownCount == totalCount) return "";
+
+        return String.format(Locale.ENGLISH, " <font color='%s'>(filtered from %d)</font>",
+                EditorColors.filterActiveHex(), totalCount);
     }
 }

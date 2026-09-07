@@ -429,7 +429,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 }).show());
     }
 
-    // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-119
+    // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-120
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
@@ -560,7 +560,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // What there is to walk is this list, so a filter that empties it grays
         // Start on the same redraw rather than at whatever happens next. Through
         // the one method that owns the buttons, so light mode's copy of them is
-        // told at the same moment (Rule-EDITOR-PANEL-134).
+        // told at the same moment (Rule-EDITOR-PANEL-135).
         onExecutionStateChanged();
     }
 
@@ -843,7 +843,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-129 and Rule-EDITOR-PANEL-133.
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130 and Rule-EDITOR-PANEL-134.
      * <p>
      * Puts the walk on the next test case waiting for a verdict, at or after
      * {@code from}, and ends it when there is none.
@@ -910,7 +910,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-129.
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130.
      * <p>
      * The first test case at or after {@code from} that is still waiting for a
      * verdict, and the size of the list when there is none - which is the value
@@ -1097,7 +1097,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-181.
+     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-182.
      * <p>
      * Says what an automated verdict threw away, when it threw anything away.
      * <p>
@@ -1142,7 +1142,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * A run already signed off is left alone: the report that reached this was
      * refused above.
      */
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-133
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-134
     public void finishIfEverythingIsJudged() {
         // A run already signed off is left alone. The guard is here rather than
         // at the call sites because there are now five of them - the end of a
@@ -1280,7 +1280,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-134.
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135.
      * <p>
      * Whether the walk would land anywhere at all.
      * <p>
@@ -1299,7 +1299,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-134.
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135.
      * <p>
      * The manual button's whole question, in one place, so the toolbar and light
      * mode cannot answer it differently - which is the mistake
@@ -1399,7 +1399,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         onExecutionStateChanged();
     }
 
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-134
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
     @Override
     public void onStartExecutionClicked() {
         final @NotNull Optional<TestRunDto> run = run();

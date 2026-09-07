@@ -9,11 +9,11 @@ There is no key for this. The **Branch** box is in the review.
 
 ## Rules
 
-- **Rule-SHARE-061** — The box lists the branches on this machine, with the one
+- **Rule-SHARE-063** — The box lists the branches on this machine, with the one
   checked out chosen.
-- **Rule-SHARE-062** — The box can also be typed into. A name that is not a
+- **Rule-SHARE-064** — The box can also be typed into. A name that is not a
   branch yet starts one.
-- **Rule-SHARE-063** — If the branch cannot be checked out, nothing at all is
+- **Rule-SHARE-065** — If the branch cannot be checked out, nothing at all is
   committed.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on

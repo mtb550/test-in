@@ -314,7 +314,11 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
 
             answered.put(next.path(), mapper.writeValueAsString(next.merged()));
             askAboutConflicts(rest, projectRoot, address, account, auth, answered);
-        }).show();
+            // Escape is a skip, not a cancel: this test case is left as the
+            // server has it and the sync goes on. It used to end the whole sync,
+            // so the rest were never asked about and nothing already answered
+            // was sent (#258).
+        }, () -> askAboutConflicts(rest, projectRoot, address, account, auth, answered)).show();
     }
 
     /**

@@ -9,10 +9,10 @@ Right click the row in the review.
 
 ## Rules
 
-- **Rule-SHARE-049** — Only a change to a test case's field can be put back.
-- **Rule-SHARE-050** — Only that one field is put back. Everything else on the
+- **Rule-SHARE-051** — Only a change to a test case's field can be put back.
+- **Rule-SHARE-052** — Only that one field is put back. Everything else on the
   test case stays as it is.
-- **Rule-SHARE-051** — The change is written to disk at once, not on the commit.
+- **Rule-SHARE-053** — The change is written to disk at once, not on the commit.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).

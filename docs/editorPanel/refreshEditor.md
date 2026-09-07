@@ -9,14 +9,14 @@ There is no key for this. The button's tooltip reads **Refresh**.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-116** — Refresh keeps every filter and the search text. It
+- **Rule-EDITOR-PANEL-117** — Refresh keeps every filter and the search text. It
   reads the data again and changes nothing else about the view.
-- **Rule-EDITOR-PANEL-117** — Refresh remembers which test case was selected,
+- **Rule-EDITOR-PANEL-118** — Refresh remembers which test case was selected,
   and lands on the page holding it.
-- **Rule-EDITOR-PANEL-118** — The tester's own refresh always reloads, even with
+- **Rule-EDITOR-PANEL-119** — The tester's own refresh always reloads, even with
   a grid cell open. A refresh Testin starts on its own leaves a busy editor
   alone.
-- **Rule-EDITOR-PANEL-119** — In a test run editor, refresh also stops the
+- **Rule-EDITOR-PANEL-120** — In a test run editor, refresh also stops the
   execution, and the message says so. Refresh reads the run again from disk and
   the walk goes with the copy it replaces.
 

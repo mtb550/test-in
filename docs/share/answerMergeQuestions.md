@@ -9,14 +9,17 @@ There is no key that opens this. It opens during a merge.
 
 ## Rules
 
-- **Rule-SHARE-077** — Only the fields both sides really changed are asked
+- **Rule-SHARE-080** — Only the fields both sides really changed are asked
   about. Everything else is merged without a question.
-- **Rule-SHARE-078** — One window for each test case, holding one question for
+- **Rule-SHARE-081** — One window for each test case, holding one question for
   each field that disagrees.
-- **Rule-SHARE-079** — The tester's own value is chosen to start with.
-- **Rule-SHARE-080** — A value is shown on one line, cut at 70 characters, and
+- **Rule-SHARE-082** — The tester's own value is chosen to start with.
+- **Rule-SHARE-083** — A value is shown on one line, cut at 70 characters, and
   an empty one reads as such.
-- **Rule-SHARE-081** — `Escape` answers nothing and stops the whole merge.
+- **Rule-SHARE-084** — `Escape` answers nothing for this test case and moves on
+  to the next. The test case is left as the other side has it and is named at
+  the end with everything else that was not resolved. Answers already given
+  are kept.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).

@@ -57,7 +57,7 @@ plugin, which is not available in this IDE.* This is checked before anything
 else, so in an IDE without Git the tester never sees *No Test Project Named*.
 
 **If no Testin folder is set** — the **New Test Project** button is gray.
-(Rule-TREE-PANEL-087)
+(Rule-TREE-PANEL-089)
 
 ---
 
