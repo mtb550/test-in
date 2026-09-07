@@ -47,11 +47,15 @@ the marker needs nothing else to be findable. It was not always so: rules were
 bare numbers until 7 September 2026, and there were eight different Rule44s. A
 marker still reading `Rule44` is from before that and names nothing.
 
-**The numbers run in reading order, with no gaps.** A part's rules are numbered
-down its own `main.md`: the rules that hold everywhere first, then use case by
-use case in the order that page lists them. So a rule added to an early page
-renumbers the ones after it, and that renumbering is part of the change, not a
-tidy-up for later.
+**A new rule takes the next number, and nothing else moves.** Read the
+**Numbering** row of that part's `main.md`, take the number after the end of its
+rule range, write the rule where it belongs on its page, and move the row on. No
+existing rule is ever renumbered to make room: a number that changes is one that
+was already quoted in an issue, a commit and a code marker.
+
+That means a page's rules need not be consecutive - 47, 48, 49 and then 194 is a
+page that was added to later, which is the numbering working. The page is the
+order to read them in; the number is only how to find one.
 
 Where the method has javadoc, the marker is a line of its own inside it, first:
 
@@ -101,9 +105,9 @@ is wrong. Three of the six critical defects found in September 2026 were code
 that contradicted a rule the codebase had already written down somewhere else.
 
 If the behavior is genuinely new, add the rule to the part's page and give it
-the next number. Each part's `main.md` carries a **Numbering** row giving the
-range its rules cover, so the next number is the one after the end of it; move
-that row on in the same commit, and cite the rule from the code.
+the next number after that part's last - the **Numbering** row of its `main.md`
+says what that is. Move the row on in the same commit, and cite the rule from
+the code. Never renumber a rule that already exists.
 
 ## When a method carries no rule
 

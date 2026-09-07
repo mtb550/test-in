@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.PathSensitivity
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
@@ -250,6 +251,14 @@ tasks {
         useTestNG()
 
         jvmArgs("--sun-misc-unsafe-memory-access=allow")
+
+        // The documents are an input to the tests that read them - RuleNumbersTest
+        // scans every page for the numbers the code cites. Without this Gradle
+        // sees only the Java, calls the task up to date after a documentation
+        // change, and the check silently does not run.
+        inputs.dir(layout.projectDirectory.dir("docs"))
+            .withPropertyName("docs")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
 
         testLogging {
             events("passed", "skipped", "failed")

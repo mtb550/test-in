@@ -115,23 +115,27 @@ quoted in an issue, a commit or a code comment pointed at none of them in
 particular. Writing the part into the number is what stops that, and it only
 works if it is written every time.
 
-**The number is three digits, and it says where the rule sits.** A part's rules
-are numbered straight down its own `main.md`: the rules that hold everywhere
-first, then use case by use case in the order that page lists them, with no gaps
-and nothing out of turn. A reader who knows the number knows roughly where to
-look, and a page's rules are always a block.
+**The number is three digits, and a rule keeps it for life.** A new rule takes
+the number after the part's last one and is written where it belongs on its
+page. No existing rule is renumbered to make room, ever.
 
-**Which means a rule added to an early page renumbers the ones after it.** That
-renumbering is part of writing the rule, not a tidy-up for later - it is what
-keeps the sequence worth reading. The cost is that a number quoted somewhere
-this repository does not control, in an old issue or an old commit, names the
-number as it was that day. The words of a rule are what to match on when a
-number no longer leads anywhere.
+**A number is a name, not a position.** It was the other way round once: the
+rules ran in reading order down each part's `main.md`, so a page's rules were
+always a block and the number told a reader roughly where to look. Adding eight
+rules to that moved 297 others, which is the whole cost of the idea and it is
+not worth paying. A number that changes is a number that was quoted in an issue,
+a commit message and a code marker, and now points somewhere else.
+
+**So a page's rules need not be consecutive.** A page written early and added to
+later reads 47, 48, 49 and then 194, and that is the numbering working rather
+than failing - 194 is a rule written after the first 193 and says so. The page
+is the order to read them in; the number is only how to find one.
 
 **Each part's page says its last number.** The **Numbering** row of every
 `main.md` gives the range that part's use cases and rules cover, so the next rule
 is the number after the end of it and nobody reads the whole part to find out.
-Writing a rule and moving that row on is one job, not two.
+Writing a rule and moving that row on is one job, not two - and that row is the
+only thing to check before choosing a number, because nothing else moves.
 
 **The other numbers still start again in each part.** *Question 1* and
 *Difference 1* are read beside the part they are listed in, so they are left
