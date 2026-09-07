@@ -63,13 +63,12 @@ public final class RunStatusService {
         // the status exactly as it was.
         item.ifPresent(recorded -> confirmVerdict(p, status, 1));
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-            final @NotNull UUID currentId = currentTc.getId();
-            final boolean stillInList = editor.getCurrentTestCases().stream()
-                    .anyMatch(t -> t.getId().equals(currentId));
-            final int nextIndex = stillInList ? executingIndex + 1 : executingIndex;
-            editor.startTimerForIndex(nextIndex);
-        });
+        // From the row just judged, not from the one after it. The editor moves
+        // on to the next case still waiting for a verdict, so this no longer has
+        // to know whether the filter refresh above dropped the judged case out of
+        // the list and shifted everything up by one - both answers lead to the
+        // same place (Rule-EDITOR-PANEL-127).
+        ApplicationManager.getApplication().invokeLater(() -> editor.startTimerForIndex(executingIndex));
     }
 
     public void executeManual(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {

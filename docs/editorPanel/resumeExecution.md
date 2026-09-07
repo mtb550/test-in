@@ -10,7 +10,8 @@ There is no key for this. Press **Start Manual Execution** again.
 ## Rules
 
 - **Rule-EDITOR-PANEL-150** — Starting again finds the first test case with no
-  verdict, so the walk resumes rather than restarting.
+  verdict, so the walk resumes rather than restarting. A test case judged in the
+  first sitting is passed over wherever it sits (Rule-EDITOR-PANEL-127).
 - **Rule-EDITOR-PANEL-151** — The clock adds to the time a test case already
   carried, rather than starting it again.
 - **Rule-EDITOR-PANEL-152** — The stamp saying when execution began is kept.
@@ -44,13 +45,6 @@ and the test run is marked completed.
 | Every verdict already recorded | When execution ended |
 | How long each test case took, added to | The verdicts recorded from now on |
 | When execution began | |
-
-## Where the plugin breaks its own rules
-
-The walk resumes at the first test case with no verdict, and from there goes one
-row at a time. A test case judged in the first sitting, sitting after test case
-21, is landed on again and timed again. That is difference 22 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
 
 ---
 

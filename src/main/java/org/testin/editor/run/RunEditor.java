@@ -846,8 +846,23 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         return list.getSelectedValuesList();
     }
 
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-131
-    public void startTimerForIndex(final int globalIndex) {
+    /**
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-127 and Rule-EDITOR-PANEL-131.
+     * <p>
+     * Puts the walk on the next test case waiting for a verdict, at or after
+     * {@code from}, and ends it when there is none.
+     * <p>
+     * The caller says where to look from, not where to land: every caller used to
+     * hand in an exact row and every one of them could be wrong about it. The
+     * verdict path passed the row after the one just judged, which is the next
+     * row and not the next unjudged one - so a tester who ran a filtered set,
+     * cleared the filter and pressed start again was walked onto test cases that
+     * already carried a verdict, timed them a second time, and re-stamped who
+     * judged them and when.
+     */
+    public void startTimerForIndex(final int from) {
+        final int globalIndex = nextPendingIndex(from);
+
         if (globalIndex >= currentTestCases.size()) {
             // The end of this list is the end of the walk, and nothing more. The
             // list is the filtered one, so a tester who narrowed 120 cases to
@@ -875,17 +890,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         list.ensureIndexIsVisible(localIndex);
 
         final @NotNull TestCaseDto currentTc = currentTestCases.get(globalIndex);
-        final @NotNull Optional<TestRunItems> runItem = runItem(currentTc.getId()).filter(item -> !item.isRemoved());
 
-        if (runItem.isEmpty()) {
-            // No run data for this case, or no test case left to run: either way
-            // the execution moves on. Status changes themselves go through
-            // RunStatusService, which owns advance + persist.
-            startTimerForIndex(globalIndex + 1);
-            return;
-        }
-
-        executionTimer.start(runItem.get(), () -> {
+        // The index came from nextPendingIndex, so this case has a pending item -
+        // the walk can land nowhere else. Read through the same Optional rather
+        // than unwrapped, so a list that changed under the EDT ends the walk
+        // instead of throwing in the middle of it.
+        runItem(currentTc.getId()).ifPresent(item -> executionTimer.start(item, () -> {
             // A model event, not a repaint. The card grows a Duration line
             // the moment that value stops being blank, which makes the row
             // taller. JList re-measures a row only when the model says that row
@@ -898,9 +908,34 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             // layout of the whole list once a second for a row nobody can see.
             if (model.contains(currentTc)) model.contentsChanged(currentTc);
             showElapsed();
-        });
+        }));
 
         onExecutionStateChanged();
+    }
+
+    /**
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-127.
+     * <p>
+     * The first test case at or after {@code from} that is still waiting for a
+     * verdict, and the size of the list when there is none - which is the value
+     * {@link #startTimerForIndex(int)} reads as the end of the walk.
+     * <p>
+     * {@code PENDING} is the right question and the only one: the run owns that
+     * status and clears it only when the run itself reaches a terminal state, so
+     * it survives a stop, a filter and a reopen. A case with a verdict is not
+     * pending, whoever gave it - the tester out of order, an automated run, or an
+     * earlier walk - and a case the run does not hold at all is not pending
+     * either.
+     */
+    public int nextPendingIndex(final int from) {
+        for (int i = Math.max(from, 0); i < currentTestCases.size(); i++) {
+            if (runItem(currentTestCases.get(i).getId())
+                    .filter(item -> !item.isRemoved())
+                    .filter(item -> item.getStatus() == TestStatus.PENDING)
+                    .isPresent()) return i;
+        }
+
+        return currentTestCases.size();
     }
 
     /**
@@ -1246,9 +1281,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * <p>
      * Whether the walk would land anywhere at all.
      * <p>
-     * The walk goes along this list, so an empty one is a walk that ends on the
-     * step it starts. Two things arrive here and they are the same thing to the
-     * walk: a test run holding no test cases, and a filter that matches nothing.
+     * Three things arrive here and they are one thing to the walk: a test run
+     * holding no test cases, a filter that matches nothing, and a list whose test
+     * cases have all been judged. In each of them the walk would end on the step
+     * it starts.
      * <p>
      * Asked of the filtered list because that is what the walk reads. Deliberately
      * not folded into {@link #canStartExecution()}, which the automation asks too -
@@ -1256,7 +1292,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * hiding everything must not stop it (#215).
      */
     public boolean hasSomethingToWalk() {
-        return !currentTestCases.isEmpty();
+        return nextPendingIndex(0) < currentTestCases.size();
     }
 
     /**
@@ -1379,33 +1415,9 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // Before the status change, which is what persists the run.
         run.get().markExecutionStarted();
         Services.getInstance(p, TestRunStatusChange.class).apply(this, TestRunStatus.IN_PROGRESS);
-        startTimerForIndex(firstPendingIndex());
-    }
-
-    /**
-     * Where execution starts: the first case the run has not reached yet.
-     * <p>
-     * Starting at zero every time re-ran the cases already given a verdict, so a
-     * tester who stopped halfway, closed the editor and came back was put back at
-     * the top of a run they were in the middle of.
-     * <p>
-     * {@code PENDING} is the right question to ask, and the only one: the run owns
-     * that status and clears it only when the run itself reaches a terminal state,
-     * so it survives a stop and a reopen. A case with a verdict is not pending, and
-     * a case the run never reached is not either once the run has closed.
-     * <p>
-     * With nothing pending it falls back to the top, which is what Start has always
-     * done. Returning the size instead would hand {@link #startTimerForIndex(int)}
-     * its "no cases left" value and complete the run from a single click.
-     */
-    private int firstPendingIndex() {
-        for (int i = 0; i < currentTestCases.size(); i++) {
-            if (runItem(currentTestCases.get(i).getId())
-                    .filter(item -> item.getStatus() == TestStatus.PENDING)
-                    .isPresent()) return i;
-        }
-
-        return 0;
+        // From the top, not from a row worked out here: where the walk lands is
+        // the walk's own question, and it is answered in one place.
+        startTimerForIndex(0);
     }
 
     /**

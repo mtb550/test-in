@@ -301,7 +301,6 @@ bug report yet.
 | | The rule it breaks | What a tester sees |
 |---|---|---|
 | **Difference 19** | Rule-EDITOR-PANEL-007 — a signed off test run records nothing more | The status bar's own tooltip says a completed or closed test run records no more verdicts. `P`, `F` and `B` still record one, still save it, and still say *Passed*. Only the automation refuses. |
-| **Difference 22** | Rule-EDITOR-PANEL-007 — a change confirms itself once | The walk lands on test cases that already have a verdict, times them again, and re-stamps them with a new time and a new tester name. |
 | **Difference 23** | Rule-EDITOR-PANEL-007 — a test run that is finished says so | Judging the last pending test case from the menu leaves the test run **In Progress**. Only the automation marks a test run completed. |
 | **Difference 24** | Rule-EDITOR-PANEL-008 — nothing is lost without being said | **Refresh** stops the execution. The clock stops, the walk ends, and the button turns back into **Start Manual Execution**. The message says *Refreshed*. |
 | **Difference 25** | Rule-EDITOR-PANEL-007 — one message with a count | An automated test run raises one message for each test case. Fifty test cases is fifty messages. |
@@ -317,6 +316,7 @@ closed up, so an issue that quotes one still points at the right thing.
 |---|---|
 | **Difference 20** | A filtered walk completed the whole test run and turned every other pending test case untested. Fixed 7 September 2026, [#214](https://github.com/mtb550/test-in/issues/214) |
 | **Difference 21** | **Start Manual Execution** was live on a test run holding no test cases and on a filter matching nothing, and pressing it marked the test run **In Progress**. Fixed 7 September 2026, [#215](https://github.com/mtb550/test-in/issues/215) |
+| **Difference 22** | The walk landed on test cases that already had a verdict, timed them again, and re-stamped who judged them and when. Fixed 7 September 2026 |
 | **Difference 28** | Closing the tab left the automation running and its verdicts homeless. Fixed 7 September 2026, [#222](https://github.com/mtb550/test-in/issues/222) |
 
 ---

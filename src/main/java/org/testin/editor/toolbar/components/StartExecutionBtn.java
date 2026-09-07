@@ -22,8 +22,9 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
      * <p>
      * Why the button is gray, in the order the reasons matter: a walk already
      * going, then a run that records nothing more, then a walk with nowhere to
-     * land. The last one is new - a test run holding no test cases, and a filter
-     * matching nothing, both left the button live and startable (#215).
+     * land. The last one covers a test run holding no test cases, a filter
+     * matching nothing, and a list whose test cases have all been judged - all
+     * three of which left the button live and startable (#215).
      */
     private static @NotNull String tooltipFor(final @NotNull RunEditor editor) {
         if (editor.isExecuting()) return "Execution in progress";
@@ -33,7 +34,7 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
 
         return editor.hasSomethingToWalk()
                 ? Toolbar.START_MANUAL_EXECUTION
-                : "Nothing to execute — no test case is showing";
+                : "Nothing to execute — no test case is waiting for a verdict";
     }
 
     public void updateEnabledState() {

@@ -99,16 +99,20 @@ public final class Notifier {
     /**
      * The tester pressed start on a walk with nowhere to land.
      * <p>
-     * Its own sentence rather than the one above: that one is for a test run
-     * with nothing left in it, and this one is usually a filter with everything
-     * still behind it. Telling a tester their test run has no test cases when a
-     * filter is what emptied the screen sends them looking for cases that are
-     * still there (#215).
+     * Its own sentence rather than the one above: that one is for a test run with
+     * nothing left in it, and this one is about what is on screen. Three
+     * situations reach it - a test run holding no test cases, a filter matching
+     * nothing, and a list whose test cases have all been judged - and one
+     * sentence covers them because the tester sees the same thing in all three.
+     * <p>
+     * Naming the filter is what stops it being the sentence above: telling a
+     * tester their test run has no test cases, when a filter is what emptied the
+     * screen, sends them looking for cases that are still there (#215).
      * <p>
      * It fades, like every other answer to a gesture the tester just made.
      */
     public void softRefuseNothingShowing(final @NotNull Project p, final @NotNull String name) {
-        softRefuse(p, "Nothing is showing in " + name + " to execute");
+        softRefuse(p, "Nothing showing in " + name + " is waiting for a verdict");
     }
 
     /**
