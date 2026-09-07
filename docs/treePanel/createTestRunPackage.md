@@ -10,11 +10,11 @@ cycles does not sit in one flat list.
 
 ## Rules
 
-- **Rule-TREE-PANEL-026** — Under **Test Runs** or a test run package, only a
+- **Rule-TREE-PANEL-032** — Under **Test Runs** or a test run package, only a
   test run or a test run package can be created.
-- **Rule-TREE-PANEL-082** — A test run package is created empty, and nothing
+- **Rule-TREE-PANEL-033** — A test run package is created empty, and nothing
   opens.
-- **Rule-TREE-PANEL-083** — A test run package can hold another test run
+- **Rule-TREE-PANEL-034** — A test run package can hold another test run
   package, as deep as the tester needs.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They

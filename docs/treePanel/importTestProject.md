@@ -14,7 +14,7 @@ it again by hand.
 - **Rule-TREE-PANEL-018** — Cloning needs two things. It needs the Git plugin.
   It also needs this code project to already name the test project it is
   cloning.
-- **Rule-TREE-PANEL-079** — The folder is named by the code project, never by
+- **Rule-TREE-PANEL-019** — The folder is named by the code project, never by
   the address. A repository called `nafath-test-case` is a place to clone from.
   What the test project is called is written down once, in the file that travels
   with the repository, so the tree, the reports and the server path all read the
@@ -57,7 +57,7 @@ plugin, which is not available in this IDE.* This is checked before anything
 else, so in an IDE without Git the tester never sees *No Test Project Named*.
 
 **If no Testin folder is set** — the **New Test Project** button is gray.
-(Rule-TREE-PANEL-077)
+(Rule-TREE-PANEL-087)
 
 ---
 
@@ -69,7 +69,7 @@ else, so in an IDE without Git the tester never sees *No Test Project Named*.
 > There is no button, no menu item and no key for it.
 >
 > What it would need: somewhere to type the server, the folder and the account,
-> and the same Rule-TREE-PANEL-079 decision about what the test project is called. Until
+> and the same Rule-TREE-PANEL-019 decision about what the test project is called. Until
 > that is built, a tester who keeps test projects on an SFTP server creates the
 > test project first, sets up the SFTP account, and then syncs.
 

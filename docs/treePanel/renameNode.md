@@ -10,11 +10,11 @@
 
 ## Rules
 
-- **Rule-TREE-PANEL-030** — The test project and the two containers cannot be
+- **Rule-TREE-PANEL-035** — The test project and the two containers cannot be
   renamed from the tree.
-- **Rule-TREE-PANEL-031** — Renaming a test set or a test set package renames
+- **Rule-TREE-PANEL-036** — Renaming a test set or a test set package renames
   its automation code with it, so the test case stays runnable.
-- **Rule-TREE-PANEL-032** — A rename can be undone.
+- **Rule-TREE-PANEL-037** — A rename can be undone.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
 are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).

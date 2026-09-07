@@ -87,7 +87,7 @@ final class IndexingScanner {
         }
     }
 
-    // UC-INTERNAL-002, Rule-INTERNAL-008 and Rule-INTERNAL-052
+    // UC-INTERNAL-002, Rule-INTERNAL-008 and Rule-INTERNAL-015
     private void scanTestSets(final @NotNull Path tcDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
         try (Stream<Path> paths = Files.list(tcDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
@@ -112,7 +112,7 @@ final class IndexingScanner {
         }
     }
 
-    // UC-INTERNAL-002, Rule-INTERNAL-008 and Rule-INTERNAL-052
+    // UC-INTERNAL-002, Rule-INTERNAL-008 and Rule-INTERNAL-015
     private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
@@ -175,7 +175,7 @@ final class IndexingScanner {
         }
     }
 
-    // UC-INTERNAL-002, Rule-INTERNAL-010 and Rule-INTERNAL-052
+    // UC-INTERNAL-002, Rule-INTERNAL-010 and Rule-INTERNAL-015
     private void scanTestRunDirs(final @NotNull Path trDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
         try (Stream<Path> paths = Files.list(trDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
@@ -196,7 +196,7 @@ final class IndexingScanner {
         }
     }
 
-    // UC-INTERNAL-002, Rule-INTERNAL-010 and Rule-INTERNAL-052
+    // UC-INTERNAL-002, Rule-INTERNAL-010 and Rule-INTERNAL-015
     private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
@@ -221,7 +221,7 @@ final class IndexingScanner {
     }
 
     /**
-     * UC-INTERNAL-002, Rule-INTERNAL-052.
+     * UC-INTERNAL-002, Rule-INTERNAL-015.
      * <p>
      * A folder with no marker is not a node, so the scan cannot read it or
      * anything under it. Most of them are nothing: a folder somebody made beside
@@ -257,7 +257,7 @@ final class IndexingScanner {
     }
 
     /**
-     * UC-INTERNAL-002, Rule-INTERNAL-052.
+     * UC-INTERNAL-002, Rule-INTERNAL-015.
      * <p>
      * One notification for the whole project, not one per folder, and it stays in
      * the log rather than fading: a scan finishes on its own time, and a balloon

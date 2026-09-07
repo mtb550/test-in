@@ -16,7 +16,7 @@ first, **so that** I am never stuck on an empty window.
   If it names none, and exactly one test project exists in the Testin folder,
   Testin binds it to that one without asking.
 
-Rule-TREE-PANEL-053 also holds here. It says an **Archived** test project is not
+Rule-TREE-PANEL-062 also holds here. It says an **Archived** test project is not
 opened on the next load, and it is on [UC-TREE-PANEL-018](retireNode.md).
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They

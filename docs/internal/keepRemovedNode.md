@@ -13,26 +13,26 @@ between them.
 
 ## Rules
 
-- **Rule-INTERNAL-035** — A removed node goes to the desktop recycle bin, so the
+- **Rule-INTERNAL-036** — A removed node goes to the desktop recycle bin, so the
   tester can find it without Testin.
-- **Rule-INTERNAL-036** — Testin also keeps its own copy, so `Ctrl+Z` has
+- **Rule-INTERNAL-037** — Testin also keeps its own copy, so `Ctrl+Z` has
   something to put back. The recycle bin can be filled and not emptied, so it
   cannot serve.
-- **Rule-INTERNAL-037** — The kept copy never lives under the Testin folder. It
+- **Rule-INTERNAL-038** — The kept copy never lives under the Testin folder. It
   would be read, committed and synced to every machine the tester works on.
-- **Rule-INTERNAL-038** — Each removal gets its own place to be kept. Two test
+- **Rule-INTERNAL-039** — Each removal gets its own place to be kept. Two test
   sets removed under the same name are two things to put back, not one over the
   other.
-- **Rule-INTERNAL-039** — One press of `Ctrl+Z` puts back everything one
+- **Rule-INTERNAL-040** — One press of `Ctrl+Z` puts back everything one
   `Delete` removed.
-- **Rule-INTERNAL-040** — A removal whose copy could not be made still happens.
+- **Rule-INTERNAL-041** — A removal whose copy could not be made still happens.
   It simply cannot be undone.
-- **Rule-INTERNAL-041** — Putting something back never writes over something
+- **Rule-INTERNAL-042** — Putting something back never writes over something
   that is there.
-- **Rule-INTERNAL-042** — Kept copies are thrown away when the removal falls off
+- **Rule-INTERNAL-043** — Kept copies are thrown away when the removal falls off
   the undo history, which holds 20 changes.
-- **Rule-INTERNAL-043** — Every kept copy is thrown away at the next IDE start.
-- **Rule-INTERNAL-044** — Undo history belongs to the surface it was made in.
+- **Rule-INTERNAL-044** — Every kept copy is thrown away at the next IDE start.
+- **Rule-INTERNAL-045** — Undo history belongs to the surface it was made in.
   The tree keeps one, and each open editor keeps its own.
 
 ## Where a removed node goes

@@ -10,13 +10,13 @@ verdict.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-163** — The verdict is not touched. Only the four fields
+- **Rule-EDITOR-PANEL-164** — The verdict is not touched. Only the four fields
   are written.
-- **Rule-EDITOR-PANEL-164** — The entry works on exactly one test case, and only
+- **Rule-EDITOR-PANEL-165** — The entry works on exactly one test case, and only
   when its verdict is **Failed**.
-- **Rule-EDITOR-PANEL-165** — The message comes after the test run is written,
+- **Rule-EDITOR-PANEL-166** — The message comes after the test run is written,
   so an edit that was dropped never reports itself as saved.
-- **Rule-EDITOR-PANEL-166** — The dialog is the same one `F` opens, filled in
+- **Rule-EDITOR-PANEL-167** — The dialog is the same one `F` opens, filled in
   with what is there.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.

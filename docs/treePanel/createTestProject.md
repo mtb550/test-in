@@ -63,7 +63,7 @@ open.
 created, and *\<name\> Already Exists* is shown in red.
 
 **If no Testin folder is set** — the **New Test Project** button is gray.
-(Rule-TREE-PANEL-077)
+(Rule-TREE-PANEL-087)
 
 ---
 

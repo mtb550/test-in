@@ -115,9 +115,18 @@ quoted in an issue, a commit or a code comment pointed at none of them in
 particular. Writing the part into the number is what stops that, and it only
 works if it is written every time.
 
-**The number is three digits, and a withdrawn rule keeps its own.** A number is
-never passed on to a different rule, so an issue that quotes one still points at
-what it pointed at when it was written.
+**The number is three digits, and it says where the rule sits.** A part's rules
+are numbered straight down its own `main.md`: the rules that hold everywhere
+first, then use case by use case in the order that page lists them, with no gaps
+and nothing out of turn. A reader who knows the number knows roughly where to
+look, and a page's rules are always a block.
+
+**Which means a rule added to an early page renumbers the ones after it.** That
+renumbering is part of writing the rule, not a tidy-up for later - it is what
+keeps the sequence worth reading. The cost is that a number quoted somewhere
+this repository does not control, in an old issue or an old commit, names the
+number as it was that day. The words of a rule are what to match on when a
+number no longer leads anywhere.
 
 **Each part's page says its last number.** The **Last rule** row of every
 `main.md` carries the highest number written in that part and the next one to

@@ -10,11 +10,11 @@
 
 ## Rules
 
-- **Rule-TREE-PANEL-048** — The tree keeps one history of its last 20 changes,
+- **Rule-TREE-PANEL-057** — The tree keeps one history of its last 20 changes,
   per code project and separate from any editor. It is held in memory, so
   closing the IDE loses it, and the copies kept aside for restoring removed
   nodes are deleted at the next start.
-- **Rule-TREE-PANEL-049** — Four things can be undone: a move, a rename, a
+- **Rule-TREE-PANEL-058** — Four things can be undone: a move, a rename, a
   removal, and an edit of a test run. Four cannot: creating anything, an order
   number, a copy, and a status change.
 

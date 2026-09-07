@@ -10,12 +10,12 @@ many test sets still reads the way the product is organized.
 
 ## Rules
 
-- **Rule-TREE-PANEL-080** — A test set package is created empty. Nothing opens,
+- **Rule-TREE-PANEL-027** — A test set package is created empty. Nothing opens,
   and no automation code is written for it.
-- **Rule-TREE-PANEL-081** — A test set package can hold another test set
+- **Rule-TREE-PANEL-028** — A test set package can hold another test set
   package, as deep as the tester needs.
 
-Rule-TREE-PANEL-023 and Rule-TREE-PANEL-024 hold here too. They say what can be
+Rule-TREE-PANEL-024 and Rule-TREE-PANEL-025 hold here too. They say what can be
 created where, and they are on [UC-TREE-PANEL-007](createTestSet.md).
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They

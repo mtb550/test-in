@@ -33,7 +33,7 @@ There is no key for this. It starts on its own.
   The tester can cancel it, and the IDE stays usable while it runs.
 - **Rule-INTERNAL-014** — One thing that cannot be read never stops the rest.
   Testin skips it and carries on.
-- **Rule-INTERNAL-052** — A folder skipped for having no marker is reported when
+- **Rule-INTERNAL-015** — A folder skipped for having no marker is reported when
   it holds test cases. A folder holding none is skipped in silence, because a
   folder that is deliberately not a test set is the ordinary case.
 

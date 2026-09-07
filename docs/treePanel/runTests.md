@@ -9,13 +9,13 @@ package or **Test Cases**, **so that** a whole area runs in one gesture.
 
 ## Rules
 
-- **Rule-TREE-PANEL-063** — Running from a parent skips retired branches.
+- **Rule-TREE-PANEL-075** — Running from a parent skips retired branches.
   Running a retired test set directly still runs it. (Rule-TREE-PANEL-008)
-- **Rule-TREE-PANEL-064** — A node with no test cases to run says so. It runs
+- **Rule-TREE-PANEL-076** — A node with no test cases to run says so. It runs
   nothing.
-- **Rule-TREE-PANEL-065** — Running needs the TestNG plugin. Without it, the
+- **Rule-TREE-PANEL-077** — Running needs the TestNG plugin. Without it, the
   item is not offered.
-- **Rule-TREE-PANEL-090** — **Run Tests** is offered on **Test Cases**, a test
+- **Rule-TREE-PANEL-078** — **Run Tests** is offered on **Test Cases**, a test
   set package, a test set and a test run. It is not offered on the test project
   row, on **Test Runs**, or on a test run package.
 

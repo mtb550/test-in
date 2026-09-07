@@ -11,15 +11,15 @@ There is no key and no button in the editor. It starts from the tree, with
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-180** — Only test cases with no verdict are run. A test
+- **Rule-EDITOR-PANEL-181** — Only test cases with no verdict are run. A test
   case already judged is never run again.
-- **Rule-EDITOR-PANEL-181** — The whole set is one configuration and one
+- **Rule-EDITOR-PANEL-182** — The whole set is one configuration and one
   process.
-- **Rule-EDITOR-PANEL-182** — A test run whose every test case has been judged
+- **Rule-EDITOR-PANEL-183** — A test run whose every test case has been judged
   is marked **Completed** on its own.
-- **Rule-EDITOR-PANEL-183** — The order the methods run in is the order of the
+- **Rule-EDITOR-PANEL-184** — The order the methods run in is the order of the
   test cases in their test set.
-- **Rule-EDITOR-PANEL-184** — A test case with no generated method is dropped,
+- **Rule-EDITOR-PANEL-185** — A test case with no generated method is dropped,
   and the rest still run.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.

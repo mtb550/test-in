@@ -10,17 +10,17 @@ can start from something that already exists instead of writing it again.
 
 ## Rules
 
-- **Rule-TREE-PANEL-041** — A copied test case is a new test case, with its own
+- **Rule-TREE-PANEL-050** — A copied test case is a new test case, with its own
   id. Editing the copy never changes the original.
-- **Rule-TREE-PANEL-084** — A copy cannot be undone. To take one back, remove
+- **Rule-TREE-PANEL-051** — A copy cannot be undone. To take one back, remove
   it, which is [UC-TREE-PANEL-012](removeNode.md).
-- **Rule-TREE-PANEL-087** — A copy carries everything the original had beside
+- **Rule-TREE-PANEL-052** — A copy carries everything the original had beside
   its test cases: its order number, and its **Deprecated** or **Archived**
   status. A copy of a retired test set is retired too. A copied test run keeps
   the results the original recorded.
 
-Rule-TREE-PANEL-037, Rule-TREE-PANEL-038, Rule-TREE-PANEL-039 and
-Rule-TREE-PANEL-043 hold here too. They say where a node can land, and they are
+Rule-TREE-PANEL-042, Rule-TREE-PANEL-043, Rule-TREE-PANEL-044 and
+Rule-TREE-PANEL-048 hold here too. They say where a node can land, and they are
 on [UC-TREE-PANEL-013](moveNodes.md).
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They

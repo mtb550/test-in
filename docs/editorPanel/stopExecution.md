@@ -10,11 +10,11 @@ There is no key for this. The button's tooltip reads **Stop Execution**.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-145** — Stopping writes the test run to disk as it stands.
-- **Rule-EDITOR-PANEL-146** — Stopping changes no verdict already recorded.
-- **Rule-EDITOR-PANEL-147** — Stopping stamps when execution ended. That stamp
+- **Rule-EDITOR-PANEL-146** — Stopping writes the test run to disk as it stands.
+- **Rule-EDITOR-PANEL-147** — Stopping changes no verdict already recorded.
+- **Rule-EDITOR-PANEL-148** — Stopping stamps when execution ended. That stamp
   is written again by every stop.
-- **Rule-EDITOR-PANEL-148** — The tester's own stop ends any automation this
+- **Rule-EDITOR-PANEL-149** — The tester's own stop ends any automation this
   editor started, and so does closing the tab. Nothing else does.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.

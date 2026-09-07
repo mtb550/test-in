@@ -18,7 +18,7 @@ Two things follow, and they are not optional.
 **1. Every method a tester can reach names its rule or its use case.**
 
 ```java
-// UC-TREE-PANEL-012, Rule-TREE-PANEL-061
+// UC-TREE-PANEL-012, Rule-TREE-PANEL-038
 public void removeSelected(final @NotNull List<DirectoryDto> nodes) {
 ```
 
@@ -38,7 +38,7 @@ that wraps it.
 | What the method carries | The marker |
 |---|---|
 | One use case | `// UC-TREE-PANEL-012` |
-| A rule inside one use case | `// UC-TREE-PANEL-012, Rule-TREE-PANEL-061` |
+| A rule inside one use case | `// UC-TREE-PANEL-012, Rule-TREE-PANEL-038` |
 | A rule that holds across a whole part | `// Rule-TREE-PANEL-007` |
 | Several use cases | `// UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033` |
 
@@ -47,11 +47,17 @@ the marker needs nothing else to be findable. It was not always so: rules were
 bare numbers until 7 September 2026, and there were eight different Rule44s. A
 marker still reading `Rule44` is from before that and names nothing.
 
+**The numbers run in reading order, with no gaps.** A part's rules are numbered
+down its own `main.md`: the rules that hold everywhere first, then use case by
+use case in the order that page lists them. So a rule added to an early page
+renumbers the ones after it, and that renumbering is part of the change, not a
+tidy-up for later.
+
 Where the method has javadoc, the marker is a line of its own inside it, first:
 
 ```java
 /**
- * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-140.
+ * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-141.
  * <p>
  * Escape records nothing at all, neither the detail nor the verdict, because a
  * half-written failure is worse than no failure.
@@ -81,7 +87,7 @@ marker, because the next reader trusts it and goes looking. Two ways to be sure:
 
 ```bash
 grep -rn "UC-TREE-PANEL-012" docs/          # the use case page and everything pointing at it
-grep -rn "\*\*Rule-TREE-PANEL-061\*\*" docs/   # the rule, on the page that owns it
+grep -rn "\*\*Rule-TREE-PANEL-038\*\*" docs/   # the rule, on the page that owns it
 ```
 
 ## When there is no rule yet
@@ -118,7 +124,8 @@ A refactor that changes nothing a tester can see changes no document. That is
 not an exception to the rule, it is the test of whether it really was a
 refactor.
 
-So the question at the end of a change is always: **what would a tester notice?**
+So the question at the end of a change is always: **what would a tester
+notice?**
 
 - Nothing → no document change. Say so in the commit body.
 - Something → the document changes in this commit, not the next one.

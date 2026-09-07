@@ -27,10 +27,10 @@ up here rather than left to the code.
 |---|---|---|
 | **UC-INTERNAL-001** | [Find anything in the test project](globalSearch.md) | Rule-INTERNAL-001 to Rule-INTERNAL-002 |
 | **UC-INTERNAL-002** | [Read a test project from disk](readTestProject.md) | Rule-INTERNAL-003 to Rule-INTERNAL-014 |
-| **UC-INTERNAL-003** | [Pick up a change made outside the IDE](noticeOutsideChange.md) | Rule-INTERNAL-015 to Rule-INTERNAL-023 |
-| **UC-INTERNAL-004** | [Give a test case its number](numberTestCase.md) | Rule-INTERNAL-024 to Rule-INTERNAL-034 |
-| **UC-INTERNAL-005** | [Keep a removed node so it can come back](keepRemovedNode.md) | Rule-INTERNAL-035 to Rule-INTERNAL-044 |
-| **UC-INTERNAL-006** | [Count what a node holds](countNodeContents.md) | Rule-INTERNAL-045 to Rule-INTERNAL-051 |
+| **UC-INTERNAL-003** | [Pick up a change made outside the IDE](noticeOutsideChange.md) | Rule-INTERNAL-016 to Rule-INTERNAL-024 |
+| **UC-INTERNAL-004** | [Give a test case its number](numberTestCase.md) | Rule-INTERNAL-025 to Rule-INTERNAL-035 |
+| **UC-INTERNAL-005** | [Keep a removed node so it can come back](keepRemovedNode.md) | Rule-INTERNAL-036 to Rule-INTERNAL-045 |
+| **UC-INTERNAL-006** | [Count what a node holds](countNodeContents.md) | Rule-INTERNAL-046 to Rule-INTERNAL-052 |
 
 ---
 
@@ -101,10 +101,10 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule-INTERNAL-046 — a container is the sum of everything beneath it | Details counts retired test sets. Making a test run on the same node leaves them out. A test project whose Details says 40 test cases can offer 31, and nothing explains the difference. |
-| **Difference 2** | Rule-INTERNAL-039 — one press puts back what one removal took | A failed undo shows two messages on one press. *Undone* arrives first, then **Undo Incomplete**. A tester who reads only the first believes a node is back. |
+| **Difference 1** | Rule-INTERNAL-047 — a container is the sum of everything beneath it | Details counts retired test sets. Making a test run on the same node leaves them out. A test project whose Details says 40 test cases can offer 31, and nothing explains the difference. |
+| **Difference 2** | Rule-INTERNAL-040 — one press puts back what one removal took | A failed undo shows two messages on one press. *Undone* arrives first, then **Undo Incomplete**. A tester who reads only the first believes a node is back. |
 | **Difference 4** | Rule-INTERNAL-014 — nothing that cannot be read stops the rest | A damaged marker file leaves its node drawn with default values. Its number, its status and who made it are silently wrong, and only the log says so. |
-| **Difference 5** | Rule-INTERNAL-018 — Testin ignores its own writes for five seconds | A tester who edits a file by hand within five seconds of Testin saving it is ignored too. The edit is on disk and not on screen until **Refresh**. |
+| **Difference 5** | Rule-INTERNAL-019 — Testin ignores its own writes for five seconds | A tester who edits a file by hand within five seconds of Testin saving it is ignored too. The edit is on disk and not on screen until **Refresh**. |
 
 A sixth belongs to the tree panel and is written there. A removal whose copy
 could not be kept aside still happens, is not undoable, and says nothing. That

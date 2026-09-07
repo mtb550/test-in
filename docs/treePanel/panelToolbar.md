@@ -11,9 +11,9 @@ somewhere else.
 
 ## Rules
 
-- **Rule-TREE-PANEL-077** — **Select Test Project** and **New Test Project** are
+- **Rule-TREE-PANEL-087** — **Select Test Project** and **New Test Project** are
   gray until a Testin folder is set. Nothing else on the toolbar is ever gray.
-- **Rule-TREE-PANEL-078** — Every button says what it does when the tester
+- **Rule-TREE-PANEL-088** — Every button says what it does when the tester
   hovers over it.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They

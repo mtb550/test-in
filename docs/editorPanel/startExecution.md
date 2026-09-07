@@ -20,7 +20,7 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
 - **Rule-EDITOR-PANEL-131** — Reaching the end of the list ends the walk, and
   nothing more. The test run is marked **Completed** only when every test case
   in it has been judged, which is asked of the test run and not of the walk.
-- **Rule-EDITOR-PANEL-190** — Start is offered only when there is something to
+- **Rule-EDITOR-PANEL-132** — Start is offered only when there is something to
   walk. A test run holding no test cases and a filter that matches nothing are
   the same thing to the walk: both gray the button, and a press that reaches
   Testin anyway is refused and says so.

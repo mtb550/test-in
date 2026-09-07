@@ -10,12 +10,12 @@ running a sync, or editing files by hand all change the tree from outside.
 
 ## Rules
 
-- **Rule-TREE-PANEL-068** — Refresh checks again which test project this code
+- **Rule-TREE-PANEL-079** — Refresh checks again which test project this code
   project uses, first. So a test project changed by hand, or changed by a branch
   switch, is picked up.
-- **Rule-TREE-PANEL-069** — Editors on a node that no longer exists are closed.
+- **Rule-TREE-PANEL-080** — Editors on a node that no longer exists are closed.
   The other editors are reloaded, unless a tester is in the middle of something.
-- **Rule-TREE-PANEL-070** — Only one refresh runs at a time. A second request
+- **Rule-TREE-PANEL-081** — Only one refresh runs at a time. A second request
   while one is running is ignored.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They

@@ -12,10 +12,10 @@ visible without opening it.
 
 ## Rules
 
-- **Rule-TREE-PANEL-055** — **Completed** and **Closed** are final. The test run
+- **Rule-TREE-PANEL-065** — **Completed** and **Closed** are final. The test run
   accepts no more verdicts. Every test case still **Pending** becomes
   **Untested**. (Rule-TREE-PANEL-009)
-- **Rule-TREE-PANEL-056** — A tester sets **Assigned**, **Completed** and
+- **Rule-TREE-PANEL-066** — A tester sets **Assigned**, **Completed** and
   **Closed**. **Created** and **In Progress** are the test run's own record of
   itself.
 
@@ -64,7 +64,7 @@ are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
    **Edit Run** and **Run Tests** are gray on it.
 
 **Signing a test run off cannot be undone.** A status change is not on the
-tree's history (Rule-TREE-PANEL-049), and there is no confirmation before it.
+tree's history (Rule-TREE-PANEL-058), and there is no confirmation before it.
 Every **Pending** verdict becomes **Untested** at that moment.
 
 ## What Testin refuses

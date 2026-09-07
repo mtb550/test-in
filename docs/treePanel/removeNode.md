@@ -10,12 +10,12 @@ whole test project, **so that** the tree holds only what is current.
 
 ## Rules
 
-- **Rule-TREE-PANEL-033** — The confirmation says what will go. For one node, it
+- **Rule-TREE-PANEL-038** — The confirmation says what will go. For one node, it
   says what the node holds and where it is. For several nodes, it says how many.
-- **Rule-TREE-PANEL-034** — Removing a test set, a test set package or a test
+- **Rule-TREE-PANEL-039** — Removing a test set, a test set package or a test
   project removes its automation code with it.
-- **Rule-TREE-PANEL-035** — A removal can be undone. (Rule-TREE-PANEL-011)
-- **Rule-TREE-PANEL-036** — The two containers are never removed. This holds
+- **Rule-TREE-PANEL-040** — A removal can be undone. (Rule-TREE-PANEL-011)
+- **Rule-TREE-PANEL-041** — The two containers are never removed. This holds
   even when they are selected together with nodes that are removed.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They

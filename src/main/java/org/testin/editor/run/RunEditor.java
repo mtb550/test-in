@@ -564,7 +564,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // What there is to walk is this list, so a filter that empties it grays
         // Start on the same redraw rather than at whatever happens next. Through
         // the one method that owns the buttons, so light mode's copy of them is
-        // told at the same moment (Rule-EDITOR-PANEL-190).
+        // told at the same moment (Rule-EDITOR-PANEL-132).
         onExecutionStateChanged();
     }
 
@@ -1066,7 +1066,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-178.
+     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-179.
      * <p>
      * Says what an automated verdict threw away, when it threw anything away.
      * <p>
@@ -1242,7 +1242,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-190.
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132.
      * <p>
      * Whether the walk would land anywhere at all.
      * <p>
@@ -1260,7 +1260,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-190.
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132.
      * <p>
      * The manual button's whole question, in one place, so the toolbar and light
      * mode cannot answer it differently - which is the mistake
@@ -1360,7 +1360,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         onExecutionStateChanged();
     }
 
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-190
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132
     @Override
     public void onStartExecutionClicked() {
         final @NotNull Optional<TestRunDto> run = run();

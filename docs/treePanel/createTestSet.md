@@ -10,11 +10,11 @@ package, **so that** the test cases I am about to write have somewhere to live.
 
 ## Rules
 
-- **Rule-TREE-PANEL-023** — Under **Test Cases** or a test set package, only a
+- **Rule-TREE-PANEL-024** — Under **Test Cases** or a test set package, only a
   test set or a test set package can be created. The dialog offers nothing else.
-- **Rule-TREE-PANEL-024** — Nothing can be created directly under the test
+- **Rule-TREE-PANEL-025** — Nothing can be created directly under the test
   project, under a test set, or under a test run.
-- **Rule-TREE-PANEL-025** — A new test set opens in its editor at once. Its
+- **Rule-TREE-PANEL-026** — A new test set opens in its editor at once. Its
   automation code is written where the Java plugin allows it.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They

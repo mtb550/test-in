@@ -10,15 +10,15 @@
 
 ## Rules
 
-- **Rule-TREE-PANEL-027** — A test run needs at least one test case. It cannot
+- **Rule-TREE-PANEL-029** — A test run needs at least one test case. It cannot
   be created empty.
-- **Rule-TREE-PANEL-028** — Three things are not offered when a test run is
+- **Rule-TREE-PANEL-030** — Three things are not offered when a test run is
   created: a retired test set, anything under an **Archived** package, and an
   empty test set. (Rule-TREE-PANEL-008)
-- **Rule-TREE-PANEL-029** — A new test run starts as **Created**. Every test
+- **Rule-TREE-PANEL-031** — A new test run starts as **Created**. Every test
   case in it starts **Pending**.
 
-Rule-TREE-PANEL-026 holds here too. It says what can be created under **Test
+Rule-TREE-PANEL-032 holds here too. It says what can be created under **Test
 Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They

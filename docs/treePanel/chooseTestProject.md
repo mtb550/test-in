@@ -10,10 +10,10 @@ products.
 
 ## Rules
 
-- **Rule-TREE-PANEL-019** — The choice is written into the code project. A
+- **Rule-TREE-PANEL-020** — The choice is written into the code project. A
   colleague who copies that project down gets the same test project, with no
   setup.
-- **Rule-TREE-PANEL-020** — If the choice cannot be written, Testin says so. It
+- **Rule-TREE-PANEL-021** — If the choice cannot be written, Testin says so. It
   never reports the choice as saved.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They

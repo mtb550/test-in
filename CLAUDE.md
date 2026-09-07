@@ -201,8 +201,8 @@ silently does nothing costs more than the setting it was meant to hold.
 
 - **Code cites its rule, and the document changes with the code.** Every method
   a tester can reach carries a marker naming the use case or rule it
-  implements — `// UC-TREE-PANEL-012, Rule-TREE-PANEL-061` — and every change to what a
-  tester sees changes the document in the same commit. The format, what to do
+  implements — `// UC-TREE-PANEL-012, Rule-TREE-PANEL-038` — and every change to
+  what a tester sees changes the document in the same commit. The format, what to do
   when no rule exists yet, and when a method needs no marker are in the
   `code-cites-its-rule` skill under `.claude/skills/`. That skill is the
   authority; do not restate it here.

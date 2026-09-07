@@ -9,12 +9,12 @@
 
 ## Rules
 
-- **Rule-TREE-PANEL-071** — The branch box appears only when the test project's
+- **Rule-TREE-PANEL-082** — The branch box appears only when the test project's
   own project file says it is shared through Git **and** its folder really is a
   Git repository. A Git folder whose project file does not say so has no box.
-- **Rule-TREE-PANEL-072** — Switching with uncommitted changes asks first.
+- **Rule-TREE-PANEL-083** — Switching with uncommitted changes asks first.
   Switching never loses them.
-- **Rule-TREE-PANEL-073** — A switch that succeeds does a full refresh: it
+- **Rule-TREE-PANEL-084** — A switch that succeeds does a full refresh: it
   re-reads which test project is bound, reads the test project again, reloads
   every open Testin editor, and **closes any editor whose node the new branch
   does not have**.

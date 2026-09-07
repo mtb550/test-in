@@ -9,15 +9,15 @@ There is no key for this. The button's tooltip reads **Result Analysis**.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-185** — The analysis can be written only once the test run
+- **Rule-EDITOR-PANEL-186** — The analysis can be written only once the test run
   is **Completed**.
-- **Rule-EDITOR-PANEL-186** — There are four sections, one for each verdict,
+- **Rule-EDITOR-PANEL-187** — There are four sections, one for each verdict,
   each carrying its own count in the heading.
-- **Rule-EDITOR-PANEL-187** — A section left blank is not saved, and does not
+- **Rule-EDITOR-PANEL-188** — A section left blank is not saved, and does not
   appear in the report.
-- **Rule-EDITOR-PANEL-188** — `Enter` in a box makes a new paragraph. **Save**
+- **Rule-EDITOR-PANEL-189** — `Enter` in a box makes a new paragraph. **Save**
   is a button.
-- **Rule-EDITOR-PANEL-189** — The analysis appears in the PDF, Word and web
+- **Rule-EDITOR-PANEL-190** — The analysis appears in the PDF, Word and web
   reports. The spreadsheet report leaves it out.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.

@@ -107,7 +107,7 @@ public class EditTestRunAction extends AbstractProjectTreeAction {
     }
 
     /**
-     * UC-TREE-PANEL-022, Rule-TREE-PANEL-061 and Rule-TREE-PANEL-089.
+     * UC-TREE-PANEL-022, Rule-TREE-PANEL-072 and Rule-TREE-PANEL-074.
      * <p>
      * Writes the change, or refuses and says why - and answers which, because the
      * dialog stays open on a refusal with everything the tester typed still in it.

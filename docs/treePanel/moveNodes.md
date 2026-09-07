@@ -11,22 +11,22 @@ tree can be reorganized without building anything again.
 
 ## Rules
 
-- **Rule-TREE-PANEL-037** — A node lands only where its kind belongs. A test set
+- **Rule-TREE-PANEL-042** — A node lands only where its kind belongs. A test set
   or a test set package lands under **Test Cases** or under a test set package.
   A test run or a test run package lands under **Test Runs** or under a test run
   package. (Rule-TREE-PANEL-003)
-- **Rule-TREE-PANEL-038** — Nothing can be pasted or dropped into a test set or
+- **Rule-TREE-PANEL-043** — Nothing can be pasted or dropped into a test set or
   into a test run. Neither of them holds nodes.
-- **Rule-TREE-PANEL-039** — A node cannot land on itself, inside itself, or in
+- **Rule-TREE-PANEL-044** — A node cannot land on itself, inside itself, or in
   the folder it already sits in.
-- **Rule-TREE-PANEL-040** — Cut then paste moves. Dragging moves. Dragging with
+- **Rule-TREE-PANEL-045** — Cut then paste moves. Dragging moves. Dragging with
   the copy key held copies instead, which is [UC-TREE-PANEL-014](copyNodes.md).
-- **Rule-TREE-PANEL-042** — A move can be undone.
-- **Rule-TREE-PANEL-086** — Moving a test set or a test set package moves its
+- **Rule-TREE-PANEL-046** — A move can be undone.
+- **Rule-TREE-PANEL-047** — Moving a test set or a test set package moves its
   automation code with it, so the test cases stay runnable.
-- **Rule-TREE-PANEL-043** — Nodes drop onto a node, never between two. Position
+- **Rule-TREE-PANEL-048** — Nodes drop onto a node, never between two. Position
   is set by ordering, in [UC-TREE-PANEL-015](orderNodes.md), not by dragging.
-- **Rule-TREE-PANEL-076** — Canceling a cut empties the clipboard. Nothing is
+- **Rule-TREE-PANEL-049** — Canceling a cut empties the clipboard. Nothing is
   left waiting to be pasted.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
@@ -123,7 +123,7 @@ first of them.
 > live, and `Ctrl+V` on another folder offers to move the same nodes again.
 
 > **After `Escape`, the nodes stay on the clipboard.** A later `Ctrl+V` still
-> offers to move them. This breaks Rule-TREE-PANEL-076, and is difference 6 on
+> offers to move them. This breaks Rule-TREE-PANEL-049, and is difference 6 on
 > [the tree panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

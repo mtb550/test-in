@@ -11,12 +11,12 @@ its history without getting in the way of what I am testing now.
 
 ## Rules
 
-- **Rule-TREE-PANEL-051** — Retiring deletes nothing. (Rule-TREE-PANEL-008)
-- **Rule-TREE-PANEL-052** — A test project that is not **Active** shows nothing
+- **Rule-TREE-PANEL-060** — Retiring deletes nothing. (Rule-TREE-PANEL-008)
+- **Rule-TREE-PANEL-061** — A test project that is not **Active** shows nothing
   under it.
-- **Rule-TREE-PANEL-053** — An **Archived** test project is not opened at all on
+- **Rule-TREE-PANEL-062** — An **Archived** test project is not opened at all on
   the next load. The panel says so, and offers the other test projects.
-- **Rule-TREE-PANEL-054** — A status is set on one node at a time. The status a
+- **Rule-TREE-PANEL-063** — A status is set on one node at a time. The status a
   node already has is not offered.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They

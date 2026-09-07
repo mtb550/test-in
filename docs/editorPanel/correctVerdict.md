@@ -9,13 +9,13 @@ Press the right verdict's key on the test case.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-155** — A verdict is simply written over. There is no
+- **Rule-EDITOR-PANEL-156** — A verdict is simply written over. There is no
   separate gesture for correcting one.
-- **Rule-EDITOR-PANEL-156** — Correcting a verdict re-stamps who recorded it and
+- **Rule-EDITOR-PANEL-157** — Correcting a verdict re-stamps who recorded it and
   when. The original tester and the original time are gone.
-- **Rule-EDITOR-PANEL-157** — Changing a failed test case to passed asks first,
+- **Rule-EDITOR-PANEL-158** — Changing a failed test case to passed asks first,
   because it clears four things.
-- **Rule-EDITOR-PANEL-158** — Only passing clears anything. Failing and blocking
+- **Rule-EDITOR-PANEL-159** — Only passing clears anything. Failing and blocking
   clear nothing.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.

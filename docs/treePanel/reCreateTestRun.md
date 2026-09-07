@@ -11,14 +11,14 @@ again by hand.
 
 ## Rules
 
-- **Rule-TREE-PANEL-057** — Re-create works on a test run in any status,
+- **Rule-TREE-PANEL-067** — Re-create works on a test run in any status,
   including a signed-off one. That is what it is for.
-- **Rule-TREE-PANEL-058** — Only the test cases and the configuration are
+- **Rule-TREE-PANEL-068** — Only the test cases and the configuration are
   carried over. Verdicts, durations and failure details start fresh.
-- **Rule-TREE-PANEL-059** — The next name is suggested by counting up. *cycle-1*
+- **Rule-TREE-PANEL-069** — The next name is suggested by counting up. *cycle-1*
   becomes *cycle-2*, and a name with no number on it gets one: *smoke* becomes
   *smoke-2*. A name already taken is skipped.
-- **Rule-TREE-PANEL-088** — The new test run is created in the same folder as
+- **Rule-TREE-PANEL-070** — The new test run is created in the same folder as
   the one it was made from.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They

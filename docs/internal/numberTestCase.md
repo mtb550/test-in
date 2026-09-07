@@ -11,28 +11,28 @@ panel.
 
 ## Rules
 
-- **Rule-INTERNAL-024** — A test case's number is its position in its test set,
+- **Rule-INTERNAL-025** — A test case's number is its position in its test set,
   counting from one.
-- **Rule-INTERNAL-025** — The number is worked out when it is drawn, and stored
+- **Rule-INTERNAL-026** — The number is worked out when it is drawn, and stored
   nowhere.
-- **Rule-INTERNAL-026** — One thing works the number out, so the card, the row
+- **Rule-INTERNAL-027** — One thing works the number out, so the card, the row
   and the generated test method always agree.
-- **Rule-INTERNAL-027** — A filter never renumbers. Hiding rows does not change
+- **Rule-INTERNAL-028** — A filter never renumbers. Hiding rows does not change
   the number on the rows that remain.
-- **Rule-INTERNAL-028** — Each test case carries its own place in the order.
+- **Rule-INTERNAL-029** — Each test case carries its own place in the order.
   Testin keeps it inside that test case's own file.
-- **Rule-INTERNAL-029** — A test case with no place yet sorts after every test
+- **Rule-INTERNAL-030** — A test case with no place yet sorts after every test
   case that has one. Among those, the oldest comes first.
-- **Rule-INTERNAL-030** — Moving one test case writes only the test cases that
+- **Rule-INTERNAL-031** — Moving one test case writes only the test cases that
   actually moved. Dropping one into a test set of 200 writes one file.
-- **Rule-INTERNAL-031** — A place between any two places always exists, so a
+- **Rule-INTERNAL-032** — A place between any two places always exists, so a
   test case can always be dropped between two others.
-- **Rule-INTERNAL-032** — A save that would leave the file exactly as it is
+- **Rule-INTERNAL-033** — A save that would leave the file exactly as it is
   writes nothing. Testin does not record the tester as having edited it.
-- **Rule-INTERNAL-033** — A test case is known by its file name. Testin decides
+- **Rule-INTERNAL-034** — A test case is known by its file name. Testin decides
   whether a save is a new test case or a change by whether it already knows that
   name.
-- **Rule-INTERNAL-034** — An import and an undo write the file without stamping
+- **Rule-INTERNAL-035** — An import and an undo write the file without stamping
   it. An import keeps the audit the file brought. An undo puts back the audit
   the test case had before.
 
@@ -107,7 +107,7 @@ land in the same place, the older one is drawn first.
 
 Three separate places used to work the number out. A filter renumbered the cards
 from one, so a test set of 40 test cases read as a test set of 12. There is now
-one owner, and Rule-INTERNAL-026 is the whole reason it exists.
+one owner, and Rule-INTERNAL-027 is the whole reason it exists.
 
 ---
 

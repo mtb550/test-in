@@ -11,10 +11,10 @@ again.
 
 ## Rules
 
-- **Rule-TREE-PANEL-085** — Bringing a node back undoes nothing but the status.
+- **Rule-TREE-PANEL-064** — Bringing a node back undoes nothing but the status.
   Everything inside it is exactly as it was left.
 
-Rule-TREE-PANEL-054 holds here too. It says a status is set on one node at a
+Rule-TREE-PANEL-063 holds here too. It says a status is set on one node at a
 time, and it is on [UC-TREE-PANEL-018](retireNode.md).
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
@@ -37,7 +37,7 @@ choosing it is [UC-TREE-PANEL-004](chooseTestProject.md).
 
 ## What Testin refuses
 
-**If the node is already Active** — the entry is gray. (Rule-TREE-PANEL-054)
+**If the node is already Active** — the entry is gray. (Rule-TREE-PANEL-063)
 
 **If the status could not be written** — Testin says it could not, and nothing
 changes. The messages are on [UC-TREE-PANEL-018](retireNode.md).

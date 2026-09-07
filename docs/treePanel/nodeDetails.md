@@ -10,9 +10,9 @@ tree is at a glance.
 
 ## Rules
 
-- **Rule-TREE-PANEL-074** — Opening **Details** changes nothing, so Testin says
+- **Rule-TREE-PANEL-085** — Opening **Details** changes nothing, so Testin says
   nothing. (Rule-TREE-PANEL-007)
-- **Rule-TREE-PANEL-075** — Testin counts what a node holds when the tester
+- **Rule-TREE-PANEL-086** — Testin counts what a node holds when the tester
   asks. It never saves the number.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
