@@ -29,7 +29,9 @@ There is no key for this. It happens when a test case is created, which is
 - **Rule-CODEGEN-013** — `testName` carries the test case's identity. That is
   what finds the method afterwards.
 - **Rule-CODEGEN-014** — `priority` carries the test case's position in its test
-  set, counting from one.
+  set, counting from one. It is the method's priority, which is what TestNG runs
+  methods in the order of - not the test case's, which is a different thing.
+  Changing a test case's priority writes nothing into the code, deliberately.
 - **Rule-CODEGEN-015** — `groups` is written only when the test case belongs to
   at least one group.
 - **Rule-CODEGEN-016** — Two descriptions that differ only in punctuation or
@@ -81,9 +83,6 @@ carrying its identity, so it cannot be run and cannot be jumped to. Nothing says
 so when it is created, and the tester finds out at the first `F5`. That is
 difference 3 on
 [the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
-
-**`priority` is not the priority.** It is the position in the test set. That is
-difference 1.
 
 ---
 

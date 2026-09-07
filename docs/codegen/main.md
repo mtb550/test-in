@@ -139,7 +139,6 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule-CODEGEN-003 — what Testin writes means what it says | `priority` in the generated method is the test case's position in its test set, not its priority. A tester reading `priority = 3` in the code reads it as the test case's priority. Changing a test case's real priority writes nothing at all. |
 | **Difference 2** | Rule-CODEGEN-002 — a menu entry does what it says | **Automate Test Case**, and `Ctrl+F12`, are live on every selected test case and always answer *Not built yet*. The one entry named after generating code is the one that does not. |
 | **Difference 3** | Rule-CODEGEN-001 — one test case, one method | Two test cases whose descriptions differ only in punctuation share one method. The second gets none, cannot be run and cannot be jumped to. Nothing says so when it is created. |
 | **Difference 4** | Rule-CODEGEN-006 — a tester can find out what happened | Clicking the gutter mark of a test case that was removed does nothing at all. Generated code outlives its test case, so this is the ordinary case. |
@@ -148,6 +147,13 @@ bug report yet.
 | **Difference 7** | Rule-CODEGEN-005 — a missing plugin is a skip | With TestNG but no Java plugin, **Run Test Case** is offered, every test case resolves to nothing, and the tester gets one *has no generated code yet* message per test case with no mention of the missing plugin. |
 | **Difference 8** | Rule-CODEGEN-006 — a refusal names what happened | Removing a test set that sits outside a test cases folder says a class name could not be **built**, during an operation that was only going to delete one. |
 | **Difference 9** | Rule-CODEGEN-003 — one name for one thing | Two test sets whose names come to nothing when the special characters are removed both write into one class called `DefaultTest`. |
+
+**Settled since this list was written.** The numbers are left out rather than
+closed up, so an issue that quotes one still points at the right thing.
+
+| Gone | Was |
+|---|---|
+| **Difference 1** | `priority` in the generated method carries the position, not the test case's priority. Not a difference: a test method's priority and a test case's priority are different things, and the case's own writes nothing into the code on purpose. Decided 7 September 2026, [#242](https://github.com/mtb550/test-in/issues/242) |
 
 ---
 
