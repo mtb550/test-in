@@ -49,15 +49,6 @@ without a method would be a message for every test case nobody has written yet.
 
 **If the IDE has no Java plugin** — nothing is rewritten.
 
-## Where the plugin breaks its own rules
-
-**The attribute is called `priority` and does not hold the priority.** A tester
-reading the generated code sees `priority = 3` and reads it as the test case's
-priority, which is a separate thing with the values High, Medium and Low.
-Changing the real priority writes nothing into the code at all. That is
-difference 1 on
-[the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
-
 ---
 
 [Documentation](../README.md) › [Automation code and the gutter](main.md)

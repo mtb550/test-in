@@ -90,7 +90,9 @@ public void logInWithAValidUser() {
    test case, and it is the only part that must never be edited.
 3. **groups** — the test case's groups. Written only when it has any.
 4. **priority** — the test case's **position in its test set**, counting from
-   one. It is not its High, Medium or Low. That is difference 1 below.
+   one. It is the method's priority, which is what TestNG runs methods in the
+   order of. The test case's own High, Medium or Low is a different thing and
+   writes nothing here (Rule-CODEGEN-014).
 5. **The method name** — the description with everything but letters and digits
    removed, the first word lowercase and later words capitalized.
 6. **The body** — one comment, and nothing else. The tester writes the rest.
