@@ -38,7 +38,29 @@ public final class ListPanelBuilder {
     public static @NotNull ListView build(final @NotNull Project p, final @NotNull Disposable fontSyncDisposable) {
         final @NotNull CollectionListModel<TestCaseDto> model = new CollectionListModel<>(new ArrayList<>());
 
-        final @NotNull JBList<TestCaseDto> list = new JBList<>(model);
+        // UC-EDITOR-PANEL-001 and UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-002.
+        //
+        // A card is drawn to the width it is given - a long title wraps onto more
+        // lines rather than running off the side - so this list never scrolls
+        // sideways, and saying so is what stops it trying.
+        //
+        // JList works the answer out instead, by comparing the widest card with
+        // the viewport, and until the list has been laid out it has no width to
+        // give: Shared.titleColumnWidth reads zero, decides there is no column to
+        // wrap inside, and lets the title run as far as it likes, which lays the
+        // card out 32767 pixels wide. So opening an editor put a horizontal
+        // scrollbar under a virtually endless row, and every re-measure as the
+        // real width arrived grew its thumb a little until the bar went away.
+        //
+        // Answered here rather than by making the zero-width case guess a column:
+        // a card with nowhere to wrap really has no column, and the fix for that
+        // is to give it the width, which is what this does.
+        final @NotNull JBList<TestCaseDto> list = new JBList<>(model) {
+            @Override
+            public boolean getScrollableTracksViewportWidth() {
+                return true;
+            }
+        };
         list.setBackground(UIUtil.getPanelBackground());
         list.setOpaque(true);
         list.setPaintBusy(true);
