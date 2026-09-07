@@ -9,18 +9,18 @@ see it, **so that** the bug report writes itself later.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-141** — Failing is the one verdict that asks for detail.
+- **Rule-EDITOR-PANEL-142** — Failing is the one verdict that asks for detail.
   The dialog opens before the verdict is recorded.
-- **Rule-EDITOR-PANEL-142** — `Escape` in the dialog records nothing at all,
+- **Rule-EDITOR-PANEL-143** — `Escape` in the dialog records nothing at all,
   neither the detail nor the verdict, and asks first when there is something
   typed to lose. A dialog opened and closed unchanged still goes at once.
-- **Rule-EDITOR-PANEL-143** — Nothing is written as the tester types. Only
+- **Rule-EDITOR-PANEL-144** — Nothing is written as the tester types. Only
   saving writes.
-- **Rule-EDITOR-PANEL-144** — The dialog opens for one test case. Several at
+- **Rule-EDITOR-PANEL-145** — The dialog opens for one test case. Several at
   once are failed with no detail collected.
-- **Rule-EDITOR-PANEL-145** — The bug severity starts at **Enhancement** and the
+- **Rule-EDITOR-PANEL-146** — The bug severity starts at **Enhancement** and the
   bug priority at **Low**.
-- **Rule-EDITOR-PANEL-146** — The four fields are the same four the failure form
+- **Rule-EDITOR-PANEL-147** — The four fields are the same four the failure form
   in light mode uses.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.

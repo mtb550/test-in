@@ -203,17 +203,14 @@ public interface TestinEditor extends Disposable {
      * <p>
      * The refresh button in the editor's own toolbar is the same thing, so it
      * calls this rather than keeping a second copy of it.
-     */
-    void reload();
-
-    /**
-     * Reads the index again without touching the toolbar.
      * <p>
-     * The difference from {@link #reload()} is the filters and the search.
-     * Dropping those is what Refresh means when a tester presses the button, and
-     * it is exactly wrong for anything the tester did not ask for - taking a
-     * change back should not also throw away what they had narrowed the view to
-     * (#165).
+     * <b>The toolbar is not touched.</b> There used to be a second method that
+     * dropped every filter and the search first, which is what Refresh meant -
+     * so a tester who narrowed 200 test cases to four, and pressed Refresh to
+     * pick up a colleague's change, got all 200 back under a message reading
+     * only "Refreshed" (#208). Reading the data again and throwing away what the
+     * tester narrowed to were never the same act; with the second one gone,
+     * there is one method left and nothing to tell apart (#165).
      */
     void reloadData();
 

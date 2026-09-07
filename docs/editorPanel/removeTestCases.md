@@ -9,13 +9,13 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-060** — The confirmation names the test case, or counts
+- **Rule-EDITOR-PANEL-061** — The confirmation names the test case, or counts
   them, and says which test set they are in.
-- **Rule-EDITOR-PANEL-061** — A removal can be taken back with `Ctrl+Z`.
-- **Rule-EDITOR-PANEL-062** — Nothing is renumbered. The removed test case
+- **Rule-EDITOR-PANEL-062** — A removal can be taken back with `Ctrl+Z`.
+- **Rule-EDITOR-PANEL-063** — Nothing is renumbered. The removed test case
   simply leaves a gap in the order, and the numbers on screen close up on their
   own.
-- **Rule-EDITOR-PANEL-063** — A test case that is waiting to be pasted is
+- **Rule-EDITOR-PANEL-064** — A test case that is waiting to be pasted is
   removed without asking again, because the move was already agreed to.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.

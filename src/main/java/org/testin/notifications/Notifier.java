@@ -116,6 +116,21 @@ public final class Notifier {
     }
 
     /**
+     * A test case the tester should be looking at is behind the filter.
+     * <p>
+     * Said rather than fixed. Testin used to clear every filter to bring the
+     * case into view, which changes the view the tester set up, without asking
+     * and without saying - and it did not even work: the search text was left
+     * alone, so a case the search was hiding stayed hidden and the filters went
+     * for nothing (#205).
+     * <p>
+     * The test case is there either way. This is about where to look for it.
+     */
+    public void softShowHiddenByFilter(final @NotNull Project p, final @NotNull String testCase) {
+        softShow(p, "Hidden by the filter", "'" + testCase + "' is not on screen. Clear the filter or the search to see it.");
+    }
+
+    /**
      * The tester asked to run something that is already running.
      * <p>
      * Its own sentence rather than the one below: a run with cases still going

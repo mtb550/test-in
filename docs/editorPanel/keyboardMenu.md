@@ -9,9 +9,9 @@ The `Context Menu` key.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-121** — The menu opens on whatever is selected, in both
+- **Rule-EDITOR-PANEL-122** — The menu opens on whatever is selected, in both
   views and in the tree.
-- **Rule-EDITOR-PANEL-122** — With nothing selected, nothing opens.
+- **Rule-EDITOR-PANEL-123** — With nothing selected, nothing opens.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on

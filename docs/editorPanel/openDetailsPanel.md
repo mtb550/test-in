@@ -9,8 +9,8 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-110** — Opening the details panel says nothing.
-- **Rule-EDITOR-PANEL-111** — Once the panel is open, moving the selection fills
+- **Rule-EDITOR-PANEL-111** — Opening the details panel says nothing.
+- **Rule-EDITOR-PANEL-112** — Once the panel is open, moving the selection fills
   it again.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.

@@ -9,20 +9,20 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-128** — The walk only ever lands on a test case waiting
+- **Rule-EDITOR-PANEL-129** — The walk only ever lands on a test case waiting
   for a verdict. It starts at the first one and moves to the next, passing over
   any that has been judged, whoever judged it.
-- **Rule-EDITOR-PANEL-129** — Starting marks the test run **In Progress**, and
+- **Rule-EDITOR-PANEL-130** — Starting marks the test run **In Progress**, and
   stamps when execution began. That stamp is set once and never overwritten.
-- **Rule-EDITOR-PANEL-130** — The clock starts on the test case the walk lands
+- **Rule-EDITOR-PANEL-131** — The clock starts on the test case the walk lands
   on, and ticks once a second.
-- **Rule-EDITOR-PANEL-131** — The button becomes **Stop Execution** while the
+- **Rule-EDITOR-PANEL-132** — The button becomes **Stop Execution** while the
   walk is going.
-- **Rule-EDITOR-PANEL-132** — Reaching the end of the list ends the walk, and
+- **Rule-EDITOR-PANEL-133** — Reaching the end of the list ends the walk, and
   nothing more. The test run is marked **Completed** only when every test case
   in it has been judged, which is asked of the test run and not of the walk -
   and asked wherever a verdict is recorded, whichever way the last one arrived.
-- **Rule-EDITOR-PANEL-133** — Start is offered only when there is something to
+- **Rule-EDITOR-PANEL-134** — Start is offered only when there is something to
   walk. A test run holding no test cases, a filter that matches nothing, and a
   list whose test cases have all been judged are the same thing to the walk: all
   three gray the button, and a press that reaches Testin anyway is refused and

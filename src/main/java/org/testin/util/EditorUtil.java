@@ -130,7 +130,7 @@ public final class EditorUtil {
                             + testinFile.getName());
                     continue;
                 }
-                editor.reload();
+                editor.reloadData();
             }
         }
     }

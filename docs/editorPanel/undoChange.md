@@ -9,15 +9,15 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-064** — Each editor has a history of its own, kept against
+- **Rule-EDITOR-PANEL-065** — Each editor has a history of its own, kept against
   the test set it is showing. The tree keeps another.
-- **Rule-EDITOR-PANEL-065** — The menu entry says what the next press would take
+- **Rule-EDITOR-PANEL-066** — The menu entry says what the next press would take
   back.
-- **Rule-EDITOR-PANEL-066** — A test case is put back exactly, including who
+- **Rule-EDITOR-PANEL-067** — A test case is put back exactly, including who
   last changed it and when.
-- **Rule-EDITOR-PANEL-067** — A test case coming back from a removal gets its
+- **Rule-EDITOR-PANEL-068** — A test case coming back from a removal gets its
   test method written again.
-- **Rule-EDITOR-PANEL-068** — A gesture that changed nothing is not on the
+- **Rule-EDITOR-PANEL-069** — A gesture that changed nothing is not on the
   history at all.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.

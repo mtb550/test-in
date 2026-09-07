@@ -9,7 +9,7 @@ in a tab. It is where test cases are written, and where a test run is executed.
 |---|---|
 | **Part of Testin** | The editor panel |
 | **Answers** | What a tester can do to test cases and to a test run, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-046`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-191` |
+| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-046`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-192` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -124,7 +124,9 @@ the same rows, a filter, a search, and a key for every gesture.
 - **Rule-EDITOR-PANEL-008** — Every change confirms itself with one message in
   the past tense. A change to several test cases gets one message with a count.
 - **Rule-EDITOR-PANEL-009** — Moving the view says nothing. Paging, filtering,
-  searching and opening the details panel are all silent.
+  searching and opening the details panel are all silent. It changes nothing
+  either: a test case the filter is hiding is reported, never brought into view
+  by throwing the filter away.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
 
@@ -289,11 +291,8 @@ bug report yet.
 | **Difference 7** | Rule-EDITOR-PANEL-005 — what the tester typed is stored | A description typed into a grid cell loses characters Testin will not keep. If nothing else changed, nothing is saved and nothing is said, and the tester watches their text change. |
 | **Difference 8** | Rule-EDITOR-PANEL-005 — one answer to one situation | A priority typed into a grid cell that Testin cannot read becomes the lowest. A status it cannot read keeps the value the test case already had. Two columns, two answers to a typo. |
 | **Difference 9** | Rule-EDITOR-PANEL-005 — a key works the same on every machine | `Ctrl+M` is not made into `Cmd+M` on a Mac, though `Ctrl+C` and `Ctrl+F` are. The empty editor's second line reads *Press Ctrl+M to add* whatever machine it is on. |
-| **Difference 10** | Rule-EDITOR-PANEL-009 — moving the view says nothing, and changes nothing | Selecting a test case that a filter is hiding throws every filter away, silently. It happens after creating a test case, after a drag, and after choosing a search result. |
 | **Difference 11** | Rule-EDITOR-PANEL-005 — what the tester typed is stored | The page size box takes anything and quietly answers something else. `5000` becomes 1000. `0`, a negative number, letters and an empty box all become 50. |
 | **Difference 12** | Rule-EDITOR-PANEL-002 — the two views show the same rows | Unticking **Order** stops three gestures in the grid working: clicking a row to select it, `Enter` to open the details panel, and the double-click. Nothing says why. |
-| **Difference 13** | Rule-EDITOR-PANEL-009 — nothing is lost without being said | **Refresh** throws away every filter and the search text. The message afterwards says only *Refreshed*. |
-| **Difference 14** | Rule-EDITOR-PANEL-005 — the tester sees what they did | A card dragged between two visible cards lands after whatever the filter is hiding between them. The message says *Re-sorted* and the test case is not where it was dropped. |
 | **Difference 15** | Rule-EDITOR-PANEL-008 — one word for one act | Dragging cards says *Re-sorted*. Moving a test case by typing its number says *Updated*. The same act, two words. |
 | **Difference 16** | Rule-EDITOR-PANEL-010 — a key that works is written down | `Shift+Enter` saves a bulk edit. The strip along the bottom names only `Enter`. |
 | **Difference 17** | Rule-EDITOR-PANEL-009 — a search finds what is there | The search reads the description, the identity, the expected result and the steps. It does not read the module, the group, the test data or the pre-conditions, each of which has its own column and its own filter. |
@@ -313,6 +312,9 @@ closed up, so an issue that quotes one still points at the right thing.
 
 | Gone | Was |
 |---|---|
+| **Difference 10** | Selecting a test case the filter was hiding threw every filter away, silently. Fixed 7 September 2026, [#205](https://github.com/mtb550/test-in/issues/205) |
+| **Difference 13** | **Refresh** threw away every filter and the search text, and said only *Refreshed*. Fixed 7 September 2026, [#208](https://github.com/mtb550/test-in/issues/208) |
+| **Difference 14** | A card dragged between two visible cards landed after whatever the filter was hiding between them. Fixed 7 September 2026, [#209](https://github.com/mtb550/test-in/issues/209) |
 | **Difference 20** | A filtered walk completed the whole test run and turned every other pending test case untested. Fixed 7 September 2026, [#214](https://github.com/mtb550/test-in/issues/214) |
 | **Difference 21** | **Start Manual Execution** was live on a test run holding no test cases and on a filter matching nothing, and pressing it marked the test run **In Progress**. Fixed 7 September 2026, [#215](https://github.com/mtb550/test-in/issues/215) |
 | **Difference 22** | The walk landed on test cases that already had a verdict, timed them again, and re-stamped who judged them and when. Fixed 7 September 2026 |

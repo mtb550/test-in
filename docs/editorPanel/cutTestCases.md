@@ -9,11 +9,11 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-076** — A cut test case is drawn faded, so the tester can
+- **Rule-EDITOR-PANEL-077** — A cut test case is drawn faded, so the tester can
   see what is waiting to move.
-- **Rule-EDITOR-PANEL-077** — Nothing is removed until the paste. A cut on its
+- **Rule-EDITOR-PANEL-078** — Nothing is removed until the paste. A cut on its
   own changes nothing.
-- **Rule-EDITOR-PANEL-078** — A cut is called off by a paste, by a copy, and by
+- **Rule-EDITOR-PANEL-079** — A cut is called off by a paste, by a copy, and by
   `Escape`.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.

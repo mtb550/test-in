@@ -9,13 +9,13 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-084** — Cells are copied as text with a tab between
+- **Rule-EDITOR-PANEL-085** — Cells are copied as text with a tab between
   columns and a line break between rows, which is what a spreadsheet reads.
-- **Rule-EDITOR-PANEL-085** — A value holding a tab, a line break or a quote is
+- **Rule-EDITOR-PANEL-086** — A value holding a tab, a line break or a quote is
   wrapped in quotes.
-- **Rule-EDITOR-PANEL-086** — One value on the clipboard fills every selected
+- **Rule-EDITOR-PANEL-087** — One value on the clipboard fills every selected
   cell. A block is laid from the top left cell.
-- **Rule-EDITOR-PANEL-087** — A cell that cannot be typed into is skipped, for
+- **Rule-EDITOR-PANEL-088** — A cell that cannot be typed into is skipped, for
   both cut and paste.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.

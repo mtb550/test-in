@@ -24,7 +24,6 @@ import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.editor.toolbar.TestToolbar;
 import org.testin.editor.toolbar.Toolbar;
-import org.testin.editor.toolbar.components.FilterPopupBtn;
 import org.testin.editor.toolbar.components.TestDetailsPopupBtn;
 import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
@@ -278,13 +277,17 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         });
     }
 
+    // UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-009
     @Override
     public void selectTestCase(final @NotNull TestCaseDto tc) {
+        // Told, not revealed. Moving the view says nothing and changes nothing,
+        // and this changed the most visible thing the tester had set up - every
+        // filter, thrown away to show one card, with no word about it. Creating
+        // a test case under a filter, dragging one, and choosing a search result
+        // all came through here (#205).
         if (!currentTestCases.contains(tc)) {
-            toolBar.getToolbarItem(FilterPopupBtn.class).resetToolBarFilter();
-
-            currentTestCases.clear();
-            currentTestCases.addAll(getFilteredList());
+            Services.getInstance(p, Notifier.class).softShowHiddenByFilter(p, tc.getDescription());
+            return;
         }
 
         final int index = currentTestCases.indexOf(tc);
@@ -432,18 +435,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         // Said when the data is back, not when the button went down: the read
         // waits for indexing and finishes on another thread, so a balloon here
         // would announce a refresh that has not happened yet (#62).
-        reload(() -> Services.getInstance(p, Notifier.class).softShow(p, Done.REFRESHED));
-    }
-
-    @Override
-    public void reload() {
-        reload(() -> {
-        });
-    }
-
-    private void reload(final @NotNull Runnable onLoaded) {
-        toolBar.clearFiltersAndSearch();
-        reloadData(onLoaded);
+        reloadData(() -> Services.getInstance(p, Notifier.class).softShow(p, Done.REFRESHED));
     }
 
     @Override

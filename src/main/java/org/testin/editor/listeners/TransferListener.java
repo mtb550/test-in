@@ -92,7 +92,8 @@ public class TransferListener extends TransferHandler {
 
             // Read before the removal, because it is found among the visible
             // rows and those still hold the dragged cases.
-            final @NotNull Optional<TestCaseDto> anchor = anchorBelowDrop(support, movedIds);
+            final @NotNull Optional<TestCaseDto> above = anchorAboveDrop(support, movedIds);
+            final @NotNull Optional<TestCaseDto> below = anchorBelowDrop(support, movedIds);
 
             final @NotNull List<TestCaseDto> allItems = editor.getAllTestCases();
             final @NotNull List<UUID> ids;
@@ -104,7 +105,7 @@ public class TransferListener extends TransferHandler {
                 if (!here.containsAll(movedIds)) return false;
 
                 allItems.removeIf(tc -> movedIds.contains(tc.getId()));
-                allItems.addAll(anchor.map(tc -> indexOfId(allItems, tc.getId())).orElse(allItems.size()), itemsToMove);
+                allItems.addAll(landingIndex(allItems, above, below), itemsToMove);
                 ids = TestCaseSnapshot.idsOf(allItems);
             }
 
@@ -148,10 +149,10 @@ public class TransferListener extends TransferHandler {
      * anyway, so a drag moved cases the tester never touched and saved them
      * (#163).
      * <p>
-     * Above rather than below: "insert before row N" is what a drop location
-     * already means, so the only boundary is the one Swing itself defines, past
-     * the last row appends. A case dropped between two visible cards therefore
-     * lands after whatever the filter is hiding between them.
+     * Kept as the fallback for a drop with nothing visible above it - the top of
+     * a page - where inserting after the card above is not a position this page
+     * can name. Without it a card dropped at the top of page two went to the top
+     * of the whole test set.
      */
     private @NotNull Optional<TestCaseDto> anchorBelowDrop(final @NotNull TransferSupport support, final @NotNull Set<UUID> movedIds) {
         if (!(support.getComponent() instanceof JBList<?> target)) return Optional.empty();
@@ -163,6 +164,47 @@ public class TransferListener extends TransferHandler {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * The visible case the drop landed under: the last row before the drop point
+     * that is not itself being dragged, and empty when the drop was above all of
+     * them.
+     * <p>
+     * The card above rather than the card below, which is what decides where the
+     * hidden cases end up. Anchoring below meant "before the next visible card",
+     * so a case dropped between two visible cards landed after every case the
+     * filter was hiding between them - saved, confirmed as Re-sorted, and
+     * nowhere the tester could see it (#209). Anchoring above puts it straight
+     * after the card it was dropped under, which is the one position the tester
+     * can actually point at.
+     */
+    // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-058
+    private @NotNull Optional<TestCaseDto> anchorAboveDrop(final @NotNull TransferSupport support, final @NotNull Set<UUID> movedIds) {
+        if (!(support.getComponent() instanceof JBList<?> target)) return Optional.empty();
+
+        final @NotNull ListModel<?> rows = target.getModel();
+        final int drop = Math.min(((JBList.DropLocation) support.getDropLocation()).getIndex(), rows.getSize());
+
+        for (int row = drop - 1; row >= 0; row--) {
+            if (rows.getElementAt(row) instanceof TestCaseDto tc && !movedIds.contains(tc.getId())) return Optional.of(tc);
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Where the dragged cases go in the whole test set.
+     * <p>
+     * After the card the drop landed under, and before the card it landed above
+     * when there is nothing under it - the top of a page, where "after the card
+     * above" names no position this page can see. With neither, the page holds
+     * nothing visible and the cases go to the end.
+     */
+    private static int landingIndex(final @NotNull List<TestCaseDto> allItems, final @NotNull Optional<TestCaseDto> above, final @NotNull Optional<TestCaseDto> below) {
+        return above.map(tc -> Math.min(indexOfId(allItems, tc.getId()) + 1, allItems.size()))
+                .or(() -> below.map(tc -> indexOfId(allItems, tc.getId())))
+                .orElse(allItems.size());
     }
 
     /**
