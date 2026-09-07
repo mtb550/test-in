@@ -3,7 +3,10 @@
 # UC-VIEW-PANEL-011: Change one field without leaving the panel
 
 **As a** tester, **I want** to correct a field I have just noticed is wrong,
-**so that** I do not have to go back to the editor and find the test case again.
+**so that** I do not have to go back to the editor and find the test case
+again.
+
+One field, one small dialog. The rest of the test case is left alone.
 
 `F2` opens the menu of fields.
 
@@ -61,8 +64,8 @@
 1. **Each row** — the field's name, then the letter that opens it.
 2. **The first row** — selected when the menu opens.
 
-Choosing a row opens that field's own editor. Those editors belong to the editor
-panel and are drawn on
+Choosing a row opens that field's own small dialog. Those dialogs belong to the
+editor panel. They are drawn on
 [UC-EDITOR-PANEL-007](../editorPanel/changeOneField.md).
 
 ## Main flow
@@ -71,7 +74,7 @@ panel and are drawn on
 2. The tester presses `F2`.
 3. The **Update Test Case** menu opens, one row for each field.
 4. The tester presses the field's letter, or picks the row.
-5. That field's editor opens with the current value in it.
+5. That field's dialog opens with the current value in it.
 6. The tester types and presses `Enter`.
 7. Testin writes the test case and shows *Updated*.
 8. The panel redraws with the new value.
@@ -80,19 +83,13 @@ panel and are drawn on
 
 **If the panel is showing no test case** — `F2` does nothing.
 
-**If the panel has never drawn a test case** — `F2` is not bound yet. It becomes
-live the first time a test case is drawn.
+**If the panel has never drawn a test case** — `F2` does nothing at all. The key
+starts working the first time a test case is drawn.
 
 **If the save would change nothing** — nothing is written, no message is raised,
 and nothing goes on the undo history.
 
 ## Where the plugin breaks its own rules
-
-**A change Testin cannot place is dropped in silence.** If neither the test
-case nor the panel's path names a test set, nothing is written. There is no
-message, no balloon and nothing on screen. Only the log records it. That is
-difference 10 on
-[the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
 **`Escape` cannot close the panel afterwards.** Using `F2` needs the keyboard to
 be in the panel, and `Escape` does nothing there. That is difference 2.

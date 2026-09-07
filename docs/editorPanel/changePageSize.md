@@ -5,6 +5,8 @@
 **As a** tester, **I want** more test cases on a page,
 **so that** I can see a whole test set of 80 without turning pages.
 
+This is the small box at the right of the status bar. It holds 50 to start with.
+
 There is no key for this. The box is at the right of the status bar.
 
 ## Rules
@@ -39,6 +41,14 @@ There is no key for this. The box is at the right of the status bar.
 - **Rule-EDITOR-PANEL-107** — Changing it goes back to the first page and
   returns the keyboard to the list.
 
+## What the tester sees
+
+This opens no screen. The tester types into the small box at the right of the
+status bar, and the list is drawn again from the first page.
+
+Nothing is said. A number Testin cannot use is corrected in the box itself, so
+the tester can see what happened.
+
 ## Main flow
 
 1. The tester clicks the small box at the right of the status bar.
@@ -49,8 +59,8 @@ There is no key for this. The box is at the right of the status bar.
 
 ## What Testin refuses
 
-**Nothing is refused.** Every value is taken and quietly turned into something
-Testin can use.
+**Nothing is refused.** Every value is taken. Testin quietly turns it into
+something it can use.
 
 | The tester types | What the page holds |
 |---|---|

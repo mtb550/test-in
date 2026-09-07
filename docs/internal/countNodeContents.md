@@ -6,6 +6,8 @@
 read them, **so that** I can decide from them, especially in the dialog that
 asks me to confirm a removal.
 
+These are the counts on the Details dialog and on the removal confirmation.
+
 There is no key for this. The counts are worked out when a screen that shows
 them opens.
 
@@ -50,14 +52,57 @@ them opens.
 The verdicts on the ring are **Passed**, **Failed**, **Blocked**, **Untested**
 and **Removed**. The pass rate sits in the middle of it.
 
+## The screen
+
+The counts sit at the bottom of the Details dialog. The rows above them are
+drawn on [UC-TREE-PANEL-027](../treePanel/nodeDetails.md).
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Details                                                     │
+├──────────────────────────────────────────────────────────────┤
+│  Name          Accounts                                      │
+│  Status        Active                                        │
+│                                                              │
+│  Test sets     2                                        (1)  │
+│  Packages      1                                             │
+│  Test cases    14                                       (2)  │
+├──────────────────────────────────────────────────────────────┤
+│  Escape Close                                                │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **A count row** — one row for each kind of thing this node can hold. Which
+   rows appear depends on the kind of node.
+2. **The number** — worked out the moment the dialog opened. It is never saved.
+
+A test run is different. It shows one row reading **Total**, and a ring beside
+it. The ring has one color for each verdict. The pass rate sits in the middle.
+A test run nobody has judged reads **Not run** there instead.
+
+The removal confirmation shows the same counts as one line. That dialog is
+drawn on [UC-TREE-PANEL-012](../treePanel/removeNode.md).
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Confirm Removing                                            │
+├──────────────────────────────────────────────────────────────┤
+│  Remove 'Accounts'?                                          │
+│  Holds 2 test sets, 14 test cases and 0 test runs       (3)  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+3. **The Holds line** — one line, and only when the node holds something.
+   Packages are not counted on it.
+
 ## Main flow
 
 1. The tester opens Details on a node, or presses `Delete` on it.
 2. Testin walks everything beneath that node, in memory.
 3. Testin groups what it finds by kind, and adds up each kind.
-4. Test cases are counted from how many the test set holds, not by sorting them.
-   Sorting 2,770 test cases to produce a number nobody reads is work for
-   nothing.
+4. Test cases are counted from how many the test set holds. They are not
+   sorted first. Sorting 2,770 test cases to make a number nobody reads is work
+   for nothing.
 5. A test run is not walked. Its recorded verdicts are added up instead.
 6. The screen draws the rows. The removal confirmation draws one line, reading
    *Holds*, then the test sets, the test cases and the test runs.
@@ -87,10 +132,10 @@ made on it, and nothing explains the difference.
 ## Why it works this way
 
 The counts used to be found by matching the start of each path against the
-node's own path. A node's path starts with itself. So removing a test set
-holding 12 test cases read *Holds 1 test set, 12 test cases and 0 test runs*,
-and removing a test run said it held one test run. That was in the one dialog
-whose whole job is to say what an unrecoverable removal takes with it.
+node's own path. A node's path starts with itself. So removing a test set that
+held 12 test cases read *Holds 1 test set, 12 test cases and 0 test runs*. And
+removing a test run said it held one test run. That was in the one dialog whose
+whole job is to say what an unrecoverable removal takes with it.
 
 ---
 

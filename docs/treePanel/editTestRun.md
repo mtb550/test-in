@@ -9,6 +9,8 @@
 name and its configuration, **so that** a test run can be corrected without
 being recreated.
 
+This changes a test run that is not signed off yet.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -56,7 +58,14 @@ being recreated.
   the test run was made is not in this dialog. What the test run recorded about
   it is kept, because a row that cannot be shown cannot have been unticked.
 
-The dialog is drawn under [UC-TREE-PANEL-009](createTestRun.md).
+## What the tester sees
+
+The **Edit Test Run** dialog opens. It is the dialog drawn under
+[UC-TREE-PANEL-009](createTestRun.md), with two differences. Its title reads
+**Edit Test Run**, and its button reads **Save**. It arrives filled in with the
+test run's own name, its test cases and its configuration. After **Save**, the
+tree refreshes and *Updated* shows above the status bar at the bottom right of
+the IDE.
 
 ## Main flow
 
@@ -66,8 +75,8 @@ The dialog is drawn under [UC-TREE-PANEL-009](createTestRun.md).
    cases already ticked, and its configuration already filled in. Test cases
    added to a test set since the test run was created appear unticked.
 4. The tester changes any of it and presses **Save**.
-5. If the name was changed, Testin closes the test run's editor, renames its
-   folder, and only then saves the test run.
+5. If the name was changed, Testin closes the test run's editor first. It then
+   renames the folder, and only then saves the test run.
 6. Testin removes any test case the tester unticked, with everything the test
    run recorded about it. A newly ticked test case is added as **Pending**.
 7. The tree refreshes, and Testin shows *Updated*.
@@ -92,16 +101,10 @@ dialog stays open.
 shown in red, and the dialog stays open. Keeping the test run's own name is not
 a clash.
 
-**If the last test case is unticked** — **Save** goes dead, the same way
-**Create** does on an empty new test run.
+**If the last test case is unticked** — **Save** is disabled. **Create** does
+the same on an empty new test run.
 
 **If several rows are selected** — **Edit Run** is gray. It needs exactly one.
-
-> **Saving quietly drops the rows of deleted test cases.** A test run keeps a row
-> at **Removed** for a test case deleted from its test set. That row is not in
-> this dialog, cannot be ticked, and pressing **Save** deletes it with its
-> verdict, its duration and its failure detail. It happens even when the tester
-> changed nothing else.
 
 ---
 

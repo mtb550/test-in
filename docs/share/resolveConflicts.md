@@ -5,6 +5,9 @@
 **As a** tester, **I want** to settle a file two of us changed,
 **so that** the pull can finish and neither of us loses work.
 
+A conflict is a file two people changed since they last agreed. The pull stops
+until somebody says which change wins.
+
 There is no key for this. The offer appears on the message.
 
 ## Rules
@@ -33,6 +36,13 @@ There is no key for this. The offer appears on the message.
   case, Testin merges them and asks only about the fields that really disagree.
 - **Rule-SHARE-079** — A pull that will not move on is reported only to the log.
 
+## What the tester sees
+
+No window opens first. A warning message appears at the bottom right of the
+IDE, titled **Git Conflicts**, naming the files both sides changed. It waits in
+the IDE's notification list, and three links sit under it: **Resolve**,
+**Continue rebase** and **Abort rebase**.
+
 ## Main flow
 
 1. The tester syncs, and the pull stops on a conflict.
@@ -40,7 +50,7 @@ There is no key for this. The offer appears on the message.
    files, then *Resolve the conflict, then continue - or abort to roll the pull
    back and keep what is here.*
 3. The tester chooses to carry on.
-4. Testin merges each conflicting test case field by field.
+4. Testin merges each conflicting test case, one field at a time.
 5. For any field both sides rewrote, the tester is asked which one wins. That is
    [UC-SHARE-018](answerMergeQuestions.md).
 6. The merged files are given back to Git and the pull carries on.
@@ -64,16 +74,15 @@ names them again.
 **If a merged file cannot be written** — a message titled **Merge Failed** reads
 *Could not write*, the path, then the reason.
 
-**If a merged file Git will not take** — nothing is said. Only the log records
-it, and the pull stops again with no conflict on screen to explain it. That is
-difference 4 on
-[the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
+**If a merged file Git will not take** — a message titled **Merge Not
+Accepted** names the file and says what to do: resolve that file in Git, then
+sync again. The sync cannot go on without it.
 
 ## Two fields are settled without asking
 
 The order of a test case always takes the other side's value. Who changed it
-last, and when, always take the later of the two edits. Neither is put to the
-tester, and neither is reported afterwards. That is difference 6.
+last, and when, always take the later of the two edits. The tester is not asked
+about either, and is not told afterwards. That is difference 6.
 
 ---
 

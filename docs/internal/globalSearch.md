@@ -9,6 +9,8 @@
 **As a** tester, **I want** to type part of a name, a step or a test case number
 and jump to it, **so that** a large tree is never a place to scroll.
 
+This is the fastest way to reach one test set, one test run or one test case.
+
 ## Rules
 
 - **Rule-INTERNAL-001** — Nodes are found by name, from the first character
@@ -46,9 +48,9 @@ the IDE, and the tree is only where it lands.
 ```
 
 1. **The field** — its gray hint text reads *Go to a test set or run, or search
-   for anything...*. With nothing typed the list holds test sets and test runs
-   only, the places there is something to open. Once the tester types, packages,
-   the two containers and the test project row match by name too.
+   for anything...*. With nothing typed, the list holds test sets and test runs
+   only. Those are the ones with something to open. Once the tester types,
+   packages, the two containers and the test project row match by name too.
 2. **A result row** — one line: the icon, the name, then the path after it in
    gray. Twelve rows are visible and the rest scroll. The icon at the front of
    the field changes to the icon of whichever row is selected.
@@ -63,9 +65,9 @@ the IDE, and the tree is only where it lands.
 2. The **Search Test Project** dialog opens. Before anything is typed, it lists
    every test set and test run.
 3. The tester types.
-4. Testin lists every node whose name contains what was typed, from the first
-   character. It lists test cases from the second character. The list is ordered
-   nodes first, shortest name first, then test cases.
+4. Testin lists every node whose name holds what was typed, from the first
+   character on. It lists test cases from the second character on. Nodes come
+   first, shortest name first. Test cases come after them.
 5. The tester moves with `↑` `↓` and presses `Enter`, or clicks a row.
 6. The panel comes forward, and the tree expands to that node and selects it.
 7. A test set or a test run opens in its editor. Any other node is only revealed

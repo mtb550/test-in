@@ -3,8 +3,11 @@
 # UC-SETTING-001: Open the settings page
 
 **As a** tester, **I want** to reach Testin's settings quickly,
-**so that** I can tell it where my test data is without hunting through the
-IDE's own settings tree.
+**so that** I can tell it where my test data is without searching the IDE's
+own settings tree.
+
+This page holds every Testin setting for this machine. It is one page, and it
+is the only place most of these values are set.
 
 There is no key for this. The fastest way in is the gear button on the tree
 panel's toolbar.
@@ -27,6 +30,32 @@ panel's toolbar.
   page differs from what is stored.
 - **Rule-SETTING-009** — Pressing **Apply** writes every field at once, not only
   the one that changed.
+
+## The screen
+
+The gear button sits on the tree panel's toolbar, near the left.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Testin                                                                  │
+├──────────────────────────────────────────────────────────────────────────┤
+│  [ search ] [ gear ] [ expand ] [ collapse ] [ refresh ] [ project ]     │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│   Demo                                                                   │
+│     Test Cases                                                           │
+│       Accounts                                                           │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The toolbar** — the row of buttons at the top of the tree panel.
+2. **The gear** — the second button. Its tooltip reads **Configure Testin
+   settings**.
+3. **The tree** — under the toolbar. This gesture does not change it.
+
+Pressing the gear opens the IDE's settings window on Testin's page. That page
+is drawn on [the settings page](main.md#the-page).
 
 ## The four ways in
 
@@ -54,9 +83,10 @@ Nothing. No value on this page is checked, and pressing **Apply** never fails.
 
 ## Where the plugin breaks its own rules
 
-A code project whose Testin panel was never opened does not read the disk again
-when the Testin folder changes. It keeps the old folder until its panel is
-opened. That is difference 5 on
+Some code projects do not notice a new Testin folder. A code project reads the
+disk again only if its Testin panel has been opened once. A project whose panel
+was never opened keeps the old folder until the panel is opened. That is
+difference 5 on
 [the settings page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

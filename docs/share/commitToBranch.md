@@ -5,6 +5,9 @@
 **As a** tester, **I want** to put these changes on another branch,
 **so that** work for the next release does not land on the one being tested now.
 
+A branch is one line of work in Git. This picks the branch the commit goes
+onto, without leaving the review dialog.
+
 There is no key for this. The **Branch** box is in the review.
 
 ## Rules
@@ -27,6 +30,28 @@ There is no key for this. The **Branch** box is in the review.
 - **Rule-SHARE-065** — If the branch cannot be checked out, nothing at all is
   committed.
 
+## The screen
+
+The box sits under the table in the review dialog.
+[UC-SHARE-010](reviewChanges.md) draws the whole dialog.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Branch     [ main                                        v] │
+└──────────────────────────────────────────────────────────────┘
+             ┌─────────────────────────────────────────────┐
+             │  main                                       │
+             │  origin/main                                │
+             │  release-2.4                                │
+             └─────────────────────────────────────────────┘
+```
+
+1. **The box** — the branch the commit goes onto. It opens on the branch that
+   is checked out.
+2. **The list** — the branches on this machine, and the ones on the remote.
+3. **Typing** — the box can be typed into. A name that is not on the list
+   starts a new branch.
+
 ## Main flow
 
 1. The tester opens the **Pending Changes** dialog.
@@ -41,17 +66,17 @@ There is no key for this. The **Branch** box is in the review.
 
 **If the branch cannot be checked out** — a message titled **Branch Not
 Switched** reads the branch's name, then *could not be checked out, so nothing
-was committed. The changes are still here and still yours.* It carries a link
-reading **Review Changes**, which opens the dialog again.
+was committed. The changes are still here and still yours.* One link sits under
+it, reading **Review Changes**. It opens the dialog again.
 
 **If the branch cannot be prepared for any other reason** — a message titled
 **Git Error** reads *Could not prepare*, the branch, then the reason.
 
 ## Why nothing is committed on a failure
 
-A commit that landed on the wrong branch would be worse than no commit. So the
-branch is prepared first, and everything stops if it cannot be. The tester's
-changes are untouched, and the message says so in those words.
+A commit on the wrong branch would be worse than no commit. So the branch is
+prepared first, and everything stops if it cannot be. The tester's changes are
+untouched, and the message says so in those words.
 
 ---
 

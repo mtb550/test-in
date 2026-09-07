@@ -5,6 +5,8 @@
 **As a** tester, **I want** to open the method behind the test case I am looking
 at, **so that** I can read or change what the automation really does.
 
+This opens the Java method that runs the selected test case.
+
 `Shift+F5` on the selected test case.
 
 ## Rules
@@ -34,6 +36,25 @@ at, **so that** I can read or change what the automation really does.
 | Chooses **Navigate to Code** | The menu in either editor |
 | Clicks the class button | A card under the pointer, or the view panel |
 
+## The screen
+
+The Java file opens in the IDE's own editor, and the caret lands on the method
+that runs this test case.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│     40      @Test(description = "Log in with a valid user",              │
+│     41            testName = "3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b",     │
+│     42            priority = 3)                                          │
+│     43      public void |logInWithAValidUser() {                         │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The caret** — drawn here as `|`. It lands on the method, not at the top of
+   the file.
+2. **The line numbers** — the file is scrolled to the method, so a long class
+   does not have to be searched.
+
 ## Main flow
 
 1. The tester selects a test case and presses `Shift+F5`.
@@ -51,9 +72,9 @@ the jump happens when indexing finishes.
 
 **If the class cannot be found** — nothing opens, and only the log says so.
 
-**If the IDE has no Java plugin** — the entry is not on the menu and the button
-is not drawn. Reached anyway, a message titled **Java Plugin Not Available**
-appears, every time rather than once.
+**If the IDE has no Java plugin** — the entry is not on the menu, and the
+button is not drawn. If it is reached anyway, a message titled **Java Plugin Not
+Available** appears. It appears every time, not once.
 
 ## Where the plugin breaks its own rules
 

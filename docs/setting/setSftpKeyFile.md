@@ -5,6 +5,8 @@
 **As a** tester, **I want** to point Testin at my private key,
 **so that** a server that wants a key gets one and never asks me for a password.
 
+The word *key* here means a key file on disk, not a key on the keyboard.
+
 There is no key for this. It is the **SFTP key file** row.
 
 ## Rules
@@ -25,6 +27,22 @@ There is no key for this. It is the **SFTP key file** row.
   key file itself.
 - **Rule-SETTING-036** — A key file's passphrase is asked for only when it is
   going to be used, and is kept in the IDE's password store.
+
+## The screen
+
+The row is the seventh one on the page, the last one with a box.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  SFTP key file:  [ C:\Users\muteb\.ssh\id_rsa        ] [...]             │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The caption** — **SFTP key file**.
+2. **The box** — the path to the private key file.
+3. **The browse button** — opens a file chooser.
+
+The whole page is drawn on [the settings page](main.md#the-page).
 
 ## Main flow
 
@@ -50,9 +68,9 @@ the server does the refusing.
 
 ## Where the passphrase goes
 
-Never into `testin.yml`, never onto a marker file, and never into the log. It is
-kept in the IDE's own password store, under a name that says which server and
-which account it belongs to and holds no part of the secret itself.
+Never into `testin.yml`, never onto a marker file, and never into the log. It
+is kept in the IDE's own password store. Its entry is named after the server and
+the account it belongs to, and that name holds no part of the secret itself.
 
 ---
 

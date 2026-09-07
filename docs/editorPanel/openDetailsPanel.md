@@ -5,6 +5,8 @@
 **As a** tester, **I want** the whole of one test case beside the list,
 **so that** I can read its steps while the list stays where it is.
 
+The panel opens beside the list, not on top of it. The list stays where it was.
+
 `Enter` on the selection.
 
 ## Rules
@@ -36,6 +38,15 @@
 - **Rule-EDITOR-PANEL-112** — Opening the details panel says nothing.
 - **Rule-EDITOR-PANEL-113** — Once the panel is open, moving the selection fills
   it again.
+
+## What the tester sees
+
+This opens no screen of its own. The view panel opens on the right of the IDE,
+with the **Details** tab in front, and it shows the whole of the selected test
+case.
+
+The list is not moved and nothing is written. No message appears, because
+nothing changed.
 
 ## The four ways in
 

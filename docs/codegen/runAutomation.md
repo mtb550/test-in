@@ -5,6 +5,8 @@
 **As a** tester, **I want** to run the generated method for one or more test
 cases, **so that** the verdict is recorded without me judging it by hand.
 
+The code runs, and Testin writes down whether each test case passed.
+
 `F5` on the selected test cases.
 
 ## Rules
@@ -43,6 +45,13 @@ cases, **so that** the verdict is recorded without me judging it by hand.
 Running everything a test run has not judged yet is different, and is
 [UC-EDITOR-PANEL-017](../editorPanel/runWholeRun.md).
 
+## What the tester sees
+
+Every selected card turns to running at once, and its run button becomes a stop
+button. One message appears near the bottom right of the IDE, reading *Running*
+and then the count. The IDE's own run window opens underneath and shows what
+TestNG is doing.
+
 ## Main flow
 
 1. The tester selects three test cases and presses `F5`.
@@ -56,9 +65,9 @@ Running everything a test run has not judged yet is different, and is
 
 **If nothing is selected** — the entry is gray and the key does nothing.
 
-**If a test case has no method** — that test case is dropped, its card goes back
-to how it was, and a message reads its description and then *has no generated
-code yet*. The other test cases still run.
+**If a test case has no method** — that test case is dropped. Its card goes
+back to how it was. A message reads its description, then *has no generated code
+yet*. The other test cases still run.
 
 **If none of them has a method** — nothing starts, and no running message
 appears.
@@ -88,9 +97,9 @@ The name in the IDE's run widget depends on the selection.
 ## Where the plugin breaks its own rules
 
 **TestNG alone is not enough.** Running needs the Java plugin to find the
-method, and only TestNG is checked before **Run Test Case** is offered. In an
-IDE with TestNG and no Java plugin, every test case resolves to nothing and the
-tester gets one *has no generated code yet* message for each, with no mention of
+method. Only TestNG is checked before **Run Test Case** is offered. So in an IDE
+with TestNG and no Java plugin, no test case finds its method. The tester gets
+one *has no generated code yet* message for each of them, and nothing mentions
 the missing plugin. That is difference 7 on
 [the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 

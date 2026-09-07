@@ -8,6 +8,8 @@
 breakdown without opening anything, **so that** I can see how big a part of the
 tree is at a glance.
 
+It is a read-only window. Nothing in it can be changed.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -49,6 +51,52 @@ tree is at a glance.
 - **Rule-TREE-PANEL-088** — Testin counts what a node holds when the tester
   asks. It never saves the number.
 
+## The Details dialog
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Details                                                     │
+├──────────────────────────────────────────────────────────────┤
+│  Name              cycle-2                              (1)  │
+│  Path              C:\Testin\Demo\Test Runs\cycle-2          │
+│  Created By        Muteb                                (2)  │
+│  Created At        12 Aug 2026 09:14                         │
+│  Updated By        Muteb                                     │
+│  Updated At        14 Aug 2026 16:02                         │
+│  Status            In Progress                          (3)  │
+│  Execution Started 12 Aug 2026 10:00                    (4)  │
+│  Platform          Web                                  (5)  │
+│  Component         Frontend                                  │
+│  Total             14                                   (6)  │
+│                                                              │
+│      ╭───╮         Passed     9                         (7)  │
+│      │75%│         Failed     2                              │
+│      ╰───╯         Blocked    1                              │
+│                    Untested   2                              │
+│                    Removed    0                              │
+├──────────────────────────────────────────────────────────────┤
+│  Escape Close                                           (8)  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **Name and Path** — **Path** is the node's full path on disk.
+2. **Who and when** — who created the node, who last changed it, and the dates.
+3. **Status** — left out on **Test Cases** and **Test Runs**, which have none.
+4. **The execution rows** — **Execution Started** and **Execution Ended**. Only
+   a test run has them, and a test run that never started shows neither.
+5. **The settings** — every answer the tester gave when the test run was made.
+   Only a test run has them.
+6. **The counts** — what the node holds. Which counts appear depends on the
+   kind of node. The table under **Main flow** says which.
+7. **The verdict chart** — a ring with the pass rate inside it, and the five
+   verdicts beside it. Each verdict has a color and a count. Only a test run has
+   this chart.
+8. **The status bar** — `Escape` closes the dialog.
+
+A row with nothing in it is not drawn. So a test set shows **Name**, **Path**,
+the four rows about who and when, **Status** and **Test cases**, and nothing
+else.
+
 ## Main flow
 
 1. The tester selects one node. With several selected, **Details** is still
@@ -60,8 +108,8 @@ tree is at a glance.
 5. It shows **Created By**, **Created At**, **Updated By** and **Updated At**.
 6. It shows **Status**, except on **Test Cases** and **Test Runs**, which have
    none.
-7. It shows what the node holds, counted when asked and never saved. Which
-   counts appear depends on the kind:
+7. It shows what the node holds. The counts are worked out when the tester
+   asks, and never saved. Which counts appear depends on the kind of node:
 
    | Node | Counts |
    |---|---|
@@ -73,14 +121,15 @@ tree is at a glance.
    | Test set | **Test cases** |
    | Test run | **Total** |
 
-8. **A test run, and only a test run**, also shows a verdict chart: a ring with
-   **Passed**, **Failed**, **Blocked**, **Untested** and **Removed** beside it,
-   each with a color and a count. Inside the ring is the pass rate, or the words
-   **Not run** when nothing in the test run has been executed.
-9. A test run also shows **Execution Started** and **Execution Ended**, and
-   every setting the tester gave when it was made: **Test Type**, **Change
-   Log**, **Commit ID**, **Platform**, **Component**, **Language**, **Browser**
-   and **Device Type**.
+8. **A test run, and only a test run**, also shows a verdict chart. It is a
+   ring, with **Passed**, **Failed**, **Blocked**, **Untested** and **Removed**
+   listed beside it. Each one has a color and a count. Inside the ring is the
+   pass rate. It reads **Not run** when nothing in the test run has been
+   executed.
+9. A test run also shows **Execution Started** and **Execution Ended**. It shows
+   every setting the tester gave when the test run was made: **Test Type**,
+   **Change Log**, **Commit ID**, **Platform**, **Component**, **Language**,
+   **Browser** and **Device Type**.
 10. A row with nothing in it is not drawn at all. A test run that never started
     shows neither execution row.
 11. The tester presses `Escape`. It closes. Nothing was changed, and nothing is
@@ -89,7 +138,8 @@ tree is at a glance.
 ## What Testin refuses
 
 **Nothing.** **Details** is never gray, and it opens on every kind of node. With
-several rows selected it opens on the first of them without saying so.
+several rows selected, it opens on the first of them and says nothing about the
+rest.
 
 ---
 

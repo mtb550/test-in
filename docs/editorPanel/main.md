@@ -22,60 +22,60 @@ Two editors share this panel. A test set opens in one, a test run in the other.
 They share the toolbar, the status bar, the two views and every key that is not
 about a verdict.
 
-| | What the tester does | |
+| | What the tester does | Why a tester would use it |
 |---|---|---|
 | | **Opening and reading** | |
-| **UC-EDITOR-PANEL-001** | [Open a test set and see its test cases](openTestSet.md) | |
-| **UC-EDITOR-PANEL-002** | [Switch between cards and a grid](switchView.md) | |
-| **UC-EDITOR-PANEL-003** | [Choose which fields are shown](chooseFields.md) | |
-| **UC-EDITOR-PANEL-004** | [Change a grid column's width](changeColumnWidth.md) | |
+| **UC-EDITOR-PANEL-001** | [Open a test set and see its test cases](openTestSet.md) | Read and work on the test cases in a test set. |
+| **UC-EDITOR-PANEL-002** | [Switch between cards and a grid](switchView.md) | Compare many test cases at once in a table. |
+| **UC-EDITOR-PANEL-003** | [Choose which fields are shown](chooseFields.md) | Hide the fields you do not need, so rows stay short. |
+| **UC-EDITOR-PANEL-004** | [Change a grid column's width](changeColumnWidth.md) | Widen a column so long text is not cut off. |
 | | **Writing test cases** | |
-| **UC-EDITOR-PANEL-005** | [Create a test case](createTestCase.md) | |
-| **UC-EDITOR-PANEL-006** | [Change one field of one test case](changeOneField.md) | |
-| **UC-EDITOR-PANEL-007** | [Change one field on many test cases at once](bulkEdit.md) | |
-| **UC-EDITOR-PANEL-008** | [Type straight into a grid cell](editGridCell.md) | |
-| **UC-EDITOR-PANEL-009** | [Move a test case by typing its number](setOrderByNumber.md) | |
-| **UC-EDITOR-PANEL-010** | [Reorder test cases by dragging](dragToReorder.md) | |
-| **UC-EDITOR-PANEL-011** | [Remove test cases](removeTestCases.md) | |
-| **UC-EDITOR-PANEL-012** | [Undo a change](undoChange.md) | |
-| **UC-EDITOR-PANEL-013** | [Redo a change](redoChange.md) | |
+| **UC-EDITOR-PANEL-005** | [Create a test case](createTestCase.md) | Write down a new test case before you forget it. |
+| **UC-EDITOR-PANEL-006** | [Change one field of one test case](changeOneField.md) | Fix one field, such as a typo, in two keys. |
+| **UC-EDITOR-PANEL-007** | [Change one field on many test cases at once](bulkEdit.md) | Correct the same field on many test cases in one go. |
+| **UC-EDITOR-PANEL-008** | [Type straight into a grid cell](editGridCell.md) | Correct a value in the table where you can see it. |
+| **UC-EDITOR-PANEL-009** | [Move a test case by typing its number](setOrderByNumber.md) | Put a test case in the right place without dragging. |
+| **UC-EDITOR-PANEL-010** | [Reorder test cases by dragging](dragToReorder.md) | Drag test cases into the order somebody would run them. |
+| **UC-EDITOR-PANEL-011** | [Remove test cases](removeTestCases.md) | Delete test cases nobody wants any more. |
+| **UC-EDITOR-PANEL-012** | [Undo a change](undoChange.md) | Take back the last change with one key. |
+| **UC-EDITOR-PANEL-013** | [Redo a change](redoChange.md) | Put back a change you took back by mistake. |
 | | **The clipboard** | |
-| **UC-EDITOR-PANEL-014** | [Copy a test case's details as text](copyAsText.md) | |
-| **UC-EDITOR-PANEL-015** | [Copy test cases](copyTestCases.md) | |
-| **UC-EDITOR-PANEL-016** | [Cut test cases](cutTestCases.md) | |
-| **UC-EDITOR-PANEL-017** | [Paste test cases](pasteTestCases.md) | |
-| **UC-EDITOR-PANEL-018** | [Copy, cut and paste grid cells](gridClipboard.md) | |
+| **UC-EDITOR-PANEL-014** | [Copy a test case's details as text](copyAsText.md) | Get a test case as text for a chat or a ticket. |
+| **UC-EDITOR-PANEL-015** | [Copy test cases](copyTestCases.md) | Copy test cases to start another test set from them. |
+| **UC-EDITOR-PANEL-016** | [Cut test cases](cutTestCases.md) | Move test cases into the test set they belong in. |
+| **UC-EDITOR-PANEL-017** | [Paste test cases](pasteTestCases.md) | Drop the test cases you copied or cut into this set. |
+| **UC-EDITOR-PANEL-018** | [Copy, cut and paste grid cells](gridClipboard.md) | Move values between the grid and a spreadsheet. |
 | | **Finding what I want** | |
-| **UC-EDITOR-PANEL-019** | [Search the test cases](searchTestCases.md) | |
-| **UC-EDITOR-PANEL-020** | [Filter the test cases](filterTestCases.md) | |
-| **UC-EDITOR-PANEL-021** | [Clear the filters](clearFilters.md) | |
-| **UC-EDITOR-PANEL-022** | [Page through the test cases](pageThrough.md) | |
-| **UC-EDITOR-PANEL-023** | [Change how many a page holds](changePageSize.md) | |
-| **UC-EDITOR-PANEL-024** | [Select test cases](selectTestCases.md) | |
+| **UC-EDITOR-PANEL-019** | [Search the test cases](searchTestCases.md) | Find a test case by a word inside it. |
+| **UC-EDITOR-PANEL-020** | [Filter the test cases](filterTestCases.md) | Show only the test cases you want to work on. |
+| **UC-EDITOR-PANEL-021** | [Clear the filters](clearFilters.md) | Get the whole test set back in one click. |
+| **UC-EDITOR-PANEL-022** | [Page through the test cases](pageThrough.md) | Move through a long test set one page at a time. |
+| **UC-EDITOR-PANEL-023** | [Change how many a page holds](changePageSize.md) | See more test cases at once, without turning pages. |
+| **UC-EDITOR-PANEL-024** | [Select test cases](selectTestCases.md) | Pick several test cases so one gesture changes them all. |
 | | **Working from the editor** | |
-| **UC-EDITOR-PANEL-025** | [Open the details panel](openDetailsPanel.md) | |
-| **UC-EDITOR-PANEL-026** | [Step back](stepBack.md) | |
-| **UC-EDITOR-PANEL-027** | [Refresh the editor from disk](refreshEditor.md) | |
-| **UC-EDITOR-PANEL-028** | [See the test set's own details](nodeDetails.md) | |
-| **UC-EDITOR-PANEL-029** | [Open the menu from the keyboard](keyboardMenu.md) | |
+| **UC-EDITOR-PANEL-025** | [Open the details panel](openDetailsPanel.md) | Read the whole of one test case beside the list. |
+| **UC-EDITOR-PANEL-026** | [Step back](stepBack.md) | One key to get back to a plain list. |
+| **UC-EDITOR-PANEL-027** | [Refresh the editor from disk](refreshEditor.md) | See the changes a colleague's sync brought in. |
+| **UC-EDITOR-PANEL-028** | [See the test set's own details](nodeDetails.md) | Check who made this test set and what it holds. |
+| **UC-EDITOR-PANEL-029** | [Open the menu from the keyboard](keyboardMenu.md) | Reach every menu entry without touching the mouse. |
 | | **The test run editor** | |
-| **UC-EDITOR-PANEL-030** | [Open a test run and see what it covers](openTestRun.md) | |
-| **UC-EDITOR-PANEL-031** | [Start executing by hand](startExecution.md) | |
-| **UC-EDITOR-PANEL-032** | [Record that a test case passed](recordPassed.md) | |
-| **UC-EDITOR-PANEL-033** | [Record that a test case is blocked](recordBlocked.md) | |
-| **UC-EDITOR-PANEL-034** | [Record that a test case failed, and say why](recordFailed.md) | |
-| **UC-EDITOR-PANEL-035** | [Stop executing](stopExecution.md) | |
-| **UC-EDITOR-PANEL-036** | [Resume a run I stopped](resumeExecution.md) | |
-| **UC-EDITOR-PANEL-037** | [Record a verdict out of order](recordOutOfOrder.md) | |
-| **UC-EDITOR-PANEL-038** | [Correct a verdict I got wrong](correctVerdict.md) | |
-| **UC-EDITOR-PANEL-039** | [Record one verdict on many test cases](bulkVerdict.md) | |
-| **UC-EDITOR-PANEL-040** | [Change the failure details on their own](editFailureDetail.md) | |
-| **UC-EDITOR-PANEL-041** | [Type an actual result into the grid](typeActualResult.md) | |
-| **UC-EDITOR-PANEL-042** | [Watch how the run is going](watchProgress.md) | |
-| **UC-EDITOR-PANEL-043** | [Run one test case's automation](runOneCase.md) | |
-| **UC-EDITOR-PANEL-044** | [Run everything not yet judged](runWholeRun.md) | |
-| **UC-EDITOR-PANEL-045** | [Write the result analysis](writeResultAnalysis.md) | |
-| **UC-EDITOR-PANEL-046** | [Work in light mode](lightMode.md) | |
+| **UC-EDITOR-PANEL-030** | [Open a test run and see what it covers](openTestRun.md) | See what a test run covers and what it recorded. |
+| **UC-EDITOR-PANEL-031** | [Start executing by hand](startExecution.md) | Walk the test run one test case at a time. |
+| **UC-EDITOR-PANEL-032** | [Record that a test case passed](recordPassed.md) | Say a test case worked, with one key. |
+| **UC-EDITOR-PANEL-033** | [Record that a test case is blocked](recordBlocked.md) | Say a test case could not be tried at all. |
+| **UC-EDITOR-PANEL-034** | [Record that a test case failed, and say why](recordFailed.md) | Say what really happened while you can still see it. |
+| **UC-EDITOR-PANEL-035** | [Stop executing](stopExecution.md) | Stop the walk and the clock part way through. |
+| **UC-EDITOR-PANEL-036** | [Resume a run I stopped](resumeExecution.md) | Pick the test run up where you left it. |
+| **UC-EDITOR-PANEL-037** | [Record a verdict out of order](recordOutOfOrder.md) | Judge a test case the walk is not on. |
+| **UC-EDITOR-PANEL-038** | [Correct a verdict I got wrong](correctVerdict.md) | Change a verdict you recorded by mistake. |
+| **UC-EDITOR-PANEL-039** | [Record one verdict on many test cases](bulkVerdict.md) | Mark many test cases blocked, or passed, at once. |
+| **UC-EDITOR-PANEL-040** | [Change the failure details on their own](editFailureDetail.md) | Add the error later, without touching the verdict. |
+| **UC-EDITOR-PANEL-041** | [Type an actual result into the grid](typeActualResult.md) | Note what happened straight into the table. |
+| **UC-EDITOR-PANEL-042** | [Watch how the run is going](watchProgress.md) | See how many passed and how long it is taking. |
+| **UC-EDITOR-PANEL-043** | [Run one test case's automation](runOneCase.md) | Let the machine judge one test case for you. |
+| **UC-EDITOR-PANEL-044** | [Run everything not yet judged](runWholeRun.md) | Set the whole test run going and come back later. |
+| **UC-EDITOR-PANEL-045** | [Write the result analysis](writeResultAnalysis.md) | Say what the test run as a whole showed. |
+| **UC-EDITOR-PANEL-046** | [Work in light mode](lightMode.md) | Judge test cases in a small window above your app. |
 
 ---
 

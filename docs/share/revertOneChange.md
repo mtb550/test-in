@@ -5,6 +5,9 @@
 **As a** tester, **I want** to undo one field I changed by mistake,
 **so that** I do not have to throw away a morning's work to lose one typo.
 
+Each row of the review is one changed field. This puts that one field back to
+what was committed, and leaves the rest of the test case alone.
+
 Right click the row in the review.
 
 ## Rules
@@ -25,6 +28,25 @@ Right click the row in the review.
   test case stays as it is.
 - **Rule-SHARE-053** — The change is written to disk at once, not on the commit.
 
+## The screen
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│[x]  | Change Type      | Test Set | Name             | Before      │
+│[x]  | Description      | Login    | Log in with a..  | Log in      │
+│[x]  | Expected Result  | Login    | Log in with a..  | It opens    │
+│[x]  | New Test Case    | Login    | Log out          |             │
+└────────────────────────────────────────────────────────────────────┘
+                ┌──────────────────────┐
+                │  Revert this change  │
+                └──────────────────────┘
+```
+
+1. **The rows** — the changed fields. [UC-SHARE-010](reviewChanges.md) draws
+   the whole dialog around them.
+2. **The menu** — right clicking a row opens it. It holds one entry.
+3. **Revert this change** — puts that one field back, then takes the row away.
+
 ## Main flow
 
 1. The tester is reading the **Pending Changes** table.
@@ -41,9 +63,9 @@ Right click the row in the review.
 **If the row is not a change to a test case** — a message reads *Only a test
 case change can be reverted*.
 
-**If the kind of change cannot be put back** — a message reads *A change to*,
-then what kind it is, then *cannot be reverted*. A new file and a removed file
-are two of those.
+**If that kind of change cannot be put back** — a message reads *A change to*,
+then the kind, then *cannot be reverted*. A new file is one of those, and so is
+a removed file.
 
 **If the test case is no longer in the test project** — a message reads *That
 test case is no longer in the project*.
@@ -53,8 +75,8 @@ test case is no longer in the project*.
 ## What cannot be put back this way
 
 A whole file. A new test case. A removed test case. A change to a test run, a
-marker or anything Testin did not recognize as a test case. For those, Git's own
-tools are the answer.
+marker, or anything Testin did not read as a test case. For those, use Git's
+own tools.
 
 ---
 

@@ -5,6 +5,9 @@
 **As a** tester, **I want** to correct a value where I can see it,
 **so that** fixing five expected results does not need five dialogs.
 
+The cell turns into a box the tester can type in, right where it sits in the
+table.
+
 `Enter` on the cell, or a double click.
 
 ## Rules
@@ -46,6 +49,27 @@
 - **Rule-EDITOR-PANEL-053** — Every cell saved is one entry on the undo history,
   named after the test case.
 
+## The screen
+
+No dialog opens. The cell itself becomes a box.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  #  | Description                 | Expected Result       | Priority     │
+├──────────────────────────────────────────────────────────────────────────┤
+│  1  | Log in with a valid user    | The dashboard opens.  | P1           │
+│  2  | Log in with a locked accou. |[The account is refu ] | P2           │
+│  3  | Log in with the wrong pass. | The password is ref.  | P1           │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The open cell** — a box with a blue outline, with the cursor in it. Only
+   one cell is open at a time.
+2. **The row** — grows taller when the tester adds a line with `Ctrl+Enter`.
+3. **Every other cell** — left as it was.
+4. **The keyboard** — belongs to the open cell. `Enter` saves it. `Escape`
+   throws the edit away.
+
 ## Which columns can be typed into
 
 | Can be typed into | Cannot |
@@ -60,7 +84,8 @@ In a test run editor only **Actual Result** can be typed into.
 2. The cell opens as a box with a blue outline and the cursor in it.
 3. The tester types. `Ctrl+Enter` adds a line, and the row grows to fit.
 4. The tester presses `Enter`.
-5. Testin makes what it can of the text and writes it into the test case.
+5. Testin reads the text, keeps what it can use, and writes it into the test
+   case.
 6. The cell is redrawn with the stored value.
 7. A message reads *Updated*.
 8. The cards behind the grid, and the details panel, both catch up.

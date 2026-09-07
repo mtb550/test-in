@@ -6,6 +6,8 @@
 **so that** an environment that is down does not cost twelve keystrokes and
 twelve dialogs.
 
+One key on a selection judges every test case in it.
+
 Select several test cases, then `P`, `F` or `B`.
 
 ## Rules
@@ -43,6 +45,14 @@ Select several test cases, then `P`, `F` or `B`.
 - **Rule-EDITOR-PANEL-166** — Failing several does not open the failure dialog.
   They are failed with no detail.
 
+## What the tester sees
+
+This opens no screen. Every selected card takes the new verdict badge at once,
+and the figures in the status bar move by the whole count.
+
+One small message appears at the bottom of the IDE and fades. It reads the
+verdict, then the count, such as *Blocked 12*.
+
 ## Main flow
 
 1. The tester selects twelve test cases that all need the same environment.
@@ -68,8 +78,8 @@ The failure dialog does not open. All of them are failed with nothing written
 about why. The detail can be filled in afterwards, one at a time, with `F2`,
 which is [UC-EDITOR-PANEL-040](editFailureDetail.md).
 
-For a real defect this is usually the wrong gesture. Failing one at a time, with
-`F`, is what records what happened.
+For a real defect this is usually the wrong gesture. Failing one test case at a
+time, with `F`, is what records what happened.
 
 ---
 

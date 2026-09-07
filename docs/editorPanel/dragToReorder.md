@@ -5,6 +5,8 @@
 **As a** tester, **I want** to drag a test case where it belongs,
 **so that** the test set reads in the order somebody would work through it.
 
+The cards are moved with the mouse. Nothing opens.
+
 There is no key for this. Drag the cards.
 
 ## Rules
@@ -36,18 +38,28 @@ There is no key for this. Drag the cards.
 - **Rule-EDITOR-PANEL-057** — Dragging works on cards only. The grid cannot be
   dragged.
 - **Rule-EDITOR-PANEL-058** — A drag is always a move, never a copy.
-- **Rule-EDITOR-PANEL-059** — A card lands directly under the card it was dropped
-  on. Under a filter that is the card the tester can see, so test cases the
-  filter is hiding between the two move down rather than staying above it.
+- **Rule-EDITOR-PANEL-059** — A card lands directly under the card it was
+  dropped on. Under a filter that is the card the tester can see, so test cases
+  the filter is hiding between the two move down rather than staying above it.
 - **Rule-EDITOR-PANEL-060** — Only the test cases that really moved are written.
 - **Rule-EDITOR-PANEL-061** — The whole drag is one entry on the undo history.
+
+## What the tester sees
+
+This opens no screen. While the tester drags, the card follows the pointer, and
+a line shows where it will land. When the button is released, the cards are
+drawn again in their new order and every number is worked out again.
+
+A small message then appears at the bottom of the IDE and fades. It reads
+*Re-sorted*, with a count after it when more than one card moved.
 
 ## Main flow
 
 1. The tester selects one or more cards.
 2. The tester drags them up the list and drops them.
 3. The cards land above the first card at or after the drop point.
-4. Testin gives new places to the test cases that moved, and writes only those.
+4. Testin gives a new place to each test case that moved. Only those files are
+   written.
 5. Testin rewrites the position in every generated test method in that test set.
 6. A message reads *Re-sorted*, with a count when more than one card moved.
 7. The first dragged card is selected.
@@ -62,13 +74,9 @@ There is no key for this. Drag the cards.
 
 ## Where the plugin breaks its own rules
 
-**A card can land somewhere the tester cannot see.** With a filter on, the drop
-lands after whatever the filter is hiding between the two visible cards. The
-move is saved and the message says *Re-sorted*. That is difference 14 on
+**This says *Re-sorted* and typing a position says *Updated*.** The same act,
+two words. That is difference 15 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
-
-**This says *Re-sorted* and typing a position says *Updated*.** That is
-difference 15.
 
 ## Why only some files are written
 

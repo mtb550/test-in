@@ -8,6 +8,8 @@
 **As a** tester, **I want** to remove a test set, a package, a test run or a
 whole test project, **so that** the tree holds only what is current.
 
+The node goes to the recycle bin, so nothing is lost for good.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -76,8 +78,9 @@ whole test project, **so that** the tree holds only what is current.
 1. **The question** — names the node.
 2. **What it holds** — the line the tester reads before pressing `Enter`. It is
    left out when the node holds no test sets, no test cases and no test runs.
-   Packages it holds are counted nowhere and never keep the line on screen.
-3. **Where it is** — in gray. It is the node's full path on disk, with the
+   Packages inside the node are never counted. So a node holding only packages
+   shows no line.
+3. **Where it is** — in gray. It is the node's full path on disk. It uses the
    operating system's own separators, not a trail of node names.
 4. The confirm key is named for what it does. It reads **Remove**, not **OK**.
 
@@ -89,15 +92,15 @@ and no path.
 1. The tester selects one or more removable nodes.
 2. The tester presses `Delete`, or chooses **Actions → Remove**.
 3. The **Confirm Removing** dialog opens. For one node it asks *Remove
-   '\<name\>'?*, says how many test sets, test cases and test runs that node
-   holds, and shows where it is after *From:*. For several nodes it asks *Remove
-   these N items?*, where N is how many.
+   '\<name\>'?*. It then says how many test sets, test cases and test runs the
+   node holds, and shows where it is after *From:*. For several nodes it asks
+   *Remove these N items?*, where N is how many.
 4. The tester presses `Enter`.
 5. Testin closes each node's editor and keeps a copy for undo.
 6. The node goes to the desktop's recycle bin, and its automation code goes with
    it. On a desktop with no recycle bin the node is deleted outright.
-7. The tree rebuilds, and Testin shows *Removed*, or *Removed N* for several,
-   counting only what actually went.
+7. The tree rebuilds. Testin shows *Removed*, or *Removed N* for several. The
+   count is only what actually went.
 
 ## What Testin refuses
 
@@ -116,9 +119,9 @@ all.
 Failed* stays in the notification log, reading *Could not delete file:* and the
 reason.
 
-> **A node whose copy could not be kept aside is still removed, and cannot be
-> undone.** Nothing says so at the time. `Ctrl+Z` then takes back whatever
-> change came before the removal instead.
+**If a node's copy could not be kept aside** — the node is still removed, and a
+message titled *Cannot Be Undone* says so at that moment. It names how many
+could not be copied aside.
 
 ---
 

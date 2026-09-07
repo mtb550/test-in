@@ -8,6 +8,8 @@
 **As a** tester, **I want** to add a test set under **Test Cases** or under a
 package, **so that** the test cases I am about to write have somewhere to live.
 
+A test set is the folder that holds test cases. This makes one.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -70,18 +72,18 @@ package, **so that** the test cases I am about to write have somewhere to live.
 
 1. **The name** — its gray hint text reads *set name...*. If the tester presses
    `Enter` with the box empty, the hint turns red and the cursor stays here.
-2. **The two kinds** — each with a hint beside it. `↑` `↓` move between them,
-   and the icon at the front of the name box changes to match. Clicking a row
+2. **The two kinds** — each with a hint beside it. `↑` and `↓` move between
+   them. The icon at the front of the name box changes to match. Clicking a row
    confirms straight away.
 3. **The status bar** — every key this dialog answers to.
 
-**Create Run Node** is the twin dialog on the test run side. It is identical
-except for two things. Its kinds are *test run* (*Records execution results*)
-and *test run package* (*Groups test runs*). Its hint text reads *set name,
-like Sprint 3 Cycle 1...*.
+**Create Run Node** is the same dialog on the test run side. Two things differ.
+Its kinds are *test run* (*Records execution results*) and *test run package*
+(*Groups test runs*). Its hint text reads *set name, like Sprint 3 Cycle 1...*.
 
-> **Today the two kind names are blank.** The rows show only their hints.
-> This is difference 4 on [the tree panel page](main.md#where-the-plugin-breaks-its-own-rules).
+> **Today the two kind names are blank.** The rows show only their hints. This
+> is difference 4 on
+> [the tree panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ## Main flow
 
@@ -112,16 +114,16 @@ gray, and `Ctrl+M` does nothing.
 **If the IDE project has no Java test folder** — *Java Test Source Not Found*
 says no automation code will be written. The test set is still created.
 
-**If the Java plugin is not installed** — *Java Plugin Not Available* says
-automation code and navigation need it. It is said once per project, and the
+**If the Java plugin is not installed** — *Java Plugin Not Available* says that
+automation code and navigation need it. Testin says this once per project. The
 test set is still created.
 
 **If several rows are selected** — **Create** stays black and creates under the
 first of them.
 
 **If the selected package is retired** — **Create** is not gray. The test set is
-created inside an **Archived** package, where no test run will ever be offered
-it.
+created inside an **Archived** package. No test run will ever be offered it
+there.
 
 ---
 

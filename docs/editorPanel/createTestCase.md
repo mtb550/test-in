@@ -3,7 +3,9 @@
 # UC-EDITOR-PANEL-005: Create a test case
 
 **As a** tester, **I want** to add a test case to the test set I am looking at,
-**so that** something I have just thought of is written down before I forget it.
+**so that** an idea is written down before I forget it.
+
+This is how every test case in Testin begins.
 
 `Ctrl+M`.
 
@@ -97,13 +99,13 @@
 **If the description is empty** — the dialog stays open, the description turns
 red, and the cursor goes back to it. No message is raised.
 
-**If the description cannot name a Java method** — nothing is saved, and a
-message titled **That description cannot name a test method** says what the
-method would have been called. A description has to begin with a letter, and
-cannot be a single word Java keeps for itself.
+**If the description cannot name a Java method** — nothing is saved. A message
+titled **That description cannot name a test method** says what the method would
+have been called. A description must begin with a letter. It also cannot be a
+single word that Java keeps for itself.
 
-**If a step is left blank** — it is dropped, and the steps after it keep their
-own numbers.
+**If a step is left blank** — it is dropped. The steps after it keep their own
+numbers.
 
 ## Where the plugin breaks its own rules
 

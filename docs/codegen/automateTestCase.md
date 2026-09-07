@@ -6,6 +6,8 @@
 does, **so that** I get a working test rather than an empty method with a
 comment in it.
 
+Testin cannot do this yet. The entry says so when it is pressed.
+
 `Ctrl+F12`, or the menu entry **Automate Test Case**.
 
 ## Rules
@@ -25,6 +27,25 @@ comment in it.
 - **Rule-CODEGEN-025** — This is not built. The menu entry and the key both
   answer with a message saying so, rather than doing nothing quietly.
 
+## The screen
+
+The only thing this use case draws. It is a small red message near the bottom
+right of the IDE, above the status bar.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Not built yet                                               │
+│  Generating automation code for a test case is coming in a   │
+│  later release.                                              │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **The title** — always these three words.
+2. **The line under it** — always the same sentence.
+3. **The color** — red, because nothing happened.
+4. **How long it stays** — about five seconds, then it fades on its own. It is
+   not kept in the IDE's notification list.
+
 ## What happens today
 
 1. The tester selects a test case and presses `Ctrl+F12`.
@@ -42,9 +63,10 @@ comment in it.
 
 ## Where the plugin breaks its own rules
 
-The entry is live on every selected test case, and its description reads
-*Generate automation code for the selected test case*. A tester cannot tell from
-the menu that it does nothing until they press it. That is difference 2 on
+The entry is live on every selected test case. Its description reads *Generate
+automation code for the selected test case*. Nothing on the menu tells the
+tester that it does nothing. They find out by pressing it. That is difference 2
+on
 [the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 
 The thing that really writes a missing method is filling in the test case's

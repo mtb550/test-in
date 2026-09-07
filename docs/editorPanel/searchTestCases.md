@@ -5,6 +5,8 @@
 **As a** tester, **I want** to find a test case by a word in it,
 **so that** I do not page through 200 of them looking for one.
 
+The search narrows the list. It hides the test cases that do not hold the word.
+
 `Ctrl+F`.
 
 ## Rules
@@ -41,6 +43,14 @@
 - **Rule-EDITOR-PANEL-093** — `Escape` in the box returns the keyboard to the
   list and leaves the text where it is.
 
+## What the tester sees
+
+This opens no screen. The cursor moves into the search box on the toolbar, and
+whatever is in the box is selected.
+
+Three tenths of a second after the last key, the list narrows to the test cases
+holding the word. The status bar says how many are left. No message appears.
+
 ## Main flow
 
 1. The tester presses `Ctrl+F`.
@@ -59,16 +69,11 @@ filters and clearing the search are two different things.
 
 ## What is not searched
 
-The module, the group, the test data and the pre-conditions are not searched,
-though each has its own column and three of them have their own filter. A tester
-looking for a module has to use the filter instead. That is difference 17 on
+The module, the group, the test data and the pre-conditions are not searched.
+Each of them has its own column, and three of them have their own filter. A
+tester looking for a module has to use the filter instead. That is difference 17
+on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
-
-## Where the plugin breaks its own rules
-
-**Refresh throws the search away.** Pressing the refresh button clears the box
-and every filter with it, and the message afterwards says only *Refreshed*. That
-is difference 13.
 
 ---
 

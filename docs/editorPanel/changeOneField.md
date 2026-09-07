@@ -2,8 +2,10 @@
 
 # UC-EDITOR-PANEL-006: Change one field of one test case
 
-**As a** tester, **I want** to correct one field without opening a form of
-twenty, **so that** fixing a typo takes two keys.
+**As a** tester, **I want** to correct one field without opening a form with
+twenty boxes on it, **so that** fixing a typo takes two keys.
+
+One field, one small dialog. The rest of the test case is left alone.
 
 `F2` opens the menu of fields. Each field also has a letter of its own.
 
@@ -99,8 +101,8 @@ open.
 dialog shows.
 
 **If several test cases are selected** — the menu title becomes **Update**, then
-the count, then **Test Cases**, and picking a field opens the bulk editor
-instead. That is [UC-EDITOR-PANEL-007](bulkEdit.md).
+the count, then **Test Cases**. Picking a field opens the bulk editor instead.
+That is [UC-EDITOR-PANEL-007](bulkEdit.md).
 
 ## The dialog cannot be moved
 

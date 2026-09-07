@@ -7,6 +7,8 @@
 **As a** tester, **I want** to run every automated test case under a test set, a
 package or **Test Cases**, **so that** a whole area runs in one gesture.
 
+Testin hands the test cases to the IDE's own test runner.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -53,6 +55,12 @@ package or **Test Cases**, **so that** a whole area runs in one gesture.
   set package, a test set and a test run. It is not offered on the test project
   row, on **Test Runs**, or on a test run package.
 
+## What the tester sees
+
+Running opens no screen of Testin's own. *Running*, or *Running N*, shows above
+the status bar at the bottom right of the IDE. The IDE's own Run window then
+opens at the bottom, on a test configuration named after the generated class.
+
 ## Main flow
 
 **From a folder of test cases**
@@ -60,12 +68,14 @@ package or **Test Cases**, **so that** a whole area runs in one gesture.
 1. The TestNG plugin is installed.
 2. The tester selects **Test Cases**, a test set package or a test set.
 3. The tester chooses **Run Tests**.
-4. Every test case under the node runs, skipping every retired branch under it.
-   Selecting a retired node itself and running it still runs everything in it.
+4. Every test case under the node runs. Retired branches under it are skipped.
+   A retired node the tester selects and runs directly still runs everything in
+   it.
 5. Testin shows *Running* for one test case, or *Running N*, where N is how many
    actually started. Test cases already running are not counted.
-6. The IDE's own Run window opens on a test configuration named after the
-   generated class, or *\<class\> and N more* where the selection spans several.
+6. The IDE's own Run window opens. Its test configuration is named after the
+   generated class. Where the selection spans several classes, the name reads
+   *\<class\> and N more*.
 
 **From a test run**
 
@@ -82,9 +92,9 @@ has no test cases to run* is shown in red. A test run with nothing left
 **If the test run is already running** — *\<name\> is already running* is shown
 in red.
 
-**If a test case has no generated automation code** — it is dropped and named:
-*\<test case\> has no generated code yet*. The rest still run. If none of them
-can, nothing starts.
+**If a test case has no generated automation code** — it is dropped, and Testin
+names it: *\<test case\> has no generated code yet*. The rest still run. If none
+of them can run, nothing starts.
 
 **If the IDE is indexing** — nothing runs, and the IDE says *Cannot run tests
 while IntelliJ is indexing. Please wait a moment.* If indexing starts while the
@@ -94,8 +104,7 @@ again.*
 **If every test case under the node was already running** — nothing starts, and
 Testin says nothing at all.
 
-**If the TestNG plugin is not installed** — **Run Tests** is not in the
-menu.
+**If the TestNG plugin is not installed** — **Run Tests** is not in the menu.
 
 ---
 

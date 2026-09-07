@@ -6,6 +6,8 @@
 **so that** I can see the whole test set again without undoing four filters one
 at a time.
 
+One click clears all four filters. It does not clear the search box.
+
 There is no key for this. The entry is at the top of the filter menu.
 
 ## Rules
@@ -37,6 +39,14 @@ There is no key for this. The entry is at the top of the filter menu.
 - **Rule-EDITOR-PANEL-099** — **Reset Filters** clears the priority, the group,
   the module and the run status together.
 - **Rule-EDITOR-PANEL-100** — It does not clear the search text.
+
+## What the tester sees
+
+This opens no screen of its own. **Reset Filters** is the first entry of the
+filter menu, above a separator line, and it is drawn only while a filter is on.
+
+Choosing it draws the whole test set again, from the first page. The count
+disappears from the filter button. Nothing is said.
 
 ## Main flow
 

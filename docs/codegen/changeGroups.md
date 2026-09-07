@@ -6,6 +6,8 @@
 on the test case, **so that** a run of the smoke group runs what the tree calls
 smoke.
 
+The groups on the test case become the groups on the method.
+
 There is no key for this. It happens when the groups are changed, which is
 [UC-EDITOR-PANEL-007](../editorPanel/changeOneField.md).
 
@@ -28,6 +30,21 @@ There is no key for this. It happens when the groups are changed, which is
 - **Rule-CODEGEN-046** — A test case belonging to no group has no `groups` in
   its method at all.
 
+## What the tester sees
+
+The dialog closes and a message reads *Updated*. Nothing on screen mentions the
+code. In the class file, the whole list after `groups` is written again, so a
+group taken away goes as well as a group added.
+
+```java
+@Test(description = "Log in with a valid user",
+      testName = "3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b",
+      groups = {"REGRESSION", "SMOKE"},
+      priority = 1)
+public void logInWithAValidUser() {
+}
+```
+
 ## Main flow
 
 1. The tester adds the smoke group to a test case.
@@ -46,9 +63,9 @@ so.
 
 ## What the tester sees elsewhere
 
-The groups are written in capitals in the code, as `REGRESSION` and `SMOKE`.
-Everywhere in Testin they read as words, as **Regression** and **Smoke**. The
-code follows the way TestNG expects them.
+In the code the groups are written in capitals, as `REGRESSION` and `SMOKE`.
+Everywhere else in Testin they read as words, as **Regression** and **Smoke**.
+The code follows the form TestNG expects.
 
 ---
 

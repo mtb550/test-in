@@ -22,14 +22,14 @@ up here rather than left to the code.
 
 ## The use cases
 
-| | What the tester does | Where its rules are |
-|---|---|---|
-| **UC-INTERNAL-001** | [Find anything in the test project](globalSearch.md) | Rule-INTERNAL-001 to Rule-INTERNAL-002 |
-| **UC-INTERNAL-002** | [Read a test project from disk](readTestProject.md) | Rule-INTERNAL-003 to Rule-INTERNAL-014 |
-| **UC-INTERNAL-003** | [Pick up a change made outside the IDE](noticeOutsideChange.md) | Rule-INTERNAL-016 to Rule-INTERNAL-024 |
-| **UC-INTERNAL-004** | [Give a test case its number](numberTestCase.md) | Rule-INTERNAL-025 to Rule-INTERNAL-035 |
-| **UC-INTERNAL-005** | [Keep a removed node so it can come back](keepRemovedNode.md) | Rule-INTERNAL-036 to Rule-INTERNAL-045 |
-| **UC-INTERNAL-006** | [Count what a node holds](countNodeContents.md) | Rule-INTERNAL-046 to Rule-INTERNAL-052 |
+| | What the tester does | Why a tester uses it | Where its rules are |
+|---|---|---|---|
+| **UC-INTERNAL-001** | [Find anything in the test project](globalSearch.md) | Reach one test case without scrolling a big tree. | Rule-INTERNAL-001 to Rule-INTERNAL-002 |
+| **UC-INTERNAL-002** | [Read a test project from disk](readTestProject.md) | Every panel answers at once, with no wait. | Rule-INTERNAL-003 to Rule-INTERNAL-014 |
+| **UC-INTERNAL-003** | [Pick up a change made outside the IDE](noticeOutsideChange.md) | See what a pull or a teammate changed. | Rule-INTERNAL-016 to Rule-INTERNAL-024 |
+| **UC-INTERNAL-004** | [Give a test case its number](numberTestCase.md) | Quote one number that means the same everywhere. | Rule-INTERNAL-025 to Rule-INTERNAL-035 |
+| **UC-INTERNAL-005** | [Keep a removed node so it can come back](keepRemovedNode.md) | Get back what a wrong Delete took away. | Rule-INTERNAL-036 to Rule-INTERNAL-045 |
+| **UC-INTERNAL-006** | [Count what a node holds](countNodeContents.md) | See what a node holds before removing it. | Rule-INTERNAL-046 to Rule-INTERNAL-052 |
 
 ---
 

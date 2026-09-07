@@ -6,7 +6,11 @@
 Testin, **so that** my first commit is not refused on a machine nobody has set
 up.
 
-Nothing starts this. It opens when a commit is refused for want of a name.
+Git will not record a commit until it knows a name and an email address. This
+dialog asks for them, then makes the commit.
+
+Nothing starts this. It opens when a commit is refused because Git has no
+name.
 
 ## Rules
 
@@ -49,8 +53,8 @@ Nothing starts this. It opens when a commit is refused for want of a name.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **The two boxes** — neither has a label, only its gray hint. The name holds
-   the cursor.
+1. **The two boxes** — neither has a label. Each shows a gray hint instead. The
+   name box holds the cursor.
 2. **Apply to** — this repository is chosen.
 
 ## Main flow
@@ -73,16 +77,16 @@ Nothing starts this. It opens when a commit is refused for want of a name.
 
 ## Where the plugin breaks its own rules
 
-The email is not checked at all. Any text is accepted, and Git makes of it what
-it will. That is difference 18 on
+The email is not checked at all. Any text is accepted. Git then makes of it
+what it will. That is difference 18 on
 [the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ## This is not the tester name
 
-Testin has its own tester name, on the settings page, which it stamps on test
-cases and verdicts. This is Git's, and it is used only on commits. They can be
-different, and nothing keeps them the same. The Testin one is
-[UC-SETTING-004](../setting/setTesterName.md).
+Testin has a tester name of its own, on the settings page. It stamps that name
+on test cases and verdicts. The name here is Git's, and it is used only on
+commits. The two can be different, and nothing keeps them the same. The Testin
+one is [UC-SETTING-004](../setting/setTesterName.md).
 
 ---
 

@@ -6,6 +6,8 @@
 its description, **so that** a test case I sketched without a name is not left
 without automation forever.
 
+Give a test case a description, and Testin writes the method it never had.
+
 There is no button for this. It happens when the description is filled in.
 
 ## Rules
@@ -31,6 +33,21 @@ There is no button for this. It happens when the description is filled in.
 - **Rule-CODEGEN-021** — A description cleared back to nothing leaves the method
   under the name it already has.
 
+## What the tester sees
+
+The dialog closes and a message reads *Updated*. That message is about the test
+case, not about the code, and nothing says a method was written. The method is
+in the class file, and it looks like this.
+
+```java
+@Test(description = "Card is declined",
+      testName = "b81c0d2e-4a77-41f0-9a35-2d8e5f6c7a10",
+      priority = 2)
+public void cardIsDeclined() {
+    // TODO: Auto-generated test steps for cardIsDeclined
+}
+```
+
 ## Main flow
 
 1. A test case exists with no description, so it has no method.
@@ -54,9 +71,9 @@ nothing happens at all, and nothing is written anywhere, not even the log.
 
 ## Why this is worth knowing
 
-There is no button anywhere in Testin that says "write the method for this test
-case". The one menu entry that sounds like it, **Automate Test Case**, is not
-built. Filling in the description is the way, and no label says so. That is
+No button in Testin says "write the method for this test case". One menu entry
+sounds like it. That entry is **Automate Test Case**, and it is not built.
+Filling in the description is the only way, and no label says so. That is
 difference 2 on
 [the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 

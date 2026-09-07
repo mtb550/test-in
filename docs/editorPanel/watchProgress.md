@@ -5,6 +5,8 @@
 **As a** tester, **I want** to see how many have passed and how long I have
 been at it, **so that** I can say when the run will be finished.
 
+The status bar reports. Nothing here changes a test case.
+
 There is no key for this. The figures are in the status bar.
 
 ## Rules
@@ -80,10 +82,6 @@ Nothing. The status bar only reports.
 more verdicts. `P`, `F` and `B` still record one on a signed off test run. That
 is difference 19 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
-
-**A finished test run can still read In Progress.** Judging the last pending
-test case from the menu does not mark the test run completed. Only the
-automation does. That is difference 23.
 
 ---
 

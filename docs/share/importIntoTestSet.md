@@ -6,6 +6,9 @@
 elsewhere, **so that** work done in a spreadsheet does not have to be typed
 again.
 
+To import is to read test cases out of a file and add them to a test set. The
+test cases already in the test set are not touched.
+
 There is no key for this. The menu entry is **Import**.
 
 ## Rules
@@ -35,6 +38,43 @@ There is no key for this. The menu entry is **Import**.
 - **Rule-SHARE-030** — Importing the same file twice makes two copies of
   everything.
 
+## The screen
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Import Test Cases                                           │
+├──────────────────────────────────────────────────────────────┤
+│  Source:   [ C:\Users\mtb\Downloads\Login.xlsx  ] [ ... ]    │
+│  Options:  [ ] Set as default folder                         │
+│  Your file should hold these columns: Description,           │
+│  Expected Result, Steps, Priority, ...                       │
+│                                                              │
+│  | Login |                                                   │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │[x]| #  | Description       | Expected Result | Priority│  │
+│  │[x]| 1  | Log in with a va. | The dashboard.. | P1      │  │
+│  │[x]| 2  | Log in with a lo. | The account i.. | P2      │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                                              │
+│                                          [ Import ]          │
+├──────────────────────────────────────────────────────────────┤
+│  [k]  Escape Cancel                                          │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **Source** — the file to read. A file chooser opens on its own as soon as
+   the dialog opens.
+2. **Options** — the tick box that remembers this folder. It is drawn only
+   while no folder has been set. That is
+   [UC-SHARE-023](chooseFolderOnce.md).
+3. **The gray lines** — the chosen format's note. It names the columns Testin
+   reads.
+4. **The tabs** — one for each sheet in the file. All of them go into this one
+   test set.
+5. **The table** — the test cases of the tab in front, every one ticked.
+   [UC-SHARE-007](chooseWhatToImport.md) draws it.
+6. **Import** — writes the test cases. `Enter` does not.
+
 ## Main flow
 
 1. The tester selects a test set and chooses **Import**.
@@ -44,7 +84,8 @@ There is no key for this. The menu entry is **Import**.
 5. The preview fills with one tab for each sheet, every test case ticked.
 6. The tester unticks what they do not want and corrects a few values.
 7. The tester presses **Import**.
-8. A bar reads *Importing*, the count, *test cases into*, then the test set.
+8. A bar reads *Importing*, then the count, then *test cases into*, then the
+   test set.
 9. Each test case is written, and the bar names it as it goes.
 10. Test methods are generated in batches, and the bar counts them.
 11. The test set's editor is closed and opened again, so the new test cases are
@@ -56,11 +97,11 @@ There is no key for this. The menu entry is **Import**.
 **If more than one node is selected, or the node cannot hold test cases** —
 **Import** is gray.
 
-**If the file parses to nothing** — a message titled **No Data** reads *No test
-cases found in the selected file.*
+**If nothing can be read out of the file** — a message titled **No Data** reads
+*No test cases found in the selected file.*
 
-**If the file will not parse** — a message titled for the format, such as **CSV
-Parse Error**, carries the reason. The preview stays empty.
+**If the file cannot be read at all** — a message titled for the format, such
+as **CSV Parse Error**, carries the reason. The preview stays empty.
 
 **If the tester presses Import with nothing loaded** — a message titled **Import
 Empty** reads *No data loaded from the selected file.*
@@ -71,8 +112,10 @@ reads *Select at least one test case to import.*
 **If the file is not one Testin can import** — nothing is read and nothing is
 said.
 
-**If the import fails part way** — a message titled **Import Failed** carries
-the reason, and everything already written stays. Nothing says how many landed.
+**If the import fails part way** — a message titled **Import Failed** says how
+many test cases were written before it stopped, and that they are still there.
+It says "at least", because the test set being written when it stopped may have
+got part of the way through.
 
 **If the IDE has no Java plugin** — the test cases are imported and no test
 methods are generated. A message says so once for the whole code project.
@@ -83,7 +126,7 @@ methods are generated. A message says so once for the whole code project.
 |---|---|
 | A column is missing, or the row stops early | Those fields are blank |
 | Every value is blank | The row is skipped without a word |
-| A value cannot be read | It is replaced, silently. See [UC-SHARE-007](chooseWhatToImport.md) |
+| A value cannot be read | It is replaced, and nothing is said. See [UC-SHARE-007](chooseWhatToImport.md) |
 | The sheet has no header row | The sheet contributes nothing |
 
 ---

@@ -8,6 +8,8 @@
 **As a** tester, **I want** a folder to group test sets, **so that** a tree with
 many test sets still reads the way the product is organized.
 
+A test set package is a folder that holds test sets. This makes one.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -52,7 +54,13 @@ many test sets still reads the way the product is organized.
 Rule-TREE-PANEL-024 and Rule-TREE-PANEL-025 hold here too. They say what can be
 created where, and they are on [UC-TREE-PANEL-007](createTestSet.md).
 
-The dialog is drawn under [UC-TREE-PANEL-007](createTestSet.md).
+## What the tester sees
+
+The **Create Test Node** dialog opens. It is the same dialog a test set uses,
+and it is drawn under [UC-TREE-PANEL-007](createTestSet.md). The tester moves to
+the second row, which reads *Groups test sets*. After `Enter`, a new folder row
+appears in the tree. *Created* shows above the status bar at the bottom right of
+the IDE. Nothing opens.
 
 ## Main flow
 

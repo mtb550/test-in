@@ -5,6 +5,8 @@
 **As a** tester, **I want** the same test cases as a table,
 **so that** I can compare many at once and correct them in columns.
 
+The grid is the same test cases drawn as a table. One row is one test case.
+
 There is no key for this. The button is on the toolbar.
 
 ## Rules
@@ -66,7 +68,7 @@ There is no key for this. The button is on the toolbar.
 
 1. The tester presses the grid button on the toolbar.
 2. Testin builds the table from the test cases on this page.
-3. Each column is made as wide as its content needs, up to a limit.
+3. Each column is made as wide as its text needs, up to a limit.
 4. The selection the cards had is carried across.
 5. The keyboard moves into the table.
 6. The button on the toolbar becomes the one that goes back to cards.

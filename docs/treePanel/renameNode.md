@@ -8,6 +8,8 @@
 **As a** tester, **I want** to rename a test set, a package or a test run,
 **so that** the tree says what things are called now.
 
+This changes the name of one node. Nothing inside it moves.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -65,15 +67,15 @@
 ```
 
 1. **One field**, filled in with the current name. Its gray hint text reads
-   *set new name...*. The cursor sits after the name, so typing **adds to it**
-   rather than replacing it. `Ctrl+A` selects it all. Spaces at either end are
-   dropped before anything is done.
+   *set new name...*. The cursor sits after the name. So typing **adds to the
+   name** instead of replacing it. `Ctrl+A` selects the whole name. Spaces at
+   either end are dropped before anything else happens.
 
 ## Main flow
 
 1. The tester selects a test set, a package or a test run.
 2. The tester presses `Shift+F6`, or chooses **Actions → Rename**.
-3. The **Rename** dialog opens, with the current name filled in and selected.
+3. The **Rename** dialog opens, with the current name filled in.
 4. The tester types the new name and presses `Enter`.
 5. Testin closes the node's open editor, whatever kind it is.
 6. For a test set or a test set package, and only with the Java plugin
@@ -100,8 +102,8 @@ Already Exists* is shown in red.
 **If the folder cannot be renamed on disk** — nothing is renamed and no
 *Renamed* is shown. An IDE notification titled *Rename Failed* stays in the
 notification log, reading *Operation failed:* and the reason, or *Could not find
-path on disk:* and the path. The other refusals above are fading balloons; this
-one is not.
+path on disk:* and the path. The other refusals above are balloons that fade.
+This one is not.
 
 **If several rows are selected** — **Rename** stays black and renames the first
 of them, saying nothing about the rest.
@@ -109,7 +111,7 @@ of them, saying nothing about the rest.
 **If the Java plugin is not installed** — the first rename in the project shows
 *Java Plugin Not Available*, reading *Automation code generation and navigation
 require the Java plugin, which is not available in this IDE.* The rename still
-happens. It is said once per project.
+happens. Testin says this once per project.
 
 > **A rename that failed is still on the undo history.** After *Rename Failed*,
 > **Actions → Undo Rename** is offered and does nothing useful.

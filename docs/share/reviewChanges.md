@@ -5,6 +5,9 @@
 **As a** tester, **I want** to see every change I have made since my last
 commit, **so that** I can decide what to send and what to put back.
 
+This lists everything the tester changed since the last commit, one row for
+each changed field. It is also where a commit is written and sent.
+
 There is no key on the menu. `Shift+Enter` reaches it from the message about
 uncommitted work.
 
@@ -57,20 +60,20 @@ uncommitted work.
 
 1. **The tick column** — every row arrives ticked.
 2. **Change Type** — what kind of change this row is.
-3. **Test Set** — filled for a test case, and blank for a test run, a marker or
+3. **Test Set** — filled for a test case. Blank for a test run, a marker, or
    any other file.
 4. **Name** — the test case's description, or the file's name.
 5. **Before** and **After** — the two values of the field that changed.
-6. **Branch** — the branch to commit onto. It can be typed into, which starts a
-   new branch.
-7. **The message box** — no label, only its gray hint.
+6. **Branch** — the branch the commit goes onto. It can be typed into, and a
+   name that is not a branch yet starts one.
+7. **The message box** — no label. It shows a gray hint instead.
 8. **Commit & Push** — a split button. Its arrow offers **Commit** alone.
 
 ## Main flow
 
 1. The tester selects a test project and chooses **View Pending Commits**.
 2. A progress bar reads *Scanning for changes*, and can be canceled.
-3. Testin asks Git what has changed, and reads each changed file.
+3. Testin asks Git what has changed. It then reads each changed file.
 4. The **Pending Changes** dialog opens with one row for each changed field.
 5. The tester unticks the rows they are not ready to send.
 6. The tester types a message and presses **Commit & Push**.
@@ -88,13 +91,13 @@ of the review. That is [UC-SHARE-017](resolveConflicts.md).
 **If nothing has changed and nothing is unpushed** — a message reads *No
 changes*.
 
-**If nothing has changed but a commit never reached the remote** — the message
-about that instead. That is [UC-SHARE-015](pushOldCommit.md).
+**If nothing has changed but a commit never reached the remote** — that
+message is shown instead. That is [UC-SHARE-015](pushOldCommit.md).
 
-**If one file cannot be read** — the row is still listed, with only what Git
-said about it.
+**If one file cannot be read** — the row is still listed. It carries only what
+Git said about the file.
 
-**If Git listed a new file that is already gone** — the row is dropped, and only
+**If Git listed a new file that is already gone** — the row is dropped. Only
 the log says so.
 
 **If the IDE has no Git plugin** — the menu entry is not there at all.

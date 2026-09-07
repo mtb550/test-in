@@ -5,6 +5,8 @@
 **As a** tester, **I want** the panel to keep up as I move down the test cases,
 **so that** I can read each one without asking for it every time.
 
+This is what the panel does by itself. There is nothing to turn on.
+
 There is no key for this. It happens once the panel is open.
 
 ## Rules
@@ -36,6 +38,16 @@ There is no key for this. It happens once the panel is open.
 - **Rule-VIEW-PANEL-018** — Every fill starts again at the first test case, so
   the paging position is never carried over.
 
+## What the tester sees
+
+This use case opens no screen of its own. The panel is already open, and what
+is drawn inside it changes.
+
+The test case in the panel is replaced by the newly selected one. Nothing is
+said, and no message appears. When the tester moves to a Testin editor with
+nothing selected, the panel is emptied and reads *Select a test case to view
+details* in gray, at the top left of the **Details** tab.
+
 ## Main flow
 
 1. The panel is open on a test case.
@@ -47,7 +59,7 @@ There is no key for this. It happens once the panel is open.
 ## What Testin refuses
 
 **If the panel is closed** — nothing happens. Moving the selection does not open
-it. A tester who closed the panel asked for the screen, and gets to keep it.
+it. A tester who closed the panel asked for the screen, and keeps it.
 
 **If the new selection is empty** — the panel keeps the test case it was
 showing.

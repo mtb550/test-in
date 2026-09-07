@@ -5,6 +5,8 @@
 **As a** tester, **I want** the full path of the report on my clipboard,
 **so that** I can paste it into a ticket or a chat message.
 
+This copies the full location of the report Testin has just written.
+
 There is no key for this. The link is on the message.
 
 ## Rules
@@ -23,6 +25,29 @@ There is no key for this. The link is on the message.
 - **Rule-REPORT-015** — The same link is offered on every message about a file
   Testin wrote, so the gesture is the same for a report and for an export.
 
+## The screen
+
+There is no dialog. The whole of this use case is one link on the message
+Testin shows when a report has been written.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  PDF Report Generated                                  [ X ] │
+│                                                              │
+│  Saved successfully: TestRun_Demo_cycle2_07-09-2026.pdf      │
+│                                                              │
+│  Open report    Copy path                                    │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **The title** — the format in capital letters, then *Report Generated*.
+2. **The line under it** — *Saved successfully:*, then the file name. It names
+   the file, not the folder.
+3. **Copy path** — this use case. Clicking it copies the whole path.
+4. **Open report** — opens the file. That is
+   [UC-REPORT-002](openReport.md).
+5. **The message** — it waits in the IDE's notification list. It does not fade.
+
 ## Main flow
 
 1. Testin writes the report and shows the message.
@@ -32,13 +57,14 @@ There is no key for this. The link is on the message.
 
 ## What Testin refuses
 
-Nothing. There is no way for it to fail, and no confirmation is raised.
+Nothing. Copying a path cannot fail. Testin shows no confirmation for it
+either.
 
 ## If the message has already gone
 
-The message stays in the IDE's notification list, so it can be found again
-there. If it has been cleared, the path can be read from the folder the report
-was written to, which is the one the report dialog named.
+The message waits in the IDE's notification list, so the tester can find it
+again there. If the list has been cleared, the path can still be built by hand.
+The report dialog named the folder, and the message named the file.
 
 ---
 

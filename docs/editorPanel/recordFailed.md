@@ -5,6 +5,9 @@
 **As a** tester, **I want** to write down what actually happened at the moment I
 see it, **so that** the bug report writes itself later.
 
+**Failed** is the one verdict that asks a question first. Testin opens a small
+form before it records anything.
+
 `F`.
 
 ## Rules
@@ -71,8 +74,8 @@ see it, **so that** the bug report writes itself later.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **Description** and **Expected** — what the test case says, so the tester can
-   see what should have happened. Neither can be typed into.
+1. **Description** and **Expected** — what the test case says. They show the
+   tester what should have happened. Neither can be typed into.
 2. **The first box** — what actually happened. It has no label, only its gray
    hint.
 3. **Bug Severity** — four choices, with the least serious chosen.
@@ -97,10 +100,10 @@ see it, **so that** the bug report writes itself later.
 
 ## What Testin refuses
 
-**If the tester presses `Escape`** — nothing at all is recorded. Everything
-typed is thrown away, with no confirmation, and the test case keeps whatever
-verdict it had. That is difference 29 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
+**If the tester presses `Escape`** — nothing at all is recorded, and the test
+case keeps whatever verdict it had. When something has been typed, Testin asks
+first before throwing it away. A dialog opened and closed unchanged goes at
+once.
 
 **If the test case was deleted from its test set** — a message reads *The test
 case was removed - the run keeps what it recorded.*
@@ -109,8 +112,8 @@ case was removed - the run keeps what it recorded.*
 row reads *No longer in the test set*, and the expected row is not drawn.
 
 **If several test cases are selected** — the dialog does not open at all. All of
-them are failed with no detail. That detail can be filled in afterwards, one at
-a time, with `F2`.
+them are failed with no detail. The detail can be filled in afterwards, one test
+case at a time, with `F2`.
 
 ---
 

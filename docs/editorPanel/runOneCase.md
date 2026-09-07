@@ -6,6 +6,9 @@
 its verdict land in this test run, **so that** I do not have to judge by hand
 what the machine can judge.
 
+The machine runs the test and writes the verdict. The tester does not press `P`
+or `F`.
+
 `F5` on the selection.
 
 ## Rules
@@ -43,6 +46,15 @@ what the machine can judge.
   way a keyboard verdict is.
 - **Rule-EDITOR-PANEL-183** — The framework's own timing replaces whatever the
   clock counted.
+
+## What the tester sees
+
+This opens no screen of Testin's own. The selected cards turn to running at
+once, and the IDE's own run window opens below the editor.
+
+Each result comes back on its own and its card takes the new verdict. Every one
+raises its own small message at the bottom of the IDE, reading *Passed* or
+*Failed*.
 
 ## Main flow
 
@@ -82,17 +94,13 @@ so. The others still run.
 
 **One message for each test case.** An automated test run of 50 raises 50
 messages reading *Passed* or *Failed*. Every other bulk gesture in Testin raises
-one with a count. That is difference 25 on
+one message with a count. That is difference 25 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
 
 **An automated pass still clears the tester's notes.** It now says so
 afterwards, in a message titled **Failure detail cleared** that names what went
 and stays in the notification list. The dialog that asks first is still on the
 keyboard path only. That is difference 26.
-
-**Pressing `F5` to stop marks the test run In Progress.** Every selected test
-case is claimed before Testin asks whether this is a run or a stop, and claiming
-starts the test run. That is difference 27.
 
 **Closing the tab stops the automation this editor started.** It is the same
 gesture as pressing **Stop Execution**, so the results of tests still running

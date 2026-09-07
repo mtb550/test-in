@@ -5,6 +5,8 @@
 **As a** tester, **I want** a test case's method to stop running,
 **so that** a test I know is broken does not fail every run until I fix it.
 
+Turn a test case off, and TestNG skips its method from then on.
+
 There is no key for this. It happens when the test case's status is set to
 disabled.
 
@@ -26,6 +28,21 @@ disabled.
   its method's annotation.
 - **Rule-CODEGEN-048** — Turning it back on takes the attribute off again,
   rather than writing `enabled = true`.
+
+## What the tester sees
+
+The card shows the new status and a message reads *Updated*. Nothing on screen
+mentions the code. In the class file, one attribute has been added to the
+annotation.
+
+```java
+@Test(description = "Log in with a valid user",
+      testName = "3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b",
+      priority = 1,
+      enabled = false)
+public void logInWithAValidUser() {
+}
+```
 
 ## Main flow
 
@@ -49,9 +66,8 @@ so.
 ## Why the attribute is removed rather than set
 
 An annotation carrying `enabled = true` says the same thing as an annotation
-with no `enabled` at all. Leaving it out keeps the generated code as short as it
-can be, and means a tester reading the code only ever sees the attribute when it
-matters.
+with no `enabled` at all. Leaving it out keeps the generated code short. It also
+means a tester only ever sees the attribute when it matters.
 
 ---
 

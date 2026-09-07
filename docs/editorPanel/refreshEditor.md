@@ -5,6 +5,8 @@
 **As a** tester, **I want** to read the test set again from disk,
 **so that** I see what a colleague's sync brought in.
 
+This reads the test set from disk again. It writes nothing.
+
 There is no key for this. The button's tooltip reads **Refresh**.
 
 ## Rules
@@ -44,31 +46,36 @@ There is no key for this. The button's tooltip reads **Refresh**.
   execution, and the message says so. Refresh reads the run again from disk and
   the walk goes with the copy it replaces.
 
+## What the tester sees
+
+This opens no screen. The list empties and reads *Refreshing...* while Testin
+reads the test set from disk again. Then the page holding the selected test case
+is drawn.
+
+A small message appears at the bottom of the IDE and fades. It reads
+*Refreshed*.
+
 ## Main flow
 
 1. The tester presses the refresh button.
-2. Every filter and the search text are cleared.
-3. The selected test case is remembered.
-4. The list empties and reads *Refreshing...*.
-5. Testin reads the test set from disk again.
+2. The selected test case is remembered.
+3. The list empties and reads *Refreshing...*.
+4. Testin reads the test set from disk again.
+5. Every filter and the search text stay as they were.
 6. The page holding the remembered test case is drawn.
-7. A message reads *Refreshed*.
+7. A message reads *Refreshed*. In a test run editor where an execution was
+   running, it reads *Refreshed, and the execution stopped*.
 
 ## What Testin refuses
 
 Nothing.
 
-## Where the plugin breaks its own rules
+## In a test run editor
 
-**The filters and the search go without a word.** A tester who has narrowed a
-test set of 200 down to four, and presses refresh to pick up a colleague's
-change, gets all 200 back. The message says *Refreshed*. That is difference 13
-on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
-
-**In a test run editor, refresh stops the execution.** The clock stops, the walk
-ends, and the toolbar button turns back into **Start Manual Execution**. The
-message still says only *Refreshed*. That is difference 24.
+Refresh also stops the execution. The clock stops, the walk ends, and the
+toolbar button turns back into **Start Manual Execution**. The message says
+*Refreshed, and the execution stopped*, so the tester is not left wondering why
+the button changed.
 
 ## Refreshing on its own
 

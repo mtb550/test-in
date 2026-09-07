@@ -5,6 +5,9 @@
 **As a** tester, **I want** to be told when I have committed something and not
 sent it, **so that** work I think the team has is not sitting on my laptop.
 
+A commit only records work on this machine. A push is what sends it. This says
+when a push is still owed.
+
 There is no key for this. The message appears when the review finds nothing else
 to do.
 
@@ -25,6 +28,12 @@ to do.
   remote, and says so rather than reporting no changes.
 - **Rule-SHARE-067** — The message counts commits, not files.
 
+## What the tester sees
+
+No window opens. A warning message appears at the bottom right of the IDE,
+titled **Not Pushed**, and it waits in the IDE's notification list. One link
+sits under it, reading **Push**.
+
 ## Main flow
 
 1. The tester committed yesterday and the push failed.
@@ -32,7 +41,8 @@ to do.
 3. Nothing has changed since, so there is nothing to review.
 4. A message titled **Not Pushed** reads the count, then *commits are committed
    here and not on the remote.*
-5. The tester chooses **Sync With Remote**, which pushes them.
+5. The tester clicks **Push** on the message, or chooses **Sync With Remote**.
+   Either one sends them.
 
 ## What Testin refuses
 
@@ -41,9 +51,9 @@ changes*, with no title.
 
 ## Why this exists
 
-The review dialog answers the question "what have I not sent". A tester whose
-push failed has an answer of nothing to review, and that reads as everything
-being sent. So Testin counts the commits the remote has not got, and says so
+The review dialog answers one question: what have I not sent. A tester whose
+push failed has nothing to review, and nothing to review reads as everything
+sent. So Testin counts the commits the remote has not got, and says so
 instead.
 
 ---

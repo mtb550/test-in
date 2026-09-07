@@ -6,6 +6,8 @@
 **so that** I can manage test cases where my team writes its code, even where
 Testin cannot generate anything.
 
+Test management works in full. Only the Java code is missing.
+
 Nothing starts this. It is the state of the IDE.
 
 ## Rules
@@ -29,6 +31,25 @@ Nothing starts this. It is the state of the IDE.
 - **Rule-CODEGEN-063** — A plugin that is installed but switched off counts as
   missing, and switching it on needs the IDE restarted before Testin notices.
 
+## The screen
+
+Nothing is drawn until something asks for code that cannot be written. Then one
+small red message appears near the bottom right of the IDE.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Java Plugin Not Available                                   │
+│  Automation code generation and navigation require the Java  │
+│  plugin, which is not available in this IDE.                 │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **The title** — always these four words.
+2. **The line under it** — always the same sentence.
+3. **The color** — red, because nothing was written.
+4. **How long it stays** — about five seconds, then it fades. It is not kept in
+   the IDE's notification list.
+
 ## What is missing
 
 | Missing | What the tester sees |
@@ -49,7 +70,7 @@ Java code.
 **If a generator is reached anyway** — a message titled **Java Plugin Not
 Available** reads *Automation code generation and navigation require the Java
 plugin, which is not available in this IDE.* It appears once for the whole code
-project, not once for each test case.
+project. It does not appear once for each test case.
 
 **If navigation is reached anyway** — the same message, every time rather than
 once.
@@ -57,9 +78,9 @@ once.
 ## Where the plugin breaks its own rules
 
 **TestNG without Java is worse than neither.** In an IDE that has TestNG and not
-Java, **Run Test Case** is still offered. Every test case then resolves to no
-method, and the tester gets one *has no generated code yet* message for each,
-with nothing saying the Java plugin is the reason. That is difference 7 on
+Java, **Run Test Case** is still offered. No test case then finds a method. The
+tester gets one *has no generated code yet* message for each of them, and
+nothing says the Java plugin is the reason. That is difference 7 on
 [the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

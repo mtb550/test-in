@@ -6,6 +6,8 @@
 **so that** I can send a useful log when something goes wrong, and turn it back
 down afterwards.
 
+The level decides how much Testin writes to its own log file.
+
 There is no key for this. It is the **Log level** row.
 
 ## Rules
@@ -26,6 +28,31 @@ There is no key for this. It is the **Log level** row.
   otherwise.
 - **Rule-SETTING-026** — The log sits beside the IDE's own log, so collecting
   the IDE's logs collects Testin's too.
+
+## The screen
+
+The row is the second one on the page. It is the only drop-down there.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Log level:  [ INFO                                      v ] │
+├──────────────────────────────────────────────────────────────┤
+│                DISABLED                                      │
+│                TRACE                                         │
+│                DEBUG                                         │
+│                INFO                                          │
+│                WARN                                          │
+│                ERROR                                         │
+│                FATAL                                         │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **The box** — the level in use now.
+2. **The list** — the seven levels, in this order. It opens under the box.
+
+Nothing can be typed into the box. The tester picks one of the seven.
+
+The whole page is drawn on [the settings page](main.md#the-page).
 
 ## The choices
 
@@ -56,11 +83,11 @@ Nothing. The drop-down cannot hold anything but one of the seven.
 
 ## Why it matters
 
-A good deal of what Testin does is only ever written to the log. A folder
-skipped for having no marker, a test case that would not read, an edit that was
-dropped because there was nowhere to write it. None of those raises a message,
-and at **INFO** most of them are not written either. A tester chasing one of
-them needs **TRACE**.
+Much of what Testin does is only ever written to the log. A folder skipped for
+having no marker. A test case that would not read. An edit dropped because
+there was nowhere to write it. None of those raises a message. At **INFO** most
+of them are not written either. A tester looking for one of them needs
+**TRACE**.
 
 ---
 

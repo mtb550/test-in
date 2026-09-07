@@ -5,6 +5,8 @@
 **As a** tester, **I want** every report and every export to start in one
 folder, **so that** I am not browsing to the same place several times a day.
 
+Testin fills this folder in for the tester when a file is saved or chosen.
+
 There is no key for this. It is the **Default download folder** row.
 
 ## Rules
@@ -28,9 +30,21 @@ There is no key for this. It is the **Default download folder** row.
 
 ## The screen
 
-The browse button opens a folder chooser titled **Select Default Download
-Folder**, whose line underneath reads *Choose the default folder for imports,
-exports, and reports*.
+The row is the fifth one on the page.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Default download folder:  [ C:\Users\muteb\Downloads    ] [...]         │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The box** — the folder that saving starts in.
+2. **The browse button** — opens a folder chooser.
+
+The folder chooser is titled **Select Default Download Folder**. The line under
+that title reads *Choose the default folder for imports, exports, and reports*.
+
+The whole page is drawn on [the settings page](main.md#the-page).
 
 ## Main flow
 
@@ -47,21 +61,21 @@ Nothing. A folder that does not exist is stored exactly as typed.
 ## The other way it gets set
 
 The report dialog, the export dialog and the import dialog each carry a
-checkbox reading **Set as default folder**. It is drawn only while no folder has
-been set yet. Ticking it and confirming writes the folder here.
+checkbox reading **Set as default folder**. The checkbox is drawn only while no
+folder has been set yet. Ticking it and confirming writes the folder here.
 
-The two dialogs store slightly different things. The report and export dialogs
-store the folder in the box. The import dialog stores the folder holding the
-file that was chosen.
+The dialogs store slightly different things. The report dialog and the export
+dialog store the folder in their own box. The import dialog stores the folder
+that holds the file the tester chose.
 
-Once a folder is set the checkbox is not drawn again, so those dialogs cannot
+Once a folder is set, the checkbox is not drawn again. So those dialogs cannot
 change it. Only this page can. That is question 3 on
 [the settings page](main.md#not-decided).
 
 ## Where the plugin breaks its own rules
 
-This page is meant to own these values, and this one has three other writers.
-That is difference 4 on
+This page is meant to be the one place these values are set. This value has
+three other writers. That is difference 4 on
 [the settings page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

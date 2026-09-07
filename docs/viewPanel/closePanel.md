@@ -5,6 +5,8 @@
 **As a** tester, **I want** the panel out of the way,
 **so that** I have the whole width of the screen for the editor.
 
+The panel takes width from the editor. Closing it gives that width back.
+
 `Escape`, pressed in the editor, closes it.
 
 ## Rules
@@ -35,6 +37,14 @@
 - **Rule-VIEW-PANEL-060** — Closing the editor a test case came from closes the
   panel too.
 
+## What the tester sees
+
+This use case opens no screen of its own. It takes one away.
+
+The panel goes from the right of the IDE, and the editor takes back the width.
+No message appears anywhere. The test case is not changed, and nothing is
+written.
+
 ## Main flow
 
 1. The panel is open, and the keyboard is in the editor.
@@ -55,13 +65,14 @@ stays open. A second press closes it.
 ## Where the plugin breaks its own rules
 
 **`Escape` does nothing from inside the panel.** It closes the panel only when
-the keyboard is in the editor. A tester who has just used `F2`, which needs the
-keyboard in the panel, cannot close it with `Escape`. That is difference 2 on
+the keyboard is in the editor. `F2` needs the keyboard in the panel, so a tester
+who has just used `F2` cannot close the panel with `Escape`. That is difference
+2 on
 [the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
-**Closing any Testin editor empties the panel.** A tester with two editors open,
-reading a test case from the first, who closes the second, watches the panel go
-blank. That is difference 9.
+**Closing any Testin editor empties the panel.** A tester has two editors open
+and is reading a test case from the first. They close the second, and the panel
+goes blank. That is difference 9.
 
 ---
 

@@ -6,6 +6,8 @@
 or move, **so that** every class beneath it still declares the package it is
 really in.
 
+Rename or move a package, and every Java file under it is put right.
+
 There is no key for this. It happens when a package is renamed or moved.
 
 ## Rules
@@ -40,6 +42,12 @@ There is no key for this. It happens when a package is renamed or moved.
 
 Test run packages and test runs have no code, so nothing happens for them.
 
+## What the tester sees
+
+The node takes its new name, and a message reads *Renamed*. Nothing on screen
+mentions the code. In the Project tool window, the folder has the new name, and
+the `package` line at the top of every Java file beneath it has been rewritten.
+
 ## Main flow
 
 1. The tester renames a package from **Accounts** to **Identity**.
@@ -65,8 +73,8 @@ nothing is said.
 
 The package a Java file declares must match the folder it is in. Moving one
 folder changes that for every file underneath it, however deep. Testin works
-each one out from where the file now sits rather than by editing the old text,
-so a file that was already wrong is put right too.
+each one out from where the file now sits. It does not edit the old text. So a
+file that was already wrong is put right too.
 
 ---
 

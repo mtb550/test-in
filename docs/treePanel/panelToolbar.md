@@ -9,6 +9,8 @@
 **so that** the things I do to the whole panel are not hidden in a menu
 somewhere else.
 
+These seven buttons act on the whole panel, not on one node.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -79,8 +81,8 @@ happens when the tester presses one.
 | 7 | **New Test Project** | *Create or Clone test project* | [UC-TREE-PANEL-002](createTestProject.md) |
 
 **Only the search button has a key.** It is `Ctrl+Alt+F`, and `Cmd+Alt+F` on a
-Mac, and it works anywhere in the IDE. The button is how a tester finds out the
-search exists at all, because nothing else on screen mentions it.
+Mac. It works anywhere in the IDE. The button is how a tester finds out the
+search exists at all. Nothing else on screen mentions it.
 
 ## Main flow
 
@@ -93,8 +95,8 @@ search exists at all, because nothing else on screen mentions it.
 **Expand All**
 
 1. The tester presses **Expand All**.
-2. Every node opens, except retired ones, which stay closed. Retired means a
-   **Deprecated** test set or an **Archived** package.
+2. Every node opens. Retired nodes stay closed. Retired means a **Deprecated**
+   test set or an **Archived** package.
 
 **Collapse All**
 

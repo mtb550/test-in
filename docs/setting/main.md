@@ -18,19 +18,19 @@ where the test data lives, who is using it, and how to reach the team's server.
 
 ## The use cases
 
-| | What the tester does | |
+| | What the tester does | Why they do it |
 |---|---|---|
-| **UC-SETTING-001** | [Open the settings page](openSettings.md) | |
-| **UC-SETTING-002** | [Set the Testin folder](setTestinFolder.md) | |
-| **UC-SETTING-003** | [Open the Testin folder on this machine](openTestinFolder.md) | |
-| **UC-SETTING-004** | [Give my name](setTesterName.md) | |
-| **UC-SETTING-005** | [Give my role](setTesterRole.md) | |
-| **UC-SETTING-006** | [Set the folder that files are saved to](setDownloadFolder.md) | |
-| **UC-SETTING-007** | [Choose how much Testin writes to its log](setLogLevel.md) | |
-| **UC-SETTING-008** | [Turn the shortcut hints off](hideShortcutHints.md) | |
-| **UC-SETTING-009** | [Name my account on the team's server](setSftpAccount.md) | |
-| **UC-SETTING-010** | [Name the key file this machine offers](setSftpKeyFile.md) | |
-| **UC-SETTING-011** | [Change the size of Testin's text](changeTextSize.md) | |
+| **UC-SETTING-001** | [Open the settings page](openSettings.md) | Reach every Testin setting in one place. |
+| **UC-SETTING-002** | [Set the Testin folder](setTestinFolder.md) | Tell Testin where the test data lives, so the tree fills. |
+| **UC-SETTING-003** | [Open the Testin folder on this machine](openTestinFolder.md) | Look at the test files on disk. |
+| **UC-SETTING-004** | [Give my name](setTesterName.md) | Put the tester's name on the work they do. |
+| **UC-SETTING-005** | [Give my role](setTesterRole.md) | Record the tester's job, though nothing reads it yet. |
+| **UC-SETTING-006** | [Set the folder that files are saved to](setDownloadFolder.md) | Save reports and exports to the same place every time. |
+| **UC-SETTING-007** | [Choose how much Testin writes to its log](setLogLevel.md) | Turn the log up when something goes wrong. |
+| **UC-SETTING-008** | [Turn the shortcut hints off](hideShortcutHints.md) | Make dialogs shorter once the keys are known. |
+| **UC-SETTING-009** | [Name my account on the team's server](setSftpAccount.md) | Let a sync connect as the tester, without asking. |
+| **UC-SETTING-010** | [Name the key file this machine offers](setSftpKeyFile.md) | Prove who this machine is with a key, not a password. |
+| **UC-SETTING-011** | [Change the size of Testin's text](changeTextSize.md) | Make Testin's text bigger or smaller. |
 
 Choosing which test project a code project uses is not on this page. It is
 written into a file the whole team shares, and it is

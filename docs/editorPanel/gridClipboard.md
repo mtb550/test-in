@@ -5,6 +5,8 @@
 **As a** tester, **I want** the grid to behave like a spreadsheet,
 **so that** I can move a column of values between Testin and Excel.
 
+Inside the grid these three keys act on cells, not on whole test cases.
+
 `Ctrl+C`, `Ctrl+X` and `Ctrl+V`, inside the grid.
 
 ## Rules
@@ -42,6 +44,14 @@
 - **Rule-EDITOR-PANEL-089** — A cell that cannot be typed into is skipped, for
   both cut and paste.
 
+## What the tester sees
+
+This opens no screen. A copy changes nothing on screen at all. A cut empties the
+cells it took, and a paste draws them with their new values.
+
+A cut and a paste raise one small message for every cell they change. Each one
+appears at the bottom of the IDE, reads *Updated*, and fades.
+
 ## Main flow
 
 1. The tester drags across a block of cells in the grid.
@@ -61,8 +71,8 @@
 **If a cell cannot be typed into** — it is skipped without a word, for a cut and
 for a paste.
 
-**If the block on the clipboard is bigger than the grid** — it is laid as far as
-the last row and the last column, and the rest is dropped.
+**If the block on the clipboard is bigger than the grid** — it is laid down as
+far as the last row and the last column. The rest is dropped.
 
 ## Where the plugin breaks its own rules
 

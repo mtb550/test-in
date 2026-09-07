@@ -6,6 +6,9 @@
 **so that** I can paste the error in after I have found it, without touching the
 verdict.
 
+This reopens the failure form on a test case that is already **Failed**. The
+verdict is not touched.
+
 `F2` on the failed test case.
 
 ## Rules
@@ -43,6 +46,41 @@ verdict.
 - **Rule-EDITOR-PANEL-170** — The dialog is the same one `F` opens, filled in
   with what is there.
 
+## The screen
+
+The same dialog the `F` key opens, with what was written already in it.
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  Failed Test Case Details                                  │
+├────────────────────────────────────────────────────────────┤
+│  Description   Log in with a locked account                │
+│  Expected      The account is refused.                     │
+│                                                            │
+│  [ The session was dropped instead.                    ]   │
+│                                                            │
+│  Bug Severity  ( ) Blocker (x) Major ( ) Minor ( ) Enha.   │
+│                                                            │
+│  Bug Priority  (x) High    ( ) Medium          ( ) Low     │
+│                                                            │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Error 500 returned by /api/session                  │  │
+│  └──────────────────────────────────────────────────────┘  │
+├────────────────────────────────────────────────────────────┤
+│  [k]  Enter Save       Escape Cancel                       │
+└────────────────────────────────────────────────────────────┘
+```
+
+1. **Description** and **Expected** — what the test case says. Neither can be
+   typed into.
+2. **The first box** — what actually happened. It opens holding what was written
+   before.
+3. **Bug Severity** and **Bug Priority** — the choices made last time are the
+   ones already selected.
+4. **The big box** — for the error or the exception. This is usually what the
+   tester came back to add.
+5. **The verdict** — not on this dialog at all. It stays **Failed**.
+
 ## Main flow
 
 1. A test case is recorded as **Failed**.
@@ -69,9 +107,9 @@ nothing is said. Only the log records it.
 
 ## Why the message comes last
 
-The message is raised after the test run is written, not before. An edit that
-was dropped therefore never says *Details updated*. Nothing at all is said, and
-that is difference 12 on
+The message is raised after the test run is written, not before. So an edit that
+was dropped never says *Details updated*. Nothing at all is said. That is
+difference 12 on
 [the view panel page](../viewPanel/main.md#where-the-plugin-breaks-its-own-rules)
 in its own form: a silent drop is still a silent drop.
 

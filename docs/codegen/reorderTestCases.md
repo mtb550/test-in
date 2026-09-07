@@ -6,6 +6,8 @@
 cases in, **so that** a test case that signs in comes before the one that signs
 out.
 
+The order in the editor becomes the order the automation runs in.
+
 There is no key for this. It happens when test cases are reordered, which is
 [UC-EDITOR-PANEL-011](../editorPanel/dragToReorder.md).
 
@@ -34,6 +36,27 @@ There is no key for this. It happens when test cases are reordered, which is
   Only the methods Testin wrote are moved, and one already in place is left
   where it is.
 
+## What the tester sees
+
+The cards move, and the numbers beside them change. A message reads *Re-sorted*,
+with a count when more than one card moved. Nothing on screen mentions the code.
+In the class file, every method's `priority` is written again, and the methods
+are put in the new order.
+
+```java
+@Test(description = "Card has expired",
+      testName = "7c2e91af-33b0-4d81-88ec-5f0a2b6c4d19",
+      priority = 1)
+public void cardHasExpired() {
+}
+
+@Test(description = "Card is declined",
+      testName = "b81c0d2e-4a77-41f0-9a35-2d8e5f6c7a10",
+      priority = 2)
+public void cardIsDeclined() {
+}
+```
+
 ## Main flow
 
 1. The tester drags a test case to the top of its test set.
@@ -47,8 +70,9 @@ There is no key for this. It happens when test cases are reordered, which is
 ## What Testin refuses
 
 **If a test case has no method** — it is skipped, and nothing is said. This is
-deliberate. The sweep touches every test case in the set, and reporting each one
-without a method would be a message for every test case nobody has written yet.
+on purpose. The sweep touches every test case in the set. Reporting each one
+without a method would mean a message for every test case nobody has written
+yet.
 
 **If a method has no annotation** — it is skipped, and only the log says so.
 

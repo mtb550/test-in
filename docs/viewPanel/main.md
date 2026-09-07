@@ -19,26 +19,26 @@ it.
 
 ## The use cases
 
-| | What the tester does | |
+| | What the tester does | Why they do it |
 |---|---|---|
 | | **Getting a test case into the panel** | |
-| **UC-VIEW-PANEL-001** | [Open a test case's details](openDetails.md) | |
-| **UC-VIEW-PANEL-002** | [Let the panel follow the selection](followSelection.md) | |
-| **UC-VIEW-PANEL-003** | [Page through several test cases](pageThroughCases.md) | |
+| **UC-VIEW-PANEL-001** | [Open a test case's details](openDetails.md) | See the whole test case, not only its title. |
+| **UC-VIEW-PANEL-002** | [Let the panel follow the selection](followSelection.md) | Read one test case after another without asking each time. |
+| **UC-VIEW-PANEL-003** | [Page through several test cases](pageThroughCases.md) | Walk the selected test cases with two keys. |
 | | **Reading** | |
-| **UC-VIEW-PANEL-004** | [Read what a test case says](readTestCase.md) | |
-| **UC-VIEW-PANEL-005** | [Read what a test run recorded](readRunResult.md) | |
-| **UC-VIEW-PANEL-006** | [Read the whole stacktrace of a failure](readStacktrace.md) | |
-| **UC-VIEW-PANEL-007** | [Read a test case's history](readHistory.md) | |
-| **UC-VIEW-PANEL-008** | [See the bugs still open on a test case](seeOpenBugs.md) | |
+| **UC-VIEW-PANEL-004** | [Read what a test case says](readTestCase.md) | Follow the steps and check the expected result. |
+| **UC-VIEW-PANEL-005** | [Read what a test run recorded](readRunResult.md) | See the verdict and what went wrong last time. |
+| **UC-VIEW-PANEL-006** | [Read the whole stacktrace of a failure](readStacktrace.md) | Copy the whole error into a bug report. |
+| **UC-VIEW-PANEL-007** | [Read a test case's history](readHistory.md) | See what changed on the test case, and when. |
+| **UC-VIEW-PANEL-008** | [See the bugs still open on a test case](seeOpenBugs.md) | Avoid raising a bug somebody has already raised. |
 | | **Working from the panel** | |
-| **UC-VIEW-PANEL-009** | [Copy a test case's identity](copyIdentity.md) | |
-| **UC-VIEW-PANEL-010** | [Go to the test set the test case lives in](goToTestSet.md) | |
-| **UC-VIEW-PANEL-011** | [Change one field without leaving the panel](changeOneField.md) | |
-| **UC-VIEW-PANEL-012** | [Run a test case from the panel](runFromPanel.md) | |
-| **UC-VIEW-PANEL-013** | [Stop a test case from the panel](stopFromPanel.md) | |
-| **UC-VIEW-PANEL-014** | [Go to the automation code](goToCode.md) | |
-| **UC-VIEW-PANEL-015** | [Close the panel](closePanel.md) | |
+| **UC-VIEW-PANEL-009** | [Copy a test case's identity](copyIdentity.md) | Name the exact test case in a bug report. |
+| **UC-VIEW-PANEL-010** | [Go to the test set the test case lives in](goToTestSet.md) | Open the test set and see the test cases around it. |
+| **UC-VIEW-PANEL-011** | [Change one field without leaving the panel](changeOneField.md) | Fix a wrong field without going back to the editor. |
+| **UC-VIEW-PANEL-012** | [Run a test case from the panel](runFromPanel.md) | Try the test case again while reading it. |
+| **UC-VIEW-PANEL-013** | [Stop a test case from the panel](stopFromPanel.md) | Stop a run that is taking too long. |
+| **UC-VIEW-PANEL-014** | [Go to the automation code](goToCode.md) | Read or change the code behind the test case. |
+| **UC-VIEW-PANEL-015** | [Close the panel](closePanel.md) | Give the editor the whole width of the screen. |
 
 ---
 

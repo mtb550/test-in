@@ -5,6 +5,8 @@
 **As a** tester, **I want** the strip of key hints gone from the bottom of every
 Testin dialog, **so that** the dialog is shorter once I know the keys.
 
+One checkbox turns the hints off in every Testin dialog at once.
+
 There is no key for this. It is the checkbox at the bottom of the page.
 
 ## Rules
@@ -47,8 +49,8 @@ then each key and what it does.
 2. **Each hint** — the key in bold, one space, then what it does.
 3. **The gaps** — seven spaces between one hint and the next.
 
-The hints change as the tester moves between fields, so the strip always shows
-the keys that work right now.
+The hints change as the tester moves between fields. The strip always shows the
+keys that work right now.
 
 ## Main flow
 
@@ -62,10 +64,10 @@ Nothing.
 
 ## Why it is on to start with
 
-The keys are the point of Testin. A tester who never finds `P`, `F` and `B` runs
-a test run with the mouse and never learns why the plugin is faster than a
-spreadsheet. So every dialog says what its keys are, until the tester says they
-have learned them.
+The keys are the point of Testin. A tester who never finds `P`, `F` and `B`
+uses the mouse for a whole test run. They never learn why the plugin is faster
+than a spreadsheet. So every dialog says what its keys are, until the tester
+says they have learned them.
 
 ---
 

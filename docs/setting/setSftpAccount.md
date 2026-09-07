@@ -5,6 +5,8 @@
 **As a** tester, **I want** to say who I am on the team's server,
 **so that** a sync connects as me without asking every time.
 
+This is the name the tester logs in with on the team's server.
+
 There is no key for this. It is the **SFTP account** row.
 
 ## Rules
@@ -26,6 +28,21 @@ There is no key for this. It is the **SFTP account** row.
 - **Rule-SETTING-033** — The sync can write this row too, so a tester who
   answers the sync's question never has to visit this page.
 
+## The screen
+
+The row is the sixth one on the page.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  SFTP account:  [ muteb                                      ]           │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The caption** — **SFTP account**.
+2. **The box** — a plain text box. There is no password box beside it.
+
+The whole page is drawn on [the settings page](main.md#the-page).
+
 ## Main flow
 
 1. The tester types their account name into the **SFTP account** row.
@@ -41,17 +58,17 @@ Nothing on this page. Every refusal happens at the sync, and those are on
 
 The server's address is not on this page. It lives in `testin.yml`, in the code
 repository, because it is the same for everyone on the team. This row is the
-half that is not.
+half that is not the same for everyone.
 
-If someone writes an account into the address in that file, Testin ignores it
+Someone may write an account into the address in that file. Testin ignores it
 and says so in the log. The file is shared with everyone, and an account is one
 person's.
 
 ## The password is not here either
 
-There is no password row. The sync asks for a password when nothing else can
-prove who this is, and keeps it in the IDE's password store. That is
-[UC-SHARE-020](../share/keepServerPassword.md).
+There is no password row. The sync asks for a password only when nothing else
+can prove who this is. It then keeps the password in the IDE's password store.
+That is [UC-SHARE-020](../share/keepServerPassword.md).
 
 ---
 

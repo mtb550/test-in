@@ -21,7 +21,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 
 ---
 
-> ### ⚠️ The state of this draft
+> ### The state of this draft
 >
 > Moved here from Notion on 6 September 2026. Its facts are unchanged. Only the
 > wording was made plain, to [the standard](standard.md). **It has not been
@@ -34,7 +34,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 >   this draft, 29 commits later. It is a whole execution capability. It is a
 >   standalone always-on-top window, showing one test case at a time, with `P`,
 >   `F` and `B` on it.
->   Section 6.2 is incomplete without it. See
+> Section 6.2 is incomplete without it. See
 >   [the light mode document](editorPanel/lightMode.md).
 > - **#74 is closed.** Section 8 names the grid view's missing keyboard path as a
 >   live gap tracked by it. That needs re-checking.
@@ -102,8 +102,8 @@ reports, the Git integration. The keyboard is the reason the work is faster
 once the tester is there.
 
 That idea is written down here as a capability, with rules behind it -
-**Rule-PRODUCT-015** to **Rule-PRODUCT-018**, and **Rule-PRODUCT-024**. It is not
-left to fall out of whichever keys happen to be bound.
+**Rule-PRODUCT-015** to **Rule-PRODUCT-018**, and **Rule-PRODUCT-024**. It is
+not left to fall out of whichever keys happen to be bound.
 
 **62 keys are bound**, counted against the product at `0becc8b2`. Of those, 40
 are shared across screens, so the same gesture means the same thing
@@ -134,7 +134,7 @@ exist. See **Appendix A** and **Question 4**.
 Planned actors are in **Appendix A**, kept separate so the main body stays
 checkable against the product.
 
-> ℹ️ The use case diagram (`testin-use-cases.png`) has not been moved. It was an
+> ℹ The use case diagram (`testin-use-cases.png`) has not been moved. It was an
 > image in the Notion page and did not come across with the text.
 
 ---
@@ -182,7 +182,7 @@ affect each other, and that is on purpose. Where a test run has got to is one
 question. The verdict a test case got is another. What the team thinks of the
 test case itself is a third.
 
-> ❗ Issue [#72](https://github.com/mtb550/test-in/issues/72) counts 22 values
+> Issue [#72](https://github.com/mtb550/test-in/issues/72) counts 22 values
 > across 6 kinds of status. Measured against the product, **it is 26 across
 > 7**. Two corrections. First, "Removed" moved. It used to sit with a test
 > project's status, and it belongs with the verdict a test case gets. A test
@@ -256,7 +256,7 @@ stateDiagram-v2
     Closed --> [*]
 ```
 
-> **⚠️ Undecided. See section 9.** The diagram shows what the product *allows*.
+> ** Undecided. See section 9.** The diagram shows what the product *allows*.
 > It currently allows every move, including Completed back to In Progress.
 > **Nothing stops a test run moving anywhere at all.** Whether a signed-off test
 > run may be reopened is question **Question 1**.
@@ -274,7 +274,8 @@ removing a test project deletes it.
 
 ### 5.5 A test set's status — two values
 
-**Active** and **Deprecated**. Deprecated is not deleted. See **Rule-PRODUCT-022**.
+**Active** and **Deprecated**. Deprecated is not deleted.
+See **Rule-PRODUCT-022**.
 
 ### 5.6 A package's status — two values
 
@@ -294,7 +295,7 @@ team thinks of the test case itself, across every test run it is ever in.
 | **Disabled** | The case exists but is not to be used |
 | **To Be Updated** | The case is known to be out of date |
 
-> **⚠️ Nothing in the product uses this today.** It can be set in exactly one
+> ** Nothing in the product uses this today.** It can be set in exactly one
 > place. The tester switches on the **Status** column in the grid view, which is
 > hidden by default, and types the label. There is no menu entry, and no key. It
 > is written into an export and **not read back by an import**, so a test case
@@ -346,7 +347,7 @@ editor toolbar, or a key. **A capability with no key says so, and says why.**
 | Jump to the generated automation method | `Shift+F5` | |
 | Generate the automation method | `Ctrl+F12` | |
 
-> **ℹ️ Light mode is missing from this table.** It was built after this draft: a
+> **ℹ Light mode is missing from this table.** It was built after this draft: a
 > standalone always-on-top window showing one case at a time, so a tester can work
 > with the IDE minimized and still record a verdict. The keys are `P`, `F` and
 > `B`, with `Ctrl+D` for the rest of the test case and `Escape` to close. It is
@@ -367,7 +368,7 @@ editor toolbar, or a key. **A capability with no key says so, and says why.**
 
 ### 6.4 Use cases
 
-> **❗ Not moved yet.** This was a Notion database. It held one row per
+> ** Not moved yet.** This was a Notion database. It held one row per
 > capability a tester triggers, numbered `UC-nn`. Each row was in the usual form
 > (who does it, what must be true first, the main flow, the alternatives, and
 > what is true afterward). Each one named the key that starts it.
@@ -381,7 +382,7 @@ editor toolbar, or a key. **A capability with no key says so, and says why.**
 
 Numbered so an issue or a commit can cite one.
 
-> **❗ Partially moved: 21 of 33 rules, and without their numbers.** This was a
+> ** Partially moved: 21 of 33 rules, and without their numbers.** This was a
 > Notion database. The text of 21 rules came across. The column holding their
 > numbers did not.
 > The numbers are the point of the database, because an issue cannot cite a rule
@@ -500,7 +501,7 @@ answered.
 
 ## Appendix A — Planned actors
 
-> **⚠️ Nothing in this appendix exists.** It is kept separate so the main body stays
+> ** Nothing in this appendix exists.** It is kept separate so the main body stays
 > true and checkable against the product.
 
 | Planned actor | What they would do | Tracked in |

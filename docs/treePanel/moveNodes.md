@@ -9,6 +9,8 @@
 **As a** tester, **I want** to move a node into another folder, **so that** the
 tree can be reorganized without building anything again.
 
+The node keeps everything inside it. Only where it sits changes.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -83,13 +85,13 @@ tree can be reorganized without building anything again.
 1. **The question** — says the verb and the names. The verb is *Move* after a
    cut. It is *Copy* after a copy.
 2. **From** and **To** — in gray. They are full paths on disk, not trails of
-   node names, and they let the tester catch a wrong drop before pressing
-   `Enter`. With nodes cut from several folders, **From** names only the first
-   one's folder.
+   node names. They let the tester catch a wrong drop before pressing `Enter`.
+   When nodes were cut from several folders, **From** names only the first
+   folder.
 3. The confirm key is named for the verb.
 
-From a paste, the title is **Paste**. From a drop, the title is the verb:
-**Move** or **Copy**. The dialog is the same otherwise.
+After a paste, the title reads **Paste**. After a drop, the title reads the
+verb, **Move** or **Copy**. Everything else on the dialog is the same.
 
 ## Main flow
 
@@ -108,10 +110,10 @@ From a paste, the title is **Paste**. From a drop, the title is the verb:
 
 **Drag and drop**
 
-1. The tester drags one or more nodes. A small rounded label follows the mouse,
-   reading *'\<name\>'* or *N items*.
-2. Over a row that cannot take them, the mouse shows the no-entry pointer, and
-   the row does not light up.
+1. The tester drags one or more nodes. A small label follows the mouse. It
+   reads *'\<name\>'*, or *N items* for several.
+2. Over a row that cannot take them, the pointer turns into the no-entry sign.
+   The row does not light up.
 3. The tester releases on a folder that can hold them. The **Move** dialog asks
    the same question, and `Enter` moves them.
 4. Nothing can be dropped between two rows.
@@ -124,10 +126,17 @@ From a paste, the title is **Paste**. From a drop, the title is the verb:
 ## What Testin refuses
 
 **If the selected node cannot take what is on the clipboard** — nothing moves,
-and *Select a folder* is shown in red. That covers a test set or a test run, the
-node being pasted or something inside it, the folder it already sits in, a node
-of the other family, and a node in another test project. On a test project or a
-test set, **Paste** is gray already, so nothing happens at all.
+and *Select a folder* is shown in red. Six places cannot take it:
+
+- a test set or a test run
+- the node being pasted
+- something inside the node being pasted
+- the folder the node already sits in
+- a node on the other side of the tree
+- a node in another test project
+
+On a test project or a test set, **Paste** is gray already. Nothing happens at
+all there.
 
 **If the destination already holds a node with the same name** — that node stays
 where it is, and *'\<name\>' already exists in '\<folder\>'* is shown in red,
@@ -150,11 +159,11 @@ first of them.
 **If the Java plugin is not installed** — the first move in the project shows
 *Java Plugin Not Available*. The move still happens.
 
-> **A paste does not empty the clipboard.** After moving nodes, **Paste** stays
-> live, and `Ctrl+V` on another folder offers to move the same nodes again.
+> **A paste does not empty the clipboard.** After a move, **Paste** is still
+> live. `Ctrl+V` on another folder offers to move the same nodes again.
 
 > **After `Escape`, the nodes stay on the clipboard.** A later `Ctrl+V` still
-> offers to move them. This breaks Rule-TREE-PANEL-050, and is difference 6 on
+> offers to move them. This breaks Rule-TREE-PANEL-050. It is difference 6 on
 > [the tree panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

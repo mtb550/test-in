@@ -6,6 +6,8 @@
 **so that** a colleague reading a test case or a verdict can see who last
 touched it.
 
+Testin writes this name onto everything this machine saves.
+
 There is no key for this. It is the **Tester name** row.
 
 ## Rules
@@ -24,6 +26,22 @@ There is no key for this. It is the **Tester name** row.
   remembered from when the IDE started. Changing it takes effect at once.
 - **Rule-SETTING-019** — An empty name is allowed. Testin then stamps nothing,
   which means the file did not say rather than that nobody chose.
+
+## The screen
+
+The row is the third one on the page.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Tester name:  [ muteb                                       ]           │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The caption** — **Tester name**.
+2. **The box** — a plain text box. It has no gray example in it and no browse
+   button beside it.
+
+The whole page is drawn on [the settings page](main.md#the-page).
 
 ## Where the name is stamped
 
@@ -51,8 +69,8 @@ Nothing. An empty name is accepted, and every stamp is then left empty.
 
 ## What it does not do
 
-The name is not sent anywhere and is not the same as the name Git records on a
-commit. Git is told who the tester is separately, and that is
+The name is not sent anywhere. It is also not the name Git records on a commit.
+Git is told who the tester is in its own place, and that is
 [UC-SHARE-008](../share/setGitIdentity.md).
 
 ---

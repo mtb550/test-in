@@ -5,6 +5,8 @@
 **As a** tester, **I want** to see the document straight away,
 **so that** I can check it before sending it, without hunting through a folder.
 
+This opens the report Testin has just written, from the message about it.
+
 There is no key for this. The link is on the message.
 
 ## Rules
@@ -24,12 +26,35 @@ There is no key for this. The link is on the message.
 - **Rule-REPORT-012** — The file is handed to whatever application on this
   machine claims it.
 
+## The screen
+
+There is no dialog. The whole of this use case is one link on the message
+Testin shows when a report has been written.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  PDF Report Generated                                  [ X ] │
+│                                                              │
+│  Saved successfully: TestRun_Demo_cycle2_07-09-2026.pdf      │
+│                                                              │
+│  Open report    Copy path                                    │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **The title** — the format in capital letters, then *Report Generated*.
+2. **The line under it** — *Saved successfully:*, then the file name.
+3. **Open report** — this use case. Clicking it opens the file.
+4. **Copy path** — puts the whole path on the clipboard. That is
+   [UC-REPORT-003](copyReportPath.md).
+5. **The message** — it waits in the IDE's notification list. It does not fade.
+
 ## Main flow
 
 1. Testin writes the report and shows the message.
 2. The tester clicks **Open report**.
 3. The message goes.
-4. The machine opens the file in whatever application claims that kind of file.
+4. The computer opens the file. It uses the program that owns that kind of
+   file, such as a PDF reader for a PDF.
 
 ## What Testin refuses
 
@@ -44,9 +69,10 @@ open the file:* and then the reason.
 
 ## Where the plugin breaks its own rules
 
-**A web page report opens in an application, not in a browser.** The same kind
-of file made as an export opens in the browser. One kind of file, two answers.
-That is difference 6 on
+**A web page report does not open in a browser.** It is handed to whatever
+program on this machine claims that kind of file. The same web page, made as an
+export, does open in the browser. One kind of file, two answers. That is
+difference 6 on
 [the reports page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

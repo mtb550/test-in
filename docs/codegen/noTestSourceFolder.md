@@ -5,6 +5,9 @@
 **As a** tester, **I want** to know why no code is appearing,
 **so that** I can mark a folder as holding tests and have it start working.
 
+No folder in the code project is marked as holding Java tests, so no code is
+written.
+
 Nothing starts this. It is the state of the code project.
 
 ## Rules
@@ -27,6 +30,25 @@ Nothing starts this. It is the state of the code project.
   only tidies up after a removal stays silent.
 - **Rule-CODEGEN-066** — The first test source folder of the first module that
   has one is the one Testin uses.
+
+## The screen
+
+The message the tester sees when the code project opens. It is small and red,
+near the bottom right of the IDE.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Java Test Source Not Found                                  │
+│  Unable to find a Java test source package in this project - │
+│  creation of automation packages, classes, and methods will  │
+│  be skipped.                                                 │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **The title** — always these five words.
+2. **The line under it** — this wording when the code project opens. A shorter
+   one is used later, each time something would have created code.
+3. **How long it stays** — about five seconds, then it fades on its own.
 
 ## Main flow
 
@@ -52,9 +74,9 @@ matter.
 
 ## Why a missing folder is not a failure
 
-Test management is the point of Testin, and the generated code is a convenience
-on top of it. A team that writes its automation somewhere else, or has not
-started yet, should be able to use every other part of the plugin. So a missing
+Test management is the point of Testin. The generated code is a convenience on
+top of it. A team that writes its automation somewhere else, or has not started
+yet, should still be able to use every other part of the plugin. So a missing
 folder is a skip with a message, never an error.
 
 ---

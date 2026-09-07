@@ -5,6 +5,8 @@
 **As a** tester, **I want** to know what this test set holds and who made it,
 **so that** I can answer a question about it without leaving the editor.
 
+This is about the test set or the test run, not about one test case.
+
 There is no key for this. The button is at the far right of the toolbar.
 
 ## Rules
@@ -37,6 +39,40 @@ There is no key for this. The button is at the far right of the toolbar.
   showing, not about the test case that is selected.
 - **Rule-EDITOR-PANEL-122** — The counts are worked out as the dialog opens and
   stored nowhere.
+
+## The screen
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  Details                                                   │
+├────────────────────────────────────────────────────────────┤
+│  Name          Login                                       │
+│  Path          C:\...\Demo\Test Cases\Login                │
+│  Created By    mtb                                         │
+│  Created At    12 Aug 2026 09:14                           │
+│  Updated By    mtb                                         │
+│  Updated At    03 Sep 2026 16:02                           │
+│  Status        Active                                      │
+│  Test Cases    12                                          │
+│                                                            │
+│           ( a ring chart of what this node holds )         │
+├────────────────────────────────────────────────────────────┤
+│  [k]  Escape Close                                         │
+└────────────────────────────────────────────────────────────┘
+```
+
+1. **Name** and **Path** — what the node is called, and where it sits on disk.
+2. **The four middle rows** — who made it and when, and who changed it last and
+   when.
+3. **Status** — the node's own status. A node with no status of its own has no
+   row here.
+4. **The counts** — how much the node holds. A test set counts its test cases.
+5. **The ring** — a chart under the rows. In a test set it shows what the node
+   holds. In a test run it shows one slice for each verdict.
+6. **The strip at the bottom** — the only key the dialog answers.
+
+A test run shows more rows: what it recorded about its own execution, and the
+answers the tester gave when it was created.
 
 ## Main flow
 

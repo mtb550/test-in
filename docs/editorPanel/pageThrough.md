@@ -5,6 +5,8 @@
 **As a** tester, **I want** to move through a long test set a page at a time,
 **so that** a test set of 2,770 test cases opens as fast as one of ten.
 
+Testin never draws the whole test set at once. It draws one page.
+
 `Ctrl+Right` and `Ctrl+Left`.
 
 ## Rules
@@ -65,8 +67,8 @@ The five controls sit in the middle of the status bar.
 
 ## What Testin refuses
 
-**If this is the first page** — the two arrows on the left are gray, drawn
-faded, and pressing `Ctrl+Left` does nothing.
+**If this is the first page** — the two arrows on the left are gray and drawn
+faded. `Ctrl+Left` does nothing.
 
 **If this is the last page** — the two arrows on the right are the same.
 

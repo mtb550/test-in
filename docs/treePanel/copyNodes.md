@@ -8,6 +8,8 @@
 **As a** tester, **I want** to copy a node into another folder, **so that** I
 can start from something that already exists instead of writing it again.
 
+The copy is new and separate. Changing it never changes the original.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -57,8 +59,12 @@ Rule-TREE-PANEL-043, Rule-TREE-PANEL-044, Rule-TREE-PANEL-045 and
 Rule-TREE-PANEL-049 hold here too. They say where a node can land, and they are
 on [UC-TREE-PANEL-013](moveNodes.md).
 
-The dialog is drawn under [UC-TREE-PANEL-013](moveNodes.md). After a copy its
-title is **Paste**, and it asks *Copy N items into '\<folder\>'?*.
+## What the tester sees
+
+Nothing in the tree changes when the tester copies. The nodes stay black, and
+*Copied* shows above the status bar at the bottom right of the IDE. Pasting then
+opens the dialog drawn under [UC-TREE-PANEL-013](moveNodes.md). Its title reads
+**Paste**, and it asks *Copy N items into '\<folder\>'?*.
 
 ## Main flow
 
@@ -73,8 +79,8 @@ title is **Paste**, and it asks *Copy N items into '\<folder\>'?*.
 7. Every test case in the copy gets its own id, and the copy is selected in the
    tree.
 
-**By dragging.** Holding `Ctrl` while releasing a dragged node titles the dialog
-**Copy**, and `Enter` copies instead of moving.
+**By dragging.** The tester holds `Ctrl` while releasing a dragged node. The
+dialog is then titled **Copy**, and `Enter` copies instead of moving.
 
 ## What Testin refuses
 
@@ -84,9 +90,9 @@ The same refusals as a move, and they are on
 **If the copy fails on disk** — an IDE notification titled *Copy Failed* stays
 in the notification log, with the reason under it.
 
-**If the Java plugin is installed** — fresh automation code is written for the
-copy. Without it, the copy has none, and the first copy in the project says
-*Java Plugin Not Available*.
+**If the Java plugin is installed** — new automation code is written for the
+copy. Without the plugin, the copy has none. The first copy in the project then
+says *Java Plugin Not Available*.
 
 ---
 

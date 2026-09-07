@@ -5,6 +5,8 @@
 **As a** tester, **I want** to move test cases into another test set,
 **so that** a test case written in the wrong place ends up in the right one.
 
+A cut on its own changes nothing. The test cases move when the tester pastes.
+
 `Ctrl+Shift+X`.
 
 ## Rules
@@ -40,6 +42,14 @@
 - **Rule-EDITOR-PANEL-080** — A cut is called off by a paste, by a copy, and by
   `Escape`.
 
+## What the tester sees
+
+This opens no screen. The cut cards stay where they are and are drawn faded, so
+the tester can see what is waiting to move.
+
+A small message appears at the bottom of the IDE and fades. It reads *Cut*, with
+a count after it for more than one test case.
+
 ## Main flow
 
 1. The tester selects two cards.
@@ -61,8 +71,8 @@ are, drawn faded until the cut is called off.
 
 ## What a moved test case keeps
 
-Its identity, so its verdicts in every test run still point at it, and its test
-method is still its own. Only its place changes.
+It keeps its identity, so the verdicts in every test run still point at it. It
+keeps its own test method too. Only its place changes.
 
 ## Undoing a move
 

@@ -5,6 +5,8 @@
 **As a** tester, **I want** the generated method to follow when I reword a test
 case, **so that** the code says the same thing the test case says.
 
+Reword a test case, and Testin rewrites the method to match.
+
 There is no key for this. It happens when the description is changed, which is
 [UC-EDITOR-PANEL-007](../editorPanel/changeOneField.md).
 
@@ -29,13 +31,29 @@ There is no key for this. It happens when the description is changed, which is
 - **Rule-CODEGEN-041** — A description cleared back to nothing leaves the method
   under the name it already has, and records the empty description.
 
+## What the tester sees
+
+The dialog closes and a message reads *Updated*. Nothing on screen mentions the
+code. Two things changed in the class file: the words after `description`, and
+the name of the method. The identity in `testName` did not change, and neither
+did anything the tester wrote inside the method.
+
+```java
+@Test(description = "Sign in with a valid user",
+      testName = "3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b",
+      priority = 3)
+public void signInWithAValidUser() {
+    // whatever the tester wrote here is left exactly as it was
+}
+```
+
 ## Main flow
 
 1. The tester changes a test case's description.
 2. Testin finds the method by the test case's identity.
 3. Testin rewrites the description in the annotation.
 4. Testin renames the method to match the new description.
-5. Everything that called the method is updated by the IDE's own rename.
+5. Anything that called the method is updated too, by the IDE's own rename.
 
 ## What Testin refuses
 

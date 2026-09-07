@@ -9,6 +9,8 @@
 current again, **so that** work I put aside can be picked up without building it
 again.
 
+This is the opposite of retiring. Nothing inside the node changes.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -51,6 +53,13 @@ again.
 Rule-TREE-PANEL-065 holds here too. It says a status is set on one node at a
 time, and it is on [UC-TREE-PANEL-018](retireNode.md).
 
+## What the tester sees
+
+Bringing a node back opens no screen of its own, and it asks no question. The
+gray comes off a test set or a package, and it sorts among the live nodes again.
+A test project that becomes **Active** shows its children again. *Active* shows
+above the status bar at the bottom right of the IDE.
+
 ## Main flow
 
 1. The tester selects exactly one retired node.
@@ -62,9 +71,9 @@ time, and it is on [UC-TREE-PANEL-018](retireNode.md).
    number. (Rule-TREE-PANEL-010)
 6. A test set that is **Active** again is offered when a test run is created.
 
-An **Archived** test project cannot be brought back from the tree, because the
-tree does not open it. The panel offers it in the list of test projects, and
-choosing it is [UC-TREE-PANEL-004](chooseTestProject.md).
+An **Archived** test project cannot be brought back from the tree. The tree does
+not open it at all. The panel offers it in the list of test projects instead.
+Choosing it there is [UC-TREE-PANEL-004](chooseTestProject.md).
 
 ## What Testin refuses
 

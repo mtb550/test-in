@@ -8,6 +8,9 @@
 **As a** tester, **I want** the panel to show my tree, or tell me what to do
 first, **so that** I am never stuck on an empty window.
 
+This page says what the panel shows when the tester opens it. There are five
+screens, and the tree is one of them.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -51,7 +54,7 @@ first, **so that** I am never stuck on an empty window.
   Testin binds it to that one without asking.
 
 Rule-TREE-PANEL-064 also holds here. It says an **Archived** test project is not
-opened on the next load, and it is on [UC-TREE-PANEL-018](retireNode.md).
+opened on the next load. It is written on [UC-TREE-PANEL-018](retireNode.md).
 
 ## No Testin folder
 
@@ -71,10 +74,11 @@ opened on the next load, and it is on [UC-TREE-PANEL-018](retireNode.md).
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The header** — every welcome screen starts with these five lines, whichever
-   of the five it is.
-2. **The one link.** Nothing else is offered, because nothing else can work yet.
-   **Select Test Project** and **New Test Project** in the toolbar are gray.
+1. **The header** — these five lines start every welcome screen. The panel has
+   five of them, and each one begins the same way.
+2. **The one link.** Nothing else is offered. Nothing else can work until a
+   Testin folder is set. **Select Test Project** and **New Test Project** in the
+   toolbar are gray.
 
 ## Choose a project
 
@@ -97,8 +101,8 @@ opened on the next load, and it is on [UC-TREE-PANEL-018](retireNode.md).
    - *could not be read*
 2. **One link per test project** — the name, then the status. The tester
    clicks a link. This code project is then set to use that test project, and
-   the tree appears. If there are more than six test projects, Testin shows one
-   link instead of a list. That link opens the **Select Test Project** dialog.
+   the tree appears. With more than six test projects, Testin shows one link
+   instead of a list. That link opens the **Select Test Project** dialog.
 
 Two more screens follow. The fifth is the tree itself.
 
@@ -108,9 +112,9 @@ Two more screens follow. The fifth is the tree itself.
 
 ## Main flow
 
-The panel shows one of five screens, and checks for them in this order. Every
-one of them opens with the same header, drawn below, and then its own line and
-its own links.
+The panel shows one of five screens. It checks for them in the order of the
+table below. Each screen starts with the same header, drawn above. After the
+header come the screen's own line and its own links.
 
 The choose screen holds one link per test project, up to six of them. The others
 hold one link each.
@@ -136,14 +140,14 @@ names \<name\>, which could not be read*.
 is no red line at all, and the tester gets the plain list of test projects with
 no explanation.
 
-> **The one project it binds to may be Archived.** Rule-TREE-PANEL-015 does not look at the
-> status, so a tester with a single archived test project is bound to it and
-> then told it is not opened, above a list holding only that one project.
+> **The one project it binds to may be Archived.** Rule-TREE-PANEL-015 does not
+> look at the status. A tester with one archived test project is bound to it.
+> The panel then says it is not opened, above a list holding only that project.
 
 > **Showing a Git-shared test project writes to the code project.** The first
-> time the panel draws one, Testin asks Git for the remote address and writes it
-> into the project file. There is no dialog and no message, and that file is one
-> the tester commits.
+> time the panel draws one, Testin asks Git for the remote address. Testin then
+> writes that address into the project file. There is no dialog and no message.
+> That file is one the tester commits.
 
 ---
 

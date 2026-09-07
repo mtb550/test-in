@@ -5,6 +5,8 @@
 **As a** tester, **I want** every line of the error behind a failure,
 **so that** I can paste it into a bug report without going to the log.
 
+The panel shows only the first three lines. This opens the rest in a window.
+
 There is no key for this. The link is under the first three lines.
 
 ## Rules
@@ -66,7 +68,8 @@ The link reads *Show all* and the number of lines the error really has.
 1. The panel shows a failed test case with an error recorded against it.
 2. The **Stacktrace** row shows the first three lines.
 3. The tester clicks *Show all*, then the number of lines.
-4. The **Error** dialog opens, wide enough to read a frame without wrapping.
+4. The **Error** dialog opens. It is wide enough to show a whole line of the
+   error without wrapping it.
 5. The tester selects the text and copies it.
 6. The tester presses `Escape`. Nothing is saved.
 
@@ -82,9 +85,9 @@ blank first line.
 
 **If the failure has no error** — the dialog shows only the message.
 
-**If the tester types in the dialog** — the change closes with the dialog and
-nothing is written. The text can be typed into so it can be selected and
-copied.
+**If the tester types in the dialog** — the typing goes when the dialog closes,
+and nothing is written. The text accepts typing only so that it can be selected
+and copied.
 
 ---
 

@@ -8,6 +8,8 @@
 **As a** tester, **I want** to create a test project by name, **so that** a new
 product under test has a place before any test is written.
 
+A test project is the folder that holds all the test work for one product.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -66,12 +68,13 @@ product under test has a place before any test is written.
 1. **One field** — its gray hint text reads *set name or paste url...*. What the
    tester types decides what happens. A Git address is cloned, which is
    [UC-TREE-PANEL-003](importTestProject.md). Anything else is the name of a new
-   test project. There is no list to pick from, because the tester would only be
-   saying twice what they already typed.
+   test project. There is no list to pick from. A list would only ask the
+   tester to repeat what they just typed.
 2. **The status bar** — every key this dialog answers to.
 
 The **New Test Project** button opens it. So does the welcome link **Create your
-first test project**, which is drawn under [UC-TREE-PANEL-001](reachTheTree.md).
+first test project**. That link is drawn under
+[UC-TREE-PANEL-001](reachTheTree.md).
 
 ## Main flow
 
@@ -82,8 +85,8 @@ first test project**, which is drawn under [UC-TREE-PANEL-001](reachTheTree.md).
 4. Testin binds this code project to it, and the tree appears.
 5. Testin shows *Project created*.
 
-To bring down a test project that already exists somewhere else, paste its
-address instead of a name. That is [UC-TREE-PANEL-003](importTestProject.md).
+To copy a test project that already exists somewhere else, paste its address
+instead of a name. That is [UC-TREE-PANEL-003](importTestProject.md).
 
 ## What Testin refuses
 

@@ -5,6 +5,8 @@
 **As a** tester, **I want** to stop a test case that is running,
 **so that** I can change something and start it again.
 
+While a test case runs, the run button becomes a stop button.
+
 There is no key for this, and no tooltip claims one.
 
 ## Rules
@@ -34,15 +36,29 @@ There is no key for this, and no tooltip claims one.
 - **Rule-VIEW-PANEL-055** — A test case the tester stopped is recorded as not
   run, never as failed.
 
+## The screen
+
+The stop button stands exactly where the run button stands.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│   [ go to code ]  [ stop ]                                               │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The first button** — goes to the automation code. A running test case does
+   not change it.
+2. **The second button** — the stop button. Its tooltip reads **Stop Test
+   Case**, and it names no key.
+
+The run button is drawn on [UC-VIEW-PANEL-012](runFromPanel.md).
+
 ## Main flow
 
 1. A test case is running, so the panel shows the stop button.
 2. The tester clicks it.
 3. Testin ends the process the test case is running in.
 4. A message reads *Stopped*, with a count when more than one stopped.
-
-The stop button is in the same place as the run button, drawn on
-[UC-VIEW-PANEL-012](runFromPanel.md).
 
 ## What Testin refuses
 
@@ -56,9 +72,9 @@ gesture does not exist.
 ## What the tester should expect
 
 The panel shows one test case, and stopping it can report *Stopped 12*. A test
-run started as one gesture runs as one process, so stopping any test case in it
-stops the rest. The count is what really went back, not what the tester aimed
-at.
+run started with one gesture runs as one process. Stopping any test case in it
+stops all the rest. The count says how many really stopped, not how many the
+tester aimed at.
 
 ---
 

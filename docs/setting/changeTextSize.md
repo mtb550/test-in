@@ -3,8 +3,10 @@
 # UC-SETTING-011: Change the size of Testin's text
 
 **As a** tester, **I want** Testin's text at the size I read code at,
-**so that** I can read a test case on a projector or on a laptop without
-squinting.
+**so that** I can read a test case on a projector or on a small laptop screen.
+
+One gesture changes the size of the text in every Testin panel and in the code
+editor.
 
 Hold `Ctrl` and turn the mouse wheel. On a Mac, hold `Cmd`.
 
@@ -59,10 +61,10 @@ still appears, so it does not look broken.
 
 ## What is not resized
 
-Some text keeps a fixed distance from the base size rather than a fixed size. A
-card's title is three points larger. A badge is two points smaller. The path at
-the top of the view panel is one point smaller. None of them ever goes below
-eight points.
+Some text has no size of its own. It is measured against the base size instead.
+A card's title is always three points larger. A badge is always two points
+smaller. The path at the top of the view panel is one point smaller. None of
+them ever goes below eight points.
 
 ---
 

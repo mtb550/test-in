@@ -6,6 +6,9 @@
 **so that** I can get back to a plain list without thinking about how I got
 here.
 
+One key, one step back. The tester does not have to remember which state they
+are in.
+
 `Escape`.
 
 ## Rules
@@ -40,6 +43,15 @@ here.
   and only cancels the edit.
 - **Rule-EDITOR-PANEL-116** — In the search box, the press returns the keyboard
   to the list and leaves the text.
+
+## What the tester sees
+
+This opens no screen, and it never closes the editor tab. One press undoes one
+thing on screen: an open cell, a waiting cut, the details panel, or the
+selection.
+
+Nothing is said, and no message appears. A press with nothing left to undo does
+nothing at all.
 
 ## The order of the steps
 

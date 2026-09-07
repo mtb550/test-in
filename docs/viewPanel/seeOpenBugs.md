@@ -5,6 +5,8 @@
 **As a** tester, **I want** the defects already raised against this test case,
 **so that** I do not raise the same one twice.
 
+This tab is not built yet. It shows one line saying so.
+
 There is no key for this. The tab is called **Open Bugs**.
 
 ## Rules
@@ -68,8 +70,8 @@ test case*. That is difference 6.
 ## Not decided
 
 Testin records a bug severity and a bug priority against a failed verdict. It
-records nothing else about a bug, and it has no link to a bug tracker. What this
-tab should show is question 2 on
+records nothing else about a bug. It has no link to a bug tracker either. What
+this tab should show is question 2 on
 [the view panel page](main.md#not-decided).
 
 ---

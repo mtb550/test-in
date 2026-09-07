@@ -5,6 +5,8 @@
 **As a** tester, **I want** to pick several test cases at once,
 **so that** one gesture changes all of them.
 
+Almost every other page here starts with a selection. This is how one is made.
+
 There is no key that starts this. Click, `Ctrl`-click and `Shift`-click.
 
 ## Rules
@@ -40,6 +42,14 @@ There is no key that starts this. Click, `Ctrl`-click and `Shift`-click.
   selection to what was clicked first.
 - **Rule-EDITOR-PANEL-111** — The grid's selection and the cards' selection are
   always the same. Changing one changes the other.
+
+## What the tester sees
+
+This opens no screen. The selected cards, or the selected cells, are drawn with
+a highlight behind them.
+
+The left of the status bar changes to say what is selected. Nothing else
+happens, and no message appears.
 
 ## How to select
 

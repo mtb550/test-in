@@ -21,9 +21,9 @@ to somebody who does not have the IDE.
 
 | | What the tester does | |
 |---|---|---|
-| **UC-REPORT-001** | [Generate a report on a test run](generateReport.md) | |
-| **UC-REPORT-002** | [Open the report that was just made](openReport.md) | |
-| **UC-REPORT-003** | [Copy the report's path](copyReportPath.md) | |
+| **UC-REPORT-001** | [Generate a report on a test run](generateReport.md) | Send a run's results to someone who has no IDE. |
+| **UC-REPORT-002** | [Open the report that was just made](openReport.md) | Check the document before sending it. |
+| **UC-REPORT-003** | [Copy the report's path](copyReportPath.md) | Paste the file's location into a ticket or a chat. |
 
 ---
 

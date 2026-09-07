@@ -9,6 +9,8 @@
 **As a** tester, **I want** to mark old work retired, **so that** it stays for
 its history without getting in the way of what I am testing now.
 
+Retiring deletes nothing. It only moves the node out of the way.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -53,11 +55,19 @@ its history without getting in the way of what I am testing now.
 - **Rule-TREE-PANEL-065** — A status is set on one node at a time. The status a
   node already has is not offered.
 
+## What the tester sees
+
+Retiring opens no screen of its own, and it asks no question. A retired test set
+or package turns gray at once and moves to the bottom of its folder. A test
+project that is not **Active** shows no children instead. The new status word
+shows above the status bar at the bottom right of the IDE. It reads *Inactive*,
+*Archived* or *Deprecated*.
+
 ## Main flow
 
 1. The tester selects exactly one node.
-2. The tester opens **Actions**. The status entries for that node's kind are
-   there, and the status it already has is gray.
+2. The tester opens **Actions**. It shows the status entries for that node's
+   kind. The status the node already has is gray.
 
    | Node | Retire it with | Statuses it can have |
    |---|---|---|
@@ -70,13 +80,13 @@ its history without getting in the way of what I am testing now.
    *Inactive*, *Archived* or *Deprecated*.
 
 **What retiring does.** A **Deprecated** test set or an **Archived** package is
-drawn gray and sorts last. **Expand All** leaves it closed. It is not offered
-when a test run is created, and its test cases are skipped when a parent is run.
-Nothing inside it is deleted.
+drawn gray, and it sorts last. **Expand All** leaves it closed. It is not
+offered when a test run is created. Its test cases are skipped when a parent is
+run. Nothing inside it is deleted.
 
 **What an inactive test project does.** Its row shows no children. If it is
-**Archived**, the next load skips it, and the panel shows *\<name\> is archived,
-so it is not opened*. That screen is drawn under
+**Archived**, the next load skips it. The panel then shows *\<name\> is
+archived, so it is not opened*. That screen is drawn under
 [UC-TREE-PANEL-001](reachTheTree.md).
 
 To bring one back, see [UC-TREE-PANEL-019](reactivateNode.md).

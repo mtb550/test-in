@@ -8,6 +8,9 @@
 project in the same Testin folder, **so that** one machine can serve several
 products.
 
+One code project uses one test project. This is how the tester changes which
+one.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -67,11 +70,12 @@ products.
 ```
 
 1. **Two columns.** The second is headed **Status**. The first has no heading at
-   all, which is difference 7 below.
+   all. That is difference 13 on
+   [the tree panel page](main.md#where-the-plugin-breaks-its-own-rules).
 2. **One row per test project** in the Testin folder, whatever its status. The
    one this code project already uses is selected.
-3. **The status bar** — every key this dialog answers to. A click selects a row
-   but never confirms; only `Enter` does.
+3. **The status bar** — every key this dialog answers to. A click selects a
+   row, but it never confirms. Only `Enter` confirms.
 
 ## Main flow
 
@@ -100,8 +104,8 @@ all the same. The panel then shows *\<name\> is archived, so it is not opened*
 instead of a tree.
 
 **If the project file is edited by hand** — the tree does not notice. Testin
-reads that file when the project opens, and again only when the tester presses
-**Refresh**.
+reads that file when the project opens. After that it reads the file again only
+when the tester presses **Refresh**.
 
 ---
 

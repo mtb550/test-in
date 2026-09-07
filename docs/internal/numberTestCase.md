@@ -6,6 +6,8 @@
 read it, **so that** the number I quote in a bug report means one test case and
 not a row in whatever list I happened to be looking at.
 
+The number is the test case's place in its test set, counting from one.
+
 There is no key for this. Dragging a test case into place is on the editor
 panel.
 
@@ -80,9 +82,9 @@ The same test set afterwards.
 ## What Testin refuses
 
 **If the tester opens a field, reads it and presses `Enter`** — nothing is
-written. Testin compares the file it would write against the file already on
-disk. They match, so it stops. The tester is not recorded as having edited the
-test case, and the test set is not recorded as having changed.
+written. Testin compares the file it would write with the file already on disk.
+They are the same, so it stops. The tester is not recorded as having edited the
+test case. The test set is not recorded as having changed either.
 
 **If a test case has no place in the order** — it sorts last, with the other
 test cases that have none, oldest first. Something that has just arrived lands
@@ -95,19 +97,20 @@ in the folder is on the screen, in the order the places give.
 second, separate test case. The file name is the identity, so both are read and
 both get a number.
 
-**If a test case file is not named the way Testin names them** — Testin keeps
-the name written inside it instead. That is a file Testin did not write, and
-inventing an identity for it would be worse than believing what it says.
+**If a test case file is not named the way Testin names them** — Testin uses
+the name written inside the file instead. Testin did not write that file.
+Making up an identity for it would be worse than believing what it says.
 
-**If two testers add a test case at the same time** — both are kept. There is no
-shared counter to contend on, and adding never rewrites a neighbor. If the two
-land in the same place, the older one is drawn first.
+**If two testers add a test case at the same time** — both are kept. There is
+no shared counter for them to fight over, and adding one never rewrites its
+neighbor. If the two land in the same place, the older one is drawn first.
 
 ## Why it works this way
 
-Three separate places used to work the number out. A filter renumbered the cards
-from one, so a test set of 40 test cases read as a test set of 12. There is now
-one owner, and Rule-INTERNAL-027 is the whole reason it exists.
+Three separate places used to work the number out. A filter renumbered the
+cards from one, so a test set of 40 test cases read as a test set of 12. One
+place owns the number now, and Rule-INTERNAL-027 is the whole reason it
+exists.
 
 ---
 

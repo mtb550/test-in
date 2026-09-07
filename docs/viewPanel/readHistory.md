@@ -5,6 +5,8 @@
 **As a** tester, **I want** to see what changed on a test case and when,
 **so that** I can tell whether a failure follows a change somebody made.
 
+This tab is not built yet. It shows one line saying so.
+
 There is no key for this. The tab is called **History**.
 
 ## Rules
@@ -56,15 +58,15 @@ There is no key for this. The tab is called **History**.
 **Always.** The tab shows the same line whether a test case is selected or not.
 It never looks at the test case.
 
-Two of the test case's own fields do carry some of this. **Updated By** and
-**Updated At** are on the Details tab, and say who last changed the test case
-and when. They do not say what changed.
+Two fields of the test case carry part of this. **Updated By** and **Updated
+At** are on the Details tab. They say who last changed the test case, and when.
+They do not say what changed.
 
 ## Not decided
 
-Nobody has decided what a test case's history should hold, or where it would be
-read from. Testin keeps no record of what a field used to say. That is question
-1 on [the view panel page](main.md#not-decided).
+Nobody has decided what a test case's history should hold. Nobody has decided
+where it would be read from either. Testin keeps no record of what a field used
+to say. That is question 1 on [the view panel page](main.md#not-decided).
 
 ---
 

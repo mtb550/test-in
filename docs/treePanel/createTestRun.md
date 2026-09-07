@@ -8,6 +8,8 @@
 **As a** tester, **I want** to start a test run over the test cases I choose,
 **so that** a pass through the product is recorded on its own.
 
+A test run is one round of testing, with a verdict for each test case.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -86,16 +88,17 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
 1. **Configuration details** — a section the tester can open and close. The gray
    hint on its right reads *Collapse*, and *Expand* once it is closed. Closing
    it takes every field below with it, the name included.
-2. **Test Run name** — filled in with what the tester typed in the create
-   dialog. Emptied, its gray hint text reads *Cycle-1*. The keyboard does not
-   start here: it starts in **Change Log**.
-3. **The fields** — one to a row. Every dropdown starts blank, which means
-   unanswered, and every one can be typed into, so a value the list does not
-   offer is still saved. **Browser** is on the form only while *Platform* is
-   **Web** and *Component* is **Frontend**. **Device Type** replaces it only
-   while *Platform* is **Mobile** and *Component* is **Frontend**. A field that
-   is not on the form is saved empty, so switching *Platform* from **Web** to
-   **Mobile** drops the browser that was picked. The lists are:
+2. **Test Run name** — filled in with what the tester typed in the first
+   dialog. When it is emptied, its gray hint text reads *Cycle-1*. The keyboard
+   does not start here. It starts in **Change Log**.
+3. **The fields** — one to a row. Every dropdown starts blank. Blank means the
+   tester has not answered it. Every dropdown can also be typed into, so a value
+   the list does not offer is still saved. **Browser** is on the form only while
+   *Platform* is **Web** and *Component* is **Frontend**. **Device Type** takes
+   its place only while *Platform* is **Mobile** and *Component* is
+   **Frontend**. A field that is not on the form is saved empty. So switching
+   *Platform* from **Web** to **Mobile** drops the browser that was picked. The
+   lists are:
 
    | Field | Offers |
    |---|---|
@@ -106,14 +109,14 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
    | Browser | *Chrome*, *Firefox*, *Safari*, *Edge* |
    | Device Type | *iPhone*, *Samsung*, *Huawei* |
 
-4. **The test cases** — the whole folder tree, each row with a tick box: a
-   **Test Cases** row at the top, then each package, each test set, and each
-   test case under it. It opens fully expanded. Ticking a folder ticks
-   everything under it. A test set with no test cases, and a package holding
-   only such test sets, is left out.
+4. **The test cases** — the whole folder tree, with a tick box on every row.
+   The **Test Cases** row is at the top. Under it come each package, each test
+   set, and each test case. The tree opens fully expanded. Ticking a folder
+   ticks everything under it. An empty test set is left out, and so is a package
+   that holds only empty test sets.
 5. **Create** — enabled only while at least one test case is ticked. `Enter`
    does nothing here. The button is the only way to confirm. A click outside the
-   dialog does not close it either; only `Escape` does.
+   dialog does not close it either. Only `Escape` closes it.
 
 **Edit Test Run** is this same dialog with the button **Save**. It opens filled
 with the test run's own name, test cases and settings.
@@ -127,14 +130,15 @@ with the test run's own name, test cases and settings.
    3 Cycle 1...*.
 4. The tester types a name and presses `Enter`.
 5. The **Create Test Run** dialog opens. It holds the typed name in *Test Run
-   name*, a *Configuration details* form, and a tree of every live, non-empty
-   test set with all test cases ticked. Retired test sets, anything under an
-   **Archived** package, and empty test sets are not in that tree.
+   name*. It also holds the *Configuration details* form, and a tree of test
+   sets with every test case ticked. Three things are left out of that tree:
+   retired test sets, anything under an **Archived** package, and empty test
+   sets.
 6. The tester ticks and unticks with `Space`, moves with `Tab`, and presses
    **Create**.
-7. Testin writes the test run under a progress bar reading *Creating test run
-   \<name\>*, which cannot be canceled. Every ticked test case is **Pending**,
-   and the status is **Created**.
+7. Testin writes the test run. A progress bar reads *Creating test run
+   \<name\>*, and it cannot be canceled. Every ticked test case is **Pending**.
+   The test run's status is **Created**.
 8. Its editor opens, and Testin shows *Run created*.
 
 ## What Testin refuses

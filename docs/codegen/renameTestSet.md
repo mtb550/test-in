@@ -5,6 +5,8 @@
 **As a** tester, **I want** the Java class to be renamed with the test set,
 **so that** the class name still says what the test set is called.
 
+Rename a test set, and Testin renames its Java class to match.
+
 There is no key for this. It happens when a test set is renamed, which is
 [UC-TREE-PANEL-011](../treePanel/renameNode.md).
 
@@ -27,6 +29,13 @@ There is no key for this. It happens when a test set is renamed, which is
 - **Rule-CODEGEN-052** — The new class name is the new test set name cleaned,
   with `Test` on the end.
 
+## What the tester sees
+
+The node in the tree takes its new name, and a message reads *Renamed*. Nothing
+on screen mentions the code. In the Project tool window, the Java file has a new
+name too, and every place that used the old class name has been updated by the
+IDE.
+
 ## Main flow
 
 1. The tester renames a test set from **Login** to **Sign in**.
@@ -46,8 +55,8 @@ nothing is said at all.
 
 ## Why the code changes first
 
-If the test set were renamed first, the old name would be gone and there would
-be nothing left to find the class with. Every rename and every move in this part
+If the test set were renamed first, the old name would be gone. There would be
+nothing left to find the class with. Every rename and every move in this part
 happens before the tree changes, for the same reason.
 
 ---

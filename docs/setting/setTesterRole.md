@@ -5,6 +5,8 @@
 **As a** tester, **I want** to record what I do,
 **so that** a report or a test case can say it was written by a test engineer.
 
+The row takes a value and stores it. Nothing in Testin reads it yet.
+
 There is no key for this. It is the **Tester role** row.
 
 ## Rules
@@ -21,6 +23,21 @@ There is no key for this. It is the **Tester role** row.
 - **Rule-SETTING-006** — Nothing on this page has a key of its own.
 - **Rule-SETTING-020** — The role is stored on this machine and read by nothing.
 
+## The screen
+
+The row is the fourth one on the page.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Tester role:  [ Test Engineer                               ]           │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The caption** — **Tester role**.
+2. **The box** — a plain text box, the same as the one above it.
+
+The whole page is drawn on [the settings page](main.md#the-page).
+
 ## Main flow
 
 1. The tester types a role into the **Tester role** row.
@@ -34,13 +51,14 @@ Nothing.
 
 ## Where the plugin breaks its own rules
 
-**The role is read by nothing at all.** It appears on no marker, in no report,
-in no message and in no log line. The field takes a value and the value is never
-used again. That is difference 2 on
+**The role is read by nothing at all.** It is on no marker. It is in no report,
+no message and no log line. The row takes a value, and the value is never used
+again. That is difference 2 on
 [the settings page](main.md#where-the-plugin-breaks-its-own-rules).
 
-A tester filling this row in reasonably expects it somewhere. It is nowhere.
-Either something should read it, or the row should go. That is question 1 on
+A tester who fills this row in expects to see the role somewhere. It is
+nowhere. Either something should read it, or the row should go. That is
+question 1 on
 [the settings page](main.md#not-decided).
 
 ---

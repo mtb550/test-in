@@ -6,6 +6,8 @@
 **so that** I can paste it into a bug report and anyone can find the exact test
 case again.
 
+The identity is a long code. It never changes, even when the title does.
+
 There is no key for this. The button sits beside the identity.
 
 ## Rules
@@ -60,9 +62,10 @@ Nothing. There is no gray state and no way for it to fail.
 
 ## Why it works this way
 
-The identity is what ties a test case to its generated test method, to a
-verdict in a test run, and to its file on disk. Quoting it in a bug report means
-the test case can be found again after its description has been rewritten.
+The identity ties three things to a test case: its generated test method, its
+verdict in a test run, and its file on disk. A bug report that quotes the
+identity still points at the right test case after the description has been
+rewritten.
 
 ---
 

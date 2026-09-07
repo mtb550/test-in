@@ -8,6 +8,8 @@
 **As a** tester, **I want** to take back the last change I made to the tree,
 **so that** a wrong move, rename or removal costs nothing.
 
+This puts the tree back the way it was before the last change.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -52,6 +54,13 @@
   removal, and an edit of a test run. Four cannot: creating anything, an order
   number, a copy, and a status change.
 
+## What the tester sees
+
+Undo opens no screen of its own. On the **Actions** menu, the entry names what
+it will take back, as in *Undo Move 'Login'* or *Undo Remove 3 items*. After
+`Ctrl+Z` the tree redraws with the change reversed, and *Undone* shows above the
+status bar at the bottom right of the IDE.
+
 ## Main flow
 
 1. The last change to the tree was a move, a rename, a removal or an edit of a
@@ -69,9 +78,9 @@ To put an undone change back, see [UC-TREE-PANEL-017](redoChange.md).
 **If the tree's history is empty** — the entry reads plain **Undo**, and is
 gray. `Ctrl+Z` does nothing.
 
-**If some removed nodes can no longer be put back** — the rest are restored, and
+**If some removed nodes can no longer be put back** — the rest are restored.
 *Undo Incomplete* is shown in red, with the line *N of M could not be put back*.
-That happens when something already sits where the node used to be.
+This happens when something already sits where the node used to be.
 
 > **A rename or a move that failed on disk is still on the history.** The menu
 > offers to undo it, and undoing does nothing useful.

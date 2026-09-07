@@ -2,6 +2,10 @@
 
 # Light mode
 
+**As a** tester, **I want** the test case I am judging to stay on top of the
+application I am testing, **so that** I can record a verdict without hunting for
+the IDE.
+
 Light mode is a separate window that stays above every other window. It shows
 **one test case at a time**. The tester can work in the application under test
 with IntelliJ minimized, and still record a verdict without switching windows.
@@ -44,17 +48,16 @@ icons. The icon names the mode, not the action.
 
 The design asked for a picture of a window holding a smaller window in its
 corner. The IDE has no ready-made icon for that. The two that came closest were
-both wrong: one points its arrow the wrong way, and the other is drawn so
-faintly it would have looked permanently disabled. So the icon is borrowed
-rather than drawn, which is what
-[#123](https://github.com/mtb550/test-in/issues/123) tracks.
+both wrong. One points its arrow the wrong way. The other is drawn so faintly
+that it would have looked switched off. So the icon is borrowed rather than
+drawn. That is what [#123](https://github.com/mtb550/test-in/issues/123)
+tracks.
 
 The button is a **toggle**. The tester presses it to open light mode. They press
 it again to close the window and carry on in the editor. It stays pressed for as
-long as the window is there. It is enabled only while the test run is open. It
-grays out the moment the test run reaches Completed or Closed. That is the same
-question that disables Start, and the same one that closes the window if it is
-open.
+long as the window is there. It works only while the test run is open. It turns
+gray the moment the test run reaches Completed or Closed. The same question
+grays out Start, and the same question closes this window if it is open.
 
 ---
 
@@ -149,9 +152,9 @@ being minimized.
 ### 2. Start, then Stop
 
 One button that swaps between Start and Stop. It uses the run editor toolbar's
-own two icons, read from one place, so the toolbar and this window can never
-end up different. A tester who presses Start in the toolbar and Stop in this
-window is pressing the same two buttons, and should be looking at them.
+own two icons. They are read from one place, so the toolbar and this window can
+never end up different. A tester who presses Start in the toolbar and Stop in
+this window is pressing the same two buttons, and should be looking at them.
 
 The icon is not the IDE's arrow for running *code*, because a tester running a
 test case by hand runs no code. Stop is a pause symbol rather than a square.
@@ -208,11 +211,11 @@ recorded whether or not they are shown, so nothing is lost by showing them
 softly.
 
 **The test run clock carries its hours. The test case clock does not.** That is
-what tells them apart. An attempt at hours and minutes for the test run broke
-that rule. At five minutes it read `00:05`, beside a test case at four and a
-half minutes reading `04:30`. The smaller number was the longer time. Keeping
-the seconds, and always carrying the hours, makes the test run clock the wider
-and the larger of the pair. That holds whatever either of them shows.
+what tells them apart. An earlier try showed the test run as hours and minutes,
+and broke that rule. At five minutes it read `00:05`, beside a test case at four
+and a half minutes reading `04:30`. The smaller number was the longer time. So
+the test run clock keeps its seconds and always carries its hours. It is then
+always the wider and larger of the two, whatever either of them shows.
 
 ### 8. The expected result, under the description
 
@@ -237,8 +240,8 @@ permanently, to be pressed twice a session, is wasted space. This window is
 built to have none.
 
 **Two keys rather than one.** A single key that both shows and hides depends on
-what the window is doing now. So the tester has to look before they can know
-what pressing it will do. Show and hide always do what they say.
+the state the window is in. The tester would have to look at the window before
+they could know what the key will do. Show and hide always do what they say.
 That matters most when the tester is looking at the application under test
 rather than at this window. The window remembers which it was showing.
 
@@ -248,10 +251,10 @@ rather than at this window. The window remembers which it was showing.
 Blocked.
 
 **This is where `Ctrl+D` and `Ctrl+H` are taught.** Removing the details button
-left two shortcuts that nothing on screen mentioned. That was the one real cost
-of the change, and this row pays it back. The row is not a new idea.
-Every Testin dialog already carries a row like this one. That is where the
-wording and the spacing come from.
+left two shortcuts that nothing on screen named. That was the one real cost of
+the change, and this row covers it. The row is not a new idea. Every Testin
+dialog already carries a row like this one. That is where the wording and the
+spacing come from.
 
 **Its background is the title bar's, not the body's.** The window uses two
 shades, and they mean something. The working area is the pale one. That is the
@@ -260,12 +263,12 @@ one. That is the title bar and this row. So the verdict row and the status bar
 look like the two separate things they are, rather than one band split by a
 hairline.
 
-**It can be turned off in two places.** It is a checkbox in the view menu, so a
-tester who has learned the keys can reclaim the row in this window. It is also a
-setting: *Settings → Testin → "Show keyboard shortcuts in dialogs"*. That
+**It can be turned off in two places.** It is a tick box in the view menu, so a
+tester who has learned the keys can win the row back in this window. It is also
+a setting: *Settings → Testin → "Show keyboard shortcuts in dialogs"*. That
 setting turns the strip off in every Testin dialog at once. Knowing the keys is
 a fact about the tester, not about 28 separate dialogs. One piece of code draws
-this row everywhere, so the setting reaches every dialog at once.
+this row everywhere, so one setting reaches every dialog.
 
 The failure form is the one exception. Its **Save** and **Cancel** buttons are
 gone, so this row
@@ -274,10 +277,9 @@ row back for that one state.
 
 **One line, always.** It never wraps and never scrolls. Whatever fits is shown,
 and the rest is simply not there. So the order was chosen, not left to chance.
-The three keys with no button to teach them come first. The three that
-fall off a narrow window are exactly the three with buttons sitting above them.
-Making the window wider brings them back, which gives the window's edge a
-second job.
+The three keys with no button to teach them come first. The three that fall off
+a narrow window are exactly the three with buttons sitting above them. Making
+the window wider brings them back. So the edge of the window has a second job.
 
 ### 11. The verdict bar
 
@@ -393,9 +395,9 @@ waiting to be filled in.
 
 **The form zooms with it.** The wheel exists so the window can be read from
 where the tester is sitting. A form they then had to lean in to type into would
-have moved the problem, not solved it. Each part remembers the size it was
-built at, and zoom multiplies that starting size. If it multiplied the size on
-screen instead, every turn of the wheel would grow on top of the last.
+have moved the problem, not solved it. Each part remembers the size it was built
+at, and zoom multiplies that starting size. Multiplying the size on screen
+instead would make every turn of the wheel grow on top of the last.
 
 ### 13. The same four fields as the run editor's failure dialog
 
@@ -430,9 +432,9 @@ error or exception or screenshot.."*. That is the same sentence, in the place
 the tester is already looking.
 
 This removes a way to lose work. Passing a test case clears everything recorded
-about a failure on it. So pasting evidence onto a test case, and then pressing
-`P`, would have destroyed the evidence. The run editor asks first. A window
-where one keystroke records a verdict cannot ask. So evidence only ever exists
+about a failure on it. So pasting evidence onto a test case and then pressing
+`P` would have destroyed that evidence. The run editor asks first. A window
+where one keystroke records a verdict cannot ask. So evidence only ever lives
 inside a form that `Enter` saves and `Escape` throws away.
 
 ### 17. The verdict buttons disappear while the form is open
@@ -475,17 +477,17 @@ that window needs to be has nothing to do with how large a grid should be on a
 monitor they are not looking at.
 
 **So it must not reuse the plugin's shared zoom.** That is the obvious thing to
-reach for, and the wrong one, because it puts a font size on every open editor
-in the IDE. This is written down because a later reader will find two pieces of
-wheel-zoom code and try to merge them.
+reach for, and it is the wrong one. It would put a font size on every open
+editor in the IDE. This is written down because a later reader will find two
+pieces of wheel-zoom code and try to merge them.
 
-**It opens at the size the tester is used to, then goes its own way.** That
+**It opens at the size the tester is used to, then follows its own zoom.** That
 happens every time, not just the first. The size is read from the IDE's editor
 font as the window opens. So a tester who changes the IDE font gets a window
 that agrees with it. The zoom on top of that is the tester's own. It is
 remembered per machine, alongside the position, the width and the four view
-toggles. It used to go back to the normal size every time the window opened,
-which meant setting it again each time.
+toggles. It used to go back to the normal size every time the window opened, so
+the tester had to set it again each time.
 
 The size is asked for each time, not fixed once. The editor font is a setting,
 and a tester can change it while the IDE is running. A fixed size would freeze
@@ -566,8 +568,8 @@ window is there. It checks whether the window is open, rather than remembering
 that someone opened it. So it pops back out on its own however the window
 closes: by `Escape`, by the test run being signed off, by the editor's tab
 closing, or by the project closing. Nobody had to write four separate pieces of
-code for that. Start and Stop already work the same way, and the second copy of
-an answer is always the one that ends up wrong.
+code for that. Start and Stop already work the same way. A second copy of an
+answer is always the one that ends up wrong.
 
 ### The window asks the test run whether it is running
 
@@ -607,8 +609,8 @@ three things already ask whether a test run has reached it:
 - the window closes
 
 One question, three answers. There is no fourth state to draw, and no "well
-done" screen to write. A window that outlived its test run would offer verdicts
-that nothing could take.
+done" screen to write. A window left open after its test run had ended would
+offer verdicts that nothing could take.
 
 ### The view menu chooses parts, not fields
 
@@ -661,20 +663,19 @@ Everywhere else in Testin, zoom is one number: the IDE's editor font size. It
 changes the font everywhere in the IDE, so the grid, the details panel and every
 editor move together. This window does not join them.
 
-The departure is the feature. A tester using light mode is not looking at the
+The difference is the feature. A tester using light mode is not looking at the
 IDE. That is why the window exists. One size makes a test case readable across a
 desk, over the top of a browser. Another makes a grid readable on a monitor
-nobody is facing. The two have nothing to do with each other. Moving both
-together would mean every zoom here quietly rearranged the work waiting behind
-it.
+nobody is facing. The two have nothing to do with each other. If they moved
+together, every zoom here would quietly rearrange the work waiting behind it.
 
 ### The clocks never compete with the test case
 
 The time is recorded for the report. It is not shown to hurry anybody. It stays
-small and gray at the bottom, and never takes the highlight color, which is
-kept for the test case being worked on. A
-window that puts a climbing number in front of a tester is asking them to go
-faster. A tester going faster is the failure this window was built to avoid.
+small and gray at the bottom. It never takes the highlight color, which is kept
+for the test case being worked on. A window that puts a climbing number in front
+of a tester is asking them to go faster. A tester going faster is the failure
+this window was built to avoid.
 
 ### A verdict color means a verdict was given
 

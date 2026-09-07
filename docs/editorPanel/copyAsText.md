@@ -5,6 +5,8 @@
 **As a** tester, **I want** a test case as plain text on my clipboard,
 **so that** I can paste it into a chat message or a ticket.
 
+This copies words a person can read. It does not copy the test case itself.
+
 `Ctrl+C` on the cards.
 
 ## Rules
@@ -37,6 +39,13 @@
   colon, then the value.
 - **Rule-EDITOR-PANEL-074** — Several test cases are separated by a blank line.
 
+## What the tester sees
+
+This opens no screen. Nothing on the list changes, because nothing was written.
+
+A small message appears at the bottom of the IDE and fades. It reads *Details
+copied*, with a count after it when more than one card was selected.
+
 ## Main flow
 
 1. The tester selects two cards and presses `Ctrl+C`.
@@ -59,7 +68,7 @@ expected result, the steps, the priority and every other field are left out.
 That is difference 1 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
 
-A tester who wants every field should export the test set instead, which is
+A tester who wants every field should export the test set instead. That is
 [UC-SHARE-001](../share/exportTestSet.md).
 
 ---

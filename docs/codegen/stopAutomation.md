@@ -5,6 +5,8 @@
 **As a** tester, **I want** to end a run that is going,
 **so that** I can change something and start it again.
 
+Stopping ends the whole run. Every test case in it goes back to not run.
+
 There is no key of its own. `F5` on a running test case stops it.
 
 ## Rules
@@ -28,6 +30,13 @@ There is no key of its own. `F5` on a running test case stops it.
 - **Rule-CODEGEN-038** — A test case the tester stopped is recorded as not run,
   never as failed.
 
+## What the tester sees
+
+The stop button on the card turns back into a run button, and every card that
+was running goes back to how it looked before. One message appears near the
+bottom right of the IDE, reading *Stopped* and then the count. It fades after
+about five seconds.
+
 ## Main flow
 
 1. Three test cases are running.
@@ -44,7 +53,7 @@ There is no key of its own. `F5` on a running test case stops it.
 
 ## What the tester should expect
 
-The count in the message is what really went back, which can be more than the
+The count in the message is what really went back. It can be more than the
 tester aimed at. Stopping one test case in a run of twelve reports *Stopped 12*,
 because the twelve share one process.
 

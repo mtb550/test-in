@@ -5,6 +5,8 @@
 **As a** tester, **I want** to say a test case is number three,
 **so that** I can put it where I want without dragging it through 200 rows.
 
+The tester types the position they want. Testin moves the test case there.
+
 `O` on the selected card.
 
 ## Rules
@@ -64,7 +66,8 @@
 1. The tester selects a card and presses `O`.
 2. The **Update Order** dialog opens with the current position in the box.
 3. The tester types a new number and presses `Enter`.
-4. Testin works out a place between the two test cases it now sits between.
+4. Testin works out a new place for it, between the two test cases it now sits
+   between.
 5. Only this test case's file is written.
 6. A message reads *Updated*.
 7. Every card is renumbered.

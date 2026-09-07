@@ -6,6 +6,8 @@
 case itself, **so that** I can see what happened last time without opening the
 test run.
 
+These rows come from one test run. The rows under them come from the test case.
+
 There is no key for this. The rows appear when the panel was opened from a test
 run.
 
@@ -40,6 +42,36 @@ run.
 - **Rule-VIEW-PANEL-033** — A test case the test run has not reached yet reads
   **Pending**.
 
+## The screen
+
+The run rows sit under the badges and above the test case's own rows.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│   ( P1 )  ( Smoke )  ( Failed )                                          │
+│                                                                          │
+│   Run Status          Failed                                             │
+│   Duration            02:14                                              │
+│   Actual Result       The session was dropped.                           │
+│   Stacktrace          java.lang.AssertionError: expected [true]          │
+│                         at org.testin.demo.LoginTest.valid               │
+│                         at org.testng.internal.Invoker.invoke            │
+│                       Show all 42 lines                                  │
+│   Bug Severity        Blocker                                            │
+│   Bug Priority        High                                               │
+│                                                                          │
+│   Expected Result:    The dashboard opens.                               │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The badges** — the last badge is the verdict.
+2. **The six run rows** — what one test run recorded. Their captions have no
+   colon after them.
+3. **Show all 42 lines** — opens the whole error in a window. That is
+   [UC-VIEW-PANEL-006](readStacktrace.md).
+4. **The test case rows** — the test case's own fields, below. Their captions
+   do have a colon.
+
 ## The rows, in order
 
 | Caption | What it holds |
@@ -65,12 +97,12 @@ run.
 are drawn. There is no test run to read from.
 
 **If the test run does not hold this test case** — no run rows are drawn. The
-test case is drawn on its own, which reads as a test case nobody has run. That
-is question 3 on [the view panel page](main.md#not-decided).
+test case is drawn on its own. It then looks like a test case nobody has run.
+That is question 3 on [the view panel page](main.md#not-decided).
 
-**If the test case passed** — the actual result, the stacktrace, the bug
-severity and the bug priority were cleared when the pass was recorded. Only
-**Run Status** and **Duration** remain.
+**If the test case passed** — four rows were cleared when the pass was
+recorded: the actual result, the stacktrace, the bug severity and the bug
+priority. Only **Run Status** and **Duration** are left.
 
 **If nothing was timed** — the **Duration** row disappears. A verdict recorded
 from the menu, or on several test cases at once, is never timed.

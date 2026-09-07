@@ -5,6 +5,8 @@
 **As a** tester, **I want** every field of the test case in one place,
 **so that** I can follow its steps and judge it against its expected result.
 
+This is what a tester reads while running a test.
+
 There is no key for this. It is what the **Details** tab shows.
 
 ## Rules
@@ -41,6 +43,41 @@ There is no key for this. It is what the **Details** tab shows.
 - **Rule-VIEW-PANEL-028** — Every value can be selected and copied, and none of
   them can be typed into.
 
+## The screen
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│   Demo  >  Test Cases  >  Accounts  >  Login                             │
+│                                                                          │
+│   ( 3f2a05c1-...-9c1b )  [copy]                                          │
+│                                                                          │
+│   Log in with a valid user                                               │
+│                                                                          │
+│   [ go to code ]  [ run ]                                                │
+│                                                                          │
+│   ( P1 )  ( Smoke )  ( Failed )                                          │
+│                                                                          │
+│   Expected Result:    The dashboard opens.                               │
+│   Steps:              1- Open the login page.                            │
+│                       2- Type the credentials.                           │
+│                       3- Press Sign in.                                  │
+│   Pre Conditions:     An account exists.                                 │
+│   Test Data:          user=admin                                         │
+│   Module:             Accounts                                           │
+│   Created By:         muteb                                              │
+│   Created At:         2 September 2026                                   │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The top part** — the path, the identity, the title, the two buttons and
+   the badges. Each one is numbered on
+   [the view panel page](main.md#the-panel).
+2. **The captions** — the name of the field, ending in a colon.
+3. **The values** — one column, all lined up. Each one can be selected and
+   copied. None of them can be typed into.
+4. **The rows that are missing** — this test case has nothing in its
+   **Reference:** field, so that row is not drawn and no gap is left for it.
+
 ## The rows, in order
 
 | Caption | What it holds |
@@ -75,7 +112,7 @@ badges. They are numbered on the panel drawing on
 ## What Testin refuses
 
 **If a field is empty** — the row is not drawn at all. The panel is never a
-column of empty captions.
+column of captions with nothing beside them.
 
 **If the description is empty** — the title reads a single dash.
 
@@ -83,7 +120,7 @@ column of empty captions.
 in 1970.
 
 **If the priority is the lowest** — no priority badge is drawn. Only the two
-higher priorities are worth a badge.
+higher priorities get a badge.
 
 **If nobody has run the test case** — no verdict badge is drawn.
 

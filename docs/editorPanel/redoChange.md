@@ -5,6 +5,8 @@
 **As a** tester, **I want** to put back something I just took back,
 **so that** an undo pressed by mistake costs nothing.
 
+It only works right after an undo. Any new change clears the list.
+
 `Ctrl+Y`.
 
 ## Rules
@@ -37,6 +39,14 @@
   back.
 - **Rule-EDITOR-PANEL-072** — Making any new change clears everything waiting to
   be put back.
+
+## What the tester sees
+
+This opens no screen. The change is made again, and the test cases it touched
+are drawn again with the new values.
+
+A small message then appears at the bottom of the IDE and fades. It reads
+*Redone*.
 
 ## Main flow
 

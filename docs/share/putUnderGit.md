@@ -5,6 +5,9 @@
 **As a** tester, **I want** to start versioning a test project that is not under
 Git yet, **so that** the team can review and pull it like code.
 
+Git is the tool a team uses to keep every version of its files. A folder Git
+watches is called a repository. This turns the test project's folder into one.
+
 There is no key for this. The link is on the message that says there is no
 repository.
 
@@ -26,6 +29,13 @@ repository.
 - **Rule-SHARE-043** — Nothing is committed by making the repository. Only the
   repository itself is made.
 
+## What the tester sees
+
+No window opens. A warning message appears at the bottom right of the IDE,
+titled **Git repository not found**, and it stays in the IDE's notification
+list. One link sits under it, reading **Initialize Git (git init)**; clicking
+it makes the repository, and a small message reads *Git initialized*.
+
 ## Main flow
 
 1. The tester selects a test project and chooses **View Pending Commits**.
@@ -36,7 +46,7 @@ repository.
 5. The tester clicks it.
 6. Testin makes the repository.
 7. A message reads *Git initialized*.
-8. The tester chooses **View Pending Commits** again, and every file is listed
+8. The tester chooses **View Pending Commits** again. Every file is now listed
    as new.
 
 ## What Testin refuses
@@ -44,13 +54,14 @@ repository.
 **If the repository cannot be made** — a message titled **Git Init Failed**
 carries the reason.
 
-**If the IDE has no Git plugin** — neither menu entry is there, and nothing says
-why. That is difference 19 on
+**If the IDE has no Git plugin** — neither menu entry is there, and nothing
+says why. That is difference 19 on
 [the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ## What comes next
 
-A new repository has no remote. The first push asks for one, which is
+A new repository has no remote. A remote is the team's copy, the one everybody
+pushes to. The first push asks for its address, which is
 [UC-SHARE-013](commitAndPush.md).
 
 ---

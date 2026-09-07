@@ -6,6 +6,8 @@
 removed, **so that** the code does not keep tests for a test set nobody has any
 more.
 
+Remove a test set or a package, and its code is deleted with it.
+
 There is no key for this. It happens when the node is removed, which is
 [UC-TREE-PANEL-012](../treePanel/removeNode.md).
 
@@ -27,6 +29,13 @@ There is no key for this. It happens when the node is removed, which is
   package deletes its folder and everything under it.
 - **Rule-CODEGEN-060** — A removal that finds no code to delete says nothing at
   all.
+
+## What the tester sees
+
+The node goes from the tree, and a message reads *Removed*, with a count when
+more than one node went. Nothing on screen mentions the code. In the Project
+tool window, the class file is gone; for a package, the whole folder is gone
+with everything under it.
 
 ## Main flow
 
@@ -59,7 +68,7 @@ again, empty. What was in the method bodies does not come back.
 
 **A removal can report that a name could not be built.** Removing a test set
 that sits outside a test cases folder shows a message titled **Class Name
-Unknown**, saying no automation class name could be built. The tester was
+Unknown**. It says no automation class name could be built. The tester was
 deleting, not creating. That is difference 8 on
 [the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 

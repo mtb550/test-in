@@ -20,40 +20,40 @@ test set and test run. Everything in Testin starts here.
 
 Each one is a page of its own: the story, its rules, its screens and its steps.
 
-| | What the tester does | |
+| | What the tester does | Why a tester would use it |
 |---|---|---|
 | | **Getting to the tree** | |
-| **UC-TREE-PANEL-001** | [Open the panel and reach the tree](reachTheTree.md) | |
-| **UC-TREE-PANEL-002** | [Create a test project](createTestProject.md) | |
-| **UC-TREE-PANEL-003** | [Import a test project that already exists](importTestProject.md) | |
-| **UC-TREE-PANEL-004** | [Choose which test project this code project uses](chooseTestProject.md) | |
+| **UC-TREE-PANEL-001** | [Open the panel and reach the tree](reachTheTree.md) | See the test project, or learn what to set up first. |
+| **UC-TREE-PANEL-002** | [Create a test project](createTestProject.md) | Give a new product under test a home. |
+| **UC-TREE-PANEL-003** | [Import a test project that already exists](importTestProject.md) | Copy a test project from Git onto this machine. |
+| **UC-TREE-PANEL-004** | [Choose which test project this code project uses](chooseTestProject.md) | Point this code project at a different test project. |
 | | **Nodes** | |
-| **UC-TREE-PANEL-005** | [Open a test set](openTestSet.md) | |
-| **UC-TREE-PANEL-006** | [Open a test run](openTestRun.md) | |
-| **UC-TREE-PANEL-007** | [Create a test set](createTestSet.md) | |
-| **UC-TREE-PANEL-008** | [Create a test set package](createTestSetPackage.md) | |
-| **UC-TREE-PANEL-009** | [Create a test run](createTestRun.md) | |
-| **UC-TREE-PANEL-010** | [Create a test run package](createTestRunPackage.md) | |
-| **UC-TREE-PANEL-011** | [Rename a node](renameNode.md) | |
-| **UC-TREE-PANEL-012** | [Remove a node](removeNode.md) | |
+| **UC-TREE-PANEL-005** | [Open a test set](openTestSet.md) | Read and write the test cases inside a test set. |
+| **UC-TREE-PANEL-006** | [Open a test run](openTestRun.md) | Record a verdict for each test case in a run. |
+| **UC-TREE-PANEL-007** | [Create a test set](createTestSet.md) | Make a place for the test cases about to be written. |
+| **UC-TREE-PANEL-008** | [Create a test set package](createTestSetPackage.md) | Group test sets so a big tree stays readable. |
+| **UC-TREE-PANEL-009** | [Create a test run](createTestRun.md) | Record one round of testing over chosen test cases. |
+| **UC-TREE-PANEL-010** | [Create a test run package](createTestRunPackage.md) | Group test runs so a year of cycles stays tidy. |
+| **UC-TREE-PANEL-011** | [Rename a node](renameNode.md) | Give a node the name it is called now. |
+| **UC-TREE-PANEL-012** | [Remove a node](removeNode.md) | Take out work that is no longer needed. |
 | | **Arranging the tree** | |
-| **UC-TREE-PANEL-013** | [Move nodes](moveNodes.md) | |
-| **UC-TREE-PANEL-014** | [Copy nodes](copyNodes.md) | |
-| **UC-TREE-PANEL-015** | [Order nodes among their siblings](orderNodes.md) | |
-| **UC-TREE-PANEL-016** | [Undo a change to the tree](undoChange.md) | |
-| **UC-TREE-PANEL-017** | [Redo a change to the tree](redoChange.md) | |
+| **UC-TREE-PANEL-013** | [Move nodes](moveNodes.md) | Put a node into a different folder. |
+| **UC-TREE-PANEL-014** | [Copy nodes](copyNodes.md) | Start from work that already exists. |
+| **UC-TREE-PANEL-015** | [Order nodes among their siblings](orderNodes.md) | Fix where a node sits among its siblings. |
+| **UC-TREE-PANEL-016** | [Undo a change to the tree](undoChange.md) | Take back a wrong move, rename or removal. |
+| **UC-TREE-PANEL-017** | [Redo a change to the tree](redoChange.md) | Put back a change that was just undone. |
 | | **Statuses** | |
-| **UC-TREE-PANEL-018** | [Retire a test project, a test set or a package](retireNode.md) | |
-| **UC-TREE-PANEL-019** | [Bring a retired node back](reactivateNode.md) | |
-| **UC-TREE-PANEL-020** | [Set a test run's status](setTestRunStatus.md) | |
-| **UC-TREE-PANEL-021** | [Re-create a test run](reCreateTestRun.md) | |
-| **UC-TREE-PANEL-022** | [Edit a test run](editTestRun.md) | |
+| **UC-TREE-PANEL-018** | [Retire a test project, a test set or a package](retireNode.md) | Keep old work for its history, out of the way. |
+| **UC-TREE-PANEL-019** | [Bring a retired node back](reactivateNode.md) | Pick up work that was put aside. |
+| **UC-TREE-PANEL-020** | [Set a test run's status](setTestRunStatus.md) | Show how far a test run has got. |
+| **UC-TREE-PANEL-021** | [Re-create a test run](reCreateTestRun.md) | Start the next cycle from a finished test run. |
+| **UC-TREE-PANEL-022** | [Edit a test run](editTestRun.md) | Correct a test run without building it again. |
 | | **Working from the tree** | |
-| **UC-TREE-PANEL-023** | [Run the automation for everything a node holds](runTests.md) | |
-| **UC-TREE-PANEL-025** | [Refresh the tree from disk](refreshTree.md) | |
-| **UC-TREE-PANEL-026** | [Switch the Git branch of the test project](switchBranch.md) | |
-| **UC-TREE-PANEL-027** | [See what a node holds](nodeDetails.md) | |
-| **UC-TREE-PANEL-028** | [Use the buttons at the top of the panel](panelToolbar.md) | |
+| **UC-TREE-PANEL-023** | [Run the automation for everything a node holds](runTests.md) | Run a whole area of automation in one step. |
+| **UC-TREE-PANEL-025** | [Refresh the tree from disk](refreshTree.md) | See changes that happened outside the IDE. |
+| **UC-TREE-PANEL-026** | [Switch the Git branch of the test project](switchBranch.md) | Follow the Git branch under test. |
+| **UC-TREE-PANEL-027** | [See what a node holds](nodeDetails.md) | See counts, dates and results without opening anything. |
+| **UC-TREE-PANEL-028** | [Use the buttons at the top of the panel](panelToolbar.md) | Reach the things that act on the whole panel. |
 
 ---
 
@@ -140,9 +140,10 @@ editors. The panel itself never shows a test case.
 ## How to read these pages
 
 Each use case page has the same shape. **Rules** are the things that must always
-be true. **Main flow** is what happens, step by step, when nothing goes wrong.
-**What Testin refuses** is every way it can go wrong, and what the tester sees
-each time.
+be true. Then comes the screen, drawn with its parts numbered. A use case that
+opens no screen of its own has **What the tester sees** instead. **Main flow**
+is what happens, step by step, when nothing goes wrong. **What Testin refuses**
+is every way it can go wrong, and what the tester sees each time.
 
 Words like *\<name\>* stand for whatever the tester is working on. Testin puts
 the real name there.

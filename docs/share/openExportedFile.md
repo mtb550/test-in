@@ -5,6 +5,9 @@
 **As a** tester, **I want** to check the file straight away,
 **so that** I do not send somebody a spreadsheet with a column missing.
 
+Every export ends with a message. The message can open the new file, or put
+its full path on the clipboard.
+
 There is no key for this. The links are on the message.
 
 ## Rules
@@ -24,12 +27,19 @@ There is no key for this. The links are on the message.
   format is handed to whatever application claims it.
 - **Rule-SHARE-023** — Clicking either link makes the message go.
 
+## What the tester sees
+
+No window opens. A message appears at the bottom right of the IDE, titled
+**Exported** and carrying the file's name. Two links sit under it, **Open
+file** and **Copy path**, and the message waits in the IDE's notification list
+until one of them is clicked.
+
 ## Main flow
 
 1. Testin writes the file.
 2. A message titled **Exported** names the file.
 3. The tester clicks **Open file**.
-4. The spreadsheet opens in whatever application claims it.
+4. The spreadsheet opens in whatever application claims that kind of file.
 
 **Copy path** puts the whole path on the clipboard instead.
 
@@ -46,9 +56,9 @@ open the file:* and then the reason.
 
 ## Where the plugin breaks its own rules
 
-A web page made as an export opens in the browser. The same kind of file made as
-a report opens in an application instead. One kind of file, two answers. That is
-difference 6 on
+A web page made as an export opens in the browser. The same kind of file made
+as a report is handed to an application instead. One kind of file, two answers.
+That is difference 6 on
 [the reports page](../report/main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

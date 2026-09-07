@@ -6,6 +6,8 @@
 **so that** I can read its steps and its expected result without leaving the
 screen I am working in.
 
+A card shows only a title. This opens the whole test case beside it.
+
 `Enter` opens it on whatever is selected. Five gestures open it in all.
 
 ## Rules
@@ -39,6 +41,35 @@ screen I am working in.
 - **Rule-VIEW-PANEL-014** — The panel is handed the folder the test case was
   opened from. That folder decides whether the run rows are drawn.
 
+## The screen
+
+The panel opens on the right of the IDE, beside the editor.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Testin                                                   ( < )  ( > )   │
+├──────────────────────────────────────────────────────────────────────────┤
+│  | Details |    History     Open Bugs                                    │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│   Demo  >  Test Cases  >  Accounts  >  Login                             │
+│                                                                          │
+│   ( 3f2a05c1-...-9c1b )  [copy]                                          │
+│                                                                          │
+│   Log in with a valid user                                               │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The stripe** — reads **Testin**, the same word the tree panel's stripe
+   reads. The side they sit on is the only thing that tells them apart.
+2. **The two arrows** — move to the previous and the next test case. They are
+   gray when the panel was handed only one.
+3. **The tabs** — the panel always opens on **Details**, whichever tab was in
+   front last time.
+4. **The test case** — drawn in full below. Every part of it is numbered on
+   [the view panel page](main.md#the-panel).
+
 ## The five ways in
 
 | The tester does this | Test cases handed over | Keyboard moves |
@@ -69,16 +100,17 @@ said.
 does not open. The cell opens for editing instead, or nothing happens.
 
 **If the tester clicks the mark beside a test method whose test case was
-removed** — nothing opens and nothing is said. Only the log records it.
+removed** — nothing opens, and nothing is said. Only the log records it.
 
 **If the search result is a package, a folder or a test project** — there is no
 test case, so the panel is never touched.
 
 ## Where the plugin breaks its own rules
 
-Opening the view panel before anything else in Testin can raise *Testin Setup
-Required*, the message that asks for the Testin folder. The tester asked to read
-a test case and was handed a settings notification. That is difference 12 on
+Opening the view panel first, before anything else in Testin, can raise a
+message titled *Testin Setup Required*. That message asks for the Testin folder.
+The tester asked to read a test case and got a settings message instead. That is
+difference 12 on
 [the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

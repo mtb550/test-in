@@ -7,6 +7,8 @@
 **As a** tester, **I want** to give a node a number that fixes its place among
 its siblings, **so that** the tree reads in the order the work is done.
 
+A smaller number sits higher in the list.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -68,11 +70,11 @@ its siblings, **so that** the tree reads in the order the work is done.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **One field** — shows the node's current number, or nothing. It accepts
-   digits only, with no leading zero. Anything else is refused as it is typed.
-   Empty means date order. The cursor sits after the number, so typing **adds
-   to it**: a node numbered 3 whose tester types 5 ends up at 35. `Ctrl+A`
-   selects it all.
+1. **One field** — it shows the node's current number, or nothing. It accepts
+   digits only, and no leading zero. Anything else is refused as it is typed. An
+   empty field means date order. The cursor sits after the number, so typing
+   **adds to the number**. A node numbered 3 whose tester types 5 ends up at 35.
+   `Ctrl+A` selects the whole number.
 
 ## Main flow
 
@@ -91,15 +93,14 @@ its siblings, **so that** the tree reads in the order the work is done.
 **If the tester types a leading zero, a letter or a space** — the character does
 not appear.
 
-**If the test project or a container is selected** — **Order** is gray. (rule
-47)
+**If the test project or a container is selected** — **Order** is gray.
+(Rule-TREE-PANEL-058)
 
 **If several rows are selected** — **Order** stays black and orders the first of
 them, saying nothing about the rest.
 
 > **A number too large to hold silently clears the order.** Typing
-> 99999999999 puts the node back into date order, and Testin still says
-> *Ordered*.
+> 99999999999 puts the node back into date order. Testin still says *Ordered*.
 
 ---
 

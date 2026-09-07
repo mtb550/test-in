@@ -5,6 +5,9 @@
 **As a** tester, **I want** to pick a test run up where I left it,
 **so that** a morning's work is not repeated after lunch.
 
+There is no separate resume button. Starting again is resuming, because the walk
+always begins at the first test case with no verdict.
+
 There is no key for this. Press **Start Manual Execution** again.
 
 ## Rules
@@ -40,6 +43,14 @@ There is no key for this. Press **Start Manual Execution** again.
   carried, rather than starting it again.
 - **Rule-EDITOR-PANEL-155** — The stamp saying when execution began is kept.
   Only the stamp saying when it ended is written again.
+
+## What the tester sees
+
+This opens no screen. It looks exactly like starting. The editor turns to the
+first test case with no verdict, selects its row, and the clock starts again.
+
+Every test case judged in the first sitting keeps its verdict, and the walk
+passes over it.
 
 ## Main flow
 

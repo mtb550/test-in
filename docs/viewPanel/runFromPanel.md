@@ -5,6 +5,8 @@
 **As a** tester, **I want** to start the test case I am reading,
 **so that** I can try it again without going back to the card it came from.
 
+The button starts this one test case, on its own.
+
 There is no key that works here. The button's tooltip names `F5`, and `F5` does
 nothing in the panel.
 
@@ -61,9 +63,9 @@ The two buttons sit between the title and the badges.
 
 ## What Testin refuses
 
-**If the IDE has no TestNG plugin** — the button is not drawn at all. Neither is
-the button beside it, if the Java plugin is also missing, and then the whole row
-is left out.
+**If the IDE has no TestNG plugin** — the run button is not drawn. If the Java
+plugin is missing too, the button beside it is not drawn either, and the whole
+row is left out.
 
 **If the test case is already running** — the place shows the stop button
 instead. Stopping is [UC-VIEW-PANEL-013](stopFromPanel.md).
@@ -73,8 +75,8 @@ description, then *has no generated code yet*.
 
 ## Where the plugin breaks its own rules
 
-**The tooltip names a key that does nothing here.** It reads `F5`, and `F5` is
-bound to the cards in the editor, not to the panel. A tester who reads the
+**The tooltip names a key that does nothing here.** It reads `F5`. That key
+belongs to the cards in the editor, not to the panel. A tester who reads the
 tooltip and presses `F5` gets nothing. That is difference 1 on
 [the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
 

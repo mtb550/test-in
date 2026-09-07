@@ -6,6 +6,8 @@
 **so that** a wrong `Delete` costs me a keypress and not a morning of rewriting
 test cases.
 
+This is what lets `Ctrl+Z` bring a removed node back.
+
 `Delete` removes. `Ctrl+Z` puts it back. Removing is
 [UC-TREE-PANEL-012](../treePanel/removeNode.md) and undo is
 [UC-TREE-PANEL-016](../treePanel/undoChange.md). This page is what happens
@@ -80,8 +82,8 @@ The confirmation the tester sees before removing anything is drawn on
 
 ## What Testin refuses
 
-**If the node cannot be copied aside** — the removal still happens, and it is
-not on the undo history. Nothing on screen says so, and `Ctrl+Z` then takes back
+**If the node cannot be copied aside** — the removal still happens. It does not
+go on the undo history. Nothing on screen says so. `Ctrl+Z` then takes back
 whatever change came before it. This is difference 15 on
 [the tree panel page](../treePanel/main.md#where-the-plugin-breaks-its-own-rules).
 
@@ -108,13 +110,13 @@ answers, not the tree's. A removal made in the tree is taken back in the tree.
 
 ## Why it works this way
 
-The copies are swept at startup rather than at shutdown, because the copies that
-matter are exactly the ones a shutdown never reached. An IDE that crashed leaves
-them behind, and the next start is the only moment certain to come.
+The copies are thrown away at startup, not at shutdown. The copies that matter
+are the ones a shutdown never reached. An IDE that crashed leaves them behind,
+and the next start is the one moment certain to come.
 
-A kept copy is deleted outright and not sent to the recycle bin. The bin already
-took the tester's copy when the node was removed. A second one arriving later is
-a duplicate nobody asked for.
+A kept copy is deleted outright. It is not sent to the recycle bin. The bin
+already took the tester's copy when the node was removed. A second copy
+arriving later is a duplicate nobody asked for.
 
 ---
 

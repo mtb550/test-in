@@ -10,6 +10,8 @@
 **Closed** from the tree, **so that** the test run's place in its life is
 visible without opening it.
 
+The status says how far the test run has got.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -69,14 +71,14 @@ visible without opening it.
 
 1. **Five rows, one per status** — each with its icon. It is the same icon the
    tree draws for a test run in that status.
-2. **A key beside three of them** — *Created* and *In Progress* have none,
-   because they are the test run's own record. The keys are not in order down
-   the list, because the rows follow the status order instead: **Assigned** is
-   `1`, **Completed** is `2`, **Closed** is `3`.
-3. The popup opens in the middle of the IDE window, not at the pointer, with
-   the first row selected. The tester chooses with `↑` `↓` and `Enter`, with a
-   key, or with a click. **Nothing on screen says so**: the popup has no status
-   bar.
+2. **A key beside three of them** — *Created* and *In Progress* have none. They
+   are the test run's own record of itself. The keys are not in order down the
+   list, because the rows are in a different order from the keys. **Assigned**
+   is `1`, **Completed** is `2`, **Closed** is `3`.
+3. The popup opens in the middle of the IDE window, not at the pointer. The
+   first row is selected. The tester chooses in three ways: with `↑` `↓` and
+   `Enter`, with a key, or with a click. **Nothing on screen says so.** The
+   popup has no status bar.
 
 ## Main flow
 
@@ -87,15 +89,15 @@ visible without opening it.
    carry a key: `1` **Assigned**, `2` **Completed**, `3` **Closed**.
 4. The tester presses that key, or moves with `↑` `↓` and presses `Enter`, or
    clicks a row.
-5. Testin writes the status. The test run's icon and its gray status word in the
-   tree both change, and Testin shows the new status word.
+5. Testin writes the status. In the tree, the test run's icon and its gray
+   status word both change. Testin shows the new status word.
 6. Setting **Completed** or **Closed** signs the test run off. Every test case
    still **Pending** becomes **Untested**. Testin records the time the test run
    finished, but only if it had been started. From then on **Set Status**,
    **Edit Run** and **Run Tests** are gray on it.
 
 **Signing a test run off cannot be undone.** A status change is not on the
-tree's history (Rule-TREE-PANEL-060), and there is no confirmation before it.
+tree's history (Rule-TREE-PANEL-060). Testin asks for no confirmation before it.
 Every **Pending** verdict becomes **Untested** at that moment.
 
 ## What Testin refuses
@@ -106,12 +108,13 @@ Every **Pending** verdict becomes **Untested** at that moment.
 last row the tester clicked.
 
 > **The popup offers the status the test run already has.** Choosing it rewrites
-> the record, stamps who changed it and when, and confirms with that word. Rule
-> 54, which keeps the current status off the menu, holds for retiring and not
-> here.
+> the record. It stamps who changed it and when, and it confirms with that word.
+> Rule-TREE-PANEL-065 keeps the current status off the menu, but it holds for
+> retiring and not here.
 
 > **An open editor of that test run is not told.** It keeps showing the old
-> status, and the rows that just became **Untested**, until it is reopened.
+> status until it is reopened. It also keeps showing the rows that just became
+> **Untested**.
 
 **Not decided** — see question 1 and question 2 on
 [the tree panel page](main.md#not-decided).

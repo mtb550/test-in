@@ -6,6 +6,8 @@
 **so that** the clock stops when I go to a meeting and the test run is written
 as it stands.
 
+Stopping changes no verdict. It only ends the walk and stops the clock.
+
 There is no key for this. The button's tooltip reads **Stop Execution**.
 
 ## Rules
@@ -43,6 +45,13 @@ There is no key for this. The button's tooltip reads **Stop Execution**.
 - **Rule-EDITOR-PANEL-152** — The tester's own stop ends any automation this
   editor started, and so does closing the tab. Nothing else does.
 
+## What the tester sees
+
+This opens no screen. The clock stops, and the toolbar button becomes **Start
+Manual Execution** again. Every verdict already recorded stays where it is.
+
+A small message appears at the bottom of the IDE and fades. It reads *Stopped*.
+
 ## Main flow
 
 1. A walk is going, and the clock is ticking.
@@ -64,13 +73,11 @@ Nothing. The button is never gray while it is on the toolbar.
 started as one gesture is one process, so ending it ends all of them.
 
 **Stopping something that had already finished says *Stopped* anyway.** The
-button has no gray state, and a stop that reached nothing still reports itself.
-That is difference 27 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
+button has no gray state. A stop that reached nothing still reports itself.
 
 ## Two other things stop the walk
 
-**Refresh** stops it, and says only *Refreshed*. That is difference 24.
+**Refresh** stops it, and says *Refreshed, and the execution stopped*.
 
 **Closing the tab** stops the walk and the automation both, writes the test run,
 and asks nothing. It is the same thing as pressing **Stop Execution**.

@@ -5,6 +5,9 @@
 **As a** tester, **I want** a workbook of six sheets to become six test sets,
 **so that** a whole test plan written in a spreadsheet arrives in one gesture.
 
+A package is a folder that holds test sets. This makes one new test set for
+each sheet in the file, and fills it.
+
 There is no key for this. The same **Import** entry, on a package.
 
 ## Rules
@@ -26,6 +29,36 @@ There is no key for this. The same **Import** entry, on a package.
   because making one generates a Java class.
 - **Rule-SHARE-033** — No editor is opened afterwards, because a package has no
   editor of its own.
+
+## The screen
+
+The same dialog as [UC-SHARE-005](importIntoTestSet.md). A workbook of six
+sheets gives it six tabs.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Import Test Cases                                           │
+├──────────────────────────────────────────────────────────────┤
+│  Source:   [ C:\Users\mtb\Downloads\Plan.xlsx   ] [ ... ]    │
+│  Options:  [ ] Set as default folder                         │
+│                                                              │
+│  | Login | Checkout | Search | Cart | Profile | Admin |      │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │[x]| #  | Description       | Expected Result | Priority│  │
+│  │[x]| 1  | Log in with a va. | The dashboard.. | P1      │  │
+│  │[x]| 2  | Log in with a lo. | The account i.. | P2      │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                                              │
+│                                          [ Import ]          │
+├──────────────────────────────────────────────────────────────┤
+│  [k]  Escape Cancel                                          │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **The tabs** — one for each sheet. Each one becomes a test set of its own.
+2. **The table** — the test cases of the tab in front. Each tab keeps its own
+   ticks.
+3. **Import** — makes the test sets, then writes the test cases into them.
 
 ## Main flow
 
@@ -49,8 +82,8 @@ Everything else is as [UC-SHARE-005](importIntoTestSet.md).
 
 ## What Testin refuses
 
-**If a new test set's Java class cannot be generated** — the test set is still
-made, and only the log says so.
+**If the Java class of a new test set cannot be written** — the test set is
+still made. Only the log says so.
 
 Every other refusal is the same as importing into one test set.
 

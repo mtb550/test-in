@@ -8,6 +8,8 @@
 the IDE, **so that** the tree shows what is on disk. Getting changes from Git,
 running a sync, or editing files by hand all change the tree from outside.
 
+Testin reads the folders again and draws the tree from what it finds.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -52,6 +54,13 @@ running a sync, or editing files by hand all change the tree from outside.
 - **Rule-TREE-PANEL-083** — Only one refresh runs at a time. A second request
   while one is running is ignored.
 
+## What the tester sees
+
+Refresh opens no screen of its own. A progress bar reads *Testin indexing -
+\<project\>* while Testin reads the test project. The tree then redraws, with
+the same rows open as before. *Refreshed* shows above the status bar at the
+bottom right of the IDE.
+
 ## Main flow
 
 1. The tester presses the **Refresh** button in the panel header.
@@ -61,7 +70,6 @@ running a sync, or editing files by hand all change the tree from outside.
 4. Editors on nodes that are gone are closed, and the rest are reloaded.
 5. The tree redraws, with the same rows expanded.
 6. Testin shows *Refreshed* when it finishes.
-
 
 ## What Testin refuses
 

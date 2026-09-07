@@ -8,6 +8,8 @@
 **As a** tester, **I want** a folder to group test runs, **so that** a year of
 cycles does not sit in one flat list.
 
+A test run package is a folder that holds test runs. This makes one.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -51,9 +53,15 @@ cycles does not sit in one flat list.
 - **Rule-TREE-PANEL-034** — A test run package can hold another test run
   package, as deep as the tester needs.
 
-The dialog is drawn under [UC-TREE-PANEL-007](createTestSet.md). The test run
-side of it carries the same two rows, reading *test run* and *test run package*,
-and its gray hint text reads *set name, like Sprint 3 Cycle 1...*.
+## What the tester sees
+
+The **Create Run Node** dialog opens. It is the test run side of the dialog
+drawn under [UC-TREE-PANEL-007](createTestSet.md). It carries the same two rows,
+reading *test run* and *test run package*. Its gray hint text reads *set name,
+like Sprint 3 Cycle 1...*. The tester moves to the second row, which reads
+*Groups test runs*. After `Enter`, a new folder row appears in the tree.
+*Created* shows above the status bar at the bottom right of the IDE. Nothing
+opens.
 
 ## Main flow
 

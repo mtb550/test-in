@@ -5,6 +5,8 @@
 **As a** tester, **I want** the Java class to move with the test set,
 **so that** the package the class is in still matches where the test set sits.
 
+Move a test set, and its Java class moves to the matching folder.
+
 There is no key for this. It happens when a test set is moved, which is
 [UC-TREE-PANEL-013](../treePanel/moveNodes.md).
 
@@ -29,6 +31,13 @@ There is no key for this. It happens when a test set is moved, which is
 - **Rule-CODEGEN-055** — A move into a place Testin has not read leaves the
   class exactly where it is.
 
+## What the tester sees
+
+The node lands in its new place, and a message reads *Moved*, with a count when
+more than one node moved. Nothing on screen mentions the code. In the Project
+tool window, the Java file now sits under the folder that matches the new place,
+and the `package` line at the top of the file has been rewritten.
+
 ## Main flow
 
 1. The tester drags a test set into another package.
@@ -52,8 +61,8 @@ nothing is said.
 ## Where the plugin breaks its own rules
 
 **A move Testin declines leaves the tree and the code disagreeing.** The test
-set is in one place and its class is in another, and nothing on screen says so.
-That is difference 6 on
+set is in one place. Its class is in another. Nothing on screen says so. That is
+difference 6 on
 [the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

@@ -6,6 +6,8 @@
 without me, **so that** what I am reading is what the files say and not what
 they said when the IDE started.
 
+Testin watches the files. When one changes, it reads that test project again.
+
 There is no key for this. It starts on its own. `Ctrl+Alt+R` does the same job
 by hand, and is on [UC-TREE-PANEL-025](../treePanel/refreshTree.md).
 
@@ -79,9 +81,9 @@ One progress bar, whatever changed and however many test projects it touched.
 tester who edits a file by hand within five seconds of Testin saving it is
 ignored too. **Refresh** recovers it.
 
-**If the tester cancels** — the read stops, and the tree and the editors are
-still redrawn. What was read is on screen. What was not is still the old
-reading, and nothing marks which is which.
+**If the tester cancels** — the read stops. The tree and the editors are still
+redrawn. What was read is on screen. What was not read is still the old
+reading, and nothing shows which rows are which.
 
 **If the code project's panel was never opened** — nothing happens at all. The
 change is on disk and Testin has not read it. It is picked up the first time the
@@ -93,13 +95,13 @@ again.
 
 ## Why it works this way
 
-A tester was told a sync had succeeded, and then read a panel still showing what
-the files said before it. Nobody presses **Refresh** after being told the work
-is done. So Testin watches instead.
+A tester was told a sync had worked. The panel still showed the old files.
+Nobody presses **Refresh** after being told the work is done. So Testin watches
+the files instead.
 
-Testin ignores its own writes because it must. Without that, saving a test case
-would rebuild the tree underneath the tester who saved it. That is correct, and
-it is unusable.
+Testin has to ignore its own writes. Without that, saving one test case would
+rebuild the whole tree under the tester who saved it. That would be correct.
+It would also be unusable.
 
 ---
 

@@ -19,36 +19,36 @@ team pulls, or a server the plugin syncs with.
 
 ## The use cases
 
-| | What the tester does | |
+| | What the tester does | Why the tester would |
 |---|---|---|
 | | **Sending test cases out** | |
-| **UC-SHARE-001** | [Export one test set](exportTestSet.md) | |
-| **UC-SHARE-002** | [Export a package, one sheet for each test set](exportPackage.md) | |
-| **UC-SHARE-003** | [Choose what goes into the export, and correct it](chooseWhatToExport.md) | |
-| **UC-SHARE-004** | [Open the exported file, or copy its path](openExportedFile.md) | |
+| **UC-SHARE-001** | [Export one test set](exportTestSet.md) | Send test cases to somebody who has no IDE. |
+| **UC-SHARE-002** | [Export a package, one sheet for each test set](exportPackage.md) | Send many test sets to a reviewer as one file. |
+| **UC-SHARE-003** | [Choose what goes into the export, and correct it](chooseWhatToExport.md) | Drop rows and fix typos before the file is written. |
+| **UC-SHARE-004** | [Open the exported file, or copy its path](openExportedFile.md) | Check the new file right away. |
 | | **Bringing test cases in** | |
-| **UC-SHARE-005** | [Import into a test set](importIntoTestSet.md) | |
-| **UC-SHARE-006** | [Import into a package, one test set for each sheet](importIntoPackage.md) | |
-| **UC-SHARE-007** | [Choose what is imported, and correct it](chooseWhatToImport.md) | |
+| **UC-SHARE-005** | [Import into a test set](importIntoTestSet.md) | Bring a spreadsheet of test cases into one test set. |
+| **UC-SHARE-006** | [Import into a package, one test set for each sheet](importIntoPackage.md) | Turn a whole workbook into many test sets. |
+| **UC-SHARE-007** | [Choose what is imported, and correct it](chooseWhatToImport.md) | Fix what the file got wrong before it becomes test cases. |
 | | **Working with Git** | |
-| **UC-SHARE-008** | [Tell Git who I am](setGitIdentity.md) | |
-| **UC-SHARE-009** | [Put the test project under Git](putUnderGit.md) | |
-| **UC-SHARE-010** | [See what I have not committed](reviewChanges.md) | |
-| **UC-SHARE-011** | [Put one changed field back](revertOneChange.md) | |
-| **UC-SHARE-012** | [Commit without pushing](commitChanges.md) | |
-| **UC-SHARE-013** | [Commit and push](commitAndPush.md) | |
-| **UC-SHARE-014** | [Commit onto a different branch](commitToBranch.md) | |
-| **UC-SHARE-015** | [Push a commit that never left this machine](pushOldCommit.md) | |
-| **UC-SHARE-016** | [Send my changes and take the team's](syncWithGit.md) | |
-| **UC-SHARE-017** | [Resolve the conflicts a pull stopped on](resolveConflicts.md) | |
-| **UC-SHARE-018** | [Answer which side wins for a field both changed](answerMergeQuestions.md) | |
+| **UC-SHARE-008** | [Tell Git who I am](setGitIdentity.md) | Let Git put a name on the tester's commits. |
+| **UC-SHARE-009** | [Put the test project under Git](putUnderGit.md) | Start versioning a test project Git does not know yet. |
+| **UC-SHARE-010** | [See what I have not committed](reviewChanges.md) | See every change made since the last commit. |
+| **UC-SHARE-011** | [Put one changed field back](revertOneChange.md) | Undo one field that was changed by mistake. |
+| **UC-SHARE-012** | [Commit without pushing](commitChanges.md) | Record the work on this machine only, for now. |
+| **UC-SHARE-013** | [Commit and push](commitAndPush.md) | Record the work and send it to the team at once. |
+| **UC-SHARE-014** | [Commit onto a different branch](commitToBranch.md) | Keep these changes off the branch being tested now. |
+| **UC-SHARE-015** | [Push a commit that never left this machine](pushOldCommit.md) | Find work the tester thinks the team already has. |
+| **UC-SHARE-016** | [Send my changes and take the team's](syncWithGit.md) | Give and take work in one gesture. |
+| **UC-SHARE-017** | [Resolve the conflicts a pull stopped on](resolveConflicts.md) | Finish a pull that two people's changes stopped. |
+| **UC-SHARE-018** | [Answer which side wins for a field both changed](answerMergeQuestions.md) | Choose between the tester's wording and a colleague's. |
 | | **Working with a server** | |
-| **UC-SHARE-019** | [Sync with the team's server](syncWithServer.md) | |
-| **UC-SHARE-020** | [Have my password kept for next time](keepServerPassword.md) | |
-| **UC-SHARE-021** | [Answer the conflicts the server sync could not settle](answerServerConflicts.md) | |
-| **UC-SHARE-022** | [Agree to remove files the server no longer holds](agreeToRemovals.md) | |
+| **UC-SHARE-019** | [Sync with the team's server](syncWithServer.md) | Share test cases with a team that has no Git. |
+| **UC-SHARE-020** | [Have my password kept for next time](keepServerPassword.md) | Type the server password once, not on every sync. |
+| **UC-SHARE-021** | [Answer the conflicts the server sync could not settle](answerServerConflicts.md) | Say which version of a test case wins. |
+| **UC-SHARE-022** | [Agree to remove files the server no longer holds](agreeToRemovals.md) | Approve a deletion before it reaches this machine. |
 | | **Both** | |
-| **UC-SHARE-023** | [Remember the folder I use](chooseFolderOnce.md) | |
+| **UC-SHARE-023** | [Remember the folder I use](chooseFolderOnce.md) | Stop browsing for the same folder several times a day. |
 
 Cloning a test project from a repository is how a test project first arrives,
 and it is [UC-TREE-PANEL-003](../treePanel/importTestProject.md).

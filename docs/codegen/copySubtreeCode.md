@@ -5,6 +5,8 @@
 **As a** tester, **I want** every class and every method under what I copied,
 **so that** a copied package is as runnable as the one it came from.
 
+A copy brings the code with it, at every level below what was copied.
+
 There is no key for this. It happens when a copy or a drop lands in the tree,
 which is [UC-TREE-PANEL-014](../treePanel/copyNodes.md).
 
@@ -29,6 +31,13 @@ which is [UC-TREE-PANEL-014](../treePanel/copyNodes.md).
 - **Rule-CODEGEN-024** — The whole subtree is one change, so the tester gets one
   undo for the copy they made.
 
+## What the tester sees
+
+The tree shows the copied nodes, and one message reads *Pasted*, with a count
+when more than one node landed. Nothing on screen mentions the code. The new
+classes and methods appear in the Project tool window, in a folder tree that
+matches the one in the Testin tree.
+
 ## Main flow
 
 1. The tester copies a package holding three test sets and pastes it.
@@ -48,9 +57,9 @@ packages and test runs write no code, and that is not reported.
 
 ## What the tester should expect
 
-A copied test case is a new test case with a new identity, so it gets a method
-of its own. Its description gains the word `(Copy)`, so the method name is
-different too, and the two do not collide.
+A copied test case is a new test case with a new identity. So it gets a method
+of its own. Its description gains the word `(Copy)`. That makes the method name
+different too, so the two never collide.
 
 ---
 

@@ -22,30 +22,30 @@ test case they came from.
 | | What the tester does | |
 |---|---|---|
 | | **Getting code written** | |
-| **UC-CODEGEN-001** | [Get a class when I create a test set](getClassForTestSet.md) | |
-| **UC-CODEGEN-002** | [Get a method when I create a test case](getMethodForTestCase.md) | |
-| **UC-CODEGEN-003** | [Get a method for a test case that had none](getMissingMethod.md) | |
-| **UC-CODEGEN-004** | [Get the whole subtree's code when I copy](copySubtreeCode.md) | |
-| **UC-CODEGEN-005** | [Ask Testin to write the automation for me](automateTestCase.md) | |
+| **UC-CODEGEN-001** | [Get a class when I create a test set](getClassForTestSet.md) | New test sets get a Java class ready for their code. |
+| **UC-CODEGEN-002** | [Get a method when I create a test case](getMethodForTestCase.md) | New test cases get a test method to fill in. |
+| **UC-CODEGEN-003** | [Get a method for a test case that had none](getMissingMethod.md) | Give a test case a description and its method appears. |
+| **UC-CODEGEN-004** | [Get the whole subtree's code when I copy](copySubtreeCode.md) | A copied package is as runnable as the original. |
+| **UC-CODEGEN-005** | [Ask Testin to write the automation for me](automateTestCase.md) | Ask for the test body to be written. Not built yet. |
 | | **Moving between the two** | |
-| **UC-CODEGEN-006** | [Go to the code from a test case](goToCode.md) | |
-| **UC-CODEGEN-007** | [Go to the test case from the code](goToTestCase.md) | |
+| **UC-CODEGEN-006** | [Go to the code from a test case](goToCode.md) | Read or change what a test case really does. |
+| **UC-CODEGEN-007** | [Go to the test case from the code](goToTestCase.md) | See what a method is meant to prove. |
 | | **Running it** | |
-| **UC-CODEGEN-008** | [Run a test case's automation](runAutomation.md) | |
-| **UC-CODEGEN-009** | [Stop a running test case](stopAutomation.md) | |
+| **UC-CODEGEN-008** | [Run a test case's automation](runAutomation.md) | Run the code and have the verdict recorded. |
+| **UC-CODEGEN-009** | [Stop a running test case](stopAutomation.md) | End a run so something can be changed and tried again. |
 | | **Keeping the code in step** | |
-| **UC-CODEGEN-010** | [Change a test case's description](renameTestCase.md) | |
-| **UC-CODEGEN-011** | [Reorder the test cases in a test set](reorderTestCases.md) | |
-| **UC-CODEGEN-012** | [Change a test case's groups](changeGroups.md) | |
-| **UC-CODEGEN-013** | [Turn a test case off](disableTestCase.md) | |
-| **UC-CODEGEN-014** | [Remove a test case](removeTestCase.md) | |
-| **UC-CODEGEN-015** | [Rename a test set](renameTestSet.md) | |
-| **UC-CODEGEN-016** | [Move a test set](moveTestSet.md) | |
-| **UC-CODEGEN-017** | [Rename or move a package](renamePackage.md) | |
-| **UC-CODEGEN-018** | [Remove a test set or a package](removeTestSet.md) | |
+| **UC-CODEGEN-010** | [Change a test case's description](renameTestCase.md) | Reword a test case and the code says the same. |
+| **UC-CODEGEN-011** | [Reorder the test cases in a test set](reorderTestCases.md) | Set the order the automation runs in. |
+| **UC-CODEGEN-012** | [Change a test case's groups](changeGroups.md) | Run only the group a test case belongs to. |
+| **UC-CODEGEN-013** | [Turn a test case off](disableTestCase.md) | Stop a broken test failing every run. |
+| **UC-CODEGEN-014** | [Remove a test case](removeTestCase.md) | Remove a test case and its dead code goes too. |
+| **UC-CODEGEN-015** | [Rename a test set](renameTestSet.md) | Rename a test set and the class name follows. |
+| **UC-CODEGEN-016** | [Move a test set](moveTestSet.md) | Move a test set and its class moves with it. |
+| **UC-CODEGEN-017** | [Rename or move a package](renamePackage.md) | Rename a package and every file below stays correct. |
+| **UC-CODEGEN-018** | [Remove a test set or a package](removeTestSet.md) | Delete a test set and its code goes with it. |
 | | **When it cannot work** | |
-| **UC-CODEGEN-019** | [Work in an IDE with no Java plugin](noJavaPlugin.md) | |
-| **UC-CODEGEN-020** | [Work in a project with no Java test folder](noTestSourceFolder.md) | |
+| **UC-CODEGEN-019** | [Work in an IDE with no Java plugin](noJavaPlugin.md) | Manage test cases in PyCharm or GoLand. |
+| **UC-CODEGEN-020** | [Work in a project with no Java test folder](noTestSourceFolder.md) | Find out why no code is appearing. |
 
 ---
 

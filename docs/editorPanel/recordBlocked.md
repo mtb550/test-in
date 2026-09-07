@@ -5,6 +5,8 @@
 **As a** tester, **I want** to say a test case could not be tried at all,
 **so that** it is not counted as a failure of the product.
 
+**Blocked** means the tester could not try it. It is not the product's fault.
+
 `B`.
 
 ## Rules
@@ -38,6 +40,14 @@
 - **Rule-EDITOR-PANEL-142** — Recording blocked clears nothing. Anything already
   written about the test case stays.
 
+## What the tester sees
+
+This opens no screen. The card's verdict badge turns to **Blocked**, and the
+figures in the status bar move. Nothing already written about the test case is
+cleared.
+
+A small message appears at the bottom of the IDE and fades. It reads *Blocked*.
+
 ## Main flow
 
 1. The walk has selected a test case and is timing it.
@@ -59,11 +69,11 @@ case was removed - the run keeps what it recorded.*
 ## Blocked against failed
 
 **Blocked** is the environment's fault. **Failed** is the product's. A report
-counts them apart, and its blocked section says the test cases *could not
-complete, typically because of an environment or data dependency*.
+counts them apart. Its blocked section says the test cases *could not complete,
+typically because of an environment or data dependency*.
 
-Blocked asks for no explanation. If the tester wants to write down why, they can
-type into the **Actual Result** column afterwards, which is
+Blocked asks for no explanation. A tester who wants to write down why can type
+into the **Actual Result** column afterwards. That is
 [UC-EDITOR-PANEL-041](typeActualResult.md).
 
 ---

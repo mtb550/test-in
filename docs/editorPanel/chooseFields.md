@@ -3,8 +3,10 @@
 # UC-EDITOR-PANEL-003: Choose which fields are shown
 
 **As a** tester, **I want** to show only the fields I am working with,
-**so that** a card is short enough to scan and the grid is narrow enough to
-read.
+**so that** a card stays short and the grid stays narrow.
+
+A test case carries 18 fields. This is where the tester picks which ones the
+rows show.
 
 There is no key for this. The button's tooltip reads **Details**.
 
@@ -43,6 +45,32 @@ There is no key for this. The button's tooltip reads **Details**.
 - **Rule-EDITOR-PANEL-024** — A burst of ticks costs one redraw, not one for
   each.
 
+## The screen
+
+The list opens under the button. It has no title.
+
+```
+┌──────────────────────────────┐
+│ [x] Order                    │
+│ [x] Description              │
+│ [ ] ID                       │
+│ [x] Expected Result          │
+│ [ ] Steps                    │
+│ [x] Priority                 │
+│ [ ] FQCN                     │
+│    ...                       │
+│ [ ] Updated At               │
+└──────────────────────────────┘
+```
+
+1. **The list** — every field, one to a line, each with a tick box. The order is
+   always the same.
+2. **A ticked box** — that field is shown, on the cards and in the grid.
+3. **Description and ID** — drawn gray. Their boxes do not answer a click or the
+   space bar.
+4. **Every tick** — acts at once. The list stays open, so the tester can tick
+   several.
+
 ## The 18 fields
 
 | Field | Shown to start with | Can be changed |
@@ -71,7 +99,7 @@ There is no key for this. The button's tooltip reads **Details**.
 1. The tester presses the fields button on the toolbar.
 2. A list of every field opens under it, each with a tick box.
 3. The tester ticks **Steps**.
-4. The cards are measured again and redrawn with a steps line.
+4. The cards are measured again and drawn with a steps line.
 5. The choice is remembered for the next time a test set is opened.
 
 ## What Testin refuses

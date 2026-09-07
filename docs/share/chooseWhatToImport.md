@@ -5,6 +5,9 @@
 **As a** tester, **I want** to fix what the spreadsheet got wrong before it
 becomes test cases, **so that** I am not correcting 40 test cases afterwards.
 
+The import dialog shows the file in a table first. The tester unticks rows and
+edits cells there, and only then are the test cases written.
+
 There is no key for this. The table is in the import dialog.
 
 ## Rules
@@ -28,6 +31,31 @@ There is no key for this. The table is in the import dialog.
   were written before it did. They are still there.
 - **Rule-SHARE-038** — A correction made here changes what is written, and the
   file on disk is never touched.
+
+## The screen
+
+The table fills the middle of the import dialog.
+[UC-SHARE-005](importIntoTestSet.md) draws the whole dialog around it.
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│  | Login | Checkout |                                                │
+│                                                                      │
+│  [x]  | #   | Description         | Priority | Group    | Module     │
+│  [x]  | 1   | Log in with a valid | P1     v | Smoke    | Accounts   │
+│  [ ]  | 2   | Description         | Priority | Group    | Module     │
+│  [x]  | 3   | Log out             | P3     v | Smoke    | Accounts   │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The box in the heading** — ticks or unticks every row on this tab.
+2. **The box on each row** — every row arrives ticked. Only ticked rows are
+   written.
+3. **The columns** — the 13 that can be imported, not the 17 that can be
+   exported.
+4. **The number column** — the one column that cannot be typed into.
+5. **Row 2 above** — a heading row somebody left in the data. Unticking it
+   keeps it out.
 
 ## Main flow
 
@@ -55,13 +83,13 @@ least one test case to import.*
 | A date Testin cannot read | Blank |
 | Steps on one line, numbered | Split into separate steps, with the numbers taken off |
 
-None of these says anything. A tester importing 200 test cases whose priority
-column says High, Medium and Low gets 200 test cases at the lowest priority,
-with no warning. That is difference 9 on
+None of these says anything. Take a file of 200 test cases whose priority
+column says High, Medium and Low. All 200 arrive at the lowest priority, and
+nothing warns the tester. That is difference 9 on
 [the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
 
-**No Group cannot be imported.** It is offered in the group picker and dropped
-when it is read back. That is difference 10.
+**No Group cannot be imported.** The group picker offers it. Reading it back
+drops it. That is difference 10.
 
 ---
 

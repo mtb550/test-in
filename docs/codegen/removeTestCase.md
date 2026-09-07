@@ -6,6 +6,8 @@
 case, **so that** the code does not fill up with tests for things that no longer
 exist.
 
+Remove a test case, and its method is deleted from the class.
+
 There is no key for this. It happens when a test case is removed, which is
 [UC-EDITOR-PANEL-012](../editorPanel/removeTestCases.md).
 
@@ -27,6 +29,12 @@ There is no key for this. It happens when a test case is removed, which is
   The class itself stays.
 - **Rule-CODEGEN-050** — A test case with no method is skipped without a word.
 
+## What the tester sees
+
+The card goes, and a message reads *Removed*, with a count when more than one
+went. Nothing on screen mentions the code. The method is simply gone from the
+class file, and the class stays with one fewer method in it.
+
 ## Main flow
 
 1. The tester selects a test case and presses `Delete`.
@@ -46,9 +54,8 @@ There is no key for this. It happens when a test case is removed, which is
 ## What the tester should expect
 
 Anything the tester wrote inside the method goes with it. Testin owns the
-declaration, but deleting a method deletes the body too, and there is no
-separate warning about that. The confirmation before the removal names the test
-case, not the code.
+declaration, but deleting a method deletes the body too. Nothing warns about
+that. The confirmation before the removal names the test case, not the code.
 
 Undoing the removal writes the method again, empty. What was in its body does
 not come back.

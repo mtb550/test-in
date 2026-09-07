@@ -5,6 +5,8 @@
 **As a** tester, **I want** to say what the run as a whole showed,
 **so that** the report carries my judgment and not only the figures.
 
+Four boxes, one for each verdict. What the tester writes goes into the report.
+
 There is no key for this. The button's tooltip reads **Result Analysis**.
 
 ## Rules
@@ -92,7 +94,7 @@ There is no key for this. The button's tooltip reads **Result Analysis**.
 
 **If the test run is not exactly Completed** — the button is gray. Its tooltip
 reads *Result Analysis is written once the run is completed — it is*, then the
-status. A **Closed** test run is refused too.
+status. A **Closed** test run is refused as well.
 
 **If a section is left blank** — it is dropped, and the report leaves that
 heading out.

@@ -2,9 +2,11 @@
 
 # UC-EDITOR-PANEL-015: Copy test cases
 
-**As a** tester, **I want** to copy test cases so I can paste them into another
-test set, **so that** a set of login tests can be the start of a set of sign-up
-tests.
+**As a** tester, **I want** to copy test cases into another test set,
+**so that** a set of login tests can be the start of a set of sign-up tests.
+
+This copies the test cases themselves, ready to be pasted. It does not copy
+words a person can read.
 
 `Ctrl+Shift+C`.
 
@@ -40,6 +42,14 @@ tests.
   the faded cards come back.
 - **Rule-EDITOR-PANEL-077** — The key works in both views.
 
+## What the tester sees
+
+This opens no screen. Nothing on the list changes, because nothing has moved
+yet.
+
+A small message appears at the bottom of the IDE and fades. It reads *Copied*,
+with a count after it for more than one test case.
+
 ## Main flow
 
 1. The tester selects three cards.
@@ -64,8 +74,8 @@ Pasting is [UC-EDITOR-PANEL-017](pasteTestCases.md).
 ## Two different copies
 
 `Ctrl+C` and `Ctrl+Shift+C` are not the same. The first copies text a person can
-read. The second copies test cases Testin can paste. They use different keys
-because they are different things.
+read. The second copies test cases Testin can paste. They are two different
+things, so they have two different keys.
 
 ---
 

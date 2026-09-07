@@ -5,6 +5,9 @@
 **As a** tester, **I want** to type my password once,
 **so that** the next sync does not ask again.
 
+The password is kept in the IDE's own password store, which is the safe place
+this machine already has for secrets.
+
 Nothing starts this. It happens when a password is typed in the account window.
 
 ## Rules
@@ -30,12 +33,19 @@ Nothing starts this. It happens when a password is typed in the account window.
   one kept from before, so a corrected password works on the attempt it was
   corrected on.
 
+## What the tester sees
+
+Nothing new opens, and nothing says the password was kept. The tester types it
+in the password box of the **Connect to** window, which
+[UC-SHARE-019](syncWithServer.md) draws, and the sync starts. Only a refusal is
+reported, as a small message titled **Password Not Kept**.
+
 ## Main flow
 
 1. The tester types a password in the account window and presses `Enter`.
 2. The sync starts in the background.
-3. Off the main thread, the password is written to the IDE's password store.
-4. On a later sync with no key file, no password typed and no agent, the stored
+3. In the background, the password is written to the IDE's password store.
+4. A later sync has no key file, no typed password and no agent. The stored
    password is read back and used.
 
 ## What Testin refuses
@@ -44,8 +54,8 @@ Nothing starts this. It happens when a password is typed in the account window.
 Not Kept** reads *This machine's keychain refused it, so the next sync asks
 again.* The sync itself carries on.
 
-**If the keychain cannot be read** — nothing is said. The empty password is
-used, and the server does the refusing.
+**If the keychain cannot be read** — nothing is said. An empty password is
+used, and the server is the one that refuses.
 
 ## The order Testin tries to prove who this is
 

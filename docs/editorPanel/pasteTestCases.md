@@ -5,6 +5,9 @@
 **As a** tester, **I want** to drop the test cases I copied or cut into this
 test set, **so that** they end up where I am working.
 
+This is the second half of a copy or a cut. It is the press that really moves
+them.
+
 `Ctrl+Shift+V`.
 
 ## Rules
@@ -43,6 +46,14 @@ test set, **so that** they end up where I am working.
 - **Rule-EDITOR-PANEL-085** — The clipboard is read as test cases. Anything else
   is turned away.
 
+## What the tester sees
+
+This opens no screen. The pasted test cases appear at the end of the list. On a
+cut they also disappear from the test set they came from.
+
+A small message appears at the bottom of the IDE and fades. It reads *Pasted*,
+with a count after it for more than one test case.
+
 ## Main flow
 
 1. The tester has copied or cut test cases.
@@ -66,7 +77,7 @@ and only the log says why.
 ## Pasting into the same test set
 
 Pasting a copy into the test set it came from is allowed. The result is a second
-test case whose description ends in `(Copy)`, with its own identity and its own
+test case. Its description ends in `(Copy)`. It has its own identity and its own
 test method.
 
 ---

@@ -5,6 +5,8 @@
 **As a** tester, **I want** an empty Java class to appear when I make a test
 set, **so that** the test cases I write next have somewhere to be written.
 
+A test set becomes a Java class. The class is where its test methods go.
+
 There is no key for this. It happens when a test set is created, which is
 [UC-TREE-PANEL-007](../treePanel/createTestSet.md).
 
@@ -44,6 +46,13 @@ public class LoginTest {
 1. **The package line** — built from the folders above the test set.
 2. **The class name** — the test set's name, cleaned, with `Test` on the end.
 
+## What the tester sees
+
+No screen opens, and Testin says nothing at all. The new Java file appears in
+the Project tool window, inside the folder that holds the Java tests. Only a
+problem speaks, as a small red message near the bottom right of the IDE, and
+that message fades after about five seconds.
+
 ## Main flow
 
 1. The tester creates a test set named **Login** under a package named
@@ -59,8 +68,9 @@ public class LoginTest {
 - automation code was not generated.* The test set is still created.
 
 **If the test set sits outside a test cases folder** — a message titled **Class
-Name Unknown** reads the test set's name, then *sits outside a test cases
-directory, so no automation class name could be built.* Nothing is written.
+Name Unknown** appears. It reads the test set's name, then *sits outside a test
+cases directory, so no automation class name could be built.* Nothing is
+written.
 
 **If the class file is already there** — nothing is written and nothing is said.
 The tester's own code is never overwritten.

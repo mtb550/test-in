@@ -5,6 +5,8 @@
 **As a** tester, **I want** to open the test method Testin wrote for this test
 case, **so that** I can read or change what the automation actually does.
 
+Testin writes a test method for each test case. This opens that method.
+
 There is no key that works here. The button's tooltip names `Shift+F5`, and
 `Shift+F5` does nothing in the panel.
 
@@ -33,13 +35,27 @@ There is no key that works here. The button's tooltip names `Shift+F5`, and
 - **Rule-VIEW-PANEL-057** — The button is the first of the two, before the run
   button.
 
+## The screen
+
+The two buttons sit between the title and the badges.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│   [ go to code ]  [ run ]                                                │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The first button** — this one. Its tooltip reads **Navigate to Code** and
+   names `Shift+F5`.
+2. **The second button** — runs the test case. That is
+   [UC-VIEW-PANEL-012](runFromPanel.md).
+3. **Either button** — grows under the pointer, and the pointer becomes a hand.
+
 ## Main flow
 
 1. The panel is showing a test case that has automation code.
 2. The tester clicks the first button, whose tooltip reads **Navigate to Code**.
 3. The Java file opens with the caret on the test method for this test case.
-
-The button is drawn on [UC-VIEW-PANEL-012](runFromPanel.md).
 
 ## What Testin refuses
 
@@ -55,12 +71,12 @@ description, then *yet*.
 
 ## Where the plugin breaks its own rules
 
-**The tooltip names a key that does nothing here.** It reads `Shift+F5`, and
-that key is bound to the cards in the editor. That is difference 1 on
+**The tooltip names a key that does nothing here.** It reads `Shift+F5`. That
+key belongs to the cards in the editor. That is difference 1 on
 [the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
-**The same action has two pictures.** On a menu it is an arrow. Here and on a
-card it is a class icon.
+**The same action has two pictures.** On a menu it is drawn as an arrow. Here,
+and on a card, it is drawn as the icon for a Java class.
 
 ---
 

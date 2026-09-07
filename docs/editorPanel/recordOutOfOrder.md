@@ -6,6 +6,9 @@
 on, **so that** I can record something I happened to try while doing something
 else.
 
+A verdict can go on any test case at any time. The walk is not in charge of
+that.
+
 `P`, `F` or `B` on any selected test case.
 
 ## Rules
@@ -41,6 +44,15 @@ else.
 - **Rule-EDITOR-PANEL-158** — Recording away from the walk does not stop the
   walk, and does not move it.
 
+## What the tester sees
+
+This opens no screen. The verdict badge on the test case the tester clicked
+changes, and the figures in the status bar move. Its duration column stays
+blank.
+
+The walk does not move. It stays on the test case it was timing, and the clock
+keeps running there.
+
 ## Main flow
 
 1. The walk is on test case 12.
@@ -63,8 +75,9 @@ only the log says so.
 ## Why the duration is blank
 
 The clock times the test case the walk is on. A verdict recorded anywhere else
-was never timed, so nothing is written to the duration and the column stays
-blank. A blank duration means nothing was measured, not that it took no time.
+was never timed. Nothing is written to the duration, so the column stays blank.
+A blank duration means nothing was measured. It does not mean the test case took
+no time.
 
 ---
 

@@ -5,6 +5,9 @@
 **As a** tester, **I want** to tell Testin which folder on this machine holds my
 test projects, **so that** the tree has something to show.
 
+Testin shows nothing at all until this folder is set. It is the first thing to
+do on a new machine.
+
 There is no key for this. It is the first row of the page.
 
 ## Rules
@@ -32,16 +35,25 @@ There is no key for this. It is the first row of the page.
 
 ## The screen
 
-The row is at the top of the page, drawn on
-[the settings page](main.md#the-page).
+The row is the first one on the page.
 
-The gray example in the empty box reads:
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Testin source root:  [ Example -> C:\Users\...\Testin ] [...] [Open]    │
+└──────────────────────────────────────────────────────────────────────────┘
+```
 
-> Example -> C:\Users\{username}\Documents\Testin
+1. **The box** — the one folder that holds every test project.
+2. **The gray example** — shown only while the box is empty. It reads
+   *Example -> C:\Users\{username}\Documents\Testin*.
+3. **The browse button** — opens a folder chooser.
+4. **Open** — opens the folder in the file manager. It is
+   [UC-SETTING-003](openTestinFolder.md).
 
-The browse button opens a folder chooser titled **Select Root Folder**, whose
-line underneath reads *Choose the directory where your test projects are
-stored*.
+The folder chooser is titled **Select Root Folder**. The line under that title
+reads *Choose the directory where your test projects are stored*.
+
+The whole page is drawn on [the settings page](main.md#the-page).
 
 ## Main flow
 
@@ -56,9 +68,9 @@ stored*.
 
 ## What Testin refuses
 
-**Nothing is refused here.** A path that does not exist, a path that is a file
-and a path of nothing but spaces are all stored exactly as typed. That is
-difference 1 on
+**Nothing is refused here.** Three kinds of path are all stored exactly as
+typed: a path that does not exist, a path that is a file, and a path of nothing
+but spaces. That is difference 1 on
 [the settings page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ## What happens when no folder is set
@@ -76,9 +88,9 @@ It carries a link reading **Open Settings**.
 
 ## Where the plugin breaks its own rules
 
-**The stored value changes on its own.** A folder saved with spaces around it is
-stored with them. The next time a code project opens, Testin trims them and
-writes the trimmed value back. That is difference 3 on
+**The stored value changes on its own.** A folder saved with spaces around it
+keeps those spaces. The next time a code project opens, Testin removes them and
+writes the shorter value back. That is difference 3 on
 [the settings page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

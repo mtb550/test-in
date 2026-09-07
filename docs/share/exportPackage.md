@@ -5,6 +5,9 @@
 **As a** tester, **I want** everything under a package in one file with the test
 sets kept apart, **so that** a reviewer gets one workbook rather than six.
 
+A package is a folder that holds test sets. This writes all of them into one
+file. Each test set becomes a sheet of its own inside it.
+
 There is no key for this. The same **Export** entry, on a package.
 
 ## Rules
@@ -29,6 +32,38 @@ There is no key for this. The same **Export** entry, on a package.
 - **Rule-SHARE-016** — Two sheets that would take the same name are numbered.
   The first keeps the name, and the rest get a number in brackets.
 
+## The screen
+
+The same dialog as [UC-SHARE-001](exportTestSet.md), with more than one tab.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Export Test Cases                                           │
+├──────────────────────────────────────────────────────────────┤
+│  | Login | Checkout | Search | Payments |                    │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │[x]| #  | Description       | Expected Result| Priority │  │
+│  │[x]| 1  | Pay with a saved. | The order is.. | P1       │  │
+│  │[x]| 2  | Pay with an expi. | The card is r..| P2       │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                                              │
+│  Destination:  [ C:\Users\mtb\Downloads           ] [ ... ]  │
+│  File name:    [ Payments                         ]          │
+│  Format:       [ XLSX                            v]          │
+│                                                              │
+│                                          [ Export ]          │
+├──────────────────────────────────────────────────────────────┤
+│  [k]  Escape Cancel                                          │
+└──────────────────────────────────────────────────────────────┘
+```
+
+1. **The tabs** — one for each test set that holds test cases. A tab takes the
+   name of its test set.
+2. **The table** — the test cases of the tab in front. Each tab keeps its own
+   ticks.
+3. **File name** — one file is written, however many tabs there are.
+4. **Export** — writes the file. `Enter` does not.
+
 ## Main flow
 
 1. The tester selects a test set package, or the **Test Cases** folder.
@@ -43,13 +78,11 @@ Everything else is as [UC-SHARE-001](exportTestSet.md).
 
 ## What Testin refuses
 
-**If a tab has nothing ticked** — that sheet is left out of the file entirely,
-and nothing is said. If no tab has anything ticked, the export is refused.
+**If a tab has nothing ticked** — that sheet is left out of the file, and
+nothing is said. If no tab has anything ticked, the whole export is refused.
 
-**If a test set is nested two levels down** — it is not exported at all, and
-nothing says so. Only the test sets directly under the package are walked. That
-is difference 7 on
-[the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
+**If a test set is nested two levels down** — it is exported like any other.
+Every test set under the package becomes a sheet, however deep it sits.
 
 ## What each format does with the sheets
 

@@ -8,6 +8,8 @@
 **As a** tester, **I want** to put back a change I undid, **so that** changing
 my mind twice costs no more than changing it once.
 
+Redo is the opposite of undo.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -50,6 +52,12 @@ my mind twice costs no more than changing it once.
 Rule-TREE-PANEL-059 and Rule-TREE-PANEL-060 hold here too. They say what the
 tree remembers and what can be taken back, and they are on
 [UC-TREE-PANEL-016](undoChange.md).
+
+## What the tester sees
+
+Redo opens no screen of its own. On the **Actions** menu, the entry names what
+it will put back. After `Ctrl+Y` the tree redraws with the change applied again,
+and *Redone* shows above the status bar at the bottom right of the IDE.
 
 ## Main flow
 

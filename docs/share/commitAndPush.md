@@ -5,6 +5,9 @@
 **As a** tester, **I want** my work recorded and sent in one press,
 **so that** the team has it without a second gesture I might forget.
 
+A commit records the work here. A push sends it to the team's copy, which Git
+calls the remote. This does both in one press.
+
 There is no key for this. **Commit & Push** is the face of the split button.
 
 ## Rules
@@ -27,6 +30,14 @@ There is no key for this. **Commit & Push** is the face of the split button.
 - **Rule-SHARE-062** — Any password inside the remote address is taken out of
   anything Testin shows or logs.
 
+## What the tester sees
+
+The button opens no window of its own. The dialog closes and a progress bar
+named *Committing and pushing* runs in the status bar. When it ends, a message
+titled **Pushed** appears at the bottom right. It waits in the IDE's
+notification list, because a push can finish while the tester is reading
+something else.
+
 ## Main flow
 
 1. The tester ticks what to send, types a message, and presses **Commit &
@@ -35,14 +46,14 @@ There is no key for this. **Commit & Push** is the face of the split button.
    [UC-SHARE-012](commitChanges.md) describes.
 3. Testin reads the remote address.
 4. Testin pushes the branch.
-5. A message titled **Pushed** reads *Commit*, the short identifier, *is on*,
-   then the remote and the branch.
+5. A message titled **Pushed** reads *Commit*, then the short identifier, then
+   *is on*, then the remote and the branch.
 
 ## What Testin refuses
 
-**If no remote is set** — a window titled **Configure Remote** asks for one. Its
-text reads *No remote repository is configured for this project.* and then asks
-for the address.
+**If no remote is set** — a window titled **Configure Remote** asks for one. It
+reads *No remote repository is configured for this project.*, then asks for the
+address.
 
 **If the tester cancels that window** — a message titled **Push Aborted** reads
 *A remote URL is required to push.* The commit was already made.
@@ -61,10 +72,9 @@ not read the Git remote:* and then the reason.
 later in Git's own words. That is difference 18 on
 [the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
 
-**A commit made and not pushed leaves work on this machine.** If the push half
-fails, the commit half stands. The tester's work is recorded and not sent, and
-the next review will offer to push it. That is
-[UC-SHARE-015](pushOldCommit.md).
+**A commit made and not pushed leaves work on this machine.** If the push
+fails, the commit still stands. The work is recorded here and not sent. The
+next review offers to push it. That is [UC-SHARE-015](pushOldCommit.md).
 
 ---
 

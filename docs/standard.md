@@ -35,9 +35,19 @@ tester does: `createTestProject.md`.
 |---|---|
 | **The story** | One sentence: as a tester, I want, so that |
 | **Rules** | Every rule this use case answers to, written out. The ones that hold for the whole part first, then its own |
-| **The screens** | Each one drawn, with its parts numbered |
+| **The screen** | Drawn, with its parts numbered. A use case that opens no screen has **What the tester sees** instead: what changes, which message appears, and where |
 | **Main flow** | What happens, step by step, when nothing goes wrong |
 | **What Testin refuses** | Every way it can go wrong, and what the tester sees each time |
+
+**Every use case is listed with its purpose.** A part's `main.md` lists its use
+cases in a table, and the third column says in one short line why a tester would
+use it - under twelve words, in the plainest words that are true. That line is
+how a reader chooses which page to open, so it is written for somebody who does
+not know the plugin yet.
+
+**Write for a tester whose first language is not English.** Short sentences.
+Common words. One idea per sentence. A term explained the first time a page uses
+it. This is not a style preference - it is who reads these pages.
 
 **One fact, one place.** A key is written once, in the step that presses it. A
 rule is written once and pointed at by number everywhere else. A screen is drawn
@@ -154,8 +164,9 @@ the part carries, so there is no list of them to go stale.
     ./tools/add-rule.ps1 -Part editorPanel -Page editGridCell.md -Text "..." 
 
 **Each part's page says its last number.** The **Numbering** row of every
-`main.md` gives the range that part's use cases and rules cover, so the next rule
-is the number after the end of it and nobody reads the whole part to find out.
+`main.md` gives the range that part's use cases and rules cover, so the next
+rule is the number after the end of it and nobody reads the whole part to find
+out.
 Writing a rule and moving that row on is one job, not two - and that row is the
 only thing to check before choosing a number, because nothing else moves.
 

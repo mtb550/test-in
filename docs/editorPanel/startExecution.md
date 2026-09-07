@@ -5,6 +5,9 @@
 **As a** tester, **I want** Testin to walk me through the test run one test case
 at a time, **so that** I judge each one in turn and each one is timed.
 
+The walk picks the next test case for the tester and times it. The tester only
+has to press `P`, `F` or `B`.
+
 There is no key for this. The button's tooltip reads **Start Manual Execution**.
 
 ## Rules
@@ -52,6 +55,16 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
   three gray the button, and a press that reaches Testin anyway is refused and
   says so.
 
+## What the tester sees
+
+This opens no screen. The toolbar button becomes **Stop Execution**. The editor
+turns to the page holding the first test case with no verdict, and selects its
+row.
+
+The status bar reads **In Progress**, and the clock starts ticking once a
+second. A small message appears at the bottom of the IDE and fades, reading
+*In Progress*.
+
 ## Main flow
 
 1. The tester presses **Start Manual Execution**.
@@ -75,10 +88,10 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
 reads *Execution disabled — run status is*, then the status.
 
 **If nothing is waiting for a verdict** — the button is gray, and its tooltip
-reads *Nothing to execute — no test case is waiting for a verdict*. That is a
-test run holding no test cases, a filter that matches nothing, and a list whose
-test cases have all been judged. [Light mode](lightMode.md) grays no button, so
-its start refuses instead, in a message that fades.
+reads *Nothing to execute — no test case is waiting for a verdict*. Three things
+lead to this: a test run holding no test cases, a filter that matches nothing,
+and a list whose test cases have all been judged. [Light mode](lightMode.md)
+grays no button, so its start refuses instead, in a message that fades.
 
 ---
 

@@ -5,6 +5,9 @@
 **As a** tester, **I want** to open the test set holding the test case I am
 reading, **so that** I can see the test cases around it.
 
+The path at the top says where the test case lives. Its last step opens that
+place.
+
 There is no key for this. The path is at the top of the panel.
 
 ## Rules
@@ -64,9 +67,8 @@ difference 4 on
 ## Where the plugin breaks its own rules
 
 **Clicking the last step fails when the panel was opened from a test run.** The
-path then names a test run, and Testin looks for a test set there. It finds
-none, and stops with an internal error the tester cannot read. That is
-difference 3 on
+path then names a test run. Testin looks for a test set there and finds none. It
+stops with an internal error the tester cannot read. That is difference 3 on
 [the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

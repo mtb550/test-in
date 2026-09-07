@@ -5,6 +5,9 @@
 **As a** tester, **I want** the test cases of a test set as a file,
 **so that** somebody without the IDE can read them or review them.
 
+To export is to write test cases out to a file. The file is a spreadsheet, or
+plain text. No test case is changed.
+
 There is no key for this. The menu entry is **Export**.
 
 ## Rules
@@ -42,9 +45,9 @@ There is no key for this. The menu entry is **Export**.
 │  │[x]| 2 | Log in with a loc..| The account is..| P2      │  │
 │  └────────────────────────────────────────────────────────┘  │
 │                                                              │
-│  Save to    [ C:\Users\mtb\Downloads              ] [ ... ]  │
-│  File name  [ Login                                       ]  │
-│  Format     [ XLSX                                        v] │
+│  Destination:  [ C:\Users\mtb\Downloads           ] [ ... ]  │
+│  File name:    [ Login                            ]          │
+│  Format:       [ XLSX                            v]          │
 │                                                              │
 │                                          [ Export ]          │
 ├──────────────────────────────────────────────────────────────┤
@@ -55,8 +58,8 @@ There is no key for this. The menu entry is **Export**.
 1. **The tab** — named after the test set.
 2. **The tick column** — every test case arrives ticked. The box in the heading
    ticks or unticks the whole tab.
-3. **The other columns** — the 17 fields. Every one but the number can be typed
-   into before the file is written.
+3. **The other columns** — the 17 fields. Every column but the number can be
+   typed into. Typing changes the file, and never the test case.
 4. **Export** — writes the file. `Enter` does not.
 
 ## Main flow
@@ -66,8 +69,8 @@ There is no key for this. The menu entry is **Export**.
 3. The **Export Test Cases** dialog opens, every test case ticked.
 4. The tester unticks two, and corrects a typo in a third.
 5. The tester picks a folder, a name and a format, then presses **Export**.
-6. The dialog closes, and a bar reads *Exporting*, the count, *test cases to*,
-   then the file name.
+6. The dialog closes. A bar reads *Exporting*, then the count, then *test
+   cases to*, then the file name.
 7. A message reads *Exported 8*.
 8. A second message names the file and carries **Open file** and **Copy path**.
 
@@ -90,8 +93,8 @@ cursor moves and the dialog stays open.
 **If the file cannot be written** — a message titled **Export Failed** carries
 the reason.
 
-**If one test case file cannot be read** — it is left out without a word, and
-the count in the message is of what was gathered.
+**If one test case file cannot be read** — the file is named before anything is
+written, and the tester chooses whether to export anyway.
 
 ---
 

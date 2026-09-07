@@ -5,6 +5,9 @@
 **As a** tester, **I want** to take back what I just did,
 **so that** a wrong bulk edit across 30 test cases costs one keystroke.
 
+One press takes back the whole of the last change, however many test cases it
+touched.
+
 `Ctrl+Z`.
 
 ## Rules
@@ -44,6 +47,14 @@
 - **Rule-EDITOR-PANEL-070** — A gesture that changed nothing is not on the
   history at all.
 
+## What the tester sees
+
+This opens no screen. The test cases the change touched are drawn again as they
+were before it.
+
+A small message then appears at the bottom of the IDE and fades. It reads
+*Undone*.
+
 ## Main flow
 
 1. The tester changes the module on 30 test cases.
@@ -77,7 +88,7 @@ not yours. Nothing was changed.*
 
 The history belongs to this editor and this test set. A change made in the tree
 is taken back in the tree. A change made in another editor is taken back there.
-Pressing `Ctrl+Z` in the wrong place takes back the wrong thing, or nothing.
+`Ctrl+Z` in the wrong place takes back the wrong thing, or nothing.
 
 ---
 

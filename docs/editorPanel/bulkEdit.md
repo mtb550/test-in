@@ -5,6 +5,9 @@
 **As a** tester, **I want** to correct the same field on 30 test cases in one
 go, **so that** a renamed module does not cost me half an hour of typing.
 
+The bulk editor shows one field of every selected test case as a list. The
+tester edits the list, and one save writes them all.
+
 Select several test cases, then `F2` or the field's own letter.
 
 ## Rules
@@ -107,11 +110,11 @@ a time*. There is no bulk editor for it.
 **If a group name is not one Testin knows** — it is dropped, and only the log
 says so.
 
-**If the cursor is put on the locked text around a value** — it is pulled to the
-nearest place it can type. No message is shown.
+**If the cursor is put on the locked text around a value** — it moves to the
+nearest place the tester can type. No message is shown.
 
-**If a key would change the locked text** — nothing happens, and the platform's
-own warning is suppressed.
+**If a key would change the locked text** — nothing happens. The platform's own
+warning is hidden.
 
 ## Where the plugin breaks its own rules
 
@@ -119,8 +122,8 @@ own warning is suppressed.
 That is difference 16 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
 
-The group editor shows its values in capitals, and puts them under a heading
-capitalized differently from every other bulk editor.
+The group editor shows its values in capitals. Its heading is capitalized
+differently from every other bulk editor.
 
 ---
 

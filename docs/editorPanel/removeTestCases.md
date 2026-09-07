@@ -5,6 +5,8 @@
 **As a** tester, **I want** to delete test cases that are no longer wanted,
 **so that** the test set is what somebody would actually run.
 
+Testin asks first. The test case's file and its generated test method both go.
+
 `Delete` on the selection.
 
 ## Rules
@@ -81,8 +83,8 @@
 The test case's file, and its generated test method. Anything the tester wrote
 inside that method goes with it, and the confirmation does not mention the code.
 
-Undoing the removal brings the test cases back and writes their methods again,
-empty. What was in the method bodies does not come back.
+Undoing the removal brings the test cases back. Their methods are written again,
+empty. What was inside those methods does not come back.
 
 ---
 

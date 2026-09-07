@@ -5,6 +5,9 @@
 **As a** tester, **I want** to be asked before a sync deletes test cases from my
 machine, **so that** somebody else's removal does not take my work with it.
 
+A sync brings deletions as well as changes. This window asks before any test
+case is deleted from this machine.
+
 There is no key for this. The question comes after the sync.
 
 ## Rules
@@ -44,7 +47,7 @@ There is no key for this. The question comes after the sync.
 ```
 
 1. **The message** — the count, then every file by name.
-2. **The confirm word** — **Remove**, then how many files.
+2. **The confirm word** — the word **Remove**, then how many files.
 
 ## Main flow
 
@@ -61,15 +64,14 @@ There is no key for this. The question comes after the sync.
 **If the tester presses `Escape`** — nothing is removed. The same question comes
 again on the next sync.
 
-**If this machine has changed one of them since** — it is not offered. It
+**If this machine has changed one of them since** — it is not offered here. It
 becomes a conflict instead, and the tester is asked which version wins. That is
 [UC-SHARE-021](answerServerConflicts.md).
 
 ## Why the files are named
 
-Three file names in a message is long, and it is the point. A tester agreeing to
-delete test cases should be able to see which ones without opening anything
-else.
+Three file names make a long message, and that is the point. A tester agreeing
+to delete test cases should see which ones, without opening anything else.
 
 ---
 

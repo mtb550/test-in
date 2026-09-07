@@ -5,6 +5,9 @@
 **As a** tester, **I want** to change a verdict I recorded by mistake,
 **so that** the test run says what really happened.
 
+There is no special gesture. The tester records the right verdict, and it is
+written over the wrong one.
+
 Press the right verdict's key on the test case.
 
 ## Rules
@@ -80,13 +83,13 @@ simply written over.
 **If the tester presses `Escape`** — nothing is changed at all.
 
 **If several test cases are selected** — the confirmation is asked once for the
-whole selection, and its message says *these*, then the count, then *cases*.
+whole selection. Its message says *these*, then the count, then *cases*.
 
 ## What cannot be undone
 
 There is no undo for a verdict inside the test run editor. `Ctrl+Z` there
-belongs to the test cases, not to the test run. A verdict written over is gone,
-and so is anything clearing it removed.
+belongs to the test cases, not to the test run. A verdict written over is gone.
+So is anything that clearing it removed.
 
 **There is no way to clear a verdict back to nothing.** **Pending**,
 **Untested** and **Removed** have no key and are on no menu.

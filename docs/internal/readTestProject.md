@@ -6,6 +6,8 @@
 it draws anything, **so that** every panel answers at once instead of going to
 disk for each row.
 
+This is the loading step. It is why the tree opens at once.
+
 There is no key for this. It starts on its own.
 
 ## Rules
@@ -75,8 +77,8 @@ the bottom of the IDE, beside the other background jobs.
 4. Testin starts one background job for each of them.
 5. The bar reads *Indexing*, then the test project's name.
 6. The bar reads the test project's name, then *test sets...*.
-7. Testin walks `Test Cases`. For each test set it reads every `.json` file at
-   once, not one after another.
+7. Testin walks `Test Cases`. For each test set, it reads every `.json` file
+   at the same time. It does not read them one after another.
 8. After each test set the bar reads *Test set:*, then its name, then how many
    test cases it holds.
 9. The bar reads the test project's name, then *test runs...*.
@@ -110,10 +112,10 @@ values. Its number, its status and who made it are lost. Nothing on screen says
 so.
 
 **If a folder under `Test Cases` holds no `.ts` and no `.tsp` file** — the
-folder is skipped, and so is everything inside it. When it holds test cases,
-Testin says so when the read finishes. One message names the folders, and it
-stays in the notification list rather than fading, because a read finishes on
-its own time.
+folder is skipped. Everything inside it is skipped too. When it holds test
+cases, Testin says so once the read has finished. One message names all such
+folders. That message waits in the notification list instead of fading, because
+a read finishes on its own time and the tester may be looking elsewhere.
 
 **If such a folder holds no test cases** — it is skipped without a word. Most
 folders that are not test sets are nothing, and reporting each one would be
@@ -123,9 +125,9 @@ noise.
 test set. The others are read. The set is drawn one row shorter, and nothing
 says which row is missing.
 
-**If two test case files claim the same identity** — both are read as separate
-test cases. The file name decides, so a test case copied by hand becomes a
-second, independent test case.
+**If two test case files claim the same identity** — both are read, as two
+separate test cases. The file name is what decides. So a test case copied by
+hand becomes a second test case of its own.
 
 **If the tester presses cancel** — the read stops between one test set and the
 next. What was already read stays in memory. The rest of that test project is

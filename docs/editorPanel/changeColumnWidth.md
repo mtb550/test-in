@@ -5,6 +5,8 @@
 **As a** tester, **I want** to widen the column I am reading,
 **so that** a long expected result is not cut off every time I open the editor.
 
+This is only about the grid. Cards have no columns.
+
 There is no key for this. Drag the divider in the header.
 
 ## Rules
@@ -39,6 +41,14 @@ There is no key for this. Drag the divider in the header.
   itself is not remembered.
 - **Rule-EDITOR-PANEL-027** — A column Testin sizes is made as wide as its
   content needs, up to 500 points.
+
+## What the tester sees
+
+This opens no screen. The tester drags the divider between two column headers,
+and the column follows the pointer as it moves. The rows below grow or shrink to
+fit the new width.
+
+Nothing is said. No message appears and no dialog opens.
 
 ## Main flow
 

@@ -5,6 +5,8 @@
 **As a** tester, **I want** to write what happened straight into the table,
 **so that** noting five results does not need five dialogs.
 
+**Actual Result** is the only column of a test run a tester can type into.
+
 `Enter` on the cell, in the grid, in a test run editor.
 
 ## Rules
@@ -41,6 +43,26 @@
 - **Rule-EDITOR-PANEL-174** — What is stored is written back into the cell,
   whatever the tester typed.
 
+## The screen
+
+No dialog opens. The cell itself becomes a box.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  #  | Description               | Run Status  | Actual Result            │
+├──────────────────────────────────────────────────────────────────────────┤
+│  1  | Log in with a valid user  | Passed      |                          │
+│  2  | Log in with a locked acc. | Failed      | [The session was dropped]│
+│  3  | Log in with wrong passwo. | Pending     |                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The open cell** — a box with a blue outline, with the cursor in it.
+2. **Every other column** — read only in a test run. Those cells never open.
+3. **The row** — grows taller when the tester adds a line with `Ctrl+Enter`.
+4. **The keyboard** — belongs to the open cell. `P`, `F` and `B` do nothing
+   until it is closed.
+
 ## Main flow
 
 1. The tester switches the test run editor to the grid.
@@ -71,8 +93,8 @@ and `B` do nothing until the cell is closed.
 ## Why so little can be typed into
 
 A test run records what happened. The verdict, the duration, who ran it and when
-are all recorded by the act of judging, and typing them in would let the record
-say something nobody did. The actual result is the one thing a tester writes in
+are all written by the act of judging. Typing them in would let the record say
+something nobody did. The actual result is the one thing a tester writes in
 their own words, so it is the one thing the grid lets them type.
 
 ---

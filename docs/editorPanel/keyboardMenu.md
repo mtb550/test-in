@@ -5,6 +5,9 @@
 **As a** tester, **I want** the menu without reaching for the mouse,
 **so that** a whole test run can be walked with two hands on the keyboard.
 
+It is the same menu the right button opens. The key just opens it from the
+keyboard.
+
 The `Context Menu` key.
 
 ## Rules
@@ -37,6 +40,42 @@ The `Context Menu` key.
   views and in the tree.
 - **Rule-EDITOR-PANEL-124** — With nothing selected, nothing opens.
 
+## The screen
+
+This is the menu in a test set editor.
+
+```
+┌──────────────────────────────────┐
+│  Create Test Case                │
+│  View Details                    │
+│  ──────────────────────────────  │
+│  Update                      >   │
+│  Copy                            │
+│  Copy Node                       │
+│  Cut Node                        │
+│  Paste Node                      │
+│  Delete                          │
+│  ──────────────────────────────  │
+│  Undo                            │
+│  Redo                            │
+│  ──────────────────────────────  │
+│  Automate Test Case              │
+│  Run Test Case                   │
+│  Navigate to Code                │
+│  ──────────────────────────────  │
+│  Next page                       │
+│  Previous page                   │
+└──────────────────────────────────┘
+```
+
+1. **Where it opens** — a quarter of the way across the selected card, or on the
+   selected cell in the grid.
+2. **The separator lines** — they group entries that belong together.
+3. **The last group of three** — not drawn at all in an IDE without the Java and
+   TestNG plugins.
+4. **Moving in it** — the arrow keys move down the entries, and `Enter` chooses
+   one.
+
 ## Main flow
 
 1. The tester selects a card.
@@ -57,8 +96,8 @@ In a test set editor, in this order: **Create Test Case**, **View Details**,
 **Undo**, **Redo**, **Automate Test Case**, **Run Test Case**, **Navigate to
 Code**, **Next page**, **Previous page**.
 
-The last group of three is not there at all in an IDE without the Java and
-TestNG plugins.
+The last group of three is not there at all in an IDE without the Java plugin
+and the TestNG plugin.
 
 In a test run editor the menu holds the three verdicts first, then **Failed Test
 Case Details**, then the rest.

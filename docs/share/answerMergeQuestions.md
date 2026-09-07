@@ -5,6 +5,9 @@
 **As a** tester, **I want** to choose between my wording and a colleague's,
 **so that** a merge does not silently throw away one of them.
 
+When two people change the same field, only one value can be kept. This window
+shows both and lets the tester pick.
+
 There is no key that opens this. It opens during a merge.
 
 ## Rules
@@ -50,8 +53,10 @@ There is no key that opens this. It opens during a merge.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The title** — the words **Both Changed**, then the test case's description.
-2. **Each row** — the field, then the two values. **Mine** is chosen.
+1. **The title** — the words **Both Changed**, then the test case's
+   description.
+2. **Each row** — the field, then the two values. **Mine** is chosen to start
+   with.
 3. **Keep Selected** — writes the answers for this test case.
 
 ## Main flow
@@ -64,18 +69,17 @@ There is no key that opens this. It opens during a merge.
 
 ## What Testin refuses
 
-**If the tester presses `Escape`** — nothing is written for this test case, and
-nothing more is asked for the rest of the sync. Every answer already given is
-thrown away, with no message. That is difference 3 on
-[the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
+**If the tester presses `Escape`** — nothing is written for this test case.
+The sync moves on to the next question. Every answer already given is kept, and
+this test case is named at the end with everything else left unresolved.
 
-**If a value is too long to show** — it is cut at 70 characters. The whole value
-is still what gets written.
+**If a value is too long to show** — it is cut at 70 characters on screen. The
+whole value is still what gets written.
 
 ## The same window serves both syncs
 
-This window is used for a Git pull and for a server sync. The two reach it
-differently and it behaves the same in both.
+This window is used for a Git pull and for a server sync. The two reach it in
+different ways. It behaves the same in both.
 
 ---
 

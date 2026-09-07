@@ -5,6 +5,9 @@
 **As a** tester, **I want** one test run written out as a document,
 **so that** I can attach it to a ticket or send it to someone with no IDE.
 
+This turns one test run into a file: a PDF, a Word file, a web page or a
+spreadsheet.
+
 `Ctrl+P` on the selected test run.
 
 ## Rules
@@ -64,9 +67,10 @@
 5. The dialog closes.
 6. A progress bar reads *Generating the*, the format, then *report for*, then
    the test run's name.
-7. Testin reads the test run and every test case it names, and writes the file.
-8. A message titled with the format and the words *Report Generated* reads
-   *Saved successfully:* and the file name.
+7. Testin reads the test run and every test case it names. Then it writes the
+   file.
+8. A message appears. Its title is the format and the words *Report Generated*.
+   It reads *Saved successfully:* and then the file name.
 9. The message carries two links, **Open report** and **Copy path**.
 
 ## The three ways in

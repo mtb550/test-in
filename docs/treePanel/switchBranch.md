@@ -7,6 +7,8 @@
 **As a** tester, **I want** to switch the test project's branch from the panel,
 **so that** the tree follows the branch I am testing.
 
+The box above the tree appears only for a test project shared through Git.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -84,20 +86,21 @@
 ## Main flow
 
 1. The test project is shared through Git, and its folder is a Git repository.
-   A drop-down box above the tree lists its branches, alphabetically, with the
-   current one selected. Remote branches are listed too, without their
+   A drop-down box above the tree lists its branches in alphabetical order. The
+   current branch is selected. Remote branches are listed too, without their
    `remotes/` prefix.
 2. The tester picks another branch. A progress bar reads *Checking branch
    \<branch\>*, then *Checking out branch: \<branch\>*.
-3. Testin checks out the branch. Picking a remote branch that has no local
-   branch yet creates one that follows it, and the message then names the local
+3. Testin checks out the branch. A remote branch with no local branch yet gets
+   one, and the new local branch follows it. The message then names the local
    branch.
 4. Testin does a full refresh, and shows *Switched to \<branch\>*. An editor
    whose node the new branch does not have is closed.
 
-The box fills itself twice when the panel opens: once from what is on the
-machine, showing *Reading branches*, then again after fetching from the remote,
-showing *Fetching from remote*. So the list can grow a moment after it appears.
+The box fills itself twice when the panel opens. It fills first from what is on
+the machine, showing *Reading branches*. It fills again after fetching from the
+remote, showing *Fetching from remote*. So the list can grow a moment after it
+appears.
 
 **With uncommitted changes**
 
@@ -114,8 +117,8 @@ showing *Fetching from remote*. So the list can grow a moment after it appears.
 **If the test project is not shared through Git** — there is no box.
 
 **If Git refuses the checkout** — the box goes back to the branch the tester was
-on, and an IDE notification titled *Branch Not Switched* says *\<branch\> was
-not checked out. There are uncommitted changes in this test project that
+on. An IDE notification titled *Branch Not Switched* opens. It says *\<branch\>
+was not checked out. There are uncommitted changes in this test project that
 switching would overwrite - commit them first.* It carries a **Review Changes**
 link.
 

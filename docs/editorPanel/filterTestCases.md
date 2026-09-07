@@ -6,6 +6,8 @@
 module, **so that** I can work through the smoke tests without the rest in the
 way.
 
+A filter hides rows. It never changes or deletes a test case.
+
 There is no key for this. The button's tooltip reads **Filter**.
 
 ## Rules
@@ -63,7 +65,7 @@ There is no key for this. The button's tooltip reads **Filter**.
 4. **Module** — the modules the test cases in this test set actually carry.
 5. **Status** — the run statuses. It is on a test run only.
 
-While a filter is on, the button gains the count in brackets and its tooltip
+While a filter is on, the button shows the count in brackets. Its tooltip
 becomes **Filter**, then the count, then **active**.
 
 ## Main flow
@@ -89,10 +91,6 @@ from what is there.
 Security, UI, Functional and Validation. The create dialog offers only
 Regression, Smoke and Sanity. That is difference 4 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
-
-**A filter can be thrown away without a word.** Selecting a test case the filter
-is hiding drops every filter. It happens after creating a test case, after a
-drag, and after choosing a search result. That is difference 10.
 
 ---
 

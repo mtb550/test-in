@@ -6,6 +6,9 @@
 take what is there, **so that** a team without Git still shares one set of test
 cases.
 
+SFTP is a safe way to copy files to a server. This sends the test project
+there, and brings back what other testers put there.
+
 There is no key for this. The menu entry is **Sync With SFTP**.
 
 ## Rules
@@ -57,12 +60,12 @@ The account is asked for when this machine cannot prove who it is.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **The title** — the word **Connect to**, then the server. A port other than
-   the usual one is shown too.
+1. **The title** — the words **Connect to**, then the server. A port other
+   than the usual one is shown too.
 2. **The account box** — filled with the stored account, or with this machine's
    own user name.
-3. **The password box** — always empty when the window opens. An empty password
-   is a real answer, meaning a key will do the proving.
+3. **The password box** — always empty when the window opens. An empty
+   password is a real answer. It means a key will prove who this is.
 
 ## Main flow
 
@@ -89,8 +92,8 @@ Configured** reads *Set connection: sftp and sftpHost in testin.yml*.
 than showing the server's refusal.
 
 **If somebody else is syncing** — a message titled **Somebody else is syncing
-this project** names who and when, then reads *Nothing was sent or fetched. Try
-again when they have finished.*
+this project** names who, and when they started. It then reads *Nothing was
+sent or fetched. Try again when they have finished.*
 
 **If the connection fails** — a message titled **Sync Failed** reads *Could not
 connect to*, the server, then the reason.

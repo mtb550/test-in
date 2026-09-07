@@ -5,6 +5,9 @@
 **As a** tester, **I want** to say which version of a test case wins,
 **so that** a sync that found two changes does not choose for me.
 
+A conflict is a test case changed on this machine and on the server. The sync
+keeps the copy here and asks the tester afterwards.
+
 There is no key for this. The questions come after the sync.
 
 ## Rules
@@ -27,6 +30,13 @@ There is no key for this. The questions come after the sync.
 - **Rule-SHARE-098** — The answers are sent on the same sync, if nobody else has
   taken the lock in the meantime.
 
+## What the tester sees
+
+First a warning message at the bottom right of the IDE, titled **Synced,
+with**, the count, **left to you**. It waits in the IDE's notification list.
+Then the **Both Changed** window opens, once for each test case, and
+[UC-SHARE-018](answerMergeQuestions.md) draws it.
+
 ## Main flow
 
 1. The tester syncs, and two test cases were changed on both sides.
@@ -45,7 +55,7 @@ The window itself is drawn on
 
 **If the tester presses `Escape`** — nothing is written for that test case, and
 nothing more is asked. Everything already answered is thrown away. The same
-questions come again on the next sync.
+questions come back on the next sync.
 
 **If somebody else has started a sync in the meantime** — a message titled
 **Nothing Settled** reads *Somebody else is syncing this project, so your
@@ -53,12 +63,13 @@ answers were not sent. You will be asked again on the next sync.*
 
 ## What the message before it said
 
-The message after the sync reads what was sent, taken and merged, then *Both
-sides changed*, the files, then *This machine kept its copies and sent nothing
-for them; you'll be asked about anything that can be merged field by field.*
+The message after the sync reads what was sent, taken and merged. Then it reads
+*Both sides changed*, then the files, then *This machine kept its copies and
+sent nothing for them; you'll be asked about anything that can be merged field
+by field.*
 
-That message stays in the notification list rather than fading, because a sync
-can finish while the tester is reading something else.
+That message stays in the notification list rather than fading. A sync can
+finish while the tester is reading something else.
 
 ---
 

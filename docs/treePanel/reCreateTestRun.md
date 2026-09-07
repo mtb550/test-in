@@ -9,6 +9,8 @@ with the same test cases and settings and no verdicts, **so that** starting the
 next round of testing takes one step, instead of building the whole test run
 again by hand.
 
+This copies a test run's test cases and settings into a new, empty one.
+
 ## Rules
 
 - **Rule-TREE-PANEL-001** — The panel shows exactly one test project. It is the
@@ -55,7 +57,14 @@ again by hand.
 - **Rule-TREE-PANEL-072** — The new test run is created in the same folder as
   the one it was made from.
 
-The dialog is drawn under [UC-TREE-PANEL-009](createTestRun.md).
+## What the tester sees
+
+The **Create Test Run** dialog opens. It is the dialog drawn under
+[UC-TREE-PANEL-009](createTestRun.md), with the same title and the same
+**Create** button. It arrives filled in. The next name is in *Test Run name*,
+the same test cases are ticked, and the same configuration is set. After
+**Create**, the new test run's editor opens and *Run created* shows above the
+status bar at the bottom right of the IDE.
 
 ## Main flow
 

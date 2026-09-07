@@ -6,6 +6,8 @@
 at, **so that** I know what the automation is supposed to prove before I change
 it.
 
+This opens the test case that a generated method was written from.
+
 There is no key for this. The mark is in the gutter beside the method.
 
 ## Rules
@@ -67,8 +69,8 @@ test case:* and then the reason.
 ## Where the plugin breaks its own rules
 
 **Clicking the mark of a removed test case does nothing.** Generated code
-outlives the test case it came from, so this is an ordinary state, not a rare
-one. The tester clicks and watches nothing happen. That is difference 4 on
+outlives the test case it came from. So this is an ordinary state, not a rare
+one. The tester clicks, and nothing happens. That is difference 4 on
 [the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 
 **A tester who edits the identity loses the mark**, with nothing saying why.

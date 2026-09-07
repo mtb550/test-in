@@ -6,6 +6,8 @@
 **so that** a regression run of 200 test cases happens while I do something
 else.
 
+Testin runs every test case that has no verdict yet, in one go.
+
 There is no key and no button in the editor. It starts from the tree, with
 **Run Tests** on the test run.
 
@@ -46,6 +48,15 @@ There is no key and no button in the editor. It starts from the tree, with
 - **Rule-EDITOR-PANEL-188** — A test case with no generated method is dropped,
   and the rest still run.
 
+## What the tester sees
+
+This opens no screen of Testin's own. The test run's editor opens or comes to
+the front, every pending card turns to running, and the IDE's own run window
+opens below it.
+
+Results land one at a time. Each one raises its own small message at the bottom
+of the IDE, reading *Passed* or *Failed*.
+
 ## Main flow
 
 1. The tester right-clicks the test run in the tree and chooses **Run Tests**.
@@ -76,9 +87,10 @@ test cases to run*.
 That is difference 25 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
 
-**A pass clears what a tester wrote by hand.** A test case failed and written up
-in the morning, re-run in the afternoon and passing, loses the actual result,
-the error, the severity and the priority with no dialog. That is difference 26.
+**A pass clears what a tester wrote by hand.** A test case is failed and written
+up in the morning. It is re-run in the afternoon and passes. The actual result,
+the error, the severity and the priority all go, with no dialog. That is
+difference 26.
 
 ---
 

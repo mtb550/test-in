@@ -6,6 +6,8 @@
 to the list, **so that** I can read four of them one after another with two
 keys.
 
+The panel was handed a list of test cases. These two keys walk that list.
+
 `Ctrl+Right` moves forward. `Ctrl+Left` moves back.
 
 ## Rules
@@ -73,9 +75,9 @@ That is every gesture except the two named in Rule-VIEW-PANEL-022.
 
 ## Where the plugin breaks its own rules
 
-`Ctrl+Right` means two different things in two places. Here it moves to the next
-test case. In an editor it turns the page. The two are one keystroke apart on
-one screen.
+`Ctrl+Right` means two different things in two places. In the panel it moves to
+the next test case. In an editor it turns the page. Both are on one screen, and
+only the place the keyboard is decides which one happens.
 
 ---
 

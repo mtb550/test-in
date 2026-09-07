@@ -5,6 +5,9 @@
 **As a** tester, **I want** one key to say a test case worked,
 **so that** walking a test run of 80 is 80 keystrokes and nothing else.
 
+One key. Testin writes the verdict, the tester's name, the time and the
+duration.
+
 `P`.
 
 ## Rules
@@ -45,6 +48,14 @@
 - **Rule-EDITOR-PANEL-140** — One test case is one message. Several at once is
   one message with a count.
 
+## What the tester sees
+
+This opens no screen. The card's verdict badge turns to **Passed**, the run
+status line follows, and the figures in the status bar move. The walk then
+selects the next test case waiting for a verdict.
+
+A small message appears at the bottom of the IDE and fades. It reads *Passed*.
+
 ## Main flow
 
 1. The walk has selected a test case and is timing it.
@@ -77,9 +88,9 @@ one, still saves it, and still says *Passed*. That is difference 19 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
 
 **An automated pass destroys a tester's notes without asking.** The confirmation
-in Rule-EDITOR-PANEL-138 is only on the keyboard path. A test case failed and
-written up by hand, then re-run by automation and passing, loses the actual
-result, the error, the severity and the priority with no dialog. That is
+in Rule-EDITOR-PANEL-138 is only on the keyboard path. A test case is failed and
+written up by hand. Automation re-runs it later and it passes. The actual
+result, the error, the severity and the priority all go, with no dialog. That is
 difference 26.
 
 ---
