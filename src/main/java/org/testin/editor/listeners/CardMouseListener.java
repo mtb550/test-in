@@ -84,9 +84,16 @@ public class CardMouseListener extends MouseAdapter {
             final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
 
             Logger.trace(action.getTooltip() + ", tc: " + tc.getDescription());
+
             // Which editor the tester clicked in. The reports that follow name
             // only the case, and a case can be in several open runs.
-            editor.launching(tc.getId());
+            //
+            // Only for the icon that starts something. Claiming stamps when
+            // execution began and moves a Created run to In Progress, and this
+            // ran for whichever icon was clicked - so the stop icon started the
+            // run it was stopping, and so did the one that only navigates to the
+            // test method (#221).
+            if (action == CardHoverAction.RUN_TEST_CASE) editor.launching(tc.getId());
 
             action.execute(p, tc);
 

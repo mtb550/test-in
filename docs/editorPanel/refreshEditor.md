@@ -16,7 +16,8 @@ There is no key for this. The button's tooltip reads **Refresh**.
   a grid cell open. A refresh Testin starts on its own leaves a busy editor
   alone.
 - **Rule-EDITOR-PANEL-118** — In a test run editor, refresh also stops the
-  execution.
+  execution, and the message says so. Refresh reads the run again from disk and
+  the walk goes with the copy it replaces.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on

@@ -236,6 +236,12 @@ public final class RunStatusService {
 
             confirmVerdict(p, status, recorded);
         }
+
+        // Whichever way the last verdict arrived. Only a walk reaching its end
+        // and an automated verdict used to ask, so judging the last pending case
+        // from the menu or the keyboard left the run In Progress - still offering
+        // to start something that had already happened (#217).
+        editor.finishIfEverythingIsJudged();
     }
 
     /**

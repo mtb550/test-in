@@ -43,6 +43,14 @@ public enum Done {
     RE_SORTED("Re-sorted"),
     REFRESHED("Refreshed"),
 
+    /**
+     * Two words because two things happened. Refresh reads the run again from
+     * disk, which throws away the one being counted, so a walk in progress ends
+     * with it - and "Refreshed" alone left the tester with a stopped clock, a
+     * Start button back and no word about why (#218).
+     */
+    REFRESHED_EXECUTION_STOPPED("Refreshed, and the execution stopped"),
+
     UNDONE("Undone"),
     REDONE("Redone"),
     REVERTED("Reverted"),

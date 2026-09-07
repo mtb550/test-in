@@ -44,16 +44,25 @@ public class RunTestCaseAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.RunTestCase.getCustomShortcut(), list);
     }
 
+    // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-148
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @NotNull List<TestCaseDto> selected = list.getSelectedValuesList();
+        final @NotNull CardHoverAction gesture = CardHoverAction.runSlot(p, selected);
 
         // Which editor the tester asked from, the same thing a click on the
         // card's run icon says. Without it a run started from the menu is a
         // report nobody claims, and the run records nothing.
-        selected.forEach(tc -> ui.launching(tc.getId()));
+        //
+        // Only on the gesture that starts something, and after asking which it
+        // is. Claiming stamps when execution began and moves a Created run to In
+        // Progress with a message, so claiming everything first made F5 - the
+        // stop gesture - start the run it was stopping (#221).
+        if (gesture == CardHoverAction.RUN_TEST_CASE) {
+            selected.forEach(tc -> ui.launching(tc.getId()));
+        }
 
-        CardHoverAction.runSlot(p, selected).execute(p, selected);
+        gesture.execute(p, selected);
     }
 
     @Override

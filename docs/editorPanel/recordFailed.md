@@ -11,8 +11,9 @@ see it, **so that** the bug report writes itself later.
 
 - **Rule-EDITOR-PANEL-141** — Failing is the one verdict that asks for detail.
   The dialog opens before the verdict is recorded.
-- **Rule-EDITOR-PANEL-142** — `Escape` in the dialog records nothing at all.
-  Neither the detail nor the verdict.
+- **Rule-EDITOR-PANEL-142** — `Escape` in the dialog records nothing at all,
+  neither the detail nor the verdict, and asks first when there is something
+  typed to lose. A dialog opened and closed unchanged still goes at once.
 - **Rule-EDITOR-PANEL-143** — Nothing is written as the tester types. Only
   saving writes.
 - **Rule-EDITOR-PANEL-144** — The dialog opens for one test case. Several at

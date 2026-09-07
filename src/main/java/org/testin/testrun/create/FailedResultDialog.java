@@ -59,6 +59,18 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-142
+    @Override
+    protected boolean holdsUnsavedInput() {
+        return fields.changedFrom(runItem);
+    }
+
+    @Override
+    protected @NotNull String unsavedInputMessage() {
+        return "The actual result, the severity, the priority and the error pasted here are not recorded yet, "
+                + "and neither is the Failed verdict. There is no copy of any of it.";
+    }
+
     @Override
     protected void submit() {
         // Applied only on save - Escape must never commit the edit.

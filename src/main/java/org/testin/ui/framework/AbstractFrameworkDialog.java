@@ -144,7 +144,39 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     // ------------------------------------------------------------------
 
     protected final void closeCancel() {
-        getPopup().cancel();
+        if (!holdsUnsavedInput()) {
+            getPopup().cancel();
+            return;
+        }
+
+        new ConfirmDialog(p, "Discard what you typed?", unsavedInputMessage(), "", "", "Discard",
+                () -> getPopup().cancel()).show();
+    }
+
+    /**
+     * Whether this dialog is holding something the tester typed that closing
+     * would throw away.
+     * <p>
+     * False for a dialog that shows rather than collects, and for one whose
+     * fields are still exactly as they opened - so Escape stays instant
+     * everywhere it costs nothing, and only asks where there is something to
+     * lose (#223).
+     * <p>
+     * Asked here rather than by each dialog wiring its own Escape, so every
+     * dialog built on the framework gets the question the moment it can answer
+     * it, and none of them can word the asking differently.
+     */
+    protected boolean holdsUnsavedInput() {
+        return false;
+    }
+
+    /**
+     * What is about to go, named in the tester's own words rather than in
+     * fields. Overridden beside {@link #holdsUnsavedInput}, because a dialog
+     * that knows it has something to lose is the only thing that knows what.
+     */
+    protected @NotNull String unsavedInputMessage() {
+        return "What you typed here has not been saved, and there is no copy of it anywhere else.";
     }
 
     protected final @NotNull JBPopup getPopup() {

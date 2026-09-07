@@ -429,13 +429,20 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 }).show());
     }
 
+    // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-118
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
 
+        // Asked before the reload, because the reload is what ends it. Refresh
+        // reads the run again from disk and the walk goes with the old copy, so
+        // the message has to carry both (#218).
+        final boolean wasExecuting = isExecuting();
+
         // Said when the run is back on screen, not when the button went down -
         // the read waits for indexing and finishes on another thread (#62).
-        reload(() -> Services.getInstance(p, Notifier.class).softShow(p, Done.REFRESHED));
+        reload(() -> Services.getInstance(p, Notifier.class)
+                .softShow(p, wasExecuting ? Done.REFRESHED_EXECUTION_STOPPED : Done.REFRESHED));
     }
 
 
@@ -1146,7 +1153,14 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * A run already signed off is left alone: the report that reached this was
      * refused above.
      */
-    private void finishIfEverythingIsJudged() {
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132
+    public void finishIfEverythingIsJudged() {
+        // A run already signed off is left alone. The guard is here rather than
+        // at the call sites because there are now five of them - the end of a
+        // walk, an automated verdict, and the three ways a tester records one by
+        // hand - and a run completed twice says Completed twice (#217).
+        if (parent.getMarker().getStatus().isTerminal()) return;
+
         if (run().filter(TestRunDto::isFullyJudged).isEmpty()) return;
 
         Services.getInstance(p, TestRunStatusChange.class).apply(this, TestRunStatus.COMPLETED);

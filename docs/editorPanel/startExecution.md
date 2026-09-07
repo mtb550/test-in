@@ -20,7 +20,8 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
   walk is going.
 - **Rule-EDITOR-PANEL-132** — Reaching the end of the list ends the walk, and
   nothing more. The test run is marked **Completed** only when every test case
-  in it has been judged, which is asked of the test run and not of the walk.
+  in it has been judged, which is asked of the test run and not of the walk -
+  and asked wherever a verdict is recorded, whichever way the last one arrived.
 - **Rule-EDITOR-PANEL-133** — Start is offered only when there is something to
   walk. A test run holding no test cases, a filter that matches nothing, and a
   list whose test cases have all been judged are the same thing to the walk: all

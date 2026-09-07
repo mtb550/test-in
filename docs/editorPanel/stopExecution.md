@@ -11,7 +11,9 @@ There is no key for this. The button's tooltip reads **Stop Execution**.
 ## Rules
 
 - **Rule-EDITOR-PANEL-147** — Stopping writes the test run to disk as it stands.
-- **Rule-EDITOR-PANEL-148** — Stopping changes no verdict already recorded.
+- **Rule-EDITOR-PANEL-148** — Stopping changes no verdict already recorded, and
+  no status either. Only a gesture that starts something stamps when execution
+  began or moves a test run to **In Progress**.
 - **Rule-EDITOR-PANEL-149** — Stopping stamps when execution ended. That stamp
   is written again by every stop.
 - **Rule-EDITOR-PANEL-150** — The tester's own stop ends any automation this
