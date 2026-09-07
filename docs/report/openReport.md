@@ -9,14 +9,20 @@ There is no key for this. The link is on the message.
 
 ## Rules
 
+- **Rule-REPORT-001** — A report is about exactly one test run.
+- **Rule-REPORT-002** — Every format reads the same figures, so two reports on
+  one test run cannot disagree.
+- **Rule-REPORT-003** — A report is written after the dialog closes, under a
+  progress bar that cannot be canceled.
+- **Rule-REPORT-004** — A report is written where the tester chose. It never
+  lands under the Testin folder.
+- **Rule-REPORT-005** — The project named in a report is the test project, not
+  the code project the IDE has open.
 - **Rule-REPORT-010** — The link is on the message that says the report was
   written, and the message stays in the IDE's notification list.
 - **Rule-REPORT-011** — Clicking the link makes the message go.
 - **Rule-REPORT-012** — The file is handed to whatever application on this
   machine claims it.
-
-Rule-REPORT-001 to Rule-REPORT-005 hold everywhere. They are on
-[their own page](rules.md).
 
 ## Main flow
 

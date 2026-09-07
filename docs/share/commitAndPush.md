@@ -9,15 +9,23 @@ There is no key for this. **Commit & Push** is the face of the split button.
 
 ## Rules
 
+- **Rule-SHARE-001** — An export never changes any test case. It only reads.
+- **Rule-SHARE-002** — An import never overwrites an existing test case. Every
+  imported test case is new.
+- **Rule-SHARE-003** — A sync sends and takes in one gesture, so a sync that
+  succeeded never leaves the tester's work only on this machine.
+- **Rule-SHARE-004** — A password is never written to a file Testin writes, and
+  never to the log.
+- **Rule-SHARE-005** — Long work runs under a progress bar. The Git ones can be
+  canceled. The export, import and report ones cannot.
+- **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
+  keys can be changed there.
 - **Rule-SHARE-059** — The push happens only after the commit succeeded.
 - **Rule-SHARE-060** — A repository with no remote asks for one, once.
 - **Rule-SHARE-061** — The message about a push stays in the IDE's notification
   list, because a push finishes on its own time.
 - **Rule-SHARE-062** — Any password inside the remote address is taken out of
   anything Testin shows or logs.
-
-Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[their own page](rules.md).
 
 ## Main flow
 

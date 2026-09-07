@@ -9,6 +9,17 @@ There is no key for this. The same **Export** entry, on a package.
 
 ## Rules
 
+- **Rule-SHARE-001** — An export never changes any test case. It only reads.
+- **Rule-SHARE-002** — An import never overwrites an existing test case. Every
+  imported test case is new.
+- **Rule-SHARE-003** — A sync sends and takes in one gesture, so a sync that
+  succeeded never leaves the tester's work only on this machine.
+- **Rule-SHARE-004** — A password is never written to a file Testin writes, and
+  never to the log.
+- **Rule-SHARE-005** — Long work runs under a progress bar. The Git ones can be
+  canceled. The export, import and report ones cannot.
+- **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
+  keys can be changed there.
 - **Rule-SHARE-013** — Every test set beneath the package becomes one sheet,
   however deep it sits. A sheet takes the test set's own name, and the name of
   the package above it as well when two would otherwise read the same.
@@ -17,9 +28,6 @@ There is no key for this. The same **Export** entry, on a package.
   export is written, and the tester decides whether to send it anyway.
 - **Rule-SHARE-016** — Two sheets that would take the same name are numbered.
   The first keeps the name, and the rest get a number in brackets.
-
-Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[their own page](rules.md).
 
 ## Main flow
 

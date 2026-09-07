@@ -9,6 +9,17 @@ There is no key for this. The table is in the import dialog.
 
 ## Rules
 
+- **Rule-SHARE-001** — An export never changes any test case. It only reads.
+- **Rule-SHARE-002** — An import never overwrites an existing test case. Every
+  imported test case is new.
+- **Rule-SHARE-003** — A sync sends and takes in one gesture, so a sync that
+  succeeded never leaves the tester's work only on this machine.
+- **Rule-SHARE-004** — A password is never written to a file Testin writes, and
+  never to the log.
+- **Rule-SHARE-005** — Long work runs under a progress bar. The Git ones can be
+  canceled. The export, import and report ones cannot.
+- **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
+  keys can be changed there.
 - **Rule-SHARE-034** — The table holds the 13 columns that can be imported, not
   the 17 that can be exported.
 - **Rule-SHARE-035** — The table is empty until a file is chosen.
@@ -17,9 +28,6 @@ There is no key for this. The table is in the import dialog.
   were written before it did. They are still there.
 - **Rule-SHARE-038** — A correction made here changes what is written, and the
   file on disk is never touched.
-
-Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[their own page](rules.md).
 
 ## Main flow
 

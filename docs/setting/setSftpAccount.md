@@ -9,15 +9,22 @@ There is no key for this. It is the **SFTP account** row.
 
 ## Rules
 
+- **Rule-SETTING-001** — One page for the whole IDE. Every code project open in
+  it reads the same values.
+- **Rule-SETTING-002** — Nothing on this page is checked. A folder that does not
+  exist is stored exactly as typed.
+- **Rule-SETTING-003** — Nothing on this page raises a message when it is saved.
+- **Rule-SETTING-004** — Only a changed Testin folder makes Testin read the disk
+  again. Every other setting is read where it is used, when it is used.
+- **Rule-SETTING-005** — A password is never on this page. It is asked for when
+  it is needed and kept in the IDE's password store.
+- **Rule-SETTING-006** — Nothing on this page has a key of its own.
 - **Rule-SETTING-031** — The account belongs to this machine and this person. It
   is never written into the file the team shares.
 - **Rule-SETTING-032** — An empty account means the tester has not said. The
   sync then asks.
 - **Rule-SETTING-033** — The sync can write this row too, so a tester who
   answers the sync's question never has to visit this page.
-
-Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
-[their own page](rules.md).
 
 ## Main flow
 

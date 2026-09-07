@@ -47,6 +47,11 @@ the marker needs nothing else to be findable. It was not always so: rules were
 bare numbers until 7 September 2026, and there were eight different Rule44s. A
 marker still reading `Rule44` is from before that and names nothing.
 
+**A rule that holds for a whole part is written on every page in it**, first in
+the list and in number order, then that page's own. No page sends the reader
+elsewhere for half its rules. Reword such a rule and every copy has to be
+reworded - `RuleNumbersTest` fails when one number is written two ways.
+
 **A new rule takes the next number, and nothing else moves.** Read the
 **Numbering** row of that part's `main.md`, take the number after the end of its
 rule range, write the rule where it belongs on its page, and move the row on. No
@@ -104,9 +109,8 @@ rule that cannot be written in one plain sentence is usually a sign the design
 is wrong. Three of the six critical defects found in September 2026 were code
 that contradicted a rule the codebase had already written down somewhere else.
 
-If the behavior is genuinely new, add the rule to the page that keeps it - the
-use case page, or that part's `rules.md` when it holds everywhere - and give it
-the next number after that part's last - the **Numbering** row of its `main.md`
+If the behavior is genuinely new, add the rule to the use case page it governs
+and give it the next number after that part's last - the **Numbering** row of its `main.md`
 says what that is. Move the row on in the same commit, and cite the rule from
 the code. Never renumber a rule that already exists.
 

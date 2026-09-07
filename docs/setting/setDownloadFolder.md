@@ -9,15 +9,22 @@ There is no key for this. It is the **Default download folder** row.
 
 ## Rules
 
+- **Rule-SETTING-001** — One page for the whole IDE. Every code project open in
+  it reads the same values.
+- **Rule-SETTING-002** — Nothing on this page is checked. A folder that does not
+  exist is stored exactly as typed.
+- **Rule-SETTING-003** — Nothing on this page raises a message when it is saved.
+- **Rule-SETTING-004** — Only a changed Testin folder makes Testin read the disk
+  again. Every other setting is read where it is used, when it is used.
+- **Rule-SETTING-005** — A password is never on this page. It is asked for when
+  it is needed and kept in the IDE's password store.
+- **Rule-SETTING-006** — Nothing on this page has a key of its own.
 - **Rule-SETTING-021** — The folder is where saving a report, saving an export
   and choosing a file to import all start.
 - **Rule-SETTING-022** — It is a starting point, not a rule. The tester can save
   anywhere from any of those dialogs.
 - **Rule-SETTING-023** — This page is not the only place the folder is set. The
   import and export dialogs can set it too.
-
-Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
-[their own page](rules.md).
 
 ## The screen
 

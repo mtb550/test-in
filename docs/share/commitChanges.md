@@ -9,6 +9,17 @@ There is no key for this. **Commit** is behind the arrow of the split button.
 
 ## Rules
 
+- **Rule-SHARE-001** — An export never changes any test case. It only reads.
+- **Rule-SHARE-002** — An import never overwrites an existing test case. Every
+  imported test case is new.
+- **Rule-SHARE-003** — A sync sends and takes in one gesture, so a sync that
+  succeeded never leaves the tester's work only on this machine.
+- **Rule-SHARE-004** — A password is never written to a file Testin writes, and
+  never to the log.
+- **Rule-SHARE-005** — Long work runs under a progress bar. The Git ones can be
+  canceled. The export, import and report ones cannot.
+- **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
+  keys can be changed there.
 - **Rule-SHARE-054** — The marker files above every committed test case are
   committed too, whether they were ticked or not.
 - **Rule-SHARE-055** — Only a path that is really on disk is added. A path that
@@ -18,9 +29,6 @@ There is no key for this. **Commit** is behind the arrow of the split button.
   the log or shown.
 - **Rule-SHARE-058** — The list of paths reaches Git in a file, not on the
   command line, so a very large commit does not fail for length.
-
-Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[their own page](rules.md).
 
 ## Main flow
 

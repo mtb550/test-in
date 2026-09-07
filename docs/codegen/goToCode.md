@@ -9,13 +9,22 @@ at, **so that** I can read or change what the automation really does.
 
 ## Rules
 
+- **Rule-CODEGEN-001** — A method is found by the identity in `testName`, never
+  by its name. Renaming a test case never loses its method.
+- **Rule-CODEGEN-002** — A test case with no description gets no method. A
+  description is what names a method.
+- **Rule-CODEGEN-003** — Testin writes only the parts listed above. The body is
+  the tester's, and Testin never touches it.
+- **Rule-CODEGEN-004** — A rename or a move happens before the tree changes,
+  while the old name still finds the code.
+- **Rule-CODEGEN-005** — Test management works without any of this. A missing
+  Java plugin or a missing test folder is a skip, never a failure.
+- **Rule-CODEGEN-006** — Nearly everything that goes wrong here is written only
+  to the log.
 - **Rule-CODEGEN-026** — The method is found by the identity in `testName`, so a
   test case that has been renamed still finds its method.
 - **Rule-CODEGEN-027** — Without the Java plugin the gesture is not offered at
   all.
-
-Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[their own page](rules.md).
 
 ## The three ways in
 

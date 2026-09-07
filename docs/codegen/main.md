@@ -99,12 +99,6 @@ For a test set, one class holding those methods. For a package, a folder.
 
 ---
 
-## Rules that hold everywhere
-
-They are on [their own page](rules.md), because they hold for the whole part
-rather than for any one use case.
-
----
 
 ## Every key
 

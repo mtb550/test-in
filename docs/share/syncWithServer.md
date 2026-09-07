@@ -10,6 +10,17 @@ There is no key for this. The menu entry is **Sync With SFTP**.
 
 ## Rules
 
+- **Rule-SHARE-001** — An export never changes any test case. It only reads.
+- **Rule-SHARE-002** — An import never overwrites an existing test case. Every
+  imported test case is new.
+- **Rule-SHARE-003** — A sync sends and takes in one gesture, so a sync that
+  succeeded never leaves the tester's work only on this machine.
+- **Rule-SHARE-004** — A password is never written to a file Testin writes, and
+  never to the log.
+- **Rule-SHARE-005** — Long work runs under a progress bar. The Git ones can be
+  canceled. The export, import and report ones cannot.
+- **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
+  keys can be changed there.
 - **Rule-SHARE-085** — The server's address comes from `testin.yml`, which the
   team shares. The account comes from this machine's settings.
 - **Rule-SHARE-086** — An account is never written into the shared file. If one
@@ -23,9 +34,6 @@ There is no key for this. The menu entry is **Sync With SFTP**.
   nothing is sent for it.
 - **Rule-SHARE-091** — Testin reads the test project again itself after a sync,
   because it ignores its own writes.
-
-Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[their own page](rules.md).
 
 ## The screen
 

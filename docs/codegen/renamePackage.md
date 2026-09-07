@@ -10,15 +10,24 @@ There is no key for this. It happens when a package is renamed or moved.
 
 ## Rules
 
+- **Rule-CODEGEN-001** — A method is found by the identity in `testName`, never
+  by its name. Renaming a test case never loses its method.
+- **Rule-CODEGEN-002** — A test case with no description gets no method. A
+  description is what names a method.
+- **Rule-CODEGEN-003** — Testin writes only the parts listed above. The body is
+  the tester's, and Testin never touches it.
+- **Rule-CODEGEN-004** — A rename or a move happens before the tree changes,
+  while the old name still finds the code.
+- **Rule-CODEGEN-005** — Test management works without any of this. A missing
+  Java plugin or a missing test folder is a skip, never a failure.
+- **Rule-CODEGEN-006** — Nearly everything that goes wrong here is written only
+  to the log.
 - **Rule-CODEGEN-056** — Renaming a package renames its folder, then rewrites
   the package line in every Java file beneath it.
 - **Rule-CODEGEN-057** — Moving a package does the same, after moving the
   folder.
 - **Rule-CODEGEN-058** — A package dropped into itself is not a move, and
   nothing is rewritten.
-
-Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[their own page](rules.md).
 
 ## What this covers
 

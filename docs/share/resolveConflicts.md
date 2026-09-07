@@ -9,6 +9,17 @@ There is no key for this. The offer appears on the message.
 
 ## Rules
 
+- **Rule-SHARE-001** — An export never changes any test case. It only reads.
+- **Rule-SHARE-002** — An import never overwrites an existing test case. Every
+  imported test case is new.
+- **Rule-SHARE-003** — A sync sends and takes in one gesture, so a sync that
+  succeeded never leaves the tester's work only on this machine.
+- **Rule-SHARE-004** — A password is never written to a file Testin writes, and
+  never to the log.
+- **Rule-SHARE-005** — Long work runs under a progress bar. The Git ones can be
+  canceled. The export, import and report ones cannot.
+- **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
+  keys can be changed there.
 - **Rule-SHARE-074** — A merged test case Git will not stage is reported to the
   tester, with what to do about it. The sync cannot go on without it.
 
@@ -21,9 +32,6 @@ There is no key for this. The offer appears on the message.
 - **Rule-SHARE-078** — Where both sides changed different fields of one test
   case, Testin merges them and asks only about the fields that really disagree.
 - **Rule-SHARE-079** — A pull that will not move on is reported only to the log.
-
-Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[their own page](rules.md).
 
 ## Main flow
 

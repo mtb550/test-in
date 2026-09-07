@@ -10,13 +10,22 @@ There is no key for this. It happens when a test set is renamed, which is
 
 ## Rules
 
+- **Rule-CODEGEN-001** — A method is found by the identity in `testName`, never
+  by its name. Renaming a test case never loses its method.
+- **Rule-CODEGEN-002** — A test case with no description gets no method. A
+  description is what names a method.
+- **Rule-CODEGEN-003** — Testin writes only the parts listed above. The body is
+  the tester's, and Testin never touches it.
+- **Rule-CODEGEN-004** — A rename or a move happens before the tree changes,
+  while the old name still finds the code.
+- **Rule-CODEGEN-005** — Test management works without any of this. A missing
+  Java plugin or a missing test folder is a skip, never a failure.
+- **Rule-CODEGEN-006** — Nearly everything that goes wrong here is written only
+  to the log.
 - **Rule-CODEGEN-051** — The class is renamed before the test set is, while the
   old name still finds it.
 - **Rule-CODEGEN-052** — The new class name is the new test set name cleaned,
   with `Test` on the end.
-
-Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[their own page](rules.md).
 
 ## Main flow
 

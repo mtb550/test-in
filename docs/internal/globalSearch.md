@@ -21,8 +21,8 @@ and jump to it, **so that** a large tree is never a place to scroll.
 - **Rule-INTERNAL-002** — Choosing a result always takes the tree to it. Only a
   test set and a test run open an editor.
 
-The rules that hold everywhere in the tree panel do not govern this dialog.
-It opens from anywhere in the IDE, and the tree is only where it lands.
+The tree panel's own rules do not govern this dialog. It opens from anywhere in
+the IDE, and the tree is only where it lands.
 
 ## The Search Test Project dialog
 

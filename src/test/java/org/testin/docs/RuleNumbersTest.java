@@ -21,13 +21,19 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 /**
- * A rule number is a name, and a name has to belong to one thing.
+ * A rule number is a name, and everything wearing it says the same thing.
  * <p>
- * Rules are numbered per part and a new one takes the number after that part's
- * last, so the only way the numbering can go wrong is a collision: two rules
- * given the same number because whoever wrote the second one read the wrong
- * last number. That happened on 7 September 2026, an hour after the scheme was
- * settled, and the audit that caught it was a script nobody would run again.
+ * A rule that holds for a whole part is written out on every page in it, so one
+ * number is written many times on purpose - which buys a page that can be read
+ * on its own, and costs the risk that two copies drift apart. Reword one and
+ * forget the rest and the pages quietly start telling a tester different things
+ * about the same rule. Nothing but this notices.
+ * <p>
+ * The other way the numbering goes wrong is a collision: two different rules
+ * given one number, because whoever wrote the second read the wrong last
+ * number. That happened on 7 September 2026, an hour after the scheme was
+ * settled, and what caught it was a script nobody would have run again. Both
+ * failures look the same from here - one number, two texts.
  * <p>
  * Written as a scan of the documents for the reason
  * {@code GridEditConfirmationTest} gives: what has to hold is a rule about the
@@ -40,11 +46,15 @@ public class RuleNumbersTest {
     private static final Path SOURCES = Paths.get("src", "main", "java");
 
     /**
-     * A rule being defined: the bullet that states it, on the page that owns it.
-     * Only in a part's own folder - the standard shows the form in a template,
-     * and the product page quotes numbers it does not define.
+     * A rule being written out: the bullet that states it, and the words that
+     * follow up to the next rule or the end of the list.
+     * <p>
+     * Only inside a part's own folder - the standard shows the form in a
+     * template, and the product page quotes numbers it does not write.
      */
-    private static final Pattern DEFINITION = Pattern.compile("^\\s*-\\s+\\*\\*Rule-([A-Z][A-Z-]*)-(\\d+)\\*\\*", Pattern.MULTILINE);
+    private static final Pattern DEFINITION = Pattern.compile(
+            "^\\s*-\\s+\\*\\*Rule-([A-Z][A-Z-]*)-(\\d+)\\*\\*(.*?)(?=\\r?\\n\\s*-\\s+\\*\\*Rule-|\\r?\\n\\r?\\n|$)",
+            Pattern.MULTILINE | Pattern.DOTALL);
 
     /**
      * A rule being named, anywhere at all.
@@ -58,29 +68,36 @@ public class RuleNumbersTest {
     private static final Pattern RANGE = Pattern.compile("Rules are `Rule-([A-Z][A-Z-]*)-\\d+` to `Rule-[A-Z][A-Z-]*-(\\d+)`");
 
     @Test
-    public void everyRuleNumberIsUsedOnce() {
-        final Map<String, Map<Integer, List<String>>> byPart = definitions();
+    public void everyCopyOfARuleSaysTheSameThing() {
+        final Map<String, Map<Integer, Map<String, List<String>>>> byPart = definitions();
 
-        final List<String> clashes = new ArrayList<>();
-        byPart.forEach((part, numbers) -> numbers.forEach((number, pages) -> {
-            if (pages.size() > 1) clashes.add(String.format("Rule-%s-%03d is defined in %s", part, number, pages));
+        final List<String> disagreements = new ArrayList<>();
+        byPart.forEach((part, numbers) -> numbers.forEach((number, texts) -> {
+            if (texts.size() == 1) return;
+
+            final StringBuilder said = new StringBuilder(
+                    String.format("Rule-%s-%03d is written %d different ways:", part, number, texts.size()));
+            texts.forEach((text, pages) -> said.append("\n      on ").append(pages).append(": ").append(text));
+
+            disagreements.add(said.toString());
         }));
 
-        if (!clashes.isEmpty()) {
-            fail("A rule number names one rule. These name more than one, so a marker in the code, "
-                    + "an issue and a commit all point at two things at once:\n  " + String.join("\n  ", clashes));
+        if (!disagreements.isEmpty()) {
+            fail("A rule that holds for a whole part is written out on every page in it, and every copy "
+                    + "has to say the same thing - a page that disagrees is a page telling a tester "
+                    + "something no other page says:\n  " + String.join("\n  ", disagreements));
         }
     }
 
     /**
      * The row a writer reads to pick the next number has to be the truth, or the
-     * next rule collides with the last one.
+     * next rule takes a number that is already taken.
      */
     @Test
     public void everyPartSaysItsLastNumber() {
-        final Map<String, Map<Integer, List<String>>> byPart = definitions();
+        final Map<String, Map<Integer, Map<String, List<String>>>> byPart = definitions();
 
-        for (final Map.Entry<String, Map<Integer, List<String>>> part : byPart.entrySet()) {
+        for (final Map.Entry<String, Map<Integer, Map<String, List<String>>>> part : byPart.entrySet()) {
             final Path main = partFolder(part.getKey()).resolve("main.md");
             final Matcher claimed = RANGE.matcher(read(main));
 
@@ -99,42 +116,53 @@ public class RuleNumbersTest {
      */
     @Test
     public void everyRuleTheCodeCitesExists() {
-        final Set<String> defined = new LinkedHashSet<>();
+        final Set<String> written = new LinkedHashSet<>();
         definitions().forEach((part, numbers) ->
-                numbers.keySet().forEach(number -> defined.add(String.format("Rule-%s-%03d", part, number))));
+                numbers.keySet().forEach(number -> written.add(String.format("Rule-%s-%03d", part, number))));
 
         final List<String> dangling = new ArrayList<>();
         for (final Path source : javaFiles()) {
             final Matcher cited = REFERENCE.matcher(read(source));
 
             while (cited.find()) {
-                if (!defined.contains(cited.group())) dangling.add(cited.group() + " in " + source.getFileName());
+                if (!written.contains(cited.group())) dangling.add(cited.group() + " in " + source.getFileName());
             }
         }
 
         if (!dangling.isEmpty()) {
-            fail("These markers name rules no document defines:\n  " + String.join("\n  ", dangling));
+            fail("These markers name rules no document writes:\n  " + String.join("\n  ", dangling));
         }
     }
 
     /**
-     * Every rule the documents define, by part and number, remembering which
-     * pages defined it so a clash can name them.
+     * Every rule the documents write out, by part, then number, then the words
+     * used - remembering which pages used each wording, so a disagreement can
+     * name both sides of it.
      */
-    private static Map<String, Map<Integer, List<String>>> definitions() {
-        final Map<String, Map<Integer, List<String>>> byPart = new TreeMap<>();
+    private static Map<String, Map<Integer, Map<String, List<String>>>> definitions() {
+        final Map<String, Map<Integer, Map<String, List<String>>>> byPart = new TreeMap<>();
 
         for (final Path page : partPages()) {
-            final Matcher defined = DEFINITION.matcher(read(page));
+            final Matcher written = DEFINITION.matcher(read(page));
 
-            while (defined.find()) {
-                byPart.computeIfAbsent(defined.group(1), part -> new TreeMap<>())
-                        .computeIfAbsent(Integer.parseInt(defined.group(2)), number -> new ArrayList<>())
+            while (written.find()) {
+                byPart.computeIfAbsent(written.group(1), part -> new TreeMap<>())
+                        .computeIfAbsent(Integer.parseInt(written.group(2)), number -> new LinkedHashMap<>())
+                        .computeIfAbsent(oneLine(written.group(3)), words -> new ArrayList<>())
                         .add(page.getFileName().toString());
             }
         }
 
         return byPart;
+    }
+
+    /**
+     * A rule's words on one line, so the same rule wrapped differently on two
+     * pages is one wording rather than two - and so a disagreement can be read
+     * in the failure rather than diffed by hand.
+     */
+    private static String oneLine(final String text) {
+        return text.replaceAll("\\s+", " ").trim();
     }
 
     /**

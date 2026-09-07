@@ -23,7 +23,6 @@ tester does: `createTestProject.md`.
 | **What the part is for** | Why it exists, in a few sentences |
 | **The words it uses** | Any word the rules lean on, explained before they use it |
 | **How to read these pages** | The shape of a use case page, and what the marks in the drawings stand for |
-| **The rules that hold everywhere** | A link to `rules.md`, which holds them. No rule is written in `main.md` |
 | **Every key, in one place** | One table: the key, what it does, and the page that owns it |
 | **The screens that belong to no single use case** | The panel, or the window itself, drawn |
 | **Why it is built this way** | The decisions worth not re-arguing |
@@ -35,7 +34,7 @@ tester does: `createTestProject.md`.
 | In this order | Holds |
 |---|---|
 | **The story** | One sentence: as a tester, I want, so that |
-| **Rules** | The numbered rules this use case needs, and a line pointing at the ones that hold everywhere |
+| **Rules** | Every rule this use case answers to, written out. The ones that hold for the whole part first, then its own |
 | **The screens** | Each one drawn, with its parts numbered |
 | **Main flow** | What happens, step by step, when nothing goes wrong |
 | **What Testin refuses** | Every way it can go wrong, and what the tester sees each time |
@@ -131,11 +130,20 @@ later reads 47, 48, 49 and then 194, and that is the numbering working rather
 than failing - 194 is a rule written after the first 193 and says so. The page
 is the order to read them in; the number is only how to find one.
 
-**Every rule lives on the page it belongs to, and `main.md` holds none.** The
-ones that hold for a whole part are on that part's `rules.md`; the rest are on
-the use case page that keeps them. A page owns its own rules, so writing one
-means opening one file - and `main.md`, which every page links to, stops being a
-file that changes whenever a rule is written.
+**Every rule is written on the page it governs, and `main.md` holds none.** A
+use case page carries every rule that page answers to: the ones that hold for
+the whole part first, in number order, then the ones that are its own. Nothing
+sends the reader somewhere else for half of them, and no page says a rule holds
+"everywhere" - it either governs this use case, in which case it is written
+here, or it does not.
+
+**Which means a rule that holds for a whole part is written on every page in
+it.** That is the cost, and it is deliberate: a page is read on its own, by a
+tester who wants to know what Testin will do, and half a list is worse than a
+long one. What it buys has to be paid for at the other end - reword such a rule
+and every copy has to be reworded, or the pages quietly start saying different
+things. `RuleNumbersTest` is what stops that: it fails when one number is
+written two different ways.
 
 **Each part's page says its last number.** The **Numbering** row of every
 `main.md` gives the range that part's use cases and rules cover, so the next rule
@@ -169,11 +177,10 @@ nobody has written, the rule is written first.
 
 ## Rules
 
-- **Rule-TREE-PANEL-016** — …
+- **Rule-TREE-PANEL-001** — … (the first of the ones that hold for the panel)
+- **Rule-TREE-PANEL-013** — … (the last of them)
+- **Rule-TREE-PANEL-016** — … (this use case's own)
 - **Rule-TREE-PANEL-017** — …
-
-Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
-are on [their own page](rules.md).
 
 ## The create dialog
 

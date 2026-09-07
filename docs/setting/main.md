@@ -64,12 +64,6 @@ The two are kept apart on purpose, and the reason is who they belong to.
 
 ---
 
-## Rules that hold everywhere on the page
-
-They are on [their own page](rules.md), because they hold for the whole part
-rather than for any one use case.
-
----
 
 ## The page
 

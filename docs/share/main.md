@@ -81,12 +81,6 @@ uses. The settings page holds this machine's half of it.
 
 ---
 
-## Rules that hold everywhere
-
-They are on [their own page](rules.md), because they hold for the whole part
-rather than for any one use case.
-
----
 
 ## Every key
 

@@ -46,12 +46,6 @@ a ticket, mailed to a manager, or kept as the record that a release was tested.
 
 ---
 
-## Rules that hold everywhere
-
-They are on [their own page](rules.md), because they hold for the whole part
-rather than for any one use case.
-
----
 
 ## Every key
 

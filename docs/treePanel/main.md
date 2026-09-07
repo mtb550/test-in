@@ -159,12 +159,6 @@ it. In every drawing:
 
 ---
 
-## Rules that hold everywhere in the panel
-
-They are on [their own page](rules.md), because they hold for the whole part
-rather than for any one use case.
-
----
 
 ## Every key the tree answers to
 

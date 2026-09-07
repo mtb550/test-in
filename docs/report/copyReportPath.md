@@ -9,13 +9,19 @@ There is no key for this. The link is on the message.
 
 ## Rules
 
+- **Rule-REPORT-001** — A report is about exactly one test run.
+- **Rule-REPORT-002** — Every format reads the same figures, so two reports on
+  one test run cannot disagree.
+- **Rule-REPORT-003** — A report is written after the dialog closes, under a
+  progress bar that cannot be canceled.
+- **Rule-REPORT-004** — A report is written where the tester chose. It never
+  lands under the Testin folder.
+- **Rule-REPORT-005** — The project named in a report is the test project, not
+  the code project the IDE has open.
 - **Rule-REPORT-013** — The whole path is copied, not the file name.
 - **Rule-REPORT-014** — Clicking the link makes the message go.
 - **Rule-REPORT-015** — The same link is offered on every message about a file
   Testin wrote, so the gesture is the same for a report and for an export.
-
-Rule-REPORT-001 to Rule-REPORT-005 hold everywhere. They are on
-[their own page](rules.md).
 
 ## Main flow
 

@@ -10,6 +10,17 @@ uncommitted work.
 
 ## Rules
 
+- **Rule-SHARE-001** — An export never changes any test case. It only reads.
+- **Rule-SHARE-002** — An import never overwrites an existing test case. Every
+  imported test case is new.
+- **Rule-SHARE-003** — A sync sends and takes in one gesture, so a sync that
+  succeeded never leaves the tester's work only on this machine.
+- **Rule-SHARE-004** — A password is never written to a file Testin writes, and
+  never to the log.
+- **Rule-SHARE-005** — Long work runs under a progress bar. The Git ones can be
+  canceled. The export, import and report ones cannot.
+- **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
+  keys can be changed there.
 - **Rule-SHARE-044** — The review reads Git directly, so a repository the IDE
   does not track and a test case Git has never seen both appear.
 - **Rule-SHARE-045** — One row for each changed **field**, not one for each
@@ -22,9 +33,6 @@ uncommitted work.
 - **Rule-SHARE-049** — Every row arrives selected.
 - **Rule-SHARE-050** — Reading Git happens off the main thread, so the IDE stays
   usable.
-
-Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[their own page](rules.md).
 
 ## The screen
 
