@@ -29,15 +29,20 @@ There is no key for this. It happens when test cases are reordered, which is
   annotation's `priority`.
 - **Rule-CODEGEN-044** — A test case with no method is skipped without a word,
   because the sweep touches every test case in the set.
+- **Rule-CODEGEN-067** — The generated methods are put in the same order as the
+  test cases, so a class read top to bottom is the test set read top to bottom.
+  Only the methods Testin wrote are moved, and one already in place is left
+  where it is.
 
 ## Main flow
 
 1. The tester drags a test case to the top of its test set.
 2. Testin rewrites the order of the test cases themselves.
-3. Testin then walks every test case in that test set.
+3. Testin then walks every test case in that test set, in one pass.
 4. For each one that has a method, Testin writes its new position into
-   `priority`.
-5. A test run of that whole test set now executes in the tester's order.
+   `priority` and moves the method after the one before it.
+5. A test run of that whole test set now executes in the tester's order, and the
+   class reads in it.
 
 ## What Testin refuses
 

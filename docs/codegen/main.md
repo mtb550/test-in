@@ -10,7 +10,7 @@ test case they came from.
 |---|---|
 | **Part of Testin** | Automation code and the gutter |
 | **Answers** | What Testin writes into the code, when it rewrites it, and what a tester sees when it cannot |
-| **Numbering** | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-020`. Rules are `Rule-CODEGEN-001` to `Rule-CODEGEN-066` |
+| **Numbering** | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-020`. Rules are `Rule-CODEGEN-001` to `Rule-CODEGEN-067` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
