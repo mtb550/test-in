@@ -145,6 +145,14 @@ and every copy has to be reworded, or the pages quietly start saying different
 things. `RuleNumbersTest` is what stops that: it fails when one number is
 written two different ways.
 
+**Do not type the copies.** `tools/add-rule.ps1` writes a new rule onto every
+page it governs, takes the number after the part's last, and moves the Numbering
+row on. It works out which rules are shared by reading which ones every page in
+the part carries, so there is no list of them to go stale.
+
+    ./tools/add-rule.ps1 -Part treePanel -Everywhere -Text "..."
+    ./tools/add-rule.ps1 -Part editorPanel -Page editGridCell.md -Text "..." 
+
 **Each part's page says its last number.** The **Numbering** row of every
 `main.md` gives the range that part's use cases and rules cover, so the next rule
 is the number after the end of it and nobody reads the whole part to find out.

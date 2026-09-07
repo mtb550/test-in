@@ -9,8 +9,8 @@
 | | |
 |---|---|
 | **Part of Testin** | All of it. These rules hold everywhere. Each part also has a document of its own, listed on [the home page](README.md) |
-| **Numbering** | These rules belong to no single part of Testin, so they are the one set that holds everywhere. Section 7 is missing its numbers, which is explained there |
-| **Rule numbers** | Written as bare numbers, from before a rule carried its part. Every other document now writes `Rule-TREE-PANEL-004` and up, as [the standard](standard.md) sets out. These are left alone because six of them point at nothing already, and naming a part for them would be a guess. Restoring them is part of [#72](https://github.com/mtb550/test-in/issues/72) |
+| **What the numbers mean** | These rules belong to no single part of Testin, so `PRODUCT` is their part. Nine rules are still missing their text, which is explained in section 7 |
+| **Numbering** | Rules are `Rule-PRODUCT-001` to `Rule-PRODUCT-024`. This document names no use cases of its own; every one belongs to a part |
 | **Answers** | Who uses Testin, what they work with, every status, the rules for the whole product, and what is undecided |
 | **State** | **Draft 1** — moved from Notion, not re-checked. Correcting it is [#72](https://github.com/mtb550/test-in/issues/72) |
 | **Checked against** | `main` at `0becc8b2`, 29 August 2026 |
@@ -101,8 +101,9 @@ on. Every other capability is a reason to be in Testin: the tree, the grid, the
 reports, the Git integration. The keyboard is the reason the work is faster
 once the tester is there.
 
-That idea is written down here as a capability, with rules behind it, **Rule40**
-to **Rule44**. It is not left to fall out of whichever keys happen to be bound.
+That idea is written down here as a capability, with rules behind it -
+**Rule-PRODUCT-015** to **Rule-PRODUCT-018**, and **Rule-PRODUCT-024**. It is not
+left to fall out of whichever keys happen to be bound.
 
 **62 keys are bound**, counted against the product at `0becc8b2`. Of those, 40
 are shared across screens, so the same gesture means the same thing
@@ -170,7 +171,7 @@ Test Project
 > **The difference that matters most.** A test case is the *question*. A test
 > run result is one *answer*, at one moment, by one person. A test case can be
 > in many test runs, and carry a different result in each. This is why deleting a test case does
-> not erase history. See **Rule11**.
+> not erase history. See **Rule-PRODUCT-007**.
 
 ---
 
@@ -273,12 +274,12 @@ removing a test project deletes it.
 
 ### 5.5 A test set's status — two values
 
-**Active** and **Deprecated**. Deprecated is not deleted. See **Rule12**.
+**Active** and **Deprecated**. Deprecated is not deleted. See **Rule-PRODUCT-022**.
 
 ### 5.6 A package's status — two values
 
 **Active** and **Archived**. Shared by test set packages and test run packages,
-because it means the same thing in both. See **Rule13**.
+because it means the same thing in both. See **Rule-PRODUCT-023**.
 
 ### 5.7 A test case's own status — four values
 
@@ -372,7 +373,7 @@ editor toolbar, or a key. **A capability with no key says so, and says why.**
 > what is true afterward). Each one named the key that starts it.
 >
 > **Mouse needed** is the column to scan. Anything in the execution flow that is
-> not **No** breaks **Rule40**. That is not a detail.
+> not **No** breaks **Rule-PRODUCT-024**. That is not a detail.
 
 ---
 
@@ -386,15 +387,21 @@ Numbered so an issue or a commit can cite one.
 > The numbers are the point of the database, because an issue cannot cite a rule
 > that has none. So they are left blank rather than invented.
 >
-> Twelve rules are missing entirely. Among them are the two the text above
-> points at by number. **Rule12** says a deprecated test set is not deleted.
-> **Rule13** says Active and Archived mean the same thing for both kinds of
-> package.
+> Twelve rules are missing entirely. Among them were the three this document
+> pointed at by number and never carried: that a deprecated test set is not
+> deleted, that Active and Archived mean the same for both kinds of package, and
+> that every step of the execution flow can be reached from the keyboard. Each is
+> quoted somewhere in the text above, so each is written into the table below in
+> its own words rather than invented - **Rule-PRODUCT-022**,
+> **Rule-PRODUCT-023** and **Rule-PRODUCT-024**. They carry the numbers after the
+> last, not the numbers their sections would suggest, because a rule keeps the
+> number it is given.
 >
-> **So six numbers in this document point at nothing.** The text names Rule11,
-> Rule12, Rule13, Rule31, Rule40 and Rule50, and none of them can be found
-> in the table below, because the numbers did not come across. Restoring them is
-> part of [#72](https://github.com/mtb550/test-in/issues/72).
+> **Every number in this document now names a rule.** The six that pointed at
+> nothing - Rule11, Rule12, Rule13, Rule31, Rule40 and Rule50 - are written as
+> `Rule-PRODUCT-nnn` and point at the rule they always meant. The nine rules
+> still missing from the table are missing text, not missing numbers; restoring
+> them is part of [#72](https://github.com/mtb550/test-in/issues/72).
 >
 > **Rules the product broke were written down, not hidden.** Two were broken by the
 > product at `0becc8b2`, and each was cited to the issue that tracks it. Those
@@ -404,57 +411,60 @@ Numbered so an issue or a commit can cite one.
 
 | BR | Rule |
 |---|---|
-| — | All data is files on the tester's own disk, in a folder they chose. |
-| — | A test project is one folder. Everything belonging to it lives beneath that folder and nowhere else. |
-| — | What is stored is exactly what the tester typed, character for character. Showing a value on screen may tidy it up. Saving never does. |
-| — | Secrets are never written to a file the repository carries. They are held in the IDE's own password store. |
+| **Rule-PRODUCT-001** | All data is files on the tester's own disk, in a folder they chose. |
+| **Rule-PRODUCT-002** | A test project is one folder. Everything belonging to it lives beneath that folder and nowhere else. |
+| **Rule-PRODUCT-003** | What is stored is exactly what the tester typed, character for character. Showing a value on screen may tidy it up. Saving never does. |
+| **Rule-PRODUCT-004** | Secrets are never written to a file the repository carries. They are held in the IDE's own password store. |
 
 ### Structure
 
 | BR | Rule |
 |---|---|
-| — | A node may only be moved into a place that can legally hold it. A test set cannot be dropped among runs, and a run cannot be dropped inside another run. |
-| — | Test Cases and Test Runs are fixed containers. They cannot be created, renamed, moved or removed. |
+| **Rule-PRODUCT-005** | A node may only be moved into a place that can legally hold it. A test set cannot be dropped among runs, and a run cannot be dropped inside another run. |
+| **Rule-PRODUCT-006** | Test Cases and Test Runs are fixed containers. They cannot be created, renamed, moved or removed. |
+| **Rule-PRODUCT-022** | A deprecated test set is not deleted. It is kept, and drawn as deprecated. |
+| **Rule-PRODUCT-023** | Active and Archived mean the same thing for a test set package as for a test run package. |
 
 ### Runs and history
 
 | BR | Rule |
 |---|---|
-| — | A test run is a record of an execution at a point in time, not a live view of the test set. Changing a case after a run has judged it does not change what the run recorded. |
-| — | A result is written into the run the tester started, and no other. The same case running in another run does not affect this one. |
-| — | A test case may belong to any number of runs and carry a different verdict in each. The verdict belongs to the run. |
-| — | Every verdict records who gave it and when, whether a person typed it or the automation reported it. |
-| — | A signed-off run records nothing further. Once Completed or Closed, execution cannot be started on it and no result arriving from anywhere is written into it. |
+| **Rule-PRODUCT-007** | A test run is a record of an execution at a point in time, not a live view of the test set. Changing a case after a run has judged it does not change what the run recorded. |
+| **Rule-PRODUCT-008** | A result is written into the run the tester started, and no other. The same case running in another run does not affect this one. |
+| **Rule-PRODUCT-009** | A test case may belong to any number of runs and carry a different verdict in each. The verdict belongs to the run. |
+| **Rule-PRODUCT-010** | Every verdict records who gave it and when, whether a person typed it or the automation reported it. |
+| **Rule-PRODUCT-011** | A signed-off run records nothing further. Once Completed or Closed, execution cannot be started on it and no result arriving from anywhere is written into it. |
 
 ### Verdicts
 
 | BR | Rule |
 |---|---|
-| — | A tester may record exactly three verdicts: Passed, Failed, Blocked. |
-| — | Pending and Untested are the test run's own record, and a person cannot apply them. Pending means not reached yet. Untested means never reached, and never will be. |
+| **Rule-PRODUCT-012** | A tester may record exactly three verdicts: Passed, Failed, Blocked. |
+| **Rule-PRODUCT-013** | Pending and Untested are the test run's own record, and a person cannot apply them. Pending means not reached yet. Untested means never reached, and never will be. |
 
 ### Feedback
 
 | BR | Rule |
 |---|---|
-| — | Every action that changes something confirms itself once, in the past tense. An action on several things confirms once, with a count, never once per thing. |
+| **Rule-PRODUCT-014** | Every action that changes something confirms itself once, in the past tense. An action on several things confirms once, with a count, never once per thing. |
 
 ### The keyboard
 
 | BR | Rule |
 |---|---|
-| — | A published binding is a promise. Changing one costs every tester their muscle memory, so a binding changes only deliberately and visibly. |
-| — | A key is shown wherever the capability it triggers is shown, so it can be learned by using the menu once. |
-| — | A capability with no key says so rather than being silently unreachable. |
-| — | One key means one thing. The same keystroke does not do different jobs in different places. |
+| **Rule-PRODUCT-015** | A published binding is a promise. Changing one costs every tester their muscle memory, so a binding changes only deliberately and visibly. |
+| **Rule-PRODUCT-016** | A key is shown wherever the capability it triggers is shown, so it can be learned by using the menu once. |
+| **Rule-PRODUCT-017** | A capability with no key says so rather than being silently unreachable. |
+| **Rule-PRODUCT-018** | One key means one thing. The same keystroke does not do different jobs in different places. |
+| **Rule-PRODUCT-024** | Every step of the execution flow can be reached from the keyboard. A capability in that flow that needs the mouse breaks this. |
 
 ### When a plugin is missing
 
 | BR | Rule |
 |---|---|
-| — | Testin installs and runs in any JetBrains IDE. Where an optional plugin is missing, the features that need it are withheld, and Testin says why. It never fails. |
-| — | Without Java: no automation code is written, and no jumping to it. Everything else works. |
-| — | Without Git: no sync and no cloning. The data is still on disk, and still usable. |
+| **Rule-PRODUCT-019** | Testin installs and runs in any JetBrains IDE. Where an optional plugin is missing, the features that need it are withheld, and Testin says why. It never fails. |
+| **Rule-PRODUCT-020** | Without Java: no automation code is written, and no jumping to it. Everything else works. |
+| **Rule-PRODUCT-021** | Without Git: no sync and no cloning. The data is still on disk, and still usable. |
 
 ---
 
@@ -466,8 +476,8 @@ These are promises already kept, not hopes.
 |---|---|
 | **The data stays on your machine** | Everything is files under a folder the tester chose. Nothing is uploaded |
 | **Nothing is sent anywhere** | Testin makes no network calls of its own. The only traffic is the tester's own Git or SFTP sync, which they set up and start |
-| **What you typed is what is stored** | Stored data matches what was typed, character for character — **Rule31** |
-| **A missing plugin removes a feature, not the product** | Testin withholds the feature and says why. It never shows an error — **Rule50** |
+| **What you typed is what is stored** | Stored data matches what was typed, character for character — **Rule-PRODUCT-003** |
+| **A missing plugin removes a feature, not the product** | Testin withholds the feature and says why. It never shows an error — **Rule-PRODUCT-019** |
 | **The keyboard is enough** | A tester can run a whole test run without the mouse. **True of the list view. The grid view was a gap, tracked as #74, which is now closed, so this needs re-checking** |
 | **It runs in every JetBrains IDE** | IntelliJ IDEA, PyCharm, GoLand, WebStorm and the rest of the family |
 
@@ -482,7 +492,7 @@ answered.
 |---|---|---|
 | **Question 1** | May a Completed or Closed test run be reopened? | **Nothing stops a test run moving anywhere at all today.** Any status can be set from any other. Section 5.2 describes what is *allowed*, which is everything. The table that once said which moves were legal was deleted, and never replaced. Tracked in [#10](https://github.com/mtb550/test-in/issues/10) |
 | **Question 2** | Is a deprecated test set hidden, or just not offered? | Today it is shown, drawn gray, and not offered. Whether it should disappear from the tree entirely is not settled. Tracked in [#68](https://github.com/mtb550/test-in/issues/68), **now closed, so re-check** |
-| **Question 3** | What happens to a test run when the whole test set behind it is deleted? | The answer for one test case is **Rule11**. The answer for a whole test set has never been stated. Tracked in [#71](https://github.com/mtb550/test-in/issues/71), **now closed, so re-check** |
+| **Question 3** | What happens to a test run when the whole test set behind it is deleted? | The answer for one test case is **Rule-PRODUCT-007**. The answer for a whole test set has never been stated. Tracked in [#71](https://github.com/mtb550/test-in/issues/71), **now closed, so re-check** |
 | **Question 4** | What are the roles, and what does each one permit? | The field is reserved, not dead: role-based permissions are planned, and will read it to decide **who may approve a test case** and **who may remove a test project**. What is undecided is the list of roles and the permission each carries — and free text cannot answer "may this person approve", so the field will need a fixed set behind it. It is also application-level today, meaning one role per IDE installation rather than one per team member. Tracked in [#14](https://github.com/mtb550/test-in/issues/14) |
 | **Question 5** | What does a test case's own status do? | Every test case has four states: Pending, Reviewed, Disabled and To Be Updated. **Not one of them changes anything.** A Disabled test case is still offered to a test run. A To Be Updated test case is still run. A Reviewed test case is treated exactly like an unreviewed one. The state can be set only in a hidden grid column, and an import drops it. Deciding what each state *does* is the same decision as **Question 4**. Reviewed means approved, and approval means nothing until something is withheld from a test case that is not approved |
 

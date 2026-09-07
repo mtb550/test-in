@@ -52,6 +52,10 @@ the list and in number order, then that page's own. No page sends the reader
 elsewhere for half its rules. Reword such a rule and every copy has to be
 reworded - `RuleNumbersTest` fails when one number is written two ways.
 
+**`tools/add-rule.ps1` writes it, on every page it governs.** It takes the next
+number, moves the Numbering row on, and puts a part-wide rule after the shared
+block on each page. Typing 46 copies by hand is how they come to disagree.
+
 **A new rule takes the next number, and nothing else moves.** Read the
 **Numbering** row of that part's `main.md`, take the number after the end of its
 rule range, write the rule where it belongs on its page, and move the row on. No

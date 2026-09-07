@@ -43,18 +43,32 @@ import static org.testng.Assert.fail;
 public class RuleNumbersTest {
 
     private static final Path DOCS = Paths.get("docs");
+
+    /**
+     * The one page at the top of {@code docs} that writes rules of its own.
+     */
+    private static final String PRODUCT = "product.md";
     private static final Path SOURCES = Paths.get("src", "main", "java");
 
     /**
      * A rule being written out: the bullet that states it, and the words that
      * follow up to the next rule or the end of the list.
      * <p>
-     * Only inside a part's own folder - the standard shows the form in a
-     * template, and the product page quotes numbers it does not write.
+     * Read from the pages that write rules, which is every page inside a part
+     * and the product page. The standard is left out because it shows the form
+     * in a template rather than writing a rule.
      */
     private static final Pattern DEFINITION = Pattern.compile(
             "^\\s*-\\s+\\*\\*Rule-([A-Z][A-Z-]*)-(\\d+)\\*\\*(.*?)(?=\\r?\\n\\s*-\\s+\\*\\*Rule-|\\r?\\n\\r?\\n|$)",
             Pattern.MULTILINE | Pattern.DOTALL);
+
+    /**
+     * The same thing written as a table row, which is how the product page has
+     * always held its rules - a column for the number and a column for the
+     * words, from when the number was a business requirement id.
+     */
+    private static final Pattern IN_A_TABLE = Pattern.compile(
+            "^\\| \\*\\*Rule-([A-Z][A-Z-]*)-(\\d+)\\*\\* \\|(.*?)\\|\\s*$", Pattern.MULTILINE);
 
     /**
      * A rule being named, anywhere at all.
@@ -98,7 +112,7 @@ public class RuleNumbersTest {
         final Map<String, Map<Integer, Map<String, List<String>>>> byPart = definitions();
 
         for (final Map.Entry<String, Map<Integer, Map<String, List<String>>>> part : byPart.entrySet()) {
-            final Path main = partFolder(part.getKey()).resolve("main.md");
+            final Path main = numberingPage(part.getKey());
             final Matcher claimed = RANGE.matcher(read(main));
 
             if (!claimed.find()) fail(main + " has no Numbering row saying the range its rules cover");
@@ -143,13 +157,17 @@ public class RuleNumbersTest {
         final Map<String, Map<Integer, Map<String, List<String>>>> byPart = new TreeMap<>();
 
         for (final Path page : partPages()) {
-            final Matcher written = DEFINITION.matcher(read(page));
+            final String text = read(page);
 
-            while (written.find()) {
-                byPart.computeIfAbsent(written.group(1), part -> new TreeMap<>())
-                        .computeIfAbsent(Integer.parseInt(written.group(2)), number -> new LinkedHashMap<>())
-                        .computeIfAbsent(oneLine(written.group(3)), words -> new ArrayList<>())
-                        .add(page.getFileName().toString());
+            for (final Pattern form : List.of(DEFINITION, IN_A_TABLE)) {
+                final Matcher written = form.matcher(text);
+
+                while (written.find()) {
+                    byPart.computeIfAbsent(written.group(1), part -> new TreeMap<>())
+                            .computeIfAbsent(Integer.parseInt(written.group(2)), number -> new LinkedHashMap<>())
+                            .computeIfAbsent(oneLine(written.group(3)), words -> new ArrayList<>())
+                            .add(page.getFileName().toString());
+                }
             }
         }
 
@@ -166,9 +184,12 @@ public class RuleNumbersTest {
     }
 
     /**
-     * The pages inside the parts, and nothing at the top of {@code docs} - the
-     * standard shows the form of a rule in a template, and the product page
-     * quotes numbers that belong to other parts.
+     * The pages inside the parts, and the product page.
+     * <p>
+     * Nothing else at the top of {@code docs}: the standard shows the form of a
+     * rule in a template, and the home page links to every part without writing
+     * a rule of its own. The product page is here because its rules are real -
+     * they belong to no part, which is what {@code PRODUCT} names.
      */
     private static List<Path> partPages() {
         final List<Path> pages = new ArrayList<>();
@@ -176,7 +197,7 @@ public class RuleNumbersTest {
         try (Stream<Path> tree = Files.walk(DOCS)) {
             for (final Path file : tree.toList()) {
                 if (!file.toString().endsWith(".md")) continue;
-                if (file.getParent().equals(DOCS)) continue;
+                if (file.getParent().equals(DOCS) && !file.getFileName().toString().equals(PRODUCT)) continue;
 
                 pages.add(file);
             }
@@ -197,6 +218,17 @@ public class RuleNumbersTest {
         }
 
         return files;
+    }
+
+    /**
+     * The page carrying a part's Numbering row, from the prefix its rules carry:
+     * {@code TREE-PANEL} is {@code docs/treePanel/main.md}. The product has no
+     * folder, so its own page answers for it.
+     */
+    private static Path numberingPage(final String part) {
+        if ("PRODUCT".equals(part)) return DOCS.resolve(PRODUCT);
+
+        return partFolder(part).resolve("main.md");
     }
 
     /**
