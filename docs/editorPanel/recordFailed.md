@@ -9,19 +9,21 @@ see it, **so that** the bug report writes itself later.
 
 ## Rules
 
-- **Rule 139** — Failing is the one verdict that asks for detail. The dialog
-  opens before the verdict is recorded.
-- **Rule 140** — `Escape` in the dialog records nothing at all. Neither the
-  detail nor the verdict.
-- **Rule 141** — Nothing is written as the tester types. Only saving writes.
-- **Rule 142** — The dialog opens for one test case. Several at once are failed
-  with no detail collected.
-- **Rule 143** — The bug severity starts at **Enhancement** and the bug priority
-  at **Low**.
-- **Rule 144** — The four fields are the same four the failure form in light
-  mode uses.
+- **Rule-EDITOR-PANEL-139** — Failing is the one verdict that asks for detail.
+  The dialog opens before the verdict is recorded.
+- **Rule-EDITOR-PANEL-140** — `Escape` in the dialog records nothing at all.
+  Neither the detail nor the verdict.
+- **Rule-EDITOR-PANEL-141** — Nothing is written as the tester types. Only
+  saving writes.
+- **Rule-EDITOR-PANEL-142** — The dialog opens for one test case. Several at
+  once are failed with no detail collected.
+- **Rule-EDITOR-PANEL-143** — The bug severity starts at **Enhancement** and the
+  bug priority at **Low**.
+- **Rule-EDITOR-PANEL-144** — The four fields are the same four the failure form
+  in light mode uses.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen

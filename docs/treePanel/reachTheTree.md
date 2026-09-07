@@ -10,16 +10,17 @@ first, **so that** I am never stuck on an empty window.
 
 ## Rules
 
-- **Rule 14** — The panel never opens on its own when the IDE starts.
-- **Rule 15** — A code project does not have to name a test project. If it names
-  none, and exactly one test project exists in the Testin folder, Testin binds it
-  to that one without asking.
+- **Rule-TREE-PANEL-014** — The panel never opens on its own when the IDE
+  starts.
+- **Rule-TREE-PANEL-015** — A code project does not have to name a test project.
+  If it names none, and exactly one test project exists in the Testin folder,
+  Testin binds it to that one without asking.
 
-Rule 53 also holds here. It says an **Archived** test project is not opened on
-the next load, and it is on [UC-TREE-PANEL-018](retireNode.md).
+Rule-TREE-PANEL-053 also holds here. It says an **Archived** test project is not
+opened on the next load, and it is on [UC-TREE-PANEL-018](retireNode.md).
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## No Testin folder
 
@@ -93,9 +94,9 @@ hold one link each.
 
 ## What Testin refuses
 
-**If the bound test project is Archived** — the panel shows, in red, *\<name\> is
-archived, so it is not opened*. Under that line sits the list of test projects to
-choose from.
+**If the bound test project is Archived** — the panel shows, in red, *\<name\>
+is archived, so it is not opened*. Under that line sits the list of test
+projects to choose from.
 
 **If the project file cannot be read** — the panel shows, in red, *testin.yml
 names \<name\>, which could not be read*.
@@ -104,7 +105,7 @@ names \<name\>, which could not be read*.
 is no red line at all, and the tester gets the plain list of test projects with
 no explanation.
 
-> **The one project it binds to may be Archived.** Rule 15 does not look at the
+> **The one project it binds to may be Archived.** Rule-TREE-PANEL-015 does not look at the
 > status, so a tester with a single archived test project is bound to it and
 > then told it is not opened, above a list holding only that one project.
 

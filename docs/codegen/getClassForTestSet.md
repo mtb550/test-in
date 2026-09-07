@@ -10,17 +10,17 @@ There is no key for this. It happens when a test set is created, which is
 
 ## Rules
 
-- **Rule 7** — The class is named after the test set, with everything but
-  letters and digits removed, and always ends in `Test`.
-- **Rule 8** — Each folder above the test set becomes a package, keeping the
-  capitals it already has.
-- **Rule 9** — A class that is already there is never written over.
-- **Rule 10** — The class is written empty. It holds no blank line inside its
-  braces.
-- **Rule 11** — A test set whose name comes to nothing becomes a class called
-  `DefaultTest`.
+- **Rule-CODEGEN-007** — The class is named after the test set, with everything
+  but letters and digits removed, and always ends in `Test`.
+- **Rule-CODEGEN-008** — Each folder above the test set becomes a package,
+  keeping the capitals it already has.
+- **Rule-CODEGEN-009** — A class that is already there is never written over.
+- **Rule-CODEGEN-010** — The class is written empty. It holds no blank line
+  inside its braces.
+- **Rule-CODEGEN-011** — A test set whose name comes to nothing becomes a class
+  called `DefaultTest`.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## What is written

@@ -4,25 +4,25 @@
 
 > **No key.** On the menu: **Actions → Re-create**.
 
-**As a** tester, **I want** to make the next cycle from a finished test run, with
-the same test cases and settings and no verdicts, **so that** starting the next
-round of testing takes one step, instead of building the whole test run again by
-hand.
+**As a** tester, **I want** to make the next cycle from a finished test run,
+with the same test cases and settings and no verdicts, **so that** starting the
+next round of testing takes one step, instead of building the whole test run
+again by hand.
 
 ## Rules
 
-- **Rule 57** — Re-create works on a test run in any status, including a
-  signed-off one. That is what it is for.
-- **Rule 58** — Only the test cases and the configuration are carried over.
-  Verdicts, durations and failure details start fresh.
-- **Rule 59** — The next name is suggested by counting up. *cycle-1* becomes
-  *cycle-2*, and a name with no number on it gets one: *smoke* becomes
+- **Rule-TREE-PANEL-057** — Re-create works on a test run in any status,
+  including a signed-off one. That is what it is for.
+- **Rule-TREE-PANEL-058** — Only the test cases and the configuration are
+  carried over. Verdicts, durations and failure details start fresh.
+- **Rule-TREE-PANEL-059** — The next name is suggested by counting up. *cycle-1*
+  becomes *cycle-2*, and a name with no number on it gets one: *smoke* becomes
   *smoke-2*. A name already taken is skipped.
-- **Rule 88** — The new test run is created in the same folder as the one it
-  was made from.
+- **Rule-TREE-PANEL-088** — The new test run is created in the same folder as
+  the one it was made from.
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 The dialog is drawn under [UC-TREE-PANEL-009](createTestRun.md).
 
@@ -51,8 +51,8 @@ stays open with everything typed still in it.
 **If the name is already used** — *\<name\> Already Exists* is shown, and the
 dialog stays open with everything typed still in it.
 
-**If the folder was removed while the dialog was open** — *'\<parent\>' no longer
-exists - test run not created* is shown in red.
+**If the folder was removed while the dialog was open** — *'\<parent\>' no
+longer exists - test run not created* is shown in red.
 
 **If several rows are selected** — **Re-create** is gray. It needs exactly one.
 

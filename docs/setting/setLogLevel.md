@@ -10,13 +10,14 @@ There is no key for this. It is the **Log level** row.
 
 ## Rules
 
-- **Rule 24** — The level takes effect the moment **Apply** is pressed. The IDE
-  does not have to restart.
-- **Rule 25** — Testin starts at **INFO** until the tester chooses otherwise.
-- **Rule 26** — The log sits beside the IDE's own log, so collecting the IDE's
-  logs collects Testin's too.
+- **Rule-SETTING-024** — The level takes effect the moment **Apply** is pressed.
+  The IDE does not have to restart.
+- **Rule-SETTING-025** — Testin starts at **INFO** until the tester chooses
+  otherwise.
+- **Rule-SETTING-026** — The log sits beside the IDE's own log, so collecting
+  the IDE's logs collects Testin's too.
 
-Rules 1 to 6 hold everywhere on the page. They are on
+Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
 [the settings page](main.md#rules-that-hold-everywhere-on-the-page).
 
 ## The choices

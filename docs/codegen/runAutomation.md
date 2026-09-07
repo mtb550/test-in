@@ -9,17 +9,18 @@ cases, **so that** the verdict is recorded without me judging it by hand.
 
 ## Rules
 
-- **Rule 31** — Whatever the tester selected is one run, not one run for each
-  test case.
-- **Rule 32** — The method is found by the test case's identity, never by its
-  name.
-- **Rule 33** — One message with a count, however many test cases started.
-- **Rule 34** — A card turns to running the moment the tester presses the key,
-  before the process exists.
-- **Rule 35** — The order the methods run in is the order of the test cases in
-  their test set.
+- **Rule-CODEGEN-031** — Whatever the tester selected is one run, not one run
+  for each test case.
+- **Rule-CODEGEN-032** — The method is found by the test case's identity, never
+  by its name.
+- **Rule-CODEGEN-033** — One message with a count, however many test cases
+  started.
+- **Rule-CODEGEN-034** — A card turns to running the moment the tester presses
+  the key, before the process exists.
+- **Rule-CODEGEN-035** — The order the methods run in is the order of the test
+  cases in their test set.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## The three ways in

@@ -10,6 +10,7 @@
 |---|---|
 | **Part of Testin** | All of it. These rules hold everywhere. Each part also has a document of its own, listed on [the home page](README.md) |
 | **Numbering** | These rules belong to no single part of Testin, so they are the one set that holds everywhere. Section 7 is missing its numbers, which is explained there |
+| **Rule numbers** | Written as bare numbers, from before a rule carried its part. Every other document now writes `Rule-TREE-PANEL-004` and up, as [the standard](standard.md) sets out. These are left alone because six of them point at nothing already, and naming a part for them would be a guess. Restoring them is part of [#72](https://github.com/mtb550/test-in/issues/72) |
 | **Answers** | Who uses Testin, what they work with, every status, the rules for the whole product, and what is undecided |
 | **State** | **Draft 1** — moved from Notion, not re-checked. Correcting it is [#72](https://github.com/mtb550/test-in/issues/72) |
 | **Checked against** | `main` at `0becc8b2`, 29 August 2026 |
@@ -100,8 +101,8 @@ on. Every other capability is a reason to be in Testin: the tree, the grid, the
 reports, the Git integration. The keyboard is the reason the work is faster
 once the tester is there.
 
-That idea is written down here as a capability, with rules behind it, **rule 40**
-to **rule 44**. It is not left to fall out of whichever keys happen to be bound.
+That idea is written down here as a capability, with rules behind it, **Rule40**
+to **Rule44**. It is not left to fall out of whichever keys happen to be bound.
 
 **62 keys are bound**, counted against the product at `0becc8b2`. Of those, 40
 are shared across screens, so the same gesture means the same thing
@@ -139,8 +140,8 @@ checkable against the product.
 
 ## 4. The things a tester works with
 
-Testin stores everything as files in a folder the tester chooses. The structure is
-a tree, and the tree is the product's vocabulary.
+Testin stores everything as files in a folder the tester chooses. The structure
+is a tree, and the tree is the product's vocabulary.
 
 ```
 Test Project
@@ -169,7 +170,7 @@ Test Project
 > **The difference that matters most.** A test case is the *question*. A test
 > run result is one *answer*, at one moment, by one person. A test case can be
 > in many test runs, and carry a different result in each. This is why deleting a test case does
-> not erase history. See **rule 11**.
+> not erase history. See **Rule11**.
 
 ---
 
@@ -267,17 +268,17 @@ as the IDE is open. The test run's own record is the one that is kept.
 
 ### 5.4 A test project's status — three values
 
-**Active**, **Inactive**, **Archived**. There is no removed state, because removing
-a test project deletes it.
+**Active**, **Inactive**, **Archived**. There is no removed state, because
+removing a test project deletes it.
 
 ### 5.5 A test set's status — two values
 
-**Active** and **Deprecated**. Deprecated is not deleted. See **rule 12**.
+**Active** and **Deprecated**. Deprecated is not deleted. See **Rule12**.
 
 ### 5.6 A package's status — two values
 
 **Active** and **Archived**. Shared by test set packages and test run packages,
-because it means the same thing in both. See **rule 13**.
+because it means the same thing in both. See **Rule13**.
 
 ### 5.7 A test case's own status — four values
 
@@ -308,8 +309,8 @@ team thinks of the test case itself, across every test run it is ever in.
 
 ## 6. Capabilities
 
-Every capability below is reachable from the project tree's context menu, an editor
-toolbar, or a key. **A capability with no key says so, and says why.**
+Every capability below is reachable from the project tree's context menu, an
+editor toolbar, or a key. **A capability with no key says so, and says why.**
 
 ### 6.1 Authoring
 
@@ -371,7 +372,7 @@ toolbar, or a key. **A capability with no key says so, and says why.**
 > what is true afterward). Each one named the key that starts it.
 >
 > **Mouse needed** is the column to scan. Anything in the execution flow that is
-> not **No** breaks **rule 40**. That is not a detail.
+> not **No** breaks **Rule40**. That is not a detail.
 
 ---
 
@@ -386,12 +387,12 @@ Numbered so an issue or a commit can cite one.
 > that has none. So they are left blank rather than invented.
 >
 > Twelve rules are missing entirely. Among them are the two the text above
-> points at by number. **Rule 12** says a deprecated test set is not deleted.
-> **Rule 13** says Active and Archived mean the same thing for both kinds of
+> points at by number. **Rule12** says a deprecated test set is not deleted.
+> **Rule13** says Active and Archived mean the same thing for both kinds of
 > package.
 >
-> **So six numbers in this document point at nothing.** The text names rule 11,
-> rule 12, rule 13, rule 31, rule 40 and rule 50, and none of them can be found
+> **So six numbers in this document point at nothing.** The text names Rule11,
+> Rule12, Rule13, Rule31, Rule40 and Rule50, and none of them can be found
 > in the table below, because the numbers did not come across. Restoring them is
 > part of [#72](https://github.com/mtb550/test-in/issues/72).
 >
@@ -465,8 +466,8 @@ These are promises already kept, not hopes.
 |---|---|
 | **The data stays on your machine** | Everything is files under a folder the tester chose. Nothing is uploaded |
 | **Nothing is sent anywhere** | Testin makes no network calls of its own. The only traffic is the tester's own Git or SFTP sync, which they set up and start |
-| **What you typed is what is stored** | Stored data matches what was typed, character for character — **rule 31** |
-| **A missing plugin removes a feature, not the product** | Testin withholds the feature and says why. It never shows an error — **rule 50** |
+| **What you typed is what is stored** | Stored data matches what was typed, character for character — **Rule31** |
+| **A missing plugin removes a feature, not the product** | Testin withholds the feature and says why. It never shows an error — **Rule50** |
 | **The keyboard is enough** | A tester can run a whole test run without the mouse. **True of the list view. The grid view was a gap, tracked as #74, which is now closed, so this needs re-checking** |
 | **It runs in every JetBrains IDE** | IntelliJ IDEA, PyCharm, GoLand, WebStorm and the rest of the family |
 
@@ -474,13 +475,14 @@ These are promises already kept, not hopes.
 
 ## 9. Undecided
 
-Listed rather than guessed. Each is a real question the product has not answered.
+Listed rather than guessed. Each is a real question the product has not
+answered.
 
 | | Question | Why it is open |
 |---|---|---|
 | **Question 1** | May a Completed or Closed test run be reopened? | **Nothing stops a test run moving anywhere at all today.** Any status can be set from any other. Section 5.2 describes what is *allowed*, which is everything. The table that once said which moves were legal was deleted, and never replaced. Tracked in [#10](https://github.com/mtb550/test-in/issues/10) |
 | **Question 2** | Is a deprecated test set hidden, or just not offered? | Today it is shown, drawn gray, and not offered. Whether it should disappear from the tree entirely is not settled. Tracked in [#68](https://github.com/mtb550/test-in/issues/68), **now closed, so re-check** |
-| **Question 3** | What happens to a test run when the whole test set behind it is deleted? | The answer for one test case is **rule 11**. The answer for a whole test set has never been stated. Tracked in [#71](https://github.com/mtb550/test-in/issues/71), **now closed, so re-check** |
+| **Question 3** | What happens to a test run when the whole test set behind it is deleted? | The answer for one test case is **Rule11**. The answer for a whole test set has never been stated. Tracked in [#71](https://github.com/mtb550/test-in/issues/71), **now closed, so re-check** |
 | **Question 4** | What are the roles, and what does each one permit? | The field is reserved, not dead: role-based permissions are planned, and will read it to decide **who may approve a test case** and **who may remove a test project**. What is undecided is the list of roles and the permission each carries — and free text cannot answer "may this person approve", so the field will need a fixed set behind it. It is also application-level today, meaning one role per IDE installation rather than one per team member. Tracked in [#14](https://github.com/mtb550/test-in/issues/14) |
 | **Question 5** | What does a test case's own status do? | Every test case has four states: Pending, Reviewed, Disabled and To Be Updated. **Not one of them changes anything.** A Disabled test case is still offered to a test run. A To Be Updated test case is still run. A Reviewed test case is treated exactly like an unreviewed one. The state can be set only in a hidden grid column, and an import drops it. Deciding what each state *does* is the same decision as **Question 4**. Reviewed means approved, and approval means nothing until something is withheld from a test case that is not approved |
 

@@ -10,14 +10,14 @@ There is no key for this. The mark is in the gutter beside the method.
 
 ## Rules
 
-- **Rule 28** — The mark is drawn beside the identity inside the method's
-  annotation, on the right of the gutter.
-- **Rule 29** — The mark is drawn only for a TestNG test whose identity Testin
-  recognizes.
-- **Rule 30** — The mark is drawn while the IDE is still indexing, and the jump
-  waits for indexing to finish.
+- **Rule-CODEGEN-028** — The mark is drawn beside the identity inside the
+  method's annotation, on the right of the gutter.
+- **Rule-CODEGEN-029** — The mark is drawn only for a TestNG test whose identity
+  Testin recognizes.
+- **Rule-CODEGEN-030** — The mark is drawn while the IDE is still indexing, and
+  the jump waits for indexing to finish.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## The screen

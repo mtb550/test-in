@@ -10,12 +10,12 @@ There is no key for this. It is the **Tester name** row.
 
 ## Rules
 
-- **Rule 18** — The name is read at the moment it is stamped, not remembered
-  from when the IDE started. Changing it takes effect at once.
-- **Rule 19** — An empty name is allowed. Testin then stamps nothing, which
-  means the file did not say rather than that nobody chose.
+- **Rule-SETTING-018** — The name is read at the moment it is stamped, not
+  remembered from when the IDE started. Changing it takes effect at once.
+- **Rule-SETTING-019** — An empty name is allowed. Testin then stamps nothing,
+  which means the file did not say rather than that nobody chose.
 
-Rules 1 to 6 hold everywhere on the page. They are on
+Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
 [the settings page](main.md#rules-that-hold-everywhere-on-the-page).
 
 ## Where the name is stamped

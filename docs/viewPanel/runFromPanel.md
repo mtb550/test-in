@@ -10,15 +10,15 @@ nothing in the panel.
 
 ## Rules
 
-- **Rule 49** — The run button is drawn only where the IDE has the TestNG
-  plugin.
-- **Rule 50** — The same place shows the run button or the stop button, never
-  both.
-- **Rule 51** — The button grows under the pointer, so it is clear it can be
-  pressed.
+- **Rule-VIEW-PANEL-049** — The run button is drawn only where the IDE has the
+  TestNG plugin.
+- **Rule-VIEW-PANEL-050** — The same place shows the run button or the stop
+  button, never both.
+- **Rule-VIEW-PANEL-051** — The button grows under the pointer, so it is clear
+  it can be pressed.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen
 

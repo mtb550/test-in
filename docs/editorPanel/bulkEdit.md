@@ -9,20 +9,22 @@ Select several test cases, then `F2` or the field's own letter.
 
 ## Rules
 
-- **Rule 39** — The tester edits the values in place, in a list, with the
-  original beside it.
-- **Rule 40** — A row the tester did not touch is not written, so it is not
-  trimmed and its file is not changed.
-- **Rule 41** — A row the tester did edit has its spaces trimmed.
-- **Rule 42** — An edited value takes a green background, so it is clear what
-  will be written.
-- **Rule 43** — A line break inside a value is shown as two characters and read
-  back as a line break.
-- **Rule 44** — A test case with nothing in the field still gets a line to type
-  into.
-- **Rule 45** — The whole gesture is one entry on the undo history.
+- **Rule-EDITOR-PANEL-039** — The tester edits the values in place, in a list,
+  with the original beside it.
+- **Rule-EDITOR-PANEL-040** — A row the tester did not touch is not written, so
+  it is not trimmed and its file is not changed.
+- **Rule-EDITOR-PANEL-041** — A row the tester did edit has its spaces trimmed.
+- **Rule-EDITOR-PANEL-042** — An edited value takes a green background, so it is
+  clear what will be written.
+- **Rule-EDITOR-PANEL-043** — A line break inside a value is shown as two
+  characters and read back as a line break.
+- **Rule-EDITOR-PANEL-044** — A test case with nothing in the field still gets a
+  line to type into.
+- **Rule-EDITOR-PANEL-045** — The whole gesture is one entry on the undo
+  history.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen

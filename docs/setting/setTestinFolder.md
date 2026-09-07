@@ -9,18 +9,18 @@ There is no key for this. It is the first row of the page.
 
 ## Rules
 
-- **Rule 10** — Testin reads exactly one folder. Every test project lives
-  directly inside it.
-- **Rule 11** — An empty box means not set. A box of nothing but spaces means
-  the same.
-- **Rule 12** — Changing the folder makes every code project that has opened the
-  Testin panel read the disk again.
-- **Rule 13** — A folder given as a partial path is read against the code
-  project's own folder.
-- **Rule 14** — With no folder set, Testin reads nothing and shows nothing. It
-  does not fail.
+- **Rule-SETTING-010** — Testin reads exactly one folder. Every test project
+  lives directly inside it.
+- **Rule-SETTING-011** — An empty box means not set. A box of nothing but spaces
+  means the same.
+- **Rule-SETTING-012** — Changing the folder makes every code project that has
+  opened the Testin panel read the disk again.
+- **Rule-SETTING-013** — A folder given as a partial path is read against the
+  code project's own folder.
+- **Rule-SETTING-014** — With no folder set, Testin reads nothing and shows
+  nothing. It does not fail.
 
-Rules 1 to 6 hold everywhere on the page. They are on
+Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
 [the settings page](main.md#rules-that-hold-everywhere-on-the-page).
 
 ## The screen

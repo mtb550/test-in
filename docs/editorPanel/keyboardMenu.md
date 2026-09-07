@@ -9,11 +9,12 @@ The `Context Menu` key.
 
 ## Rules
 
-- **Rule 120** — The menu opens on whatever is selected, in both views and in
-  the tree.
-- **Rule 121** — With nothing selected, nothing opens.
+- **Rule-EDITOR-PANEL-120** — The menu opens on whatever is selected, in both
+  views and in the tree.
+- **Rule-EDITOR-PANEL-121** — With nothing selected, nothing opens.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow

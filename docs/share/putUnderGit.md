@@ -10,12 +10,12 @@ repository.
 
 ## Rules
 
-- **Rule 40** — Testin offers to make the repository at the moment it finds
-  there is none.
-- **Rule 41** — Nothing is committed by making the repository. Only the
+- **Rule-SHARE-040** — Testin offers to make the repository at the moment it
+  finds there is none.
+- **Rule-SHARE-041** — Nothing is committed by making the repository. Only the
   repository itself is made.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

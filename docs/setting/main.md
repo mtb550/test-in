@@ -9,7 +9,8 @@ where the test data lives, who is using it, and how to reach the team's server.
 |---|---|
 | **Part of Testin** | The settings page |
 | **Answers** | What every setting does, where each one is kept, and what happens when one is wrong |
-| **Numbering** | Use cases are `UC-SETTING-001` to `UC-SETTING-011`. Rules are numbered 1 and up, and belong to the settings page |
+| **Numbering** | Use cases are `UC-SETTING-001` to `UC-SETTING-011`. Rules are `Rule-SETTING-001` and up, and belong to the settings page |
+| **Last rule** | `Rule-SETTING-039`. The next rule written here is `Rule-SETTING-040` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -66,16 +67,16 @@ The two are kept apart on purpose, and the reason is who they belong to.
 
 ## Rules that hold everywhere on the page
 
-- **Rule 1** — One page for the whole IDE. Every code project open in it reads
-  the same values.
-- **Rule 2** — Nothing on this page is checked. A folder that does not exist is
-  stored exactly as typed.
-- **Rule 3** — Nothing on this page raises a message when it is saved.
-- **Rule 4** — Only a changed Testin folder makes Testin read the disk again.
-  Every other setting is read where it is used, when it is used.
-- **Rule 5** — A password is never on this page. It is asked for when it is
-  needed and kept in the IDE's password store.
-- **Rule 6** — Nothing on this page has a key of its own.
+- **Rule-SETTING-001** — One page for the whole IDE. Every code project open in
+  it reads the same values.
+- **Rule-SETTING-002** — Nothing on this page is checked. A folder that does not
+  exist is stored exactly as typed.
+- **Rule-SETTING-003** — Nothing on this page raises a message when it is saved.
+- **Rule-SETTING-004** — Only a changed Testin folder makes Testin read the disk
+  again. Every other setting is read where it is used, when it is used.
+- **Rule-SETTING-005** — A password is never on this page. It is asked for when
+  it is needed and kept in the IDE's password store.
+- **Rule-SETTING-006** — Nothing on this page has a key of its own.
 
 ---
 
@@ -173,11 +174,11 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule 2 — nothing is checked, so nothing warns | A Testin folder that does not exist, or is a file, is stored without a word. The tree then shows its empty state, and nothing connects that to the path just typed. |
-| **Difference 2** | Rule 1 — a setting is read by something | **Tester role** is stored and read by nothing at all. It is on no marker, no report and no message. |
-| **Difference 3** | Rule 2 — a value is stored as typed | The Testin folder is stored exactly as typed, spaces included, and then trimmed the next time a code project opens. The value in the file changes on its own. |
-| **Difference 4** | Rule 1 — this page owns these values | The default download folder is also written by the import dialog and the export dialog. Choosing a folder there and ticking a box overwrites what this page says. |
-| **Difference 5** | Rule 4 — changing the folder makes Testin read again | Only code projects that have opened the Testin panel read again. A project whose panel was never opened keeps the old folder until it is opened. |
+| **Difference 1** | Rule-SETTING-002 — nothing is checked, so nothing warns | A Testin folder that does not exist, or is a file, is stored without a word. The tree then shows its empty state, and nothing connects that to the path just typed. |
+| **Difference 2** | Rule-SETTING-001 — a setting is read by something | **Tester role** is stored and read by nothing at all. It is on no marker, no report and no message. |
+| **Difference 3** | Rule-SETTING-002 — a value is stored as typed | The Testin folder is stored exactly as typed, spaces included, and then trimmed the next time a code project opens. The value in the file changes on its own. |
+| **Difference 4** | Rule-SETTING-001 — this page owns these values | The default download folder is also written by the import dialog and the export dialog. Choosing a folder there and ticking a box overwrites what this page says. |
+| **Difference 5** | Rule-SETTING-004 — changing the folder makes Testin read again | Only code projects that have opened the Testin panel read again. A project whose panel was never opened keeps the old folder until it is opened. |
 
 ---
 

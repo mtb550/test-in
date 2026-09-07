@@ -9,11 +9,11 @@ There is no key for this. The tab is called **History**.
 
 ## Rules
 
-- **Rule 37** — The History tab is not built. It shows one line saying so,
-  rather than showing invented data.
+- **Rule-VIEW-PANEL-037** — The History tab is not built. It shows one line
+  saying so, rather than showing invented data.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen
 
@@ -48,8 +48,8 @@ and when. They do not say what changed.
 ## Not decided
 
 Nobody has decided what a test case's history should hold, or where it would be
-read from. Testin keeps no record of what a field used to say. That is question 1
-on [the view panel page](main.md#not-decided).
+read from. Testin keeps no record of what a field used to say. That is question
+1 on [the view panel page](main.md#not-decided).
 
 ---
 

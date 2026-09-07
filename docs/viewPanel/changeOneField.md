@@ -9,18 +9,18 @@
 
 ## Rules
 
-- **Rule 44** — `F2` works only once a test case has been drawn. It does nothing
-  while the panel is empty.
-- **Rule 45** — The panel always changes exactly one test case, because it only
-  ever shows one.
-- **Rule 46** — A save that would leave the file as it is writes nothing, and
-  raises no message.
-- **Rule 47** — A saved change is one entry on the undo history.
-- **Rule 48** — Saving a change rewrites the automation code for that field,
-  where the field has any.
+- **Rule-VIEW-PANEL-044** — `F2` works only once a test case has been drawn. It
+  does nothing while the panel is empty.
+- **Rule-VIEW-PANEL-045** — The panel always changes exactly one test case,
+  because it only ever shows one.
+- **Rule-VIEW-PANEL-046** — A save that would leave the file as it is writes
+  nothing, and raises no message.
+- **Rule-VIEW-PANEL-047** — A saved change is one entry on the undo history.
+- **Rule-VIEW-PANEL-048** — Saving a change rewrites the automation code for
+  that field, where the field has any.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen
 

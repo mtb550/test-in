@@ -11,9 +11,9 @@ Read this before writing or changing any page under `docs/`.
 
 ## One page per thing the tester does
 
-A part of Testin is a folder, named after the part: `treePanel`. `main.md` is its
-front page, and every use case is a page beside it, named after what the tester
-does: `createTestProject.md`.
+A part of Testin is a folder, named after the part: `treePanel`. `main.md` is
+its front page, and every use case is a page beside it, named after what the
+tester does: `createTestProject.md`.
 
 **`main.md` holds what is true of the whole part:**
 
@@ -85,28 +85,49 @@ Four things are numbered. Each one is written the way it is read:
 | Written | What it is |
 |---|---|
 | **UC-TREE-PANEL-001** | One thing a tester does, such as creating a test project. It is the title of its own page |
-| **Rule 1** | Something that must always be true |
+| **Rule-TREE-PANEL-001** | Something that must always be true |
 | **Question 1** | Something nobody has answered yet, listed instead of guessed |
 | **Difference 1** | A place where the plugin does not do what its own rules say |
 
-**A use case carries the part of Testin it belongs to**, so a number read on its
-own still says where to look:
+**A use case and a rule both carry the part of Testin they belong to**, so a
+number read on its own still says where to look:
 
-| Part of Testin | Its use cases |
-|---|---|
-| The tree panel | `UC-TREE-PANEL-001` to `UC-TREE-PANEL-999` |
-| The editor panel | `UC-EDITOR-PANEL-001` and up |
-| The view panel | `UC-VIEW-PANEL-001` and up |
-| The settings page | `UC-SETTING-001` and up |
-| Automation code and the gutter | `UC-CODEGEN-001` and up |
-| Reports | `UC-REPORT-001` and up |
-| Sharing work with the team | `UC-SHARE-001` and up |
-| Inside Testin | `UC-INTERNAL-001` and up |
+| Part of Testin | Its use cases | Its rules |
+|---|---|---|
+| The tree panel | `UC-TREE-PANEL-001` and up | `Rule-TREE-PANEL-001` and up |
+| The editor panel | `UC-EDITOR-PANEL-001` and up | `Rule-EDITOR-PANEL-001` and up |
+| The view panel | `UC-VIEW-PANEL-001` and up | `Rule-VIEW-PANEL-001` and up |
+| The settings page | `UC-SETTING-001` and up | `Rule-SETTING-001` and up |
+| Automation code and the gutter | `UC-CODEGEN-001` and up | `Rule-CODEGEN-001` and up |
+| Reports | `UC-REPORT-001` and up | `Rule-REPORT-001` and up |
+| Sharing work with the team | `UC-SHARE-001` and up | `Rule-SHARE-001` and up |
+| Inside Testin | `UC-INTERNAL-001` and up | `Rule-INTERNAL-001` and up |
 
-**The other numbers start again in each part.** The tree panel has a rule 4, and
-so will the editor panel. Inside one document, "rule 4" is enough. Anywhere
-else, say which part it belongs to: *the tree panel's rule 4*. A bug report says
-*tree panel, rule 4*.
+**A rule is written in full, as one word, everywhere: `Rule-TREE-PANEL-004`.**
+One word can be found in a single search, from the code as well as the
+documentation, and the code marks each method with the rule it carries. The same
+holds in a range: *Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013*, so both ends can
+be searched for.
+
+**Never shortened, not even inside its own document.** Every part used to start
+its numbers again, so a bare *Rule4* named eight rules at once and a number
+quoted in an issue, a commit or a code comment pointed at none of them in
+particular. Writing the part into the number is what stops that, and it only
+works if it is written every time.
+
+**The number is three digits, and a withdrawn rule keeps its own.** A number is
+never passed on to a different rule, so an issue that quotes one still points at
+what it pointed at when it was written.
+
+**Each part's page says its last number.** The **Last rule** row of every
+`main.md` carries the highest number written in that part and the next one to
+use, so a new rule is numbered without reading the whole part first. Writing a
+rule and moving that row on is one job, not two.
+
+**The other numbers still start again in each part.** *Question 1* and
+*Difference 1* are read beside the part they are listed in, so they are left
+short. Anywhere else, say which part they belong to: *the tree panel's
+Difference 1*.
 
 The one exception is [the product's own document](product.md).
 Its rules hold everywhere, so they belong to no part, and it says so at the top.
@@ -129,11 +150,11 @@ nobody has written, the rule is written first.
 
 ## Rules
 
-- **Rule 16** — …
-- **Rule 17** — …
+- **Rule-TREE-PANEL-016** — …
+- **Rule-TREE-PANEL-017** — …
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The create dialog
 
@@ -170,7 +191,8 @@ These documents are for testers. Every sentence is checked against that reader.
   sentences. The one exception is the user story, which is one sentence in
   three fixed parts however long it runs.
 - **No dashes and no semicolons in a sentence.** A dash joins two ideas. Split
-  them. A dash may only separate a number from the text after it: *Rule 8 — …*
+  them. A dash may only separate a number from the text after it:
+  *Rule-TREE-PANEL-008 — …*
 - **A list, not a sentence with parts.** Three or more things go in a list when
   each one needs more than a word or two. Steps go in a numbered list. A short
   series stays in the sentence: *create, name, group, order, retire and
@@ -205,8 +227,8 @@ These documents are for testers. Every sentence is checked against that reader.
 - **"The tester", never "the user".** It is who the product is for.
 - **A key is written as the plugin shows it**, in backticks: `Ctrl+M`, `F2`,
   `Shift+F6`, `Delete`, `Enter`. Not "control-M", not "the F2 key".
-- **A menu label is written exactly**, in bold: **Create**, **Rename**, **Remove**.
-  If the label changes, the document changes in the same commit.
+- **A menu label is written exactly**, in bold: **Create**, **Rename**,
+  **Remove**. If the label changes, the document changes in the same commit.
 - **A notification is quoted exactly**, in italics: the tester sees *Removed 4*,
   so the scenario says *Removed 4*.
 - **What is refused is stated as plainly as what is allowed.** *"The two fixed
@@ -250,8 +272,9 @@ A reader is never more than one click from the index.
 ## When behavior changes
 
 The page changes **in the same commit** as the code. A commit that changes what
-a key does, and does not change the step that names it, is incomplete. The review should say so. This is the whole reason the
-documentation lives in this repository, rather than beside it.
+a key does, and does not change the step that names it, is incomplete. The
+review should say so. This is the whole reason the documentation lives in this
+repository, rather than beside it.
 
 ---
 

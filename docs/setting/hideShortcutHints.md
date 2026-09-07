@@ -9,14 +9,14 @@ There is no key for this. It is the checkbox at the bottom of the page.
 
 ## Rules
 
-- **Rule 27** — The hints are on until the tester turns them off.
-- **Rule 28** — One answer covers every Testin dialog at once.
-- **Rule 29** — The setting is read as each strip is drawn, so it takes effect
-  on the next dialog, not the next IDE.
-- **Rule 30** — A dialog may still leave its own strip out for its own reasons.
-  The setting can only take a strip away, never add one.
+- **Rule-SETTING-027** — The hints are on until the tester turns them off.
+- **Rule-SETTING-028** — One answer covers every Testin dialog at once.
+- **Rule-SETTING-029** — The setting is read as each strip is drawn, so it takes
+  effect on the next dialog, not the next IDE.
+- **Rule-SETTING-030** — A dialog may still leave its own strip out for its own
+  reasons. The setting can only take a strip away, never add one.
 
-Rules 1 to 6 hold everywhere on the page. They are on
+Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
 [the settings page](main.md#rules-that-hold-everywhere-on-the-page).
 
 ## The screen

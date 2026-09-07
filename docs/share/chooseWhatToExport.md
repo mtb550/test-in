@@ -9,15 +9,15 @@ There is no key for this. The table is in the export dialog.
 
 ## Rules
 
-- **Rule 16** — Every test case arrives ticked.
-- **Rule 17** — The box in the first column's heading ticks or unticks the whole
-  tab.
-- **Rule 18** — Every column but the number can be typed into.
-- **Rule 19** — A correction made here changes the file, and never the test case
-  itself.
-- **Rule 20** — Moving away from a cell saves what was typed in it.
+- **Rule-SHARE-016** — Every test case arrives ticked.
+- **Rule-SHARE-017** — The box in the first column's heading ticks or unticks
+  the whole tab.
+- **Rule-SHARE-018** — Every column but the number can be typed into.
+- **Rule-SHARE-019** — A correction made here changes the file, and never the
+  test case itself.
+- **Rule-SHARE-020** — Moving away from a cell saves what was typed in it.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## The two special columns

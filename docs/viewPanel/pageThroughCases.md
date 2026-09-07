@@ -10,14 +10,15 @@ keys.
 
 ## Rules
 
-- **Rule 19** — The two keys work from any of the three tabs.
-- **Rule 20** — An arrow with nowhere to go is gray.
-- **Rule 21** — Paging says nothing.
-- **Rule 22** — Only two gestures hand over more than one test case. They are
-  **View Details** on several selected cards, and following the selection.
+- **Rule-VIEW-PANEL-019** — The two keys work from any of the three tabs.
+- **Rule-VIEW-PANEL-020** — An arrow with nowhere to go is gray.
+- **Rule-VIEW-PANEL-021** — Paging says nothing.
+- **Rule-VIEW-PANEL-022** — Only two gestures hand over more than one test case.
+  They are **View Details** on several selected cards, and following the
+  selection.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen
 
@@ -51,7 +52,7 @@ nothing.
 **If there is no previous test case** — the back arrow is gray.
 
 **If the panel was handed one test case** — both arrows are gray from the start.
-That is every gesture except the two named in rule 22.
+That is every gesture except the two named in Rule-VIEW-PANEL-022.
 
 **If the panel is showing nothing** — both arrows are gray.
 

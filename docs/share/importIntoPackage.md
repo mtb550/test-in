@@ -9,14 +9,14 @@ There is no key for this. The same **Import** entry, on a package.
 
 ## Rules
 
-- **Rule 30** — One new test set is made for each sheet, named after the sheet
-  with special characters removed.
-- **Rule 31** — The test sets are made before any test case is written, because
-  making one generates a Java class.
-- **Rule 32** — No editor is opened afterwards, because a package has no editor
-  of its own.
+- **Rule-SHARE-030** — One new test set is made for each sheet, named after the
+  sheet with special characters removed.
+- **Rule-SHARE-031** — The test sets are made before any test case is written,
+  because making one generates a Java class.
+- **Rule-SHARE-032** — No editor is opened afterwards, because a package has no
+  editor of its own.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

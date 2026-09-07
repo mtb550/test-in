@@ -10,12 +10,12 @@ disabled.
 
 ## Rules
 
-- **Rule 47** — Turning a test case off writes `enabled = false` into its
-  method's annotation.
-- **Rule 48** — Turning it back on takes the attribute off again, rather than
-  writing `enabled = true`.
+- **Rule-CODEGEN-047** — Turning a test case off writes `enabled = false` into
+  its method's annotation.
+- **Rule-CODEGEN-048** — Turning it back on takes the attribute off again,
+  rather than writing `enabled = true`.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

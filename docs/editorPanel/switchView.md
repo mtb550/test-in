@@ -9,18 +9,19 @@ There is no key for this. The button is on the toolbar.
 
 ## Rules
 
-- **Rule 15** — Only one of the two buttons is on the toolbar at a time. It is
-  always the view the tester is not in.
-- **Rule 16** — The grid is built the first time the tester asks for it, not
-  when the editor opens.
-- **Rule 17** — The two views show the same rows, and the selection follows from
-  one to the other.
-- **Rule 18** — Anything half typed in a grid cell is saved, not thrown away,
-  before the grid is rebuilt.
-- **Rule 19** — The grid has one column for each field the tester chose to show,
-  in a fixed order.
+- **Rule-EDITOR-PANEL-015** — Only one of the two buttons is on the toolbar at a
+  time. It is always the view the tester is not in.
+- **Rule-EDITOR-PANEL-016** — The grid is built the first time the tester asks
+  for it, not when the editor opens.
+- **Rule-EDITOR-PANEL-017** — The two views show the same rows, and the
+  selection follows from one to the other.
+- **Rule-EDITOR-PANEL-018** — Anything half typed in a grid cell is saved, not
+  thrown away, before the grid is rebuilt.
+- **Rule-EDITOR-PANEL-019** — The grid has one column for each field the tester
+  chose to show, in a fixed order.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen

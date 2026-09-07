@@ -11,13 +11,14 @@ panel's toolbar.
 
 ## Rules
 
-- **Rule 7** — The gear button on the tree panel opens this page directly.
-- **Rule 8** — **Apply** and **OK** stay gray until something on the page
-  differs from what is stored.
-- **Rule 9** — Pressing **Apply** writes every field at once, not only the one
-  that changed.
+- **Rule-SETTING-007** — The gear button on the tree panel opens this page
+  directly.
+- **Rule-SETTING-008** — **Apply** and **OK** stay gray until something on the
+  page differs from what is stored.
+- **Rule-SETTING-009** — Pressing **Apply** writes every field at once, not only
+  the one that changed.
 
-Rules 1 to 6 hold everywhere on the page. They are on
+Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
 [the settings page](main.md#rules-that-hold-everywhere-on-the-page).
 
 ## The four ways in

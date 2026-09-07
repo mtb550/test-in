@@ -9,17 +9,19 @@
 
 ## Rules
 
-- **Rule 46** — Only some columns can be typed into. The rest never open.
-- **Rule 47** — `Ctrl+Enter` puts a line break in. `Enter` saves.
-- **Rule 48** — Clicking away from an open cell saves it.
-- **Rule 49** — What is stored is what Testin made of what was typed, and the
-  cell is redrawn to match.
-- **Rule 50** — A cell that ends up the same as it started writes nothing and
-  says nothing.
-- **Rule 51** — Every cell saved is one entry on the undo history, named after
-  the test case.
+- **Rule-EDITOR-PANEL-046** — Only some columns can be typed into. The rest
+  never open.
+- **Rule-EDITOR-PANEL-047** — `Ctrl+Enter` puts a line break in. `Enter` saves.
+- **Rule-EDITOR-PANEL-048** — Clicking away from an open cell saves it.
+- **Rule-EDITOR-PANEL-049** — What is stored is what Testin made of what was
+  typed, and the cell is redrawn to match.
+- **Rule-EDITOR-PANEL-050** — A cell that ends up the same as it started writes
+  nothing and says nothing.
+- **Rule-EDITOR-PANEL-051** — Every cell saved is one entry on the undo history,
+  named after the test case.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Which columns can be typed into

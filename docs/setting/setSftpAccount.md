@@ -9,14 +9,14 @@ There is no key for this. It is the **SFTP account** row.
 
 ## Rules
 
-- **Rule 31** — The account belongs to this machine and this person. It is never
-  written into the file the team shares.
-- **Rule 32** — An empty account means the tester has not said. The sync then
-  asks.
-- **Rule 33** — The sync can write this row too, so a tester who answers the
-  sync's question never has to visit this page.
+- **Rule-SETTING-031** — The account belongs to this machine and this person. It
+  is never written into the file the team shares.
+- **Rule-SETTING-032** — An empty account means the tester has not said. The
+  sync then asks.
+- **Rule-SETTING-033** — The sync can write this row too, so a tester who
+  answers the sync's question never has to visit this page.
 
-Rules 1 to 6 hold everywhere on the page. They are on
+Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
 [the settings page](main.md#rules-that-hold-everywhere-on-the-page).
 
 ## Main flow

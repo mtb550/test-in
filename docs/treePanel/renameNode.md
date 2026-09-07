@@ -10,14 +10,14 @@
 
 ## Rules
 
-- **Rule 30** — The test project and the two containers cannot be renamed from
-  the tree.
-- **Rule 31** — Renaming a test set or a test set package renames its automation
-  code with it, so the test case stays runnable.
-- **Rule 32** — A rename can be undone.
+- **Rule-TREE-PANEL-030** — The test project and the two containers cannot be
+  renamed from the tree.
+- **Rule-TREE-PANEL-031** — Renaming a test set or a test set package renames
+  its automation code with it, so the test case stays runnable.
+- **Rule-TREE-PANEL-032** — A rename can be undone.
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Rename dialog
 
@@ -66,11 +66,11 @@ Already Exists* is shown in red.
 **If the test project or a container is selected** — **Rename** is gray, and
 `Shift+F6` does nothing.
 
-**If the folder cannot be renamed on disk** — nothing is renamed and no *Renamed*
-is shown. An IDE notification titled *Rename Failed* stays in the notification
-log, reading *Operation failed:* and the reason, or *Could not find path on
-disk:* and the path. The other refusals above are fading balloons; this one is
-not.
+**If the folder cannot be renamed on disk** — nothing is renamed and no
+*Renamed* is shown. An IDE notification titled *Rename Failed* stays in the
+notification log, reading *Operation failed:* and the reason, or *Could not find
+path on disk:* and the path. The other refusals above are fading balloons; this
+one is not.
 
 **If several rows are selected** — **Rename** stays black and renames the first
 of them, saying nothing about the rest.

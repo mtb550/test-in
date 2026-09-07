@@ -9,14 +9,17 @@ There is no key for this. The button's tooltip reads **Refresh**.
 
 ## Rules
 
-- **Rule 114** — Refresh clears every filter and the search text.
-- **Rule 115** — Refresh remembers which test case was selected, and lands on
-  the page holding it.
-- **Rule 116** — The tester's own refresh always reloads, even with a grid cell
-  open. A refresh Testin starts on its own leaves a busy editor alone.
-- **Rule 117** — In a test run editor, refresh also stops the execution.
+- **Rule-EDITOR-PANEL-114** — Refresh clears every filter and the search text.
+- **Rule-EDITOR-PANEL-115** — Refresh remembers which test case was selected,
+  and lands on the page holding it.
+- **Rule-EDITOR-PANEL-116** — The tester's own refresh always reloads, even with
+  a grid cell open. A refresh Testin starts on its own leaves a busy editor
+  alone.
+- **Rule-EDITOR-PANEL-117** — In a test run editor, refresh also stops the
+  execution.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow

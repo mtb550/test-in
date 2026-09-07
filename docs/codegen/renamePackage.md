@@ -10,13 +10,14 @@ There is no key for this. It happens when a package is renamed or moved.
 
 ## Rules
 
-- **Rule 56** — Renaming a package renames its folder, then rewrites the package
-  line in every Java file beneath it.
-- **Rule 57** — Moving a package does the same, after moving the folder.
-- **Rule 58** — A package dropped into itself is not a move, and nothing is
-  rewritten.
+- **Rule-CODEGEN-056** — Renaming a package renames its folder, then rewrites
+  the package line in every Java file beneath it.
+- **Rule-CODEGEN-057** — Moving a package does the same, after moving the
+  folder.
+- **Rule-CODEGEN-058** — A package dropped into itself is not a move, and
+  nothing is rewritten.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## What this covers

@@ -9,16 +9,17 @@ its siblings, **so that** the tree reads in the order the work is done.
 
 ## Rules
 
-- **Rule 44** — A number is 1 or higher. Leave it empty and Testin sorts by date
-  instead.
-- **Rule 45** — Two siblings may carry the same number. The older one comes
-  first.
-- **Rule 46** — A retired node sorts after every live sibling. Its number does
-  not change that. (rule 8, rule 10)
-- **Rule 47** — The test project and the two containers cannot be ordered.
+- **Rule-TREE-PANEL-044** — A number is 1 or higher. Leave it empty and Testin
+  sorts by date instead.
+- **Rule-TREE-PANEL-045** — Two siblings may carry the same number. The older
+  one comes first.
+- **Rule-TREE-PANEL-046** — A retired node sorts after every live sibling. Its
+  number does not change that. (Rule-TREE-PANEL-008, Rule-TREE-PANEL-010)
+- **Rule-TREE-PANEL-047** — The test project and the two containers cannot be
+  ordered.
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Order dialog
 

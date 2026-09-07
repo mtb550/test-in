@@ -10,12 +10,12 @@ There is no key for this. It happens when a test set is renamed, which is
 
 ## Rules
 
-- **Rule 51** — The class is renamed before the test set is, while the old name
-  still finds it.
-- **Rule 52** — The new class name is the new test set name cleaned, with `Test`
-  on the end.
+- **Rule-CODEGEN-051** — The class is renamed before the test set is, while the
+  old name still finds it.
+- **Rule-CODEGEN-052** — The new class name is the new test set name cleaned,
+  with `Test` on the end.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

@@ -9,15 +9,17 @@
 
 ## Rules
 
-- **Rule 59** — The confirmation names the test case, or counts them, and says
-  which test set they are in.
-- **Rule 60** — A removal can be taken back with `Ctrl+Z`.
-- **Rule 61** — Nothing is renumbered. The removed test case simply leaves a gap
-  in the order, and the numbers on screen close up on their own.
-- **Rule 62** — A test case that is waiting to be pasted is removed without
-  asking again, because the move was already agreed to.
+- **Rule-EDITOR-PANEL-059** — The confirmation names the test case, or counts
+  them, and says which test set they are in.
+- **Rule-EDITOR-PANEL-060** — A removal can be taken back with `Ctrl+Z`.
+- **Rule-EDITOR-PANEL-061** — Nothing is renumbered. The removed test case
+  simply leaves a gap in the order, and the numbers on screen close up on their
+  own.
+- **Rule-EDITOR-PANEL-062** — A test case that is waiting to be pasted is
+  removed without asking again, because the move was already agreed to.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen

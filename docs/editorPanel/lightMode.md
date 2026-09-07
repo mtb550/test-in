@@ -61,7 +61,8 @@ open.
 ## The window
 
 The sketches below are at the real size. The content is the sample project's
-Login test case, mid-way through Cycle 2. The window is about 420 pixels wide to start with.
+Login test case, mid-way through Cycle 2. The window is about 420 pixels wide to
+start with.
 
 ### Before the tester presses Start
 
@@ -164,8 +165,9 @@ Four checkboxes decide what the window shows:
 - the verdict buttons
 - the status bar
 
-It carries the toolbar's own Details icon, a tick box with a tick in it. It is the same picture in the IDE and in the
-window, and it is a picture of exactly what it opens.
+It carries the toolbar's own Details icon, a tick box with a tick in it. It is
+the same picture in the IDE and in the window, and it is a picture of exactly
+what it opens.
 
 ### 4. Run and counter
 
@@ -436,10 +438,10 @@ inside a form that `Enter` saves and `Escape` throws away.
 ### 17. The verdict buttons disappear while the form is open
 
 There is no **Cancel** button and no **Save & next** button. `Enter` and
-`Escape` already do the same, and two buttons repeating them would cost a row
-in a window whose whole argument is that it is small. The clocks keep running, because the tester is still on this test case
-while they write the failure up. The status bar names the two keys that work
-here.
+`Escape` already do the same, and two buttons repeating them would cost a row in
+a window whose whole argument is that it is small. The clocks keep running,
+because the tester is still on this test case while they write the failure up.
+The status bar names the two keys that work here.
 
 That is the one thing the removal had to pay for. With no buttons, the status
 bar is the only place `Enter` and `Escape` are written down. So while a form is
@@ -478,11 +480,12 @@ in the IDE. This is written down because a later reader will find two pieces of
 wheel-zoom code and try to merge them.
 
 **It opens at the size the tester is used to, then goes its own way.** That
-happens every time, not just the first. The size is read from the IDE's editor font as the window opens. So a tester who changes the
-IDE font gets a window that agrees with it. The zoom on top of that is the
-tester's own. It is remembered per machine, alongside the position, the width
-and the four view toggles. It used to go back to the normal size every time the
-window opened, which meant setting it again each time.
+happens every time, not just the first. The size is read from the IDE's editor
+font as the window opens. So a tester who changes the IDE font gets a window
+that agrees with it. The zoom on top of that is the tester's own. It is
+remembered per machine, alongside the position, the width and the four view
+toggles. It used to go back to the normal size every time the window opened,
+which meant setting it again each time.
 
 The size is asked for each time, not fixed once. The editor font is a setting,
 and a tester can change it while the IDE is running. A fixed size would freeze
@@ -496,10 +499,10 @@ base size.
 - labels and the test set name are two points smaller
 
 No text ever goes below 8 points, which is where the rest of the plugin stops
-too. One number moves, and everything moves together. So the layout cannot come apart at a size
-nobody tested. The expected result and the detail values share a size on
-purpose. They are the same kind of thing being read, and setting them apart said
-they were not.
+too. One number moves, and everything moves together. So the layout cannot come
+apart at a size nobody tested. The expected result and the detail values share a
+size on purpose. They are the same kind of thing being read, and setting them
+apart said they were not.
 
 **No other key held down.** Everywhere else in the IDE, and on every other
 Testin screen, zoom is `Ctrl` and the wheel. Here it is the wheel alone, for
@@ -614,8 +617,8 @@ test case fields appear. The menu chooses between the things the window itself
 holds instead. The four fields behind Details stay fixed: steps, test data,
 preconditions and tags. Four switches over parts of a window cannot grow into
 more. A list of 18 switches over test case fields is a settings screen, inside a
-window built to have none. If the wrong four are behind Details, changing those four is
-the fix.
+window built to have none. If the wrong four are behind Details, changing those
+four is the fix.
 
 ### Details open with a key, and that costs something
 

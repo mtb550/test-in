@@ -11,17 +11,19 @@ run.
 
 ## Rules
 
-- **Rule 29** — The run rows are drawn only when the panel was opened from a
-  test run that holds this test case.
-- **Rule 30** — The rows come from the test run itself, so the panel and a
-  report on the same test run can never disagree.
-- **Rule 31** — A run row with nothing in it is not drawn.
-- **Rule 32** — Recording a pass clears the actual result, the stacktrace, the
-  bug severity and the bug priority. Four of the six rows go with it.
-- **Rule 33** — A test case the test run has not reached yet reads **Pending**.
+- **Rule-VIEW-PANEL-029** — The run rows are drawn only when the panel was
+  opened from a test run that holds this test case.
+- **Rule-VIEW-PANEL-030** — The rows come from the test run itself, so the panel
+  and a report on the same test run can never disagree.
+- **Rule-VIEW-PANEL-031** — A run row with nothing in it is not drawn.
+- **Rule-VIEW-PANEL-032** — Recording a pass clears the actual result, the
+  stacktrace, the bug severity and the bug priority. Four of the six rows go
+  with it.
+- **Rule-VIEW-PANEL-033** — A test case the test run has not reached yet reads
+  **Pending**.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The rows, in order
 

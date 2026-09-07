@@ -10,7 +10,8 @@ to somebody who does not have the IDE.
 |---|---|
 | **Part of Testin** | Reports |
 | **Answers** | How a report is made, what it contains, and what each format holds |
-| **Numbering** | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are numbered 1 and up, and belong to reports |
+| **Numbering** | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` and up, and belong to reports |
+| **Last rule** | `Rule-REPORT-015`. The next rule written here is `Rule-REPORT-016` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -48,15 +49,15 @@ a ticket, mailed to a manager, or kept as the record that a release was tested.
 
 ## Rules that hold everywhere
 
-- **Rule 1** — A report is about exactly one test run.
-- **Rule 2** — Every format reads the same figures, so two reports on one test
-  run cannot disagree.
-- **Rule 3** — A report is written after the dialog closes, under a progress bar
-  that cannot be canceled.
-- **Rule 4** — A report is written where the tester chose. It never lands under
-  the Testin folder.
-- **Rule 5** — The project named in a report is the test project, not the code
-  project the IDE has open.
+- **Rule-REPORT-001** — A report is about exactly one test run.
+- **Rule-REPORT-002** — Every format reads the same figures, so two reports on
+  one test run cannot disagree.
+- **Rule-REPORT-003** — A report is written after the dialog closes, under a
+  progress bar that cannot be canceled.
+- **Rule-REPORT-004** — A report is written where the tester chose. It never
+  lands under the Testin folder.
+- **Rule-REPORT-005** — The project named in a report is the test project, not
+  the code project the IDE has open.
 
 ---
 
@@ -126,13 +127,13 @@ tables**. A tester who wants the whole report should not choose this format.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule 3 — a refusal is stated | Leaving the folder, the file name or the format empty shows no message and no red mark. The cursor moves and the dialog stays open, which reads as a button that does not work. |
-| **Difference 2** | Rule 3 — `Enter` confirms a dialog | `Enter` does nothing in the report dialog. The tester has to press **Generate**. |
-| **Difference 3** | Rule 1 — a report is about one test run | The report button on a run editor's toolbar is never gray. Pressed where no test run can be worked out, it does nothing and says nothing. |
-| **Difference 4** | Rule 2 — a report says what is true | A test run nobody executed still prints **Execution Started** and **Execution Ended** as empty rows. Every other empty row is left out. |
-| **Difference 5** | Rule 2 — one name for one thing | The message after a report is made names the format in capitals, so it reads *WORD Report Generated* and *XLSX Report Generated*. The dialog beside it calls them **Word** and **Excel**. |
-| **Difference 6** | Rule 4 — one kind of file opens one way | A web page made as a report opens in whatever application claims the file. The same page made as an export opens in the browser. |
-| **Difference 7** | Rule 3 — long work can be watched | The progress bar cannot be canceled. A report on a very large test run has to be waited out. |
+| **Difference 1** | Rule-REPORT-003 — a refusal is stated | Leaving the folder, the file name or the format empty shows no message and no red mark. The cursor moves and the dialog stays open, which reads as a button that does not work. |
+| **Difference 2** | Rule-REPORT-003 — `Enter` confirms a dialog | `Enter` does nothing in the report dialog. The tester has to press **Generate**. |
+| **Difference 3** | Rule-REPORT-001 — a report is about one test run | The report button on a run editor's toolbar is never gray. Pressed where no test run can be worked out, it does nothing and says nothing. |
+| **Difference 4** | Rule-REPORT-002 — a report says what is true | A test run nobody executed still prints **Execution Started** and **Execution Ended** as empty rows. Every other empty row is left out. |
+| **Difference 5** | Rule-REPORT-002 — one name for one thing | The message after a report is made names the format in capitals, so it reads *WORD Report Generated* and *XLSX Report Generated*. The dialog beside it calls them **Word** and **Excel**. |
+| **Difference 6** | Rule-REPORT-004 — one kind of file opens one way | A web page made as a report opens in whatever application claims the file. The same page made as an export opens in the browser. |
+| **Difference 7** | Rule-REPORT-003 — long work can be watched | The progress bar cannot be canceled. A report on a very large test run has to be waited out. |
 
 ---
 

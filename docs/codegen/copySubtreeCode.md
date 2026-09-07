@@ -10,14 +10,14 @@ which is [UC-TREE-PANEL-014](../treePanel/copyNodes.md).
 
 ## Rules
 
-- **Rule 22** — Copying a package writes the code for everything beneath it, at
-  any depth, not only for the node that was dropped.
-- **Rule 23** — A test set's own test cases are written before its children, so
-  the class exists before a method goes into it.
-- **Rule 24** — The whole subtree is one change, so the tester gets one undo for
-  the copy they made.
+- **Rule-CODEGEN-022** — Copying a package writes the code for everything
+  beneath it, at any depth, not only for the node that was dropped.
+- **Rule-CODEGEN-023** — A test set's own test cases are written before its
+  children, so the class exists before a method goes into it.
+- **Rule-CODEGEN-024** — The whole subtree is one change, so the tester gets one
+  undo for the copy they made.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

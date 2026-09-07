@@ -10,15 +10,16 @@ There is no button for this. It happens when the description is filled in.
 
 ## Rules
 
-- **Rule 19** — Filling in a description on a test case that has no method
-  writes the method, rather than reporting that there is nothing to change.
-- **Rule 20** — Changing a description on a test case that already has a method
-  rewrites the method instead. That is
+- **Rule-CODEGEN-019** — Filling in a description on a test case that has no
+  method writes the method, rather than reporting that there is nothing to
+  change.
+- **Rule-CODEGEN-020** — Changing a description on a test case that already has
+  a method rewrites the method instead. That is
   [UC-CODEGEN-010](renameTestCase.md).
-- **Rule 21** — A description cleared back to nothing leaves the method under
-  the name it already has.
+- **Rule-CODEGEN-021** — A description cleared back to nothing leaves the method
+  under the name it already has.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

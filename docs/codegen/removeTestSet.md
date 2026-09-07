@@ -11,11 +11,12 @@ There is no key for this. It happens when the node is removed, which is
 
 ## Rules
 
-- **Rule 59** — Removing a test set deletes its class file. Removing a package
-  deletes its folder and everything under it.
-- **Rule 60** — A removal that finds no code to delete says nothing at all.
+- **Rule-CODEGEN-059** — Removing a test set deletes its class file. Removing a
+  package deletes its folder and everything under it.
+- **Rule-CODEGEN-060** — A removal that finds no code to delete says nothing at
+  all.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

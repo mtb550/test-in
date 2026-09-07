@@ -10,15 +10,18 @@ what the machine can judge.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-176** — This editor claims each test case first, so the verdict comes
-  back to this test run and not to another editor showing the same test case.
-- **Rule-EDITOR-PANEL-177** — Claiming marks the test run **In Progress** if it is not
-  already.
-- **Rule-EDITOR-PANEL-178** — A verdict from the automation is written the same way a
-  keyboard verdict is.
-- **Rule-EDITOR-PANEL-179** — The framework's own timing replaces whatever the clock counted.
+- **Rule-EDITOR-PANEL-176** — This editor claims each test case first, so the
+  verdict comes back to this test run and not to another editor showing the same
+  test case.
+- **Rule-EDITOR-PANEL-177** — Claiming marks the test run **In Progress** if it
+  is not already.
+- **Rule-EDITOR-PANEL-178** — A verdict from the automation is written the same
+  way a keyboard verdict is.
+- **Rule-EDITOR-PANEL-179** — The framework's own timing replaces whatever the
+  clock counted.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow

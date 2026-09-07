@@ -10,7 +10,8 @@ it.
 |---|---|
 | **Part of Testin** | The view panel |
 | **Answers** | What the panel shows, how a test case gets into it, and what a tester can do from it |
-| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-015`. Rules are numbered 1 and up, and belong to the view panel |
+| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-015`. Rules are `Rule-VIEW-PANEL-001` and up, and belong to the view panel |
+| **Last rule** | `Rule-VIEW-PANEL-059`. The next rule written here is `Rule-VIEW-PANEL-060` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -65,23 +66,24 @@ in front of them while they write down what actually happened.
 
 ## Rules that hold everywhere in the panel
 
-- **Rule 1** — The panel is docked on the right of the IDE. Its stripe reads
-  **Testin**, exactly as the tree panel's does. The side they are on is the only
-  thing that tells them apart.
-- **Rule 2** — The panel shows one test case at a time.
-- **Rule 3** — The panel never opens on its own. The tester asks for a test
-  case's details, and it opens.
-- **Rule 4** — Once open, the panel follows the tester. Once closed, it stays
-  closed until the tester asks again.
-- **Rule 5** — Every value is read again from Testin's memory each time the
-  panel draws. The panel cannot show a value that was changed somewhere else.
-- **Rule 6** — A field with nothing in it is not drawn. Its caption goes with
-  it, so the panel is never a column of empty rows.
-- **Rule 7** — Opening, paging and closing say nothing. There is no message for
-  any of them.
-- **Rule 8** — The panel has three tabs, and all three are drawn every time it
-  refreshes.
-- **Rule 9** — Closing any Testin editor empties the panel.
+- **Rule-VIEW-PANEL-001** — The panel is docked on the right of the IDE. Its
+  stripe reads **Testin**, exactly as the tree panel's does. The side they are
+  on is the only thing that tells them apart.
+- **Rule-VIEW-PANEL-002** — The panel shows one test case at a time.
+- **Rule-VIEW-PANEL-003** — The panel never opens on its own. The tester asks
+  for a test case's details, and it opens.
+- **Rule-VIEW-PANEL-004** — Once open, the panel follows the tester. Once
+  closed, it stays closed until the tester asks again.
+- **Rule-VIEW-PANEL-005** — Every value is read again from Testin's memory each
+  time the panel draws. The panel cannot show a value that was changed somewhere
+  else.
+- **Rule-VIEW-PANEL-006** — A field with nothing in it is not drawn. Its caption
+  goes with it, so the panel is never a column of empty rows.
+- **Rule-VIEW-PANEL-007** — Opening, paging and closing say nothing. There is no
+  message for any of them.
+- **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
+  every time it refreshes.
+- **Rule-VIEW-PANEL-009** — Closing any Testin editor empties the panel.
 
 ---
 
@@ -186,18 +188,18 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule 3 — a key that is written is a key that works | The run button's tooltip says `F5`. The go to code button's says `Shift+F5`. Neither key does anything while the focus is in the panel. Both work on the cards in the editor. |
-| **Difference 2** | Rule 4 — the tester closes the panel when they want the screen | `Escape` closes the panel from the editor, and does nothing from inside the panel. A tester who has just used `F2`, which needs the focus in the panel, cannot close it with `Escape`. |
-| **Difference 3** | Rule 5 — reading a panel never changes anything | Clicking the last step of the path fails when the panel was opened from a test run. It looks for a test set where a test run is, finds none, and stops with an internal error the tester cannot read. |
-| **Difference 4** | Rule 3 — what looks clickable is clickable | Every step of the path takes a hand pointer and underlines itself. Only the last one does anything. Clicking **Test Cases** to go up a level does nothing, and says nothing. |
-| **Difference 5** | Rule 8 — the three tabs describe the same test case | A failed test case shows **Blocker** and **High** on the Details tab, while the tab beside it reads *No bugs found for this test case.* The Open Bugs tab is not built, and never looks at the test case. |
-| **Difference 6** | Rule 6 — nothing is drawn about a test case that is not there | With no test case selected, Details reads *Select a test case to view details* and Open Bugs reads *No bugs found for this test case.* There is no test case. |
-| **Difference 7** | Rule 1 — a tester can tell the two panels apart | Both Testin tool windows are named **Testin**. This is the tree panel's difference too. |
-| **Difference 8** | Rule 6 — one look for one kind of thing | In one column of one panel, the run captions have no colon and the test case captions do. |
-| **Difference 9** | Rule 9 — closing an editor empties the panel | It empties the panel whichever editor closed. A tester reading a test case from the first editor, who closes the second, watches the panel go blank for no reason they can see. |
-| **Difference 10** | Rule 7 — a change confirms itself once | An edit made with `F2` that Testin cannot find a place to write is dropped. No message, no balloon, nothing on screen. Only the log says so. |
-| **Difference 11** | Rule 8 — the panel redraws when its test case changes | Every result a running test reports redraws the whole panel, whichever test case reported. A test run of 50 test cases rebuilds the panel 50 times, including the two tabs that never change. |
-| **Difference 12** | Rule 3 — the panel opens when the tester asks for a test case | Opening the view panel first, before anything else in Testin, can raise *Testin Setup Required*. The tester asked to read a test case and was handed a settings notification. |
+| **Difference 1** | Rule-VIEW-PANEL-003 — a key that is written is a key that works | The run button's tooltip says `F5`. The go to code button's says `Shift+F5`. Neither key does anything while the focus is in the panel. Both work on the cards in the editor. |
+| **Difference 2** | Rule-VIEW-PANEL-004 — the tester closes the panel when they want the screen | `Escape` closes the panel from the editor, and does nothing from inside the panel. A tester who has just used `F2`, which needs the focus in the panel, cannot close it with `Escape`. |
+| **Difference 3** | Rule-VIEW-PANEL-005 — reading a panel never changes anything | Clicking the last step of the path fails when the panel was opened from a test run. It looks for a test set where a test run is, finds none, and stops with an internal error the tester cannot read. |
+| **Difference 4** | Rule-VIEW-PANEL-003 — what looks clickable is clickable | Every step of the path takes a hand pointer and underlines itself. Only the last one does anything. Clicking **Test Cases** to go up a level does nothing, and says nothing. |
+| **Difference 5** | Rule-VIEW-PANEL-008 — the three tabs describe the same test case | A failed test case shows **Blocker** and **High** on the Details tab, while the tab beside it reads *No bugs found for this test case.* The Open Bugs tab is not built, and never looks at the test case. |
+| **Difference 6** | Rule-VIEW-PANEL-006 — nothing is drawn about a test case that is not there | With no test case selected, Details reads *Select a test case to view details* and Open Bugs reads *No bugs found for this test case.* There is no test case. |
+| **Difference 7** | Rule-VIEW-PANEL-001 — a tester can tell the two panels apart | Both Testin tool windows are named **Testin**. This is the tree panel's difference too. |
+| **Difference 8** | Rule-VIEW-PANEL-006 — one look for one kind of thing | In one column of one panel, the run captions have no colon and the test case captions do. |
+| **Difference 9** | Rule-VIEW-PANEL-009 — closing an editor empties the panel | It empties the panel whichever editor closed. A tester reading a test case from the first editor, who closes the second, watches the panel go blank for no reason they can see. |
+| **Difference 10** | Rule-VIEW-PANEL-007 — a change confirms itself once | An edit made with `F2` that Testin cannot find a place to write is dropped. No message, no balloon, nothing on screen. Only the log says so. |
+| **Difference 11** | Rule-VIEW-PANEL-008 — the panel redraws when its test case changes | Every result a running test reports redraws the whole panel, whichever test case reported. A test run of 50 test cases rebuilds the panel 50 times, including the two tabs that never change. |
+| **Difference 12** | Rule-VIEW-PANEL-003 — the panel opens when the tester asks for a test case | Opening the view panel first, before anything else in Testin, can raise *Testin Setup Required*. The tester asked to read a test case and was handed a settings notification. |
 
 ---
 

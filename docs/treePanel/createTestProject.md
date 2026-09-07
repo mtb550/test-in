@@ -10,12 +10,13 @@ product under test has a place before any test is written.
 
 ## Rules
 
-- **Rule 16** — A test project is a folder directly under the Testin folder.
-  Any other folder there is ignored.
-- **Rule 17** — Creating a test project binds this code project to it.
+- **Rule-TREE-PANEL-016** — A test project is a folder directly under the Testin
+  folder. Any other folder there is ignored.
+- **Rule-TREE-PANEL-017** — Creating a test project binds this code project to
+  it.
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Create Project dialog
 
@@ -33,8 +34,8 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 
 1. **One field** — its gray hint text reads *set name or paste url...*. What the
    tester types decides what happens. A Git address is cloned, which is
-   [UC-TREE-PANEL-003](importTestProject.md). Anything else is the name of a new test
-   project. There is no list to pick from, because the tester would only be
+   [UC-TREE-PANEL-003](importTestProject.md). Anything else is the name of a new
+   test project. There is no list to pick from, because the tester would only be
    saying twice what they already typed.
 2. **The status bar** — every key this dialog answers to.
 
@@ -62,7 +63,7 @@ open.
 created, and *\<name\> Already Exists* is shown in red.
 
 **If no Testin folder is set** — the **New Test Project** button is gray.
-(rule 77)
+(Rule-TREE-PANEL-077)
 
 ---
 

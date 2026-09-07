@@ -9,12 +9,13 @@ There is no key for this. The button is at the far right of the toolbar.
 
 ## Rules
 
-- **Rule 118** — The dialog is about the node the editor is showing, not about
-  the test case that is selected.
-- **Rule 119** — The counts are worked out as the dialog opens and stored
-  nowhere.
+- **Rule-EDITOR-PANEL-118** — The dialog is about the node the editor is
+  showing, not about the test case that is selected.
+- **Rule-EDITOR-PANEL-119** — The counts are worked out as the dialog opens and
+  stored nowhere.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow

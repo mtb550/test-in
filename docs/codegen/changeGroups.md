@@ -11,12 +11,12 @@ There is no key for this. It happens when the groups are changed, which is
 
 ## Rules
 
-- **Rule 45** — The groups are written into the annotation as a list, using the
-  names in capitals.
-- **Rule 46** — A test case belonging to no group has no `groups` in its method
-  at all.
+- **Rule-CODEGEN-045** — The groups are written into the annotation as a list,
+  using the names in capitals.
+- **Rule-CODEGEN-046** — A test case belonging to no group has no `groups` in
+  its method at all.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

@@ -9,18 +9,20 @@
 
 ## Rules
 
-- **Rule 27** — The dialog opens showing the description alone. Every other
-  field appears when its key is pressed.
-- **Rule 28** — A field the tester never opened writes nothing.
-- **Rule 29** — A new test case has no place in the order yet, so it sorts last.
-- **Rule 30** — A new test case starts at the lowest priority.
-- **Rule 31** — The description, the expected result, the module, the
-  pre-conditions, the test data and each step have their spaces trimmed.
-- **Rule 32** — A blank step is dropped.
-- **Rule 33** — The dialog does not close when the tester clicks outside it, or
-  when the IDE loses the focus.
+- **Rule-EDITOR-PANEL-027** — The dialog opens showing the description alone.
+  Every other field appears when its key is pressed.
+- **Rule-EDITOR-PANEL-028** — A field the tester never opened writes nothing.
+- **Rule-EDITOR-PANEL-029** — A new test case has no place in the order yet, so
+  it sorts last.
+- **Rule-EDITOR-PANEL-030** — A new test case starts at the lowest priority.
+- **Rule-EDITOR-PANEL-031** — The description, the expected result, the module,
+  the pre-conditions, the test data and each step have their spaces trimmed.
+- **Rule-EDITOR-PANEL-032** — A blank step is dropped.
+- **Rule-EDITOR-PANEL-033** — The dialog does not close when the tester clicks
+  outside it, or when the IDE loses the focus.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen

@@ -9,15 +9,15 @@
 
 ## Rules
 
-- **Rule 6** — The file name is filled in already. It names the test project,
-  the test run, the date and the time.
-- **Rule 7** — Spaces and special characters are taken out of the project and
-  run names in the file name.
-- **Rule 8** — A part of the name that is empty is left out, rather than leaving
-  a gap.
-- **Rule 9** — The dialog closes before the work starts.
+- **Rule-REPORT-006** — The file name is filled in already. It names the test
+  project, the test run, the date and the time.
+- **Rule-REPORT-007** — Spaces and special characters are taken out of the
+  project and run names in the file name.
+- **Rule-REPORT-008** — A part of the name that is empty is left out, rather
+  than leaving a gap.
+- **Rule-REPORT-009** — The dialog closes before the work starts.
 
-Rules 1 to 5 hold everywhere. They are on
+Rule-REPORT-001 to Rule-REPORT-005 hold everywhere. They are on
 [the reports page](main.md#rules-that-hold-everywhere).
 
 ## The screen

@@ -9,16 +9,17 @@ There is no key for this. The offer appears on the message.
 
 ## Rules
 
-- **Rule 72** — A pull that stops leaves the repository part way through, and
-  Testin says so rather than leaving the tester to find out.
-- **Rule 73** — Two answers are offered: carry on once it is settled, or roll
-  the whole pull back.
-- **Rule 74** — Rolling back keeps everything that was here before the pull.
-- **Rule 75** — Where both sides changed different fields of one test case,
-  Testin merges them and asks only about the fields that really disagree.
-- **Rule 76** — A pull that will not move on is reported only to the log.
+- **Rule-SHARE-072** — A pull that stops leaves the repository part way through,
+  and Testin says so rather than leaving the tester to find out.
+- **Rule-SHARE-073** — Two answers are offered: carry on once it is settled, or
+  roll the whole pull back.
+- **Rule-SHARE-074** — Rolling back keeps everything that was here before the
+  pull.
+- **Rule-SHARE-075** — Where both sides changed different fields of one test
+  case, Testin merges them and asks only about the fields that really disagree.
+- **Rule-SHARE-076** — A pull that will not move on is reported only to the log.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

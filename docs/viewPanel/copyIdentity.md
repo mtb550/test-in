@@ -10,12 +10,13 @@ There is no key for this. The button sits beside the identity.
 
 ## Rules
 
-- **Rule 39** — The button turns into a green tick for one and a half seconds,
-  then turns back.
-- **Rule 40** — Copying raises no message. The tick is the whole confirmation.
+- **Rule-VIEW-PANEL-039** — The button turns into a green tick for one and a
+  half seconds, then turns back.
+- **Rule-VIEW-PANEL-040** — Copying raises no message. The tick is the whole
+  confirmation.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen
 

@@ -9,13 +9,13 @@ There is no key for this. The same **Export** entry, on a package.
 
 ## Rules
 
-- **Rule 13** — Each test set directly under the package becomes one sheet,
-  named after itself.
-- **Rule 14** — A test set holding no test cases produces no sheet.
-- **Rule 15** — Two sheets that would take the same name are numbered. The first
-  keeps the name, and the rest get a number in brackets.
+- **Rule-SHARE-013** — Each test set directly under the package becomes one
+  sheet, named after itself.
+- **Rule-SHARE-014** — A test set holding no test cases produces no sheet.
+- **Rule-SHARE-015** — Two sheets that would take the same name are numbered.
+  The first keeps the name, and the rest get a number in brackets.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

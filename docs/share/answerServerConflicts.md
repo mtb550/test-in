@@ -9,13 +9,14 @@ There is no key for this. The questions come after the sync.
 
 ## Rules
 
-- **Rule 93** — A file both sides changed is kept as it is here, and nothing is
-  sent for it, until the tester answers.
-- **Rule 94** — The tester is asked only about the fields that really disagree.
-- **Rule 95** — The answers are sent on the same sync, if nobody else has taken
-  the lock in the meantime.
+- **Rule-SHARE-093** — A file both sides changed is kept as it is here, and
+  nothing is sent for it, until the tester answers.
+- **Rule-SHARE-094** — The tester is asked only about the fields that really
+  disagree.
+- **Rule-SHARE-095** — The answers are sent on the same sync, if nobody else has
+  taken the lock in the meantime.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

@@ -10,19 +10,20 @@ uncommitted work.
 
 ## Rules
 
-- **Rule 42** — The review reads Git directly, so a repository the IDE does not
-  track and a test case Git has never seen both appear.
-- **Rule 43** — One row for each changed **field**, not one for each changed
-  file.
-- **Rule 44** — A changed file with nothing readable different still gets a row,
-  so it can be committed.
-- **Rule 45** — What a file is is decided by reading it, not by its name.
-- **Rule 46** — A rename is two rows, the removal first and the addition second.
-- **Rule 47** — Every row arrives selected.
-- **Rule 48** — Reading Git happens off the main thread, so the IDE stays
+- **Rule-SHARE-042** — The review reads Git directly, so a repository the IDE
+  does not track and a test case Git has never seen both appear.
+- **Rule-SHARE-043** — One row for each changed **field**, not one for each
+  changed file.
+- **Rule-SHARE-044** — A changed file with nothing readable different still gets
+  a row, so it can be committed.
+- **Rule-SHARE-045** — What a file is is decided by reading it, not by its name.
+- **Rule-SHARE-046** — A rename is two rows, the removal first and the addition
+  second.
+- **Rule-SHARE-047** — Every row arrives selected.
+- **Rule-SHARE-048** — Reading Git happens off the main thread, so the IDE stays
   usable.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## The screen

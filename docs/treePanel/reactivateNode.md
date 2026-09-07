@@ -11,14 +11,14 @@ again.
 
 ## Rules
 
-- **Rule 85** — Bringing a node back undoes nothing but the status. Everything
-  inside it is exactly as it was left.
+- **Rule-TREE-PANEL-085** — Bringing a node back undoes nothing but the status.
+  Everything inside it is exactly as it was left.
 
-Rule 54 holds here too. It says a status is set on one node at a time, and it is
-on [UC-TREE-PANEL-018](retireNode.md).
+Rule-TREE-PANEL-054 holds here too. It says a status is set on one node at a
+time, and it is on [UC-TREE-PANEL-018](retireNode.md).
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 
@@ -28,7 +28,7 @@ Rules 1 to 13 hold everywhere in the panel. They are on
    test set or a package.
 4. Testin writes the status, refreshes the tree, and shows *Active*.
 5. The node is no longer gray. It sorts among the live nodes again, by its own
-   number. (rule 10)
+   number. (Rule-TREE-PANEL-010)
 6. A test set that is **Active** again is offered when a test run is created.
 
 An **Archived** test project cannot be brought back from the tree, because the
@@ -37,7 +37,7 @@ choosing it is [UC-TREE-PANEL-004](chooseTestProject.md).
 
 ## What Testin refuses
 
-**If the node is already Active** — the entry is gray. (rule 54)
+**If the node is already Active** — the entry is gray. (Rule-TREE-PANEL-054)
 
 **If the status could not be written** — Testin says it could not, and nothing
 changes. The messages are on [UC-TREE-PANEL-018](retireNode.md).

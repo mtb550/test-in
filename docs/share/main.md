@@ -10,7 +10,8 @@ team pulls, or a server the plugin syncs with.
 |---|---|
 | **Part of Testin** | Sharing work with the team |
 | **Answers** | How test cases leave Testin and come back, and how a test project is kept in step with a team |
-| **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are numbered 1 and up, and belong to this part |
+| **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` and up, and belong to this part |
+| **Last rule** | `Rule-SHARE-101`. The next rule written here is `Rule-SHARE-102` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -83,17 +84,17 @@ uses. The settings page holds this machine's half of it.
 
 ## Rules that hold everywhere
 
-- **Rule 1** — An export never changes any test case. It only reads.
-- **Rule 2** — An import never overwrites an existing test case. Every imported
-  test case is new.
-- **Rule 3** — A sync sends and takes in one gesture, so a sync that succeeded
-  never leaves the tester's work only on this machine.
-- **Rule 4** — A password is never written to a file Testin writes, and never to
-  the log.
-- **Rule 5** — Long work runs under a progress bar. The Git ones can be
+- **Rule-SHARE-001** — An export never changes any test case. It only reads.
+- **Rule-SHARE-002** — An import never overwrites an existing test case. Every
+  imported test case is new.
+- **Rule-SHARE-003** — A sync sends and takes in one gesture, so a sync that
+  succeeded never leaves the tester's work only on this machine.
+- **Rule-SHARE-004** — A password is never written to a file Testin writes, and
+  never to the log.
+- **Rule-SHARE-005** — Long work runs under a progress bar. The Git ones can be
   canceled. The export, import and report ones cannot.
-- **Rule 6** — Nothing here is in the IDE's keymap, so none of these keys can be
-  changed there.
+- **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
+  keys can be changed there.
 
 ---
 
@@ -184,25 +185,25 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule 5 — a refusal is stated | Leaving the folder, the file name or the format empty in the export or report dialog says nothing at all. The cursor moves and the dialog stays open. |
-| **Difference 2** | Rule 6 — a dialog answers `Enter` | `Enter` does nothing in the export, import and review dialogs. Only a button confirms them. |
-| **Difference 3** | Rule 2 — an answer the tester gave is used | `Escape` on a merge question throws away every answer already given for that sync, with no message, and nothing more is asked. |
-| **Difference 4** | Rule 3 — the tester knows what happened | A merged file Git will not take is reported only to the log. The pull stops again with no conflict on screen to explain it. |
-| **Difference 5** | Rule 2 — an import is all or nothing | An import that fails part way leaves what it already wrote. Nothing says how many landed. |
-| **Difference 6** | Rule 3 — a conflict is put to the tester | Two fields are settled without asking. The order always takes the other side's value, and who changed it last always takes the later edit. |
-| **Difference 7** | Rule 1 — an export writes what is there | Exporting a package walks only one level down. A test set nested two levels deep contributes nothing, and nothing says so. |
-| **Difference 8** | Rule 1 — the same | A test case file that cannot be read is left out of an export in silence, and the count in the message is of what was gathered. |
-| **Difference 9** | Rule 2 — a value the tester typed is kept or refused | An unreadable value is quietly replaced in four different ways. A priority becomes the lowest, a group is dropped, a date becomes blank, a status keeps its old value. |
-| **Difference 10** | Rule 2 — what is offered can be used | **No Group** is offered in the group picker and cannot be imported back. It is dropped without a word. |
-| **Difference 11** | Rule 5 — long work is watched | Parsing an import file has no progress bar at all, and runs on every keystroke in the source box. A large workbook makes the dialog look frozen. |
-| **Difference 12** | Rule 5 — the same | The export, import and report bars cannot be canceled. |
-| **Difference 13** | Rule 6 — one look for one thing | Choosing a file Testin cannot import does nothing and says nothing. |
-| **Difference 14** | Rule 3 — one word for one outcome | A Git sync says *Synced* and fades. A Git push says *Pushed* and stays in the notification list. A server sync says *Synced* and fades, unless there were conflicts, when it stays. |
-| **Difference 15** | Rule 3 — a count reads as a count | A message about one thing reads *Exported*. A message about none reads *Exported 0*. |
-| **Difference 16** | Rule 3 — the tester is told | A message can be shown to nobody. When the code project's window has no status bar, the message is dropped and nothing is reported. Every success here is that kind of message. |
-| **Difference 17** | Rule 6 — a refusal that cannot happen is not written | The import refusal naming which nodes can be imported into can never be seen. The menu entry is already gray in exactly that case. |
-| **Difference 18** | Rule 4 — a value is checked before it is used | Neither the remote address nor the Git email address is checked. Any text is taken, and the failure arrives later in Git's own words. |
-| **Difference 19** | Rule 6 — a missing feature says so | Sync with a server is offered in every IDE. The two Git entries vanish with no word, so a tester has no way to learn the Git plugin is why. |
+| **Difference 1** | Rule-SHARE-005 — a refusal is stated | Leaving the folder, the file name or the format empty in the export or report dialog says nothing at all. The cursor moves and the dialog stays open. |
+| **Difference 2** | Rule-SHARE-006 — a dialog answers `Enter` | `Enter` does nothing in the export, import and review dialogs. Only a button confirms them. |
+| **Difference 3** | Rule-SHARE-002 — an answer the tester gave is used | `Escape` on a merge question throws away every answer already given for that sync, with no message, and nothing more is asked. |
+| **Difference 4** | Rule-SHARE-003 — the tester knows what happened | A merged file Git will not take is reported only to the log. The pull stops again with no conflict on screen to explain it. |
+| **Difference 5** | Rule-SHARE-002 — an import is all or nothing | An import that fails part way leaves what it already wrote. Nothing says how many landed. |
+| **Difference 6** | Rule-SHARE-003 — a conflict is put to the tester | Two fields are settled without asking. The order always takes the other side's value, and who changed it last always takes the later edit. |
+| **Difference 7** | Rule-SHARE-001 — an export writes what is there | Exporting a package walks only one level down. A test set nested two levels deep contributes nothing, and nothing says so. |
+| **Difference 8** | Rule-SHARE-001 — the same | A test case file that cannot be read is left out of an export in silence, and the count in the message is of what was gathered. |
+| **Difference 9** | Rule-SHARE-002 — a value the tester typed is kept or refused | An unreadable value is quietly replaced in four different ways. A priority becomes the lowest, a group is dropped, a date becomes blank, a status keeps its old value. |
+| **Difference 10** | Rule-SHARE-002 — what is offered can be used | **No Group** is offered in the group picker and cannot be imported back. It is dropped without a word. |
+| **Difference 11** | Rule-SHARE-005 — long work is watched | Parsing an import file has no progress bar at all, and runs on every keystroke in the source box. A large workbook makes the dialog look frozen. |
+| **Difference 12** | Rule-SHARE-005 — the same | The export, import and report bars cannot be canceled. |
+| **Difference 13** | Rule-SHARE-006 — one look for one thing | Choosing a file Testin cannot import does nothing and says nothing. |
+| **Difference 14** | Rule-SHARE-003 — one word for one outcome | A Git sync says *Synced* and fades. A Git push says *Pushed* and stays in the notification list. A server sync says *Synced* and fades, unless there were conflicts, when it stays. |
+| **Difference 15** | Rule-SHARE-003 — a count reads as a count | A message about one thing reads *Exported*. A message about none reads *Exported 0*. |
+| **Difference 16** | Rule-SHARE-003 — the tester is told | A message can be shown to nobody. When the code project's window has no status bar, the message is dropped and nothing is reported. Every success here is that kind of message. |
+| **Difference 17** | Rule-SHARE-006 — a refusal that cannot happen is not written | The import refusal naming which nodes can be imported into can never be seen. The menu entry is already gray in exactly that case. |
+| **Difference 18** | Rule-SHARE-004 — a value is checked before it is used | Neither the remote address nor the Git email address is checked. Any text is taken, and the failure arrives later in Git's own words. |
+| **Difference 19** | Rule-SHARE-006 — a missing feature says so | Sync with a server is offered in every IDE. The two Git entries vanish with no word, so a tester has no way to learn the Git plugin is why. |
 
 ---
 

@@ -10,21 +10,21 @@ There is no key for this. The menu entry is **Sync With SFTP**.
 
 ## Rules
 
-- **Rule 82** — The server's address comes from `testin.yml`, which the team
-  shares. The account comes from this machine's settings.
-- **Rule 83** — An account is never written into the shared file. If one is
-  found there it is ignored, and the log says so.
-- **Rule 84** — Only one machine syncs a test project at a time. A second is
-  told who is syncing.
-- **Rule 85** — The server must already be known to this machine. One that is
-  not is refused rather than trusted.
-- **Rule 86** — The sync sends and takes in one gesture.
-- **Rule 87** — A file both sides changed is kept as it is here, and nothing is
-  sent for it.
-- **Rule 88** — Testin reads the test project again itself after a sync, because
-  it ignores its own writes.
+- **Rule-SHARE-082** — The server's address comes from `testin.yml`, which the
+  team shares. The account comes from this machine's settings.
+- **Rule-SHARE-083** — An account is never written into the shared file. If one
+  is found there it is ignored, and the log says so.
+- **Rule-SHARE-084** — Only one machine syncs a test project at a time. A second
+  is told who is syncing.
+- **Rule-SHARE-085** — The server must already be known to this machine. One
+  that is not is refused rather than trusted.
+- **Rule-SHARE-086** — The sync sends and takes in one gesture.
+- **Rule-SHARE-087** — A file both sides changed is kept as it is here, and
+  nothing is sent for it.
+- **Rule-SHARE-088** — Testin reads the test project again itself after a sync,
+  because it ignores its own writes.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## The screen

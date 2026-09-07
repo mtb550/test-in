@@ -10,14 +10,14 @@ Hold `Ctrl` and turn the mouse wheel. On a Mac, hold `Cmd`.
 
 ## Rules
 
-- **Rule 37** — The gesture changes the IDE's own editor font size, so every
-  Testin surface and every code editor change together.
-- **Rule 38** — Nothing is drawn smaller than eight points, and nothing larger
-  than 72.
-- **Rule 39** — The gesture works over the tree panel, the editor panel, the
-  view panel and light mode.
+- **Rule-SETTING-037** — The gesture changes the IDE's own editor font size, so
+  every Testin surface and every code editor change together.
+- **Rule-SETTING-038** — Nothing is drawn smaller than eight points, and nothing
+  larger than 72.
+- **Rule-SETTING-039** — The gesture works over the tree panel, the editor
+  panel, the view panel and light mode.
 
-Rules 1 to 6 hold everywhere on the page. They are on
+Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
 [the settings page](main.md#rules-that-hold-everywhere-on-the-page).
 
 ## The screen

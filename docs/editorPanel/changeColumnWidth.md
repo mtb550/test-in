@@ -9,14 +9,15 @@ There is no key for this. Drag the divider in the header.
 
 ## Rules
 
-- **Rule 24** — A width the tester dragged is remembered, and comes back the
-  next time the grid is built.
-- **Rule 25** — Only a drag saves a width. A column Testin sized itself is not
-  remembered.
-- **Rule 26** — A column Testin sizes is made as wide as its content needs, up
-  to 500 points.
+- **Rule-EDITOR-PANEL-024** — A width the tester dragged is remembered, and
+  comes back the next time the grid is built.
+- **Rule-EDITOR-PANEL-025** — Only a drag saves a width. A column Testin sized
+  itself is not remembered.
+- **Rule-EDITOR-PANEL-026** — A column Testin sizes is made as wide as its
+  content needs, up to 500 points.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow

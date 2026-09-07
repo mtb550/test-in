@@ -10,19 +10,19 @@
 
 ## Rules
 
-- **Rule 27** — A test run needs at least one test case. It cannot be created
-  empty.
-- **Rule 28** — Three things are not offered when a test run is created: a
-  retired test set, anything under an **Archived** package, and an empty test
-  set. (rule 8)
-- **Rule 29** — A new test run starts as **Created**. Every test case in it
-  starts **Pending**.
+- **Rule-TREE-PANEL-027** — A test run needs at least one test case. It cannot
+  be created empty.
+- **Rule-TREE-PANEL-028** — Three things are not offered when a test run is
+  created: a retired test set, anything under an **Archived** package, and an
+  empty test set. (Rule-TREE-PANEL-008)
+- **Rule-TREE-PANEL-029** — A new test run starts as **Created**. Every test
+  case in it starts **Pending**.
 
-Rule 26 holds here too. It says what can be created under **Test Runs**, and it
-is on [UC-TREE-PANEL-010](createTestRunPackage.md).
+Rule-TREE-PANEL-026 holds here too. It says what can be created under **Test
+Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Create Test Run dialog
 
@@ -53,11 +53,11 @@ Rules 1 to 13 hold everywhere in the panel. They are on
 ```
 
 1. **Configuration details** — a section the tester can open and close. The gray
-   hint on its right reads *Collapse*, and *Expand* once it is closed. Closing it
-   takes every field below with it, the name included.
-2. **Test Run name** — filled in with what the tester typed in the create dialog.
-   Emptied, its gray hint text reads *Cycle-1*. The keyboard does not start here:
-   it starts in **Change Log**.
+   hint on its right reads *Collapse*, and *Expand* once it is closed. Closing
+   it takes every field below with it, the name included.
+2. **Test Run name** — filled in with what the tester typed in the create
+   dialog. Emptied, its gray hint text reads *Cycle-1*. The keyboard does not
+   start here: it starts in **Change Log**.
 3. **The fields** — one to a row. Every dropdown starts blank, which means
    unanswered, and every one can be typed into, so a value the list does not
    offer is still saved. **Browser** is on the form only while *Platform* is
@@ -110,17 +110,17 @@ with the test run's own name, test cases and settings.
 
 **If no test case is ticked** — the **Create** button is disabled.
 
-**If the name has been emptied** — the dialog stays open, and *A test run needs a
-name* is shown in red.
+**If the name has been emptied** — the dialog stays open, and *A test run needs
+a name* is shown in red.
 
 **If a test run with that name already exists** — *\<name\> Already Exists* is
 shown in red. Typing it in the first dialog closes that dialog and the second
 one never opens. Typing it in **Create Test Run** leaves the dialog open with
 everything still in it.
 
-**If the parent folder was removed while the dialog was open** — the dialog stays
-open, and *'\<parent\>' no longer exists - test run not created* is shown in
-red.
+**If the parent folder was removed while the dialog was open** — the dialog
+stays open, and *'\<parent\>' no longer exists - test run not created* is shown
+in red.
 
 **If writing the test run fails** — an IDE notification titled *Test Run Not
 Created* stays in the notification log, with the reason under it.

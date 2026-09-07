@@ -9,16 +9,19 @@
 
 ## Rules
 
-- **Rule 63** — Each editor has a history of its own, kept against the test set
-  it is showing. The tree keeps another.
-- **Rule 64** — The menu entry says what the next press would take back.
-- **Rule 65** — A test case is put back exactly, including who last changed it
-  and when.
-- **Rule 66** — A test case coming back from a removal gets its test method
-  written again.
-- **Rule 67** — A gesture that changed nothing is not on the history at all.
+- **Rule-EDITOR-PANEL-063** — Each editor has a history of its own, kept against
+  the test set it is showing. The tree keeps another.
+- **Rule-EDITOR-PANEL-064** — The menu entry says what the next press would take
+  back.
+- **Rule-EDITOR-PANEL-065** — A test case is put back exactly, including who
+  last changed it and when.
+- **Rule-EDITOR-PANEL-066** — A test case coming back from a removal gets its
+  test method written again.
+- **Rule-EDITOR-PANEL-067** — A gesture that changed nothing is not on the
+  history at all.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow

@@ -9,15 +9,16 @@
 
 ## Rules
 
-- **Rule 87** — The list narrows three tenths of a second after the last
-  keystroke, not on every letter.
-- **Rule 88** — The search reads the description, the identity, the expected
-  result and the steps. Nothing else.
-- **Rule 89** — Searching goes back to the first page.
-- **Rule 90** — `Escape` in the box returns the keyboard to the list and leaves
-  the text where it is.
+- **Rule-EDITOR-PANEL-087** — The list narrows three tenths of a second after
+  the last keystroke, not on every letter.
+- **Rule-EDITOR-PANEL-088** — The search reads the description, the identity,
+  the expected result and the steps. Nothing else.
+- **Rule-EDITOR-PANEL-089** — Searching goes back to the first page.
+- **Rule-EDITOR-PANEL-090** — `Escape` in the box returns the keyboard to the
+  list and leaves the text where it is.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow

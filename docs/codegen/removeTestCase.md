@@ -11,11 +11,11 @@ There is no key for this. It happens when a test case is removed, which is
 
 ## Rules
 
-- **Rule 49** — Removing a test case deletes its method from the class. The
-  class itself stays.
-- **Rule 50** — A test case with no method is skipped without a word.
+- **Rule-CODEGEN-049** — Removing a test case deletes its method from the class.
+  The class itself stays.
+- **Rule-CODEGEN-050** — A test case with no method is skipped without a word.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

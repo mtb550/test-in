@@ -10,19 +10,19 @@ screen I am working in.
 
 ## Rules
 
-- **Rule 10** — Five gestures open the panel. Each of them opens the tool window
-  if it was closed.
-- **Rule 11** — Four of the five move the keyboard into the panel. Choosing a
-  search result does not.
-- **Rule 12** — The panel opens on the **Details** tab, whichever tab was in
-  front last time.
-- **Rule 13** — Two gestures can hand over more than one test case. The panel
-  shows the first, and the rest are reached with the paging keys.
-- **Rule 14** — The panel is handed the folder the test case was opened from.
-  That folder decides whether the run rows are drawn.
+- **Rule-VIEW-PANEL-010** — Five gestures open the panel. Each of them opens the
+  tool window if it was closed.
+- **Rule-VIEW-PANEL-011** — Four of the five move the keyboard into the panel.
+  Choosing a search result does not.
+- **Rule-VIEW-PANEL-012** — The panel opens on the **Details** tab, whichever
+  tab was in front last time.
+- **Rule-VIEW-PANEL-013** — Two gestures can hand over more than one test case.
+  The panel shows the first, and the rest are reached with the paging keys.
+- **Rule-VIEW-PANEL-014** — The panel is handed the folder the test case was
+  opened from. That folder decides whether the run rows are drawn.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The five ways in
 

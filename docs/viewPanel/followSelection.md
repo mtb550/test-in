@@ -9,17 +9,17 @@ There is no key for this. It happens once the panel is open.
 
 ## Rules
 
-- **Rule 15** — Moving the selection in an editor fills the panel again, but
-  only while the panel is on screen.
-- **Rule 16** — Following never opens the panel. A panel the tester closed does
-  not come back on the next click.
-- **Rule 17** — Moving to a Testin editor with nothing selected empties the
-  panel.
-- **Rule 18** — Every fill starts again at the first test case, so the paging
-  position is never carried over.
+- **Rule-VIEW-PANEL-015** — Moving the selection in an editor fills the panel
+  again, but only while the panel is on screen.
+- **Rule-VIEW-PANEL-016** — Following never opens the panel. A panel the tester
+  closed does not come back on the next click.
+- **Rule-VIEW-PANEL-017** — Moving to a Testin editor with nothing selected
+  empties the panel.
+- **Rule-VIEW-PANEL-018** — Every fill starts again at the first test case, so
+  the paging position is never carried over.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 

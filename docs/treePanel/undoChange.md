@@ -10,16 +10,16 @@
 
 ## Rules
 
-- **Rule 48** — The tree keeps one history of its last 20 changes, per code
-  project and separate from any editor. It is held in memory, so closing the
-  IDE loses it, and the copies kept aside for restoring removed nodes are
-  deleted at the next start.
-- **Rule 49** — Four things can be undone: a move, a rename, a removal, and an
-  edit of a test run. Four cannot: creating anything, an order number, a copy,
-  and a status change.
+- **Rule-TREE-PANEL-048** — The tree keeps one history of its last 20 changes,
+  per code project and separate from any editor. It is held in memory, so
+  closing the IDE loses it, and the copies kept aside for restoring removed
+  nodes are deleted at the next start.
+- **Rule-TREE-PANEL-049** — Four things can be undone: a move, a rename, a
+  removal, and an edit of a test run. Four cannot: creating anything, an order
+  number, a copy, and a status change.
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 
@@ -35,8 +35,8 @@ To put an undone change back, see [UC-TREE-PANEL-017](redoChange.md).
 
 ## What Testin refuses
 
-**If the tree's history is empty** — the entry reads plain **Undo**, and is gray.
-`Ctrl+Z` does nothing.
+**If the tree's history is empty** — the entry reads plain **Undo**, and is
+gray. `Ctrl+Z` does nothing.
 
 **If some removed nodes can no longer be put back** — the rest are restored, and
 *Undo Incomplete* is shown in red, with the line *N of M could not be put back*.

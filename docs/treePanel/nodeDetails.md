@@ -10,13 +10,13 @@ tree is at a glance.
 
 ## Rules
 
-- **Rule 74** — Opening **Details** changes nothing, so Testin says nothing.
-  (rule 7)
-- **Rule 75** — Testin counts what a node holds when the tester asks. It never
-  saves the number.
+- **Rule-TREE-PANEL-074** — Opening **Details** changes nothing, so Testin says
+  nothing. (Rule-TREE-PANEL-007)
+- **Rule-TREE-PANEL-075** — Testin counts what a node holds when the tester
+  asks. It never saves the number.
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 
@@ -46,10 +46,10 @@ Rules 1 to 13 hold everywhere in the panel. They are on
    **Passed**, **Failed**, **Blocked**, **Untested** and **Removed** beside it,
    each with a color and a count. Inside the ring is the pass rate, or the words
    **Not run** when nothing in the test run has been executed.
-9. A test run also shows **Execution Started** and **Execution Ended**, and every
-   setting the tester gave when it was made: **Test Type**, **Change Log**,
-   **Commit ID**, **Platform**, **Component**, **Language**, **Browser** and
-   **Device Type**.
+9. A test run also shows **Execution Started** and **Execution Ended**, and
+   every setting the tester gave when it was made: **Test Type**, **Change
+   Log**, **Commit ID**, **Platform**, **Component**, **Language**, **Browser**
+   and **Device Type**.
 10. A row with nothing in it is not drawn at all. A test run that never started
     shows neither execution row.
 11. The tester presses `Escape`. It closes. Nothing was changed, and nothing is

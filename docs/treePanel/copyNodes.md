@@ -5,28 +5,29 @@
 > **`Ctrl+C`** copies and **`Ctrl+V`** pastes. Dragging with `Ctrl` held copies
 > too. On the menu: **Actions → Copy** and **Paste**.
 
-**As a** tester, **I want** to copy a node into another folder, **so that** I can
-start from something that already exists instead of writing it again.
+**As a** tester, **I want** to copy a node into another folder, **so that** I
+can start from something that already exists instead of writing it again.
 
 ## Rules
 
-- **Rule 41** — A copied test case is a new test case, with its own id. Editing
-  the copy never changes the original.
-- **Rule 84** — A copy cannot be undone. To take one back, remove it, which is
-  [UC-TREE-PANEL-012](removeNode.md).
-- **Rule 87** — A copy carries everything the original had beside its test
-  cases: its order number, and its **Deprecated** or **Archived** status. A copy
-  of a retired test set is retired too. A copied test run keeps the results the
-  original recorded.
+- **Rule-TREE-PANEL-041** — A copied test case is a new test case, with its own
+  id. Editing the copy never changes the original.
+- **Rule-TREE-PANEL-084** — A copy cannot be undone. To take one back, remove
+  it, which is [UC-TREE-PANEL-012](removeNode.md).
+- **Rule-TREE-PANEL-087** — A copy carries everything the original had beside
+  its test cases: its order number, and its **Deprecated** or **Archived**
+  status. A copy of a retired test set is retired too. A copied test run keeps
+  the results the original recorded.
 
-Rules 37, 38, 39 and 43 hold here too. They say where a node can land, and they
-are on [UC-TREE-PANEL-013](moveNodes.md).
+Rule-TREE-PANEL-037, Rule-TREE-PANEL-038, Rule-TREE-PANEL-039 and
+Rule-TREE-PANEL-043 hold here too. They say where a node can land, and they are
+on [UC-TREE-PANEL-013](moveNodes.md).
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
-The dialog is drawn under [UC-TREE-PANEL-013](moveNodes.md). After a copy its title is
-**Paste**, and it asks *Copy N items into '\<folder\>'?*.
+The dialog is drawn under [UC-TREE-PANEL-013](moveNodes.md). After a copy its
+title is **Paste**, and it asks *Copy N items into '\<folder\>'?*.
 
 ## Main flow
 
@@ -49,8 +50,8 @@ The dialog is drawn under [UC-TREE-PANEL-013](moveNodes.md). After a copy its ti
 The same refusals as a move, and they are on
 [UC-TREE-PANEL-013](moveNodes.md#what-testin-refuses).
 
-**If the copy fails on disk** — an IDE notification titled *Copy Failed* stays in
-the notification log, with the reason under it.
+**If the copy fails on disk** — an IDE notification titled *Copy Failed* stays
+in the notification log, with the reason under it.
 
 **If the Java plugin is installed** — fresh automation code is written for the
 copy. Without it, the copy has none, and the first copy in the project says

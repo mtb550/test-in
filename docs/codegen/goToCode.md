@@ -9,11 +9,12 @@ at, **so that** I can read or change what the automation really does.
 
 ## Rules
 
-- **Rule 26** — The method is found by the identity in `testName`, so a test
-  case that has been renamed still finds its method.
-- **Rule 27** — Without the Java plugin the gesture is not offered at all.
+- **Rule-CODEGEN-026** — The method is found by the identity in `testName`, so a
+  test case that has been renamed still finds its method.
+- **Rule-CODEGEN-027** — Without the Java plugin the gesture is not offered at
+  all.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## The three ways in

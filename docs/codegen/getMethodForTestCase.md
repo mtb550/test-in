@@ -11,21 +11,22 @@ There is no key for this. It happens when a test case is created, which is
 
 ## Rules
 
-- **Rule 12** — The method name is the description with everything but letters
-  and digits removed, the first word lowercase and later words capitalized.
-- **Rule 13** — `testName` carries the test case's identity. That is what finds
-  the method afterwards.
-- **Rule 14** — `priority` carries the test case's position in its test set,
-  counting from one.
-- **Rule 15** — `groups` is written only when the test case belongs to at least
-  one group.
-- **Rule 16** — Two descriptions that differ only in punctuation or capitals are
-  one method.
-- **Rule 17** — A test case created with no description gets no method.
-- **Rule 18** — A whole sheet of test cases is written as one change, so it is
-  one undo and one write.
+- **Rule-CODEGEN-012** — The method name is the description with everything but
+  letters and digits removed, the first word lowercase and later words
+  capitalized.
+- **Rule-CODEGEN-013** — `testName` carries the test case's identity. That is
+  what finds the method afterwards.
+- **Rule-CODEGEN-014** — `priority` carries the test case's position in its test
+  set, counting from one.
+- **Rule-CODEGEN-015** — `groups` is written only when the test case belongs to
+  at least one group.
+- **Rule-CODEGEN-016** — Two descriptions that differ only in punctuation or
+  capitals are one method.
+- **Rule-CODEGEN-017** — A test case created with no description gets no method.
+- **Rule-CODEGEN-018** — A whole sheet of test cases is written as one change,
+  so it is one undo and one write.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## What is written

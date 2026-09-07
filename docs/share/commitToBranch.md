@@ -9,14 +9,14 @@ There is no key for this. The **Branch** box is in the review.
 
 ## Rules
 
-- **Rule 61** — The box lists the branches on this machine, with the one checked
-  out chosen.
-- **Rule 62** — The box can also be typed into. A name that is not a branch yet
-  starts one.
-- **Rule 63** — If the branch cannot be checked out, nothing at all is
+- **Rule-SHARE-061** — The box lists the branches on this machine, with the one
+  checked out chosen.
+- **Rule-SHARE-062** — The box can also be typed into. A name that is not a
+  branch yet starts one.
+- **Rule-SHARE-063** — If the branch cannot be checked out, nothing at all is
   committed.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

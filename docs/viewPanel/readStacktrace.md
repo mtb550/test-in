@@ -9,14 +9,15 @@ There is no key for this. The link is under the first three lines.
 
 ## Rules
 
-- **Rule 34** — The panel shows the first three lines of the error, and offers a
-  link to the rest.
-- **Rule 35** — An error of three lines or fewer is shown whole, with no link.
-- **Rule 36** — The text in the dialog can be selected and copied. It can also
-  be typed into, and nothing typed there is ever saved.
+- **Rule-VIEW-PANEL-034** — The panel shows the first three lines of the error,
+  and offers a link to the rest.
+- **Rule-VIEW-PANEL-035** — An error of three lines or fewer is shown whole,
+  with no link.
+- **Rule-VIEW-PANEL-036** — The text in the dialog can be selected and copied.
+  It can also be typed into, and nothing typed there is ever saved.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen
 

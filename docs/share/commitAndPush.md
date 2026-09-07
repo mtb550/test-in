@@ -9,14 +9,14 @@ There is no key for this. **Commit & Push** is the face of the split button.
 
 ## Rules
 
-- **Rule 57** — The push happens only after the commit succeeded.
-- **Rule 58** — A repository with no remote asks for one, once.
-- **Rule 59** — The message about a push stays in the IDE's notification list,
-  because a push finishes on its own time.
-- **Rule 60** — Any password inside the remote address is taken out of anything
-  Testin shows or logs.
+- **Rule-SHARE-057** — The push happens only after the commit succeeded.
+- **Rule-SHARE-058** — A repository with no remote asks for one, once.
+- **Rule-SHARE-059** — The message about a push stays in the IDE's notification
+  list, because a push finishes on its own time.
+- **Rule-SHARE-060** — Any password inside the remote address is taken out of
+  anything Testin shows or logs.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

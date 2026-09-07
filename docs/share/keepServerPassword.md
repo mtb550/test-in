@@ -9,16 +9,17 @@ Nothing starts this. It happens when a password is typed in the account window.
 
 ## Rules
 
-- **Rule 89** — A password is kept in the IDE's own password store. Never in
-  `testin.yml`, never on a marker file, never in the log.
-- **Rule 90** — It is kept for one server and one account, so two servers, or
-  two accounts on one, do not overwrite each other.
-- **Rule 91** — The name it is kept under says which server and which account,
-  and holds no part of the secret.
-- **Rule 92** — A password the tester has just typed is preferred over one kept
-  from before, so a corrected password works on the attempt it was corrected on.
+- **Rule-SHARE-089** — A password is kept in the IDE's own password store. Never
+  in `testin.yml`, never on a marker file, never in the log.
+- **Rule-SHARE-090** — It is kept for one server and one account, so two
+  servers, or two accounts on one, do not overwrite each other.
+- **Rule-SHARE-091** — The name it is kept under says which server and which
+  account, and holds no part of the secret.
+- **Rule-SHARE-092** — A password the tester has just typed is preferred over
+  one kept from before, so a corrected password works on the attempt it was
+  corrected on.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

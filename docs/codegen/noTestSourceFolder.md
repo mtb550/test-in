@@ -9,14 +9,14 @@ Nothing starts this. It is the state of the code project.
 
 ## Rules
 
-- **Rule 64** — Testin looks for the test source folder once when the code
-  project opens, and remembers what it found.
-- **Rule 65** — Anything that would create code says so. Anything that only
-  tidies up after a removal stays silent.
-- **Rule 66** — The first test source folder of the first module that has one is
-  the one Testin uses.
+- **Rule-CODEGEN-064** — Testin looks for the test source folder once when the
+  code project opens, and remembers what it found.
+- **Rule-CODEGEN-065** — Anything that would create code says so. Anything that
+  only tidies up after a removal stays silent.
+- **Rule-CODEGEN-066** — The first test source folder of the first module that
+  has one is the one Testin uses.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

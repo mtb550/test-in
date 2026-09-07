@@ -9,15 +9,15 @@ There is no key for this, and no tooltip claims one.
 
 ## Rules
 
-- **Rule 52** — While a test case is running, the run button is replaced by the
-  stop button.
-- **Rule 53** — Stopping one test case stops every test case running with it.
-  They share one process.
-- **Rule 54** — A test case the tester stopped is recorded as not run, never as
-  failed.
+- **Rule-VIEW-PANEL-052** — While a test case is running, the run button is
+  replaced by the stop button.
+- **Rule-VIEW-PANEL-053** — Stopping one test case stops every test case running
+  with it. They share one process.
+- **Rule-VIEW-PANEL-054** — A test case the tester stopped is recorded as not
+  run, never as failed.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 

@@ -10,14 +10,15 @@ There is no key for this. The button's tooltip reads **Stop Execution**.
 
 ## Rules
 
-- **Rule 145** — Stopping writes the test run to disk as it stands.
-- **Rule 146** — Stopping changes no verdict already recorded.
-- **Rule 147** — Stopping stamps when execution ended. That stamp is written
-  again by every stop.
-- **Rule 148** — Only the tester's own stop ends any automation this editor
-  started.
+- **Rule-EDITOR-PANEL-145** — Stopping writes the test run to disk as it stands.
+- **Rule-EDITOR-PANEL-146** — Stopping changes no verdict already recorded.
+- **Rule-EDITOR-PANEL-147** — Stopping stamps when execution ended. That stamp
+  is written again by every stop.
+- **Rule-EDITOR-PANEL-148** — The tester's own stop ends any automation this
+  editor started, and so does closing the tab. Nothing else does.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
@@ -49,7 +50,8 @@ That is difference 27 on
 
 **Refresh** stops it, and says only *Refreshed*. That is difference 24.
 
-**Closing the tab** stops it, writes the test run, and asks nothing.
+**Closing the tab** stops the walk and the automation both, writes the test run,
+and asks nothing. It is the same thing as pressing **Stop Execution**.
 
 ---
 

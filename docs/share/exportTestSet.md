@@ -9,16 +9,16 @@ There is no key for this. The menu entry is **Export**.
 
 ## Rules
 
-- **Rule 7** — The rows are written in the order the editor shows them.
-- **Rule 8** — Only what the tester ticks is written.
-- **Rule 9** — Only files ending in `.json` inside the test set are read, so
-  nothing else in the folder is exported.
-- **Rule 10** — The file is written where the tester chose, never under the
-  Testin folder.
-- **Rule 11** — Exporting changes no test case.
-- **Rule 12** — A test set becomes one sheet, named after itself.
+- **Rule-SHARE-007** — The rows are written in the order the editor shows them.
+- **Rule-SHARE-008** — Only what the tester ticks is written.
+- **Rule-SHARE-009** — Only files ending in `.json` inside the test set are
+  read, so nothing else in the folder is exported.
+- **Rule-SHARE-010** — The file is written where the tester chose, never under
+  the Testin folder.
+- **Rule-SHARE-011** — Exporting changes no test case.
+- **Rule-SHARE-012** — A test set becomes one sheet, named after itself.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## The screen

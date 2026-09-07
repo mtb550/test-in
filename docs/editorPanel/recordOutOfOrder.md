@@ -10,14 +10,15 @@ else.
 
 ## Rules
 
-- **Rule 152** — A verdict can be recorded on any test case at any time. The
-  walk does not have to be going.
-- **Rule 153** — A verdict recorded away from the walk is not timed. The test
-  case keeps whatever duration it had.
-- **Rule 154** — Recording away from the walk does not stop the walk, and does
-  not move it.
+- **Rule-EDITOR-PANEL-152** — A verdict can be recorded on any test case at any
+  time. The walk does not have to be going.
+- **Rule-EDITOR-PANEL-153** — A verdict recorded away from the walk is not
+  timed. The test case keeps whatever duration it had.
+- **Rule-EDITOR-PANEL-154** — Recording away from the walk does not stop the
+  walk, and does not move it.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow

@@ -2,38 +2,40 @@
 
 # UC-INTERNAL-002: Read a test project from disk
 
-**As a** tester, **I want** Testin to read my test projects into memory before it
-draws anything, **so that** every panel answers at once instead of going to disk
-for each row.
+**As a** tester, **I want** Testin to read my test projects into memory before
+it draws anything, **so that** every panel answers at once instead of going to
+disk for each row.
 
 There is no key for this. It starts on its own.
 
 ## Rules
 
-- **Rule-INTERNAL-003** — A folder is a test project only if it holds a file named `.tp`.
-- **Rule-INTERNAL-004** — Only the folders directly inside the Testin folder are looked at.
-  A test project one level deeper is not found.
+- **Rule-INTERNAL-003** — A folder is a test project only if it holds a file
+  named `.tp`.
+- **Rule-INTERNAL-004** — Only the folders directly inside the Testin folder are
+  looked at. A test project one level deeper is not found.
 - **Rule-INTERNAL-005** — An archived test project is not read at all.
-- **Rule-INTERNAL-006** — When `testin.yml` names a test project, only that one is read.
-- **Rule-INTERNAL-007** — Inside a test project, Testin reads two folders. They are named
-  `Test Cases` and `Test Runs`. Nothing else is read.
-- **Rule-INTERNAL-008** — A folder inside `Test Cases` is read only if it holds a file
-  named `.ts` or a file named `.tsp`. The first makes it a test set. The second
-  makes it a test set package.
+- **Rule-INTERNAL-006** — When `testin.yml` names a test project, only that one
+  is read.
+- **Rule-INTERNAL-007** — Inside a test project, Testin reads two folders. They
+  are named `Test Cases` and `Test Runs`. Nothing else is read.
+- **Rule-INTERNAL-008** — A folder inside `Test Cases` is read only if it holds
+  a file named `.ts` or a file named `.tsp`. The first makes it a test set. The
+  second makes it a test set package.
 - **Rule-INTERNAL-009** — A folder holding both is read as a test set.
-- **Rule-INTERNAL-010** — A folder inside `Test Runs` is read the same way, from a file
-  named `.tr` or a file named `.trp`.
-- **Rule-INTERNAL-011** — Every file ending in `.json` directly inside a test set is a
-  test case.
-- **Rule-INTERNAL-012** — A test case is known by its file name. What the file says its
-  own name is does not decide.
-- **Rule-INTERNAL-013** — Each test project is read by its own background job. The tester
-  can cancel it, and the IDE stays usable while it runs.
-- **Rule-INTERNAL-014** — One thing that cannot be read never stops the rest. Testin skips
-  it and carries on.
-- **Rule-INTERNAL-052** — A folder skipped for having no marker is reported when it holds
-  test cases. A folder holding none is skipped in silence, because a folder that
-  is deliberately not a test set is the ordinary case.
+- **Rule-INTERNAL-010** — A folder inside `Test Runs` is read the same way, from
+  a file named `.tr` or a file named `.trp`.
+- **Rule-INTERNAL-011** — Every file ending in `.json` directly inside a test
+  set is a test case.
+- **Rule-INTERNAL-012** — A test case is known by its file name. What the file
+  says its own name is does not decide.
+- **Rule-INTERNAL-013** — Each test project is read by its own background job.
+  The tester can cancel it, and the IDE stays usable while it runs.
+- **Rule-INTERNAL-014** — One thing that cannot be read never stops the rest.
+  Testin skips it and carries on.
+- **Rule-INTERNAL-052** — A folder skipped for having no marker is reported when
+  it holds test cases. A folder holding none is skipped in silence, because a
+  folder that is deliberately not a test set is the ordinary case.
 
 ## What starts a read
 

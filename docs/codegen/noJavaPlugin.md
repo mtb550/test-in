@@ -10,14 +10,14 @@ Nothing starts this. It is the state of the IDE.
 
 ## Rules
 
-- **Rule 61** — Test management works in full without the Java plugin. Only the
-  code generation and the jumps into code are missing.
-- **Rule 62** — What is missing is not offered. The entries are absent from the
-  menus rather than gray.
-- **Rule 63** — A plugin that is installed but switched off counts as missing,
-  and switching it on needs the IDE restarted before Testin notices.
+- **Rule-CODEGEN-061** — Test management works in full without the Java plugin.
+  Only the code generation and the jumps into code are missing.
+- **Rule-CODEGEN-062** — What is missing is not offered. The entries are absent
+  from the menus rather than gray.
+- **Rule-CODEGEN-063** — A plugin that is installed but switched off counts as
+  missing, and switching it on needs the IDE restarted before Testin notices.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## What is missing

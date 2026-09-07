@@ -9,12 +9,14 @@ There is no key for this. The box is at the right of the status bar.
 
 ## Rules
 
-- **Rule 102** — A page holds 50 test cases until the tester says otherwise.
-- **Rule 103** — The most a page can hold is 1000.
-- **Rule 104** — Changing it goes back to the first page and returns the
-  keyboard to the list.
+- **Rule-EDITOR-PANEL-102** — A page holds 50 test cases until the tester says
+  otherwise.
+- **Rule-EDITOR-PANEL-103** — The most a page can hold is 1000.
+- **Rule-EDITOR-PANEL-104** — Changing it goes back to the first page and
+  returns the keyboard to the list.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow

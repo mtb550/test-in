@@ -9,13 +9,14 @@ There is no key for this. It is the **SFTP key file** row.
 
 ## Rules
 
-- **Rule 34** — A key file named here is the way this machine proves who it is.
-- **Rule 35** — An agent already holding identities is tried before the key file
-  itself.
-- **Rule 36** — A key file's passphrase is asked for only when it is going to be
-  used, and is kept in the IDE's password store.
+- **Rule-SETTING-034** — A key file named here is the way this machine proves
+  who it is.
+- **Rule-SETTING-035** — An agent already holding identities is tried before the
+  key file itself.
+- **Rule-SETTING-036** — A key file's passphrase is asked for only when it is
+  going to be used, and is kept in the IDE's password store.
 
-Rules 1 to 6 hold everywhere on the page. They are on
+Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
 [the settings page](main.md#rules-that-hold-everywhere-on-the-page).
 
 ## Main flow

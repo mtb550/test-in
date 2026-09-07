@@ -9,14 +9,14 @@ There is no key for this. It is the **Default download folder** row.
 
 ## Rules
 
-- **Rule 21** — The folder is where saving a report, saving an export and
-  choosing a file to import all start.
-- **Rule 22** — It is a starting point, not a rule. The tester can save anywhere
-  from any of those dialogs.
-- **Rule 23** — This page is not the only place the folder is set. The import
-  and export dialogs can set it too.
+- **Rule-SETTING-021** — The folder is where saving a report, saving an export
+  and choosing a file to import all start.
+- **Rule-SETTING-022** — It is a starting point, not a rule. The tester can save
+  anywhere from any of those dialogs.
+- **Rule-SETTING-023** — This page is not the only place the folder is set. The
+  import and export dialogs can set it too.
 
-Rules 1 to 6 hold everywhere on the page. They are on
+Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
 [the settings page](main.md#rules-that-hold-everywhere-on-the-page).
 
 ## The screen

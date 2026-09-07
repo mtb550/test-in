@@ -6,21 +6,24 @@
 > edit back.
 
 **As a** tester, **I want** to change which test cases a test run covers, its
-name and its configuration, **so that** a test run can be corrected without being
-recreated.
+name and its configuration, **so that** a test run can be corrected without
+being recreated.
 
 ## Rules
 
-- **Rule 60** — A signed-off test run cannot be edited. (rule 9)
-- **Rule 61** — Removing a test case from a test run drops everything that test
-  case recorded in that test run. Adding a test case adds it as **Pending**.
-- **Rule 62** — An edit can be undone, as one step. (rule 49)
-- **Rule 89** — A test case that was deleted from its test set after the test
-  run was made is not in this dialog, and saving drops what the test run
-  recorded about it.
+- **Rule-TREE-PANEL-060** — A signed-off test run cannot be edited.
+  (Rule-TREE-PANEL-009)
+- **Rule-TREE-PANEL-061** — Removing a test case from a test run drops
+  everything that test case recorded in that test run. Adding a test case adds
+  it as **Pending**.
+- **Rule-TREE-PANEL-062** — An edit can be undone, as one step.
+  (Rule-TREE-PANEL-049)
+- **Rule-TREE-PANEL-089** — A test case that was deleted from its test set after
+  the test run was made is not in this dialog. What the test run recorded about
+  it is kept, because a row that cannot be shown cannot have been unticked.
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 The dialog is drawn under [UC-TREE-PANEL-009](createTestRun.md).
 
@@ -34,8 +37,8 @@ The dialog is drawn under [UC-TREE-PANEL-009](createTestRun.md).
 4. The tester changes any of it and presses **Save**.
 5. If the name was changed, Testin closes the test run's editor, renames its
    folder, and only then saves the test run.
-6. Testin removes any test case the tester unticked, with everything the test run
-   recorded about it. A newly ticked test case is added as **Pending**.
+6. Testin removes any test case the tester unticked, with everything the test
+   run recorded about it. A newly ticked test case is added as **Pending**.
 7. The tree refreshes, and Testin shows *Updated*.
 8. `Ctrl+Z` in the tree puts the previous name, test cases and configuration all
    back, and Testin shows *Undone*.

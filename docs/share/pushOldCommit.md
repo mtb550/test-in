@@ -10,11 +10,11 @@ to do.
 
 ## Rules
 
-- **Rule 64** — Testin counts what is committed here and not on the remote, and
-  says so rather than reporting no changes.
-- **Rule 65** — The message counts commits, not files.
+- **Rule-SHARE-064** — Testin counts what is committed here and not on the
+  remote, and says so rather than reporting no changes.
+- **Rule-SHARE-065** — The message counts commits, not files.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

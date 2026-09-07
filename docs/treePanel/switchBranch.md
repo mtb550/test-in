@@ -9,17 +9,18 @@
 
 ## Rules
 
-- **Rule 71** — The branch box appears only when the test project's own project
-  file says it is shared through Git **and** its folder really is a Git
-  repository. A Git folder whose project file does not say so has no box.
-- **Rule 72** — Switching with uncommitted changes asks first. Switching never
-  loses them.
-- **Rule 73** — A switch that succeeds does a full refresh: it re-reads which
-  test project is bound, reads the test project again, reloads every open Testin
-  editor, and **closes any editor whose node the new branch does not have**.
+- **Rule-TREE-PANEL-071** — The branch box appears only when the test project's
+  own project file says it is shared through Git **and** its folder really is a
+  Git repository. A Git folder whose project file does not say so has no box.
+- **Rule-TREE-PANEL-072** — Switching with uncommitted changes asks first.
+  Switching never loses them.
+- **Rule-TREE-PANEL-073** — A switch that succeeds does a full refresh: it
+  re-reads which test project is bound, reads the test project again, reloads
+  every open Testin editor, and **closes any editor whose node the new branch
+  does not have**.
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Uncommitted Changes dialog
 
@@ -82,9 +83,10 @@ showing *Fetching from remote*. So the list can grow a moment after it appears.
 **If the test project is not shared through Git** — there is no box.
 
 **If Git refuses the checkout** — the box goes back to the branch the tester was
-on, and an IDE notification titled *Branch Not Switched* says *\<branch\> was not
-checked out. There are uncommitted changes in this test project that switching
-would overwrite - commit them first.* It carries a **Review Changes** link.
+on, and an IDE notification titled *Branch Not Switched* says *\<branch\> was
+not checked out. There are uncommitted changes in this test project that
+switching would overwrite - commit them first.* It carries a **Review Changes**
+link.
 
 **If the branches cannot be read** — the box reads *Failed to load branches* and
 cannot be opened. An IDE notification titled *Git Error* gives the reason.

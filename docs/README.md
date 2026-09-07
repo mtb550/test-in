@@ -6,10 +6,10 @@
 Everything about the plugin that is not the code: what it is for, what it does,
 what every screen looks like, and how to work on it.
 
-New here? Start with the [project README](https://github.com/mtb550/test-in#readme).
-It says what Testin is and how to install it. Then read
-**[the tree panel](treePanel/main.md)**, which is where everything in Testin
-starts.
+New here? Start with the
+[project README](https://github.com/mtb550/test-in#readme). It says what Testin
+is and how to install it. Then read **[the tree panel](treePanel/main.md)**,
+which is where everything in Testin starts.
 
 ---
 
@@ -63,10 +63,14 @@ What a person needs before their first change.
 
 ## How these documents stay true
 
-- Every sentence can be checked against the plugin. Planned behavior is marked as planned.
-- Known defects are named, not hidden. Each part ends with the places it breaks its own rules.
-- Every rule and use case has a number, so an issue or a commit can point at one. The numbering is explained in [How a document is written](standard.md).
+- Every sentence can be checked against the plugin. Planned behavior is marked
+  as planned.
+- Known defects are named, not hidden. Each part ends with the places it breaks
+  its own rules.
+- Every rule and use case has a number, so an issue or a commit can point at
+  one. The numbering is explained in [How a document is written](standard.md).
 - When the plugin changes, the document changes in the same commit.
 - Every document says which version of the plugin it was checked against.
-- Not written is a state. Every missing document is listed with the issue that will write it.
+- Not written is a state. Every missing document is listed with the issue that
+  will write it.
 - One fact, one place. Nothing is written twice.

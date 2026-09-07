@@ -10,14 +10,14 @@ Nothing starts this. It opens when a commit is refused for want of a name.
 
 ## Rules
 
-- **Rule 37** — The dialog opens only when Git says it does not know who the
-  tester is.
-- **Rule 38** — The commit is made straight after the identity is set. The
-  tester does not have to press commit again.
-- **Rule 39** — The tester chooses whether this is for this one repository or
-  for every repository on this machine.
+- **Rule-SHARE-037** — The dialog opens only when Git says it does not know who
+  the tester is.
+- **Rule-SHARE-038** — The commit is made straight after the identity is set.
+  The tester does not have to press commit again.
+- **Rule-SHARE-039** — The tester chooses whether this is for this one
+  repository or for every repository on this machine.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## The screen

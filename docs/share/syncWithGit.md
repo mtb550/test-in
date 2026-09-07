@@ -9,17 +9,17 @@ There is no key for this. The menu entry is **Sync With Remote**.
 
 ## Rules
 
-- **Rule 66** — The branch that is synced is the one that is checked out.
-- **Rule 67** — A sync pulls and then pushes, so a sync that succeeded never
-  leaves the tester's commits only here.
-- **Rule 68** — The push is skipped when nothing is waiting, so a sync pressed
-  out of habit costs no network.
-- **Rule 69** — The pull rebases, and stashes anything uncommitted first.
-- **Rule 70** — The progress bar can be canceled.
-- **Rule 71** — Afterwards the working folder, Testin's own reading of it, and
-  the tree are all read again.
+- **Rule-SHARE-066** — The branch that is synced is the one that is checked out.
+- **Rule-SHARE-067** — A sync pulls and then pushes, so a sync that succeeded
+  never leaves the tester's commits only here.
+- **Rule-SHARE-068** — The push is skipped when nothing is waiting, so a sync
+  pressed out of habit costs no network.
+- **Rule-SHARE-069** — The pull rebases, and stashes anything uncommitted first.
+- **Rule-SHARE-070** — The progress bar can be canceled.
+- **Rule-SHARE-071** — Afterwards the working folder, Testin's own reading of
+  it, and the tree are all read again.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

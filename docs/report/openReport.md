@@ -9,13 +9,13 @@ There is no key for this. The link is on the message.
 
 ## Rules
 
-- **Rule 10** — The link is on the message that says the report was written, and
-  the message stays in the IDE's notification list.
-- **Rule 11** — Clicking the link makes the message go.
-- **Rule 12** — The file is handed to whatever application on this machine
-  claims it.
+- **Rule-REPORT-010** — The link is on the message that says the report was
+  written, and the message stays in the IDE's notification list.
+- **Rule-REPORT-011** — Clicking the link makes the message go.
+- **Rule-REPORT-012** — The file is handed to whatever application on this
+  machine claims it.
 
-Rules 1 to 5 hold everywhere. They are on
+Rule-REPORT-001 to Rule-REPORT-005 hold everywhere. They are on
 [the reports page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

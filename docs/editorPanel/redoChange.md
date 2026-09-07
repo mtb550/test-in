@@ -9,10 +9,13 @@
 
 ## Rules
 
-- **Rule 68** — The menu entry says what the next press would put back.
-- **Rule 69** — Making any new change clears everything waiting to be put back.
+- **Rule-EDITOR-PANEL-068** — The menu entry says what the next press would put
+  back.
+- **Rule-EDITOR-PANEL-069** — Making any new change clears everything waiting to
+  be put back.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow

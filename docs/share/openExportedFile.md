@@ -9,11 +9,11 @@ There is no key for this. The links are on the message.
 
 ## Rules
 
-- **Rule 21** — A web page export opens in the browser. Every other format is
-  handed to whatever application claims it.
-- **Rule 22** — Clicking either link makes the message go.
+- **Rule-SHARE-021** — A web page export opens in the browser. Every other
+  format is handed to whatever application claims it.
+- **Rule-SHARE-022** — Clicking either link makes the message go.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## Main flow
@@ -40,7 +40,8 @@ open the file:* and then the reason.
 
 A web page made as an export opens in the browser. The same kind of file made as
 a report opens in an application instead. One kind of file, two answers. That is
-difference 6 on [the reports page](../report/main.md#where-the-plugin-breaks-its-own-rules).
+difference 6 on
+[the reports page](../report/main.md#where-the-plugin-breaks-its-own-rules).
 
 ---
 

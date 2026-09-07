@@ -9,12 +9,12 @@ There is no key for this. The link is on the message.
 
 ## Rules
 
-- **Rule 13** — The whole path is copied, not the file name.
-- **Rule 14** — Clicking the link makes the message go.
-- **Rule 15** — The same link is offered on every message about a file Testin
-  wrote, so the gesture is the same for a report and for an export.
+- **Rule-REPORT-013** — The whole path is copied, not the file name.
+- **Rule-REPORT-014** — Clicking the link makes the message go.
+- **Rule-REPORT-015** — The same link is offered on every message about a file
+  Testin wrote, so the gesture is the same for a report and for an export.
 
-Rules 1 to 5 hold everywhere. They are on
+Rule-REPORT-001 to Rule-REPORT-005 hold everywhere. They are on
 [the reports page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

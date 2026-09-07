@@ -11,22 +11,24 @@ by hand, and is on [UC-TREE-PANEL-025](../treePanel/refreshTree.md).
 
 ## Rules
 
-- **Rule 15** — Testin watches every file the IDE watches. A change counts only
-  if the file is inside a test project under the Testin folder.
-- **Rule 16** — Anything inside a `.git` folder is ignored, however deep it is.
-- **Rule 17** — The Testin folder itself is not watched. It holds test projects,
-  and is not one.
-- **Rule 18** — Testin ignores its own writes for five seconds after making
-  them.
-- **Rule 19** — Testin waits four tenths of a second after the last change
-  before it reads. A pull that brings 40 files costs one read, not 40.
-- **Rule 20** — The whole test project is read again, never the one file that
-  changed.
-- **Rule 21** — A change arriving while a read is running books the next read.
-  Nothing is missed and nothing is read twice at once.
-- **Rule 22** — A code project whose Testin panel was never opened is left
-  alone.
-- **Rule 23** — `testin.yml` is not watched. Only **Refresh** reads it again.
+- **Rule-INTERNAL-015** — Testin watches every file the IDE watches. A change
+  counts only if the file is inside a test project under the Testin folder.
+- **Rule-INTERNAL-016** — Anything inside a `.git` folder is ignored, however
+  deep it is.
+- **Rule-INTERNAL-017** — The Testin folder itself is not watched. It holds test
+  projects, and is not one.
+- **Rule-INTERNAL-018** — Testin ignores its own writes for five seconds after
+  making them.
+- **Rule-INTERNAL-019** — Testin waits four tenths of a second after the last
+  change before it reads. A pull that brings 40 files costs one read, not 40.
+- **Rule-INTERNAL-020** — The whole test project is read again, never the one
+  file that changed.
+- **Rule-INTERNAL-021** — A change arriving while a read is running books the
+  next read. Nothing is missed and nothing is read twice at once.
+- **Rule-INTERNAL-022** — A code project whose Testin panel was never opened is
+  left alone.
+- **Rule-INTERNAL-023** — `testin.yml` is not watched. Only **Refresh** reads it
+  again.
 
 ## What is picked up, and what is not
 

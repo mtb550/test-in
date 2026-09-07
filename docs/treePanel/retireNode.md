@@ -11,15 +11,16 @@ its history without getting in the way of what I am testing now.
 
 ## Rules
 
-- **Rule 51** — Retiring deletes nothing. (rule 8)
-- **Rule 52** — A test project that is not **Active** shows nothing under it.
-- **Rule 53** — An **Archived** test project is not opened at all on the next
-  load. The panel says so, and offers the other test projects.
-- **Rule 54** — A status is set on one node at a time. The status a node already
-  has is not offered.
+- **Rule-TREE-PANEL-051** — Retiring deletes nothing. (Rule-TREE-PANEL-008)
+- **Rule-TREE-PANEL-052** — A test project that is not **Active** shows nothing
+  under it.
+- **Rule-TREE-PANEL-053** — An **Archived** test project is not opened at all on
+  the next load. The panel says so, and offers the other test projects.
+- **Rule-TREE-PANEL-054** — A status is set on one node at a time. The status a
+  node already has is not offered.
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow
 
@@ -44,7 +45,8 @@ Nothing inside it is deleted.
 
 **What an inactive test project does.** Its row shows no children. If it is
 **Archived**, the next load skips it, and the panel shows *\<name\> is archived,
-so it is not opened*. That screen is drawn under [UC-TREE-PANEL-001](reachTheTree.md).
+so it is not opened*. That screen is drawn under
+[UC-TREE-PANEL-001](reachTheTree.md).
 
 To bring one back, see [UC-TREE-PANEL-019](reactivateNode.md).
 

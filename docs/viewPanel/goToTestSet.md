@@ -9,12 +9,15 @@ There is no key for this. The path is at the top of the panel.
 
 ## Rules
 
-- **Rule 41** — The path shows one step for each folder above the test case.
-- **Rule 42** — Only the last step opens anything. It opens the test set.
-- **Rule 43** — Opening a test set that is already open brings it to the front.
+- **Rule-VIEW-PANEL-041** — The path shows one step for each folder above the
+  test case.
+- **Rule-VIEW-PANEL-042** — Only the last step opens anything. It opens the test
+  set.
+- **Rule-VIEW-PANEL-043** — Opening a test set that is already open brings it to
+  the front.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen
 

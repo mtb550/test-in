@@ -11,20 +11,22 @@ them opens.
 
 ## Rules
 
-- **Rule 45** — A count is worked out when it is asked for, and stored nowhere.
-  A number that is never saved cannot be stale.
-- **Rule 46** — A container is the sum of everything beneath it, at any depth.
-- **Rule 47** — A test run is counted from the verdicts it recorded, not from
-  the test cases it was made from.
-- **Rule 48** — A test run's numbers come from one place, so its Details and its
-  report can never disagree.
-- **Rule 49** — Retired test sets and archived packages are counted. That a
-  branch is out of current work is already visible in the tree, which draws it
-  gray and sorts it last.
-- **Rule 50** — A test run that could not be read counts as nothing, rather than
-  failing. The tree already draws the node, so its Details still says what the
-  node is.
-- **Rule 51** — A test run nobody has judged shows *Not run*, never *0%*.
+- **Rule-INTERNAL-045** — A count is worked out when it is asked for, and stored
+  nowhere. A number that is never saved cannot be stale.
+- **Rule-INTERNAL-046** — A container is the sum of everything beneath it, at
+  any depth.
+- **Rule-INTERNAL-047** — A test run is counted from the verdicts it recorded,
+  not from the test cases it was made from.
+- **Rule-INTERNAL-048** — A test run's numbers come from one place, so its
+  Details and its report can never disagree.
+- **Rule-INTERNAL-049** — Retired test sets and archived packages are counted.
+  That a branch is out of current work is already visible in the tree, which
+  draws it gray and sorts it last.
+- **Rule-INTERNAL-050** — A test run that could not be read counts as nothing,
+  rather than failing. The tree already draws the node, so its Details still
+  says what the node is.
+- **Rule-INTERNAL-051** — A test run nobody has judged shows *Not run*, never
+  *0%*.
 
 ## Where the counts appear
 

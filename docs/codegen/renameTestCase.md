@@ -10,14 +10,14 @@ There is no key for this. It happens when the description is changed, which is
 
 ## Rules
 
-- **Rule 39** — The method is found by the test case's identity, so the old
-  description is not needed.
-- **Rule 40** — Both the annotation's description and the method's name are
-  rewritten.
-- **Rule 41** — A description cleared back to nothing leaves the method under
-  the name it already has, and records the empty description.
+- **Rule-CODEGEN-039** — The method is found by the test case's identity, so the
+  old description is not needed.
+- **Rule-CODEGEN-040** — Both the annotation's description and the method's name
+  are rewritten.
+- **Rule-CODEGEN-041** — A description cleared back to nothing leaves the method
+  under the name it already has, and records the empty description.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

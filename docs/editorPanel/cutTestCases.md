@@ -9,13 +9,15 @@
 
 ## Rules
 
-- **Rule 75** — A cut test case is drawn faded, so the tester can see what is
-  waiting to move.
-- **Rule 76** — Nothing is removed until the paste. A cut on its own changes
-  nothing.
-- **Rule 77** — A cut is called off by a paste, by a copy, and by `Escape`.
+- **Rule-EDITOR-PANEL-075** — A cut test case is drawn faded, so the tester can
+  see what is waiting to move.
+- **Rule-EDITOR-PANEL-076** — Nothing is removed until the paste. A cut on its
+  own changes nothing.
+- **Rule-EDITOR-PANEL-077** — A cut is called off by a paste, by a copy, and by
+  `Escape`.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## Main flow

@@ -10,14 +10,14 @@ There is no key for this. It happens when a test set is moved, which is
 
 ## Rules
 
-- **Rule 53** — The class file is moved, and its package line is rewritten to
-  match where it landed.
-- **Rule 54** — A test set dropped where it already is, is not a move, and
-  nothing is rewritten.
-- **Rule 55** — A move into a place Testin has not read leaves the class exactly
-  where it is.
+- **Rule-CODEGEN-053** — The class file is moved, and its package line is
+  rewritten to match where it landed.
+- **Rule-CODEGEN-054** — A test set dropped where it already is, is not a move,
+  and nothing is rewritten.
+- **Rule-CODEGEN-055** — A move into a place Testin has not read leaves the
+  class exactly where it is.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

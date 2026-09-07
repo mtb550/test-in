@@ -9,14 +9,14 @@ There is no key for this. The table is in the import dialog.
 
 ## Rules
 
-- **Rule 33** — The table holds the 13 columns that can be imported, not the 17
-  that can be exported.
-- **Rule 34** — The table is empty until a file is chosen.
-- **Rule 35** — Choosing a second file replaces every tab.
-- **Rule 36** — A correction made here changes what is written, and the file on
-  disk is never touched.
+- **Rule-SHARE-033** — The table holds the 13 columns that can be imported, not
+  the 17 that can be exported.
+- **Rule-SHARE-034** — The table is empty until a file is chosen.
+- **Rule-SHARE-035** — Choosing a second file replaces every tab.
+- **Rule-SHARE-036** — A correction made here changes what is written, and the
+  file on disk is never touched.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
 [the sharing page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

@@ -11,14 +11,14 @@ There is no key for this. It happens when test cases are reordered, which is
 
 ## Rules
 
-- **Rule 42** — Reordering rewrites the position on **every** test case in the
-  test set, not only the one that moved.
-- **Rule 43** — The position counts from one, and is written into the
+- **Rule-CODEGEN-042** — Reordering rewrites the position on **every** test case
+  in the test set, not only the one that moved.
+- **Rule-CODEGEN-043** — The position counts from one, and is written into the
   annotation's `priority`.
-- **Rule 44** — A test case with no method is skipped without a word, because
-  the sweep touches every test case in the set.
+- **Rule-CODEGEN-044** — A test case with no method is skipped without a word,
+  because the sweep touches every test case in the set.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

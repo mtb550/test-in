@@ -10,10 +10,10 @@ comment in it.
 
 ## Rules
 
-- **Rule 25** — This is not built. The menu entry and the key both answer with a
-  message saying so, rather than doing nothing quietly.
+- **Rule-CODEGEN-025** — This is not built. The menu entry and the key both
+  answer with a message saying so, rather than doing nothing quietly.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## What happens today

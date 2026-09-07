@@ -10,7 +10,8 @@ test case they came from.
 |---|---|
 | **Part of Testin** | Automation code and the gutter |
 | **Answers** | What Testin writes into the code, when it rewrites it, and what a tester sees when it cannot |
-| **Numbering** | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-020`. Rules are numbered 1 and up, and belong to this part |
+| **Numbering** | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-020`. Rules are `Rule-CODEGEN-001` and up, and belong to this part |
+| **Last rule** | `Rule-CODEGEN-066`. The next rule written here is `Rule-CODEGEN-067` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -101,18 +102,18 @@ For a test set, one class holding those methods. For a package, a folder.
 
 ## Rules that hold everywhere
 
-- **Rule 1** — A method is found by the identity in `testName`, never by its
-  name. Renaming a test case never loses its method.
-- **Rule 2** — A test case with no description gets no method. A description is
-  what names a method.
-- **Rule 3** — Testin writes only the parts listed above. The body is the
-  tester's, and Testin never touches it.
-- **Rule 4** — A rename or a move happens before the tree changes, while the old
-  name still finds the code.
-- **Rule 5** — Test management works without any of this. A missing Java plugin
-  or a missing test folder is a skip, never a failure.
-- **Rule 6** — Nearly everything that goes wrong here is written only to the
-  log.
+- **Rule-CODEGEN-001** — A method is found by the identity in `testName`, never
+  by its name. Renaming a test case never loses its method.
+- **Rule-CODEGEN-002** — A test case with no description gets no method. A
+  description is what names a method.
+- **Rule-CODEGEN-003** — Testin writes only the parts listed above. The body is
+  the tester's, and Testin never touches it.
+- **Rule-CODEGEN-004** — A rename or a move happens before the tree changes,
+  while the old name still finds the code.
+- **Rule-CODEGEN-005** — Test management works without any of this. A missing
+  Java plugin or a missing test folder is a skip, never a failure.
+- **Rule-CODEGEN-006** — Nearly everything that goes wrong here is written only
+  to the log.
 
 ---
 
@@ -155,15 +156,15 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule 3 — what Testin writes means what it says | `priority` in the generated method is the test case's position in its test set, not its priority. A tester reading `priority = 3` in the code reads it as the test case's priority. Changing a test case's real priority writes nothing at all. |
-| **Difference 2** | Rule 2 — a menu entry does what it says | **Automate Test Case**, and `Ctrl+F12`, are live on every selected test case and always answer *Not built yet*. The one entry named after generating code is the one that does not. |
-| **Difference 3** | Rule 1 — one test case, one method | Two test cases whose descriptions differ only in punctuation share one method. The second gets none, cannot be run and cannot be jumped to. Nothing says so when it is created. |
-| **Difference 4** | Rule 6 — a tester can find out what happened | Clicking the gutter mark of a test case that was removed does nothing at all. Generated code outlives its test case, so this is the ordinary case. |
-| **Difference 5** | Rule 6 — one situation, one sentence | A test case with no method says *has no generated code yet* when it is run, and **Nothing to open** when it is jumped to. One state, two sentences, one keystroke apart. |
-| **Difference 6** | Rule 4 — the tree and the code agree | Moving a test set to a place Testin has not read leaves the class where it was. The tree and the code then disagree, and only the log says so. |
-| **Difference 7** | Rule 5 — a missing plugin is a skip | With TestNG but no Java plugin, **Run Test Case** is offered, every test case resolves to nothing, and the tester gets one *has no generated code yet* message per test case with no mention of the missing plugin. |
-| **Difference 8** | Rule 6 — a refusal names what happened | Removing a test set that sits outside a test cases folder says a class name could not be **built**, during an operation that was only going to delete one. |
-| **Difference 9** | Rule 3 — one name for one thing | Two test sets whose names come to nothing when the special characters are removed both write into one class called `DefaultTest`. |
+| **Difference 1** | Rule-CODEGEN-003 — what Testin writes means what it says | `priority` in the generated method is the test case's position in its test set, not its priority. A tester reading `priority = 3` in the code reads it as the test case's priority. Changing a test case's real priority writes nothing at all. |
+| **Difference 2** | Rule-CODEGEN-002 — a menu entry does what it says | **Automate Test Case**, and `Ctrl+F12`, are live on every selected test case and always answer *Not built yet*. The one entry named after generating code is the one that does not. |
+| **Difference 3** | Rule-CODEGEN-001 — one test case, one method | Two test cases whose descriptions differ only in punctuation share one method. The second gets none, cannot be run and cannot be jumped to. Nothing says so when it is created. |
+| **Difference 4** | Rule-CODEGEN-006 — a tester can find out what happened | Clicking the gutter mark of a test case that was removed does nothing at all. Generated code outlives its test case, so this is the ordinary case. |
+| **Difference 5** | Rule-CODEGEN-006 — one situation, one sentence | A test case with no method says *has no generated code yet* when it is run, and **Nothing to open** when it is jumped to. One state, two sentences, one keystroke apart. |
+| **Difference 6** | Rule-CODEGEN-004 — the tree and the code agree | Moving a test set to a place Testin has not read leaves the class where it was. The tree and the code then disagree, and only the log says so. |
+| **Difference 7** | Rule-CODEGEN-005 — a missing plugin is a skip | With TestNG but no Java plugin, **Run Test Case** is offered, every test case resolves to nothing, and the tester gets one *has no generated code yet* message per test case with no mention of the missing plugin. |
+| **Difference 8** | Rule-CODEGEN-006 — a refusal names what happened | Removing a test set that sits outside a test cases folder says a class name could not be **built**, during an operation that was only going to delete one. |
+| **Difference 9** | Rule-CODEGEN-003 — one name for one thing | Two test sets whose names come to nothing when the special characters are removed both write into one class called `DefaultTest`. |
 
 ---
 

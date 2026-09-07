@@ -9,20 +9,22 @@ There is no key for this. It is what the **Details** tab shows.
 
 ## Rules
 
-- **Rule 23** — The rows are drawn in one fixed order, whatever the test case
-  holds.
-- **Rule 24** — A row with nothing in it is not drawn, and its caption goes with
-  it.
-- **Rule 25** — A test case with no description shows a dash for its title.
-- **Rule 26** — Text is capitalized and given a full stop, unless it already
-  ends in one. The test data row is left exactly as the tester typed it.
-- **Rule 27** — A blank step is skipped, and its number is not given to the step
-  after it. A test case with a blank second step reads one, two, four.
-- **Rule 28** — Every value can be selected and copied, and none of them can be
-  typed into.
+- **Rule-VIEW-PANEL-023** — The rows are drawn in one fixed order, whatever the
+  test case holds.
+- **Rule-VIEW-PANEL-024** — A row with nothing in it is not drawn, and its
+  caption goes with it.
+- **Rule-VIEW-PANEL-025** — A test case with no description shows a dash for its
+  title.
+- **Rule-VIEW-PANEL-026** — Text is capitalized and given a full stop, unless it
+  already ends in one. The test data row is left exactly as the tester typed it.
+- **Rule-VIEW-PANEL-027** — A blank step is skipped, and its number is not given
+  to the step after it. A test case with a blank second step reads one, two,
+  four.
+- **Rule-VIEW-PANEL-028** — Every value can be selected and copied, and none of
+  them can be typed into.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The rows, in order
 

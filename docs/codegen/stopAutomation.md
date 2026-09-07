@@ -9,14 +9,14 @@ There is no key of its own. `F5` on a running test case stops it.
 
 ## Rules
 
-- **Rule 36** — While a test case is running, the run button and the menu entry
-  both become the stop.
-- **Rule 37** — Stopping one test case stops every test case running with it.
-  One run is one process.
-- **Rule 38** — A test case the tester stopped is recorded as not run, never as
-  failed.
+- **Rule-CODEGEN-036** — While a test case is running, the run button and the
+  menu entry both become the stop.
+- **Rule-CODEGEN-037** — Stopping one test case stops every test case running
+  with it. One run is one process.
+- **Rule-CODEGEN-038** — A test case the tester stopped is recorded as not run,
+  never as failed.
 
-Rules 1 to 6 hold everywhere. They are on
+Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
 [the automation code page](main.md#rules-that-hold-everywhere).
 
 ## Main flow

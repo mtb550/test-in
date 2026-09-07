@@ -9,11 +9,11 @@ There is no key for this. The tab is called **Open Bugs**.
 
 ## Rules
 
-- **Rule 38** — The Open Bugs tab is not built. It shows one line saying so, and
-  never looks at the test case.
+- **Rule-VIEW-PANEL-038** — The Open Bugs tab is not built. It shows one line
+  saying so, and never looks at the test case.
 
-Rules 1 to 9 hold everywhere in the panel. They are on
-[the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
+are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The screen
 
@@ -47,8 +47,8 @@ found. That is difference 5 on
 [the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
 **The tab names a test case that is not there.** With nothing selected, Details
-reads *Select a test case to view details* and this tab still says *for this test
-case*. That is difference 6.
+reads *Select a test case to view details* and this tab still says *for this
+test case*. That is difference 6.
 
 ## Not decided
 

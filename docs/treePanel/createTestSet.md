@@ -10,15 +10,15 @@ package, **so that** the test cases I am about to write have somewhere to live.
 
 ## Rules
 
-- **Rule 23** — Under **Test Cases** or a test set package, only a test set or a
-  test set package can be created. The dialog offers nothing else.
-- **Rule 24** — Nothing can be created directly under the test project, under a
-  test set, or under a test run.
-- **Rule 25** — A new test set opens in its editor at once. Its automation code
-  is written where the Java plugin allows it.
+- **Rule-TREE-PANEL-023** — Under **Test Cases** or a test set package, only a
+  test set or a test set package can be created. The dialog offers nothing else.
+- **Rule-TREE-PANEL-024** — Nothing can be created directly under the test
+  project, under a test set, or under a test run.
+- **Rule-TREE-PANEL-025** — A new test set opens in its editor at once. Its
+  automation code is written where the Java plugin allows it.
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 ## The Create Test Node dialog
 
@@ -72,8 +72,8 @@ To group test sets instead of adding one, see
 **If the name is empty** — the dialog stays open, the gray hint text turns red,
 and the cursor stays in the box.
 
-**If a node with that name already exists under the parent** — the dialog closes,
-nothing is created, and *\<name\> Already Exists* is shown in red.
+**If a node with that name already exists under the parent** — the dialog
+closes, nothing is created, and *\<name\> Already Exists* is shown in red.
 
 **If the test project, a test set or a test run is selected** — **Create** is
 gray, and `Ctrl+M` does nothing.

@@ -10,16 +10,16 @@ many test sets still reads the way the product is organized.
 
 ## Rules
 
-- **Rule 80** — A test set package is created empty. Nothing opens, and no
-  automation code is written for it.
-- **Rule 81** — A test set package can hold another test set package, as deep as
-  the tester needs.
+- **Rule-TREE-PANEL-080** — A test set package is created empty. Nothing opens,
+  and no automation code is written for it.
+- **Rule-TREE-PANEL-081** — A test set package can hold another test set
+  package, as deep as the tester needs.
 
-Rules 23 and 24 hold here too. They say what can be created where, and they are
-on [UC-TREE-PANEL-007](createTestSet.md).
+Rule-TREE-PANEL-023 and Rule-TREE-PANEL-024 hold here too. They say what can be
+created where, and they are on [UC-TREE-PANEL-007](createTestSet.md).
 
-Rules 1 to 13 hold everywhere in the panel. They are on
-[the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
+are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
 The dialog is drawn under [UC-TREE-PANEL-007](createTestSet.md).
 
@@ -39,8 +39,8 @@ The dialog is drawn under [UC-TREE-PANEL-007](createTestSet.md).
 **If the name is empty** — the dialog stays open, the gray hint text turns red,
 and the cursor stays in the box.
 
-**If a node with that name already exists under the parent** — the dialog closes,
-nothing is created, and *\<name\> Already Exists* is shown in red.
+**If a node with that name already exists under the parent** — the dialog
+closes, nothing is created, and *\<name\> Already Exists* is shown in red.
 
 **If the test project, a test set or a test run is selected** — **Create** is
 gray, and `Ctrl+M` does nothing.
