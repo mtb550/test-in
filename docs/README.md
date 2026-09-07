@@ -31,7 +31,7 @@ step, and every way it can be refused.
 | **[Sharing work with the team](share/main.md)** | Export, import, Git and a server. Every way test data leaves and arrives | 23 | 104 |
 | **[Inside Testin](internal/main.md)** | The parts that belong to no panel: the search, and the one thing that owns every file | 6 | 52 |
 
-**151 use cases and 619 rules**, each one checked against the code it describes.
+**151 use cases and 622 rules**, each one checked against the code it describes.
 Every part also lists where the plugin breaks its own rules, and what nobody has
 decided yet.
 
