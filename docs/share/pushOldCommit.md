@@ -15,7 +15,7 @@ to do.
 - **Rule-SHARE-067** — The message counts commits, not files.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[the sharing page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

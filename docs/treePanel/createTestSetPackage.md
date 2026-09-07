@@ -19,7 +19,7 @@ Rule-TREE-PANEL-024 and Rule-TREE-PANEL-025 hold here too. They say what can be
 created where, and they are on [UC-TREE-PANEL-007](createTestSet.md).
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
-are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+are on [their own page](rules.md).
 
 The dialog is drawn under [UC-TREE-PANEL-007](createTestSet.md).
 

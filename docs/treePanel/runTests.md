@@ -20,7 +20,7 @@ package or **Test Cases**, **so that** a whole area runs in one gesture.
   row, on **Test Runs**, or on a test run package.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
-are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+are on [their own page](rules.md).
 
 ## Main flow
 

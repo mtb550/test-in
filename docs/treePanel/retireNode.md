@@ -20,7 +20,7 @@ its history without getting in the way of what I am testing now.
   node already has is not offered.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
-are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+are on [their own page](rules.md).
 
 ## Main flow
 

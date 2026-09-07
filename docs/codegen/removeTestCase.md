@@ -16,7 +16,7 @@ There is no key for this. It happens when a test case is removed, which is
 - **Rule-CODEGEN-050** — A test case with no method is skipped without a word.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

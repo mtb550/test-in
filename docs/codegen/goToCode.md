@@ -15,7 +15,7 @@ at, **so that** I can read or change what the automation really does.
   all.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## The three ways in
 

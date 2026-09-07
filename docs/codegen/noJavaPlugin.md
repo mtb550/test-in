@@ -18,7 +18,7 @@ Nothing starts this. It is the state of the IDE.
   missing, and switching it on needs the IDE restarted before Testin notices.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## What is missing
 

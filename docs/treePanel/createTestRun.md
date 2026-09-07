@@ -22,7 +22,7 @@ Rule-TREE-PANEL-032 holds here too. It says what can be created under **Test
 Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
-are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+are on [their own page](rules.md).
 
 ## The Create Test Run dialog
 

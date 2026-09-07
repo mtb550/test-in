@@ -12,7 +12,7 @@ There is no key for this. It is the **Tester role** row.
 - **Rule-SETTING-020** — The role is stored on this machine and read by nothing.
 
 Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
-[the settings page](main.md#rules-that-hold-everywhere-on-the-page).
+[their own page](rules.md).
 
 ## Main flow
 

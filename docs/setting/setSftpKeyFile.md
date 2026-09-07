@@ -17,7 +17,7 @@ There is no key for this. It is the **SFTP key file** row.
   going to be used, and is kept in the IDE's password store.
 
 Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
-[the settings page](main.md#rules-that-hold-everywhere-on-the-page).
+[their own page](rules.md).
 
 ## Main flow
 

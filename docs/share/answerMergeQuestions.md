@@ -22,7 +22,7 @@ There is no key that opens this. It opens during a merge.
   are kept.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[the sharing page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## The screen
 

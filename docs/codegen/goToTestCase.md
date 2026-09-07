@@ -18,7 +18,7 @@ There is no key for this. The mark is in the gutter beside the method.
   the jump waits for indexing to finish.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## The screen
 

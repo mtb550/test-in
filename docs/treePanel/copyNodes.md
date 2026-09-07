@@ -24,7 +24,7 @@ Rule-TREE-PANEL-049 hold here too. They say where a node can land, and they are
 on [UC-TREE-PANEL-013](moveNodes.md).
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
-are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+are on [their own page](rules.md).
 
 The dialog is drawn under [UC-TREE-PANEL-013](moveNodes.md). After a copy its
 title is **Paste**, and it asks *Copy N items into '\<folder\>'?*.

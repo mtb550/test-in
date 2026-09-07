@@ -23,7 +23,7 @@ There is no key for this. The offer appears on the message.
 - **Rule-SHARE-079** — A pull that will not move on is reported only to the log.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[the sharing page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

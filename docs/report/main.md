@@ -48,15 +48,8 @@ a ticket, mailed to a manager, or kept as the record that a release was tested.
 
 ## Rules that hold everywhere
 
-- **Rule-REPORT-001** — A report is about exactly one test run.
-- **Rule-REPORT-002** — Every format reads the same figures, so two reports on
-  one test run cannot disagree.
-- **Rule-REPORT-003** — A report is written after the dialog closes, under a
-  progress bar that cannot be canceled.
-- **Rule-REPORT-004** — A report is written where the tester chose. It never
-  lands under the Testin folder.
-- **Rule-REPORT-005** — The project named in a report is the test project, not
-  the code project the IDE has open.
+They are on [their own page](rules.md), because they hold for the whole part
+rather than for any one use case.
 
 ---
 

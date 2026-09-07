@@ -17,7 +17,7 @@ Nothing starts this. It is the state of the code project.
   has one is the one Testin uses.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

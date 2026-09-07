@@ -18,7 +18,7 @@ package, **so that** the test cases I am about to write have somewhere to live.
   automation code is written where the Java plugin allows it.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
-are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+are on [their own page](rules.md).
 
 ## The Create Test Node dialog
 

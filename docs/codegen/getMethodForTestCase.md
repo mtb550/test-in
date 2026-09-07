@@ -27,7 +27,7 @@ There is no key for this. It happens when a test case is created, which is
   so it is one undo and one write.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## What is written
 

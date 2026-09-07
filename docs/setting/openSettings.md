@@ -19,7 +19,7 @@ panel's toolbar.
   the one that changed.
 
 Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
-[the settings page](main.md#rules-that-hold-everywhere-on-the-page).
+[their own page](rules.md).
 
 ## The four ways in
 

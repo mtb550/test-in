@@ -19,7 +19,7 @@ There is no key for this. It happens when test cases are reordered, which is
   because the sweep touches every test case in the set.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

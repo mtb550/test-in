@@ -18,7 +18,7 @@
 - **Rule-REPORT-009** — The dialog closes before the work starts.
 
 Rule-REPORT-001 to Rule-REPORT-005 hold everywhere. They are on
-[the reports page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## The screen
 

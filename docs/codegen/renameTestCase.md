@@ -18,7 +18,7 @@ There is no key for this. It happens when the description is changed, which is
   under the name it already has, and records the empty description.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

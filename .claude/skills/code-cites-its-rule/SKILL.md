@@ -104,7 +104,8 @@ rule that cannot be written in one plain sentence is usually a sign the design
 is wrong. Three of the six critical defects found in September 2026 were code
 that contradicted a rule the codebase had already written down somewhere else.
 
-If the behavior is genuinely new, add the rule to the part's page and give it
+If the behavior is genuinely new, add the rule to the page that keeps it - the
+use case page, or that part's `rules.md` when it holds everywhere - and give it
 the next number after that part's last - the **Numbering** row of its `main.md`
 says what that is. Move the row on in the same commit, and cite the rule from
 the code. Never renumber a rule that already exists.

@@ -21,7 +21,7 @@ There is no key for this. It is the first row of the page.
   nothing. It does not fail.
 
 Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
-[the settings page](main.md#rules-that-hold-everywhere-on-the-page).
+[their own page](rules.md).
 
 ## The screen
 

@@ -18,7 +18,7 @@ There is no key for this. The table is in the export dialog.
 - **Rule-SHARE-021** — Moving away from a cell saves what was typed in it.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[the sharing page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## The two special columns
 

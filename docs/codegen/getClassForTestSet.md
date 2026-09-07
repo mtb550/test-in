@@ -21,7 +21,7 @@ There is no key for this. It happens when a test set is created, which is
   called `DefaultTest`.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## What is written
 

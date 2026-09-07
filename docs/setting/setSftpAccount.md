@@ -17,7 +17,7 @@ There is no key for this. It is the **SFTP account** row.
   answers the sync's question never has to visit this page.
 
 Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
-[the settings page](main.md#rules-that-hold-everywhere-on-the-page).
+[their own page](rules.md).
 
 ## Main flow
 

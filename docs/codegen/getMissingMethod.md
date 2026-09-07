@@ -20,7 +20,7 @@ There is no button for this. It happens when the description is filled in.
   under the name it already has.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

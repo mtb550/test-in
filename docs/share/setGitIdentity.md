@@ -18,7 +18,7 @@ Nothing starts this. It opens when a commit is refused for want of a name.
   repository or for every repository on this machine.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[the sharing page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## The screen
 

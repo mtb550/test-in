@@ -18,7 +18,7 @@ which is [UC-TREE-PANEL-014](../treePanel/copyNodes.md).
   undo for the copy they made.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

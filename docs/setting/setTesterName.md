@@ -16,7 +16,7 @@ There is no key for this. It is the **Tester name** row.
   which means the file did not say rather than that nobody chose.
 
 Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
-[the settings page](main.md#rules-that-hold-everywhere-on-the-page).
+[their own page](rules.md).
 
 ## Where the name is stamped
 

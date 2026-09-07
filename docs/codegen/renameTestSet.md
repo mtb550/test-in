@@ -16,7 +16,7 @@ There is no key for this. It happens when a test set is renamed, which is
   with `Test` on the end.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

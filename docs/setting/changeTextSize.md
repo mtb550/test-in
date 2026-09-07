@@ -18,7 +18,7 @@ Hold `Ctrl` and turn the mouse wheel. On a Mac, hold `Cmd`.
   panel, the view panel and light mode.
 
 Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
-[the settings page](main.md#rules-that-hold-everywhere-on-the-page).
+[their own page](rules.md).
 
 ## The screen
 

@@ -17,7 +17,7 @@ There is no key for this. It happens when the groups are changed, which is
   its method at all.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

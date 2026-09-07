@@ -25,7 +25,7 @@ see it, **so that** the bug report writes itself later.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
-[the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[their own page](rules.md).
 
 ## The screen
 

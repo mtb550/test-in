@@ -17,7 +17,7 @@ There is no key for this. It is the **Default download folder** row.
   import and export dialogs can set it too.
 
 Rule-SETTING-001 to Rule-SETTING-006 hold everywhere on the page. They are on
-[the settings page](main.md#rules-that-hold-everywhere-on-the-page).
+[their own page](rules.md).
 
 ## The screen
 

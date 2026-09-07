@@ -20,7 +20,7 @@ Rule-TREE-PANEL-064 also holds here. It says an **Archived** test project is not
 opened on the next load, and it is on [UC-TREE-PANEL-018](retireNode.md).
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
-are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+are on [their own page](rules.md).
 
 ## No Testin folder
 

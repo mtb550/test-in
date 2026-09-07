@@ -20,7 +20,7 @@ Nothing starts this. It happens when a password is typed in the account window.
   corrected on.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[the sharing page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

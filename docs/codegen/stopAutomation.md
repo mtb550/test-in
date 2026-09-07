@@ -17,7 +17,7 @@ There is no key of its own. `F5` on a running test case stops it.
   never as failed.
 
 Rule-CODEGEN-001 to Rule-CODEGEN-006 hold everywhere. They are on
-[the automation code page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

@@ -22,7 +22,7 @@ There is no key for this. The button is on the toolbar.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
-[the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[their own page](rules.md).
 
 ## The screen
 

@@ -23,7 +23,7 @@ tester does: `createTestProject.md`.
 | **What the part is for** | Why it exists, in a few sentences |
 | **The words it uses** | Any word the rules lean on, explained before they use it |
 | **How to read these pages** | The shape of a use case page, and what the marks in the drawings stand for |
-| **The rules that hold everywhere** | Numbered rules that apply to the whole part |
+| **The rules that hold everywhere** | A link to `rules.md`, which holds them. No rule is written in `main.md` |
 | **Every key, in one place** | One table: the key, what it does, and the page that owns it |
 | **The screens that belong to no single use case** | The panel, or the window itself, drawn |
 | **Why it is built this way** | The decisions worth not re-arguing |
@@ -131,6 +131,12 @@ later reads 47, 48, 49 and then 194, and that is the numbering working rather
 than failing - 194 is a rule written after the first 193 and says so. The page
 is the order to read them in; the number is only how to find one.
 
+**Every rule lives on the page it belongs to, and `main.md` holds none.** The
+ones that hold for a whole part are on that part's `rules.md`; the rest are on
+the use case page that keeps them. A page owns its own rules, so writing one
+means opening one file - and `main.md`, which every page links to, stops being a
+file that changes whenever a rule is written.
+
 **Each part's page says its last number.** The **Numbering** row of every
 `main.md` gives the range that part's use cases and rules cover, so the next rule
 is the number after the end of it and nobody reads the whole part to find out.
@@ -167,7 +173,7 @@ nobody has written, the rule is written first.
 - **Rule-TREE-PANEL-017** — …
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
-are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+are on [their own page](rules.md).
 
 ## The create dialog
 

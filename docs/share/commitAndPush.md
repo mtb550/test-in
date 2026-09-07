@@ -17,7 +17,7 @@ There is no key for this. **Commit & Push** is the face of the split button.
   anything Testin shows or logs.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[the sharing page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

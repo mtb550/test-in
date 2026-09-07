@@ -19,7 +19,7 @@ There is no key for this. The same **Export** entry, on a package.
   The first keeps the name, and the rest get a number in brackets.
 
 Rule-SHARE-001 to Rule-SHARE-006 hold everywhere. They are on
-[the sharing page](main.md#rules-that-hold-everywhere).
+[their own page](rules.md).
 
 ## Main flow
 

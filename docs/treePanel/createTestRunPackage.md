@@ -18,7 +18,7 @@ cycles does not sit in one flat list.
   package, as deep as the tester needs.
 
 Rule-TREE-PANEL-001 to Rule-TREE-PANEL-013 hold everywhere in the panel. They
-are on [the tree panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+are on [their own page](rules.md).
 
 The dialog is drawn under [UC-TREE-PANEL-007](createTestSet.md). The test run
 side of it carries the same two rows, reading *test run* and *test run package*,

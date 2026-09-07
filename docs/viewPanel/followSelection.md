@@ -19,7 +19,7 @@ There is no key for this. It happens once the panel is open.
   the paging position is never carried over.
 
 Rule-VIEW-PANEL-001 to Rule-VIEW-PANEL-009 hold everywhere in the panel. They
-are on [the view panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+are on [their own page](rules.md).
 
 ## Main flow
 

@@ -21,7 +21,7 @@ test set, **so that** they end up where I am working.
 
 Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
-[the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
+[their own page](rules.md).
 
 ## Main flow
 
