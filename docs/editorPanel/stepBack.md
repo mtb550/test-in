@@ -10,14 +10,14 @@ here.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-111** — One press does one step. The steps are always in
+- **Rule-EDITOR-PANEL-112** — One press does one step. The steps are always in
   the same order.
-- **Rule-EDITOR-PANEL-112** — In the grid, an open cell takes the press first,
+- **Rule-EDITOR-PANEL-113** — In the grid, an open cell takes the press first,
   and only cancels the edit.
-- **Rule-EDITOR-PANEL-113** — In the search box, the press returns the keyboard
+- **Rule-EDITOR-PANEL-114** — In the search box, the press returns the keyboard
   to the list and leaves the text.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

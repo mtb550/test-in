@@ -9,19 +9,19 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-133** — A verdict records what it was, who recorded it,
+- **Rule-EDITOR-PANEL-134** — A verdict records what it was, who recorded it,
   and when, to the second.
-- **Rule-EDITOR-PANEL-134** — A verdict recorded on the test case the walk is
+- **Rule-EDITOR-PANEL-135** — A verdict recorded on the test case the walk is
   timing also records how long it took.
-- **Rule-EDITOR-PANEL-135** — Recording a pass clears the actual result, the
+- **Rule-EDITOR-PANEL-136** — Recording a pass clears the actual result, the
   error, the bug severity and the bug priority. A test case that passed has
   nothing to explain.
-- **Rule-EDITOR-PANEL-136** — The walk then moves to the next test case and
+- **Rule-EDITOR-PANEL-137** — The walk then moves to the next test case and
   starts timing it.
-- **Rule-EDITOR-PANEL-137** — One test case is one message. Several at once is
+- **Rule-EDITOR-PANEL-138** — One test case is one message. Several at once is
   one message with a count.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
@@ -57,7 +57,7 @@ one, still saves it, and still says *Passed*. That is difference 19 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
 
 **An automated pass destroys a tester's notes without asking.** The confirmation
-in Rule-EDITOR-PANEL-135 is only on the keyboard path. A test case failed and
+in Rule-EDITOR-PANEL-136 is only on the keyboard path. A test case failed and
 written up by hand, then re-run by automation and passing, loses the actual
 result, the error, the severity and the priority with no dialog. That is
 difference 26.

@@ -9,11 +9,11 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-070** — Each test case is written as the field name, a
+- **Rule-EDITOR-PANEL-071** — Each test case is written as the field name, a
   colon, then the value.
-- **Rule-EDITOR-PANEL-071** — Several test cases are separated by a blank line.
+- **Rule-EDITOR-PANEL-072** — Several test cases are separated by a blank line.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

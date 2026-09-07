@@ -10,16 +10,16 @@ There is no key for this. The button's tooltip reads **Filter**.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-091** — Four things can be filtered on: the priority, the
+- **Rule-EDITOR-PANEL-092** — Four things can be filtered on: the priority, the
   group, the module and, in a test run, the run status.
-- **Rule-EDITOR-PANEL-092** — The module list is built from the test cases in
+- **Rule-EDITOR-PANEL-093** — The module list is built from the test cases in
   this test set, so it only ever offers modules that exist.
-- **Rule-EDITOR-PANEL-093** — Choosing nothing in a filter means every test case
+- **Rule-EDITOR-PANEL-094** — Choosing nothing in a filter means every test case
   matches it.
-- **Rule-EDITOR-PANEL-094** — Filtering goes back to the first page.
-- **Rule-EDITOR-PANEL-095** — The button says how many filters are on.
+- **Rule-EDITOR-PANEL-095** — Filtering goes back to the first page.
+- **Rule-EDITOR-PANEL-096** — The button says how many filters are on.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

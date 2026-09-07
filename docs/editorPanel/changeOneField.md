@@ -9,19 +9,19 @@ twenty, **so that** fixing a typo takes two keys.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-034** — Only the field the tester opened may be written
+- **Rule-EDITOR-PANEL-035** — Only the field the tester opened may be written
   back. Every other field on the dialog is gray.
-- **Rule-EDITOR-PANEL-035** — The dialog always shows the description, and shows
+- **Rule-EDITOR-PANEL-036** — The dialog always shows the description, and shows
   the expected result when it is not empty, so the tester can see what they are
   changing.
-- **Rule-EDITOR-PANEL-036** — A save that changed nothing writes nothing and
+- **Rule-EDITOR-PANEL-037** — A save that changed nothing writes nothing and
   says nothing.
-- **Rule-EDITOR-PANEL-037** — One gesture is one entry on the undo history,
+- **Rule-EDITOR-PANEL-038** — One gesture is one entry on the undo history,
   however many test cases it changed.
-- **Rule-EDITOR-PANEL-038** — Undo puts the test case back exactly, including
+- **Rule-EDITOR-PANEL-039** — Undo puts the test case back exactly, including
   who last changed it and when.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

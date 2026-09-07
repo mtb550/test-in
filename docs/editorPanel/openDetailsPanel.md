@@ -9,11 +9,11 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-109** — Opening the details panel says nothing.
-- **Rule-EDITOR-PANEL-110** — Once the panel is open, moving the selection fills
+- **Rule-EDITOR-PANEL-110** — Opening the details panel says nothing.
+- **Rule-EDITOR-PANEL-111** — Once the panel is open, moving the selection fills
   it again.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

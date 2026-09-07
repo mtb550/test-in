@@ -10,16 +10,16 @@ Select several test cases, then `P`, `F` or `B`.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-160** — Every selected test case gets the verdict. Test
+- **Rule-EDITOR-PANEL-161** — Every selected test case gets the verdict. Test
   cases that were removed from their test set are skipped and not counted.
-- **Rule-EDITOR-PANEL-161** — Nothing is timed. Every one of them gets no
+- **Rule-EDITOR-PANEL-162** — Nothing is timed. Every one of them gets no
   duration.
-- **Rule-EDITOR-PANEL-162** — One message with a count, however many were
+- **Rule-EDITOR-PANEL-163** — One message with a count, however many were
   recorded.
-- **Rule-EDITOR-PANEL-163** — Failing several does not open the failure dialog.
+- **Rule-EDITOR-PANEL-164** — Failing several does not open the failure dialog.
   They are failed with no detail.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

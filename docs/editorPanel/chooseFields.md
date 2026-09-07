@@ -10,16 +10,16 @@ There is no key for this. The button's tooltip reads **Details**.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-020** — Ticking a field shows it at once, in whichever
+- **Rule-EDITOR-PANEL-021** — Ticking a field shows it at once, in whichever
   view is on screen.
-- **Rule-EDITOR-PANEL-021** — The choice is remembered, and is separate for a
+- **Rule-EDITOR-PANEL-022** — The choice is remembered, and is separate for a
   test set and a test run.
-- **Rule-EDITOR-PANEL-022** — Two fields cannot be changed. **Description** is
+- **Rule-EDITOR-PANEL-023** — Two fields cannot be changed. **Description** is
   always shown and **ID** is never shown.
-- **Rule-EDITOR-PANEL-023** — A burst of ticks costs one redraw, not one for
+- **Rule-EDITOR-PANEL-024** — A burst of ticks costs one redraw, not one for
   each.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

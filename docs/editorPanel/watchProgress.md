@@ -9,18 +9,18 @@ There is no key for this. The figures are in the status bar.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-172** — A verdict no test case carries is not drawn at
+- **Rule-EDITOR-PANEL-173** — A verdict no test case carries is not drawn at
   all.
-- **Rule-EDITOR-PANEL-173** — The untouched test cases read **Pending** while
+- **Rule-EDITOR-PANEL-174** — The untouched test cases read **Pending** while
   the test run is open, and **Untested** once it is signed off.
-- **Rule-EDITOR-PANEL-174** — The figures are worked out from what the test run
+- **Rule-EDITOR-PANEL-175** — The figures are worked out from what the test run
   holds now, not from disk.
-- **Rule-EDITOR-PANEL-175** — A test run that has measured nothing shows a blank
+- **Rule-EDITOR-PANEL-176** — A test run that has measured nothing shows a blank
   clock, not a row of zeros.
-- **Rule-EDITOR-PANEL-176** — The three run labels are hidden, not blank, when
+- **Rule-EDITOR-PANEL-177** — The three run labels are hidden, not blank, when
   there is nothing to say. A test set editor never shows them.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

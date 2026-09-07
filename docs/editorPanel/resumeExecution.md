@@ -9,15 +9,15 @@ There is no key for this. Press **Start Manual Execution** again.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-150** — Starting again finds the first test case with no
+- **Rule-EDITOR-PANEL-151** — Starting again finds the first test case with no
   verdict, so the walk resumes rather than restarting. A test case judged in the
-  first sitting is passed over wherever it sits (Rule-EDITOR-PANEL-127).
-- **Rule-EDITOR-PANEL-151** — The clock adds to the time a test case already
+  first sitting is passed over wherever it sits (Rule-EDITOR-PANEL-128).
+- **Rule-EDITOR-PANEL-152** — The clock adds to the time a test case already
   carried, rather than starting it again.
-- **Rule-EDITOR-PANEL-152** — The stamp saying when execution began is kept.
+- **Rule-EDITOR-PANEL-153** — The stamp saying when execution began is kept.
   Only the stamp saying when it ended is written again.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

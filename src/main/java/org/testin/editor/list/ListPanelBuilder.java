@@ -38,7 +38,7 @@ public final class ListPanelBuilder {
     public static @NotNull ListView build(final @NotNull Project p, final @NotNull Disposable fontSyncDisposable) {
         final @NotNull CollectionListModel<TestCaseDto> model = new CollectionListModel<>(new ArrayList<>());
 
-        // UC-EDITOR-PANEL-001 and UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-002.
+        // UC-EDITOR-PANEL-001 and UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-003.
         //
         // A card is drawn to the width it is given - a long title wraps onto more
         // lines rather than running off the side - so this list never scrolls

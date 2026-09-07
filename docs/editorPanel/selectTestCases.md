@@ -9,15 +9,15 @@ There is no key that starts this. Click, `Ctrl`-click and `Shift`-click.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-105** — Several test cases can be selected, in as many
+- **Rule-EDITOR-PANEL-106** — Several test cases can be selected, in as many
   separate runs as the tester likes.
-- **Rule-EDITOR-PANEL-106** — Clicking outside every card clears the selection.
-- **Rule-EDITOR-PANEL-107** — Right-clicking outside the selection moves the
+- **Rule-EDITOR-PANEL-107** — Clicking outside every card clears the selection.
+- **Rule-EDITOR-PANEL-108** — Right-clicking outside the selection moves the
   selection to what was clicked first.
-- **Rule-EDITOR-PANEL-108** — The grid's selection and the cards' selection are
+- **Rule-EDITOR-PANEL-109** — The grid's selection and the cards' selection are
   always the same. Changing one changes the other.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

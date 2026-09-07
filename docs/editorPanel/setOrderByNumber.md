@@ -9,14 +9,14 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-052** — The number is the position in the whole test set,
+- **Rule-EDITOR-PANEL-053** — The number is the position in the whole test set,
   counting from one.
-- **Rule-EDITOR-PANEL-053** — Positions are read with this test case taken out
+- **Rule-EDITOR-PANEL-054** — Positions are read with this test case taken out
   of the list, so typing three puts it third.
-- **Rule-EDITOR-PANEL-054** — Only this test case's own file is written. The
+- **Rule-EDITOR-PANEL-055** — Only this test case's own file is written. The
   test cases around it are not touched.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

@@ -9,17 +9,17 @@ test set, **so that** they end up where I am working.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-078** — A pasted copy is a new test case with a new
+- **Rule-EDITOR-PANEL-079** — A pasted copy is a new test case with a new
   identity, and its description gains the word `(Copy)`.
-- **Rule-EDITOR-PANEL-079** — A pasted cut keeps its identity, because it is the
+- **Rule-EDITOR-PANEL-080** — A pasted cut keeps its identity, because it is the
   same test case in a new place.
-- **Rule-EDITOR-PANEL-080** — Pasted test cases land at the end of the test set.
-- **Rule-EDITOR-PANEL-081** — A cut and its paste are one entry on the undo
+- **Rule-EDITOR-PANEL-081** — Pasted test cases land at the end of the test set.
+- **Rule-EDITOR-PANEL-082** — A cut and its paste are one entry on the undo
   history.
-- **Rule-EDITOR-PANEL-082** — The clipboard is read as test cases. Anything else
+- **Rule-EDITOR-PANEL-083** — The clipboard is read as test cases. Anything else
   is turned away.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

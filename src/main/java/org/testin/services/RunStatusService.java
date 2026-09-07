@@ -67,7 +67,7 @@ public final class RunStatusService {
         // on to the next case still waiting for a verdict, so this no longer has
         // to know whether the filter refresh above dropped the judged case out of
         // the list and shifted everything up by one - both answers lead to the
-        // same place (Rule-EDITOR-PANEL-127).
+        // same place (Rule-EDITOR-PANEL-128).
         ApplicationManager.getApplication().invokeLater(() -> editor.startTimerForIndex(executingIndex));
     }
 

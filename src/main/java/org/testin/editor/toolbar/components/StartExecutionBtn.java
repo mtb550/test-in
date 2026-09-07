@@ -18,7 +18,7 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
     }
 
     /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132.
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-133.
      * <p>
      * Why the button is gray, in the order the reasons matter: a walk already
      * going, then a run that records nothing more, then a walk with nowhere to

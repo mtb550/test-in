@@ -9,7 +9,7 @@ in a tab. It is where test cases are written, and where a test run is executed.
 |---|---|
 | **Part of Testin** | The editor panel |
 | **Answers** | What a tester can do to test cases and to a test run, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-046`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-190` |
+| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-046`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-191` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -110,19 +110,22 @@ the same rows, a filter, a search, and a key for every gesture.
   status bar at the bottom.
 - **Rule-EDITOR-PANEL-002** — Both editors open showing cards. The grid is built
   the first time the tester asks for it.
-- **Rule-EDITOR-PANEL-003** — A page holds 50 test cases until the tester says
+- **Rule-EDITOR-PANEL-003** — A card is drawn to the width of the list. A title
+  too long for that width wraps onto more lines, and the cards never scroll
+  sideways.
+- **Rule-EDITOR-PANEL-004** — A page holds 50 test cases until the tester says
   otherwise. The most a page can hold is 1000.
-- **Rule-EDITOR-PANEL-004** — What the tester types is stored exactly. Testin
+- **Rule-EDITOR-PANEL-005** — What the tester types is stored exactly. Testin
   may draw it differently, and never saves the drawn form.
-- **Rule-EDITOR-PANEL-005** — A save that would leave the file as it is writes
+- **Rule-EDITOR-PANEL-006** — A save that would leave the file as it is writes
   nothing, and says nothing.
-- **Rule-EDITOR-PANEL-006** — Each editor keeps an undo history of its own, and
+- **Rule-EDITOR-PANEL-007** — Each editor keeps an undo history of its own, and
   the tree keeps another.
-- **Rule-EDITOR-PANEL-007** — Every change confirms itself with one message in
+- **Rule-EDITOR-PANEL-008** — Every change confirms itself with one message in
   the past tense. A change to several test cases gets one message with a count.
-- **Rule-EDITOR-PANEL-008** — Moving the view says nothing. Paging, filtering,
+- **Rule-EDITOR-PANEL-009** — Moving the view says nothing. Paging, filtering,
   searching and opening the details panel are all silent.
-- **Rule-EDITOR-PANEL-009** — While a grid cell is open for editing, every key
+- **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
 
 ---
@@ -277,37 +280,37 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule-EDITOR-PANEL-007 — a message says what happened | `Ctrl+C` says *Details copied* and copies one line, the description. Every other field is left out. |
-| **Difference 2** | Rule-EDITOR-PANEL-004 — a field the tester can fill in has a way in | **Test Data** and **Pre Conditions** cannot be filled in when a test case is created. Both are drawn in the dialog and neither has a key that opens it. |
-| **Difference 3** | Rule-EDITOR-PANEL-004 — one word for one thing | The group boxes in the create dialog read **REGRESSION** and **SMOKE**. The badges, the filter and the grid beside them read **Regression** and **Smoke**. |
-| **Difference 4** | Rule-EDITOR-PANEL-004 — what can be filtered can be set | Four groups can be filtered on and never assigned. The filter offers Security, UI, Functional and Validation. The dialog offers only Regression, Smoke and Sanity. |
+| **Difference 1** | Rule-EDITOR-PANEL-008 — a message says what happened | `Ctrl+C` says *Details copied* and copies one line, the description. Every other field is left out. |
+| **Difference 2** | Rule-EDITOR-PANEL-005 — a field the tester can fill in has a way in | **Test Data** and **Pre Conditions** cannot be filled in when a test case is created. Both are drawn in the dialog and neither has a key that opens it. |
+| **Difference 3** | Rule-EDITOR-PANEL-005 — one word for one thing | The group boxes in the create dialog read **REGRESSION** and **SMOKE**. The badges, the filter and the grid beside them read **Regression** and **Smoke**. |
+| **Difference 4** | Rule-EDITOR-PANEL-005 — what can be filtered can be set | Four groups can be filtered on and never assigned. The filter offers Security, UI, Functional and Validation. The dialog offers only Regression, Smoke and Sanity. |
 | **Difference 5** | Rule-EDITOR-PANEL-001 — one name for one thing | Two buttons on one toolbar are both tooltipped **Details**. One picks which fields are shown, the other opens the test set's own details. |
-| **Difference 6** | Rule-EDITOR-PANEL-007 — one message with a count | Pasting a block of 20 cells into the grid raises 20 messages. `Ctrl+X` over a block does the same. |
-| **Difference 7** | Rule-EDITOR-PANEL-004 — what the tester typed is stored | A description typed into a grid cell loses characters Testin will not keep. If nothing else changed, nothing is saved and nothing is said, and the tester watches their text change. |
-| **Difference 8** | Rule-EDITOR-PANEL-004 — one answer to one situation | A priority typed into a grid cell that Testin cannot read becomes the lowest. A status it cannot read keeps the value the test case already had. Two columns, two answers to a typo. |
-| **Difference 9** | Rule-EDITOR-PANEL-004 — a key works the same on every machine | `Ctrl+M` is not made into `Cmd+M` on a Mac, though `Ctrl+C` and `Ctrl+F` are. The empty editor's second line reads *Press Ctrl+M to add* whatever machine it is on. |
-| **Difference 10** | Rule-EDITOR-PANEL-008 — moving the view says nothing, and changes nothing | Selecting a test case that a filter is hiding throws every filter away, silently. It happens after creating a test case, after a drag, and after choosing a search result. |
-| **Difference 11** | Rule-EDITOR-PANEL-004 — what the tester typed is stored | The page size box takes anything and quietly answers something else. `5000` becomes 1000. `0`, a negative number, letters and an empty box all become 50. |
+| **Difference 6** | Rule-EDITOR-PANEL-008 — one message with a count | Pasting a block of 20 cells into the grid raises 20 messages. `Ctrl+X` over a block does the same. |
+| **Difference 7** | Rule-EDITOR-PANEL-005 — what the tester typed is stored | A description typed into a grid cell loses characters Testin will not keep. If nothing else changed, nothing is saved and nothing is said, and the tester watches their text change. |
+| **Difference 8** | Rule-EDITOR-PANEL-005 — one answer to one situation | A priority typed into a grid cell that Testin cannot read becomes the lowest. A status it cannot read keeps the value the test case already had. Two columns, two answers to a typo. |
+| **Difference 9** | Rule-EDITOR-PANEL-005 — a key works the same on every machine | `Ctrl+M` is not made into `Cmd+M` on a Mac, though `Ctrl+C` and `Ctrl+F` are. The empty editor's second line reads *Press Ctrl+M to add* whatever machine it is on. |
+| **Difference 10** | Rule-EDITOR-PANEL-009 — moving the view says nothing, and changes nothing | Selecting a test case that a filter is hiding throws every filter away, silently. It happens after creating a test case, after a drag, and after choosing a search result. |
+| **Difference 11** | Rule-EDITOR-PANEL-005 — what the tester typed is stored | The page size box takes anything and quietly answers something else. `5000` becomes 1000. `0`, a negative number, letters and an empty box all become 50. |
 | **Difference 12** | Rule-EDITOR-PANEL-002 — the two views show the same rows | Unticking **Order** stops three gestures in the grid working: clicking a row to select it, `Enter` to open the details panel, and the double-click. Nothing says why. |
-| **Difference 13** | Rule-EDITOR-PANEL-008 — nothing is lost without being said | **Refresh** throws away every filter and the search text. The message afterwards says only *Refreshed*. |
-| **Difference 14** | Rule-EDITOR-PANEL-004 — the tester sees what they did | A card dragged between two visible cards lands after whatever the filter is hiding between them. The message says *Re-sorted* and the test case is not where it was dropped. |
-| **Difference 15** | Rule-EDITOR-PANEL-007 — one word for one act | Dragging cards says *Re-sorted*. Moving a test case by typing its number says *Updated*. The same act, two words. |
-| **Difference 16** | Rule-EDITOR-PANEL-009 — a key that works is written down | `Shift+Enter` saves a bulk edit. The strip along the bottom names only `Enter`. |
-| **Difference 17** | Rule-EDITOR-PANEL-008 — a search finds what is there | The search reads the description, the identity, the expected result and the steps. It does not read the module, the group, the test data or the pre-conditions, each of which has its own column and its own filter. |
-| **Difference 18** | Rule-EDITOR-PANEL-008 — the status bar says what is true | With a row highlighted the status bar can read *0 of 12 test cases*, where the zero is meant as a position and reads as a count. |
+| **Difference 13** | Rule-EDITOR-PANEL-009 — nothing is lost without being said | **Refresh** throws away every filter and the search text. The message afterwards says only *Refreshed*. |
+| **Difference 14** | Rule-EDITOR-PANEL-005 — the tester sees what they did | A card dragged between two visible cards lands after whatever the filter is hiding between them. The message says *Re-sorted* and the test case is not where it was dropped. |
+| **Difference 15** | Rule-EDITOR-PANEL-008 — one word for one act | Dragging cards says *Re-sorted*. Moving a test case by typing its number says *Updated*. The same act, two words. |
+| **Difference 16** | Rule-EDITOR-PANEL-010 — a key that works is written down | `Shift+Enter` saves a bulk edit. The strip along the bottom names only `Enter`. |
+| **Difference 17** | Rule-EDITOR-PANEL-009 — a search finds what is there | The search reads the description, the identity, the expected result and the steps. It does not read the module, the group, the test data or the pre-conditions, each of which has its own column and its own filter. |
+| **Difference 18** | Rule-EDITOR-PANEL-009 — the status bar says what is true | With a row highlighted the status bar can read *0 of 12 test cases*, where the zero is meant as a position and reads as a count. |
 
 ## Where the plugin breaks its own rules, executing a test run
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 19** | Rule-EDITOR-PANEL-007 — a signed off test run records nothing more | The status bar's own tooltip says a completed or closed test run records no more verdicts. `P`, `F` and `B` still record one, still save it, and still say *Passed*. Only the automation refuses. |
-| **Difference 23** | Rule-EDITOR-PANEL-007 — a test run that is finished says so | Judging the last pending test case from the menu leaves the test run **In Progress**. Only the automation marks a test run completed. |
-| **Difference 24** | Rule-EDITOR-PANEL-008 — nothing is lost without being said | **Refresh** stops the execution. The clock stops, the walk ends, and the button turns back into **Start Manual Execution**. The message says *Refreshed*. |
-| **Difference 25** | Rule-EDITOR-PANEL-007 — one message with a count | An automated test run raises one message for each test case. Fifty test cases is fifty messages. |
-| **Difference 26** | Rule-EDITOR-PANEL-004 — what the tester typed is kept | An automated pass still clears the actual result, the error, the bug severity and the bug priority the tester wrote by hand. It now says so afterwards, in a message that stays in the notification list. The dialog that asks first is still on the manual path only. |
-| **Difference 27** | Rule-EDITOR-PANEL-007 — a message says what happened | Pressing `F5` to **stop** a test case marks the test run **In Progress** first, and raises that message. Stopping starts something. |
-| **Difference 29** | Rule-EDITOR-PANEL-008 — the same | `Escape` in the failure dialog throws away everything typed, with no confirmation. |
-| **Difference 30** | Rule-EDITOR-PANEL-008 — a key means one thing | `Ctrl+Right` turns the page here, and moves to the next test case in the view panel. It is the same key on two panels a tester uses together. |
+| **Difference 19** | Rule-EDITOR-PANEL-008 — a signed off test run records nothing more | The status bar's own tooltip says a completed or closed test run records no more verdicts. `P`, `F` and `B` still record one, still save it, and still say *Passed*. Only the automation refuses. |
+| **Difference 23** | Rule-EDITOR-PANEL-008 — a test run that is finished says so | Judging the last pending test case from the menu leaves the test run **In Progress**. Only the automation marks a test run completed. |
+| **Difference 24** | Rule-EDITOR-PANEL-009 — nothing is lost without being said | **Refresh** stops the execution. The clock stops, the walk ends, and the button turns back into **Start Manual Execution**. The message says *Refreshed*. |
+| **Difference 25** | Rule-EDITOR-PANEL-008 — one message with a count | An automated test run raises one message for each test case. Fifty test cases is fifty messages. |
+| **Difference 26** | Rule-EDITOR-PANEL-005 — what the tester typed is kept | An automated pass still clears the actual result, the error, the bug severity and the bug priority the tester wrote by hand. It now says so afterwards, in a message that stays in the notification list. The dialog that asks first is still on the manual path only. |
+| **Difference 27** | Rule-EDITOR-PANEL-008 — a message says what happened | Pressing `F5` to **stop** a test case marks the test run **In Progress** first, and raises that message. Stopping starts something. |
+| **Difference 29** | Rule-EDITOR-PANEL-009 — the same | `Escape` in the failure dialog throws away everything typed, with no confirmation. |
+| **Difference 30** | Rule-EDITOR-PANEL-009 — a key means one thing | `Ctrl+Right` turns the page here, and moves to the next test case in the view panel. It is the same key on two panels a tester uses together. |
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.

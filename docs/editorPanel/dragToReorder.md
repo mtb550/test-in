@@ -9,13 +9,13 @@ There is no key for this. Drag the cards.
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-055** — Dragging works on cards only. The grid cannot be
+- **Rule-EDITOR-PANEL-056** — Dragging works on cards only. The grid cannot be
   dragged.
-- **Rule-EDITOR-PANEL-056** — A drag is always a move, never a copy.
-- **Rule-EDITOR-PANEL-057** — Only the test cases that really moved are written.
-- **Rule-EDITOR-PANEL-058** — The whole drag is one entry on the undo history.
+- **Rule-EDITOR-PANEL-057** — A drag is always a move, never a copy.
+- **Rule-EDITOR-PANEL-058** — Only the test cases that really moved are written.
+- **Rule-EDITOR-PANEL-059** — The whole drag is one entry on the undo history.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

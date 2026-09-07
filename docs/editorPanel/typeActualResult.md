@@ -9,15 +9,15 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-168** — **Actual Result** is the only column of a test run
+- **Rule-EDITOR-PANEL-169** — **Actual Result** is the only column of a test run
   that can be typed into.
-- **Rule-EDITOR-PANEL-169** — Typing there does not change the verdict.
-- **Rule-EDITOR-PANEL-170** — A cell tabbed through unchanged writes nothing and
+- **Rule-EDITOR-PANEL-170** — Typing there does not change the verdict.
+- **Rule-EDITOR-PANEL-171** — A cell tabbed through unchanged writes nothing and
   says nothing.
-- **Rule-EDITOR-PANEL-171** — What is stored is written back into the cell,
+- **Rule-EDITOR-PANEL-172** — What is stored is written back into the cell,
   whatever the tester typed.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 

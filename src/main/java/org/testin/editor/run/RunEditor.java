@@ -564,7 +564,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // What there is to walk is this list, so a filter that empties it grays
         // Start on the same redraw rather than at whatever happens next. Through
         // the one method that owns the buttons, so light mode's copy of them is
-        // told at the same moment (Rule-EDITOR-PANEL-132).
+        // told at the same moment (Rule-EDITOR-PANEL-133).
         onExecutionStateChanged();
     }
 
@@ -847,7 +847,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-127 and Rule-EDITOR-PANEL-131.
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-128 and Rule-EDITOR-PANEL-132.
      * <p>
      * Puts the walk on the next test case waiting for a verdict, at or after
      * {@code from}, and ends it when there is none.
@@ -914,7 +914,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-127.
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-128.
      * <p>
      * The first test case at or after {@code from} that is still waiting for a
      * verdict, and the size of the list when there is none - which is the value
@@ -1101,7 +1101,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-179.
+     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-180.
      * <p>
      * Says what an automated verdict threw away, when it threw anything away.
      * <p>
@@ -1277,7 +1277,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132.
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-133.
      * <p>
      * Whether the walk would land anywhere at all.
      * <p>
@@ -1296,7 +1296,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132.
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-133.
      * <p>
      * The manual button's whole question, in one place, so the toolbar and light
      * mode cannot answer it differently - which is the mistake
@@ -1396,7 +1396,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         onExecutionStateChanged();
     }
 
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-133
     @Override
     public void onStartExecutionClicked() {
         final @NotNull Optional<TestRunDto> run = run();

@@ -9,14 +9,14 @@
 
 ## Rules
 
-- **Rule-EDITOR-PANEL-098** — The whole test set is paged through after the
+- **Rule-EDITOR-PANEL-099** — The whole test set is paged through after the
   filters and the search have narrowed it.
-- **Rule-EDITOR-PANEL-099** — An arrow with nowhere to go is gray.
-- **Rule-EDITOR-PANEL-100** — Paging says nothing.
-- **Rule-EDITOR-PANEL-101** — Reloading lands on whichever page holds the test
+- **Rule-EDITOR-PANEL-100** — An arrow with nowhere to go is gray.
+- **Rule-EDITOR-PANEL-101** — Paging says nothing.
+- **Rule-EDITOR-PANEL-102** — Reloading lands on whichever page holds the test
   case that was selected.
 
-Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-009 hold everywhere in the panel.
+Rule-EDITOR-PANEL-001 to Rule-EDITOR-PANEL-010 hold everywhere in the panel.
 They are on
 [the editor panel page](main.md#rules-that-hold-everywhere-in-the-panel).
 
