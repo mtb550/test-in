@@ -126,6 +126,24 @@ public enum UpdateTestCaseFields implements MenuItem {
      * Also the one field the create dialog does not offer: see
      * {@link org.testin.testcase.create.OrderSection}.
      */
+    /**
+     * UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194.
+     * <p>
+     * Where the case is in its own life, which is the one field here that no key
+     * opens. The letters that would name it are taken by fields a tester reaches
+     * far more often - `s` is Steps - and a status is not worth taking one from
+     * them, so this is a menu row and nothing else.
+     */
+    STATUS(
+            TestEditorAttributes.STATUS.getName(),
+            Shortcuts.EMPTY,
+            AllIcons.Actions.Preview,
+            GenType.UPDATE_TEST_CASE_STATUS,
+            (p, items, updatedItems) -> new StatusBulkSectionDialog(p, items, updatedItems).open(),
+            TestCaseBaseDialog::getStatusSection,
+            new TestCaseDialogKey[]{}
+    ),
+
     ORDER(
             TestEditorAttributes.ORDER.getName(),
             Shortcuts.UpdateTestCaseOrder,
@@ -167,6 +185,11 @@ public enum UpdateTestCaseFields implements MenuItem {
     }
 
     public void bindShortcut(final @NotNull JComponent component, final @NotNull Runnable onTrigger) {
+        // A constant with no key binds nothing, which is what MenuItem promises.
+        // Registering the empty keystroke would claim VK_UNDEFINED for whichever
+        // field declared it first.
+        if (Shortcuts.isNoKey(shortcut.getKey())) return;
+
         new DumbAwareAction() {
             @Override
             public void actionPerformed(final @NotNull AnActionEvent e) {

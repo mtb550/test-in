@@ -51,6 +51,7 @@ public abstract class TestCaseBaseDialog {
     protected final @NotNull GroupSection groupSection;
     protected final @NotNull StepsSection stepsSection;
     protected final @NotNull OrderSection orderSection;
+    protected final @NotNull StatusSection statusSection;
     protected final @NotNull StatusBarSection statusBarSection;
     /**
      * Owns all global registrations of this dialog (application focus listener,
@@ -133,6 +134,7 @@ public abstract class TestCaseBaseDialog {
         this.prioritySection = new PrioritySection();
         this.groupSection = new GroupSection();
         this.orderSection = new OrderSection(p);
+        this.statusSection = new StatusSection();
         this.statusBarSection = new StatusBarSection();
 
         // Every section either dialog offers, in the order the create dialog

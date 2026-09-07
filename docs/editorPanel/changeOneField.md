@@ -44,6 +44,9 @@ twenty, **so that** fixing a typo takes two keys.
   however many test cases it changed.
 - **Rule-EDITOR-PANEL-039** — Undo puts the test case back exactly, including
   who last changed it and when.
+- **Rule-EDITOR-PANEL-194** — Status is on the update menu and has no letter of
+  its own. It is the one field with no key, because every letter that would name
+  it is taken by a field a tester reaches more often.
 
 ## The screen
 
@@ -59,12 +62,15 @@ twenty, **so that** fixing a typo takes two keys.
 │  Steps                   S             │
 │  Priority                P             │
 │  Group                   G             │
+│  Status                                │
 │  Order                   O             │
 └────────────────────────────────────────┘
 ```
 
 1. **Each row** — the field, then the letter that opens it.
 2. **The first row** — selected when the menu opens.
+3. **Status** — the one row with no letter. It is opened from this menu and
+   nowhere else.
 
 Pressing the letter on the card skips this menu and opens the field straight
 away.
