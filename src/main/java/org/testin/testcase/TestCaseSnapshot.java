@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.undo.UndoScope;
@@ -202,6 +203,24 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
     private void applyTo() {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
+        // The set the cases belong to, put back on them before anything reads
+        // them.
+        //
+        // A snapshot's cases are deep copies, and a copy goes through JSON,
+        // where the parent is @JsonIgnore - so every case in one carries an
+        // empty test set. That is the path the whole of code generation is
+        // derived from: with it empty, Fqcn.ofMethod answers "DefaultTest",
+        // which no class is called, and every generator quietly found nothing.
+        // Undoing a rename left the method named after the new description,
+        // undoing a group change left the groups, and undoing a removal never
+        // wrote the method back.
+        //
+        // Worse than that, the parent-less copy was what went into the index, so
+        // a single CTRL+Z left the case with no way to name its own class until
+        // the next rescan (#66, finding 44).
+        final @NotNull TestSetDirectoryDto parent = indexer.getTestSetByPath(testSetPath);
+        present.forEach(tc -> tc.setParent(parent));
+
         // Verbatim, so the case comes back with the audit it had. Written
         // through putTestCase it would be stamped as modified by whoever
         // pressed CTRL+Z, which says the opposite of what just happened (#164).
@@ -216,7 +235,9 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
             // every case is there.
             final boolean isComingBack = indexer.findTestCase(tc.getId()).isEmpty();
 
-            indexer.putTestCaseVerbatim(testSetPath, copy(p, tc));
+            final @NotNull TestCaseDto stored = copy(p, tc);
+            stored.setParent(parent);
+            indexer.putTestCaseVerbatim(testSetPath, stored);
 
             if (isComingBack) GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
         });
