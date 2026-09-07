@@ -91,6 +91,37 @@ public class TestRunDirectoryDto extends DirectoryDto {
      */
     @Override
     public boolean isOrderable() {
-        return true;
+        return isStillOpen();
+    }
+
+    /**
+     * UC-TREE-PANEL-025, Rule-TREE-PANEL-009.
+     * <p>
+     * A signed-off run does not change, and its name, its place among its
+     * siblings and its existence are part of what it is.
+     * <p>
+     * The verdict half of that rule was already kept: a Completed or Closed run
+     * refuses verdicts, edits and execution. The tree half was not, so the same
+     * run could be renamed, dragged somewhere else, given a different number and
+     * removed - and a report naming it by name and place moved underneath the
+     * person reading it (#184, and #84 for the other half).
+     * <p>
+     * Asked of the node rather than checked in the four actions, so a fifth
+     * gesture cannot forget: rename, order, remove and drag each already ask the
+     * node whether it allows them.
+     */
+    @Override
+    public boolean isRenamable() {
+        return isStillOpen();
+    }
+
+    @Override
+    public boolean isRemovable() {
+        return isStillOpen();
+    }
+
+    @Override
+    public boolean isTransferable() {
+        return isStillOpen();
     }
 }

@@ -937,6 +937,17 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-INTERNAL-002, Rule-INTERNAL-014.
+     * <p>
+     * The nodes drawn with default values because their marker would not parse,
+     * and forgotten in the asking, so the scan that reports them reports each
+     * one once.
+     */
+    public @NotNull List<String> takeDamagedMarkers() {
+        return store.takeDamagedMarkers();
+    }
+
+    /**
      * The node at a path, whatever kind it is, empty when nothing is indexed
      * there. Saves a caller that only has a path from having to know which kind
      * of node to ask for.

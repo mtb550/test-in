@@ -87,11 +87,10 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
 
         final @NotNull String name = projects.getValueAt(selected.getFirst(), 0);
 
-        if (!Services.getInstance(p, BoundTestProject.class).bind(name)) {
-            Services.getInstance(p, Notifier.class).error(p, "Not Bound",
-                    "testin.yml could not be written, so " + name + " will not be remembered.");
-            return;
-        }
+        // The refusal is the binding's own, said wherever a binding fails; this
+        // only has to stay open on it, because the tester's choice is still in
+        // front of them (#188).
+        if (!Services.getInstance(p, BoundTestProject.class).bind(name)) return;
 
         closeOk();
 

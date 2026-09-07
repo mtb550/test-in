@@ -81,6 +81,7 @@ final class IndexingScanner {
                 indicator.setText(tp.getName() + " - done.");
 
             reportUnread(tp.getName(), unread);
+            reportDamaged(tp.getName(), Services.getInstance(p, ProjectIndexer.class).takeDamagedMarkers());
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan project: " + projectPath.getFileName() + " - " + ex.getMessage());
@@ -274,6 +275,31 @@ final class IndexingScanner {
         Services.getInstance(p, Notifier.class).warn(p, "Folders not read in " + projectName,
                 count + " test cases and carry no marker, so nothing in them was read: " + named + rest
                         + ". Create a test set of that name, or move the test cases into one.");
+    }
+
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-014.
+     * <p>
+     * A marker that is there and will not parse leaves its node drawn with
+     * default values: its number, its status and who made it are not what the
+     * file says, and nothing about the node on screen shows it. One thing that
+     * cannot be read never stops the rest, which is why the node is still drawn -
+     * but a node quietly wrong is worse than one that says so (#277).
+     * <p>
+     * One notification for the project, like the folders above, and it stays in
+     * the list rather than fading: a marker is repaired by hand, and the tester
+     * needs the names after the balloon would have gone.
+     */
+    private void reportDamaged(final @NotNull String projectName, final @NotNull List<String> damaged) {
+        if (damaged.isEmpty()) return;
+
+        final @NotNull String named = damaged.stream().limit(5).collect(Collectors.joining(", "));
+        final @NotNull String rest = damaged.size() > 5 ? ", and " + (damaged.size() - 5) + " more" : "";
+        final @NotNull String count = damaged.size() == 1 ? "One node is" : damaged.size() + " nodes are";
+
+        Services.getInstance(p, Notifier.class).warn(p, "Markers not read in " + projectName,
+                count + " drawn with default values, because the marker file could not be read: " + named + rest
+                        + ". Their number, their status and who made them are not what is on disk.");
     }
 
     private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {

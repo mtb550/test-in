@@ -102,7 +102,6 @@ bug report yet.
 |---|---|---|
 | **Difference 1** | Rule-INTERNAL-047 — a container is the sum of everything beneath it | Details counts retired test sets. Making a test run on the same node leaves them out. A test project whose Details says 40 test cases can offer 31, and nothing explains the difference. |
 | **Difference 2** | Rule-INTERNAL-040 — one press puts back what one removal took | A failed undo shows two messages on one press. *Undone* arrives first, then **Undo Incomplete**. A tester who reads only the first believes a node is back. |
-| **Difference 4** | Rule-INTERNAL-014 — nothing that cannot be read stops the rest | A damaged marker file leaves its node drawn with default values. Its number, its status and who made it are silently wrong, and only the log says so. |
 | **Difference 5** | Rule-INTERNAL-019 — Testin ignores its own writes for five seconds | A tester who edits a file by hand within five seconds of Testin saving it is ignored too. The edit is on disk and not on screen until **Refresh**. |
 
 A sixth belongs to the tree panel and is written there. A removal whose copy
@@ -115,6 +114,7 @@ closed up, so an issue that quotes one still points at the right thing.
 
 | Gone | Was |
 |---|---|
+| **Difference 4** | A damaged marker file left its node drawn with default values, and only the log said so. Fixed 7 September 2026, [#277](https://github.com/mtb550/test-in/issues/277) |
 | **Difference 3** | Test cases in an unmarked folder were invisible everywhere, and nothing said so. Fixed 7 September 2026, [#276](https://github.com/mtb550/test-in/issues/276) |
 
 ---

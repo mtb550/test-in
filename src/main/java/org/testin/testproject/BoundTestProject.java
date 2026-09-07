@@ -1,5 +1,6 @@
 package org.testin.testproject;
 
+import org.testin.notifications.Notifier;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
@@ -102,13 +103,28 @@ public final class BoundTestProject {
     }
 
     /**
+     * UC-TREE-PANEL-004, Rule-TREE-PANEL-021.
+     * <p>
      * Binds the repository to a project, by writing the name into its
      * {@code testin.yml}. Answers whether the file now says so - a tester who is
      * told the binding is done and finds it gone on the next open is worse off
      * than one who is told it could not be written.
+     * <p>
+     * <b>And says so here, where every path goes through.</b> Four things bind a
+     * repository - the picker, creating a test project, cloning one, and
+     * clicking one on the welcome screen - and only the picker looked at the
+     * answer. The other three reported success without checking, so a write that
+     * failed left the tester told the work was done and the choice gone at the
+     * next open (#188). A caller can still read the answer, and the panel does;
+     * what it can no longer do is forget to.
      */
     public boolean bind(final @NotNull String projectName) {
         Logger.info("Binding " + p.getName() + " to test project '" + projectName + "'");
-        return Services.getInstance(p, TestinConfigService.class).bind(projectName);
+
+        if (Services.getInstance(p, TestinConfigService.class).bind(projectName)) return true;
+
+        Services.getInstance(p, Notifier.class).error(p, "Not Bound",
+                "testin.yml could not be written, so " + projectName + " will not be remembered.");
+        return false;
     }
 }

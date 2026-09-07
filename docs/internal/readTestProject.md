@@ -32,7 +32,8 @@ There is no key for this. It starts on its own.
 - **Rule-INTERNAL-013** — Each test project is read by its own background job.
   The tester can cancel it, and the IDE stays usable while it runs.
 - **Rule-INTERNAL-014** — One thing that cannot be read never stops the rest.
-  Testin skips it and carries on.
+  Testin skips it and carries on, and says which ones it could not read. A node
+  whose marker will not parse is still drawn, and the scan names it.
 - **Rule-INTERNAL-015** — A folder skipped for having no marker is reported when
   it holds test cases. A folder holding none is skipped in silence, because a
   folder that is deliberately not a test set is the ordinary case.

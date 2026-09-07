@@ -64,10 +64,15 @@ public class CreateTestProjectAction extends AbstractProjectAction {
         }).show();
     }
 
+    // UC-TREE-PANEL-028, Rule-TREE-PANEL-089
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (!Services.getInstance(p, TestinRoot.class).isConfigured())
-            e.getPresentation().setEnabled(false);
+        // Both branches, the way Select Test Project answers the same question.
+        // Only the false branch was written here, and a presentation keeps
+        // whatever it was last told - so once this had been drawn without a
+        // Testin folder it stayed gray for the rest of the IDE session, however
+        // the setting changed afterwards (#189).
+        e.getPresentation().setEnabled(Services.getInstance(p, TestinRoot.class).isConfigured());
     }
 
     @Override

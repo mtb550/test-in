@@ -245,6 +245,8 @@ final class IndexerDataStore {
      * directory is a real node either way, and dropping the node out of the tree
      * would hide test cases over an unparsable audit stamp.
      */
+    private final @NotNull Set<String> damagedMarkers = ConcurrentHashMap.newKeySet();
+
     <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass, final @NotNull String name) {
         final @NotNull Path markerFile = dirPath.resolve(kind.getMarker());
 
@@ -262,8 +264,32 @@ final class IndexerDataStore {
 
         } catch (final Exception ex) {
             Logger.warn("Unreadable " + kind.getMarkerKind() + " marker '" + name + "', using defaults: " + ex.getMessage());
+
+            // Remembered as well as logged. The node is still drawn, and drawn
+            // looking ordinary - its number, its status and who made it are the
+            // defaults rather than what the file says - and the log is at a level
+            // most testers never turn on (#277). Whoever is scanning reports it.
+            damagedMarkers.add(name);
             return defaultMarker(markerClass, kind);
         }
+    }
+
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-014.
+     * <p>
+     * The nodes whose marker was there and would not parse, since the last time
+     * anyone asked, and forgotten in the asking.
+     * <p>
+     * Collected here because this is where the failure happens, and handed to
+     * the scan to report because a notification per node would be one per node -
+     * a project whose markers were all damaged by one bad merge would raise
+     * dozens. The scan already reports the folders it could not read this way.
+     */
+    @NotNull List<String> takeDamagedMarkers() {
+        final @NotNull List<String> taken = List.copyOf(damagedMarkers);
+        damagedMarkers.clear();
+
+        return taken;
     }
 
     private <M> @NotNull M defaultMarker(final @NotNull Class<M> markerClass, final @NotNull DirectoryType kind) {

@@ -514,12 +514,9 @@ documentation describes. None of them has a bug report yet.
 |---|---|---|
 | **Difference 1** | Rule-TREE-PANEL-007 — one past-tense word | Creating a test run says *Run created*. Creating a test project says *Project created* or *Project cloned*. Every other creation says *Created*. |
 | **Difference 2** | Rule-TREE-PANEL-044 — nothing lands in a test run | **Paste** is offered on a test run. It always refuses, with *Select a folder*. It should be grayed, as it is on a test set. |
-| **Difference 3** | Rule-TREE-PANEL-009 — a signed-off test run does not change | A **Completed** or **Closed** test run can still be renamed, moved, reordered and removed from the tree. Only editing, running and its status are blocked. |
 | **Difference 4** | Rule-TREE-PANEL-024, Rule-TREE-PANEL-032 — the dialog offers the kinds | Neither create dialog names its two kinds. Both rows show only their hints: *Holds test cases* and *Groups test sets* on the test case side, *Records execution results* and *Groups test runs* on the test run side. Someone removed the names while tidying up the labels, and nobody noticed. |
 | **Difference 5** | Rule-TREE-PANEL-068 — Created and In Progress are the test run's own | The status popup offers **Created** and **In Progress** as choices. It also lets a test run go backwards, from **Assigned** to **Created**. |
 | **Difference 6** | Rule-TREE-PANEL-050 — canceling a cut empties the clipboard | The tester cuts nodes, then presses the key that clears the gray. The nodes stay on the clipboard. The next paste still moves them, though the tester canceled the cut. A paste that worked does not empty it either, so the same nodes can be offered again. |
-| **Difference 7** | Rule-TREE-PANEL-021 — a choice that was not saved is not reported as saved | Only the **Select Test Project** dialog checks. Creating a test project, cloning one, and clicking a test project on the welcome screen all report success without looking. If the write failed, the tester is told the work is done and the choice is gone next time the project opens. |
-| **Difference 8** | Rule-TREE-PANEL-089 — the two buttons come back once a Testin folder is set | **New Test Project** never comes back. Once it has been drawn without a folder it stays gray for the rest of the IDE session, however the setting changes. **Select Test Project** does come back. |
 | **Difference 10** | Rule-TREE-PANEL-007 — a change confirms itself once | Setting a test run's status from the tree does not tell that test run's open editor. It keeps showing the old status, and the rows that just became **Untested**, until it is reopened. |
 | **Difference 11** | Rule-TREE-PANEL-006 — nothing changes until the tester confirms | **Rename**, **Order**, **Paste**, **Create** and **Details** stay black with several rows selected, and act on the first row alone. Nothing says the other rows were passed over. |
 | **Difference 12** | Rule-TREE-PANEL-055 — a number is 1 or higher | A number too large to hold silently clears the order and puts the node back into date order, while Testin still says *Ordered*. |
@@ -531,6 +528,9 @@ closed up, so an issue that quotes one still points at the right thing.
 
 | Gone | Was |
 |---|---|
+| **Difference 3** | A signed-off test run could still be renamed, moved, reordered and removed from the tree. Fixed 7 September 2026, [#184](https://github.com/mtb550/test-in/issues/184) |
+| **Difference 7** | Three of the four ways to bind a test project reported success without checking the write. Fixed 7 September 2026, [#188](https://github.com/mtb550/test-in/issues/188) |
+| **Difference 8** | **New Test Project** stayed gray for the rest of the session once it had been drawn without a Testin folder. Fixed 7 September 2026, [#189](https://github.com/mtb550/test-in/issues/189) |
 | **Difference 15** | A removal whose copy could not be kept aside was not undoable, said nothing, and left CTRL+Z pointing at an unrelated change. Fixed 7 September 2026, [#196](https://github.com/mtb550/test-in/issues/196) |
 | **Difference 9** | An edit deleted the verdicts of test cases removed from their test set. Fixed 7 September 2026, [#190](https://github.com/mtb550/test-in/issues/190) |
 
