@@ -192,49 +192,67 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         final int generation = modelGeneration.incrementAndGet();
         loading = true;
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-            indexer.awaitIndexing();
+            try {
+                final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                indexer.awaitIndexing();
 
-            final @NotNull List<TestCaseDto> items = indexer.getTestCasesForTestSet(parent.getPath());
+                final @NotNull List<TestCaseDto> items = indexer.getTestCasesForTestSet(parent.getPath());
 
-            if (items.isEmpty()) {
+                if (items.isEmpty()) {
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        if (generation != modelGeneration.get()) return;
+                        allTestCases.clear();
+                        currentTestCases.clear();
+                        list.setPaintBusy(false);
+                        loading = false;
+                        // The message comes from refreshView, which is the one place
+                        // that knows what the page ended up holding.
+                        refreshView();
+                        onLoaded.run();
+                    });
+                    return;
+                }
+
+                Services.getInstance(p, TestCaseCacheService.class).load(items);
+
+                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(items);
+
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (generation != modelGeneration.get()) return;
                     allTestCases.clear();
+                    allTestCases.addAll(ordered);
                     currentTestCases.clear();
+                    currentTestCases.addAll(ordered);
+
+                    ordered.forEach(tc -> tc.setParent(parent));
+
+                    // The item may now sit on a different page than before the reload.
+                    jumpToPageOfPendingSelection();
+
                     list.setPaintBusy(false);
                     loading = false;
-                    // The message comes from refreshView, which is the one place
-                    // that knows what the page ended up holding.
+
                     refreshView();
+                    focusIfGoingTo();
                     onLoaded.run();
                 });
-                return;
+
+            // A read that throws used to leave the editor saying Loading for the
+            // rest of the session: the pooled body had no catch, so nothing
+            // cleared the flag, nothing painted, and the only trace was whatever
+            // the platform logged about an uncaught exception. The run editor has
+            // said what happened all along; this is the same thing on this side
+            // (#66).
+            } catch (final Exception ex) {
+                Logger.error("Failed to load test set data from disk: " + ex.getMessage());
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (generation != modelGeneration.get()) return;
+
+                    list.setPaintBusy(false);
+                    loading = false;
+                    list.getEmptyText().setText("Unable to load this test set.");
+                });
             }
-
-            Services.getInstance(p, TestCaseCacheService.class).load(items);
-
-            final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(items);
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-                if (generation != modelGeneration.get()) return;
-                allTestCases.clear();
-                allTestCases.addAll(ordered);
-                currentTestCases.clear();
-                currentTestCases.addAll(ordered);
-
-                ordered.forEach(tc -> tc.setParent(parent));
-
-                // The item may now sit on a different page than before the reload.
-                jumpToPageOfPendingSelection();
-
-                list.setPaintBusy(false);
-                loading = false;
-
-                refreshView();
-                focusIfGoingTo();
-                onLoaded.run();
-            });
         });
     }
 
