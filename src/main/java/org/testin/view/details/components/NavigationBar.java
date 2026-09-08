@@ -46,6 +46,7 @@ public class NavigationBar extends BaseDetails {
      */
     private final @NotNull List<String> currentPath;
 
+    // UC-VIEW-PANEL-010, Rule-VIEW-PANEL-041
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final @NotNull JBPanel<?> pathPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));

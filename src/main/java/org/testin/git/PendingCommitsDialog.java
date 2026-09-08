@@ -76,7 +76,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
 
         final @NotNull ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
                 .column("Change Type", 150)
-                .column(DirectoryType.TS.getDisplayedName(), 150)
+                .column(DirectoryType.TS.getDescription(), 150)
                 .column("Name", 240)
                 .column("Before", 180)
                 .column("After", 180)

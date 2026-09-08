@@ -8,7 +8,7 @@ import org.testin.util.Shortcuts;
 /**
  * A page arrow, drawn the way every other button in this plugin is drawn.
  * <p>
- * The four arrows were stock {@link JButton}s carrying their look-and-feel
+ * The four arrows were stock {@link javax.swing.JButton}s carrying their look-and-feel
  * border, made compact by hand with a margin and a smaller font. What they
  * wanted is what {@link AbstractIconButton} already owns and the toolbar has had all
  * along: no border at rest, a rounded pill under the pointer, one frozen size so

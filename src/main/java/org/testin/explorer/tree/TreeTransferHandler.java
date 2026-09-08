@@ -73,6 +73,8 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
+     * Rule-TREE-PANEL-013.
+     * <p>
      * Transfers never cross test projects, whatever the node types — the
      * clipboard survives switching projects, so a cut in project A must not
      * paste into project B. Unresolvable ownership rejects.
@@ -99,6 +101,8 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
+     * UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-004, Rule-TREE-PANEL-045.
+     * <p>
      * The destination must not be the node itself, inside its own subtree, or
      * its current parent — and must not already contain a node with the same
      * name. Any of those makes the VFS operation fail with an IO error
@@ -120,6 +124,8 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
+     * UC-TREE-PANEL-013, UC-TREE-PANEL-014.
+     * <p>
      * Swing's contract: null is how a TransferHandler says there is nothing to
      * drag, and the platform reads it before anything of ours does (#71).
      */
@@ -166,6 +172,8 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
+     * UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-002.
+     * <p>
      * Whether copying or cutting would put anything on the clipboard - which is
      * true of the nodes that declare themselves transferable, and no others.
      * <p>
@@ -177,6 +185,8 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
+     * UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-002, Rule-TREE-PANEL-044.
+     * <p>
      * Whether Paste is worth offering on what is selected.
      * <p>
      * The clipboard holds Testin nodes and the selection is a place that can
@@ -203,6 +213,7 @@ public class TreeTransferHandler extends TransferHandler {
                 .toList();
     }
 
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-046
     @Override
     public boolean canImport(final @NotNull TransferSupport support) {
         if (!support.isDataFlavorSupported(NODE_FLAVOR)) return false;
@@ -240,6 +251,7 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-006
     @Override
     public boolean importData(final @NotNull TransferSupport support) {
         if (!canImport(support)) return false;
@@ -294,6 +306,8 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
+     * UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-043, Rule-TREE-PANEL-044, Rule-TREE-PANEL-045.
+     * <p>
      * True when the source may be pasted or dropped into the target at all.
      */
     public boolean canTransferInto(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
@@ -314,6 +328,8 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
+     * UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-004.
+     * <p>
      * Small soft balloon naming what could not land because the name is taken,
      * and whether there was anything to say.
      * <p>
@@ -401,6 +417,7 @@ public class TreeTransferHandler extends TransferHandler {
         return MOVE;
     }
 
+    // UC-TREE-PANEL-013, Rule-TREE-PANEL-047
     private void moveNodes(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
         // Captured before the move - the DTO paths change underneath.
         final @NotNull List<Path> oldPaths = sources.stream().map(DirectoryDto::getPath).toList();
@@ -469,6 +486,8 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
+     * UC-TREE-PANEL-013, Rule-TREE-PANEL-048.
+     * <p>
      * Moves the generated Java of every node in the batch, as one command.
      * <p>
      * One command for the gesture rather than one per node: every mover opens a
@@ -521,6 +540,7 @@ public class TreeTransferHandler extends TransferHandler {
         updateClipboardState(action, transferableSelection());
     }
 
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-007
     public void copySelectionToClipboard(final boolean cut) {
         final @NotNull List<DirectoryDto> directories = transferableSelection();
         if (directories.isEmpty()) return;

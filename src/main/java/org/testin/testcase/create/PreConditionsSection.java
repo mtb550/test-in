@@ -31,6 +31,7 @@ public class PreConditionsSection implements CreateTestCaseSection {
         return wrapper;
     }
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
         dto.setPreConditions(preConditionsField.getText().trim());

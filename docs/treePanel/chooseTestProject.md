@@ -60,7 +60,7 @@ one.
 ┌──────────────────────────────────────────────────────────────┐
 │  Select Test Project                                         │
 ├──────────────────────────────────────────────────────────────┤
-│                                       Status            (1)  │
+│  Test Project                         Status            (1)  │
 │  Demo                                 Active            (2)  │
 │  Mobile                               Active                 │
 │  Legacy                               Archived               │
@@ -69,9 +69,7 @@ one.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **Two columns.** The second is headed **Status**. The first has no heading at
-   all. That is difference 13 on
-   [the tree panel page](main.md#where-the-plugin-breaks-its-own-rules).
+1. **Two columns**, headed **Test Project** and **Status**.
 2. **One row per test project** in the Testin folder, whatever its status. The
    one this code project already uses is selected.
 3. **The status bar** — every key this dialog answers to. A click selects a

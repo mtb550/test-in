@@ -27,7 +27,7 @@ public enum ChangeSubject {
     ),
 
     TEST_RUN(
-            DirectoryType.TR.getDisplayedName()
+            DirectoryType.TR.getDescription()
     ),
 
     /**

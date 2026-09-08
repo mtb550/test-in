@@ -44,7 +44,7 @@ public class TreeDropHandler implements FileDropHandler {
                     // said so when it was not.
                     if (!node.isOpenableInEditor()) continue;
 
-                    Logger.info("dragged " + node.getType().getDisplayedName() + ": " + node.getName());
+                    Logger.info("dragged " + node.getType().getMarkerKind() + ": " + node.getName());
                     Services.getInstance(p, EditorUtil.class).open(p, node);
                 }
             });

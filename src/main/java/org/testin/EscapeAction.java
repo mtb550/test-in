@@ -54,6 +54,7 @@ public class EscapeAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), table);
     }
 
+    // UC-TREE-PANEL-013, UC-EDITOR-PANEL-026, UC-VIEW-PANEL-015
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         onEscape.run();
@@ -68,6 +69,7 @@ public class EscapeAction extends AbstractProjectAction {
         Logger.info("Clipboard/Cut state cleared via ESC.");
     }
 
+    // UC-EDITOR-PANEL-026, Rule-EDITOR-PANEL-115
     private void escapeInGrid(final @NotNull JBTable table) {
         // While a cell is open the editor owns ESC: cancel the edit only.
         if (table.isEditing()) {
@@ -79,6 +81,8 @@ public class EscapeAction extends AbstractProjectAction {
     }
 
     /**
+     * UC-EDITOR-PANEL-026, UC-VIEW-PANEL-015, Rule-EDITOR-PANEL-114, Rule-VIEW-PANEL-058.
+     * <p>
      * One step back per press, on any surface that shows test cases: drop a
      * pending cut, then close the details panel, then clear the selection.
      * Clearing a selection that is already empty is what Swing does with it -

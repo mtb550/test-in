@@ -580,6 +580,16 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * A run editor draws run statuses; a test set editor does not.
+     */
+    @Override
+    public boolean hasRunStatuses() {
+        return true;
+    }
+
+    /**
+     * UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-176.
+     * <p>
      * Redraws everything a run's status changes.
      * <p>
      * The cards carry the run's status, the page indicator is rebuilt with them,
@@ -587,12 +597,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * than at the caller so the list stays this editor's own - the status change
      * used to be handed the list to repaint.
      */
-    @Override
-    public boolean hasRunStatuses() {
-        return true;
-    }
-
-    // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-176
     public void refreshAfterRunStatusChanged() {
         list.repaint();
         statusBar.updatePaginationState(currentPage, getTotalPageCount());
@@ -1031,7 +1035,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * Runs the cases this run has not reached yet, and records their verdicts into
      * it.
      * <p>
-     * Pending, not every case, and that is the same answer {@link #firstPendingIndex()}
+     * Pending, not every case, and that is the same answer {@link #nextPendingIndex(int)}
      * gives the Start button beside it: re-running cases already judged puts a
      * tester back at the top of a run they were in the middle of, and it would
      * overwrite a verdict they gave by hand with one nothing asked for. A run with

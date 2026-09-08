@@ -45,7 +45,7 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
         title = "Select Test Project";
 
         final @NotNull ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
-                .column(DirectoryType.TP.getDisplayedName(), 260)
+                .column(DirectoryType.TP.getDescription(), 260)
                 .column("Status", 100)
                 .build();
 

@@ -41,6 +41,7 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
+    // UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-005
     @Override
     protected void submit() {
         final @NotNull String name = component().getText().trim();

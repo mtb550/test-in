@@ -35,11 +35,13 @@ public class CreateTestCaseAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.CreateItem.getCustomShortcut(), list);
     }
 
+    // UC-EDITOR-PANEL-005
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         openCreateDialog();
     }
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-008, Rule-EDITOR-PANEL-030
     public void openCreateDialog() {
         new CreateTestCaseDialog(p, dir, tc -> {
             // No rank here. The case arrives unranked, which sorts it last -
@@ -85,6 +87,7 @@ public class CreateTestCaseAction extends AbstractProjectAction {
         }).show();
     }
 
+    // UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-030
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(editor instanceof TestEditor);

@@ -32,6 +32,7 @@ public class TestDataSection extends AbstractMultiLineSection {
         super(p, new EditorTextField(), CreateTestCaseFields.TEST_DATA);
     }
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
         dto.setTestData(field.getText().trim());

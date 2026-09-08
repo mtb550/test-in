@@ -42,6 +42,7 @@ public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWit
         );
     }
 
+    // UC-TREE-PANEL-007, UC-TREE-PANEL-008, Rule-TREE-PANEL-005
     @Override
     protected void submit() {
         final @NotNull String name = component().getText().trim();

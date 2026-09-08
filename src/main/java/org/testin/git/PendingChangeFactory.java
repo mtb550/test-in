@@ -140,9 +140,9 @@ final class PendingChangeFactory {
         final @NotNull String runName = parentName(relativePath);
 
         final @NotNull List<FieldChange> changes = switch (type) {
-            case ADDED -> List.of(new FieldChange(DirectoryType.TR.getDisplayedName(), "", summary(read(mapper, afterJson, TestRunDto.class)),
+            case ADDED -> List.of(new FieldChange(DirectoryType.TR.getDescription(), "", summary(read(mapper, afterJson, TestRunDto.class)),
                     ChangeType.CREATE_TEST_RUN));
-            case DELETED -> List.of(new FieldChange(DirectoryType.TR.getDisplayedName(), summary(read(mapper, beforeJson, TestRunDto.class)), "",
+            case DELETED -> List.of(new FieldChange(DirectoryType.TR.getDescription(), summary(read(mapper, beforeJson, TestRunDto.class)), "",
                     ChangeType.REMOVE_TEST_RUN));
             case MODIFIED -> TestRunChangeComparator.compare(
                     read(mapper, beforeJson, TestRunDto.class), read(mapper, afterJson, TestRunDto.class));

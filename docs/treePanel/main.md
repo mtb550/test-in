@@ -518,7 +518,6 @@ documentation describes. None of them has a bug report yet.
 | **Difference 5** | Rule-TREE-PANEL-068 — Created and In Progress are the test run's own | The status popup offers **Created** and **In Progress** as choices. It also lets a test run go backwards, from **Assigned** to **Created**. |
 | **Difference 10** | Rule-TREE-PANEL-007 — a change confirms itself once | Setting a test run's status from the tree does not tell that test run's open editor. It keeps showing the old status, and the rows that just became **Untested**, until it is reopened. |
 | **Difference 11** | Rule-TREE-PANEL-006 — nothing changes until the tester confirms | **Rename**, **Order**, **Paste**, **Create** and **Details** stay black with several rows selected, and act on the first row alone. Nothing says the other rows were passed over. |
-| **Difference 13** | Rule-TREE-PANEL-038 — the confirmation says what will go | The **Select Test Project** dialog's first column has no heading. The same caption sweep as difference 4. |
 | **Difference 14** | Rule-TREE-PANEL-007 — a change confirms itself once | The **Uncommitted Changes** dialog reads *1 change in this test project are not committed* when there is exactly one. |
 
 **Fixed since this list was written.** The numbers are left out rather than
@@ -534,6 +533,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 4** | Neither create dialog named its two kinds, so both rows showed only their hints. Fixed 8 September 2026, [#185](https://github.com/mtb550/test-in/issues/185) |
 | **Difference 6** | Neither canceling a cut nor pasting it emptied the clipboard, so the same move was offered again. Fixed 8 September 2026, [#187](https://github.com/mtb550/test-in/issues/187) |
 | **Difference 12** | A position too large to hold silently cleared the order and still said *Ordered*. Fixed 7 September 2026 in `b28e9af7`, and the document did not follow |
+| **Difference 13** | The **Select Test Project** dialog's first column had no heading. Fixed 8 September 2026, [#194](https://github.com/mtb550/test-in/issues/194) |
 
 ---
 

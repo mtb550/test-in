@@ -17,7 +17,7 @@ import java.util.function.BiFunction;
 public class EditorType extends FakeFileType {
 
     public static final @NotNull EditorType TEST_RUN = new EditorType(
-            DirectoryType.TR.getDisplayedName(),
+            DirectoryType.TR.getDescription(),
             "Test Run Editor",
             AllIcons.Nodes.Services,
             RunEditor::new

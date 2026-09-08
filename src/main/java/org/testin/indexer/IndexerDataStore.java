@@ -237,6 +237,14 @@ final class IndexerDataStore {
     }
 
     /**
+     * The nodes whose marker would not parse, so the tester is told once for the
+     * project rather than once per node.
+     */
+    private final @NotNull Set<String> damagedMarkers = ConcurrentHashMap.newKeySet();
+
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-014.
+     * <p>
      * The other half of {@link #writeMarker}, so the marker round trip is owned
      * by one class. It used to live in DirectoryMapper, which meant the indexer
      * owned the write and a mapper owned the read — the debt #49 records, which
@@ -248,9 +256,6 @@ final class IndexerDataStore {
      * directory is a real node either way, and dropping the node out of the tree
      * would hide test cases over an unparsable audit stamp.
      */
-    private final @NotNull Set<String> damagedMarkers = ConcurrentHashMap.newKeySet();
-
-    // UC-INTERNAL-002, Rule-INTERNAL-014
     <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass, final @NotNull String name) {
         final @NotNull Path markerFile = dirPath.resolve(kind.getMarker());
 

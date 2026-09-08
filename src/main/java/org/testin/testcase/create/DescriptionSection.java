@@ -63,6 +63,7 @@ public class DescriptionSection implements CreateTestCaseSection {
                 .collect(Collectors.toSet());
     }
 
+    // UC-EDITOR-PANEL-005
     public void setError(final boolean error) {
         if (error) {
             descriptionField.setForeground(JBColor.RED);
@@ -77,6 +78,8 @@ public class DescriptionSection implements CreateTestCaseSection {
     }
 
     /**
+     * UC-EDITOR-PANEL-005, Rule-CODEGEN-001.
+     * <p>
      * Refuses a description the generated code could not be named after.
      * <p>
      * Here rather than in the generator, which is where it used to be found: by
@@ -88,7 +91,6 @@ public class DescriptionSection implements CreateTestCaseSection {
      * A blank one is not this section's refusal to make - the save has always
      * owned that, and it says so differently.
      */
-    // UC-EDITOR-PANEL-005, Rule-CODEGEN-001
     @Override
     public boolean accepts() {
         final @NotNull String description = descriptionField.getText().trim();
@@ -135,6 +137,7 @@ public class DescriptionSection implements CreateTestCaseSection {
         return wrapper;
     }
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
         dto.setDescription(descriptionField.getText().trim());

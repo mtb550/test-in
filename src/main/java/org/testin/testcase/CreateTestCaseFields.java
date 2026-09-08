@@ -141,6 +141,8 @@ public enum CreateTestCaseFields implements StatusBarItem {
     }
 
     /**
+     * UC-EDITOR-PANEL-005.
+     * <p>
      * What the status bar shows while this section holds the focus: the two keys
      * every section shares, then its own, and on the entry section the keys that
      * jump to the other fields.
