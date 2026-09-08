@@ -38,7 +38,7 @@
 
     <b>Compatibility</b>
     <ul>
-        <li>IntelliJ IDEA, PyCharm, GoLand, WebStorm and other IntelliJ-based IDEs, build 261 and later.</li>
+        <li>IntelliJ IDEA, PyCharm, Rider, GoLand, WebStorm and other IntelliJ-based IDEs, build 261 and later.</li>
         <li>Test management works in all of them. Java code generation, TestNG execution and the Git features appear when those plugins are installed, and are absent rather than broken when they are not.</li>
     </ul>
 

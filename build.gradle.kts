@@ -128,7 +128,7 @@ intellijPlatform {
     }
 
     pluginVerification {
-        // IntelliJ IDEA and PyCharm, because both verdicts are now news.
+        // IntelliJ IDEA, PyCharm and Rider, because all three verdicts are news.
         //
         // PyCharm used to be behind the flag below with GoLand and WebStorm: the
         // verifier reported every PSI and TestNG reference as unresolved - 53
@@ -139,9 +139,15 @@ intellijPlatform {
         // which the Marketplace confirmed on 2.9.0-alpha, so PyCharm's answer is
         // a real answer again and belongs in the gate rather than behind a flag.
         //
-        // GoLand and WebStorm stay behind it. Nothing targets them, PyCharm is
-        // the IDE without Java support that Testin is actually built for
-        // (#2, #148), and two more IDEs is two more downloads on every sweep.
+        // Rider joins them because it is the widest gap between what the plugin
+        // claims and what is proved: it is not an IntelliJ IDEA with a plugin
+        // missing, it is a different product built on the same platform, and the
+        // plugin page names it as somewhere Testin runs. A claim nothing checks
+        // is the kind that is true until the day it is not.
+        //
+        // GoLand and WebStorm stay behind the flag. Nothing targets them, they
+        // are the same shape of IDE as PyCharm - the platform without Java - and
+        // two more is two more downloads on every sweep.
         //
         // The full sweep is still one command away:
         //
@@ -157,7 +163,7 @@ intellijPlatform {
             // compiles against hid a real defect: the Marketplace reported a
             // renderer scheduled for removal in 262 that our own sweep, running
             // against 261, could not see.
-            listOf(IntelliJPlatformType.IntellijIdea, IntelliJPlatformType.PyCharm).forEach { ide ->
+            listOf(IntelliJPlatformType.IntellijIdea, IntelliJPlatformType.PyCharm, IntelliJPlatformType.Rider).forEach { ide ->
                 create(ide, providers.gradleProperty("intellij.version"))
                 create(ide, NEXT_BRANCH)
             }
