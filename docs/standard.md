@@ -183,6 +183,23 @@ only thing to check before choosing a number, because nothing else moves.
 short. Anywhere else, say which part they belong to: *the tree panel's
 Difference 1*.
 
+**A difference that is fixed moves to the retired table, and the pages that
+describe it change in the same edit.** Retiring a row does not touch the pages
+pointing at it, and a page still describing a repaired defect is worse than one
+saying nothing - a tester reads that Testin will lose their work and stops using
+the feature that was mended. `DifferenceNumbersTest` is what stops that: it
+fails when a page describes a difference its part has retired, when a page
+points at a number no part lists, when one number is live and retired at once,
+and when a difference names a rule nobody wrote. The link in a citation is what
+says whose difference it means, so *difference 6 on [the tree panel
+page](../treePanel/main.md)* is checked against the tree panel's list wherever
+it is written.
+
+Whether a difference names the **right** rule is not checked and cannot be. The
+cell holds a paraphrase, and judging a paraphrase against a rule is reading. Six
+rows were found naming a rule that says something else on 8 September 2026, all
+by hand.
+
 The one exception is [the product's own document](product.md).
 Its rules hold everywhere, so they belong to no part, and it says so at the top.
 

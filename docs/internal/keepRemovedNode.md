@@ -82,10 +82,10 @@ The confirmation the tester sees before removing anything is drawn on
 
 ## What Testin refuses
 
-**If the node cannot be copied aside** — the removal still happens. It does not
-go on the undo history. Nothing on screen says so. `Ctrl+Z` then takes back
-whatever change came before it. This is difference 15 on
-[the tree panel page](../treePanel/main.md#where-the-plugin-breaks-its-own-rules).
+**If the node cannot be copied aside** — the removal still happens, and it does
+not go on the undo history. A message titled *Cannot Be Undone* says so at that
+moment, naming how many could not be copied aside, so `Ctrl+Z` taking back an
+earlier change is not a surprise.
 
 **If nothing at all could be copied aside** — no undo entry is made. `Ctrl+Z`
 offers the change before it instead.
