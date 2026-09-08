@@ -89,17 +89,39 @@ public class EscapeAction extends AbstractProjectAction {
      * nothing - so it is not asked about first.
      */
     private void stepBack(final @NotNull Runnable clearSelection) {
-        clearClipboardState();
+        if (dropPendingCut()) return;
         if (hideViewPanelIfVisible()) return;
 
         clearSelection.run();
     }
 
-    private void clearClipboardState() {
-        if (Services.getInstance(p, CutState.class).isCutting()) {
-            Services.getInstance(p, CutState.class).clear();
-        }
+    /**
+     * UC-EDITOR-PANEL-026, Rule-EDITOR-PANEL-114, Rule-VIEW-PANEL-058.
+     * <p>
+     * Drops a pending cut, and answers whether there was one to drop - which is
+     * what makes it a step rather than something that happens on the way past.
+     * It used to return nothing and run unconditionally, so a press with a cut
+     * waiting and the panel open did both at once, where the rule and the step
+     * table both say one press does one of them.
+     * <p>
+     * The clipboard is emptied only when Testin put a cut on it. The wipe used
+     * to sit outside this question entirely, so every press emptied the IDE's
+     * clipboard - a URL from a browser, a stack trace from the run console,
+     * anything at all - and nothing said so (#289).
+     * <p>
+     * A copy is left alone: a copy is meant to be pasted more than once, and a
+     * cut is spent. The tree is not quite the same here - its clearClipboard
+     * empties whenever the clipboard holds Testin's own nodes, cut or copied -
+     * so the two surfaces answer "Escape after a copy" differently. Both are
+     * safe, because both ask whether the content is Testin's before touching
+     * it; which of the two is right is a decision, not a defect.
+     */
+    private boolean dropPendingCut() {
+        if (!Services.getInstance(p, CutState.class).isCutting()) return false;
+
+        Services.getInstance(p, CutState.class).clear();
         CopyPasteManager.getInstance().setContents(new StringSelection(""));
+        return true;
     }
 
     /**
