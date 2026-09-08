@@ -2,11 +2,13 @@ package org.testin.editor.run;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.AutomationState;
 import org.testin.editor.BaseCard;
 import org.testin.editor.CardHoverAction;
 import org.testin.editor.Shared;
 import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestRunItems;
+import org.testin.services.Services;
 
 import java.awt.*;
 import java.util.*;
@@ -24,6 +26,8 @@ public class RunCard extends BaseCard {
 
     // UC-EDITOR-PANEL-030
     public void updateData(final @NotNull Integer index, final @NotNull Set<?> activeDetails, final @NotNull TestRunItems runItem, final @NotNull String title) {
+        this.automation = Services.getInstance(p, AutomationState.class).of(runItem.getId());
+
         badges.clear();
         details.clear();
 

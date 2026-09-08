@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
+import org.testin.codegen.AutomationState;
 import org.testin.editor.*;
 import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.editor.grid.GridView;
@@ -560,6 +561,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         statusBar.updatePaginationState(page.page(), page.totalPages());
 
+        // The same fired-and-forgotten read the test editor makes, into the same
+        // service: a run holds test cases, and whether one has a generated method
+        // is what says how much of this run will actually execute.
+        Services.getInstance(p, AutomationState.class).read(p, snapshotOfAll(), this::refreshView);
+
         // After the selection has been restored above, which is the whole point:
         // the label says what is selected, so it cannot be written before that
         // is known.
@@ -720,8 +726,9 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // Status is the run editor's alone - a test case does not have one.
         final @NotNull Set<TestStatus> statusFilter = toolBar.getToolbarItem(FilterPopupBtn.class).getSelectedStatus();
 
+        final @NotNull List<TestCaseDto> matched;
         synchronized (allTestCases) {
-            return TestCaseFilter.filter(
+            matched = TestCaseFilter.filter(
                     allTestCases,
                     filters.query(),
                     filters.groups(),
@@ -730,6 +737,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                     statusFilter,
                     this::runItem);
         }
+
+        return Services.getInstance(p, AutomationState.class).matching(matched, filters.automation());
     }
 
     @Override

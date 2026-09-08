@@ -8,6 +8,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.Automated;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.RowStripe;
 
@@ -47,6 +48,12 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * otherwise, so a card whose state nobody tracks still offers the gesture.
      */
     protected @NotNull CardHoverAction runSlot = CardHoverAction.RUN_TEST_CASE;
+    /**
+     * Whether this case has automation behind it, which is what the navigate
+     * icon draws. Unknown until somebody has looked, and unknown draws what the
+     * button has always drawn.
+     */
+    protected @NotNull Automated automation = Automated.UNKNOWN;
     /**
      * The title as words, kept beside the label because a wrapped label holds
      * markup instead - see {@link #layOutTitle}.
@@ -217,11 +224,12 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         return Math.min(titleArea.getFontMetrics(titleArea.getFont()).stringWidth(plainTitle), titleColumnWidth);
     }
 
+    // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-195
     @Override
     protected void paintChildren(final Graphics g) {
         super.paintChildren(g);
         if (isRowHovered) {
-            Shared.drawDescriptionActionIcons(this, g, titleWidth(), hoveredAction, runSlot);
+            Shared.drawDescriptionActionIcons(this, g, titleWidth(), hoveredAction, runSlot, automation);
         }
     }
 

@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.Group;
 import org.testin.model.Priority;
 import org.testin.model.RunStatus;
+import org.testin.model.Automated;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.FontSync;
 
@@ -277,21 +278,25 @@ public final class Shared {
      * Draws the card's action icons: the navigate button, and whichever of the
      * run and stop buttons this card's state offers.
      */
-    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth, final @NotNull String hoveredAction, final @NotNull CardHoverAction runSlot) {
+    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth, final @NotNull String hoveredAction, final @NotNull CardHoverAction runSlot, final @NotNull Automated automation) {
         final @NotNull ActionIcons icons = descriptionActionIcons(titleWidth);
 
-        drawIfOffered(c, g, CardHoverAction.NAVIGATE_TO_TEST_METHOD, icons.navigate(), hoveredAction);
-        drawIfOffered(c, g, runSlot, icons.run(), hoveredAction);
+        // Both under the pointer, as they always were. Drawing the navigate icon
+        // on every card was tried and taken back: three shapes down every row is
+        // a lot of chrome for a fact most cards share, and the filter answers
+        // "which of these are automated" better than eighty small icons do.
+        drawIfOffered(c, g, CardHoverAction.NAVIGATE_TO_TEST_METHOD, automation.getIcon(), icons.navigate(), hoveredAction);
+        drawIfOffered(c, g, runSlot, runSlot.getIcon(), icons.run(), hoveredAction);
     }
 
     /**
      * One button, drawn where it sits, and left out entirely in an IDE that
      * cannot act on it.
      */
-    private static void drawIfOffered(final @NotNull Component c, final @NotNull Graphics g, final @NotNull CardHoverAction action, final @NotNull Rectangle at, final @NotNull String hoveredAction) {
+    private static void drawIfOffered(final @NotNull Component c, final @NotNull Graphics g, final @NotNull CardHoverAction action, final @NotNull Icon icon, final @NotNull Rectangle at, final @NotNull String hoveredAction) {
         if (!action.isOffered()) return;
 
-        drawHoverableIcon(c, g, action.getIcon(), at.x, at.y, action.name().equals(hoveredAction));
+        drawHoverableIcon(c, g, icon, at.x, at.y, action.name().equals(hoveredAction));
     }
 
     /**

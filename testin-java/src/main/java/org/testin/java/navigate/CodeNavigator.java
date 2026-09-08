@@ -19,8 +19,13 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Finds the generated method and opens it, through the Java plugin's PSI.
@@ -61,6 +66,72 @@ public final class CodeNavigator implements CodeNavigation {
         if (method.isEmpty()) Logger.warn("No generated method for '" + tc.getDescription() + "' in " + classFqcn);
 
         return method;
+    }
+
+    /**
+     * UC-CODEGEN-006, Rule-CODEGEN-026.
+     * <p>
+     * The cases a generated method carries, and whether that method does
+     * anything, one pass per class.
+     * <p>
+     * Grouped by the class each case generates into, so a page of one test set
+     * resolves one class and walks its methods once. {@code byCaseId} already
+     * returns every generated method of a class keyed by the id it carries, so
+     * the per-case half of this is a map lookup. Asking {@code methodOf} per
+     * card would resolve the same class once per card instead.
+     * <p>
+     * A class that cannot be resolved contributes nothing rather than failing:
+     * its cases have no method, which is what the caller is asking. The caller
+     * holds the read action.
+     * <p>
+     * A body with no statements is the stub {@code CreateTestMethod} writes - an
+     * annotation, a name and a TODO comment. Reporting that as automated made
+     * every test case with a description look automated, which is every test
+     * case anyone had finished writing.
+     */
+    @Override
+    public @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
+        final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
+
+        for (final TestCaseDto tc : cases) {
+            final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
+            if (fqcn.size() < 2) continue;
+
+            byClass.computeIfAbsent(String.join(".", fqcn.subList(0, fqcn.size() - 1)),
+                    ignored -> new ArrayList<>()).add(tc);
+        }
+
+        final @NotNull Map<UUID, Boolean> found = new LinkedHashMap<>();
+
+        for (final Map.Entry<String, List<TestCaseDto>> group : byClass.entrySet()) {
+            final @NotNull Optional<PsiClass> owner = Optional.ofNullable(
+                    JavaPsiFacade.getInstance(p).findClass(group.getKey(), GlobalSearchScope.projectScope(p)));
+
+            if (owner.isEmpty()) continue;
+
+            final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byCaseId(owner.orElseThrow());
+
+            for (final TestCaseDto tc : group.getValue()) {
+                Optional.ofNullable(methods.get(tc.getId().toString()))
+                        .ifPresent(pm -> found.put(tc.getId(), doesSomething(pm)));
+            }
+        }
+
+        return found;
+    }
+
+    /**
+     * Whether a generated method has anything in it.
+     * <p>
+     * Statements, not text: the stub Testin writes carries a TODO comment, and a
+     * comment is not a statement - so an untouched stub answers false and a
+     * method a tester has written one line into answers true. A method with no
+     * body at all is abstract or from a class file, and has nothing either.
+     */
+    private static boolean doesSomething(final @NotNull PsiMethod pm) {
+        return Optional.ofNullable(pm.getBody())
+                .filter(body -> body.getStatements().length > 0)
+                .isPresent();
     }
 
     // UC-CODEGEN-008, Rule-CODEGEN-032

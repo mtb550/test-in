@@ -9,7 +9,7 @@ in a tab. It is where test cases are written, and where a test run is executed.
 |---|---|
 | **Part of Testin** | The editor panel |
 | **Answers** | What a tester can do to test cases and to a test run, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-046`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-194` |
+| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-198` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -76,6 +76,7 @@ about a verdict.
 | **UC-EDITOR-PANEL-044** | [Run everything not yet judged](runWholeRun.md) | Set the whole test run going and come back later. |
 | **UC-EDITOR-PANEL-045** | [Write the result analysis](writeResultAnalysis.md) | Say what the test run as a whole showed. |
 | **UC-EDITOR-PANEL-046** | [Work in light mode](lightMode.md) | Judge test cases in a small window above your app. |
+| **UC-EDITOR-PANEL-047** | [See which test cases are automated](seeWhatIsAutomated.md) | Tell what a run will cover without opening the code. |
 
 ---
 

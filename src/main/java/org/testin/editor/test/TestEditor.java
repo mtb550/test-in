@@ -25,6 +25,7 @@ import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.editor.toolbar.TestToolbar;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.TestDetailsPopupBtn;
+import org.testin.codegen.AutomationState;
 import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -553,6 +554,15 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
         showEmptyStateIfNothingToDraw(totalItems);
 
+        // Fired and forgotten: the list is already on screen, and this answers
+        // for it whenever it answers. Nothing waits, so a test set opens at the
+        // speed it opened before; a read that fails leaves the cards drawing
+        // what they drew, which is the icon the button always had.
+        //
+        // The whole set rather than the page, because it is one class either
+        // way - and because the filter narrows the set, not the page.
+        Services.getInstance(p, AutomationState.class).read(p, snapshotOfAll(), this::refreshView);
+
         statusBar.updatePaginationState(page.page(), page.totalPages());
 
         // After the selection has been restored above, which is the whole point:
@@ -810,15 +820,19 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     private @NotNull List<TestCaseDto> getFilteredList() {
         final @NotNull EditorFilters filters = EditorFilters.of(toolBar);
 
+        final @NotNull List<TestCaseDto> matched;
         synchronized (allTestCases) {
-            return TestCaseFilter.filter(
+            matched = TestCaseFilter.filter(
                     allTestCases,
                     filters.query(),
                     filters.groups(),
                     filters.priorities(),
                     filters.modules());
         }
+
+        return Services.getInstance(p, AutomationState.class).matching(matched, filters.automation());
     }
+
 
     @Override
     public void dispose() {

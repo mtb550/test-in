@@ -13,6 +13,7 @@ import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -177,6 +178,20 @@ public interface TestinEditor extends Disposable {
      * Default rather than repeated: both editors hold that list and neither has
      * a different answer to give.
      */
+    /**
+     * A copy of every test case this editor holds, taken under the lock the list
+     * is written behind.
+     * <p>
+     * For the callers that read it on another thread. Both editors wrote this
+     * out for themselves, which is two copies of one rule about how that list is
+     * shared.
+     */
+    default @NotNull List<TestCaseDto> snapshotOfAll() {
+        synchronized (getAllTestCases()) {
+            return new ArrayList<>(getAllTestCases());
+        }
+    }
+
     default int positionOf(final @NotNull TestCaseDto tc) {
         final @NotNull List<TestCaseDto> all = getAllTestCases();
 

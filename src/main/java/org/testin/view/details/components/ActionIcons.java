@@ -8,8 +8,13 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.AutomationState;
 import org.testin.editor.CardHoverAction;
+import org.testin.model.Automated;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.services.Services;
+
+import java.util.List;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,12 +49,21 @@ public class ActionIcons extends BaseDetails {
         final @NotNull JBPanel<?> actionsPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         actionsPanel.setOpaque(false);
 
-        if (navigate.isOffered()) actionsPanel.add(hoverIcon(navigate, p, dto));
+        // The panel shows one test case, so its page is one case - and the read
+        // is the same fired-and-forgotten one the cards make. It answers into the
+        // same service, so a case read here is already known when its card is
+        // drawn, and the other way round.
+        final @NotNull AutomationState automation = Services.getInstance(p, AutomationState.class);
+        automation.read(p, List.of(dto), panel::repaint);
+
+        final @NotNull Automated state = automation.of(dto.getId());
+
+        if (navigate.isOffered()) actionsPanel.add(hoverIcon(navigate, p, dto, state.getIcon(), state.getLabel()));
 
         if (navigate.isOffered() && run.isOffered())
             actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(STRUT_WIDTH)));
 
-        if (run.isOffered()) actionsPanel.add(hoverIcon(run, p, dto));
+        if (run.isOffered()) actionsPanel.add(hoverIcon(run, p, dto, run.getIcon(), run.getTooltip()));
 
         return addFullWidthRow(panel, gbc, actionsPanel,
                 JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT), currentRow);
@@ -64,15 +78,15 @@ public class ActionIcons extends BaseDetails {
      * the key it names, and what the click does - so this panel and the cards
      * cannot end up disagreeing about a button they both show.
      */
-    private @NotNull JBLabel hoverIcon(final @NotNull CardHoverAction action, final @NotNull Project p, final @NotNull TestCaseDto dto) {
+    private @NotNull JBLabel hoverIcon(final @NotNull CardHoverAction action, final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull Icon drawn, final @NotNull String tooltip) {
         final @NotNull JBLabel label = new JBLabel();
-        final @NotNull Icon base = IconUtil.scale(action.getIcon(), label, BASE_SCALE);
-        final @NotNull Icon hover = IconUtil.scale(action.getIcon(), label, HOVER_SCALE);
+        final @NotNull Icon base = IconUtil.scale(drawn, label, BASE_SCALE);
+        final @NotNull Icon hover = IconUtil.scale(drawn, label, HOVER_SCALE);
         label.setIcon(base);
         label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         new HelpTooltip()
-                .setDescription(HtmlChunk.text(action.getTooltip()))
+                .setDescription(HtmlChunk.text(tooltip))
                 .setShortcut(action.getShortcut().getShortcutText())
                 .installOn(label);
 

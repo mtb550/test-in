@@ -7,6 +7,8 @@ import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Jumping from a test case to the generated method that runs it.
@@ -58,6 +60,28 @@ public interface CodeNavigation {
      * first half without the second.
      */
     @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc);
+
+    /**
+     * Which of these cases have a generated method carrying their id, and
+     * whether that method does anything.
+     * <p>
+     * A set for a whole page rather than a question per case, because the cost
+     * is the class: {@link #methodOf} resolves one for every call, and a page of
+     * 50 cards is 50 resolves of the same class. These are grouped by the class
+     * they generate into and each class is walked once, which is the shape
+     * {@code CreateTestMethod} already had to learn - writing 550 methods one at
+     * a time cost 2,035ms where one batched pass cost 590ms.
+     * <p>
+     * Present means a method carries the id; true means its body holds at least
+     * one statement. Testin writes every method as a stub with a TODO comment
+     * and nothing else, so "a method exists" is not "this is automated" - it is
+     * the ordinary state of a case somebody has created and not yet written.
+     * <p>
+     * Facts rather than states, so this interface says only what it can see.
+     * What a missing method means - not written yet, or written and gone - is
+     * decided by the caller, which knows whether the case names one at all.
+     */
+    @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> cases);
 
     /**
      * Whoever can navigate here, and one that says it cannot when nobody can.

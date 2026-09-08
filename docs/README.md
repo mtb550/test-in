@@ -53,7 +53,7 @@ tell you what changes and which message appears.
 | **[Sharing work with the team](share/main.md)** | Export, import, Git and a server. Every way test data leaves and arrives | 23 | 104 |
 | **[Inside Testin](internal/main.md)** | The parts that belong to no panel: the search, and the one thing that owns every file | 6 | 52 |
 
-**152 use cases and 654 rules**, each one checked against the code it describes.
+**153 use cases and 658 rules**, each one checked against the code it describes.
 
 Every part also lists two more things at the end of its page: where the plugin
 breaks its own rules today, and what nobody has decided yet. Both are honest

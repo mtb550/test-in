@@ -13,6 +13,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.toolbar.Toolbar;
+import org.testin.model.Automated;
 import org.testin.model.Group;
 import org.testin.model.Priority;
 import org.testin.model.TestEditorAttributes;
@@ -38,6 +39,13 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     @Getter
     @NotNull
     private final Set<TestStatus> selectedStatus = new HashSet<>();
+
+    /**
+     * Which automation states the tester is narrowing to, and empty for all of
+     * them.
+     */
+    @Getter
+    private final Set<Automated> selectedAutomation = new HashSet<>();
 
     @NotNull
     private final Supplier<Set<String>> availableModulesSupplier;
@@ -65,7 +73,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     }
 
     /**
-     * The four sets a tester can narrow the list with, as one list.
+     * The five sets a tester can narrow the list with, as one list.
      * <p>
      * They were spelled out three times - counted for the badge, tested for the
      * Reset action, cleared on reset - so a fifth kind of filter meant finding
@@ -73,7 +81,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
      * Reset button said was not there.
      */
     private @NotNull List<Set<?>> filters() {
-        return List.of(selectedPriority, selectedGroup, selectedModule, selectedStatus);
+        return List.of(selectedPriority, selectedGroup, selectedModule, selectedStatus, selectedAutomation);
     }
 
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-098
@@ -172,6 +180,14 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
                 filterPriorityMenu.add(new ToggleFilterAction<>(p.getLabel(), IconManager.createIcon(p.getColor()),
                         p, selectedPriority, FilterMembership.plain(), onChanged)));
         filterResetBtn.add(filterPriorityMenu);
+
+        // automation menu: only the states a tester can act on. "Not read yet"
+        // is not one of them - by the time this popup is open the answer is in,
+        // and nobody can look for cases nobody has looked at.
+        final @NotNull DefaultActionGroup filterAutomationMenu = new DefaultActionGroup("Automation", true);
+        Automated.FILTERABLE.forEach(a -> filterAutomationMenu.add(new ToggleFilterAction<>(a.getLabel(), a.getIcon(),
+                a, selectedAutomation, FilterMembership.plain(), onChanged)));
+        filterResetBtn.add(filterAutomationMenu);
 
         // group menu
         final @NotNull DefaultActionGroup filterGroupMenu = new DefaultActionGroup(TestEditorAttributes.GROUP.getName(), true);
