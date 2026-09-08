@@ -97,6 +97,8 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     protected abstract void submit();
 
     /**
+     * UC-INTERNAL-007, Rule-INTERNAL-057.
+     * <p>
      * The dialog's primary component, typed: the first declared component
      * that wants the focus (display-only components never qualify).
      */
@@ -108,6 +110,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
         return (C) primaryComponent();
     }
 
+    // UC-INTERNAL-007, Rule-INTERNAL-061
     public final void show() {
         // Assembled on first show: by now the subclass is fully constructed,
         // so its declaration (and its this:: references) is safe to use.
@@ -143,6 +146,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     // Assembly.
     // ------------------------------------------------------------------
 
+    // UC-INTERNAL-007, Rule-INTERNAL-059
     protected final void closeCancel() {
         if (!holdsUnsavedInput()) {
             getPopup().cancel();
@@ -154,6 +158,8 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     }
 
     /**
+     * UC-INTERNAL-007, Rule-INTERNAL-059.
+     * <p>
      * Whether this dialog is holding something the tester typed that closing
      * would throw away.
      * <p>
@@ -227,6 +233,8 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     }
 
     /**
+     * UC-INTERNAL-007, Rule-INTERNAL-053, Rule-INTERNAL-058.
+     * <p>
      * Content = declared components stacked top to bottom + the status bar.
      * The component claiming {@link DialogComponent#fillsSpace()} takes the
      * remaining space; the ones above sit on top, the ones below (e.g. a
@@ -277,6 +285,8 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     }
 
     /**
+     * UC-INTERNAL-007, Rule-INTERNAL-054, Rule-INTERNAL-055, Rule-INTERNAL-056.
+     * <p>
      * Binds every bindable entry's key twice: on each component's focus
      * component (exact pre-multi-component semantics, overriding any inert
      * default binding the field may carry) and on the content panel for
@@ -309,6 +319,8 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     }
 
     /**
+     * UC-INTERNAL-007, Rule-INTERNAL-060.
+     * <p>
      * Every component's own submit gesture (a click on a selection, an OK
      * button) triggers the dialog's submit action.
      */

@@ -20,11 +20,14 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
     private static final @NotNull Runnable NOTHING = () -> {
     };
 
+    // UC-INTERNAL-007, Rule-INTERNAL-054
     public static @NotNull StatusBarShortcut build(final @NotNull Shortcuts shortcut, final @NotNull String name, final @NotNull Runnable action) {
         return new StatusBarShortcut(shortcut, shortcut.getShortcutText(), name, action);
     }
 
     /**
+     * UC-INTERNAL-007, Rule-INTERNAL-059.
+     * <p>
      * Escape, called Cancel, closing without saving.
      * <p>
      * Twenty-one dialogs declared this identically - the same key, the same

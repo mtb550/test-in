@@ -13,7 +13,7 @@ up here rather than left to the code.
 |---|---|
 | **Part of Testin** | The parts that belong to no panel |
 | **Answers** | What the search finds, and what Testin does with the files under the Testin folder |
-| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-006`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-052` |
+| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-007`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-061` |
 | **State** | **Written** |
 | **Checked against** | `main` at `2cb8c1dc`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -30,6 +30,7 @@ up here rather than left to the code.
 | **UC-INTERNAL-004** | [Give a test case its number](numberTestCase.md) | Quote one number that means the same everywhere. | Rule-INTERNAL-025 to Rule-INTERNAL-035 |
 | **UC-INTERNAL-005** | [Keep a removed node so it can come back](keepRemovedNode.md) | Get back what a wrong Delete took away. | Rule-INTERNAL-036 to Rule-INTERNAL-045 |
 | **UC-INTERNAL-006** | [Count what a node holds](countNodeContents.md) | See what a node holds before removing it. | Rule-INTERNAL-046 to Rule-INTERNAL-052 |
+| **UC-INTERNAL-007** | [Answer any Testin dialog](dialogFramework.md) | Learn one dialog and know them all. | Rule-INTERNAL-053 to Rule-INTERNAL-061 |
 
 ---
 
@@ -103,6 +104,7 @@ bug report yet.
 | **Difference 1** | Rule-INTERNAL-047 — a container is the sum of everything beneath it | Details counts retired test sets. Making a test run on the same node leaves them out. A test project whose Details says 40 test cases can offer 31, and nothing explains the difference. |
 | **Difference 2** | Rule-INTERNAL-040 — one press puts back what one removal took | A failed undo shows two messages on one press. *Undone* arrives first, then **Undo Incomplete**. A tester who reads only the first believes a node is back. |
 | **Difference 5** | Rule-INTERNAL-019 — Testin ignores its own writes for five seconds | A tester who edits a file by hand within five seconds of Testin saving it is ignored too. The edit is on disk and not on screen until **Refresh**. |
+| **Difference 6** | Rule-INTERNAL-053 — every dialog has the same three parts | Twenty-three dialogs are built on the shell and six are not: the test case create and update dialogs, light mode's zoom indicator and the shortcut menu. They behave the same way by hand, so each is a copy that can drift. [#69](https://github.com/mtb550/test-in/issues/69) |
 
 A sixth belongs to the tree panel and is written there. A removal whose copy
 could not be kept aside still happens, is not undoable, and says nothing. That
