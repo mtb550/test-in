@@ -251,7 +251,7 @@ final class IndexingScanner {
      */
     private boolean holdsTestCases(final @NotNull Path dirPath) {
         try (Stream<Path> files = Files.list(dirPath)) {
-            return files.filter(Files::isRegularFile).anyMatch(ProjectIndexer::isCaseFile);
+            return files.filter(Files::isRegularFile).anyMatch(IndexingScanner::looksLikeACaseFile);
         } catch (final Exception unreadable) {
             // A folder that will not even list is a bigger problem than a missing
             // marker, and the line above already said the scan skipped it.
@@ -325,6 +325,33 @@ final class IndexingScanner {
         } catch (final Exception ex) {
             Logger.error("Failed to scan test run '" +
                     path.getFileName().toString() + "': " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Whether an unmarked folder's file looks like a test case, so the warning
+     * can say how many it is passing over.
+     * <p>
+     * A guess on purpose, and the only place one is made. The folder carries no
+     * marker, so there is no test set to ask - which is exactly what the warning
+     * is about. A name Testin wrote is the best evidence available; a run's file
+     * is named for its folder and does not match.
+     * <p>
+     * Deliberately not the same question as {@code ProjectIndexer.isCaseFile},
+     * which asks whether a file <b>is</b> a test case and answers it by the rule
+     * - a {@code .json} directly inside a test set. The two shared one method
+     * until #288, and the sharing is what hid that they were asking different
+     * things.
+     */
+    private static boolean looksLikeACaseFile(final @NotNull Path file) {
+        final @NotNull String name = file.getFileName().toString();
+        if (!name.endsWith(".json")) return false;
+
+        try {
+            UUID.fromString(name.substring(0, name.length() - ".json".length()));
+            return true;
+        } catch (final IllegalArgumentException notACase) {
+            return false;
         }
     }
 

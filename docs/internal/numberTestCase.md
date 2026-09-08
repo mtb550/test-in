@@ -101,6 +101,12 @@ both get a number.
 the name written inside the file instead. Testin did not write that file.
 Making up an identity for it would be worse than believing what it says.
 
+**If a test set holding such a file is copied** — the copy gets a new id like
+every other test case in it, and its file is renamed to the way Testin names
+them. The original keeps the name the tester gave it. A copy is a new test case
+(Rule-TREE-PANEL-051), and leaving this one carrying the original's id would
+make the two one test case in two files.
+
 **If two testers add a test case at the same time** — both are kept. There is
 no shared counter for them to fight over, and adding one never rewrites its
 neighbor. If the two land in the same place, the older one is drawn first.

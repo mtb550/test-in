@@ -37,6 +37,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -702,6 +703,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-TREE-PANEL-014, Rule-TREE-PANEL-051.
+     * <p>
      * Gives every test case in a freshly copied subtree an id of its own.
      * <p>
      * A copy is a copy of the files, so the cases in it arrive carrying the ids
@@ -718,6 +721,11 @@ public final class ProjectIndexer {
      * Test runs are left alone. Their file is named for their folder rather than
      * for an id, so they are not touched by this, and a copied run still refers
      * to the cases it actually executed.
+     * <p>
+     * A case whose file a tester named by hand comes through here like any
+     * other, and leaves with the name Testin gives - a fresh id, and the file
+     * called after it. The name it had was the tester's on the original, which
+     * keeps it; the copy is a case Testin wrote.
      */
     private void reidentifyCopiedCases(final @NotNull Path copiedRoot) {
         final List<Path> caseFiles;
@@ -725,7 +733,9 @@ public final class ProjectIndexer {
         try (Stream<Path> files = Files.walk(copiedRoot)) {
             // Collected before rewriting: the walk is lazy, and creating and
             // deleting files under it while it runs is not its contract.
-            caseFiles = files.filter(Files::isRegularFile).filter(ProjectIndexer::isCaseFile).toList();
+            caseFiles = files.filter(Files::isRegularFile)
+                    .filter(file -> isCaseFile(file, dir -> store.hasMarker(dir, DirectoryType.TS)))
+                    .toList();
 
         } catch (final IOException ex) {
             Logger.error("Could not read the copied nodes at " + copiedRoot + ": " + ex.getMessage());
@@ -737,21 +747,26 @@ public final class ProjectIndexer {
     }
 
     /**
-     * UC-INTERNAL-002, Rule-INTERNAL-012.
+     * UC-INTERNAL-002, Rule-INTERNAL-011.
      * <p>
-     * A test case is the file whose name is an id. A marker is named for its
-     * kind and a run for its folder, so neither answers true.
+     * A test case is a {@code .json} directly inside a test set, which is the
+     * rule the scan reads by - so the copy and the scan agree about what a test
+     * case is. A run's file is named for its folder and sits inside a test run,
+     * and a marker is not JSON, so neither answers true.
+     * <p>
+     * It used to ask whether the file name parsed as a UUID. That is how Testin
+     * names the files it writes, but not the only legal name: a case file named
+     * by hand is read by the scan, which takes its identity from inside the file
+     * instead. So the scan indexed it and this passed over it, and copying its
+     * test set left the copy carrying the original's id - two files claiming one
+     * case, where editing either edited both (#288).
+     * <p>
+     * The test-set check is injected so the rule stays testable without an
+     * indexer - the same reason {@code TreeTransferHandler.isValidDestination}
+     * takes its occupied check as a parameter.
      */
-    static boolean isCaseFile(final @NotNull Path file) {
-        final @NotNull String name = file.getFileName().toString();
-        if (!name.endsWith(".json")) return false;
-
-        try {
-            UUID.fromString(name.substring(0, name.length() - ".json".length()));
-            return true;
-        } catch (final IllegalArgumentException notACase) {
-            return false;
-        }
+    static boolean isCaseFile(final @NotNull Path file, final @NotNull Predicate<Path> isTestSet) {
+        return file.getFileName().toString().endsWith(".json") && isTestSet.test(file.getParent());
     }
 
     private void reidentify(final @NotNull Path caseFile) {
