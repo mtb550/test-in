@@ -161,9 +161,15 @@ bug report yet.
 |---|---|---|
 | **Difference 1** | Rule-SETTING-002 — nothing is checked, so nothing warns | A Testin folder that does not exist, or is a file, is stored without a word. The tree then shows its empty state, and nothing connects that to the path just typed. |
 | **Difference 2** | Rule-SETTING-001 — a setting is read by something | **Tester role** is stored and read by nothing at all. It is on no marker, no report and no message. |
-| **Difference 3** | Rule-SETTING-002 — a value is stored as typed | The Testin folder is stored exactly as typed, spaces included, and then trimmed the next time a code project opens. The value in the file changes on its own. |
 | **Difference 4** | Rule-SETTING-001 — this page owns these values | The default download folder is also written by the import dialog and the export dialog. Choosing a folder there and ticking a box overwrites what this page says. |
 | **Difference 5** | Rule-SETTING-004 — changing the folder makes Testin read again | Only code projects that have opened the Testin panel read again. A project whose panel was never opened keeps the old folder until it is opened. |
+
+**Fixed since this list was written.** The numbers are left out rather than
+closed up, so an issue that quotes one still points at the right thing.
+
+| Gone | Was |
+|---|---|
+| **Difference 3** | The Testin folder was stored exactly as typed and trimmed later by the reader, so the stored value changed on its own at the next project open. Every field on the page is trimmed when it is stored now. Fixed 9 September 2026, [#239](https://github.com/mtb550/test-in/issues/239) |
 
 ---
 

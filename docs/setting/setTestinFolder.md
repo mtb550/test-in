@@ -86,12 +86,9 @@ It carries a link reading **Open Settings**.
 
 **On disk** — nothing is read at all.
 
-## Where the plugin breaks its own rules
-
-**The stored value changes on its own.** A folder saved with spaces around it
-keeps those spaces. The next time a code project opens, Testin removes them and
-writes the shorter value back. That is difference 3 on
-[the settings page](main.md#where-the-plugin-breaks-its-own-rules).
+**If the path has spaces around it** — they are removed when it is stored, so
+the value in the file is the value Testin uses. It used to keep them and trim
+them at the next project open, which changed a stored setting nobody had edited.
 
 ---
 

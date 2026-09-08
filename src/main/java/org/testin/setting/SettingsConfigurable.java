@@ -99,11 +99,11 @@ public final class SettingsConfigurable implements Configurable {
     @Override
     public boolean isModified() {
         final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
-        boolean modified = !testinPathPanel.getPathText().equals(settings.rootTestinPath);
+        boolean modified = !testinPathPanel.getPathText().trim().equals(settings.rootTestinPath);
         modified |= !Objects.equals(logLevelComboBox.getSelectedItem(), settings.logLevel);
-        modified |= !testerNameField.getText().equals(settings.testerName);
-        modified |= !testerRoleField.getText().equals(settings.testerRole);
-        modified |= !downloadFolderField.getText().equals(settings.defaultDownloadFolder);
+        modified |= !testerNameField.getText().trim().equals(settings.testerName);
+        modified |= !testerRoleField.getText().trim().equals(settings.testerRole);
+        modified |= !downloadFolderField.getText().trim().equals(settings.defaultDownloadFolder);
         modified |= !sftpUserField.getText().equals(settings.sftpUser);
         modified |= !sftpKeyFileField.getText().equals(settings.sftpKeyFile);
         modified |= showShortcutHintsBox.isSelected() != settings.showShortcutHints;
@@ -120,12 +120,17 @@ public final class SettingsConfigurable implements Configurable {
         // renamed tester.
         final boolean rootChanged = TestinRoot.isRootChanged(settings.rootTestinPath, testinPathPanel.getPathText());
 
-        settings.rootTestinPath = testinPathPanel.getPathText();
+        // Trimmed here, like the two SFTP fields below. It used to be stored
+        // exactly as typed and trimmed later by TestinRoot.normalize, so the
+        // value in testinSettings.xml changed on its own at the next project
+        // open - a stored setting nobody edited, different from yesterday
+        // (#239).
+        settings.rootTestinPath = testinPathPanel.getPathText().trim();
         settings.logLevel = Objects.requireNonNullElse((String) logLevelComboBox.getSelectedItem(),
                 Level.INFO.name());
-        settings.testerName = testerNameField.getText();
-        settings.testerRole = testerRoleField.getText();
-        settings.defaultDownloadFolder = downloadFolderField.getText();
+        settings.testerName = testerNameField.getText().trim();
+        settings.testerRole = testerRoleField.getText().trim();
+        settings.defaultDownloadFolder = downloadFolderField.getText().trim();
         settings.sftpUser = sftpUserField.getText().trim();
         settings.sftpKeyFile = sftpKeyFileField.getText().trim();
         settings.showShortcutHints = showShortcutHintsBox.isSelected();

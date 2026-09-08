@@ -67,11 +67,13 @@ public class ImportAction extends AbstractProjectTreeAction {
     // UC-SHARE-005
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        // No refusal here. update() grays the entry on exactly the nodes this
+        // would have refused, so the message could never be read - and a refusal
+        // nobody can reach is a sentence to keep right forever for no reader
+        // (#271). The gray entry is what says the node cannot take an import.
         TreeValueUtil.directoryAt(tree.getSelectionPath())
                 .filter(DirectoryDto::isTestCaseContainer)
-                .ifPresentOrElse(this::openImportDialog, () ->
-                        Services.getInstance(p, Notifier.class).softRefuse(p, "Nothing to Import Into",
-                                "Select a Test Set, a Test Set Package, or the Test Cases directory."));
+                .ifPresent(this::openImportDialog);
     }
 
     private void openImportDialog(final @NotNull DirectoryDto dirDto) {

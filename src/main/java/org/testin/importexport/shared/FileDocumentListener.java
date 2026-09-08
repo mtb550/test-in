@@ -14,6 +14,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -71,8 +72,26 @@ public class FileDocumentListener implements DocumentListener {
     }
 
     private void loadFile(final @NotNull File importFile) {
+        // Said out loud. A file no format can read fell through here in silence,
+        // so a tester who picked a .pdf watched the dialog do nothing at all and
+        // had no way to tell that from a file Testin was still reading (#267).
+        // The formats are named rather than counted: the tester's next move is
+        // to go and find one.
         importableFormatOf(importFile.getName().toLowerCase())
-                .ifPresent(format -> loadFile(importFile, format));
+                .ifPresentOrElse(format -> loadFile(importFile, format),
+                        () -> Services.getInstance(p, Notifier.class).softRefuse(p, "Cannot Be Imported",
+                                importFile.getName() + " is not a kind of file Testin can read. It reads "
+                                        + importableFormats() + "."));
+    }
+
+    /**
+     * The extensions an import understands, as a tester would say them.
+     */
+    private static @NotNull String importableFormats() {
+        return Arrays.stream(FileTypes.values())
+                .filter(FileTypes::isImportable)
+                .map(FileTypes::getExtension)
+                .collect(Collectors.joining(", "));
     }
 
     private void loadFile(final @NotNull File importFile, final @NotNull FileTypes format) {
