@@ -53,8 +53,7 @@ The node goes to the recycle bin, so nothing is lost for good.
 - **Rule-TREE-PANEL-040** — A removal can be undone. (Rule-TREE-PANEL-011)
 - **Rule-TREE-PANEL-041** — A node whose copy could not be kept aside is still
   removed, and Testin says at that moment that it cannot be undone. `Ctrl+Z`
-  then answers for that removal rather than reaching past it to an earlier
-  change.
+  then answers for that removal, and does not take back the change before it.
 - **Rule-TREE-PANEL-042** — The two containers are never removed. This holds
   even when they are selected together with nodes that are removed.
 

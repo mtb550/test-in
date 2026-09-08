@@ -52,9 +52,9 @@ This copies a test project from Git onto this machine.
   cloning.
 - **Rule-TREE-PANEL-019** — The folder is named by the code project, never by
   the address. A repository called `nafath-test-case` is a place to clone from.
-  What the test project is called is written down once, in the file that travels
-  with the repository, so the tree, the reports and the server path all read the
-  same name.
+  The test project's name is written once, in `testin.yml`, which travels with
+  the repository. The tree, the reports and the server path all read it from
+  there.
 
 ## What the tester sees
 

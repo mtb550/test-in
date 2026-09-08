@@ -29,7 +29,7 @@ There is no key for this. **Commit** is behind the arrow of the split button.
 - **Rule-SHARE-054** — The marker files above every committed test case are
   committed too, whether they were ticked or not.
 - **Rule-SHARE-055** — Only a path that is really on disk is added. A path that
-  is gone is committed as the removal it is.
+  is gone is committed as a removal.
 - **Rule-SHARE-056** — No Git command Testin runs may open an editor.
 - **Rule-SHARE-057** — A password inside a remote address is never written to
   the log or shown.

@@ -12,9 +12,8 @@ One field, one small dialog. The rest of the test case is left alone.
 
 ## Rules
 
-- **Rule-VIEW-PANEL-001** — The panel is docked on the right of the IDE. Its
-  stripe reads **Testin**, exactly as the tree panel's does. The side they are
-  on is the only thing that tells them apart.
+- **Rule-VIEW-PANEL-001** — The panel is docked on the right of the IDE, and a
+  tester can tell it from the tree panel at a glance.
 - **Rule-VIEW-PANEL-002** — The panel shows one test case at a time.
 - **Rule-VIEW-PANEL-003** — The panel never opens on its own. The tester asks
   for a test case's details, and it opens.
@@ -35,8 +34,8 @@ One field, one small dialog. The rest of the test case is left alone.
 - **Rule-VIEW-PANEL-045** — The panel always changes exactly one test case,
   because it only ever shows one.
 - **Rule-VIEW-PANEL-046** — An edit Testin can find no test set to write to is
-  refused and says so. A test case opened without its test set - from a search
-  result - is the one that reaches this.
+  refused, and says so. That happens to a test case opened from a search result,
+  which arrives without its test set.
 - **Rule-VIEW-PANEL-047** — A save that would leave the file as it is writes
   nothing, and raises no message.
 - **Rule-VIEW-PANEL-048** — A saved change is one entry on the undo history.

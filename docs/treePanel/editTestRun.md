@@ -56,7 +56,7 @@ This changes a test run that is not signed off yet.
   (Rule-TREE-PANEL-060)
 - **Rule-TREE-PANEL-076** — A test case that was deleted from its test set after
   the test run was made is not in this dialog. What the test run recorded about
-  it is kept, because a row that cannot be shown cannot have been unticked.
+  it is kept, and saving the dialog never removes it.
 
 ## What the tester sees
 

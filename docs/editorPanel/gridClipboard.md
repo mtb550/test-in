@@ -29,10 +29,10 @@ Inside the grid these three keys act on cells, not on whole test cases.
   the tree keeps another.
 - **Rule-EDITOR-PANEL-008** — Every change confirms itself with one message in
   the past tense. A change to several test cases gets one message with a count.
-- **Rule-EDITOR-PANEL-009** — Moving the view says nothing. Paging, filtering,
-  searching and opening the details panel are all silent. It changes nothing
-  either: a test case the filter is hiding is reported, never brought into view
-  by throwing the filter away.
+- **Rule-EDITOR-PANEL-009** — Moving the view says nothing and changes nothing.
+  Paging, filtering, searching and opening the details panel are all silent.
+  None of them throws a filter away: a test case the filter is hiding is
+  reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-086** — Cells are copied as text with a tab between

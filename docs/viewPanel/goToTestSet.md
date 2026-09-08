@@ -12,9 +12,8 @@ There is no key for this. The path is at the top of the panel.
 
 ## Rules
 
-- **Rule-VIEW-PANEL-001** — The panel is docked on the right of the IDE. Its
-  stripe reads **Testin**, exactly as the tree panel's does. The side they are
-  on is the only thing that tells them apart.
+- **Rule-VIEW-PANEL-001** — The panel is docked on the right of the IDE, and a
+  tester can tell it from the tree panel at a glance.
 - **Rule-VIEW-PANEL-002** — The panel shows one test case at a time.
 - **Rule-VIEW-PANEL-003** — The panel never opens on its own. The tester asks
   for a test case's details, and it opens.

@@ -50,8 +50,8 @@ one.
 - **Rule-TREE-PANEL-020** — The choice is written into the code project. A
   colleague who copies that project down gets the same test project, with no
   setup.
-- **Rule-TREE-PANEL-021** — If the choice cannot be written, Testin says so,
-  whichever way the choice was made - the picker, creating a test project,
+- **Rule-TREE-PANEL-021** — If the choice cannot be written, Testin says so.
+  That holds whichever way the choice was made: the picker, creating a test project,
   cloning one, or the welcome screen. It never reports the choice as saved.
 
 ## The Select Test Project dialog

@@ -24,8 +24,8 @@ There is no key for this. It is the **Tester name** row.
 - **Rule-SETTING-006** — Nothing on this page has a key of its own.
 - **Rule-SETTING-018** — The name is read at the moment it is stamped, not
   remembered from when the IDE started. Changing it takes effect at once.
-- **Rule-SETTING-019** — An empty name is allowed. Testin then stamps nothing,
-  which means the file did not say rather than that nobody chose.
+- **Rule-SETTING-019** — An empty name is allowed. Testin then writes no name at
+  all, rather than writing that the name is unknown.
 
 ## The screen
 

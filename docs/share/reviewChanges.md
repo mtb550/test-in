@@ -31,9 +31,10 @@ uncommitted work.
   does not track and a test case Git has never seen both appear.
 - **Rule-SHARE-045** — One row for each changed **field**, not one for each
   changed file.
-- **Rule-SHARE-046** — A changed file with nothing readable different still gets
-  a row, so it can be committed.
-- **Rule-SHARE-047** — What a file is is decided by reading it, not by its name.
+- **Rule-SHARE-046** — A file Git says has changed gets a row even when Testin
+  can see no difference inside it, so the tester can still commit it.
+- **Rule-SHARE-047** — Testin decides what a file is by reading it, not by its
+  name.
 - **Rule-SHARE-048** — A rename is two rows, the removal first and the addition
   second.
 - **Rule-SHARE-049** — Every row arrives selected.

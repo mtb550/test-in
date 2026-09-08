@@ -30,10 +30,10 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
   the tree keeps another.
 - **Rule-EDITOR-PANEL-008** — Every change confirms itself with one message in
   the past tense. A change to several test cases gets one message with a count.
-- **Rule-EDITOR-PANEL-009** — Moving the view says nothing. Paging, filtering,
-  searching and opening the details panel are all silent. It changes nothing
-  either: a test case the filter is hiding is reported, never brought into view
-  by throwing the filter away.
+- **Rule-EDITOR-PANEL-009** — Moving the view says nothing and changes nothing.
+  Paging, filtering, searching and opening the details panel are all silent.
+  None of them throws a filter away: a test case the filter is hiding is
+  reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-130** — The walk only ever lands on a test case waiting
@@ -47,12 +47,13 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
   walk is going.
 - **Rule-EDITOR-PANEL-134** — Reaching the end of the list ends the walk, and
   nothing more. The test run is marked **Completed** only when every test case
-  in it has been judged, which is asked of the test run and not of the walk -
-  and asked wherever a verdict is recorded, whichever way the last one arrived.
+  in it has been judged. That question is asked of the test run rather than of
+  the walk, and it is asked wherever a verdict is recorded, however the last one
+  arrived.
 - **Rule-EDITOR-PANEL-135** — Start is offered only when there is something to
-  walk. A test run holding no test cases, a filter that matches nothing, and a
-  list whose test cases have all been judged are the same thing to the walk: all
-  three gray the button, and a press that reaches Testin anyway is refused and
+  walk. Three things leave nothing to walk: a test run holding no test cases, a
+  filter that matches nothing, and a list where every test case has been judged.
+  All three gray the button. A press that reaches Testin anyway is refused, and
   says so.
 
 ## What the tester sees

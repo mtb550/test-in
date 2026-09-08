@@ -50,8 +50,8 @@ The copy is new and separate. Changing it never changes the original.
   id. Editing the copy never changes the original.
 - **Rule-TREE-PANEL-052** — A copy cannot be undone. To take one back, remove
   it, which is [UC-TREE-PANEL-012](removeNode.md).
-- **Rule-TREE-PANEL-053** — A copy carries everything the original had beside
-  its test cases: its order number, and its **Deprecated** or **Archived**
+- **Rule-TREE-PANEL-053** — A copy carries everything the original had, as well
+  as its test cases: its order number, and its **Deprecated** or **Archived**
   status. A copy of a retired test set is retired too. A copied test run keeps
   the results the original recorded.
 

@@ -31,8 +31,8 @@ There is no key that opens this. It opens during a merge.
 - **Rule-SHARE-081** — One window for each test case, holding one question for
   each field that disagrees.
 - **Rule-SHARE-082** — The tester's own value is chosen to start with.
-- **Rule-SHARE-083** — A value is shown on one line, cut at 70 characters, and
-  an empty one reads as such.
+- **Rule-SHARE-083** — A value is shown on one line, cut at 70 characters. An
+  empty one says that it is empty rather than showing nothing.
 - **Rule-SHARE-084** — `Escape` answers nothing for this test case and moves on
   to the next. The test case is left as the other side has it and is named at
   the end with everything else that was not resolved. Answers already given

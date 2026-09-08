@@ -30,18 +30,18 @@ table.
   the tree keeps another.
 - **Rule-EDITOR-PANEL-008** — Every change confirms itself with one message in
   the past tense. A change to several test cases gets one message with a count.
-- **Rule-EDITOR-PANEL-009** — Moving the view says nothing. Paging, filtering,
-  searching and opening the details panel are all silent. It changes nothing
-  either: a test case the filter is hiding is reported, never brought into view
-  by throwing the filter away.
+- **Rule-EDITOR-PANEL-009** — Moving the view says nothing and changes nothing.
+  Paging, filtering, searching and opening the details panel are all silent.
+  None of them throws a filter away: a test case the filter is hiding is
+  reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-047** — Only some columns can be typed into. The rest
   never open.
 - **Rule-EDITOR-PANEL-048** — `Ctrl+Enter` puts a line break in. `Enter` saves.
 - **Rule-EDITOR-PANEL-049** — Clicking away from an open cell saves it.
-- **Rule-EDITOR-PANEL-050** — What is stored is what Testin made of what was
-  typed, and the cell is redrawn to match.
+- **Rule-EDITOR-PANEL-050** — Testin stores the value it made of what the tester
+  typed, and redraws the cell to match.
 - **Rule-EDITOR-PANEL-051** — A cell that no longer shows what was typed into it
   says so, whether or not anything was saved.
 - **Rule-EDITOR-PANEL-052** — A cell that ends up the same as it started writes
