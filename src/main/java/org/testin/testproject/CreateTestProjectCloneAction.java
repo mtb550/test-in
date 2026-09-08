@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
@@ -74,7 +75,7 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
                         Services.getInstance(p, BoundTestProject.class).bind(projectName);
 
                         tp.refresh();
-                        Services.getInstance(p, Notifier.class).softShow(p, "Project cloned");
+                        Services.getInstance(p, Notifier.class).softShow(p, Done.CLONED);
                     });
 
                 } catch (final Exception ex) {

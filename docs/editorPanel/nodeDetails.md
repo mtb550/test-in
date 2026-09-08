@@ -90,12 +90,10 @@ The same dialog opens from the tree, and is drawn on
 
 Nothing.
 
-## Where the plugin breaks its own rules
+## What else is on the toolbar
 
-This button and the fields button are both tooltipped **Details**, on the same
-toolbar. One picks which fields the rows show. This one opens a dialog about the
-test set. That is difference 5 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
+This button is tooltipped **Details** and the fields button beside it is
+tooltipped **Fields**. They used to share the one word.
 
 ---
 

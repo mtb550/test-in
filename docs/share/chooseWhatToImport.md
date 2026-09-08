@@ -91,8 +91,8 @@ column says High, Medium and Low. All 200 arrive at the lowest priority, and
 nothing warns the tester. That is difference 9 on
 [the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
 
-**No Group cannot be imported.** The group picker offers it. Reading it back
-drops it. That is difference 10.
+**If No Group is picked** — the test cases arrive with no group, which is what
+the picker offered. It used to be read back as an unknown group and thrown away.
 
 ---
 

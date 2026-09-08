@@ -15,6 +15,7 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
@@ -151,7 +152,7 @@ public class CreateTestRun implements NodeCreator {
                 // Here rather than in CreateTreeNodeAction: creating a run is
                 // asynchronous, and the action returns while the dialog is still
                 // open (#62).
-                Services.getInstance(p, Notifier.class).softShow(p, "Run created");
+                Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
             });
 
         });

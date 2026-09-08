@@ -142,6 +142,13 @@ public final class TestDataParser {
 
     public static @NotNull List<Group> groups(final @NotNull String rawGroups) {
         if (rawGroups.isBlank()) return new ArrayList<>();
+
+        // The picker offers No Group and writes the label it draws, so this has
+        // to read it back. It used to reach Group.valueOf, throw on the angle
+        // brackets and be dropped as an unknown group - a value the plugin
+        // itself offered, silently thrown away (#265). No group is no groups,
+        // which is the empty list every reader already treats as unassigned.
+        if (rawGroups.trim().equalsIgnoreCase(Group.UNASSIGNED.getName())) return new ArrayList<>();
         return Arrays.stream(rawGroups.split(","))
                 .map(String::trim)
                 .filter(group -> !group.isEmpty())

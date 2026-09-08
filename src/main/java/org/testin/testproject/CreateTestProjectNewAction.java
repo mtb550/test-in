@@ -10,6 +10,7 @@ import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryMapper;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
@@ -56,7 +57,7 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
         Services.getInstance(p, BoundTestProject.class).bind(created.getName());
 
         tp.refresh();
-        Services.getInstance(p, Notifier.class).softShow(p, "Project created");
+        Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
     }
 
 

@@ -1,5 +1,6 @@
 package org.testin.testcase;
 
+import org.testin.codegen.GenType;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -91,7 +92,11 @@ public class UpdateTestCaseAction extends AbstractProjectAction {
             // presses of CTRL+Z to take back (#165).
             TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Update", updatedItems), before, TestCaseSnapshot.of(p, path, ids));
 
-            Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
+            // Reordering says Re-sorted whichever way it was done. Dragging a
+            // card already said it and typing a position said Updated, so the
+            // same act had two words depending on the gesture (#210).
+            Services.getInstance(p, Notifier.class).softShow(p,
+                    gt == GenType.UPDATE_TEST_CASE_ORDER ? Done.RE_SORTED : Done.UPDATED);
 
             if (editor instanceof Toolbar)
                 ((Toolbar) editor).onToolBarFilterSelectionChanged();

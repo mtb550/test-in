@@ -9,7 +9,7 @@ public class TestDetailsPopupBtn extends AbstractDetailsPopupBtn<TestEditorAttri
     public TestDetailsPopupBtn(final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         // v4 is the curated default set (#80). See RunDetailsPopupBtn for when
         // this is bumped and what it costs.
-        super("Details",
+        super("Fields",
                 "testin.selectedDetails.test.v4",
                 TestEditorAttributes.class,
                 onToolBarDetailsSelectedChanged);

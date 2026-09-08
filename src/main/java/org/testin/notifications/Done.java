@@ -31,6 +31,7 @@ public enum Done {
     MOVED("Moved"),
 
     CREATED("Created"),
+    CLONED("Cloned"),
     RENAMED("Renamed"),
     REMOVED("Removed"),
     UPDATED("Updated"),

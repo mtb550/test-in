@@ -116,9 +116,6 @@ numbers.
 
 ## Where the plugin breaks its own rules
 
-**The group boxes read in capitals.** They read **REGRESSION** where the badge
-beside them reads **Regression**. That is difference 3.
-
 **`Ctrl+M` is not `Cmd+M` on a Mac.** Two other keys on the same screen are
 turned into Mac keys and this one is not. That is difference 9.
 

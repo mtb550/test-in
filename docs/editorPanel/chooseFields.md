@@ -114,10 +114,6 @@ so.
 
 ## Where the plugin breaks its own rules
 
-**Two toolbar buttons are both tooltipped Details.** This one, and the one at
-the far right that opens the test set's own details. That is difference 5 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
-
 **Unticking Order stops three gestures working in the grid.** Clicking a row to
 select it, `Enter` to open the details panel, and the double-click all stop.
 Nothing says why. That is difference 12.

@@ -173,7 +173,6 @@ bug report yet.
 | **Difference 2** | Rule-SHARE-006 — a dialog answers `Enter` | `Enter` does nothing in the export, import and review dialogs. Only a button confirms them. |
 | **Difference 6** | Rule-SHARE-003 — a conflict is put to the tester | Two fields are settled without asking. The order always takes the other side's value, and who changed it last always takes the later edit. |
 | **Difference 9** | Rule-SHARE-002 — a value the tester typed is kept or refused | An unreadable value is quietly replaced in four different ways. A priority becomes the lowest, a group is dropped, a date becomes blank, a status keeps its old value. |
-| **Difference 10** | Rule-SHARE-002 — what is offered can be used | **No Group** is offered in the group picker and cannot be imported back. It is dropped without a word. |
 | **Difference 11** | Rule-SHARE-005 — long work is watched | Parsing an import file has no progress bar at all, and runs on every keystroke in the source box. A large workbook makes the dialog look frozen. |
 | **Difference 12** | Rule-SHARE-005 — the same | The export, import and report bars cannot be canceled. |
 | **Difference 13** | Rule-SHARE-006 — one look for one thing | Choosing a file Testin cannot import does nothing and says nothing. |
@@ -194,6 +193,8 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 5** | An import that failed part way left what it had written and said nothing about how much. Fixed 7 September 2026, [#260](https://github.com/mtb550/test-in/issues/260) |
 | **Difference 7** | Exporting a package walked only one level down, so nested test sets contributed nothing. Fixed 7 September 2026, [#262](https://github.com/mtb550/test-in/issues/262) |
 | **Difference 8** | A test case file that would not read was dropped from an export in silence. Fixed 7 September 2026, [#263](https://github.com/mtb550/test-in/issues/263) |
+| **Difference 10** | **No Group** was offered in the picker and thrown away on the way back in, because the label reached `Group.valueOf` and was read as an unknown group. Fixed 9 September 2026, [#265](https://github.com/mtb550/test-in/issues/265) |
+| **Difference 15** | A message about none read *Exported 0*. A count of none says nothing now. Fixed 9 September 2026, [#269](https://github.com/mtb550/test-in/issues/269) |
 
 ---
 

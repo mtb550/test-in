@@ -5,7 +5,6 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.logger.Logger;
 import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
@@ -16,9 +15,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 public class GroupSection implements CreateTestCaseSection {
+    /**
+     * The tick box for each group, and the group it stands for.
+     * <p>
+     * A map rather than the box's own text. The text used to be the group's
+     * identity - {@code Group.valueOf(cb.getText())} - so it had to be the enum
+     * constant, and the tester read REGRESSION where every other surface says
+     * Regression (#199). A label is what a tester reads; it is not a key.
+     */
+    private final @NotNull Map<Group, JBCheckBox> boxes = new LinkedHashMap<>();
     private final @NotNull JBPanel<?> group;
     private final @NotNull JBPanel<?> wrapper;
 
@@ -26,14 +37,18 @@ public class GroupSection implements CreateTestCaseSection {
         this.group = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(4), JBUI.scale(4)));
         this.group.setOpaque(false);
 
-        Arrays.stream(Group.values())
-                .filter(Group::isActive)
-                .map(group -> {
-                    final @NotNull JBCheckBox checkBox = new JBCheckBox(group.name());
+        // No Group first, then the groups themselves. It was left out entirely,
+        // so a tester who ticked a group by mistake had no way back and an
+        // import carrying no group could not round-trip (#265).
+        Stream.concat(Stream.of(Group.UNASSIGNED), Arrays.stream(Group.values()).filter(Group::isActive))
+                .forEach(g -> {
+                    final @NotNull JBCheckBox checkBox = new JBCheckBox(g.getName());
                     checkBox.setFont(fieldFont());
-                    return checkBox;
-                })
-                .forEach(this.group::add);
+                    checkBox.addActionListener(e -> keepExclusive(g));
+
+                    boxes.put(g, checkBox);
+                    this.group.add(checkBox);
+                });
 
         this.wrapper = createWrapper(CreateTestCaseFields.GROUP.getIcon(), this.group);
     }
@@ -59,13 +74,34 @@ public class GroupSection implements CreateTestCaseSection {
 
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        final @NotNull ArrayList<Group> selectedGroups = new ArrayList<>();
-        for (final Component c : group.getComponents()) {
-            if (c instanceof JBCheckBox cb && cb.isSelected()) {
-                selectedGroups.add(Group.valueOf(cb.getText()));
-            }
+        // No Group is the empty list, which is what every reader already treats
+        // as unassigned - so it is a way of saying nothing rather than a group
+        // to store.
+        if (boxes.get(Group.UNASSIGNED).isSelected()) {
+            dto.setGroup(new ArrayList<>());
+            return;
         }
+
+        final @NotNull ArrayList<Group> selectedGroups = new ArrayList<>();
+        boxes.forEach((g, cb) -> {
+            if (cb.isSelected()) selectedGroups.add(g);
+        });
+
         dto.setGroup(selectedGroups);
+    }
+
+    /**
+     * No Group is not a group, so it cannot be ticked beside one.
+     */
+    private void keepExclusive(final @NotNull Group justToggled) {
+        if (!boxes.get(justToggled).isSelected()) return;
+
+        if (justToggled == Group.UNASSIGNED) {
+            boxes.forEach((g, cb) -> cb.setSelected(g == Group.UNASSIGNED));
+            return;
+        }
+
+        boxes.get(Group.UNASSIGNED).setSelected(false);
     }
 
     @Override
@@ -96,17 +132,9 @@ public class GroupSection implements CreateTestCaseSection {
     }
 
     public void setSelectedGroup(final @NotNull List<Group> selectedList) {
-        for (final Component c : group.getComponents()) {
-            if (c instanceof JBCheckBox cb) {
-                try {
-                    final @NotNull Group group = Group.valueOf(cb.getText());
-                    cb.setSelected(selectedList.contains(group));
-
-                } catch (final Exception ex) {
-                    Logger.error("setSelectedGroups ignored");
-                }
-            }
-        }
+        boxes.forEach((g, cb) -> cb.setSelected(g == Group.UNASSIGNED
+                ? selectedList.isEmpty()
+                : selectedList.contains(g)));
     }
 
     @Override

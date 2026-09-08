@@ -256,9 +256,7 @@ bug report yet.
 | | The rule it breaks | What a tester sees |
 |---|---|---|
 | **Difference 1** | Rule-EDITOR-PANEL-008 — a message says what happened | `Ctrl+C` says *Details copied* and copies one line, the description. Every other field is left out. |
-| **Difference 3** | Rule-EDITOR-PANEL-005 — one word for one thing | The group boxes in the create dialog read **REGRESSION** and **SMOKE**. The badges, the filter and the grid beside them read **Regression** and **Smoke**. |
 | **Difference 4** | Rule-EDITOR-PANEL-005 — what can be filtered can be set | Four groups can be filtered on and never assigned. The filter offers Security, UI, Functional and Validation. The dialog offers only Regression, Smoke and Sanity. |
-| **Difference 5** | Rule-EDITOR-PANEL-001 — one name for one thing | Two buttons on one toolbar are both tooltipped **Details**. One picks which fields are shown, the other opens the test set's own details. |
 | **Difference 6** | Rule-EDITOR-PANEL-008 — one message with a count | Pasting a block of 20 cells into the grid raises 20 messages. `Ctrl+X` over a block does the same. |
 | **Difference 7** | Rule-EDITOR-PANEL-005 — what the tester typed is stored | A description typed into a grid cell loses characters Testin will not keep. If nothing else changed, nothing is saved and nothing is said, and the tester watches their text change. |
 | **Difference 8** | Rule-EDITOR-PANEL-005 — one answer to one situation | A priority typed into a grid cell that Testin cannot read becomes the lowest. A status it cannot read keeps the value the test case already had. Two columns, two answers to a typo. |
@@ -296,6 +294,8 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 29** | `Escape` in the failure dialog threw away everything typed with no confirmation. Fixed 7 September 2026, [#223](https://github.com/mtb550/test-in/issues/223) |
 | **Difference 2** | **Test Data** and **Pre Conditions** were drawn in the create dialog with no key that opened either. Fixed 8 September 2026, [#198](https://github.com/mtb550/test-in/issues/198) |
 | **Difference 16** | `Shift+Enter` saved a bulk edit and the strip named only `Enter`. Fixed 9 September 2026, [#211](https://github.com/mtb550/test-in/issues/211) |
+| **Difference 3** | The group tick boxes read **REGRESSION** where every other surface reads **Regression**, because the box's own text was the group's identity. Fixed 9 September 2026, [#199](https://github.com/mtb550/test-in/issues/199) |
+| **Difference 5** | Two buttons on one toolbar were both tooltipped **Details**. The one that picks what a card shows is **Fields**, which is what this document already called it. Fixed 9 September 2026, [#201](https://github.com/mtb550/test-in/issues/201) |
 
 ---
 
