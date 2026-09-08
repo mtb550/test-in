@@ -38,7 +38,7 @@ There is no key for this. It is what the **Details** tab shows.
 - **Rule-VIEW-PANEL-026** — Text is capitalized and given a full stop, unless it
   already ends in one. The test data row is left exactly as the tester typed it.
 - **Rule-VIEW-PANEL-027** — A blank step is skipped, and its number is not given
-  to the step after it. A test case with a blank second step reads one, two,
+  to the step after it. A test case with a blank third step reads one, two,
   four.
 - **Rule-VIEW-PANEL-028** — Every value can be selected and copied, and none of
   them can be typed into.

@@ -94,7 +94,7 @@ public class UpdateTestBase {
     }
 
     /**
-     * UC-CODEGEN-002, Rule-CODEGEN-015.
+     * UC-CODEGEN-002, Rule-CODEGEN-046.
      * <p>
      * The case's groups onto the method, and the whole attribute rewritten
      * because a group taken away has to go as well as one added.

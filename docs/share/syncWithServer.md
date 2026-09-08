@@ -20,8 +20,11 @@ There is no key for this. The menu entry is **Sync With SFTP**.
   succeeded never leaves the tester's work only on this machine.
 - **Rule-SHARE-004** — A password is never written to a file Testin writes, and
   never to the log.
-- **Rule-SHARE-005** — Long work runs under a progress bar. The Git ones can be
-  canceled. The export, import and report ones cannot.
+- **Rule-SHARE-005** — Long work runs under a progress bar. A Git step that
+  only reads can be canceled; one that is writing to the repository or to the
+  remote cannot, because a push or a rebase stopped half way leaves the
+  repository in a state nobody asked for. The export, import and report ones
+  cannot be canceled either.
 - **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
   keys can be changed there.
 - **Rule-SHARE-085** — The server's address comes from `testin.yml`, which the
@@ -33,8 +36,9 @@ There is no key for this. The menu entry is **Sync With SFTP**.
 - **Rule-SHARE-088** — The server must already be known to this machine. One
   that is not is refused rather than trusted.
 - **Rule-SHARE-089** — The sync sends and takes in one gesture.
-- **Rule-SHARE-090** — A file both sides changed is kept as it is here, and
-  nothing is sent for it.
+- **Rule-SHARE-090** — A test case both sides changed is merged field by
+  field. What the merge cannot settle is kept as it is here, and nothing is sent
+  for it.
 - **Rule-SHARE-091** — Testin reads the test project again itself after a sync,
   because it ignores its own writes.
 

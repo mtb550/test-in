@@ -25,8 +25,8 @@ There is no key for this. It is the **Default download folder** row.
   and choosing a file to import all start.
 - **Rule-SETTING-022** — It is a starting point, not a rule. The tester can save
   anywhere from any of those dialogs.
-- **Rule-SETTING-023** — This page is not the only place the folder is set. The
-  import and export dialogs can set it too.
+- **Rule-SETTING-023** — This page owns the download folder. The import and
+  export dialogs can set it too, which is why it is a difference below.
 
 ## The screen
 

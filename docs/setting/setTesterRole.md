@@ -21,7 +21,8 @@ There is no key for this. It is the **Tester role** row.
 - **Rule-SETTING-005** — A password is never on this page. It is asked for when
   it is needed and kept in the IDE's password store.
 - **Rule-SETTING-006** — Nothing on this page has a key of its own.
-- **Rule-SETTING-020** — The role is stored on this machine and read by nothing.
+- **Rule-SETTING-020** — A value this page stores is read by something. The
+  role is stored and read by nothing, which is why it is a difference below.
 
 ## The screen
 

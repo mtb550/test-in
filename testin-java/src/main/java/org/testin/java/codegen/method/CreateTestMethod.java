@@ -326,7 +326,7 @@ public class CreateTestMethod implements GenAction {
     }
 
     /**
-     * UC-CODEGEN-002, Rule-CODEGEN-014, Rule-CODEGEN-015.
+     * UC-CODEGEN-002, Rule-CODEGEN-014, Rule-CODEGEN-046.
      * <p>
      * The source of one generated test method: its TestNG annotation and an
      * empty body. Written here for both ways of adding it - one at a time

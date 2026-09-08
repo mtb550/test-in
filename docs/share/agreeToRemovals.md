@@ -19,11 +19,16 @@ There is no key for this. The question comes after the sync.
   succeeded never leaves the tester's work only on this machine.
 - **Rule-SHARE-004** — A password is never written to a file Testin writes, and
   never to the log.
-- **Rule-SHARE-005** — Long work runs under a progress bar. The Git ones can be
-  canceled. The export, import and report ones cannot.
+- **Rule-SHARE-005** — Long work runs under a progress bar. A Git step that
+  only reads can be canceled; one that is writing to the repository or to the
+  remote cannot, because a push or a rebase stopped half way leaves the
+  repository in a state nobody asked for. The export, import and report ones
+  cannot be canceled either.
 - **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
   keys can be changed there.
-- **Rule-SHARE-099** — A sync never deletes anything on its own. It asks.
+- **Rule-SHARE-099** — A sync never deletes anything on this machine on its
+  own. It asks. A file the tester deleted here goes from the server without
+  asking again.
 - **Rule-SHARE-100** — Only files this machine has not touched since are offered
   for removal.
 - **Rule-SHARE-101** — Saying no offers the same choice again on the next sync.

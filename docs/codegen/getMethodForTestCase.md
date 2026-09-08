@@ -34,8 +34,6 @@ There is no key for this. It happens when a test case is created, which is
   set, counting from one. It is the method's priority, which is what TestNG runs
   methods in the order of - not the test case's, which is a different thing.
   Changing a test case's priority writes nothing into the code, deliberately.
-- **Rule-CODEGEN-015** — `groups` is written only when the test case belongs to
-  at least one group.
 - **Rule-CODEGEN-016** — Two descriptions that differ only in punctuation or
   capitals are one method.
 - **Rule-CODEGEN-017** — A test case created with no description gets no method.

@@ -53,7 +53,7 @@ Retiring deletes nothing. It only moves the node out of the way.
 - **Rule-TREE-PANEL-064** — An **Archived** test project is not opened at all on
   the next load. The panel says so, and offers the other test projects.
 - **Rule-TREE-PANEL-065** — A status is set on one node at a time. The status a
-  node already has is not offered.
+  node already has is offered gray, so the tester can see what it is now.
 
 ## What the tester sees
 

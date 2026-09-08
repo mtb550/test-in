@@ -19,12 +19,15 @@ There is no key for this. The questions come after the sync.
   succeeded never leaves the tester's work only on this machine.
 - **Rule-SHARE-004** — A password is never written to a file Testin writes, and
   never to the log.
-- **Rule-SHARE-005** — Long work runs under a progress bar. The Git ones can be
-  canceled. The export, import and report ones cannot.
+- **Rule-SHARE-005** — Long work runs under a progress bar. A Git step that
+  only reads can be canceled; one that is writing to the repository or to the
+  remote cannot, because a push or a rebase stopped half way leaves the
+  repository in a state nobody asked for. The export, import and report ones
+  cannot be canceled either.
 - **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
   keys can be changed there.
-- **Rule-SHARE-096** — A file both sides changed is kept as it is here, and
-  nothing is sent for it, until the tester answers.
+- **Rule-SHARE-096** — What the field merge cannot settle is kept as it is
+  here, and nothing is sent for it until the tester answers.
 - **Rule-SHARE-097** — The tester is asked only about the fields that really
   disagree.
 - **Rule-SHARE-098** — The answers are sent on the same sync, if nobody else has

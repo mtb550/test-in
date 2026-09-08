@@ -163,6 +163,14 @@ the part carries, so there is no list of them to go stale.
     ./tools/add-rule.ps1 -Part treePanel -Everywhere -Text "..."
     ./tools/add-rule.ps1 -Part editorPanel -Page editGridCell.md -Text "..." 
 
+**A rule is retired, never reused.** Two rules that say one thing are one rule
+written twice, and the copy goes: the one on the page that owns the concept
+stays, the visitor is deleted, and every code marker citing it is repointed in
+the same edit — `RuleNumbersTest` fails otherwise, because it checks that every
+rule the code cites exists. The part's `main.md` gains a **Retired** row naming
+the number, what it said, and which rule to read instead, so an issue that
+quoted it still leads somewhere. The number is never given to anything else.
+
 **Each part's page says its last number.** The **Numbering** row of every
 `main.md` gives the range that part's use cases and rules cover, so the next
 rule is the number after the end of it and nobody reads the whole part to find
