@@ -170,7 +170,6 @@ bug report yet.
 | | The rule it breaks | What a tester sees |
 |---|---|---|
 | **Difference 1** | No rule covers it — nothing in this part says a refusal must be stated | Leaving the folder, the file name or the format empty in the export or report dialog says nothing at all. The cursor moves and the dialog stays open. |
-| **Difference 2** | Rule-SHARE-006 — a dialog answers `Enter` | `Enter` does nothing in the export, import and review dialogs. Only a button confirms them. |
 | **Difference 6** | Rule-SHARE-003 — a conflict is put to the tester | Two fields are settled without asking. The order always takes the other side's value, and who changed it last always takes the later edit. |
 | **Difference 9** | Rule-SHARE-002 — a value the tester typed is kept or refused | An unreadable value is quietly replaced in four different ways. A priority becomes the lowest, a group is dropped, a date becomes blank, a status keeps its old value. |
 | **Difference 11** | Rule-SHARE-005 — long work is watched | Parsing an import file has no progress bar at all, and runs on every keystroke in the source box. A large workbook makes the dialog look frozen. |
@@ -195,6 +194,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 15** | A message about none read *Exported 0*. A count of none says nothing now. Fixed 9 September 2026, [#269](https://github.com/mtb550/test-in/issues/269) |
 | **Difference 13** | Choosing a file no format could read did nothing and said nothing. It names the file and the kinds Testin reads. Fixed 9 September 2026, [#267](https://github.com/mtb550/test-in/issues/267) |
 | **Difference 17** | A refusal naming which nodes can be imported into, on nodes where the menu entry was already gray. The refusal is gone; the gray entry says it. Fixed 9 September 2026, [#271](https://github.com/mtb550/test-in/issues/271) |
+| **Difference 2** | `Enter` did nothing in the export, import and review dialogs, which declared only `Escape`. All three answer it now, and the report dialog with them. Fixed 9 September 2026, [#252](https://github.com/mtb550/test-in/issues/252) |
 
 ---
 

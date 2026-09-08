@@ -7,6 +7,7 @@ import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Shortcuts;
 
 import java.io.File;
 import java.util.Arrays;
@@ -41,6 +42,7 @@ public final class GenerateReportDialog extends AbstractFrameworkDialog<Destinat
                 ComponentDialogBase.button("Generate"));
 
         shortcuts = List.of(
+                StatusBarShortcut.build(Shortcuts.Enter, "Generate", this::submit),
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 

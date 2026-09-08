@@ -12,6 +12,7 @@ import org.testin.services.Services;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Shortcuts;
 
 import java.awt.*;
 import java.io.File;
@@ -49,6 +50,7 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
                 ComponentDialogBase.button("Import"));
 
         shortcuts = List.of(
+                StatusBarShortcut.build(Shortcuts.Enter, "Import", this::submit),
                 StatusBarShortcut.cancel(this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(900), JBUI.scale(600));
