@@ -15,7 +15,8 @@ There is no key for this. The link is on the message.
 - **Rule-REPORT-002** — Every format reads the same figures, so two reports on
   one test run cannot disagree.
 - **Rule-REPORT-003** — A report is written after the dialog closes, under a
-  progress bar that cannot be canceled.
+  progress bar the tester can cancel. Stopping it leaves no file behind: the
+  report is written in one go at the end.
 - **Rule-REPORT-004** — A report is written where the tester chose. It never
   lands under the Testin folder.
 - **Rule-REPORT-005** — The project named in a report is the test project, not
@@ -67,13 +68,9 @@ Error** reads *Opening a file is not supported on this system.*
 **If the open fails** — a message titled **Execution Error** reads *Failed to
 open the file:* and then the reason.
 
-## Where the plugin breaks its own rules
-
-**A web page report does not open in a browser.** It is handed to whatever
-program on this machine claims that kind of file. The same web page, made as an
-export, does open in the browser. One kind of file, two answers. That is
-difference 6 on
-[the reports page](main.md#where-the-plugin-breaks-its-own-rules).
+**If the report is a web page** — it opens in the browser, which is where a web
+page is read. That holds whether the file was made as a report or as an export:
+one kind of file, one answer.
 
 ---
 

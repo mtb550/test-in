@@ -22,8 +22,8 @@ There is no key for this. The table is in the import dialog.
 - **Rule-SHARE-005** — Long work runs under a progress bar. A Git step that
   only reads can be canceled; one that is writing to the repository or to the
   remote cannot, because a push or a rebase stopped half way leaves the
-  repository in a state nobody asked for. The export, import and report ones
-  cannot be canceled either.
+  repository in a state nobody asked for. The export, import and report ones can
+  be canceled: none of them leaves anything the tester cannot see.
 - **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
   keys can be changed there.
 - **Rule-SHARE-034** — The table holds the 13 columns that can be imported, not

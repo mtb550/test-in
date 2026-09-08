@@ -223,10 +223,12 @@ public class BranchSelector {
     private void askBeforeCarryingWorkAcross(final @NotNull Path repositoryPath, final @NotNull String targetBranch, final int pending) {
         restoreSelectedBranch();
 
-        final @NotNull String changes = pending == 1 ? "1 change" : pending + " changes";
+        final @NotNull String changes = pending == 1
+                ? "One change in this test project is not committed"
+                : pending + " changes in this test project are not committed";
 
         new ConfirmDialog(p, "Uncommitted Changes",
-                changes + " in this test project are not committed. Switching does not leave them behind - "
+                changes + ". Switching does not leave them behind - "
                         + "they come with you, and can be committed onto " + targetBranch + " by mistake.",
                 currentBranch, targetBranch,
                 "Switch Anyway", () -> checkout(repositoryPath, targetBranch),

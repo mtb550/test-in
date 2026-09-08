@@ -15,7 +15,8 @@ There is no key for this. The link is on the message.
 - **Rule-REPORT-002** — Every format reads the same figures, so two reports on
   one test run cannot disagree.
 - **Rule-REPORT-003** — A report is written after the dialog closes, under a
-  progress bar that cannot be canceled.
+  progress bar the tester can cancel. Stopping it leaves no file behind: the
+  report is written in one go at the end.
 - **Rule-REPORT-004** — A report is written where the tester chose. It never
   lands under the Testin folder.
 - **Rule-REPORT-005** — The project named in a report is the test project, not

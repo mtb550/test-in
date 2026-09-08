@@ -44,7 +44,7 @@ public enum FileTypes {
     ),
 
     XLSX(
-            "XLSX",
+            "Excel",
             ".xlsx",
             """
                     To ensure a successful import, your Excel file should contain the following column headers (case-insensitive):
@@ -101,7 +101,7 @@ public enum FileTypes {
     ),
 
     WORD(
-            "WORD",
+            "Word",
             ".docx",
             "",
             ExportHandler.UNSUPPORTED,

@@ -178,7 +178,6 @@ bug report yet.
 | **Difference 12** | Rule-SHARE-005 — the same | The export, import and report bars cannot be canceled. |
 | **Difference 13** | Rule-SHARE-006 — one look for one thing | Choosing a file Testin cannot import does nothing and says nothing. |
 | **Difference 14** | Rule-SHARE-003 — one word for one outcome | A Git sync says *Synced* and fades. A Git push says *Pushed* and stays in the notification list. A server sync says *Synced* and fades, unless there were conflicts, when it stays. |
-| **Difference 15** | Rule-SHARE-003 — a count reads as a count | A message about one thing reads *Exported*. A message about none reads *Exported 0*. |
 
 | **Difference 16** | Rule-SHARE-003 — the tester is told | A message can be shown to nobody. When the code project's window has no status bar, the message is dropped and nothing is reported. Every success here is that kind of message. |
 | **Difference 17** | Rule-SHARE-006 — a refusal that cannot happen is not written | The import refusal naming which nodes can be imported into can never be seen. The menu entry is already gray in exactly that case. |

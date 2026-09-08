@@ -46,7 +46,13 @@ public final class BackgroundWork {
      */
     public static void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final @NotNull Consumer<@NotNull ProgressIndicator> work) {
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, title, false) {
+        // Cancellable, unlike the Git tasks. A report writes one file at the end
+        // and an export writes one file at the end, so stopping leaves nothing
+        // behind at all; an import writes a test case at a time and already says
+        // how many were written when it stops part way (Rule-SHARE-037). None of
+        // the three can leave the repository in a state the tester cannot see,
+        // which is the reason a push or a rebase cannot be stopped (#257).
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, title, true) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);

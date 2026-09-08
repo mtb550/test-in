@@ -22,8 +22,8 @@ There is no key for this. The links are on the message.
 - **Rule-SHARE-005** — Long work runs under a progress bar. A Git step that
   only reads can be canceled; one that is writing to the repository or to the
   remote cannot, because a push or a rebase stopped half way leaves the
-  repository in a state nobody asked for. The export, import and report ones
-  cannot be canceled either.
+  repository in a state nobody asked for. The export, import and report ones can
+  be canceled: none of them leaves anything the tester cannot see.
 - **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
   keys can be changed there.
 - **Rule-SHARE-022** — A web page export opens in the browser. Every other
@@ -57,12 +57,8 @@ Error** reads *Opening a file is not supported on this system.*
 **If the open fails** — a message titled **Execution Error** reads *Failed to
 open the file:* and then the reason.
 
-## Where the plugin breaks its own rules
-
-A web page made as an export opens in the browser. The same kind of file made
-as a report is handed to an application instead. One kind of file, two answers.
-That is difference 6 on
-[the reports page](../report/main.md#where-the-plugin-breaks-its-own-rules).
+**If the file is a web page** — it opens in the browser, whether it was made as
+an export or as a report. One kind of file, one answer.
 
 ---
 

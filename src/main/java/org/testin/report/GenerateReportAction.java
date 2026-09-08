@@ -138,14 +138,14 @@ public class GenerateReportAction extends AbstractProjectAction {
                 final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
                 notifier.infoWithActions(p,
-                        format.name() + " Report Generated",
+                        format.getLabel() + " Report Generated",
                         "Saved successfully: " + outputFile.getName(),
                         notifier.action("Open report", () -> ExportNotice.open(p, outputFile)),
                         notifier.copyPath(outputFile)
                 );
 
             } catch (final Exception ex) {
-                Services.getInstance(p, Notifier.class).error(p, "Report Error", "Failed to generate " + format.name() + " report: " + ex.getMessage());
+                Services.getInstance(p, Notifier.class).error(p, "Report Error", "Failed to generate " + format.getLabel() + " report: " + ex.getMessage());
                 Logger.error("Exception: " + ex.getMessage());
             }
         });

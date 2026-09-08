@@ -155,6 +155,12 @@ public final class Notifier {
      * every bulk action pluralizes and counts the same way (#62).
      */
     public void softShowCounted(final @NotNull Project p, final @NotNull String outcome, final int count) {
+        // Nothing happened, so there is nothing to confirm. It used to say
+        // "Removed 0", which is a balloon telling the tester that their gesture
+        // reached nothing - news only if something was expected, and the caller
+        // that expected something says so itself (#269).
+        if (count <= 0) return;
+
         softShow(p, count == 1 ? outcome : outcome + " " + count);
     }
 

@@ -86,9 +86,14 @@ public final class ReportOverview {
             add(rows, field.getDisplayName(), field.valueIn(tr));
         }
 
-        rows.add(new DetailRow(RunEditorAttributes.EXECUTED_BY.getName(), summary.executedBy()));
-        rows.addAll(TestRunExecution.rowsOf(tr));
-        rows.add(new DetailRow(RunEditorAttributes.RUN_STATUS.getName(), trDir.getMarker().getStatus().getLabel()));
+        // Through add, like every row above: it is the one place that drops a
+        // blank, and going round it is how a run nobody executed printed Executed
+        // By, Execution Started and Execution Ended with nothing after them
+        // (#254). TestRunExecution.valueIn already promises every reader does
+        // this; the report was the reader that did not.
+        add(rows, RunEditorAttributes.EXECUTED_BY.getName(), summary.executedBy());
+        TestRunExecution.rowsOf(tr).forEach(row -> add(rows, row.caption(), row.value()));
+        add(rows, RunEditorAttributes.RUN_STATUS.getName(), trDir.getMarker().getStatus().getLabel());
 
         return List.copyOf(rows);
     }

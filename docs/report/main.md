@@ -116,10 +116,16 @@ tables**. A tester who wants the whole report should not choose this format.
 | **Difference 1** | Rule-REPORT-003 — a refusal is stated | Leaving the folder, the file name or the format empty shows no message and no red mark. The cursor moves and the dialog stays open, which reads as a button that does not work. |
 | **Difference 2** | Rule-REPORT-003 — `Enter` confirms a dialog | `Enter` does nothing in the report dialog. The tester has to press **Generate**. |
 | **Difference 3** | Rule-REPORT-001 — a report is about one test run | The report button on a run editor's toolbar is never gray. Pressed where no test run can be worked out, it does nothing and says nothing. |
-| **Difference 4** | Rule-REPORT-002 — a report says what is true | A test run nobody executed still prints **Execution Started** and **Execution Ended** as empty rows. Every other empty row is left out. |
-| **Difference 5** | Rule-REPORT-002 — one name for one thing | The message after a report is made names the format in capitals, so it reads *WORD Report Generated* and *XLSX Report Generated*. The dialog beside it calls them **Word** and **Excel**. |
-| **Difference 6** | Rule-REPORT-004 — one kind of file opens one way | A web page made as a report opens in whatever application claims the file. The same page made as an export opens in the browser. |
-| **Difference 7** | Rule-REPORT-003 — long work can be watched | The progress bar cannot be canceled. A report on a very large test run has to be waited out. |
+
+**Fixed since this list was written.** The numbers are left out rather than
+closed up, so an issue that quotes one still points at the right thing.
+
+| Gone | Was |
+|---|---|
+| **Difference 4** | A test run nobody executed printed **Execution Started** and **Execution Ended** as empty rows, because three rows went round the helper that drops a blank. Fixed 9 September 2026, [#254](https://github.com/mtb550/test-in/issues/254) |
+| **Difference 5** | The message named the format in capitals — *WORD Report Generated*. Formats read as words now, in the message and in the dialog alike. Fixed 9 September 2026, [#255](https://github.com/mtb550/test-in/issues/255) |
+| **Difference 6** | A web page opened in whatever application claimed the file when it was a report, and in the browser when it was an export. Every web page goes to the browser now. Fixed 9 September 2026, [#256](https://github.com/mtb550/test-in/issues/256) |
+| **Difference 7** | The report, export and import bars could not be canceled. All three can be. Fixed 9 September 2026, [#257](https://github.com/mtb550/test-in/issues/257) |
 
 ---
 

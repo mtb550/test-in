@@ -453,9 +453,10 @@ final class BulkJsonEditors implements DialogComponent {
             final @NotNull Runnable action = Objects.requireNonNull(shortcut.action());
             register(action, key.getKey(), target);
 
-            // Shift+Enter saves as well. It is not advertised: it exists so the
-            // gesture that normally inserts a line break cannot put a newline
-            // inside a value the JSON shape says is one line.
+            // Shift+Enter saves as well, and the strip says so (#211). It exists
+            // so the gesture that normally inserts a line break cannot put a
+            // newline inside a value the JSON shape says is one line - and a key
+            // that works without being named is a key nobody finds.
             if (key == Shortcuts.Enter) {
                 register(action, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK), target);
             }

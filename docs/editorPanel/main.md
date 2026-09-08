@@ -266,7 +266,6 @@ bug report yet.
 | **Difference 11** | Rule-EDITOR-PANEL-005 — what the tester typed is stored | The page size box takes anything and quietly answers something else. `5000` becomes 1000. `0`, a negative number, letters and an empty box all become 50. |
 | **Difference 12** | Rule-EDITOR-PANEL-002 — the two views show the same rows | Unticking **Order** stops three gestures in the grid working: clicking a row to select it, `Enter` to open the details panel, and the double-click. Nothing says why. |
 | **Difference 15** | Rule-EDITOR-PANEL-008 — one word for one act | Dragging cards says *Re-sorted*. Moving a test case by typing its number says *Updated*. The same act, two words. |
-| **Difference 16** | Rule-EDITOR-PANEL-010 — a key that works is written down | `Shift+Enter` saves a bulk edit. The strip along the bottom names only `Enter`. |
 | **Difference 17** | Rule-EDITOR-PANEL-009 — a search finds what is there | The search reads the description, the identity, the expected result and the steps. It does not read the module, the group, the test data or the pre-conditions, each of which has its own column and its own filter. |
 | **Difference 18** | Rule-EDITOR-PANEL-009 — the status bar says what is true | With a row highlighted the status bar can read *0 of 12 test cases*, where the zero is meant as a position and reads as a count. |
 
@@ -296,6 +295,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 28** | Closing the tab left the automation running and its verdicts homeless. Fixed 7 September 2026, [#222](https://github.com/mtb550/test-in/issues/222) |
 | **Difference 29** | `Escape` in the failure dialog threw away everything typed with no confirmation. Fixed 7 September 2026, [#223](https://github.com/mtb550/test-in/issues/223) |
 | **Difference 2** | **Test Data** and **Pre Conditions** were drawn in the create dialog with no key that opened either. Fixed 8 September 2026, [#198](https://github.com/mtb550/test-in/issues/198) |
+| **Difference 16** | `Shift+Enter` saved a bulk edit and the strip named only `Enter`. Fixed 9 September 2026, [#211](https://github.com/mtb550/test-in/issues/211) |
 
 ---
 

@@ -116,11 +116,9 @@ nearest place the tester can type. No message is shown.
 **If a key would change the locked text** — nothing happens. The platform's own
 warning is hidden.
 
-## Where the plugin breaks its own rules
-
-`Shift+Enter` also saves, and the strip along the bottom names only `Enter`.
-That is difference 16 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
+**`Shift+Enter` also saves**, and the strip names it. It is there because the
+gesture that normally inserts a line break must not put a newline inside a value
+the shape says is one line.
 
 The group editor shows its values in capitals. Its heading is capitalized
 differently from every other bulk editor.

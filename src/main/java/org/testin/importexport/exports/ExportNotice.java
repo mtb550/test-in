@@ -13,6 +13,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
 import java.awt.*;
+import java.util.Locale;
 import java.util.Optional;
 import java.io.File;
 import java.io.IOException;
@@ -66,6 +67,15 @@ public final class ExportNotice {
     private static void openWithAssociatedProgram(final @NotNull Project p, final @NotNull VirtualFile virtualFile) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
+        // A web page goes to the browser, whichever button wrote it. The same
+        // .html opened in whatever application claimed the extension when it was
+        // a report and in the browser when it was an export - one file, two
+        // behaviours, decided by which half of the plugin made it (#256).
+        if (virtualFile.getName().toLowerCase(Locale.ROOT).endsWith(".html")) {
+            BrowserUtil.browse(new File(virtualFile.getPath()).toURI().toString());
+            return;
+        }
+
         if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
             notifier.error(p, "System Error", "Opening a file is not supported on this system.");
             return;
@@ -85,8 +95,8 @@ public final class ExportNotice {
     /**
      * UC-SHARE-004, Rule-SHARE-022.
      * <p>
-     * For a report meant to be read in a browser rather than handed to whatever
-     * application claims the extension.
+     * For a file meant to be read in a browser. {@link #open} sends every web
+     * page there anyway, so this is the caller that knows before it looks.
      */
     static void showInBrowser(final @NotNull Project p, final @NotNull File file) {
         show(p, file, () -> BrowserUtil.browse(file.toURI().toString()));
