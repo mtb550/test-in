@@ -2,6 +2,8 @@ package org.testin.editor.listeners;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
+import org.testin.services.Services;
+import org.testin.notifications.Notifier;
 import org.testin.editor.statusbar.PageStep;
 
 
@@ -32,8 +34,20 @@ public class StatusBarListener {
             // used to leave whatever was typed alone unless it failed to parse,
             // so "0" and "-3" stayed on screen while the editor kept the old
             // size - the field disagreeing with the list underneath it.
-            final int size = TestinEditor.pageSizeOf(editor.getStatusBar().getPageSizeField().getText());
+            final @NotNull String typed = editor.getStatusBar().getPageSizeField().getText().trim();
+            final int size = TestinEditor.pageSizeOf(typed);
             editor.getStatusBar().getPageSizeField().setText(String.valueOf(size));
+
+            // A tester who asked for a number and got a different one is told
+            // the limit. The corrected field says what the page size is now but
+            // not why it is not what they typed, and 5000 becoming 1000 with no
+            // word reads as the box ignoring them (#206). A blank box or letters
+            // asked for nothing, so nothing is said about those.
+            if (!typed.isEmpty() && typed.chars().allMatch(Character::isDigit)
+                    && !typed.equals(String.valueOf(size))) {
+                Services.getInstance(editor.getProject(), Notifier.class).softRefuse(editor.getProject(),
+                        "A page holds between 1 and " + TestinEditor.MAX_PAGE_SIZE + " test cases");
+            }
 
             // Silent, and deliberately so: this only changes how much of the list
             // is drawn at once, and the corrected number in the field is the whole

@@ -435,7 +435,10 @@ public class StatusBar extends JBPanel<StatusBar> {
             statusLabel.setText(String.format(Locale.ENGLISH, "<html>%d of %s</html>", firstSelectedPosition + 1, of));
 
         } else {
-            statusLabel.setText(String.format(Locale.ENGLISH, "<html>0 of %s</html>", of));
+            // The count alone. "0 of 12 test cases" put a position where a
+            // tester reads a count, and with nothing selected there is no
+            // position to give - a highlighted row is not a selected one (#213).
+            statusLabel.setText(String.format(Locale.ENGLISH, "<html>%s</html>", of));
         }
     }
 

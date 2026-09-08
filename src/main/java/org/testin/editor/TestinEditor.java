@@ -192,6 +192,15 @@ public interface TestinEditor extends Disposable {
         }
     }
 
+    /**
+     * The project this editor belongs to.
+     * <p>
+     * Declared here as well as on {@code Toolbar} because a caller holding a
+     * {@code TestinEditor} needs it to reach a service, and both editors already
+     * answer it - the two interfaces are two views of one object.
+     */
+    @NotNull Project getProject();
+
     default int positionOf(final @NotNull TestCaseDto tc) {
         final @NotNull List<TestCaseDto> all = getAllTestCases();
 

@@ -72,12 +72,12 @@ something it can use.
 The box is corrected in place, so the tester can see what happened. No message
 is raised.
 
-## Where the plugin breaks its own rules
+**If the number is outside the range** — the box shows the number Testin used
+and says *A page holds between 1 and 1000 test cases*. Typing `5000` gives 1000
+and says so.
 
-Typing `5000` and getting 1000 is a refusal with no words. Typing `0` and
-getting 50 is another. Every other refusal in Testin says what it did. That is
-difference 11 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
+**If the box is empty, or holds anything but digits** — it goes back to 50 and
+nothing is said. Nothing was asked for, so there is nothing to refuse.
 
 ---
 

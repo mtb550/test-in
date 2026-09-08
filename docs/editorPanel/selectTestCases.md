@@ -78,11 +78,9 @@ selection, not on the card under the pointer.
 **If the tester right-clicks outside the selection** — the selection moves to
 that card first, then the menu opens.
 
-## Where the plugin breaks its own rules
-
-With one row highlighted the status bar can read *0 of 12 test cases*, because
-the zero is meant as a position and reads as a count. That is difference 18 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
+**With nothing selected** — the status bar reads the count alone, *12 test
+cases*. It used to read *0 of 12 test cases*, putting a position where a tester
+reads a count.
 
 ---
 
