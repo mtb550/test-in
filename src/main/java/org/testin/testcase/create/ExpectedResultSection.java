@@ -21,6 +21,7 @@ public class ExpectedResultSection extends AbstractMultiLineSection {
         super(p, SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getExpectedResults(), CreateTestCaseFields.EXPECTED_RESULT.getIcon()), ""), CreateTestCaseFields.EXPECTED_RESULT);
     }
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
         dto.setExpectedResult(field.getText().trim());

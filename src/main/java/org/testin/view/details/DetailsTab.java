@@ -49,6 +49,7 @@ public class DetailsTab {
     final double WEIGHT_X = 1.0;
     final double SPACER_WEIGHT_Y = 1.0;
 
+    // UC-VIEW-PANEL-004
     public void load(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab, final @NotNull Optional<TestCaseDto> dto, final @NotNull List<String> currentPath) {
         detailsTab.removeAll();
         detailsTab.setLayout(new BorderLayout());
@@ -213,6 +214,7 @@ public class DetailsTab {
         detailsTab.putClientProperty(SHORTCUT_REGISTERED_KEY, Boolean.TRUE);
 
         new DumbAwareAction() {
+            // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-044
             @Override
             public void actionPerformed(final @NotNull AnActionEvent e) {
                 ViewToolWindowFactory.panel(p).ifPresent(viewPanel -> viewPanel.getCurrentTestCase()

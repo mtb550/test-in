@@ -57,6 +57,8 @@ public interface SftpAuth {
     }
 
     /**
+     * UC-SHARE-020.
+     * <p>
      * How a key-authenticated connection proves itself: the agent when one is
      * holding keys, and the key file when none is.
      * <p>

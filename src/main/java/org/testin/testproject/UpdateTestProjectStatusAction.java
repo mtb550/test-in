@@ -32,11 +32,13 @@ public class UpdateTestProjectStatusAction extends AbstractProjectTreeAction {
         this.projectStatus = projectStatus;
     }
 
+    // UC-TREE-PANEL-018, UC-TREE-PANEL-019
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         selectedTestProject().ifPresent(this::mark);
     }
 
+    // UC-TREE-PANEL-018, Rule-TREE-PANEL-062
     private void mark(final @NotNull TestProjectDirectoryDto tp) {
         try {
             tp.getMarker().setStatus(projectStatus);
@@ -55,6 +57,7 @@ public class UpdateTestProjectStatusAction extends AbstractProjectTreeAction {
         }
     }
 
+    // UC-TREE-PANEL-018, Rule-TREE-PANEL-065
     @Override
     public void update(final @NotNull AnActionEvent e) {
         final @NotNull Optional<TestProjectDirectoryDto> tp = selectedTestProject();

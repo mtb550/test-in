@@ -58,6 +58,7 @@ final class SftpAccountDialog extends AbstractFrameworkDialog<TextInput> {
         passwordField = password.getComponent();
     }
 
+    // UC-SHARE-019
     @Override
     protected void submit() {
         final @NotNull String user = userField.getText().trim();

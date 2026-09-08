@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 
 public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
+    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-036
     public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p);
 

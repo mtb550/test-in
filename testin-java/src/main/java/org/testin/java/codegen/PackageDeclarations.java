@@ -35,6 +35,8 @@ import java.util.Objects;
 public final class PackageDeclarations {
 
     /**
+     * UC-CODEGEN-017, Rule-CODEGEN-056, Rule-CODEGEN-057.
+     * <p>
      * Rewrites the package of every {@code .java} file under {@code moved}.
      *
      * @param sourceRoot the test source root every package is named from
@@ -52,6 +54,8 @@ public final class PackageDeclarations {
     }
 
     /**
+     * UC-CODEGEN-016, Rule-CODEGEN-053.
+     * <p>
      * Rewrites one file's package to match the directory holding it.
      */
     public static void retarget(final @NotNull Project p, final @NotNull VirtualFile sourceRoot, final @NotNull VirtualFile file, final @NotNull VirtualFile holder) {

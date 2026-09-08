@@ -15,6 +15,7 @@ public class SelectAllHeaderListener extends MouseAdapter {
     private final @NotNull DefaultTableModel model;
     private final @NotNull JBCheckBox headerCheckbox;
 
+    // UC-SHARE-003, Rule-SHARE-018
     @Override
     public void mouseClicked(final @NotNull MouseEvent e) {
         final int col = table.columnAtPoint(e.getPoint());

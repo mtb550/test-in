@@ -45,6 +45,8 @@ public final class UndoService {
     private final @NotNull Map<UndoScope, History> histories = new HashMap<>();
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-043.
+     * <p>
      * Records a just-performed operation against the surface it happened on.
      */
     public void push(final @NotNull UndoScope scope, final @NotNull Operation operation) {

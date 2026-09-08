@@ -21,6 +21,7 @@ import java.util.Optional;
 
 public class RenameJavaPackage implements GenAction {
 
+    // UC-CODEGEN-017, Rule-CODEGEN-056
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof Renamed renamed)) return;

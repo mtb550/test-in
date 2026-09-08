@@ -76,6 +76,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         return List.of(selectedPriority, selectedGroup, selectedModule, selectedStatus);
     }
 
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-098
     public int activeFilterCount() {
         return filters().stream().mapToInt(Set::size).sum();
     }
@@ -121,12 +122,15 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         }
     }
 
+    // UC-EDITOR-PANEL-021
     public void resetToolBarFilter() {
         clearFilters();
         onToolBarFilterReset.run();
     }
 
     /**
+     * UC-EDITOR-PANEL-021, Rule-EDITOR-PANEL-099.
+     * <p>
      * Clears the UI state without triggering a second editor refresh.
      */
     public void clearFilters() {
@@ -134,6 +138,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         updateToolBarFilterState();
     }
 
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
     private @NotNull DefaultActionGroup buildActionGroup(final @NotNull Runnable onToolBarFilterSelectedChanged) {
         final @NotNull Runnable onChanged = () -> {
             updateToolBarFilterState();
@@ -181,6 +186,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
 
         // module menu is dynamic: modules come from the currently loaded test cases
         final @NotNull ActionGroup filterModuleMenu = new ActionGroup(TestEditorAttributes.MODULE.getName(), true) {
+            // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
             @Override
             public AnAction @NotNull [] getChildren(final @Nullable AnActionEvent e) {
                 final @NotNull List<String> orderedModules = new ArrayList<>(availableModulesSupplier.get());

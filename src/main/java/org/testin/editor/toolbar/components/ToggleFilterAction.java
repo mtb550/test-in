@@ -39,6 +39,7 @@ final class ToggleFilterAction<T> extends DumbAwareToggleAction {
         return selection.contains(value);
     }
 
+    // UC-EDITOR-PANEL-020
     @Override
     public void setSelected(final @NotNull AnActionEvent e, final boolean state) {
         membership.apply(value, selection, state);

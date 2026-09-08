@@ -44,6 +44,8 @@ final class VfsExecutor {
     }
 
     /**
+     * UC-INTERNAL-003, Rule-INTERNAL-019.
+     * <p>
      * Says this change is the plugin's own, so the file watcher does not read
      * the project again for something the plugin is already redrawing (#20).
      * <p>
@@ -113,6 +115,8 @@ final class VfsExecutor {
     }
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-036.
+     * <p>
      * Deletes the file, then reports on the EDT whether it is gone.
      * <p>
      * The callback exists because the lookup has to leave the EDT, which makes

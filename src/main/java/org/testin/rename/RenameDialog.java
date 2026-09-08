@@ -19,6 +19,7 @@ final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
 
     private final @NotNull Consumer<@NotNull String> onSubmit;
 
+    // UC-TREE-PANEL-011
     RenameDialog(final @NotNull Project p, final @NotNull String currentName, final @NotNull Consumer<@NotNull String> onSubmit) {
         super(p);
         this.onSubmit = onSubmit;
@@ -37,6 +38,7 @@ final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
+    // UC-TREE-PANEL-011, Rule-TREE-PANEL-005
     @Override
     protected void submit() {
         final @NotNull String value = component().getText().trim();

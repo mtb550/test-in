@@ -46,6 +46,7 @@ public final class GoTo {
     private static final boolean WITH_FOCUS = true;
     private static final boolean WITHOUT_FOCUS = false;
 
+    // UC-INTERNAL-001, Rule-INTERNAL-002
     public static void the(final @NotNull Project p, final @NotNull Hit hit) {
         Logger.info("Going to " + hit.name() + " in " + hit.where());
 

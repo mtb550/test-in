@@ -22,6 +22,8 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
     public abstract void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu menu);
 
     /**
+     * Rule-EDITOR-PANEL-010.
+     * <p>
      * Every shortcut this menu offers, live on the grid as well as on the list
      * (#74).
      * <p>

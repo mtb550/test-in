@@ -30,6 +30,7 @@ public class AutomateTestCaseAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), list);
     }
 
+    // UC-CODEGEN-005, Rule-CODEGEN-025
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         // update() disables the action on an empty selection, but the shortcut
@@ -45,6 +46,7 @@ public class AutomateTestCaseAction extends AbstractProjectAction {
                 "Generating automation code for a test case is coming in a later release.");
     }
 
+    // UC-CODEGEN-005
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());

@@ -23,6 +23,7 @@ public class OpenAction extends AbstractProjectTreeAction {
         this.registerCustomShortcutSet(Shortcuts.Enter.getCustomShortcut(), tree);
     }
 
+    // UC-TREE-PANEL-005, UC-TREE-PANEL-006, Rule-TREE-PANEL-022
     public void execute(final @NotNull Project p) {
         // Unresolvable nodes are not in the list at all, and one that cannot be
         // opened is skipped: the rest of the selection still opens.
@@ -34,11 +35,13 @@ public class OpenAction extends AbstractProjectTreeAction {
                 });
     }
 
+    // UC-TREE-PANEL-005, UC-TREE-PANEL-006
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         execute(p);
     }
 
+    // UC-TREE-PANEL-005, Rule-TREE-PANEL-022
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TreeValueUtil.selectedDirectories(tree.getSelectionPaths()).stream()

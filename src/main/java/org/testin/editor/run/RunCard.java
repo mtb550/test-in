@@ -22,6 +22,7 @@ public class RunCard extends BaseCard {
         this.p = p;
     }
 
+    // UC-EDITOR-PANEL-030
     public void updateData(final @NotNull Integer index, final @NotNull Set<?> activeDetails, final @NotNull TestRunItems runItem, final @NotNull String title) {
         badges.clear();
         details.clear();

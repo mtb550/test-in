@@ -52,6 +52,8 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-019.
+     * <p>
      * Off unless {@code testin.yml} says this project is reached over a server.
      * <p>
      * The connection carries the answer, the way it carries whether a branch box
@@ -70,6 +72,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
         return ActionUpdateThread.BGT;
     }
 
+    // UC-SHARE-019, Rule-SHARE-085
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @NotNull SftpAddress address =
@@ -93,6 +96,8 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-019.
+     * <p>
      * Collects the account on the EDT, then leaves it.
      * <p>
      * The dialog is Swing and the sync is network and disk, so the two cannot
@@ -124,6 +129,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
         }).show();
     }
 
+    // UC-SHARE-019, Rule-SHARE-091
     private void syncInBackground(final @NotNull SftpAddress address, final @NotNull Path projectRoot, final @NotNull SftpAccountDialog.Account account, final @NotNull String keyFile) {
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Syncing with " + address.display(), true) {
             @Override
@@ -174,6 +180,8 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-020, Rule-SHARE-095.
+     * <p>
      * How this machine proves who it is: the agent when one holds keys, then a
      * key file, then the password kept for this server.
      */
@@ -219,6 +227,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
         return Path.of(System.getProperty("user.home", ""), ".ssh", "known_hosts");
     }
 
+    // UC-SHARE-019
     private void report(final @NotNull SftpSync.Outcome outcome, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth) {
         ApplicationManager.getApplication().invokeLater(() -> {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
@@ -256,6 +265,8 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-022, Rule-SHARE-099.
+     * <p>
      * Offers to remove what the server no longer holds.
      * <p>
      * Asked rather than done, because a deletion is the one thing a sync cannot
@@ -288,6 +299,8 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-021, Rule-SHARE-097.
+     * <p>
      * Puts one case both testers rewrote in front of the tester, then the next,
      * and sends the answers when there are no more.
      * <p>
@@ -322,6 +335,8 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-021.
+     * <p>
      * Sends what the tester settled, off the EDT - it opens a connection.
      */
     private void send(final @NotNull Map<String, String> answered, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth) {

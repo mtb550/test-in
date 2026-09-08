@@ -38,6 +38,7 @@ public class SetTestCaseStatusAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.customShortcut(entry.shortcut()), list);
     }
 
+    // UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033, UC-EDITOR-PANEL-034
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @NotNull List<TestCaseDto> selectedItems = list.getSelectedValuesList();

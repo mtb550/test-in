@@ -26,6 +26,7 @@ public class GridContextMenuListener extends MouseAdapter {
         this.pageItems = pageItems;
     }
 
+    // UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-110
     @Override
     public void mousePressed(final MouseEvent e) {
         popupShownOnPress = e.isPopupTrigger();

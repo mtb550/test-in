@@ -44,6 +44,8 @@ public final class GeneratedMethod {
     private static final @NotNull String TEST_NAME = "testName";
 
     /**
+     * Rule-CODEGEN-001.
+     * <p>
      * The method in this class carrying this case's id, and empty when none
      * does.
      */
@@ -52,6 +54,8 @@ public final class GeneratedMethod {
     }
 
     /**
+     * Rule-CODEGEN-001.
+     * <p>
      * Every generated method in the class, by the case id it carries.
      * <p>
      * One pass for a caller with a set to place rather than one scan per case.
@@ -71,6 +75,8 @@ public final class GeneratedMethod {
     }
 
     /**
+     * UC-CODEGEN-002, Rule-CODEGEN-013.
+     * <p>
      * The case id in a method's {@code @Test}, and empty on a method that
      * carries none.
      * <p>

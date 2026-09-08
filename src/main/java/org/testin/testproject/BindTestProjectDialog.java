@@ -80,6 +80,7 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
         }
     }
 
+    // UC-TREE-PANEL-004, Rule-TREE-PANEL-020
     @Override
     protected void submit() {
         final @NotNull List<Integer> selected = projects.getSelectedRows();

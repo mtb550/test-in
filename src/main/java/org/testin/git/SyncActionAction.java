@@ -34,6 +34,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         this.commits = new GitCommitService(p);
     }
 
+    // UC-SHARE-016
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         getActiveProjectPath().ifPresentOrElse(this::syncRepository, () ->
@@ -42,6 +43,8 @@ public class SyncActionAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-016, Rule-SHARE-069.
+     * <p>
      * Everything the action does once it knows which repository it is syncing.
      */
     private void syncRepository(final @NotNull Path repoPath) {
@@ -131,6 +134,8 @@ public class SyncActionAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-017.
+     * <p>
      * Merges the conflicted test cases and continues the pull when nothing is
      * left conflicting. Off the EDT: it reads Git and writes files.
      */
@@ -169,6 +174,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         Services.getInstance(p, Notifier.class).error(p, "Sync Failed", detail);
     }
 
+    // UC-SHARE-017, Rule-SHARE-077
     private void finishRebase(final @NotNull Path repoPath, final boolean abort) {
         // One sentence for this attempt, whichever way it fails - the body's
         // refusal and the handler's both say it.
@@ -259,6 +265,8 @@ public class SyncActionAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-016, Rule-SHARE-070.
+     * <p>
      * Pushes the commits that are here and not on the remote, and answers how
      * many went.
      * <p>
@@ -274,6 +282,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         return unpushed;
     }
 
+    // UC-SHARE-016
     private void refreshAfterSync(final @NotNull Path repoPath, final int pushed) {
         RepositoryRefresh.after(p, repoPath);
         ApplicationManager.getApplication().invokeLater(() -> {
@@ -315,6 +324,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         return Optional.empty();
     }
 
+    // UC-SHARE-016
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TreeValueUtil.selected(tree, TestProjectDirectoryDto.class).isPresent());

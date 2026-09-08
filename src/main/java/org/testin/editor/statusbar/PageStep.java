@@ -69,12 +69,16 @@ public enum PageStep {
     private final @NotNull Shortcuts shortcut;
 
     /**
+     * UC-EDITOR-PANEL-022.
+     * <p>
      * How many pages this step moves from where the tester is, and zero when it
      * would move them nowhere.
      */
     public abstract int deltaFrom(final int currentPage, final int totalPages);
 
     /**
+     * UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-102.
+     * <p>
      * Whether this step goes anywhere from here - the one rule the four arrows
      * and the two keyboard actions now share.
      */

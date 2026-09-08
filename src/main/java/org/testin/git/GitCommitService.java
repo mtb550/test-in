@@ -53,11 +53,14 @@ public final class GitCommitService {
         return markers;
     }
 
+    // UC-SHARE-009
     public void initialize(final @NotNull Path repositoryPath) {
         GitCommandRunner.execute(p, repositoryPath, "git", "init");
     }
 
     /**
+     * UC-SHARE-012, Rule-SHARE-054.
+     * <p>
      * Commits what the tester selected, and the marker files that make it mean
      * anything.
      * <p>
@@ -87,6 +90,8 @@ public final class GitCommitService {
     }
 
     /**
+     * UC-SHARE-012, Rule-SHARE-055.
+     * <p>
      * Of the paths to commit, the ones {@code git add} can be given.
      * <p>
      * It refuses a path that is in neither the working tree nor the index, and
@@ -127,10 +132,12 @@ public final class GitCommitService {
         }
     }
 
+    // UC-SHARE-013
     public void configureRemote(final @NotNull Path repositoryPath, final @NotNull String remoteName, final @NotNull String remoteUrl) {
         GitCommandRunner.execute(p, repositoryPath, "git", "remote", "add", remoteName, remoteUrl);
     }
 
+    // UC-SHARE-008, Rule-SHARE-041
     public void configureIdentity(final @NotNull Path repositoryPath, final @NotNull String name, final @NotNull String email, final boolean global) {
         final @NotNull String scope = global ? "--global" : "--local";
         GitCommandRunner.execute(p, repositoryPath, "git", "config", scope, "user.name", name);
@@ -161,6 +168,8 @@ public final class GitCommitService {
     }
 
     /**
+     * UC-SHARE-016, Rule-SHARE-071.
+     * <p>
      * Pulls with a rebase, telling the handler which remote URL it is for.
      * <p>
      * The URL is what lets the IDE find the credentials it already holds for
@@ -194,6 +203,7 @@ public final class GitCommitService {
         }
     }
 
+    // UC-SHARE-013
     public void push(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
         GitCommandRunner.executeRemote(p, repositoryPath, repositories.getRemoteUrl(repositoryPath, remote),
                 "git", "push", "-u", remote, branch);

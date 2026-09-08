@@ -24,6 +24,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
         this.tree = tree;
     }
 
+    // UC-TREE-PANEL-020
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         TreeValueUtil.selected(tree, TestRunDirectoryDto.class).ifPresent(this::askForStatus);
@@ -46,6 +47,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
         }).show();
     }
 
+    // UC-TREE-PANEL-020, Rule-TREE-PANEL-067
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TreeValueUtil.selected(tree, TestRunDirectoryDto.class)

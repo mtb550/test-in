@@ -84,6 +84,7 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
         return this;
     }
 
+    // UC-SETTING-007, Rule-SETTING-025
     @Override
     public void loadState(final @NotNull AppSettingsState state) {
         XmlSerializerUtil.copyBean(state, this);

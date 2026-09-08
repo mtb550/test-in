@@ -32,6 +32,8 @@ import java.util.Set;
 public final class TestinFileWatcher implements AsyncFileListener {
 
     /**
+     * UC-INTERNAL-003, Rule-INTERNAL-016.
+     * <p>
      * Null means "nothing here concerns Testin", which is the answer for
      * virtually every batch. The platform's contract, and the reason this
      * method is the cheap half of the listener - the work is in the applier,
@@ -51,6 +53,8 @@ public final class TestinFileWatcher implements AsyncFileListener {
     }
 
     /**
+     * UC-INTERNAL-003, Rule-INTERNAL-016, Rule-INTERNAL-019.
+     * <p>
      * The test projects this batch of events touched, and empty when it touched
      * none.
      */

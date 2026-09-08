@@ -35,6 +35,8 @@ public final class GitRefs {
             Set.of("DD", "AU", "UD", "UA", "DU", "AA", "UU");
 
     /**
+     * UC-SHARE-010, Rule-SHARE-048.
+     * <p>
      * Reads {@code git status --porcelain -uall} into what changed.
      * <p>
      * Pure text, so the rules can be asserted without a repository. The three
@@ -133,6 +135,8 @@ public final class GitRefs {
     }
 
     /**
+     * UC-SHARE-017.
+     * <p>
      * What a tester is told when a pull stops on conflicts.
      * <p>
      * Naming the files is the whole point: "resolve them in the IDE" without

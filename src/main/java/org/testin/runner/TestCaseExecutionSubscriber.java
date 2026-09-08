@@ -148,6 +148,8 @@ public final class TestCaseExecutionSubscriber implements Disposable {
     }
 
     /**
+     * UC-CODEGEN-009, Rule-CODEGEN-038.
+     * <p>
      * What the report means for this case.
      * <p>
      * A case the tester stopped reports itself finished without having passed,

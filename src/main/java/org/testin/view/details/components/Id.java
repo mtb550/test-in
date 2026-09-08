@@ -34,6 +34,7 @@ public class Id extends BaseDetails {
     final int INSETS_BOTTOM = 0;
     final int INSETS_RIGHT = 16;
 
+    // UC-VIEW-PANEL-009
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final @NotNull JBLabel idBadge = new JBLabel(dto.getId().toString()) {
@@ -60,6 +61,7 @@ public class Id extends BaseDetails {
         copyIcon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         copyIcon.addMouseListener(new MouseAdapter() {
+            // UC-VIEW-PANEL-009, Rule-VIEW-PANEL-039, Rule-VIEW-PANEL-040
             @Override
             public void mouseClicked(final MouseEvent e) {
                 CopyPasteManager.getInstance().setContents(new StringSelection(dto.getId().toString()));

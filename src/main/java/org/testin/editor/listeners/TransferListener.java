@@ -32,6 +32,7 @@ public class TransferListener extends TransferHandler {
         this.editor = editor;
     }
 
+    // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-058
     @Override
     public int getSourceActions(final JComponent c) {
         return MOVE;
@@ -69,6 +70,7 @@ public class TransferListener extends TransferHandler {
         return support.isDataFlavorSupported(FLAVOR);
     }
 
+    // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-061
     @Override
     public boolean importData(final TransferSupport support) {
         // Asked before the transferable is, because getTransferData throws for a

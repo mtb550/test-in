@@ -46,6 +46,8 @@ public final class GridKeys {
     public static final @NotNull String PASTE = "testin.grid.paste";
 
     /**
+     * UC-EDITOR-PANEL-018.
+     * <p>
      * The clipboard keys and the {@code ActionMap} name each one runs.
      * <p>
      * Through {@link Shortcuts#menuMask}, so this is CMD on a Mac (#25) and so

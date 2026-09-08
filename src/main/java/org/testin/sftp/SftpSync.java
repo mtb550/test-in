@@ -86,6 +86,7 @@ public final class SftpSync {
             return !blockedBy.isEmpty();
         }
 
+        // UC-SHARE-019
         public @NotNull String describe() {
             if (isBlocked()) return blockedBy;
 
@@ -107,6 +108,8 @@ public final class SftpSync {
     }
 
     /**
+     * UC-SHARE-019, Rule-SHARE-089.
+     * <p>
      * Runs one sync and answers what it did.
      */
     public static @NotNull Outcome run(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull String user, final @NotNull SftpAuth auth, final @NotNull Path knownHosts, final @NotNull ProgressIndicator indicator) {
@@ -271,6 +274,8 @@ public final class SftpSync {
 
 
     /**
+     * UC-SHARE-021, Rule-SHARE-098.
+     * <p>
      * Puts the cases a tester answered onto both sides, and records that they
      * now agree (#94).
      * <p>
@@ -326,6 +331,8 @@ public final class SftpSync {
     }
 
     /**
+     * UC-SHARE-021, Rule-SHARE-096.
+     * <p>
      * Settles what it can of the files both sides changed, and hands back the
      * rest as questions (#94).
      * <p>

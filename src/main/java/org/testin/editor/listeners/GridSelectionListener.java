@@ -32,6 +32,7 @@ public class GridSelectionListener implements ListSelectionListener {
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull List<TestCaseDto> pageItems;
 
+    // UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-111
     @Override
     public void valueChanged(final ListSelectionEvent e) {
         if (e.getValueIsAdjusting()) return;

@@ -18,6 +18,7 @@ public abstract class AbstractListRenderer<U extends TestinEditor> implements Li
     private static final @NotNull Border UNSELECTED_BORDER = JBUI.Borders.empty(1);
     protected final @NotNull U editor;
 
+    // UC-EDITOR-PANEL-001, UC-EDITOR-PANEL-030
     @Override
     public @NotNull BaseCard getListCellRendererComponent(final JList<? extends TestCaseDto> list, final TestCaseDto tc, final int index, final boolean isSelected, final boolean cellHasFocus) {
         final boolean isRowHovered = (index == editor.getHoveredIndex());

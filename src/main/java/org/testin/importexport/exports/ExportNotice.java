@@ -30,6 +30,8 @@ import java.io.IOException;
 public final class ExportNotice {
 
     /**
+     * UC-SHARE-004, Rule-SHARE-022.
+     * <p>
      * For a file the operating system knows how to open: a spreadsheet, a CSV,
      * a JSON document.
      */
@@ -38,6 +40,8 @@ public final class ExportNotice {
     }
 
     /**
+     * UC-SHARE-004.
+     * <p>
      * Opens a file the plugin has just written, whatever wrote it.
      * <p>
      * Public because the report generator had its own copy of this - a bare
@@ -79,6 +83,8 @@ public final class ExportNotice {
     }
 
     /**
+     * UC-SHARE-004, Rule-SHARE-022.
+     * <p>
      * For a report meant to be read in a browser rather than handed to whatever
      * application claims the extension.
      */

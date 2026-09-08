@@ -65,6 +65,8 @@ public final class SftpTransport implements AutoCloseable {
     }
 
     /**
+     * UC-SHARE-019, Rule-SHARE-088.
+     * <p>
      * Connects, or says why it could not.
      *
      * @param knownHosts the file of hosts this machine already trusts. A host

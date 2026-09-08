@@ -147,6 +147,8 @@ public class TreePanelTree implements Disposable {
     }
 
     /**
+     * UC-TREE-PANEL-013, UC-TREE-PANEL-014.
+     * <p>
      * Rebuilds from the indexer and then puts the tree on this node.
      * <p>
      * For anything that adds a node the tester is looking for - a paste, a

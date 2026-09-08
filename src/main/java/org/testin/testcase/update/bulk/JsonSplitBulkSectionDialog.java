@@ -99,6 +99,8 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
     }
 
     /**
+     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-041.
+     * <p>
      * Writes the rows the tester edited, and answers with the cases it actually
      * wrote to.
      * <p>
@@ -129,6 +131,8 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
     // ------------------------------------------------------------------
 
     /**
+     * UC-EDITOR-PANEL-007.
+     * <p>
      * Shows the dialog and releases the editors when it closes. The framework
      * creates the popup inside show(), so the close listener is attached after.
      */
@@ -143,6 +147,7 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
         editors.focusFirstValue();
     }
 
+    // UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-042
     @Override
     protected void submit() {
         final @NotNull List<EditedValue> newValues = new ArrayList<>();

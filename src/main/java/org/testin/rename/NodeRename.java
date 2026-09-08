@@ -35,6 +35,8 @@ import java.nio.file.Path;
 public final class NodeRename {
 
     /**
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-036.
+     * <p>
      * The callback runs when the rename has finished and the tree has caught up,
      * never if it failed - {@code renameNode} reports and swallows that.
      */

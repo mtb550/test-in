@@ -32,11 +32,13 @@ public class UpdateTestSetStatusAction extends AbstractProjectTreeAction {
         this.status = status;
     }
 
+    // UC-TREE-PANEL-018, UC-TREE-PANEL-019
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         selectedTestSet().ifPresent(this::mark);
     }
 
+    // UC-TREE-PANEL-018, Rule-TREE-PANEL-062
     private void mark(final @NotNull TestSetDirectoryDto ts) {
         try {
             ts.getMarker().setStatus(status);
@@ -54,6 +56,7 @@ public class UpdateTestSetStatusAction extends AbstractProjectTreeAction {
         }
     }
 
+    // UC-TREE-PANEL-018, Rule-TREE-PANEL-065
     @Override
     public void update(final @NotNull AnActionEvent e) {
         final @NotNull Optional<TestSetDirectoryDto> ts = selectedTestSet();

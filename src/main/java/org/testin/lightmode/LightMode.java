@@ -36,6 +36,8 @@ public final class LightMode implements Disposable {
     private @NotNull Optional<LightModeWindow> window = Optional.empty();
 
     /**
+     * UC-EDITOR-PANEL-046.
+     * <p>
      * Opens light mode on this run - or closes it, if it is this run that is
      * already showing.
      * <p>
@@ -70,6 +72,8 @@ public final class LightMode implements Disposable {
     }
 
     /**
+     * UC-EDITOR-PANEL-046.
+     * <p>
      * Redraws the window if it is this run it is showing, and does nothing at
      * all otherwise - which is every other run editor in the project, and the
      * usual case.
@@ -100,6 +104,8 @@ public final class LightMode implements Disposable {
     }
 
     /**
+     * UC-EDITOR-PANEL-046.
+     * <p>
      * Moves the clocks on, once a second, and touches nothing else - a full
      * refresh re-measures and re-sizes the window, which is not something to do
      * to a tester every second while they are reading.

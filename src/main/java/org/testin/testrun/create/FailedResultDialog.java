@@ -24,6 +24,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
     private final @NotNull Runnable onSave;
     private final @NotNull FailureFields fields;
 
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-143
     public FailedResultDialog(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull Runnable onSave) {
         super(p);
         this.runItem = runItem;
@@ -71,6 +72,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
                 + "and neither is the Failed verdict. There is no copy of any of it.";
     }
 
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145
     @Override
     protected void submit() {
         // Applied only on save - Escape must never commit the edit.

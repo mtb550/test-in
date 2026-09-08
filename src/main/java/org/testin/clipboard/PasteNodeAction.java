@@ -33,6 +33,7 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
         this.registerCustomShortcutSet(Shortcuts.PasteItem.getCustomShortcut(), tree);
     }
 
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (!(tree.getTransferHandler() instanceof TreeTransferHandler transferHandler)) return;
@@ -41,6 +42,7 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
                 TreeValueUtil.selectedDirectory(tree).ifPresent(target -> paste(transferHandler, contents, target)));
     }
 
+    // UC-TREE-PANEL-013, Rule-TREE-PANEL-006
     private void paste(final @NotNull TreeTransferHandler transferHandler, final @NotNull Transferable contents, final @NotNull DirectoryDto target) {
         try {
             final @NotNull TreeTransferPayload payload = (TreeTransferPayload) contents.getTransferData(TreeTransferHandler.NODE_FLAVOR);
@@ -86,6 +88,8 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-TREE-PANEL-013.
+     * <p>
      * Greyed out where pasting has no meaning: a test project holds its two
      * containers and nothing else, so nothing is ever a child of one.
      * <p>

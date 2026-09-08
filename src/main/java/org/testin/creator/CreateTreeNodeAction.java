@@ -31,6 +31,7 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
         this.registerCustomShortcutSet(Shortcuts.CreateItem.getCustomShortcut(), tree);
     }
 
+    // UC-TREE-PANEL-007, UC-TREE-PANEL-009
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
@@ -38,6 +39,8 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-TREE-PANEL-007, UC-TREE-PANEL-008, UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-004.
+     * <p>
      * Everything the action does once it knows which node it is creating under.
      */
     private void createUnder(final @NotNull DirectoryDto pDir) {
@@ -85,6 +88,7 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
         }
     }
 
+    // UC-TREE-PANEL-007, Rule-TREE-PANEL-025
     @Override
     public void update(final @NotNull AnActionEvent e) {
 

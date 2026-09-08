@@ -38,11 +38,14 @@ public final class TestCaseOrder {
             .thenComparing(TestCaseDto::getCreatedAt)
             .thenComparing(TestCaseDto::getId);
 
+    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-013
     public static @NotNull List<TestCaseDto> ordered(final @NotNull List<TestCaseDto> cases) {
         return cases.stream().sorted(BY_RANK).toList();
     }
 
     /**
+     * UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014.
+     * <p>
      * Where a case sits in an ordered set, counting from one, and the end of it
      * when the set does not hold the case yet.
      * <p>
@@ -68,6 +71,8 @@ public final class TestCaseOrder {
     }
 
     /**
+     * UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-060.
+     * <p>
      * Makes the list's own order the ranks, and answers which cases had to
      * change to say so.
      * <p>

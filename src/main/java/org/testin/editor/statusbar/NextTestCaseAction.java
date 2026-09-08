@@ -22,11 +22,13 @@ public class NextTestCaseAction extends DumbAwareAction {
         }
     }
 
+    // UC-VIEW-PANEL-003
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         controller.goNext();
     }
 
+    // UC-VIEW-PANEL-003, Rule-VIEW-PANEL-020
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(controller.hasNext());

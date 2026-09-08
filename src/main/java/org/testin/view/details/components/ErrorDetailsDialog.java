@@ -32,6 +32,7 @@ public final class ErrorDetailsDialog extends AbstractFrameworkDialog<TextArea> 
     private static final int WIDTH = 900;
     private static final int HEIGHT = 600;
 
+    // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-036
     public ErrorDetailsDialog(final @NotNull Project p, final @NotNull String caseDescription, final @NotNull String message, final @NotNull String stacktrace) {
         super(p);
 

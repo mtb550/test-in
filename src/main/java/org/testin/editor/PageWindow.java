@@ -22,6 +22,8 @@ public record PageWindow(int page, int totalPages, int fromIndex, int toIndex) {
     }
 
     /**
+     * UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-104.
+     * <p>
      * The 1-based page holding this test case, or 0 when it is not in the list.
      * <p>
      * Both editors reload onto a page that may no longer hold the selected case,

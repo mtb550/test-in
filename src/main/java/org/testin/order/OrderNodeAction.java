@@ -34,6 +34,7 @@ public class OrderNodeAction extends AbstractProjectTreeAction {
         this.tp = tp;
     }
 
+    // UC-TREE-PANEL-015
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         selected().ifPresent(node -> new OrderDialog(p, node.getOrder(), order -> apply(node, order)).show());
@@ -78,6 +79,8 @@ public class OrderNodeAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-TREE-PANEL-015, Rule-TREE-PANEL-058.
+     * <p>
      * Always on the menu, and greyed out on a node that has no order to set.
      * <p>
      * Hiding it would answer a question the tester did not ask: an entry that

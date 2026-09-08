@@ -80,6 +80,7 @@ public final class GridExcelBehavior {
         };
     }
 
+    // UC-EDITOR-PANEL-018, Rule-EDITOR-PANEL-086
     private static void copySelection(final @NotNull JBTable table, final boolean cut) {
         final int[] rows = table.getSelectedRows();
         final int[] cols = table.getSelectedColumns();
@@ -107,6 +108,7 @@ public final class GridExcelBehavior {
         }
     }
 
+    // UC-EDITOR-PANEL-018, Rule-EDITOR-PANEL-088
     private static void pasteIntoSelection(final @NotNull JBTable table) {
         // An empty clipboard and a clipboard holding no text are the same
         // nothing to paste.
@@ -151,6 +153,8 @@ public final class GridExcelBehavior {
     }
 
     /**
+     * UC-EDITOR-PANEL-018, Rule-EDITOR-PANEL-087.
+     * <p>
      * Excel TSV quoting: fields containing tabs, newlines, or quotes are wrapped
      * in double quotes with internal quotes doubled.
      */

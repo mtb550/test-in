@@ -25,12 +25,15 @@ public class CreateTestProjectAction extends AbstractProjectAction {
         this.tp = tp;
     }
 
+    // UC-TREE-PANEL-002
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         execute();
     }
 
     /**
+     * UC-TREE-PANEL-002, UC-TREE-PANEL-003, Rule-TREE-PANEL-019.
+     * <p>
      * Direct entry point for the tree panel's empty state — no AnActionEvent required.
      */
     public void execute() {

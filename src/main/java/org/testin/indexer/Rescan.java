@@ -58,6 +58,7 @@ public final class Rescan {
      */
     private final @NotNull AtomicBoolean booked = new AtomicBoolean();
 
+    // UC-INTERNAL-003, Rule-INTERNAL-020
     public void of(final @NotNull Collection<Path> testProjects) {
         if (testProjects.isEmpty()) return;
 
@@ -68,6 +69,7 @@ public final class Rescan {
                 .schedule(this::run, QUIET_MILLIS, TimeUnit.MILLISECONDS);
     }
 
+    // UC-INTERNAL-003, Rule-INTERNAL-022
     private void run() {
         // Released before the work, not after: a change that lands while this
         // pass is reading has not been read, and must book the next one.
@@ -91,6 +93,8 @@ public final class Rescan {
     }
 
     /**
+     * UC-INTERNAL-003, Rule-INTERNAL-021, Rule-INTERNAL-023.
+     * <p>
      * One project's tree brought up to date, and only where there is a tree.
      * <p>
      * A project that never opened the Testin tool window has nothing on screen

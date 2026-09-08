@@ -15,6 +15,7 @@ public class TestRunStatusMenuDialog {
 
     private final @NotNull Consumer<TestRunStatus> onStatusSelected;
 
+    // UC-TREE-PANEL-020
     public void show() {
         new ShortcutMenuPopup<>(p, "Set Test Run Status", TestRunStatus.values(), onStatusSelected).show();
     }

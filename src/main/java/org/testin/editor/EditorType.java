@@ -54,6 +54,8 @@ public class EditorType extends FakeFileType {
     }
 
     /**
+     * UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-001.
+     * <p>
      * Which editor a node opens in.
      * <p>
      * Here rather than on {@link DirectoryType}, which is where #175 proposed it:

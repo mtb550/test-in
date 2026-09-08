@@ -23,11 +23,13 @@ abstract class AbstractPageAction extends DumbAwareAction {
         registerCustomShortcutSet(step.getShortcut().getCustomShortcut(), list);
     }
 
+    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-103
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         editor.stepPage(step.deltaFrom(editor.getCurrentPage(), editor.getTotalPageCount()));
     }
 
+    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-102
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(step.isAvailable(editor.getCurrentPage(), editor.getTotalPageCount()));

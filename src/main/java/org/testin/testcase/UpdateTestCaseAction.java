@@ -37,12 +37,15 @@ public class UpdateTestCaseAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.UpdateItem.getCustomShortcut(), list);
     }
 
+    // UC-EDITOR-PANEL-006
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         overSelection(TestCaseUpdateMenuDialog::show);
     }
 
     /**
+     * UC-EDITOR-PANEL-006.
+     * <p>
      * The same update, started at one field instead of at the menu - what a
      * field's letter opens while a card is selected.
      */

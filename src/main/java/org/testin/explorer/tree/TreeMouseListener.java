@@ -34,6 +34,7 @@ public class TreeMouseListener extends PopupHandler {
         });
     }
 
+    // UC-TREE-PANEL-005, UC-TREE-PANEL-006
     @Override
     public void mouseClicked(final @NotNull MouseEvent e) {
         if (nodeAt(e.getX(), e.getY()).isEmpty()) return;

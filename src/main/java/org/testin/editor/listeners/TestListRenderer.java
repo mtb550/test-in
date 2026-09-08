@@ -17,6 +17,7 @@ public class TestListRenderer extends AbstractListRenderer<TestinEditor> {
         this.card = new TestCard(p);
     }
 
+    // UC-EDITOR-PANEL-001
     @Override
     protected @NotNull TestCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int row, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover) {
 

@@ -43,6 +43,8 @@ public final class TestinRoot {
     public static final @NotNull Path NONE = Path.of("");
 
     /**
+     * UC-SETTING-002, Rule-SETTING-011.
+     * <p>
      * A stored root as a path, and {@link #NONE} when nothing is stored.
      * <p>
      * Nullable on purpose, and the only place here that is: this reads a value
@@ -54,6 +56,8 @@ public final class TestinRoot {
     }
 
     /**
+     * UC-SETTING-002, Rule-SETTING-011.
+     * <p>
      * Whether a root has been configured at all. Asked by name so no caller has
      * to know that "not configured" is spelled as the empty path.
      */
@@ -62,6 +66,8 @@ public final class TestinRoot {
     }
 
     /**
+     * Rule-SETTING-004.
+     * <p>
      * True when an Apply moved the Testin root. The tree is built from the indexer,
      * so only a different root makes a reload necessary - every other setting is
      * read live where it is used.
@@ -75,6 +81,8 @@ public final class TestinRoot {
     }
 
     /**
+     * UC-SETTING-002, Rule-SETTING-011.
+     * <p>
      * Whether this project has a root configured.
      * <p>
      * Six call sites asked it as {@code getPath().toString().isEmpty()} and one
@@ -88,6 +96,8 @@ public final class TestinRoot {
     }
 
     /**
+     * UC-SETTING-002, Rule-SETTING-013.
+     * <p>
      * The configured root as an absolute path, and {@link #NONE} when none is
      * configured.
      * <p>
@@ -111,6 +121,8 @@ public final class TestinRoot {
     }
 
     /**
+     * UC-SETTING-002, Rule-SETTING-010.
+     * <p>
      * Where a node named by its place in the tree lives on disk.
      * <p>
      * The tree carries a node's path as the segments a tester reads - "test

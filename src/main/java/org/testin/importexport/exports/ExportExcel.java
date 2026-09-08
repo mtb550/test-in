@@ -39,6 +39,8 @@ public class ExportExcel {
     }
 
     /**
+     * UC-SHARE-002, Rule-SHARE-016.
+     * <p>
      * A sheet name Excel will accept and this workbook does not already hold.
      * <p>
      * Two test sets can want the same sheet: their names differ but sanitize
@@ -67,6 +69,7 @@ public class ExportExcel {
         }
     }
 
+    // UC-SHARE-002, Rule-SHARE-012
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try (Workbook workbook = new XSSFWorkbook()) {
             final @NotNull CellStyle headerStyle = workbook.createCellStyle();

@@ -65,6 +65,7 @@ public class RunTestCaseAction extends AbstractProjectAction {
         gesture.execute(p, selected);
     }
 
+    // UC-CODEGEN-009, Rule-CODEGEN-036
     @Override
     public void update(final @NotNull AnActionEvent e) {
         final @NotNull List<TestCaseDto> selected = list.getSelectedValuesList();

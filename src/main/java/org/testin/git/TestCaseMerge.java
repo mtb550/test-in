@@ -105,6 +105,8 @@ public final class TestCaseMerge {
     }
 
     /**
+     * UC-SHARE-018, Rule-SHARE-080.
+     * <p>
      * Merges the three stages Git holds.
      *
      * @param mapper the project's mapper - handed in rather than reached for, so
@@ -161,6 +163,8 @@ public final class TestCaseMerge {
     }
 
     /**
+     * UC-SHARE-018.
+     * <p>
      * Takes the tester's answer for one field.
      */
     public static void answer(final @NotNull Mapper mapper, final @NotNull ObjectNode merged, final @NotNull Question question, final boolean takeTheirs, final @NotNull String theirs) {

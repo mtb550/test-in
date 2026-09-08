@@ -67,6 +67,8 @@ public final class GitRepositoryService {
     }
 
     /**
+     * UC-SHARE-016, Rule-SHARE-068.
+     * <p>
      * The branch this repository syncs: the one that is checked out.
      * <p>
      * The one owner of that question, because it used to have two answers. The
@@ -168,6 +170,8 @@ public final class GitRepositoryService {
     }
 
     /**
+     * UC-SHARE-014, Rule-SHARE-064.
+     * <p>
      * Starts a branch at the current commit and moves onto it, answering whether
      * it worked.
      * <p>
@@ -182,6 +186,8 @@ public final class GitRepositoryService {
     }
 
     /**
+     * UC-SHARE-014, Rule-SHARE-063.
+     * <p>
      * The branches on this machine, current one first. What the review offers to
      * commit onto - remote-only branches are left out, because committing onto
      * one means creating the local branch anyway, and the tester can type the
@@ -192,6 +198,8 @@ public final class GitRepositoryService {
     }
 
     /**
+     * UC-SHARE-010, Rule-SHARE-044.
+     * <p>
      * What Git itself reports as changed, one porcelain line per file.
      * <p>
      * {@code -uall} rather than the default: without it Git collapses an
@@ -254,6 +262,8 @@ public final class GitRepositoryService {
     }
 
     /**
+     * UC-SHARE-015, Rule-SHARE-066.
+     * <p>
      * How many commits are on this branch and not on its remote.
      * <p>
      * The number nobody could see: a commit that succeeded and a push that

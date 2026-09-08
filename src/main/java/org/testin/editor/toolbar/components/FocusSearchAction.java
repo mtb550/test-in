@@ -21,6 +21,7 @@ public class FocusSearchAction extends DumbAwareAction {
         registerCustomShortcutSet(Shortcuts.FocusSearch.getCustomShortcut(), scope);
     }
 
+    // UC-EDITOR-PANEL-019
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         searchTxt.getTextEditor().requestFocusInWindow();

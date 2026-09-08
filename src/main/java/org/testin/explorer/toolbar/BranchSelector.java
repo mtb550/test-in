@@ -81,6 +81,7 @@ public class BranchSelector {
         updateProject(testProjectDirectory);
     }
 
+    // UC-TREE-PANEL-026, Rule-TREE-PANEL-084
     public void updateProject(final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
         final @NotNull Path path = testProjectDirectory.map(TestProjectDirectoryDto::getPath).orElse(Path.of(""));
         this.projectPath = path;
@@ -112,6 +113,8 @@ public class BranchSelector {
     }
 
     /**
+     * UC-TREE-PANEL-026.
+     * <p>
      * Replaces whatever the box holds with an explanation, and marks it as one.
      * <p>
      * The whole job, not half of it: clearing the box, forgetting what was in
@@ -140,6 +143,8 @@ public class BranchSelector {
     }
 
     /**
+     * UC-TREE-PANEL-026.
+     * <p>
      * The event is reported as unused, and the parameter stays: this is an
      * {@code ActionListener} target, so the signature is the contract rather
      * than a choice. The selected branch comes from the box, not the event (#61).
@@ -157,6 +162,8 @@ public class BranchSelector {
     }
 
     /**
+     * UC-TREE-PANEL-026, Rule-TREE-PANEL-085.
+     * <p>
      * Checks the branch out and re-reads everything that came with it.
      * <p>
      * Rebuilding the tree is not enough and never was. The tree is drawn from
@@ -197,6 +204,8 @@ public class BranchSelector {
     }
 
     /**
+     * UC-TREE-PANEL-026, Rule-TREE-PANEL-085.
+     * <p>
      * Asks before a switch takes uncommitted work with it.
      * <p>
      * Git hardly ever refuses. A new test case is an untracked file and comes
@@ -226,6 +235,7 @@ public class BranchSelector {
                 .show();
     }
 
+    // UC-TREE-PANEL-026, Rule-TREE-PANEL-086
     private void checkout(final @NotNull Path repositoryPath, final @NotNull String targetBranch) {
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Checking out branch: " + targetBranch, false) {
             @Override
@@ -254,6 +264,8 @@ public class BranchSelector {
     }
 
     /**
+     * UC-TREE-PANEL-026.
+     * <p>
      * What a refused checkout says. Git refuses when the switch would overwrite
      * uncommitted work, which here means edited test cases - so the message
      * names that as the cause and carries the review that clears it, instead of
@@ -289,6 +301,8 @@ public class BranchSelector {
     }
 
     /**
+     * UC-TREE-PANEL-026.
+     * <p>
      * Fills the box, twice.
      * <p>
      * First from what Git already holds, which needs no network and is on
@@ -322,6 +336,8 @@ public class BranchSelector {
     }
 
     /**
+     * UC-TREE-PANEL-026.
+     * <p>
      * Reads the branches Git holds on disk and hands them to the box. No
      * network, so nothing here can hang on a remote.
      */
@@ -343,6 +359,8 @@ public class BranchSelector {
     }
 
     /**
+     * UC-TREE-PANEL-026.
+     * <p>
      * Brings the remote up to date, and says so rather than failing when it
      * cannot: the box is already showing branches, and a remote that is down is
      * not a reason to take them away.

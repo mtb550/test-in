@@ -28,6 +28,8 @@ import java.util.stream.Stream;
 final class FilesUtil {
 
     /**
+     * UC-INTERNAL-004, Rule-INTERNAL-033.
+     * <p>
      * Whether the file already holds exactly what this content serializes to.
      * <p>
      * The file is the only record of what a test case looked like before an
@@ -64,6 +66,7 @@ final class FilesUtil {
         writeBytes(p, path, jsonBytes);
     }
 
+    // UC-INTERNAL-003, Rule-INTERNAL-019
     private void writeBytes(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
         // The last line of defense for test data: writing nothing over a file
         // empties it, and an empty marker takes its node's audit info with it.
@@ -92,6 +95,8 @@ final class FilesUtil {
     }
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-036.
+     * <p>
      * Removes a file, and the folders it leaves empty behind it, up to but never
      * including the project.
      * <p>

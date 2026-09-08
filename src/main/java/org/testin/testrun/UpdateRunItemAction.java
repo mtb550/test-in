@@ -38,6 +38,7 @@ public class UpdateRunItemAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.UpdateItem.getCustomShortcut(), list);
     }
 
+    // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
@@ -96,6 +97,7 @@ public class UpdateRunItemAction extends AbstractProjectAction {
         }, () -> Logger.warn("Run item edited while the run was reloading; not persisted"))).show();
     }
 
+    // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-168
     @Override
     public void update(final @NotNull AnActionEvent e) {
         // Details belong to failed test cases only - the dialog's title stays

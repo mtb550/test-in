@@ -27,6 +27,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class GitConflictOffer {
 
+    // UC-SHARE-017
     static void show(final @NotNull Project p, final @NotNull List<String> conflicting, final @NotNull Runnable onResolve, final @NotNull Runnable onContinue, final @NotNull Runnable onAbort) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 

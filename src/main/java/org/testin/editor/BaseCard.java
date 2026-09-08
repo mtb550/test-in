@@ -87,6 +87,8 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     }
 
     /**
+     * UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014.
+     * <p>
      * The title line: the Order and Description attributes drawn together, as in
      * "1. Log in with a valid user". Either half can be switched off in the
      * Details popup - an unticked Order drops the number, an unticked Description
@@ -104,6 +106,8 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     }
 
     /**
+     * UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-003.
+     * <p>
      * Lays the card out for the list it is drawn in: the fonts every label takes
      * from the list, and the width the title has before it wraps, which is the
      * list's own less what the card spends on insets and hover icons.

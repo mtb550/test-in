@@ -36,6 +36,7 @@ public class RenameAction extends AbstractProjectTreeAction {
         this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
     }
 
+    // UC-TREE-PANEL-011
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
@@ -44,6 +45,7 @@ public class RenameAction extends AbstractProjectTreeAction {
                 .ifPresent(dir -> new RenameDialog(p, dir.getName(), newName -> renameNode(dir, newName)).show());
     }
 
+    // UC-TREE-PANEL-011, Rule-TREE-PANEL-004
     private void renameNode(final @NotNull DirectoryDto dir, final @NotNull String newName) {
         if (newName.isBlank() || newName.equals(dir.getName())) return;
 
@@ -79,6 +81,8 @@ public class RenameAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-037.
+     * <p>
      * The undo and redo reverses pass no {@code onDone}: they are confirmed as
      * "Undone" and "Redone" by their own actions, and a second balloon saying it
      * was renamed would double-report one keystroke (#62).
@@ -88,6 +92,7 @@ public class RenameAction extends AbstractProjectTreeAction {
         });
     }
 
+    // UC-TREE-PANEL-011, Rule-TREE-PANEL-035
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TreeValueUtil.selectedDirectory(tree)

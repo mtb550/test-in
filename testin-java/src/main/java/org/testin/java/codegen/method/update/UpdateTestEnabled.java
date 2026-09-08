@@ -22,6 +22,7 @@ import org.testin.model.dto.TestCaseDto;
  */
 public class UpdateTestEnabled extends UpdateTestBase implements GenAction {
 
+    // UC-CODEGEN-013, Rule-CODEGEN-047, Rule-CODEGEN-048
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;

@@ -39,6 +39,8 @@ public final class DeletedNodes {
     private final @NotNull AtomicBoolean swept = new AtomicBoolean();
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-044.
+     * <p>
      * Clears whatever the last run left behind, once per IDE run.
      * <p>
      * At startup rather than at shutdown, because the copies that matter are
@@ -60,6 +62,8 @@ public final class DeletedNodes {
     }
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-037, Rule-INTERNAL-039, Rule-INTERNAL-041.
+     * <p>
      * Copies a node aside and answers where it went, or nothing at all when the
      * copy failed - in which case the removal still happens and simply cannot be
      * undone, which is what every removal did before this existed.
@@ -88,6 +92,8 @@ public final class DeletedNodes {
     }
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-042.
+     * <p>
      * Puts a kept node back where it was removed from, and says whether it went.
      * <p>
      * Refuses a path something already occupies. A node created under the same
@@ -116,6 +122,8 @@ public final class DeletedNodes {
     }
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-043.
+     * <p>
      * Nobody can reach the operation holding this any more, so the copy goes for
      * good. Outright rather than to the recycle bin: the bin already took the
      * tester's own copy when the node was removed, and a second one arriving

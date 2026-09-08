@@ -72,17 +72,21 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         return ActionUpdateThread.EDT;
     }
 
+    // UC-SHARE-010
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TreeValueUtil.selected(tree, TestProjectDirectoryDto.class).isPresent());
     }
 
+    // UC-SHARE-010
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         TreeValueUtil.projectPath(tree).ifPresent(this::openFor);
     }
 
     /**
+     * UC-SHARE-009, Rule-SHARE-042.
+     * <p>
      * The review for a repository the caller already knows, rather than for
      * whatever the tree has selected.
      * <p>
@@ -106,6 +110,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         scanForChanges(p, path);
     }
 
+    // UC-SHARE-010, Rule-SHARE-050
     private void scanForChanges(final @NotNull Project p, final @NotNull Path path) {
         GitBackgroundTask.run(p, "Scanning for changes", true,
                 indicator -> {
@@ -139,6 +144,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to calculate diffs: " + ex.getMessage()));
     }
 
+    // UC-SHARE-010
     private void reviewChanges(final @NotNull Project p, final @NotNull Path path, final @NotNull List<PendingChange> changes, final @NotNull List<String> branches, final @NotNull String currentBranch, final int unpushed) {
         if (changes.isEmpty()) {
             offerThePush(p, path, currentBranch, unpushed);
@@ -153,6 +159,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-014, Rule-SHARE-065.
+     * <p>
      * Puts the review's changes on the branch the review named.
      * <p>
      * Three cases and one of them is the ordinary one. The branch that is
@@ -215,6 +223,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-015, Rule-SHARE-067.
+     * <p>
      * What to say when there is nothing to commit.
      * <p>
      * Usually nothing happened and "No changes" is the whole truth. But a commit
@@ -240,6 +250,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 () -> pushToRemote(p, path, commits.headCommitId(path), currentBranch));
     }
 
+    // UC-SHARE-013, Rule-SHARE-059
     private void performCommitWorkflow(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull PendingCommitsDialog.Request request, final @NotNull String branch) {
         final @NotNull String commitMessage = request.message();
         final @NotNull Collection<PendingChange> selectedChanges = request.changes();
@@ -273,6 +284,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 });
     }
 
+    // UC-SHARE-009, Rule-SHARE-043
     private void initializeGitRepository(final @NotNull Project p, final @NotNull Path repoPath) {
         GitBackgroundTask.run(p, "Initializing git repository", false,
                 indicator -> {
@@ -290,6 +302,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-013.
+     *
      * @param committedOn the branch the commit went onto, or null when Git could
      *                    not say which one that was. A push follows the commit
      *                    rather than the remote's default: they are the same
@@ -320,6 +334,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Could not read the Git remote: " + ex.getMessage()));
     }
 
+    // UC-SHARE-013, Rule-SHARE-060
     private void configureRemoteAndPush(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull String remoteName, final @NotNull String branch, final @NotNull String commitId) {
         final @NotNull TestinConfigService config = Services.getInstance(p, TestinConfigService.class);
 
@@ -347,6 +362,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage()));
     }
 
+    // UC-SHARE-013, Rule-SHARE-061
     private void executeGitPush(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final @NotNull String commitId) {
         GitBackgroundTask.run(p, "Pushing to Remote", false,
                 indicator -> {
@@ -392,6 +408,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-017.
+     * <p>
      * Merges the conflicted test cases and continues the rebase when nothing is
      * left conflicting.
      * <p>
@@ -407,6 +425,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-017.
+     * <p>
      * Pushes once the rebase is through.
      * <p>
      * Separate from {@link #finishRebase} because the rebase is already over by
@@ -427,6 +447,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Push Failed", ex.getMessage()));
     }
 
+    // UC-SHARE-017, Rule-SHARE-077
     private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final boolean abort) {
         GitBackgroundTask.run(p, abort ? "Aborting rebase" : "Continuing rebase", false,
                 indicator -> {
@@ -460,6 +481,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 });
     }
 
+    // UC-SHARE-008, Rule-SHARE-040
     private void promptAndSetGitIdentity(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull PendingCommitsDialog.Request request, final @NotNull String branch) {
         // The dialog validates what it collected - a blank name or email never
         // leaves it - so this is the workflow resuming, not a second check.
@@ -482,6 +504,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-008, Rule-SHARE-039.
+     * <p>
      * An exception with no message of its own arrives here as the empty string,
      * converted where it comes out of the JDK rather than checked here (#71).
      */

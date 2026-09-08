@@ -12,6 +12,7 @@ import java.util.List;
 
 public class CreateJavaClass implements GenAction {
 
+    // UC-CODEGEN-001
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestSetDirectoryDto dir)) return;

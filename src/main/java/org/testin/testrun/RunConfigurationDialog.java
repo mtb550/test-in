@@ -52,6 +52,7 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunCon
         selection.onCheckChanged(() -> confirmButton.setEnabled(selection.hasChecked()));
     }
 
+    // UC-TREE-PANEL-009, Rule-TREE-PANEL-029
     @Override
     protected void submit() {
         if (!selection.hasChecked()) return;

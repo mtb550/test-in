@@ -25,6 +25,7 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
     private @NotNull Optional<JTable> editingTable = Optional.empty();
     private int editingRow = -1;
 
+    // UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-048
     public GridCellEditor() {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);

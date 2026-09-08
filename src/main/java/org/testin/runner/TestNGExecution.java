@@ -127,6 +127,8 @@ public final class TestNGExecution implements Disposable {
     }
 
     /**
+     * UC-CODEGEN-008, Rule-CODEGEN-034.
+     * <p>
      * A case is on its way to the runner: remembered, and shown as running.
      * <p>
      * Remembering it and marking it are one fact, so they happen together. The
@@ -153,6 +155,8 @@ public final class TestNGExecution implements Disposable {
     }
 
     /**
+     * UC-CODEGEN-008, Rule-CODEGEN-031.
+     * <p>
      * Starts the configuration, and remembers which cases are running under it.
      */
     public void launch(final @NotNull List<TestCaseDto> cases, final @NotNull RunnerAndConfigurationSettings settings) {
@@ -174,6 +178,8 @@ public final class TestNGExecution implements Disposable {
     }
 
     /**
+     * UC-CODEGEN-008.
+     * <p>
      * A case that was asked for has no generated method to run.
      * <p>
      * The card is already showing Running by the time this is reached - it is
@@ -189,6 +195,8 @@ public final class TestNGExecution implements Disposable {
     }
 
     /**
+     * UC-CODEGEN-009, Rule-CODEGEN-038.
+     * <p>
      * Whether a report arriving for this case belongs to a run the tester
      * stopped.
      */
@@ -197,6 +205,8 @@ public final class TestNGExecution implements Disposable {
     }
 
     /**
+     * UC-CODEGEN-009, Rule-CODEGEN-036.
+     * <p>
      * Whether a stop has something to reach for this case: a launch on its way
      * or a process it is running under.
      * <p>
@@ -220,6 +230,8 @@ public final class TestNGExecution implements Disposable {
     }
 
     /**
+     * UC-CODEGEN-008.
+     * <p>
      * A report landed with this case's result: what every surface paints from
      * now on, and the end of the case counting as running.
      */
@@ -228,6 +240,8 @@ public final class TestNGExecution implements Disposable {
     }
 
     /**
+     * UC-CODEGEN-009, Rule-CODEGEN-037.
+     * <p>
      * Kills the runs these cases belong to and drops their launches that have not
      * started yet.
      * <p>
@@ -242,6 +256,8 @@ public final class TestNGExecution implements Disposable {
     }
 
     /**
+     * UC-CODEGEN-009, Rule-CODEGEN-037.
+     * <p>
      * The same, for a caller that holds ids rather than cases.
      * <p>
      * The run editor is one: it remembers which cases it launched by id,

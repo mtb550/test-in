@@ -24,6 +24,7 @@ public final class CreateProjectDialog extends AbstractFrameworkDialog<TextInput
 
     private final @NotNull Consumer<@NotNull String> onCreate;
 
+    // UC-TREE-PANEL-002, UC-TREE-PANEL-003
     public CreateProjectDialog(final @NotNull Project p, final @NotNull Consumer<@NotNull String> onCreate) {
         super(p);
         this.onCreate = onCreate;
@@ -41,6 +42,7 @@ public final class CreateProjectDialog extends AbstractFrameworkDialog<TextInput
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
+    // UC-TREE-PANEL-002, Rule-TREE-PANEL-005
     @Override
     protected void submit() {
         final @NotNull String name = component().getText().trim();

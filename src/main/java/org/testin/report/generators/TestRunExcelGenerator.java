@@ -35,6 +35,8 @@ public final class TestRunExcelGenerator {
 
 
     /**
+     * UC-REPORT-001, Rule-REPORT-002.
+     * <p>
      * The project is not read here and is part of the signature anyway: all four
      * generators are called through one functional interface in {@code FileTypes},
      * and the three that render a document do need it (#61).

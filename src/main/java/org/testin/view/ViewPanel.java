@@ -72,6 +72,7 @@ public class ViewPanel implements Disposable {
         return sp;
     }
 
+    // UC-VIEW-PANEL-001, Rule-VIEW-PANEL-010, Rule-VIEW-PANEL-012
     public void show(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
         if (testCases.isEmpty()) return;
 
@@ -86,6 +87,8 @@ public class ViewPanel implements Disposable {
     }
 
     /**
+     * UC-VIEW-PANEL-002, Rule-VIEW-PANEL-015, Rule-VIEW-PANEL-016.
+     * <p>
      * Follows what is selected, and stays shut when the tester has shut it.
      * <p>
      * The difference between this and {@link #show} is who asked. Double-clicking
@@ -113,6 +116,7 @@ public class ViewPanel implements Disposable {
         return ViewToolWindowFactory.toolWindow(p).filter(ToolWindow::isVisible).isPresent();
     }
 
+    // UC-VIEW-PANEL-015
     public @NotNull ViewPanel hide() {
         ViewToolWindowFactory.toolWindow(p)
                 .filter(ToolWindow::isVisible)
@@ -120,6 +124,7 @@ public class ViewPanel implements Disposable {
         return this;
     }
 
+    // UC-VIEW-PANEL-002, Rule-VIEW-PANEL-017
     public void reset() {
         this.updateList(List.of(), List.of());
     }
@@ -140,6 +145,8 @@ public class ViewPanel implements Disposable {
     }
 
     /**
+     * UC-VIEW-PANEL-015, Rule-VIEW-PANEL-060.
+     * <p>
      * Closes the panel when what it is showing is the case being closed
      * elsewhere - an editor shutting down takes its own case off the screen.
      */
@@ -159,6 +166,7 @@ public class ViewPanel implements Disposable {
         this.refreshCurrentView();
     }
 
+    // Rule-VIEW-PANEL-008
     public void refreshCurrentView() {
         new DetailsTab().load(p, detailsTab, currentFromIndex(), page.getCurrentPath());
         new HistoryTab().load(historyTab);
@@ -169,6 +177,8 @@ public class ViewPanel implements Disposable {
     }
 
     /**
+     * Rule-VIEW-PANEL-005.
+     * <p>
      * Refreshes the panel when the case on display is one of those updated.
      * The callers used to work this out from outside, asking the panel three
      * questions in a row; whether a refresh is needed is the panel's own business.
@@ -205,6 +215,7 @@ public class ViewPanel implements Disposable {
                 .map(shown -> Services.getInstance(p, ProjectIndexer.class).findTestCase(shown.getId()).orElse(shown));
     }
 
+    // UC-VIEW-PANEL-001, Rule-VIEW-PANEL-011, Rule-VIEW-PANEL-012
     public void focusDetailsTab() {
         selectDetailsTab();
         detailsTab.setFocusable(true);

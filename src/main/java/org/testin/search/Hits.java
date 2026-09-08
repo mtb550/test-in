@@ -45,6 +45,8 @@ public final class Hits {
     private static final int SHOWN = 50;
 
     /**
+     * UC-INTERNAL-001, Rule-INTERNAL-001.
+     * <p>
      * Everything matching, best first - and with nothing typed, everywhere the
      * tester might want to go.
      * <p>
@@ -133,6 +135,8 @@ public final class Hits {
     }
 
     /**
+     * UC-INTERNAL-001, Rule-INTERNAL-001.
+     * <p>
      * Whether a query is worth searching test cases with.
      * <p>
      * One character matches almost every case in the project, which is a screen

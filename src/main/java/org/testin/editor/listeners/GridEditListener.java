@@ -46,6 +46,7 @@ public class GridEditListener extends AbstractGridEditListener {
         return TestEditorAttributes.values().length;
     }
 
+    // UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-050
     @Override
     protected boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto tc, final int row, final int col) {
         final @NotNull TestEditorAttributes attr = TestEditorAttributes.values()[col];
@@ -78,6 +79,8 @@ public class GridEditListener extends AbstractGridEditListener {
     }
 
     /**
+     * UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-053.
+     * <p>
      * Same behavior as the update dialog: write the test case JSON and update the
      * generated automation code for the edited attribute. Runs off the EDT — the
      * code generators schedule their own write command actions.

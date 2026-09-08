@@ -32,6 +32,8 @@ import java.util.Optional;
 final class RepositoryRefresh {
 
     /**
+     * UC-SHARE-016, Rule-SHARE-073.
+     * <p>
      * Refreshes the working tree, re-indexes the project, and redraws the
      * explorer.
      * <p>

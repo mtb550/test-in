@@ -54,6 +54,8 @@ public final class ConflictResolution {
     }
 
     /**
+     * UC-SHARE-017.
+     * <p>
      * Carries a stopped rebase all the way through, resolving each stop as it
      * comes.
      * <p>
@@ -91,6 +93,8 @@ public final class ConflictResolution {
     }
 
     /**
+     * UC-SHARE-017, Rule-SHARE-079.
+     * <p>
      * What to do once a stop is resolved: continue the rebase, and read what
      * that left behind.
      */
@@ -119,6 +123,8 @@ public final class ConflictResolution {
     }
 
     /**
+     * UC-SHARE-017, Rule-SHARE-078.
+     * <p>
      * Resolves what it can and asks about the rest.
      * <p>
      * Called on a background thread - it reads Git and writes files - and hands
@@ -172,6 +178,8 @@ public final class ConflictResolution {
     }
 
     /**
+     * UC-SHARE-018, Rule-SHARE-081.
+     * <p>
      * Asks about one conflicted case, then the next. One dialog at a time: three
      * dialogs at once would be three questions with no order to them, and each
      * answer is written and staged before the following question opens.
@@ -219,7 +227,7 @@ public final class ConflictResolution {
      * is over. Answers whether both halves worked - a file written and not
      * staged would stop the rebase again with no conflict left to see.
      */
-    // UC-SHARE-017, Rule-SHARE-003
+    // UC-SHARE-017, Rule-SHARE-074
     private static boolean keep(final @NotNull Project p, final @NotNull GitRepositoryService git, final @NotNull Path repositoryPath, final @NotNull String relativePath, final @NotNull ObjectNode merged) {
         try {
             Files.writeString(repositoryPath.resolve(relativePath), merged.toPrettyString(), StandardCharsets.UTF_8);

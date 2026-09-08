@@ -46,11 +46,14 @@ public final class ReportFileName {
     private static final @NotNull DateTimeFormatter STAMP =
             DateTimeFormatter.ofPattern("dd-MM-yyyy_hh-mm-ssa", Locale.US);
 
+    // UC-REPORT-001, Rule-REPORT-006
     public static @NotNull String suggestedFor(final @NotNull Project p, final @NotNull TestRunDirectoryDto run, final @NotNull ZonedDateTime at) {
         return of(Services.getInstance(p, BoundTestProject.class).name(), run.getName(), at);
     }
 
     /**
+     * UC-REPORT-001, Rule-REPORT-007, Rule-REPORT-008.
+     * <p>
      * The name from its parts. Separate from the lookup above so the rule can be
      * checked without a project to look anything up in.
      * <p>

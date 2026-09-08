@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ListViewBtn extends AbstractIconButton implements ToolbarItem {
 
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-016
     public ListViewBtn(final @NotNull Runnable onSwitchToList) {
         // https://intellij-icons.jetbrains.design/
         super("List View", AllIcons.General.LayoutEditorOnly);

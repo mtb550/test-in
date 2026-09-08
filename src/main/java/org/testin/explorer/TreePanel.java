@@ -123,6 +123,8 @@ public final class TreePanel implements Disposable {
     }
 
     /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-001.
+     * <p>
      * Redraws the panel around whichever test project this repository is bound
      * to - the tree when there is one, and the way to get one when there is not.
      * <p>
@@ -181,6 +183,8 @@ public final class TreePanel implements Disposable {
     }
 
     /**
+     * UC-TREE-PANEL-004, Rule-TREE-PANEL-020.
+     * <p>
      * Binds to a project the tester clicked in the welcome screen, off the EDT
      * because it writes {@code testin.yml}, and redraws either way - a write
      * that failed has said so, and the screen must not sit there looking as
@@ -207,6 +211,8 @@ public final class TreePanel implements Disposable {
     }
 
     /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-015.
+     * <p>
      * Binds a repository that names no test project to the only one there is,
      * and says whether it did.
      * <p>
@@ -254,6 +260,7 @@ public final class TreePanel implements Disposable {
                 !underRoot.isEmpty());
     }
 
+    // UC-TREE-PANEL-001
     private void showTree(final @NotNull TestProjectDirectoryDto tp) {
         Logger.info("TreePanel.refresh(): showing '" + tp.getName() + "'");
 
@@ -271,6 +278,8 @@ public final class TreePanel implements Disposable {
     }
 
     /**
+     * UC-TREE-PANEL-001.
+     * <p>
      * Records the test project's remote in {@code testin.yml}, once (#94).
      * <p>
      * That line is what lets a colleague who clones this repository be offered
@@ -313,6 +322,8 @@ public final class TreePanel implements Disposable {
     }
 
     /**
+     * UC-TREE-PANEL-001.
+     * <p>
      * The screen for a repository with no project open, and the one step out of
      * it. Which step depends on what is missing: a root to look in, a project to
      * look at, or the line in {@code testin.yml} that says which one (#8).
@@ -348,6 +359,8 @@ public final class TreePanel implements Disposable {
     }
 
     /**
+     * UC-TREE-PANEL-001.
+     * <p>
      * No root is set, so the only step out of here is the settings page.
      */
     private void offerSettings(final @NotNull StatusText emptyText) {
@@ -359,6 +372,8 @@ public final class TreePanel implements Disposable {
     }
 
     /**
+     * UC-TREE-PANEL-001, UC-TREE-PANEL-003.
+     * <p>
      * The repository names a project this machine does not hold yet, so the step
      * out is to clone the one it names rather than to pick a different one.
      */
@@ -376,6 +391,8 @@ public final class TreePanel implements Disposable {
     }
 
     /**
+     * UC-TREE-PANEL-001, UC-TREE-PANEL-002.
+     * <p>
      * The root is set and empty, so there is nothing to choose between yet.
      */
     private void offerFirstProject(final @NotNull StatusText emptyText) {
@@ -387,6 +404,8 @@ public final class TreePanel implements Disposable {
     }
 
     /**
+     * UC-TREE-PANEL-001, UC-TREE-PANEL-004.
+     * <p>
      * The root holds projects and none of them is bound to this repository, so
      * the step out is to say which.
      */

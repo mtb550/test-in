@@ -39,6 +39,7 @@ public class CardMouseListener extends MouseAdapter {
         this.cm = cm;
     }
 
+    // UC-EDITOR-PANEL-024, UC-EDITOR-PANEL-025
     @Override
     public void mouseClicked(final MouseEvent e) {
         final int index = list.locationToIndex(e.getPoint());
@@ -70,6 +71,7 @@ public class CardMouseListener extends MouseAdapter {
         }
     }
 
+    // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-181
     @Override
     public void mousePressed(final MouseEvent e) {
         if (!SwingUtilities.isLeftMouseButton(e)) return;

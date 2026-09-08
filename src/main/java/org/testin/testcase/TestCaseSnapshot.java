@@ -63,6 +63,8 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
     }
 
     /**
+     * UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-067.
+     * <p>
      * How a gesture over these cases is named in the undo menu - "Undo Remove
      * 'Log in with a valid user'", "Undo Update 4 test cases". The case's own
      * words when there is one, because that is what the tester recognizes it
@@ -80,6 +82,8 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
     }
 
     /**
+     * UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-038.
+     * <p>
      * Records a change that has already happened, so CTRL+Z can put it back.
      * <p>
      * One operation for the whole gesture, whatever its size: a bulk edit over
@@ -94,6 +98,8 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
     }
 
     /**
+     * UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-070.
+     * <p>
      * The same, for a gesture that touches more than one test set - a cut in
      * one and a paste into another is a single press of CTRL+Z, so it is a
      * single operation over both sets rather than one operation each. It lands

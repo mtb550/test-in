@@ -50,6 +50,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
                 .toList();
     }
 
+    // UC-TREE-PANEL-012, Rule-TREE-PANEL-038
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
@@ -75,6 +76,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
         new ConfirmDialog(p, "Confirm Removing", msg, from, "", "Remove", () -> removeNodes(nodesToRemove)).show();
     }
 
+    // UC-TREE-PANEL-012, Rule-TREE-PANEL-041
     private void removeNodes(final @NotNull List<DirectoryDto> nodesToRemove) {
         if (nodesToRemove.isEmpty()) return;
 
@@ -122,6 +124,8 @@ public class RemoveAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-TREE-PANEL-012, Rule-TREE-PANEL-042.
+     * <p>
      * Removes every node, and rebuilds the tree once the last of them has
      * actually gone.
      * <p>
@@ -177,6 +181,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
                 () -> kept.forEach(one -> Services.getInstance(p, ProjectIndexer.class).forgetKept(one.copy()))));
     }
 
+    // UC-TREE-PANEL-016, Rule-TREE-PANEL-040
     private void restoreAll(final @NotNull List<Kept> kept) {
         if (kept.isEmpty()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, "Cannot Be Undone",
@@ -200,6 +205,8 @@ public class RemoveAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-TREE-PANEL-017.
+     * <p>
      * Takes them away again, through the same handler and the same waiting the
      * removal used - so the generated code, the caches and the tree see a redo
      * exactly as they saw the removal. The copies stay where they are: a redo is
@@ -209,6 +216,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
         removeEach(kept.stream().map(Kept::dto).toList(), count -> Logger.info("Removed " + count + " node(s) again."));
     }
 
+    // UC-TREE-PANEL-012, Rule-TREE-PANEL-042
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(!getRemovableNodes(tree.getSelectionPaths()).isEmpty());

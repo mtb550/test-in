@@ -20,6 +20,7 @@ public final class GridListSelectionSynchronizer implements ListSelectionListene
     private final @NotNull Supplier<Optional<JBTable>> tableSupplier;
     private final @NotNull BooleanSupplier gridActiveSupplier;
 
+    // UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-111
     @Override
     public void valueChanged(final ListSelectionEvent event) {
         if (event.getValueIsAdjusting() || !gridActiveSupplier.getAsBoolean()) return;

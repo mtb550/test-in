@@ -34,6 +34,7 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
         this.tp = tp;
     }
 
+    // UC-TREE-PANEL-004
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         // The listing walks the Testin root and reads a marker per project, so it
@@ -58,6 +59,7 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
         });
     }
 
+    // UC-TREE-PANEL-028, Rule-TREE-PANEL-089
     @Override
     public void update(final @NotNull AnActionEvent e) {
         // There is nothing to choose from without a root. Both branches, so the

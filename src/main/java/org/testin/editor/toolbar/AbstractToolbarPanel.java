@@ -105,6 +105,8 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     }
 
     /**
+     * UC-EDITOR-PANEL-019.
+     * <p>
      * Registers the search-focus shortcut on the given scope (the editor's
      * main panel), so the toolbar owns the whole search story: the field, its
      * callbacks and its shortcut (#18).
@@ -177,6 +179,7 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         updateViewButtons();
     }
 
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-016
     private void updateViewButtons() {
         final @NotNull GridViewBtn gridBtn = getToolbarItem(GridViewBtn.class);
         final @NotNull ListViewBtn listBtn = getToolbarItem(ListViewBtn.class);

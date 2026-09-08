@@ -75,6 +75,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
         addActionListener(e -> showDetailsPopup(onToolBarDetailsSelectedChanged));
     }
 
+    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-022
     private void saveProps() {
         final @NotNull String joinedNames = selectedDetails.stream()
                 .map(Enum::name)
@@ -83,9 +84,12 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
         PropertiesComponent.getInstance().setValue(propertyKey, joinedNames);
     }
 
+    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-024
     private void showDetailsPopup(final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         final @NotNull CheckBoxList<E> detailsList = new CheckBoxList<>() {
             /**
+             * UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-023.
+             * <p>
              * Grays the locked attributes out, and stops the click and the space
              * key from toggling them - the platform asks this before both.
              */

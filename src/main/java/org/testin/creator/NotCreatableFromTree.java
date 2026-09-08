@@ -22,6 +22,7 @@ public final class NotCreatableFromTree implements NodeCreator {
 
     private final @NotNull String nodeType;
 
+    // Rule-TREE-PANEL-002
     @Override
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         Logger.info(nodeType + " is not created from the tree");

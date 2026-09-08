@@ -11,6 +11,8 @@ import java.awt.*;
 
 public class HistoryTab {
 
+    /// UC-VIEW-PANEL-007, Rule-VIEW-PANEL-037.
+    ///
     /// TODO: real change history is not implemented yet; show an honest empty state
     /// instead of demo data until it is.
     public void load(final @NotNull JBPanel<?> historyTab) {

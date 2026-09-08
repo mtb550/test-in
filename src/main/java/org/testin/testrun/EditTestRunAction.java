@@ -77,6 +77,7 @@ public class EditTestRunAction extends AbstractProjectTreeAction {
         this.tp = tp;
     }
 
+    // UC-TREE-PANEL-022
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         Optional.ofNullable(tree.getSelectionPath()).ifPresent(this::editAt);
@@ -107,7 +108,7 @@ public class EditTestRunAction extends AbstractProjectTreeAction {
     }
 
     /**
-     * UC-TREE-PANEL-022, Rule-TREE-PANEL-074 and Rule-TREE-PANEL-076.
+     * UC-TREE-PANEL-022, Rule-TREE-PANEL-074, Rule-TREE-PANEL-076.
      * <p>
      * Writes the change, or refuses and says why - and answers which, because the
      * dialog stays open on a refusal with everything the tester typed still in it.
@@ -237,6 +238,7 @@ public class EditTestRunAction extends AbstractProjectTreeAction {
                 .filter(TestRunDirectoryDto::isStillOpen);
     }
 
+    // UC-TREE-PANEL-022, Rule-TREE-PANEL-073
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(selectedRun(TreeValueUtil.singleSelectedDirectory(tree)).isPresent());

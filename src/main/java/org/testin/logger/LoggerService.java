@@ -43,6 +43,7 @@ public final class LoggerService implements Disposable {
         startWriterThread();
     }
 
+    // UC-SETTING-007, Rule-SETTING-024
     public void setLogLevel(final @NotNull Level level) {
         this.currentLogLevel = level;
     }

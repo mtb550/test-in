@@ -30,6 +30,7 @@ final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
 
     private final @NotNull IntConsumer onSubmit;
 
+    // UC-TREE-PANEL-015, Rule-TREE-PANEL-055
     OrderDialog(final @NotNull Project p, final int current, final @NotNull IntConsumer onSubmit) {
         super(p);
         this.onSubmit = onSubmit;

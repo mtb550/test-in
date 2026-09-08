@@ -60,6 +60,7 @@ final class GitIdentityDialog extends AbstractFrameworkDialog<TextInput> {
         scope = where.getComponent();
     }
 
+    // UC-SHARE-008
     @Override
     protected void submit() {
         final @NotNull String name = nameField.getText().trim();

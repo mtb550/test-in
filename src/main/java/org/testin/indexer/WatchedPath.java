@@ -24,6 +24,8 @@ import java.util.Optional;
 public final class WatchedPath {
 
     /**
+     * UC-INTERNAL-003, Rule-INTERNAL-016, Rule-INTERNAL-017, Rule-INTERNAL-018.
+     * <p>
      * The test project this changed file sits in, and empty when it sits
      * somewhere Testin does not read.
      * <p>
@@ -51,6 +53,8 @@ public final class WatchedPath {
     }
 
     /**
+     * UC-INTERNAL-003, Rule-INTERNAL-017.
+     * <p>
      * Whether any segment of this path belongs to Git.
      * <p>
      * Any segment rather than the first, because a test project is itself a

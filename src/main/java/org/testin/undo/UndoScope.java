@@ -25,6 +25,8 @@ public record UndoScope(@NotNull String key) {
     public static final @NotNull UndoScope TREE = new UndoScope("tree");
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-045.
+     * <p>
      * The editor showing this test set.
      */
     public static @NotNull UndoScope of(final @NotNull Path testSetPath) {

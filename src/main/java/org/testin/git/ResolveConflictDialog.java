@@ -102,6 +102,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
         return jsonField;
     }
 
+    // UC-SHARE-018, Rule-SHARE-083
     private static @NotNull String shortened(final @NotNull String value) {
         final @NotNull String oneLine = value.replace('\n', ' ').trim();
         if (oneLine.isEmpty()) return "(empty)";
@@ -110,7 +111,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
     }
 
     /**
-     * UC-SHARE-018, Rule-SHARE-002.
+     * UC-SHARE-018, Rule-SHARE-084.
      * <p>
      * This test case is left as Git has it, and the sync goes on to the next
      * one. What the tester already answered is written and staged before each
@@ -122,6 +123,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
         onSkipped.run();
     }
 
+    // UC-SHARE-018
     @Override
     protected void submit() {
         final @NotNull Set<String> takeTheirs = new LinkedHashSet<>();

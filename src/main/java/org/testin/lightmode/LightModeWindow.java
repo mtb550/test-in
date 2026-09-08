@@ -454,6 +454,8 @@ final class LightModeWindow {
     }
 
     /**
+     * UC-EDITOR-PANEL-046.
+     * <p>
      * Redraws the case at a new size, and refits the window around it - a
      * paragraph set larger wraps to more lines, and the height is the content's.
      * <p>
@@ -510,6 +512,8 @@ final class LightModeWindow {
     }
 
     /**
+     * UC-EDITOR-PANEL-046.
+     * <p>
      * Opens or closes the case's other fields, and resizes the window to what is
      * left.
      * <p>
@@ -530,6 +534,8 @@ final class LightModeWindow {
     }
 
     /**
+     * UC-EDITOR-PANEL-046.
+     * <p>
      * Takes a verdict on the case being executed - the one on screen.
      * <p>
      * A verdict that collects failure details opens the form instead of
@@ -610,6 +616,8 @@ final class LightModeWindow {
     }
 
     /**
+     * UC-EDITOR-PANEL-046.
+     * <p>
      * Escape means "leave what I am in": the form while one is open, and the
      * window otherwise.
      */
@@ -809,6 +817,8 @@ final class LightModeWindow {
     }
 
     /**
+     * UC-EDITOR-PANEL-046.
+     * <p>
      * The tester may make the window wider or narrower, and may never make it
      * taller.
      * <p>

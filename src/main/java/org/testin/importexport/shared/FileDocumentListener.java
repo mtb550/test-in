@@ -59,6 +59,7 @@ public class FileDocumentListener implements DocumentListener {
         triggerLoadIfValid();
     }
 
+    // UC-SHARE-005, Rule-SHARE-028
     private void triggerLoadIfValid() {
         final @NotNull String filePath = fileField.getText().trim();
         if (filePath.isEmpty()) return;

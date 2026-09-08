@@ -35,6 +35,7 @@ public final class DirectoryMapper {
         return tp;
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-014
     public @NotNull TestProjectDirectoryDto getTestProjectNode(final @NotNull Project p, final @NotNull Path path) {
         final @NotNull String fileName = path.getFileName().toString();
         try {
@@ -86,6 +87,7 @@ public final class DirectoryMapper {
                 .build();
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-014
     public @NotNull TestSetPackageDirectoryDto getTestSetPackageNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final @NotNull String fileName = path.getFileName().toString();
         try {
@@ -108,6 +110,7 @@ public final class DirectoryMapper {
         }
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-014
     public @NotNull TestRunPackageDirectoryDto getTestRunPackageNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final @NotNull String fileName = path.getFileName().toString();
         try {
@@ -130,6 +133,7 @@ public final class DirectoryMapper {
         }
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-014
     public @NotNull TestSetDirectoryDto getTestSetNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final @NotNull String fileName = path.getFileName().toString();
         try {
@@ -170,6 +174,7 @@ public final class DirectoryMapper {
         return buildTestRunNode(p, path, parent, marker);
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-014
     private @NotNull TestRunDirectoryDto buildTestRunNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull TestRunMarker marker) {
         final @NotNull String fileName = path.getFileName().toString();
         try {

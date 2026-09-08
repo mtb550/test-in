@@ -61,6 +61,7 @@ public final class GridEnterAction extends AbstractProjectAction {
         installDoubleClick();
     }
 
+    // UC-EDITOR-PANEL-008, UC-EDITOR-PANEL-025
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final int row = table.getSelectedRow();
@@ -120,6 +121,8 @@ public final class GridEnterAction extends AbstractProjectAction {
     }
 
     /**
+     * UC-EDITOR-PANEL-025.
+     * <p>
      * Double-click on the sequence column opens the details too, so the grid
      * offers the same two gestures as the list. Every other column is left to the
      * table, where a double click starts an edit if the cell allows one.
@@ -138,6 +141,7 @@ public final class GridEnterAction extends AbstractProjectAction {
         });
     }
 
+    // UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-048
     @Override
     public void update(final @NotNull AnActionEvent e) {
         // Enabled for all three outcomes, so no second handler ever sees ENTER.

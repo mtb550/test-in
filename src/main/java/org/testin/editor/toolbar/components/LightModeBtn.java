@@ -29,6 +29,7 @@ public class LightModeBtn extends AbstractIconButton implements ToolbarItem {
     private final @NotNull Project p;
     private final @NotNull RunEditor editor;
 
+    // UC-EDITOR-PANEL-046
     public LightModeBtn(final @NotNull RunEditor editor) {
         // https://intellij-icons.jetbrains.design/
         super("Light Mode - one test case, above other windows", AllIcons.MeetNewUi.LightTheme);

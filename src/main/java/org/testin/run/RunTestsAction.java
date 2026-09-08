@@ -103,6 +103,8 @@ public class RunTestsAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-CODEGEN-008, Rule-CODEGEN-031.
+     * <p>
      * Runs what is under the node, as one run.
      * <p>
      * The cases are asked for by name rather than the class they generate into.

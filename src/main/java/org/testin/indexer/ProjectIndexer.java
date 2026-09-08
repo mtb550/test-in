@@ -74,6 +74,7 @@ public final class ProjectIndexer {
         this.scanCoordinator = new ProjectScanCoordinator(new IndexingScanner(p, store));
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-013
     public void indexWithProgress() {
         try {
             if (indexed.get() || indexing.getAndSet(true)) {
@@ -150,6 +151,7 @@ public final class ProjectIndexer {
         }
     }
 
+    // UC-INTERNAL-002
     private void finishWithFailure() {
         if (indexingLatch.getCount() == 0) {
             indexing.set(false);
@@ -217,6 +219,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-INTERNAL-002, Rule-INTERNAL-006.
+     * <p>
      * Just the project this repository is bound to, when it is bound to one.
      * <p>
      * The reason the change is worth making: a tester with eleven test projects
@@ -271,6 +275,7 @@ public final class ProjectIndexer {
         return byName;
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-003, Rule-INTERNAL-004
     private @NotNull List<Path> collectValidProjects(final @NotNull Path rootPath) {
         if (!Files.exists(rootPath) || !Files.isDirectory(rootPath)) return Collections.emptyList();
 
@@ -312,6 +317,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-INTERNAL-006, Rule-INTERNAL-046.
+     * <p>
      * How many test cases a test set holds.
      * <p>
      * Counted from the ids the store already keeps rather than from the cases:
@@ -327,6 +334,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * Rule-TREE-PANEL-008.
+     * <p>
      * Every test case under this node, in tree order: a test set's own cases, and
      * those of every test set beneath a package.
      * <p>
@@ -356,6 +365,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-INTERNAL-006, Rule-INTERNAL-051.
+     * <p>
      * The run recorded at this path, and empty when the tree has the directory
      * but nothing could be read out of it - a run whose JSON is missing, or one
      * that would not parse, both of which the scan logs and carries on past.
@@ -398,6 +409,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-INTERNAL-004, Rule-INTERNAL-033.
+     * <p>
      * Saves a test case, and says whether it had anything to save - false when
      * the file already holds it exactly, which is a tester who opened a field,
      * changed nothing and pressed Enter (#164).
@@ -407,6 +420,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-INTERNAL-004, Rule-INTERNAL-035.
+     * <p>
      * Saves a case exactly as it was given, audit included. Every ordinary save
      * stamps who did it and when; these two are the saves where that would be a
      * lie.
@@ -448,6 +463,7 @@ public final class ProjectIndexer {
         return List.copyOf(store.allDirectories());
     }
 
+    // UC-INTERNAL-004, Rule-INTERNAL-031
     public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
         store.updateSequence(testSetPath, orderedList, moved);
     }
@@ -557,6 +573,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-TREE-PANEL-012, Rule-TREE-PANEL-042.
+     * <p>
      * Removes nothing, for the two containers the tree never deletes: Test Cases
      * and Test Runs go with their test project and never on their own.
      * <p>
@@ -719,6 +737,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-INTERNAL-002, Rule-INTERNAL-012.
+     * <p>
      * A test case is the file whose name is an id. A marker is named for its
      * kind and a run for its folder, so neither answers true.
      */
@@ -749,6 +769,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-037, Rule-INTERNAL-041.
+     * <p>
      * Keeps a copy of a node aside before it is removed, so the removal can be
      * taken back, and answers where it was kept. Nothing when the copy could not
      * be made, in which case the removal still happens and simply cannot be
@@ -759,6 +781,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-042.
+     * <p>
      * Puts a removed node back from the copy kept aside for it, and re-reads the
      * test project it landed in so the tree, the open editors and the caches all
      * agree with the disk again.
@@ -772,6 +796,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-043.
+     * <p>
      * Nobody can reach the operation that was holding this any more.
      */
     public void forgetKept(final @NotNull Path kept) {
@@ -840,6 +866,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-INTERNAL-003, Rule-INTERNAL-017.
+     * <p>
      * Whether the file belongs to Git rather than to the test project.
      * <p>
      * A repository's own directory is not test data. Its files change on every
@@ -899,6 +927,8 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-INTERNAL-003, Rule-INTERNAL-021.
+     * <p>
      * The same pass, reporting into a bar the tester can watch and stop.
      * <p>
      * The indicator is carried rather than made here because the scan is what

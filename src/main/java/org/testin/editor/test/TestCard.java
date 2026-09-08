@@ -27,6 +27,7 @@ public class TestCard extends BaseCard {
         this.p = p;
     }
 
+    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-021
     public void updateData(final int index, final @NotNull TestCaseDto tc, final @NotNull Set<?> activeDetails, final @NotNull String title) {
         badges.clear();
         details.clear();
@@ -45,6 +46,7 @@ public class TestCard extends BaseCard {
         updateUI(index, title, badges, details);
     }
 
+    // UC-EDITOR-PANEL-016, Rule-EDITOR-PANEL-078
     @Override
     public void paint(final Graphics g) {
         if (isPendingCut) {

@@ -26,6 +26,8 @@ import java.util.List;
 final class BulkJsonEditor {
 
     /**
+     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-044.
+     * <p>
      * A value as it is written inside the JSON these dialogs show.
      * <p>
      * A line break becomes the two characters {@code \n}. It used to become a
@@ -45,6 +47,8 @@ final class BulkJsonEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-044.
+     * <p>
      * The inverse, read left to right in one pass.
      * <p>
      * Not a sequence of replaces, which is what it was and what a third escape
@@ -130,6 +134,8 @@ final class BulkJsonEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-007.
+     * <p>
      * Ctrl+Shift+A: one caret at the end of every editable value.
      */
     static void placeCaretOnAll(final @NotNull Editor editor, final @NotNull List<RangeMarker> markers) {

@@ -29,6 +29,8 @@ import java.nio.file.Path;
 final class Trash {
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-036.
+     * <p>
      * Moves a file, or a whole folder and everything under it, to the recycle
      * bin - and reports whether it went there.
      * <p>

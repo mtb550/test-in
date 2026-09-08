@@ -17,6 +17,7 @@ public class RunListRenderer extends AbstractListRenderer<RunEditor> {
         this.card = new RunCard(p);
     }
 
+    // UC-EDITOR-PANEL-030
     @Override
     protected @NotNull RunCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int row, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover) {
         // The results map can be transiently empty during a refresh while the list

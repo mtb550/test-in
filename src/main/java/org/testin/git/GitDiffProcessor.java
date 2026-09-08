@@ -40,6 +40,7 @@ import java.util.function.Function;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GitDiffProcessor {
 
+    // UC-SHARE-010
     public static @NotNull List<PendingChange> getPendingChanges(final @NotNull Project p, final @NotNull Path repositoryRoot) {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
         final @NotNull GitRepositoryService repositories = new GitRepositoryService(p);
@@ -50,6 +51,8 @@ public final class GitDiffProcessor {
     }
 
     /**
+     * UC-SHARE-010.
+     * <p>
      * The review, built from what Git said and what is on disk.
      * <p>
      * Separated from {@link #getPendingChanges} so the whole mapping can be

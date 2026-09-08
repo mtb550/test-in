@@ -30,6 +30,7 @@ public class ViewPagination {
         this.viewPanel = viewPanel;
     }
 
+    // UC-VIEW-PANEL-002, Rule-VIEW-PANEL-018
     public void updateList(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
         this.items = testCases;
         this.currentIndex = 0;
@@ -45,6 +46,7 @@ public class ViewPagination {
                 : Optional.empty();
     }
 
+    // UC-VIEW-PANEL-003
     public void goNext() {
         if (hasNext()) {
             currentIndex++;
@@ -52,6 +54,7 @@ public class ViewPagination {
         }
     }
 
+    // UC-VIEW-PANEL-003
     public void goPrevious() {
         if (hasPrevious()) {
             currentIndex--;

@@ -10,6 +10,7 @@ import org.testin.util.NameSanitizer;
 
 public class UpdateTestDescription extends UpdateTestBase implements GenAction {
 
+    // UC-CODEGEN-010, Rule-CODEGEN-039, Rule-CODEGEN-040
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;

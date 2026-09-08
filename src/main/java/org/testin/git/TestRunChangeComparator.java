@@ -26,6 +26,7 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class TestRunChangeComparator {
 
+    // UC-SHARE-010, Rule-SHARE-046
     static @NotNull List<FieldChange> compare(final @NotNull TestRunDto oldRun, final @NotNull TestRunDto newRun) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
 

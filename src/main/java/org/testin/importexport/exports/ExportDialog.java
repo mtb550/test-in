@@ -63,6 +63,7 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
         preferredSize = new Dimension(JBUI.scale(900), JBUI.scale(600));
     }
 
+    // UC-SHARE-001
     @Override
     protected void submit() {
         component().resolve().ifPresent(destination -> {

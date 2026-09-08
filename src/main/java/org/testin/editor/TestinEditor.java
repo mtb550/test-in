@@ -43,6 +43,8 @@ public interface TestinEditor extends Disposable {
     int MAX_PAGE_SIZE = 1000;
 
     /**
+     * UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-106.
+     * <p>
      * What a typed page size actually comes to.
      * <p>
      * Silent and total: whatever is in the field, this answers with a page size,
@@ -71,6 +73,8 @@ public interface TestinEditor extends Disposable {
     }
 
     /**
+     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-180.
+     * <p>
      * A test case is being launched from this editor.
      * <p>
      * The execution reports that follow are broadcast to every listener, and a
@@ -99,6 +103,8 @@ public interface TestinEditor extends Disposable {
     void setPageSize(final int size);
 
     /**
+     * UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-102.
+     * <p>
      * Whether turning this many pages would land on one that exists.
      */
     default boolean canStepPage(final int delta) {
@@ -108,6 +114,8 @@ public interface TestinEditor extends Disposable {
     }
 
     /**
+     * UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-103.
+     * <p>
      * Turns the page by this many, and does nothing when that would leave the
      * range.
      * <p>
@@ -130,6 +138,8 @@ public interface TestinEditor extends Disposable {
     }
 
     /**
+     * UC-EDITOR-PANEL-024.
+     * <p>
      * Tells the status bar what is selected, converting the page row to its
      * place in the list being paged through on the way.
      * <p>
@@ -153,6 +163,8 @@ public interface TestinEditor extends Disposable {
     }
 
     /**
+     * UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014.
+     * <p>
      * The case's place in the whole test set, counting from one - the number a
      * card and a grid row show.
      * <p>
@@ -193,6 +205,8 @@ public interface TestinEditor extends Disposable {
     void refreshView();
 
     /**
+     * UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-117.
+     * <p>
      * Throws away what this editor holds and reads the index again.
      * <p>
      * {@link #refreshView()} redraws from the lists the editor is holding, which
@@ -215,6 +229,8 @@ public interface TestinEditor extends Disposable {
     void reloadData();
 
     /**
+     * UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-119.
+     * <p>
      * Whether this editor is in the middle of something a reload would ruin - a
      * run being executed, a grid cell open under the tester's cursor.
      * <p>
@@ -232,6 +248,8 @@ public interface TestinEditor extends Disposable {
     @NotNull List<TestCaseDto> getSelectedTestCases();
 
     /**
+     * UC-EDITOR-PANEL-005.
+     * <p>
      * Adds a test case the tester has just created to this editor.
      * <p>
      * Nothing by default, the same shape {@code launching} has: only the test
@@ -273,6 +291,8 @@ public interface TestinEditor extends Disposable {
     @NotNull String cardTitle(final @NotNull TestCaseDto tc);
 
     /**
+     * UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-013.
+     * <p>
      * Redraws what is on screen with the set's own order re-applied.
      * <p>
      * What follows an update that may have moved a case - the Order field, which

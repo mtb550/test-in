@@ -53,6 +53,8 @@ public final class JavaSourceRoot {
     }
 
     /**
+     * UC-CODEGEN-020, Rule-CODEGEN-064, Rule-CODEGEN-066.
+     * <p>
      * Detected once and cached; the modules are scanned again only if the cached
      * root stopped being valid, which is what happens when the folder is deleted.
      */
@@ -78,6 +80,8 @@ public final class JavaSourceRoot {
     }
 
     /**
+     * UC-CODEGEN-020, Rule-CODEGEN-065.
+     * <p>
      * Like {@link #find} and also says so, for the generators that create
      * something - the tester is left wondering why no code appeared otherwise.
      */
@@ -102,6 +106,8 @@ public final class JavaSourceRoot {
     }
 
     /**
+     * UC-CODEGEN-018, Rule-CODEGEN-060.
+     * <p>
      * Deletes what sits at a path under the source root, when anything does.
      * Removing a class and removing a package were the same five lines, and
      * neither of them was ever a failure when there was nothing to remove.
@@ -121,6 +127,8 @@ public final class JavaSourceRoot {
     }
 
     /**
+     * UC-CODEGEN-001, Rule-CODEGEN-008.
+     * <p>
      * The folder this package stands for under the root, made if it is not there
      * yet, and empty when the platform could not make it - which it says by
      * answering null.
@@ -146,6 +154,8 @@ public final class JavaSourceRoot {
     }
 
     /**
+     * UC-CODEGEN-001, Rule-CODEGEN-009, Rule-CODEGEN-010.
+     * <p>
      * The class file for this name, written as an empty class if it is not there
      * yet, and empty when the package folder could not be made.
      * <p>
@@ -223,6 +233,8 @@ public final class JavaSourceRoot {
     }
 
     /**
+     * UC-CODEGEN-020, Rule-CODEGEN-065.
+     * <p>
      * Runs the work against the root inside a write action, silently skipping a
      * project that has no root, and logging an IO failure as "Error " plus what
      * was being done. For tidying up after something the tester removed: there
@@ -248,6 +260,8 @@ public final class JavaSourceRoot {
     }
 
     /**
+     * UC-CODEGEN-020, Rule-CODEGEN-065.
+     * <p>
      * The same for work that creates something, so a missing root is said out
      * loud: the tester made a node and is expecting a file to appear.
      *

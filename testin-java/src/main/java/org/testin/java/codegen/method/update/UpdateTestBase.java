@@ -71,7 +71,7 @@ public class UpdateTestBase {
     }
 
     /**
-     * UC-CODEGEN-002, Rule-CODEGEN-013.
+     * UC-CODEGEN-002, Rule-CODEGEN-012, Rule-CODEGEN-040.
      * <p>
      * The description onto the method: into the annotation, and into the
      * method's name.
@@ -109,7 +109,7 @@ public class UpdateTestBase {
     }
 
     /**
-     * UC-CODEGEN-002, Rule-CODEGEN-012.
+     * UC-CODEGEN-002, Rule-CODEGEN-047, Rule-CODEGEN-048.
      * <p>
      * Disabled writes the attribute; anything else takes it off rather than
      * writing true, so a case that was once disabled does not carry a word that
@@ -183,6 +183,8 @@ public class UpdateTestBase {
     }
 
     /**
+     * UC-CODEGEN-003, Rule-CODEGEN-019.
+     * <p>
      * The same, where a case with no generated method should be given one.
      * <p>
      * A description is what names a method, so a case saved without one has no
@@ -202,6 +204,8 @@ public class UpdateTestBase {
     }
 
     /**
+     * UC-CODEGEN-011, Rule-CODEGEN-044.
+     * <p>
      * The same, where a case with no generated method is the normal state
      * rather than news.
      * <p>

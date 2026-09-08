@@ -38,6 +38,7 @@ public class ExportAction extends AbstractProjectTreeAction {
         super(p, tree, "Export", "Export test cases to a file", AllIcons.ToolbarDecorator.Export);
     }
 
+    // UC-SHARE-001, UC-SHARE-002
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
@@ -45,6 +46,8 @@ public class ExportAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-001, Rule-SHARE-015.
+     * <p>
      * Everything the action does once it knows which node it is exporting from.
      */
     private void exportFrom(final @NotNull DirectoryDto dirDto) {
@@ -102,6 +105,8 @@ public class ExportAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-001, Rule-SHARE-005.
+     * <p>
      * The write, once the tester has chosen a file. Under its own bar and after
      * the dialog has closed: a workbook of several hundred cases took the EDT
      * with it, and the dialog sat there for all of it (#87).
@@ -233,6 +238,7 @@ public class ExportAction extends AbstractProjectTreeAction {
         return new ArrayList<>(TestCaseOrder.ordered(loaded));
     }
 
+    // UC-SHARE-001
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TreeValueUtil.singleSelectedDirectory(tree)

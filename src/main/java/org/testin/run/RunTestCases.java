@@ -26,6 +26,8 @@ import java.util.List;
 public final class RunTestCases {
 
     /**
+     * UC-CODEGEN-008, Rule-CODEGEN-031, Rule-CODEGEN-033.
+     * <p>
      * Runs a selection as one run.
      * <p>
      * <b>One run for the selection, not one per case.</b> A run is a compile and

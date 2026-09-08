@@ -121,6 +121,8 @@ final class BulkJsonEditors implements DialogComponent {
     }
 
     /**
+     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-040.
+     * <p>
      * Replaces both sides. The editable ranges are offsets into the right text;
      * everything between and around them becomes a guarded block, so the JSON
      * shape cannot be typed over.
@@ -208,6 +210,8 @@ final class BulkJsonEditors implements DialogComponent {
     }
 
     /**
+     * UC-EDITOR-PANEL-007.
+     * <p>
      * Moves to the neighboring value. Reads the marker offsets live, because a
      * position captured when the text was built goes stale as soon as anyone types.
      */
@@ -226,6 +230,8 @@ final class BulkJsonEditors implements DialogComponent {
     }
 
     /**
+     * UC-EDITOR-PANEL-007.
+     * <p>
      * Ctrl+Shift+A: one caret at the end of every value.
      */
     void caretOnEveryValue() {
@@ -275,6 +281,8 @@ final class BulkJsonEditors implements DialogComponent {
     }
 
     /**
+     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-043.
+     * <p>
      * Values that differ from what they started as get a green background, so an
      * edit is visible without comparing the two sides by eye.
      */

@@ -26,6 +26,7 @@ public final class TestCaseFilter {
                 id -> Optional.empty());
     }
 
+    // UC-EDITOR-PANEL-019, UC-EDITOR-PANEL-020
     public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull String query, final @NotNull Set<Group> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules, final @NotNull Set<TestStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
         if (source.isEmpty()) {
             return Collections.emptyList();
@@ -37,6 +38,7 @@ public final class TestCaseFilter {
                 .collect(Collectors.toList());
     }
 
+    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-091
     private static boolean matches(final @NotNull TestCaseDto testCase, final @NotNull String query, final @NotNull Set<Group> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules, final @NotNull Set<TestStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
         final boolean matchesSearch = query.isEmpty()
                 || containsIgnoreCase(testCase.getDescription(), query)

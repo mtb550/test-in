@@ -35,6 +35,8 @@ public final class LabelValueRow {
     private static final int VALUE_INSETS_RIGHT = 16;
 
     /**
+     * Rule-VIEW-PANEL-006.
+     * <p>
      * Adds the value in the read-only wrapping area both callers use. A blank
      * value adds nothing and leaves the row number where it was.
      */

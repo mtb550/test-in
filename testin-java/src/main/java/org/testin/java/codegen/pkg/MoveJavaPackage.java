@@ -24,6 +24,7 @@ import java.util.List;
  */
 public class MoveJavaPackage implements GenAction {
 
+    // UC-CODEGEN-017, Rule-CODEGEN-057, Rule-CODEGEN-058
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof Moved moved)) return;

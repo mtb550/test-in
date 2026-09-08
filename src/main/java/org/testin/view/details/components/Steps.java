@@ -17,6 +17,7 @@ import java.util.List;
 public class Steps extends BaseDetails {
     private static final int MARGIN_BOTTOM_PER_STEP = 8;
 
+    // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-027
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int row) {
 

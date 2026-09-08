@@ -7,6 +7,7 @@ import org.testin.editor.statusbar.PageStep;
 
 public class StatusBarListener {
 
+    // UC-EDITOR-PANEL-022, UC-EDITOR-PANEL-023
     public static void attach(final @NotNull TestinEditor editor) {
         // What the editor is actually paging by. The field used to be built with
         // "50" written into it and was only ever corrected after a tester typed

@@ -32,6 +32,7 @@ public final class ResultAnalysisDialog extends AbstractFrameworkDialog<TextArea
     private final @NotNull Map<ResultAnalysis, TextArea> written = new EnumMap<>(ResultAnalysis.class);
     private final @NotNull Consumer<@NotNull Map<ResultAnalysis, String>> onSave;
 
+    // UC-EDITOR-PANEL-045, Rule-EDITOR-PANEL-190
     public ResultAnalysisDialog(final @NotNull Project p, final @NotNull TestRunSummary summary, final @NotNull Map<ResultAnalysis, String> current, final @NotNull Consumer<@NotNull Map<ResultAnalysis, String>> onSave) {
         super(p);
         this.onSave = onSave;
@@ -71,6 +72,7 @@ public final class ResultAnalysisDialog extends AbstractFrameworkDialog<TextArea
         preferredSize = JBUI.size(760, 640);
     }
 
+    // UC-EDITOR-PANEL-045
     @Override
     protected void submit() {
         final @NotNull Map<ResultAnalysis, String> analysis = new EnumMap<>(ResultAnalysis.class);

@@ -101,6 +101,8 @@ public enum CardHoverAction {
     }
 
     /**
+     * UC-EDITOR-PANEL-043.
+     * <p>
      * Stops these cases and no others: a card stops the one it sits on, and the
      * key stops what is selected. Said once with a count, the way starting them
      * is - a page of twelve raises one notification, not twelve.
@@ -120,6 +122,8 @@ public enum CardHoverAction {
     }
 
     /**
+     * UC-EDITOR-PANEL-043.
+     * <p>
      * Which of the two a whole selection offers: the stop as soon as one of them
      * is running, because a stop stops the run and not the case it was asked
      * from.

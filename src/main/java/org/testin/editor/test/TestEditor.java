@@ -242,6 +242,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         orderThen(this::refreshView);
     }
 
+    // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-060
     @Override
     public void updateSequenceAndSaveAll(final @NotNull Runnable onPersisted) {
         final List<TestCaseDto> snapshot;
@@ -314,6 +315,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         });
     }
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-030
     @Override
     public void appendNewTestCase(final @NotNull TestCaseDto tc, final @NotNull Runnable onPersisted) {
         this.allTestCases.add(tc);
@@ -358,34 +360,40 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         return list;
     }
 
+    // UC-EDITOR-PANEL-005
     @Override
     public void onToolBarCreateTestCaseClicked() {
         new CreateTestCaseAction(p, this, parent, list).openCreateDialog();
     }
 
+    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-092
     @Override
     public void onToolBarSearchValueChanged() {
         this.currentPage = 1;
         refreshView();
     }
 
+    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-093
     @Override
     public void onToolBarSearchFocusReleased() {
         list.requestFocusInWindow();
     }
 
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-097
     @Override
     public void onToolBarFilterSelectionChanged() {
         this.currentPage = 1;
         refreshView();
     }
 
+    // UC-EDITOR-PANEL-021, Rule-EDITOR-PANEL-099
     @Override
     public void onToolBarFilterResetButtonClicked() {
         this.currentPage = 1;
         refreshView();
     }
 
+    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-021
     @Override
     public void onToolBarDetailsSelectionChanged() {
         Logger.debug("[details] selectedDetails changed -> " + getSelectedDetails());
@@ -406,6 +414,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
                 gridPanelBuilder.applyColumnVisibility(view.table(), TestEditorAttributes.class, getSelectedDetails()));
     }
 
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-018
     @Override
     public void onToolBarSwitchedToListView() {
         Logger.debug("[switch] -> LIST view, currentView=" + toolBar.getCurrentView());
@@ -416,6 +425,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         model.allContentsChanged();
     }
 
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-017
     @Override
     public void onToolBarSwitchedToGridView() {
         Logger.debug("[switch] -> GRID view, currentView=" + toolBar.getCurrentView());
@@ -428,6 +438,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         });
     }
 
+    // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-117
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
@@ -457,6 +468,8 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-119.
+     * <p>
      * Busy while a grid cell is open for editing - a reload would discard the
      * half-typed value, so an on-disk refresh leaves this editor be until the
      * tester is done (#20). The run editor answers this with its execution state
@@ -467,6 +480,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         return grid.map(GridView::isCellOpen).orElse(false);
     }
 
+    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014
     @Override
     public @NotNull String cardTitle(final @NotNull TestCaseDto tc) {
         final @NotNull Set<TestEditorAttributes> selected = getSelectedDetails();
@@ -481,6 +495,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         return getToolBar().getToolbarItem(TestDetailsPopupBtn.class).getSelectedDetails();
     }
 
+    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-101
     public void refreshView() {
         // Recomputed here rather than by the callers: the view is a filtered page
         // of the master list, so anything that changes that list - deleting,
@@ -535,6 +550,8 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-001.
+     * <p>
      * What an empty list says, decided here because this is where the page is
      * decided.
      * <p>
@@ -568,6 +585,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         gridColumnToRestore = grid.map(view -> view.table().getSelectedColumn()).orElse(-1);
     }
 
+    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-104
     @Override
     public void selectWhenLoaded(final @NotNull UUID id) {
         final @NotNull Optional<TestCaseDto> loaded = currentTestCases.stream()
@@ -614,6 +632,8 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-118.
+     * <p>
      * Moves to whichever page now holds the remembered test case.
      */
     private void jumpToPageOfPendingSelection() {
@@ -633,6 +653,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         return new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
     }
 
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-019
     private void rebuildGrid() {
         // Before the page is read, not after: the committed value has to be in the
         // data the new grid is built from, or the tester watches their own
@@ -697,6 +718,8 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-013.
+     * <p>
      * Recomputes the order off the EDT (#24): the
      * walk runs on a pooled thread and the result is applied back on the EDT,
      * where onDone continues (persisting, refreshing). Any newer sort or load
@@ -751,6 +774,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
 
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
     @Override
     public @NotNull Set<String> getAvailableModules() {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -764,6 +788,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         return modules;
     }
 
+    // UC-EDITOR-PANEL-020
     private @NotNull List<TestCaseDto> getFilteredList() {
         final @NotNull EditorFilters filters = EditorFilters.of(toolBar);
 

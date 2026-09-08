@@ -24,6 +24,7 @@ public class ViewDetailsAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.Enter.getCustomShortcut(), list);
     }
 
+    // UC-VIEW-PANEL-001, Rule-VIEW-PANEL-011, Rule-VIEW-PANEL-013
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @NotNull List<TestCaseDto> selected = list.getSelectedValuesList();
@@ -32,6 +33,7 @@ public class ViewDetailsAction extends AbstractProjectAction {
             ViewToolWindowFactory.showPanel(p, selected, path, ViewPanel::focusDetailsTab);
     }
 
+    // UC-VIEW-PANEL-001
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());

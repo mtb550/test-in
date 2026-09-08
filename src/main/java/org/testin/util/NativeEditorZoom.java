@@ -75,6 +75,7 @@ public final class NativeEditorZoom implements Disposable {
         Services.getInstance(NativeEditorZoom.class);
     }
 
+    // UC-SETTING-011, Rule-SETTING-037
     private void push() {
         try {
             wheeled.filter(editor -> !editor.isDisposed())

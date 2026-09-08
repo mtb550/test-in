@@ -81,6 +81,7 @@ public class GridPanelBuilder {
      */
     private static final int ORDER_COLUMN = 0;
 
+    // UC-SETTING-011, Rule-SETTING-039
     public static void resizeToFont(final @NotNull JBTable table) {
         final @NotNull FontMetrics fm = table.getFontMetrics(table.getFont());
         table.setRowHeight(Math.max(fm.getHeight() + 4, 20));
@@ -266,6 +267,8 @@ public class GridPanelBuilder {
     }
 
     /**
+     * UC-EDITOR-PANEL-004, Rule-EDITOR-PANEL-025.
+     * <p>
      * Where this column's width is remembered, and empty for a table carrying no
      * kind - one with nothing to remember it under.
      * <p>
@@ -280,6 +283,7 @@ public class GridPanelBuilder {
 
     private static void addColumnResizeListener(final @NotNull JBTable table, final @NotNull RowHeights rowHeights) {
         table.getColumnModel().addColumnModelListener(new javax.swing.event.TableColumnModelListener() {
+            // UC-EDITOR-PANEL-004, Rule-EDITOR-PANEL-026
             @Override
             public void columnMarginChanged(final javax.swing.event.ChangeEvent e) {
                 // getResizingColumn() is non-null only during a user drag-resize,
@@ -352,6 +356,8 @@ public class GridPanelBuilder {
     }
 
     /**
+     * UC-EDITOR-PANEL-004, Rule-EDITOR-PANEL-027.
+     * <p>
      * Sizes every column to its content, capped, and sets the viewport to fit.
      * <p>
      * Public because the import and export preview had a copy of this without
@@ -432,6 +438,7 @@ public class GridPanelBuilder {
         return viewColumn >= 0 && isOrderColumn(table.convertColumnIndexToModel(viewColumn));
     }
 
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020
     public @NotNull JBTable buildRunTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<RunEditorAttributes> attributes, final @NotNull Map<UUID, TestRunItems> resultsMap, final @NotNull ToIntFunction<TestCaseDto> position) {
         Logger.debug("[GridPanelBuilder] buildRunTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final @NotNull List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
@@ -471,6 +478,7 @@ public class GridPanelBuilder {
         return table;
     }
 
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-020
     public @NotNull JBTable buildTestTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<TestEditorAttributes> attributes, final @NotNull ToIntFunction<TestCaseDto> position) {
         Logger.debug("[GridPanelBuilder] buildTestTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final @NotNull List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values()).toList();
@@ -502,6 +510,7 @@ public class GridPanelBuilder {
         return table;
     }
 
+    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-021
     public <E extends Enum<E> & ToolBarAttribute> void applyColumnVisibility(final @NotNull JBTable table, final @NotNull Class<E> attributes, final @NotNull Set<E> selected) {
         final @NotNull TableColumnModel cm = table.getColumnModel();
         while (cm.getColumnCount() > 0) {
@@ -527,6 +536,7 @@ public class GridPanelBuilder {
 
     private @NotNull JBTable buildTable(final String @NotNull [] columns, final @NotNull List<String[]> rows, final @NotNull IntPredicate columnEditable, final @NotNull String kind) {
         final @NotNull DefaultTableModel model = new DefaultTableModel(columns, 0) {
+            // UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-047
             @Override
             public boolean isCellEditable(final int row, final int column) {
                 return columnEditable.test(column);

@@ -15,6 +15,7 @@ public class SearchTxt extends SearchTextField implements Disposable, ToolbarIte
     private final @NotNull Timer searchDebounceTimer;
     private final @NotNull Runnable onFocusReleased;
 
+    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-090
     public SearchTxt(final @NotNull Runnable onToolBarSearchValueChanged, final @NotNull Runnable onFocusReleased) {
         super();
         this.onFocusReleased = onFocusReleased;
@@ -37,6 +38,8 @@ public class SearchTxt extends SearchTextField implements Disposable, ToolbarIte
     }
 
     /**
+     * UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-093.
+     * <p>
      * ESC releases focus back to the editor list without clearing the filter
      * text (issue #18) - leaving the field is not resetting the search.
      */

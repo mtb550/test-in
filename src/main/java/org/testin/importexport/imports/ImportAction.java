@@ -64,6 +64,7 @@ public class ImportAction extends AbstractProjectTreeAction {
         super(p, tree, "Import", "Import test cases from a file", AllIcons.ToolbarDecorator.Import);
     }
 
+    // UC-SHARE-005
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         TreeValueUtil.directoryAt(tree.getSelectionPath())
@@ -82,6 +83,7 @@ public class ImportAction extends AbstractProjectTreeAction {
                 .show();
     }
 
+    // UC-SHARE-005, UC-SHARE-006
     private void executeImportWriteAction(final @NotNull Project p, final @NotNull DirectoryDto selectedDirDto, final @NotNull Map<String, List<TestCaseDto>> selectedCasesBySheet) {
 
         final @NotNull Path targetPath = selectedDirDto.getPath();
@@ -129,7 +131,7 @@ public class ImportAction extends AbstractProjectTreeAction {
                     imported += cases.size();
                 }
             } catch (final Exception ex) {
-                // UC-SHARE-007, Rule-SHARE-002.
+                // UC-SHARE-007, Rule-SHARE-037.
                 //
                 // Caught here rather than left to BackgroundWork, which reports
                 // the reason and knows nothing about the count. An import writes
@@ -171,6 +173,8 @@ public class ImportAction extends AbstractProjectTreeAction {
     }
 
     /**
+     * UC-SHARE-006, Rule-SHARE-031.
+     * <p>
      * Which test set each sheet's cases are going into.
      * <p>
      * Two shapes, and only this decides between them: a test set takes every
@@ -290,6 +294,7 @@ public class ImportAction extends AbstractProjectTreeAction {
                 + (System.currentTimeMillis() - startedAt) + "ms");
     }
 
+    // UC-SHARE-005, Rule-SHARE-025
     private void linkAndSaveTestCases(final @NotNull Project p, final @NotNull Path dirPath, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
@@ -331,6 +336,7 @@ public class ImportAction extends AbstractProjectTreeAction {
         return existing.isEmpty() ? Optional.empty() : Optional.of(existing.getLast());
     }
 
+    // UC-SHARE-005
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TreeValueUtil.singleSelectedDirectory(tree)

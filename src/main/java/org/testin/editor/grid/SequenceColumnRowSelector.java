@@ -21,6 +21,7 @@ final class SequenceColumnRowSelector extends MouseAdapter {
         this.table = table;
     }
 
+    // UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-108
     @Override
     public void mousePressed(final MouseEvent e) {
         if (!SwingUtilities.isLeftMouseButton(e) || e.isPopupTrigger()) return;

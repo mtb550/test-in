@@ -132,6 +132,7 @@ final class IndexerDataStore {
         throw new IllegalStateException("No " + kind + " indexed at " + path);
     }
 
+    // UC-INTERNAL-004, Rule-INTERNAL-033
     boolean putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
         // The marker follows the write. A save that changed nothing did not
         // modify the set, and stamping the set's marker for it would move the
@@ -142,6 +143,7 @@ final class IndexerDataStore {
         return true;
     }
 
+    // UC-INTERNAL-004, Rule-INTERNAL-035
     void putTestCaseVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
         testCaseStore.putVerbatim(testSetPath, tc);
         markTestSetModified(testSetPath);
@@ -152,6 +154,7 @@ final class IndexerDataStore {
         markTestSetModified(testSetPath);
     }
 
+    // UC-INTERNAL-004, Rule-INTERNAL-031
     void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
         testCaseStore.updateSequence(testSetPath, orderedList, moved);
         markTestSetModified(testSetPath);
@@ -247,6 +250,7 @@ final class IndexerDataStore {
      */
     private final @NotNull Set<String> damagedMarkers = ConcurrentHashMap.newKeySet();
 
+    // UC-INTERNAL-002, Rule-INTERNAL-014
     <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass, final @NotNull String name) {
         final @NotNull Path markerFile = dirPath.resolve(kind.getMarker());
 
@@ -308,6 +312,8 @@ final class IndexerDataStore {
     }
 
     /**
+     * UC-INTERNAL-002, Rule-INTERNAL-009.
+     * <p>
      * What kind a directory is marked as, asked once.
      * <p>
      * The probe lives here rather than on the enum because reading the disk is

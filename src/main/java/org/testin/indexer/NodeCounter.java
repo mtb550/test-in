@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
 public final class NodeCounter {
 
     /**
+     * UC-INTERNAL-006, Rule-INTERNAL-046, Rule-INTERNAL-047, Rule-INTERNAL-050.
+     * <p>
      * What lies beneath a container: its test sets, its packages, its test
      * cases and its test runs, at any depth.
      * <p>
@@ -60,6 +62,8 @@ public final class NodeCounter {
     }
 
     /**
+     * UC-INTERNAL-006, Rule-INTERNAL-048, Rule-INTERNAL-049, Rule-INTERNAL-051.
+     * <p>
      * How a run went, from {@link TestRunSummary} rather than from the results
      * again: the popup is its second caller, not its second implementation, so
      * a run's Details and its PDF cannot disagree about the same run.

@@ -72,11 +72,13 @@ public class GenerateReportAction extends AbstractProjectAction {
         registerCustomShortcutSet(Shortcuts.GenerateReport.getCustomShortcut(), list);
     }
 
+    // UC-REPORT-001
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         execute();
     }
 
+    // UC-REPORT-001, Rule-REPORT-001
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(isAvailable());
@@ -90,6 +92,8 @@ public class GenerateReportAction extends AbstractProjectAction {
     }
 
     /**
+     * UC-REPORT-001.
+     * <p>
      * Direct entry point for toolbar buttons — no AnActionEvent required.
      */
     public void execute() {
@@ -103,6 +107,7 @@ public class GenerateReportAction extends AbstractProjectAction {
         return ActionUpdateThread.EDT;
     }
 
+    // UC-REPORT-001, Rule-REPORT-003
     private void processAndSave(final @NotNull Project p, final @NotNull TestRunDirectoryDto tr, final @NotNull FileTypes format, final @NotNull File outputFile) {
         // Under a bar rather than on a bare pooled thread: the dialog is gone by
         // now, and without one the tester sees nothing at all between pressing

@@ -42,6 +42,7 @@ public final class SearchAction extends DumbAwareAction {
         return Objects.requireNonNull(ActionManager.getInstance().getAction(ID), ID + " is not registered");
     }
 
+    // UC-INTERNAL-001
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         Optional.ofNullable(e.getProject()).ifPresent(p -> new SearchDialog(p).show());

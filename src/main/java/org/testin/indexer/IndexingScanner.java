@@ -47,6 +47,7 @@ final class IndexingScanner {
         }
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-005, Rule-INTERNAL-007
     private void scanProjectContents(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
             final @NotNull TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).getTestProjectNode(p, projectPath);
@@ -88,7 +89,7 @@ final class IndexingScanner {
         }
     }
 
-    // UC-INTERNAL-002, Rule-INTERNAL-008 and Rule-INTERNAL-015
+    // UC-INTERNAL-002, Rule-INTERNAL-008, Rule-INTERNAL-015
     private void scanTestSets(final @NotNull Path tcDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
         try (Stream<Path> paths = Files.list(tcDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
@@ -113,7 +114,7 @@ final class IndexingScanner {
         }
     }
 
-    // UC-INTERNAL-002, Rule-INTERNAL-008 and Rule-INTERNAL-015
+    // UC-INTERNAL-002, Rule-INTERNAL-008, Rule-INTERNAL-015
     private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
@@ -138,6 +139,7 @@ final class IndexingScanner {
         }
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-011
     private void scanTestSet(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
@@ -176,7 +178,7 @@ final class IndexingScanner {
         }
     }
 
-    // UC-INTERNAL-002, Rule-INTERNAL-010 and Rule-INTERNAL-015
+    // UC-INTERNAL-002, Rule-INTERNAL-010, Rule-INTERNAL-015
     private void scanTestRunDirs(final @NotNull Path trDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
         try (Stream<Path> paths = Files.list(trDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
@@ -197,7 +199,7 @@ final class IndexingScanner {
         }
     }
 
-    // UC-INTERNAL-002, Rule-INTERNAL-010 and Rule-INTERNAL-015
+    // UC-INTERNAL-002, Rule-INTERNAL-010, Rule-INTERNAL-015
     private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
@@ -302,6 +304,7 @@ final class IndexingScanner {
                         + ". Their number, their status and who made them are not what is on disk.");
     }
 
+    // UC-INTERNAL-002
     private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
@@ -326,6 +329,8 @@ final class IndexingScanner {
     }
 
     /**
+     * UC-INTERNAL-002, Rule-INTERNAL-012.
+     * <p>
      * Which test case a file is: its name, when the name is a UUID.
      * <p>
      * The plugin writes a case to {@code <id>.json} and reads it back keyed by

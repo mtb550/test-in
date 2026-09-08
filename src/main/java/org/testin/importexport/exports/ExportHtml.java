@@ -19,6 +19,7 @@ import java.util.Map;
 public class ExportHtml {
     private final @NotNull ExportAction exportAction;
 
+    // UC-SHARE-002, Rule-SHARE-022
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         // Explicit UTF-8: the document declares <meta charset="UTF-8">, and the platform
         // default charset (e.g. cp1252 on Windows) would mangle non-ASCII text.

@@ -10,6 +10,7 @@ import org.testin.util.Shortcuts;
 
 public class GenerateReportBtn extends AbstractIconButton implements ToolbarItem {
 
+    // UC-REPORT-001
     public GenerateReportBtn(final @NotNull Project p, final @NotNull RunEditor editor) {
         super("Generate Test Summary Report", AllIcons.ToolbarDecorator.Export, Shortcuts.GenerateReport);
 

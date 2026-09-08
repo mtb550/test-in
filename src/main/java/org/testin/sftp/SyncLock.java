@@ -34,6 +34,8 @@ public record SyncLock(@NotNull SftpTransport transport) {
     private static final @NotNull String HOLDER = FOLDER + "/holder.txt";
 
     /**
+     * UC-SHARE-019, Rule-SHARE-087.
+     * <p>
      * Takes the lock, and says who has it when somebody else does.
      * <p>
      * Empty means taken by this caller and nobody else. Present means refused,

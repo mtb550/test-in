@@ -17,6 +17,7 @@ public class ShowNodeDetailsAction extends AbstractProjectTreeAction {
         super(p, tree, "Details", "Show node details", AllIcons.General.IndentDetected);
     }
 
+    // UC-TREE-PANEL-027, Rule-TREE-PANEL-087
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 

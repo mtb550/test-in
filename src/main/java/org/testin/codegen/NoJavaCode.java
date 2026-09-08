@@ -19,6 +19,7 @@ public final class NoJavaCode implements GenAction {
 
     private final @NotNull String nodeType;
 
+    // UC-CODEGEN-004
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         Logger.debug(nodeType + " generates no Java code");

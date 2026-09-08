@@ -51,6 +51,7 @@ final class RunExecutionTimer implements Disposable {
         });
     }
 
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132
     void start(final @NotNull TestRunItems item, final @NotNull Runnable repaint) {
         // Records the previous case's last stretch before letting go of it.
         stop();
@@ -67,6 +68,8 @@ final class RunExecutionTimer implements Disposable {
     }
 
     /**
+     * UC-EDITOR-PANEL-035.
+     * <p>
      * Stops counting, and records what has elapsed since the last redraw.
      * <p>
      * That final write is the point. The ticker's first tick is a second after

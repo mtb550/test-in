@@ -21,6 +21,7 @@ public class CutNodeAction extends DumbAwareAction {
         this.registerCustomShortcutSet(Shortcuts.CutItem.getCustomShortcut(), tree);
     }
 
+    // UC-TREE-PANEL-013
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (tree.getTransferHandler() instanceof TreeTransferHandler transferHandler) {
@@ -29,6 +30,8 @@ public class CutNodeAction extends DumbAwareAction {
     }
 
     /**
+     * UC-TREE-PANEL-013, Rule-TREE-PANEL-002.
+     * <p>
      * Greyed out where there is nothing to copy: a test project and the two
      * containers under it are the tree's fixed shape, not nodes that go
      * anywhere.

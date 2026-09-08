@@ -22,6 +22,7 @@ public class ResultAnalysisBtn extends AbstractIconButton implements ToolbarItem
 
     private final @NotNull RunEditor editor;
 
+    // UC-EDITOR-PANEL-045
     public ResultAnalysisBtn(final @NotNull RunEditor editor, final @NotNull Runnable onResultAnalysisClicked) {
         // The platform's own analysis icon. The one this was asked for -
         // ExceptionAnalyzerIcons expui/exceptionAnalyzer - ships with the
@@ -38,6 +39,7 @@ public class ResultAnalysisBtn extends AbstractIconButton implements ToolbarItem
         updateEnabledState();
     }
 
+    // UC-EDITOR-PANEL-045, Rule-EDITOR-PANEL-189
     public void updateEnabledState() {
         final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();
         final boolean completed = status == TestRunStatus.COMPLETED;

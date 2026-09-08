@@ -47,7 +47,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
     }
 
     /**
-     * UC-CODEGEN-011, Rule-CODEGEN-042 and Rule-CODEGEN-045.
+     * UC-CODEGEN-011, Rule-CODEGEN-042, Rule-CODEGEN-067.
      * <p>
      * Every case in the sets these belong to, not only the ones handed in.
      * <p>
@@ -85,7 +85,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
     }
 
     /**
-     * UC-CODEGEN-011, Rule-CODEGEN-043 and Rule-CODEGEN-045.
+     * UC-CODEGEN-011, Rule-CODEGEN-043, Rule-CODEGEN-067.
      * <p>
      * One set: every case's position written into its method, and every method
      * put after the one before it.
@@ -122,7 +122,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
     }
 
     /**
-     * UC-CODEGEN-011, Rule-CODEGEN-045.
+     * UC-CODEGEN-011, Rule-CODEGEN-067.
      * <p>
      * Puts one method where it belongs and answers with the method now in the
      * file, which is what the next one goes after.

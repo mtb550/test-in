@@ -37,6 +37,7 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.DeletePackage.getCustomShortcut(), list);
     }
 
+    // UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-062
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @NotNull List<TestCaseDto> selectedItems = list.getSelectedValuesList();
@@ -67,6 +68,7 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
         }).show();
     }
 
+    // UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-064
     private void performDeletion(final @NotNull List<TestCaseDto> selectedItems) {
         // The whole case, before it goes: its content, its id and its rank, which
         // is what puts it back where it was rather than at the end of the set.

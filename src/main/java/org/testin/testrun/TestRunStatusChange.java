@@ -36,6 +36,8 @@ public final class TestRunStatusChange {
     private final @NotNull Project p;
 
     /**
+     * Rule-EDITOR-PANEL-008.
+     * <p>
      * Moves this run to a new status.
      * <p>
      * Completing stops the execution, whatever the run was before. That covers

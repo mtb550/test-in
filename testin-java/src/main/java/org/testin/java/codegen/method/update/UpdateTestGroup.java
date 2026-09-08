@@ -10,6 +10,7 @@ import java.util.List;
 
 public class UpdateTestGroup extends UpdateTestBase implements GenAction {
 
+    // UC-CODEGEN-012, Rule-CODEGEN-045
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;

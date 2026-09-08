@@ -35,6 +35,7 @@ public final class FailureFields {
     private final @NotNull ComponentDialogBase<RadioSelection<BugPriority>> priority;
     private final @NotNull ComponentDialogBase<TextArea> errorCapture;
 
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-147
     public FailureFields(final @NotNull TestRunItems runItem) {
         actualResult = ComponentDialogBase.textField()
                 .placeholder("set actual result..")
@@ -59,6 +60,8 @@ public final class FailureFields {
     }
 
     /**
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148.
+     * <p>
      * The four, in the order a tester fills them in: what happened, then how
      * much it matters, then the evidence.
      */
@@ -67,6 +70,8 @@ public final class FailureFields {
     }
 
     /**
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145.
+     * <p>
      * Writes what was typed onto the run row.
      * <p>
      * Only ever called by a save. Escape must never commit an edit, so nothing
@@ -80,6 +85,8 @@ public final class FailureFields {
     }
 
     /**
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-144.
+     * <p>
      * Whether the four say something other than what the run row already holds.
      * <p>
      * The mirror of {@link #applyTo}, and written next to it on purpose: a field

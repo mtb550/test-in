@@ -46,12 +46,15 @@ public final class OwnWrites {
      */
     private final @NotNull Map<String, Long> written = new ConcurrentHashMap<>();
 
+    // UC-INTERNAL-003, Rule-INTERNAL-019
     public void record(final @NotNull Path path) {
         forgetOldEntries();
         written.put(key(path), System.currentTimeMillis());
     }
 
     /**
+     * UC-INTERNAL-003, Rule-INTERNAL-019.
+     * <p>
      * Whether this file changed because the plugin changed it.
      */
     public boolean areOurs(final @NotNull Path path) {

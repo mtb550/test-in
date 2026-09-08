@@ -40,6 +40,8 @@ public final class Display {
     }
 
     /**
+     * Rule-EDITOR-PANEL-005.
+     * <p>
      * A value as the details panel shows it: capitalized, and ended with a full
      * stop unless it already ends in something that closes it (#22).
      */

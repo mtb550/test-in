@@ -33,6 +33,8 @@ import java.util.List;
 public final class ExecutionPosition {
 
     /**
+     * UC-CODEGEN-002, Rule-CODEGEN-014.
+     * <p>
      * This case's place among the cases of its test set, counting from one.
      * <p>
      * Asked of the set rather than of whatever list a caller happens to hold: a
@@ -48,6 +50,8 @@ public final class ExecutionPosition {
     }
 
     /**
+     * UC-CODEGEN-011, Rule-CODEGEN-042.
+     * <p>
      * The cases of this case's test set, in the order a run executes them.
      * <p>
      * Here because everything that has to reason about a case's place needs the

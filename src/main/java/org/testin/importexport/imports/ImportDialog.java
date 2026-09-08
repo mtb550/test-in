@@ -56,6 +56,7 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
         form.selectSourceFile();
     }
 
+    // UC-SHARE-007
     @Override
     protected void submit() {
         // The form validates and focuses its own field; what the import

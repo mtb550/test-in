@@ -30,6 +30,8 @@ public final class NextRunName {
     private static final @NotNull Pattern TRAILING_NUMBER = Pattern.compile("^(.*?)(\\d{1,9})$");
 
     /**
+     * UC-TREE-PANEL-021, Rule-TREE-PANEL-071.
+     * <p>
      * The first name after this one that nothing has taken.
      * <p>
      * Counted up rather than tried once, because the obvious next name is

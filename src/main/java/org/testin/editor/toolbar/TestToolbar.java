@@ -12,6 +12,7 @@ public class TestToolbar extends AbstractToolbarPanel {
         layoutComponents();
     }
 
+    // UC-EDITOR-PANEL-001
     @Override
     public @NotNull List<ToolbarItem> getCustomComponents() {
         return List.of(

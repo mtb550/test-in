@@ -152,6 +152,7 @@ public class StepsSection implements CreateTestCaseSection {
         ApplicationManager.getApplication().invokeLater(repackAction::execute);
     }
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-033
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
         final @NotNull List<String> finalSteps = new ArrayList<>();

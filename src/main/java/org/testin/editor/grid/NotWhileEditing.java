@@ -40,6 +40,7 @@ public final class NotWhileEditing extends AnAction {
         new NotWhileEditing(action, table).registerCustomShortcutSet(action.getShortcutSet(), table);
     }
 
+    // Rule-EDITOR-PANEL-010
     @Override
     public void update(final @NotNull AnActionEvent e) {
         delegate.update(e);

@@ -38,6 +38,7 @@ public final class TestRunHtmlGenerator {
     final String BORDER_COLOR = "#d0d7e5";
 
 
+    // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
     public @NotNull String generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
 
         // Compute summary stats

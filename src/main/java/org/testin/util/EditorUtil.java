@@ -90,6 +90,8 @@ public final class EditorUtil {
     }
 
     /**
+     * UC-TREE-PANEL-025, Rule-TREE-PANEL-082.
+     * <p>
      * Brings every open Testin editor back in line with the index that was just
      * rebuilt: the ones whose node is still there read it again, and the ones
      * whose node is gone close.
@@ -334,6 +336,7 @@ public final class EditorUtil {
         return entries;
     }
 
+    // UC-INTERNAL-002
     public void restoreLastOpened(final @NotNull Project p) {
         try {
             final @NotNull String saved = Objects.requireNonNullElse(

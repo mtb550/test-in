@@ -289,6 +289,8 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     /**
+     * UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-178.
+     * <p>
      * Already formatted by the caller: the blank for "not started" is decided
      * by {@code Display.formatRunClock}, not here.
      */
@@ -298,6 +300,8 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     /**
+     * UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-175.
+     * <p>
      * How many cases carry each verdict, already phrased and colored by
      * {@code ResultAnalysis.segments}. Empty for a run with nothing recorded,
      * which is the rule the execution time beside it already follows.
@@ -345,6 +349,8 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     /**
+     * UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-179.
+     * <p>
      * Where the run stands, said in the bar rather than only in a tooltip.
      * <p>
      * A completed or closed run refuses verdicts and result edits, and the one
@@ -364,6 +370,8 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     /**
+     * UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-102.
+     * <p>
      * The page indicator and the arrows. Not the left label.
      * <p>
      * It used to write that too, as "0 of N" against the filtered count, while
@@ -395,6 +403,8 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     /**
+     * UC-EDITOR-PANEL-024.
+     * <p>
      * The one writer of the left label.
      * <p>
      * The row's position in the list being paged through is handed in rather

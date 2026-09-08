@@ -95,6 +95,8 @@ public class OrderSection implements CreateTestCaseSection {
     }
 
     /**
+     * UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-054.
+     * <p>
      * Refuses a position the field cannot read as one, in the platform's own
      * words - "Value must be between 1 and 17" - rather than quietly leaving the
      * case where it is and reporting the edit as saved.
@@ -114,6 +116,8 @@ public class OrderSection implements CreateTestCaseSection {
     }
 
     /**
+     * UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-055.
+     * <p>
      * Ranks the case between the two it was asked to land between, as they sit
      * in the set with this case taken out of it.
      * <p>

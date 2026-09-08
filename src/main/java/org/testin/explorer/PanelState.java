@@ -41,6 +41,8 @@ public enum PanelState {
     TREE;
 
     /**
+     * UC-TREE-PANEL-001.
+     * <p>
      * The state these facts add up to.
      *
      * @param rootConfigured       a Testin root is set

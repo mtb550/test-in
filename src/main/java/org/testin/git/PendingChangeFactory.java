@@ -30,6 +30,8 @@ final class PendingChangeFactory {
     private static final @NotNull String JSON = ".json";
 
     /**
+     * UC-SHARE-010, Rule-SHARE-047.
+     * <p>
      * The change for one file. Always one: a file Git reports as changed is a
      * file the tester has to be able to commit, and the review is the only place
      * that can offer it - answering null here used to drop a run, a reorder or
@@ -169,6 +171,8 @@ final class PendingChangeFactory {
     }
 
     /**
+     * UC-SHARE-010.
+     * <p>
      * The row for a file that could not be read at all - deleted between the
      * status and the read, or written by something else. It says only what Git
      * said, which is enough to select it and commit it.

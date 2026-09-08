@@ -173,6 +173,8 @@ final class RunRegistry {
     }
 
     /**
+     * UC-CODEGEN-009, Rule-CODEGEN-037.
+     * <p>
      * Everything a stop of these cases takes down, and the record that it
      * happened.
      * <p>

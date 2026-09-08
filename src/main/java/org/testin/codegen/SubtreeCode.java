@@ -27,6 +27,8 @@ import org.testin.services.Services;
 public final class SubtreeCode {
 
     /**
+     * UC-CODEGEN-004, Rule-CODEGEN-022, Rule-CODEGEN-024.
+     * <p>
      * Generates for this node, its test cases, and every node under it, as one
      * command.
      * <p>
@@ -41,6 +43,7 @@ public final class SubtreeCode {
         WriteCommandAction.runWriteCommandAction(p, "Generate Test Code", null, () -> walk(p, dir));
     }
 
+    // UC-CODEGEN-004, Rule-CODEGEN-023
     private static void walk(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 

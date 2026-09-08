@@ -37,6 +37,7 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
                 : "Nothing to execute — no test case is waiting for a verdict";
     }
 
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
     public void updateEnabledState() {
         setEnabled(editor.canStartManualExecution());
         setToolTipText(tooltipFor(editor));

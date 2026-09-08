@@ -28,6 +28,7 @@ public class ActionIcons extends BaseDetails {
     public ActionIcons() {
     }
 
+    // UC-VIEW-PANEL-012, UC-VIEW-PANEL-014, Rule-VIEW-PANEL-050, Rule-VIEW-PANEL-056, Rule-VIEW-PANEL-057
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         // The run slot draws what clicking it does, not how the last run went: a
@@ -82,6 +83,7 @@ public class ActionIcons extends BaseDetails {
         label.setVerticalAlignment(SwingConstants.CENTER);
 
         label.addMouseListener(new MouseAdapter() {
+            // UC-VIEW-PANEL-012, Rule-VIEW-PANEL-052
             @Override
             public void mouseEntered(final MouseEvent e) {
                 label.setIcon(hover);
@@ -92,6 +94,7 @@ public class ActionIcons extends BaseDetails {
                 label.setIcon(base);
             }
 
+            // UC-VIEW-PANEL-012, UC-VIEW-PANEL-014
             @Override
             public void mouseClicked(final MouseEvent e) {
                 action.execute(p, dto);

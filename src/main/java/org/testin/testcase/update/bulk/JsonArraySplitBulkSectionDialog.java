@@ -99,6 +99,8 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
     // ------------------------------------------------------------------
 
     /**
+     * UC-EDITOR-PANEL-007.
+     * <p>
      * Shows the dialog and releases the editors when it closes. The framework
      * creates the popup inside show(), so the close listener is attached after.
      */
@@ -127,6 +129,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
     private static final @NotNull ItemRecorder RECORDS_NOTHING = (start, end, testCaseIndex, itemIndex) -> {
     };
 
+    // UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-041
     @Override
     protected void submit() {
         readEditorIntoValues();
@@ -154,6 +157,8 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
     }
 
     /**
+     * UC-EDITOR-PANEL-007.
+     * <p>
      * Ctrl+Enter: a new empty item after each item under a caret.
      */
     private void addItemAtCarets() {
@@ -175,6 +180,8 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
     }
 
     /**
+     * UC-EDITOR-PANEL-007.
+     * <p>
      * Shift+Delete: drops each item under a caret. The last item of a test case
      * is emptied rather than removed - a case with no items has nowhere to type.
      */

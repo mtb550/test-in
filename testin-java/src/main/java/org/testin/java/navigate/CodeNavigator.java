@@ -35,6 +35,8 @@ import java.util.Optional;
 public final class CodeNavigator implements CodeNavigation {
 
     /**
+     * UC-CODEGEN-006, Rule-CODEGEN-026.
+     * <p>
      * The generated method that runs this case, and empty when there is none.
      * <p>
      * The class comes from the tree path, which is what names it; the method
@@ -61,6 +63,7 @@ public final class CodeNavigator implements CodeNavigation {
         return method;
     }
 
+    // UC-CODEGEN-008, Rule-CODEGEN-032
     @Override
     public @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         return resolve(p, tc).map(method -> {
@@ -71,6 +74,7 @@ public final class CodeNavigator implements CodeNavigation {
         });
     }
 
+    // UC-CODEGEN-006, Rule-CODEGEN-026
     @Override
     public void toCode(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         Logger.trace("navigate to the method of '" + tc.getDescription() + "'");

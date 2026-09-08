@@ -32,6 +32,8 @@ public interface CodeGenerators {
     @NotNull GenAction actionFor(final @NotNull GenType type);
 
     /**
+     * UC-CODEGEN-019, Rule-CODEGEN-005.
+     * <p>
      * The generator for this operation, and one that quietly writes nothing when
      * no module claimed it.
      * <p>

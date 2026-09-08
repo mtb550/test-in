@@ -32,12 +32,15 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
         this.tp = tp;
     }
 
+    // UC-TREE-PANEL-003
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         execute();
     }
 
     /**
+     * UC-TREE-PANEL-003, Rule-TREE-PANEL-019.
+     * <p>
      * Direct entry point for dialog callbacks — no AnActionEvent required.
      */
     public void execute() {

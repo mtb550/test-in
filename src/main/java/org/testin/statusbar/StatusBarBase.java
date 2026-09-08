@@ -58,6 +58,8 @@ public class StatusBarBase {
     }
 
     /**
+     * UC-SETTING-008, Rule-SETTING-029.
+     * <p>
      * Whether this strip is drawn, with the tester's standing answer folded in.
      * <p>
      * <b>One owner, because there are two questions and one strip.</b> A surface

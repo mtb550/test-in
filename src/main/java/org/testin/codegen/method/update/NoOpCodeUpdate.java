@@ -18,6 +18,7 @@ public final class NoOpCodeUpdate implements GenAction {
 
     private final @NotNull String fieldName;
 
+    // Rule-CODEGEN-003
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         Logger.info("Update " + fieldName + ": data-only field, no Java code change");

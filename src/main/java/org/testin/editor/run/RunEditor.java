@@ -245,6 +245,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126.
+     * <p>
      * The same, telling {@code onLoaded} once the run is on screen - which is
      * the only moment a refresh can honestly be confirmed. The failure branch
      * says nothing, because nothing was refreshed.
@@ -331,17 +333,20 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         });
     }
 
+    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-092
     @Override
     public void onToolBarSearchValueChanged() {
         currentPage = 1;
         refreshView();
     }
 
+    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-093
     @Override
     public void onToolBarSearchFocusReleased() {
         list.requestFocusInWindow();
     }
 
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-097
     @Override
     public void onToolBarFilterSelectionChanged() {
         currentPage = 1;
@@ -355,12 +360,14 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         refreshView();
     }
 
+    // UC-EDITOR-PANEL-021, Rule-EDITOR-PANEL-099
     @Override
     public void onToolBarFilterResetButtonClicked() {
         currentPage = 1;
         refreshView();
     }
 
+    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-021
     @Override
     public void onToolBarDetailsSelectionChanged() {
         Logger.debug("[details] selectedDetails changed -> " + getSelectedDetails());
@@ -385,6 +392,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 gridPanelBuilder.applyColumnVisibility(view.table(), RunEditorAttributes.class, getSelectedDetails()));
     }
 
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-018
     @Override
     public void onToolBarSwitchedToListView() {
         Logger.debug("[switch] -> LIST view, currentView=" + toolBar.getCurrentView());
@@ -395,6 +403,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         refreshCards();
     }
 
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-017
     @Override
     public void onToolBarSwitchedToGridView() {
         Logger.debug("[switch] -> GRID view, currentView=" + toolBar.getCurrentView());
@@ -408,6 +417,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-045, Rule-EDITOR-PANEL-191.
+     * <p>
      * What the run means, in the tester's words, kept on the run itself.
      * <p>
      * The counts handed to the dialog are read from the results here rather than
@@ -447,6 +458,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
 
     /**
+     * UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-117.
+     * <p>
      * Re-read and redrawn. The execution stops first: the timer holds the item
      * it is counting and everything it is counted into is about to be thrown
      * away.
@@ -476,6 +489,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         loadDataAsync(onLoaded);
     }
 
+    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014
     @Override
     public @NotNull String cardTitle(final @NotNull TestCaseDto tc) {
         final @NotNull Set<RunEditorAttributes> selected = getSelectedDetails();
@@ -505,6 +519,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         return allTestCases.size();
     }
 
+    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-101
     public void refreshView() {
         // Recomputed here rather than by the callers, as the test editor does.
         // The view is a filtered page of the master list, so anything that
@@ -577,6 +592,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         return true;
     }
 
+    // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-176
     public void refreshAfterRunStatusChanged() {
         list.repaint();
         statusBar.updatePaginationState(currentPage, getTotalPageCount());
@@ -598,6 +614,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-118.
+     * <p>
      * Moves to whichever page now holds the remembered test case, so a selection
      * that a reload pushed onto another page is not lost.
      */
@@ -618,6 +636,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         return new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
     }
 
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-019
     private void rebuildGrid() {
         // Before the page is read, not after: the committed value has to be in the
         // data the new grid is built from, or the tester watches their own
@@ -678,6 +697,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
 
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
     @Override
     public @NotNull Set<String> getAvailableModules() {
         final @NotNull Set<String> modules = new HashSet<>();
@@ -690,6 +710,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         return modules;
     }
 
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
     private @NotNull List<TestCaseDto> getFilteredList() {
         final @NotNull EditorFilters filters = EditorFilters.of(toolBar);
         // Status is the run editor's alone - a test case does not have one.
@@ -785,6 +806,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         selectVisibleIndex(localIndex);
     }
 
+    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-104
     @Override
     public void selectWhenLoaded(final @NotNull UUID id) {
         final @NotNull Optional<TestCaseDto> loaded = currentTestCases.stream()
@@ -843,7 +865,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130 and Rule-EDITOR-PANEL-134.
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130, Rule-EDITOR-PANEL-134.
      * <p>
      * Puts the walk on the next test case waiting for a verdict, at or after
      * {@code from}, and ends it when there is none.
@@ -960,6 +982,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-181.
+     * <p>
      * A run with cases going has started, whoever started them.
      * <p>
      * The stamp used to belong to the Start Execution button, so a tester who
@@ -983,6 +1007,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-044.
+     * <p>
      * Asked from outside to run what this run has left - see
      * {@link TestinEditor#runWhenLoaded()}.
      */
@@ -1000,6 +1026,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-044, Rule-EDITOR-PANEL-184.
+     * <p>
      * Runs the cases this run has not reached yet, and records their verdicts into
      * it.
      * <p>
@@ -1046,6 +1074,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         RunTestCases.run(p, pending);
     }
 
+    // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-182
     private void executionReported(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         if (!launchedHere.contains(tc.getId())) return;
 
@@ -1156,6 +1185,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-177.
+     * <p>
      * Puts what the run has done so far into the status bar: how many cases carry
      * each verdict, and how long they took.
      * <p>
@@ -1188,6 +1219,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-042.
+     * <p>
      * The running total, and nothing else.
      * <p>
      * Separate because it alone changes every second. The timer ticks once a
@@ -1218,6 +1251,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-046.
+     * <p>
      * How long the case being executed has taken so far, and zero when none is
      * - which is the honest answer rather than a missing one, and the same
      * value a case that has just started carries.
@@ -1262,6 +1297,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-119.
+     * <p>
      * Busy while a run is being executed or a grid cell is open for editing -
      * either is live state that a reload under the tester would throw away, so an
      * on-disk refresh leaves this editor be until it is done (#20, #74).
@@ -1310,6 +1347,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-133.
+     * <p>
      * The one place that reacts to this run's execution changing: which of the
      * two execution buttons is showing, and what the light mode window is
      * drawing.
@@ -1347,6 +1386,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-151.
+     * <p>
      * Ends the execution flow, wherever the end came from - the tester's Stop, the
      * last verdict, a bulk apply, the run completing. The run itself decides
      * whether it has an end to stamp: a run nobody started has none.
@@ -1362,6 +1403,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-152.
+     * <p>
      * Stops whatever automation this editor started, and says how much went
      * back.
      * <p>
@@ -1383,6 +1426,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-150.
+     * <p>
      * Stops the execution flow without saying the run ended.
      * <p>
      * Refresh needs exactly this. It throws the loaded run and its results away
@@ -1424,6 +1469,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
+     * UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-149.
+     * <p>
      * The tester's own stop, and the only one that reaches the test runner.
      * <p>
      * {@link #stopExecution()} runs on four internal paths - the last verdict, a

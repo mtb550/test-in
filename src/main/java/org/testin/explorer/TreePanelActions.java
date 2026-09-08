@@ -14,6 +14,7 @@ import java.util.List;
 
 public class TreePanelActions {
 
+    // UC-TREE-PANEL-028
     public @NotNull List<AnAction> create(final @NotNull Project p, final @NotNull TreePanel tp) {
         return List.of(
                 // The keystroke reaches the search from anywhere, which is the

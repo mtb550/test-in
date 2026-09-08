@@ -74,6 +74,7 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
         return rows;
     }
 
+    // UC-SHARE-003
     @Override
     protected void submit() {
         onPicked.accept(selectedGroupsStr());

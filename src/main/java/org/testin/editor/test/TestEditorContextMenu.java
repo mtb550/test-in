@@ -83,6 +83,8 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
     }
 
     /**
+     * UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194.
+     * <p>
      * Each of these registers its own shortcut on the list from its constructor,
      * so the action object is not needed afterward and is deliberately
      * discarded. It reads like a mistake and is not one — the alternative is a

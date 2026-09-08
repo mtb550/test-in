@@ -51,6 +51,7 @@ public enum OptionalPlugin {
         this.warned = Key.create("testin.optionalPlugin.warned." + pluginId);
     }
 
+    // Rule-CODEGEN-005
     public boolean isAvailable() {
         Availability known = availability;
         if (known == Availability.UNKNOWN) {

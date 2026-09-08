@@ -27,6 +27,8 @@ public final class StartupActivity implements ProjectActivity {
     private static final @NotNull Key<Boolean> STARTED = Key.create("testin.started");
 
     /**
+     * UC-SETTING-002, Rule-SETTING-014.
+     * <p>
      * Everything Testin does when a project opens, once per project.
      * <p>
      * Three doors lead here - the platform's startup extension, the tree tool

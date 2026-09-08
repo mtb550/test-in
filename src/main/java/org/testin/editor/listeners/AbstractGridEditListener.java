@@ -53,6 +53,8 @@ public abstract class AbstractGridEditListener implements TableModelListener {
     }
 
     /**
+     * UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-052.
+     * <p>
      * Final, because everything it does is the part neither grid should be
      * writing for itself. What differs between them is {@link #apply}.
      */

@@ -95,6 +95,8 @@ public enum ReportTile {
     }
 
     /**
+     * Rule-REPORT-002.
+     * <p>
      * The headline for one run, in order - and the count, which the two
      * generators that need a table width now take from {@code size()} rather than
      * from a ternary restating the rule above.

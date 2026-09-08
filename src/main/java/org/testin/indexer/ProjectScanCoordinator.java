@@ -27,6 +27,7 @@ final class ProjectScanCoordinator {
         }
     }
 
+    // UC-INTERNAL-003, Rule-INTERNAL-022
     void rescanExclusively(final @NotNull Path projectPath) {
         scanLock.writeLock().lock();
         try {

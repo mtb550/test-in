@@ -47,6 +47,8 @@ public final class SheetPreview implements DialogComponent {
     }
 
     /**
+     * UC-SHARE-007, Rule-SHARE-036.
+     * <p>
      * Replaces the preview with these sheets. The models go with the tabs:
      * keeping the previous file's would leave rows nobody can see still
      * selectable.
@@ -83,6 +85,8 @@ public final class SheetPreview implements DialogComponent {
     }
 
     /**
+     * UC-SHARE-001, Rule-SHARE-008.
+     * <p>
      * The ticked cases per sheet. A sheet with nothing ticked is left out, so an
      * empty result means the tester selected nothing at all.
      */

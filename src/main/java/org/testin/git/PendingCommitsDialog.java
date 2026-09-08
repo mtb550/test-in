@@ -141,6 +141,8 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     }
 
     /**
+     * UC-SHARE-010, Rule-SHARE-045.
+     * <p>
      * One row per changed field, not per changed file: a case with three edited
      * fields is three rows, so each can be reverted on its own. A run and a
      * marker contribute rows the same way - what changed inside them, one line
@@ -186,6 +188,8 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     }
 
     /**
+     * UC-SHARE-011, Rule-SHARE-051.
+     * <p>
      * Puts one field back to what was committed, and takes its row away.
      */
     private void revertRow(final @NotNull Project p, final int row) {
@@ -239,6 +243,8 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     }
 
     /**
+     * UC-SHARE-011, Rule-SHARE-052.
+     * <p>
      * Puts one edited field back to what was committed, and answers whether that
      * happened - so the caller confirms a revert only when there was one.
      * <p>
@@ -270,6 +276,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         commit.setEnabled(!changes.getSelectedRows().isEmpty());
     }
 
+    // UC-SHARE-012, UC-SHARE-013
     @Override
     protected void submit() {
         final @NotNull List<PendingChange> selected = selectedDifferences();

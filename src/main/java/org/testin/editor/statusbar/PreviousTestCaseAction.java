@@ -21,11 +21,13 @@ public class PreviousTestCaseAction extends DumbAwareAction {
 
     }
 
+    // UC-VIEW-PANEL-003
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         controller.goPrevious();
     }
 
+    // UC-VIEW-PANEL-003, Rule-VIEW-PANEL-020
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(controller.hasPrevious());

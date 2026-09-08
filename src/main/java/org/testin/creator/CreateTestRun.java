@@ -38,6 +38,8 @@ public class CreateTestRun implements NodeCreator {
     private final @NotNull Project p;
 
     /**
+     * UC-TREE-PANEL-009.
+     * <p>
      * Asynchronous creator: shows the run configuration dialog and completes on OK,
      * including its own tree refresh and editor opening. Always returns null.
      */
@@ -54,6 +56,8 @@ public class CreateTestRun implements NodeCreator {
     }
 
     /**
+     * UC-TREE-PANEL-009, UC-TREE-PANEL-021.
+     * <p>
      * Opens the run form set to create, which is what makes a run and what makes
      * the next cycle: they differ only in what the form opens holding - the
      * previous cycle's cases ticked and its configuration filled in - and not at
@@ -66,6 +70,8 @@ public class CreateTestRun implements NodeCreator {
     }
 
     /**
+     * UC-TREE-PANEL-009, Rule-TREE-PANEL-004.
+     * <p>
      * Writes the run, or refuses and says why - and answers which, because the
      * dialog stays open on a refusal.
      * <p>
@@ -105,6 +111,7 @@ public class CreateTestRun implements NodeCreator {
 
 
 
+    // UC-TREE-PANEL-009, Rule-TREE-PANEL-031
     private void saveSelectedToJSON(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull TreePanel tp, final @NotNull TestRunDirectoryDto trDir) {
         // Read once, here, while the dialog is still on screen. Everything below
         // works from this map rather than going back to the form, and the

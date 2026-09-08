@@ -44,6 +44,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
         return editor.getPreferredFocusedComponent();
     }
 
+    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-011
     @Override
     public @NotNull String getName() {
         return vf.getDir().getName();
@@ -81,6 +82,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
     public void setState(final @NotNull FileEditorState state) {
     }
 
+    // UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-113
     @Override
     public void selectNotify() {
         final @NotNull List<TestCaseDto> selected = editor.getSelectedTestCases();

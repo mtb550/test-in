@@ -47,6 +47,8 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
     }
 
     /**
+     * Rule-VIEW-PANEL-005.
+     * <p>
      * Tells the details panel that these cases were written, so it re-reads if it
      * is showing one of them.
      * <p>
@@ -63,6 +65,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         panel(p).ifPresent(view -> view.refreshIfShowing(written));
     }
 
+    // UC-VIEW-PANEL-001, Rule-VIEW-PANEL-010
     public static void showPanel(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path, final @NotNull Consumer<ViewPanel> onReadyAction) {
         toolWindow(p).ifPresent(tw -> tw.show(() -> panel(p).ifPresent(viewer -> {
             viewer.show(testCases, path);
@@ -74,6 +77,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         showPanel(p, testCases, path, NOTHING_AFTER);
     }
 
+    // Rule-VIEW-PANEL-008
     @Override
     public void createToolWindowContent(final @NotNull Project p, final @NotNull ToolWindow toolWindow) {
         Logger.info("ViewToolWindowFactory.createToolWindowContent()");

@@ -32,6 +32,7 @@ final class TestCaseSequenceStore {
         return testSetCaseIds;
     }
 
+    // UC-INTERNAL-004, Rule-INTERNAL-030
     @NotNull List<TestCaseDto> getForTestSet(final @NotNull Path testSetPath) {
         final @NotNull List<UUID> ids = testSetCaseIds.getOrDefault(testSetPath.toString(), List.of());
         if (ids.isEmpty()) return List.of();
@@ -54,6 +55,8 @@ final class TestCaseSequenceStore {
     }
 
     /**
+     * UC-INTERNAL-004, Rule-INTERNAL-033, Rule-INTERNAL-034.
+     * <p>
      * Saves a test case, and says whether it had anything to save.
      * <p>
      * Every save arrives here - the update dialog, a grid cell, the details
@@ -98,6 +101,8 @@ final class TestCaseSequenceStore {
     }
 
     /**
+     * UC-INTERNAL-004, Rule-INTERNAL-035.
+     * <p>
      * The save that stamps nothing, for the two callers whose audit is already
      * decided: an import writes the audit the file brought with it, and an undo
      * writes the audit the case had before the change being taken back.
@@ -142,6 +147,8 @@ final class TestCaseSequenceStore {
     }
 
     /**
+     * UC-INTERNAL-004, Rule-INTERNAL-031.
+     * <p>
      * The set's membership and order after a rearrangement.
      *
      * @param moved the cases whose rank actually changed. Only these are

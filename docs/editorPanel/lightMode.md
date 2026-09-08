@@ -1,6 +1,6 @@
 [Documentation](../README.md) › [The editor panel](main.md) › UC-EDITOR-PANEL-046
 
-# Light mode
+# UC-EDITOR-PANEL-046: Work in light mode
 
 **As a** tester, **I want** the test case I am judging to stay on top of the
 application I am testing, **so that** I can record a verdict without hunting for

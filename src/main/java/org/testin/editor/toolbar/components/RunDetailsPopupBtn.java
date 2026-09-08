@@ -5,6 +5,7 @@ import org.testin.model.RunEditorAttributes;
 
 public class RunDetailsPopupBtn extends AbstractDetailsPopupBtn<RunEditorAttributes> {
 
+    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-022
     public RunDetailsPopupBtn(final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         // The key is bumped only when a stored selection would be answering an
         // older question, because bumping discards what every tester ticked: v5

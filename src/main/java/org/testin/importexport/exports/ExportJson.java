@@ -18,6 +18,8 @@ import java.util.Map;
 public class ExportJson {
 
     /**
+     * UC-SHARE-001, Rule-SHARE-010.
+     * <p>
      * Writes the export itself rather than borrowing the indexer's writer: an
      * export lands outside the test data tree, on a destination the tester chose,
      * so it is not the indexer's to own. {@code importexport} is an exempt

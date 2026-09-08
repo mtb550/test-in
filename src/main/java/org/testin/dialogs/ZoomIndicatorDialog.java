@@ -54,6 +54,8 @@ public final class ZoomIndicatorDialog implements Disposable {
     }
 
     /**
+     * UC-SETTING-011.
+     * <p>
      * Shows what the font size has just become, against this component.
      */
     public static void show(final @NotNull Project p, final @NotNull JComponent parent, final float currentSize) {

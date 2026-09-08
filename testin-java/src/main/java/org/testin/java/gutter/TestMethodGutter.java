@@ -37,6 +37,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         }
     }
 
+    // UC-CODEGEN-007, Rule-CODEGEN-028, Rule-CODEGEN-029
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
         final @NotNull Project p = element.getProject();
@@ -64,6 +65,8 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
     }
 
     /**
+     * UC-CODEGEN-007, Rule-CODEGEN-029.
+     * <p>
      * Whether this string literal is the testName of a TestNG @Test. Each step
      * up the tree can run out of parents, and running out means the same as
      * finding the wrong thing: not ours.
@@ -76,6 +79,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 .isPresent();
     }
 
+    // UC-CODEGEN-007, Rule-CODEGEN-030
     private void openViewPanel(final @NotNull Project p, final @NotNull UUID uuid) {
         Logger.info("Searching for UUID: " + uuid);
 

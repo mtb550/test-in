@@ -19,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 public record GridView(@NotNull JBTable table, @NotNull JBScrollPane scrollPane, @NotNull Disposable fontSync) {
 
     /**
+     * UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-119.
+     * <p>
      * Whether a cell is open for editing under the tester's cursor. A reload
      * would throw that half-typed value away, so an editor showing this grid
      * reports itself busy while it is true and an on-disk refresh waits for the
@@ -29,6 +31,8 @@ public record GridView(@NotNull JBTable table, @NotNull JBScrollPane scrollPane,
     }
 
     /**
+     * UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-019.
+     * <p>
      * Commits what is being typed, before this view is thrown away.
      * <p>
      * A rebuild replaces the table, and an open editor goes with it - so a value

@@ -22,6 +22,7 @@ public class CellEditListener implements TableModelListener {
         this.testCases = testCases;
     }
 
+    // UC-SHARE-003, Rule-SHARE-021
     @Override
     public void tableChanged(final @NotNull TableModelEvent e) {
         if (isUpdating) return;

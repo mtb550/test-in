@@ -53,6 +53,8 @@ public final class BoundTestProject {
     }
 
     /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-001.
+     * <p>
      * The named project as the indexer holds it, empty when the name matches
      * nothing there - no file, a name nobody uses, or a project that is archived
      * and therefore never indexed.
@@ -87,6 +89,8 @@ public final class BoundTestProject {
     }
 
     /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-064.
+     * <p>
      * Why the named project is not showing, in one sentence a tester can act on,
      * or empty when there is nothing wrong. Archived is called by its name
      * because it is the one cause with an obvious fix.

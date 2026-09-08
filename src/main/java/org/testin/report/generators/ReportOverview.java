@@ -43,6 +43,7 @@ public final class ReportOverview {
      */
     private static final @NotNull String NOT_RECORDED = "n/a";
 
+    // Rule-REPORT-002
     public static @NotNull List<DetailRow> rowsFor(final @NotNull String projectName, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull TestRunSummary summary) {
         final @NotNull List<DetailRow> rows = new ArrayList<>();
 

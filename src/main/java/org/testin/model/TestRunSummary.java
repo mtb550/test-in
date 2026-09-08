@@ -40,6 +40,7 @@ public record TestRunSummary(long total, long passed, long failed, long blocked,
      */
     public static final @NotNull TestRunSummary EMPTY = new TestRunSummary(0, 0, 0, 0, 0, 0, 0, "");
 
+    // UC-INTERNAL-006, Rule-INTERNAL-048, Rule-INTERNAL-049
     public static @NotNull TestRunSummary of(final @NotNull List<TestRunItems> results) {
         final @NotNull Map<TestStatus, Long> counts = results.stream()
                 .collect(Collectors.groupingBy(TestRunItems::getStatus, Collectors.counting()));

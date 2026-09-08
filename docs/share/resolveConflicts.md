@@ -28,7 +28,8 @@ There is no key for this. The offer appears on the message.
 
 - **Rule-SHARE-075** — A pull that stops leaves the repository part way through,
   and Testin says so rather than leaving the tester to find out.
-- **Rule-SHARE-076** — Two answers are offered: carry on once it is settled, or
+- **Rule-SHARE-076** — Three answers are offered: let Testin settle the test
+  cases field by field and then carry on, carry on without merging anything, or
   roll the whole pull back.
 - **Rule-SHARE-077** — Rolling back keeps everything that was here before the
   pull.

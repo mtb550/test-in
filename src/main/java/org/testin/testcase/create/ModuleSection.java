@@ -34,6 +34,7 @@ public class ModuleSection implements CreateTestCaseSection {
         return wrapper;
     }
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
         dto.setModule(moduleField.getText().trim());

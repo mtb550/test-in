@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 
 public class OpenBugsTab {
+    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-038
     public void load(final @NotNull JBPanel<?> bugTab) {
         bugTab.removeAll();
         bugTab.add(new JBLabel("No bugs found for this test case."), BorderLayout.NORTH);

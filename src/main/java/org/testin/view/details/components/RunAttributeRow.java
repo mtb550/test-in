@@ -38,6 +38,8 @@ public final class RunAttributeRow extends BaseDetails {
     }
 
     /**
+     * UC-VIEW-PANEL-005, Rule-VIEW-PANEL-031.
+     * <p>
      * Nothing recorded draws no row. A case that passed carries no bug severity
      * and no stacktrace - the verdict cleared them, because a case that passed
      * has nothing to explain - and a row labelled with a blank beside it is a

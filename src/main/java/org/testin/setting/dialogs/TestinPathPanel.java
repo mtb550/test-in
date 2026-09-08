@@ -93,6 +93,7 @@ public final class TestinPathPanel {
         }
     }
 
+    // UC-SETTING-002, UC-SETTING-003
     public @NotNull JBPanel<?> getComponent() {
         final @NotNull JBPanel<?> panel = new JBPanel<>(new BorderLayout(5, 0));
         panel.add(pathField, BorderLayout.CENTER);

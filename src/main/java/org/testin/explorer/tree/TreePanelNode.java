@@ -27,6 +27,7 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
         this.p = p;
     }
 
+    // UC-TREE-PANEL-018, Rule-TREE-PANEL-063
     @Override
     public @NotNull Collection<? extends AbstractTreeNode<?>> getChildren() {
         final @NotNull Object value = getValue();
@@ -75,6 +76,8 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
     }
 
     /**
+     * UC-TREE-PANEL-028, Rule-TREE-PANEL-008.
+     * <p>
      * The platform's expand-all asks every node this before descending into it.
      * An archived package answers no, so it stays collapsed when the tree opens
      * a project, while a click still expands it as before.

@@ -39,6 +39,8 @@ public record NodeFigures(long testSets, long packages, long testCases, long tes
     }
 
     /**
+     * UC-INTERNAL-006, Rule-INTERNAL-052.
+     * <p>
      * What the chart's hole reads.
      * <p>
      * A run nobody has given a verdict in has no rate to report, and "0%" there
@@ -54,6 +56,8 @@ public record NodeFigures(long testSets, long packages, long testCases, long tes
     }
 
     /**
+     * UC-TREE-PANEL-012, Rule-TREE-PANEL-038.
+     * <p>
      * The sentence a removal confirmation shows, blank when the node holds
      * nothing - "and nothing else goes with it" is not worth a line.
      * <p>

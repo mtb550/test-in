@@ -48,6 +48,7 @@ public class FontSync {
         attachWheelZoom(p, component);
     }
 
+    // UC-SETTING-011, Rule-SETTING-039
     public static void attachWheelZoom(final @NotNull Project p, final @NotNull JComponent component) {
         component.addMouseWheelListener(e -> {
             if (e.isControlDown() || e.isMetaDown()) {
@@ -58,6 +59,8 @@ public class FontSync {
     }
 
     /**
+     * UC-SETTING-011, Rule-SETTING-037.
+     * <p>
      * Puts a font size on the global scheme and on every open editor, and tells
      * the IDE it changed.
      * <p>
@@ -81,6 +84,7 @@ public class FontSync {
                 .globalSchemeChange(globalScheme);
     }
 
+    // UC-SETTING-011, Rule-SETTING-038
     private static void zoomGlobalIdeEditors(final @NotNull Project p, final @NotNull JComponent component, final boolean zoomIn) {
         ApplicationManager.getApplication().invokeLater(() -> {
             final float newSize = Math.clamp(getBaseFontSize() + (zoomIn ? 1.0f : -1.0f), FLOOR, 72.0f);

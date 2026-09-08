@@ -113,6 +113,8 @@ public final class Shared {
      * unconditional - the same reason {@link #addBugBadge} is shaped this way.
      */
     /**
+     * UC-EDITOR-PANEL-001.
+     * <p>
      * The badges a test case carries on its own: its priority, then one per
      * group. Not its run status - that belongs to a run rather than to the case,
      * so the surfaces that want it add it after these.
@@ -293,6 +295,8 @@ public final class Shared {
     }
 
     /**
+     * UC-SETTING-011, Rule-SETTING-039.
+     * <p>
      * Hands a wheel event to the enclosing scroll pane, so a component that does
      * not scroll itself does not swallow the gesture. Ctrl/Meta is left alone -
      * that is the font zoom, not a scroll.

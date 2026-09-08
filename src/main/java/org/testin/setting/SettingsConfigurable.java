@@ -63,6 +63,7 @@ public final class SettingsConfigurable implements Configurable {
         return Bundle.getPluginName();
     }
 
+    // UC-SETTING-001
     @Override
     public @NotNull JComponent createComponent() {
         // Null project, as the source-root field above already does: the chooser
@@ -94,6 +95,7 @@ public final class SettingsConfigurable implements Configurable {
                 .getPanel();
     }
 
+    // UC-SETTING-001, Rule-SETTING-008
     @Override
     public boolean isModified() {
         final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
@@ -108,6 +110,7 @@ public final class SettingsConfigurable implements Configurable {
         return modified;
     }
 
+    // UC-SETTING-001, Rule-SETTING-009, Rule-SETTING-024
     @Override
     public void apply() {
         final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
@@ -151,6 +154,7 @@ public final class SettingsConfigurable implements Configurable {
         }
     }
 
+    // UC-SETTING-001
     @Override
     public void reset() {
         final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);

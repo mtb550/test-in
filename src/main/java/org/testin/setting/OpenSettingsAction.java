@@ -14,6 +14,7 @@ public class OpenSettingsAction extends AbstractProjectAction {
         super(p, "Settings", "Configure Testin settings", AllIcons.General.Settings);
     }
 
+    // UC-SETTING-001, Rule-SETTING-007
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class);

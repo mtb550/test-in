@@ -57,6 +57,8 @@ public final class Notifier {
     }
 
     /**
+     * Rule-TREE-PANEL-004.
+     * <p>
      * The tester typed a name that is already taken.
      * <p>
      * One sentence for one situation, whichever action they reached it through -
@@ -85,6 +87,8 @@ public final class Notifier {
     }
 
     /**
+     * UC-TREE-PANEL-023, Rule-TREE-PANEL-078.
+     * <p>
      * The tester asked to run a node that has nothing left to run.
      * <p>
      * One sentence for two situations that read the same to them: a test set
@@ -116,6 +120,8 @@ public final class Notifier {
     }
 
     /**
+     * Rule-EDITOR-PANEL-009.
+     * <p>
      * A test case the tester should be looking at is behind the filter.
      * <p>
      * Said rather than fixed. Testin used to clear every filter to bring the
@@ -142,6 +148,8 @@ public final class Notifier {
     }
 
     /**
+     * Rule-TREE-PANEL-007, Rule-EDITOR-PANEL-008.
+     * <p>
      * Confirms an operation that ran over a selection: "Node copied" for one,
      * "Nodes copied 3" for several. Here rather than at the call sites so that
      * every bulk action pluralizes and counts the same way (#62).
@@ -151,6 +159,8 @@ public final class Notifier {
     }
 
     /**
+     * Rule-TREE-PANEL-007, Rule-EDITOR-PANEL-008.
+     * <p>
      * The same two, taking the outcome rather than a word for it.
      * <p>
      * Preferred over the String forms wherever the outcome is one of the

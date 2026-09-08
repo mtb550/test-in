@@ -62,6 +62,8 @@ public enum SftpSecret {
     private final @NotNull String description;
 
     /**
+     * UC-SHARE-020, Rule-SHARE-094.
+     * <p>
      * How this secret is filed for that server and account.
      * <p>
      * Pure, and separate from the store, so what a key looks like can be checked
@@ -73,6 +75,8 @@ public enum SftpSecret {
     }
 
     /**
+     * UC-SHARE-020.
+     * <p>
      * What is stored for that server and account, and empty when nothing is.
      * <p>
      * Empty rather than absent, so a caller hands it straight to the connection
@@ -89,6 +93,8 @@ public enum SftpSecret {
     }
 
     /**
+     * UC-SHARE-020, Rule-SHARE-092.
+     * <p>
      * Keeps it for next time. Answers whether the store took it - a tester whose
      * keychain refused should be told, rather than asked again every sync with
      * no explanation.

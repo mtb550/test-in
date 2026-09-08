@@ -34,6 +34,7 @@ import java.util.List;
  */
 public final class SearchDialog extends AbstractFrameworkDialog<TextFieldWithSelections<Hit>> {
 
+    // UC-INTERNAL-001
     public SearchDialog(final @NotNull Project p) {
         super(p);
 
@@ -66,6 +67,7 @@ public final class SearchDialog extends AbstractFrameworkDialog<TextFieldWithSel
                 .toList();
     }
 
+    // UC-INTERNAL-001, Rule-INTERNAL-002
     @Override
     protected void submit() {
         // Empty when a query matched nothing, which is an ordinary thing for a

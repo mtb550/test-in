@@ -44,6 +44,7 @@ public class ReCreateTestRunAction extends AbstractProjectTreeAction {
         super(p, tree, "Re-create", "Create the next cycle from this test run", AllIcons.Actions.Refresh);
     }
 
+    // UC-TREE-PANEL-021
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         Optional.ofNullable(tree.getSelectionPath()).ifPresent(this::reCreateAt);
@@ -79,6 +80,7 @@ public class ReCreateTestRunAction extends AbstractProjectTreeAction {
                 () -> Logger.warn("Re-create test run: no test project is bound to " + p.getName()));
     }
 
+    // UC-TREE-PANEL-021, Rule-TREE-PANEL-069
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TreeValueUtil.singleSelectedDirectory(tree).filter(TestRunDirectoryDto.class::isInstance).isPresent());

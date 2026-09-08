@@ -120,6 +120,8 @@ public final class DestinationForm implements DialogComponent {
     }
 
     /**
+     * UC-SHARE-023, Rule-SHARE-103.
+     * <p>
      * The destination, or empty when a field is still empty - in which case the
      * offending field takes the focus and the dialog stays open. Remembers the
      * folder when the checkbox is ticked.

@@ -5,6 +5,7 @@ import org.testin.model.TestEditorAttributes;
 
 public class TestDetailsPopupBtn extends AbstractDetailsPopupBtn<TestEditorAttributes> {
 
+    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-022
     public TestDetailsPopupBtn(final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         // v4 is the curated default set (#80). See RunDetailsPopupBtn for when
         // this is bumped and what it costs.

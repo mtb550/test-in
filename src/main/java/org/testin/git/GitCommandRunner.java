@@ -43,6 +43,8 @@ final class GitCommandRunner {
     }
 
     /**
+     * UC-SHARE-012, Rule-SHARE-058.
+     * <p>
      * Runs a command over a set of paths, handing Git the list in a file rather
      * than on the command line.
      * <p>
@@ -117,6 +119,7 @@ final class GitCommandRunner {
         return String.join("\0", paths).getBytes(StandardCharsets.UTF_8);
     }
 
+    // UC-SHARE-012, Rule-SHARE-056
     private static @NotNull String run(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String remoteUrl, final @NotNull String... command) {
         if (command.length < 2 || !"git".equals(command[0])) {
             throw new IllegalArgumentException("Expected a git command");

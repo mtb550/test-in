@@ -9,6 +9,7 @@ import org.testin.util.EditorUtil;
 
 public final class SaveOnProjectClose implements ProjectCloseListener {
 
+    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-015
     @Override
     public void projectClosingBeforeSave(final @NotNull Project p) {
         Services.getInstance(p, EditorUtil.class).saveOpen(p);

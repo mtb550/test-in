@@ -64,6 +64,8 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
     }
 
     /**
+     * UC-EDITOR-PANEL-026, UC-EDITOR-PANEL-029.
+     * <p>
      * Each of these registers its own shortcut on the list from its constructor,
      * so the action object is not needed afterward and is deliberately
      * discarded. It reads like a mistake and is not one — the alternative is a

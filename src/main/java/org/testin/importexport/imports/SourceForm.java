@@ -86,6 +86,8 @@ public final class SourceForm implements DialogComponent {
     }
 
     /**
+     * UC-SHARE-005, Rule-SHARE-103.
+     * <p>
      * Opens the chooser as soon as the dialog is on screen - the import dialog
      * has nothing to preview until a file is picked, so it asks for one instead
      * of waiting. The default folder, when set, seeds the field so the chooser
@@ -105,6 +107,8 @@ public final class SourceForm implements DialogComponent {
     }
 
     /**
+     * UC-SHARE-023, Rule-SHARE-104.
+     * <p>
      * The chosen file, or empty when the field is still empty - in which case
      * it takes the focus and the dialog stays open. Remembers the file's folder
      * when the checkbox is ticked.

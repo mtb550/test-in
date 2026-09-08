@@ -45,6 +45,7 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
                 .map(PackageMarker.class::cast);
     }
 
+    // UC-TREE-PANEL-018, UC-TREE-PANEL-019
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         TreeValueUtil.singleSelectedDirectory(tree)
@@ -52,6 +53,7 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
                 .ifPresent(this::mark);
     }
 
+    // UC-TREE-PANEL-018, Rule-TREE-PANEL-062
     private void mark(final @NotNull DirectoryDto dir) {
         final @NotNull PackageMarker marker = (PackageMarker) dir.getMarker();
         try {
@@ -70,6 +72,7 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
         }
     }
 
+    // UC-TREE-PANEL-018, Rule-TREE-PANEL-065
     @Override
     public void update(final @NotNull AnActionEvent e) {
         final @NotNull Optional<PackageMarker> marker = selectedMarker();

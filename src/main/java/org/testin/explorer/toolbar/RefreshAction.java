@@ -40,11 +40,14 @@ public class RefreshAction extends AbstractProjectAction {
         this.tp = tp;
     }
 
+    // UC-TREE-PANEL-025
     public void execute() {
         execute(REFRESHED);
     }
 
     /**
+     * UC-TREE-PANEL-025, UC-TREE-PANEL-026, Rule-TREE-PANEL-081.
+     * <p>
      * Re-indexes and rebuilds the tree, reporting the outcome in the caller's
      * words.
      * <p>
@@ -103,6 +106,7 @@ public class RefreshAction extends AbstractProjectAction {
         });
     }
 
+    // UC-TREE-PANEL-025
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         execute();

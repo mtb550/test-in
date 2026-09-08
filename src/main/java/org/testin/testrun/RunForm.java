@@ -42,6 +42,8 @@ public final class RunForm {
     private final @NotNull Project p;
 
     /**
+     * UC-TREE-PANEL-009, UC-TREE-PANEL-021, UC-TREE-PANEL-022.
+     * <p>
      * Builds the tree off the EDT - it awaits indexing and walks the project -
      * and shows the dialog back on it.
      */
@@ -82,6 +84,8 @@ public final class RunForm {
     }
 
     /**
+     * UC-TREE-PANEL-009, Rule-TREE-PANEL-030.
+     * <p>
      * The node for a folder, with its test cases or its child folders under it.
      * <p>
      * Always returns a node. It used to return null for an empty test set or an

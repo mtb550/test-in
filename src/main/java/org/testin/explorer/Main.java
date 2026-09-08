@@ -15,6 +15,7 @@ import org.testin.setting.StartupActivity;
 
 public class Main implements ToolWindowFactory, DumbAware {
 
+    // UC-TREE-PANEL-001
     @Override
     public void createToolWindowContent(final @NotNull Project p, final @NotNull ToolWindow tw) {
         Logger.info("ToolWindowFactory.createToolWindowContent()");

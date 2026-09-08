@@ -27,6 +27,7 @@ public class RunToolbar extends AbstractToolbarPanel {
         layoutComponents();
     }
 
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-129
     @Override
     public @NotNull List<ToolbarItem> getCustomComponents() {
         return List.of(

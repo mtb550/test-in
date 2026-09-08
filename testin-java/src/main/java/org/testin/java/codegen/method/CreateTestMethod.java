@@ -45,6 +45,8 @@ public class CreateTestMethod implements GenAction {
     }
 
     /**
+     * UC-CODEGEN-002.
+     * <p>
      * Writes the method here and now, in the caller's command when there is one.
      * <p>
      * A command inside a command is the outer one, so a caller generating for a
@@ -70,6 +72,8 @@ public class CreateTestMethod implements GenAction {
     }
 
     /**
+     * UC-CODEGEN-002, Rule-CODEGEN-018.
+     * <p>
      * Writes the methods for these cases. The only way in - one case comes
      * through it as a set of one.
      * <p>
@@ -135,6 +139,8 @@ public class CreateTestMethod implements GenAction {
     }
 
     /**
+     * UC-CODEGEN-002, Rule-CODEGEN-016.
+     * <p>
      * Writes a whole set of methods into the class as one edit.
      * <p>
      * Adding them through the PSI one at a time is what made this slow: every
@@ -295,6 +301,8 @@ public class CreateTestMethod implements GenAction {
     }
 
     /**
+     * UC-CODEGEN-002.
+     * <p>
      * Puts the TestNG @Test import in the file, when it is not there already.
      * <p>
      * Both of the platform's empty answers mean the same thing here - a file
@@ -318,6 +326,8 @@ public class CreateTestMethod implements GenAction {
     }
 
     /**
+     * UC-CODEGEN-002, Rule-CODEGEN-014, Rule-CODEGEN-015.
+     * <p>
      * The source of one generated test method: its TestNG annotation and an
      * empty body. Written here for both ways of adding it - one at a time
      * through the PSI, and a whole set as text.
@@ -358,6 +368,8 @@ public class CreateTestMethod implements GenAction {
     }
 
     /**
+     * UC-CODEGEN-002, Rule-CODEGEN-016.
+     * <p>
      * Adds one method through the PSI and hands back what it added, or nothing
      * when the class already had it. The caller reformats what it gets.
      * <p>

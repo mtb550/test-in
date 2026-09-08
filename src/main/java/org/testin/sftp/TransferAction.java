@@ -57,6 +57,8 @@ public enum TransferAction {
     DELETE_REMOTE;
 
     /**
+     * UC-SHARE-022, Rule-SHARE-100.
+     * <p>
      * What to do about one file, from where it stood and where it stands.
      *
      * @param base   its hash at the last successful transfer, empty when it was

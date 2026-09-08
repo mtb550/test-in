@@ -58,6 +58,7 @@ public final class TestRunPdfGenerator {
     private final @NotNull DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
     private final @NotNull DeviceRgb LINK_BLUE = new DeviceRgb(0x00, 0x52, 0xCC);
 
+    // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
     public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         // try-with-resources: closing the Document also closes the PdfDocument and
         // PdfWriter, including on any failure path inside the body.

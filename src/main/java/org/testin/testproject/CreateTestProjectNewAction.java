@@ -26,12 +26,15 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
         this.tpName = name;
     }
 
+    // UC-TREE-PANEL-002
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         execute();
     }
 
     /**
+     * UC-TREE-PANEL-002, Rule-TREE-PANEL-017.
+     * <p>
      * Direct entry point for dialog callbacks — no AnActionEvent required.
      */
     public void execute() {
@@ -57,6 +60,7 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
     }
 
 
+    // UC-TREE-PANEL-028, Rule-TREE-PANEL-089
     @Override
     public void update(final @NotNull AnActionEvent e) {
         // Both branches, otherwise the action stays disabled for the whole session

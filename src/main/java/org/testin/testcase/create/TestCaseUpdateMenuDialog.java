@@ -47,6 +47,7 @@ public class TestCaseUpdateMenuDialog {
         ApplicationManager.getApplication().executeOnPooledThread(() -> gt.executeAll(p, updated));
     }
 
+    // UC-EDITOR-PANEL-006
     public void show() {
         final @NotNull String title = items.size() == 1 ? "Update Test Case" : "Update " + items.size() + " Test Cases";
 
@@ -54,6 +55,8 @@ public class TestCaseUpdateMenuDialog {
     }
 
     /**
+     * UC-EDITOR-PANEL-006, UC-EDITOR-PANEL-007.
+     * <p>
      * Opens one field's editor over the cases this dialog was given: what
      * choosing a row on the menu does, and what a field's letter pressed on a
      * selected card does with no menu in between.

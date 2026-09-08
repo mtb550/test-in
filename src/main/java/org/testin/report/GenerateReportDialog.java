@@ -22,6 +22,7 @@ public final class GenerateReportDialog extends AbstractFrameworkDialog<Destinat
 
     private final @NotNull BiConsumer<@NotNull FileTypes, @NotNull File> onGenerate;
 
+    // UC-REPORT-001
     public GenerateReportDialog(final @NotNull Project p, final @NotNull String suggestedFileName, final @NotNull BiConsumer<@NotNull FileTypes, @NotNull File> onGenerate) {
         super(p);
         this.onGenerate = onGenerate;
@@ -43,6 +44,7 @@ public final class GenerateReportDialog extends AbstractFrameworkDialog<Destinat
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
+    // UC-REPORT-001, Rule-REPORT-009
     @Override
     protected void submit() {
         component().resolve().ifPresent(destination -> {

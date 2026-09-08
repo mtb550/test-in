@@ -10,6 +10,7 @@ import java.util.List;
 
 public class ViewPanelActions {
 
+    // UC-VIEW-PANEL-003
     public @NotNull List<AnAction> create(final @NotNull ViewPagination page, final @NotNull JComponent component) {
         return List.of(
                 new PreviousTestCaseAction(page, component),

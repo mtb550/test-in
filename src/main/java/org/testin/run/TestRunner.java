@@ -30,6 +30,8 @@ public interface TestRunner {
     @NotNull ExtensionPointName<TestRunner> EP = ExtensionPointName.create("org.testin.testRunners");
 
     /**
+     * UC-CODEGEN-008, Rule-CODEGEN-031.
+     * <p>
      * Runs these cases as one run.
      */
     void run(final @NotNull Project p, final @NotNull List<TestCaseDto> cases);

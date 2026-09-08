@@ -28,6 +28,8 @@ import java.util.Optional;
 public record Moved(@NotNull DirectoryDto dir, @NotNull Path newParent) {
 
     /**
+     * UC-CODEGEN-016, Rule-CODEGEN-055.
+     * <p>
      * The package the destination stands for, as its segments.
      * <p>
      * Asked of the indexer rather than worked out from the path, because a

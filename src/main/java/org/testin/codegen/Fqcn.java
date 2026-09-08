@@ -26,6 +26,8 @@ import java.util.List;
 public final class Fqcn {
 
     /**
+     * UC-CODEGEN-002, Rule-CODEGEN-012.
+     * <p>
      * The method name alone, for the callers that want only the tail of
      * {@link #ofMethod}. Four places derived it the same way, and a name says
      * what the last element of that list is.
@@ -38,6 +40,8 @@ public final class Fqcn {
     }
 
     /**
+     * UC-CODEGEN-002, Rule-CODEGEN-002.
+     * <p>
      * Packages, class and method for the automation code of one test case - and
      * empty when there is no method to name.
      * <p>
@@ -65,6 +69,8 @@ public final class Fqcn {
     }
 
     /**
+     * UC-CODEGEN-001, Rule-CODEGEN-007.
+     * <p>
      * Packages and class for a directory, or empty when there is no class to
      * name.
      * <p>
@@ -87,6 +93,8 @@ public final class Fqcn {
     }
 
     /**
+     * UC-CODEGEN-001, Rule-CODEGEN-008.
+     * <p>
      * Packages alone, for a directory that becomes one.
      */
     public static @NotNull List<String> ofPackage(final @NotNull DirectoryDto dir) {

@@ -20,6 +20,7 @@ public class SelectionListener implements ListSelectionListener {
     private final @NotNull TestinEditor editor;
     private final @NotNull ArrayList<String> path;
 
+    // UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-113
     @Override
     public void valueChanged(final ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {

@@ -24,6 +24,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
      */
     private final @NotNull Set<DirectoryDto> selectedNodes;
 
+    // Rule-TREE-PANEL-008
     @Override
     public void customizeCellRenderer(final @NotNull JTree tree, final @Nullable Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
         try {

@@ -43,6 +43,8 @@ public final class StacktraceRow extends BaseDetails {
     }
 
     /**
+     * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-035.
+     * <p>
      * A case with nothing to explain draws no row - the same rule every other
      * run row follows, and the reason a passing case shows none of them.
      */

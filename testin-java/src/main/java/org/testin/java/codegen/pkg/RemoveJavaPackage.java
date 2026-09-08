@@ -11,6 +11,7 @@ import java.util.List;
 
 public class RemoveJavaPackage implements GenAction {
 
+    // UC-CODEGEN-018, Rule-CODEGEN-059
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof DirectoryDto dir)) return;

@@ -217,6 +217,7 @@ public enum GenType {
      */
     private final class JavaCodeUpdate implements GenAction {
 
+        // UC-CODEGEN-019, Rule-CODEGEN-005
         @Override
         public void execute(final @NotNull Project p, final @NotNull Object obj) {
             if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
@@ -224,6 +225,7 @@ public enum GenType {
             CodeGenerators.find(GenType.this).execute(p, obj);
         }
 
+        // UC-CODEGEN-019, Rule-CODEGEN-005
         @Override
         public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
             if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;

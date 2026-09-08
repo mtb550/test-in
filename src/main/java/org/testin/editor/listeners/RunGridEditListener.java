@@ -43,6 +43,7 @@ public class RunGridEditListener extends AbstractGridEditListener {
         return RunEditorAttributes.values().length;
     }
 
+    // UC-EDITOR-PANEL-041, Rule-EDITOR-PANEL-174
     @Override
     protected boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto onThisRow, final int row, final int col) {
         final @NotNull RunEditorAttributes attr = RunEditorAttributes.values()[col];

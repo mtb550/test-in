@@ -213,6 +213,8 @@ public abstract class TestCaseBaseDialog {
     private @NotNull Optional<CreateTestCaseSection> editableSection = Optional.empty();
 
     /**
+     * UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-035.
+     * <p>
      * Greys out every section but this one, and records that only it may write.
      */
     protected void onlyEditable(final @NotNull CreateTestCaseSection target) {
@@ -267,6 +269,7 @@ public abstract class TestCaseBaseDialog {
         return LookupManager.getInstance(p).getActiveLookup() != null;
     }
 
+    // Rule-EDITOR-PANEL-029, Rule-EDITOR-PANEL-035
     public @NotNull Runnable save(final @NotNull TestCaseDto dto, final @NotNull Consumer<@NotNull TestCaseDto> onSave, final @NotNull JBPopup[] popupWrapper) {
         return () -> {
             // A section the tester never opened holds its empty defaults, and
