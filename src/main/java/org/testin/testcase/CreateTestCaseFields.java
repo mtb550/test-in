@@ -56,7 +56,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
 
     TEST_DATA(
             TestEditorAttributes.TEST_DATA.getName(),
-            Shortcuts.EMPTY,
+            Shortcuts.CreateTestCaseTestData,
             AllIcons.Nodes.DataTables,
             TestCaseBaseDialog::getTestDataSection,
             "set test data",
@@ -65,7 +65,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
 
     PRE_CONDITIONS(
             TestEditorAttributes.PRE_CONDITIONS.getName(),
-            Shortcuts.EMPTY,
+            Shortcuts.CreateTestCasePreConditions,
             AllIcons.Actions.StepOut,
             TestCaseBaseDialog::getPreConditionsSection,
             "set pre conditions",
@@ -107,7 +107,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
      * duplicate {@code *_SHORTCUT} constants used to exist.
      */
     private static final @NotNull List<CreateTestCaseFields> JUMP_KEYS =
-            List.of(DESCRIPTION, EXPECTED_RESULT, STEPS, PRIORITY, GROUP);
+            List.of(DESCRIPTION, EXPECTED_RESULT, STEPS, TEST_DATA, PRE_CONDITIONS, PRIORITY, GROUP);
 
     private final @NotNull String name;
     /**

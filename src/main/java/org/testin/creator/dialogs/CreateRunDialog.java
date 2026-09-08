@@ -20,6 +20,7 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
 
     private final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onCreate;
 
+    // UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-032
     public CreateRunDialog(final @NotNull Project p, final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onCreate) {
         super(p);
         this.onCreate = onCreate;
@@ -30,8 +31,8 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
                 ComponentDialogBase.<DirectoryType>textFieldWithSelections()
                         .icon(DirectoryType.TR.getIcon())
                         .placeholder("set name, like Sprint 3 Cycle 1...")
-                        .selection(DirectoryType.TR.getIcon(), DirectoryType.TR.getDisplayedName(), "Records execution results", DirectoryType.TR)
-                        .selection(DirectoryType.TRP.getIcon(), DirectoryType.TRP.getDisplayedName(), "Groups test runs", DirectoryType.TRP)
+                        .selection(DirectoryType.TR.getIcon(), DirectoryType.TR.getDescription(), "Records execution results", DirectoryType.TR)
+                        .selection(DirectoryType.TRP.getIcon(), DirectoryType.TRP.getDescription(), "Groups test runs", DirectoryType.TRP)
                         .build());
 
         shortcuts = List.of(

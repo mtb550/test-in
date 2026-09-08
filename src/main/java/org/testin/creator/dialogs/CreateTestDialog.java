@@ -20,6 +20,7 @@ public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWit
 
     private final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onCreate;
 
+    // UC-TREE-PANEL-007, UC-TREE-PANEL-008, Rule-TREE-PANEL-024
     public CreateTestDialog(final @NotNull Project p, final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onCreate) {
         super(p);
         this.onCreate = onCreate;
@@ -30,8 +31,8 @@ public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWit
                 ComponentDialogBase.<DirectoryType>textFieldWithSelections()
                         .icon(DirectoryType.TS.getIcon())
                         .placeholder("set name...")
-                        .selection(DirectoryType.TS.getIcon(), DirectoryType.TS.getDisplayedName(), "Holds test cases", DirectoryType.TS)
-                        .selection(DirectoryType.TSP.getIcon(), DirectoryType.TSP.getDisplayedName(), "Groups test sets", DirectoryType.TSP)
+                        .selection(DirectoryType.TS.getIcon(), DirectoryType.TS.getDescription(), "Holds test cases", DirectoryType.TS)
+                        .selection(DirectoryType.TSP.getIcon(), DirectoryType.TSP.getDescription(), "Groups test sets", DirectoryType.TSP)
                         .build());
 
         shortcuts = List.of(

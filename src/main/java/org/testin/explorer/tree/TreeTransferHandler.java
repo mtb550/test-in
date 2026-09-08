@@ -29,6 +29,7 @@ import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.image.BufferedImage;
@@ -537,8 +538,32 @@ public class TreeTransferHandler extends TransferHandler {
                 .softShowCounted(p, cut ? Done.CUT : Done.COPIED, directories.size());
     }
 
+    // UC-TREE-PANEL-013, Rule-TREE-PANEL-050
     public void pasteFromClipboard() {
-        ClipboardContents.current().ifPresent(contents -> importData(new TransferSupport(tree, contents)));
+        ClipboardContents.current().ifPresent(contents -> {
+            // A cut is spent by the paste that carries it out. Left on the
+            // clipboard it offered the same move again, from a folder the nodes
+            // had already left, and the second attempt found nothing there. A
+            // copy stays: a copy is meant to be pasted more than once.
+            final boolean wasCut = !selectedNodes.isEmpty();
+            if (importData(new TransferSupport(tree, contents)) && wasCut) clearClipboard();
+        });
+    }
+
+    /**
+     * UC-TREE-PANEL-013, Rule-TREE-PANEL-050.
+     * <p>
+     * Takes the nodes off the clipboard and off the screen: nothing is left
+     * waiting to be pasted, and no row stays faded. Only Testin's own nodes are
+     * cleared away - anything else on the clipboard belongs to somebody else's
+     * copy.
+     */
+    public void clearClipboard() {
+        if (ClipboardContents.withFlavor(NODE_FLAVOR).isPresent()) {
+            CopyPasteManager.getInstance().setContents(new StringSelection(""));
+        }
+
+        resetLastAction();
     }
 
     private void updateClipboardState(final int action, final @NotNull List<DirectoryDto> directories) {

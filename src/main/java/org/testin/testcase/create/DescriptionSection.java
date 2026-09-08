@@ -19,12 +19,24 @@ import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 
 import javax.swing.*;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DescriptionSection implements CreateTestCaseSection {
     private final @NotNull Project p;
     @Getter
     private final @NotNull EditorTextField descriptionField;
     private final @NotNull JBPanel<?> wrapper;
+
+    /**
+     * The test methods the other test cases in this test set already name.
+     * <p>
+     * Empty until a dialog says what to compare against, and empty is a dialog
+     * with nothing to compare - it refuses nothing, which is what the update
+     * dialogs want.
+     */
+    private @NotNull Set<String> takenMethodKeys = Set.of();
 
     public DescriptionSection(final @NotNull Project p) {
         this.p = p;
@@ -33,6 +45,22 @@ public class DescriptionSection implements CreateTestCaseSection {
         styleField(this.descriptionField, CreateTestCaseFields.DESCRIPTION);
 
         this.wrapper = createWrapper(CreateTestCaseFields.DESCRIPTION.getIcon(), this.descriptionField);
+    }
+
+    /**
+     * UC-EDITOR-PANEL-005, Rule-CODEGEN-001.
+     * <p>
+     * The test cases this description must not name the same method as. Held as
+     * keys rather than as the cases, because that is the only question asked of
+     * them and the answer must not change while the dialog is open.
+     */
+    public void compareAgainst(final @NotNull List<TestCaseDto> siblings) {
+        takenMethodKeys = siblings.stream()
+                .map(TestCaseDto::getDescription)
+                .map(NameSanitizer::methodName)
+                .filter(name -> !name.isEmpty())
+                .map(NameSanitizer::methodKey)
+                .collect(Collectors.toSet());
     }
 
     public void setError(final boolean error) {
@@ -60,22 +88,46 @@ public class DescriptionSection implements CreateTestCaseSection {
      * A blank one is not this section's refusal to make - the save has always
      * owned that, and it says so differently.
      */
+    // UC-EDITOR-PANEL-005, Rule-CODEGEN-001
     @Override
     public boolean accepts() {
         final @NotNull String description = descriptionField.getText().trim();
-        if (description.isEmpty() || NameSanitizer.canMakeMethodName(description)) {
+        if (description.isEmpty()) {
             setError(false);
             return true;
         }
 
-        setError(true);
-        Services.getInstance(p, Notifier.class).softRefuse(p,
-                "That description cannot name a test method",
-                "The generated method would be called \"" + NameSanitizer.methodName(description)
-                        + "\", which Java will not accept. A description has to begin with a letter, "
-                        + "and cannot be a single word Java keeps for itself such as new or class.");
+        final @NotNull String methodName = NameSanitizer.methodName(description);
 
-        return false;
+        if (!NameSanitizer.canMakeMethodName(description)) {
+            setError(true);
+            Services.getInstance(p, Notifier.class).softRefuse(p,
+                    "That description cannot name a test method",
+                    "The generated method would be called \"" + methodName
+                            + "\", which Java will not accept. A description has to begin with a letter, "
+                            + "and cannot be a single word Java keeps for itself such as new or class.");
+
+            return false;
+        }
+
+        // Punctuation and capitals are dropped on the way to a method name, so
+        // "Log in" and "Log-in!" are one method - and only one was ever written.
+        // The second test case ended up with no method of its own: it could not
+        // be run and could not be jumped to, and nothing said so until the first
+        // F5 (#244).
+        if (takenMethodKeys.contains(NameSanitizer.methodKey(methodName))) {
+            setError(true);
+            Services.getInstance(p, Notifier.class).softRefuse(p,
+                    "Another test case already names that test method",
+                    "The generated method would be called \"" + methodName
+                            + "\", and a test case in this test set already has it. Punctuation and "
+                            + "capitals do not make two methods, so this description has to differ by a word.");
+
+            return false;
+        }
+
+        setError(false);
+        return true;
     }
 
     @Override

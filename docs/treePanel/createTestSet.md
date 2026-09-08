@@ -78,19 +78,15 @@ A test set is the folder that holds test cases. This makes one.
 3. **The status bar** — every key this dialog answers to.
 
 **Create Run Node** is the same dialog on the test run side. Two things differ.
-Its kinds are *test run* (*Records execution results*) and *test run package*
+Its kinds are *Test Run* (*Records execution results*) and *Test Run Package*
 (*Groups test runs*). Its hint text reads *set name, like Sprint 3 Cycle 1...*.
-
-> **Today the two kind names are blank.** The rows show only their hints. This
-> is difference 4 on
-> [the tree panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ## Main flow
 
 1. The tester selects **Test Cases** or a test set package.
 2. The tester presses `Ctrl+M`, or chooses **Create**.
 3. The **Create Test Node** dialog opens. Its first row is selected, and reads
-   *Holds test cases*.
+   *Test Set*, with the hint *Holds test cases* beside it.
 4. The tester types a name and presses `Enter`.
 5. Testin creates the test set under the selected parent, refreshes the tree,
    and shows *Created*.

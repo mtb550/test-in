@@ -255,7 +255,6 @@ bug report yet.
 | | The rule it breaks | What a tester sees |
 |---|---|---|
 | **Difference 1** | Rule-EDITOR-PANEL-008 — a message says what happened | `Ctrl+C` says *Details copied* and copies one line, the description. Every other field is left out. |
-| **Difference 2** | Rule-EDITOR-PANEL-005 — a field the tester can fill in has a way in | **Test Data** and **Pre Conditions** cannot be filled in when a test case is created. Both are drawn in the dialog and neither has a key that opens it. |
 | **Difference 3** | Rule-EDITOR-PANEL-005 — one word for one thing | The group boxes in the create dialog read **REGRESSION** and **SMOKE**. The badges, the filter and the grid beside them read **Regression** and **Smoke**. |
 | **Difference 4** | Rule-EDITOR-PANEL-005 — what can be filtered can be set | Four groups can be filtered on and never assigned. The filter offers Security, UI, Functional and Validation. The dialog offers only Regression, Smoke and Sanity. |
 | **Difference 5** | Rule-EDITOR-PANEL-001 — one name for one thing | Two buttons on one toolbar are both tooltipped **Details**. One picks which fields are shown, the other opens the test set's own details. |
@@ -295,6 +294,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 27** | Stopping a test case marked the test run **In Progress** first, and so did clicking the icon that only navigates to the test method. Fixed 7 September 2026, [#221](https://github.com/mtb550/test-in/issues/221) |
 | **Difference 28** | Closing the tab left the automation running and its verdicts homeless. Fixed 7 September 2026, [#222](https://github.com/mtb550/test-in/issues/222) |
 | **Difference 29** | `Escape` in the failure dialog threw away everything typed with no confirmation. Fixed 7 September 2026, [#223](https://github.com/mtb550/test-in/issues/223) |
+| **Difference 2** | **Test Data** and **Pre Conditions** were drawn in the create dialog with no key that opened either. Fixed 8 September 2026, [#198](https://github.com/mtb550/test-in/issues/198) |
 
 ---
 

@@ -159,6 +159,8 @@ While the create or update dialog is open.
 | `Ctrl+M` | Opens the module |
 | `Ctrl+S` | Adds a step |
 | `Ctrl+W` | Removes a step |
+| `Ctrl+T` | Opens the test data |
+| `Ctrl+B` | Opens the pre conditions |
 | `Ctrl+G` | Opens the group picker |
 | `Ctrl+P` | Opens the priority |
 | `Alt+Enter` | Offers the corrections for what was typed |

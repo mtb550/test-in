@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.util.EditorUtil;
@@ -77,11 +77,10 @@ public class NavigationBar extends BaseDetails {
                         setUnderline(folderLabel, false);
                     }
 
+                    // UC-VIEW-PANEL-010, Rule-VIEW-PANEL-042, Rule-VIEW-PANEL-043
                     @Override
                     public void mouseClicked(final MouseEvent e) {
                         if (isLast) {
-                            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-
                             // Resolved by the class that owns it. This walked the
                             // segments off the raw stored root, which skips the
                             // two steps that make it a real path - falling back
@@ -90,16 +89,24 @@ public class NavigationBar extends BaseDetails {
                             // it. Either case yielded a relative path, the
                             // indexer lookup then threw, and it threw out of a
                             // Swing mouse listener.
-                            final @NotNull Path testSetPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
+                            final @NotNull Path lastStepPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
 
-                            final @NotNull TestSetDirectoryDto ts = indexer.getTestSetByPath(testSetPath);
+                            // Whatever the step names, which is a test set when
+                            // the panel was opened from the tree and a test run
+                            // when it was opened from a run. Asking for a test
+                            // set by path threw the second time: there is no test
+                            // set where a run is, and a cache miss is an error the
+                            // tester cannot read - out of a mouse listener again.
+                            // Asked, not assumed, so the step opens what it says.
+                            Services.getInstance(p, ProjectIndexer.class).find(lastStepPath)
+                                    .filter(DirectoryDto::isOpenableInEditor)
+                                    .ifPresent(dir -> Services.getInstance(p, EditorUtil.class).open(p, dir));
 
                             // No is-open guard. Opening a node that is already
                             // open focuses it, which is what the guard was for -
                             // and the guard matched on the name, so with two test
-                            // sets called the same it focused the neighbour and
+                            // sets called the same it focused the neighbor and
                             // then returned without opening this one.
-                            Services.getInstance(p, EditorUtil.class).open(p, ts);
                         }
                     }
                 });

@@ -59,9 +59,12 @@ public class EscapeAction extends AbstractProjectAction {
         onEscape.run();
     }
 
+    // UC-TREE-PANEL-013, Rule-TREE-PANEL-050
     private void clearTreeTransfer(final @NotNull TreeTransferHandler transferHandler) {
-        transferHandler.getSelectedNodes().clear();
-        transferHandler.resetLastAction();
+        // The handler owns the clipboard it wrote, so it is the one that empties
+        // it. ESC used to take the gray off the rows and leave the nodes waiting,
+        // so the next Ctrl+V still offered the move the tester had called off.
+        transferHandler.clearClipboard();
         Logger.info("Clipboard/Cut state cleared via ESC.");
     }
 

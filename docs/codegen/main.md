@@ -142,7 +142,7 @@ bug report yet.
 | | The rule it breaks | What a tester sees |
 |---|---|---|
 | **Difference 2** | Rule-CODEGEN-002 — a menu entry does what it says | **Automate Test Case**, and `Ctrl+F12`, are live on every selected test case and always answer *Not built yet*. The one entry named after generating code is the one that does not. |
-| **Difference 3** | Rule-CODEGEN-001 — one test case, one method | Two test cases whose descriptions differ only in punctuation share one method. The second gets none, cannot be run and cannot be jumped to. Nothing says so when it is created. |
+| **Difference 3** | Rule-CODEGEN-001 — one test case, one method | Two test cases whose descriptions differ only in punctuation share one method, and the second gets none. The create dialog now refuses such a description and says which method it would have named, so this can no longer be typed. It can still arrive: an import, a Git merge, and editing a description after the test case exists are none of them checked. |
 | **Difference 4** | Rule-CODEGEN-006 — a tester can find out what happened | Clicking the gutter mark of a test case that was removed does nothing at all. Generated code outlives its test case, so this is the ordinary case. |
 | **Difference 5** | Rule-CODEGEN-006 — one situation, one sentence | A test case with no method says *has no generated code yet* when it is run, and **Nothing to open** when it is jumped to. One state, two sentences, one keystroke apart. |
 | **Difference 6** | Rule-CODEGEN-004 — the tree and the code agree | Moving a test set to a place Testin has not read leaves the class where it was. The tree and the code then disagree, and only the log says so. |

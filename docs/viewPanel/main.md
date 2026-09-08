@@ -167,7 +167,6 @@ bug report yet.
 |---|---|---|
 | **Difference 1** | Rule-VIEW-PANEL-003 — a key that is written is a key that works | The run button's tooltip says `F5`. The go to code button's says `Shift+F5`. Neither key does anything while the focus is in the panel. Both work on the cards in the editor. |
 | **Difference 2** | Rule-VIEW-PANEL-004 — the tester closes the panel when they want the screen | `Escape` closes the panel from the editor, and does nothing from inside the panel. A tester who has just used `F2`, which needs the focus in the panel, cannot close it with `Escape`. |
-| **Difference 3** | Rule-VIEW-PANEL-005 — reading a panel never changes anything | Clicking the last step of the path fails when the panel was opened from a test run. It looks for a test set where a test run is, finds none, and stops with an internal error the tester cannot read. |
 | **Difference 4** | Rule-VIEW-PANEL-003 — what looks clickable is clickable | Every step of the path takes a hand pointer and underlines itself. Only the last one does anything. Clicking **Test Cases** to go up a level does nothing, and says nothing. |
 | **Difference 5** | Rule-VIEW-PANEL-008 — the three tabs describe the same test case | A failed test case shows **Blocker** and **High** on the Details tab, while the tab beside it reads *No bugs found for this test case.* The Open Bugs tab is not built, and never looks at the test case. |
 | **Difference 6** | Rule-VIEW-PANEL-006 — nothing is drawn about a test case that is not there | With no test case selected, Details reads *Select a test case to view details* and Open Bugs reads *No bugs found for this test case.* There is no test case. |
@@ -183,6 +182,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | Gone | Was |
 |---|---|
 | **Difference 10** | An F2 edit that Testin could find no place to write was dropped in silence. Fixed 7 September 2026, [#234](https://github.com/mtb550/test-in/issues/234) |
+| **Difference 3** | The last step of the path looked for a test set where a test run was, and stopped with an internal error. Fixed 8 September 2026, [#227](https://github.com/mtb550/test-in/issues/227) |
 
 ---
 

@@ -159,12 +159,13 @@ first of them.
 **If the Java plugin is not installed** — the first move in the project shows
 *Java Plugin Not Available*. The move still happens.
 
-> **A paste does not empty the clipboard.** After a move, **Paste** is still
-> live. `Ctrl+V` on another folder offers to move the same nodes again.
+**After a move** — the clipboard is empty and **Paste** is gray again. The
+nodes were moved once; offering to move them a second time from a folder they
+have left would find nothing there. A copy is different: it stays on the
+clipboard and can be pasted as often as the tester likes.
 
-> **After `Escape`, the nodes stay on the clipboard.** A later `Ctrl+V` still
-> offers to move them. This breaks Rule-TREE-PANEL-050. It is difference 6 on
-> [the tree panel page](main.md#where-the-plugin-breaks-its-own-rules).
+**After `Escape`** — the clipboard is empty too, and the faded rows come back
+to normal. Nothing is left waiting.
 
 ---
 

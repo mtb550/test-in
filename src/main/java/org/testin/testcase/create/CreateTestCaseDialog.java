@@ -10,7 +10,10 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.services.Services;
 import org.testin.testcase.UIAction;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Shortcuts;
@@ -21,8 +24,13 @@ import java.util.function.Consumer;
 
 public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
-    public CreateTestCaseDialog(final @NotNull Project p, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
+    // UC-EDITOR-PANEL-005, Rule-CODEGEN-001
+    public CreateTestCaseDialog(final @NotNull Project p, final @NotNull TestSetDirectoryDto dir, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p);
+
+        // Asked of the indexer, which owns the test set's cases, and asked once:
+        // the set cannot change while this dialog is in front of it.
+        descriptionSection.compareAgainst(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(dir.getPath()));
 
         final @NotNull TestCaseDto dto = new TestCaseDto();
 

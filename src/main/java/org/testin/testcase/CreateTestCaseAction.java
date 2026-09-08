@@ -41,7 +41,7 @@ public class CreateTestCaseAction extends AbstractProjectAction {
     }
 
     public void openCreateDialog() {
-        new CreateTestCaseDialog(p, tc -> {
+        new CreateTestCaseDialog(p, dir, tc -> {
             // No rank here. The case arrives unranked, which sorts it last -
             // and the append path already ranks the list it just sorted, so it
             // sees this case at the end and gives it a rank after everything.

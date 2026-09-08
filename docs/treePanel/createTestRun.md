@@ -3,7 +3,7 @@
 # UC-TREE-PANEL-009: Create a test run
 
 > **`Ctrl+M`**, with **Test Runs** or a test run package selected, then pick
-> *test run*. On the menu: **Create**.
+> *Test Run*. On the menu: **Create**.
 
 **As a** tester, **I want** to start a test run over the test cases I choose,
 **so that** a pass through the product is recorded on its own.

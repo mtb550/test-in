@@ -110,6 +110,13 @@ public enum Shortcuts {
     CreateTestCaseRemoveStep(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK)),
     CreateTestCaseGroup(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK)),
     CreateTestCasePriority(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)),
+    /**
+     * The same two letters the update menu uses for these fields, so a tester
+     * learns each field once: T is test data and B is pre-conditions, with Ctrl
+     * in the create dialog and without it on a card.
+     */
+    CreateTestCaseTestData(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)),
+    CreateTestCasePreConditions(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK)),
 
     // Test case update-menu fields (update dialogs + fields enums)
     UpdateTestCaseDescription(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0)),

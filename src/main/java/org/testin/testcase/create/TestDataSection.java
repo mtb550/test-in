@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 
@@ -36,11 +37,16 @@ public class TestDataSection extends AbstractMultiLineSection {
         dto.setTestData(field.getText().trim());
     }
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-028
     @Override
     public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
-        // No key for test data. It had one, but the status bar never advertised it -
-        // the section is not in the dialog's jump map - so it was a binding
-        // nobody could discover and only competed with the keys that are shown.
+        // Advertised as well as bound - the field is in the dialog's jump map.
+        // The key was taken away once because it was not, which left the field
+        // drawn in a dialog with no way at all to reach it.
+        base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseTestData.getCustomShortcut(), () -> {
+            showSection(slot);
+            repackAction.execute();
+        });
     }
 
     @Override

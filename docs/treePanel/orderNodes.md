@@ -99,8 +99,10 @@ not appear.
 **If several rows are selected** — **Order** stays black and orders the first of
 them, saying nothing about the rest.
 
-> **A number too large to hold silently clears the order.** Typing
-> 99999999999 puts the node back into date order. Testin still says *Ordered*.
+**If the number is too large** — nothing is saved. A message titled **Too
+Large** says what the largest position is, and the dialog stays open with the
+number still in it. The same happens to anything that is not a whole number.
+(Rule-TREE-PANEL-055)
 
 ---
 

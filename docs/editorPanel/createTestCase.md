@@ -60,7 +60,8 @@ This is how every test case in Testin begins.
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤
 │  [k] Enter Save    Escape Cancel    Ctrl+D Description       │
-│      Ctrl+E Expected Result    Ctrl+S Steps    Ctrl+P Prio.. │
+│      Ctrl+E Expected Result    Ctrl+S Steps    Ctrl+T Test.. │
+│      Ctrl+B Pre Conditions    Ctrl+P Priority    Ctrl+G Gr.. │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -78,8 +79,8 @@ This is how every test case in Testin begins.
 | Steps | `Ctrl+S` | *set step*, then the number |
 | Priority | `Ctrl+P` | none, it is a list |
 | Group | `Ctrl+G` | none, they are tick boxes |
-| Test Data | **none** | *set test data* |
-| Pre Conditions | **none** | *set pre conditions* |
+| Test Data | `Ctrl+T` | *set test data* |
+| Pre Conditions | `Ctrl+B` | *set pre conditions* |
 
 ## Main flow
 
@@ -104,15 +105,16 @@ titled **That description cannot name a test method** says what the method would
 have been called. A description must begin with a letter. It also cannot be a
 single word that Java keeps for itself.
 
+**If another test case in this test set already names that method** — nothing is
+saved. A message titled **Another test case already names that test method**
+says what the method would have been called. Punctuation and capitals are
+dropped on the way to a method name, so *Log in* and *Log-in!* are one method:
+the description has to differ by a word.
+
 **If a step is left blank** — it is dropped. The steps after it keep their own
 numbers.
 
 ## Where the plugin breaks its own rules
-
-**Test Data and Pre Conditions cannot be filled in here.** Both are drawn in the
-dialog and neither has a key that opens it, so neither can be reached. They can
-be set afterwards with `T` and `B`. That is difference 2 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
 
 **The group boxes read in capitals.** They read **REGRESSION** where the badge
 beside them reads **Regression**. That is difference 3.
