@@ -133,6 +133,39 @@ testin_example/
 
 The two fixed folders, test run packages and test runs generate nothing at all.
 
+A package is never written on its own. The folders are made on the way to a
+class, so creating a package and stopping there puts nothing on disk, and the
+folder appears when the first test set is created inside it. Java has no empty
+packages, and an empty folder is invisible to the thing that looks a class up
+by name.
+
+---
+
+## When Testin will not generate
+
+Writing code touches two things the plugin does not own: the IDE's Java support,
+and the IDE's index.
+
+**Without the Java plugin**, nothing is generated at all. A message says so once
+for the whole code project, and every later operation is a silent skip. That is
+[UC-CODEGEN-021](noJavaPlugin.md).
+
+**While the IDE is indexing**, Testin refuses and says so. Every generated file
+is found by the name of the class it belongs to, and looking a class up by name
+is a question the index answers - so until the index is built there is no answer
+to give.
+
+The refusal is deliberate, rather than waiting for the index and doing the work
+afterwards. Waiting would be right for creating something and wrong for renaming
+or moving it: **Rule-CODEGEN-004** has a rename happen while the old name still
+finds the code, and a rename that waited would run after the tree had changed
+and look for a class that no longer answers to that name. So Testin says it
+cannot, and the tester's next attempt works.
+
+Both answers are given in one place, so a fifteenth operation gets them without
+asking. Everything Testin writes runs inside one of the IDE's write commands,
+which is also what makes each operation a single entry on the undo history.
+
 ---
 
 ## Where the plugin breaks its own rules

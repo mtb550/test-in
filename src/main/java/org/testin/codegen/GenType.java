@@ -1,10 +1,15 @@
 package org.testin.codegen;
 
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.method.update.NoOpCodeUpdate;
+import org.testin.logger.Logger;
+import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import org.testin.services.OptionalPlugin;
+import org.testin.services.Services;
 
 import java.util.List;
 
@@ -220,7 +225,7 @@ public enum GenType {
         // UC-CODEGEN-019, Rule-CODEGEN-005
         @Override
         public void execute(final @NotNull Project p, final @NotNull Object obj) {
-            if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+            if (!canGenerate(p)) return;
 
             CodeGenerators.find(GenType.this).execute(p, obj);
         }
@@ -228,9 +233,33 @@ public enum GenType {
         // UC-CODEGEN-019, Rule-CODEGEN-005
         @Override
         public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-            if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+            if (!canGenerate(p)) return;
 
             CodeGenerators.find(GenType.this).executeAll(p, items);
+        }
+
+        /**
+         * UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-006.
+         * <p>
+         * Whether there is anything that can generate right now. Two questions,
+         * and both belong here rather than in the fourteen generators: an IDE
+         * without the Java plugin has nothing to run, and an IDE still building
+         * its index cannot look a class up by name.
+         * <p>
+         * Every generator resolves its target through
+         * {@code JavaPsiFacade.findClass}, which raises rather than answering
+         * empty while the index is being built - and every action that reaches
+         * one is a {@code DumbAwareAction}, so they are all live during
+         * indexing. The two together are an internal error in front of a tester
+         * who was creating a test case (#126).
+         */
+        private boolean canGenerate(final @NotNull Project p) {
+            if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return false;
+            if (!DumbService.isDumb(p)) return true;
+
+            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.WHILE_INDEXING, description);
+            Logger.info("Skipped " + tooltip + ": the IDE is indexing");
+            return false;
         }
     }
 

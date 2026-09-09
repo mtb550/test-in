@@ -74,7 +74,24 @@ public enum Refused {
      * still going has plenty left to run, and telling them it has nothing would
      * send them looking for cases that are on screen in front of them.
      */
-    ALREADY_RUNNING("%s is already running");
+    ALREADY_RUNNING("%s is already running"),
+
+    /**
+     * UC-CODEGEN-019, Rule-CODEGEN-005.
+     * <p>
+     * The IDE is still building its index, so no class can be found by name -
+     * {@code JavaPsiFacade.findClass} answers that with an exception, which
+     * would reach the tester as an internal error during an action they did not
+     * know touched the index (#126).
+     * <p>
+     * Refused rather than deferred, and the difference matters for one
+     * operation in particular. Deferring would be right for a create and wrong
+     * for a rename or a move: Rule-CODEGEN-004 has those run while the old name
+     * still finds the code, so a rename that waits for the index runs after the
+     * tree has changed and looks for a class that no longer answers to that
+     * name.
+     */
+    WHILE_INDEXING("%s needs the IDE to finish indexing first");
 
     /**
      * The sentence, with one slot for whatever the tester acted on.
