@@ -601,3 +601,33 @@ tasks.register("uninstallSftpServer") {
         println("  What it served is kept in " + File(System.getProperty("user.home"), ".testin-sftp"))
     }
 }
+
+/**
+ * The inspection gate, as one command on any operating system (#106).
+ *
+ * The findings the editor shows exist only inside the IDE: `./gradlew compileJava`
+ * reports zero warnings because everything the profile finds is an IntelliJ
+ * inspection rather than a javac one. `tools/inspect.ps1` produces the same list
+ * on the command line, and this is the way to call it that does not need to be
+ * remembered - by CI, or by anyone who has not read the script.
+ *
+ * It still needs `pwsh`, which installs on macOS and Linux as readily as on
+ * Windows and is what the script's own `#Requires -Version 7` asks for. The
+ * script itself no longer assumes Windows: it finds the downloaded IDE by the
+ * suffix of the platform it is running on and launches `inspect.sh` where there
+ * is no `inspect.bat`.
+ *
+ * Costs one full indexing pass, so 10-20 minutes. A deliberate sweep, not a
+ * per-commit gate.
+ */
+tasks.register<Exec>("inspect") {
+    group = "verification"
+    description = "Runs the IntelliJ inspections over src/main and writes .inspection/ (needs pwsh)"
+
+    commandLine("pwsh", "-NoProfile", "-File", file("tools/inspect.ps1").absolutePath)
+
+    // The script exits non-zero for DataFlowIssue, ReturnNull and
+    // WrappedMethodDeclaration, and that verdict is the point of running it -
+    // so it is the task's verdict too.
+    isIgnoreExitValue = false
+}

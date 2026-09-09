@@ -68,18 +68,25 @@ function Resolve-Inspector {
     # Wherever Gradle keeps its caches. GitHub Actions points GRADLE_USER_HOME
     # at the runner's workspace rather than at the profile, so looking only in
     # the profile found nothing there and the scheduled run could not start.
-    $gradleHome = if ($env:GRADLE_USER_HOME) { $env:GRADLE_USER_HOME } else { Join-Path $env:USERPROFILE '.gradle' }
+    # $HOME is PowerShell's own and is the profile on every platform.
+    $gradleHome = if ($env:GRADLE_USER_HOME) { $env:GRADLE_USER_HOME } else { Join-Path $HOME '.gradle' }
+
+    # The platform is downloaded per operating system and the folder is named
+    # after it, so the suffix is matched rather than assumed (#106).
+    $osSuffix = if ($IsWindows) { 'win' } elseif ($IsMacOS) { 'mac' } else { 'linux' }
 
     # The Gradle transform path carries a content hash, so it is matched by shape rather than stored.
-    $ide = Get-ChildItem -Path "$gradleHome\caches\*\transforms\*\transformed\idea-$version-win" `
+    $ide = Get-ChildItem -Path (Join-Path $gradleHome "caches/*/transforms/*/transformed" "idea-$version-$osSuffix") `
         -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
 
     if (-not $ide) {
         throw "No downloaded IDE $version found under $gradleHome. Run './gradlew compileJava' first - it fetches the platform this script inspects with."
     }
 
-    $inspect = Join-Path $ide.FullName 'bin\inspect.bat'
-    if (-not (Test-Path $inspect)) { throw "No inspect.bat in $($ide.FullName)" }
+    # inspect.bat on Windows, inspect.sh everywhere else. Same arguments, different name.
+    $launcher = if ($IsWindows) { 'inspect.bat' } else { 'inspect.sh' }
+    $inspect = Join-Path $ide.FullName 'bin' $launcher
+    if (-not (Test-Path $inspect)) { throw "No $launcher in $($ide.FullName)" }
 
     Write-Host "Inspector: $inspect"
     return $inspect
@@ -105,7 +112,7 @@ idea.system.path=$s/system
 idea.log.path=$s/log
 "@ | Set-Content -Path $propsFile -Encoding utf8
 
-    $profilePath = Join-Path $repo '.idea\inspectionProfiles\Testin.xml'
+    $profilePath = Join-Path $repo '.idea' 'inspectionProfiles' 'Testin.xml'
     $arguments = @($repo, $profilePath, $outPath, '-v1')
     if ($Subdirectory) { $arguments += @('-d', (Join-Path $repo $Subdirectory)) }
 

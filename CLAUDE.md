@@ -245,7 +245,7 @@ silently does nothing costs more than the setting it was meant to hold.
   it into a throw that exists only inside a running IDE. `return null` from a
   method declared to return `Optional` compiles. A null literal passed to a
   `@NotNull` parameter compiles. Both throw in front of the tester.
-- **So run `pwsh tools/inspect.ps1` before offering a change for a sandbox
+- **So run `./gradlew inspect` before offering a change for a sandbox
   test**, whenever it touched nullability, annotations, or many files at once.
   It costs one indexing pass, 10-20 minutes, which makes it a sweep gate and
   not a per-commit one. Drive `DataFlowIssue` and `ReturnNull` to zero; every
@@ -256,3 +256,9 @@ silently does nothing costs more than the setting it was meant to hold.
 - The report lands in `.inspection/`, deliberately outside `build/` so
   `./gradlew clean` does not delete the list you are working from. Start with
   `summary.txt` for the counts and `findings.txt` for the lines.
+- The task shells out to `tools/inspect.ps1`, so **`pwsh` has to be installed** —
+  it is cross-platform and the script asks for version 7. The script finds the
+  downloaded IDE by the suffix of the platform it is running on and launches
+  `inspect.sh` where there is no `inspect.bat`, so the same gate runs on macOS
+  and Linux (#106). `pwsh tools/inspect.ps1` still works; the task is the form
+  CI and a newcomer should use.

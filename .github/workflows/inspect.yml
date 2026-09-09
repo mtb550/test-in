@@ -82,7 +82,7 @@ jobs:
         # and it left out testin-java and testin-testng altogether, which is
         # the gap Get-SourceRoots was written to close. Without the argument
         # the script uses those three production trees and nothing else.
-        run: pwsh -NoProfile -File tools/inspect.ps1
+        run: ./gradlew inspect
 
       # Always, because a breached gate is exactly when somebody wants the list.
       - name: Keep the findings
