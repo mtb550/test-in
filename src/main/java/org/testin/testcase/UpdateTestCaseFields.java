@@ -102,7 +102,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             GenType.UPDATE_TEST_CASE_PRIORITY,
             (p, items, updatedItems) -> new PriorityBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPrioritySection,
-            new TestCaseDialogKey[]{NAVIGATE_ARROWS, SET_PRIORITY}
+            new TestCaseDialogKey[]{NAVIGATE_ARROWS}
     ),
 
     GROUP(

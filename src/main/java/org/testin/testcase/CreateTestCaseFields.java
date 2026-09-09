@@ -87,7 +87,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             AllIcons.Nodes.Favorite,
             TestCaseBaseDialog::getPrioritySection,
             "",
-            SET_PRIORITY, NAVIGATE_ARROWS
+            NAVIGATE_ARROWS
     ),
 
     GROUP(

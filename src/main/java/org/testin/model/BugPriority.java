@@ -4,7 +4,6 @@ import com.intellij.ui.JBColor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.Shortcuts;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -18,7 +17,6 @@ public enum BugPriority {
             0,
             JBColor.background(),
             true,
-            Shortcuts.PriorityEmpty,
             ReportEmphasis.MUTED
     ),
 
@@ -27,7 +25,6 @@ public enum BugPriority {
             1,
             JBColor.RED.brighter().brighter(),
             true,
-            Shortcuts.PriorityHigh,
             ReportEmphasis.ALARMING
     ),
 
@@ -36,7 +33,6 @@ public enum BugPriority {
             2,
             JBColor.BLUE.brighter(),
             true,
-            Shortcuts.PriorityMedium,
             ReportEmphasis.CAUTIONARY
     ),
 
@@ -45,7 +41,6 @@ public enum BugPriority {
             3,
             JBColor.GRAY.brighter(),
             true,
-            Shortcuts.PriorityLow,
             ReportEmphasis.MUTED
     );
 
@@ -73,7 +68,6 @@ public enum BugPriority {
     // failing compile - remove it from all three enums together or not at all
     // (#66, E3).
     private final boolean active;
-    private final @NotNull Shortcuts shortcut;
     /**
      * How loudly this reads in a report - see {@link ReportEmphasis}.
      */

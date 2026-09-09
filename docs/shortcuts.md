@@ -190,19 +190,22 @@ While the create or update dialog is open.
 | `Ctrl+C` `Ctrl+X` `Ctrl+V` | Copy, cut and paste the text |
 | `Ctrl+A` | Selects all of it |
 
-## Declared and not bound
+## Every key on this page is bound
 
-Two sets of keys are declared in `Shortcuts.java` and bound nowhere. They are
-drawn as hint text beside a value and nothing answers to them:
+There is no list of declared-and-unbound keys any more, and there should never
+be one again.
 
-- `H` `M` `L` beside the priorities. The priorities are drawn `P1` `P2` `P3`, so
-  the letters do not even match the labels.
-- `E` beside the empty bug priority, which the failure dialog does not offer at
-  all.
+`H` `M` `L` were drawn beside the priorities and `E` beside the empty bug
+priority, and nothing answered to any of them. They were removed rather than
+bound: the priorities render `P1` `P2` `P3`, so the letters matched nothing a
+tester could see, and `E` named a choice the failure dialog does not offer at
+all. Choosing a priority is the mouse or the arrow keys, which is what the hint
+beside it now says. [#283](https://github.com/mtb550/test-in/issues/283).
 
-Listed here because a key that is shown and does nothing is worse than one that
-is not shown, and because deciding to bind them or to stop drawing them is
-[#283](https://github.com/mtb550/test-in/issues/283).
+**A key is drawn only where pressing it does that thing.** Both directions of
+that matter: a capability shown without its key is
+[Rule-PRODUCT-016](product.md), and a key shown for a capability that has none
+is this.
 
 ---
 

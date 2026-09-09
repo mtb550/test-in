@@ -40,7 +40,6 @@ public class PrioritySection implements CreateTestCaseSection {
                     setIcon(IconManager.createIcon(priority.getColor()));
                     append(" Priority:  ");
                     append(priority.getLabel());
-                    append("    " + priority.getShortcut().getShortcutText(), new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GRAY));
                 });
             }
         });

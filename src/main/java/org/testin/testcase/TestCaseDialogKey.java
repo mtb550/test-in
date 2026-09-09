@@ -34,8 +34,7 @@ public enum TestCaseDialogKey implements StatusBarItem {
     SELECT_GROUP("Select / Unselect Group", Shortcuts.SelectGroup),
 
     NAVIGATE_TAB("Navigate", Shortcuts.TabNext, Shortcuts.TabPrevious),
-    NAVIGATE_ARROWS("Navigate Priority", Shortcuts.ArrowUp, Shortcuts.ArrowDown),
-    SET_PRIORITY("Set Priority", Shortcuts.PriorityHigh, Shortcuts.PriorityMedium, Shortcuts.PriorityLow);
+    NAVIGATE_ARROWS("Navigate Priority", Shortcuts.ArrowUp, Shortcuts.ArrowDown);
 
     private final @NotNull String name;
 
