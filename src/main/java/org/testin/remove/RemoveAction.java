@@ -177,17 +177,27 @@ public class RemoveAction extends AbstractProjectTreeAction {
         Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
                 what,
                 () -> restoreAll(kept),
-                () -> removeAll(kept),
+                () -> {
+                    removeAll(kept);
+                    return true;
+                },
                 () -> kept.forEach(one -> Services.getInstance(p, ProjectIndexer.class).forgetKept(one.copy()))));
     }
 
-    // UC-TREE-PANEL-016, Rule-TREE-PANEL-040
-    private void restoreAll(final @NotNull List<Kept> kept) {
+    /**
+     * UC-TREE-PANEL-016, Rule-TREE-PANEL-040, Rule-INTERNAL-063.
+     * <p>
+     * Puts back what the removal kept aside, and answers whether all of it came
+     * back. False means this has already said why, so the press is not confirmed
+     * on top of it - a tester used to get "Undo Incomplete" and "Undone" from
+     * one CTRL+Z, the two contradicting each other (#275).
+     */
+    private boolean restoreAll(final @NotNull List<Kept> kept) {
         if (kept.isEmpty()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, "Cannot Be Undone",
                     "No copy of what was removed could be kept aside, so there is nothing to put back. "
                             + "The recycle bin may still have it.");
-            return;
+            return false;
         }
 
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -195,13 +205,10 @@ public class RemoveAction extends AbstractProjectTreeAction {
         final @NotNull List<Kept> lost = kept.stream().filter(one -> !indexer.restoreNode(one.copy(), one.original())).toList();
         tp.getProjectTree().updateNodes();
 
-        // What did not come back is the only thing worth saying. The tree used
-        // to be refreshed either way and nothing read the answer, so an undo
-        // whose copy was gone redrew exactly like one that worked - and the
-        // tester was told "Undone" over a node still missing.
-        if (!lost.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, "Undo Incomplete", lost.size() + " of " + kept.size() + " could not be put back");
-        }
+        if (lost.isEmpty()) return true;
+
+        Services.getInstance(p, Notifier.class).softRefuse(p, "Undo Incomplete", lost.size() + " of " + kept.size() + " could not be put back");
+        return false;
     }
 
     /**

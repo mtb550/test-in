@@ -42,8 +42,11 @@ public class UndoAction extends AbstractProjectAction {
         // still fire.
         if (!direction.can(service, scope)) return;
 
-        direction.apply(service, scope);
-        Services.getInstance(p, Notifier.class).softShow(p, direction.getDone());
+        // Only what happened. The word used to be said the moment the
+        // operation had been fired, so an undo that could not put a node back
+        // raised its own refusal and then this on top of it - two messages on
+        // one press, contradicting each other (#275).
+        if (direction.apply(service, scope)) Services.getInstance(p, Notifier.class).softShow(p, direction.getDone());
     }
 
     // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-067

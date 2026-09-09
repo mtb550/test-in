@@ -29,6 +29,9 @@ between them.
   `Delete` removed.
 - **Rule-INTERNAL-041** — A removal whose copy could not be made still happens.
   It simply cannot be undone.
+- **Rule-INTERNAL-063** — One press raises one message. A `Ctrl+Z` that could
+  not put everything back says only what went wrong; it does not also say
+  *Undone*.
 - **Rule-INTERNAL-042** — Putting something back never writes over something
   that is there.
 - **Rule-INTERNAL-043** — Kept copies are thrown away when the removal falls off

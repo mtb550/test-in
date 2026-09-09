@@ -3,6 +3,7 @@ package org.testin.undo;
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.BooleanSupplier;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -84,22 +85,34 @@ public final class UndoService {
         return next(of(scope).redoStack).description();
     }
 
-    public void undo(final @NotNull UndoScope scope) {
+    /**
+     * UC-INTERNAL-004, Rule-INTERNAL-063.
+     * <p>
+     * Answers whether everything came back. An operation that could not finish
+     * has already said why, so the caller says nothing rather than confirming
+     * over it (#275).
+     */
+    public boolean undo(final @NotNull UndoScope scope) {
         final @NotNull History history = of(scope);
-        if (history.undoStack.isEmpty()) return;
+        if (history.undoStack.isEmpty()) return false;
 
         final @NotNull Operation operation = history.undoStack.pop();
-        operation.undo().run();
+        final boolean whole = operation.undo().getAsBoolean();
         history.redoStack.push(operation);
+
+        return whole;
     }
 
-    public void redo(final @NotNull UndoScope scope) {
+    /** The same, the other way. */
+    public boolean redo(final @NotNull UndoScope scope) {
         final @NotNull History history = of(scope);
-        if (history.redoStack.isEmpty()) return;
+        if (history.redoStack.isEmpty()) return false;
 
         final @NotNull Operation operation = history.redoStack.pop();
-        operation.redo().run();
+        final boolean whole = operation.redo().getAsBoolean();
         history.undoStack.push(operation);
+
+        return whole;
     }
 
     private @NotNull History of(final @NotNull UndoScope scope) {
@@ -127,11 +140,28 @@ public final class UndoService {
      * an operation holding something aside is waiting to hear. Nothing for the
      * ones that hold nothing, which is most of them.
      */
-    public record Operation(@NotNull String description, @NotNull Runnable undo, @NotNull Runnable redo, @NotNull Runnable forget) {
+    public record Operation(@NotNull String description, @NotNull BooleanSupplier undo, @NotNull BooleanSupplier redo, @NotNull Runnable forget) {
 
+        /**
+         * UC-INTERNAL-004, Rule-INTERNAL-063.
+         * <p>
+         * For work that either happens or throws, which is four of the five.
+         * Their reversals answer true because there is no half of them to fail.
+         * <p>
+         * The type asks anyway, so the one that can come back short - a removal
+         * whose copy is no longer on disk - has somewhere to say so, and cannot
+         * be confirmed as done over a node still missing (#275).
+         */
         public Operation(final @NotNull String description, final @NotNull Runnable undo, final @NotNull Runnable redo) {
-            this(description, undo, redo, () -> {
+            this(description, always(undo), always(redo), () -> {
             });
+        }
+
+        private static @NotNull BooleanSupplier always(final @NotNull Runnable work) {
+            return () -> {
+                work.run();
+                return true;
+            };
         }
     }
 }

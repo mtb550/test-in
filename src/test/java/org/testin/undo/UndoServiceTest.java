@@ -123,7 +123,12 @@ public class UndoServiceTest {
         final AtomicInteger ignored = new AtomicInteger();
 
         for (int i = 0; i < 21; i++) {
-            service.push(TREE, new UndoService.Operation("op " + i, ignored::incrementAndGet, ignored::incrementAndGet, forgotten::incrementAndGet));
+            // Reversals answer whether the whole of the work went, so these say
+            // yes: what is being counted here is that they were reached at all.
+            service.push(TREE, new UndoService.Operation("op " + i,
+                    () -> ignored.incrementAndGet() > 0,
+                    () -> ignored.incrementAndGet() > 0,
+                    forgotten::incrementAndGet));
         }
 
         assertEquals(forgotten.get(), 1, "the operation dropped off the end must release what it held");

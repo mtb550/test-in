@@ -29,8 +29,8 @@ public enum UndoDirection {
         }
 
         @Override
-        public void apply(final @NotNull UndoService service, final @NotNull UndoScope scope) {
-            service.undo(scope);
+        public boolean apply(final @NotNull UndoService service, final @NotNull UndoScope scope) {
+            return service.undo(scope);
         }
 
         @Override
@@ -46,8 +46,8 @@ public enum UndoDirection {
         }
 
         @Override
-        public void apply(final @NotNull UndoService service, final @NotNull UndoScope scope) {
-            service.redo(scope);
+        public boolean apply(final @NotNull UndoService service, final @NotNull UndoScope scope) {
+            return service.redo(scope);
         }
 
         @Override
@@ -66,7 +66,12 @@ public enum UndoDirection {
      */
     public abstract boolean can(final @NotNull UndoService service, final @NotNull UndoScope scope);
 
-    public abstract void apply(final @NotNull UndoService service, final @NotNull UndoScope scope);
+    /**
+     * Goes one step, and answers whether the whole of it went. False means the
+     * operation has already said why not, so the caller confirms nothing on top
+     * of it (#275).
+     */
+    public abstract boolean apply(final @NotNull UndoService service, final @NotNull UndoScope scope);
 
     /**
      * What the next press would do, and nothing at all when there is nothing -
