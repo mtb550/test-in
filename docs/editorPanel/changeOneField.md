@@ -100,6 +100,11 @@ open.
 **If the description cannot name a Java method** — the same message the create
 dialog shows.
 
+**If another test case in this test set already names that method** — nothing is
+saved, and the same message the create dialog shows. The test case being edited
+is not compared against itself, so a description left as it was is never
+refused.
+
 **If several test cases are selected** — the menu title becomes **Update**, then
 the count, then **Test Cases**. Picking a field opens the bulk editor instead.
 That is [UC-EDITOR-PANEL-007](bulkEdit.md).

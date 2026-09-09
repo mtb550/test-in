@@ -12,10 +12,13 @@ import org.testin.codegen.ExecutionPosition;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
+import org.testin.java.codegen.GeneratedMethod;
 import org.testin.java.codegen.JavaLiteral;
 import org.testin.logger.Logger;
 import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.util.NameSanitizer;
 
 import java.util.*;
@@ -168,22 +171,50 @@ public class CreateTestMethod implements GenAction {
         // single edit below, so what it already holds is read once and what this
         // pass adds is remembered as it goes. That also catches a sheet listing
         // one description twice, which asking the class could not.
-        // Keys rather than names: a hand-written method differing only in
+        //
+        // Keys to the case that owns them, empty for a method a tester wrote
+        // themselves. Keys rather than names because a method differing only in
         // casing or underscores is the same method, and the exact compare wrote
         // a stub beside it (#66, finding 41).
-        final @NotNull Set<String> taken = Arrays.stream(targetClass.getMethods())
-                .map(PsiMethod::getName)
-                .map(NameSanitizer::methodKey)
-                .collect(Collectors.toCollection(HashSet::new));
+        final @NotNull Map<String, String> owners = new HashMap<>();
+        for (final PsiMethod pm : targetClass.getMethods()) {
+            owners.putIfAbsent(NameSanitizer.methodKey(pm.getName()), GeneratedMethod.caseIdOf(pm).orElse(""));
+        }
+
+        final @NotNull Map<String, PsiMethod> generated = GeneratedMethod.byCaseId(targetClass);
 
         final @NotNull StringBuilder methods = new StringBuilder();
+        final @NotNull List<TestCaseDto> lostTheName = new ArrayList<>();
         int alreadyThere = 0;
+
         for (final TestCaseDto tc : cases) {
-            final @NotNull String methodName = Fqcn.methodNameOf(tc);
-            if (!taken.add(NameSanitizer.methodKey(methodName))) {
+            final @NotNull String id = tc.getId().toString();
+
+            // Asked of the id rather than of the name, which is the whole of
+            // #244: a case whose method exists is one carrying its id, not one
+            // whose description happens to sanitize the same way.
+            if (generated.containsKey(id)) {
                 alreadyThere++;
                 continue;
             }
+
+            final @NotNull String methodName = Fqcn.methodNameOf(tc);
+            final @NotNull String key = NameSanitizer.methodKey(methodName);
+            final @NotNull Optional<String> owner = Optional.ofNullable(owners.get(key));
+
+            if (owner.isPresent()) {
+                // A method with no case id is the tester's own, written for this
+                // case by hand. Leaving it alone is what the key compare is for,
+                // and saying so every time would be noise on every generate.
+                if (owner.orElseThrow().isEmpty()) alreadyThere++;
+                    // Another case already answers to that name, so this one would
+                    // get no method - unrunnable, unreachable from the gutter, and
+                    // until now silent (#244).
+                else lostTheName.add(tc);
+                continue;
+            }
+
+            owners.put(key, id);
             methods.append('\n').append(methodText(p, methodName, tc)).append('\n');
         }
 
@@ -193,6 +224,8 @@ public class CreateTestMethod implements GenAction {
             Logger.info(alreadyThere + " of " + testMethods(cases.size())
                     + " already in " + targetClass.getQualifiedName());
         }
+
+        reportLostTheName(p, targetClass, lostTheName);
 
         if (methods.isEmpty()) return;
 
@@ -217,6 +250,39 @@ public class CreateTestMethod implements GenAction {
         documents.commitDocument(document.orElseThrow());
 
         CodeStyleManager.getInstance(p).reformatText(file, insertAt, insertAt + methods.length());
+    }
+
+    /**
+     * UC-CODEGEN-002, Rule-CODEGEN-001.
+     * <p>
+     * Says which test cases got no method because another case already answers
+     * to the name theirs would have had.
+     * <p>
+     * The dialogs refuse a description that clashes, so a tester cannot type one
+     * in. These arrive by the doors that cannot be refused - an imported sheet,
+     * a paste, a branch switch, a sync - or were already on disk before the
+     * refusal existed. Left silent they were counted in with the methods that
+     * were skipped for already existing, and the tester found out at the first
+     * F5 that a case could not be run and could not be jumped to (#244).
+     * <p>
+     * A notification that stays rather than a balloon that fades: generation
+     * runs after an import, on its own time, and what it asks for - rewording
+     * one of the two descriptions - is not something to do on the spot.
+     */
+    private void reportLostTheName(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> lost) {
+        if (lost.isEmpty()) return;
+
+        final @NotNull String names = lost.stream().limit(3).map(TestCaseDto::getDescription).collect(Collectors.joining("\", \"", "\"", "\""));
+        final @NotNull String andMore = lost.size() > 3 ? " and " + (lost.size() - 3) + " more" : "";
+
+        Logger.warn("No method for " + lost.size() + " case(s) in " + targetClass.getQualifiedName()
+                + ": the name is already taken by another case");
+
+        Services.getInstance(p, Notifier.class).warn(p,
+                lost.size() == 1 ? "A test case has no automation method" : lost.size() + " test cases have no automation method",
+                names + andMore + " would be named after a method another test case already has. "
+                        + "Punctuation and capitals do not make two methods, so reword one of them by a word "
+                        + "and generate again.");
     }
 
     /**
@@ -384,14 +450,33 @@ public class CreateTestMethod implements GenAction {
 
             if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, factory);
 
+            // By the case's id first, exactly as the batch path asks: a method
+            // already carrying this id is this case's method, whatever it has
+            // since been renamed to.
+            if (GeneratedMethod.forCase(targetClass, tc).isPresent()) {
+                Logger.info("Method already exists: " + methodName);
+                return Optional.empty();
+            }
+
             // The key compare has to see every method's name, so this walks the
             // class - affordable only because this is the rare per-case
             // fallback. The batch path above pays for its walk once per class,
             // which is what the finding about half a million comparisons asked
             // for (#66, finding 23).
             final @NotNull String key = NameSanitizer.methodKey(methodName);
-            if (Arrays.stream(targetClass.getMethods()).map(PsiMethod::getName).map(NameSanitizer::methodKey).anyMatch(key::equals)) {
-                Logger.info("Method already exists: " + methodName);
+            final @NotNull Optional<PsiMethod> sameName = Arrays.stream(targetClass.getMethods())
+                    .filter(pm -> key.equals(NameSanitizer.methodKey(pm.getName())))
+                    .findFirst();
+
+            if (sameName.isPresent()) {
+                // Another case owning the name is #244 and has to be said out
+                // loud; a method with no case id is one the tester wrote, and
+                // leaving that alone is what the key compare is for.
+                if (GeneratedMethod.caseIdOf(sameName.orElseThrow()).isPresent())
+                    reportLostTheName(p, targetClass, List.of(tc));
+                else
+                    Logger.info("Method already exists: " + methodName);
+
                 return Optional.empty();
             }
 

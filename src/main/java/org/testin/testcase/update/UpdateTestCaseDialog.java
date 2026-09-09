@@ -9,7 +9,9 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.services.Services;
 import org.testin.testcase.UIAction;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testcase.create.*;
@@ -25,6 +27,19 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-036
     public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p);
+
+        // Rule-CODEGEN-001. The same refusal the create dialog makes, which is
+        // where it stopped: a description could not be typed into a clash but
+        // could be edited into one, and editing is how a clash is likelier to
+        // happen - "Verify login" is written first and "Verify login!" is a
+        // correction to it (#244).
+        //
+        // Every case in the set except this one. Comparing against itself would
+        // refuse a description the tester did not change.
+        descriptionSection.compareAgainst(Services.getInstance(p, ProjectIndexer.class)
+                .getTestCasesForTestSet(existingDto.getParent().getPath()).stream()
+                .filter(sibling -> !sibling.getId().equals(existingDto.getId()))
+                .toList());
 
         final @NotNull UIAction repackPopup = this::repack;
 
