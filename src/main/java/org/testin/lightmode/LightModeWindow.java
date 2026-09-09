@@ -3,11 +3,14 @@ package org.testin.lightmode;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.WindowStateService;
 import com.intellij.ui.WindowMoveListener;
 import com.intellij.ui.WindowResizeListener;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.Animator;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
@@ -21,6 +24,7 @@ import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.statusbar.StatusBarBase;
 import org.testin.statusbar.StatusBarItem;
+import org.testin.ui.Motion;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Display;
@@ -32,6 +36,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * The light mode window: one test case, above everything else (#13).
@@ -159,7 +164,20 @@ final class LightModeWindow {
     private final @NotNull JBLabel idle = new JBLabel("Press the play button to start test execution", SwingConstants.CENTER);
 
     private final @NotNull JBLabel chosen = new JBLabel();
-    private final @NotNull JBPanel<?> caseView = new JBPanel<>(new BorderLayout());
+    private final @NotNull SlidingPanel caseView = new SlidingPanel(new BorderLayout());
+
+    /** The case the window is showing, so a refresh can tell a new one from the same one again. */
+    private @NotNull Optional<UUID> shownCase = Optional.empty();
+
+    /**
+     * Everything this window animates, cancelled in one go when it closes.
+     * The platform stops an Animator when its parent goes, so nothing has to
+     * remember which movements were still running.
+     */
+    private final @NotNull Disposable motionScope = Disposer.newDisposable("Testin light mode motion");
+
+    private @NotNull Optional<Animator> heightMotion = Optional.empty();
+    private @NotNull Optional<Animator> slideMotion = Optional.empty();
     private final @NotNull CaseDetails details;
 
     /**
@@ -338,12 +356,52 @@ final class LightModeWindow {
      * width it currently has, so measuring first and sizing afterward would
      * measure the width it is about to stop having.
      */
+    // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-202, Rule-EDITOR-PANEL-204
     private void fitHeight() {
         frame.validate();
-        frame.setSize(frame.getWidth(), frame.getPreferredSize().height);
+
+        final int target = frame.getPreferredSize().height;
+        final int from = frame.getHeight();
+
+        // Nothing to move, and the two cases where moving would be wrong: a
+        // window not on screen yet has no height to grow from, and a repeat of
+        // the height it already has is every refresh that changed nothing.
+        if (from == target || !frame.isShowing() || from <= 0) {
+            frame.setSize(frame.getWidth(), target);
+            return;
+        }
+
+        // Dropped rather than finished: the new run starts from wherever this
+        // one had reached, which is what makes a second verdict key pressed
+        // mid-movement land at once instead of queueing behind it.
+        heightMotion.ifPresent(Animator::dispose);
+
+        heightMotion = Optional.of(Motion.run(motionScope, "Testin light mode height",
+                travelled -> frame.setSize(frame.getWidth(), from + (int) ((target - from) * travelled)),
+                () -> frame.setSize(frame.getWidth(), target)));
     }
 
+    /**
+     * UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-201.
+     * <p>
+     * The case on screen, and the movement from the last one when it is a
+     * different case.
+     * <p>
+     * Asked by id rather than assumed, because this runs on every refresh - a
+     * clock tick, a window resize, a verdict on the case already showing - and
+     * only a genuinely different case is something a tester needs to be shown
+     * arriving. Sliding on every tick would be a window that never stops moving.
+     * <p>
+     * The first case does not slide. Nothing left, so nothing takes its place.
+     */
     private void showCase(final @NotNull TestCaseDto tc) {
+        final boolean arrived = shownCase.map(previous -> !previous.equals(tc.getId())).orElse(false);
+        shownCase = Optional.of(tc.getId());
+
+        // Before the fields are overwritten: this is the last moment the case
+        // that is leaving still exists to be looked at.
+        if (arrived) caseView.captureLeaving();
+
         set.setText(tc.getParent().getName());
         final @NotNull Project p = editor.getProject();
 
@@ -353,6 +411,30 @@ final class LightModeWindow {
         // Visibility is not touched here: rebuilding the rows does not change
         // whether they are shown, and showDetails is the one thing that decides.
         details.show(tc);
+
+        if (arrived) slideCaseIn();
+    }
+
+    /**
+     * UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-201.
+     * <p>
+     * Runs the case block down and the next one in behind it, over the one
+     * duration everything in Testin moves at.
+     * <p>
+     * Rule-EDITOR-PANEL-204.
+     * <p>
+     * A slide already running is dropped where it is rather than allowed to
+     * finish: a tester holding a verdict key is asking for the next case now,
+     * and a movement that queued would put the whole run behind it.
+     */
+    private void slideCaseIn() {
+        if (!caseView.hasSomethingToSlide()) return;
+
+        slideMotion.ifPresent(Animator::dispose);
+
+        slideMotion = Optional.of(Motion.run(motionScope, "Testin light mode case",
+                caseView::setTravelled,
+                () -> caseView.setTravelled(1.0)));
     }
 
     /**
@@ -380,6 +462,7 @@ final class LightModeWindow {
         // is not the tester's and is worked out from the case every time.
         WindowStateService.getInstance().putSize(PLACEMENT, frame.getSize());
 
+        Disposer.dispose(motionScope);
         frame.dispose();
     }
 

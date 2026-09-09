@@ -16,8 +16,8 @@ with IntelliJ minimized, and still record a verdict without switching windows.
 | **Answers for** | This one window. The rest of the editor panel is [on its own pages](main.md) |
 | **Answers** | Why this window is shaped the way it is, and what every part of it does |
 | **State** | **Written.** Built and shipped — [#13](https://github.com/mtb550/test-in/issues/13), closed |
-| **Checked against** | `main` at `206c9744`, 6 September 2026 — read class by class against the built code |
-| **Numbering** | `UC-EDITOR-PANEL-046`. Its rules are not numbered yet, because this page was written before the rest of the part |
+| **Checked against** | `main` at `347921aa`, 9 September 2026 — read class by class against the built code |
+| **Numbering** | `UC-EDITOR-PANEL-046`. Rules `Rule-EDITOR-PANEL-201` to `Rule-EDITOR-PANEL-204` say how the window moves; the rest of this page was written before the part was numbered and its statements are not numbered yet |
 
 This document describes the window as it was built.
 
@@ -513,6 +513,34 @@ has nothing else a wheel could mean. Its height is fixed to what it shows, so
 there is nothing to scroll. Anything inside it that does scroll would take the
 wheel first anyway. So this is the one window in the plugin where zoom needs no
 other key held down.
+
+---
+
+## How it moves
+
+The window used to change instantly. A verdict was recorded, and the next test
+case was simply there — different words in the same place, and the window a
+different height. On a window that sits above the application under test and is
+looked at rather than worked in, that reads as a redraw rather than as progress.
+
+- **Rule-EDITOR-PANEL-201** — A new test case comes in from above while the one
+  it replaces goes down and out. The first test case does not arrive this way,
+  because none left to make room for it.
+- **Rule-EDITOR-PANEL-202** — The window eases to its new height rather than
+  jumping to it. That covers every height change: the details opening, the
+  failure form taking their place, a longer test case arriving and every zoom
+  step.
+- **Rule-EDITOR-PANEL-203** — Everything moves for the same 200 milliseconds.
+- **Rule-EDITOR-PANEL-204** — A key pressed while the window is still moving is
+  taken at once. The movement in progress is dropped where it is and the next
+  one starts from there; nothing waits for an animation to finish.
+
+**Why 200 milliseconds.** `P` is pressed once per test case, so a hundred-case
+run is a hundred of these, and the tester is watching the application under test
+rather than this window. The movement has to be seen without being waited for.
+
+**What does not move.** Dragging the window's width tracks the pointer exactly —
+that is the tester's hand on the edge, not a state change.
 
 ---
 
