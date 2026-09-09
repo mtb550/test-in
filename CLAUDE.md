@@ -147,9 +147,20 @@ silently does nothing costs more than the setting it was meant to hold.
 - Dialogs are built on the declarative framework (`org.testin.ui.framework`):
   a dialog assigns `title`, `components`, `shortcuts` in its constructor and
   implements `submit()`. Never hand-build popup layouts.
+- **A class does one job, and its name says which.** Before adding a method to
+  an existing class, say the class's job in one sentence, then the method's. If
+  the second is not the first, the method belongs elsewhere — even when the
+  class is where every caller already looks. `Notifier` delivers messages and
+  had grown six methods that wrote them; they are `Refused` constants now, the
+  twin of the `Done` enum that already owned the success words. Read the
+  `a-class-does-one-job` skill under `.claude/skills/` before adding to a
+  shared class.
+
 - **Every state-changing action confirms itself** with one soft notification at
   the point it succeeded: `Services.getInstance(p, Notifier.class).softShow(p,
-  "Copied")`. The message is the **outcome in the past tense** and nothing
+  Done.COPIED)`. The words live in `Done` when it worked and `Refused` when it
+  did not; `Notifier` only delivers them. The message is the **outcome in the
+  past tense** and nothing
   else — `Copied`, `Pasted`, `Renamed`, `Removed`, `Re-sorted`, `Passed`. One
   word wherever one will do, no trailing dots, and **no noun**: the tester
   pressed the key on the thing in front of them, so naming it back is a word
