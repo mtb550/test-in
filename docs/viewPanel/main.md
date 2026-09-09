@@ -138,9 +138,6 @@ are difference 1 below.
 9. **The test case rows** — what the test case says. Every empty one is left
    out.
 
-The captions on the run rows have no colon. The captions on the test case rows
-do. That is difference 8 below.
-
 ---
 
 ## Why the panel is built this way
@@ -171,7 +168,6 @@ bug report yet.
 | **Difference 5** | Rule-VIEW-PANEL-008 — the three tabs describe the same test case | A failed test case shows **Blocker** and **High** on the Details tab, while the tab beside it reads *No bugs found for this test case.* The Open Bugs tab is not built, and never looks at the test case. |
 | **Difference 6** | Rule-VIEW-PANEL-006 — nothing is drawn about a test case that is not there | With no test case selected, Details reads *Select a test case to view details* and Open Bugs reads *No bugs found for this test case.* There is no test case. |
 | **Difference 7** | Rule-VIEW-PANEL-001 — a tester can tell the two panels apart | Both Testin tool windows are named **Testin**. This is the tree panel's difference too. |
-| **Difference 8** | Rule-VIEW-PANEL-006 — one look for one kind of thing | In one column of one panel, the run captions have no colon and the test case captions do. |
 | **Difference 9** | Rule-VIEW-PANEL-009 — closing an editor empties the panel | It empties the panel whichever editor closed. A tester reading a test case from the first editor, who closes the second, watches the panel go blank for no reason they can see. |
 | **Difference 11** | Rule-VIEW-PANEL-008 — the panel redraws when its test case changes | Every result a running test reports redraws the whole panel, whichever test case reported. A test run of 50 test cases rebuilds the panel 50 times, including the two tabs that never change. |
 | **Difference 12** | Rule-VIEW-PANEL-003 — the panel opens when the tester asks for a test case | Opening the view panel first, before anything else in Testin, can raise *Testin Setup Required*. The tester asked to read a test case and was handed a settings notification. |
@@ -183,6 +179,7 @@ closed up, so an issue that quotes one still points at the right thing.
 |---|---|
 | **Difference 10** | An F2 edit that Testin could find no place to write was dropped in silence. Fixed 7 September 2026, [#234](https://github.com/mtb550/test-in/issues/234) |
 | **Difference 3** | The last step of the path looked for a test set where a test run was, and stopped with an internal error. Fixed 8 September 2026, [#227](https://github.com/mtb550/test-in/issues/227) |
+| **Difference 8** | Run captions had no colon and test case captions did, in one column. The colon was part of the caption; it belongs to the one surface that needs it, which is copied text. Fixed 9 September 2026, [#232](https://github.com/mtb550/test-in/issues/232) |
 
 ---
 

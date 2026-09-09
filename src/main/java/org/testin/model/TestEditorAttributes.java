@@ -30,7 +30,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
      */
     ORDER(
             "Order",
-            "Order:",
             ToolBarDefault.ON,
             (tc, p) -> "",
             (p, tc, v) -> {
@@ -45,7 +44,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     DESCRIPTION(
             "Description",
-            "Description:",
             ToolBarDefault.LOCKED_CHECKED,
             (tc, p) -> tc.getDescription(),
             (p, tc, v) -> tc.setDescription(NameSanitizer.description(v)),
@@ -60,7 +58,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     ID(
             "ID",
-            "ID:",
             ToolBarDefault.LOCKED_UNCHECKED,
             (tc, p) -> String.valueOf(tc.getId()),
             (p, tc, v) -> {
@@ -81,7 +78,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
      */
     EXPECTED_RESULT(
             "Expected Result",
-            "Expected Result:",
             ToolBarDefault.ON,
             (tc, p) -> tc.getExpectedResult(),
             (p, tc, v) -> tc.setExpectedResult(v),
@@ -91,7 +87,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     STEPS(
             "Steps",
-            "Steps:",
             ToolBarDefault.OFF,
             (tc, p) -> String.join(", ", tc.getSteps()),
             (p, tc, v) -> tc.setSteps(TestDataParser.steps(v)),
@@ -101,7 +96,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     PRIORITY(
             "Priority",
-            "Priority:",
             ToolBarDefault.ON,
             (tc, p) -> tc.getPriority().getLabel(),
             (p, tc, v) -> tc.setPriority(TestDataParser.priority(v)),
@@ -116,7 +110,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     FQCN(
             "FQCN",
-            "FQCN:",
             ToolBarDefault.OFF,
             (tc, p) -> String.join(" > ", Fqcn.ofMethod(tc)),
             (p, tc, v) -> {
@@ -127,7 +120,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     REFERENCE(
             "Reference",
-            "Reference:",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getReference(),
             (p, tc, v) -> tc.setReference(v),
@@ -137,7 +129,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     TEST_DATA(
             "Test Data",
-            "Test Data:",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getTestData(),
             (p, tc, v) -> tc.setTestData(v),
@@ -147,7 +138,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     PRE_CONDITIONS(
             "Pre Conditions",
-            "Pre Conditions:",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getPreConditions(),
             (p, tc, v) -> tc.setPreConditions(v),
@@ -157,7 +147,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     GROUP(
             "Group",
-            "Group:",
             ToolBarDefault.ON,
             (tc, p) -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             (p, tc, v) -> tc.setGroup(TestDataParser.groups(v)),
@@ -172,7 +161,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     PATH(
             "Path",
-            "Path:",
             ToolBarDefault.OFF,
             (tc, p) -> String.join(" > ", tc.getParent().getPath2()),
             (p, tc, v) -> {
@@ -183,7 +171,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     MODULE(
             "Module",
-            "Module:",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getModule(),
             (p, tc, v) -> tc.setModule(v),
@@ -193,7 +180,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     STATUS(
             "Status",
-            "Status:",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getStatus().getLabel(),
             (p, tc, v) -> tc.setStatus(TestDataParser.testCaseStatus(v, tc.getStatus())),
@@ -203,7 +189,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     CREATE_BY(
             "Created By",
-            "Created By:",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getCreatedBy(),
             (p, tc, v) -> tc.setCreatedBy(v),
@@ -213,7 +198,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     UPDATE_BY(
             "Updated By",
-            "Updated By:",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getUpdatedBy(),
             (p, tc, v) -> tc.setUpdatedBy(v),
@@ -223,7 +207,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     CREATE_AT(
             "Created At",
-            "Created At:",
             ToolBarDefault.OFF,
             (tc, p) -> Display.formatDate(tc.getCreatedAt()),
             (p, tc, v) -> tc.setCreatedAt(TestDataParser.date(v)),
@@ -233,7 +216,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     UPDATE_AT(
             "Updated At",
-            "Updated At:",
             ToolBarDefault.OFF,
             (tc, p) -> Display.formatDate(tc.getUpdatedAt()),
             (p, tc, v) -> tc.setUpdatedAt(TestDataParser.date(v)),
@@ -266,7 +248,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     }
 
     private final @NotNull String name;
-    private final @NotNull String name2;
     private final @NotNull ToolBarDefault toolBarDefault;
 
     /** How the value is read off a test case, for every surface that shows it. */
@@ -284,9 +265,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     @Getter(AccessLevel.NONE)
     private final @NotNull Set<Can> can;
 
-    TestEditorAttributes(final @NotNull String name, final @NotNull String name2, final @NotNull ToolBarDefault toolBarDefault, final @NotNull ValueExtractor<TestCaseDto> testValueExtractor, final @NotNull ImportSetter importSetter, final @NotNull GenType genType, final @NotNull Can... can) {
+    TestEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull ValueExtractor<TestCaseDto> testValueExtractor, final @NotNull ImportSetter importSetter, final @NotNull GenType genType, final @NotNull Can... can) {
         this.name = name;
-        this.name2 = name2;
         this.toolBarDefault = toolBarDefault;
         this.testValueExtractor = testValueExtractor;
         this.importSetter = importSetter;

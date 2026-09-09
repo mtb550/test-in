@@ -162,8 +162,12 @@ public final class CodeNavigator implements CodeNavigation {
                         final @NotNull Optional<PsiMethod> found = resolve(p, tc);
 
                         if (found.isEmpty()) {
+                            // The same sentence Run gives, from the same owner.
+                            // This said "Nothing to open" where Run said "has no
+                            // generated code yet" - one state described two ways,
+                            // one keystroke apart (#246).
                             ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class)
-                                    .softRefuse(p, "Nothing to open", "No automation has been generated for '" + tc.getDescription() + "' yet"));
+                                    .softShowNoGeneratedCode(p, tc.getDescription()));
                             return;
                         }
 

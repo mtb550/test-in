@@ -253,7 +253,10 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
             // files uploaded and a question about removals arrived with nothing
             // ever saying what had been sent.
             if (outcome.conflicting().isEmpty()) {
-                notifier.softShow(p, "Synced", outcome.describe());
+                // Stays, like the Git sync and the push. A sync that worked
+                // while the tester was elsewhere is exactly the message they
+                // come back to (#268).
+                notifier.info(p, "Synced", outcome.describe());
             } else {
                 notifier.warn(p, "Synced, with " + outcome.conflicts() + " left to you",
                         outcome.describe() + " Both sides changed " + naming(outcome.conflicting())

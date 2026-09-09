@@ -50,7 +50,10 @@ public class CopyTestCaseAction extends AbstractProjectAction {
     private @NotNull String detailsOf(final @NotNull TestCaseDto tc) {
         return Arrays.stream(TestEditorAttributes.values())
                 .filter(a -> a.can(Can.COPY))
-                .map(attr -> attr.getName2() + " " + attr.getTestValueExtractor().execute(tc, p))
+                // The colon belongs to this line, not to the caption. It used to be
+                // part of the name, so the view panel drew test case rows with
+                // one and run rows without in the same column (#232).
+                .map(attr -> attr.getName() + ": " + attr.getTestValueExtractor().execute(tc, p))
                 .collect(Collectors.joining("\n"));
     }
 

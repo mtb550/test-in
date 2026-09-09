@@ -27,6 +27,6 @@ public final class AttributeRow extends BaseDetails {
     // UC-VIEW-PANEL-004
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        return addRow(panel, gbc, attribute.getName2(), extractor.apply(p, dto), currentRow);
+        return addRow(panel, gbc, attribute.getName(), extractor.apply(p, dto), currentRow);
     }
 }

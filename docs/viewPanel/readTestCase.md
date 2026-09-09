@@ -75,22 +75,22 @@ There is no key for this. It is what the **Details** tab shows.
 3. **The values** — one column, all lined up. Each one can be selected and
    copied. None of them can be typed into.
 4. **The rows that are missing** — this test case has nothing in its
-   **Reference:** field, so that row is not drawn and no gap is left for it.
+   **Reference** field, so that row is not drawn and no gap is left for it.
 
 ## The rows, in order
 
 | Caption | What it holds |
 |---|---|
-| **Expected Result:** | What should happen |
-| **Steps:** | One numbered line for each step |
-| **Pre Conditions:** | What must be true before the test case starts |
-| **Test Data:** | The data the test case uses, exactly as typed |
-| **Reference:** | A link or a ticket number |
-| **Module:** | The part of the product this test case covers |
-| **Created By:** | Who made it |
-| **Updated By:** | Who last changed it |
-| **Created At:** | When it was made |
-| **Updated At:** | When it was last changed |
+| **Expected Result** | What should happen |
+| **Steps** | One numbered line for each step |
+| **Pre Conditions** | What must be true before the test case starts |
+| **Test Data** | The data the test case uses, exactly as typed |
+| **Reference** | A link or a ticket number |
+| **Module** | The part of the product this test case covers |
+| **Created By** | Who made it |
+| **Updated By** | Who last changed it |
+| **Created At** | When it was made |
+| **Updated At** | When it was last changed |
 
 Above the rows sit the path, the identity, the title, the two buttons and the
 badges. They are numbered on the panel drawing on
@@ -124,13 +124,7 @@ higher priorities get a badge.
 **If nobody has run the test case** — no verdict badge is drawn.
 
 **If the test case has no steps, or every step is blank** — there is no
-**Steps:** row.
-
-## Where the plugin breaks its own rules
-
-The captions here end in a colon. The captions on the run rows above them do
-not. That is difference 8 on
-[the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
+**Steps** row.
 
 ---
 

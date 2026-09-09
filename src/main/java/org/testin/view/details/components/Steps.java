@@ -38,7 +38,7 @@ public class Steps extends BaseDetails {
             stepsContainer.add(createStepComponent(stepText, marginBottom));
         }
 
-        return addRow(panel, gbc, TestEditorAttributes.STEPS.getName2(), stepsContainer, row);
+        return addRow(panel, gbc, TestEditorAttributes.STEPS.getName(), stepsContainer, row);
     }
 
     private @NotNull JTextArea createStepComponent(final @NotNull String text, final int marginBottom) {

@@ -287,11 +287,14 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         RepositoryRefresh.after(p, repoPath);
         ApplicationManager.getApplication().invokeLater(() -> {
             // A balloon, not a log entry. A sync is pressed and watched: it
-            // finishes in seconds with the tree rebuilding underneath it, and
-            // what it leaves behind is the tree itself rather than a line in the
-            // Notifications log. The failures still go there, which is what the
-            // log is worth keeping for.
-            Services.getInstance(p, Notifier.class).softShow(p, "Synced", pushed == 0
+            // It stays in the Notifications log, like the push beside it and
+            // the server sync beside that. This used to fade, on the argument
+            // that the rebuilt tree is what it leaves behind - but a sync runs
+            // in the background and lands on its own time, so a tester reading a
+            // bug report while it finishes had no way to learn it had (#268).
+            // CLAUDE.md draws that line: work that completes while nobody is
+            // looking is the work that must still be there afterwards.
+            Services.getInstance(p, Notifier.class).info(p, "Synced", pushed == 0
                     ? "Up to date with the remote"
                     : "Pushed " + pushed + (pushed == 1 ? " commit" : " commits"));
         });

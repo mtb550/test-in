@@ -174,7 +174,6 @@ bug report yet.
 | **Difference 9** | Rule-SHARE-002 — a value the tester typed is kept or refused | An unreadable value is quietly replaced in four different ways. A priority becomes the lowest, a group is dropped, a date becomes blank, a status keeps its old value. |
 | **Difference 11** | Rule-SHARE-005 — long work is watched | Parsing an import file has no progress bar at all, and runs on every keystroke in the source box. A large workbook makes the dialog look frozen. |
 | **Difference 12** | Rule-SHARE-005 — the same | The export, import and report bars cannot be canceled. |
-| **Difference 14** | Rule-SHARE-003 — one word for one outcome | A Git sync says *Synced* and fades. A Git push says *Pushed* and stays in the notification list. A server sync says *Synced* and fades, unless there were conflicts, when it stays. |
 
 | **Difference 16** | Rule-SHARE-003 — the tester is told | A message can be shown to nobody. When the code project's window has no status bar, the message is dropped and nothing is reported. Every success here is that kind of message. |
 | **Difference 18** | Rule-SHARE-004 — a value is checked before it is used | Neither the remote address nor the Git email address is checked. Any text is taken, and the failure arrives later in Git's own words. |
@@ -194,6 +193,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 15** | A message about none read *Exported 0*. A count of none says nothing now. Fixed 9 September 2026, [#269](https://github.com/mtb550/test-in/issues/269) |
 | **Difference 13** | Choosing a file no format could read did nothing and said nothing. It names the file and the kinds Testin reads. Fixed 9 September 2026, [#267](https://github.com/mtb550/test-in/issues/267) |
 | **Difference 17** | A refusal naming which nodes can be imported into, on nodes where the menu entry was already gray. The refusal is gone; the gray entry says it. Fixed 9 September 2026, [#271](https://github.com/mtb550/test-in/issues/271) |
+| **Difference 14** | A Git sync faded, a push stayed, a server sync faded. All three stay: a sync lands on its own time, so it is the message a tester comes back to. Fixed 9 September 2026, [#268](https://github.com/mtb550/test-in/issues/268) |
 | **Difference 2** | `Enter` did nothing in the export, import and review dialogs, which declared only `Escape`. All three answer it now, and the report dialog with them. Fixed 9 September 2026, [#252](https://github.com/mtb550/test-in/issues/252) |
 
 ---

@@ -76,20 +76,6 @@ the jump happens when indexing finishes.
 button is not drawn. If it is reached anyway, a message titled **Java Plugin Not
 Available** appears. It appears every time, not once.
 
-## Where the plugin breaks its own rules
-
-**One state, two sentences.** A test case with no method says *has no generated
-code yet* when it is run and **Nothing to open** when it is jumped to. That is
-difference 5 on
-[the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
-
-**One action, two pictures.** The menu draws an arrow. The card and the view
-panel draw a class icon.
-
-**The key does not work in the view panel**, though the button there says it
-does. That is difference 1 on
-[the view panel page](../viewPanel/main.md#where-the-plugin-breaks-its-own-rules).
-
 ---
 
 [Documentation](../README.md) › [Automation code and the gutter](main.md)
