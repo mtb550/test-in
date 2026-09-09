@@ -75,7 +75,9 @@ public class OrderNodeAction extends AbstractProjectTreeAction {
      * a single line, and neither tests for anything.
      */
     private @NotNull Optional<DirectoryDto> selected() {
-        return TreeValueUtil.selectedDirectory(tree).filter(DirectoryDto::isOrderable);
+        // One node, so several selected grays the entry rather than ordering the
+        // first and passing over the rest in silence (#192).
+        return TreeValueUtil.singleSelectedDirectory(tree).filter(DirectoryDto::isOrderable);
     }
 
     /**

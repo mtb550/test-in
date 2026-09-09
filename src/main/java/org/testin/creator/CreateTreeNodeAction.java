@@ -36,7 +36,7 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        TreeValueUtil.selectedDirectory(tree).ifPresent(this::createUnder);
+        TreeValueUtil.singleSelectedDirectory(tree).ifPresent(this::createUnder);
     }
 
     /**
@@ -98,7 +98,10 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
         // the capability flag is the whole question. It used to be asked twice,
         // once by name and once by capability, and the instanceof never removed
         // anything the flag would have kept.
-        e.getPresentation().setEnabled(TreeValueUtil.selectedDirectory(tree)
+        // And one parent to create under. With several selected there is no one
+        // answer to "under which", so the entry grays rather than picking the
+        // first (#192).
+        e.getPresentation().setEnabled(TreeValueUtil.singleSelectedDirectory(tree)
                 .filter(DirectoryDto::canCreateChildren)
                 .isPresent());
     }

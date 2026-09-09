@@ -202,7 +202,9 @@ public class TreeTransferHandler extends TransferHandler {
      * containers and nothing else, and no node is a child of one.
      */
     public boolean canPasteFromClipboard() {
-        final @NotNull Optional<DirectoryDto> target = TreeValueUtil.selectedDirectory(tree).filter(DirectoryDto::isTransferTarget);
+        // One target, so several selected grays Paste rather than pasting into
+        // whichever row happened to be first (#192).
+        final @NotNull Optional<DirectoryDto> target = TreeValueUtil.singleSelectedDirectory(tree).filter(DirectoryDto::isTransferTarget);
         if (target.isEmpty()) return false;
 
         // The same second question a drop asks, and the reason Paste used to be

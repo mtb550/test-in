@@ -517,7 +517,7 @@ documentation describes. None of them has a bug report yet.
 | **Difference 2** | Rule-TREE-PANEL-044 — nothing lands in a test run | Fixed. **Paste** asks the same two questions a drop asks — is this a place things land in, and can anything on the clipboard land here — so it is gray on a test run, as it always was on a test set. The *Select a folder* refusal is no longer reachable from the menu. |
 | **Difference 5** | Rule-TREE-PANEL-068 — Created and In Progress are the test run's own | The status popup offers **Created** and **In Progress** as choices. It also lets a test run go backwards, from **Assigned** to **Created**. |
 | **Difference 10** | Rule-TREE-PANEL-007 — a change confirms itself once | Setting a test run's status from the tree does not tell that test run's open editor. It keeps showing the old status, and the rows that just became **Untested**, until it is reopened. |
-| **Difference 11** | Rule-TREE-PANEL-006 — nothing changes until the tester confirms | **Rename**, **Order**, **Paste**, **Create** and **Details** stay black with several rows selected, and act on the first row alone. Nothing says the other rows were passed over. |
+| **Difference 11** | Rule-TREE-PANEL-006 — nothing changes until the tester confirms | Fixed. All five ask `singleSelectedDirectory`, the question eight other tree entries already asked, so each is gray with more than one row selected instead of acting on the first. **Details** had no `update()` at all and now has one. |
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.

@@ -65,16 +65,18 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
         add(new UndoAction(p, list, UndoScope.of(dir.getPath()), UndoDirection.UNDO));
         add(new UndoAction(p, list, UndoScope.of(dir.getPath()), UndoDirection.REDO));
 
-        // Absent, not present and broken: in an IDE without the Java or TestNG
-        // plugin these three cannot do anything, and a tester should not find
-        // them on the menu to be told so by a balloon (#66).
-        if (OptionalPlugin.JAVA.isAvailable() || OptionalPlugin.TESTNG.isAvailable()) {
-            addSeparator();
+        // Present and grayed, with the reason on the entry. This is the reverse
+        // of what #66 decided - absent rather than offered and refused - and the
+        // reverse is deliberate: a menu that changes shape between IDEs teaches
+        // a tester nothing, and they cannot learn the feature exists or what to
+        // install. Each action grays itself, because what it needs is its own
+        // knowledge: deciding it here is how Run came to be offered in an IDE
+        // that could not resolve a single case (#248).
+        addSeparator();
 
-            if (OptionalPlugin.JAVA.isAvailable()) add(new AutomateTestCaseAction(p, list));
-            if (OptionalPlugin.TESTNG.isAvailable()) add(new RunTestCaseAction(p, ui, list));
-            if (OptionalPlugin.JAVA.isAvailable()) add(new NavigateToCodeAction(p, list));
-        }
+        add(new AutomateTestCaseAction(p, list));
+        add(new RunTestCaseAction(p, ui, list));
+        add(new NavigateToCodeAction(p, list));
 
         addSeparator();
 

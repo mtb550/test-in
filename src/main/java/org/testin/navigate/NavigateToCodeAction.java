@@ -40,6 +40,10 @@ public class NavigateToCodeAction extends AbstractProjectAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
+        // Grayed with the reason without the Java plugin, rather than left out of
+        // the menu (#248).
+        if (!CardHoverAction.NAVIGATE_TO_TEST_METHOD.enableOrExplain(e.getPresentation())) return;
+
         e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
     }
 

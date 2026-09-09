@@ -44,13 +44,11 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         add(new ViewDetailsAction(p, list, dir.getPath2()));
         addSeparator();
         add(new CopyTestCaseAction(p, list));
-        // See TestEditorContextMenu: an action the IDE cannot perform is not
-        // offered rather than offered and refused (#66).
-        if (OptionalPlugin.JAVA.isAvailable() || OptionalPlugin.TESTNG.isAvailable()) {
-            addSeparator();
-            if (OptionalPlugin.TESTNG.isAvailable()) add(new RunTestCaseAction(p, ui, list));
-            if (OptionalPlugin.JAVA.isAvailable()) add(new NavigateToCodeAction(p, list));
-        }
+        // See TestEditorContextMenu: present and grayed with the reason, which
+        // reverses what #66 decided here too (#248).
+        addSeparator();
+        add(new RunTestCaseAction(p, ui, list));
+        add(new NavigateToCodeAction(p, list));
 
         // No Start Manual Execution here. Every entry in this menu acts on the
         // cases the tester highlighted, and that one ignores them - it walks the

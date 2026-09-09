@@ -96,7 +96,9 @@ public class RenameAction extends AbstractProjectTreeAction {
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-035
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(TreeValueUtil.selectedDirectory(tree)
+        // Renaming is about one node, so several selected grays it rather than
+        // quietly renaming the first (#192).
+        e.getPresentation().setEnabled(TreeValueUtil.singleSelectedDirectory(tree)
                 .filter(DirectoryDto::isRenamable)
                 .isPresent());
     }

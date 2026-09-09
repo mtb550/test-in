@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
+import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.util.Shortcuts;
 
@@ -51,6 +52,10 @@ public class AutomateTestCaseAction extends AbstractProjectAction {
     // UC-CODEGEN-005
     @Override
     public void update(final @NotNull AnActionEvent e) {
+        // Grayed with the reason without the Java plugin, rather than left out of
+        // the menu (#248).
+        if (!OptionalPlugin.JAVA.enableOrExplain(e.getPresentation(), "Automate Test Case")) return;
+
         e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
     }
 

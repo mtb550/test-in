@@ -71,9 +71,14 @@ public class RunTestCaseAction extends AbstractProjectAction {
         final @NotNull List<TestCaseDto> selected = list.getSelectedValuesList();
         final @NotNull CardHoverAction offered = CardHoverAction.runSlot(p, selected);
 
-        e.getPresentation().setEnabled(!list.isEmpty() && !selected.isEmpty());
         e.getPresentation().setText(offered.getTooltip());
         e.getPresentation().setIcon(offered.getIcon());
+
+        // Grayed with the reason when a plugin it needs is missing, rather than
+        // left out of the menu (#248).
+        if (!offered.enableOrExplain(e.getPresentation())) return;
+
+        e.getPresentation().setEnabled(!list.isEmpty() && !selected.isEmpty());
     }
 
     @Override

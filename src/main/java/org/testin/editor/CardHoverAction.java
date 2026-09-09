@@ -2,6 +2,7 @@ package org.testin.editor;
 
 import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -26,15 +27,19 @@ public enum CardHoverAction {
     NAVIGATE_TO_TEST_METHOD(
             "Navigate to Code",
             Shortcuts.NavigateToCode,
-            OptionalPlugin.JAVA,
+            List.of(OptionalPlugin.JAVA),
             AllIcons.Nodes.Class,
             (p, cases) -> NavigateToCodeAction.execute(p, cases.getFirst())
     ),
 
     RUN_TEST_CASE(
             "Run Test Case",
+            // Both. TestNG starts the run and Java finds the method it starts, so
+            // an IDE with only TestNG offered Run and then resolved every case to
+            // nothing - one "has no generated code yet" per case, with no
+            // mention of the plugin that was missing (#248).
             Shortcuts.RunTestCase,
-            OptionalPlugin.TESTNG,
+            List.of(OptionalPlugin.JAVA, OptionalPlugin.TESTNG),
             AllIcons.RunConfigurations.TestState.Run,
             RunTestCases::run
     ),
@@ -50,7 +55,7 @@ public enum CardHoverAction {
     STOP_TEST_CASE(
             "Stop Test Case",
             Shortcuts.EMPTY,
-            OptionalPlugin.TESTNG,
+            List.of(OptionalPlugin.TESTNG),
             AllIcons.Actions.Suspend,
             CardHoverAction::stopRun
     );
@@ -58,9 +63,11 @@ public enum CardHoverAction {
     private final @NotNull String tooltip;
     private final @NotNull Shortcuts shortcut;
     /**
-     * The IDE plugin this action needs to do anything at all.
+     * The IDE plugins this action needs to do anything at all - every one of
+     * them, not the most obvious one.
      */
-    private final @NotNull OptionalPlugin requires;
+    @Getter(AccessLevel.NONE)
+    private final @NotNull List<OptionalPlugin> requires;
 
     /**
      * What the button draws. On the action rather than at the painter: the
@@ -83,6 +90,22 @@ public enum CardHoverAction {
      */
     @Getter(AccessLevel.NONE)
     private final @NotNull BiConsumer<Project, List<TestCaseDto>> onClick;
+
+    /**
+     * UC-CODEGEN-009, Rule-CODEGEN-005.
+     * <p>
+     * Leaves a menu entry alone when every plugin this action needs is there,
+     * and grays it with the first missing one named when they are not.
+     * <p>
+     * Asked here rather than at each menu, because what an action needs is the
+     * action's own knowledge - the two context menus were deciding it for
+     * themselves, and one of them had it wrong. The card already asked the same
+     * list through {@link #isOffered}; the menus did not, which is how Run came
+     * to be offered in an IDE that could not resolve a single case (#248).
+     */
+    public boolean enableOrExplain(final @NotNull Presentation presentation) {
+        return requires.stream().allMatch(plugin -> plugin.enableOrExplain(presentation, tooltip));
+    }
 
     /**
      * Does this button's work on the one case it was pressed from.
@@ -162,6 +185,6 @@ public enum CardHoverAction {
      * icon is absent rather than present and answering with a balloon (#66).
      */
     public boolean isOffered() {
-        return requires.isAvailable();
+        return requires.stream().allMatch(OptionalPlugin::isAvailable);
     }
 }
