@@ -43,7 +43,6 @@ sheets gives it six tabs.
 │  Import Test Cases                                           │
 ├──────────────────────────────────────────────────────────────┤
 │  Source:   [ C:\Users\mtb\Downloads\Plan.xlsx   ] [ ... ]    │
-│  Options:  [ ] Set as default folder                         │
 │                                                              │
 │  | Login | Checkout | Search | Cart | Profile | Admin |      │
 │  ┌────────────────────────────────────────────────────────┐  │

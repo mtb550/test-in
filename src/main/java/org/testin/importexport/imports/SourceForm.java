@@ -7,7 +7,6 @@ import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -47,20 +46,12 @@ public final class SourceForm implements DialogComponent {
     private final @NotNull FormRows rows;
 
     private final @NotNull TextFieldWithBrowseButton fileField = new TextFieldWithBrowseButton();
-    private final @NotNull JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
     private final @NotNull JBLabel formatHint = new JBLabel();
     private final @NotNull FileChooserDescriptor descriptor;
-
-    /**
-     * Whether the remember-this-folder checkbox is offered, decided once -
-     * drawing the row and writing the setting used to derive it separately.
-     */
-    private final boolean offersDefaultFolder;
 
     public SourceForm(final @NotNull Project p, final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader, final @NotNull Consumer<@NotNull Map<String, List<TestCaseDto>>> onDataLoaded) {
         this.p = p;
         this.importAttributes = importAttributes;
-        this.offersDefaultFolder = defaultFolder().isBlank();
 
         descriptor = new FileChooserDescriptor(true, false, false, false, false, false)
                 .withExtensionFilter("", "xls", "xlsx", "csv", "json")
@@ -81,12 +72,11 @@ public final class SourceForm implements DialogComponent {
         formatHint.setVisible(false);
 
         rows = new FormRows().row("Source:", fileField);
-        if (offersDefaultFolder) rows.row("Options:", setDefaultCheckBox);
         rows.wideRow(formatHint);
     }
 
     /**
-     * UC-SHARE-005, Rule-SHARE-103.
+     * UC-SHARE-005, Rule-SETTING-021.
      * <p>
      * Opens the chooser as soon as the dialog is on screen - the import dialog
      * has nothing to preview until a file is picked, so it asks for one instead
@@ -107,11 +97,10 @@ public final class SourceForm implements DialogComponent {
     }
 
     /**
-     * UC-SHARE-023, Rule-SHARE-104.
+     * UC-SHARE-005.
      * <p>
      * The chosen file, or empty when the field is still empty - in which case
-     * it takes the focus and the dialog stays open. Remembers the file's folder
-     * when the checkbox is ticked.
+     * it takes the focus and the dialog stays open.
      */
     public @NotNull Optional<File> resolve() {
         final @NotNull String filePath = fileField.getText().trim();
@@ -120,14 +109,7 @@ public final class SourceForm implements DialogComponent {
             return Optional.empty();
         }
 
-        final @NotNull File source = new File(filePath);
-
-        if (offersDefaultFolder && setDefaultCheckBox.isSelected()) {
-            Optional.ofNullable(source.getParentFile()).ifPresent(folder ->
-                    Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder = folder.getAbsolutePath());
-        }
-
-        return Optional.of(source);
+        return Optional.of(new File(filePath));
     }
 
     /**

@@ -48,7 +48,6 @@ There is no key for this. The menu entry is **Import**.
 │  Import Test Cases                                           │
 ├──────────────────────────────────────────────────────────────┤
 │  Source:   [ C:\Users\mtb\Downloads\Login.xlsx  ] [ ... ]    │
-│  Options:  [ ] Set as default folder                         │
 │  Your file should hold these columns: Description,           │
 │  Expected Result, Steps, Priority, ...                       │
 │                                                              │
@@ -66,17 +65,14 @@ There is no key for this. The menu entry is **Import**.
 ```
 
 1. **Source** — the file to read. A file chooser opens on its own as soon as
-   the dialog opens.
-2. **Options** — the tick box that remembers this folder. It is drawn only
-   while no folder has been set. That is
-   [UC-SHARE-023](chooseFolderOnce.md).
-3. **The gray lines** — the chosen format's note. It names the columns Testin
+   the dialog opens, on the folder the settings page names.
+2. **The gray lines** — the chosen format's note. It names the columns Testin
    reads.
-4. **The tabs** — one for each sheet in the file. All of them go into this one
+3. **The tabs** — one for each sheet in the file. All of them go into this one
    test set.
-5. **The table** — the test cases of the tab in front, every one ticked.
+4. **The table** — the test cases of the tab in front, every one ticked.
    [UC-SHARE-007](chooseWhatToImport.md) draws it.
-6. **Import** — writes the test cases. `Enter` does not.
+5. **Import** — writes the test cases. `Enter` does not.
 
 ## Main flow
 

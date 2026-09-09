@@ -43,8 +43,6 @@ spreadsheet.
 │                                                              │
 │  Format       [ PDF                                      v ] │
 │                                                              │
-│  [ ] Set as default folder                                   │
-│                                                              │
 │                                        [ Generate ]          │
 ├──────────────────────────────────────────────────────────────┤
 │  [k]  Escape Cancel                                          │
@@ -55,9 +53,10 @@ spreadsheet.
    names.
 2. **File name** — filled in already, and can be changed.
 3. **Format** — **XLSX**, **HTML**, **PDF** or **WORD**. **PDF** is chosen.
-4. **Set as default folder** — drawn only while no default folder has been set.
-   It is [UC-SETTING-006](../setting/setDownloadFolder.md).
-5. **Generate** — writes the file. `Enter` does not.
+4. **Generate** — writes the file. `Enter` does not.
+
+The folder this dialog opens on is set on the settings page, and only there. It
+is [UC-SETTING-006](../setting/setDownloadFolder.md).
 
 ## Main flow
 

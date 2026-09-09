@@ -25,8 +25,8 @@ There is no key for this. It is the **Default download folder** row.
   and choosing a file to import all start.
 - **Rule-SETTING-022** — It is a starting point, not a rule. The tester can save
   anywhere from any of those dialogs.
-- **Rule-SETTING-023** — This page owns the download folder. The import and
-  export dialogs can set it too, which is why it is a difference below.
+- **Rule-SETTING-023** — This page owns the download folder. Nothing else
+  writes it.
 
 ## The screen
 
@@ -58,25 +58,16 @@ The whole page is drawn on [the settings page](main.md#the-page).
 
 Nothing. A folder that does not exist is stored exactly as typed.
 
-## The other way it gets set
+## The only way it gets set
 
-The report dialog, the export dialog and the import dialog each carry a
-checkbox reading **Set as default folder**. The checkbox is drawn only while no
-folder has been set yet. Ticking it and confirming writes the folder here.
+This row, and nothing else. The report, export and import dialogs each used to
+carry a **Set as default folder** tick box that wrote this value, drawn only
+while no folder was set - so once one was there they could not change it back,
+and ticking it overwrote what this page said without saying so. The box is gone
+and the use case behind it, *Remember the folder I use*, is retired on
+[the sharing page](../share/main.md#retired).
 
-The dialogs store slightly different things. The report dialog and the export
-dialog store the folder in their own box. The import dialog stores the folder
-that holds the file the tester chose.
-
-Once a folder is set, the checkbox is not drawn again. So those dialogs cannot
-change it. Only this page can. That is question 3 on
-[the settings page](main.md#not-decided).
-
-## Where the plugin breaks its own rules
-
-This page is meant to be the one place these values are set. This value has
-three other writers. That is difference 4 on
-[the settings page](main.md#where-the-plugin-breaks-its-own-rules).
+Those dialogs still **open** on this folder. They never write it.
 
 ---
 

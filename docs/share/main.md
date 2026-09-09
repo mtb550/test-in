@@ -47,8 +47,6 @@ team pulls, or a server the plugin syncs with.
 | **UC-SHARE-020** | [Have my password kept for next time](keepServerPassword.md) | Type the server password once, not on every sync. |
 | **UC-SHARE-021** | [Answer the conflicts the server sync could not settle](answerServerConflicts.md) | Say which version of a test case wins. |
 | **UC-SHARE-022** | [Agree to remove files the server no longer holds](agreeToRemovals.md) | Approve a deletion before it reaches this machine. |
-| | **Both** | |
-| **UC-SHARE-023** | [Remember the folder I use](chooseFolderOnce.md) | Stop browsing for the same folder several times a day. |
 
 Cloning a test project from a repository is how a test project first arrives,
 and it is [UC-TREE-PANEL-003](../treePanel/importTestProject.md).
@@ -178,6 +176,17 @@ bug report yet.
 | **Difference 16** | Rule-SHARE-003 — the tester is told | A message can be shown to nobody. When the code project's window has no status bar, the message is dropped and nothing is reported. Every success here is that kind of message. |
 | **Difference 18** | Rule-SHARE-004 — a value is checked before it is used | Neither the remote address nor the Git email address is checked. Any text is taken, and the failure arrives later in Git's own words. |
 | **Difference 19** | Rule-SHARE-006 — a missing feature says so | Sync with a server is offered in every IDE. The two Git entries vanish with no word, so a tester has no way to learn the Git plugin is why. |
+
+**Retired.** A use case or a rule that is gone keeps its number forever, so an
+issue that quotes one still leads somewhere and nothing is ever renumbered onto
+it.
+
+| Gone | Was | Read instead |
+|---|---|---|
+| **UC-SHARE-023** | *Remember the folder I use* — a **Set as default folder** tick box on the export, report and import dialogs wrote the machine's download folder. It was drawn only while no folder was set, so once one was there those dialogs could not change it back, and it overwrote a value the tester had set on the settings page without saying so. Removed 9 September 2026, [#240](https://github.com/mtb550/test-in/issues/240) | [UC-SETTING-006](../setting/setDownloadFolder.md) |
+| **Rule-SHARE-102** | *The tick box is drawn only while no folder has been set yet.* | — |
+| **Rule-SHARE-103** | *One folder is remembered, and every dialog uses it.* Said twice; the settings page owns the folder | [Rule-SETTING-021](../setting/setDownloadFolder.md) |
+| **Rule-SHARE-104** | *The export dialog remembers the folder in its box. The import dialog remembers the folder holding the file that was chosen.* Two dialogs storing two different things under one name was half the defect | — |
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.

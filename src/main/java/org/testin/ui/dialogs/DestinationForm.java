@@ -7,7 +7,6 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.SimpleListCellRenderer;
-import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTextField;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
@@ -36,18 +35,10 @@ public final class DestinationForm implements DialogComponent {
     private final @NotNull TextFieldWithBrowseButton folderField = new TextFieldWithBrowseButton();
     private final @NotNull JBTextField fileNameField = new JBTextField(30);
     private final @NotNull ComboBox<FileTypes> formatCombo;
-    private final @NotNull JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
-    /**
-     * Whether the remember-this-folder checkbox is offered, decided once.
-     * Drawing the row and writing the setting used to derive it separately, so
-     * one could show the box and the other ignore the answer.
-     */
-    private final boolean offersDefaultFolder;
 
     public DestinationForm(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String fileName, final @NotNull String chooserTitle, final @NotNull String chooserDescription) {
         this.p = p;
         this.formatCombo = new ComboBox<>(formats);
-        this.offersDefaultFolder = defaultFolder().isBlank();
 
         fileNameField.setText(fileName);
         formatCombo.setSelectedItem(defaultFormat);
@@ -113,18 +104,14 @@ public final class DestinationForm implements DialogComponent {
                 .row("File name:", fileNameField)
                 .row("Format:", formatCombo);
 
-        if (offersDefaultFolder)
-            formRows.unlabeledRow(setDefaultCheckBox);
-
         return formRows;
     }
 
     /**
-     * UC-SHARE-023, Rule-SHARE-103.
+     * UC-SHARE-001.
      * <p>
      * The destination, or empty when a field is still empty - in which case the
-     * offending field takes the focus and the dialog stays open. Remembers the
-     * folder when the checkbox is ticked.
+     * offending field takes the focus and the dialog stays open.
      */
     public @NotNull Optional<Destination> resolve() {
         final @NotNull String folder = folderField.getText().trim();
@@ -147,12 +134,18 @@ public final class DestinationForm implements DialogComponent {
 
         final @NotNull FileTypes format = selectedFormat.orElseThrow();
 
-        if (offersDefaultFolder && setDefaultCheckBox.isSelected())
-            Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder = folder;
-
         return Optional.of(new Destination(new File(folder, withExtension(fileName, format.getExtension())), format));
     }
 
+    /**
+     * Rule-SETTING-021, Rule-SETTING-023.
+     * <p>
+     * Where the dialog starts, never where it writes. This form used to offer a
+     * "Set as default folder" tick box that stored the chosen folder, so a
+     * setting the tester had made on the settings page was overwritten from a
+     * dialog - and the box was drawn only while no folder was set, so once one
+     * was there it could not be changed back from here (#240).
+     */
     private @NotNull String defaultFolder() {
         return Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
     }
