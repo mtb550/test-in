@@ -1,5 +1,6 @@
 package org.testin.editor.listeners;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,12 @@ public abstract class AbstractGridEditListener implements TableModelListener {
     protected final @NotNull Project p;
 
     private final @NotNull List<TestCaseDto> pageItems;
+
+    /**
+     * How many cells this gesture has written, while the message it will be
+     * confirmed with is still waiting to be shown. Zero between gestures.
+     */
+    private int writtenThisGesture;
 
     /**
      * True while this listener is writing the stored value back into the cell it
@@ -123,11 +130,31 @@ public abstract class AbstractGridEditListener implements TableModelListener {
     protected abstract boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto onThisRow, final int row, final int col);
 
     /**
+     * UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-008.
+     * <p>
      * The word the update dialog already uses for the same act, because it is the
-     * same act: an existing thing now says something different.
+     * same act: an existing thing now says something different. One message per
+     * gesture, with a count, however many cells the gesture wrote.
+     * <p>
+     * A paste or a cut over a block writes each cell in turn, and each write
+     * arrives here - so twenty cells raised twenty balloons, where every other
+     * bulk gesture in Testin raises one with a count (#202).
+     * <p>
+     * Counted rather than wired to the clipboard actions, which are static and
+     * hold nothing but the table. All the writes of one gesture happen inside
+     * one event on the EDT, so the first schedules the message and the rest only
+     * add themselves to it: the count is complete by the time it is read, and a
+     * gesture nobody has written yet is coalesced without knowing this exists.
      */
     private void confirmEdit() {
-        Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
+        if (writtenThisGesture++ > 0) return;
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            final int written = writtenThisGesture;
+            writtenThisGesture = 0;
+
+            Services.getInstance(p, Notifier.class).softShowCounted(p, Done.UPDATED, written);
+        });
     }
 
     /**

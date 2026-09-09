@@ -257,7 +257,7 @@ bug report yet.
 |---|---|---|
 | **Difference 1** | Rule-EDITOR-PANEL-008 — a message says what happened | `Ctrl+C` says *Details copied* and copies one line, the description. Every other field is left out. |
 | **Difference 4** | Rule-EDITOR-PANEL-005 — what can be filtered can be set | Four groups can be filtered on and never assigned. The filter offers Security, UI, Functional and Validation. The dialog offers only Regression, Smoke and Sanity. |
-| **Difference 6** | Rule-EDITOR-PANEL-008 — one message with a count | Pasting a block of 20 cells into the grid raises 20 messages. `Ctrl+X` over a block does the same. |
+| **Difference 6** | Rule-EDITOR-PANEL-008 — one message with a count | Fixed. Pasting or cutting a block raises one message with the number of cells written. The writes of one gesture all happen in one event, so they are counted together without the clipboard actions having to know about it. |
 | **Difference 7** | Rule-EDITOR-PANEL-005 — what the tester typed is stored | A description typed into a grid cell loses characters Testin will not keep. If nothing else changed, nothing is saved and nothing is said, and the tester watches their text change. |
 | **Difference 8** | Rule-EDITOR-PANEL-005 — one answer to one situation | A priority typed into a grid cell that Testin cannot read becomes the lowest. A status it cannot read keeps the value the test case already had. Two columns, two answers to a typo. |
 | **Difference 9** | Rule-EDITOR-PANEL-005 — a key works the same on every machine | `Ctrl+M` is not made into `Cmd+M` on a Mac, though `Ctrl+C` and `Ctrl+F` are. The empty editor's second line reads *Press Ctrl+M to add* whatever machine it is on. |
