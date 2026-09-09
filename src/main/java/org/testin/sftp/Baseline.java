@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -48,6 +49,28 @@ public record Baseline(@NotNull Map<String, String> contents) {
      * Empty is the honest ancestor for a file with no history: a three-way merge
      * given an empty base treats both sides as additions, which is what they are.
      */
+    /**
+     * UC-SHARE-022, Rule-SHARE-100.
+     * <p>
+     * The same baseline without these paths, so the next sync reads them as
+     * files this machine has that the server has never seen.
+     * <p>
+     * This is what "keep it" means. A file the server deleted is judged against
+     * its baseline entry: the entry says the two sides once agreed, so the local
+     * copy is unchanged and the server's deletion stands. Forgetting the entry
+     * takes that history away, and {@code TransferAction.of} answers UPLOAD for
+     * a file with no ancestor that only this side has - which sends it back and
+     * settles the question rather than asking it again every sync (#95).
+     */
+    public @NotNull Baseline forgetting(final @NotNull Collection<String> paths) {
+        if (paths.isEmpty()) return this;
+
+        final @NotNull Map<String, String> left = new TreeMap<>(contents);
+        paths.forEach(left::remove);
+
+        return new Baseline(left);
+    }
+
     public @NotNull String at(final @NotNull String path) {
         return contents.getOrDefault(path, "");
     }

@@ -31,7 +31,9 @@ There is no key for this. The question comes after the sync.
   asking again.
 - **Rule-SHARE-100** — Only files this machine has not touched since are offered
   for removal.
-- **Rule-SHARE-101** — Saying no offers the same choice again on the next sync.
+- **Rule-SHARE-101** — Keeping them sends them back to the server on the next
+  sync, so the question is asked once. Walking away without answering leaves it
+  to be asked again.
 
 ## The screen
 
@@ -44,15 +46,17 @@ There is no key for this. The question comes after the sync.
 │  and this machine has not touched them since: Test Cases/    │
 │  Login/a.json, Test Cases/Login/b.json, Test Cases/Login/    │
 │  c.json. Removing them here agrees with that. Keeping them   │
-│  offers the same choice again on the next sync.              │
+│  sends them back to the server on the next sync.             │
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤
-│  [k]  Enter Remove 3 files       Escape Cancel               │
+│  [k] Enter Remove 3 files  Shift+Enter Keep 3 files  Escape  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 1. **The message** — the count, then every file by name.
 2. **The confirm word** — the word **Remove**, then how many files.
+3. **The second answer** — **Keep**, then how many files. It settles the
+   question rather than putting it off.
 
 ## Main flow
 
@@ -64,10 +68,19 @@ There is no key for this. The question comes after the sync.
 6. The three are removed from this machine.
 7. A message reads *Removed 3*.
 
+To keep them instead, the tester presses `Shift+Enter`. Testin forgets that
+those three were ever transferred, so the next sync sees three files this
+machine has and the server does not, and sends them. A message reads *Kept 3*.
+
 ## What Testin refuses
 
-**If the tester presses `Escape`** — nothing is removed. The same question comes
-again on the next sync.
+**If the tester presses `Escape`** — nothing is removed and nothing is sent. The
+same question comes again on the next sync, which is what a tester who has not
+decided wants.
+
+**If the record of what was last transferred cannot be written** — a message
+titled **Not Kept** says so, and the files will be offered for removal again.
+Nothing is lost: the files are still here.
 
 **If this machine has changed one of them since** — it is not offered here. It
 becomes a conflict instead, and the tester is asked which version wins. That is

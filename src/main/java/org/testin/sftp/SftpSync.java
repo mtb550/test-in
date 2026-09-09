@@ -17,6 +17,7 @@ import org.testin.util.Mapper;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -288,6 +289,32 @@ public final class SftpSync {
      * machine's copy would leave the case unsettled on the server and ask the
      * same question again on the next sync, forever.
      */
+    /**
+     * UC-SHARE-022, Rule-SHARE-100.
+     * <p>
+     * Keeps files the server deleted, and means it: the next sync sends them
+     * back rather than offering the same question again.
+     * <p>
+     * No connection, because none is needed. What made these files look deleted
+     * is their baseline entry - it says the two sides once agreed, so an
+     * untouched local copy loses to the server's deletion. Forgetting the entry
+     * leaves a file this machine has and the server has never seen, which is an
+     * upload. So keeping is one small local write, and the sending happens on
+     * the next sync through the path that already exists.
+     * <p>
+     * Answering Keep used to change nothing at all, so the same files were
+     * offered for deletion at every sync from then on (#95).
+     */
+    public static boolean keep(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull Collection<String> paths) {
+        if (paths.isEmpty()) return false;
+
+        final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
+        final @NotNull Path baselineFile = BaselineStore.fileFor(projectRoot);
+
+        return BaselineStore.write(mapper, baselineFile,
+                BaselineStore.read(mapper, baselineFile).forgetting(paths));
+    }
+
     public static boolean finish(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull String user, final @NotNull SftpAuth auth, final @NotNull Path knownHosts, final @NotNull Map<String, String> answered) {
         if (answered.isEmpty()) return false;
 

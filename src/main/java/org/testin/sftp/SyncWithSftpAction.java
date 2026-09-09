@@ -17,6 +17,8 @@ import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
+import org.testin.util.Shortcuts;
+import org.testin.notifications.Done;
 import org.testin.git.ResolveConflictDialog;
 import org.testin.git.TestCaseMerge;
 import org.testin.services.Services;
@@ -283,8 +285,8 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
         new ConfirmDialog(p, "Removed On The Server",
                 what + " here were deleted on the server by somebody else, and this machine has not "
                         + "touched them since: " + naming(outcome.removedOnServer())
-                        + ". Removing them here agrees with that. Keeping them offers the same choice "
-                        + "again on the next sync.",
+                        + ". Removing them here agrees with that. Keeping them sends them back to "
+                        + "the server on the next sync.",
                 "", "", "Remove " + what,
                 () -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
                     Services.getInstance(p, ProjectIndexer.class)
@@ -293,9 +295,35 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         tp.getProjectTree().refresh();
                         Services.getInstance(p, EditorUtil.class).refreshOpen(p);
-                        Services.getInstance(p, Notifier.class).softShow(p, "Removed " + count);
+                        Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, count);
                     });
-                })).show();
+                }),
+                List.of(new ConfirmDialog.Alternative(Shortcuts.ConfirmAlternative, "Keep " + what,
+                        () -> keepThem(outcome, projectRoot, count)))).show();
+    }
+
+    /**
+     * UC-SHARE-022, Rule-SHARE-100.
+     * <p>
+     * Keeping them, and meaning it. Escape still leaves the question open for
+     * next time, which is what a tester who has not decided wants; this is the
+     * answer that settles it.
+     */
+    private void keepThem(final @NotNull SftpSync.Outcome outcome, final @NotNull Path projectRoot, final int count) {
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final boolean kept = SftpSync.keep(p, projectRoot, outcome.removedOnServer());
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (!kept) {
+                    Services.getInstance(p, Notifier.class).softRefuse(p, "Not Kept",
+                            "The record of what was last transferred could not be written, so these files "
+                                    + "will be offered for removal again at the next sync.");
+                    return;
+                }
+
+                Services.getInstance(p, Notifier.class).softShowCounted(p, Done.KEPT, count);
+            });
+        });
     }
 
     /**

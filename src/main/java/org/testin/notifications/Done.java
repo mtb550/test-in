@@ -55,6 +55,7 @@ public enum Done {
     UNDONE("Undone"),
     REDONE("Redone"),
     REVERTED("Reverted"),
+    KEPT("Kept"),
 
     STOPPED("Stopped"),
     CLEARED("Cleared");
