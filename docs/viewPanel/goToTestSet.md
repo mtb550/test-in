@@ -5,8 +5,8 @@
 **As a** tester, **I want** to open the test set holding the test case I am
 reading, **so that** I can see the test cases around it.
 
-The path at the top says where the test case lives. Its last step opens that
-place.
+The path at the top says where the test case lives. Every step goes to the place
+it names.
 
 There is no key for this. The path is at the top of the panel.
 
@@ -33,9 +33,10 @@ There is no key for this. The path is at the top of the panel.
   otherwise.
 - **Rule-VIEW-PANEL-041** — The path shows one step for each folder above the
   test case.
-- **Rule-VIEW-PANEL-042** — Only the last step opens anything, and it opens the
-  place it names: the test set, or the test run when the panel was opened from
-  a run.
+- **Rule-VIEW-PANEL-042** — Every step goes to the place it names. The tree
+  opens on it and expands to it; a step that names something with an editor —
+  the test set, or the test run when the panel was opened from a run — opens
+  that too.
 - **Rule-VIEW-PANEL-043** — Opening a test set that is already open brings it to
   the front.
 
@@ -47,16 +48,17 @@ There is no key for this. The path is at the top of the panel.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **Every step** — gray, and underlined under the pointer.
-2. **The last step** — the only one that opens anything. It opens the place it
-   names.
+1. **Every step** — gray, and underlined under the pointer. Every one of them
+   goes somewhere.
 
 ## Main flow
 
-1. The tester moves the pointer over the last step of the path.
+1. The tester moves the pointer over a step of the path.
 2. The step turns to the link color and underlines itself.
 3. The tester clicks it.
-4. The test set's editor opens, or comes to the front if it was already open.
+4. The Testin tool window comes up and the tree expands to that step.
+5. If the step names a test set or a test run, its editor opens too, or comes to
+   the front if it was already open.
 
 **When the panel was opened from a test run**, the path names that test run, and
 its last step opens the test run's editor. The step always opens the place it
@@ -64,16 +66,11 @@ names, so what the tester reads is what they get.
 
 ## What Testin refuses
 
-**If the tester clicks any step but the last** — nothing happens, and nothing is
-said. The step still shows a hand pointer and still underlines itself. That is
-difference 4 on
-[the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
-
 **If the panel was handed no path** — no steps are drawn at all.
 
-**If the last step names something with no editor** — nothing happens, and
-nothing is said. A package and the two containers are places in the tree, not
-things to open.
+**If the step names something with no editor** — a package, or one of the two
+containers — the tree goes there and no editor opens. Those are places in the
+tree rather than things to open, and going to one is the tree going to it.
 
 ---
 

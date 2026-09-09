@@ -2,11 +2,12 @@
 
 # UC-CODEGEN-007: Go to the test case from the code
 
-**As a** tester, **I want** to read the test case behind a method I am looking
-at, **so that** I know what the automation is supposed to prove before I change
-it.
+**As a** tester, **I want** to be taken to the test case behind a method I am
+looking at, **so that** I can read what the automation is supposed to prove, and
+change it, without going looking for it.
 
-This opens the test case that a generated method was written from.
+This goes to the test case that a generated method was written from: the tree
+expands to its test set, the editor opens on it, and the row is selected.
 
 There is no key for this. The mark is in the gutter beside the method.
 
@@ -30,6 +31,10 @@ There is no key for this. The mark is in the gutter beside the method.
   Testin recognizes.
 - **Rule-CODEGEN-030** — The mark is drawn while the IDE is still indexing, and
   the jump waits for indexing to finish.
+- **Rule-CODEGEN-070** — The mark goes to the test case, not merely to what it
+  says: the tree expands to its test set, the editor opens on it and the row is
+  selected. Reading a generated method and being shown the case's details but
+  left nowhere near it is not going to it.
 - **Rule-CODEGEN-069** — Clicking the mark of a method whose test case is gone
   says so, naming the method. Generated code outlives the test case it was
   written from, so this is an ordinary answer rather than a failure.
@@ -46,14 +51,20 @@ There is no key for this. The mark is in the gutter beside the method.
 ```
 
 1. **The mark** — on the line holding the identity, not the line holding the
-   method name. Its tooltip reads **View Test Case Details**.
+   method name. Its tooltip reads **Go to Test Case**.
 
 ## Main flow
 
 1. The tester is reading a generated method.
-2. The tester clicks the mark in the gutter.
+2. The tester clicks the mark beside the identity.
 3. Testin waits for indexing, then looks the test case up by its identity.
-4. The view panel opens on that test case, with the Details tab in front.
+4. The Testin tool window comes up and the tree expands to the test set holding
+   it.
+5. That test set's editor opens and the test case is selected in it, with the
+   view panel showing it.
+
+The same three things the global search does for a test case it found, because
+it is the same call.
 
 ## What Testin refuses
 

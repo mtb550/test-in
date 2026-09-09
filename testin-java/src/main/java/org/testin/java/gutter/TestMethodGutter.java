@@ -16,12 +16,11 @@ import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.view.ViewPanel;
-import org.testin.view.ViewToolWindowFactory;
+import org.testin.search.GoTo;
+import org.testin.search.Hit;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,7 +57,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 element,
                 element.getTextRange(),
                 AllIcons.Nodes.Related,
-                psiElement -> "View Test Case Details",
+                psiElement -> "Go to Test Case",
                 (mouseEvent, psiElement) -> openViewPanel(p, testCaseId, methodName(psiElement)),
                 GutterIconRenderer.Alignment.RIGHT,
                 Collections::emptyList
@@ -103,8 +102,16 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 indexer.findTestCase(uuid).ifPresentOrElse(
                         dto -> {
                             Logger.info("Found in indexer: " + dto.getDescription());
-                            ApplicationManager.getApplication().invokeLater(() ->
-                                    ViewToolWindowFactory.showPanel(p, List.of(dto), dto.getParent().getPath2(), ViewPanel::focusDetailsTab));
+
+                            // Where the tester works, not just what the case says.
+                            // This opened the details panel and stopped there, so
+                            // reading a generated method told you about the test
+                            // case and left you nowhere near it. GoTo is the one
+                            // that takes somebody somewhere: the tree expands to
+                            // the test set, the editor opens on it, and the row
+                            // is selected - the same three things the global
+                            // search does for a case it found.
+                            ApplicationManager.getApplication().invokeLater(() -> GoTo.the(p, Hit.of(dto)));
                         },
                         () -> refuseMissingCase(p, uuid, methodName));
 

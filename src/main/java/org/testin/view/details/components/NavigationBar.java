@@ -10,10 +10,10 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
-import org.testin.editor.EditorUtil;
+import org.testin.search.GoTo;
+import org.testin.search.Hit;
 import org.testin.ui.FontSync;
 
 import java.awt.*;
@@ -60,6 +60,9 @@ public class NavigationBar extends BaseDetails {
                 final @NotNull String labelText = currentPath.get(i);
                 final boolean isLast = (i == currentPath.size() - 1);
 
+                // Captured: the listener below runs long after the loop has ended.
+                final int index = i;
+
                 final @NotNull JBLabel folderLabel = new JBLabel(labelText);
                 folderLabel.setFont(JBUI.Fonts.label(navFontSize));
                 folderLabel.setForeground(DEFAULT_TEXT_COLOR);
@@ -78,37 +81,32 @@ public class NavigationBar extends BaseDetails {
                         setUnderline(folderLabel, false);
                     }
 
-                    // UC-VIEW-PANEL-010, Rule-VIEW-PANEL-042, Rule-VIEW-PANEL-043
+                    /**
+                     * UC-VIEW-PANEL-010, Rule-VIEW-PANEL-042, Rule-VIEW-PANEL-043.
+                     * <p>
+                     * Every step goes where it says, not only the last one.
+                     * <p>
+                     * All of them took a hand pointer, turned the link colour and
+                     * underlined themselves, and only the last did anything -
+                     * clicking Test Cases to go up a level did nothing and said
+                     * nothing (#228). The steps above the last are the test
+                     * project, the Test Cases folder and the packages, and none
+                     * of those has an editor to open, so what going to one means
+                     * is the tree going there.
+                     * <p>
+                     * Which is what {@code GoTo} already does, for the global
+                     * search: bring the tool window up, expand to the node, and
+                     * open its editor if it has one. A node that has none is
+                     * refused there rather than guessed at, so the last step
+                     * opens a test set and a step above it simply reveals - one
+                     * call, and this bar does not have to know which kind it is
+                     * looking at.
+                     */
                     @Override
                     public void mouseClicked(final MouseEvent e) {
-                        if (isLast) {
-                            // Resolved by the class that owns it. This walked the
-                            // segments off the raw stored root, which skips the
-                            // two steps that make it a real path - falling back
-                            // to the project directory when nothing is
-                            // configured, and resolving a relative root against
-                            // it. Either case yielded a relative path, the
-                            // indexer lookup then threw, and it threw out of a
-                            // Swing mouse listener.
-                            final @NotNull Path lastStepPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
+                        final @NotNull Path stepPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath.subList(0, index + 1));
 
-                            // Whatever the step names, which is a test set when
-                            // the panel was opened from the tree and a test run
-                            // when it was opened from a run. Asking for a test
-                            // set by path threw the second time: there is no test
-                            // set where a run is, and a cache miss is an error the
-                            // tester cannot read - out of a mouse listener again.
-                            // Asked, not assumed, so the step opens what it says.
-                            Services.getInstance(p, ProjectIndexer.class).find(lastStepPath)
-                                    .filter(DirectoryDto::isOpenableInEditor)
-                                    .ifPresent(dir -> Services.getInstance(p, EditorUtil.class).open(p, dir));
-
-                            // No is-open guard. Opening a node that is already
-                            // open focuses it, which is what the guard was for -
-                            // and the guard matched on the name, so with two test
-                            // sets called the same it focused the neighbor and
-                            // then returned without opening this one.
-                        }
+                        Services.getInstance(p, ProjectIndexer.class).find(stepPath).map(Hit::of).ifPresent(hit -> GoTo.the(p, hit));
                     }
                 });
 
