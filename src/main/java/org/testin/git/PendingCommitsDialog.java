@@ -9,7 +9,13 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.ui.framework.*;
+import org.testin.ui.framework.AbstractFrameworkDialog;
+import org.testin.ui.framework.ChoiceInput;
+import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.DialogSplitButton;
+import org.testin.ui.framework.SelectionTable;
+import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.ui.framework.TextInput;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;

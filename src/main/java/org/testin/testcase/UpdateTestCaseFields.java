@@ -14,7 +14,15 @@ import org.testin.statusbar.MenuItem;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.testcase.create.CreateTestCaseSection;
 import org.testin.testcase.create.TestCaseBaseDialog;
-import org.testin.testcase.update.bulk.*;
+import org.testin.testcase.update.bulk.DescriptionBulkSectionDialog;
+import org.testin.testcase.update.bulk.ExpectedResultBulkSectionDialog;
+import org.testin.testcase.update.bulk.GroupBulkSectionDialog;
+import org.testin.testcase.update.bulk.ModuleBulkSectionDialog;
+import org.testin.testcase.update.bulk.PreConditionsBulkSectionDialog;
+import org.testin.testcase.update.bulk.PriorityBulkSectionDialog;
+import org.testin.testcase.update.bulk.StatusBulkSectionDialog;
+import org.testin.testcase.update.bulk.StepsBulkSectionDialog;
+import org.testin.testcase.update.bulk.TestDataBulkSectionDialog;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;

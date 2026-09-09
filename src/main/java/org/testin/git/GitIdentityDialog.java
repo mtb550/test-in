@@ -2,7 +2,11 @@ package org.testin.git;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.ui.framework.*;
+import org.testin.ui.framework.AbstractFrameworkDialog;
+import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.RadioSelection;
+import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.ui.framework.TextInput;
 
 import java.util.List;
 import java.util.function.Consumer;

@@ -1,6 +1,13 @@
 package org.testin.explorer.tree;
 
-import org.testin.model.dto.dirs.*;
+import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.TestCasesMainDirectoryDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
+import org.testin.model.dto.dirs.TestRunsMainDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;

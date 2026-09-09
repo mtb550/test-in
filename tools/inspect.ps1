@@ -563,6 +563,12 @@ function Read-ModelStatics([string[]] $scopes) {
                 $trimmed = $text.Trim()
                 if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
 
+                # An import declares nothing, so it holds nothing. An
+                # 'import static a.b.C.took;' has no parentheses and no
+                # 'final', which is every test below - so it read as a mutable
+                # static and failed the gate over a line that is not a member.
+                if ($trimmed.StartsWith('import ')) { continue }
+
                 if ($text -notmatch '\bstatic\b') { continue }
                 if ($text -match '\bfinal\b') { continue }
                 if ($text -match '\bstatic\s+(final\s+)?(class|interface|enum|record)\b') { continue }

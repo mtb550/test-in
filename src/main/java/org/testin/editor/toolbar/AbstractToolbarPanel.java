@@ -7,7 +7,12 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.ViewMode;
-import org.testin.editor.toolbar.components.*;
+import org.testin.editor.toolbar.components.FocusSearchAction;
+import org.testin.editor.toolbar.components.GridViewBtn;
+import org.testin.editor.toolbar.components.ListViewBtn;
+import org.testin.editor.toolbar.components.NodeDetailsBtn;
+import org.testin.editor.toolbar.components.SearchTxt;
+import org.testin.editor.toolbar.components.ToolbarItem;
 import org.testin.logger.Logger;
 
 import javax.swing.*;

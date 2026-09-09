@@ -30,7 +30,16 @@ import org.testin.util.Display;
 import org.testin.ui.FontSync;
 import org.testin.util.Shortcuts;
 import org.testin.view.ViewToolWindowFactory;
-import org.testin.view.details.components.*;
+import org.testin.view.details.components.ActionIcons;
+import org.testin.view.details.components.AttributeRow;
+import org.testin.view.details.components.BadgeRow;
+import org.testin.view.details.components.BaseDetails;
+import org.testin.view.details.components.Id;
+import org.testin.view.details.components.NavigationBar;
+import org.testin.view.details.components.RunAttributeRow;
+import org.testin.view.details.components.StacktraceRow;
+import org.testin.view.details.components.Steps;
+import org.testin.view.details.components.Title;
 
 import javax.swing.*;
 import java.awt.*;

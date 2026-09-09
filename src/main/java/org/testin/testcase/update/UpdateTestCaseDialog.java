@@ -14,7 +14,11 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testcase.UIAction;
 import org.testin.testcase.UpdateTestCaseFields;
-import org.testin.testcase.create.*;
+import org.testin.testcase.create.CreateTestCaseSection;
+import org.testin.testcase.create.DescriptionSection;
+import org.testin.testcase.create.ExpectedResultSection;
+import org.testin.testcase.create.StepsSection;
+import org.testin.testcase.create.TestCaseBaseDialog;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Shortcuts;
 
