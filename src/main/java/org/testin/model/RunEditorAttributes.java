@@ -3,8 +3,8 @@ package org.testin.model;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Badges;
 import org.testin.codegen.Fqcn;
-import org.testin.editor.Shared;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
@@ -29,7 +29,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             (item, p) -> ""
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             // Drawn by the card title, ahead of the description: "1. Log in with a valid user".
         }
     },
@@ -40,7 +40,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             (item, p) -> item.requireTc().getDescription()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             // The card title is the description; a details row under it would print it twice.
         }
     },
@@ -63,8 +63,8 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             (item, p) -> item.requireTc().getPriority().getLabel()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            Shared.addPriorityBadge(badges, runItem.requireTc());
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+            Badges.addPriorityBadge(badges, runItem.requireTc());
         }
     },
 
@@ -74,8 +74,8 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             (item, p) -> item.requireTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", "))
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            runItem.requireTc().getGroup().stream().map(Shared::createGroupBadge).forEach(badges::add);
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+            runItem.requireTc().getGroup().stream().map(Badges::createGroupBadge).forEach(badges::add);
         }
     },
 
@@ -116,8 +116,8 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             (item, p) -> item.getBugSeverity().getLabel()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            Shared.addBugBadge(badges, runItem.getBugSeverity().getLabel(), runItem.getBugSeverity().getColor());
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+            Badges.addBugBadge(badges, runItem.getBugSeverity().getLabel(), runItem.getBugSeverity().getColor());
         }
     },
 
@@ -127,10 +127,10 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             (item, p) -> item.getBugPriority().getLabel()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             // Its own half of the badge severity started, or the whole of it
             // when severity is not shown. One badge either way (#89).
-            Shared.addBugBadge(badges, runItem.getBugPriority().getLabel(), runItem.getBugPriority().getColor());
+            Badges.addBugBadge(badges, runItem.getBugPriority().getLabel(), runItem.getBugPriority().getColor());
         }
     },
 
@@ -213,7 +213,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
      * this in their own body — the two behaviors sit on the constants that
      * have them instead of being chosen by a null at run time.
      */
-    public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+    public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
         details.put(name, runValueExtractor.execute(runItem, p));
     }
 

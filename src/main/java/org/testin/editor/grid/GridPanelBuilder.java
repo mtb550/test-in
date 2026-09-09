@@ -9,9 +9,9 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.WheelForwarding;
 import org.testin.ui.framework.RowStripe;
 import org.testin.editor.EditorColors;
-import org.testin.editor.Shared;
 import org.testin.logger.Logger;
 import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestEditorAttributes;
@@ -261,7 +261,7 @@ public class GridPanelBuilder {
         table.addMouseWheelListener(new MouseAdapter() {
             @Override
             public void mouseWheelMoved(final MouseWheelEvent e) {
-                Shared.forwardWheelToScrollPane(e);
+                WheelForwarding.forwardWheelToScrollPane(e);
             }
         });
     }

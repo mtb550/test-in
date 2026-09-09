@@ -6,6 +6,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.CardTitle;
+import org.testin.editor.WheelForwarding;
 import org.testin.editor.*;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -144,7 +146,7 @@ public class CardMouseListener extends MouseAdapter {
 
     @Override
     public void mouseWheelMoved(final MouseWheelEvent e) {
-        Shared.forwardWheelToScrollPane(e);
+        WheelForwarding.forwardWheelToScrollPane(e);
     }
 
     /**
@@ -168,7 +170,7 @@ public class CardMouseListener extends MouseAdapter {
         final @NotNull Font titleFont = list.getFont().deriveFont(Font.BOLD, baseSize + BaseCard.TITLE_FONT_DELTA);
 
         // The title is asked of the editor, which owns what it reads, and where
-        // the icons sit is asked of Shared, which paints them. Neither is worked
+        // the icons sit is asked of CardTitle, which paints them. Neither is worked
         // out here: both used to be, and both drifted.
         final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
         final @NotNull String title = editor.cardTitle(tc);
@@ -176,11 +178,11 @@ public class CardMouseListener extends MouseAdapter {
         // Capped at the title column exactly as the card caps what it paints, so
         // a title long enough to wrap keeps the clickable band under the icons
         // rather than out past the edge of the card.
-        final int titleWidth = Math.min(list.getFontMetrics(titleFont).stringWidth(title), Shared.titleColumnWidth(list.getWidth()));
+        final int titleWidth = Math.min(list.getFontMetrics(titleFont).stringWidth(title), CardTitle.titleColumnWidth(list.getWidth()));
 
         // The card draws the run button or the stop button by the same rule, so
         // the pointer is over whichever one this case is offering.
-        return Shared.descriptionActionIcons(titleWidth).at(xInCell, yInCell, CardHoverAction.runSlot(p, tc));
+        return CardTitle.descriptionActionIcons(titleWidth).at(xInCell, yInCell, CardHoverAction.runSlot(p, tc));
     }
 
 }

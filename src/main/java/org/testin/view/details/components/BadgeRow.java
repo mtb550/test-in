@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.Shared;
+import org.testin.ui.Badges;
 import org.testin.model.Group;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -15,7 +15,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Badges extends BaseDetails {
+public class BadgeRow extends BaseDetails {
 
     final int FLOW_GAP = 6;
     final int INSETS_TOP = 8;
@@ -29,13 +29,13 @@ public class Badges extends BaseDetails {
         final @NotNull JBPanel<?> badgesPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
         badgesPanel.setOpaque(false);
 
-        final @NotNull List<Shared.Badge> badges = Shared.caseBadges(dto);
+        final @NotNull List<Badges.Badge> badges = Badges.caseBadges(dto);
 
         // Last, the way a card orders them. None for a case nobody has run.
         final @NotNull RunStatus tempStatus = Services.getInstance(p, TestNGExecution.class).statusOf(dto);
-        if (tempStatus.hasBadge()) badges.add(Shared.createRunStatusBadge(tempStatus.getBadge()));
+        if (tempStatus.hasBadge()) badges.add(Badges.createRunStatusBadge(tempStatus.getBadge()));
 
-        Shared.showBadges(badgesPanel, badges);
+        Badges.showBadges(badgesPanel, badges);
 
         return addFullWidthRow(panel, gbc, badgesPanel,
                 JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT), currentRow);

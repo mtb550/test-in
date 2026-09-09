@@ -133,7 +133,7 @@ public class DetailsTab {
                         new Id(),
                         new Title(),
                         new ActionIcons(),
-                        new Badges()),
+                        new BadgeRow()),
                 runItem.stream().flatMap(DetailsTab::runRows),
                 caseRows()
         ).flatMap(rows -> rows).toList();

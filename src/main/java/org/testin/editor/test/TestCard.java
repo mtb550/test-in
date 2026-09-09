@@ -2,11 +2,11 @@ package org.testin.editor.test;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Badges;
 import org.testin.clipboard.CutState;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.BaseCard;
 import org.testin.editor.CardHoverAction;
-import org.testin.editor.Shared;
 import org.testin.model.RunStatus;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
@@ -19,7 +19,7 @@ import java.util.List;
 
 public class TestCard extends BaseCard {
     private final @NotNull Project p;
-    private final @NotNull List<Shared.Badge> badges = new ArrayList<>();
+    private final @NotNull List<Badges.Badge> badges = new ArrayList<>();
     private final @NotNull Map<String, String> details = new LinkedHashMap<>();
     private boolean isPendingCut = false;
 
@@ -48,7 +48,7 @@ public class TestCard extends BaseCard {
         final @NotNull RunStatus runStatus = Services.getInstance(p, TestNGExecution.class).statusOf(tc);
         this.runSlot = CardHoverAction.runSlot(p, tc);
 
-        if (runStatus.hasBadge()) badges.add(Shared.createRunStatusBadge(runStatus.getBadge()));
+        if (runStatus.hasBadge()) badges.add(Badges.createRunStatusBadge(runStatus.getBadge()));
 
         updateUI(index, title, badges, details);
     }

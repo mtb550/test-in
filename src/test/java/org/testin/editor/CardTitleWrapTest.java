@@ -83,10 +83,10 @@ public class CardTitleWrapTest {
      */
     @Test
     public void theIconsStillFitAfterATitleThatFillsTheColumn() {
-        final int column = Shared.titleColumnWidth(900);
+        final int column = CardTitle.titleColumnWidth(900);
 
         assertTrue(column > 0 && column < 900, "a 900px list must give a bounded column, got " + column);
-        assertTrue(Shared.descriptionActionIcons(column).run().getMaxX() <= 900, "the icons after a full-width title run off the card");
+        assertTrue(CardTitle.descriptionActionIcons(column).run().getMaxX() <= 900, "the icons after a full-width title run off the card");
     }
 
     /**
@@ -96,6 +96,6 @@ public class CardTitleWrapTest {
      */
     @Test
     public void aListWithNoWidthYetLetsTheTitleRun() {
-        assertEquals(Shared.titleColumnWidth(0), Integer.MAX_VALUE);
+        assertEquals(CardTitle.titleColumnWidth(0), Integer.MAX_VALUE);
     }
 }

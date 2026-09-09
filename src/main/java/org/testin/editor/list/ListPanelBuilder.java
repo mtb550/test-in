@@ -10,6 +10,7 @@ import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.CardTitle;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.listeners.CardMouseListener;
@@ -46,7 +47,7 @@ public final class ListPanelBuilder {
         //
         // JList works the answer out instead, by comparing the widest card with
         // the viewport, and until the list has been laid out it has no width to
-        // give: Shared.titleColumnWidth reads zero, decides there is no column to
+        // give: CardTitle.titleColumnWidth reads zero, decides there is no column to
         // wrap inside, and lets the title run as far as it likes, which lays the
         // card out 32767 pixels wide. So opening an editor put a horizontal
         // scrollbar under a virtually endless row, and every re-measure as the

@@ -5,6 +5,7 @@ import com.intellij.ui.LayeredIcon;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.CardTitle;
 
 import javax.swing.*;
 import java.util.List;
@@ -27,8 +28,8 @@ import java.util.List;
  * circle nobody could read - a state has to be told apart by its outline, not
  * by how bright it is.
  * <p>
- * All three are the same size on purpose. {@code Shared.descriptionActionIcons}
- * and {@code Shared.titleColumnWidth} both measure the card's title column from
+ * All three are the same size on purpose. {@code CardTitle.descriptionActionIcons}
+ * and {@code CardTitle.titleColumnWidth} both measure the card's title column from
  * this icon's width, so a state whose icon were wider would move the title
  * column on the cards in that state and nowhere else.
  */

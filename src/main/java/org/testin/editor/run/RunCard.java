@@ -2,10 +2,10 @@ package org.testin.editor.run;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Badges;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.BaseCard;
 import org.testin.editor.CardHoverAction;
-import org.testin.editor.Shared;
 import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.services.Services;
@@ -16,7 +16,7 @@ import java.util.List;
 
 public class RunCard extends BaseCard {
     private final @NotNull Project p;
-    private final @NotNull List<Shared.Badge> badges = new ArrayList<>();
+    private final @NotNull List<Badges.Badge> badges = new ArrayList<>();
     private final @NotNull Map<String, String> details = new LinkedHashMap<>();
 
     public RunCard(final @NotNull Project p) {

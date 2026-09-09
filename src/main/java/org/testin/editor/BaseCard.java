@@ -8,6 +8,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Badges;
 import org.testin.model.Automated;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.RowStripe;
@@ -138,7 +139,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
             c.setFont(listFont.deriveFont(Font.BOLD, badgeSize));
         }
 
-        titleColumnWidth = Shared.titleColumnWidth(list.getWidth());
+        titleColumnWidth = CardTitle.titleColumnWidth(list.getWidth());
         layOutTitle();
     }
 
@@ -167,7 +168,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * because only it knows which attributes are ticked - so neither card decides
      * anything about it here.
      */
-    protected void updateUI(final int index, final @NotNull String title, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details) {
+    protected void updateUI(final int index, final @NotNull String title, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
         // Kept as it arrived, and put on the label by applyListLayout once the
         // font and the width it must fit are both known. Not set here as well:
         // the label's text is markup when the title wraps, so one method composes
@@ -177,7 +178,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         setBackground(RowStripe.of(index));
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
 
-        Shared.showBadges(badgePanel, badges);
+        Badges.showBadges(badgePanel, badges);
 
         attributeLabels.values().forEach(lbl -> lbl.setVisible(false));
 
@@ -229,7 +230,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected void paintChildren(final Graphics g) {
         super.paintChildren(g);
         if (isRowHovered) {
-            Shared.drawDescriptionActionIcons(this, g, titleWidth(), hoveredAction, runSlot, automation);
+            CardTitle.drawDescriptionActionIcons(this, g, titleWidth(), hoveredAction, runSlot, automation);
         }
     }
 

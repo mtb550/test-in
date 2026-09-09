@@ -4,8 +4,8 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Badges;
 import org.testin.ui.framework.Prose;
-import org.testin.editor.Shared;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Display;
@@ -141,13 +141,13 @@ class CaseDetails extends JBPanel<CaseDetails> {
      * automation reached it is answering a question nobody in front of it asked.
      */
     private void addTags(final @NotNull TestCaseDto tc) {
-        final @NotNull List<Shared.Badge> badges = Shared.caseBadges(tc);
+        final @NotNull List<Badges.Badge> badges = Badges.caseBadges(tc);
 
         if (badges.isEmpty()) return;
 
         final @NotNull JBPanel<?> chips = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(5), 0));
         chips.setOpaque(false);
-        Shared.showBadges(chips, badges);
+        Badges.showBadges(chips, badges);
 
         // Labeled for what the row holds rather than for the groups alone: a
         // High-priority case in no group drew a row reading GROUP: High.

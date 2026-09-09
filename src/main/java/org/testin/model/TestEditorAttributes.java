@@ -4,9 +4,9 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Badges;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenType;
-import org.testin.editor.Shared;
 import org.testin.importexport.imports.ImportSetter;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Display;
@@ -37,7 +37,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             GenType.NO_CODE_CHANGE
     ) {
         @Override
-        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             // Drawn by the card title, ahead of the description: "1. Log in with a valid user".
         }
     },
@@ -51,7 +51,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
         @Override
-        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             // The card title is the description; a details row under it would print it twice.
         }
     },
@@ -103,8 +103,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.EDIT, Can.IMPORT, Can.EXPORT
     ) {
         @Override
-        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            Shared.addPriorityBadge(badges, tc);
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+            Badges.addPriorityBadge(badges, tc);
         }
     },
 
@@ -154,8 +154,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.EDIT, Can.IMPORT, Can.EXPORT
     ) {
         @Override
-        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            tc.getGroup().stream().map(Shared::createGroupBadge).forEach(badges::add);
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+            tc.getGroup().stream().map(Badges::createGroupBadge).forEach(badges::add);
         }
     },
 
@@ -298,7 +298,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
      * this in their own body — the two behaviors sit on the constants that
      * have them instead of being chosen by a null at run time.
      */
-    public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+    public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
         details.put(name, testValueExtractor.execute(tc, p));
     }
 

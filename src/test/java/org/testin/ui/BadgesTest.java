@@ -1,4 +1,4 @@
-package org.testin.editor;
+package org.testin.ui;
 
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
@@ -27,21 +27,21 @@ import static org.testng.Assert.*;
  * the two decisions instead - which text colour a background earns, and whether
  * a value becomes a badge at all.
  */
-public class CardBadgeTest {
+public class BadgesTest {
 
     @Test
     public void aLightBackgroundEarnsDarkText() {
-        assertTrue(Shared.isLight(Color.YELLOW), "yellow with white text is the failure this exists to stop");
-        assertTrue(Shared.isLight(Color.ORANGE), "orange is light enough to lose white text");
-        assertTrue(Shared.isLight(Color.GREEN), "pure green is brighter than it looks");
-        assertTrue(Shared.isLight(Color.GRAY.brighter()), "the test case's Low priority, marginal under white");
+        assertTrue(Badges.isLight(Color.YELLOW), "yellow with white text is the failure this exists to stop");
+        assertTrue(Badges.isLight(Color.ORANGE), "orange is light enough to lose white text");
+        assertTrue(Badges.isLight(Color.GREEN), "pure green is brighter than it looks");
+        assertTrue(Badges.isLight(Color.GRAY.brighter()), "the test case's Low priority, marginal under white");
     }
 
     @Test
     public void aDarkBackgroundKeepsWhiteText() {
-        assertFalse(Shared.isLight(Color.RED), "a blocker is deep red");
-        assertFalse(Shared.isLight(Color.BLUE), "blue is dark however bright the channel is");
-        assertFalse(Shared.isLight(Color.DARK_GRAY), "the group badge");
+        assertFalse(Badges.isLight(Color.RED), "a blocker is deep red");
+        assertFalse(Badges.isLight(Color.BLUE), "blue is dark however bright the channel is");
+        assertFalse(Badges.isLight(Color.DARK_GRAY), "the group badge");
     }
 
     /**
@@ -51,16 +51,16 @@ public class CardBadgeTest {
      */
     @Test
     public void brightnessIsWhatTheEyeSeesNotWhatTheChannelSays() {
-        assertTrue(Shared.isLight(new Color(0, 255, 0)));
-        assertFalse(Shared.isLight(new Color(0, 0, 255)));
+        assertTrue(Badges.isLight(new Color(0, 255, 0)));
+        assertFalse(Badges.isLight(new Color(0, 0, 255)));
     }
 
     @Test
     public void aCaseThatNeverFailedDrawsNoPill() {
-        final List<Shared.Badge> badges = new ArrayList<>();
+        final List<Badges.Badge> badges = new ArrayList<>();
 
-        Shared.addBugBadge(badges, BugSeverity.EMPTY.getLabel(), BugSeverity.EMPTY.getColor());
-        Shared.addBugBadge(badges, BugPriority.EMPTY.getLabel(), BugPriority.EMPTY.getColor());
+        Badges.addBugBadge(badges, BugSeverity.EMPTY.getLabel(), BugSeverity.EMPTY.getColor());
+        Badges.addBugBadge(badges, BugPriority.EMPTY.getLabel(), BugPriority.EMPTY.getColor());
 
         assertEquals(badges.size(), 0, "an empty value is not a badge with no text, it is no badge");
     }
@@ -72,15 +72,15 @@ public class CardBadgeTest {
      */
     @Test
     public void oneHalfOnItsOwnIsThatHalf() {
-        final List<Shared.Badge> severityOnly = new ArrayList<>();
-        Shared.addBugBadge(severityOnly, BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
+        final List<Badges.Badge> severityOnly = new ArrayList<>();
+        Badges.addBugBadge(severityOnly, BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
         assertEquals(severityOnly.size(), 1);
-        assertTrue(severityOnly.getFirst() instanceof Shared.Bug bug && bug.text().equals("Major"));
+        assertTrue(severityOnly.getFirst() instanceof Badges.Bug bug && bug.text().equals("Major"));
 
-        final List<Shared.Badge> priorityOnly = new ArrayList<>();
-        Shared.addBugBadge(priorityOnly, BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
+        final List<Badges.Badge> priorityOnly = new ArrayList<>();
+        Badges.addBugBadge(priorityOnly, BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
         assertEquals(priorityOnly.size(), 1);
-        assertTrue(priorityOnly.getFirst() instanceof Shared.Bug bug && bug.text().equals("High"),
+        assertTrue(priorityOnly.getFirst() instanceof Badges.Bug bug && bug.text().equals("High"),
                 "the survivor keeps its own color, which is why BugPriority still declares one");
     }
 
@@ -90,15 +90,15 @@ public class CardBadgeTest {
      */
     @Test
     public void bothHalvesJoinIntoOneBadge() {
-        final List<Shared.Badge> badges = new ArrayList<>();
+        final List<Badges.Badge> badges = new ArrayList<>();
 
-        Shared.addBugBadge(badges, BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
-        Shared.addBugBadge(badges, BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
+        Badges.addBugBadge(badges, BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
+        Badges.addBugBadge(badges, BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
 
         assertEquals(badges.size(), 1, "two halves, one badge");
-        assertTrue(badges.getFirst() instanceof Shared.Bug bug && bug.text().equals("Major / High"),
+        assertTrue(badges.getFirst() instanceof Badges.Bug bug && bug.text().equals("Major / High"),
                 "severity first, because the enum offers it first");
-        assertEquals(((Shared.Bug) badges.getFirst()).color(), BugSeverity.MAJOR.getColor(),
+        assertEquals(((Badges.Bug) badges.getFirst()).color(), BugSeverity.MAJOR.getColor(),
                 "the color is the first half's");
     }
 
@@ -108,13 +108,13 @@ public class CardBadgeTest {
      */
     @Test
     public void lowPriorityDrawsNoPill() {
-        final List<Shared.Badge> badges = new ArrayList<>();
+        final List<Badges.Badge> badges = new ArrayList<>();
 
-        Shared.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.LOW));
+        Badges.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.LOW));
         assertEquals(badges.size(), 0, "Low is the default, and the default needs no badge");
 
-        Shared.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.HIGH));
-        Shared.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.MEDIUM));
+        Badges.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.HIGH));
+        Badges.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.MEDIUM));
         assertEquals(badges.size(), 2, "a priority somebody chose is still drawn");
     }
 
