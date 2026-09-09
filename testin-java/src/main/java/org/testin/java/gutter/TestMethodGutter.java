@@ -99,9 +99,13 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                         () -> Logger.error("Unable to find test case with UUID: " + uuid));
 
             } catch (final Exception ex) {
-                Logger.error("Error: " + ex.getMessage());
+                // Named for what failed rather than titled "Error", which said
+                // nothing the message did not and was the same word two other
+                // files write. Found the day the gate first read this module
+                // (#170).
+                Logger.error("Could not open the test case behind this mark: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Services.getInstance(p, Notifier.class).error(p, "Error", "Could not find test case: " + ex.getMessage())
+                        Services.getInstance(p, Notifier.class).error(p, "Test Case Not Opened", "Could not find test case: " + ex.getMessage())
                 );
             }
         });

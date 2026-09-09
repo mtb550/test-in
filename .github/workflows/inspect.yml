@@ -82,6 +82,10 @@ jobs:
         # and it left out testin-java and testin-testng altogether, which is
         # the gap Get-SourceRoots was written to close. Without the argument
         # the script uses those three production trees and nothing else.
+        #
+        # That last sentence was written before it was true: the parameter had a
+        # default, so the branch reading all three roots was unreachable and
+        # only src/main was ever checked. Fixed in #170.
         run: ./gradlew inspect
 
       # Always, because a breached gate is exactly when somebody wants the list.

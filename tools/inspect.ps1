@@ -40,11 +40,14 @@ param(
     # for the next hour. Gitignored instead.
     [string] $OutputDir = '.inspection',
 
-    # Restrict the run to a subdirectory. Defaults to the production sources,
-    # which is the point: .sandbox holds a whole IDE installation from
-    # ./gradlew runIde, and inspecting it produced 74,803 spellcheck findings
-    # against 33 in src. Pass '' to inspect the project root instead.
-    [string] $Subdirectory = 'src/main',
+    # Narrows a run to one place, and passing '' inspects the project root.
+    #
+    # No default, deliberately. It used to default to 'src/main', which is
+    # always truthy - so the branch that reads every production source root was
+    # unreachable, the content modules were never checked, and three comments
+    # said otherwise (#170). What "no override" means is now asked of
+    # PSBoundParameters, which can tell it from a value.
+    [string] $Subdirectory,
 
     # How many display strings written in more than one place this tree is
     # allowed to have. A ratchet rather than a gate: see
@@ -60,6 +63,16 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
+
+# Whether the caller narrowed this run. Asked of PSBoundParameters rather than
+# of the value, because "-Subdirectory ''" is a real request - inspect the
+# project root - and a value cannot tell that from having no value at all.
+$narrowed = $PSBoundParameters.ContainsKey('Subdirectory')
+
+# What the inspector analyses. src/main unless narrowed, and never the whole
+# repository by accident: .sandbox holds an entire IDE installation, and
+# inspecting it produced 74,803 spellcheck findings against 33 in src.
+$analysisScope = if ($narrowed) { $Subdirectory } else { 'src/main' }
 
 function Resolve-Inspector {
     $props = Get-Content (Join-Path $repo 'gradle.properties')
@@ -114,7 +127,7 @@ idea.log.path=$s/log
 
     $profilePath = Join-Path $repo '.idea' 'inspectionProfiles' 'Testin.xml'
     $arguments = @($repo, $profilePath, $outPath, '-v1')
-    if ($Subdirectory) { $arguments += @('-d', (Join-Path $repo $Subdirectory)) }
+    if ($analysisScope) { $arguments += @('-d', (Join-Path $repo $analysisScope)) }
 
     Write-Host "Inspecting $repo - one indexing pass, expect 10-20 minutes..."
     $env:IDEA_PROPERTIES = $propsFile
@@ -195,6 +208,19 @@ function Resolve-CrossModuleUsages([object[]] $problems) {
     foreach ($problem in $problems) {
         if ($problem.Inspection -ne 'unused') { continue }
 
+        # A parameter an implementation elsewhere uses. Its own name is no use
+        # for the search below - a parameter called p appears in every file in
+        # the plugin - so what is looked for is the type declaring it, which a
+        # content module has to name to implement it at all. CodeNavigation's
+        # two p parameters were reported unused on every run: the only
+        # implementation in scope is NoCodeNavigation, which does nothing by
+        # design, and the real one is CodeNavigator in testin-java (#170).
+        if ($problem.Message -match '^Parameter .* is not used in any implementation') {
+            $type = [System.IO.Path]::GetFileNameWithoutExtension($problem.Path)
+            if ($moduleText -match ('\b' + [regex]::Escape($type) + '\b')) { Set-UsedFromContentModule $problem }
+            continue
+        }
+
         # A method, a whole class, or an enum constant. It caught only the first
         # to begin with, which left ExecutionPosition reported as a dead class
         # while two files in testin-java were calling it.
@@ -216,11 +242,22 @@ function Resolve-CrossModuleUsages([object[]] $problems) {
 
         if ($moduleText -notmatch $pattern) { continue }
 
-        $problem.Inspection = 'UsedFromContentModule'
-        $problem.Message = "$($problem.Message) It is called from a content module, which is outside the inspector's analysis scope - not dead code."
+        Set-UsedFromContentModule $problem
     }
 
     return $problems
+}
+
+<#
+    Relabels one finding as reached from a content module.
+
+    One place, because there are two ways in now - a declaration nothing in
+    scope calls, and a parameter no implementation in scope uses - and the
+    sentence a reader gets should not depend on which of them found it.
+#>
+function Set-UsedFromContentModule([object] $problem) {
+    $problem.Inspection = 'UsedFromContentModule'
+    $problem.Message = "$($problem.Message) It is called from a content module, which is outside the inspector's analysis scope - not dead code."
 }
 
 function Get-DeclaredName([object] $problem) {
@@ -716,7 +753,7 @@ if (-not $ReportOnly) {
 # Every production source root, so the one-line-signature gate covers the
 # content modules too. An explicit -Subdirectory still wins, for the caller
 # narrowing a run to one place.
-$scopes = if ($Subdirectory) { @(Join-Path $repo $Subdirectory) } else { Get-SourceRoots }
+$scopes = if ($narrowed) { @(Join-Path $repo $Subdirectory) } else { Get-SourceRoots }
 
 $problems = @(Read-Problems $outPath)
 foreach ($scope in $scopes) { $problems += @(Read-WrappedDeclarations $scope) }
