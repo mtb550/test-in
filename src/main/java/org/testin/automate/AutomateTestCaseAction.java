@@ -35,7 +35,9 @@ public class AutomateTestCaseAction extends AbstractProjectAction {
     public void actionPerformed(final @NotNull AnActionEvent e) {
         // update() disables the action on an empty selection, but the shortcut
         // and the selection can race, so Swing can still answer with nothing.
-        /// TODO: to be implemented by integrating to pi agent automatic, next release
+        //
+        // Generating the code is #243, which also decides whether this entry
+        // stays on the menu until it is built.
         Optional.ofNullable(list.getSelectedValue()).ifPresent(tc -> Logger.info(tc.getDescription()));
 
         // Says so until then. This is the one action in the menu that changes

@@ -13,8 +13,10 @@ public class HistoryTab {
 
     /// UC-VIEW-PANEL-007, Rule-VIEW-PANEL-037.
     ///
-    /// TODO: real change history is not implemented yet; show an honest empty state
-    /// instead of demo data until it is.
+    /// An honest empty state, because a test case records one edit and forgets
+    /// the rest - there is no history to show. Recording it is #150. This drew
+    /// demo data once, which read as a working feature holding somebody else's
+    /// data.
     public void load(final @NotNull JBPanel<?> historyTab) {
         historyTab.removeAll();
 
