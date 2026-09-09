@@ -89,6 +89,10 @@ final class FilesUtil {
             // filesystem root - has no folder to create.
             FileUtil.createParentDirs(path.toFile());
             Files.write(path, jsonBytes);
+
+            // What actually landed, so an edit a tester makes inside the window
+            // is told from this write rather than swallowed with it (#278).
+            Services.getInstance(OwnWrites.class).wrote(path, jsonBytes);
         } catch (final IOException ex) {
             reportWriteFailure(p, path, ex);
         }

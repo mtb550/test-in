@@ -21,6 +21,10 @@ by hand, and is on [UC-TREE-PANEL-025](../treePanel/refreshTree.md).
   projects, and is not one.
 - **Rule-INTERNAL-019** — Testin ignores its own writes for five seconds after
   making them.
+- **Rule-INTERNAL-064** — It ignores them because the file still says what
+  Testin wrote, not because five seconds have passed. A file somebody changed by
+  hand is read again whenever the change arrives, including inside those five
+  seconds and including the file Testin has just saved.
 - **Rule-INTERNAL-020** — Testin waits four tenths of a second after the last
   change before it reads. A pull that brings 40 files costs one read, not 40.
 - **Rule-INTERNAL-021** — The whole test project is read again, never the one
