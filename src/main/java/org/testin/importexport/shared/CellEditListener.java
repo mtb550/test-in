@@ -1,26 +1,22 @@
 package org.testin.importexport.shared;
 
 import com.intellij.openapi.project.Project;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 
+import java.util.List;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import java.util.List;
 
+@RequiredArgsConstructor
 public class CellEditListener implements TableModelListener {
     private final @NotNull List<TestEditorAttributes> importAttributes;
     private final @NotNull Project p;
     private final @NotNull List<TestCaseDto> testCases;
     private boolean isUpdating = false;
-
-    public CellEditListener(final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
-        this.importAttributes = importAttributes;
-        this.p = p;
-        this.testCases = testCases;
-    }
 
     // UC-SHARE-003, Rule-SHARE-021
     @Override

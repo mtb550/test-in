@@ -4,6 +4,8 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.ui.table.JBTable;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,15 +21,11 @@ import org.jetbrains.annotations.NotNull;
  * nine of them, an action added to the menu tomorrow would need the tenth, and
  * none of them has any other reason to know a grid exists.
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NotWhileEditing extends AnAction {
 
     private final @NotNull AnAction delegate;
     private final @NotNull JBTable table;
-
-    private NotWhileEditing(final @NotNull AnAction delegate, final @NotNull JBTable table) {
-        this.delegate = delegate;
-        this.table = table;
-    }
 
     /**
      * Puts this action's own shortcut on the table, guarded.

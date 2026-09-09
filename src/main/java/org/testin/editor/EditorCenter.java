@@ -1,12 +1,13 @@
 package org.testin.editor;
 
 import com.intellij.ui.components.JBPanel;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
-import javax.swing.*;
-import java.util.Optional;
 import java.awt.*;
+import java.util.Optional;
+import javax.swing.*;
 
 /**
  * The editor's swappable middle: the panel, and whichever component is in it.
@@ -17,6 +18,7 @@ import java.awt.*;
  * slot, which is why this holds the pair together rather than leaving the field
  * beside the panel and hoping.
  */
+@RequiredArgsConstructor
 public final class EditorCenter {
 
     private final @NotNull JBPanel<?> panel;
@@ -25,10 +27,6 @@ public final class EditorCenter {
      * Whatever is in the center, and nothing before the first {@link #set}.
      */
     private @NotNull Optional<JComponent> current = Optional.empty();
-
-    public EditorCenter(final @NotNull JBPanel<?> panel) {
-        this.panel = panel;
-    }
 
     /**
      * Puts this component in the center, taking out whatever was there.

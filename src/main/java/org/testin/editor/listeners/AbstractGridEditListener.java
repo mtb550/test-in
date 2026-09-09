@@ -1,17 +1,19 @@
 package org.testin.editor.listeners;
 
-import org.testin.notifications.Done;
 import com.intellij.openapi.project.Project;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.view.ViewToolWindowFactory;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.view.ViewToolWindowFactory;
 
+import java.util.List;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import java.util.List;
 
 /**
  * What both grids do when a tester types into a cell.
@@ -35,6 +37,7 @@ import java.util.List;
  * place, so the two grids cannot end up saying different words for one act
  * (#66, finding 29).
  */
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractGridEditListener implements TableModelListener {
 
     protected final @NotNull Project p;
@@ -46,11 +49,6 @@ public abstract class AbstractGridEditListener implements TableModelListener {
      * was just handed.
      */
     private boolean updating = false;
-
-    protected AbstractGridEditListener(final @NotNull Project p, final @NotNull List<TestCaseDto> pageItems) {
-        this.p = p;
-        this.pageItems = pageItems;
-    }
 
     /**
      * UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-052.

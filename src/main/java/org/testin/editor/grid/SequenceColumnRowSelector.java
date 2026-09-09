@@ -1,11 +1,13 @@
 package org.testin.editor.grid;
 
 import com.intellij.ui.table.JBTable;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.*;
 
 /**
  * Excel-style row selection via the order column: plain click selects
@@ -13,13 +15,10 @@ import java.awt.event.MouseEvent;
  * registered ahead of the table UI's mouse handler and consumes the press so
  * default cell selection cannot override the row selection.
  */
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 final class SequenceColumnRowSelector extends MouseAdapter {
 
     private final @NotNull JBTable table;
-
-    SequenceColumnRowSelector(final @NotNull JBTable table) {
-        this.table = table;
-    }
 
     // UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-108
     @Override

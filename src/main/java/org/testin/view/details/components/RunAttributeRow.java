@@ -2,6 +2,7 @@ package org.testin.view.details.components;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestRunItems;
@@ -27,15 +28,11 @@ import java.awt.*;
  * The {@code dto} parameter is ignored: it is the case, and this row is not
  * about the case. It stays in the signature because every other row needs it.
  */
+@RequiredArgsConstructor
 public final class RunAttributeRow extends BaseDetails {
 
     private final @NotNull RunEditorAttributes attribute;
     private final @NotNull TestRunItems item;
-
-    public RunAttributeRow(final @NotNull RunEditorAttributes attribute, final @NotNull TestRunItems item) {
-        this.attribute = attribute;
-        this.item = item;
-    }
 
     /**
      * UC-VIEW-PANEL-005, Rule-VIEW-PANEL-031.

@@ -79,6 +79,81 @@ call to go. `Bundle` is the one class in `src/main` that hand-writes a
 constructor, and this is why. If a second one appears, it needs the same kind of
 reason written beside it.
 
+## `@NotNull` survives generation — it is TYPE_USE
+
+Worth knowing before anyone "fixes" it. The JetBrains annotations are
+`TYPE_USE`, so a field written
+
+```java
+private final @NotNull String outcome;
+```
+
+has `@NotNull String` as its *type*, and Lombok copies the type verbatim into
+the getter's return and the constructor's parameter. Verified on the compiled
+class:
+
+```
+public java.lang.String getOutcome();
+  RuntimeInvisibleTypeAnnotations:
+    0: org.jetbrains.annotations.NotNull(): METHOD_RETURN
+```
+
+So there is **no need for a `lombok.config` with `copyableAnnotations`**, and
+the project deliberately has no `lombok.config` at all. A generated member
+carries the null contract already.
+
+## What is deliberately not used
+
+Named so nobody spends an afternoon rediscovering why.
+
+| | Why not |
+|---|---|
+| `@UtilityClass` | Makes every member implicitly `static`. The `static` keyword stops appearing in the source, so a reader cannot tell a static method from an instance one by looking at it. `@NoArgsConstructor(access = PRIVATE)` says the same thing without hiding anything. |
+| `@Data` | Bundles decisions nobody made: a setter for every field, `equals` on a mutable object. Name the two or three you actually want. |
+| `@Value` | A `record` does it, in the language, with no annotation. There are 51 of them. |
+| `val` / `var` from Lombok | The convention is `final @NotNull` on locals, which is a stated null contract. An inferred type states nothing. |
+| `@SneakyThrows` | A method handles its own failures. Zero in the tree. |
+| `@ExtensionMethod`, `@Delegate` | Both make a call site resolve somewhere the reader cannot see from the line in front of them. |
+| `@Synchronized` | It moves the lock to a hidden field, which is exactly the thing the 16 `synchronized` uses here are being explicit about. |
+| `@StandardException` | No custom exception types exist. |
+| `@Builder.Default` sweeps | Only meaningful where a `@Builder` field has an initializer; check the specific class rather than applying it broadly. |
+
+## What the audit found, 9 September 2026
+
+Measured, not estimated, across `src/main` and `testin-java/src/main`:
+
+| | Count |
+|---|---|
+| `@Getter` | 135 |
+| `@NoArgsConstructor` | 94 |
+| `@AllArgsConstructor` | 73 |
+| `@Builder` / `@SuperBuilder` | 44 / 10 |
+| `records` | 51 |
+| **Hand-written getters** | **0** |
+| Hand-written `equals` / `hashCode` / `toString` | 2 |
+| Hand-written setters that only assign a field | 1 |
+| Pure field-assignment constructors | 22, of which 8 were exactly replaceable |
+
+The conclusion is the useful part: **Lombok was already doing nearly all of it.**
+Eight constructors became `@RequiredArgsConstructor`; everything else on the list
+either does real work or would be made worse by an annotation. If a future pass
+turns up a big number here, check the measurement before writing code.
+
+## The trap in `@RequiredArgsConstructor`
+
+It generates parameters from the **final fields in declaration order**. Two
+fields of the same type in a different order compiles clean and is wrong. Before
+applying it, check three things:
+
+1. The constructor body is nothing but `this.x = x;` lines.
+2. The parameter order matches the field declaration order exactly.
+3. No other `final` field lacks an initializer — Lombok would add it as a
+   parameter nobody passes.
+
+And it cannot generate a **varargs** parameter: `TestCaseDialogKey(String name,
+Shortcuts... keys)` stays hand-written, because the annotation would produce
+`Shortcuts[]` and every enum constant would stop compiling.
+
 ## Checking it
 
 `grep -rn "^    private [A-Z]\w*() *{$" --include=*.java src/main` should return

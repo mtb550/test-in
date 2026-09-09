@@ -9,33 +9,28 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.statusbar.MenuItem;
 import org.testin.util.ListValue;
 
-import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.function.Consumer;
+import javax.swing.*;
 
 /**
  * Generic list-menu popup with per-item shortcuts, used by the update-menu and
  * status-menu dialogs. Selection happens by click, Enter, or an item's own
  * keyboard shortcut; the popup closes after invoking the selection callback.
  */
+@RequiredArgsConstructor
 public final class ShortcutMenuPopup<T extends MenuItem> {
 
     private final @NotNull Project p;
     private final @NotNull String title;
     private final T @NotNull [] items;
     private final @NotNull Consumer<T> onSelection;
-
-    public ShortcutMenuPopup(final @NotNull Project p, final @NotNull String title, final T @NotNull [] items, final @NotNull Consumer<T> onSelection) {
-        this.p = p;
-        this.title = title;
-        this.items = items;
-        this.onSelection = onSelection;
-    }
 
     public void show() {
         final @NotNull JBList<T> list = new JBList<>(items);
