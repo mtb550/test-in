@@ -18,7 +18,7 @@ import org.testin.model.dto.dirs.*;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.util.EditorUtil;
+import org.testin.editor.EditorUtil;
 import org.testin.util.Shortcuts;
 
 import java.nio.file.Path;

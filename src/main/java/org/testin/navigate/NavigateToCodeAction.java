@@ -9,7 +9,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.util.OptionalPlugin;
+import org.testin.services.OptionalPlugin;
 import org.testin.util.Shortcuts;
 
 

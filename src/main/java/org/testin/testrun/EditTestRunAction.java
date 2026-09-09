@@ -26,8 +26,8 @@ import org.testin.testproject.BoundTestProject;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.undo.UndoScope;
 import org.testin.undo.UndoService;
-import org.testin.util.BackgroundWork;
-import org.testin.util.EditorUtil;
+import org.testin.services.BackgroundWork;
+import org.testin.editor.EditorUtil;
 import org.testin.util.Mapper;
 
 import javax.swing.tree.TreePath;

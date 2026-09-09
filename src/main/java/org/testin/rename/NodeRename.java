@@ -11,8 +11,8 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
-import org.testin.util.EditorUtil;
-import org.testin.util.OptionalPlugin;
+import org.testin.editor.EditorUtil;
+import org.testin.services.OptionalPlugin;
 
 import java.nio.file.Path;
 

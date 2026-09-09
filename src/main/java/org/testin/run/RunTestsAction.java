@@ -17,7 +17,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.util.EditorUtil;
+import org.testin.editor.EditorUtil;
 
 import java.util.List;
 import java.util.Optional;

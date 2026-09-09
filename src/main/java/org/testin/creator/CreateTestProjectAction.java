@@ -15,7 +15,7 @@ import org.testin.testproject.BoundTestProject;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.CreateTestProjectCloneAction;
 import org.testin.testproject.CreateTestProjectNewAction;
-import org.testin.util.OptionalPlugin;
+import org.testin.services.OptionalPlugin;
 
 public class CreateTestProjectAction extends AbstractProjectAction {
     private final @NotNull TreePanel tp;

@@ -1,4 +1,4 @@
-package org.testin.util;
+package org.testin.services;
 
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
-import org.testin.services.Services;
 
 import java.util.function.Consumer;
 

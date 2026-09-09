@@ -17,7 +17,7 @@ import org.testin.editor.listeners.GridListSelectionSynchronizer;
 import org.testin.editor.listeners.SelectionListener;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.util.FontSync;
+import org.testin.ui.FontSync;
 
 import javax.swing.*;
 import java.awt.event.ComponentAdapter;

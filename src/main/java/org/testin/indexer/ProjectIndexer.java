@@ -22,7 +22,7 @@ import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.BoundTestProject;
-import org.testin.util.EditorUtil;
+import org.testin.editor.EditorUtil;
 import org.testin.util.Mapper;
 
 import java.io.File;

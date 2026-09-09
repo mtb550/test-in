@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.util.FontSync;
+import org.testin.ui.FontSync;
 
 import javax.swing.*;
 import java.awt.*;

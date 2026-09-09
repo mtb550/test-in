@@ -9,7 +9,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
-import org.testin.util.OptionalPlugin;
+import org.testin.services.OptionalPlugin;
 
 import java.util.List;
 

@@ -18,7 +18,7 @@ import org.testin.model.Priority;
 import org.testin.model.RunStatus;
 import org.testin.model.Automated;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.util.FontSync;
+import org.testin.ui.FontSync;
 
 import javax.swing.*;
 import java.util.Optional;

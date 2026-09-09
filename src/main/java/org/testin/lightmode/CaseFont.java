@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.FontSync;
+import org.testin.ui.FontSync;
 
 import java.awt.Font;
 

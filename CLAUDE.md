@@ -28,9 +28,13 @@ and none of these touch it.
 Testin root, and it runs before the indexer exists — it is what tells the indexer
 which project to index.
 
-`util` is deliberately not on the list. `FilesUtil` and `VfsExecutor` are the file
-layer the indexer itself calls, not callers of it — whether that counts as inside
-or outside the rule is still open, and tracked in issue #49.
+`util` is not on the list and needs nothing on it. `FilesUtil` and `VfsExecutor`
+are the file layer the indexer itself calls rather than callers of it, and they
+live in `indexer` now, where that is obvious. What is left in `util` imports
+nothing above `model` — a name sanitizer, a parser, a clipboard, a bundle — so
+reaching for a helper can no longer drag an editor into the classpath (#112).
+Keep it that way: a helper that needs `editor`, `view`, `ui`, `services` or
+`notifications` is feature glue, and it belongs beside the feature.
 
 In particular: **test runs are saved and read only through the indexer**
 (`putTestRun`, `persistRun`, `persistRunMarker`, `addTestRunDir`,

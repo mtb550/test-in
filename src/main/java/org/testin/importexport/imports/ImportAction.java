@@ -28,10 +28,10 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.BackgroundWork;
-import org.testin.util.EditorUtil;
+import org.testin.services.BackgroundWork;
+import org.testin.editor.EditorUtil;
 import org.testin.util.NameSanitizer;
-import org.testin.util.OptionalPlugin;
+import org.testin.services.OptionalPlugin;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

@@ -24,8 +24,8 @@ import org.testin.testrun.RunConfigurationForm;
 import org.testin.testrun.RunForm;
 import org.testin.testrun.RunFormAction;
 import org.testin.ui.framework.SelectionTree;
-import org.testin.util.BackgroundWork;
-import org.testin.util.EditorUtil;
+import org.testin.services.BackgroundWork;
+import org.testin.editor.EditorUtil;
 
 import java.nio.file.Path;
 import java.util.Optional;

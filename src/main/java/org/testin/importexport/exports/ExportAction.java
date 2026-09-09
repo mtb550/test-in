@@ -22,7 +22,7 @@ import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.util.BackgroundWork;
+import org.testin.services.BackgroundWork;
 import org.testin.util.Mapper;
 
 import java.io.InputStream;

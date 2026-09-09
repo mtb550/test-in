@@ -21,7 +21,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.importexport.exports.ExportNotice;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.BackgroundWork;
+import org.testin.services.BackgroundWork;
 import org.testin.util.Shortcuts;
 
 import java.io.File;

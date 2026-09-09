@@ -12,7 +12,7 @@ import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
-import org.testin.util.EditorUtil;
+import org.testin.editor.EditorUtil;
 import org.testin.services.Services;
 
 import java.util.concurrent.atomic.AtomicBoolean;

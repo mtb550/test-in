@@ -1,4 +1,4 @@
-package org.testin.util;
+package org.testin.ui;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;

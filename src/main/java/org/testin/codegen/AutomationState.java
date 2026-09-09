@@ -9,7 +9,7 @@ import org.testin.logger.Logger;
 import org.testin.model.Automated;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
-import org.testin.util.OptionalPlugin;
+import org.testin.services.OptionalPlugin;
 
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -23,7 +23,7 @@ import org.testin.git.ResolveConflictDialog;
 import org.testin.git.TestCaseMerge;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.util.EditorUtil;
+import org.testin.editor.EditorUtil;
 import org.testin.util.Mapper;
 import org.testin.setting.AppSettingsState;
 

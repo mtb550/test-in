@@ -13,8 +13,8 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
-import org.testin.util.EditorUtil;
-import org.testin.util.FontSync;
+import org.testin.editor.EditorUtil;
+import org.testin.ui.FontSync;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;

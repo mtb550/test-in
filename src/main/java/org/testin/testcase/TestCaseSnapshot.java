@@ -11,7 +11,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.undo.UndoScope;
 import org.testin.undo.UndoService;
-import org.testin.util.EditorUtil;
+import org.testin.editor.EditorUtil;
 import org.testin.util.Mapper;
 import org.testin.view.ViewToolWindowFactory;
 

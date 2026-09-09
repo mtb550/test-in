@@ -41,7 +41,7 @@ import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.TestCaseOrder;
-import org.testin.util.FontSync;
+import org.testin.ui.FontSync;
 import org.testin.editor.grid.GridEnterAction;
 import org.testin.view.ViewToolWindowFactory;
 

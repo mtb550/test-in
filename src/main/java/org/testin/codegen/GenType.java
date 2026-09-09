@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.method.update.NoOpCodeUpdate;
-import org.testin.util.OptionalPlugin;
+import org.testin.services.OptionalPlugin;
 
 import java.util.List;
 

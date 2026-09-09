@@ -10,7 +10,7 @@ import org.testin.explorer.tree.TreePanelTree;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.util.EditorUtil;
+import org.testin.editor.EditorUtil;
 
 import java.util.Optional;
 import java.util.function.Consumer;

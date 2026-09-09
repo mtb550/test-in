@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
-import org.testin.util.EditorUtil;
+import org.testin.editor.EditorUtil;
 
 import java.nio.file.Path;
 import java.util.Collection;

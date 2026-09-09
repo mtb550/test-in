@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
-import org.testin.util.EditorUtil;
+import org.testin.editor.EditorUtil;
 
 import java.awt.datatransfer.Transferable;
 

@@ -24,7 +24,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.util.OptionalPlugin;
+import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.setting.SettingsConfigurable;
 import org.testin.setting.TestinRoot;

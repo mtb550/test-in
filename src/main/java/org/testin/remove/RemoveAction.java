@@ -20,7 +20,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.util.EditorUtil;
+import org.testin.editor.EditorUtil;
 
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;

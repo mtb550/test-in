@@ -13,7 +13,7 @@ import org.testin.notifications.Notifier;
 import org.testin.run.RunTestCases;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
-import org.testin.util.OptionalPlugin;
+import org.testin.services.OptionalPlugin;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;

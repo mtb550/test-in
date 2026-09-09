@@ -47,7 +47,7 @@ import org.testin.testcase.TestCaseOrder;
 import org.testin.testrun.ResultAnalysisDialog;
 import org.testin.testrun.TestRunStatusChange;
 import org.testin.util.Display;
-import org.testin.util.FontSync;
+import org.testin.ui.FontSync;
 import org.testin.editor.grid.GridEnterAction;
 
 import javax.swing.*;

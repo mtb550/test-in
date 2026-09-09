@@ -35,7 +35,7 @@ import org.testin.testset.UpdateTestSetStatusAction;
 import org.testin.undo.UndoAction;
 import org.testin.undo.UndoDirection;
 import org.testin.undo.UndoScope;
-import org.testin.util.OptionalPlugin;
+import org.testin.services.OptionalPlugin;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -11,7 +11,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.util.FontSync;
+import org.testin.ui.FontSync;
 
 import javax.swing.*;
 import java.awt.*;

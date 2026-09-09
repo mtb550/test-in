@@ -26,7 +26,7 @@ import org.testin.setting.TestinRoot;
 import org.testin.testcase.TestCaseSnapshot;
 import org.testin.testcase.create.TestCaseUpdateMenuDialog;
 import org.testin.util.Display;
-import org.testin.util.FontSync;
+import org.testin.ui.FontSync;
 import org.testin.util.Shortcuts;
 import org.testin.view.ViewToolWindowFactory;
 import org.testin.view.details.components.*;

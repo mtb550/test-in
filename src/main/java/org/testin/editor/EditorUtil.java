@@ -1,4 +1,4 @@
-package org.testin.util;
+package org.testin.editor;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -10,10 +10,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.EditorType;
-import org.testin.editor.TestinEditor;
-import org.testin.editor.UnifiedFileEditor;
-import org.testin.editor.UnifiedVirtualFile;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;

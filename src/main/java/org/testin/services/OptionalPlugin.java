@@ -1,4 +1,4 @@
-package org.testin.util;
+package org.testin.services;
 
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.extensions.PluginId;
@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Notifier;
-import org.testin.services.Services;
+import org.testin.util.Once;
 
 /**
  * The IDE plugins Testin can run without. plugin.xml declares them as optional

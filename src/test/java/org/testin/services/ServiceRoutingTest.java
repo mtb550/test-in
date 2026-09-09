@@ -4,7 +4,7 @@ import org.testin.indexer.OwnWrites;
 import org.testin.indexer.Rescan;
 import org.testin.logger.LoggerService;
 import org.testin.setting.AppSettingsState;
-import org.testin.util.EditorUtil;
+import org.testin.editor.EditorUtil;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
