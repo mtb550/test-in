@@ -38,7 +38,30 @@ public enum NodeCount {
     // nothing here, and this already read its colours from it.
     TEST_SETS("Test sets", NodeFigures::testSets, NodeCount::plain, Uncharted.COLOR),
     PACKAGES("Packages", NodeFigures::packages, NodeCount::plain, Uncharted.COLOR),
-    TEST_CASES("Test cases", NodeFigures::testCases, NodeCount::plain, Uncharted.COLOR),
+    /**
+     * UC-INTERNAL-006, Rule-INTERNAL-046, Rule-INTERNAL-065.
+     * <p>
+     * How many test cases lie beneath the node - and, when a new test run would
+     * not take all of them, how many it would.
+     * <p>
+     * Both numbers are right and they answer different questions: a container is
+     * the sum of what is beneath it, retired branches included, and a new run
+     * leaves retired branches out because that is what retiring one means. With
+     * only the first on screen, a test project reading 40 here offered 31 there
+     * and nothing said why (#274).
+     * <p>
+     * Said only when they differ. A node with nothing retired beneath it would
+     * otherwise carry the same number twice, which is furniture rather than an
+     * answer.
+     */
+    TEST_CASES("Test cases", NodeFigures::testCases, NodeCount::plain, Uncharted.COLOR) {
+        @Override
+        public @NotNull String of(final @NotNull NodeFigures figures) {
+            if (figures.testCases() == figures.runnableTestCases()) return super.of(figures);
+
+            return super.of(figures) + " (" + figures.runnableTestCases() + " for a new test run)";
+        }
+    },
     TEST_RUNS("Test runs", NodeFigures::testRuns, NodeCount::plain, Uncharted.COLOR),
 
     PASSED(TestStatus.PASSED.getLabel(), figures -> figures.run().passed(), NodeCount::plain, TestStatus.PASSED.getRowColor()),

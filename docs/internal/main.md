@@ -13,7 +13,7 @@ up here rather than left to the code.
 |---|---|
 | **Part of Testin** | The parts that belong to no panel |
 | **Answers** | What the search finds, and what Testin does with the files under the Testin folder |
-| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-007`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-064` |
+| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-007`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-065` |
 | **State** | **Written** |
 | **Checked against** | `main` at `2cb8c1dc`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -29,7 +29,7 @@ up here rather than left to the code.
 | **UC-INTERNAL-003** | [Pick up a change made outside the IDE](noticeOutsideChange.md) | See what a pull or a teammate changed. | Rule-INTERNAL-016 to Rule-INTERNAL-024 |
 | **UC-INTERNAL-004** | [Give a test case its number](numberTestCase.md) | Quote one number that means the same everywhere. | Rule-INTERNAL-025 to Rule-INTERNAL-035 |
 | **UC-INTERNAL-005** | [Keep a removed node so it can come back](keepRemovedNode.md) | Get back what a wrong Delete took away. | Rule-INTERNAL-036 to Rule-INTERNAL-045 |
-| **UC-INTERNAL-006** | [Count what a node holds](countNodeContents.md) | See what a node holds before removing it. | Rule-INTERNAL-046 to Rule-INTERNAL-052 |
+| **UC-INTERNAL-006** | [Count what a node holds](countNodeContents.md) | See what a node holds before removing it. | Rule-INTERNAL-046 to Rule-INTERNAL-052, Rule-INTERNAL-065 |
 | **UC-INTERNAL-007** | [Answer any Testin dialog](dialogFramework.md) | Learn one dialog and know them all. | Rule-INTERNAL-053 to Rule-INTERNAL-061 |
 
 ---
@@ -101,7 +101,7 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule-INTERNAL-047 — a container is the sum of everything beneath it | Details counts retired test sets. Making a test run on the same node leaves them out. A test project whose Details says 40 test cases can offer 31, and nothing explains the difference. |
+| **Difference 1** | Fixed. Both counts were right and answered different questions - a container is the sum of everything beneath it, and a new test run leaves retired branches out - so the count now names the other one when they differ: *40 (31 for a new test run)*. The second number comes from the very method the run form walks, not from a rule about retirement written twice (Rule-INTERNAL-065). [#274](https://github.com/mtb550/test-in/issues/274) |
 | **Difference 2** | Rule-INTERNAL-040 — one press puts back what one removal took | Fixed. The undo answers whether the whole of it came back, and the press is confirmed only when it did — so a `Ctrl+Z` that could not restore a node says that and nothing else (Rule-INTERNAL-063). 
 | **Difference 5** | Rule-INTERNAL-019 — Testin ignores its own writes for five seconds | Fixed. The five seconds still bound how long a claim is kept, but what decides is whether the file still says what Testin wrote (Rule-INTERNAL-064). A hand edit changes the content, so it is read again whenever it arrives. A write still in flight, and a delete or a rename, have no content to compare and keep the window as their whole answer. |
 | **Difference 6** | Rule-INTERNAL-053 — every dialog has the same three parts | Twenty-three dialogs are built on the shell and six are not: the test case create and update dialogs, light mode's zoom indicator and the shortcut menu. They behave the same way by hand, so each is a copy that can drift. [#69](https://github.com/mtb550/test-in/issues/69) |

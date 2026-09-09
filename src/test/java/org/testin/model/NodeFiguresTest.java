@@ -73,7 +73,7 @@ public class NodeFiguresTest {
 
     @Test
     public void aContainerCountsWhatIsBeneathItAndHasNoRun() {
-        final NodeFigures container = NodeFigures.ofChildren(9, 4, 2770, 2);
+        final NodeFigures container = NodeFigures.ofChildren(9, 4, 2770, 2770, 2);
 
         assertEquals(container.testSets(), 9);
         assertEquals(container.packages(), 4);
@@ -84,11 +84,28 @@ public class NodeFiguresTest {
 
     @Test
     public void aCountReadsAsTheRowItWillBecome() {
-        final NodeFigures figures = NodeFigures.ofChildren(9, 4, 2770, 2);
+        final NodeFigures figures = NodeFigures.ofChildren(9, 4, 2770, 2770, 2);
 
         assertEquals(NodeCount.TEST_CASES.of(figures), "2770");
         assertEquals(NodeCount.PASS_RATE.of(NodeFigures.NONE), "0%", "a rate carries its sign");
         assertEquals(NodeCount.TEST_RUNS.of(NodeFigures.NONE), "0",
                 "an empty node answers zero; an absent row would read as 'not counted'");
+    }
+
+    /**
+     * Both numbers are right and they answer different questions: a container is
+     * the sum of everything beneath it, retired branches included, and a new
+     * test run leaves retired branches out. A tester reading one and being
+     * offered the other had nothing to tell them why (#274).
+     */
+    @Test
+    public void aCountSaysWhatANewRunWouldTakeWhenThatIsFewer() {
+        assertEquals(NodeCount.TEST_CASES.of(NodeFigures.ofChildren(9, 4, 40, 31, 2)), "40 (31 for a new test run)");
+    }
+
+    @Test
+    public void aCountSaysItOnlyOnceWhenNothingIsRetired() {
+        assertEquals(NodeCount.TEST_CASES.of(NodeFigures.ofChildren(9, 4, 40, 40, 2)), "40",
+                "the same number twice is furniture, not an answer");
     }
 }

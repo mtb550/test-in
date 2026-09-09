@@ -29,6 +29,10 @@ them opens.
   says what the node is.
 - **Rule-INTERNAL-052** — A test run nobody has judged shows *Not run*, never
   *0%*.
+- **Rule-INTERNAL-065** — When a new test run would not take every test case
+  beneath a node, the count says how many it would. Both numbers are right and
+  they answer different questions, so the one on screen names the other rather
+  than leaving a tester to find the difference by making a run.
 
 ## Where the counts appear
 
@@ -120,14 +124,8 @@ A *0%* there would read as every test case having failed.
 node is still in the tree, so Details still opens on it.
 
 **If the branch holds retired test sets** — they are counted. A deprecated test
-set still holds its test cases.
-
-## Where the plugin breaks its own rules
-
-**A count can be larger than what a test run will offer.** Details counts
-retired test sets. Choosing test cases for a new test run leaves them out. So a
-test project whose Details says 40 test cases can offer 31 when a test run is
-made on it, and nothing explains the difference.
+set still holds its test cases. The row also says how many a new test run would
+take, which is the same count without them: *40 (31 for a new test run)*.
 
 ## Why it works this way
 

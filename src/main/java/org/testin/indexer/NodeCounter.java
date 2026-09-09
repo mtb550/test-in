@@ -41,6 +41,13 @@ public final class NodeCounter {
      * cases and a package's size is its size; that it is out of current work is
      * already visible in the tree, which draws it gray and sorts it last.
      * <p>
+     * And counted again without them, because a new test run leaves them out
+     * (#68) - so the two numbers are both right and a tester reading 40 here and
+     * being offered 31 there had nothing to tell them why (#274). The second
+     * count comes from {@code getTestCasesUnder}, which is the very method the
+     * run form walks, rather than from a rule about retirement written a second
+     * time here.
+     * <p>
      * The two package kinds are summed rather than chosen between: nothing on
      * the test-case side can hold a run package and nothing on the run side can
      * hold a set package, so one of the two terms is always zero and asking
@@ -58,6 +65,7 @@ public final class NodeCounter {
                 counted(byType, DirectoryType.TSP) + counted(byType, DirectoryType.TRP),
                 indexer.caseCountOf(dto.getPath())
                         + beneath.stream().mapToLong(node -> indexer.caseCountOf(node.getPath())).sum(),
+                indexer.getTestCasesUnder(dto).size(),
                 counted(byType, DirectoryType.TR));
     }
 

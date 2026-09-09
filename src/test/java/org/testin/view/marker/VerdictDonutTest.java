@@ -77,7 +77,7 @@ public class VerdictDonutTest {
     @Test
     public void aNodeWithNoSlicesHasNoRing() {
         assertEquals(VerdictDonut.sweeps(NodeStatistics.CHILDREN.getSlices(),
-                NodeFigures.ofChildren(9, 4, 2770, 2)).length, 0,
+                NodeFigures.ofChildren(9, 4, 2770, 2770, 2)).length, 0,
                 "a container's counts are not parts of one whole, so nothing is drawn through them");
     }
 }
