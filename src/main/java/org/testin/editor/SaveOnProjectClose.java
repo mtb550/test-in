@@ -11,7 +11,14 @@ public final class SaveOnProjectClose implements ProjectCloseListener {
     // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-015
     @Override
     public void projectClosingBeforeSave(final @NotNull Project p) {
-        Services.getInstance(p, EditorUtil.class).saveOpen(p);
+        final @NotNull EditorUtil editors = Services.getInstance(p, EditorUtil.class);
+
+        // Written down first, then closed - in that order, because closing is
+        // what makes there be nothing left to write down. Both halves belong
+        // here rather than one of them inside the other: this listener is the
+        // only thing that knows the IDE is about to save its tab list.
+        editors.saveOpen(p);
+        editors.closeAll(p);
     }
 
 }

@@ -86,6 +86,32 @@ public final class EditorUtil {
     }
 
     /**
+     * Rule-EDITOR-PANEL-015.
+     * <p>
+     * Closes every Testin tab as the project closes, once their paths are safely
+     * written down.
+     * <p>
+     * So that the IDE has nothing of ours left to remember. Two things were
+     * reopening these tabs: the entry above, and the IDE's own tab list, which
+     * records a Testin tab by its {@code testin://} address like any other file.
+     * The IDE's attempt could never work - it asks the file system for that
+     * address before the index exists, and twenty seconds before it could
+     * answer - so every launch began with two "No file exists" warnings and a
+     * tab the IDE had given up on being opened again by us (#160).
+     * <p>
+     * There is one owner now. This runs in {@code projectClosingBeforeSave},
+     * which is before the IDE writes its tab list, so what it writes for Testin
+     * is nothing.
+     */
+    public void closeAll(final @NotNull Project p) {
+        final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
+
+        for (final VirtualFile open : fed.getOpenFiles()) {
+            if (open instanceof UnifiedVirtualFile) fed.closeFile(open);
+        }
+    }
+
+    /**
      * UC-TREE-PANEL-025, Rule-TREE-PANEL-082.
      * <p>
      * Brings every open Testin editor back in line with the index that was just
@@ -165,7 +191,7 @@ public final class EditorUtil {
      */
     public void openThen(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull Consumer<TestinEditor> tell) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (!openNow(p, dir)) return;
+            if (!openNow(p, dir, true)) return;
 
             editorFor(p, dir).ifPresent(tell);
         });
@@ -246,7 +272,15 @@ public final class EditorUtil {
      * already open <em>is</em> focusing it, so the two names were one behavior.
      */
     public void open(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        ApplicationManager.getApplication().invokeLater(() -> openNow(p, dir));
+        open(p, dir, true);
+    }
+
+    /**
+     * The same, for a caller that is opening several at once and wants the
+     * cursor to land on one of them rather than on each in turn.
+     */
+    private void open(final @NotNull Project p, final @NotNull DirectoryDto dir, final boolean focus) {
+        ApplicationManager.getApplication().invokeLater(() -> openNow(p, dir, focus));
     }
 
     /**
@@ -269,7 +303,7 @@ public final class EditorUtil {
      * own declaration, and the two kinds that say yes are exactly the two the
      * editors are written for.
      */
-    private boolean openNow(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+    private boolean openNow(final @NotNull Project p, final @NotNull DirectoryDto dir, final boolean focus) {
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
         for (final VirtualFile open : fed.getOpenFiles()) {
@@ -282,7 +316,7 @@ public final class EditorUtil {
             if (!testinFile.getDir().getPath().equals(dir.getPath())) continue;
 
             Logger.info("Editor already open, focusing: " + dir.getName());
-            fed.openFile(open, true);
+            fed.openFile(open, focus);
             return true;
         }
 
@@ -292,7 +326,7 @@ public final class EditorUtil {
         }
 
         Logger.info("Opening Editor: " + dir.getPath());
-        fed.openFile(new UnifiedVirtualFile(dir, EditorType.of(dir)), true);
+        fed.openFile(new UnifiedVirtualFile(dir, EditorType.of(dir)), focus);
 
         return true;
     }
@@ -350,6 +384,7 @@ public final class EditorUtil {
             Logger.info("restoring " + entries.length + " open editors");
 
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull List<DirectoryDto> found = new ArrayList<>();
 
             for (final String entry : entries) {
                 // A remembered editor whose node is not there any more is not
@@ -358,10 +393,17 @@ public final class EditorUtil {
                 indexer.find(Path.of(entry)).ifPresentOrElse(
                         dir -> {
                             Logger.debug("restoring editor for '" + entry + "' -> found");
-                            open(p, dir);
+                            found.add(dir);
                         },
                         () -> Logger.debug("restoring editor for '" + entry + "' -> not indexed"));
             }
+
+            // Only the last asks for the cursor. Every one of them used to, and
+            // each open pumps the event queue while it waits, so the second
+            // request arrived while the first was still focusing and the platform
+            // logged "Cannot focus editor ... reason=selection changed". The last
+            // tab won either way; now it wins without the race (#160).
+            for (int i = 0; i < found.size(); i++) open(p, found.get(i), i == found.size() - 1);
 
             PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY, null);
             Logger.info("EditorStateService: cleared saved editor state");
