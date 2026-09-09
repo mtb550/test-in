@@ -1,5 +1,7 @@
 package org.testin.codegen;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
@@ -230,12 +232,32 @@ public enum GenType {
             CodeGenerators.find(GenType.this).execute(p, obj);
         }
 
-        // UC-CODEGEN-019, Rule-CODEGEN-005
+        /**
+         * UC-CODEGEN-019, Rule-CODEGEN-005, Rule-EDITOR-PANEL-046.
+         * <p>
+         * One command around the whole list, so one gesture is one entry on the
+         * IDE's undo history.
+         * <p>
+         * Each generator used to open a command per case, so bulk-editing forty
+         * descriptions was forty entries with the same name on them, and a
+         * tester who changed their mind held CTRL+Z and watched the class
+         * rewrite itself a method at a time with no way to tell how many
+         * presses were left. Dragging one card in a set of two hundred was
+         * worse: the order sweep touches every case in the set (#153).
+         * <p>
+         * The hop is here rather than in each generator because a command has
+         * to be opened on the EDT and a caller may not be on it - the update
+         * menu hands its list over from a pooled thread. A generator that opens
+         * one of its own is merged into this one rather than starting a second,
+         * which is what lets the two that batch by class keep doing it.
+         */
         @Override
         public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-            if (!canGenerate(p)) return;
+            if (!canGenerate(p) || items.isEmpty()) return;
 
-            CodeGenerators.find(GenType.this).executeAll(p, items);
+            ApplicationManager.getApplication().invokeLater(() ->
+                    WriteCommandAction.runWriteCommandAction(p, description, null,
+                            () -> CodeGenerators.find(GenType.this).executeAll(p, items)));
         }
 
         /**

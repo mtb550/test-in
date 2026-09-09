@@ -1,6 +1,7 @@
 package org.testin.java.codegen.method.update;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
@@ -227,13 +228,21 @@ public class UpdateTestBase {
         if (fqcn.size() < 2) return;
         final @NotNull String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
-        ApplicationManager.getApplication().invokeLater(() ->
-                WriteCommandAction.runWriteCommandAction(p, title, null, () -> {
-                    Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)))
-                            .ifPresentOrElse(
-                                    targetClass -> findMethodByTestName(targetClass, tc).ifPresentOrElse(updater,
-                                            () -> onMissing.accept("no method with testName=" + tc.getId())),
-                                    () -> onMissing.accept("class not found: " + path));
-                }));
+        final @NotNull Runnable inCommand = () ->
+                WriteCommandAction.runWriteCommandAction(p, title, null, () ->
+                        Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)))
+                                .ifPresentOrElse(
+                                        targetClass -> findMethodByTestName(targetClass, tc).ifPresentOrElse(updater,
+                                                () -> onMissing.accept("no method with testName=" + tc.getId())),
+                                        () -> onMissing.accept("class not found: " + path)));
+
+        // Straight through when a command is already open, and only then hop.
+        // The hop is what used to make a bulk edit forty undo entries: a
+        // command opened around the list is left behind by the first
+        // invokeLater, so every case started one of its own (#153). A nested
+        // write command is merged into the open one, which is why the work
+        // itself needs no branch.
+        if (CommandProcessor.getInstance().getCurrentCommand() != null) inCommand.run();
+        else ApplicationManager.getApplication().invokeLater(inCommand);
     }
 }
