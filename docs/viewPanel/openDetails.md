@@ -104,14 +104,6 @@ removed** — nothing opens, and nothing is said. Only the log records it.
 **If the search result is a package, a folder or a test project** — there is no
 test case, so the panel is never touched.
 
-## Where the plugin breaks its own rules
-
-Opening the view panel first, before anything else in Testin, can raise a
-message titled *Testin Setup Required*. That message asks for the Testin folder.
-The tester asked to read a test case and got a settings message instead. That is
-difference 12 on
-[the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
-
 ---
 
 [Documentation](../README.md) › [The view panel](main.md)

@@ -49,7 +49,7 @@ public final class StartupActivity implements ProjectActivity {
 
         // An unconfigured root is the empty path, not the absence of one - and
         // not the empty string either. This asked the stored value whether it
-        // was empty while the warning below asked the normalized path, so a root
+        // was empty while the setup warning asked the normalized path, so a root
         // of nothing but spaces produced the setup warning and a log line
         // announcing defaults were being saved, in the same startup.
         final @NotNull Path testinPath = TestinRoot.normalize(settings.rootTestinPath);
@@ -69,19 +69,6 @@ public final class StartupActivity implements ProjectActivity {
         // rather than at shutdown: the copies that matter are the ones a
         // shutdown never reached.
         Services.getInstance(DeletedNodes.class).sweep();
-
-        if (!rootConfigured) {
-            ApplicationManager.getApplication().invokeLater(() -> {
-                if (!p.isDisposed()) {
-                    Services.getInstance(p, Notifier.class).warnWithAction(p,
-                            "Testin Setup Required",
-                            "Please configure the Root Testin Folder to enable test management features.",
-                            "Open Settings",
-                            () -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class)
-                    );
-                }
-            });
-        }
 
         Services.getInstance(p, TestinRoot.class).setPath(testinPath);
         Logger.info("testin Path: " + testinPath);
@@ -126,6 +113,33 @@ public final class StartupActivity implements ProjectActivity {
     }
 
     /**
+     * UC-SETTING-002, Rule-SETTING-014.
+     * <p>
+     * The setup prompt belongs to opening a project, so it hangs off the
+     * platform's door and not off {@link #execute(Project)}, which has three of
+     * them. A tester who opened the view panel to read a test case was handed a
+     * settings notification instead (#236).
+     * <p>
+     * Outside the claim on purpose: whichever door started Testin, the project
+     * still opened, and this is the one door that means it did.
+     */
+    private static void warnIfUnconfigured(final @NotNull Project p) {
+        final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        if (TestinRoot.isConfigured(TestinRoot.normalize(settings.rootTestinPath))) return;
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (p.isDisposed()) return;
+
+            Services.getInstance(p, Notifier.class).warnWithAction(p,
+                    "Testin Setup Required",
+                    "Please configure the Root Testin Folder to enable test management features.",
+                    "Open Settings",
+                    () -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class)
+            );
+        });
+    }
+
+    /**
      * The Java test source root is detected automatically by JavaSourceRoot;
      * warn when none exists so the user knows automation code generation
      * (packages, classes, test methods) will be skipped.
@@ -150,6 +164,7 @@ public final class StartupActivity implements ProjectActivity {
     @Override
     public @NotNull Object execute(final @NotNull Project p, final @NotNull Continuation<? super kotlin.Unit> continuation) {
         execute(p);
+        warnIfUnconfigured(p);
         return kotlin.Unit.INSTANCE;
     }
 }

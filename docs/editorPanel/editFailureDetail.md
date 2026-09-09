@@ -108,10 +108,9 @@ nothing is said. Only the log records it.
 ## Why the message comes last
 
 The message is raised after the test run is written, not before. So an edit that
-was dropped never says *Details updated*. Nothing at all is said. That is
-difference 12 on
-[the view panel page](../viewPanel/main.md#where-the-plugin-breaks-its-own-rules)
-in its own form: a silent drop is still a silent drop.
+was dropped never says *Details updated*. Nothing at all is said, which is the
+half of the trade worth keeping: a confirmation of a write that did not happen
+costs more than a silence.
 
 ---
 
