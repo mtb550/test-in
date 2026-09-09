@@ -101,7 +101,18 @@ public enum Refused {
      * the usual one. Said while they are still looking at it, rather than as a
      * failed push some seconds later (#83).
      */
-    NOT_A_REPOSITORY_URL("'%s' is not a repository address");
+    NOT_A_REPOSITORY_URL("'%s' is not a repository address"),
+
+    /**
+     * UC-CODEGEN-007, Rule-CODEGEN-069.
+     * <p>
+     * The tester clicked the gutter mark beside a generated method whose test
+     * case is not in the Testin folder any more. Generated code outlives the
+     * case it was written from, so this is the ordinary state rather than a rare
+     * one - and it went to the log alone, which left the click looking broken
+     * (#245).
+     */
+    NO_TEST_CASE_BEHIND_IT("%s was generated from a test case that is gone");
 
     /**
      * The sentence, with one slot for whatever the tester acted on.

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
@@ -58,7 +59,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 element.getTextRange(),
                 AllIcons.Nodes.Related,
                 psiElement -> "View Test Case Details",
-                (mouseEvent, psiElement) -> openViewPanel(p, testCaseId),
+                (mouseEvent, psiElement) -> openViewPanel(p, testCaseId, methodName(psiElement)),
                 GutterIconRenderer.Alignment.RIGHT,
                 Collections::emptyList
         )));
@@ -79,8 +80,17 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 .isPresent();
     }
 
-    // UC-CODEGEN-007, Rule-CODEGEN-030
-    private void openViewPanel(final @NotNull Project p, final @NotNull UUID uuid) {
+    /**
+     * The generated method the mark sits on, for the sentence a refusal needs.
+     * Read on the click rather than kept, because a marker outlives several edits
+     * of the method around it.
+     */
+    private static @NotNull String methodName(final @NotNull PsiElement element) {
+        return Optional.ofNullable(PsiTreeUtil.getParentOfType(element, PsiMethod.class)).map(PsiMethod::getName).orElse("This method");
+    }
+
+    // UC-CODEGEN-007, Rule-CODEGEN-030, Rule-CODEGEN-069
+    private void openViewPanel(final @NotNull Project p, final @NotNull UUID uuid, final @NotNull String methodName) {
         Logger.info("Searching for UUID: " + uuid);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -96,7 +106,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                             ApplicationManager.getApplication().invokeLater(() ->
                                     ViewToolWindowFactory.showPanel(p, List.of(dto), dto.getParent().getPath2(), ViewPanel::focusDetailsTab));
                         },
-                        () -> Logger.error("Unable to find test case with UUID: " + uuid));
+                        () -> refuseMissingCase(p, uuid, methodName));
 
             } catch (final Exception ex) {
                 // Named for what failed rather than titled "Error", which said
@@ -109,5 +119,25 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 );
             }
         });
+    }
+
+    /**
+     * UC-CODEGEN-007, Rule-CODEGEN-069.
+     * <p>
+     * The click found nothing, which is an ordinary answer rather than a
+     * failure: generated code outlives the test case it was written from, so a
+     * method whose case has been removed still carries the mark and still names
+     * an id. It went to the log alone, and the tester clicking got no answer at
+     * all (#245).
+     * <p>
+     * A soft refusal rather than a notification that stays, because it is
+     * feedback on the click just made and the remedy - open the test set, or
+     * delete the method - is theirs either way.
+     */
+    private static void refuseMissingCase(final @NotNull Project p, final @NotNull UUID uuid, final @NotNull String methodName) {
+        Logger.info("No test case behind " + methodName + ": " + uuid);
+
+        ApplicationManager.getApplication().invokeLater(() ->
+                Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NO_TEST_CASE_BEHIND_IT, methodName));
     }
 }

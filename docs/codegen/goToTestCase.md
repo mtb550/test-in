@@ -30,6 +30,9 @@ There is no key for this. The mark is in the gutter beside the method.
   Testin recognizes.
 - **Rule-CODEGEN-030** — The mark is drawn while the IDE is still indexing, and
   the jump waits for indexing to finish.
+- **Rule-CODEGEN-069** — Clicking the mark of a method whose test case is gone
+  says so, naming the method. Generated code outlives the test case it was
+  written from, so this is an ordinary answer rather than a failure.
 
 ## The screen
 
@@ -58,8 +61,9 @@ There is no key for this. The mark is in the gutter beside the method.
 
 **If the method is not a TestNG test** — no mark is drawn.
 
-**If the test case behind the identity no longer exists** — nothing opens and
-nothing is said. Only the log records it.
+**If the test case behind the identity no longer exists** — nothing opens, and
+the message names the method: *logInWithAValidUser was generated from a test
+case that is gone*. It fades (Rule-CODEGEN-069).
 
 **If anything else fails** — a message titled **Error** reads *Could not find
 test case:* and then the reason.
@@ -67,11 +71,6 @@ test case:* and then the reason.
 **If the IDE has no Java plugin** — no mark is drawn anywhere.
 
 ## Where the plugin breaks its own rules
-
-**Clicking the mark of a removed test case does nothing.** Generated code
-outlives the test case it came from. So this is an ordinary state, not a rare
-one. The tester clicks, and nothing happens. That is difference 4 on
-[the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 
 **A tester who edits the identity loses the mark**, with nothing saying why.
 That is question 3.
