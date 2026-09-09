@@ -47,10 +47,10 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
         components = List.of(
                 ComponentDialogBase.of(form),
                 ComponentDialogBase.of(preview),
-                ComponentDialogBase.button("Import"));
+                ComponentDialogBase.button(ImportAction.NAME));
 
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, "Import", this::submit),
+                StatusBarShortcut.build(Shortcuts.Enter, ImportAction.NAME, this::submit),
                 StatusBarShortcut.cancel(this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(900), JBUI.scale(600));

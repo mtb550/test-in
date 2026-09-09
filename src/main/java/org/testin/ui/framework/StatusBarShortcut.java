@@ -57,6 +57,25 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
     }
 
     /**
+     * The word the dialogs that write a test case use for the same key, which
+     * {@link #confirm} says is offered rather than imposed.
+     * <p>
+     * Public because the key is not the only thing that says it: a dialog with
+     * a Save button and a Shift+Enter hint beside it writes the word twice
+     * more, and all three should be one word. It was six files before this
+     * existed.
+     */
+    public static final @NotNull String SAVE = "Save";
+
+    /**
+     * Enter, called Save, submitting - {@link #confirm} in the words those
+     * dialogs use.
+     */
+    public static @NotNull StatusBarShortcut save(final @NotNull Runnable action) {
+        return build(Shortcuts.Enter, SAVE, action);
+    }
+
+    /**
      * A display-only entry for keys the component binds itself.
      */
     public static @NotNull StatusBarShortcut hint(final @NotNull String displayText, final @NotNull String name) {

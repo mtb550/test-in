@@ -49,8 +49,8 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
         components = List.of(ComponentDialogBase.of(editors));
 
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, "Save", this::submit),
-                StatusBarShortcut.hint("Shift+Enter", "Save"),
+                StatusBarShortcut.save(this::submit),
+                StatusBarShortcut.hint("Shift+Enter", StatusBarShortcut.SAVE),
                 StatusBarShortcut.build(Shortcuts.TabNext, "Next", () -> editors.navigate(1, true)),
                 StatusBarShortcut.build(Shortcuts.TabPrevious, "Previous", () -> editors.navigate(-1, true)),
                 StatusBarShortcut.build(Shortcuts.ArrowDown, "Next", () -> editors.navigate(1, false)),

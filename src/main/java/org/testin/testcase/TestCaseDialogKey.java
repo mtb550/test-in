@@ -2,6 +2,7 @@ package org.testin.testcase;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.util.Shortcuts;
 
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 @Getter
 public enum TestCaseDialogKey implements StatusBarItem {
 
-    SAVE("Save", Shortcuts.Enter),
+    SAVE(StatusBarShortcut.SAVE, Shortcuts.Enter),
     CANCEL("Cancel", Shortcuts.Escape),
 
     // Bound by the platform on the spell-checked editors, not by us; shown only

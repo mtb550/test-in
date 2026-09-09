@@ -63,8 +63,8 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         components = List.of(ComponentDialogBase.of(editors));
 
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, "Save", this::submit),
-                StatusBarShortcut.hint("Shift+Enter", "Save"),
+                StatusBarShortcut.save(this::submit),
+                StatusBarShortcut.hint("Shift+Enter", StatusBarShortcut.SAVE),
                 StatusBarShortcut.build(Shortcuts.AddArrayItem, "Add", this::addItemAtCarets),
                 StatusBarShortcut.build(Shortcuts.RemoveArrayItem, "Remove", this::removeItemAtCarets),
                 StatusBarShortcut.build(Shortcuts.TabNext, "Next", () -> editors.navigate(1, true)),

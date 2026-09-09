@@ -30,12 +30,15 @@ import java.util.*;
 
 public class ExportAction extends AbstractProjectTreeAction {
 
+    /** The gesture's name, which its dialog reads rather than spells. */
+    public static final @NotNull String NAME = "Export";
+
     protected final @NotNull List<TestEditorAttributes> exportAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(a -> a.can(Can.EXPORT))
             .toList();
 
     public ExportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, tree, "Export", "Export test cases to a file", AllIcons.ToolbarDecorator.Export);
+        super(p, tree, NAME, "Export test cases to a file", AllIcons.ToolbarDecorator.Export);
     }
 
     // UC-SHARE-001, UC-SHARE-002

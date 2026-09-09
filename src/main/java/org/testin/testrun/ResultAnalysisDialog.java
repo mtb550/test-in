@@ -58,7 +58,7 @@ public final class ResultAnalysisDialog extends AbstractFrameworkDialog<TextArea
         // a new paragraph, which is what a tester writing four of them expects it
         // to be - so there is no key left to confirm with, and the dialog says so
         // with a button instead of a shortcut it would have to steal back.
-        parts.add(ComponentDialogBase.button("Save"));
+        parts.add(ComponentDialogBase.button(StatusBarShortcut.SAVE));
 
         components = List.copyOf(parts);
 

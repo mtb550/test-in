@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValueUtil;
@@ -105,7 +106,7 @@ public class EditTestRunAction extends AbstractProjectTreeAction {
     }
 
     private @NotNull RunFormAction saves(final @NotNull TestRunDirectoryDto run, final @NotNull DirectoryDto parent, final @NotNull TestRunDto current) {
-        return new RunFormAction("Edit Test Run", "Save", (form, selection) -> save(run, parent, current, form, selection));
+        return new RunFormAction("Edit Test Run", StatusBarShortcut.SAVE, (form, selection) -> save(run, parent, current, form, selection));
     }
 
     /**

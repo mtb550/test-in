@@ -56,10 +56,10 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
         components = List.of(
                 ComponentDialogBase.of(form),
                 ComponentDialogBase.of(preview),
-                ComponentDialogBase.button("Export"));
+                ComponentDialogBase.button(ExportAction.NAME));
 
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, "Export", this::submit),
+                StatusBarShortcut.build(Shortcuts.Enter, ExportAction.NAME, this::submit),
                 StatusBarShortcut.cancel(this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(900), JBUI.scale(600));

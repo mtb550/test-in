@@ -32,6 +32,14 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribute> extends AbstractIconButton implements ToolbarItem {
 
+    /**
+     * What the two details popups are called. Passed by each subclass rather
+     * than fixed here, because the third caller is not one of them - light
+     * mode's title bar opens the same list under its own word - but written
+     * once, because those two do share it.
+     */
+    protected static final @NotNull String FIELDS = "Fields";
+
     @Getter
     private final @NotNull Set<E> selectedDetails = new HashSet<>();
 

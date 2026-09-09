@@ -84,4 +84,26 @@
 # reason and took its caption with it.
 #
 # Counted rather than attributed, as above.
-148
+#
+# 156 on 9 September, the first time the ratchet has gone up. Six clusters, all
+# from that one day. Finding them meant running the check at the commit that
+# recorded 148 and diffing its findings against the current ones - the count
+# alone says how many, never which.
+#
+# 144 after three of the six. Fields moved to AbstractDetailsPopupBtn, passed by
+# each subclass rather than fixed in the parent, because a third caller
+# deliberately says something else. Export and Import became ExportAction.NAME
+# and ImportAction.NAME, so a dialog reads the gesture it performs instead of
+# spelling it - which took the button and the Enter hint inside each dialog with
+# it. Save became StatusBarShortcut.save() and SAVE, the same move cancel() and
+# confirm() made at 304: six files wrote that word and one does now.
+#
+# The other three were left, and the reasons are worth more than the count.
+# "Created" and "Updated" are three concepts sharing a spelling - a
+# notification, a run status, a row caption - so one owner would mean renaming a
+# status renames a balloon; a fourth site is a javadoc the filter cannot tell
+# from a caption. "test cases" and "test runs" are the circular initialization
+# this file already records. "Navigate to Code" is written on opposite sides of
+# the leaf rule: Automated is in model, CardHoverAction is in editor, and model
+# may not import editor.
+144

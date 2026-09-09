@@ -44,6 +44,9 @@ import java.util.function.Supplier;
 
 public class ImportAction extends AbstractProjectTreeAction {
 
+    /** The gesture's name, which its dialog reads rather than spells. */
+    public static final @NotNull String NAME = "Import";
+
     /**
      * How many test methods go into one write command.
      * <p>
@@ -61,7 +64,7 @@ public class ImportAction extends AbstractProjectTreeAction {
             .toList();
 
     public ImportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, tree, "Import", "Import test cases from a file", AllIcons.ToolbarDecorator.Import);
+        super(p, tree, NAME, "Import test cases from a file", AllIcons.ToolbarDecorator.Import);
     }
 
     // UC-SHARE-005
