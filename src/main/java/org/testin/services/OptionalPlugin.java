@@ -1,6 +1,7 @@
 package org.testin.services;
 
 import com.intellij.ide.plugins.PluginManagerCore;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
@@ -8,6 +9,8 @@ import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Notifier;
 import org.testin.util.Once;
+
+import java.util.Objects;
 
 /**
  * The IDE plugins Testin can run without. plugin.xml declares them as optional
@@ -121,6 +124,22 @@ public enum OptionalPlugin {
     /**
      * UC-SHARE-010, Rule-SHARE-105.
      * <p>
+     * The same, for an action, which already knows what it is called.
+     * <p>
+     * From the <b>template</b> presentation: it is the name the action was
+     * constructed with and nothing ever writes to it, so reading it cannot pick
+     * up a suffix an earlier pass appended. The three callers used to pass the
+     * name as a literal, which put a string a tester reads in two places in one
+     * file - and the copy is the one that keeps the old name when somebody
+     * renames the entry.
+     */
+    public boolean enableOrExplain(final @NotNull AnAction action, final @NotNull Presentation presentation) {
+        return enableOrExplain(presentation, Objects.requireNonNullElse(action.getTemplatePresentation().getText(), ""));
+    }
+
+    /**
+     * UC-SHARE-010, Rule-SHARE-105.
+     * <p>
      * Leaves a menu entry alone when the plugin is there, and grays it with the
      * reason written into it when it is not. Answers whether the caller should
      * go on deciding for itself.
@@ -133,10 +152,13 @@ public enum OptionalPlugin {
      * <p>
      * The reason goes in the <b>text</b>, not only the description: a grayed
      * entry in a popup menu is not hovered, so a description nobody sees is the
-     * same silence in a different place. The name is passed in rather than read
-     * off the presentation, because {@code update} runs many times over one
-     * entry and appending to what is already there would grow the label on every
-     * pass.
+     * same silence in a different place.
+     * <p>
+     * The name is given rather than read off the live presentation, because
+     * {@code update} runs many times over one entry and appending to what is
+     * already there would grow the label on every pass. An action takes the
+     * overload above, which reads it from the template - the name it was
+     * constructed with, which nothing ever writes to.
      */
     public boolean enableOrExplain(final @NotNull Presentation presentation, final @NotNull String entryName) {
         if (isAvailable()) return true;

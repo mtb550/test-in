@@ -18,7 +18,6 @@ import org.testin.report.GenerateReportAction;
 import org.testin.run.RunTestCaseAction;
 import org.testin.testrun.SetTestCaseStatusAction;
 import org.testin.testrun.UpdateRunItemAction;
-import org.testin.services.OptionalPlugin;
 import org.testin.view.ViewDetailsAction;
 
 import java.util.Arrays;

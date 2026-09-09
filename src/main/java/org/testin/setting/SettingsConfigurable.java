@@ -185,7 +185,20 @@ public final class SettingsConfigurable implements SearchableConfigurable {
                     + "because test projects are folders inside it.", "Testin Folder Is Not A Folder");
     }
 
-    // UC-SETTING-001, Rule-SETTING-009, Rule-SETTING-024, Rule-SETTING-042
+    /**
+     * UC-SETTING-001, Rule-SETTING-009, Rule-SETTING-024, Rule-SETTING-042.
+     * <p>
+     * <b>The fifth {@code throws} in the plugin, and a declaration rather than
+     * deferred work.</b> {@code Configurable.apply} declares
+     * {@code ConfigurationException}, and the settings dialog is the one owner
+     * that catches it - it is how the platform is told to stay open and print
+     * the message under the field. Catching it here and notifying instead would
+     * hand the dialog a success it did not have, and it would close over a value
+     * it had refused.
+     * <p>
+     * The private check below throws for the same reason and through the same
+     * owner; it is one declaration in two places, not two.
+     */
     @Override
     public void apply() throws ConfigurationException {
         // Before a single field is read: a page that stored eight values and

@@ -54,7 +54,7 @@ public class AutomateTestCaseAction extends AbstractProjectAction {
     public void update(final @NotNull AnActionEvent e) {
         // Grayed with the reason without the Java plugin, rather than left out of
         // the menu (#248).
-        if (!OptionalPlugin.JAVA.enableOrExplain(e.getPresentation(), "Automate Test Case")) return;
+        if (!OptionalPlugin.JAVA.enableOrExplain(this, e.getPresentation())) return;
 
         e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
     }

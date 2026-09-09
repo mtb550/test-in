@@ -333,7 +333,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
     public void update(final @NotNull AnActionEvent e) {
         // Rule-SHARE-105. Grayed with the reason in it when Git is missing,
         // rather than left out of the menu entirely (#273).
-        if (!OptionalPlugin.GIT.enableOrExplain(e.getPresentation(), "Sync With Remote")) return;
+        if (!OptionalPlugin.GIT.enableOrExplain(this, e.getPresentation())) return;
 
         e.getPresentation().setEnabled(TreeValueUtil.selected(tree, TestProjectDirectoryDto.class).isPresent());
     }

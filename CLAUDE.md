@@ -207,8 +207,8 @@ silently does nothing costs more than the setting it was meant to hold.
   `AssertionError` carrying the cause; a test that skips itself does that check
   *outside* the try, because a skip is a `RuntimeException` and a broad catch
   swallows it into a failure on every machine that legitimately cannot run it.
-- **The rule is about methods, and the whole tree obeys it.** Four `throws`
-  remain and all four are declarations rather than work, each with a comment
+- **The rule is about methods, and the whole tree obeys it.** Five `throws`
+  remain and all five are declarations rather than work, each with a comment
   saying so. Do not sweep them again:
   - `NodesTransferable.getTransferData` — AWT's `Transferable` contract is that
     an unsupported flavor throws. Catching it hands the platform a wrong object
@@ -217,8 +217,13 @@ silently does nothing costs more than the setting it was meant to hold.
     functional interfaces whose whole point is to let the lambda fail, so that
     one owner above them catches. Removing the declaration moves the catch into
     every lambda, which is the duplication `JavaSourceRoot` exists to delete.
+  - `SettingsConfigurable.apply` — `Configurable.apply` declares
+    `ConfigurationException`, and the settings dialog is the one owner that
+    catches it: throwing is how the platform is told to stay open and print the
+    message under the field. Catching it and notifying instead would hand the
+    dialog a success it did not have, and close it over a refused value.
 
-  Adding a fifth is a decision, not a shortcut: it needs the same shape (a
+  Adding a sixth is a decision, not a shortcut: it needs the same shape (a
   declaration, one owner catching above it) and a comment saying which.
 
 ## Process
