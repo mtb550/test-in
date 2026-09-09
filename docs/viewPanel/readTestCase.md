@@ -41,6 +41,10 @@ There is no key for this. It is what the **Details** tab shows.
   four.
 - **Rule-VIEW-PANEL-028** — Every value can be selected and copied, and none of
   them can be typed into.
+- **Rule-VIEW-PANEL-061** — Who did something and when are one row, not two.
+  **Created** reads the name, then *on*, then the date.
+- **Rule-VIEW-PANEL-062** — **Order** is where the test case sits in its test
+  set, read from the set rather than from the test case.
 
 ## The screen
 
@@ -63,8 +67,8 @@ There is no key for this. It is what the **Details** tab shows.
 │   Pre Conditions:     An account exists.                                 │
 │   Test Data:          user=admin                                         │
 │   Module:             Accounts                                           │
-│   Created By:         muteb                                              │
-│   Created At:         2 September 2026                                   │
+│   Order:              3                                                  │
+│   Created:            muteb on 2 September 2026                          │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -87,10 +91,9 @@ There is no key for this. It is what the **Details** tab shows.
 | **Test Data** | The data the test case uses, exactly as typed |
 | **Reference** | A link or a ticket number |
 | **Module** | The part of the product this test case covers |
-| **Created By** | Who made it |
-| **Updated By** | Who last changed it |
-| **Created At** | When it was made |
-| **Updated At** | When it was last changed |
+| **Order** | Where the test case sits in its test set |
+| **Created** | Who made it, and when |
+| **Updated** | Who last changed it, and when |
 
 Above the rows sit the path, the identity, the title, the two buttons and the
 badges. They are numbered on the panel drawing on
@@ -115,8 +118,8 @@ column of captions with nothing beside them.
 
 **If the description is empty** — the title reads a single dash.
 
-**If a date was never set** — that row disappears, rather than showing a date
-in 1970.
+**If a date was never set** — the row says the name alone rather than showing a
+date in 1970. A row with neither a name nor a date is not drawn at all.
 
 **If the priority is the lowest** — no priority badge is drawn. Only the two
 higher priorities get a badge.

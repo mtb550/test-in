@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.RunEditorAttributes;
+import org.testin.codegen.ExecutionPosition;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
@@ -168,27 +169,34 @@ public class DetailsTab {
      */
     private static @NotNull Stream<BaseDetails> caseRows() {
         return Stream.of(
-                new AttributeRow(TestEditorAttributes.EXPECTED_RESULT, (p, dto) -> Display.format(dto.getExpectedResult())),
+                new AttributeRow(TestEditorAttributes.EXPECTED_RESULT.getName(), (p, dto) -> Display.format(dto.getExpectedResult())),
                 new Steps(),
-                new AttributeRow(TestEditorAttributes.PRE_CONDITIONS, (p, dto) -> Display.format(dto.getPreConditions())),
+                new AttributeRow(TestEditorAttributes.PRE_CONDITIONS.getName(), (p, dto) -> Display.format(dto.getPreConditions())),
                 // Verbatim, and not through Display: test data is credentials, a
                 // query, a payload - values that are used, not read, so a
                 // character this panel decides to drop is a value that no longer
                 // works. The line breaks are the tester's own now that the field
                 // is multi-line, and the row renders them.
-                new AttributeRow(TestEditorAttributes.TEST_DATA, (p, dto) -> dto.getTestData()),
+                new AttributeRow(TestEditorAttributes.TEST_DATA.getName(), (p, dto) -> dto.getTestData()),
                 // No FQCN row. The fully qualified class and method name is how
                 // the plugin finds the generated code to navigate to and run -
                 // it is machinery, not something a tester reads while executing.
                 // It stays available as a toolbar attribute for anyone who wants
                 // it on the card or in the grid; it is only off the always-on
                 // panel.
-                new AttributeRow(TestEditorAttributes.REFERENCE, (p, dto) -> Display.format(dto.getReference())),
-                new AttributeRow(TestEditorAttributes.MODULE, (p, dto) -> Display.format(dto.getModule())),
-                new AttributeRow(TestEditorAttributes.CREATE_BY, (p, dto) -> dto.getCreatedBy()),
-                new AttributeRow(TestEditorAttributes.UPDATE_BY, (p, dto) -> dto.getUpdatedBy()),
-                new AttributeRow(TestEditorAttributes.CREATE_AT, (p, dto) -> Display.formatDate(dto.getCreatedAt())),
-                new AttributeRow(TestEditorAttributes.UPDATE_AT, (p, dto) -> Display.formatDate(dto.getUpdatedAt()))
+                new AttributeRow(TestEditorAttributes.REFERENCE.getName(), (p, dto) -> Display.format(dto.getReference())),
+                new AttributeRow(TestEditorAttributes.MODULE.getName(), (p, dto) -> Display.format(dto.getModule())),
+                // Where the case sits in its set, which is the number the card
+                // draws before the description and the number a generated
+                // method carries as its priority. Read from the set rather than
+                // the case: a position is what the set says, not something the
+                // case stores.
+                new AttributeRow(TestEditorAttributes.ORDER.getName(), (p, dto) -> String.valueOf(ExecutionPosition.of(p, dto))),
+                // Two rows for two facts, not four. Who and when read as one
+                // thing, and four captions to say two of them filled a quarter
+                // of the panel with words nobody needed twice (#23).
+                new AttributeRow("Created", (p, dto) -> Display.whoAndWhen(dto.getCreatedBy(), dto.getCreatedAt())),
+                new AttributeRow("Updated", (p, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt()))
         );
     }
 

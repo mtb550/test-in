@@ -62,6 +62,28 @@ public final class Display {
     }
 
     /**
+     * UC-VIEW-PANEL-004, Rule-VIEW-PANEL-006.
+     * <p>
+     * Who did something and when, as one value: "Sara on 3 June 2026".
+     * <p>
+     * Two facts a tester reads as one, so the details panel gives them one row
+     * instead of four - it used to say Created By, Updated By, Created At and
+     * Updated At down four lines to tell them two things (#23).
+     * <p>
+     * Whichever half is missing simply is not said, and neither half means the
+     * row is not drawn at all. A hand-edited file is the only way to have one
+     * without the other: Testin stamps both together.
+     */
+    public static @NotNull String whoAndWhen(final @NotNull String who, final @NotNull ZonedDateTime at) {
+        final @NotNull String when = formatDate(at);
+
+        if (who.isBlank()) return when;
+        if (when.isEmpty()) return who;
+
+        return who + " on " + when;
+    }
+
+    /**
      * The steps, numbered the way this plugin numbers them, one per line.
      * <p>
      * A step is numbered by where it sits in the case, so the number a tester
