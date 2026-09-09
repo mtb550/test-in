@@ -34,7 +34,7 @@ public class MoveJavaClass implements GenAction {
 
         final @NotNull Optional<List<String>> found = moved.destinationPackage(p);
         if (found.isEmpty()) {
-            Logger.info("Destination is not indexed, so " + String.join(".", fqcn) + " is left where it is");
+            moved.reportCodeLeftBehind(p, String.join(".", fqcn));
             return;
         }
 

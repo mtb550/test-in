@@ -34,6 +34,10 @@ panel's toolbar.
   page differs from what is stored.
 - **Rule-SETTING-009** — Pressing **Apply** writes every field at once, not only
   the one that changed.
+- **Rule-SETTING-042** — A Testin folder that does not exist, or that names a
+  file rather than a folder, is refused. The page stays open, says which, and
+  stores nothing — not even the fields that were fine. Leaving it empty is
+  allowed: that is how a tester says they have not chosen one yet.
 
 ## The screen
 

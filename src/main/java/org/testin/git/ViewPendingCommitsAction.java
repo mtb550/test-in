@@ -14,6 +14,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Notifier;
+import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 
 import java.nio.file.Path;
@@ -58,6 +59,10 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     // UC-SHARE-010
     @Override
     public void update(final @NotNull AnActionEvent e) {
+        // Rule-SHARE-105. Grayed with the reason in it when Git is missing,
+        // rather than left out of the menu entirely (#273).
+        if (!OptionalPlugin.GIT.enableOrExplain(e.getPresentation(), "View Pending Commits")) return;
+
         e.getPresentation().setEnabled(TreeValueUtil.selected(tree, TestProjectDirectoryDto.class).isPresent());
     }
 

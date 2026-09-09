@@ -29,7 +29,9 @@ There is no key for this. It happens when a test set is moved, which is
 - **Rule-CODEGEN-054** — A test set dropped where it already is, is not a move,
   and nothing is rewritten.
 - **Rule-CODEGEN-055** — A move into a place Testin has not read leaves the
-  class exactly where it is.
+  class exactly where it is, and says so. The notification names the class and
+  stays, because the tree and the code disagree until the tester does something
+  about it.
 
 ## What the tester sees
 

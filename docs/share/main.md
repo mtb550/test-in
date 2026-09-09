@@ -10,7 +10,7 @@ team pulls, or a server the plugin syncs with.
 |---|---|
 | **Part of Testin** | Sharing work with the team |
 | **Answers** | How test cases leave Testin and come back, and how a test project is kept in step with a team |
-| **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` to `Rule-SHARE-104` |
+| **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` to `Rule-SHARE-105` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -167,15 +167,15 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | No rule covers it — nothing in this part says a refusal must be stated | Leaving the folder, the file name or the format empty in the export or report dialog says nothing at all. The cursor moves and the dialog stays open. |
+| **Difference 1** | No rule covers it — nothing in this part says a refusal must be stated | Fixed. An empty folder, file name or format now turns that box's own placeholder red and puts the cursor in it, the way every dialog on the framework already did. |
 | **Difference 6** | Rule-SHARE-003 — a conflict is put to the tester | Two fields are settled without asking. The order always takes the other side's value, and who changed it last always takes the later edit. |
 | **Difference 9** | Rule-SHARE-002 — a value the tester typed is kept or refused | An unreadable value is quietly replaced in four different ways. A priority becomes the lowest, a group is dropped, a date becomes blank, a status keeps its old value. |
 | **Difference 11** | Rule-SHARE-005 — long work is watched | Parsing an import file has no progress bar at all, and runs on every keystroke in the source box. A large workbook makes the dialog look frozen. |
 | **Difference 12** | Rule-SHARE-005 — the same | The export, import and report bars cannot be canceled. |
 
-| **Difference 16** | Rule-SHARE-003 — the tester is told | A message can be shown to nobody. When the code project's window has no status bar, the message is dropped and nothing is reported. Every success here is that kind of message. |
+| **Difference 16** | Rule-SHARE-003 — the tester is told | A message can still be shown to nobody: with no status bar on the code project's window, the balloon is dropped. It is written to `testin.log` now rather than lost, so an export that finished with nobody told can be told from one that did not finish. Nothing is raised in its place — a notification about a failed notification is noise. |
 | **Difference 18** | Rule-SHARE-004 — a value is checked before it is used | The Git email address is not checked. Any text is taken, and the failure arrives later in Git's own words. The remote address is checked now, by the rule the create project dialog already used. |
-| **Difference 19** | Rule-SHARE-006 — a missing feature says so | Sync with a server is offered in every IDE. The two Git entries vanish with no word, so a tester has no way to learn the Git plugin is why. |
+| **Difference 19** | Rule-SHARE-006 — a missing feature says so | Fixed. Both Git entries are in the menu in every IDE now, grayed and reading *(needs the Git plugin)* when it is missing, so the menu has one shape everywhere and the reason is on the entry (Rule-SHARE-105). |
 
 **Retired.** A use case or a rule that is gone keeps its number forever, so an
 issue that quotes one still leads somewhere and nothing is ever renumbered onto

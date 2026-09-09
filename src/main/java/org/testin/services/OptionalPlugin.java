@@ -1,6 +1,7 @@
 package org.testin.services;
 
 import com.intellij.ide.plugins.PluginManagerCore;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
@@ -115,5 +116,35 @@ public enum OptionalPlugin {
 
     private void warn(final @NotNull Project p) {
         Services.getInstance(p, Notifier.class).softRefuse(p, label + " Plugin Not Available", requirement);
+    }
+
+    /**
+     * UC-SHARE-010, Rule-SHARE-105.
+     * <p>
+     * Leaves a menu entry alone when the plugin is there, and grays it with the
+     * reason written into it when it is not. Answers whether the caller should
+     * go on deciding for itself.
+     * <p>
+     * Shown and grayed rather than left out. The two Git entries were simply not
+     * added without the Git plugin, while Sync With SFTP beside them was added
+     * in every IDE - so the menu had a different shape in two IDEs, with nothing
+     * to say why, and a tester could not learn the Git integration existed at
+     * all (#273).
+     * <p>
+     * The reason goes in the <b>text</b>, not only the description: a grayed
+     * entry in a popup menu is not hovered, so a description nobody sees is the
+     * same silence in a different place. The name is passed in rather than read
+     * off the presentation, because {@code update} runs many times over one
+     * entry and appending to what is already there would grow the label on every
+     * pass.
+     */
+    public boolean enableOrExplain(final @NotNull Presentation presentation, final @NotNull String entryName) {
+        if (isAvailable()) return true;
+
+        presentation.setEnabled(false);
+        presentation.setText(entryName + " (needs the " + label + " plugin)");
+        presentation.setDescription(requirement);
+
+        return false;
     }
 }

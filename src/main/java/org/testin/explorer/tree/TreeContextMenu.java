@@ -83,11 +83,13 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         add(new ImportAction(p, tree));
 
-        if (OptionalPlugin.GIT.isAvailable()) {
-            addSeparator();
-            add(new SyncActionAction(p, tree));
-            add(new ViewPendingCommitsAction(p, tree));
-        }
+        // Added in every IDE, and grayed with the reason when Git is missing.
+        // Leaving them out gave the menu a different shape in two IDEs with
+        // nothing to say why, while Sync With SFTP below was added in both
+        // (#273).
+        addSeparator();
+        add(new SyncActionAction(p, tree));
+        add(new ViewPendingCommitsAction(p, tree));
 
         addSeparator();
         add(new SyncWithSftpAction(p, tree, tp));

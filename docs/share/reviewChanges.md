@@ -38,6 +38,11 @@ uncommitted work.
 - **Rule-SHARE-048** — A rename is two rows, the removal first and the addition
   second.
 - **Rule-SHARE-049** — Every row arrives selected.
+- **Rule-SHARE-105** — Without the Git plugin, **Sync With Remote** and **View
+  Pending Commits** are still in the menu, grayed, and each says what it needs:
+  *(needs the Git plugin)*. They are not left out. The menu then has the same
+  shape in every IDE, and a tester can see the feature exists and learn what to
+  install.
 - **Rule-SHARE-050** — Reading Git happens off the main thread, so the IDE stays
   usable.
 

@@ -87,8 +87,11 @@ final class FrameworkTextField {
      */
     void showEmptyWarning() {
         emptyWarningShown = true;
-        showPlaceholder(SimpleTextAttributes.ERROR_ATTRIBUTES);
-        field.requestFocusInWindow();
+
+        // Through the shared one, so the framework dialogs and the report and
+        // export dialog cannot drift into two ways of saying it (#251). The
+        // placeholder is this field's own words, which is what it passes.
+        EmptyWarning.show(field, placeholder);
     }
 
     private void showPlaceholder(final @NotNull SimpleTextAttributes attributes) {

@@ -1,6 +1,7 @@
 package org.testin.setting;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -22,6 +23,8 @@ import org.testin.setting.dialogs.TestinPathPanel;
 import org.testin.util.Bundle;
 
 import javax.swing.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -151,9 +154,44 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         return modified;
     }
 
-    // UC-SETTING-001, Rule-SETTING-009, Rule-SETTING-024
+    /**
+     * UC-SETTING-001, Rule-SETTING-042.
+     * <p>
+     * Refuses a Testin folder that is not one, before anything is stored.
+     * <p>
+     * Nothing on this page was checked. A path that does not exist, a path that
+     * names a file, and a path of nothing but spaces were all stored exactly as
+     * typed; the tree then showed its empty state, and nothing on screen
+     * connected that to the path just entered - the tester was left to conclude
+     * the plugin was broken (#237).
+     * <p>
+     * Thrown rather than notified, which is what {@code ConfigurationException}
+     * is for: the settings dialog stays open with the message under the field,
+     * so the value that cannot work is never stored in the first place. Empty is
+     * allowed and always was - it is how a tester says they have not chosen yet,
+     * and the panel has its own empty state for exactly that.
+     */
+    private void refuseAnImpossibleRoot() throws ConfigurationException {
+        final @NotNull String typed = testinPathPanel.getPathText().trim();
+        if (typed.isEmpty()) return;
+
+        final @NotNull Path root = Path.of(typed);
+
+        if (!Files.exists(root))
+            throw new ConfigurationException("There is no folder at " + root + ".", "Testin Folder Not Found");
+
+        if (!Files.isDirectory(root))
+            throw new ConfigurationException(root + " is a file. The Testin folder has to be a folder, "
+                    + "because test projects are folders inside it.", "Testin Folder Is Not A Folder");
+    }
+
+    // UC-SETTING-001, Rule-SETTING-009, Rule-SETTING-024, Rule-SETTING-042
     @Override
-    public void apply() {
+    public void apply() throws ConfigurationException {
+        // Before a single field is read: a page that stored eight values and
+        // then refused would leave seven of them applied.
+        refuseAnImpossibleRoot();
+
         final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
 
         // Decided before the fields are overwritten: a moved root is the only change

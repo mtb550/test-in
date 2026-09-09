@@ -13,6 +13,7 @@ import org.testin.importexport.FileTypes;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.ui.framework.DialogComponent;
+import org.testin.ui.framework.EmptyWarning;
 
 import java.util.Optional;
 import javax.swing.*;
@@ -117,18 +118,23 @@ public final class DestinationForm implements DialogComponent {
         final @NotNull String folder = folderField.getText().trim();
         final @NotNull String fileName = fileNameField.getText().trim();
 
+        // Said in the box that is empty, the way every dialog on the framework
+        // says it. All three used to move the cursor and nothing else: the
+        // tester pressed the button, the dialog stayed open, nothing turned red
+        // and nothing was written - which reads as a button that does not work
+        // rather than as a field that needs filling in (#251).
         if (fileName.isEmpty()) {
-            fileNameField.requestFocus();
+            EmptyWarning.show(fileNameField, "Name the file");
             return Optional.empty();
         }
         if (folder.isEmpty()) {
-            folderField.getTextField().requestFocus();
+            EmptyWarning.show(folderField.getTextField(), "Choose a folder");
             return Optional.empty();
         }
 
         final @NotNull Optional<FileTypes> selectedFormat = Optional.ofNullable((FileTypes) formatCombo.getSelectedItem());
         if (selectedFormat.isEmpty()) {
-            formatCombo.requestFocus();
+            EmptyWarning.show(formatCombo, "Choose a format");
             return Optional.empty();
         }
 

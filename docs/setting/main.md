@@ -9,7 +9,7 @@ where the test data lives, who is using it, and how to reach the team's server.
 |---|---|
 | **Part of Testin** | The settings page |
 | **Answers** | What every setting does, where each one is kept, and what happens when one is wrong |
-| **Numbering** | Use cases are `UC-SETTING-001` to `UC-SETTING-011`. Rules are `Rule-SETTING-001` to `Rule-SETTING-041` |
+| **Numbering** | Use cases are `UC-SETTING-001` to `UC-SETTING-011`. Rules are `Rule-SETTING-001` to `Rule-SETTING-042` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -170,7 +170,7 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule-SETTING-002 — nothing is checked, so nothing warns | A Testin folder that does not exist, or is a file, is stored without a word. The tree then shows its empty state, and nothing connects that to the path just typed. |
+| **Difference 1** | Rule-SETTING-002 — nothing is checked, so nothing warns | The Testin folder is checked now and refused when it is not a folder (Rule-SETTING-042). The rest of the page still is not: a tester name, a download folder, an SFTP account and a key file are all stored exactly as typed. None of them can make the tree empty, which is why the folder went first. |
 | **Difference 2** | Rule-SETTING-020 — a value this page stores is read by something | **Tester role** is stored and read by nothing at all. It is on no marker, no report and no message. It is reserved rather than dead: [#14](https://github.com/mtb550/test-in/issues/14) is what will read it. |
 | **Difference 5** | Rule-SETTING-004 — changing the folder makes Testin read again | Only code projects that have opened the Testin panel read again. A project whose panel was never opened keeps the old folder until it is opened. |
 

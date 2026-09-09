@@ -21,6 +21,7 @@ import com.intellij.ui.awt.RelativePoint;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
 
 import java.awt.*;
 import java.util.Optional;
@@ -108,12 +109,16 @@ public final class Notifier {
     private void showBalloon(final @NotNull Project p, final @NotNull String htmlContent, final @NotNull MessageType type) {
         ApplicationManager.getApplication().invokeLater(() -> {
             // A project window that is closing, or has not opened its frame yet,
-            // has no status bar to anchor to - and a balloon nobody can see is
-            // not a failure worth reporting.
+            // has no status bar to anchor to. Nothing is raised in its place -
+            // a second notification about a failed notification is noise - but
+            // it is written down, because what these balloons carry is every
+            // "exported", "imported" and "synced" the plugin says, and an export
+            // that finished with nobody told is not the same as one that did not
+            // finish (#270).
             Optional.ofNullable(WindowManager.getInstance().getIdeFrame(p))
                     .map(IdeFrame::getStatusBar)
                     .map(StatusBar::getComponent)
-                    .ifPresent(statusBarComponent -> {
+                    .ifPresentOrElse(statusBarComponent -> {
                         final @NotNull Balloon balloon = JBPopupFactory.getInstance()
                                 .createHtmlTextBalloonBuilder(htmlContent, type, null)
                                 .setFadeoutTime(5000)
@@ -123,7 +128,8 @@ public final class Notifier {
                         final @NotNull Point targetPoint = new Point(statusBarComponent.getWidth() - 30,
                                 statusBarComponent.getHeight() / 2);
                         balloon.show(new RelativePoint(statusBarComponent, targetPoint), Balloon.Position.above);
-                    });
+                    },
+                    () -> Logger.info("Nowhere to show this, so it is only here: " + htmlContent));
         });
     }
 

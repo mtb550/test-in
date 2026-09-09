@@ -3,7 +3,9 @@ package org.testin.codegen;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
 import java.nio.file.Path;
@@ -56,5 +58,32 @@ public record Moved(@NotNull DirectoryDto dir, @NotNull Path newParent) {
      */
     public @NotNull Optional<List<String>> destinationPackage(final @NotNull Project p) {
         return Services.getInstance(p, ProjectIndexer.class).find(newParent).map(Fqcn::ofPackage);
+    }
+
+    /**
+     * UC-CODEGEN-016, Rule-CODEGEN-055.
+     * <p>
+     * Says that the node moved and its generated code did not.
+     * <p>
+     * Leaving the code alone is right - guessing a destination the tree has not
+     * read is what once moved a whole package into the default package and lost
+     * it - but doing it in silence is not. The tree and the code disagree from
+     * this moment, and the only sign of it was a line in the log; the tester
+     * found out when every case under the node reported no generated code
+     * (#247).
+     * <p>
+     * One sentence for both movers, because a class left behind and a package
+     * left behind are the same news to a tester and used to be phrased
+     * separately. A notification that stays rather than a balloon that fades: it
+     * needs acting on, and the move it follows may have been one of many.
+     */
+    public void reportCodeLeftBehind(final @NotNull Project p, final @NotNull String fullName) {
+        Logger.warn("Destination is not indexed, so " + fullName + " is left where it is");
+
+        Services.getInstance(p, Notifier.class).warn(p,
+                "The automation code did not move with '" + dir.getName() + "'",
+                fullName + " is still in its old package, so the tree and the code now disagree. "
+                        + "Testin does not know the destination yet - refresh the panel and move the node again, "
+                        + "or move the code by hand.");
     }
 }

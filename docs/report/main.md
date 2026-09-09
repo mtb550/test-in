@@ -113,7 +113,7 @@ tables**. A tester who wants the whole report should not choose this format.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule-REPORT-003 — a refusal is stated | Leaving the folder, the file name or the format empty shows no message and no red mark. The cursor moves and the dialog stays open, which reads as a button that does not work. |
+| **Difference 1** | Rule-REPORT-003 — a refusal is stated | Fixed. An empty folder, file name or format turns that box's own placeholder red — *Choose a folder*, *Name the file* — and puts the cursor in it, which is what the commit message box already did. |
 | **Difference 2** | Rule-REPORT-003 — `Enter` confirms a dialog | `Enter` does nothing in the report dialog. The tester has to press **Generate**. |
 | **Difference 3** | Rule-REPORT-001 — a report is about one test run | The report button on a run editor's toolbar is never gray. Pressed where no test run can be worked out, it does nothing and says nothing. |
 

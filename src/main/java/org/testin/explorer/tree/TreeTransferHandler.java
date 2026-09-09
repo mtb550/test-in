@@ -202,9 +202,40 @@ public class TreeTransferHandler extends TransferHandler {
      * containers and nothing else, and no node is a child of one.
      */
     public boolean canPasteFromClipboard() {
-        if (ClipboardContents.withFlavor(NODE_FLAVOR).isEmpty()) return false;
+        final @NotNull Optional<DirectoryDto> target = TreeValueUtil.selectedDirectory(tree).filter(DirectoryDto::isTransferTarget);
+        if (target.isEmpty()) return false;
 
-        return TreeValueUtil.selectedDirectory(tree).filter(DirectoryDto::isTransferTarget).isPresent();
+        // The same second question a drop asks, and the reason Paste used to be
+        // black on a test run: a test run is a transfer target - a test case can
+        // be dropped into one - but nothing on the clipboard from the tree can
+        // land in it. Pressing it refused with "Select a folder" every time,
+        // while on a test set, which also takes nothing, the entry was gray
+        // (#183).
+        return clipboardNodes().stream().anyMatch(node -> canTransferInto(node, target.orElseThrow()));
+    }
+
+    /**
+     * What the tree put on the clipboard, and empty for anything else on it -
+     * a copied file, text from an editor, nothing at all.
+     */
+    private @NotNull List<DirectoryDto> clipboardNodes() {
+        return ClipboardContents.withFlavor(NODE_FLAVOR)
+                .map(this::nodesOf)
+                .orElseGet(List::of);
+    }
+
+    /**
+     * The nodes inside a transferable already known to carry them. Empty when
+     * the clipboard changed underneath the read, which is the one way asking
+     * for data of a flavor it just claimed to have can still fail.
+     */
+    private @NotNull List<DirectoryDto> nodesOf(final @NotNull Transferable contents) {
+        try {
+            return List.of(((TreeTransferPayload) contents.getTransferData(NODE_FLAVOR)).nodes());
+        } catch (final Exception ex) {
+            Logger.debug("Clipboard no longer holds tree nodes: " + ex.getMessage());
+            return List.of();
+        }
     }
 
     private @NotNull List<DirectoryDto> transferableSelection() {
