@@ -19,6 +19,20 @@ import java.util.concurrent.TimeUnit;
 public final class LoggerService implements Disposable {
 
     private static final long MAX_LOG_SIZE = 5L * 1024 * 1024;
+
+    /**
+     * How long the writer gets to flush the tail of the log before it is
+     * interrupted. Bounded so a stuck write cannot hold up a quit.
+     */
+    private static final int JOIN_TIMEOUT = 2000;
+
+    /**
+     * The IDE's log, used by {@link #report} alone. Named for what it is rather
+     * than imported, because {@code Logger} in this package is Testin's own and
+     * two of them under one name is how the wrong one gets called.
+     */
+    private static final com.intellij.openapi.diagnostic.@NotNull Logger IDE_LOG =
+            com.intellij.openapi.diagnostic.Logger.getInstance(LoggerService.class);
     /**
      * Not a log line. The queue holds Object so this can be one: a String
      * sentinel would have to be identity-compared against text a tester could
@@ -133,6 +147,8 @@ public final class LoggerService implements Disposable {
 
     @Override
     public void dispose() {
+        final long started = System.nanoTime();
+
         // Never deletes the log - it must survive shutdown so users can attach
         // it to bug reports. Only stop accepting, let the writer drain the
         // queue, and give it a bounded moment to flush the tail.
@@ -147,14 +163,40 @@ public final class LoggerService implements Disposable {
         //noinspection ResultOfMethodCallIgnored
         logQueue.offer(SHUTDOWN);
 
+        boolean timedOut = false;
+
         if (writerThread.isPresent()) {
             final @NotNull Thread thread = writerThread.orElseThrow();
             try {
-                thread.join(2000);
+                thread.join(JOIN_TIMEOUT);
             } catch (final InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
-            if (thread.isAlive()) thread.interrupt();
+            timedOut = thread.isAlive();
+            if (timedOut) thread.interrupt();
         }
+
+        report(System.nanoTime() - started, timedOut);
+    }
+
+    /**
+     * How long the shutdown took, in the IDE's own log (#292).
+     * <p>
+     * <b>The one place in the plugin that writes to {@code idea.log}.</b> Two
+     * reasons, and both are about this method only. It runs after Testin's own
+     * log has been told to stop, so a {@code Logger} call here would be queued
+     * to a writer that is closing and never appear. And what it answers is a
+     * question asked of {@code idea.log}: quitting the IDE stalls for about nine
+     * seconds between two of the platform's own lines, and the only way to say
+     * whether this method is inside that gap is to put the number in the same
+     * timeline, beside {@code ComponentStoreImpl} and the rest.
+     * <p>
+     * At INFO and one line, so it costs a quit nothing and cannot be asked a
+     * second time without an answer.
+     */
+    private static void report(final long elapsedNanos, final boolean timedOut) {
+        IDE_LOG.info("Testin logger shutdown took " + elapsedNanos / 1_000_000 + " ms"
+                + (timedOut ? ", and the writer did not finish within " + JOIN_TIMEOUT + " ms - it was interrupted"
+                : ", writer finished on its own"));
     }
 }
