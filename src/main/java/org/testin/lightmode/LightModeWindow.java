@@ -405,8 +405,8 @@ final class LightModeWindow {
         set.setText(tc.getParent().getName());
         final @NotNull Project p = editor.getProject();
 
-        description.setText(TestEditorAttributes.DESCRIPTION.displayValue(p, tc));
-        expected.setText(TestEditorAttributes.EXPECTED_RESULT.displayValue(p, tc));
+        description.setText(TestEditorAttributes.DESCRIPTION.displayValue(tc));
+        expected.setText(TestEditorAttributes.EXPECTED_RESULT.displayValue(tc));
 
         // Visibility is not touched here: rebuilding the rows does not change
         // whether they are shown, and showDetails is the one thing that decides.

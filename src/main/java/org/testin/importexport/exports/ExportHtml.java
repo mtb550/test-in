@@ -97,7 +97,7 @@ public class ExportHtml {
                 for (final TestCaseDto tc : testCases) {
                     writer.write("<tr>");
                     for (final TestEditorAttributes attr : exportAction.exportAttributes) {
-                        writer.write("<td>" + StringUtil.escapeXmlEntities(attr.getTestValueExtractor().execute(tc, p)) + "</td>");
+                        writer.write("<td>" + StringUtil.escapeXmlEntities(attr.gridValue(tc)) + "</td>");
                     }
                     writer.write("</tr>");
                     writer.newLine();

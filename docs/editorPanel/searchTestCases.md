@@ -37,9 +37,10 @@ The search narrows the list. It hides the test cases that do not hold the word.
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-090** — The list narrows three tenths of a second after
   the last keystroke, not on every letter.
-- **Rule-EDITOR-PANEL-091** — The search reads every field the tester writes on
-  a test case: the description, the identity, the expected result, the steps,
-  the pre-conditions, the test data, the module, the group and the reference.
+- **Rule-EDITOR-PANEL-091** — The search reads every field a test case carries,
+  which is every field the Fields popup lists. It is the same question the
+  global search asks, answered in one place, so a field readable in one is
+  readable in the other.
 - **Rule-EDITOR-PANEL-092** — Searching goes back to the first page.
 - **Rule-EDITOR-PANEL-093** — `Escape` in the box returns the keyboard to the
   list and leaves the text where it is.

@@ -109,7 +109,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
         // window decides to drop is a value that no longer works. The same rule
         // the details panel states, for the same reason.
         addRow(TestEditorAttributes.TEST_DATA.getName(), tc.getTestData());
-        addRow(TestEditorAttributes.PRE_CONDITIONS.getName(), TestEditorAttributes.PRE_CONDITIONS.displayValue(p, tc));
+        addRow(TestEditorAttributes.PRE_CONDITIONS.getName(), TestEditorAttributes.PRE_CONDITIONS.displayValue(tc));
 
         addTags(tc);
     }

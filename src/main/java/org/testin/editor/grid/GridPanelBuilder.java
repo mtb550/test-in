@@ -499,7 +499,7 @@ public class GridPanelBuilder {
                 // within the enum moves its column and nothing else.
                 row[c] = attr == TestEditorAttributes.ORDER
                         ? String.valueOf(rowNumber)
-                        : attr.gridValue(p, tc);
+                        : attr.gridValue(tc);
             }
             rows.add(row);
         }

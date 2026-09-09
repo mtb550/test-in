@@ -67,4 +67,39 @@ public class TestCaseFilterTest {
 
         assertEquals(result, List.of(passed));
     }
+
+    /**
+     * The defect #212 reported, and the reason #294 existed: the module has its
+     * own column and its own filter, and the editor's search box could not see
+     * it while the global search could. Both ask
+     * {@link org.testin.model.TestEditorAttributes#anyContains} now.
+     * <p>
+     * That this test needs no IDE is the point. Routing the question through the
+     * attributes used to mean handing them a Project, and there is no way to
+     * build one here - which is what kept the two answers apart.
+     */
+    @Test
+    public void theSearchReadsEveryFieldTheTesterWrites() {
+        final TestCaseDto tc = TestCaseDto.builder()
+                .description("Log in")
+                .module("accounts")
+                .testData("admin@example.com")
+                .preConditions("The account exists")
+                .reference("JIRA-123")
+                .group(List.of(Group.REGRESSION))
+                .build();
+
+        for (final String wanted : List.of("accounts", "admin@example.com", "The account exists", "JIRA-123", Group.REGRESSION.getName())) {
+            final List<TestCaseDto> result = TestCaseFilter.filter(List.of(tc), wanted, Set.of(), Set.of(), Set.of());
+
+            assertEquals(result, List.of(tc), "the search did not read the field holding '" + wanted + "'");
+        }
+    }
+
+    @Test
+    public void aQueryNoFieldHoldsFindsNothing() {
+        final TestCaseDto tc = TestCaseDto.builder().description("Log in").build();
+
+        assertEquals(TestCaseFilter.filter(List.of(tc), "nothing holds this", Set.of(), Set.of(), Set.of()), List.of());
+    }
 }

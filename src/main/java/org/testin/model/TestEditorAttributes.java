@@ -18,6 +18,7 @@ import org.testin.util.TestDataParser;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -47,7 +48,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ORDER(
             "Order",
             ToolBarDefault.LOCKED_CHECKED,
-            (tc, p) -> "",
+            tc -> "",
             (p, tc, v) -> true,
             GenType.NO_CODE_CHANGE
     ) {
@@ -60,7 +61,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     DESCRIPTION(
             "Description",
             ToolBarDefault.LOCKED_CHECKED,
-            (tc, p) -> tc.getDescription(),
+            tc -> tc.getDescription(),
             (p, tc, v) -> always(() -> tc.setDescription(NameSanitizer.description(v))),
             GenType.UPDATE_TEST_CASE_DESCRIPTION,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
@@ -74,7 +75,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ID(
             "ID",
             ToolBarDefault.LOCKED_UNCHECKED,
-            (tc, p) -> String.valueOf(tc.getId()),
+            tc -> String.valueOf(tc.getId()),
             (p, tc, v) -> true,
             GenType.NO_CODE_CHANGE,
             Can.EXPORT
@@ -93,7 +94,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     EXPECTED_RESULT(
             "Expected Result",
             ToolBarDefault.ON,
-            (tc, p) -> tc.getExpectedResult(),
+            tc -> tc.getExpectedResult(),
             (p, tc, v) -> always(() -> tc.setExpectedResult(v)),
             GenType.UPDATE_TEST_CASE_EXPECTED_RESULT,
             Can.EDIT, Can.IMPORT, Can.EXPORT
@@ -102,7 +103,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     STEPS(
             "Steps",
             ToolBarDefault.OFF,
-            (tc, p) -> String.join(", ", tc.getSteps()),
+            tc -> String.join(", ", tc.getSteps()),
             (p, tc, v) -> always(() -> tc.setSteps(TestDataParser.steps(v))),
             GenType.UPDATE_TEST_CASE_STEPS,
             Can.EDIT, Can.IMPORT, Can.EXPORT
@@ -111,7 +112,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     PRIORITY(
             "Priority",
             ToolBarDefault.ON,
-            (tc, p) -> tc.getPriority().getLabel(),
+            tc -> tc.getPriority().getLabel(),
             (p, tc, v) -> took(TestDataParser.priority(v, tc.getPriority()), tc::setPriority),
             GenType.UPDATE_TEST_CASE_PRIORITY,
             Can.EDIT, Can.IMPORT, Can.EXPORT
@@ -125,7 +126,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     FQCN(
             "FQCN",
             ToolBarDefault.OFF,
-            (tc, p) -> String.join(" > ", Fqcn.ofMethod(tc)),
+            tc -> String.join(" > ", Fqcn.ofMethod(tc)),
             (p, tc, v) -> true,
             GenType.NO_CODE_CHANGE,
             Can.EXPORT
@@ -134,7 +135,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     REFERENCE(
             "Reference",
             ToolBarDefault.OFF,
-            (tc, p) -> tc.getReference(),
+            tc -> tc.getReference(),
             (p, tc, v) -> always(() -> tc.setReference(v)),
             GenType.NO_CODE_CHANGE,
             Can.EDIT, Can.IMPORT, Can.EXPORT
@@ -143,7 +144,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     TEST_DATA(
             "Test Data",
             ToolBarDefault.OFF,
-            (tc, p) -> tc.getTestData(),
+            tc -> tc.getTestData(),
             (p, tc, v) -> always(() -> tc.setTestData(v)),
             GenType.UPDATE_TEST_CASE_TEST_DATA,
             Can.EDIT, Can.IMPORT, Can.EXPORT
@@ -152,7 +153,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     PRE_CONDITIONS(
             "Pre Conditions",
             ToolBarDefault.OFF,
-            (tc, p) -> tc.getPreConditions(),
+            tc -> tc.getPreConditions(),
             (p, tc, v) -> always(() -> tc.setPreConditions(v)),
             GenType.UPDATE_TEST_CASE_PRE_CONDITIONS,
             Can.EDIT, Can.IMPORT, Can.EXPORT
@@ -161,7 +162,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     GROUP(
             "Group",
             ToolBarDefault.ON,
-            (tc, p) -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
+            tc -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             (p, tc, v) -> took(TestDataParser.groups(v), tc::setGroup),
             GenType.UPDATE_TEST_CASE_GROUP,
             Can.EDIT, Can.IMPORT, Can.EXPORT
@@ -175,7 +176,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     PATH(
             "Path",
             ToolBarDefault.OFF,
-            (tc, p) -> String.join(" > ", tc.getParent().getPath2()),
+            tc -> String.join(" > ", tc.getParent().getPath2()),
             (p, tc, v) -> true,
             GenType.NO_CODE_CHANGE,
             Can.EXPORT
@@ -184,7 +185,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     MODULE(
             "Module",
             ToolBarDefault.OFF,
-            (tc, p) -> tc.getModule(),
+            tc -> tc.getModule(),
             (p, tc, v) -> always(() -> tc.setModule(v)),
             GenType.UPDATE_TEST_CASE_MODULE,
             Can.EDIT, Can.IMPORT, Can.EXPORT
@@ -193,7 +194,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     STATUS(
             "Status",
             ToolBarDefault.OFF,
-            (tc, p) -> tc.getStatus().getLabel(),
+            tc -> tc.getStatus().getLabel(),
             (p, tc, v) -> took(TestDataParser.testCaseStatus(v, tc.getStatus()), tc::setStatus),
             GenType.UPDATE_TEST_CASE_STATUS,
             Can.EDIT, Can.EXPORT
@@ -202,7 +203,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     CREATE_BY(
             "Created By",
             ToolBarDefault.OFF,
-            (tc, p) -> tc.getCreatedBy(),
+            tc -> tc.getCreatedBy(),
             (p, tc, v) -> always(() -> tc.setCreatedBy(v)),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
@@ -211,7 +212,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     UPDATE_BY(
             "Updated By",
             ToolBarDefault.OFF,
-            (tc, p) -> tc.getUpdatedBy(),
+            tc -> tc.getUpdatedBy(),
             (p, tc, v) -> always(() -> tc.setUpdatedBy(v)),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
@@ -220,7 +221,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     CREATE_AT(
             "Created At",
             ToolBarDefault.OFF,
-            (tc, p) -> Display.formatDate(tc.getCreatedAt()),
+            tc -> Display.formatDate(tc.getCreatedAt()),
             (p, tc, v) -> took(TestDataParser.date(v), tc::setCreatedAt),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
@@ -229,7 +230,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     UPDATE_AT(
             "Updated At",
             ToolBarDefault.OFF,
-            (tc, p) -> Display.formatDate(tc.getUpdatedAt()),
+            tc -> Display.formatDate(tc.getUpdatedAt()),
             (p, tc, v) -> took(TestDataParser.date(v), tc::setUpdatedAt),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
@@ -260,6 +261,33 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     }
 
     /**
+     * UC-EDITOR-PANEL-019, UC-INTERNAL-001, Rule-EDITOR-PANEL-091.
+     * <p>
+     * Whether any field this test case carries holds what was typed.
+     * <p>
+     * One owner, where there were two. The global search asked this of all
+     * eighteen attributes and the editor's own search box wrote out four field
+     * names by hand - so the two disagreed about what a search is, and a tester
+     * looking for a module found nothing in the editor and the case in the
+     * global search (#212, #294). A column added here is now searchable in both
+     * without touching anything else.
+     * <p>
+     * Short-circuits on the first attribute that holds it, so the common case -
+     * a description match - costs one comparison rather than eighteen. The row
+     * number needs no exception: its extractor is empty, and an empty value
+     * holds no query.
+     */
+    public static boolean anyContains(final @NotNull TestCaseDto tc, final @NotNull String wanted) {
+        final @NotNull String lowered = wanted.toLowerCase(Locale.ROOT);
+
+        for (final TestEditorAttributes attribute : values()) {
+            if (attribute.gridValue(tc).toLowerCase(Locale.ROOT).contains(lowered)) return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Rule-VIEW-PANEL-026, Rule-EDITOR-PANEL-005.
      * <p>
      * The attributes a tester writes as sentences, and the only ones a reader
@@ -282,8 +310,19 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     private final @NotNull String name;
     private final @NotNull ToolBarDefault toolBarDefault;
 
-    /** How the value is read off a test case, for every surface that shows it. */
-    private final @NotNull ValueExtractor<TestCaseDto> testValueExtractor;
+    /**
+     * How the value is read off a test case, for every surface that shows it.
+     * <p>
+     * A plain {@code Function} rather than the {@link ValueExtractor} the run
+     * attributes use, because not one of these eighteen ever read the
+     * {@code Project} that interface hands over - it is there for
+     * {@link RunEditorAttributes}, where one extractor genuinely asks the
+     * indexer. Carrying it here cost more than an unused parameter: it made
+     * "does this test case hold this text" a question only a caller holding a
+     * project could ask, which is why the editor's search box wrote its own
+     * answer instead of using the one the global search already had (#294).
+     */
+    private final @NotNull Function<TestCaseDto, String> testValueExtractor;
 
     /** How an imported cell is written back onto a test case. */
     private final @NotNull ImportSetter importSetter;
@@ -297,7 +336,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     @Getter(AccessLevel.NONE)
     private final @NotNull Set<Can> can;
 
-    TestEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull ValueExtractor<TestCaseDto> testValueExtractor, final @NotNull ImportSetter importSetter, final @NotNull GenType genType, final @NotNull Can... can) {
+    TestEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull Function<TestCaseDto, String> testValueExtractor, final @NotNull ImportSetter importSetter, final @NotNull GenType genType, final @NotNull Can... can) {
         this.name = name;
         this.toolBarDefault = toolBarDefault;
         this.testValueExtractor = testValueExtractor;
@@ -359,8 +398,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
      * other attribute - and every other surface, including exports, clipboard
      * copy and the import preview - uses the canonical extractor unchanged.
      */
-    public @NotNull String gridValue(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        return this == STEPS ? String.join("\n", tc.getSteps()) : testValueExtractor.execute(tc, p);
+    public @NotNull String gridValue(final @NotNull TestCaseDto tc) {
+        return this == STEPS ? String.join("\n", tc.getSteps()) : testValueExtractor.apply(tc);
     }
 
     /**
@@ -375,8 +414,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
      * the first time a tester edited a cell they had not changed, which is the
      * whole thing #22 exists to prevent.
      */
-    public @NotNull String displayValue(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        final @NotNull String raw = testValueExtractor.execute(tc, p);
+    public @NotNull String displayValue(final @NotNull TestCaseDto tc) {
+        final @NotNull String raw = testValueExtractor.apply(tc);
 
         return PROSE.contains(this) ? Display.format(raw) : raw;
     }
@@ -387,7 +426,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
      * have them instead of being chosen by a null at run time.
      */
     public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-        details.put(name, displayValue(p, tc));
+        details.put(name, displayValue(tc));
     }
 
 }

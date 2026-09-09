@@ -523,7 +523,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         return BaseCard.titleText(positionOf(tc),
                 selected.contains(RunEditorAttributes.ORDER),
-                selected.contains(RunEditorAttributes.DESCRIPTION) ? TestEditorAttributes.DESCRIPTION.displayValue(p, tc) : "");
+                selected.contains(RunEditorAttributes.DESCRIPTION) ? TestEditorAttributes.DESCRIPTION.displayValue(tc) : "");
     }
 
     @Override

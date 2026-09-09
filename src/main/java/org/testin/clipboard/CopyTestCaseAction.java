@@ -53,7 +53,7 @@ public class CopyTestCaseAction extends AbstractProjectAction {
                 // The colon belongs to this line, not to the caption. It used to be
                 // part of the name, so the view panel drew test case rows with
                 // one and run rows without in the same column (#232).
-                .map(attr -> attr.getName() + ": " + attr.getTestValueExtractor().execute(tc, p))
+                .map(attr -> attr.getName() + ": " + attr.gridValue(tc))
                 .collect(Collectors.joining("\n"));
     }
 

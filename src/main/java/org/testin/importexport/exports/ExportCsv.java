@@ -31,7 +31,7 @@ public class ExportCsv {
                 for (final TestCaseDto tc : entry.getValue()) {
                     final @NotNull List<String> rowValues = new ArrayList<>();
                     for (final TestEditorAttributes attr : exportAction.exportAttributes) {
-                        rowValues.add(escapeCsvField(attr.getTestValueExtractor().execute(tc, p)));
+                        rowValues.add(escapeCsvField(attr.gridValue(tc)));
                     }
                     writer.write(String.join(",", rowValues));
                     writer.newLine();

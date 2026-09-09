@@ -92,7 +92,7 @@ public class ExportExcel {
                     final @NotNull Row row = sheet.createRow(rowIndex++);
                     for (int i = 0; i < exportAction.exportAttributes.size(); i++) {
                         final @NotNull Cell cell = row.createCell(i);
-                        cell.setCellValue(exportAction.exportAttributes.get(i).getTestValueExtractor().execute(tc, p));
+                        cell.setCellValue(exportAction.exportAttributes.get(i).gridValue(tc));
                     }
                 }
 

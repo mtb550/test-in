@@ -42,7 +42,7 @@ public class CellEditListener implements TableModelListener {
                         TestEditorAttributes.sayWhatWasRefused(p, 1);
                     }
 
-                    final @NotNull String formattedValue = currentAttr.getTestValueExtractor().execute(tc, p);
+                    final @NotNull String formattedValue = currentAttr.gridValue(tc);
                     model.setValueAt(formattedValue, row, col);
                 } finally {
                     isUpdating = false;

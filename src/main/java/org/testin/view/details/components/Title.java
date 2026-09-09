@@ -24,7 +24,7 @@ public class Title extends BaseDetails {
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
 
-        final @NotNull String titleText = TestEditorAttributes.DESCRIPTION.displayValue(p, dto);
+        final @NotNull String titleText = TestEditorAttributes.DESCRIPTION.displayValue(dto);
         final @NotNull String finalValue = titleText.trim().isEmpty() ? "-" : titleText;
 
         final @NotNull JTextArea mainTitleArea = Prose.of(finalValue);

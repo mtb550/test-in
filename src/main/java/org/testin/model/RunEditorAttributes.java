@@ -181,7 +181,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
 
     private final @NotNull String name;
     private final @NotNull ToolBarDefault toolBarDefault;
-    private final @NotNull ValueExtractor<TestRunItems> runValueExtractor;
+    private final @NotNull ValueExtractor runValueExtractor;
 
     /**
      * What typing into this column does. {@link RunValueSetter#NONE} for every
@@ -189,11 +189,11 @@ public enum RunEditorAttributes implements ToolBarAttribute {
      */
     private final @NotNull RunValueSetter runValueSetter;
 
-    RunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull ValueExtractor<TestRunItems> runValueExtractor) {
+    RunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull ValueExtractor runValueExtractor) {
         this(name, toolBarDefault, runValueExtractor, RunValueSetter.NONE);
     }
 
-    RunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull ValueExtractor<TestRunItems> runValueExtractor, final @NotNull RunValueSetter runValueSetter) {
+    RunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull ValueExtractor runValueExtractor, final @NotNull RunValueSetter runValueSetter) {
         this.name = name;
         this.toolBarDefault = toolBarDefault;
         this.runValueExtractor = runValueExtractor;

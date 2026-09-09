@@ -63,9 +63,9 @@ public class GridEditListener extends AbstractGridEditListener {
 
         final @NotNull String typed = String.valueOf(model.getValueAt(row, col));
 
-        final @NotNull Object before = attr.gridValue(p, tc);
+        final @NotNull Object before = attr.gridValue(tc);
         final boolean took = attr.getImportSetter().execute(p, tc, typed);
-        final @NotNull Object after = attr.gridValue(p, tc);
+        final @NotNull Object after = attr.gridValue(tc);
 
         // Rule-EDITOR-PANEL-206. The cell redraws with the old value either way,
         // so without this a refused typo and an edit that changed nothing look
