@@ -509,7 +509,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
         return BaseCard.titleText(positionOf(tc),
                 selected.contains(TestEditorAttributes.ORDER),
-                selected.contains(TestEditorAttributes.DESCRIPTION) ? tc.getDescription() : "");
+                selected.contains(TestEditorAttributes.DESCRIPTION) ? TestEditorAttributes.DESCRIPTION.displayValue(p, tc) : "");
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
+import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -159,7 +160,7 @@ final class LightModeWindow {
 
     private final @NotNull JBLabel chosen = new JBLabel();
     private final @NotNull JBPanel<?> caseView = new JBPanel<>(new BorderLayout());
-    private final @NotNull CaseDetails details = new CaseDetails();
+    private final @NotNull CaseDetails details;
 
     /**
      * The one box under the case. It holds the details that {@code Ctrl+D} fills
@@ -235,6 +236,7 @@ final class LightModeWindow {
 
     LightModeWindow(final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
         this.editor = editor;
+        this.details = new CaseDetails(editor.getProject());
         this.onClosed = onClosed;
 
         frame.setUndecorated(true);
@@ -343,8 +345,10 @@ final class LightModeWindow {
 
     private void showCase(final @NotNull TestCaseDto tc) {
         set.setText(tc.getParent().getName());
-        description.setText(Display.format(tc.getDescription()));
-        expected.setText(Display.format(tc.getExpectedResult()));
+        final @NotNull Project p = editor.getProject();
+
+        description.setText(TestEditorAttributes.DESCRIPTION.displayValue(p, tc));
+        expected.setText(TestEditorAttributes.EXPECTED_RESULT.displayValue(p, tc));
 
         // Visibility is not touched here: rebuilding the rows does not change
         // whether they are shown, and showDetails is the one thing that decides.

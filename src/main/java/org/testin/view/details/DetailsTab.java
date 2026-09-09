@@ -169,23 +169,23 @@ public class DetailsTab {
      */
     private static @NotNull Stream<BaseDetails> caseRows() {
         return Stream.of(
-                new AttributeRow(TestEditorAttributes.EXPECTED_RESULT.getName(), (p, dto) -> Display.format(dto.getExpectedResult())),
+                new AttributeRow(TestEditorAttributes.EXPECTED_RESULT.getName(), TestEditorAttributes.EXPECTED_RESULT::displayValue),
                 new Steps(),
-                new AttributeRow(TestEditorAttributes.PRE_CONDITIONS.getName(), (p, dto) -> Display.format(dto.getPreConditions())),
+                new AttributeRow(TestEditorAttributes.PRE_CONDITIONS.getName(), TestEditorAttributes.PRE_CONDITIONS::displayValue),
                 // Verbatim, and not through Display: test data is credentials, a
                 // query, a payload - values that are used, not read, so a
                 // character this panel decides to drop is a value that no longer
                 // works. The line breaks are the tester's own now that the field
                 // is multi-line, and the row renders them.
-                new AttributeRow(TestEditorAttributes.TEST_DATA.getName(), (p, dto) -> dto.getTestData()),
+                new AttributeRow(TestEditorAttributes.TEST_DATA.getName(), TestEditorAttributes.TEST_DATA::displayValue),
                 // No FQCN row. The fully qualified class and method name is how
                 // the plugin finds the generated code to navigate to and run -
                 // it is machinery, not something a tester reads while executing.
                 // It stays available as a toolbar attribute for anyone who wants
                 // it on the card or in the grid; it is only off the always-on
                 // panel.
-                new AttributeRow(TestEditorAttributes.REFERENCE.getName(), (p, dto) -> Display.format(dto.getReference())),
-                new AttributeRow(TestEditorAttributes.MODULE.getName(), (p, dto) -> Display.format(dto.getModule())),
+                new AttributeRow(TestEditorAttributes.REFERENCE.getName(), TestEditorAttributes.REFERENCE::displayValue),
+                new AttributeRow(TestEditorAttributes.MODULE.getName(), TestEditorAttributes.MODULE::displayValue),
                 // Where the case sits in its set, which is the number the card
                 // draws before the description and the number a generated
                 // method carries as its priority. Read from the set rather than

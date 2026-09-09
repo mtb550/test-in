@@ -247,6 +247,26 @@ public enum TestEditorAttributes implements ToolBarAttribute {
         EXPORT
     }
 
+    /**
+     * Rule-VIEW-PANEL-026, Rule-EDITOR-PANEL-005.
+     * <p>
+     * The attributes a tester writes as sentences, and the only ones a reader
+     * capitalizes and closes with a period.
+     * <p>
+     * Reference, module and test data are not on the list and must not be. A
+     * reference is an identifier, a module is a label, and test data is a value
+     * that gets used rather than read - a period after "JIRA-123" reads as a
+     * typo, and a period after a password breaks it. The panel added one to the
+     * first two for as long as each row decided formatting for itself (#22).
+     * <p>
+     * Here rather than at the surfaces, because the card, the details panel and
+     * light mode all show the same field and each was deciding separately: the
+     * card printed the raw expected result directly beside a panel showing it
+     * closed with a period.
+     */
+    private static final @NotNull Set<TestEditorAttributes> PROSE =
+            EnumSet.of(DESCRIPTION, EXPECTED_RESULT, STEPS, PRE_CONDITIONS);
+
     private final @NotNull String name;
     private final @NotNull ToolBarDefault toolBarDefault;
 
@@ -294,12 +314,30 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     }
 
     /**
+     * Rule-VIEW-PANEL-026, Rule-EDITOR-PANEL-005.
+     * <p>
+     * The value as a reader sees it: a sentence where the tester wrote one, and
+     * untouched everywhere else.
+     * <p>
+     * Display only, and deliberately not what {@link #gridValue} answers. A grid
+     * cell and an editor field are typed into, so they load the raw value - a
+     * period this method adds would otherwise be committed back into the JSON
+     * the first time a tester edited a cell they had not changed, which is the
+     * whole thing #22 exists to prevent.
+     */
+    public @NotNull String displayValue(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        final @NotNull String raw = testValueExtractor.execute(tc, p);
+
+        return PROSE.contains(this) ? Display.format(raw) : raw;
+    }
+
+    /**
      * Renders as a plain detail row. The attributes drawn as badges override
      * this in their own body — the two behaviors sit on the constants that
      * have them instead of being chosen by a null at run time.
      */
     public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-        details.put(name, testValueExtractor.execute(tc, p));
+        details.put(name, displayValue(p, tc));
     }
 
 }

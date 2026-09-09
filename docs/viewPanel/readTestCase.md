@@ -34,8 +34,13 @@ There is no key for this. It is what the **Details** tab shows.
   caption goes with it.
 - **Rule-VIEW-PANEL-025** — A test case with no description shows a dash for its
   title.
-- **Rule-VIEW-PANEL-026** — Text is capitalized, and a period is added unless it
-  already ends in one. The test data row is left exactly as the tester typed it.
+- **Rule-VIEW-PANEL-026** — The rows a tester writes as sentences are
+  capitalized, and a period is added unless the text already closes itself:
+  **Description**, **Expected Result**, **Steps** and **Pre Conditions**.
+  **Reference**, **Module** and **Test Data** are left exactly as the tester
+  typed them — a reference is an identifier and a module is a label, and a
+  period after either reads as a typo. The same four rows are the ones the card
+  and light mode capitalize, because all three ask the same question.
 - **Rule-VIEW-PANEL-027** — A blank step is skipped, and its number is not given
   to the step after it. A test case with a blank third step reads one, two,
   four.

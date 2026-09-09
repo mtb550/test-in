@@ -7,6 +7,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.Prose;
+import org.testin.model.TestEditorAttributes;
 import org.testin.util.Display;
 import org.testin.ui.FontSync;
 
@@ -24,7 +25,7 @@ public class Title extends BaseDetails {
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
 
-        final @NotNull String titleText = Display.format(dto.getDescription());
+        final @NotNull String titleText = TestEditorAttributes.DESCRIPTION.displayValue(p, dto);
         final @NotNull String finalValue = titleText.trim().isEmpty() ? "-" : titleText;
 
         final @NotNull JTextArea mainTitleArea = Prose.of(finalValue);

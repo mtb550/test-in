@@ -498,7 +498,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         return BaseCard.titleText(positionOf(tc),
                 selected.contains(RunEditorAttributes.ORDER),
-                selected.contains(RunEditorAttributes.DESCRIPTION) ? tc.getDescription() : "");
+                selected.contains(RunEditorAttributes.DESCRIPTION) ? TestEditorAttributes.DESCRIPTION.displayValue(p, tc) : "");
     }
 
     @Override

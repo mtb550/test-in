@@ -108,14 +108,14 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * mouse listener measures it to know where the hover icons start. Composing it
      * twice is how they drift.
      * <p>
-     * The description is formatted, which is where it is displayed rather than
-     * where it is stored. The view panel has shown it capitalized and closed
-     * since #22 and the card showed it raw, so one test case read two ways on
-     * two surfaces a tester has open at the same time.
+     * The description arrives formatted rather than being formatted here. Both
+     * editors read it through {@code TestEditorAttributes.DESCRIPTION}, which is
+     * the one thing that knows a description is a sentence and a reference is
+     * not - this method only decides where the number goes (#22).
      */
     public static @NotNull String titleText(final int position, final boolean showOrder, final @NotNull String description) {
         final @NotNull String order = showOrder ? String.format(Locale.ENGLISH, "%d.", position) : "";
-        final @NotNull String title = Display.format(description);
+        final @NotNull String title = description.trim();
 
         return order.isEmpty() || title.isEmpty() ? order + title : order + " " + title;
     }

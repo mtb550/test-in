@@ -1,5 +1,6 @@
 package org.testin.lightmode;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
@@ -56,11 +57,16 @@ class CaseDetails extends JBPanel<CaseDetails> {
      */
     private @NotNull Optional<TestCaseDto> shown = Optional.empty();
 
+    /** Only so the rows can ask an attribute how it is displayed. */
+    private final @NotNull Project p;
+
     private float zoom = 1.0f;
 
-    CaseDetails() {
+    CaseDetails(final @NotNull Project p) {
         super(new GridBagLayout());
         setOpaque(false);
+
+        this.p = p;
     }
 
     /**
@@ -103,7 +109,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
         // window decides to drop is a value that no longer works. The same rule
         // the details panel states, for the same reason.
         addRow(TestEditorAttributes.TEST_DATA.getName(), tc.getTestData());
-        addRow(TestEditorAttributes.PRE_CONDITIONS.getName(), Display.format(tc.getPreConditions()));
+        addRow(TestEditorAttributes.PRE_CONDITIONS.getName(), TestEditorAttributes.PRE_CONDITIONS.displayValue(p, tc));
 
         addTags(tc);
     }
