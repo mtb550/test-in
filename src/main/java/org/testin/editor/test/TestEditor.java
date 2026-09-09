@@ -707,7 +707,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         final @NotNull Set<TestEditorAttributes> attributes = getSelectedDetails();
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
         try {
-            final @NotNull JBTable table = gridPanelBuilder.buildTestTable(p, pageItems, attributes, this::positionOf);
+            final @NotNull JBTable table = gridPanelBuilder.buildTestTable(pageItems, attributes, this::positionOf);
 
             // The previous grid's subscription goes with the previous grid, so
             // they do not accumulate one per rebuild.

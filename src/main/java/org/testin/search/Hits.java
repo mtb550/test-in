@@ -65,7 +65,7 @@ public final class Hits {
         final @NotNull List<Hit> found = new ArrayList<>(
                 wanted.isEmpty() ? everywhereToGo(indexer) : nodesNamed(indexer, wanted));
 
-        found.addAll(cases(p, indexer, wanted, SHOWN - found.size()));
+        found.addAll(cases(indexer, wanted, SHOWN - found.size()));
 
         return List.copyOf(found);
     }
@@ -109,7 +109,7 @@ public final class Hits {
      * against every attribute of every case in the project is both the slowest
      * query there is and the least useful: it matches nearly all of them.
      */
-    private static @NotNull List<Hit> cases(final @NotNull Project p, final @NotNull ProjectIndexer indexer, final @NotNull String wanted, final int room) {
+    private static @NotNull List<Hit> cases(final @NotNull ProjectIndexer indexer, final @NotNull String wanted, final int room) {
         if (room <= 0 || tooShort(wanted)) return List.of();
 
         return indexer.getAllTestCases().stream()

@@ -66,7 +66,7 @@ public final class SheetPreview implements DialogComponent {
         for (final Map.Entry<String, List<TestCaseDto>> entry : sheets.entrySet()) {
             final @NotNull List<TestCaseDto> testCases = entry.getValue();
 
-            final @NotNull DefaultTableModel model = new TablePanelBuilder().createModel(p, attributes, testCases);
+            final @NotNull DefaultTableModel model = new TablePanelBuilder().createModel(attributes, testCases);
             // Without this an edited cell is shown and then dropped: the model
             // holds it, and nothing carries it back to the test case.
             model.addTableModelListener(new CellEditListener(attributes, p, testCases));

@@ -24,7 +24,7 @@ public class ExportHtml {
         // Explicit UTF-8: the document declares <meta charset="UTF-8">, and the platform
         // default charset (e.g. cp1252 on Windows) would mangle non-ASCII text.
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), StandardCharsets.UTF_8))) {
-            writeHtmlDocument(writer, p, sheetsData);
+            writeHtmlDocument(writer, sheetsData);
         } catch (final IOException ex) {
             Logger.error(ex.getMessage());
             throw new RuntimeException(ex);
@@ -33,7 +33,7 @@ public class ExportHtml {
         ExportNotice.showInBrowser(p, destFile);
     }
 
-    private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Project p, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
+    private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try {
             writer.write("<!DOCTYPE html>");
             writer.newLine();

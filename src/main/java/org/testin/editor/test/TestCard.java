@@ -43,7 +43,7 @@ public class TestCard extends BaseCard {
 
         Arrays.stream(TestEditorAttributes.values())
                 .filter(activeDetails::contains)
-                .forEach(attr -> attr.applyToUI(tc, badges, details, p));
+                .forEach(attr -> attr.applyToUI(tc, badges, details));
 
         final @NotNull RunStatus runStatus = Services.getInstance(p, TestNGExecution.class).statusOf(tc);
         this.runSlot = CardHoverAction.runSlot(p, tc);

@@ -403,8 +403,6 @@ final class LightModeWindow {
         if (arrived) caseView.captureLeaving();
 
         set.setText(tc.getParent().getName());
-        final @NotNull Project p = editor.getProject();
-
         description.setText(TestEditorAttributes.DESCRIPTION.displayValue(tc));
         expected.setText(TestEditorAttributes.EXPECTED_RESULT.displayValue(tc));
 

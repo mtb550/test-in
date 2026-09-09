@@ -30,7 +30,7 @@ public class TablePanelBuilder {
     }
 
     // UC-SHARE-003, Rule-SHARE-017
-    public @NotNull DefaultTableModel createModel(final @NotNull Project p, final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull List<TestCaseDto> testCases) {
+    public @NotNull DefaultTableModel createModel(final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull List<TestCaseDto> testCases) {
         final String @NotNull[] columns = buildColumnNames(importAttributes);
         final @NotNull DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override

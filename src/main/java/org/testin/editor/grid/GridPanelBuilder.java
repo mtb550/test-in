@@ -478,7 +478,7 @@ public class GridPanelBuilder {
     }
 
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-020
-    public @NotNull JBTable buildTestTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<TestEditorAttributes> attributes, final @NotNull ToIntFunction<TestCaseDto> position) {
+    public @NotNull JBTable buildTestTable(final @NotNull List<TestCaseDto> testCases, final @NotNull Set<TestEditorAttributes> attributes, final @NotNull ToIntFunction<TestCaseDto> position) {
         Logger.debug("[GridPanelBuilder] buildTestTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final @NotNull List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values()).toList();
 
