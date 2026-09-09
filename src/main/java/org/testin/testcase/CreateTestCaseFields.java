@@ -143,15 +143,15 @@ public enum CreateTestCaseFields implements StatusBarItem {
     /**
      * UC-EDITOR-PANEL-005.
      * <p>
-     * What the status bar shows while this section holds the focus: the two keys
-     * every section shares, then its own, and on the entry section the keys that
-     * jump to the other fields.
+     * What the section strip shows while this section holds the focus: its own
+     * keys, and on the entry section the keys that jump to the other fields.
+     * <p>
+     * Save and Cancel are not here. They mean the same thing in every section,
+     * so they sit on a strip of their own that never redraws - see
+     * {@link org.testin.testcase.create.StatusBarSection} (#56).
      */
     public StatusBarItem @NotNull [] getStatusBarItems() {
-        final @NotNull List<StatusBarItem> items = new ArrayList<>();
-        items.add(SAVE);
-        items.add(CANCEL);
-        items.addAll(List.of(ownKeys));
+        final @NotNull List<StatusBarItem> items = new ArrayList<>(List.of(ownKeys));
 
         // Description is where the dialog opens, so its bar is also the map.
         if (this == DESCRIPTION) items.addAll(JUMP_KEYS);

@@ -47,7 +47,24 @@ public class StatusBarBase {
     private final @NotNull Icon icon = AllIcons.General.Keyboard;
     private final @NotNull Border border = JBUI.Borders.emptyRight(6);
 
+    /**
+     * Whether this strip introduces itself with the keyboard icon.
+     * <p>
+     * It does, unless it is the second strip of a pair: two of them on two
+     * stacked rows read as two unrelated bars rather than one hint area, and
+     * the icon belongs to the row a tester reads first (#56).
+     */
+    public static final boolean WITH_ICON = true;
+    public static final boolean WITHOUT_ICON = false;
+
+    private final boolean withIcon;
+
     public StatusBarBase(final StatusBarItem @NotNull [] items) {
+        this(items, WITH_ICON);
+    }
+
+    public StatusBarBase(final StatusBarItem @NotNull [] items, final boolean withIcon) {
+        this.withIcon = withIcon;
         this.statusBar = new JBPanel<>(new BorderLayout());
         this.statusBar.setBorder(JBUI.Borders.empty(4, 10));
         this.statusBar.setOpaque(true);
@@ -83,7 +100,7 @@ public class StatusBarBase {
         final @NotNull JBPanel<?> contentPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         contentPanel.setOpaque(false);
 
-        contentPanel.add(setStatusBarIcon());
+        if (withIcon) contentPanel.add(setStatusBarIcon());
 
         for (int i = 0; i < items.length; i++) {
             final @NotNull StatusBarItem item = items[i];

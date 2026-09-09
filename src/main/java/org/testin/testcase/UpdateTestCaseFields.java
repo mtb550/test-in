@@ -18,8 +18,6 @@ import org.testin.testcase.update.bulk.*;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 
 import static org.testin.testcase.TestCaseDialogKey.*;
@@ -167,16 +165,12 @@ public enum UpdateTestCaseFields implements MenuItem {
     private final TestCaseDialogKey @NotNull [] ownKeys;
 
     /**
-     * What the status bar shows while this section holds the focus: the two keys
-     * every section shares, then its own.
+     * What the section strip shows while this section holds the focus: its own
+     * keys, and nothing else. Save and Cancel are on the strip below, which
+     * never redraws (#56).
      */
     public StatusBarItem @NotNull [] getStatusBarItems() {
-        final @NotNull List<StatusBarItem> items = new ArrayList<>();
-        items.add(SAVE);
-        items.add(CANCEL);
-        items.addAll(List.of(ownKeys));
-
-        return items.toArray(StatusBarItem[]::new);
+        return ownKeys.clone();
     }
 
     @Override

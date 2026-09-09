@@ -46,6 +46,11 @@ This is how every test case in Testin begins.
 - **Rule-EDITOR-PANEL-033** — A blank step is dropped.
 - **Rule-EDITOR-PANEL-034** — The dialog does not close when the tester clicks
   outside it, or when the IDE loses the focus.
+- **Rule-EDITOR-PANEL-199** — The keys sit on two strips. **Save** and
+  **Cancel** are on their own and never move; the strip above them holds the
+  keys of the field the tester is in.
+- **Rule-EDITOR-PANEL-200** — A field with no keys of its own shows no upper
+  strip. An empty strip is not drawn.
 
 ## The screen
 
@@ -59,15 +64,19 @@ This is how every test case in Testin begins.
 │  (a field appears here when its key is pressed)              │
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤
-│  [k] Enter Save    Escape Cancel    Ctrl+D Description       │
-│      Ctrl+E Expected Result    Ctrl+S Steps    Ctrl+T Test.. │
+│      Ctrl+D Description    Ctrl+E Expected Result    Ctrl+.. │
 │      Ctrl+B Pre Conditions    Ctrl+P Priority    Ctrl+G Gr.. │
+├──────────────────────────────────────────────────────────────┤
+│  [k] Enter Save    Escape Cancel                             │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 1. **The description** — the only field there when the dialog opens.
-2. **The strip at the bottom** — the keys that work right now. It changes as the
-   tester moves between fields.
+2. **The upper strip** — the keys of the field the tester is in. It changes as
+   they move between fields, and a field with no keys of its own has no strip
+   at all.
+3. **The lower strip** — **Save** and **Cancel**. They mean the same thing in
+   every field, so they sit apart and never move.
 
 ## The fields, and the keys that open them
 
