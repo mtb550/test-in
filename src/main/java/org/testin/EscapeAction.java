@@ -7,6 +7,7 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +44,29 @@ public class EscapeAction extends AbstractProjectAction {
         super(p, "Escape Action", "Clear a pending cut or copy, close the details panel, then clear the selection", AllIcons.Actions.InlayGear);
         this.onEscape = () -> stepBack(list::clearSelection);
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), list);
+    }
+
+    /**
+     * UC-VIEW-PANEL-015, Rule-VIEW-PANEL-058.
+     * <p>
+     * The view panel's own tabs, which had no registration at all.
+     * <p>
+     * ESC closed the panel from the editor and did nothing from inside it - so a
+     * tester who had just pressed {@code F2}, which needs the keyboard in the
+     * panel, could not close what they were looking at with the key that closes
+     * it everywhere else (#226).
+     * <p>
+     * The same step back as every other surface, not a special "close" - a
+     * pending cut still goes first, and one press still does one thing. What
+     * differs is only the last step: there is no selection of its own here to
+     * clear, so a press with nothing left to undo does nothing, which is what
+     * the tester means by then.
+     */
+    public EscapeAction(final @NotNull Project p, final @NotNull JBPanel<?> tab) {
+        super(p, "Escape Action", "Clear a pending cut, then close the details panel", AllIcons.Actions.InlayGear);
+        this.onEscape = () -> stepBack(() -> {
+        });
+        this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), tab);
     }
 
     /**

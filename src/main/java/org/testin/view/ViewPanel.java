@@ -10,6 +10,7 @@ import com.intellij.ui.content.Content;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.EscapeAction;
 import org.testin.services.Services;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
@@ -55,6 +56,14 @@ public class ViewPanel implements Disposable {
         detailsScrollPane = createScrollPane(detailsTab);
         historyScrollPane = createScrollPane(historyTab);
         openBugsScrollPane = createScrollPane(openBugsTab);
+
+        // Rule-VIEW-PANEL-058. On each tab, because focus is in whichever one
+        // the tester is reading - and F2 puts it there, which is how a tester
+        // ended up unable to close the panel with the key that closes it
+        // everywhere else (#226).
+        new EscapeAction(p, detailsTab);
+        new EscapeAction(p, historyTab);
+        new EscapeAction(p, openBugsTab);
 
         page = new ViewPagination(this);
 

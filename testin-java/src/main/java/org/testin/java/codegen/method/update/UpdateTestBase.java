@@ -96,10 +96,19 @@ public class UpdateTestBase {
     }
 
     /**
-     * UC-CODEGEN-002, Rule-CODEGEN-046.
+     * UC-CODEGEN-002, Rule-CODEGEN-015, Rule-CODEGEN-046.
      * <p>
      * The case's groups onto the method, and the whole attribute rewritten
      * because a group taken away has to go as well as one added.
+     * <p>
+     * The last group taken away takes the attribute with it, exactly as
+     * {@link #writeEnabled} below takes {@code enabled} off a case that is no
+     * longer disabled. It used to write {@code groups = {}}, so a case created
+     * with no groups and a case whose groups had been cleared described the same
+     * state two ways in one class - and the document says the attribute is
+     * written only for a case that belongs to at least one group. TestNG accepts
+     * the empty braces, so nothing failed; the file simply stopped being what
+     * the document describes (#287).
      */
     protected void writeGroups(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
         final @NotNull List<String> active = tc.getGroup().stream()
@@ -107,7 +116,8 @@ public class UpdateTestBase {
                 .map(g -> "\"" + g.getName() + "\"")
                 .toList();
 
-        updateTestAnnotationAttribute(p, pm, "groups", "{" + String.join(", ", active) + "}");
+        if (active.isEmpty()) removeTestAnnotationAttribute(p, pm, "groups");
+        else updateTestAnnotationAttribute(p, pm, "groups", "{" + String.join(", ", active) + "}");
     }
 
     /**
