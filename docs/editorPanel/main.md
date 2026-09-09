@@ -263,7 +263,6 @@ bug report yet.
 | **Difference 9** | Rule-EDITOR-PANEL-005 — a key works the same on every machine | `Ctrl+M` is not made into `Cmd+M` on a Mac, though `Ctrl+C` and `Ctrl+F` are. The empty editor's second line reads *Press Ctrl+M to add* whatever machine it is on. |
 | **Difference 12** | Rule-EDITOR-PANEL-002 — the two views show the same rows | Unticking **Order** stops three gestures in the grid working: clicking a row to select it, `Enter` to open the details panel, and the double-click. Nothing says why. |
 | **Difference 15** | Rule-EDITOR-PANEL-008 — one word for one act | Dragging cards says *Re-sorted*. Moving a test case by typing its number says *Updated*. The same act, two words. |
-| **Difference 17** | Rule-EDITOR-PANEL-009 — a search finds what is there | The search reads the description, the identity, the expected result and the steps. It does not read the module, the group, the test data or the pre-conditions, each of which has its own column and its own filter. |
 
 ## Where the plugin breaks its own rules, executing a test run
 
@@ -296,6 +295,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 5** | Two buttons on one toolbar were both tooltipped **Details**. The one that picks what a card shows is **Fields**, which is what this document already called it. Fixed 9 September 2026, [#201](https://github.com/mtb550/test-in/issues/201) |
 | **Difference 11** | The page size box answered a different number without a word. A number outside the range now says what the range is; a blank box or letters asked for nothing and still say nothing. Fixed 9 September 2026, [#206](https://github.com/mtb550/test-in/issues/206) |
 | **Difference 18** | The status bar read *0 of 12 test cases* with nothing selected, putting a position where a tester reads a count. It says the count alone now. Fixed 9 September 2026, [#213](https://github.com/mtb550/test-in/issues/213) |
+| **Difference 17** | The search read the description, the identity, the expected result and the steps, and knew nothing of the module, the group, the test data or the pre-conditions - each of which has its own column, and three of which have their own filter. It reads every field the tester writes now, the reference included (Rule-EDITOR-PANEL-091). Fixed 9 September 2026, [#212](https://github.com/mtb550/test-in/issues/212) |
 
 ---
 
