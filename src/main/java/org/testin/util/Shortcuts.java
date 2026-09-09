@@ -90,9 +90,17 @@ public enum Shortcuts {
     RunTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0)),
     NavigateToCode(KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK)),
 
-    // Page navigation (status bar tooltips + page actions)
-    NextTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK)),
-    PreviousTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK)),
+    // Forward and back, in whichever surface has the keyboard. Named for the
+    // gesture and not for what it lands on, because the two surfaces move
+    // through different things and both are right: a page of fifty cards in the
+    // editor, one test case in the view panel, which shows one at a time and so
+    // has nothing else forward could mean there.
+    //
+    // They were NextTestCase and PreviousTestCase, and the editor used them for
+    // pages - so the name said one surface and the binding said both, and
+    // docs/shortcuts.md listed the same key twice with two meanings (#224).
+    Next(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK)),
+    Previous(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK)),
 
     // Field navigation inside the create/update dialogs
     TabNext(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0)),

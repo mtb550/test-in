@@ -17,7 +17,7 @@ public class PreviousTestCaseAction extends DumbAwareAction {
         super("Previous Test Case", "Previous test case", AllIcons.Actions.Back);
         this.controller = controller;
 
-        this.registerCustomShortcutSet(Shortcuts.PreviousTestCase.getCustomShortcut(), component);
+        this.registerCustomShortcutSet(Shortcuts.Previous.getCustomShortcut(), component);
 
     }
 

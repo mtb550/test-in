@@ -39,8 +39,8 @@ table; this is all of them together.
 | Key | What it does |
 |---|---|
 | `Ctrl+F` | Puts the cursor in the search box |
-| `Ctrl+Right` | The next page |
-| `Ctrl+Left` | The previous page |
+| `Ctrl+Right` | Forward: the next page |
+| `Ctrl+Left` | Back: the previous page |
 | `Enter` | Opens the details panel, or a grid cell |
 | `Escape` | Steps back one step |
 | `Context Menu` | Opens the menu on the selection |
@@ -104,8 +104,8 @@ The always on top window, which has its own keys.
 |---|---|
 | `Enter` | Opens the panel on the selected test cases |
 | `F2` | Opens the menu that changes one field |
-| `Ctrl+Right` | Moves to the next test case |
-| `Ctrl+Left` | Moves to the previous test case |
+| `Ctrl+Right` | Forward: the next test case |
+| `Ctrl+Left` | Back: the previous test case |
 | `F5` | Runs the test case on display |
 | `Shift+F5` | Opens its generated test method |
 | `Escape` | Closes the panel, pressed in the editor |

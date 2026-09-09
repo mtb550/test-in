@@ -37,14 +37,14 @@ public enum PageStep {
         }
     },
 
-    PREVIOUS("Previous page", "Navigate to the previous page", AllIcons.Actions.Play_back, Shortcuts.PreviousTestCase) {
+    PREVIOUS("Previous page", "Navigate to the previous page", AllIcons.Actions.Play_back, Shortcuts.Previous) {
         @Override
         public int deltaFrom(final int currentPage, final int totalPages) {
             return currentPage > 1 ? -1 : 0;
         }
     },
 
-    NEXT("Next page", "Navigate to the next page", AllIcons.Actions.Play_forward, Shortcuts.NextTestCase) {
+    NEXT("Next page", "Navigate to the next page", AllIcons.Actions.Play_forward, Shortcuts.Next) {
         @Override
         public int deltaFrom(final int currentPage, final int totalPages) {
             return currentPage < totalPages ? 1 : 0;

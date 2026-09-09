@@ -72,12 +72,12 @@ faded. `Ctrl+Left` does nothing.
 
 **If this is the last page** — the two arrows on the right are the same.
 
-## Where the plugin breaks its own rules
+## The same key in the view panel
 
-`Ctrl+Right` turns the page here and moves to the next test case in the view
-panel. It is the same key on two panels a tester uses together. That is
-difference 30 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
+`Ctrl+Right` and `Ctrl+Left` mean forward and back in whichever surface has the
+keyboard. Here that is a page of test cases. In the view panel it is one test
+case, because the panel shows one at a time and has nothing else forward could
+mean there.
 
 ---
 
