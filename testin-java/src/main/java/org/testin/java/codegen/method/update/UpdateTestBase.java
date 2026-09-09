@@ -17,6 +17,7 @@ import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.NameSanitizer;
 import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import org.testin.services.Services;
 
 import java.util.Optional;
@@ -171,7 +172,7 @@ public class UpdateTestBase {
     private void noCodeToUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String detail) {
         Logger.warn("Update: " + detail);
 
-        Services.getInstance(p, Notifier.class).softShowNoGeneratedCode(p, tc.getDescription());
+        Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NO_GENERATED_CODE, tc.getDescription());
     }
 
     /**

@@ -16,6 +16,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
 import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import org.testin.services.Services;
 
 import java.util.ArrayList;
@@ -167,7 +168,7 @@ public final class CodeNavigator implements CodeNavigation {
                             // generated code yet" - one state described two ways,
                             // one keystroke apart (#246).
                             ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class)
-                                    .softShowNoGeneratedCode(p, tc.getDescription()));
+                                    .softRefuse(p, Refused.NO_GENERATED_CODE, tc.getDescription()));
                             return;
                         }
 

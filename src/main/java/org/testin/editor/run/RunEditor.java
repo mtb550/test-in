@@ -35,6 +35,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.run.RunTestCases;
 import org.testin.runner.TestCaseExecutionSubscriber;
@@ -1062,7 +1063,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             // whether a run is mid-execution is known here and nowhere else. Said
             // rather than swallowed: the tab came forward and nothing happened,
             // which reads as a menu entry that does not work.
-            if (isExecuting()) Services.getInstance(p, Notifier.class).softRefuseAlreadyRunning(p, parent.getName());
+            if (isExecuting()) Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_RUNNING, parent.getName());
             return;
         }
 
@@ -1074,7 +1075,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 .toList();
 
         if (pending.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuseNothingToRun(p, parent.getName());
+            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NOTHING_TO_RUN, parent.getName());
             return;
         }
 
@@ -1469,7 +1470,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // In Progress, stamp when execution began, and - until #214 - complete
         // the whole run at once (#215).
         if (!hasSomethingToWalk()) {
-            Services.getInstance(p, Notifier.class).softRefuseNothingShowing(p, parent.getName());
+            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NOTHING_SHOWING, parent.getName());
             return;
         }
 

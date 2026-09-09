@@ -57,94 +57,14 @@ public final class Notifier {
     }
 
     /**
-     * Rule-TREE-PANEL-004.
+     * A refusal about one thing, in the words {@link Refused} keeps.
      * <p>
-     * The tester typed a name that is already taken.
-     * <p>
-     * One sentence for one situation, whichever action they reached it through -
-     * creating a test project, creating any node in the tree, or renaming one.
-     * It fades rather than going in the log: it is feedback on what they just
-     * typed, not a failure worth keeping beside real ones (#62).
+     * Composing the sentence is not this class's job - delivering it is. Five
+     * refusals used to be a method each here, which made the class that hands
+     * messages to the platform also the class that decides what they say.
      */
-    public void softShowExists(final @NotNull Project p, final @NotNull String name) {
-        softRefuse(p, name + " Already Exists");
-    }
-
-    /**
-     * The tester acted on a test case that has no generated method.
-     * <p>
-     * One sentence for one situation, whichever action they reached it through -
-     * running the case, or editing it and expecting the code to follow. Both used
-     * to give up in silence, each in its own way: the runner ran whatever else
-     * the class held, and an edit changed the case and left the code alone (#34,
-     * #66 finding 19).
-     * <p>
-     * It fades rather than going in the log: it is feedback on what they just
-     * did, and the remedy - generate the code - is a keystroke away.
-     */
-    public void softShowNoGeneratedCode(final @NotNull Project p, final @NotNull String testCase) {
-        softRefuse(p, testCase + " has no generated code yet");
-    }
-
-    /**
-     * UC-TREE-PANEL-023, Rule-TREE-PANEL-078.
-     * <p>
-     * The tester asked to run a node that has nothing left to run.
-     * <p>
-     * One sentence for two situations that read the same to them: a test set
-     * holding no cases at all, and a run whose cases have all been judged
-     * already. Both are the tree saying "there is nothing here for me to start",
-     * and neither is a failure worth keeping beside real ones.
-     */
-    public void softRefuseNothingToRun(final @NotNull Project p, final @NotNull String name) {
-        softRefuse(p, name + " has no test cases to run");
-    }
-
-    /**
-     * The tester pressed start on a walk with nowhere to land.
-     * <p>
-     * Its own sentence rather than the one above: that one is for a test run with
-     * nothing left in it, and this one is about what is on screen. Three
-     * situations reach it - a test run holding no test cases, a filter matching
-     * nothing, and a list whose test cases have all been judged - and one
-     * sentence covers them because the tester sees the same thing in all three.
-     * <p>
-     * Naming the filter is what stops it being the sentence above: telling a
-     * tester their test run has no test cases, when a filter is what emptied the
-     * screen, sends them looking for cases that are still there (#215).
-     * <p>
-     * It fades, like every other answer to a gesture the tester just made.
-     */
-    public void softRefuseNothingShowing(final @NotNull Project p, final @NotNull String name) {
-        softRefuse(p, "Nothing showing in " + name + " is waiting for a verdict");
-    }
-
-    /**
-     * Rule-EDITOR-PANEL-009.
-     * <p>
-     * A test case the tester should be looking at is behind the filter.
-     * <p>
-     * Said rather than fixed. Testin used to clear every filter to bring the
-     * case into view, which changes the view the tester set up, without asking
-     * and without saying - and it did not even work: the search text was left
-     * alone, so a case the search was hiding stayed hidden and the filters went
-     * for nothing (#205).
-     * <p>
-     * The test case is there either way. This is about where to look for it.
-     */
-    public void softShowHiddenByFilter(final @NotNull Project p, final @NotNull String testCase) {
-        softShow(p, "Hidden by the filter", "'" + testCase + "' is not on screen. Clear the filter or the search to see it.");
-    }
-
-    /**
-     * The tester asked to run something that is already running.
-     * <p>
-     * Its own sentence rather than the one below: a run with cases still going
-     * has plenty left to run, and telling them it has nothing would send them
-     * looking for cases that are on screen in front of them.
-     */
-    public void softRefuseAlreadyRunning(final @NotNull Project p, final @NotNull String name) {
-        softRefuse(p, name + " is already running");
+    public void softRefuse(final @NotNull Project p, final @NotNull Refused refusal, final @NotNull String name) {
+        softRefuse(p, refusal.about(name));
     }
 
     /**

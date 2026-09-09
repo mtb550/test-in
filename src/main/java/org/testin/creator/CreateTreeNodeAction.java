@@ -16,6 +16,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.*;
 import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.Shortcuts;
@@ -56,7 +57,7 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
             // existing directory and every test case in it, and rewrote its
             // marker. The tester saw "Node created" and got somebody else's set.
             if (Services.getInstance(p, ProjectIndexer.class).nodeExists(newDirPath)) {
-                Services.getInstance(p, Notifier.class).softShowExists(p, s);
+                Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, s);
                 return;
             }
 

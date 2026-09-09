@@ -15,6 +15,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 
@@ -117,7 +118,7 @@ public class RunTestsAction extends AbstractProjectTreeAction {
         final @NotNull List<TestCaseDto> cases = Services.getInstance(p, ProjectIndexer.class).getTestCasesUnder(dir);
 
         if (cases.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuseNothingToRun(p, dir.getName());
+            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NOTHING_TO_RUN, dir.getName());
             return;
         }
 

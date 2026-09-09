@@ -304,9 +304,12 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         // and this changed the most visible thing the tester had set up - every
         // filter, thrown away to show one card, with no word about it. Creating
         // a test case under a filter, dragging one, and choosing a search result
-        // all came through here (#205).
+        // all came through here (#205). The test case is there either way, so
+        // this says where to look for it rather than refusing anything - which
+        // is why the sentence is here and not beside Testin's refusals.
         if (!currentTestCases.contains(tc)) {
-            Services.getInstance(p, Notifier.class).softShowHiddenByFilter(p, tc.getDescription());
+            Services.getInstance(p, Notifier.class).softShow(p, "Hidden by the filter",
+                    "'" + tc.getDescription() + "' is not on screen. Clear the filter or the search to see it.");
             return;
         }
 

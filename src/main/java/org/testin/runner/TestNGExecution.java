@@ -17,6 +17,7 @@ import org.testin.model.Failure;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import org.testin.services.Services;
 
 import java.time.Duration;
@@ -191,7 +192,7 @@ public final class TestNGExecution implements Disposable {
         Logger.warn("Not running '" + tc.getDescription() + "': it has no generated code");
         notStarting(tc);
 
-        Services.getInstance(p, Notifier.class).softShowNoGeneratedCode(p, tc.getDescription());
+        Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NO_GENERATED_CODE, tc.getDescription());
     }
 
     /**

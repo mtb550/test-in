@@ -12,6 +12,7 @@ import org.testin.model.DirectoryMapper;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 
@@ -43,7 +44,7 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
         final @NotNull Path tpPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(tpName);
 
         if (Services.getInstance(p, ProjectIndexer.class).projectExists(tpPath)) {
-            Services.getInstance(p, Notifier.class).softShowExists(p, tpName);
+            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, tpName);
             return;
         }
 

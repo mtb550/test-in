@@ -17,6 +17,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.RunConfigurationForm;
@@ -100,7 +101,7 @@ public class CreateTestRun implements NodeCreator {
 
         final @NotNull Path savePath = parentDir.getPath().resolve(name);
         if (indexer.nodeExists(savePath)) {
-            notifier.softShowExists(p, name);
+            notifier.softRefuse(p, Refused.ALREADY_EXISTS, name);
             return false;
         }
 

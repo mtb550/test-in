@@ -16,6 +16,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.util.Shortcuts;
 
@@ -65,7 +66,7 @@ public class RenameAction extends AbstractProjectTreeAction {
         // "already exists" - reject it with a message instead. Existence comes
         // from the indexer cache - file access is the indexer's alone.
         if (Services.getInstance(p, ProjectIndexer.class).nodeExists(parent.resolve(newName))) {
-            Services.getInstance(p, Notifier.class).softShowExists(p, newName);
+            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, newName);
             return;
         }
 
