@@ -7,12 +7,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValueUtil;
-import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.notifications.Notifier;
-import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 
 
@@ -30,21 +26,13 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
         TreeValueUtil.selected(tree, TestRunDirectoryDto.class).ifPresent(this::askForStatus);
     }
 
+    /**
+     * Inside the menu callback, so a dismissed menu changes nothing and says
+     * nothing (#62).
+     */
     private void askForStatus(final @NotNull TestRunDirectoryDto testRunDto) {
-        new TestRunStatusMenuDialog(p, selectedStatus -> {
-            Logger.trace("Status changed -> " + testRunDto.getName() + " = " + selectedStatus.getLabel());
-
-            // Updates the indexer-owned marker (single source of truth) and
-            // persists it through the sequential run-status writer.
-            Services.getInstance(p, RunStatusService.class).persistMarker(
-                    p, testRunDto.getPath(), selectedStatus);
-
-            Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
-
-            // The status names itself, as verdicts do: "Completed", "Closed".
-            // Inside the menu callback, so a dismissed menu says nothing (#62).
-            Services.getInstance(p, Notifier.class).softShow(p, selectedStatus.getLabel());
-        }).show();
+        new TestRunStatusMenuDialog(p, selectedStatus ->
+                Services.getInstance(p, TestRunStatusChange.class).apply(testRunDto, selectedStatus)).show();
     }
 
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-067

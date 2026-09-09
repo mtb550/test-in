@@ -1026,7 +1026,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         if (status == TestRunStatus.IN_PROGRESS || status.isTerminal()) return;
 
         run().ifPresent(TestRunDto::markExecutionStarted);
-        Services.getInstance(p, TestRunStatusChange.class).apply(this, TestRunStatus.IN_PROGRESS);
+        Services.getInstance(p, TestRunStatusChange.class).apply(parent, TestRunStatus.IN_PROGRESS);
     }
 
     /**
@@ -1227,7 +1227,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         if (run().filter(TestRunDto::isFullyJudged).isEmpty()) return;
 
-        Services.getInstance(p, TestRunStatusChange.class).apply(this, TestRunStatus.COMPLETED);
+        Services.getInstance(p, TestRunStatusChange.class).apply(parent, TestRunStatus.COMPLETED);
     }
 
     /**
@@ -1509,7 +1509,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         // Before the status change, which is what persists the run.
         run.get().markExecutionStarted();
-        Services.getInstance(p, TestRunStatusChange.class).apply(this, TestRunStatus.IN_PROGRESS);
+        Services.getInstance(p, TestRunStatusChange.class).apply(parent, TestRunStatus.IN_PROGRESS);
         // From the top, not from a row worked out here: where the walk lands is
         // the walk's own question, and it is answered in one place.
         startTimerForIndex(0);

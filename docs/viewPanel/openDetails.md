@@ -28,7 +28,9 @@ A card shows only a title. This opens the whole test case beside it.
   message for any of them.
 - **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
   every time it refreshes.
-- **Rule-VIEW-PANEL-009** — Closing any Testin editor empties the panel.
+- **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
+  panel is showing one of that editor's test cases, and leaves it alone
+  otherwise.
 - **Rule-VIEW-PANEL-010** — Five gestures open the panel. Each of them opens the
   tool window if it was closed.
 - **Rule-VIEW-PANEL-011** — Four of the five move the keyboard into the panel.

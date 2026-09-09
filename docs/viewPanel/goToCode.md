@@ -28,7 +28,9 @@ There is no key that works here. The button's tooltip names `Shift+F5`, and
   message for any of them.
 - **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
   every time it refreshes.
-- **Rule-VIEW-PANEL-009** — Closing any Testin editor empties the panel.
+- **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
+  panel is showing one of that editor's test cases, and leaves it alone
+  otherwise.
 - **Rule-VIEW-PANEL-056** — The button is drawn only where the IDE has the Java
   plugin.
 - **Rule-VIEW-PANEL-057** — The button is the first of the two, before the run

@@ -219,9 +219,14 @@ public final class EditorUtil {
 
     /**
      * The open Testin editor showing this node, and empty when none is - which
-     * happens when the open above could not build one.
+     * happens when the open above could not build one, and when nothing has this
+     * node open at all.
+     * <p>
+     * Public because a change made somewhere else has to reach whatever is
+     * drawing the node: setting a test run's status from the tree left that
+     * run's open editor on the old one (#191).
      */
-    private @NotNull Optional<TestinEditor> editorFor(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+    public @NotNull Optional<TestinEditor> editorFor(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
         for (final VirtualFile open : fed.getOpenFiles()) {

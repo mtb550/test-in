@@ -172,7 +172,6 @@ bug report yet.
 |---|---|---|
 | **Difference 1** | Rule-SETTING-002 — nothing is checked, so nothing warns | The Testin folder is checked now and refused when it is not a folder (Rule-SETTING-042). The rest of the page still is not: a tester name, a download folder, an SFTP account and a key file are all stored exactly as typed. None of them can make the tree empty, which is why the folder went first. |
 | **Difference 2** | Rule-SETTING-020 — a value this page stores is read by something | **Tester role** is stored and read by nothing at all. It is on no marker, no report and no message. It is reserved rather than dead: [#14](https://github.com/mtb550/test-in/issues/14) is what will read it. |
-| **Difference 5** | Rule-SETTING-004 — changing the folder makes Testin read again | Only code projects that have opened the Testin panel read again. A project whose panel was never opened keeps the old folder until it is opened. |
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.
@@ -181,6 +180,7 @@ closed up, so an issue that quotes one still points at the right thing.
 |---|---|
 | **Difference 3** | The Testin folder was stored exactly as typed and trimmed later by the reader, so the stored value changed on its own at the next project open. Every field on the page is trimmed when it is stored now. Fixed 9 September 2026, [#239](https://github.com/mtb550/test-in/issues/239) |
 | **Difference 4** | The export, report and import dialogs each carried a **Set as default folder** tick box that wrote this page's value. The box is gone and this page is the one writer, which retires UC-SHARE-023. Fixed 9 September 2026, [#240](https://github.com/mtb550/test-in/issues/240) |
+| **Difference 5** | It read Rule-SETTING-004 as a promise that every open code project re-reads the disk. That rule is about which *setting* causes a re-read, not which projects; which projects is Rule-SETTING-012, and it says the ones with a panel open. A project without one has read nothing to correct, and the folder is read where it is used, so it answers the new one the first time it asks. Not a defect, closed 9 September 2026, [#241](https://github.com/mtb550/test-in/issues/241) and [#77](https://github.com/mtb550/test-in/issues/77) |
 
 ---
 

@@ -54,6 +54,9 @@ The status says how far the test run has got.
 - **Rule-TREE-PANEL-068** — A tester sets **Assigned**, **Completed** and
   **Closed**. **Created** and **In Progress** are the test run's own record of
   itself.
+- **Rule-TREE-PANEL-091** — A test run's status is set on the test run, not on
+  whichever surface set it. The tree row and any open editor of that test run
+  both follow it, whichever of them the tester used.
 
 ## The Set Test Run Status popup
 
@@ -112,9 +115,10 @@ last row the tester clicked.
 > Rule-TREE-PANEL-065 keeps the current status off the menu, but it holds for
 > retiring and not here.
 
-> **An open editor of that test run is not told.** It keeps showing the old
-> status until it is reopened. It also keeps showing the rows that just became
-> **Untested**.
+> **An open editor of that test run follows.** Its status, its verdict counts
+> and the rows that just became **Untested** all redraw where they are
+> (Rule-TREE-PANEL-091). The same holds the other way: a status the editor sets
+> redraws the tree row.
 
 **Not decided** — see question 1 and question 2 on
 [the tree panel page](main.md#not-decided).

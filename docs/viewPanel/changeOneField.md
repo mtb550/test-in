@@ -28,7 +28,9 @@ One field, one small dialog. The rest of the test case is left alone.
   message for any of them.
 - **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
   every time it refreshes.
-- **Rule-VIEW-PANEL-009** — Closing any Testin editor empties the panel.
+- **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
+  panel is showing one of that editor's test cases, and leaves it alone
+  otherwise.
 - **Rule-VIEW-PANEL-044** — `F2` works only once a test case has been drawn. It
   does nothing while the panel is empty.
 - **Rule-VIEW-PANEL-045** — The panel always changes exactly one test case,

@@ -27,7 +27,9 @@ There is no key for this. The link is under the first three lines.
   message for any of them.
 - **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
   every time it refreshes.
-- **Rule-VIEW-PANEL-009** — Closing any Testin editor empties the panel.
+- **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
+  panel is showing one of that editor's test cases, and leaves it alone
+  otherwise.
 - **Rule-VIEW-PANEL-034** — The panel shows the first three lines of the error,
   and offers a link to the rest.
 - **Rule-VIEW-PANEL-035** — An error of three lines or fewer is shown whole,

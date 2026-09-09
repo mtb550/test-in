@@ -28,7 +28,9 @@ nothing in the panel.
   message for any of them.
 - **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
   every time it refreshes.
-- **Rule-VIEW-PANEL-009** — Closing any Testin editor empties the panel.
+- **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
+  panel is showing one of that editor's test cases, and leaves it alone
+  otherwise.
 - **Rule-VIEW-PANEL-050** — The run button is drawn only where the IDE has the
   TestNG plugin.
 - **Rule-VIEW-PANEL-051** — The same place shows the run button or the stop

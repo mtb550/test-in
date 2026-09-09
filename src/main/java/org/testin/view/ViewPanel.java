@@ -156,18 +156,22 @@ public class ViewPanel implements Disposable {
     /**
      * UC-VIEW-PANEL-015, Rule-VIEW-PANEL-060.
      * <p>
-     * Closes the panel when what it is showing is the case being closed
-     * elsewhere - an editor shutting down takes its own case off the screen.
+     * Closes the panel when what it is showing came from the node being closed
+     * - an editor shutting down takes its own cases off the screen, and nobody
+     * else's.
+     * <p>
+     * By the node rather than by one case. It used to be told whichever case
+     * happened to be selected as the editor went down, and the editor's own
+     * teardown emptied the panel unconditionally a moment later anyway - so a
+     * tester reading a case from one editor watched the panel go blank because
+     * they closed another (#233).
      */
-    public void hide(final @NotNull TestCaseDto testCaseDtoToMatch) {
+    public void hide(final @NotNull List<String> closingPath) {
         if (!isOpen()) return;
+        if (!page.getCurrentPath().equals(closingPath)) return;
 
-        getCurrentTestCase()
-                .filter(shown -> shown.getId().equals(testCaseDtoToMatch.getId()))
-                .ifPresent(shown -> {
-                    this.reset();
-                    this.hide();
-                });
+        this.reset();
+        this.hide();
     }
 
     public void updateList(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {

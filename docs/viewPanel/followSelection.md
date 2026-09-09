@@ -27,7 +27,9 @@ There is no key for this. It happens once the panel is open.
   message for any of them.
 - **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
   every time it refreshes.
-- **Rule-VIEW-PANEL-009** — Closing any Testin editor empties the panel.
+- **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
+  panel is showing one of that editor's test cases, and leaves it alone
+  otherwise.
 - **Rule-VIEW-PANEL-015** — Moving the selection in an editor fills the panel
   again, but only while the panel is on screen.
 - **Rule-VIEW-PANEL-016** — Following never opens the panel. A panel the tester
@@ -66,9 +68,8 @@ showing.
 **If the tester moves to a Testin editor with nothing selected** — the panel is
 emptied, and reads *Select a test case to view details*.
 
-**If the tester closes any Testin editor** — the panel is emptied, whichever
-editor closed and whatever the panel was showing. That is difference 9 on
-[the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
+**If the tester closes the Testin editor the panel's test case came from** — the
+panel is emptied and goes with it. Closing any other editor leaves it alone.
 
 ---
 

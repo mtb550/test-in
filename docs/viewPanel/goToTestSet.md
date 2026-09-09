@@ -28,7 +28,9 @@ There is no key for this. The path is at the top of the panel.
   message for any of them.
 - **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
   every time it refreshes.
-- **Rule-VIEW-PANEL-009** — Closing any Testin editor empties the panel.
+- **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
+  panel is showing one of that editor's test cases, and leaves it alone
+  otherwise.
 - **Rule-VIEW-PANEL-041** — The path shows one step for each folder above the
   test case.
 - **Rule-VIEW-PANEL-042** — Only the last step opens anything, and it opens the

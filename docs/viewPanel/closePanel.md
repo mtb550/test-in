@@ -27,7 +27,9 @@ The panel takes width from the editor. Closing it gives that width back.
   message for any of them.
 - **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
   every time it refreshes.
-- **Rule-VIEW-PANEL-009** — Closing any Testin editor empties the panel.
+- **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
+  panel is showing one of that editor's test cases, and leaves it alone
+  otherwise.
 - **Rule-VIEW-PANEL-058** — `Escape` in the editor does three things in order.
   It drops a pending cut, then closes the panel, then clears the selection. One
   press does one of them.
@@ -69,9 +71,9 @@ who has just used `F2` cannot close the panel with `Escape`. That is difference
 2 on
 [the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
-**Closing any Testin editor empties the panel.** A tester has two editors open
-and is reading a test case from the first. They close the second, and the panel
-goes blank. That is difference 9.
+**Closing an editor empties the panel only when the panel was showing that
+editor's test case.** A tester with two editors open, reading a test case from
+the first, closes the second and the panel stays exactly as it was.
 
 ---
 

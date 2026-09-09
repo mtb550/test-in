@@ -89,14 +89,6 @@ is drawn on [the settings page](main.md#the-page).
 
 Nothing. No value on this page is checked, and pressing **Apply** never fails.
 
-## Where the plugin breaks its own rules
-
-Some code projects do not notice a new Testin folder. A code project reads the
-disk again only if its Testin panel has been opened once. A project whose panel
-was never opened keeps the old folder until the panel is opened. That is
-difference 5 on
-[the settings page](main.md#where-the-plugin-breaks-its-own-rules).
-
 ---
 
 [Documentation](../README.md) › [The settings page](main.md)

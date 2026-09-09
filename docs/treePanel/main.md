@@ -9,7 +9,7 @@ test set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The tree panel |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-028`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-090` |
+| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-028`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-091` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code |
 | **Written to** | [How a document is written](../standard.md) |
@@ -516,7 +516,6 @@ documentation describes. None of them has a bug report yet.
 | **Difference 1** | Rule-TREE-PANEL-007 — one past-tense word | Creating a test run says *Run created*. Creating a test project says *Project created* or *Project cloned*. Every other creation says *Created*. |
 | **Difference 2** | Rule-TREE-PANEL-044 — nothing lands in a test run | Fixed. **Paste** asks the same two questions a drop asks — is this a place things land in, and can anything on the clipboard land here — so it is gray on a test run, as it always was on a test set. The *Select a folder* refusal is no longer reachable from the menu. |
 | **Difference 5** | Rule-TREE-PANEL-068 — Created and In Progress are the test run's own | The status popup offers **Created** and **In Progress** as choices. It also lets a test run go backwards, from **Assigned** to **Created**. |
-| **Difference 10** | Rule-TREE-PANEL-007 — a change confirms itself once | Setting a test run's status from the tree does not tell that test run's open editor. It keeps showing the old status, and the rows that just became **Untested**, until it is reopened. |
 | **Difference 11** | Rule-TREE-PANEL-006 — nothing changes until the tester confirms | Fixed. All five ask `singleSelectedDirectory`, the question eight other tree entries already asked, so each is gray with more than one row selected instead of acting on the first. **Details** had no `update()` at all and now has one. |
 
 **Fixed since this list was written.** The numbers are left out rather than
@@ -534,6 +533,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 12** | A position too large to hold silently cleared the order and still said *Ordered*. Fixed 7 September 2026 in `b28e9af7`, and the document did not follow |
 | **Difference 13** | The **Select Test Project** dialog's first column had no heading. Fixed 8 September 2026, [#194](https://github.com/mtb550/test-in/issues/194) |
 | **Difference 14** | The **Uncommitted Changes** dialog read *1 change ... are not committed*. Fixed 9 September 2026, [#195](https://github.com/mtb550/test-in/issues/195) |
+| **Difference 10** | Setting a test run's status from the tree did not tell that run's open editor, which kept the old status and the rows that had just become **Untested**. The tree was doing the work itself instead of asking the one place that owns a status change; now both go through it, and the editor and the tree each hear about the other. Fixed 9 September 2026, [#191](https://github.com/mtb550/test-in/issues/191) |
 
 ---
 

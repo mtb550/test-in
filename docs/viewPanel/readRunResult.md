@@ -29,7 +29,9 @@ run.
   message for any of them.
 - **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
   every time it refreshes.
-- **Rule-VIEW-PANEL-009** — Closing any Testin editor empties the panel.
+- **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
+  panel is showing one of that editor's test cases, and leaves it alone
+  otherwise.
 - **Rule-VIEW-PANEL-029** — The run rows are drawn only when the panel was
   opened from a test run that holds this test case.
 - **Rule-VIEW-PANEL-030** — The rows come from the test run itself, so the panel

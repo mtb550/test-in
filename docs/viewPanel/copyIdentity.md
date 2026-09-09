@@ -28,7 +28,9 @@ There is no key for this. The button sits beside the identity.
   message for any of them.
 - **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
   every time it refreshes.
-- **Rule-VIEW-PANEL-009** — Closing any Testin editor empties the panel.
+- **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
+  panel is showing one of that editor's test cases, and leaves it alone
+  otherwise.
 - **Rule-VIEW-PANEL-039** — The button turns into a green tick for one and a
   half seconds, then turns back.
 - **Rule-VIEW-PANEL-040** — Copying raises no message. The tick is the whole

@@ -9,7 +9,6 @@ import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.testcase.TestCaseOrder;
-import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.*;
@@ -401,7 +400,11 @@ public interface TestinEditor extends Disposable {
      */
     @NotNull Project getP();
 
+    /**
+     * Takes this editor's own cases off the view panel as it closes, and leaves
+     * the panel alone when it is showing another editor's (#233).
+     */
     default void dispose() {
-        ViewToolWindowFactory.panel(getP()).ifPresent(ViewPanel::reset);
+        ViewToolWindowFactory.panel(getP()).ifPresent(viewer -> viewer.hide(getParent().getPath2()));
     }
 }

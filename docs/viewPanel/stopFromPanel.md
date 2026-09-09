@@ -27,7 +27,9 @@ There is no key for this, and no tooltip claims one.
   message for any of them.
 - **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
   every time it refreshes.
-- **Rule-VIEW-PANEL-009** — Closing any Testin editor empties the panel.
+- **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
+  panel is showing one of that editor's test cases, and leaves it alone
+  otherwise.
 - **Rule-VIEW-PANEL-053** — While a test case is running, the run button is
   replaced by the stop button.
 - **Rule-VIEW-PANEL-054** — Stopping one test case stops every test case running
