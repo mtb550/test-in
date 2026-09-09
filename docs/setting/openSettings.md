@@ -23,6 +23,10 @@ panel's toolbar.
   again. Every other setting is read where it is used, when it is used.
 - **Rule-SETTING-005** — A password is never on this page. It is asked for when
   it is needed and kept in the IDE's password store.
+- **Rule-SETTING-040** — The page answers the IDE's settings search. Typing
+  a row's name opens the page with that row highlighted.
+- **Rule-SETTING-041** — The page says which of the two stores a value belongs
+  to: this machine's settings, or the repository's `testin.yml`.
 - **Rule-SETTING-006** — Nothing on this page has a key of its own.
 - **Rule-SETTING-007** — The gear button on the tree panel opens this page
   directly.

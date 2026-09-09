@@ -1,7 +1,7 @@
 package org.testin.setting;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.options.Configurable;
+import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
@@ -12,6 +12,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
 import org.testin.logger.Level;
@@ -24,7 +25,7 @@ import javax.swing.*;
 import java.util.Arrays;
 import java.util.Objects;
 
-public final class SettingsConfigurable implements Configurable {
+public final class SettingsConfigurable implements SearchableConfigurable {
 
     private final @NotNull TestinPathPanel testinPathPanel;
     private final @NotNull JBTextField testerNameField = new JBTextField();
@@ -63,6 +64,22 @@ public final class SettingsConfigurable implements Configurable {
         return Bundle.getPluginName();
     }
 
+    /**
+     * UC-SETTING-001, Rule-SETTING-040.
+     * <p>
+     * The same id plugin.xml registers the page under, which is what the
+     * platform's settings search needs to open it and highlight the row that
+     * matched.
+     * <p>
+     * A plain {@code Configurable} is findable as a page and no further: typing
+     * a setting's name found Testin and left the tester to read eight rows for
+     * the one they asked for (#124).
+     */
+    @Override
+    public @NotNull String getId() {
+        return "org.testin.setting.SettingsConfigurable";
+    }
+
     // UC-SETTING-001
     @Override
     public @NotNull JComponent createComponent() {
@@ -91,8 +108,32 @@ public final class SettingsConfigurable implements Configurable {
                 .addLabeledComponent(new JBLabel("SFTP key file: "), sftpKeyFileField, 1, false)
                 .addVerticalGap(5)
                 .addComponent(showShortcutHintsBox)
+                .addVerticalGap(10)
+                .addComponent(whereSettingsLive())
                 .addComponentFillVertically(new JBPanel<>(), 0)
                 .getPanel();
+    }
+
+    /**
+     * UC-SETTING-001, Rule-SETTING-041.
+     * <p>
+     * Which of the two stores a value belongs to, said where a tester is
+     * looking for one.
+     * <p>
+     * The split is practiced everywhere and stated nowhere the tester can see:
+     * this page is the machine's and is never committed, and what a repository
+     * says about itself is in its own file and travels with it. A tester
+     * hunting for the test project on this page had no way to learn it is not
+     * here (#124).
+     */
+    private @NotNull JBLabel whereSettingsLive() {
+        final @NotNull JBLabel note = new JBLabel("<html>Everything here belongs to this machine and this person, and is never committed.<br>"
+                + "Which test project a repository is about, and how it is shared, live in that repository's <b>testin.yml</b>.</html>");
+
+        note.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+        note.setFont(JBUI.Fonts.smallFont());
+
+        return note;
     }
 
     // UC-SETTING-001, Rule-SETTING-008

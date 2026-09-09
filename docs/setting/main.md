@@ -9,7 +9,7 @@ where the test data lives, who is using it, and how to reach the team's server.
 |---|---|
 | **Part of Testin** | The settings page |
 | **Answers** | What every setting does, where each one is kept, and what happens when one is wrong |
-| **Numbering** | Use cases are `UC-SETTING-001` to `UC-SETTING-011`. Rules are `Rule-SETTING-001` to `Rule-SETTING-039` |
+| **Numbering** | Use cases are `UC-SETTING-001` to `UC-SETTING-011`. Rules are `Rule-SETTING-001` to `Rule-SETTING-041` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -90,6 +90,10 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 │                                                                            │
 │   [x] Show keyboard shortcuts in dialogs                                   │
 │                                                                            │
+│   Everything here belongs to this machine and this person, and is never     │
+│   committed. Which test project a repository is about, and how it is        │
+│   shared, live in that repository's testin.yml.                       (11)  │
+│                                                                            │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -107,9 +111,16 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 9. **SFTP key file** — the key this machine offers that server.
 10. **Show keyboard shortcuts in dialogs** — the strip of key hints along the
     bottom of every Testin dialog.
+11. **The gray note** — which of the two stores a value belongs to. It is the
+    table below, said where a tester is looking for a setting rather than only
+    in this document.
 
 **OK**, **Apply** and **Cancel** belong to the IDE's own settings window, not to
 this page.
+
+**The page answers the IDE's settings search.** Typing a row's name in the
+search box at the top of the settings window opens this page with that row
+highlighted.
 
 ---
 
