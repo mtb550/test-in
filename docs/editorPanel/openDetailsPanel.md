@@ -74,11 +74,6 @@ The panel itself is a part of Testin of its own, and is
 **If `Enter` is pressed on any grid column but the number** — the cell opens for
 editing instead, or nothing happens.
 
-**If the Order field has been unticked** — no grid column is the number column,
-so `Enter` and the double-click stop working there. Nothing says why. That is
-difference 12 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
-
 ---
 
 [Documentation](../README.md) › [The editor panel](main.md)

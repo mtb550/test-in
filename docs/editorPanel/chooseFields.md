@@ -40,8 +40,10 @@ There is no key for this. The button's tooltip reads **Details**.
   view is on screen.
 - **Rule-EDITOR-PANEL-022** — The choice is remembered, and is separate for a
   test set and a test run.
-- **Rule-EDITOR-PANEL-023** — Two fields cannot be changed. **Description** is
-  always shown and **ID** is never shown.
+- **Rule-EDITOR-PANEL-023** — Three fields cannot be changed. **Order** and
+  **Description** are always shown, and **ID** is never shown. Order is the
+  grid's row header and not a field a tester chooses: clicking it selects the
+  row, and `Enter` and the double-click on it open the details panel.
 - **Rule-EDITOR-PANEL-024** — A burst of ticks costs one redraw, not one for
   each.
 
@@ -51,7 +53,7 @@ The list opens under the button. It has no title.
 
 ```
 ┌──────────────────────────────┐
-│ [x] Order                    │
+│ [x] Order            (gray)  │
 │ [x] Description              │
 │ [ ] ID                       │
 │ [x] Expected Result          │
@@ -75,7 +77,7 @@ The list opens under the button. It has no title.
 
 | Field | Shown to start with | Can be changed |
 |---|---|---|
-| Order | Yes | Yes |
+| Order | Yes | **No** |
 | Description | Yes | **No** |
 | ID | No | **No** |
 | Expected Result | Yes | Yes |
@@ -111,12 +113,6 @@ answer. No message is shown.
 
 **If a remembered choice cannot be read** — it is dropped, and only the log says
 so.
-
-## Where the plugin breaks its own rules
-
-**Unticking Order stops three gestures working in the grid.** Clicking a row to
-select it, `Enter` to open the details panel, and the double-click all stop.
-Nothing says why. That is difference 12.
 
 ---
 

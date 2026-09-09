@@ -22,10 +22,14 @@ public enum RunEditorAttributes implements ToolBarAttribute {
      * first column. The run item carries no such value - the position is the
      * view's, not the model's - so the extractor is empty and each view fills
      * the number in from the index it is already counting.
+     * <p>
+     * Locked on, for the reason {@link TestEditorAttributes#ORDER} gives: the
+     * run grid is built by the same builder and answers the same three gestures,
+     * so unticking it here broke them here too (#207).
      */
     ORDER(
             TestEditorAttributes.ORDER.getName(),
-            ToolBarDefault.ON,
+            ToolBarDefault.LOCKED_CHECKED,
             (item, p) -> ""
     ) {
         @Override

@@ -34,10 +34,19 @@ public enum TestEditorAttributes implements ToolBarAttribute {
      * first column. The test case carries no such value - the position is the
      * view's, not the model's - so the extractor is empty and each view fills
      * the number in from the index it is already counting.
+     * <p>
+     * Locked on, the way the description is. It is not a field the tester
+     * chooses to see - it is the grid's row header, and the target of the two
+     * gestures that are not edits: clicking it selects the whole row, and ENTER
+     * and the double-click open the details panel. Every other column is
+     * editable, so those two keys already mean "start editing" there and have
+     * nowhere else to go. Unticking Order took all three away and said nothing
+     * (#207); ToolBarDefault.LOCKED_CHECKED already named this column in its own
+     * javadoc, and only the constant disagreed.
      */
     ORDER(
             "Order",
-            ToolBarDefault.ON,
+            ToolBarDefault.LOCKED_CHECKED,
             (tc, p) -> "",
             (p, tc, v) -> true,
             GenType.NO_CODE_CHANGE
