@@ -5,6 +5,8 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.scale.JBUIScale;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.NodeCount;
 import org.testin.model.NodeFigures;
@@ -220,15 +222,11 @@ public final class VerdictDonut implements DialogComponent {
      * The ring itself: one arc per slice over a faint track, and the rate in
      * the middle.
      */
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class Ring extends JComponent {
 
         private final @NotNull List<NodeCount> slices;
         private final @NotNull NodeFigures figures;
-
-        private Ring(final @NotNull List<NodeCount> slices, final @NotNull NodeFigures figures) {
-            this.slices = slices;
-            this.figures = figures;
-        }
 
         @Override
         protected void paintComponent(final @NotNull Graphics g) {

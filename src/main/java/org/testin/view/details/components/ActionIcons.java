@@ -30,9 +30,6 @@ public class ActionIcons extends BaseDetails {
     final int INSETS_BOTTOM = 0;
     final int INSETS_RIGHT = 16;
 
-    public ActionIcons() {
-    }
-
     // UC-VIEW-PANEL-012, UC-VIEW-PANEL-014, Rule-VIEW-PANEL-050, Rule-VIEW-PANEL-056, Rule-VIEW-PANEL-057
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {

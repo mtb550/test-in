@@ -61,23 +61,39 @@ also the odd file out.
 - **`@Builder` only where a call site really cannot read positionally.** Most
   Testin constructors take two or three arguments and read fine.
 
-## The exception, and why it is the only one
+## The three constructors Lombok cannot write
 
-A private constructor that calls `super(...)` cannot be generated:
+These are the whole list. Anything else hand-written is a miss.
+
+| | Why it stays |
+|---|---|
+| `util/Bundle` | Calls `super(Bundle.class, BUNDLE)`. `@NoArgsConstructor` writes an empty body, so there is nowhere for the `super` call to go. |
+| `open/OpenContextMenuAction` | Calls `super("Show Context Menu")`, then does four more lines of work. |
+| `ui/Badges.BadgePill` | Its body is real: `setOpaque`, a border, an icon gap. A constructor that configures is not boilerplate. |
+
+Two of the three are the same rule: **a constructor that calls `super` with
+arguments cannot be generated.** The third is the other rule: **a constructor
+that does work is not boilerplate, however short it is.**
+
+If a fourth appears, it needs one of those two reasons written beside it.
+
+## Also delete, do not annotate
+
+An **empty** no-arg constructor needs no annotation at all — Java writes a
+public no-arg constructor for any class that declares none. `ActionIcons` had
 
 ```java
-public final class Bundle extends DynamicBundle {
-
-    private Bundle() {
-        super(Bundle.class, BUNDLE);
-    }
+public ActionIcons() {
 }
 ```
 
-`@NoArgsConstructor` writes an empty body, so there is nowhere for the `super`
-call to go. `Bundle` is the one class in `src/main` that hand-writes a
-constructor, and this is why. If a second one appears, it needs the same kind of
-reason written beside it.
+which does exactly nothing that removing it would not do. There should be zero
+of these; `@NoArgsConstructor` on such a class is a second way of writing the
+same nothing.
+
+`@NoArgsConstructor(access = AccessLevel.PRIVATE)` is different, and is the
+right answer: it makes the constructor **private**, which is the point — it says
+the class is not to be instantiated.
 
 ## `@NotNull` survives generation — it is TYPE_USE
 
@@ -156,5 +172,25 @@ Shortcuts... keys)` stays hand-written, because the annotation would produce
 
 ## Checking it
 
-`grep -rn "^    private [A-Z]\w*() *{$" --include=*.java src/main` should return
-exactly one line, and it should be `Bundle`.
+A grep for `private X() {` finds only the no-arg ones at one indent, which is
+how nine hand-written constructors hid behind an answer of "there is one". Scan
+for the shape instead — any visibility, any arity, any indent:
+
+```python
+# constructors whose body is nothing but this.x = x, or nothing at all
+import io, re, glob
+for f in glob.glob('src/**/*.java', recursive=True):
+    s = io.open(f, encoding='utf-8').read()
+    types = set(re.findall(r'(?:class|enum|record|interface)\s+(\w+)', s))
+    for m in re.finditer(r'^([ 	]+)(?:public |private |protected )?(\w+)\([^)]*\)\s*\{
+((?:.*?
+)*?)\}', s, re.M):
+        if m.group(2) not in types:
+            continue
+        body = [l.strip() for l in m.group(3).split('
+') if l.strip() and not l.strip().startswith('//')]
+        if all(re.fullmatch(r'this\.(\w+) = ;', l) for l in body):
+            print(f, m.group(2), len(body))
+```
+
+Run against `src` and `testin-java`, it should print only the three above.

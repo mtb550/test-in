@@ -4,6 +4,7 @@ import com.intellij.util.IconUtil;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
 import org.jetbrains.annotations.Nullable;
@@ -192,15 +193,12 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     /**
      * Fluent builder for {@link RadioSelection}.
      */
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class RadioBuilder<T> {
 
         private final @NotNull String caption;
         private final @NotNull List<RadioSelection.Option<T>> options = new ArrayList<>();
         private @Nullable T selected;
-
-        private RadioBuilder(final @NotNull String caption) {
-            this.caption = caption;
-        }
 
         public @NotNull RadioBuilder<T> option(final @NotNull String name, final @NotNull T value) {
             options.add(new RadioSelection.Option<>(name, value));

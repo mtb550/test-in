@@ -4,6 +4,8 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
@@ -40,6 +42,7 @@ import java.util.Set;
  * claiming files were agreed that never arrived, and the next sync would read
  * that as the server having deleted them.
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SftpTransport implements AutoCloseable {
 
     private static final int TIMEOUT = 30_000;
@@ -57,12 +60,6 @@ public final class SftpTransport implements AutoCloseable {
     private final @NotNull SftpAddress address;
     private final @NotNull Session session;
     private final @NotNull ChannelSftp sftp;
-
-    private SftpTransport(final @NotNull SftpAddress address, final @NotNull Session session, final @NotNull ChannelSftp sftp) {
-        this.address = address;
-        this.session = session;
-        this.sftp = sftp;
-    }
 
     /**
      * UC-SHARE-019, Rule-SHARE-088.

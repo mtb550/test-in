@@ -1,5 +1,7 @@
 package org.testin.sftp;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.apache.sshd.common.config.keys.AuthorizedKeyEntry;
 import org.apache.sshd.common.config.keys.KeyUtils;
 import org.apache.sshd.common.config.keys.PublicKeyEntry;
@@ -32,6 +34,7 @@ import java.util.stream.Stream;
  * accept-any-host-key default is a property of its <em>client</em> builder, and
  * nothing here is a client.
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class SftpTestServer implements AutoCloseable {
 
     static final String USER = "tester";
@@ -40,12 +43,6 @@ final class SftpTestServer implements AutoCloseable {
     private final SshServer server;
     private final Path directory;
     private final Path root;
-
-    private SftpTestServer(final SshServer server, final Path directory, final Path root) {
-        this.server = server;
-        this.directory = directory;
-        this.root = root;
-    }
 
     static SftpTestServer start() {
 

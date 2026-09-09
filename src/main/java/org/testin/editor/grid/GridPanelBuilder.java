@@ -8,6 +8,8 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.WheelForwarding;
 import org.testin.ui.framework.RowStripe;
@@ -191,6 +193,7 @@ public class GridPanelBuilder {
      * The range accumulates across the burst: two cells edited in one gesture
      * are measured once, over both their rows.
      */
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class RowHeights {
 
         private final @NotNull JBTable table;
@@ -202,10 +205,6 @@ public class GridPanelBuilder {
          */
         private int from = Integer.MAX_VALUE;
         private int to = -1;
-
-        private RowHeights(final @NotNull JBTable table) {
-            this.table = table;
-        }
 
         /**
          * Every row: a column appeared, moved or changed width, so anything on

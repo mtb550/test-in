@@ -1,19 +1,23 @@
 package org.testin.editor;
 
-import org.testin.model.DirectoryType;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.ex.FakeFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
-import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.editor.test.TestEditor;
+import org.testin.model.DirectoryType;
+import org.testin.model.dto.dirs.DirectoryDto;
 
 import javax.swing.*;
 import java.util.function.BiFunction;
 
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class EditorType extends FakeFileType {
 
     public static final @NotNull EditorType TEST_RUN = new EditorType(
@@ -30,28 +34,10 @@ public class EditorType extends FakeFileType {
             TestEditor::new
     );
 
-    @Getter
-    @NotNull
-    private final String name;
-
-    @Getter
-    @NotNull
-    private final String description;
-
-    @Getter
-    @NotNull
-    private final Icon icon;
-
-    @Getter
-    @NotNull
-    private final BiFunction<Project, UnifiedVirtualFile, TestinEditor> factory;
-
-    private EditorType(final @NotNull String name, final @NotNull String description, final @NotNull Icon icon, final @NotNull BiFunction<Project, UnifiedVirtualFile, TestinEditor> factory) {
-        this.name = name;
-        this.description = description;
-        this.icon = icon;
-        this.factory = factory;
-    }
+    private final @NotNull String name;
+    private final @NotNull String description;
+    private final @NotNull Icon icon;
+    private final @NotNull BiFunction<Project, UnifiedVirtualFile, TestinEditor> factory;
 
     /**
      * UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-001.
