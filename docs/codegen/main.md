@@ -180,7 +180,7 @@ bug report yet.
 | **Difference 4** | Rule-CODEGEN-006 — a tester can find out what happened | Clicking the gutter mark of a test case that was removed does nothing at all. Generated code outlives its test case, so this is the ordinary case. |
 | **Difference 6** | Rule-CODEGEN-004 — the tree and the code agree | Moving a test set to a place Testin has not read still leaves the class where it was — guessing a destination the tree has not read is what once moved a whole package into the default package and lost it. The tester is told now, in a notification that stays, naming the class and what to do about it. The tree and the code disagree until they act. |
 | **Difference 7** | Rule-CODEGEN-005 — a missing plugin is a skip | With TestNG but no Java plugin, **Run Test Case** is offered, every test case resolves to nothing, and the tester gets one *has no generated code yet* message per test case with no mention of the missing plugin. |
-| **Difference 9** | Rule-CODEGEN-003 — one name for one thing | Two test sets whose names come to nothing when the special characters are removed both write into one class called `DefaultTest`. |
+| **Difference 9** | Rule-CODEGEN-011 — one name for one thing | Fixed, and the row cited the wrong rule: Rule-CODEGEN-003 is about the method body. Two test sets whose names come to nothing are named after what they were called, so they no longer share `DefaultTest` — and the package fallback no longer carries a timestamp, so a node names the same package on the call that writes its code and the call that comes looking for it. |
 
 **Settled since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.

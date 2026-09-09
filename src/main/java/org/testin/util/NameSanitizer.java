@@ -29,13 +29,53 @@ public final class NameSanitizer {
             }
         }
 
-        if (result.isEmpty()) return "generated" + System.currentTimeMillis();
+        if (result.isEmpty()) return "generated" + tag(value);
         if (Character.isDigit(result.charAt(0))) result.insert(0, '_');
         return result.toString();
     }
 
+    /**
+     * UC-CODEGEN-002, Rule-CODEGEN-011.
+     * <p>
+     * What tells two names apart when neither has a letter or a digit left in
+     * it, derived from the name itself and from nothing else.
+     * <p>
+     * The package fallback used to be {@code "generated" + currentTimeMillis()}.
+     * That is not a name, it is a new name every time it is asked for: the same
+     * node produced a different package on the call that generated its code and
+     * on the call that came looking for it, so a rename, a move or a remove
+     * found nothing and did nothing, in silence. The class fallback had the
+     * opposite fault - every such node answered {@code DefaultTest}, so two of
+     * them wrote into one file and the second set's methods landed in the
+     * first's class (#250).
+     * <p>
+     * A hash of the raw name fixes both at once, because it is the two things
+     * neither fallback was: the same answer every time for one name, and a
+     * different answer for a different name. {@code String.hashCode} is
+     * specified by the language rather than left to the JVM, so a name generated
+     * on one machine is found again on another.
+     */
+    private static @NotNull String tag(final @NotNull String value) {
+        return Integer.toHexString(value.hashCode());
+    }
+
+    /**
+     * UC-CODEGEN-002, Rule-CODEGEN-011.
+     * <p>
+     * The class a test set's name gives. The same name always gives the same
+     * class, and two different names never give one class - which is the whole
+     * of what a generated name has to promise.
+     * <p>
+     * A name with nothing left in it after the illegal characters go takes a
+     * name built from what it was, rather than the one word every such name used
+     * to take. See {@link #tag}.
+     */
     public static @NotNull String className(final @NotNull String value) {
+        // A node with no name at all is one node, not a family of them, so one
+        // word answers for it. The tree refuses an empty name, so this is data
+        // that arrived some other way.
         if (value.trim().isEmpty()) return "DefaultTest";
+
         final @NotNull String cleanName = INVALID_NAME.matcher(value).replaceAll("").trim();
         final @NotNull StringBuilder result = new StringBuilder();
         for (final String word : cleanName.split("[\\s_]+")) {
@@ -43,7 +83,7 @@ public final class NameSanitizer {
                 result.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
             }
         }
-        if (result.isEmpty()) return "DefaultTest";
+        if (result.isEmpty()) return "Generated" + tag(value) + "Test";
         if (Character.isDigit(result.charAt(0))) result.insert(0, '_');
         return result.append("Test").toString();
     }

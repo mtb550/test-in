@@ -31,8 +31,11 @@ There is no key for this. It happens when a test set is created, which is
 - **Rule-CODEGEN-009** — A class that is already there is never written over.
 - **Rule-CODEGEN-010** — The class is written empty. It holds no blank line
   inside its braces.
-- **Rule-CODEGEN-011** — A test set whose name comes to nothing becomes a class
-  called `DefaultTest`.
+- **Rule-CODEGEN-011** — A test set whose name comes to nothing when the illegal
+  characters are removed is still named after what it was called, so two of them
+  never share a class and each one is in the same class every time. A test set
+  with no name at all — which the tree does not let a tester make — becomes
+  `DefaultTest`.
 
 ## What is written
 
