@@ -9,7 +9,7 @@ in a tab. It is where test cases are written, and where a test run is executed.
 |---|---|
 | **Part of Testin** | The editor panel |
 | **Answers** | What a tester can do to test cases and to a test run, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-207` |
+| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-209` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -135,7 +135,7 @@ the same rows, a filter, a search, and a key for every gesture.
 
 | Key | What it does | The page that owns it |
 |---|---|---|
-| `Ctrl+C` | On cards, copies the details as text. In the grid, copies the cells | [UC-EDITOR-PANEL-014](copyAsText.md) |
+| `Ctrl+C` | On cards, opens the copy menu; a letter copies one value. In the grid, copies the cells | [UC-EDITOR-PANEL-014](copyAsText.md) |
 | `Ctrl+X` | In the grid, copies the cells and empties the ones that can be typed into | [UC-EDITOR-PANEL-018](gridClipboard.md) |
 | `Ctrl+V` | In the grid, pastes text into the cells | [UC-EDITOR-PANEL-018](gridClipboard.md) |
 | `Ctrl+Shift+C` | Copies the test cases themselves | [UC-EDITOR-PANEL-015](copyTestCases.md) |

@@ -137,6 +137,29 @@ public enum Shortcuts {
     Next(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK)),
     Previous(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK)),
 
+    // The copy menu's rows. Its own keys, not the update menu's: the two menus
+    // hold different things - a tester copies the class name, the identity and
+    // the path and can never edit them - so one enum over both would put rows
+    // in the update menu that mean nothing there. What they share is this file,
+    // which is where a key lives whatever menu shows it.
+    //
+    // The letters match the update menu's wherever the field is the same, so D
+    // is the description in both and nobody learns a second alphabet.
+    CopyAll(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0)),
+    CopyDescription(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0)),
+    CopyExpectedResult(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)),
+    CopySteps(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)),
+    CopyPreConditions(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
+    CopyTestData(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0)),
+    CopyPriority(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
+    CopyModule(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0)),
+    CopyGroup(KeyStroke.getKeyStroke(KeyEvent.VK_G, 0)),
+    CopyStatus(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0)),
+    CopyReference(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0)),
+    CopyFqcn(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)),
+    CopyId(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0)),
+    CopyPath(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0)),
+
     // Field navigation inside the create/update dialogs
     TabNext(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0)),
     TabPrevious(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK)),

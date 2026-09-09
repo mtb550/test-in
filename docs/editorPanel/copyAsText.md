@@ -7,7 +7,7 @@
 
 This copies words a person can read. It does not copy the test case itself.
 
-`Ctrl+C` on the cards.
+`Ctrl+C` on the cards opens a menu of what can be copied. A letter picks one.
 
 ## Rules
 
@@ -38,33 +38,72 @@ This copies words a person can read. It does not copy the test case itself.
 - **Rule-EDITOR-PANEL-073** — Each test case is written as the field name, a
   colon, then the value.
 - **Rule-EDITOR-PANEL-074** — Several test cases are separated by a blank line.
-- **Rule-EDITOR-PANEL-207** — What is copied is every field the tester wrote on
-  the test case: the description, the expected result, the steps, the priority,
-  the reference, the test data, the pre-conditions, the group, the module and
-  the status. The row number, the identity, the class name, the path and the
-  four audit fields are not written by the tester and are not copied. A field
-  left empty is not a line.
+- **Rule-EDITOR-PANEL-207** — **All Details** copies every field the tester
+  wrote on the test case: the description, the expected result, the steps, the
+  priority, the reference, the test data, the pre-conditions, the group, the
+  module and the status. A field left empty is not a line.
+- **Rule-EDITOR-PANEL-208** — Any one of those can be copied on its own, and so
+  can the class name, the identity and the path — which the tester never writes
+  and often needs. A single value is copied bare, with no caption in front of
+  it.
+- **Rule-EDITOR-PANEL-209** — The menu's letters are the update menu's letters
+  wherever the field is the same, so `D` is the description in both.
 
-## What the tester sees
+## The screen
 
-This opens no screen. Nothing on the list changes, because nothing was written.
+```
+┌──────────────────────────────────────────────┐
+│  Copy                                        │
+├──────────────────────────────────────────────┤
+│  > 📋  All Details                       A   │
+│    📋  Description                       D   │
+│    📋  Expected Result                   E   │
+│    📋  Steps                             S   │
+│    📋  Pre Conditions                    B   │
+│    📋  Test Data                         T   │
+│    📋  Priority                          P   │
+│    📋  Module                            M   │
+│    📋  Group                             G   │
+│    📋  Status                            U   │
+│    📋  Reference                         R   │
+│    📋  FQCN                              F   │
+│    📋  ID                                I   │
+│    📋  Path                              H   │
+└──────────────────────────────────────────────┘
+```
 
-A small message appears at the bottom of the IDE and fades. It reads *Details
-copied*, with a count after it when more than one card was selected.
+1. **All Details first, and already selected** — so `Ctrl+C` then `Enter` copies
+   the whole test case, which is what `Ctrl+C` did on its own before the menu.
+2. **A letter on each row** — pressing it copies that value and closes the menu.
+   `Ctrl+C` then `D` is as quick as one keystroke for a tester who knows it.
+3. **The last three** — the class name, the identity and the path. Testin writes
+   those; a tester pastes them into a stack trace, a ticket or a search.
+
+Nothing on the list changes, because nothing was written. A small message appears
+at the bottom of the IDE and fades: *Description copied*, with a count after it
+when more than one card was selected.
 
 ## Main flow
 
 1. The tester selects two cards and presses `Ctrl+C`.
-2. The text goes on the clipboard.
-3. A message reads *Details copied 2*.
+2. The **Copy** menu opens, with **All Details** selected.
+3. The tester presses `D`.
+4. Both descriptions go on the clipboard, one block each.
+5. A message reads *Description copied 2*.
 
 ## What Testin refuses
 
 **If nothing is selected** — **Copy** is gray and the key does nothing.
 
 **If the grid is showing** — `Ctrl+C` belongs to the grid there, and copies the
-selected cells instead. That is
+selected cells instead. The menu does not open. That is
 [UC-EDITOR-PANEL-018](gridClipboard.md).
+
+**If the tester presses `Escape`** — the menu closes and nothing is copied.
+
+**If the value is empty** — it is copied as nothing, and the message still says
+so. The menu offers every value the test case can hold, not only the ones this
+test case has.
 
 A tester who wants the identity, the class name or who changed the case and when
 should export the test set instead. That is

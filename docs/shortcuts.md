@@ -49,7 +49,7 @@ table; this is all of them together.
 | `Ctrl+Z` | Takes back the last change |
 | `Ctrl+Y` | Puts it back |
 | `Ctrl+Enter` | A line break inside a grid cell or a long field |
-| `Ctrl+C` | On cards, copies the details as text. In the grid, copies the cells |
+| `Ctrl+C` | On cards, opens the copy menu; a letter copies one value. In the grid, copies the cells |
 | `Ctrl+X` | In the grid, copies the cells and empties the ones that can be typed into |
 | `Ctrl+V` | In the grid, pastes text into the cells |
 | `Ctrl+Shift+C` | Copies the test cases themselves |
