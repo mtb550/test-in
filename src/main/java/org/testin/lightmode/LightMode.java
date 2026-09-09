@@ -2,7 +2,6 @@ package org.testin.lightmode;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
-import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -57,11 +56,6 @@ public final class LightMode implements Disposable {
                 window = Optional.empty();
                 onChange.run();
             }));
-
-            // The editor going takes the window with it: this window reads that
-            // editor every time it draws. Asked rather than remembered, so a
-            // registration left by an earlier open does nothing to a later one.
-            Disposer.register(editor, () -> closeIfShowing(editor.getParent()));
         }
 
         // On every path, not only the opening one. Closing runs the lambda the
@@ -96,11 +90,38 @@ public final class LightMode implements Disposable {
     }
 
     /**
-     * The one way a run takes its window down, so the two that need it - a run
-     * signed off and its editor closing - cannot decide it differently.
+     * The one way a run signed off takes its window down. The toolbar button is
+     * told, because the editor holding it is still there to draw it un-pressed.
      */
     private void closeIfShowing(final @NotNull TestRunDirectoryDto run) {
         window.filter(open -> open.shows(run)).ifPresent(LightModeWindow::close);
+    }
+
+    /**
+     * UC-EDITOR-PANEL-046.
+     * <p>
+     * Takes the window down when the run editor it is showing closes.
+     * <p>
+     * Called by the editor from its own {@code dispose}, beside every other
+     * thing that editor takes with it. It used to be a {@code Disposer.register}
+     * on the editor here, which was wrong twice: the editor is disposed by a
+     * direct call rather than through the Disposer, so the registration never
+     * once ran - a tab closed with light mode open left the window standing,
+     * reading an editor that no longer existed - and registering a child on
+     * something the Disposer had never heard of adopted the editor under the
+     * application root, where nothing ever removed it. That is the leak the IDE
+     * reported on every quit, with Testin named as the plugin to blame (#292).
+     * <p>
+     * Quietly, and that is the difference from {@link #closeIfShowing}: the
+     * button that would be told is part of the editor that is going, so there is
+     * nobody left to tell. The window reference is cleared here for the same
+     * reason - a quiet close does not run the lambda that clears it.
+     */
+    public void editorClosing(final @NotNull TestRunDirectoryDto run) {
+        window.filter(open -> open.shows(run)).ifPresent(open -> {
+            open.closeQuietly();
+            window = Optional.empty();
+        });
     }
 
     /**

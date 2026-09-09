@@ -744,6 +744,15 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public void dispose() {
+        // Before anything is torn down: the light mode window reads this editor
+        // every time it draws, so it must not outlive it. Here rather than a
+        // Disposer child registered on this editor, which never ran - this
+        // dispose is called directly rather than through the Disposer - and
+        // which quietly adopted the editor under the application root, where
+        // nothing removed it and the IDE reported it as a leak on every quit
+        // (#292).
+        Services.getInstance(p, LightMode.class).editorClosing(parent);
+
         // Closing the tab is the same gesture as pressing Stop, so it does the
         // same thing: the automation this editor launched is ended, the walk is
         // halted, and the run is written. Stopping the automation first, because
