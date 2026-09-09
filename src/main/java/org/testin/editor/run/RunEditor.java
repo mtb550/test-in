@@ -1132,6 +1132,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             sayWhatTheVerdictCleared(tc, verdict);
 
             Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict, duration, failure);
+
+            // Silent per case, and one line when the automation has nothing left
+            // to report. Fifty cases used to raise fifty balloons, where every
+            // other bulk gesture in Testin says one thing with a count (#219).
+            if (launchedHere.isEmpty()) sayWhatTheRunRecorded();
         });
 
         // A model event, not a repaint: the card grows a Duration line the
@@ -1195,6 +1200,24 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * refused above.
      */
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-134
+    /**
+     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-008.
+     * <p>
+     * What the automation recorded, in one line at the end of it - "Passed 42,
+     * Failed 8".
+     * <p>
+     * The words are {@link ResultAnalysis#segments}, which the status bar
+     * already uses, so the balloon and the bar cannot end up counting the same
+     * run differently.
+     */
+    private void sayWhatTheRunRecorded() {
+        final @NotNull String recorded = ResultAnalysis
+                .segments(TestRunSummary.of(List.copyOf(resultsMap.values())), parent.getMarker().getStatus())
+                .stream().map(ResultAnalysis.Segment::text).collect(Collectors.joining(", "));
+
+        if (!recorded.isEmpty()) Services.getInstance(p, Notifier.class).softShow(p, recorded);
+    }
+
     public void finishIfEverythingIsJudged() {
         // A run already signed off is left alone. The guard is here rather than
         // at the call sites because there are now five of them - the end of a

@@ -71,7 +71,12 @@ public final class RunStatusService {
         ApplicationManager.getApplication().invokeLater(() -> editor.startTimerForIndex(executingIndex));
     }
 
-    public void executeManual(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
+    /**
+     * Records one verdict and answers whether it landed. The caller confirms,
+     * because only the caller knows whether this was one press or one of fifty
+     * results an automated run is still reporting (#219).
+     */
+    public boolean executeManual(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         // Stopping is the editor's own business - it owns the executing index -
         // and it happens before the verdict, so the case being judged is no
         // longer the one being timed.
@@ -80,9 +85,10 @@ public final class RunStatusService {
             editor.stopExecution();
         }
 
-        if (!recordVerdict(p, editor.getParent().getPath(), tc.getId(), status, duration, failure)) return;
+        if (!recordVerdict(p, editor.getParent().getPath(), tc.getId(), status, duration, failure)) return false;
 
         triggerFilterRefresh(editor);
+        return true;
     }
 
     /**
@@ -134,7 +140,6 @@ public final class RunStatusService {
 
         Services.getInstance(p, ProjectIndexer.class).persistRun(runPath, run);
 
-        confirmVerdict(p, status, 1);
         return true;
     }
 
@@ -211,7 +216,7 @@ public final class RunStatusService {
             if (globalIndex == editor.getCurrentlyExecutingIndex()) {
                 executeNext(p, editor, status);
             } else {
-                executeManual(p, editor, tc, status, Duration.ZERO, Failure.NONE);
+                if (executeManual(p, editor, tc, status, Duration.ZERO, Failure.NONE)) confirmVerdict(p, status, 1);
             }
         } else {
             int recorded = 0;

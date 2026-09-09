@@ -270,7 +270,7 @@ bug report yet.
 | | The rule it breaks | What a tester sees |
 |---|---|---|
 | **Difference 19** | Rule-EDITOR-PANEL-008 — a signed off test run records nothing more | The status bar's own tooltip says a completed or closed test run records no more verdicts. `P`, `F` and `B` still record one, still save it, and still say *Passed*. Only the automation refuses. |
-| **Difference 25** | Rule-EDITOR-PANEL-008 — one message with a count | An automated test run raises one message for each test case. Fifty test cases is fifty messages. |
+| **Difference 25** | Rule-EDITOR-PANEL-008 — one message with a count | Fixed. An automated run says nothing per test case and one line when it has nothing left to report — *Passed 42, Failed 8*. The words are the status bar's own, so the balloon and the bar cannot count one run differently. |
 | **Difference 26** | Rule-EDITOR-PANEL-005 — what the tester typed is kept | An automated pass still clears the actual result, the error, the bug severity and the bug priority the tester wrote by hand. It now says so afterwards, in a message that stays in the notification list. The dialog that asks first is still on the manual path only. |
 | **Difference 30** | Rule-EDITOR-PANEL-009 — a key means one thing | `Ctrl+Right` turns the page here, and moves to the next test case in the view panel. It is the same key on two panels a tester uses together. |
 
