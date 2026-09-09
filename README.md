@@ -69,6 +69,10 @@ the automation project it tests, so test data and code have their own histories.
 Testin's settings are per-IDE, not per-project: the root you choose is the one
 every open project uses.
 
+**New to it?** [First run](docs/firstRun.md) takes ten minutes and ends at a
+recorded verdict and a report — install, a test case you wrote, the Java method
+Testin wrote for it, and the document you send to someone who has no IDE.
+
 ## Building from source
 
 ```bash
@@ -98,7 +102,7 @@ or in this repository under [`docs/`](docs/README.md).
 
 Testin has eight parts. Each part gets a folder, and every thing a tester does
 in it gets a page of its own: the story, its rules, its screens, what happens
-step by step, and every way it can be refused. 151 use cases and 608 rules, each
+step by step, and every way it can be refused. 153 use cases and 659 rules, each
 checked against the code it describes.
 
 | Document | Covers |
@@ -112,9 +116,10 @@ checked against the code it describes.
 | **[Sharing work with the team](docs/share/main.md)** | Export, import, Git and a server |
 | **[Inside Testin](docs/internal/main.md)** | The search, and the one thing that owns every file |
 
-The keyboard reference, a first-run walkthrough, the formats on disk and the
-architecture are listed on [the home page](docs/README.md) with the issue that
-will write each one.
+Four pages sit outside the eight parts: [First run](docs/firstRun.md), [every
+shortcut](docs/shortcuts.md), [the formats on disk](docs/formats.md) and [the
+standing decisions](docs/decisions.md). The architecture guide is still to be
+written, and [the home page](docs/README.md) names the issue for it.
 
 Questions, ideas and feedback are welcome in
 [Discussions](https://github.com/mtb550/test-in/discussions).

@@ -77,7 +77,7 @@ You installed the plugin and want to use it well.
 |---|---|---|
 | **[Every shortcut](shortcuts.md)** | Every key Testin answers to, on every screen | Written |
 | **Task guides and concepts** | The rest of the tester site | Not written — [#73](https://github.com/mtb550/test-in/issues/73) |
-| **First run** | From installing the plugin to a first verdict, in ten minutes | Not written — [#104](https://github.com/mtb550/test-in/issues/104) |
+| **[First run](firstRun.md)** | From installing the plugin to a first verdict, in ten minutes | Written |
 
 ## For contributors
 
