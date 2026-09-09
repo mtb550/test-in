@@ -5,6 +5,7 @@ import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -81,8 +82,13 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
     /**
      * Applies one edited, trimmed value to the test case. Called only for rows
      * the tester actually changed.
+     *
+     * @return true when the value was written, false when Testin could not read
+     * it and the test case was left as it was - the same answer
+     * {@link org.testin.importexport.imports.ImportSetter#execute} gives, and
+     * for the same reason (#295)
      */
-    protected abstract void setValue(final @NotNull TestCaseDto tc, final @NotNull String value);
+    protected abstract boolean setValue(final @NotNull TestCaseDto tc, final @NotNull String value);
 
     /**
      * Whether a value edited to blank may be applied (e.g. a description must not be blanked).
@@ -111,18 +117,31 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
      * rebuilt because one of them was edited, and the tester was told fifty had
      * changed. Two rules for what a bulk edit touched, in two places, and only
      * one of them was right.
+     * <p>
+     * A row Testin could not read is not one of them either. It is left as it
+     * was, kept out of the answer so the count does not claim it, and said once
+     * with the others - Rule-EDITOR-PANEL-206, which the grid and the two
+     * importers already kept and this dialog did not (#295).
      */
     protected @NotNull List<TestCaseDto> applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<EditedValue> newValues) {
         final @NotNull List<TestCaseDto> written = new ArrayList<>();
+
+        int refused = 0;
 
         for (int i = 0; i < items.size(); i++) {
             final @NotNull EditedValue edited = newValues.get(i);
             if (!edited.changed()) continue;
             if (edited.value().isEmpty() && !acceptsBlank()) continue;
 
-            setValue(items.get(i), edited.value());
+            if (!setValue(items.get(i), edited.value())) {
+                refused++;
+                continue;
+            }
+
             written.add(items.get(i));
         }
+
+        TestEditorAttributes.sayWhatWasRefused(p, refused);
 
         return written;
     }

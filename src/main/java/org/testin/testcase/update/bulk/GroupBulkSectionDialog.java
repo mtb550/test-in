@@ -3,13 +3,13 @@ package org.testin.testcase.update.bulk;
 import org.testin.model.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.logger.Logger;
 import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.TestDataParser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
@@ -43,27 +43,34 @@ public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
         return originalGroups;
     }
 
+    /**
+     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-206.
+     * <p>
+     * Writes the groups the tester typed, and says how many rows Testin could
+     * not read.
+     * <p>
+     * This was a fourth reader of the same text, with its own {@code valueOf},
+     * its own upper-casing and its own deduplication - so it took the constant
+     * name where every other surface takes the label the tester is looking at,
+     * and a group it could not read went to the log and nowhere else. A tester
+     * who mistyped one group in a list of four got three back and no sign the
+     * fourth had gone (#264, #295).
+     */
     @Override
     protected void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<List<String>> newValues) {
+        int refused = 0;
+
         for (int i = 0; i < items.size(); i++) {
-            final @NotNull List<Group> enumList = new ArrayList<>();
+            final @NotNull Optional<List<Group>> read = TestDataParser.groups(String.join(",", newValues.get(i)));
 
-            for (final String str : newValues.get(i)) {
-                final @NotNull String cleanStr = Objects.toString(str, "").trim();
-
-                if (!cleanStr.isEmpty()) {
-                    try {
-                        final @NotNull Group g = Group.valueOf(cleanStr.toUpperCase());
-                        if (!enumList.contains(g)) {
-                            enumList.add(g);
-                        }
-                    } catch (final IllegalArgumentException ex) {
-                        Logger.error(ex.getMessage());
-                    }
-                }
+            if (read.isEmpty()) {
+                refused++;
+                continue;
             }
 
-            items.get(i).setGroup(enumList);
+            items.get(i).setGroup(read.get());
         }
+
+        TestEditorAttributes.sayWhatWasRefused(p, refused);
     }
 }

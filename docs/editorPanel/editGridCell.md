@@ -50,8 +50,9 @@ table.
   named after the test case.
 - **Rule-EDITOR-PANEL-206** — A value Testin cannot read is refused. What the
   test case already had stays, and the tester is told: once for a cell, and once
-  with a count for a whole imported sheet. Blank is not unreadable — it clears a
-  date and it clears the groups, and it leaves the priority and the status alone,
+  with a count for a sheet or a bulk edit. A refused test case is not counted
+  among the ones the change touched. Blank is not unreadable — it clears a date
+  and it clears the groups, and it leaves the priority and the status alone,
   because those have no empty form.
 
 ## The screen

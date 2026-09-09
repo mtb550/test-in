@@ -8,6 +8,8 @@ import org.testin.util.TestDataParser;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.testin.importexport.imports.ImportSetter.took;
+
 /**
  * One status across a selection, edited as text like the priority beside it.
  */
@@ -38,12 +40,12 @@ public class StatusBulkSectionDialog extends JsonSplitBulkSectionDialog {
     }
 
     @Override
-    protected void setValue(final @NotNull TestCaseDto tc, final @NotNull String value) {
+    protected boolean setValue(final @NotNull TestCaseDto tc, final @NotNull String value) {
         // Through the parser, like every other reader of this text: it takes the
         // label the tester is looking at rather than the constant name, so "To
         // Be Updated" is read as the status it names. A word it cannot read
         // leaves the case with the status it already had, which is the answer a
         // typo deserves here - the alternative is silently choosing one.
-        TestDataParser.testCaseStatus(value, tc.getStatus()).ifPresent(tc::setStatus);
+        return took(TestDataParser.testCaseStatus(value, tc.getStatus()), tc::setStatus);
     }
 }

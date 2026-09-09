@@ -47,6 +47,12 @@ Select several test cases, then `F2` or the field's own letter.
   characters and read back as a line break.
 - **Rule-EDITOR-PANEL-045** — A test case with nothing in the field still gets a
   line to type into.
+- **Rule-EDITOR-PANEL-206** — A value Testin cannot read is refused. What the
+  test case already had stays, and the tester is told: once for a cell, and once
+  with a count for a sheet or a bulk edit. A refused test case is not counted
+  among the ones the change touched. Blank is not unreadable — it clears a date
+  and it clears the groups, and it leaves the priority and the status alone,
+  because those have no empty form.
 - **Rule-EDITOR-PANEL-046** — The whole gesture is one entry on the undo
   history.
 
@@ -107,8 +113,10 @@ a time*. There is no bulk editor for it.
 
 **If a priority is edited to nothing** — that row is skipped without a word.
 
-**If a group name is not one Testin knows** — it is dropped, and only the log
-says so.
+**If a value is not one Testin can read** — a priority, a status or a group name
+it does not know — that test case is left exactly as it was and is not counted
+among the ones the edit changed. One message says how many:
+*Could not read 3 values, so what was there stayed* (Rule-EDITOR-PANEL-206).
 
 **If the cursor is put on the locked text around a value** — it moves to the
 nearest place the tester can type. No message is shown.

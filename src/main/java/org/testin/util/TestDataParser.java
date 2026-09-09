@@ -186,7 +186,10 @@ public final class TestDataParser {
 
             if (group.isEmpty()) return Optional.empty();
 
-            read.add(group.get());
+            // Named twice is named once. The bulk editor deduplicated and the
+            // grid did not, so the same cell gave two answers depending on which
+            // one the tester typed it into (#295).
+            if (!read.contains(group.get())) read.add(group.get());
         }
 
         return Optional.of(read);

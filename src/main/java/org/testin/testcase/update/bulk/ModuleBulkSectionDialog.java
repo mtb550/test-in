@@ -7,6 +7,8 @@ import org.testin.model.dto.TestCaseDto;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.testin.importexport.imports.ImportSetter.always;
+
 public class ModuleBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
     public ModuleBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
@@ -29,7 +31,7 @@ public class ModuleBulkSectionDialog extends JsonSplitBulkSectionDialog {
     }
 
     @Override
-    protected void setValue(final @NotNull TestCaseDto tc, final @NotNull String value) {
-        tc.setModule(value);
+    protected boolean setValue(final @NotNull TestCaseDto tc, final @NotNull String value) {
+        return always(() -> tc.setModule(value));
     }
 }
