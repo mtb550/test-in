@@ -39,6 +39,38 @@ There is no key for this. It starts on its own.
 - **Rule-INTERNAL-015** — A folder skipped for having no marker is reported when
   it holds test cases. A folder holding none is skipped in silence, because a
   folder that is deliberately not a test set is the ordinary case.
+- **Rule-INTERNAL-062** — Reading a test case costs no more than 40 microseconds
+  and holds no more than 4 kilobytes. Ten thousand test cases is the size the
+  budget is stated at.
+
+## The budget
+
+A test project of ten thousand test cases, measured rather than estimated.
+
+| | Measured | Budget |
+|---|---|---|
+| **Reading one test case** | 21 µs | 40 µs |
+| **Reading ten thousand** | 214 ms | 400 ms |
+| **Held in memory, per case** | 1.5 KB | 4 KB |
+| **Held in memory, ten thousand** | 14.6 MB | 40 MB |
+
+Measured on 9 September 2026, Windows 11 with JBR 25, by
+`IndexerBudgetTest`. That test asserts the budget on every build, so a change
+that doubles the cost fails rather than ships.
+
+**What the budget covers is the reading, not the disk.** The same ten thousand
+cases written out as files and walked took **3.5 seconds warm and 150 seconds
+cold** on the same machine — a forty-fold spread on identical work, because a
+cold read of ten thousand freshly written files is the virus scanner's number
+rather than the plugin's. Those two figures are measured and reported by the
+same test with `-Dtestin.budget.cases=10000`, and deliberately not asserted on:
+a budget that fails on a loaded runner and passes through a real regression on a
+fast disk is worse than none.
+
+So the honest statement is two sentences. The part Testin controls is 214
+milliseconds for ten thousand cases. The part the machine controls is
+everything else, and it is why the scan runs in the background with a progress
+bar the tester can cancel (Rule-INTERNAL-013).
 
 ## What starts a read
 

@@ -258,6 +258,13 @@ tasks {
 
         jvmArgs("--sun-misc-unsafe-memory-access=allow")
 
+        // How many test cases IndexerBudgetTest measures against. Forwarded
+        // rather than inherited: a -D on the Gradle command line reaches the
+        // Gradle daemon, not the JVM the tests run in, so without this the
+        // documented `-Dtestin.budget.cases=10000` would silently measure the
+        // default instead (#125).
+        System.getProperty("testin.budget.cases")?.let { systemProperty("testin.budget.cases", it) }
+
         // The documents are an input to the tests that read them - RuleNumbersTest
         // scans every page for the numbers the code cites. Without this Gradle
         // sees only the Java, calls the task up to date after a documentation

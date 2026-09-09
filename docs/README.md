@@ -51,9 +51,9 @@ tell you what changes and which message appears.
 | **[Automation code and the gutter](codegen/main.md)** | The test methods Testin writes, and how they are kept in step with the tree | 20 | 68 |
 | **[Reports](report/main.md)** | Writing a test run out as a document, in four formats | 3 | 15 |
 | **[Sharing work with the team](share/main.md)** | Export, import, Git and a server. Every way test data leaves and arrives | 23 | 104 |
-| **[Inside Testin](internal/main.md)** | The parts that belong to no panel: the search, and the one thing that owns every file | 6 | 52 |
+| **[Inside Testin](internal/main.md)** | The parts that belong to no panel: the search, and the one thing that owns every file | 6 | 53 |
 
-**153 use cases and 658 rules**, each one checked against the code it describes.
+**153 use cases and 659 rules**, each one checked against the code it describes.
 
 Every part also lists two more things at the end of its page: where the plugin
 breaks its own rules today, and what nobody has decided yet. Both are honest
@@ -89,3 +89,4 @@ What a person needs before their first change.
 | **Contributing** | Setup, the checks that must pass, and the run configurations | Not written — [#102](https://github.com/mtb550/test-in/issues/102) |
 | **[Standing decisions](decisions.md)** | Seven decisions made once, with the reason each one looks wrong, so they are not argued again in every review | Written |
 | **[The formats on disk](formats.md)** | Every marker, the test case and run files, and `testin.yml` — field by field, with the versioning rules | Written |
+| **[The indexer's budget](internal/readTestProject.md)** | What reading ten thousand test cases costs, measured, and the test that holds it there | Written |
