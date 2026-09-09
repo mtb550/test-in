@@ -169,13 +169,13 @@ Analysis**, light mode, and stopping one running test case.
 │ (+) (refresh) (fields) (filter) (grid)   [ search...          ]  (details) │
 ├────────────────────────────────────────────────────────────────────────────┤
 │                                                                            │
-│   1. Log in with a valid user                        ( P1 ) ( Regression ) │
+│   1. Log in with a valid user.                       ( P1 ) ( Regression ) │
 │      Expected Result: The dashboard opens.                                 │
 │                                                                            │
-│   2. Log in with a locked account                    ( P2 ) ( Smoke )      │
+│   2. Log in with a locked account.                   ( P2 ) ( Smoke )      │
 │      Expected Result: The account is refused.                              │
 │                                                                            │
-│   3. Log in with the wrong password                  ( P1 )                │
+│   3. Log in with the wrong password.                 ( P1 )                │
 │      Expected Result: The password is refused.                             │
 │                                                                            │
 ├────────────────────────────────────────────────────────────────────────────┤
@@ -203,11 +203,11 @@ The same shape, with three things added.
 │ (start) (light) (report) (refresh) (fields) (filter) (grid) [ search ] (..)│
 ├────────────────────────────────────────────────────────────────────────────┤
 │                                                                            │
-│   1. Log in with a valid user                        ( P1 ) ( Passed )     │
+│   1. Log in with a valid user.                       ( P1 ) ( Passed )     │
 │      Run Status: Passed                                                    │
 │      Duration: 00:42                                                       │
 │                                                                            │
-│   2. Log in with a locked account                    ( P2 ) ( Failed )     │
+│   2. Log in with a locked account.                   ( P2 ) ( Failed )     │
 │      Run Status: Failed                                                    │
 │      Actual Result: The session was dropped.                               │
 │                                                                            │

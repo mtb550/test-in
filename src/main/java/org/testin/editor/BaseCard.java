@@ -8,6 +8,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Display;
 import org.testin.ui.Badges;
 import org.testin.model.Automated;
 import org.testin.ui.framework.Prose;
@@ -106,11 +107,17 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * Static because two callers need the same answer: the card draws it, and the
      * mouse listener measures it to know where the hover icons start. Composing it
      * twice is how they drift.
+     * <p>
+     * The description is formatted, which is where it is displayed rather than
+     * where it is stored. The view panel has shown it capitalized and closed
+     * since #22 and the card showed it raw, so one test case read two ways on
+     * two surfaces a tester has open at the same time.
      */
     public static @NotNull String titleText(final int position, final boolean showOrder, final @NotNull String description) {
         final @NotNull String order = showOrder ? String.format(Locale.ENGLISH, "%d.", position) : "";
+        final @NotNull String title = Display.format(description);
 
-        return order.isEmpty() || description.isEmpty() ? order + description : order + " " + description;
+        return order.isEmpty() || title.isEmpty() ? order + title : order + " " + title;
     }
 
     /**
