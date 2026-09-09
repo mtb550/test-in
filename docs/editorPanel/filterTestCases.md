@@ -85,13 +85,6 @@ becomes **Filter**, then the count, then **active**.
 **If the module has never been used** — it is not offered. The list is built
 from what is there.
 
-## Where the plugin breaks its own rules
-
-**Four groups can be filtered on and never assigned.** The filter offers
-Security, UI, Functional and Validation. The create dialog offers only
-Regression, Smoke and Sanity. That is difference 4 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
-
 ---
 
 [Documentation](../README.md) › [The editor panel](main.md)

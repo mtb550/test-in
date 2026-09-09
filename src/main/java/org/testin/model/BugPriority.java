@@ -61,12 +61,13 @@ public enum BugPriority {
     private final @NotNull String label;
     private final int value;
     private final @NotNull Color color;
-    // Always true here, and still a real extension point rather than dead: it is
-    // read through method references (Priority::isActive, Group::isActive) that a
-    // search for isActive() does not find, and Group.UNASSIGNED in the third enum
-    // of the set is genuinely inactive. Deleting it once already reached a
-    // failing compile - remove it from all three enums together or not at all
-    // (#66, E3).
+    // Always true here, and read through a method reference (Priority::isActive)
+    // that a search for isActive() does not find - PrioritySection filters on it,
+    // so deleting it reaches a failing compile rather than a warning.
+    //
+    // Group carried the same flag and no longer does: every group can be typed
+    // now, so nothing read it (#200). This one is on its own until a priority is
+    // retired, which is the case it exists for.
     private final boolean active;
     /**
      * How loudly this reads in a report - see {@link ReportEmphasis}.

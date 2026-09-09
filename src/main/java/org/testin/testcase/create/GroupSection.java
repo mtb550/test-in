@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class GroupSection implements CreateTestCaseSection {
     /**
@@ -37,10 +36,13 @@ public class GroupSection implements CreateTestCaseSection {
         this.group = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(4), JBUI.scale(4)));
         this.group.setOpaque(false);
 
-        // No Group first, then the groups themselves. It was left out entirely,
-        // so a tester who ticked a group by mistake had no way back and an
-        // import carrying no group could not round-trip (#265).
-        Stream.concat(Stream.of(Group.UNASSIGNED), Arrays.stream(Group.values()).filter(Group::isActive))
+        // Every group, in the enum's own order - No Group first, then the
+        // groups themselves. It was left out entirely once, so a tester who
+        // ticked a group by mistake had no way back and an import carrying no
+        // group could not round-trip (#265); and four more were left out after
+        // that, so a case could arrive carrying a group nobody could type
+        // (#200).
+        Arrays.stream(Group.values())
                 .forEach(g -> {
                     final @NotNull JBCheckBox checkBox = new JBCheckBox(g.getName());
                     checkBox.setFont(fieldFont());
