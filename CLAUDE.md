@@ -151,6 +151,15 @@ silently does nothing costs more than the setting it was meant to hold.
 - Dialogs are built on the declarative framework (`org.testin.ui.framework`):
   a dialog assigns `title`, `components`, `shortcuts` in its constructor and
   implements `submit()`. Never hand-build popup layouts.
+
+- **Lombok writes the boilerplate; never hand-write what it generates.** A
+  holder's private constructor is `@NoArgsConstructor(access =
+  AccessLevel.PRIVATE)`, not three typed lines — it belongs with `final` and
+  `public` as a property of the class, not as a member a reader has to look at
+  and dismiss. The same for getters, all-args constructors and enum fields.
+  `Bundle` is the one exception in `src/main`, because its constructor calls
+  `super(...)` and Lombok writes an empty body. Read the
+  `lombok-writes-the-boilerplate` skill under `.claude/skills/`.
 - **A class does one job, and its name says which.** Before adding a method to
   an existing class, say the class's job in one sentence, then the method's. If
   the second is not the first, the method belongs elsewhere — even when the
