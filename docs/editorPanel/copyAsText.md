@@ -38,6 +38,12 @@ This copies words a person can read. It does not copy the test case itself.
 - **Rule-EDITOR-PANEL-073** — Each test case is written as the field name, a
   colon, then the value.
 - **Rule-EDITOR-PANEL-074** — Several test cases are separated by a blank line.
+- **Rule-EDITOR-PANEL-207** — What is copied is every field the tester wrote on
+  the test case: the description, the expected result, the steps, the priority,
+  the reference, the test data, the pre-conditions, the group, the module and
+  the status. The row number, the identity, the class name, the path and the
+  four audit fields are not written by the tester and are not copied. A field
+  left empty is not a line.
 
 ## What the tester sees
 
@@ -60,15 +66,8 @@ copied*, with a count after it when more than one card was selected.
 selected cells instead. That is
 [UC-EDITOR-PANEL-018](gridClipboard.md).
 
-## Where the plugin breaks its own rules
-
-**Only the description is copied.** The message says *Details copied*, and what
-lands on the clipboard is one line reading `Description:` and the text. The
-expected result, the steps, the priority and every other field are left out.
-That is difference 1 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
-
-A tester who wants every field should export the test set instead. That is
+A tester who wants the identity, the class name or who changed the case and when
+should export the test set instead. That is
 [UC-SHARE-001](../share/exportTestSet.md).
 
 ---

@@ -47,9 +47,23 @@ public class CopyTestCaseAction extends AbstractProjectAction {
         Services.getInstance(p, Notifier.class).softShow(p, selected.size() == 1 ? "Details copied" : "Details copied " + selected.size());
     }
 
+    /**
+     * UC-EDITOR-PANEL-026, Rule-EDITOR-PANEL-008.
+     * <p>
+     * The test case as text: every field the tester wrote on it, one to a line,
+     * captioned.
+     * <p>
+     * Can.COPY was declared on the description and on nothing else, so this put
+     * one line on the clipboard while the message said "Details copied" (#197).
+     * <p>
+     * A field the tester left empty is not a line. A block of "Module:" and
+     * "Reference:" with nothing after them is the paste saying what the test
+     * case does not have, which is the details panel's own rule for a blank row.
+     */
     private @NotNull String detailsOf(final @NotNull TestCaseDto tc) {
         return Arrays.stream(TestEditorAttributes.values())
                 .filter(a -> a.can(Can.COPY))
+                .filter(attr -> !attr.gridValue(tc).isBlank())
                 // The colon belongs to this line, not to the caption. It used to be
                 // part of the name, so the view panel drew test case rows with
                 // one and run rows without in the same column (#232).

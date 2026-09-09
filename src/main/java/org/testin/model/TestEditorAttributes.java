@@ -97,7 +97,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             tc -> tc.getExpectedResult(),
             (p, tc, v) -> always(() -> tc.setExpectedResult(v)),
             GenType.UPDATE_TEST_CASE_EXPECTED_RESULT,
-            Can.EDIT, Can.IMPORT, Can.EXPORT
+            Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
 
     STEPS(
@@ -106,7 +106,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             tc -> String.join(", ", tc.getSteps()),
             (p, tc, v) -> always(() -> tc.setSteps(TestDataParser.steps(v))),
             GenType.UPDATE_TEST_CASE_STEPS,
-            Can.EDIT, Can.IMPORT, Can.EXPORT
+            Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
 
     PRIORITY(
@@ -115,7 +115,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             tc -> tc.getPriority().getLabel(),
             (p, tc, v) -> took(TestDataParser.priority(v, tc.getPriority()), tc::setPriority),
             GenType.UPDATE_TEST_CASE_PRIORITY,
-            Can.EDIT, Can.IMPORT, Can.EXPORT
+            Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
         @Override
         public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
@@ -138,7 +138,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             tc -> tc.getReference(),
             (p, tc, v) -> always(() -> tc.setReference(v)),
             GenType.NO_CODE_CHANGE,
-            Can.EDIT, Can.IMPORT, Can.EXPORT
+            Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
 
     TEST_DATA(
@@ -147,7 +147,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             tc -> tc.getTestData(),
             (p, tc, v) -> always(() -> tc.setTestData(v)),
             GenType.UPDATE_TEST_CASE_TEST_DATA,
-            Can.EDIT, Can.IMPORT, Can.EXPORT
+            Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
 
     PRE_CONDITIONS(
@@ -156,7 +156,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             tc -> tc.getPreConditions(),
             (p, tc, v) -> always(() -> tc.setPreConditions(v)),
             GenType.UPDATE_TEST_CASE_PRE_CONDITIONS,
-            Can.EDIT, Can.IMPORT, Can.EXPORT
+            Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
 
     GROUP(
@@ -165,7 +165,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             tc -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             (p, tc, v) -> took(TestDataParser.groups(v), tc::setGroup),
             GenType.UPDATE_TEST_CASE_GROUP,
-            Can.EDIT, Can.IMPORT, Can.EXPORT
+            Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
         @Override
         public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
@@ -188,7 +188,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             tc -> tc.getModule(),
             (p, tc, v) -> always(() -> tc.setModule(v)),
             GenType.UPDATE_TEST_CASE_MODULE,
-            Can.EDIT, Can.IMPORT, Can.EXPORT
+            Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
 
     STATUS(
@@ -197,7 +197,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             tc -> tc.getStatus().getLabel(),
             (p, tc, v) -> took(TestDataParser.testCaseStatus(v, tc.getStatus()), tc::setStatus),
             GenType.UPDATE_TEST_CASE_STATUS,
-            Can.EDIT, Can.EXPORT
+            Can.EDIT, Can.COPY, Can.EXPORT
     ),
 
     CREATE_BY(
@@ -253,7 +253,18 @@ public enum TestEditorAttributes implements ToolBarAttribute {
         /** Read from an imported sheet. */
         IMPORT,
 
-        /** Carried by a clipboard copy of the test case. */
+        /**
+         * Carried by a clipboard copy of the test case.
+         * <p>
+         * The ten a tester writes, which is exactly {@link #EDIT}'s set: what
+         * they typed is what they mean to paste into a bug report or a chat.
+         * The row number, the identity, the fully qualified name, the path and
+         * the four audit fields are machinery and provenance, and nobody pastes
+         * a UUID at somebody.
+         * <p>
+         * It was declared on the description and on nothing else, so Ctrl+C put
+         * one line on the clipboard and said "Details copied" (#197).
+         */
         COPY,
 
         /** Written into an exported sheet. */

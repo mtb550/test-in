@@ -9,7 +9,7 @@ in a tab. It is where test cases are written, and where a test run is executed.
 |---|---|
 | **Part of Testin** | The editor panel |
 | **Answers** | What a tester can do to test cases and to a test run, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-206` |
+| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-207` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -255,7 +255,6 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule-EDITOR-PANEL-008 — a message says what happened | `Ctrl+C` says *Details copied* and copies one line, the description. Every other field is left out. |
 | **Difference 6** | Rule-EDITOR-PANEL-008 — one message with a count | Fixed. Pasting or cutting a block raises one message with the number of cells written. The writes of one gesture all happen in one event, so they are counted together without the clipboard actions having to know about it. |
 | **Difference 7** | Rule-EDITOR-PANEL-005 — what the tester typed is stored | A description typed into a grid cell loses characters Testin will not keep. If nothing else changed, nothing is saved and nothing is said, and the tester watches their text change. |
 | **Difference 9** | Rule-EDITOR-PANEL-005 — a key works the same on every machine | `Ctrl+M` is not made into `Cmd+M` on a Mac, though `Ctrl+C` and `Ctrl+F` are. The empty editor's second line reads *Press Ctrl+M to add* whatever machine it is on. |
@@ -291,6 +290,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 5** | Two buttons on one toolbar were both tooltipped **Details**. The one that picks what a card shows is **Fields**, which is what this document already called it. Fixed 9 September 2026, [#201](https://github.com/mtb550/test-in/issues/201) |
 | **Difference 11** | The page size box answered a different number without a word. A number outside the range now says what the range is; a blank box or letters asked for nothing and still say nothing. Fixed 9 September 2026, [#206](https://github.com/mtb550/test-in/issues/206) |
 | **Difference 18** | The status bar read *0 of 12 test cases* with nothing selected, putting a position where a tester reads a count. It says the count alone now. Fixed 9 September 2026, [#213](https://github.com/mtb550/test-in/issues/213) |
+| **Difference 1** | `Ctrl+C` said *Details copied* and copied one line, the description, because `Can.COPY` was declared on that one attribute of eighteen. It copies the ten fields the tester writes now, and drops the ones they left empty (Rule-EDITOR-PANEL-207). Fixed 10 September 2026, [#197](https://github.com/mtb550/test-in/issues/197) |
 | **Difference 4** | The filter offered eight groups and the create dialog three, so Security, UI, Functional and Validation could be filtered on and never typed - while an import, a paste, a Git merge and a bulk edit all put them on a test case perfectly well. The dialog offers every group now, and the `active` flag that held four of them back is gone, along with an `assignable` flag nothing ever read. Fixed 10 September 2026, [#200](https://github.com/mtb550/test-in/issues/200) |
 | **Difference 8** | An unreadable priority became the lowest and an unreadable status kept the old value - two columns, two answers to a typo, both silent. All four parsed columns refuse now and keep what was there, and the message names the text and the column (Rule-EDITOR-PANEL-206). Fixed 9 September 2026, [#204](https://github.com/mtb550/test-in/issues/204) |
 | **Difference 30** | `Ctrl+Right` turned the page here and moved to the next test case in the view panel, and the constant behind both was called `NextTestCase` while the editor used it for pages - so the code disagreed with itself and the key reference listed the key twice with two meanings. The key is one gesture, forward in whichever surface has the keyboard, and the constant is called `Next`. Fixed 10 September 2026, [#224](https://github.com/mtb550/test-in/issues/224) |
