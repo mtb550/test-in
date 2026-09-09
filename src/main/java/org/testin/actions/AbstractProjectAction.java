@@ -3,7 +3,6 @@ package org.testin.actions;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -33,16 +32,7 @@ public abstract class AbstractProjectAction extends DumbAwareAction {
      * the only keyboard-only action so far, and hard-coding its name into the
      * base class would make the next one rename every action that uses it (#66).
      */
-    @SuppressWarnings("SameParameterValue")
-    protected AbstractProjectAction(final @NotNull Project p, final @NotNull String title) {
-        super(title);
-        this.p = p;
-    }
-
-    /**
-     * The icon is nullable because an action shown only in a list has none.
-     */
-    protected AbstractProjectAction(final @NotNull Project p, final @NotNull String title, final @NotNull String description, final @Nullable Icon icon) {
+    protected AbstractProjectAction(final @NotNull Project p, final @NotNull String title, final @NotNull String description, final @NotNull Icon icon) {
         super(title, description, icon);
         this.p = p;
     }

@@ -57,7 +57,7 @@ public class GenerateReportAction extends AbstractProjectAction {
     }
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor) {
-        super(p, "Generate Report", "Generate test run report", null);
+        super(p, "Generate Report", "Generate test run report", AllIcons.Actions.Report);
         this.selectedRun = () -> editor instanceof RunEditor re ? Optional.of(re.getParent()) : Optional.empty();
     }
 

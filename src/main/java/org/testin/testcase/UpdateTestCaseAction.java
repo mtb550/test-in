@@ -5,6 +5,7 @@ import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ public class UpdateTestCaseAction extends AbstractProjectAction {
     private final @NotNull TestinEditor editor;
 
     public UpdateTestCaseAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull Path path) {
-        super(p, "Update");
+        super(p, "Update", "Change a field of the selected test case", AllIcons.Actions.Edit);
         this.list = list;
         this.path = path;
         this.editor = editor;

@@ -3,7 +3,6 @@ package org.testin.actions;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -23,7 +22,7 @@ public abstract class AbstractProjectTreeAction extends AbstractProjectAction {
 
     protected final @NotNull SimpleTree tree;
 
-    protected AbstractProjectTreeAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull String title, final @NotNull String description, final @Nullable Icon icon) {
+    protected AbstractProjectTreeAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull String title, final @NotNull String description, final @NotNull Icon icon) {
         super(p, title, description, icon);
         this.tree = tree;
     }
