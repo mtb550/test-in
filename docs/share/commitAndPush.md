@@ -55,11 +55,18 @@ something else.
 ## What Testin refuses
 
 **If no remote is set** — a window titled **Configure Remote** asks for one. It
-reads *No remote repository is configured for this project.*, then asks for the
-address.
+says the repository has nowhere to push to yet, names the remote the address
+will be added as, and shows an example address in the empty box.
 
-**If the tester cancels that window** — a message titled **Push Aborted** reads
-*A remote URL is required to push.* The commit was already made.
+**If the box is left empty** — the window stays open and the box says so.
+
+**If what was typed is not a repository address** — the window stays open and a
+message reads the text, then *is not a repository address*. A repository's web
+page pasted in place of its clone address is the usual way to meet this.
+
+**If the tester closes that window** — nothing is said. They shut the window on
+the question, and the push not happening is the answer to it. The commit was
+already made.
 
 **If the address cannot be added** — a message titled **Git Error** reads
 *Failed to add remote:* and then the reason.
@@ -71,8 +78,9 @@ not read the Git remote:* and then the reason.
 
 ## Where the plugin breaks its own rules
 
-**The remote address is never checked.** Any text is taken. The failure arrives
-later in Git's own words. That is difference 18 on
+**The Git email address is never checked.** Any text is taken. The failure
+arrives later in Git's own words. The remote address is checked, by the same
+rule the create project dialog uses. That is difference 18 on
 [the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
 
 **A commit made and not pushed leaves work on this machine.** If the push

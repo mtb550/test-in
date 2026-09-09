@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
@@ -41,22 +40,6 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         this.commits = new GitCommitService(p);
     }
 
-    /**
-     * The remote URL as the tester types it, or empty when they close the prompt.
-     * Empty rather than null, so the caller that decides what to do about a
-     * missing URL does it in one place whichever way it came up missing.
-     */
-    private static @NotNull String askForRemoteUrl(final @NotNull Project p) {
-        // Cancelling the dialog types nothing, which is the same as typing
-        // nothing into it.
-        final @NotNull String typed = Objects.requireNonNullElse(Messages.showInputDialog(
-                p,
-                "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
-                "Configure Remote",
-                Messages.getQuestionIcon()), "");
-
-        return typed.trim();
-    }
 
     /**
      * How a commit is named to the tester. The id when Git could give one - it is
@@ -342,18 +325,28 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         // it should not have to be told again. Asking is the fallback, not the
         // first move (#8).
         final @NotNull String known = config.get().repoUrl();
-        final @NotNull String remoteUrl = known.isEmpty() ? askForRemoteUrl(p) : known;
 
-        if (remoteUrl.isEmpty()) {
-            Services.getInstance(p, Notifier.class).warn(p, "Push Aborted", "A remote URL is required to push.");
+        if (!known.isEmpty()) {
+            addRemoteAndPush(p, repoPath, remoteName, branch, commitId, known);
             return;
         }
 
-        // Written back so the next machine that opens this repository inherits it.
-        // Only what the tester typed: a URL that came out of the file is already
-        // in it.
-        if (known.isEmpty()) config.rememberRepoUrl(remoteUrl);
+        // The dialog refuses an empty field and an address nothing can be pushed
+        // to, so what arrives here is a URL. Closing it says nothing: the tester
+        // shut the dialog on the question, and the push not happening is the
+        // answer to it - which is also why the old "Push Aborted" balloon is
+        // gone, since cancelling was the only way to reach it.
+        new RemoteUrlDialog(p, remoteName, typed -> {
+            // Written back so the next machine that opens this repository
+            // inherits it. Only what the tester typed: a URL that came out of
+            // the file is already in it.
+            config.rememberRepoUrl(typed);
+            addRemoteAndPush(p, repoPath, remoteName, branch, commitId, typed);
+        }).show();
+    }
 
+    // UC-SHARE-013, Rule-SHARE-060
+    private void addRemoteAndPush(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull String remoteName, final @NotNull String branch, final @NotNull String commitId, final @NotNull String remoteUrl) {
         GitBackgroundTask.run(p, "Configuring remote", false,
                 indicator -> {
                     commits.configureRemote(repoPath, remoteName, remoteUrl);

@@ -91,7 +91,17 @@ public enum Refused {
      * tree has changed and looks for a class that no longer answers to that
      * name.
      */
-    WHILE_INDEXING("%s needs the IDE to finish indexing first");
+    WHILE_INDEXING("%s needs the IDE to finish indexing first"),
+
+    /**
+     * UC-SHARE-013, Rule-SHARE-060.
+     * <p>
+     * What the tester typed as a remote is not an address anything can be
+     * pushed to - a repository's web page pasted in place of its clone URL is
+     * the usual one. Said while they are still looking at it, rather than as a
+     * failed push some seconds later (#83).
+     */
+    NOT_A_REPOSITORY_URL("'%s' is not a repository address");
 
     /**
      * The sentence, with one slot for whatever the tester acted on.

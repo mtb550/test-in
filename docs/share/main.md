@@ -174,7 +174,7 @@ bug report yet.
 | **Difference 12** | Rule-SHARE-005 — the same | The export, import and report bars cannot be canceled. |
 
 | **Difference 16** | Rule-SHARE-003 — the tester is told | A message can be shown to nobody. When the code project's window has no status bar, the message is dropped and nothing is reported. Every success here is that kind of message. |
-| **Difference 18** | Rule-SHARE-004 — a value is checked before it is used | Neither the remote address nor the Git email address is checked. Any text is taken, and the failure arrives later in Git's own words. |
+| **Difference 18** | Rule-SHARE-004 — a value is checked before it is used | The Git email address is not checked. Any text is taken, and the failure arrives later in Git's own words. The remote address is checked now, by the rule the create project dialog already used. |
 | **Difference 19** | Rule-SHARE-006 — a missing feature says so | Sync with a server is offered in every IDE. The two Git entries vanish with no word, so a tester has no way to learn the Git plugin is why. |
 
 **Retired.** A use case or a rule that is gone keeps its number forever, so an
