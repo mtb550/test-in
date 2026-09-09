@@ -18,6 +18,12 @@ import java.util.stream.Collectors;
 
 /**
  * Defensive parsing of values imported from tables and external files.
+ * <p>
+ * <b>An empty answer means Testin could not read the text</b> - never that the
+ * text was empty. Blank is a value here: it clears a date and it clears the
+ * groups, because those have an empty form of their own, and it keeps the
+ * priority and the status, because those do not. What none of them does is
+ * choose something the tester did not type and say nothing (#204, #264).
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestDataParser {
@@ -57,19 +63,24 @@ public final class TestDataParser {
      * became P1 to P3 still says - High, Medium, Low - so an older export
      * imports as the priority it meant rather than as the fallback.
      * <p>
-     * Blank or unrecognized is P3: a case with no priority stated is the lowest
-     * one, which is also what a new case starts as.
+     * Blank keeps what the case has, because a priority has no empty form - a
+     * new case starts at P3 and a cell cleared by hand is a cell that says
+     * nothing, not a cell that says P3.
+     * <p>
+     * A word it cannot read is refused rather than answered with P3. That was
+     * the loudest half of #264: importing 200 cases whose priority column reads
+     * High, Medium and Low gave 200 at the lowest priority and said nothing.
      */
-    public static @NotNull Priority priority(final @NotNull String value) {
+    public static @NotNull Optional<Priority> priority(final @NotNull String value, final @NotNull Priority current) {
         final @NotNull String wanted = value.trim();
-        if (wanted.isEmpty()) return Priority.LOW;
+        if (wanted.isEmpty()) return Optional.of(current);
 
         for (final Priority priority : Priority.values()) {
-            if (priority.getLabel().equalsIgnoreCase(wanted)) return priority;
-            if (priority.name().equalsIgnoreCase(wanted)) return priority;
+            if (priority.getLabel().equalsIgnoreCase(wanted)) return Optional.of(priority);
+            if (priority.name().equalsIgnoreCase(wanted)) return Optional.of(priority);
         }
 
-        return Priority.LOW;
+        return Optional.empty();
     }
 
     /**
@@ -84,22 +95,24 @@ public final class TestDataParser {
      * legal answer; "Disabled" was, only because that constant happens to be
      * named in mixed case.
      * <p>
-     * Anything unrecognized keeps the status the case already has, the way
-     * {@link #priority} falls back rather than throwing. The cell redraws with
-     * the old value, so a typo reads as "that did not take" instead of as a
-     * crash - and a status is never silently changed to a default the tester
-     * did not choose.
+     * Anything unrecognized is refused, the way {@link #priority} refuses. The
+     * cell redraws with the old value, so a typo reads as "that did not take"
+     * instead of as a crash - and a status is never silently changed to a
+     * default the tester did not choose.
+     * <p>
+     * Blank keeps what the case has, for the same reason a blank priority does:
+     * a status has no empty form.
      */
-    public static @NotNull TestCaseStatus testCaseStatus(final @NotNull String value, final @NotNull TestCaseStatus current) {
+    public static @NotNull Optional<TestCaseStatus> testCaseStatus(final @NotNull String value, final @NotNull TestCaseStatus current) {
         final @NotNull String wanted = value.trim();
-        if (wanted.isEmpty()) return current;
+        if (wanted.isEmpty()) return Optional.of(current);
 
         for (final TestCaseStatus status : TestCaseStatus.values()) {
-            if (status.getLabel().equalsIgnoreCase(wanted)) return status;
-            if (status.name().equalsIgnoreCase(wanted)) return status;
+            if (status.getLabel().equalsIgnoreCase(wanted)) return Optional.of(status);
+            if (status.name().equalsIgnoreCase(wanted)) return Optional.of(status);
         }
 
-        return current;
+        return Optional.empty();
     }
 
     /**
@@ -112,12 +125,13 @@ public final class TestDataParser {
      * a failure and answered "now". The import preview showed today's date and
      * time for a case created months ago, whatever the file said.
      * <p>
-     * A blank cell, or text that is neither shape, is the empty timestamp rather
-     * than now: the file did not say when, and inventing a moment is what this
-     * was doing wrong in the first place.
+     * A blank cell is the empty timestamp rather than now: the file did not say
+     * when, and inventing a moment is what this was doing wrong in the first
+     * place. Text that is neither shape is refused - it did say when, and
+     * Testin could not read it, which is a different thing from silence.
      */
-    public static @NotNull ZonedDateTime date(final @NotNull String value) {
-        if (value.isBlank()) return Config.NOT_EXECUTED;
+    public static @NotNull Optional<ZonedDateTime> date(final @NotNull String value) {
+        if (value.isBlank()) return Optional.of(Config.NOT_EXECUTED);
 
         final @NotNull String text = value.trim();
         try {
@@ -126,41 +140,56 @@ public final class TestDataParser {
             // java.time refuses the whole string when the two disagree, which is
             // what an edited cell looks like: "Sunday 05-08-2026" for a date that
             // is a Wednesday. The numbers are the fact, so they are what is read.
-            return ZonedDateTime.parse(text.replaceFirst("^\\p{L}+\\s+", ""), WITHOUT_WEEKDAY);
+            return Optional.of(ZonedDateTime.parse(text.replaceFirst("^\\p{L}+\\s+", ""), WITHOUT_WEEKDAY));
         } catch (final Exception ignored) {
             // Not the plugin's own format; try the plain one a spreadsheet from
             // another tool carries.
         }
 
         try {
-            return LocalDateTime.parse(text, Config.EXCEL_DATE_FORMATTER)
-                    .atZone(ZoneId.systemDefault());
-        } catch (final Exception ignored) {
-            return Config.NOT_EXECUTED;
+            return Optional.of(LocalDateTime.parse(text, Config.EXCEL_DATE_FORMATTER).atZone(ZoneId.systemDefault()));
+        } catch (final Exception unreadable) {
+            return Optional.empty();
         }
     }
 
-    public static @NotNull List<Group> groups(final @NotNull String rawGroups) {
-        if (rawGroups.isBlank()) return new ArrayList<>();
+    /**
+     * Reads the groups back out of the text a cell or a sheet holds.
+     * <p>
+     * Refused whole rather than in part. A cell reading "Regression, Nonsense"
+     * used to keep Regression and drop the rest without a word, so a tester who
+     * mistyped one group in a list of four got three and no sign that the fourth
+     * had gone (#264). The cell is one value the tester typed, and one value is
+     * kept or refused.
+     * <p>
+     * Blank is the empty list, which is what every reader already treats as
+     * unassigned - a group has an empty form, so blank clears it.
+     */
+    public static @NotNull Optional<List<Group>> groups(final @NotNull String rawGroups) {
+        if (rawGroups.isBlank()) return Optional.of(new ArrayList<>());
 
         // The picker offers No Group and writes the label it draws, so this has
         // to read it back. It used to reach Group.valueOf, throw on the angle
         // brackets and be dropped as an unknown group - a value the plugin
         // itself offered, silently thrown away (#265). No group is no groups,
         // which is the empty list every reader already treats as unassigned.
-        if (rawGroups.trim().equalsIgnoreCase(Group.UNASSIGNED.getName())) return new ArrayList<>();
-        return Arrays.stream(rawGroups.split(","))
-                .map(String::trim)
-                .filter(group -> !group.isEmpty())
-                .map(group -> {
-                    try {
-                        return Group.valueOf(group.toUpperCase(Locale.ROOT));
-                    } catch (final IllegalArgumentException ignored) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        if (rawGroups.trim().equalsIgnoreCase(Group.UNASSIGNED.getName())) return Optional.of(new ArrayList<>());
+
+        final @NotNull List<Group> read = new ArrayList<>();
+        for (final String name : rawGroups.split(",")) {
+            final @NotNull String wanted = name.trim();
+            if (wanted.isEmpty()) continue;
+
+            final @NotNull Optional<Group> group = Arrays.stream(Group.values())
+                    .filter(one -> one.name().equalsIgnoreCase(wanted) || one.getName().equalsIgnoreCase(wanted))
+                    .findFirst();
+
+            if (group.isEmpty()) return Optional.empty();
+
+            read.add(group.get());
+        }
+
+        return Optional.of(read);
     }
 
 }

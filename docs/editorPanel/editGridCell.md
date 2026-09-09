@@ -48,6 +48,11 @@ table.
   nothing and says nothing.
 - **Rule-EDITOR-PANEL-053** — Every cell saved is one entry on the undo history,
   named after the test case.
+- **Rule-EDITOR-PANEL-206** — A value Testin cannot read is refused. What the
+  test case already had stays, and the tester is told: once for a cell, and once
+  with a count for a whole imported sheet. Blank is not unreadable — it clears a
+  date and it clears the groups, and it leaves the priority and the status alone,
+  because those have no empty form.
 
 ## The screen
 
@@ -106,14 +111,20 @@ owns the keyboard until it is closed.
 **If the editor has no test set to write to** — nothing is written, and only the
 log says so.
 
+**If Testin cannot read what was typed** — nothing is written, the cell redraws
+with the old value, and the message names both the text and the column:
+*Could not read "Urgent" as a Priority, so what was there stayed*
+(Rule-EDITOR-PANEL-206).
+
 ## What Testin makes of what is typed
 
 | The tester types | What is stored |
 |---|---|
 | Steps, one to a line | One step for each line |
-| A priority Testin does not know | The lowest priority |
-| A status Testin does not know | Whatever the test case had already |
-| A group Testin does not know | Dropped from the list |
+| A priority Testin does not know | Refused. The priority it had already, and Testin says so |
+| A status Testin does not know | Refused. The status it had already, and Testin says so |
+| A group Testin does not know | Refused whole. The groups it had already, and Testin says so |
+| A date Testin does not know | Refused. The date it had already, and Testin says so |
 | A description with characters Testin will not keep | Those characters removed |
 
 ## Where the plugin breaks its own rules
@@ -123,9 +134,6 @@ characters Testin will not keep are taken out and the cell is redrawn. If
 nothing else changed, no save happens and no message appears, so the tester
 watches their text change for no stated reason. That is difference 7 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
-
-**Two columns answer a typo two ways.** An unreadable priority becomes the
-lowest. An unreadable status keeps the old value. That is difference 8.
 
 ---
 

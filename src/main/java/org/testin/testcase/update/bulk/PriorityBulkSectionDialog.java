@@ -39,6 +39,12 @@ public class PriorityBulkSectionDialog extends JsonSplitBulkSectionDialog {
         // Through the parser, like every other reader of this text: it takes the
         // label the tester is looking at, and valueOf took the constant name -
         // so editing forty cases to P1 set forty of them to P3.
-        tc.setPriority(TestDataParser.priority(value));
+        //
+        // A word the parser cannot read leaves the case with the priority it
+        // already had, which is the one answer every surface gives now
+        // (Rule-EDITOR-PANEL-206). This one still gives it in silence: saying so
+        // needs the boolean the grid and the importers carry, and that is the
+        // base class's contract rather than this method's (#295).
+        TestDataParser.priority(value, tc.getPriority()).ifPresent(tc::setPriority);
     }
 }

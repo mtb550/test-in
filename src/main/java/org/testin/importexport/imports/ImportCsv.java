@@ -66,6 +66,8 @@ public class ImportCsv {
 
         final @NotNull Map<String, Integer> headerIndexMap = headerIndexes(records.getFirst());
 
+        int refused = 0;
+
         for (int r = 1; r < records.size(); r++) {
             final String @NotNull[] values = records.get(r);
 
@@ -75,20 +77,17 @@ public class ImportCsv {
 
             final @NotNull TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
 
-            for (final TestEditorAttributes attr : TestEditorAttributes.values()) {
-                if (attr.can(Can.IMPORT)) {
-                    // A column this file does not carry, or a short row that
-                    // stops before it, both read as blank.
-                    final @NotNull String rawValue = Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
-                            .filter(colIndex -> colIndex < values.length)
-                            .map(colIndex -> values[colIndex].trim())
-                            .orElse("");
-                    attr.getImportSetter().execute(p, currentTestCase, rawValue);
-                }
-            }
+            // A column this file does not carry, or a short row that stops
+            // before it, both read as blank.
+            refused += TestEditorAttributes.importRow(p, currentTestCase, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
+                    .filter(colIndex -> colIndex < values.length)
+                    .map(colIndex -> values[colIndex].trim())
+                    .orElse(""));
 
             result.add(currentTestCase);
         }
+
+        TestEditorAttributes.sayWhatWasRefused(p, refused);
 
         return result;
     }

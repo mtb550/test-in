@@ -9,7 +9,7 @@ in a tab. It is where test cases are written, and where a test run is executed.
 |---|---|
 | **Part of Testin** | The editor panel |
 | **Answers** | What a tester can do to test cases and to a test run, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-204` |
+| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-206` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -259,7 +259,6 @@ bug report yet.
 | **Difference 4** | Rule-EDITOR-PANEL-005 — what can be filtered can be set | Four groups can be filtered on and never assigned. The filter offers Security, UI, Functional and Validation. The dialog offers only Regression, Smoke and Sanity. |
 | **Difference 6** | Rule-EDITOR-PANEL-008 — one message with a count | Fixed. Pasting or cutting a block raises one message with the number of cells written. The writes of one gesture all happen in one event, so they are counted together without the clipboard actions having to know about it. |
 | **Difference 7** | Rule-EDITOR-PANEL-005 — what the tester typed is stored | A description typed into a grid cell loses characters Testin will not keep. If nothing else changed, nothing is saved and nothing is said, and the tester watches their text change. |
-| **Difference 8** | Rule-EDITOR-PANEL-005 — one answer to one situation | A priority typed into a grid cell that Testin cannot read becomes the lowest. A status it cannot read keeps the value the test case already had. Two columns, two answers to a typo. |
 | **Difference 9** | Rule-EDITOR-PANEL-005 — a key works the same on every machine | `Ctrl+M` is not made into `Cmd+M` on a Mac, though `Ctrl+C` and `Ctrl+F` are. The empty editor's second line reads *Press Ctrl+M to add* whatever machine it is on. |
 | **Difference 12** | Rule-EDITOR-PANEL-002 — the two views show the same rows | Unticking **Order** stops three gestures in the grid working: clicking a row to select it, `Enter` to open the details panel, and the double-click. Nothing says why. |
 | **Difference 15** | Rule-EDITOR-PANEL-008 — one word for one act | Dragging cards says *Re-sorted*. Moving a test case by typing its number says *Updated*. The same act, two words. |
@@ -295,6 +294,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 5** | Two buttons on one toolbar were both tooltipped **Details**. The one that picks what a card shows is **Fields**, which is what this document already called it. Fixed 9 September 2026, [#201](https://github.com/mtb550/test-in/issues/201) |
 | **Difference 11** | The page size box answered a different number without a word. A number outside the range now says what the range is; a blank box or letters asked for nothing and still say nothing. Fixed 9 September 2026, [#206](https://github.com/mtb550/test-in/issues/206) |
 | **Difference 18** | The status bar read *0 of 12 test cases* with nothing selected, putting a position where a tester reads a count. It says the count alone now. Fixed 9 September 2026, [#213](https://github.com/mtb550/test-in/issues/213) |
+| **Difference 8** | An unreadable priority became the lowest and an unreadable status kept the old value - two columns, two answers to a typo, both silent. All four parsed columns refuse now and keep what was there, and the message names the text and the column (Rule-EDITOR-PANEL-206). Fixed 9 September 2026, [#204](https://github.com/mtb550/test-in/issues/204) |
 | **Difference 17** | The search read the description, the identity, the expected result and the steps, and knew nothing of the module, the group, the test data or the pre-conditions - each of which has its own column, and three of which have their own filter. It reads every field the tester writes now, the reference included (Rule-EDITOR-PANEL-091). Fixed 9 September 2026, [#212](https://github.com/mtb550/test-in/issues/212) |
 
 ---

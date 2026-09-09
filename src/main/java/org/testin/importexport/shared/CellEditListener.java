@@ -35,7 +35,12 @@ public class CellEditListener implements TableModelListener {
                     final @NotNull TestEditorAttributes currentAttr = importAttributes.get(col - 2);
                     final @NotNull TestCaseDto tc = testCases.get(row);
 
-                    currentAttr.getImportSetter().execute(p, tc, updatedValue);
+                    // Rule-SHARE-106. The preview cell redraws with the
+                    // old value, so a refused typo has to say so or it reads as
+                    // an edit that did nothing (#264).
+                    if (!currentAttr.getImportSetter().execute(p, tc, updatedValue)) {
+                        TestEditorAttributes.sayWhatWasRefused(p, 1);
+                    }
 
                     final @NotNull String formattedValue = currentAttr.getTestValueExtractor().execute(tc, p);
                     model.setValueAt(formattedValue, row, col);

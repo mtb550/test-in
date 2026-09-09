@@ -32,6 +32,10 @@ There is no key for this. The table is in the import dialog.
 - **Rule-SHARE-036** — Choosing a second file replaces every tab.
 - **Rule-SHARE-037** — An import that stops part way says how many test cases
   were written before it did. They are still there.
+- **Rule-SHARE-106** — A value Testin cannot read is refused. The test case keeps
+  what it had, and the tester is told once with a count — never once per row.
+  Blank is not unreadable: it clears a date and it clears the groups, and it
+  leaves the priority and the status alone, because those have no empty form.
 - **Rule-SHARE-038** — A correction made here changes what is written, and the
   file on disk is never touched.
 
@@ -82,14 +86,16 @@ least one test case to import.*
 | In the file | What is imported |
 |---|---|
 | A priority Testin does not know | The lowest |
-| A group Testin does not know | Dropped from the list |
-| A date Testin cannot read | Blank |
+| A group Testin does not know | Refused whole. The row keeps the groups it had |
+| A date Testin cannot read | Refused. The row keeps the date it had |
 | Steps on one line, numbered | Split into separate steps, with the numbers taken off |
 
-None of these says anything. Take a file of 200 test cases whose priority
-column says High, Medium and Low. All 200 arrive at the lowest priority, and
-nothing warns the tester. That is difference 9 on
-[the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
+Each of them says so, once for the whole file and with a count:
+*Could not read 12 values, so what was there stayed* (Rule-SHARE-106). Take a
+file of 200 test cases whose priority column says High, Medium and Low — the
+column is refused rather than read as the lowest, and the tester is told before
+the import finishes. A correction made in this table is one value, so it says so
+one at a time.
 
 **If No Group is picked** — the test cases arrive with no group, which is what
 the picker offered. It used to be read back as an unknown group and thrown away.

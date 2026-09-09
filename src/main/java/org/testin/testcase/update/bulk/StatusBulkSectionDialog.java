@@ -44,6 +44,6 @@ public class StatusBulkSectionDialog extends JsonSplitBulkSectionDialog {
         // Be Updated" is read as the status it names. A word it cannot read
         // leaves the case with the status it already had, which is the answer a
         // typo deserves here - the alternative is silently choosing one.
-        tc.setStatus(TestDataParser.testCaseStatus(value, tc.getStatus()));
+        TestDataParser.testCaseStatus(value, tc.getStatus()).ifPresent(tc::setStatus);
     }
 }

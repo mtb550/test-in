@@ -4,6 +4,7 @@ import org.testin.model.TestCaseStatus;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * The Status grid cell reads back what it wrote.
@@ -19,19 +20,19 @@ public class TestCaseStatusParseTest {
     @Test
     public void everyStatusCanBeTypedBackExactlyAsItIsShown() {
         for (final TestCaseStatus status : TestCaseStatus.values()) {
-            assertEquals(TestDataParser.testCaseStatus(status.getLabel(), TestCaseStatus.PENDING), status,
+            assertEquals(TestDataParser.testCaseStatus(status.getLabel(), TestCaseStatus.PENDING).orElseThrow(), status,
                     status.getLabel() + " is what the cell prints, so it has to be what the cell accepts");
         }
     }
 
     @Test
     public void theConstantNameIsAcceptedToo() {
-        assertEquals(TestDataParser.testCaseStatus("TO_BE_UPDATED", TestCaseStatus.PENDING), TestCaseStatus.TO_BE_UPDATED);
+        assertEquals(TestDataParser.testCaseStatus("TO_BE_UPDATED", TestCaseStatus.PENDING).orElseThrow(), TestCaseStatus.TO_BE_UPDATED);
     }
 
     @Test
     public void caseAndSurroundingSpaceDoNotMatter() {
-        assertEquals(TestDataParser.testCaseStatus("  reviewed  ", TestCaseStatus.PENDING), TestCaseStatus.REVIEWED);
+        assertEquals(TestDataParser.testCaseStatus("  reviewed  ", TestCaseStatus.PENDING).orElseThrow(), TestCaseStatus.REVIEWED);
     }
 
     /**
@@ -41,8 +42,8 @@ public class TestCaseStatusParseTest {
      */
     @Test
     public void anythingElseKeepsTheStatusTheCaseAlreadyHad() {
-        assertEquals(TestDataParser.testCaseStatus("Nonsense", TestCaseStatus.REVIEWED), TestCaseStatus.REVIEWED);
-        assertEquals(TestDataParser.testCaseStatus("", TestCaseStatus.DISABLED), TestCaseStatus.DISABLED);
-        assertEquals(TestDataParser.testCaseStatus("   ", TestCaseStatus.TO_BE_UPDATED), TestCaseStatus.TO_BE_UPDATED);
+        assertTrue(TestDataParser.testCaseStatus("Nonsense", TestCaseStatus.REVIEWED).isEmpty(), "a word Testin cannot read is refused, so the caller can say so");
+        assertEquals(TestDataParser.testCaseStatus("", TestCaseStatus.DISABLED).orElseThrow(), TestCaseStatus.DISABLED);
+        assertEquals(TestDataParser.testCaseStatus("   ", TestCaseStatus.TO_BE_UPDATED).orElseThrow(), TestCaseStatus.TO_BE_UPDATED);
     }
 }

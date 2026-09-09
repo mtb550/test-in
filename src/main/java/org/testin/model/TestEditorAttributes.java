@@ -9,6 +9,9 @@ import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenType;
 import org.testin.importexport.imports.ImportSetter;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
+import org.testin.services.Services;
 import org.testin.util.Display;
 import org.testin.util.NameSanitizer;
 import org.testin.util.TestDataParser;
@@ -17,7 +20,11 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.testin.importexport.imports.ImportSetter.always;
+import static org.testin.importexport.imports.ImportSetter.took;
 
 @Getter
 public enum TestEditorAttributes implements ToolBarAttribute {
@@ -32,8 +39,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Order",
             ToolBarDefault.ON,
             (tc, p) -> "",
-            (p, tc, v) -> {
-            },
+            (p, tc, v) -> true,
             GenType.NO_CODE_CHANGE
     ) {
         @Override
@@ -46,7 +52,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Description",
             ToolBarDefault.LOCKED_CHECKED,
             (tc, p) -> tc.getDescription(),
-            (p, tc, v) -> tc.setDescription(NameSanitizer.description(v)),
+            (p, tc, v) -> always(() -> tc.setDescription(NameSanitizer.description(v))),
             GenType.UPDATE_TEST_CASE_DESCRIPTION,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
@@ -60,8 +66,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "ID",
             ToolBarDefault.LOCKED_UNCHECKED,
             (tc, p) -> String.valueOf(tc.getId()),
-            (p, tc, v) -> {
-            },
+            (p, tc, v) -> true,
             GenType.NO_CODE_CHANGE,
             Can.EXPORT
     ),
@@ -80,7 +85,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Expected Result",
             ToolBarDefault.ON,
             (tc, p) -> tc.getExpectedResult(),
-            (p, tc, v) -> tc.setExpectedResult(v),
+            (p, tc, v) -> always(() -> tc.setExpectedResult(v)),
             GenType.UPDATE_TEST_CASE_EXPECTED_RESULT,
             Can.EDIT, Can.IMPORT, Can.EXPORT
     ),
@@ -89,7 +94,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Steps",
             ToolBarDefault.OFF,
             (tc, p) -> String.join(", ", tc.getSteps()),
-            (p, tc, v) -> tc.setSteps(TestDataParser.steps(v)),
+            (p, tc, v) -> always(() -> tc.setSteps(TestDataParser.steps(v))),
             GenType.UPDATE_TEST_CASE_STEPS,
             Can.EDIT, Can.IMPORT, Can.EXPORT
     ),
@@ -98,7 +103,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Priority",
             ToolBarDefault.ON,
             (tc, p) -> tc.getPriority().getLabel(),
-            (p, tc, v) -> tc.setPriority(TestDataParser.priority(v)),
+            (p, tc, v) -> took(TestDataParser.priority(v, tc.getPriority()), tc::setPriority),
             GenType.UPDATE_TEST_CASE_PRIORITY,
             Can.EDIT, Can.IMPORT, Can.EXPORT
     ) {
@@ -112,8 +117,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "FQCN",
             ToolBarDefault.OFF,
             (tc, p) -> String.join(" > ", Fqcn.ofMethod(tc)),
-            (p, tc, v) -> {
-            },
+            (p, tc, v) -> true,
             GenType.NO_CODE_CHANGE,
             Can.EXPORT
     ),
@@ -122,7 +126,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Reference",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getReference(),
-            (p, tc, v) -> tc.setReference(v),
+            (p, tc, v) -> always(() -> tc.setReference(v)),
             GenType.NO_CODE_CHANGE,
             Can.EDIT, Can.IMPORT, Can.EXPORT
     ),
@@ -131,7 +135,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Test Data",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getTestData(),
-            (p, tc, v) -> tc.setTestData(v),
+            (p, tc, v) -> always(() -> tc.setTestData(v)),
             GenType.UPDATE_TEST_CASE_TEST_DATA,
             Can.EDIT, Can.IMPORT, Can.EXPORT
     ),
@@ -140,7 +144,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Pre Conditions",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getPreConditions(),
-            (p, tc, v) -> tc.setPreConditions(v),
+            (p, tc, v) -> always(() -> tc.setPreConditions(v)),
             GenType.UPDATE_TEST_CASE_PRE_CONDITIONS,
             Can.EDIT, Can.IMPORT, Can.EXPORT
     ),
@@ -149,7 +153,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Group",
             ToolBarDefault.ON,
             (tc, p) -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
-            (p, tc, v) -> tc.setGroup(TestDataParser.groups(v)),
+            (p, tc, v) -> took(TestDataParser.groups(v), tc::setGroup),
             GenType.UPDATE_TEST_CASE_GROUP,
             Can.EDIT, Can.IMPORT, Can.EXPORT
     ) {
@@ -163,8 +167,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Path",
             ToolBarDefault.OFF,
             (tc, p) -> String.join(" > ", tc.getParent().getPath2()),
-            (p, tc, v) -> {
-            },
+            (p, tc, v) -> true,
             GenType.NO_CODE_CHANGE,
             Can.EXPORT
     ),
@@ -173,7 +176,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Module",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getModule(),
-            (p, tc, v) -> tc.setModule(v),
+            (p, tc, v) -> always(() -> tc.setModule(v)),
             GenType.UPDATE_TEST_CASE_MODULE,
             Can.EDIT, Can.IMPORT, Can.EXPORT
     ),
@@ -182,7 +185,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Status",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getStatus().getLabel(),
-            (p, tc, v) -> tc.setStatus(TestDataParser.testCaseStatus(v, tc.getStatus())),
+            (p, tc, v) -> took(TestDataParser.testCaseStatus(v, tc.getStatus()), tc::setStatus),
             GenType.UPDATE_TEST_CASE_STATUS,
             Can.EDIT, Can.EXPORT
     ),
@@ -191,7 +194,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Created By",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getCreatedBy(),
-            (p, tc, v) -> tc.setCreatedBy(v),
+            (p, tc, v) -> always(() -> tc.setCreatedBy(v)),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
     ),
@@ -200,7 +203,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Updated By",
             ToolBarDefault.OFF,
             (tc, p) -> tc.getUpdatedBy(),
-            (p, tc, v) -> tc.setUpdatedBy(v),
+            (p, tc, v) -> always(() -> tc.setUpdatedBy(v)),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
     ),
@@ -209,7 +212,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Created At",
             ToolBarDefault.OFF,
             (tc, p) -> Display.formatDate(tc.getCreatedAt()),
-            (p, tc, v) -> tc.setCreatedAt(TestDataParser.date(v)),
+            (p, tc, v) -> took(TestDataParser.date(v), tc::setCreatedAt),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
     ),
@@ -218,7 +221,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Updated At",
             ToolBarDefault.OFF,
             (tc, p) -> Display.formatDate(tc.getUpdatedAt()),
-            (p, tc, v) -> tc.setUpdatedAt(TestDataParser.date(v)),
+            (p, tc, v) -> took(TestDataParser.date(v), tc::setUpdatedAt),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
     );
@@ -292,6 +295,44 @@ public enum TestEditorAttributes implements ToolBarAttribute {
         this.importSetter = importSetter;
         this.genType = genType;
         this.can = can.length == 0 ? EnumSet.noneOf(Can.class) : EnumSet.copyOf(List.of(can));
+    }
+
+    /**
+     * UC-SHARE-006, Rule-SHARE-106, Rule-EDITOR-PANEL-206.
+     * <p>
+     * Writes one row of an imported sheet onto a test case, and answers how many
+     * of its values Testin could not read.
+     * <p>
+     * The two importers had this loop each, differing only in how a cell is
+     * fetched out of the file - so the count #264 asks for would have been
+     * written twice, and the next importer would have written it a third time.
+     * What varies is the cell lookup, so that is what is passed.
+     */
+    public static int importRow(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull Function<TestEditorAttributes, String> cell) {
+        int refused = 0;
+
+        for (final TestEditorAttributes attr : values()) {
+            if (!attr.can(Can.IMPORT)) continue;
+            if (!attr.importSetter.execute(p, tc, cell.apply(attr))) refused++;
+        }
+
+        return refused;
+    }
+
+    /**
+     * UC-SHARE-006, Rule-SHARE-106, Rule-EDITOR-PANEL-206.
+     * <p>
+     * Says once how many values a sheet carried that Testin could not read, and
+     * nothing at all when it could read them all.
+     * <p>
+     * Once with a count, never once per row: an import of two hundred cases with
+     * an unreadable priority column is one thing that happened, and two hundred
+     * balloons is how a tester learns to dismiss all of them (#62).
+     */
+    public static void sayWhatWasRefused(final @NotNull Project p, final int refused) {
+        if (refused == 0) return;
+
+        Services.getInstance(p, Notifier.class).softRefuse(p, Refused.UNREADABLE, refused + (refused == 1 ? " value" : " values"));
     }
 
     /**

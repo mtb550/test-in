@@ -103,13 +103,12 @@ groups are written back into the cell, joined by commas.
 
 | The tester types | What is written |
 |---|---|
-| A priority Testin does not know | The lowest |
-| A status Testin does not know | Whatever the row had already |
-| A group Testin does not know | Dropped from the list |
-| A date Testin cannot read | An empty cell |
+| A priority Testin does not know | Refused. The row keeps the priority it had |
+| A status Testin does not know | Refused. The row keeps the status it had |
+| A group Testin does not know | Refused whole. The row keeps the groups it had |
+| A date Testin cannot read | Refused. The row keeps the date it had |
 
-None of the four says anything. That is difference 9 on
-[the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
+All four say so, once and with a count (Rule-SHARE-106).
 
 **If the priority or the group column cannot be found** — neither picker is
 drawn anywhere in the table. Only the log says so.

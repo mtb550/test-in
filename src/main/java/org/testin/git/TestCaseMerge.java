@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Mapper;
+import org.testin.model.Config;
 import org.testin.util.TestDataParser;
 
 import java.time.ZonedDateTime;
@@ -179,8 +180,8 @@ public final class TestCaseMerge {
      * conflicts even when the testers agreed about everything else.
      */
     private static void stampTheLaterEdit(final @NotNull ObjectNode merged, final @NotNull ObjectNode mine, final @NotNull ObjectNode theirs) {
-        final @NotNull ZonedDateTime mineAt = TestDataParser.date(text(mine.path(UPDATED_AT)));
-        final @NotNull ZonedDateTime theirsAt = TestDataParser.date(text(theirs.path(UPDATED_AT)));
+        final @NotNull ZonedDateTime mineAt = TestDataParser.date(text(mine.path(UPDATED_AT))).orElse(Config.NOT_EXECUTED);
+        final @NotNull ZonedDateTime theirsAt = TestDataParser.date(text(theirs.path(UPDATED_AT))).orElse(Config.NOT_EXECUTED);
 
         final @NotNull ObjectNode later = theirsAt.isAfter(mineAt) ? theirs : mine;
 

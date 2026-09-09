@@ -90,6 +90,8 @@ public class ImportExcel {
 
         final @NotNull List<TestCaseDto> sheetList = new ArrayList<>();
 
+        int refused = 0;
+
         // The sheet's own iterator visits the rows that exist, so a file with a
         // gap in the middle needs no test for the rows that are not there.
         for (final Row row : sheet) {
@@ -97,19 +99,16 @@ public class ImportExcel {
 
             final @NotNull TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
 
-            for (final TestEditorAttributes attr : TestEditorAttributes.values()) {
-                if (attr.can(Can.IMPORT)) {
-                    // A column the file does not carry reads as blank, which is
-                    // what an absent value means to every importer.
-                    final @NotNull String rawValue = Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
-                            .map(colIndex -> dataFormatter.formatCellValue(row.getCell(colIndex)).trim())
-                            .orElse("");
-                    attr.getImportSetter().execute(p, currentTestCase, rawValue);
-                }
-            }
+            // A column the file does not carry reads as blank, which is what an
+            // absent value means to every importer.
+            refused += TestEditorAttributes.importRow(p, currentTestCase, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
+                    .map(colIndex -> dataFormatter.formatCellValue(row.getCell(colIndex)).trim())
+                    .orElse(""));
 
             sheetList.add(currentTestCase);
         }
+
+        TestEditorAttributes.sayWhatWasRefused(p, refused);
 
         return sheetList;
     }

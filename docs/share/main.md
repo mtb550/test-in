@@ -10,7 +10,7 @@ team pulls, or a server the plugin syncs with.
 |---|---|
 | **Part of Testin** | Sharing work with the team |
 | **Answers** | How test cases leave Testin and come back, and how a test project is kept in step with a team |
-| **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` to `Rule-SHARE-105` |
+| **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` to `Rule-SHARE-106` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -169,7 +169,6 @@ bug report yet.
 |---|---|---|
 | **Difference 1** | No rule covers it — nothing in this part says a refusal must be stated | Fixed. An empty folder, file name or format now turns that box's own placeholder red and puts the cursor in it, the way every dialog on the framework already did. |
 | **Difference 6** | Rule-SHARE-003 — a conflict is put to the tester | Two fields are settled without asking. The order always takes the other side's value, and who changed it last always takes the later edit. |
-| **Difference 9** | Rule-SHARE-002 — a value the tester typed is kept or refused | An unreadable value is quietly replaced in four different ways. A priority becomes the lowest, a group is dropped, a date becomes blank, a status keeps its old value. |
 | **Difference 11** | Rule-SHARE-005 — long work is watched | Parsing an import file has no progress bar at all, and runs on every keystroke in the source box. A large workbook makes the dialog look frozen. |
 | **Difference 12** | Rule-SHARE-005 — the same | The export, import and report bars cannot be canceled. |
 
@@ -204,6 +203,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 17** | A refusal naming which nodes can be imported into, on nodes where the menu entry was already gray. The refusal is gone; the gray entry says it. Fixed 9 September 2026, [#271](https://github.com/mtb550/test-in/issues/271) |
 | **Difference 14** | A Git sync faded, a push stayed, a server sync faded. All three stay: a sync lands on its own time, so it is the message a tester comes back to. Fixed 9 September 2026, [#268](https://github.com/mtb550/test-in/issues/268) |
 | **Difference 2** | `Enter` did nothing in the export, import and review dialogs, which declared only `Escape`. All three answer it now, and the report dialog with them. Fixed 9 September 2026, [#252](https://github.com/mtb550/test-in/issues/252) |
+| **Difference 9** | An unreadable value was quietly replaced four different ways - a priority became the lowest, a group was dropped from the list, a date became blank, a status kept whatever the row had - so 200 rows whose priority column read High, Medium and Low all arrived at the lowest priority in silence. One answer now, and it is said once with a count (Rule-SHARE-106). Fixed 9 September 2026, [#264](https://github.com/mtb550/test-in/issues/264) |
 
 ---
 

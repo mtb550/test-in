@@ -112,7 +112,27 @@ public enum Refused {
      * one - and it went to the log alone, which left the click looking broken
      * (#245).
      */
-    NO_TEST_CASE_BEHIND_IT("%s was generated from a test case that is gone");
+    NO_TEST_CASE_BEHIND_IT("%s was generated from a test case that is gone"),
+
+    /**
+     * UC-EDITOR-PANEL-008, UC-SHARE-006, Rule-EDITOR-PANEL-206, Rule-SHARE-106.
+     * <p>
+     * The tester typed - or a sheet carried - text that the attribute cannot
+     * read: a priority that is not one, a group that does not exist, a date in
+     * no shape Testin writes, a status it does not have.
+     * <p>
+     * One sentence for four columns and two surfaces. Each answered a typo its
+     * own way and none of them said anything: a priority became the lowest, a
+     * group was dropped from the list, a date became blank, a status kept
+     * whatever the row had. Two of those changed data nobody asked to change,
+     * and importing 200 cases whose priority column read High, Medium and Low
+     * gave 200 at the lowest priority in silence (#204, #264).
+     * <p>
+     * The slot takes one thing for a cell and a count for a sheet, because the
+     * refusal is the same either way and a tester importing two hundred rows
+     * must not get two hundred balloons.
+     */
+    UNREADABLE("Could not read %s, so what was there stayed");
 
     /**
      * The sentence, with one slot for whatever the tester acted on.

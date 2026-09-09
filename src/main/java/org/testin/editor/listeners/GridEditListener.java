@@ -1,6 +1,7 @@
 package org.testin.editor.listeners;
 
 import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -60,9 +61,16 @@ public class GridEditListener extends AbstractGridEditListener {
         // holding, so a snapshot after it would be a snapshot of the edit.
         final @NotNull TestCaseSnapshot undoFrom = TestCaseSnapshot.of(p, testSetPath, List.of(tc.getId()));
 
+        final @NotNull String typed = String.valueOf(model.getValueAt(row, col));
+
         final @NotNull Object before = attr.gridValue(p, tc);
-        attr.getImportSetter().execute(p, tc, String.valueOf(model.getValueAt(row, col)));
+        final boolean took = attr.getImportSetter().execute(p, tc, typed);
         final @NotNull Object after = attr.gridValue(p, tc);
+
+        // Rule-EDITOR-PANEL-206. The cell redraws with the old value either way,
+        // so without this a refused typo and an edit that changed nothing look
+        // identical to the tester (#204).
+        if (!took) Services.getInstance(p, Notifier.class).softRefuse(p, Refused.UNREADABLE, quoted(typed, attr));
 
         // Always write the normalized value back to the cell - it renumbers
         // steps and drops blank entries even when nothing really changed. That
@@ -76,6 +84,15 @@ public class GridEditListener extends AbstractGridEditListener {
         onEdited.run();
 
         return true;
+    }
+
+    /**
+     * What the refusal names: the text that could not be read, and the column it
+     * was typed into. The column matters - a grid is eighteen of them, and
+     * "Urgent" is refused by Priority and taken by Module.
+     */
+    private static @NotNull String quoted(final @NotNull String typed, final @NotNull TestEditorAttributes attr) {
+        return "\"" + typed.trim() + "\" as a " + attr.getName();
     }
 
     /**
