@@ -1,6 +1,5 @@
 package org.testin.git;
 
-import org.testin.model.Group;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -25,7 +24,7 @@ public class TestCaseChangeComparatorTest {
                 .module("payments")
                 .testData("account=1")
                 .preConditions("authenticated")
-                .group(new ArrayList<>(List.of(Group.SMOKE)))
+                .group(new ArrayList<>(List.of("Smoke")))
                 .build();
     }
 
@@ -48,7 +47,7 @@ public class TestCaseChangeComparatorTest {
                 .module("payments")
                 .testData("account=1")
                 .preConditions("authenticated")
-                .group(List.of(Group.SMOKE))
+                .group(List.of("Smoke"))
                 .build();
 
         final List<FieldChange> changes = TestCaseChangeComparator.compare(oldState, newState);
@@ -96,7 +95,7 @@ public class TestCaseChangeComparatorTest {
     @Test
     public void addingAGroupIsOneChangeListingAllOfThem() {
         final FieldChange change = onlyChange(
-                base().setGroup(new ArrayList<>(List.of(Group.SMOKE, Group.REGRESSION))));
+                base().setGroup(new ArrayList<>(List.of("Smoke", "Regression"))));
 
         assertEquals(change.changeType(), ChangeType.CHANGE_GROUP);
         assertEquals(change.oldValue(), "Smoke");
@@ -110,8 +109,8 @@ public class TestCaseChangeComparatorTest {
      */
     @Test
     public void reorderingGroupsIsAChangeBecauseTheFileChanged() {
-        final TestCaseDto before = base().setGroup(new ArrayList<>(List.of(Group.SMOKE, Group.REGRESSION)));
-        final TestCaseDto after = base().setGroup(new ArrayList<>(List.of(Group.REGRESSION, Group.SMOKE)));
+        final TestCaseDto before = base().setGroup(new ArrayList<>(List.of("Smoke", "Regression")));
+        final TestCaseDto after = base().setGroup(new ArrayList<>(List.of("Regression", "Smoke")));
 
         final List<FieldChange> changes = TestCaseChangeComparator.compare(before, after);
 

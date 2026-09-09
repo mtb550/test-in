@@ -3,7 +3,6 @@ package org.testin.java.codegen.method.update;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenAction;
-import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;

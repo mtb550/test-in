@@ -1,6 +1,5 @@
 package org.testin.editor;
 
-import org.testin.model.Group;
 import org.testin.model.Priority;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
@@ -23,7 +22,7 @@ public class TestCaseFilterTest {
                 .description("Login succeeds")
                 .expectedResult("Dashboard")
                 .priority(Priority.HIGH)
-                .group(List.of(Group.REGRESSION))
+                .group(List.of("Regression"))
                 .module("accounts")
                 .build();
         final TestCaseDto other = TestCaseDto.builder()
@@ -35,7 +34,7 @@ public class TestCaseFilterTest {
         final List<TestCaseDto> result = TestCaseFilter.filter(
                 List.of(matching, other),
                 "  LOGIN ",
-                Set.of(Group.REGRESSION),
+                Set.of("Regression"),
                 Set.of(Priority.HIGH),
                 Set.of("accounts"));
 
@@ -86,10 +85,10 @@ public class TestCaseFilterTest {
                 .testData("admin@example.com")
                 .preConditions("The account exists")
                 .reference("JIRA-123")
-                .group(List.of(Group.REGRESSION))
+                .group(List.of("Regression"))
                 .build();
 
-        for (final String wanted : List.of("accounts", "admin@example.com", "The account exists", "JIRA-123", Group.REGRESSION.getName())) {
+        for (final String wanted : List.of("accounts", "admin@example.com", "The account exists", "JIRA-123", "Regression")) {
             final List<TestCaseDto> result = TestCaseFilter.filter(List.of(tc), wanted, Set.of(), Set.of(), Set.of());
 
             assertEquals(result, List.of(tc), "the search did not read the field holding '" + wanted + "'");

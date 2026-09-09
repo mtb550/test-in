@@ -3,7 +3,9 @@ package org.testin.importexport.shared;
 import org.testin.model.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.Group;
+import org.testin.model.Groups;
+import org.testin.services.Services;
+import org.testin.services.TestCaseCacheService;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.SelectionTable;
@@ -48,9 +50,12 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
                 StatusBarShortcut.cancel(this::closeCancel));
 
         groups = table.getComponent();
-        for (final Group group : Group.values()) {
-            groups.addRow(group.getName());
-        }
+
+        // No Group first, then every group the project has used. It was the eight
+        // constants of an enum; a group is a word now, so the list is what the
+        // cache has seen rather than what somebody shipped (#296).
+        groups.addRow(Groups.NONE);
+        Services.getInstance(p, TestCaseCacheService.class).getGroups().stream().sorted().forEach(groups::addRow);
         groups.selectRows(rowsOf(currentSelection));
     }
 

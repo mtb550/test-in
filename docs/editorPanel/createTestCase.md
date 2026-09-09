@@ -87,7 +87,7 @@ This is how every test case in Testin begins.
 | Module | `Ctrl+M` | *set module* |
 | Steps | `Ctrl+S` | *set step*, then the number |
 | Priority | `Ctrl+P` | none, it is a list |
-| Group | `Ctrl+G` | none, they are tick boxes |
+| Group | `Ctrl+G` | *set group*, and it completes what the project uses |
 | Test Data | `Ctrl+T` | *set test data* |
 | Pre Conditions | `Ctrl+B` | *set pre conditions* |
 

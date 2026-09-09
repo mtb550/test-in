@@ -1,6 +1,5 @@
 package org.testin.git;
 
-import org.testin.model.Group;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -38,7 +37,7 @@ public class ChangeTypeRevertTest {
                 .module("committed module")
                 .testData("committed data")
                 .preConditions("committed preconditions")
-                .group(new ArrayList<>(List.of(Group.SMOKE)))
+                .group(new ArrayList<>(List.of("Smoke")))
                 .build();
     }
 
@@ -53,7 +52,7 @@ public class ChangeTypeRevertTest {
                 .module("edited module")
                 .testData("edited data")
                 .preConditions("edited preconditions")
-                .group(new ArrayList<>(List.of(Group.REGRESSION)))
+                .group(new ArrayList<>(List.of("Regression")))
                 .build();
     }
 
@@ -118,11 +117,11 @@ public class ChangeTypeRevertTest {
         ChangeType.CHANGE_GROUP.getRevertAction().apply(current, committed);
 
         current.getSteps().add("typed after the revert");
-        current.getGroup().add(Group.REGRESSION);
+        current.getGroup().add("Regression");
 
         assertEquals(committed.getSteps(), List.of("committed first", "committed second"),
                 "the committed steps were shared, not copied");
-        assertEquals(committed.getGroup(), List.of(Group.SMOKE),
+        assertEquals(committed.getGroup(), List.of("Smoke"),
                 "the committed groups were shared, not copied");
     }
 

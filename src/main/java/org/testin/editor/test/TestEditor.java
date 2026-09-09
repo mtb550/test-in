@@ -831,6 +831,17 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         return modules;
     }
 
+    /**
+     * UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095.
+     * <p>
+     * Every group the project has used, from the cache that already holds them
+     * for the completion field (#296).
+     */
+    @Override
+    public @NotNull Set<String> getAvailableGroups() {
+        return Services.getInstance(p, TestCaseCacheService.class).getGroups();
+    }
+
     // UC-EDITOR-PANEL-020
     private @NotNull List<TestCaseDto> getFilteredList() {
         final @NotNull EditorFilters filters = EditorFilters.of(toolBar);

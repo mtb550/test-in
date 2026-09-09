@@ -1,213 +1,62 @@
 package org.testin.testcase.create;
 
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.Disposable;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.EditorTextField;
-import com.intellij.ui.TextFieldWithAutoCompletion;
-import com.intellij.ui.TextFieldWithAutoCompletionListProvider;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBUI;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.UIAction;
 import org.testin.util.Shortcuts;
-import org.testin.util.SpellChecker;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
-public class StepsSection implements CreateTestCaseSection {
-    private final @NotNull Project p;
-    @Getter
-    private final @NotNull List<EditorTextField> stepFields;
-    private final @NotNull JBPanel<?> stepsContainer;
-    private final @NotNull JBPanel<?> wrapper;
-    /**
-     * Parent for the per-step shortcut registrations, so a row recreated by a
-     * fillData does not keep the discarded one alive. The owning dialog's, given
-     * at construction - there is no moment when the section has steps and no
-     * disposable to hang them from (#71).
-     */
-    private final @NotNull Disposable parentDisposable;
+/**
+ * UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-033.
+ * <p>
+ * The steps of a test case, one box each, added with CTRL+S.
+ * <p>
+ * The rows, the key and what is saved are {@link AbstractMultiValueSection}'s -
+ * groups work the same way since they became words rather than constants
+ * (#296). What is this section's own is the numbering: a step's place is part of
+ * what it says, so the placeholder counts.
+ */
+public class StepsSection extends AbstractMultiValueSection {
 
-    public StepsSection(final @NotNull Project p, final @NotNull Disposable parentDisposable) {
-        this.p = p;
-        this.parentDisposable = parentDisposable;
-        this.stepFields = new ArrayList<>();
-
-        this.stepsContainer = new JBPanel<>();
-        this.stepsContainer.setLayout(new BoxLayout(this.stepsContainer, BoxLayout.Y_AXIS));
-        this.stepsContainer.setOpaque(false);
-
-        this.wrapper = createWrapper(CreateTestCaseFields.STEPS.getIcon(), this.stepsContainer);
+    public StepsSection(final @NotNull Project p) {
+        super(p);
     }
 
     @Override
-    public @NotNull JBPanel<?> getWrapper() {
-        return wrapper;
-    }
-
-    /**
-     * Nothing: the tester opens the steps to type into a field that the
-     * two-argument overload has not added yet, and it focuses that field.
-     */
-    @Override
-    public void focusOnShow() {
-    }
-
-    public void showSection(final @NotNull JBPanel<?> contentPanel, final @NotNull UIAction repackAction) {
-        showSection(contentPanel);
-        wrapper.setVisible(true);
-        addStepField("", repackAction);
-        ApplicationManager.getApplication().invokeLater(() -> {
-            repackAction.execute();
-            if (!stepFields.isEmpty()) {
-                stepFields.getLast().requestFocus();
-            }
-        });
-    }
-
-    public void addStepField(final @NotNull String text, final @NotNull UIAction repackAction) {
-        final @NotNull TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getSteps(), CreateTestCaseFields.STEPS.getIcon());
-        final @NotNull EditorTextField stepField = SpellChecker.createCompletionField(p, provider, text);
-
-        stepField.setOneLineMode(true);
-        stepField.setFont(fieldFont());
-        stepField.setPlaceholder(CreateTestCaseFields.STEPS.getPlaceholder() + (stepFields.size() + 1));
-        stepField.setShowPlaceholderWhenFocused(true);
-        stepField.setBorder(JBUI.Borders.empty(6, 10));
-
-        final @NotNull JBPanel<?> stepRow = new JBPanel<>(new BorderLayout(JBUI.scale(8), 0));
-        stepRow.setOpaque(false);
-        stepRow.setBorder(JBUI.Borders.emptyBottom(6));
-
-        final @NotNull JBLabel removeButton = new JBLabel(AllIcons.Actions.Cancel);
-        removeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        removeButton.setToolTipText("Remove step " + Shortcuts.CreateTestCaseRemoveStep.getShortcutText());
-
-        removeButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(final MouseEvent e) {
-                removeButton.setIcon(AllIcons.General.Remove);
-            }
-
-            @Override
-            public void mouseExited(final MouseEvent e) {
-                removeButton.setIcon(AllIcons.Actions.Cancel);
-            }
-
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                removeStepAction(stepRow, stepField, repackAction);
-            }
-        });
-
-        final @NotNull RemoveStepShortcutAction removeStepShortcut =
-                new RemoveStepShortcutAction(stepField, () -> removeStepAction(stepRow, stepField, repackAction));
-
-        // Tied to the dialog's disposable: rows are recreated on every fillData,
-        // and unparented registrations would keep the discarded rows alive.
-        removeStepShortcut.registerCustomShortcutSet(
-                Shortcuts.CreateTestCaseRemoveStep.getCustomShortcut(), stepField, parentDisposable);
-
-        final @NotNull JBPanel<?> buttonWrapper = new JBPanel<>(new BorderLayout());
-        buttonWrapper.setOpaque(false);
-        buttonWrapper.setBorder(JBUI.Borders.emptyRight(4));
-        buttonWrapper.add(removeButton, BorderLayout.CENTER);
-
-        stepRow.add(stepField, BorderLayout.CENTER);
-        stepRow.add(buttonWrapper, BorderLayout.EAST);
-
-        stepFields.add(stepField);
-        stepsContainer.add(stepRow);
-    }
-
-    private void removeStepAction(final @NotNull JBPanel<?> stepRow, final @NotNull EditorTextField stepField, final @NotNull UIAction repackAction) {
-        if (stepFields.size() == 1) {
-            stepField.setText("");
-            stepField.requestFocus();
-            return;
-        }
-
-        stepsContainer.remove(stepRow);
-        stepFields.remove(stepField);
-
-        for (int i = 0; i < stepFields.size(); i++)
-            stepFields.get(i).setPlaceholder(CreateTestCaseFields.STEPS.getPlaceholder() + (i + 1));
-
-        if (!stepFields.isEmpty())
-            stepFields.getLast().requestFocus();
-        ApplicationManager.getApplication().invokeLater(repackAction::execute);
-    }
-
-    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-033
-    @Override
-    public void applyTo(final @NotNull TestCaseDto dto) {
-        final @NotNull List<String> finalSteps = new ArrayList<>();
-        for (final EditorTextField sf : stepFields) {
-            if (!sf.getText().trim().isEmpty()) {
-                finalSteps.add(sf.getText().trim());
-            }
-        }
-        dto.setSteps(finalSteps);
+    protected @NotNull CreateTestCaseFields field() {
+        return CreateTestCaseFields.STEPS;
     }
 
     @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
-        base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseAddStep.getCustomShortcut(), () ->
-                showSection(slot, repackAction));
+    protected @NotNull Set<String> completions(final @NotNull TestCaseCacheService cache) {
+        return cache.getSteps();
     }
 
     @Override
-    public @NotNull JComponent getFocusComponent() {
-        if (!stepFields.isEmpty()) {
-            return stepFields.getLast();
-        }
-        return stepsContainer;
+    protected @NotNull List<String> valuesOf(final @NotNull TestCaseDto dto) {
+        return dto.getSteps();
+    }
+
+    @Override
+    protected void write(final @NotNull TestCaseDto dto, final @NotNull List<String> values) {
+        dto.setSteps(values);
+    }
+
+    @Override
+    protected @NotNull Shortcuts addKey() {
+        return Shortcuts.CreateTestCaseAddStep;
     }
 
     /**
-     * The components of the row a step field sits in. A field that has not been
-     * added to one has nothing to iterate, so the caller needs no test.
+     * "Step 1", "Step 2". The order is what a step means, so the row says which
+     * one it is before anything is typed in it.
      */
-    private static @NotNull Component[] rowOf(final @NotNull EditorTextField field) {
-        return Optional.ofNullable(field.getParent()).map(Container::getComponents).orElse(new Component[0]);
-    }
-
     @Override
-    public void setEditable(final boolean editable) {
-        for (final EditorTextField field : stepFields) {
-            field.setEnabled(editable);
-            for (final Component c : rowOf(field)) {
-                if (c instanceof JBPanel<?> buttonWrapper) {
-                    buttonWrapper.setVisible(editable);
-                }
-            }
-        }
-    }
-
-    public void setStepsData(final @NotNull List<String> steps, final @NotNull UIAction repack) {
-        stepsContainer.removeAll();
-        stepFields.clear();
-        for (final String step : steps) {
-            addStepField(step, repack);
-        }
-    }
-
-    @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
-        setStepsData(dto.getSteps(), repackAction);
+    protected @NotNull String placeholderFor(final int index) {
+        return CreateTestCaseFields.STEPS.getPlaceholder() + (index + 1);
     }
 }

@@ -162,7 +162,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     GROUP(
             "Group",
             ToolBarDefault.ON,
-            tc -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
+            tc -> Groups.text(tc.getGroup()),
             (p, tc, v) -> took(TestDataParser.groups(v), tc::setGroup),
             GenType.UPDATE_TEST_CASE_GROUP,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT

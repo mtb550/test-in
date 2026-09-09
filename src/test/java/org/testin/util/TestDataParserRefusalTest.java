@@ -1,6 +1,6 @@
 package org.testin.util;
 
-import org.testin.model.Group;
+import org.testin.model.Groups;
 import org.testin.model.Priority;
 import org.testng.annotations.Test;
 
@@ -46,24 +46,34 @@ public class TestDataParserRefusalTest {
     }
 
     /**
-     * The cell is one value the tester typed, so it is kept or refused as one.
-     * Keeping the half it understood is how a tester who mistyped one group in a
-     * list of four got three back and no sign the fourth had gone.
+     * A group is a word now, not a constant, so there is nothing left to refuse:
+     * a name Testin has never seen is a name the tester is adding (#296). This
+     * used to be the one column that could refuse part of a cell, and it kept
+     * the half it understood without saying so (#264).
      */
     @Test
-    public void oneGroupItCannotReadRefusesTheWholeCell() {
-        assertTrue(TestDataParser.groups(Group.REGRESSION.name() + ", Nonsense").isEmpty(),
-                "half a list is not what the tester typed");
+    public void aGroupNobodyHasUsedBeforeIsTaken() {
+        assertEquals(TestDataParser.groups("Regression, Payments").orElseThrow(), List.of("Regression", "Payments"));
     }
 
     @Test
-    public void groupsItCanReadAreTaken() {
-        assertEquals(TestDataParser.groups(Group.REGRESSION.name()).orElseThrow(), List.of(Group.REGRESSION));
+    public void aGroupNamedTwiceIsNamedOnce() {
+        assertEquals(TestDataParser.groups("Regression, Regression").orElseThrow(), List.of("Regression"),
+                "the bulk editor deduplicated and the grid did not, so one cell had two answers (#295)");
     }
 
     @Test
     public void aBlankCellIsNoGroupsAtAll() {
         assertTrue(TestDataParser.groups("   ").orElseThrow().isEmpty(),
-                "groups have an empty form, so a blank cell clears them rather than being refused");
+                "groups have an empty form, so a blank cell clears them");
+    }
+
+    /**
+     * The picker writes the words it draws, so the parser has to read them back.
+     * No Group is not a group; it is how a tester says there are none.
+     */
+    @Test
+    public void theNoGroupWordIsNoGroupsEither() {
+        assertTrue(TestDataParser.groups(Groups.NONE).orElseThrow().isEmpty());
     }
 }

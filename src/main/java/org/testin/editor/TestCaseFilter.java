@@ -3,7 +3,7 @@ package org.testin.editor;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.Group;
+import org.testin.model.Groups;
 import org.testin.model.Priority;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestRunItems;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestCaseFilter {
 
-    public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull String query, final @NotNull Set<Group> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules) {
+    public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull String query, final @NotNull Set<String> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules) {
         // No run items on this path - the test editor has no statuses to filter
         // by. An empty map says that; a function returning null only implies it.
         return filter(source, query, groups, priorities, modules, Collections.emptySet(),
@@ -28,7 +28,7 @@ public final class TestCaseFilter {
     }
 
     // UC-EDITOR-PANEL-019, UC-EDITOR-PANEL-020
-    public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull String query, final @NotNull Set<Group> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules, final @NotNull Set<TestStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
+    public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull String query, final @NotNull Set<String> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules, final @NotNull Set<TestStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
         if (source.isEmpty()) {
             return Collections.emptyList();
         }
@@ -40,11 +40,11 @@ public final class TestCaseFilter {
     }
 
     // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-091
-    private static boolean matches(final @NotNull TestCaseDto testCase, final @NotNull String query, final @NotNull Set<Group> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules, final @NotNull Set<TestStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
+    private static boolean matches(final @NotNull TestCaseDto testCase, final @NotNull String query, final @NotNull Set<String> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules, final @NotNull Set<TestStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
         final boolean matchesSearch = query.isEmpty() || TestEditorAttributes.anyContains(testCase, query);
         final boolean matchesPriority = priorities.isEmpty() || priorities.contains(testCase.getPriority());
         final boolean matchesGroup = groups.isEmpty()
-                || (groups.contains(Group.UNASSIGNED) && testCase.getGroup().isEmpty())
+                || (groups.contains(Groups.NONE) && testCase.getGroup().isEmpty())
                 || testCase.getGroup().stream().anyMatch(groups::contains);
         final boolean matchesModule = modules.isEmpty() || modules.contains(testCase.getModule());
         final boolean matchesStatus = statuses.isEmpty()

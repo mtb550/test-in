@@ -17,6 +17,7 @@ import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testcase.create.CreateTestCaseSection;
 import org.testin.testcase.create.DescriptionSection;
 import org.testin.testcase.create.ExpectedResultSection;
+import org.testin.testcase.create.AbstractMultiValueSection;
 import org.testin.testcase.create.StepsSection;
 import org.testin.testcase.create.TestCaseBaseDialog;
 import org.testin.ui.dialogs.DialogStyle;
@@ -82,9 +83,11 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
             final boolean isTarget = (section == targetSection);
 
-            if (isTarget && section instanceof StepsSection s) {
-                if (s.getStepFields().isEmpty()) {
-                    s.addStepField("", repackPopup);
+            // Steps and groups are both several boxes, and opening either on a
+            // case that has none has to put one there to type into (#296).
+            if (isTarget && section instanceof AbstractMultiValueSection s) {
+                if (s.getFields().isEmpty()) {
+                    s.addField("", repackPopup);
                 }
             }
 

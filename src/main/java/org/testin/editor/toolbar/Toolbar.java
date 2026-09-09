@@ -115,4 +115,14 @@ public interface Toolbar {
     }
 
     @NotNull Set<String> getAvailableModules();
+
+    /**
+     * Every group the project has used, for the filter menu to offer.
+     * <p>
+     * The project's, not this editor's - unlike the modules above, which are
+     * built from the test set on screen. A group is a word a tester types and
+     * the cache holds every one of them, so filtering by a group used in another
+     * test set is a question worth being able to ask (#296).
+     */
+    @NotNull Set<String> getAvailableGroups();
 }

@@ -7,7 +7,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
-import org.testin.model.Group;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
@@ -82,7 +81,7 @@ public final class TestCaseDto {
 
     @NonNull
     @Builder.Default
-    private volatile List<Group> group = new ArrayList<>();
+    private volatile List<String> group = new ArrayList<>();
 
     @NonNull
     @Builder.Default

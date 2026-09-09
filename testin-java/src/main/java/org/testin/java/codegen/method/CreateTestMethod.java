@@ -15,7 +15,6 @@ import org.testin.codegen.JavaSourceRoot;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.java.codegen.JavaLiteral;
 import org.testin.logger.Logger;
-import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -401,15 +400,12 @@ public class CreateTestMethod implements GenAction {
     private static @NotNull String methodText(final @NotNull Project p, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         final @NotNull StringBuilder attributes = new StringBuilder();
 
+        // No No-Group filter any more: a case in no group holds an empty list,
+        // where it used to hold a constant that meant the same thing (#296).
         if (!tc.getGroup().isEmpty()) {
-            final @NotNull List<String> activeGroups = tc.getGroup().stream()
-                    .filter(g -> g != Group.UNASSIGNED)
-                    .map(g -> "\"" + g.getName() + "\"")
-                    .toList();
+            final @NotNull List<String> quoted = tc.getGroup().stream().map(g -> "\"" + g + "\"").toList();
 
-            if (!activeGroups.isEmpty()) {
-                attributes.append(", groups = {").append(String.join(", ", activeGroups)).append("}");
-            }
+            attributes.append(", groups = {").append(String.join(", ", quoted)).append("}");
         }
 
         // The case's place in its test set, not its High/Medium/Low. TestNG runs

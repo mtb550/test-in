@@ -1,10 +1,10 @@
 package org.testin.git;
 
+import org.testin.model.Groups;
 import org.testin.model.TestEditorAttributes;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ final class TestCaseChangeComparator {
 
         if (!Objects.equals(oldState.getGroup(), newState.getGroup())) {
             changes.add(new FieldChange(
-                    TestEditorAttributes.GROUP.getName(), groupNames(oldState), groupNames(newState), ChangeType.CHANGE_GROUP));
+                    TestEditorAttributes.GROUP.getName(), Groups.text(oldState.getGroup()), Groups.text(newState.getGroup()), ChangeType.CHANGE_GROUP));
         }
         return changes;
     }
@@ -40,11 +40,6 @@ final class TestCaseChangeComparator {
         if (!Objects.equals(oldValue, newValue)) {
             changes.add(new FieldChange(field, oldValue, newValue, type));
         }
-    }
-
-    private static @NotNull String groupNames(final @NotNull TestCaseDto testCase) {
-        return testCase.getGroup().stream().map(Group::getName)
-                .reduce((first, second) -> first + ", " + second).orElse("");
     }
 
     private static @NotNull String formatSteps(final @NotNull TestCaseDto testCase) {

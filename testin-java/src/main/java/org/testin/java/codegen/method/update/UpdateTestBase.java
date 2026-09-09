@@ -13,7 +13,6 @@ import org.testin.codegen.GenType;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.logger.Logger;
 import org.testin.java.codegen.JavaLiteral;
-import org.testin.model.Group;
 import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.NameSanitizer;
@@ -111,13 +110,10 @@ public class UpdateTestBase {
      * the document describes (#287).
      */
     protected void writeGroups(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
-        final @NotNull List<String> active = tc.getGroup().stream()
-                .filter(g -> g != Group.UNASSIGNED)
-                .map(g -> "\"" + g.getName() + "\"")
-                .toList();
+        final @NotNull List<String> quoted = tc.getGroup().stream().map(g -> "\"" + g + "\"").toList();
 
-        if (active.isEmpty()) removeTestAnnotationAttribute(p, pm, "groups");
-        else updateTestAnnotationAttribute(p, pm, "groups", "{" + String.join(", ", active) + "}");
+        if (quoted.isEmpty()) removeTestAnnotationAttribute(p, pm, "groups");
+        else updateTestAnnotationAttribute(p, pm, "groups", "{" + String.join(", ", quoted) + "}");
     }
 
     /**

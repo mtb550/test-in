@@ -78,7 +78,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             AllIcons.Actions.ListFiles,
             TestCaseBaseDialog::getStepsSection,
             "set step",
-            CORRECTIONS, ADD_STEP, REMOVE_STEP, AUTO_COMPLETE, NAVIGATE_TAB
+            CORRECTIONS, ADD_STEP, AUTO_COMPLETE, NAVIGATE_TAB
     ),
 
     PRIORITY(
@@ -96,7 +96,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             AllIcons.Nodes.Tag,
             TestCaseBaseDialog::getGroupSection,
             "",
-            NAVIGATE_TAB, SELECT_GROUP
+            ADD_GROUP, AUTO_COMPLETE, NAVIGATE_TAB
     );
 
     /**

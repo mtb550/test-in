@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.model.Automated;
-import org.testin.model.Group;
+import org.testin.model.Groups;
 import org.testin.model.Priority;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestStatus;
@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     @Getter
     @NotNull
-    private final Set<Group> selectedGroup = new HashSet<>();
+    private final Set<String> selectedGroup = new HashSet<>();
 
     @Getter
     @NotNull
@@ -49,6 +49,12 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     @NotNull
     private final Supplier<Set<String>> availableModulesSupplier;
 
+    /**
+     * Every group the project has used, asked for when the menu opens rather
+     * than held - a group typed a second ago belongs on it.
+     */
+    private final Supplier<Set<String>> availableGroupsSupplier;
+
     @NotNull
     private final DefaultActionGroup cachedActionGroup;
 
@@ -58,12 +64,13 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     @NotNull
     private final Toolbar callbacks;
 
-    public FilterPopupBtn(final @NotNull Toolbar callbacks, final @NotNull Runnable onToolBarFilterReset, final @NotNull Runnable onToolBarFilterSelectedChanged, final @NotNull Supplier<Set<String>> availableModulesSupplier) {
+    public FilterPopupBtn(final @NotNull Toolbar callbacks, final @NotNull Runnable onToolBarFilterReset, final @NotNull Runnable onToolBarFilterSelectedChanged, final @NotNull Supplier<Set<String>> availableModulesSupplier, final @NotNull Supplier<Set<String>> availableGroupsSupplier) {
         super("Filter", AllIcons.General.Filter);
         this.callbacks = callbacks;
         this.onToolBarFilterReset = onToolBarFilterReset;
 
         this.availableModulesSupplier = availableModulesSupplier;
+        this.availableGroupsSupplier = availableGroupsSupplier;
 
         this.cachedActionGroup = buildActionGroup(onToolBarFilterSelectedChanged);
 
@@ -188,15 +195,25 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
                 a, selectedAutomation, FilterMembership.plain(), onChanged)));
         filterResetBtn.add(filterAutomationMenu);
 
-        // group menu
-        final @NotNull DefaultActionGroup filterGroupMenu = new DefaultActionGroup(TestEditorAttributes.GROUP.getName(), true);
-        Arrays.stream(Group.values()).forEach(g -> {
-            if (g == Group.REGRESSION) {
-                filterGroupMenu.addSeparator();
+        // The group menu is dynamic for the same reason the module menu below it
+        // is: a group is a word a tester types, so the list is what the project
+        // has used rather than what an enum shipped (#296). No Group is first and
+        // is not one of them - it is how a tester asks for the cases in none.
+        final @NotNull ActionGroup filterGroupMenu = new ActionGroup(TestEditorAttributes.GROUP.getName(), true) {
+            // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
+            @Override
+            public AnAction @NotNull [] getChildren(final @Nullable AnActionEvent e) {
+                final @NotNull List<AnAction> actions = new ArrayList<>();
+                actions.add(new ToggleFilterAction<>(Groups.NONE, null,
+                        Groups.NONE, selectedGroup, FilterMembership.plain(), onChanged));
+
+                availableGroupsSupplier.get().stream().sorted().forEach(group ->
+                        actions.add(new ToggleFilterAction<>(group, null,
+                                group, selectedGroup, FilterMembership.plain(), onChanged)));
+
+                return actions.toArray(new AnAction[0]);
             }
-            filterGroupMenu.add(new ToggleFilterAction<>(g.getName(), null,
-                    g, selectedGroup, FilterMembership.plain(), onChanged));
-        });
+        };
         filterResetBtn.add(filterGroupMenu);
 
         // module menu is dynamic: modules come from the currently loaded test cases

@@ -75,7 +75,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     GROUP(
             TestEditorAttributes.GROUP.getName(),
             ToolBarDefault.OFF,
-            (item, p) -> item.requireTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", "))
+            (item, p) -> Groups.text(item.requireTc().getGroup())
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {

@@ -22,6 +22,13 @@ public final class TestCaseCacheService implements Disposable {
     private final @NotNull Set<String> expectedResults = ConcurrentHashMap.newKeySet();
     private final @NotNull Set<String> modules = ConcurrentHashMap.newKeySet();
     private final @NotNull Set<String> steps = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Every group the project uses, which is the whole list there is: a group is
+     * a word a tester types, not a constant somebody shipped, so what exists is
+     * what has been used (#296).
+     */
+    private final @NotNull Set<String> groups = ConcurrentHashMap.newKeySet();
     private final @NotNull AtomicBoolean reloadScheduled = new AtomicBoolean();
 
     private static void addTo(final @NotNull Set<String> target, final @NotNull String value) {
@@ -53,6 +60,10 @@ public final class TestCaseCacheService implements Disposable {
         return Collections.unmodifiableSet(steps);
     }
 
+    public @NotNull Set<String> getGroups() {
+        return Collections.unmodifiableSet(groups);
+    }
+
     public void addDescription(final @NotNull String t) {
         addTo(descriptions, t);
     }
@@ -63,6 +74,10 @@ public final class TestCaseCacheService implements Disposable {
 
     public void addModule(final @NotNull String e) {
         addTo(modules, e);
+    }
+
+    public void addGroup(final @NotNull String g) {
+        addTo(groups, g);
     }
 
     public void addStep(final @NotNull String s) {
@@ -106,6 +121,7 @@ public final class TestCaseCacheService implements Disposable {
             final @NotNull Set<String> newExpectedResults = ConcurrentHashMap.newKeySet();
             final @NotNull Set<String> newModules = ConcurrentHashMap.newKeySet();
             final @NotNull Set<String> newSteps = ConcurrentHashMap.newKeySet();
+            final @NotNull Set<String> newGroups = ConcurrentHashMap.newKeySet();
 
             for (final TestCaseDto tc : testCases) {
                 addTo(newDescriptions, tc.getDescription());
@@ -113,12 +129,14 @@ public final class TestCaseCacheService implements Disposable {
                 addTo(newModules, tc.getModule());
                 // Jackson can leave steps null on hand-edited JSON despite the field default.
                 Optional.of(tc.getSteps()).ifPresent(stepList -> stepList.forEach(s -> addTo(newSteps, s)));
+                Optional.of(tc.getGroup()).ifPresent(groupList -> groupList.forEach(g -> addTo(newGroups, g)));
             }
 
             replace(descriptions, newDescriptions);
             replace(expectedResults, newExpectedResults);
             replace(modules, newModules);
             replace(steps, newSteps);
+            replace(groups, newGroups);
         });
     }
 
@@ -132,6 +150,7 @@ public final class TestCaseCacheService implements Disposable {
         addExpectedResult(tc.getExpectedResult());
         addModule(tc.getModule());
         tc.getSteps().forEach(this::addStep);
+        tc.getGroup().forEach(this::addGroup);
     }
 
     @Override
@@ -140,5 +159,6 @@ public final class TestCaseCacheService implements Disposable {
         expectedResults.clear();
         modules.clear();
         steps.clear();
+        groups.clear();
     }
 }

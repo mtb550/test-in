@@ -3,7 +3,7 @@ package org.testin.testcase.update.bulk;
 import org.testin.model.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.Group;
+import org.testin.model.Groups;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.TestDataParser;
 
@@ -30,47 +30,26 @@ public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
 
     @Override
     protected @NotNull List<List<String>> extractOriginalValues(final @NotNull List<TestCaseDto> items) {
-        final @NotNull List<List<String>> originalGroups = new ArrayList<>();
-
-        for (final TestCaseDto tc : items) {
-            final @NotNull List<String> groupStrings = new ArrayList<>();
-            for (final Group g : tc.getGroup()) {
-                groupStrings.add(g.name());
-            }
-            originalGroups.add(groupStrings);
-        }
-
-        return originalGroups;
+        return items.stream().map(tc -> (List<String>) new ArrayList<>(tc.getGroup())).toList();
     }
 
     /**
-     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-206.
+     * UC-EDITOR-PANEL-007.
      * <p>
-     * Writes the groups the tester typed, and says how many rows Testin could
-     * not read.
+     * Writes the groups the tester typed.
      * <p>
-     * This was a fourth reader of the same text, with its own {@code valueOf},
-     * its own upper-casing and its own deduplication - so it took the constant
-     * name where every other surface takes the label the tester is looking at,
-     * and a group it could not read went to the log and nowhere else. A tester
-     * who mistyped one group in a list of four got three back and no sign the
-     * fourth had gone (#264, #295).
+     * Nothing here can be refused any more. This was a fourth reader of the same
+     * text, with its own {@code valueOf}, its own upper-casing and its own
+     * deduplication, so it took the constant name where every other surface took
+     * the label - and a group it could not read went to the log and nowhere else
+     * (#264, #295). It asks {@link Groups} now, and a group Testin has never
+     * seen is a group the tester is adding (#296).
      */
     @Override
     protected void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<List<String>> newValues) {
-        int refused = 0;
-
         for (int i = 0; i < items.size(); i++) {
-            final @NotNull Optional<List<Group>> read = TestDataParser.groups(String.join(",", newValues.get(i)));
-
-            if (read.isEmpty()) {
-                refused++;
-                continue;
-            }
-
-            items.get(i).setGroup(read.get());
+            items.get(i).setGroup(Groups.read(String.join(",", newValues.get(i))));
         }
-
-        TestEditorAttributes.sayWhatWasRefused(p, refused);
     }
+
 }

@@ -12,7 +12,6 @@ import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.Group;
 import org.testin.model.Priority;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -129,7 +128,7 @@ public final class Badges {
         final @NotNull List<Badge> badges = new ArrayList<>();
         addPriorityBadge(badges, tc);
 
-        for (final Group group : tc.getGroup()) {
+        for (final String group : tc.getGroup()) {
             badges.add(createGroupBadge(group));
         }
 
@@ -191,8 +190,8 @@ public final class Badges {
      * A group, as a tag: the ribbon shape is what says this is a label the
      * tester put on the case rather than a state the case is in.
      */
-    public static @NotNull Badge createGroupBadge(final @NotNull Group group) {
-        return new Tag(group.getName(), GROUP_COLOR);
+    public static @NotNull Badge createGroupBadge(final @NotNull String group) {
+        return new Tag(group, GROUP_COLOR);
     }
 
     /**

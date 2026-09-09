@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
-import org.testin.model.Group;
+import org.testin.model.Groups;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseStatus;
 
@@ -156,43 +156,13 @@ public final class TestDataParser {
     /**
      * Reads the groups back out of the text a cell or a sheet holds.
      * <p>
-     * Refused whole rather than in part. A cell reading "Regression, Nonsense"
-     * used to keep Regression and drop the rest without a word, so a tester who
-     * mistyped one group in a list of four got three and no sign that the fourth
-     * had gone (#264). The cell is one value the tester typed, and one value is
-     * kept or refused.
-     * <p>
-     * Blank is the empty list, which is what every reader already treats as
-     * unassigned - a group has an empty form, so blank clears it.
+     * Handed to {@link Groups}, which owns what a group is now that it is a word
+     * rather than a constant (#296). Nothing here can be refused any more - a
+     * name Testin has never seen is a name the tester is adding - so this is the
+     * one parsed column that answers with a value every time.
      */
-    public static @NotNull Optional<List<Group>> groups(final @NotNull String rawGroups) {
-        if (rawGroups.isBlank()) return Optional.of(new ArrayList<>());
-
-        // The picker offers No Group and writes the label it draws, so this has
-        // to read it back. It used to reach Group.valueOf, throw on the angle
-        // brackets and be dropped as an unknown group - a value the plugin
-        // itself offered, silently thrown away (#265). No group is no groups,
-        // which is the empty list every reader already treats as unassigned.
-        if (rawGroups.trim().equalsIgnoreCase(Group.UNASSIGNED.getName())) return Optional.of(new ArrayList<>());
-
-        final @NotNull List<Group> read = new ArrayList<>();
-        for (final String name : rawGroups.split(",")) {
-            final @NotNull String wanted = name.trim();
-            if (wanted.isEmpty()) continue;
-
-            final @NotNull Optional<Group> group = Arrays.stream(Group.values())
-                    .filter(one -> one.name().equalsIgnoreCase(wanted) || one.getName().equalsIgnoreCase(wanted))
-                    .findFirst();
-
-            if (group.isEmpty()) return Optional.empty();
-
-            // Named twice is named once. The bulk editor deduplicated and the
-            // grid did not, so the same cell gave two answers depending on which
-            // one the tester typed it into (#295).
-            if (!read.contains(group.get())) read.add(group.get());
-        }
-
-        return Optional.of(read);
+    public static @NotNull Optional<List<String>> groups(final @NotNull String rawGroups) {
+        return Optional.of(Groups.read(rawGroups));
     }
 
 }

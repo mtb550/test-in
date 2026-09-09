@@ -30,9 +30,8 @@ public enum TestCaseDialogKey implements StatusBarItem {
     CORRECTIONS("Corrections", Shortcuts.Corrections),
 
     ADD_STEP("Add Step", Shortcuts.CreateTestCaseAddStep),
-    REMOVE_STEP("Remove Step", Shortcuts.CreateTestCaseRemoveStep),
     AUTO_COMPLETE("Auto Complete", Shortcuts.AutoComplete),
-    SELECT_GROUP("Select / Unselect Group", Shortcuts.SelectGroup),
+    ADD_GROUP("Add Group", Shortcuts.CreateTestCaseGroup),
 
     NAVIGATE_TAB("Navigate", Shortcuts.TabNext, Shortcuts.TabPrevious),
     NAVIGATE_ARROWS("Navigate Priority", Shortcuts.ArrowUp, Shortcuts.ArrowDown);

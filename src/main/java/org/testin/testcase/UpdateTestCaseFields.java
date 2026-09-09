@@ -100,7 +100,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             GenType.UPDATE_TEST_CASE_STEPS,
             (p, items, updatedItems) -> new StepsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getStepsSection,
-            new TestCaseDialogKey[]{CORRECTIONS, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE}
+            new TestCaseDialogKey[]{CORRECTIONS, ADD_STEP, NAVIGATE_TAB, AUTO_COMPLETE}
     ),
 
     PRIORITY(
@@ -120,7 +120,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             GenType.UPDATE_TEST_CASE_GROUP,
             (p, items, updatedItems) -> new GroupBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getGroupSection,
-            new TestCaseDialogKey[]{NAVIGATE_TAB, SELECT_GROUP}
+            new TestCaseDialogKey[]{ADD_GROUP, AUTO_COMPLETE, NAVIGATE_TAB}
     ),
 
     /**
