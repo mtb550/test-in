@@ -65,6 +65,8 @@ It is a read-only window. Nothing in it can be changed.
 │  Updated At        14 Aug 2026 16:02                         │
 │  Status            In Progress                          (3)  │
 │  Execution Started 12 Aug 2026 10:00                    (4)  │
+│  Execution Ended   12 Aug 2026 13:42                         │
+│  Execution Time    03:42:00                                  │
 │  Platform          Web                                  (5)  │
 │  Component         Frontend                                  │
 │  Total             14                                   (6)  │
@@ -82,8 +84,10 @@ It is a read-only window. Nothing in it can be changed.
 1. **Name and Path** — **Path** is the node's full path on disk.
 2. **Who and when** — who created the node, who last changed it, and the dates.
 3. **Status** — left out on **Test Cases** and **Test Runs**, which have none.
-4. **The execution rows** — **Execution Started** and **Execution Ended**. Only
-   a test run has them, and a test run that never started shows neither.
+4. **The execution rows** — **Execution Started**, **Execution Ended** and
+   **Execution Time**, which is how long the run took. Only a test run has
+   them, and a test run that never started shows none of them. A run that
+   started and has not ended shows the first alone: there is no length yet.
 5. **The settings** — every answer the tester gave when the test run was made.
    Only a test run has them.
 6. **The counts** — what the node holds. Which counts appear depends on the
@@ -126,12 +130,13 @@ else.
    listed beside it. Each one has a color and a count. Inside the ring is the
    pass rate. It reads **Not run** when nothing in the test run has been
    executed.
-9. A test run also shows **Execution Started** and **Execution Ended**. It shows
-   every setting the tester gave when the test run was made: **Test Type**,
-   **Change Log**, **Commit ID**, **Platform**, **Component**, **Language**,
-   **Browser** and **Device Type**.
+9. A test run also shows **Execution Started**, **Execution Ended** and
+   **Execution Time**. It shows every setting the tester gave when the test run
+   was made: **Test Type**, **Change Log**, **Commit ID**, **Platform**,
+   **Component**, **Language**, **Browser** and **Device Type**.
 10. A row with nothing in it is not drawn at all. A test run that never started
-    shows neither execution row.
+    shows none of the three execution rows, and one still running shows only
+    the first.
 11. The tester presses `Escape`. It closes. Nothing was changed, and nothing is
     announced.
 

@@ -7,10 +7,12 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.markers.DetailRow;
 import org.testin.util.Display;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * What a run recorded about its own execution, and what each of those is called.
@@ -63,12 +65,34 @@ public enum TestRunExecution {
     }
 
     /**
+     * What the run took, blank until it has both ends.
+     * <p>
+     * Not a constant of this enum, and that is the point: the two above are
+     * what the run wrote down, and this is arithmetic on them. As a constant it
+     * would reach the Git review through {@code values()}, and one run
+     * finishing would be reported as three fields changing - started, ended,
+     * and the number derived from both.
+     */
+    private static @NotNull String tookIn(final @NotNull TestRunDto run) {
+        final @NotNull ZonedDateTime from = run.getExecutionStartedAt();
+        final @NotNull ZonedDateTime to = run.getExecutionEndedAt();
+
+        if (Config.isNotExecuted(from) || Config.isNotExecuted(to)) return "";
+
+        return Display.formatRunClock(Duration.between(from, to));
+    }
+
+    /**
      * All of them, as rows, in declaration order - which is the order they
-     * happened in.
+     * happened in - and then how long the run took.
+     * <p>
+     * Every reader here drops a blank row, so a run nobody executed shows none
+     * of these rather than three empty ones.
      */
     public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunDto run) {
-        return Arrays.stream(values())
-                .map(field -> new DetailRow(field.displayName, field.valueIn(run)))
+        return Stream.concat(
+                        Arrays.stream(values()).map(field -> new DetailRow(field.displayName, field.valueIn(run))),
+                        Stream.of(new DetailRow("Execution Time", tookIn(run))))
                 .toList();
     }
 }

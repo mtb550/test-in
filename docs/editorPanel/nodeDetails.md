@@ -71,8 +71,9 @@ There is no key for this. The button is at the far right of the toolbar.
    holds. In a test run it shows one slice for each verdict.
 6. **The strip at the bottom** — the only key the dialog answers.
 
-A test run shows more rows: what it recorded about its own execution, and the
-answers the tester gave when it was created.
+A test run shows more rows: when it started, when it ended, how long it took,
+and the answers the tester gave when it was created. The same rows the tree's
+own dialog draws, which is [UC-TREE-PANEL-027](../treePanel/nodeDetails.md).
 
 ## Main flow
 
