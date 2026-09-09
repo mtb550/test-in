@@ -160,8 +160,8 @@ bug report yet.
 | | The rule it breaks | What a tester sees |
 |---|---|---|
 | **Difference 1** | Rule-SETTING-002 — nothing is checked, so nothing warns | A Testin folder that does not exist, or is a file, is stored without a word. The tree then shows its empty state, and nothing connects that to the path just typed. |
-| **Difference 2** | Rule-SETTING-001 — a setting is read by something | **Tester role** is stored and read by nothing at all. It is on no marker, no report and no message. |
-| **Difference 4** | Rule-SETTING-001 — this page owns these values | The default download folder is also written by the import dialog and the export dialog. Choosing a folder there and ticking a box overwrites what this page says. |
+| **Difference 2** | Rule-SETTING-020 — a value this page stores is read by something | **Tester role** is stored and read by nothing at all. It is on no marker, no report and no message. It is reserved rather than dead: [#14](https://github.com/mtb550/test-in/issues/14) is what will read it. |
+| **Difference 4** | Rule-SETTING-023 — this page owns the download folder | The default download folder is also written by the import dialog and the export dialog. Choosing a folder there and ticking a box overwrites what this page says. |
 | **Difference 5** | Rule-SETTING-004 — changing the folder makes Testin read again | Only code projects that have opened the Testin panel read again. A project whose panel was never opened keeps the old folder until it is opened. |
 
 **Fixed since this list was written.** The numbers are left out rather than
@@ -175,15 +175,20 @@ closed up, so an issue that quotes one still points at the right thing.
 
 ## Not decided
 
-**Question 1** — Should **Tester role** exist? Nothing reads it. Either
-something should, or the field should go.
-
 **Question 2** — Should the Testin folder be checked when it is typed? Every
 other refusal in Testin is stated at the moment it happens.
 
 **Question 3** — There is no way to clear the default download folder from the
 import or export dialogs. The box that sets it disappears once it is set. Only
 this page can change it back.
+
+**Settled.** Whether **Tester role** should exist was question 1 here. It is
+answered on [the product page](../product.md): the field is reserved for
+role-based permissions, which is what decides who may approve a test case and
+who may remove a test project. It stays, unread, until
+[#14](https://github.com/mtb550/test-in/issues/14) reads it. What is still open
+there is the list of roles, and that free text cannot answer *may this person
+approve*.
 
 ---
 

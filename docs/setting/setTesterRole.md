@@ -5,7 +5,9 @@
 **As a** tester, **I want** to record what I do,
 **so that** a report or a test case can say it was written by a test engineer.
 
-The row takes a value and stores it. Nothing in Testin reads it yet.
+The row takes a value and stores it. Nothing in Testin reads it yet, and the
+row is kept for the thing that will: role-based permissions,
+[#14](https://github.com/mtb550/test-in/issues/14).
 
 There is no key for this. It is the **Tester role** row.
 
@@ -58,9 +60,11 @@ again. That is difference 2 on
 [the settings page](main.md#where-the-plugin-breaks-its-own-rules).
 
 A tester who fills this row in expects to see the role somewhere. It is
-nowhere. Either something should read it, or the row should go. That is
-question 1 on
-[the settings page](main.md#not-decided).
+nowhere. The row is kept anyway, because role-based permissions will read it to
+decide who may approve a test case and who may remove a test project. That is
+answered on [the product page](../product.md) and tracked in
+[#14](https://github.com/mtb550/test-in/issues/14). What is still open is the
+list of roles: free text cannot answer *may this person approve*.
 
 ---
 
