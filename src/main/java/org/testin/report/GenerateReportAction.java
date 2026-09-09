@@ -85,10 +85,14 @@ public class GenerateReportAction extends AbstractProjectAction {
     }
 
     /**
-     * True when the current selection resolves to a test run.
+     * UC-REPORT-001, Rule-REPORT-016.
+     * <p>
+     * True when the selection is a test run that can be reported on. Asked by
+     * {@code update}, so the tree entry and Ctrl+P gray for the same reason the
+     * toolbar button does.
      */
     public boolean isAvailable() {
-        return selectedRun.get().isPresent();
+        return selectedRun.get().map(tr -> tr.getMarker().getStatus().isReportable()).orElse(false);
     }
 
     /**

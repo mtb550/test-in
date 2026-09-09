@@ -63,6 +63,17 @@ public enum TestRunStatus implements MenuItem {
     private final @NotNull Icon icon;
 
     /**
+     * UC-REPORT-001, Rule-REPORT-016.
+     * <p>
+     * A report is about what a run recorded, and a run still going is still
+     * recording - so the document would describe a state that has already moved
+     * on (#253).
+     */
+    public boolean isReportable() {
+        return this != IN_PROGRESS;
+    }
+
+    /**
      * True when the run has reached a terminal state (completed or closed).
      */
     public boolean isTerminal() {

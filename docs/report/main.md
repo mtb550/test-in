@@ -10,7 +10,7 @@ to somebody who does not have the IDE.
 |---|---|
 | **Part of Testin** | Reports |
 | **Answers** | How a report is made, what it contains, and what each format holds |
-| **Numbering** | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` to `Rule-REPORT-015` |
+| **Numbering** | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` to `Rule-REPORT-016` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -115,7 +115,7 @@ tables**. A tester who wants the whole report should not choose this format.
 |---|---|---|
 | **Difference 1** | Rule-REPORT-003 — a refusal is stated | Fixed. An empty folder, file name or format turns that box's own placeholder red — *Choose a folder*, *Name the file* — and puts the cursor in it, which is what the commit message box already did. |
 | **Difference 2** | Rule-REPORT-003 — `Enter` confirms a dialog | `Enter` does nothing in the report dialog. The tester has to press **Generate**. |
-| **Difference 3** | Rule-REPORT-001 — a report is about one test run | The report button on a run editor's toolbar is never gray. Pressed where no test run can be worked out, it does nothing and says nothing. |
+| **Difference 3** | Rule-REPORT-001 — a report is about one test run | Fixed, and the row overstated it: the button could never actually be unavailable, because it is only ever built with a run editor. What it did offer was a report on a run still being written, which it now grays with the reason in the tooltip (Rule-REPORT-016). |
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.

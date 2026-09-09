@@ -20,6 +20,10 @@ spreadsheet.
   report is written in one go at the end.
 - **Rule-REPORT-004** — A report is written where the tester chose. It never
   lands under the Testin folder.
+- **Rule-REPORT-016** — While a test run is **In Progress**, every way of asking
+  for a report on it is gray: the toolbar button, the tree entry and `Ctrl+P`.
+  The button is still there, with the reason in its tooltip — Testin does not
+  hide a control that cannot work just now.
 - **Rule-REPORT-005** — The project named in a report is the test project, not
   the code project the IDE has open.
 - **Rule-REPORT-006** — The file name is filled in already. It names the test

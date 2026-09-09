@@ -1400,6 +1400,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         stopBtn.setVisible(executing);
         startBtn.updateEnabledState();
         toolBar.getToolbarItem(ResultAnalysisBtn.class).updateEnabledState();
+        toolBar.getToolbarItem(GenerateReportBtn.class).updateEnabledState();
         toolBar.getToolbarItem(LightModeBtn.class).updateState();
 
         toolBar.revalidate();
