@@ -16,7 +16,7 @@ public class CreateJavaClass implements GenAction {
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestSetDirectoryDto dir)) return;
-        final @NotNull List<String> fqcn = Fqcn.ofClass(p, dir);
+        final @NotNull List<String> fqcn = Fqcn.ofClass(dir);
         if (fqcn.isEmpty()) return;
 
         final @NotNull List<String> packageSegments = fqcn.subList(0, fqcn.size() - 1);

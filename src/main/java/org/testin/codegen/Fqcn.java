@@ -1,14 +1,12 @@
 package org.testin.codegen;
 
-import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.notifications.Notifier;
-import org.testin.services.Services;
 import org.testin.util.NameSanitizer;
 
 import java.util.ArrayList;
@@ -74,17 +72,16 @@ public final class Fqcn {
      * Packages and class for a directory, or empty when there is no class to
      * name.
      * <p>
-     * Empty and returned empty, because the message says nothing was built: this
-     * used to notify and then fall into {@code get(-1)} on the next line, so the
-     * tester read "no class name could be built" and got an
-     * IndexOutOfBoundsException to go with it. Callers skip on empty (#66, F1).
+     * Only the test cases directory itself names no class, and the four callers
+     * all skip on empty (#66, F1). It said so in a message titled "Class Name
+     * Unknown", which a tester removing or moving a test set read as a failure
+     * to build something they had not asked for (#249).
      */
-    public static @NotNull List<String> ofClass(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+    public static @NotNull List<String> ofClass(final @NotNull DirectoryDto dir) {
         final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(dir.getPath2());
 
         if (generatedFqcn.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, "Class Name Unknown",
-                    "'" + dir.getName() + "' sits outside a test cases directory, so no automation class name could be built.");
+            Logger.info("No class name for '" + dir.getName() + "': it is the test cases directory itself");
             return List.of();
         }
 

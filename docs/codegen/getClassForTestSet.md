@@ -67,10 +67,8 @@ that message fades after about five seconds.
 **Java Test Source Not Found** reads *Unable to find a Java test source package
 - automation code was not generated.* The test set is still created.
 
-**If the test set sits outside a test cases folder** — a message titled **Class
-Name Unknown** appears. It reads the test set's name, then *sits outside a test
-cases directory, so no automation class name could be built.* Nothing is
-written.
+**If there is no name to build a class from** — nothing is written, and only the
+log says so.
 
 **If the class file is already there** — nothing is written and nothing is said.
 The tester's own code is never overwritten.

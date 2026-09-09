@@ -29,7 +29,7 @@ public class MoveJavaClass implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof Moved moved)) return;
 
-        final @NotNull List<String> fqcn = Fqcn.ofClass(p, moved.dir());
+        final @NotNull List<String> fqcn = Fqcn.ofClass(moved.dir());
         if (fqcn.isEmpty()) return;
 
         final @NotNull Optional<List<String>> found = moved.destinationPackage(p);

@@ -147,7 +147,6 @@ bug report yet.
 | **Difference 4** | Rule-CODEGEN-006 — a tester can find out what happened | Clicking the gutter mark of a test case that was removed does nothing at all. Generated code outlives its test case, so this is the ordinary case. |
 | **Difference 6** | Rule-CODEGEN-004 — the tree and the code agree | Moving a test set to a place Testin has not read leaves the class where it was. The tree and the code then disagree, and only the log says so. |
 | **Difference 7** | Rule-CODEGEN-005 — a missing plugin is a skip | With TestNG but no Java plugin, **Run Test Case** is offered, every test case resolves to nothing, and the tester gets one *has no generated code yet* message per test case with no mention of the missing plugin. |
-| **Difference 8** | Rule-CODEGEN-006 — a refusal names what happened | Removing a test set that sits outside a test cases folder says a class name could not be **built**, during an operation that was only going to delete one. |
 | **Difference 9** | Rule-CODEGEN-003 — one name for one thing | Two test sets whose names come to nothing when the special characters are removed both write into one class called `DefaultTest`. |
 
 **Settled since this list was written.** The numbers are left out rather than
@@ -157,6 +156,7 @@ closed up, so an issue that quotes one still points at the right thing.
 |---|---|
 | **Difference 5** | One state said two ways: *has no generated code yet* when run, **Nothing to open** when jumped to. Both go through the one owner now. Fixed 9 September 2026, [#246](https://github.com/mtb550/test-in/issues/246) |
 | **Difference 1** | `priority` in the generated method carries the position, not the test case's priority. Not a difference: a test method's priority and a test case's priority are different things, and the case's own writes nothing into the code on purpose. Decided 7 September 2026, [#242](https://github.com/mtb550/test-in/issues/242) |
+| **Difference 8** | A removal, a move and a rename all read *Class Name Unknown* from the one place that builds a class name, because only creating one made that news. It goes to the log now, which is what Rule-CODEGEN-006 said all along. Fixed 9 September 2026, [#249](https://github.com/mtb550/test-in/issues/249) |
 
 ---
 

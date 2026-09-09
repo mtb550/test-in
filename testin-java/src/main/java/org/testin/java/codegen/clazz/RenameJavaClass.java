@@ -23,7 +23,7 @@ public class RenameJavaClass implements GenAction {
         if (!(obj instanceof Renamed renamed)) return;
 
         final @NotNull String newName = renamed.newName();
-        final @NotNull List<String> fqcn = Fqcn.ofClass(p, renamed.dir());
+        final @NotNull List<String> fqcn = Fqcn.ofClass(renamed.dir());
         if (fqcn.isEmpty()) return;
         final @NotNull String path = String.join(".", fqcn);
 

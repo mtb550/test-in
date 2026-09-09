@@ -64,14 +64,6 @@ does not mention the code.
 Undoing the removal puts the test data back and writes the classes and methods
 again, empty. What was in the method bodies does not come back.
 
-## Where the plugin breaks its own rules
-
-**A removal can report that a name could not be built.** Removing a test set
-that sits outside a test cases folder shows a message titled **Class Name
-Unknown**. It says no automation class name could be built. The tester was
-deleting, not creating. That is difference 8 on
-[the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
-
 ---
 
 [Documentation](../README.md) › [Automation code and the gutter](main.md)
