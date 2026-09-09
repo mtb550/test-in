@@ -65,6 +65,7 @@ lists, not apologies.
 |---|---|
 | **[Every shortcut](shortcuts.md)** | Every key Testin answers to, what it does, and where |
 | **[The product](product.md)** | Who uses Testin, what they work with, every status, and the rules that hold everywhere |
+| **[Standing decisions](decisions.md)** | Seven designs that look wrong until you know why, and what each one costs to reverse |
 | **[How a document is written](standard.md)** | Read this before writing one |
 
 ## For testers
@@ -85,4 +86,4 @@ What a person needs before their first change.
 |---|---|---|
 | **Architecture** | The layers, the rule that all file access goes through one place, and two walkthroughs | Not written — [#99](https://github.com/mtb550/test-in/issues/99) |
 | **Contributing** | Setup, the checks that must pass, and the run configurations | Not written — [#102](https://github.com/mtb550/test-in/issues/102) |
-| **Standing decisions** | Decisions made once, so they are not argued again in every review | Not written — [#101](https://github.com/mtb550/test-in/issues/101) |
+| **[Standing decisions](decisions.md)** | Seven decisions made once, with the reason each one looks wrong, so they are not argued again in every review | Written |
