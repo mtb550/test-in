@@ -19,13 +19,10 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
 public class CutTestCaseNodeAction extends AbstractProjectAction {
 
-    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
     private final @NotNull TestinEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
@@ -33,7 +30,7 @@ public class CutTestCaseNodeAction extends AbstractProjectAction {
         super(p, "Cut Node", "Cut selected test case(s) to clipboard", AllIcons.Actions.MenuCut);
         this.editor = editor;
         this.list = list;
-        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), list);
+        this.registerCustomShortcutSet(Shortcuts.CutTestCase.getCustomShortcut(), list);
     }
 
     @Override

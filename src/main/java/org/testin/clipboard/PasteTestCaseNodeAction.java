@@ -26,8 +26,6 @@ import org.testin.util.Shortcuts;
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.nio.file.Path;
@@ -39,13 +37,12 @@ import java.util.UUID;
 
 public class PasteTestCaseNodeAction extends AbstractProjectAction {
 
-    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
     private final @NotNull TestinEditor editor;
 
     public PasteTestCaseNodeAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Paste Node", "Paste selected test cases from clipboard", AllIcons.Actions.MenuPaste);
         this.editor = editor;
-        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), list);
+        this.registerCustomShortcutSet(Shortcuts.PasteTestCase.getCustomShortcut(), list);
     }
 
     @Override

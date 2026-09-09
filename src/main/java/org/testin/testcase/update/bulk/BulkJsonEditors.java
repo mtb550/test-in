@@ -25,8 +25,6 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -458,7 +456,7 @@ final class BulkJsonEditors implements DialogComponent {
             // newline inside a value the JSON shape says is one line - and a key
             // that works without being named is a key nobody finds.
             if (key == Shortcuts.Enter) {
-                register(action, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK), target);
+                register(action, Shortcuts.ConfirmAlternative.getKey(), target);
             }
         }
     }

@@ -10,7 +10,6 @@ import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
 import java.util.Objects;
@@ -31,8 +30,7 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
         textArea.setWrapStyleWord(true);
         textArea.setOpaque(true);
 
-        final @NotNull KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-        textArea.getInputMap().put(enter, "stopEditing");
+        textArea.getInputMap().put(Shortcuts.Enter.getKey(), "stopEditing");
         textArea.getActionMap().put("stopEditing", new AbstractAction() {
             @Override
             public void actionPerformed(final ActionEvent e) {

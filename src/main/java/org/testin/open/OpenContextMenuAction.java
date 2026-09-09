@@ -11,7 +11,6 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -27,8 +26,6 @@ import java.util.function.Supplier;
  * deciding which half of the class it was in.
  */
 public class OpenContextMenuAction extends DumbAwareAction {
-
-    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0);
 
     private final @NotNull JComponent owner;
     private final @NotNull DefaultActionGroup cm;
@@ -56,7 +53,7 @@ public class OpenContextMenuAction extends DumbAwareAction {
         this.owner = owner;
         this.cm = cm;
         this.anchor = anchor;
-        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), owner);
+        this.registerCustomShortcutSet(Shortcuts.ContextMenu.getCustomShortcut(), owner);
     }
 
     @Override

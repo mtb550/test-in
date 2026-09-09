@@ -124,11 +124,13 @@ final class LightModeWindow {
      * that opens the details and one that closes them, rather than a single key
      * whose effect depends on what is already on screen.
      * <p>
-     * Constants here rather than in {@link Shortcuts}, which holds the keys more
-     * than one class binds. These are this window's alone.
+     * In {@link Shortcuts} with every other key, though this window is the only
+     * thing that binds them. They used to be constants here, on the rule that
+     * the register holds what more than one class binds - and that rule is what
+     * let CTRL+SHIFT+C stay wrong on a Mac for as long as it did, because a key
+     * declared inside the action that binds it is exactly the key a sweep over
+     * the register cannot see (#25).
      */
-    private static final @NotNull KeyStroke SHOW_DETAILS = KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK);
-    private static final @NotNull KeyStroke HIDE_DETAILS = KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK);
 
     private final @NotNull JFrame frame = new JFrame();
     private final @NotNull RunEditor editor;
@@ -499,8 +501,8 @@ final class LightModeWindow {
     private void bindKeys() {
         bind(Shortcuts.Escape.getKey(), "testin.lightMode.escape", this::escape);
         bind(Shortcuts.Enter.getKey(), "testin.lightMode.commit", this::saveCapture);
-        bind(SHOW_DETAILS, "testin.lightMode.showDetails", () -> showDetails(true));
-        bind(HIDE_DETAILS, "testin.lightMode.hideDetails", () -> showDetails(false));
+        bind(Shortcuts.ShowDetails.getKey(), "testin.lightMode.showDetails", () -> showDetails(true));
+        bind(Shortcuts.HideDetails.getKey(), "testin.lightMode.hideDetails", () -> showDetails(false));
 
         for (final TestStatus status : TestStatus.values()) {
             if (!status.isVerdict()) continue;
@@ -1063,8 +1065,8 @@ final class LightModeWindow {
      */
     private StatusBarItem @NotNull [] caseKeys() {
         final @NotNull List<StatusBarItem> items = new ArrayList<>();
-        items.add(StatusBarShortcut.hint(Shortcuts.shortcutText(SHOW_DETAILS), "Details"));
-        items.add(StatusBarShortcut.hint(Shortcuts.shortcutText(HIDE_DETAILS), "Hide"));
+        items.add(StatusBarShortcut.hint(Shortcuts.ShowDetails.getShortcutText(), "Details"));
+        items.add(StatusBarShortcut.hint(Shortcuts.HideDetails.getShortcutText(), "Hide"));
         items.add(StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), "Close"));
 
         for (final TestStatus status : TestStatus.values()) {

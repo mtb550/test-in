@@ -18,19 +18,16 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
 public class CopyTestCaseNodeAction extends AbstractProjectAction {
 
-    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
     private final @NotNull JBList<TestCaseDto> list;
 
     public CopyTestCaseNodeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Copy Node", "Copy selected test case(s) to clipboard", AllIcons.Actions.Copy);
         this.list = list;
-        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), list);
+        this.registerCustomShortcutSet(Shortcuts.CopyTestCase.getCustomShortcut(), list);
     }
 
     @Override

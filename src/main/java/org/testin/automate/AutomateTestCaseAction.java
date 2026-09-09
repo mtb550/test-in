@@ -17,18 +17,15 @@ import org.testin.services.Services;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 
 public class AutomateTestCaseAction extends AbstractProjectAction {
 
-    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_F12, InputEvent.CTRL_DOWN_MASK);
     private final @NotNull JBList<TestCaseDto> list;
 
     public AutomateTestCaseAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Automate Test Case", "Generate automation code for the selected test case", AllIcons.Actions.IntentionBulb);
         this.list = list;
-        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), list);
+        this.registerCustomShortcutSet(Shortcuts.AutomateTestCase.getCustomShortcut(), list);
     }
 
     // UC-CODEGEN-005, Rule-CODEGEN-025

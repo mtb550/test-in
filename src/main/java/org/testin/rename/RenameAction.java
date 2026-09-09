@@ -21,20 +21,17 @@ import org.testin.services.Services;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.nio.file.Path;
 import java.util.Optional;
 
 public class RenameAction extends AbstractProjectTreeAction {
 
-    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK);
     private final @NotNull TreePanel tp;
 
     public RenameAction(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull SimpleTree tree) {
         super(p, tree, "Rename", "Rename selected node", AllIcons.Actions.Edit);
         this.tp = tp;
-        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
+        this.registerCustomShortcutSet(Shortcuts.Rename.getCustomShortcut(), tree);
     }
 
     // UC-TREE-PANEL-011
@@ -107,6 +104,5 @@ public class RenameAction extends AbstractProjectTreeAction {
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.EDT;
     }
-
 
 }

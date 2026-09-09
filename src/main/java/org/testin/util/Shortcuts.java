@@ -75,6 +75,41 @@ public enum Shortcuts {
     CopyItem(KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask())),
     CutItem(KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask())),
     PasteItem(KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask())),
+
+    /**
+     * The same three gestures for a test case, which is not a node of the tree
+     * and so needs a key of its own on the list (product.md).
+     * <p>
+     * The platform modifier, for the reason {@link #CopyItem} gives one line
+     * up: these three hard-coded CTRL, inside the actions themselves rather than
+     * here, so the sweep that made copy CMD+C on a Mac could not see them. A
+     * tester there had Copy on CMD and Copy Node on CTRL, on one list (#25).
+     */
+    CopyTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask() | InputEvent.SHIFT_DOWN_MASK)),
+    CutTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask() | InputEvent.SHIFT_DOWN_MASK)),
+    PasteTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask() | InputEvent.SHIFT_DOWN_MASK)),
+
+    /**
+     * Testin's own keys, declared here rather than inside the action that binds
+     * them.
+     * <p>
+     * Every one of these was a KeyStroke field in its own class, which is one
+     * key that this file does not know about each - and this file is what says
+     * what a surface answers. Their modifier is left as it was: CTRL is what the
+     * rest of the register uses for a key Testin invented, as against the seven
+     * above that borrow a gesture the platform already owns. Whether a plugin's
+     * own keys should take CMD on a Mac is the half of #25 that needs a Mac to
+     * answer.
+     */
+    AutomateTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_F12, InputEvent.CTRL_DOWN_MASK)),
+    ShowDetails(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK)),
+    HideDetails(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK)),
+
+    /** The platform's own rename key, which is SHIFT+F6 on every desktop. */
+    Rename(KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK)),
+
+    /** The keyboard's menu key. It carries no modifier anywhere. */
+    ContextMenu(KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0)),
     Undo(KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuMask())),
     Redo(KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuMask())),
     DeletePackage(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)),
