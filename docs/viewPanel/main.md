@@ -74,9 +74,8 @@ in front of them while they write down what actually happened.
 | `Ctrl+Left` | Moves to the previous test case | [UC-VIEW-PANEL-003](pageThroughCases.md) |
 | `Escape` | Closes the panel, pressed in the editor | [UC-VIEW-PANEL-015](closePanel.md) |
 | `Ctrl` and the mouse wheel | Makes every Testin text bigger or smaller | [UC-SETTING-011](../setting/changeTextSize.md) |
-
-Two more keys are written in the panel's own tooltips and do nothing there. They
-are difference 1 below.
+| `F5` | Runs the test case on display | [UC-VIEW-PANEL-012](runFromPanel.md) |
+| `Shift+F5` | Opens its generated test method | [UC-VIEW-PANEL-014](goToCode.md) |
 
 ---
 
@@ -162,7 +161,6 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule-VIEW-PANEL-003 — a key that is written is a key that works | The run button's tooltip says `F5`. The go to code button's says `Shift+F5`. Neither key does anything while the focus is in the panel. Both work on the cards in the editor. |
 | **Difference 2** | Rule-VIEW-PANEL-004 — the tester closes the panel when they want the screen | Fixed. `Escape` is registered on the panel's three tabs, so it closes the panel from inside it as well as from the editor — including straight after `F2`, which is what puts the keyboard there. It takes the same step back as everywhere else: a pending cut first, then the panel. |
 | **Difference 4** | Rule-VIEW-PANEL-003 — what looks clickable is clickable | Every step of the path takes a hand pointer and underlines itself. Only the last one does anything. Clicking **Test Cases** to go up a level does nothing, and says nothing. |
 | **Difference 5** | Rule-VIEW-PANEL-008 — the three tabs describe the same test case | A failed test case shows **Blocker** and **High** on the Details tab, while the tab beside it reads *No bugs found for this test case.* The Open Bugs tab is not built, and never looks at the test case. |
@@ -178,6 +176,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 10** | An F2 edit that Testin could find no place to write was dropped in silence. Fixed 7 September 2026, [#234](https://github.com/mtb550/test-in/issues/234) |
 | **Difference 3** | The last step of the path looked for a test set where a test run was, and stopped with an internal error. Fixed 8 September 2026, [#227](https://github.com/mtb550/test-in/issues/227) |
 | **Difference 8** | Run captions had no colon and test case captions did, in one column. The colon was part of the caption; it belongs to the one surface that needs it, which is copied text. Fixed 9 September 2026, [#232](https://github.com/mtb550/test-in/issues/232) |
+| **Difference 1** | The run button's tooltip said `F5` and the go to code button's said `Shift+F5`, and neither key did anything while the focus was in the panel. Both are bound there now, to the same `CardHoverAction` that printed them into the tooltip - so the key and the words cannot drift apart. Fixed 10 September 2026, [#225](https://github.com/mtb550/test-in/issues/225) |
 | **Difference 9** | It emptied the panel whichever editor closed, so a tester reading a test case from the first editor who closed the second watched it go blank. The panel already records which node it is showing, so it is asked. Fixed 9 September 2026, [#233](https://github.com/mtb550/test-in/issues/233) |
 | **Difference 12** | Three doors start Testin and any of them could raise *Testin Setup Required*, so opening the panel to read a test case handed the tester a settings notification. The prompt is about a project opening, so it hangs off the one door that means a project opened. Fixed 9 September 2026, [#236](https://github.com/mtb550/test-in/issues/236) |
 

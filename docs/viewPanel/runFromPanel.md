@@ -7,8 +7,8 @@
 
 The button starts this one test case, on its own.
 
-There is no key that works here. The button's tooltip names `F5`, and `F5` does
-nothing in the panel.
+`F5` does it, which is the key the button's tooltip names and the same key that
+runs a card in the editor.
 
 ## Rules
 
@@ -73,13 +73,6 @@ instead. Stopping is [UC-VIEW-PANEL-013](stopFromPanel.md).
 
 **If the test case has no automation code** — a message reads the test case's
 description, then *has no generated code yet*.
-
-## Where the plugin breaks its own rules
-
-**The tooltip names a key that does nothing here.** It reads `F5`. That key
-belongs to the cards in the editor, not to the panel. A tester who reads the
-tooltip and presses `F5` gets nothing. That is difference 1 on
-[the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---
 

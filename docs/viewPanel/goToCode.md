@@ -7,8 +7,8 @@ case, **so that** I can read or change what the automation actually does.
 
 Testin writes a test method for each test case. This opens that method.
 
-There is no key that works here. The button's tooltip names `Shift+F5`, and
-`Shift+F5` does nothing in the panel.
+`Shift+F5` does it, which is the key the button's tooltip names and the same key
+that opens the code from a card in the editor.
 
 ## Rules
 
@@ -71,10 +71,6 @@ open** reads *No automation has been generated for*, then the test case's
 description, then *yet*.
 
 ## Where the plugin breaks its own rules
-
-**The tooltip names a key that does nothing here.** It reads `Shift+F5`. That
-key belongs to the cards in the editor. That is difference 1 on
-[the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
 
 **The same action has two pictures.** On a menu it is drawn as an arrow. Here,
 and on a card, it is drawn as the icon for a Java class.

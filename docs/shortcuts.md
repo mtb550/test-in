@@ -106,6 +106,8 @@ The always on top window, which has its own keys.
 | `F2` | Opens the menu that changes one field |
 | `Ctrl+Right` | Moves to the next test case |
 | `Ctrl+Left` | Moves to the previous test case |
+| `F5` | Runs the test case on display |
+| `Shift+F5` | Opens its generated test method |
 | `Escape` | Closes the panel, pressed in the editor |
 | `Ctrl` and the wheel | Changes the text size |
 

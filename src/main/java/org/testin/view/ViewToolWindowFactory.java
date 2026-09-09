@@ -98,7 +98,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
                         contentFactory.createContent(tab.paneOf(panel), tab.getDisplayName(), false));
             }
 
-            toolWindow.setTitleActions(new ViewPanelActions().create(panel.getPage(), toolWindow.getComponent()));
+            toolWindow.setTitleActions(new ViewPanelActions().create(panel, toolWindow.getComponent()));
         });
     }
 
