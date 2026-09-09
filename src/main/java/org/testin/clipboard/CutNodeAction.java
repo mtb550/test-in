@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
 
 public class CutNodeAction extends DumbAwareAction {
 

@@ -2,7 +2,6 @@ package org.testin.editor.statusbar;
 
 import org.testin.editor.EditorColors;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.ui.JBColor;
@@ -17,7 +16,6 @@ import org.testin.editor.TestinEditor;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunStatus;
-import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;

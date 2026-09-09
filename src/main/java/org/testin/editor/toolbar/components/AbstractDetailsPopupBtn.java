@@ -12,7 +12,6 @@ import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
 import org.testin.ui.dialogs.DialogStyle;
 
-import javax.swing.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;

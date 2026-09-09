@@ -5,7 +5,6 @@ import com.intellij.ui.LayeredIcon;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.CardTitle;
 
 import javax.swing.*;
 import java.util.List;

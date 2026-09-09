@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.Prose;
 import org.testin.model.TestEditorAttributes;
-import org.testin.util.Display;
 import org.testin.ui.FontSync;
 
 import javax.swing.*;

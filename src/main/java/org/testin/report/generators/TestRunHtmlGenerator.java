@@ -5,7 +5,6 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.DetailRow;
 import org.testin.model.TestRunSummary;
-import org.testin.model.TestStatus;
 import org.testin.report.ReportTile;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;

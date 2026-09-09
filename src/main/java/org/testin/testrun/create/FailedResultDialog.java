@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.*;
-import org.testin.util.Shortcuts;
 
 import java.util.ArrayList;
 import java.util.List;

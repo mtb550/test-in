@@ -8,7 +8,6 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.Display;
 import org.testin.ui.Badges;
 import org.testin.model.Automated;
 import org.testin.ui.framework.Prose;
