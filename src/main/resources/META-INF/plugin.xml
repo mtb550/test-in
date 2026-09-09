@@ -181,7 +181,7 @@
     <!-- Dependencies                                                       -->
     <!-- Only the platform is required. Java, TestNG and Git are optional   -->
     <!-- so Testin loads in PyCharm/GoLand/WebStorm; the code checks        -->
-    <!-- org.testin.util.OptionalPlugin before touching their classes.      -->
+    <!-- org.testin.services.OptionalPlugin before touching their classes.  -->
     <!-- ================================================================== -->
     <depends>com.intellij.modules.platform</depends>
     <depends optional="true" config-file="testin-java.xml">com.intellij.modules.java</depends>
