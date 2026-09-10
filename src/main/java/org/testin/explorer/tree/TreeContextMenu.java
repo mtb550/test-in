@@ -18,7 +18,6 @@ import org.testin.logger.Logger;
 import org.testin.sftp.SyncWithSftpAction;
 import org.testin.EscapeAction;
 import org.testin.explorer.TreePanel;
-import org.testin.git.ViewPendingCommitsAction;
 import org.testin.model.PackageStatus;
 import org.testin.model.ProjectStatus;
 import org.testin.model.TestSetStatus;
@@ -84,7 +83,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         // (#273).
         addSeparator();
         add(Declared.action("Testin.SyncWithRemote"));
-        add(new ViewPendingCommitsAction(p, tree));
+        add(Declared.action("Testin.ViewPendingCommits"));
 
         addSeparator();
         add(new SyncWithSftpAction(p, tree, tp));

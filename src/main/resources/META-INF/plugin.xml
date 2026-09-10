@@ -476,6 +476,14 @@
              every IDE and grays itself with the reason when Git is missing -
              the same answer the tree menu gives (#273). -->
         <action
+                id="Testin.ViewPendingCommits"
+                class="org.testin.git.ViewPendingCommitsAction"
+                text="View Pending Commits"
+                description="Review and push the changed test cases, test runs and markers"
+                icon="AllIcons.Actions.Commit"
+        />
+
+        <action
                 id="Testin.SyncWithRemote"
                 class="org.testin.git.SyncActionAction"
                 text="Sync With Remote"

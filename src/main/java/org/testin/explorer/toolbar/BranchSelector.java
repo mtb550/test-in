@@ -233,7 +233,7 @@ public class BranchSelector {
                 currentBranch, targetBranch,
                 "Switch Anyway", () -> checkout(repositoryPath, targetBranch),
                 List.of(new ConfirmDialog.Alternative(Shortcuts.ConfirmAlternative, "Review Changes",
-                        () -> new ViewPendingCommitsAction(p, tp.getProjectTree().getMainTree()).openFor(repositoryPath))))
+                        () -> ViewPendingCommitsAction.reviewFor(p, repositoryPath))))
                 .show();
     }
 
@@ -284,7 +284,7 @@ public class BranchSelector {
                 // Built on the panel's own tree: the review belongs to the
                 // project the tree is showing, which is the one whose branch
                 // would not switch.
-                () -> new ViewPendingCommitsAction(p, tp.getProjectTree().getMainTree()).openFor(repositoryPath));
+                () -> ViewPendingCommitsAction.reviewFor(p, repositoryPath));
     }
 
     /**
