@@ -417,7 +417,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     // UC-EDITOR-PANEL-005
     @Override
     public void onToolBarCreateTestCaseClicked() {
-        new CreateTestCaseAction(p, this, parent, list).openCreateDialog();
+        CreateTestCaseAction.openCreateDialog(p, this, parent);
     }
 
     // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-092

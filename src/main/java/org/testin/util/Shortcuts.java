@@ -70,7 +70,6 @@ public enum Shortcuts {
     FocusSearch(KeyStroke.getKeyStroke(KeyEvent.VK_F, menuMask())),
 
     // Item operations shared between the project tree, editors, and details panel
-    CreateItem(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK)),
     UpdateItem(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0)),
     /**
      * The platform copy gesture, so it is CMD+C on a Mac like every other copy

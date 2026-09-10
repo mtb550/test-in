@@ -324,6 +324,17 @@
         <!-- The editors' actions. Each reads what the editor has selected from
              TestinData and grays itself outside one (#119). -->
         <action
+                id="Testin.CreateTestCase"
+                class="org.testin.testcase.CreateTestCaseAction"
+                text="Create Test Case"
+                description="Create a new test case in this test set"
+                icon="AllIcons.Actions.AddToDictionary"
+        >
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl M"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta M"/>
+        </action>
+
+        <action
                 id="Testin.RemoveTestCase"
                 class="org.testin.testcase.RemoveTestCaseAction"
                 text="Delete Test Case"

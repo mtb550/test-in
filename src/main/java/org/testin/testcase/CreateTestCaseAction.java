@@ -1,14 +1,14 @@
 package org.testin.testcase;
 
 import org.testin.notifications.Done;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectAction;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
@@ -19,30 +19,34 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.create.CreateTestCaseDialog;
-import org.testin.util.Shortcuts;
 
 import java.util.List;
 import java.util.UUID;
 
-public class CreateTestCaseAction extends AbstractProjectAction {
-    private final @NotNull TestinEditor editor;
-    private final @NotNull TestSetDirectoryDto dir;
-
-    public CreateTestCaseAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
-        super(p, GenType.CREATE_TEST_CASE.getDescription(), "Create new test case", AllIcons.Actions.AddToDictionary);
-        this.editor = editor;
-        this.dir = dir;
-        this.registerCustomShortcutSet(Shortcuts.CreateItem.getCustomShortcut(), list);
-    }
+/**
+ * UC-EDITOR-PANEL-005.
+ * <p>
+ * Declared in {@code plugin.xml} (#119) with Ctrl+M, the same key the tree's
+ * Create carries - and now both are in the keymap, so rebinding Create rebinds
+ * it in both places. Until this one was declared the tree's key was rebindable
+ * and the editor's was not, which is a split a tester would meet and nothing
+ * would explain.
+ */
+public class CreateTestCaseAction extends DumbAwareAction {
 
     // UC-EDITOR-PANEL-005
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        openCreateDialog();
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
+
+        TestinData.editor(e)
+                .filter(TestEditor.class::isInstance)
+                .ifPresent(editor -> openCreateDialog(p, editor, (TestSetDirectoryDto) editor.getParent()));
     }
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-008, Rule-EDITOR-PANEL-030
-    public void openCreateDialog() {
+    public static void openCreateDialog(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull TestSetDirectoryDto dir) {
         new CreateTestCaseDialog(p, dir, tc -> {
             // No rank here. The case arrives unranked, which sorts it last -
             // and the append path already ranks the list it just sorted, so it
@@ -90,12 +94,13 @@ public class CreateTestCaseAction extends AbstractProjectAction {
     // UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-030
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(editor instanceof TestEditor);
+        e.getPresentation().setEnabled(TestinData.editor(e).filter(TestEditor.class::isInstance).isPresent());
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - update() reads only fields/services, never Swing state; do not switch to EDT (#52).
-        return ActionUpdateThread.BGT;
+        // EDT now: update() reads which editor has the keyboard, which the
+        // platform answers from Swing state (#52, #119).
+        return ActionUpdateThread.EDT;
     }
 }

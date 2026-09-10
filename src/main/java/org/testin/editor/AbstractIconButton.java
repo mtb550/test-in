@@ -126,11 +126,22 @@ public abstract class AbstractIconButton extends JButton {
      * others.
      */
     public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Shortcuts shortcut) {
+        this(tooltip, icon, shortcut.getShortcutText());
+    }
+
+    /**
+     * The same, for a button whose command is a declared action (#119).
+     * <p>
+     * The key is asked of the keymap by id rather than named here, so the
+     * tooltip prints whatever the tester has bound. A button naming our default
+     * after they rebound it is the failure declaring an action exists to end.
+     */
+    public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull String shortcutText) {
         this("", icon);
 
         new HelpTooltip()
                 .setDescription(HtmlChunk.text(tooltip))
-                .setShortcut(shortcut.getShortcut())
+                .setShortcut(shortcutText)
                 .installOn(this);
     }
 
