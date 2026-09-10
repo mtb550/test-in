@@ -19,6 +19,7 @@ import org.testin.creator.NodeCreator;
 import org.testin.creator.NotCreatableFromTree;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.services.Services;
+import org.testin.util.NameSanitizer;
 
 import javax.swing.*;
 import java.util.List;
@@ -159,6 +160,38 @@ public enum DirectoryType {
      * The same question on the run side, with the same precedence rule.
      */
     public static final @NotNull List<DirectoryType> UNDER_TEST_RUNS = List.of(TR, TRP);
+
+    /**
+     * UC-TREE-PANEL-008, Rule-TREE-PANEL-095.
+     * <p>
+     * The kinds whose name becomes a Java package - Rule-CODEGEN-008, every
+     * folder above a test set.
+     * <p>
+     * The test set itself is not one of them: its name becomes the class, which
+     * always ends in {@code Test} and so is never a word Java keeps for itself.
+     * The run family generates no code at all, so a test run may be called
+     * anything a folder may be called.
+     * <p>
+     * A list beside the two above it rather than a thirteenth column on the
+     * enum. It is one fact about two constants, and saying "no" seven times in a
+     * constructor argument is harder to read than the two names are.
+     */
+    public static final @NotNull List<DirectoryType> BECOME_JAVA_PACKAGES = List.of(TP, TSP);
+
+    /**
+     * UC-TREE-PANEL-008, Rule-TREE-PANEL-095.
+     * <p>
+     * Whether a node of this kind may be called that - asked by the create and
+     * rename dialogs before the name is stored.
+     * <p>
+     * Asked of the type rather than tested for at the dialogs, so the three that
+     * ask cannot come to three different answers, and a kind of node added later
+     * is covered by the list above rather than by remembering to edit them
+     * (#11).
+     */
+    public boolean canTakeName(final @NotNull String name) {
+        return !BECOME_JAVA_PACKAGES.contains(this) || NameSanitizer.canMakePackageName(name);
+    }
 
     /**
      * The markers a family is recognized by, joined the way a warning says them -

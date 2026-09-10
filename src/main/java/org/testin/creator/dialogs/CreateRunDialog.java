@@ -3,6 +3,7 @@ package org.testin.creator.dialogs;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
+import org.testin.notifications.Refused;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -41,16 +42,18 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
-    // UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-005
+    // UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095
     @Override
     protected void submit() {
-        final @NotNull String name = component().getText().trim();
-        if (name.isEmpty()) {
-            component().showEmptyWarning();
-            return;
-        }
+        // The same question the test side asks, and the run types answer yes to
+        // every name - they generate no code. Asked anyway, so a run node is not
+        // the one dialog that knows a rule instead of asking for it.
+        final @NotNull DirectoryType type = component().getSelectedValue();
 
-        onCreate.accept(name, component().getSelectedValue());
+        final @NotNull String name = accepted(component(), type::canTakeName, Refused.NOT_A_JAVA_NAME);
+        if (name.isEmpty()) return;
+
+        onCreate.accept(name, type);
         closeOk();
     }
 }

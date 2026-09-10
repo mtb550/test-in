@@ -2,7 +2,9 @@ package org.testin.creator.dialogs;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.git.GitRefs;
 import org.testin.model.DirectoryType;
+import org.testin.notifications.Refused;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -42,16 +44,29 @@ public final class CreateProjectDialog extends AbstractFrameworkDialog<TextInput
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
-    // UC-TREE-PANEL-002, Rule-TREE-PANEL-005
+    // UC-TREE-PANEL-002, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095
     @Override
     protected void submit() {
-        final @NotNull String name = component().getText().trim();
-        if (name.isEmpty()) {
-            component().showEmptyWarning();
-            return;
-        }
+        final @NotNull String name = accepted(component(), CreateProjectDialog::isNameOrUrl, Refused.NOT_A_JAVA_NAME);
+        if (name.isEmpty()) return;
 
         onCreate.accept(name);
         closeOk();
+    }
+
+    /**
+     * UC-TREE-PANEL-002, UC-TREE-PANEL-003, Rule-TREE-PANEL-095.
+     * <p>
+     * Whether what was typed is something this dialog can act on - and the one
+     * field means the rule has two halves, the way the dialog itself does.
+     * <p>
+     * A test project's name becomes the first Java package of everything under
+     * it, so it has to be a name Java accepts. A repository address does not: the
+     * folder is named by {@code testin.yml} rather than by the URL, so a URL is
+     * never asked to be a Java name and refusing it for not being one would
+     * refuse the clone this dialog exists to offer.
+     */
+    private static boolean isNameOrUrl(final @NotNull String typed) {
+        return GitRefs.isRepositoryUrl(typed) || DirectoryType.TP.canTakeName(typed);
     }
 }

@@ -50,6 +50,10 @@ A test set package is a folder that holds test sets. This makes one.
   and no automation code is written for it.
 - **Rule-TREE-PANEL-028** — A test set package can hold another test set
   package, as deep as the tester needs.
+- **Rule-TREE-PANEL-095** — A folder that becomes a Java package will not take a
+  name Java refuses - New, Class, Import - whether it is being created or
+  renamed. The tester is told while they are still looking at what they typed,
+  rather than finding a package named something else.
 
 Rule-TREE-PANEL-024 and Rule-TREE-PANEL-025 hold here too. They say what can be
 created where, and they are on [UC-TREE-PANEL-007](createTestSet.md).
@@ -80,6 +84,11 @@ and the cursor stays in the box.
 
 **If a node with that name already exists under the parent** — the dialog
 closes, nothing is created, and *\<name\> Already Exists* is shown in red.
+
+**If the name cannot be a Java package** — the dialog stays open with the name
+still in the box, and *'\<name\>' cannot name a Java package* is shown in red.
+`New`, `Class` and `Import` are the usual ones: Java keeps those words for
+itself. (Rule-TREE-PANEL-095)
 
 **If the test project, a test set or a test run is selected** — **Create** is
 gray, and `Ctrl+M` does nothing.

@@ -6,6 +6,9 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.ui.components.JBPanel;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
+import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
+import org.testin.services.Services;
 import org.testin.statusbar.StatusBarBase;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.ui.dialogs.DialogStyle;
@@ -15,6 +18,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * The dialog framework shell (issue #11). A concrete dialog assigns the
@@ -95,6 +99,53 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
      * What the dialog does when it is confirmed; wire it in {@link #shortcuts}.
      */
     protected abstract void submit();
+
+    /**
+     * UC-INTERNAL-007, Rule-INTERNAL-067.
+     * <p>
+     * What the tester typed into that field, once it is something this dialog
+     * will take - and empty when it is not, with the field already marked as the
+     * one holding the dialog open.
+     * <p>
+     * Six dialogs opened {@code submit()} with the same four lines: read the
+     * field, trim it, warn if it is empty, return. They agreed only because
+     * nobody had yet changed one of them, and the one that did not agree was the
+     * report dialog, which moved the cursor and said nothing (#251, #11).
+     * <p>
+     * Trimmed here rather than by the field, because a surrounding space is a
+     * question about the value and not about the component holding it.
+     */
+    protected final @NotNull String accepted(final @NotNull TextValue field) {
+        final @NotNull String value = field.getText().trim();
+        if (value.isEmpty()) field.showEmptyWarning();
+
+        return value;
+    }
+
+    /**
+     * UC-INTERNAL-007, Rule-INTERNAL-067.
+     * <p>
+     * The same, for a field that also has a rule about what it may hold - a
+     * repository address, an email address, a name that can become a Java
+     * package.
+     * <p>
+     * <b>Empty means the dialog will not take what is there</b>, whether the
+     * field was blank or the value was refused, so a caller has one thing to
+     * test and the same thing to do about it. Which of the two it was has
+     * already been said, in the place that says it best: the field itself when
+     * nothing was typed, and a sentence naming the value when something was.
+     * <p>
+     * Refused here rather than after the dialog closes, which is the whole point
+     * of asking in a dialog of ours - the tester is still looking at what they
+     * typed and can correct it.
+     */
+    protected final @NotNull String accepted(final @NotNull TextValue field, final @NotNull Predicate<String> allows, final @NotNull Refused refusal) {
+        final @NotNull String value = accepted(field);
+        if (value.isEmpty() || allows.test(value)) return value;
+
+        Services.getInstance(p, Notifier.class).softRefuse(p, refusal, value);
+        return "";
+    }
 
     /**
      * UC-INTERNAL-007, Rule-INTERNAL-057.

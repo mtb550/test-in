@@ -61,11 +61,8 @@ final class SftpAccountDialog extends AbstractFrameworkDialog<TextInput> {
     // UC-SHARE-019
     @Override
     protected void submit() {
-        final @NotNull String user = userField.getText().trim();
-        if (user.isEmpty()) {
-            userField.showEmptyWarning();
-            return;
-        }
+        final @NotNull String user = accepted(userField);
+        if (user.isEmpty()) return;
 
         onGiven.accept(new Account(user, passwordField.getText()));
         closeOk();

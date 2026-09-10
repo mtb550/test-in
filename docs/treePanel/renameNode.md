@@ -96,6 +96,13 @@ are dropped first.
 **If a sibling already has the new name** — nothing is renamed, and *\<name\>
 Already Exists* is shown in red.
 
+**If the name cannot be a Java package** — the dialog stays open with the name
+still in the box, and *'\<name\>' cannot name a Java package* is shown in red.
+`New`, `Class` and `Import` are the usual ones: Java keeps those words for
+itself. (Rule-TREE-PANEL-095) Only the test project and the test set
+packages are asked: a test set's name becomes the class, which always ends in
+`Test`, and a test run generates no code at all.
+
 **If the test project or a container is selected** — **Rename** is gray, and
 `Shift+F6` does nothing.
 

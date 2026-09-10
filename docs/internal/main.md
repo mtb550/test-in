@@ -13,7 +13,7 @@ up here rather than left to the code.
 |---|---|
 | **Part of Testin** | The parts that belong to no panel |
 | **Answers** | What the search finds, and what Testin does with the files under the Testin folder |
-| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-007`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-066` |
+| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-007`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-067` |
 | **State** | **Written** |
 | **Checked against** | `main` at `2cb8c1dc`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -30,7 +30,7 @@ up here rather than left to the code.
 | **UC-INTERNAL-004** | [Give a test case its number](numberTestCase.md) | Quote one number that means the same everywhere. | Rule-INTERNAL-025 to Rule-INTERNAL-035 |
 | **UC-INTERNAL-005** | [Keep a removed node so it can come back](keepRemovedNode.md) | Get back what a wrong Delete took away. | Rule-INTERNAL-036 to Rule-INTERNAL-045 |
 | **UC-INTERNAL-006** | [Count what a node holds](countNodeContents.md) | See what a node holds before removing it. | Rule-INTERNAL-046 to Rule-INTERNAL-052, Rule-INTERNAL-065 |
-| **UC-INTERNAL-007** | [Answer any Testin dialog](dialogFramework.md) | Learn one dialog and know them all. | Rule-INTERNAL-053 to Rule-INTERNAL-061 |
+| **UC-INTERNAL-007** | [Answer any Testin dialog](dialogFramework.md) | Learn one dialog and know them all. | Rule-INTERNAL-053 to Rule-INTERNAL-061, Rule-INTERNAL-067 |
 
 ---
 

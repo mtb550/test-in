@@ -3,6 +3,9 @@ package org.testin.rename;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.DirectoryType;
+import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.notifications.Refused;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -19,10 +22,17 @@ final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
 
     private final @NotNull Consumer<@NotNull String> onSubmit;
 
+    /**
+     * The kind of node being renamed, which is what decides whether the new name
+     * has to be one Java can take - see {@link DirectoryType#canTakeName}.
+     */
+    private final @NotNull DirectoryType type;
+
     // UC-TREE-PANEL-011
-    RenameDialog(final @NotNull Project p, final @NotNull String currentName, final @NotNull Consumer<@NotNull String> onSubmit) {
+    RenameDialog(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull Consumer<@NotNull String> onSubmit) {
         super(p);
         this.onSubmit = onSubmit;
+        this.type = dir.getType();
 
         title = "Rename";
 
@@ -30,7 +40,7 @@ final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
                 ComponentDialogBase.textField()
                         .icon(AllIcons.Actions.Edit)
                         .placeholder("set new name...")
-                        .value(currentName)
+                        .value(dir.getName())
                         .build());
 
         shortcuts = List.of(
@@ -38,14 +48,11 @@ final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
-    // UC-TREE-PANEL-011, Rule-TREE-PANEL-005
+    // UC-TREE-PANEL-011, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095
     @Override
     protected void submit() {
-        final @NotNull String value = component().getText().trim();
-        if (value.isEmpty()) {
-            component().showEmptyWarning();
-            return;
-        }
+        final @NotNull String value = accepted(component(), type::canTakeName, Refused.NOT_A_JAVA_NAME);
+        if (value.isEmpty()) return;
 
         onSubmit.accept(value);
         closeOk();

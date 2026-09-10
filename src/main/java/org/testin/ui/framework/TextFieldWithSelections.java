@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * the tester types. A dialog with fixed choices declares rows that ignore the
  * query, and behaves exactly as it did before that was possible.
  */
-public final class TextFieldWithSelections<T> implements DialogComponent {
+public final class TextFieldWithSelections<T> implements DialogComponent, TextValue {
 
     /**
      * How long after the last keystroke the rows are asked for again. The same
@@ -225,10 +225,12 @@ public final class TextFieldWithSelections<T> implements DialogComponent {
         return ListValue.selected(list).map(SelectionList::value);
     }
 
+    @Override
     public @NotNull String getText() {
         return textField.getText();
     }
 
+    @Override
     public void showEmptyWarning() {
         input.showEmptyWarning();
     }

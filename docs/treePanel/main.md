@@ -9,7 +9,7 @@ test set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The tree panel |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-028`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-094` |
+| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-028`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-095` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code |
 | **Written to** | [How a document is written](../standard.md) |
@@ -247,6 +247,7 @@ A refusal fades too. It says what stopped the action, and nothing was changed.
 | *\<name\> has no test cases to run* | Nothing under the node can be run | [UC-TREE-PANEL-023](runTests.md) |
 | *No Test Projects* | There is nothing to choose. It adds *Create one under the Testin root first* | [UC-TREE-PANEL-004](chooseTestProject.md) |
 | *Java Test Source Not Found* | The IDE project has no Java test folder, so no automation code is written | [UC-TREE-PANEL-007](createTestSet.md) |
+| *'\<name\>' cannot name a Java package* | The name is a word Java keeps for itself, on a folder that becomes a package | [UC-TREE-PANEL-002](createTestProject.md), [UC-TREE-PANEL-008](createTestSetPackage.md), [UC-TREE-PANEL-011](renameNode.md) |
 
 ### When something failed
 

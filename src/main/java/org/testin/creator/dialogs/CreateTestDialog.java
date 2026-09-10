@@ -3,6 +3,7 @@ package org.testin.creator.dialogs;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
+import org.testin.notifications.Refused;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -42,16 +43,18 @@ public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWit
         );
     }
 
-    // UC-TREE-PANEL-007, UC-TREE-PANEL-008, Rule-TREE-PANEL-005
+    // UC-TREE-PANEL-007, UC-TREE-PANEL-008, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095
     @Override
     protected void submit() {
-        final @NotNull String name = component().getText().trim();
-        if (name.isEmpty()) {
-            component().showEmptyWarning();
-            return;
-        }
+        // Which of the two was picked decides what the name has to be able to
+        // do: a test set package becomes a Java package and a test set becomes
+        // the class. Asked of the type rather than written out here (#11).
+        final @NotNull DirectoryType type = component().getSelectedValue();
 
-        onCreate.accept(name, component().getSelectedValue());
+        final @NotNull String name = accepted(component(), type::canTakeName, Refused.NOT_A_JAVA_NAME);
+        if (name.isEmpty()) return;
+
+        onCreate.accept(name, type);
         closeOk();
     }
 }

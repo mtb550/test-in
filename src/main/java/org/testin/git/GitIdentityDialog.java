@@ -2,9 +2,7 @@ package org.testin.git;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.services.Services;
 import org.testin.notifications.Refused;
-import org.testin.notifications.Notifier;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
@@ -67,30 +65,17 @@ final class GitIdentityDialog extends AbstractFrameworkDialog<TextInput> {
         scope = where.getComponent();
     }
 
-    // UC-SHARE-008, Rule-SHARE-108
+    // UC-SHARE-008, Rule-SHARE-108, Rule-INTERNAL-067
     @Override
     protected void submit() {
-        final @NotNull String name = nameField.getText().trim();
-        if (name.isEmpty()) {
-            nameField.showEmptyWarning();
-            return;
-        }
+        final @NotNull String name = accepted(nameField);
+        if (name.isEmpty()) return;
 
-        final @NotNull String email = emailField.getText().trim();
-        if (email.isEmpty()) {
-            emailField.showEmptyWarning();
-            return;
-        }
-
-        // Refused here rather than found out later, which is the whole point of
-        // asking in a dialog of ours - the same argument RemoteUrlDialog makes
-        // one field over. Git records whatever it is handed, so a name typed
-        // into the email box is not noticed until somebody reads a commit and
-        // wonders who wrote it (#272).
-        if (!GitRefs.isEmailAddress(email)) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NOT_AN_EMAIL_ADDRESS, email);
-            return;
-        }
+        // Git records whatever it is handed, so a name typed into the email box
+        // is not noticed until somebody reads a commit and wonders who wrote it
+        // (#272).
+        final @NotNull String email = accepted(emailField, GitRefs::isEmailAddress, Refused.NOT_AN_EMAIL_ADDRESS);
+        if (email.isEmpty()) return;
 
         onSet.accept(new Identity(name, email, scope.getSelected()));
         closeOk();

@@ -2,9 +2,7 @@ package org.testin.git;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
-import org.testin.services.Services;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -60,23 +58,11 @@ final class RemoteUrlDialog extends AbstractFrameworkDialog<TextInput> {
         urlField = url.getComponent();
     }
 
-    // UC-SHARE-013, Rule-SHARE-060
+    // UC-SHARE-013, Rule-SHARE-060, Rule-INTERNAL-067
     @Override
     protected void submit() {
-        final @NotNull String typed = urlField.getText().trim();
-
-        if (typed.isEmpty()) {
-            urlField.showEmptyWarning();
-            return;
-        }
-
-        // Refused here rather than at the push, which is the whole point of
-        // asking in a dialog of ours: the tester is still looking at what they
-        // typed and can correct it.
-        if (!GitRefs.isRepositoryUrl(typed)) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NOT_A_REPOSITORY_URL, typed);
-            return;
-        }
+        final @NotNull String typed = accepted(urlField, GitRefs::isRepositoryUrl, Refused.NOT_A_REPOSITORY_URL);
+        if (typed.isEmpty()) return;
 
         onUrl.accept(typed);
         closeOk();

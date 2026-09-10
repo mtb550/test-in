@@ -36,6 +36,10 @@ and which keys it answers, and the shell builds the rest.
 - **Rule-INTERNAL-061** — A dialog opens in the middle of the window at the size
   its contents need. A dialog that asks for a size instead can be moved and
   resized.
+- **Rule-INTERNAL-067** — A dialog says why it will not take what was typed and
+  stays open with the value still in the field. An empty field is marked as the
+  one holding the dialog open; a value the dialog refuses for any other reason
+  is refused in one sentence naming the value.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

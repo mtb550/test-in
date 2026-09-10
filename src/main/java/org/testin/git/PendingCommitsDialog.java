@@ -290,14 +290,10 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         final @NotNull List<PendingChange> selected = selectedDifferences();
         if (selected.isEmpty()) return;
 
-        // Said here, next to the empty field, rather than as a balloon after the
-        // dialog closed and took the changes off the screen with it.
-        if (message.getText().isBlank()) {
-            message.showEmptyWarning();
-            return;
-        }
+        final @NotNull String written = accepted(message);
+        if (written.isEmpty()) return;
 
-        onCommit.accept(new Request(selected, message.getText().trim(),
+        onCommit.accept(new Request(selected, written,
                 PUSH.equals(commit.getChosen()), branch.getValue(), branch.isNew()));
         closeOk();
     }

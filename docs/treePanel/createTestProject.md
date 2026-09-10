@@ -96,6 +96,12 @@ open.
 **If a folder with that name already exists in the Testin folder** — nothing is
 created, and *\<name\> Already Exists* is shown in red.
 
+**If the name cannot be a Java package** — the dialog stays open with the name
+still in the box, and *'\<name\>' cannot name a Java package* is shown in red.
+`New`, `Class` and `Import` are the usual ones: Java keeps those words for
+itself. (Rule-TREE-PANEL-095) A repository address is never asked to be
+one: the folder is named by `testin.yml` rather than by the URL.
+
 **If no Testin folder is set** — the **New Test Project** button is gray.
 (Rule-TREE-PANEL-089)
 

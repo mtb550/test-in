@@ -114,6 +114,23 @@ public enum Refused {
     NOT_AN_EMAIL_ADDRESS("'%s' is not an email address"),
 
     /**
+     * UC-TREE-PANEL-008, Rule-TREE-PANEL-095, Rule-CODEGEN-073.
+     * <p>
+     * The tester named a folder something that cannot become a Java package -
+     * a word Java keeps for itself, or a name with nothing left in it once the
+     * illegal characters go. Every folder above a test set becomes a package,
+     * so the code under it would have been in a package named something else.
+     * <p>
+     * The third of this shape, and the same argument as the two above it: said
+     * while the tester is still looking at what they typed. The generator has an
+     * answer for such a name either way - it has to, because a name can arrive
+     * by import or by sync and never pass a dialog at all - but an answer
+     * nobody chose is not what a tester who is sitting right there should get
+     * (#11).
+     */
+    NOT_A_JAVA_NAME("'%s' cannot name a Java package"),
+
+    /**
      * UC-CODEGEN-007, Rule-CODEGEN-069.
      * <p>
      * The tester clicked the gutter mark beside a generated method whose test

@@ -45,7 +45,7 @@ public class RenameAction extends DumbAwareAction {
 
         TestinData.singleSelectedNode(e)
                 .filter(DirectoryDto::isRenamable)
-                .ifPresent(dir -> new RenameDialog(p, dir.getName(), newName -> renameNode(p, dir, newName)).show());
+                .ifPresent(dir -> new RenameDialog(p, dir, newName -> renameNode(p, dir, newName)).show());
     }
 
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-004

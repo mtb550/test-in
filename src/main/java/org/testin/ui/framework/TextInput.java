@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  * other single-value input. Same look and empty-submit cue as
  * {@link TextFieldWithSelections}, without the selection list.
  */
-public final class TextInput implements DialogComponent {
+public final class TextInput implements DialogComponent, TextValue {
 
     /**
      * What a field with no rule accepts: anything at all, and no filter is
@@ -109,10 +109,12 @@ public final class TextInput implements DialogComponent {
         });
     }
 
+    @Override
     public @NotNull String getText() {
         return input.getText();
     }
 
+    @Override
     public void showEmptyWarning() {
         input.showEmptyWarning();
     }
