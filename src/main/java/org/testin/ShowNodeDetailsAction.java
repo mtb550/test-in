@@ -1,27 +1,31 @@
 package org.testin;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.view.marker.MarkerDetailsViewDialog;
+import com.intellij.openapi.project.DumbAwareAction;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
 
 
-public class ShowNodeDetailsAction extends AbstractProjectTreeAction {
-
-    public ShowNodeDetailsAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, tree, "Details", "Show node details", AllIcons.General.IndentDetected);
-    }
+/**
+ * UC-TREE-PANEL-027.
+ * <p>
+ * Declared in {@code plugin.xml} (#119): the platform builds one instance for
+ * the IDE, so what it acts on comes from the keystroke rather than from whoever
+ * built it, and its name, description and icon are in the XML the Keymap reads.
+ */
+public class ShowNodeDetailsAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-027, Rule-TREE-PANEL-087
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
 
-        TreeValueUtil.singleSelectedDirectory(tree).ifPresent(dir -> new MarkerDetailsViewDialog(p, dir).show());
+        TestinData.singleSelectedNode(e).ifPresent(dir -> new MarkerDetailsViewDialog(p, dir).show());
     }
 
     /**
@@ -34,7 +38,7 @@ public class ShowNodeDetailsAction extends AbstractProjectTreeAction {
      */
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(TreeValueUtil.singleSelectedDirectory(tree).isPresent());
+        e.getPresentation().setEnabled(TestinData.singleSelectedNode(e).isPresent());
     }
 
     @Override

@@ -10,10 +10,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.util.Shortcuts;
+
+import javax.swing.JComponent;
 import org.testin.logger.Logger;
 import org.testin.sftp.SyncWithSftpAction;
 import org.testin.EscapeAction;
-import org.testin.ShowNodeDetailsAction;
 import org.testin.clipboard.CopyNodeAction;
 import org.testin.clipboard.CutNodeAction;
 import org.testin.clipboard.PasteNodeAction;
@@ -26,7 +28,6 @@ import org.testin.importexport.imports.ImportAction;
 import org.testin.model.PackageStatus;
 import org.testin.model.ProjectStatus;
 import org.testin.model.TestSetStatus;
-import org.testin.open.OpenAction;
 import org.testin.order.OrderNodeAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.remove.RemoveAction;
@@ -52,7 +53,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         super("Tree Popup Menu", true);
         this.p = p;
 
-        add(new OpenAction(p, tree));
+        add(declared("Testin.Open"));
         add(new CreateTreeNodeAction(p, tree));
 
         addSeparator();
@@ -106,7 +107,7 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         add(new GenerateReportAction(p, tree));
 
-        add(new ShowNodeDetailsAction(p, tree));
+        add(declared("Testin.ShowNodeDetails"));
 
     }
 
@@ -138,6 +139,21 @@ public class TreeContextMenu extends DefaultActionGroup {
      * names nothing is a wiring mistake rather than a state, so it is said once
      * here instead of returning something that quietly does nothing.
      */
+    /**
+     * UC-TREE-PANEL-001.
+     * <p>
+     * Puts a declared action's key on one component rather than in the keymap.
+     * <p>
+     * For the keys that are a surface's gesture and not a command: ENTER opens
+     * what a tree has selected, and a global ENTER would fire in every editor in
+     * the IDE. The action is still declared - Find Action offers it, the Keymap
+     * lists it with no default - and there is still one action behind the menu
+     * entry and the key (#119).
+     */
+    public static void bindToTree(final @NotNull String id, final @NotNull Shortcuts shortcut, final @NotNull JComponent tree) {
+        declared(id).registerCustomShortcutSet(shortcut.getCustomShortcut(), tree);
+    }
+
     private static @NotNull AnAction declared(final @NotNull String id) {
         final @Nullable AnAction action = ActionManager.getInstance().getAction(id);
 

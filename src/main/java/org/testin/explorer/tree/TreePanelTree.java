@@ -13,6 +13,7 @@ import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
+import org.testin.util.Shortcuts;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
@@ -103,6 +104,11 @@ public class TreePanelTree implements Disposable {
         final @NotNull TreeContextMenu treeContextMenu = new TreeContextMenu(p, tp, mainTree);
         mainTree.addMouseListener(new TreeMouseListener(p, mainTree, treeContextMenu));
         treeContextMenu.registerShortcuts(mainTree, transferHandler);
+
+        // ENTER on a tree is that tree's gesture rather than a command, so it is
+        // not in the keymap - it is put on the declared action here, which keeps
+        // one action behind both the menu entry and the key (#119).
+        TreeContextMenu.bindToTree("Testin.Open", Shortcuts.Enter, mainTree);
     }
 
     /**

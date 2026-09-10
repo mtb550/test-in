@@ -1,33 +1,35 @@
 package org.testin.open;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
 import org.testin.editor.EditorUtil;
-import org.testin.util.Shortcuts;
+import com.intellij.openapi.project.DumbAwareAction;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
+import java.util.List;
 
 
-public class OpenAction extends AbstractProjectTreeAction {
-
-    public OpenAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, tree, "Open", "Open selected test sets or runs", AllIcons.Actions.MenuOpen);
-
-        this.registerCustomShortcutSet(Shortcuts.Enter.getCustomShortcut(), tree);
-    }
+/**
+ * UC-TREE-PANEL-005, UC-TREE-PANEL-006.
+ * <p>
+ * Declared in {@code plugin.xml} (#119) so Find Action offers it, and with no
+ * {@code keyboard-shortcut} of its own: ENTER on a tree is that tree's gesture,
+ * not a command, and a global ENTER would fire in every editor in the IDE. The
+ * tree registers it on the declared instance instead, which keeps one action
+ * behind both the menu entry and the key.
+ */
+public class OpenAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-005, UC-TREE-PANEL-006, Rule-TREE-PANEL-022
-    public void execute(final @NotNull Project p) {
+    public static void execute(final @NotNull Project p, final @NotNull List<DirectoryDto> selected) {
         // Unresolvable nodes are not in the list at all, and one that cannot be
         // opened is skipped: the rest of the selection still opens.
-        TreeValueUtil.selectedDirectories(tree.getSelectionPaths()).stream()
+        selected.stream()
                 .filter(DirectoryDto::isOpenableInEditor)
                 .forEach(dir -> {
                     Logger.info("open: " + dir.getPath());
@@ -38,13 +40,16 @@ public class OpenAction extends AbstractProjectTreeAction {
     // UC-TREE-PANEL-005, UC-TREE-PANEL-006
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        execute(p);
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
+
+        execute(p, TestinData.selectedNodes(e));
     }
 
     // UC-TREE-PANEL-005, Rule-TREE-PANEL-022
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(TreeValueUtil.selectedDirectories(tree.getSelectionPaths()).stream()
+        e.getPresentation().setEnabled(TestinData.selectedNodes(e).stream()
                 .anyMatch(DirectoryDto::isOpenableInEditor));
     }
 

@@ -40,7 +40,7 @@ public class TreeMouseListener extends PopupHandler {
         if (nodeAt(e.getX(), e.getY()).isEmpty()) return;
 
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-            new OpenAction(p, tree).execute(p);
+            OpenAction.execute(p, TreeValueUtil.selectedDirectories(tree.getSelectionPaths()));
             e.consume();
         }
     }
