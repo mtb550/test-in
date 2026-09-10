@@ -92,7 +92,6 @@ public enum Shortcuts {
      * here, so the sweep that made copy CMD+C on a Mac could not see them. A
      * tester there had Copy on CMD and Copy Node on CTRL, on one list (#25).
      */
-    PasteTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask() | InputEvent.SHIFT_DOWN_MASK)),
 
     /**
      * Testin's own keys, declared here rather than inside the action that binds

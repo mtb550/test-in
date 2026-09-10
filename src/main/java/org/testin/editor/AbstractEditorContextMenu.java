@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
-import org.testin.clipboard.PasteTestCaseNodeAction;
 import org.testin.actions.Declared;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.ui.ActionsMenu;
@@ -56,7 +55,7 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
         actions.add(Declared.action("Testin.CopyTestCase"));
         actions.add(Declared.action("Testin.CopyTestCaseNode"));
         actions.add(Declared.action("Testin.CutTestCaseNode"));
-        actions.add(new PasteTestCaseNodeAction(p, ui, list));
+        actions.add(Declared.action("Testin.PasteTestCaseNode"));
         actions.add(new RemoveTestCaseAction(p, ui, dir, list, model));
 
         actions.addSeparator();

@@ -324,6 +324,17 @@
         <!-- The editors' actions. Each reads what the editor has selected from
              TestinData and grays itself outside one (#119). -->
         <action
+                id="Testin.PasteTestCaseNode"
+                class="org.testin.clipboard.PasteTestCaseNodeAction"
+                text="Paste Test Case"
+                description="Paste the test cases on the clipboard into this test set"
+                icon="AllIcons.Actions.MenuPaste"
+        >
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift V"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift V"/>
+        </action>
+
+        <action
                 id="Testin.CopyTestCaseNode"
                 class="org.testin.clipboard.CopyTestCaseNodeAction"
                 text="Copy Test Case"
