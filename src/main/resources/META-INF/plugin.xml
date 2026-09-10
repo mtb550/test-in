@@ -324,6 +324,16 @@
         <!-- The editors' actions. Each reads what the editor has selected from
              TestinData and grays itself outside one (#119). -->
         <action
+                id="Testin.AutomateTestCase"
+                class="org.testin.automate.AutomateTestCaseAction"
+                text="Automate Test Case"
+                description="Generate automation code for the selected test case"
+                icon="AllIcons.Actions.IntentionBulb"
+        >
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl F12"/>
+        </action>
+
+        <action
                 id="Testin.RunTestCase"
                 class="org.testin.run.RunTestCaseAction"
                 text="Run Test Case"

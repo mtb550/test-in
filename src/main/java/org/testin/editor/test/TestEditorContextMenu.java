@@ -6,7 +6,6 @@ import com.intellij.ui.components.JBList;
 import org.testin.actions.Declared;
 import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
-import org.testin.automate.AutomateTestCaseAction;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
@@ -50,7 +49,7 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
         // that could not resolve a single case (#248).
         addSeparator();
 
-        add(new AutomateTestCaseAction(p, list));
+        add(Declared.action("Testin.AutomateTestCase"));
         add(Declared.action("Testin.RunTestCase"));
         add(Declared.action("Testin.NavigateToCode"));
 

@@ -1,32 +1,28 @@
 package org.testin.automate;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectAction;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
 
-import java.util.Optional;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
-import org.testin.util.Shortcuts;
 
-import javax.swing.*;
 
-public class AutomateTestCaseAction extends AbstractProjectAction {
-
-    private final @NotNull JBList<TestCaseDto> list;
-
-    public AutomateTestCaseAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
-        super(p, "Automate Test Case", "Generate automation code for the selected test case", AllIcons.Actions.IntentionBulb);
-        this.list = list;
-        this.registerCustomShortcutSet(Shortcuts.AutomateTestCase.getCustomShortcut(), list);
-    }
+/**
+ * UC-CODEGEN-005.
+ * <p>
+ * Declared in {@code plugin.xml} (#119), with Ctrl+F12 as its default. Find
+ * Action is where a tester goes looking for "automate", and this entry saying
+ * "not built yet" there is a better answer than nothing being found.
+ */
+public class AutomateTestCaseAction extends DumbAwareAction {
 
     /**
      * What the entry is called while it does nothing: the name, and the reason
@@ -43,12 +39,15 @@ public class AutomateTestCaseAction extends AbstractProjectAction {
         //
         // Generating the code is #243, which also decides whether this entry
         // stays on the menu until it is built.
-        Optional.ofNullable(list.getSelectedValue()).ifPresent(tc -> Logger.info(tc.getDescription()));
+        TestinData.selectedCases(e).stream().findFirst().ifPresent(tc -> Logger.info(tc.getDescription()));
 
         // Says so until then. This is the one action in the menu that changes
         // nothing, and silence here reads as a bug rather than as unbuilt: after
         // #62 every other action confirms itself, so the odd one out is the one
         // that answers with nothing at all (#66, F4).
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
+
         Services.getInstance(p, Notifier.class).softRefuse(p, "Not built yet",
                 "Generating automation code for a test case is coming in a later release.");
     }

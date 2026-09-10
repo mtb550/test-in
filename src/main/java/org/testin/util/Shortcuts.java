@@ -108,7 +108,6 @@ public enum Shortcuts {
      * own keys should take CMD on a Mac is the half of #25 that needs a Mac to
      * answer.
      */
-    AutomateTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_F12, InputEvent.CTRL_DOWN_MASK)),
     ShowDetails(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK)),
     HideDetails(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK)),
 
