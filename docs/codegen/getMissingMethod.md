@@ -72,10 +72,9 @@ nothing happens at all, and nothing is written anywhere, not even the log.
 ## Why this is worth knowing
 
 No button in Testin says "write the method for this test case". One menu entry
-sounds like it. That entry is **Automate Test Case**, and it is not built.
-Filling in the description is the only way, and no label says so. That is
-difference 2 on
-[the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
+sounds like it: **Automate Test Case**, which is not built and is gray, and
+says so in its own name. Filling in the description is the way, and that entry's
+description now points here while it waits.
 
 ---
 

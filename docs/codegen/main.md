@@ -10,7 +10,7 @@ test case they came from.
 |---|---|
 | **Part of Testin** | Automation code and the gutter |
 | **Answers** | What Testin writes into the code, when it rewrites it, and what a tester sees when it cannot |
-| **Numbering** | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-020`. Rules are `Rule-CODEGEN-001` to `Rule-CODEGEN-070` |
+| **Numbering** | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-020`. Rules are `Rule-CODEGEN-001` to `Rule-CODEGEN-071` |
 | **Retired** | `Rule-CODEGEN-015` said what `Rule-CODEGEN-046` says — the groups attribute is written only when the test case belongs to one. Retired 8 September 2026; read Rule-CODEGEN-046 instead. The number is not given to anything else |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
@@ -175,7 +175,6 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 2** | Rule-CODEGEN-002 — a menu entry does what it says | **Automate Test Case**, and `Ctrl+F12`, are live on every selected test case and always answer *Not built yet*. The one entry named after generating code is the one that does not. |
 | **Difference 3** | Rule-CODEGEN-001 — one test case, one method | Two test cases whose descriptions differ only in punctuation share one method, and the second gets none. It can no longer be typed: the create dialog and the update dialog both refuse such a description and say which method it would have named. It can still arrive by the doors that cannot refuse — an import, a paste, a Git merge, a sync, and the bulk description editor — and a test set that already held a clash before the refusal existed still holds it. Those no longer pass in silence: generating says which test cases got no method and why, so the tester learns it then rather than at the first `F5`. |
 | **Difference 6** | Rule-CODEGEN-004 — the tree and the code agree | Moving a test set to a place Testin has not read still leaves the class where it was — guessing a destination the tree has not read is what once moved a whole package into the default package and lost it. The tester is told now, in a notification that stays, naming the class and what to do about it. The tree and the code disagree until they act. |
 | **Difference 7** | Rule-CODEGEN-005 — a missing plugin is a skip | Fixed. **Run Test Case** declares both plugins it needs — TestNG starts the run, Java finds the method it starts — so it is gray in an IDE with only one of them, reading *(needs the Java plugin)*. The three entries are also shown in every IDE now rather than left out, which reverses what difference 66 decided: a menu that changes shape between IDEs teaches a tester nothing. |
@@ -186,6 +185,7 @@ closed up, so an issue that quotes one still points at the right thing.
 
 | Gone | Was |
 |---|---|
+| **Difference 2** | **Automate Test Case** and `Ctrl+F12` were live on every selected test case and always answered *Not built yet*, so the one entry named after generating code was the one that did not. It is gray now and its own name says why - *Automate Test Case (not built yet)* - which is what the no-hidden-buttons rule asks for. The feature behind it is still [#3](https://github.com/mtb550/test-in/issues/3). Fixed 10 September 2026, [#243](https://github.com/mtb550/test-in/issues/243) |
 | **Difference 5** | One state said two ways: *has no generated code yet* when run, **Nothing to open** when jumped to. Both go through the one owner now. Fixed 9 September 2026, [#246](https://github.com/mtb550/test-in/issues/246) |
 | **Difference 1** | `priority` in the generated method carries the position, not the test case's priority. Not a difference: a test method's priority and a test case's priority are different things, and the case's own writes nothing into the code on purpose. Decided 7 September 2026, [#242](https://github.com/mtb550/test-in/issues/242) |
 | **Difference 8** | A removal, a move and a rename all read *Class Name Unknown* from the one place that builds a class name, because only creating one made that news. It goes to the log now, which is what Rule-CODEGEN-006 said all along. Fixed 9 September 2026, [#249](https://github.com/mtb550/test-in/issues/249) |

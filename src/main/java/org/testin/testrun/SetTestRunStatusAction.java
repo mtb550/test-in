@@ -31,7 +31,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
      * nothing (#62).
      */
     private void askForStatus(final @NotNull TestRunDirectoryDto testRunDto) {
-        new TestRunStatusMenuDialog(p, selectedStatus ->
+        new TestRunStatusMenuDialog(p, testRunDto.getMarker().getStatus(), selectedStatus ->
                 Services.getInstance(p, TestRunStatusChange.class).apply(testRunDto, selectedStatus)).show();
     }
 

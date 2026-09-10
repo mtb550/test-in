@@ -20,6 +20,10 @@ Testin cannot do this yet. The entry says so when it is pressed.
   declaration. The body is the tester's, and Testin never touches it.
 - **Rule-CODEGEN-004** — A rename or a move happens before the tree changes,
   while the old name still finds the code.
+- **Rule-CODEGEN-071** — The entry is gray until there is something behind it,
+  and its own name says why: **Automate Test Case (not built yet)**. A control
+  that cannot work is shown and disabled with the reason, never left out — a
+  tester who cannot see it cannot learn it is coming.
 - **Rule-CODEGEN-005** — Test management works without any of this. A missing
   Java plugin or a missing test folder is a skip, never a failure.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
@@ -61,17 +65,11 @@ right of the IDE, above the status bar.
 
 **If the IDE has no Java plugin** — the entry is not on the menu at all.
 
-## Where the plugin breaks its own rules
+## What really writes a missing method
 
-The entry is live on every selected test case. Its description reads *Generate
-automation code for the selected test case*. Nothing on the menu tells the
-tester that it does nothing. They find out by pressing it. That is difference 2
-on
-[the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
-
-The thing that really writes a missing method is filling in the test case's
-description, and no label anywhere says so. That is
-[UC-CODEGEN-003](getMissingMethod.md).
+Filling in the test case's description. That is
+[UC-CODEGEN-003](getMissingMethod.md), and this entry's own description says so
+while it is gray.
 
 ---
 

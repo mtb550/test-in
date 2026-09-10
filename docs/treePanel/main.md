@@ -9,7 +9,7 @@ test set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The tree panel |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-028`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-091` |
+| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-028`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-092` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code |
 | **Written to** | [How a document is written](../standard.md) |
@@ -515,7 +515,6 @@ documentation describes. None of them has a bug report yet.
 |---|---|---|
 | **Difference 1** | Rule-TREE-PANEL-007 — one past-tense word | Creating a test run says *Run created*. Creating a test project says *Project created* or *Project cloned*. Every other creation says *Created*. |
 | **Difference 2** | Rule-TREE-PANEL-044 — nothing lands in a test run | Fixed. **Paste** asks the same two questions a drop asks — is this a place things land in, and can anything on the clipboard land here — so it is gray on a test run, as it always was on a test set. The *Select a folder* refusal is no longer reachable from the menu. |
-| **Difference 5** | Rule-TREE-PANEL-068 — Created and In Progress are the test run's own | The status popup offers **Created** and **In Progress** as choices. It also lets a test run go backwards, from **Assigned** to **Created**. |
 | **Difference 11** | Rule-TREE-PANEL-006 — nothing changes until the tester confirms | Fixed. All five ask `singleSelectedDirectory`, the question eight other tree entries already asked, so each is gray with more than one row selected instead of acting on the first. **Details** had no `update()` at all and now has one. |
 
 **Fixed since this list was written.** The numbers are left out rather than
@@ -533,6 +532,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 12** | A position too large to hold silently cleared the order and still said *Ordered*. Fixed 7 September 2026 in `b28e9af7`, and the document did not follow |
 | **Difference 13** | The **Select Test Project** dialog's first column had no heading. Fixed 8 September 2026, [#194](https://github.com/mtb550/test-in/issues/194) |
 | **Difference 14** | The **Uncommitted Changes** dialog read *1 change ... are not committed*. Fixed 9 September 2026, [#195](https://github.com/mtb550/test-in/issues/195) |
+| **Difference 5** | The popup offered all five statuses, including the two that are the run's own record of itself, and let a run go from **Assigned** back to **Created**. It offers what the run can be moved to and nothing else: the three a tester sets, and only those ahead of where it is now (Rule-TREE-PANEL-092). That settles question 1. Fixed 10 September 2026, [#186](https://github.com/mtb550/test-in/issues/186) |
 | **Difference 10** | Setting a test run's status from the tree did not tell that run's open editor, which kept the old status and the rows that had just become **Untested**. The tree was doing the work itself instead of asking the one place that owns a status change; now both go through it, and the editor and the tree each hear about the other. Fixed 9 September 2026, [#191](https://github.com/mtb550/test-in/issues/191) |
 
 ---
@@ -541,10 +541,17 @@ closed up, so an issue that quotes one still points at the right thing.
 
 | | Question | Why it is open |
 |---|---|---|
-| **Question 1** | May a test run go backwards, from **Assigned** to **Created**, or from **In Progress** to **Created**? | Nothing prevents it today (difference 5). The same question for the whole product is [question 1 in the product's own document](../product.md#9-undecided). |
 | **Question 2** | Should a signed-off test run be locked in the tree, as well as in its editor? | Today it is not (difference 3). Its own description says its name must not change. The tree's rename does not check. |
 | **Question 3** | What should the paste refusal say? | *Select a folder* is shown for six different reasons. Four of them are: the wrong side of the tree, the node itself, another test project, and a test run. Choosing a different folder only fixes one of the six. |
 | **Question 4** | On a Mac, should cut, paste, undo and redo in the tree use the Mac's own key for those actions, the way copy already does? | Today copy does. The other four do not. The keys are named in the key table above. |
+
+
+**Settled.** Question 1 asked whether a test run may go backwards, from
+**Assigned** to **Created** or from **In Progress** to **Created**. It may not:
+the popup offers only the statuses ahead of where the run is now, so there is no
+way to ask (Rule-TREE-PANEL-092, [#186](https://github.com/mtb550/test-in/issues/186)).
+The same question for the whole product is [question 1 in the product's own
+document](../product.md#9-undecided).
 
 ---
 

@@ -28,7 +28,14 @@ public class AutomateTestCaseAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.AutomateTestCase.getCustomShortcut(), list);
     }
 
-    // UC-CODEGEN-005, Rule-CODEGEN-025
+    /**
+     * What the entry is called while it does nothing: the name, and the reason
+     * in the same breath. On the entry rather than in a message, so a tester
+     * reads it before pressing rather than after.
+     */
+    private static final @NotNull String NOT_BUILT = "Automate Test Case (not built yet)";
+
+    // UC-CODEGEN-005, Rule-CODEGEN-025, Rule-CODEGEN-071
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         // update() disables the action on an empty selection, but the shortcut
@@ -46,14 +53,30 @@ public class AutomateTestCaseAction extends AbstractProjectAction {
                 "Generating automation code for a test case is coming in a later release.");
     }
 
-    // UC-CODEGEN-005
+    /**
+     * UC-CODEGEN-005, Rule-CODEGEN-071.
+     * <p>
+     * Gray, and saying why, until there is something behind it.
+     * <p>
+     * It was live on every selected test case and always answered <i>Not built
+     * yet</i> - the one entry named after generating code being the one that did
+     * not, and nothing on the menu saying so until it was pressed (#243). A
+     * control that cannot work is shown and disabled with the reason, never left
+     * out: a tester who cannot see it cannot learn it is coming.
+     * <p>
+     * The plugin check above it stays and runs first. Without the Java plugin the
+     * reason is that, not this - there is no point promising a later release to
+     * an IDE that could not run it either way.
+     */
     @Override
     public void update(final @NotNull AnActionEvent e) {
         // Grayed with the reason without the Java plugin, rather than left out of
         // the menu (#248).
         if (!OptionalPlugin.JAVA.enableOrExplain(this, e.getPresentation())) return;
 
-        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
+        e.getPresentation().setEnabled(false);
+        e.getPresentation().setText(NOT_BUILT);
+        e.getPresentation().setDescription("Testin writes a test case's method when the case is saved with a description. Generating one for a case that already exists is a later release.");
     }
 
     @Override

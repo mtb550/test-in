@@ -3,6 +3,7 @@ package org.testin.model;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -26,32 +27,70 @@ public enum TestRunStatus implements MenuItem {
     CREATED(
             "Created",
             Shortcuts.NO_KEY,
-            AllIcons.General.Add
+            AllIcons.General.Add,
+            Stage.MADE,
+            SetBy.TESTIN
     ),
 
     IN_PROGRESS(
             "In Progress",
             Shortcuts.NO_KEY,
-            AllIcons.Actions.BuildAutoReloadChanges
+            AllIcons.Actions.BuildAutoReloadChanges,
+            Stage.RUNNING,
+            SetBy.TESTIN
     ),
 
     COMPLETED(
             "Completed",
             KeyStroke.getKeyStroke(KeyEvent.VK_2, 0),
-            AllIcons.Toolwindows.ToolWindowCoverage
+            AllIcons.Toolwindows.ToolWindowCoverage,
+            Stage.OVER,
+            SetBy.TESTER
     ),
 
     ASSIGNED(
             "Assigned",
             KeyStroke.getKeyStroke(KeyEvent.VK_1, 0),
-            AllIcons.Gutter.ExtAnnotation
+            AllIcons.Gutter.ExtAnnotation,
+            Stage.HANDED_OUT,
+            SetBy.TESTER
     ), //todo, later, use XML to add tester's name dynamic
 
     CLOSED(
             "Closed",
             KeyStroke.getKeyStroke(KeyEvent.VK_3, 0),
-            AllIcons.Actions.Cancel
+            AllIcons.Actions.Cancel,
+            Stage.OVER,
+            SetBy.TESTER
     );
+
+    /**
+     * UC-TREE-PANEL-020, Rule-TREE-PANEL-068.
+     * <p>
+     * Who puts a run in this status. Two of the five are the run's own record of
+     * itself - Created when it is made, In Progress when execution starts - and
+     * offering them on the Set Status menu invited a tester to declare something
+     * that had either happened or not (#186).
+     */
+    private enum SetBy { TESTER, TESTIN }
+
+    /**
+     * UC-TREE-PANEL-020, Rule-TREE-PANEL-092.
+     * <p>
+     * How far through its life the run is. A number rather than the declaration
+     * order, which is not the lifecycle: the constants are declared in the order
+     * the menu once drew them.
+     * <p>
+     * Completed and Closed share the last one. They are two ways of being over,
+     * not one after the other, and a run in either is signed off - which is
+     * already why Set Status is gray on it.
+     */
+    private static final class Stage {
+        private static final int MADE = 0;
+        private static final int HANDED_OUT = 1;
+        private static final int RUNNING = 2;
+        private static final int OVER = 3;
+    }
 
     private final @NotNull String label;
 
@@ -61,6 +100,27 @@ public enum TestRunStatus implements MenuItem {
      */
     private final @NotNull KeyStroke shortcut;
     private final @NotNull Icon icon;
+
+    @Getter(AccessLevel.NONE)
+    private final int stage;
+
+    @Getter(AccessLevel.NONE)
+    private final @NotNull SetBy setBy;
+
+    /**
+     * UC-TREE-PANEL-020, Rule-TREE-PANEL-068, Rule-TREE-PANEL-092.
+     * <p>
+     * Whether a tester can move this run to that status.
+     * <p>
+     * Two questions in one answer, because they are one question at the menu: is
+     * it a status a tester sets at all, and is it forward of where the run is
+     * now. A run could be moved from Assigned back to Created, and from In
+     * Progress back to Assigned, which un-says something that has happened
+     * (#186).
+     */
+    public boolean canBeSetFrom(final @NotNull TestRunStatus current) {
+        return setBy == SetBy.TESTER && stage > current.stage;
+    }
 
     /**
      * UC-REPORT-001, Rule-REPORT-016.

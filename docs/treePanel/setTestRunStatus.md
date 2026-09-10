@@ -54,6 +54,9 @@ The status says how far the test run has got.
 - **Rule-TREE-PANEL-068** — A tester sets **Assigned**, **Completed** and
   **Closed**. **Created** and **In Progress** are the test run's own record of
   itself.
+- **Rule-TREE-PANEL-092** — The popup offers the statuses this test run can be
+  moved to and no others: the three a tester sets, and only those ahead of where
+  the run is now. A run is never sent backwards through its own life.
 - **Rule-TREE-PANEL-091** — A test run's status is set on the test run, not on
   whichever surface set it. The tree row and any open editor of that test run
   both follow it, whichever of them the tester used.
