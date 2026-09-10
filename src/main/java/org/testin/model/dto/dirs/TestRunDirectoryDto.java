@@ -115,11 +115,24 @@ public class TestRunDirectoryDto extends DirectoryDto {
         return isStillOpen();
     }
 
-    @Override
-    public boolean isRemovable() {
-        return isStillOpen();
-    }
-
+    /**
+     * UC-TREE-PANEL-012, Rule-TREE-PANEL-094.
+     * <p>
+     * <b>A run can always be removed, whatever it has been signed off as.</b>
+     * <p>
+     * It used to answer {@code isStillOpen()} with the three above, and that was
+     * one restriction too many. The other three keep a report honest: a run that
+     * is renamed, renumbered or dragged somewhere else is still there, still
+     * named in a report, and now described wrongly - the reader has no way to
+     * know. A removed run is not misdescribed, it is gone, and a reader who
+     * cannot find it knows exactly that.
+     * <p>
+     * It was also the rule nobody could see. Rule-TREE-PANEL-009 says a
+     * signed-off run's cases, verdicts and configuration cannot change, and says
+     * nothing about removing it - so the entry grayed for a reason written in
+     * this class and nowhere a tester could read. Half of #184, reversed
+     * deliberately on 10 September 2026.
+     */
     @Override
     public boolean isTransferable() {
         return isStillOpen();

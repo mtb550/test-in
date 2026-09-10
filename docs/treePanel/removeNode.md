@@ -56,6 +56,11 @@ The node goes to the recycle bin, so nothing is lost for good.
   then answers for that removal, and does not take back the change before it.
 - **Rule-TREE-PANEL-042** — The two containers are never removed. This holds
   even when they are selected together with nodes that are removed.
+- **Rule-TREE-PANEL-094** — A test run can be removed whatever its status. A
+  signed-off run still refuses a rename, a new number and a drag, because a run
+  that is renamed or moved is still named in a report and now described wrongly
+  - but a removed run is not misdescribed, it is gone, and a reader who cannot
+  find it knows exactly that.
 
 ## The Confirm Removing dialog
 
@@ -107,6 +112,10 @@ and no path.
 
 **If only Test Cases or Test Runs is selected** — **Remove** is gray, and
 `Delete` does nothing.
+
+**A completed or closed test run is not refused.** It refuses a rename, a new
+number and a drag, and it can still be removed — see Rule-TREE-PANEL-094 for why
+those are different questions.
 
 **If a container is selected together with a test set** — only the test set is
 removed. The container is left out, and not counted.
