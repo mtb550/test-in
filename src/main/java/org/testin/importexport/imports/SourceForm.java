@@ -63,7 +63,7 @@ public final class SourceForm implements DialogComponent {
         // The form shows the hint for whatever format was just parsed; the
         // dialog only ever hears about the data.
         fileField.getTextField().getDocument().addDocumentListener(
-                new FileDocumentListener(fileField, p, (format, parsedData) -> {
+                new FileDocumentListener(fileField, p, this::showStatus, (format, parsedData) -> {
                     showFormatHint(format);
                     onDataLoaded.accept(parsedData);
                 }, importLoader));
@@ -117,6 +117,22 @@ public final class SourceForm implements DialogComponent {
      * the attributes the form was given, so it can never list a column the
      * import would ignore.
      */
+    /**
+     * UC-SHARE-005, Rule-SHARE-107.
+     * <p>
+     * What the form says while it is reading a file, on the row the format hint
+     * uses when it has one.
+     * <p>
+     * One row rather than two: the two never have anything to say at the same
+     * moment - the hint describes a file that has been read, and this describes
+     * one being read - and a second line that is blank most of the time is a
+     * gap in the form for nothing.
+     */
+    private void showStatus(final @NotNull String status) {
+        formatHint.setText(status);
+        formatHint.setVisible(!status.isBlank());
+    }
+
     private void showFormatHint(final @NotNull FileTypes format) {
         final @NotNull String message = format.getInfoMessage();
         if (message.isBlank()) {

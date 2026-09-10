@@ -32,6 +32,10 @@ There is no key for this. The table is in the import dialog.
 - **Rule-SHARE-036** — Choosing a second file replaces every tab.
 - **Rule-SHARE-037** — An import that stops part way says how many test cases
   were written before it did. They are still there.
+- **Rule-SHARE-107** — The file is read three tenths of a second after the last
+  keystroke in the source box, not on every one, and the form says which file it
+  is reading while it does. The line goes when the reading stops, however it
+  stopped.
 - **Rule-SHARE-106** — A value Testin cannot read is refused. The test case keeps
   what it had, and the tester is told once with a count — never once per row.
   Blank is not unreadable: it clears a date and it clears the groups, and it
