@@ -193,6 +193,74 @@ While the create or update dialog is open.
 | `Ctrl+C` `Ctrl+X` `Ctrl+V` | Copy, cut and paste the text |
 | `Ctrl+A` | Selects all of it |
 
+## Which keys the IDE knows about, and which stay on their surface
+
+Every key above works. They do not all reach the tester the same way, and the
+difference is worth knowing before rebinding one.
+
+**A key in the Keymap.** Testin declares the action to the IDE, so it appears in
+**Find Action** under its own name and in **Settings › Keymap › Plug-ins ›
+Testin**, where any key can be put on it. Thirty-four actions are declared, and
+these carry a default key:
+
+| Key | The action | Where it works |
+|---|---|---|
+| `Ctrl+Alt+F` | Search Test Project | Anywhere in the IDE |
+| `Ctrl+M` | Create Testin Node, Create Test Case | The tree, and a test set editor |
+| `Shift+F6` | Rename Testin Node | The tree |
+| `F2` | Update Test Case, Failed Test Case Details | Both editors, and the view panel |
+| `Ctrl+Shift+C` `Ctrl+Shift+X` `Ctrl+Shift+V` | Copy, Cut and Paste Test Case | Both editors |
+| `F5` | Run Test Case | Both editors and the view panel |
+| `Shift+F5` | Navigate to Test Code | Both editors and the view panel |
+| `Ctrl+F12` | Automate Test Case | Both editors |
+
+Rebinding one of these moves it everywhere it works at once, including the
+tooltips and status bars that print it — those ask the keymap rather than
+remembering our default.
+
+**A key on its surface.** The action is still declared, so Find Action offers it
+and the Keymap lists it — with no default key, because the key belongs to the
+component. A declared shortcut is dispatched before a component's own bindings,
+so a Keymap entry would silently take the key away from the grid or the tree:
+
+| Key | The action | Why it is not in the Keymap |
+|---|---|---|
+| `Enter` | Open Testin Node, View Test Case Details | Enter is what a tree and a list do; a global Enter would fire in every editor in the IDE |
+| `Delete` | Remove Testin Node, Delete Test Case | Three surfaces answer it — the tree, the card list and the grid — and one entry would answer for all three |
+| `Ctrl+C` `Ctrl+X` `Ctrl+V` | Copy, Cut and Paste Testin Node, Copy Test Case Value | The grid keeps these for its own cells, and Excel expects them there |
+| `P` `F` `B` | Passed, Failed, Blocked | Bare letters. In the Keymap they would answer everywhere, including while somebody is typing |
+
+**A key nothing declares.** These are bound by the surface that draws them, and
+they are not in Find Action or the Keymap. Each one is here for a reason, and
+the reason is the same shape every time: the key means something only while a
+particular thing is on screen.
+
+| Keys | Where | Why they stay | 
+|---|---|---|
+| `D` `E` `M` `T` `B` `S` `P` `G` `O` | The update menu, and a selected card | Bare letters that stand for a field. They mean nothing outside a test case, and in the Keymap they would answer while a tester types |
+| `A` `D` `E` `S` `B` `T` `P` `M` `G` `U` `R` `F` `I` `H` | The copy menu | The same, for the fourteen values a copy can take |
+| `1` `2` `3` | The test run status popup | Numbers standing for the three run statuses, live only while that popup is open |
+| `Ctrl+D` `Ctrl+E` `Ctrl+M` `Ctrl+S` `Ctrl+T` `Ctrl+B` `Ctrl+G` `Ctrl+P` | The create and update test case dialogs | Each opens one field of the dialog in front of the tester. Outside it there is no field to open |
+| `Tab` `Shift+Tab` `Up` `Down` `Space` | Any dialog | Moving between fields and choices is the platform's own gesture, not a command |
+| `Enter` `Escape` | Any dialog, and the grid | Confirm and cancel. Every dialog has them, so they belong to the dialog framework rather than to any one action ([#11](https://github.com/mtb550/test-in/issues/11)) |
+| `Ctrl+Space` | Any dialog field that completes | The platform's own completion gesture |
+| `Ctrl+Enter` | A grid cell, a long field | A line break where `Enter` saves |
+| `Ctrl+Shift+A`, `Shift+Delete` | The bulk editors | Caret on every value, and remove an item — both about the editor on screen |
+| `Ctrl+Z` `Ctrl+Y` | The tree, and each editor | Undo and redo are per surface: each keeps its own history, so one keymap entry could not say whose |
+| `Ctrl+Left` `Ctrl+Right`, with `Shift` | Both editors, and the view panel | Paging in an editor and stepping through cases in the panel — the same gesture over different things |
+| `Ctrl+F` | Both editors | Puts the cursor in that editor's own search box |
+| `Ctrl+P` | A test run | Generate a report. Its action is not declared yet — see below |
+| `Context Menu` | The tree and both lists | Opens the menu on the selection, without the mouse |
+| `Escape` | The tree, the lists, the grid, the details tab | Steps back one step, and what a step is depends on the surface |
+| `Ctrl+D` `Ctrl+H`, the wheel alone | Light mode | A window with its own keys, always on top |
+
+**Still to declare.** Three actions a tester can reach are not declared yet, so
+they are not in Find Action and their keys cannot be rebound: **Generate Report**
+(`Ctrl+P`), **Undo** and **Redo** (`Ctrl+Z`, `Ctrl+Y`), and **Set Status** on a
+test run. Each of them is one action shown on several surfaces with different
+things behind it, which is the part of [#119](https://github.com/mtb550/test-in/issues/119)
+that is not finished.
+
 ## Every key on this page is bound
 
 There is no list of declared-and-unbound keys any more, and there should never

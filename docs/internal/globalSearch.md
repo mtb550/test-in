@@ -25,6 +25,13 @@ This is the fastest way to reach one test set, one test run or one test case.
   Case does not matter, and spaces at either end are dropped.
 - **Rule-INTERNAL-002** — Choosing a result always takes the tree to it. Only a
   test set and a test run open an editor.
+- **Rule-INTERNAL-066** — A key a tester can rebind is declared to the IDE, so
+  Find Action offers the action by name and Settings > Keymap holds the key; a
+  key that is a surface's own gesture - Enter, Delete, the clipboard three, a
+  bare letter - is registered on that surface instead, because a declared
+  shortcut is dispatched before a component's own bindings and would take the
+  key away from the tree, the card list or the grid. Which keys are which is
+  written out on the shortcuts page.
 
 The tree panel's own rules do not govern this dialog. It opens from anywhere in
 the IDE, and the tree is only where it lands.

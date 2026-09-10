@@ -73,6 +73,8 @@ public final class Declared {
     }
 
     /**
+     * UC-INTERNAL-001, Rule-INTERNAL-066.
+     * <p>
      * Puts a declared action's key on one component rather than in the keymap.
      * <p>
      * For the keys that are a surface's gesture and not a command: ENTER opens

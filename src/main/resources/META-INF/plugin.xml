@@ -300,11 +300,20 @@
 
     </extensions>
 
-    <!-- The one shortcut that is not bound to a component. Every other key in
-         the plugin is registered on the thing it acts on, so it works there and
-         nowhere else; a search has to open from the tree, from either editor and
-         from the view panel alike, so it lives in the keymap - which is also
-         where a tester rebinds it if it collides with something of theirs (#29). -->
+    <!-- Every action a tester can reach, declared so Find Action offers it by
+         name and Settings -> Keymap can rebind its key (#119).
+
+         An action with a <keyboard-shortcut> owns that key across the IDE and
+         grays itself outside Testin. An action without one is still declared -
+         listed in the Keymap with no default - and the surface it belongs to
+         registers the key on it, because a declared shortcut is dispatched
+         before a component's input map and would take ENTER, DELETE or the
+         clipboard three away from the tree, the card list or the grid.
+         Rule-INTERNAL-066, and docs/shortcuts.md says which keys are which.
+
+         The search was the first of these and is still the plainest: it has to
+         open from the tree, from either editor and from the view panel alike,
+         so it lives in the keymap (#29). -->
     <actions>
         <action
                 id="Testin.Search"
