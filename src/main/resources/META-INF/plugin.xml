@@ -324,6 +324,14 @@
         <!-- The editors' actions. Each reads what the editor has selected from
              TestinData and grays itself outside one (#119). -->
         <action
+                id="Testin.RunTestCase"
+                class="org.testin.run.RunTestCaseAction"
+                text="Run Test Case"
+                description="Run the selected test cases, or stop a run that is going"
+                icon="AllIcons.RunConfigurations.TestState.Run"
+        />
+
+        <action
                 id="Testin.NavigateToCode"
                 class="org.testin.navigate.NavigateToCodeAction"
                 text="Navigate to Test Code"

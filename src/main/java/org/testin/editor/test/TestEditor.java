@@ -193,6 +193,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         // the hint is the two-owners problem #119 exists to end. Both move
         // together when the last hover action is declared.
         Declared.bindTo("Testin.NavigateToCode", Shortcuts.NavigateToCode, list);
+        Declared.bindTo("Testin.RunTestCase", Shortcuts.RunTestCase, list);
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
                 () -> grid.map(GridView::table),
                 () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);

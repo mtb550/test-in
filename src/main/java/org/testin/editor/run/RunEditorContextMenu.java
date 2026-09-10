@@ -13,7 +13,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.report.GenerateReportAction;
-import org.testin.run.RunTestCaseAction;
 import org.testin.testrun.SetTestCaseStatusAction;
 import org.testin.testrun.UpdateRunItemAction;
 
@@ -47,7 +46,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         add(actions(p, ui, dir, list, model));
 
         addSeparator();
-        add(new RunTestCaseAction(p, ui, list));
+        add(Declared.action("Testin.RunTestCase"));
         add(Declared.action("Testin.NavigateToCode"));
 
         // No Start Manual Execution here. Every entry in this menu acts on the
