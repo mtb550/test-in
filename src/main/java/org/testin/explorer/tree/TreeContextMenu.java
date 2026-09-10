@@ -17,7 +17,6 @@ import javax.swing.JComponent;
 import org.testin.logger.Logger;
 import org.testin.sftp.SyncWithSftpAction;
 import org.testin.EscapeAction;
-import org.testin.clipboard.PasteNodeAction;
 import org.testin.explorer.TreePanel;
 import org.testin.git.SyncActionAction;
 import org.testin.git.ViewPendingCommitsAction;
@@ -73,7 +72,7 @@ public class TreeContextMenu extends DefaultActionGroup {
                         new OrderNodeAction(p, tp, tree),
                         Declared.action("Testin.CopyNode"),
                         Declared.action("Testin.CutNode"),
-                        new PasteNodeAction(p, tree))));
+                        Declared.action("Testin.PasteNode"))));
 
         if (OptionalPlugin.TESTNG.isAvailable()) {
             addSeparator();

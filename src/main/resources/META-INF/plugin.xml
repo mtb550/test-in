@@ -478,6 +478,14 @@
         />
 
         <action
+                id="Testin.PasteNode"
+                class="org.testin.clipboard.PasteNodeAction"
+                text="Paste Testin Node"
+                description="Paste the test sets, packages or runs on the clipboard into this node"
+                icon="AllIcons.Actions.MenuPaste"
+        />
+
+        <action
                 id="Testin.Rename"
                 class="org.testin.rename.RenameAction"
                 text="Rename Testin Node"
