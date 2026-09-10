@@ -118,6 +118,10 @@ public class TreePanelTree implements Disposable {
         Declared.bindTo("Testin.CopyNode", Shortcuts.CopyItem, mainTree);
         Declared.bindTo("Testin.CutNode", Shortcuts.CutItem, mainTree);
         Declared.bindTo("Testin.PasteNode", Shortcuts.PasteItem, mainTree);
+
+        // Nor this one: DELETE is the card list's key as well as the tree's, and
+        // it is the grid's for a cell's contents (#119).
+        Declared.bindTo("Testin.RemoveNode", Shortcuts.DeletePackage, mainTree);
     }
 
     /**

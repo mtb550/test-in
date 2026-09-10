@@ -488,6 +488,17 @@
                 icon="AllIcons.ObjectBrowser.Sorted"
         />
 
+        <!-- No keyboard-shortcut: DELETE is the tree's key, the card list's and
+             the grid's, and one keymap entry would answer for all three. The
+             tree binds it on this action instead (#119). -->
+        <action
+                id="Testin.RemoveNode"
+                class="org.testin.remove.RemoveAction"
+                text="Remove Testin Node"
+                description="Remove the selected test projects, test sets, packages or runs"
+                icon="AllIcons.Actions.GC"
+        />
+
         <!-- No keyboard-shortcut on either: CTRL+C and CTRL+X are the grid's
              keys for its own cells and the card list's for a test case, and a
              registered shortcut is dispatched before a component's input map -
