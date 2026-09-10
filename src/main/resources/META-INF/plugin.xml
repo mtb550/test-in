@@ -324,6 +324,28 @@
         <!-- The editors' actions. Each reads what the editor has selected from
              TestinData and grays itself outside one (#119). -->
         <action
+                id="Testin.CopyTestCaseNode"
+                class="org.testin.clipboard.CopyTestCaseNodeAction"
+                text="Copy Test Case"
+                description="Put the selected test cases themselves on the clipboard"
+                icon="AllIcons.Actions.Copy"
+        >
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift C"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift C"/>
+        </action>
+
+        <action
+                id="Testin.CutTestCaseNode"
+                class="org.testin.clipboard.CutTestCaseNodeAction"
+                text="Cut Test Case"
+                description="Cut the selected test cases to the clipboard"
+                icon="AllIcons.Actions.MenuCut"
+        >
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift X"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift X"/>
+        </action>
+
+        <action
                 id="Testin.CopyTestCase"
                 class="org.testin.clipboard.CopyTestCaseAction"
                 text="Copy Test Case Value"

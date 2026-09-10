@@ -1,41 +1,40 @@
 package org.testin.clipboard;
 
 import org.testin.notifications.Done;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectAction;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditor;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
-import org.testin.util.Shortcuts;
 
-import javax.swing.*;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
+import java.util.Optional;
 
-public class CutTestCaseNodeAction extends AbstractProjectAction {
-
-    private final @NotNull TestinEditor editor;
-    private final @NotNull JBList<TestCaseDto> list;
-
-    public CutTestCaseNodeAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
-        super(p, "Cut Node", "Cut selected test case(s) to clipboard", AllIcons.Actions.MenuCut);
-        this.editor = editor;
-        this.list = list;
-        this.registerCustomShortcutSet(Shortcuts.CutTestCase.getCustomShortcut(), list);
-    }
+/**
+ * Declared in {@code plugin.xml} (#119) with CTRL+SHIFT+X, which the grid does
+ * not claim - the plain CTRL+X is the grid's own cut, and this one acts on the
+ * node.
+ */
+public class CutTestCaseNodeAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        List<TestCaseDto> selectedTestCases = list.getSelectedValuesList();
+        final @Nullable Project p = e.getProject();
+        final @NotNull Optional<TestinEditor> found = TestinData.editor(e);
+        if (p == null || found.isEmpty()) return;
+
+        final @NotNull TestinEditor editor = found.orElseThrow();
+        final @NotNull List<TestCaseDto> selectedTestCases = TestinData.selectedCases(e);
 
         if (!selectedTestCases.isEmpty()) {
             try {
@@ -44,7 +43,9 @@ public class CutTestCaseNodeAction extends AbstractProjectAction {
                 String json = Services.getInstance(p, Mapper.class).writeValueAsString(selectedTestCases);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
-                list.repaint();
+                // The cards draw a cut case faded, so the editor redraws from
+                // what it is holding rather than this reaching for its list.
+                editor.refreshView();
 
                 Services.getInstance(p, Notifier.class).softShowCounted(p, Done.CUT, selectedTestCases.size());
 
@@ -58,13 +59,13 @@ public class CutTestCaseNodeAction extends AbstractProjectAction {
     public void update(final @NotNull AnActionEvent e) {
         // Rule-EDITOR-PANEL-214. Gray with the reason on a node that cannot lose
         // a test case, rather than absent from that editor's menu (#248).
-        if (!editor.getParent().isTestCaseContainer()) {
+        if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             e.getPresentation().setEnabled(false);
             e.getPresentation().setDescription("A test run's test cases were chosen when it was created. Cut the test case in its test set.");
             return;
         }
 
-        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
+        e.getPresentation().setEnabled(!TestinData.selectedCases(e).isEmpty());
     }
 
     @Override

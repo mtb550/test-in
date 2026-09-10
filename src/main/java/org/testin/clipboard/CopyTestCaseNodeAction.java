@@ -1,38 +1,37 @@
 package org.testin.clipboard;
 
 import org.testin.notifications.Done;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectAction;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
-import org.testin.util.Shortcuts;
 
-import javax.swing.*;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
-public class CopyTestCaseNodeAction extends AbstractProjectAction {
-
-    private final @NotNull JBList<TestCaseDto> list;
-
-    public CopyTestCaseNodeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
-        super(p, "Copy Node", "Copy selected test case(s) to clipboard", AllIcons.Actions.Copy);
-        this.list = list;
-        this.registerCustomShortcutSet(Shortcuts.CopyTestCase.getCustomShortcut(), list);
-    }
+/**
+ * Declared in {@code plugin.xml} (#119) with CTRL+SHIFT+C, which the grid does
+ * not claim - so unlike the plain CTRL+C beside it, this key can live in the
+ * keymap and be rebound. The pair is the rule the plugin already holds: the
+ * plain key acts on the content in front of you, CTRL+SHIFT acts on the node.
+ */
+public class CopyTestCaseNodeAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @NotNull List<TestCaseDto> tcs = list.getSelectedValuesList();
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
+
+        final @NotNull List<TestCaseDto> tcs = TestinData.selectedCases(e);
 
         if (!tcs.isEmpty()) {
             try {
@@ -51,7 +50,7 @@ public class CopyTestCaseNodeAction extends AbstractProjectAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
+        e.getPresentation().setEnabled(!TestinData.selectedCases(e).isEmpty());
     }
 
     @Override
