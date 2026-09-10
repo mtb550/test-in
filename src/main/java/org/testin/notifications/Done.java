@@ -3,6 +3,7 @@ package org.testin.notifications;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 /**
  * What a state-changing action says when it worked.
@@ -25,24 +26,24 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public enum Done {
 
-    COPIED("Copied"),
-    CUT("Cut"),
-    PASTED("Pasted"),
-    MOVED("Moved"),
+    COPIED(Bundle.message("done.copied")),
+    CUT(Bundle.message("done.cut")),
+    PASTED(Bundle.message("done.pasted")),
+    MOVED(Bundle.message("done.moved")),
 
-    CREATED("Created"),
-    CLONED("Cloned"),
-    RENAMED("Renamed"),
-    REMOVED("Removed"),
-    UPDATED("Updated"),
-    SAVED("Saved"),
+    CREATED(Bundle.message("done.created")),
+    CLONED(Bundle.message("done.cloned")),
+    RENAMED(Bundle.message("done.renamed")),
+    REMOVED(Bundle.message("done.removed")),
+    UPDATED(Bundle.message("done.updated")),
+    SAVED(Bundle.message("done.saved")),
 
-    IMPORTED("Imported"),
-    EXPORTED("Exported"),
+    IMPORTED(Bundle.message("done.imported")),
+    EXPORTED(Bundle.message("done.exported")),
 
-    ORDERED("Ordered"),
-    RE_SORTED("Re-sorted"),
-    REFRESHED("Refreshed"),
+    ORDERED(Bundle.message("done.ordered")),
+    RE_SORTED(Bundle.message("done.re.sorted")),
+    REFRESHED(Bundle.message("done.refreshed")),
 
     /**
      * Two words because two things happened. Refresh reads the run again from
@@ -50,15 +51,15 @@ public enum Done {
      * with it - and "Refreshed" alone left the tester with a stopped clock, a
      * Start button back and no word about why (#218).
      */
-    REFRESHED_EXECUTION_STOPPED("Refreshed, and the execution stopped"),
+    REFRESHED_EXECUTION_STOPPED(Bundle.message("done.refreshed.execution.stopped")),
 
-    UNDONE("Undone"),
-    REDONE("Redone"),
-    REVERTED("Reverted"),
-    KEPT("Kept"),
+    UNDONE(Bundle.message("done.undone")),
+    REDONE(Bundle.message("done.redone")),
+    REVERTED(Bundle.message("done.reverted")),
+    KEPT(Bundle.message("done.kept")),
 
-    STOPPED("Stopped"),
-    CLEARED("Cleared");
+    STOPPED(Bundle.message("done.stopped")),
+    CLEARED(Bundle.message("done.cleared"));
 
     /**
      * The word itself. Past tense, one word where one will do - which is the

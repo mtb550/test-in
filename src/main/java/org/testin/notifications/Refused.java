@@ -3,6 +3,7 @@ package org.testin.notifications;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 /**
  * What Testin says when it will not do what was asked.
@@ -33,7 +34,7 @@ public enum Refused {
      * reached it through - creating a test project, creating any node in the
      * tree, or renaming one.
      */
-    ALREADY_EXISTS("%s Already Exists"),
+    ALREADY_EXISTS(Bundle.message("refused.already.exists")),
 
     /**
      * The tester acted on a test case that has no generated method, whichever
@@ -45,7 +46,7 @@ public enum Refused {
      * The remedy - generate the code - is a keystroke away, which is why this
      * fades rather than going in the log.
      */
-    NO_GENERATED_CODE("%s has no generated code yet"),
+    NO_GENERATED_CODE(Bundle.message("refused.no.generated.code")),
 
     /**
      * UC-TREE-PANEL-023, Rule-TREE-PANEL-078.
@@ -54,7 +55,7 @@ public enum Refused {
      * holding no cases at all, or a run whose cases have all been judged. Both
      * are Testin saying there is nothing here to start.
      */
-    NOTHING_TO_RUN("%s has no test cases to run"),
+    NOTHING_TO_RUN(Bundle.message("refused.nothing.to.run")),
 
     /**
      * The tester pressed start on a walk with nowhere to land.
@@ -65,7 +66,7 @@ public enum Refused {
      * test cases, when a filter is what emptied the screen, sends them looking
      * for cases that are still there (#215).
      */
-    NOTHING_SHOWING("Nothing showing in %s is waiting for a verdict"),
+    NOTHING_SHOWING(Bundle.message("refused.nothing.showing")),
 
     /**
      * The tester asked to run something that is already running.
@@ -74,7 +75,7 @@ public enum Refused {
      * still going has plenty left to run, and telling them it has nothing would
      * send them looking for cases that are on screen in front of them.
      */
-    ALREADY_RUNNING("%s is already running"),
+    ALREADY_RUNNING(Bundle.message("refused.already.running")),
 
     /**
      * UC-CODEGEN-019, Rule-CODEGEN-005.
@@ -91,7 +92,7 @@ public enum Refused {
      * tree has changed and looks for a class that no longer answers to that
      * name.
      */
-    WHILE_INDEXING("%s needs the IDE to finish indexing first"),
+    WHILE_INDEXING(Bundle.message("refused.while.indexing")),
 
     /**
      * UC-SHARE-013, Rule-SHARE-060.
@@ -101,7 +102,7 @@ public enum Refused {
      * the usual one. Said while they are still looking at it, rather than as a
      * failed push some seconds later (#83).
      */
-    NOT_A_REPOSITORY_URL("'%s' is not a repository address"),
+    NOT_A_REPOSITORY_URL(Bundle.message("refused.not.a.repository.url")),
 
     /**
      * UC-SHARE-014, Rule-SHARE-108.
@@ -111,7 +112,7 @@ public enum Refused {
      * at what they typed. Git takes whatever it is given, so an address typed
      * wrong is not found out until somebody reads a commit (#272).
      */
-    NOT_AN_EMAIL_ADDRESS("'%s' is not an email address"),
+    NOT_AN_EMAIL_ADDRESS(Bundle.message("refused.not.an.email.address")),
 
     /**
      * UC-TREE-PANEL-008, Rule-TREE-PANEL-095, Rule-CODEGEN-073.
@@ -128,7 +129,7 @@ public enum Refused {
      * nobody chose is not what a tester who is sitting right there should get
      * (#11).
      */
-    NOT_A_JAVA_NAME("'%s' cannot name a Java package"),
+    NOT_A_JAVA_NAME(Bundle.message("refused.not.a.java.name")),
 
     /**
      * UC-CODEGEN-007, Rule-CODEGEN-069.
@@ -139,7 +140,7 @@ public enum Refused {
      * one - and it went to the log alone, which left the click looking broken
      * (#245).
      */
-    NO_TEST_CASE_BEHIND_IT("%s was generated from a test case that is gone"),
+    NO_TEST_CASE_BEHIND_IT(Bundle.message("refused.no.test.case.behind.it")),
 
     /**
      * UC-EDITOR-PANEL-008, UC-SHARE-006, Rule-EDITOR-PANEL-206, Rule-SHARE-106.
@@ -159,7 +160,7 @@ public enum Refused {
      * refusal is the same either way and a tester importing two hundred rows
      * must not get two hundred balloons.
      */
-    UNREADABLE("Could not read %s, so what was there stayed");
+    UNREADABLE(Bundle.message("refused.unreadable"));
 
     /**
      * The sentence, with one slot for whatever the tester acted on.
