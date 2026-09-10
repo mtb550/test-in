@@ -324,6 +324,14 @@
         <!-- The editors' actions. Each reads what the editor has selected from
              TestinData and grays itself outside one (#119). -->
         <action
+                id="Testin.CopyTestCase"
+                class="org.testin.clipboard.CopyTestCaseAction"
+                text="Copy Test Case Value"
+                description="Choose which of the test case's values to put on the clipboard"
+                icon="AllIcons.Actions.Copy"
+        />
+
+        <action
                 id="Testin.AutomateTestCase"
                 class="org.testin.automate.AutomateTestCaseAction"
                 text="Automate Test Case"

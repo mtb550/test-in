@@ -188,6 +188,10 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         // not in the keymap - it is put on the declared action here (#119).
         Declared.bindTo("Testin.ViewDetails", Shortcuts.Enter, list);
 
+        // Not in the keymap: the grid answers CTRL+C for its own cells, and a
+        // registered shortcut is dispatched before a component's input map (#119).
+        Declared.bindTo("Testin.CopyTestCase", Shortcuts.CopyItem, list);
+
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
                 () -> grid.map(GridView::table),
                 () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);

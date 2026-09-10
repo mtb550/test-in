@@ -1,30 +1,30 @@
 package org.testin.clipboard;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectAction;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.dialogs.ShortcutMenuPopup;
-import org.testin.util.Shortcuts;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
-public class CopyTestCaseAction extends AbstractProjectAction {
-    private final @NotNull JBList<TestCaseDto> list;
-
-    public CopyTestCaseAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
-        super(p, "Copy", "Copy test case", AllIcons.Actions.Copy);
-        this.list = list;
-        registerCustomShortcutSet(Shortcuts.CopyItem.getCustomShortcut(), list);
-    }
+/**
+ * Declared in {@code plugin.xml} (#119) with no default key, and that is a
+ * decision rather than an omission. CTRL+C in the keymap would be dispatched
+ * before the grid's own input map, and the grid answers CTRL+C for itself -
+ * copying the selected cells rather than the selected test case, which is what
+ * {@code GridKeys} exists to keep true. So the key stays on the list, bound to
+ * this declared instance, and Find Action still offers the entry by name.
+ */
+public class CopyTestCaseAction extends DumbAwareAction {
 
     /**
      * UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-207.
@@ -47,13 +47,16 @@ public class CopyTestCaseAction extends AbstractProjectAction {
      */
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @NotNull List<TestCaseDto> selected = list.getSelectedValuesList();
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
+
+        final @NotNull List<TestCaseDto> selected = TestinData.selectedCases(e);
         if (selected.isEmpty()) return;
 
-        new ShortcutMenuPopup<>(p, "Copy", CopyChoice.values(), choice -> copy(choice, selected)).show();
+        new ShortcutMenuPopup<>(p, "Copy", CopyChoice.values(), choice -> copy(p, choice, selected)).show();
     }
 
-    private void copy(final @NotNull CopyChoice choice, final @NotNull List<TestCaseDto> selected) {
+    private static void copy(final @NotNull Project p, final @NotNull CopyChoice choice, final @NotNull List<TestCaseDto> selected) {
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(choice.from(selected)), null);
 
         // The value's own name, not just "Copied": the same list also offers Copy
@@ -64,7 +67,7 @@ public class CopyTestCaseAction extends AbstractProjectAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(!list.getSelectedValuesList().isEmpty());
+        e.getPresentation().setEnabled(!TestinData.selectedCases(e).isEmpty());
     }
 
     @Override
