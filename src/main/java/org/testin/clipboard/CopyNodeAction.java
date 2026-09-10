@@ -1,29 +1,32 @@
 package org.testin.clipboard;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.tree.TreeTransferHandler;
-import org.testin.util.Shortcuts;
 
+/**
+ * UC-TREE-PANEL-014.
+ * <p>
+ * Declared in {@code plugin.xml} (#119), which is what puts it in Find Action
+ * and lists it in Settings -> Keymap. That is why it has no constructor and no
+ * fields: the platform builds one instance for the whole IDE, so the tree it
+ * copies from comes from the keystroke rather than from whoever built it.
+ * <p>
+ * <b>And declared with no default key.</b> CTRL+C is the grid's key for its own
+ * cells and the card list's for a test case, and a registered shortcut is
+ * dispatched before a component's input map - so one keymap entry would answer
+ * for all three and silently replace what the grid binds. The tree puts the key
+ * on this action itself instead, which keeps one action behind the menu entry
+ * and the key without taking the gesture away from anybody else.
+ */
 public class CopyNodeAction extends DumbAwareAction {
-    private final @NotNull SimpleTree tree;
-
-    public CopyNodeAction(final @NotNull SimpleTree tree) {
-        super("Copy", "Copy selected items", AllIcons.Actions.Copy);
-        this.tree = tree;
-        this.registerCustomShortcutSet(Shortcuts.CopyItem.getCustomShortcut(), tree);
-    }
 
     // UC-TREE-PANEL-014
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (tree.getTransferHandler() instanceof TreeTransferHandler transferHandler) {
-            transferHandler.copySelectionToClipboard(false);
-        }
+        TreeTransferHandler.of(e).ifPresent(handler -> handler.copySelectionToClipboard(false));
     }
 
     /**
@@ -36,11 +39,16 @@ public class CopyNodeAction extends DumbAwareAction {
      * Greyed rather than hidden, so the menu keeps the same shape whatever is
      * right-clicked - a tester learns what a node cannot do by reading it, not
      * by noticing an entry that is missing.
+     * <p>
+     * Now also the guard that keeps the key to itself: there is no handler to
+     * ask when the keystroke arrived outside the Testin tree, so this is gray in
+     * a Java file rather than copying whatever a tree behind it holds (#119).
      */
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(tree.getTransferHandler() instanceof TreeTransferHandler handler
-                && handler.hasTransferableSelection());
+        e.getPresentation().setEnabled(TreeTransferHandler.of(e)
+                .filter(TreeTransferHandler::hasTransferableSelection)
+                .isPresent());
     }
 
     @Override

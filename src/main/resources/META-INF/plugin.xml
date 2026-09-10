@@ -456,6 +456,27 @@
                 icon="AllIcons.General.IndentDetected"
         />
 
+        <!-- No keyboard-shortcut on either: CTRL+C and CTRL+X are the grid's
+             keys for its own cells and the card list's for a test case, and a
+             registered shortcut is dispatched before a component's input map -
+             so a keymap entry here would answer for all three. The tree binds
+             them on these very actions instead (#119). -->
+        <action
+                id="Testin.CopyNode"
+                class="org.testin.clipboard.CopyNodeAction"
+                text="Copy Testin Node"
+                description="Put the selected test sets, packages or runs on the clipboard"
+                icon="AllIcons.Actions.Copy"
+        />
+
+        <action
+                id="Testin.CutNode"
+                class="org.testin.clipboard.CutNodeAction"
+                text="Cut Testin Node"
+                description="Cut the selected test sets, packages or runs to the clipboard"
+                icon="AllIcons.Actions.MenuCut"
+        />
+
         <action
                 id="Testin.Rename"
                 class="org.testin.rename.RenameAction"

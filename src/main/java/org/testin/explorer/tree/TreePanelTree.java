@@ -110,6 +110,13 @@ public class TreePanelTree implements Disposable {
         // not in the keymap - it is put on the declared action here, which keeps
         // one action behind both the menu entry and the key (#119).
         Declared.bindTo("Testin.Open", Shortcuts.Enter, mainTree);
+
+        // Not in the keymap either: the grid answers CTRL+C and CTRL+X for its
+        // own cells and the card list for a test case, and a registered shortcut
+        // is dispatched before a component's input map - so a keymap entry would
+        // answer for all three (#119).
+        Declared.bindTo("Testin.CopyNode", Shortcuts.CopyItem, mainTree);
+        Declared.bindTo("Testin.CutNode", Shortcuts.CutItem, mainTree);
     }
 
     /**

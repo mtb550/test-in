@@ -1,6 +1,7 @@
 package org.testin.explorer.tree;
 
 import org.testin.notifications.Done;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
@@ -22,6 +23,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.ClipboardContents;
+import org.testin.actions.TestinData;
 import org.testin.services.OptionalPlugin;
 import org.testin.ui.framework.ConfirmDialog;
 
@@ -70,6 +72,25 @@ public class TreeTransferHandler extends TransferHandler {
         this.selectedNodes = selectedNodes;
         this.refresh = refresh;
         this.refreshAndReveal = refreshAndReveal;
+    }
+
+    /**
+     * UC-TREE-PANEL-013, UC-TREE-PANEL-014.
+     * <p>
+     * The handler of the tree this keystroke arrived in, and nothing when it
+     * arrived anywhere else (#119).
+     * <p>
+     * Copy, Cut and Paste are declared actions now, so none of them is handed a
+     * tree - each has to ask the event which tree has the keyboard and then ask
+     * that tree for its handler. Written here rather than three times, because
+     * "whose handler answers for this event" is one question and this class is
+     * what it is about.
+     */
+    public static @NotNull Optional<TreeTransferHandler> of(final @NotNull AnActionEvent e) {
+        return TestinData.tree(e)
+                .map(JComponent::getTransferHandler)
+                .filter(TreeTransferHandler.class::isInstance)
+                .map(TreeTransferHandler.class::cast);
     }
 
     /**
