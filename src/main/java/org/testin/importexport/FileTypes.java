@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.importexport.exports.ExportAction;
 import org.testin.importexport.exports.ExportCsv;
 import org.testin.importexport.exports.ExportExcel;
 import org.testin.importexport.exports.ExportHtml;
@@ -57,7 +56,7 @@ public enum FileTypes {
                     
                     Note: Missing columns will safely default to empty values.
                     You can also download a ready-to-use sample file using the button below.""",
-            (p, export, destFile, sheets) -> new ExportExcel(export).exportToFile(p, destFile, sheets),
+            (p, destFile, sheets) -> new ExportExcel().exportToFile(p, destFile, sheets),
             (p, imports, importFile) -> new ImportExcel(imports).processImport(p, importFile),
             (p, trDir, tr, detailsMap) -> new TestRunExcelGenerator().generate(p, trDir, tr, detailsMap)
     ),
@@ -66,7 +65,7 @@ public enum FileTypes {
             "JSON",
             ".json",
             "",
-            (p, export, destFile, sheets) -> new ExportJson().exportToFile(p, destFile, sheets),
+            (p, destFile, sheets) -> new ExportJson().exportToFile(p, destFile, sheets),
             (p, imports, importFile) -> new ImportJson().processImport(p, importFile),
             ReportHandler.UNSUPPORTED
     ),
@@ -81,7 +80,7 @@ public enum FileTypes {
                     
                     Note: Missing columns will safely default to empty values.
                     The CSV should use comma as delimiter. Values containing commas or newlines must be quoted with double quotes.""",
-            (p, export, destFile, sheets) -> new ExportCsv(export).exportToFile(p, destFile, sheets),
+            (p, destFile, sheets) -> new ExportCsv().exportToFile(p, destFile, sheets),
             (p, imports, importFile) -> new ImportCsv(imports).processImport(p, importFile),
             ReportHandler.UNSUPPORTED
     ),
@@ -90,7 +89,7 @@ public enum FileTypes {
             "HTML",
             ".html",
             "",
-            (p, export, destFile, sheets) -> new ExportHtml(export).exportToFile(p, destFile, sheets),
+            (p, destFile, sheets) -> new ExportHtml().exportToFile(p, destFile, sheets),
             ImportHandler.UNSUPPORTED,
             (p, trDir, tr, detailsMap) -> new TestRunHtmlGenerator().generate(p, trDir, tr, detailsMap).getBytes(StandardCharsets.UTF_8)
     ),
@@ -143,10 +142,10 @@ public enum FileTypes {
         return reportHandler != ReportHandler.UNSUPPORTED;
     }
 
-    public void exportToFile(final @NotNull Project p, final @NotNull ExportAction exportAction, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
+    public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         // Checked here rather than left to the handler, so the failure names the format.
         if (!isExportable()) throw new IllegalStateException(label + " cannot be exported to");
-        exportHandler.execute(p, exportAction, destFile, sheetsData);
+        exportHandler.execute(p, destFile, sheetsData);
     }
 
     public @NotNull Map<String, List<TestCaseDto>> importToFile(final @NotNull Project p, final @NotNull ImportAction importAction, final @NotNull File importFile) {

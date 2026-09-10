@@ -20,7 +20,6 @@ import org.testin.EscapeAction;
 import org.testin.explorer.TreePanel;
 import org.testin.git.SyncActionAction;
 import org.testin.git.ViewPendingCommitsAction;
-import org.testin.importexport.exports.ExportAction;
 import org.testin.importexport.imports.ImportAction;
 import org.testin.model.PackageStatus;
 import org.testin.model.ProjectStatus;
@@ -79,7 +78,7 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         addSeparator();
 
-        add(new ExportAction(p, tree));
+        add(Declared.action("Testin.Export"));
 
         add(new ImportAction(p, tree));
 

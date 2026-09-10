@@ -457,6 +457,14 @@
         />
 
         <action
+                id="Testin.Export"
+                class="org.testin.importexport.exports.ExportAction"
+                text="Export Test Cases"
+                description="Export the test cases under the selected node to a file"
+                icon="AllIcons.ToolbarDecorator.Export"
+        />
+
+        <action
                 id="Testin.RunTests"
                 class="org.testin.run.RunTestsAction"
                 text="Run Tests"

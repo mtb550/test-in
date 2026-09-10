@@ -347,6 +347,14 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     @Getter(AccessLevel.NONE)
     private final @NotNull Set<Can> can;
 
+    /**
+     * Which attributes each capability covers, in column order - see
+     * {@link #all}. Built after the constants, which is when {@code values()}
+     * has an answer to give.
+     */
+    private static final @NotNull Map<Can, List<TestEditorAttributes>> BY_CAPABILITY = EnumSet.allOf(Can.class).stream()
+            .collect(Collectors.toUnmodifiableMap(capability -> capability, capability -> List.of(values()).stream().filter(attribute -> attribute.can(capability)).toList()));
+
     TestEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull Function<TestCaseDto, String> testValueExtractor, final @NotNull ImportSetter importSetter, final @NotNull GenType genType, final @NotNull Can... can) {
         this.name = name;
         this.toolBarDefault = toolBarDefault;
@@ -401,6 +409,24 @@ public enum TestEditorAttributes implements ToolBarAttribute {
      */
     public boolean can(final @NotNull Can capability) {
         return can.contains(capability);
+    }
+
+    /**
+     * UC-SHARE-002, Rule-SHARE-001.
+     * <p>
+     * Every attribute a tester can do this to, in column order.
+     * <p>
+     * The list the exporters write their header from, which used to be a field
+     * on {@code ExportAction} - so three exporters were handed the action just
+     * to read one list off it, and the action could not be declared to the
+     * platform while it carried state (#119). Which columns an export holds is
+     * this enum's knowledge either way.
+     * <p>
+     * Worked out once per capability rather than per sheet: a workbook of five
+     * hundred cases asks for it on every row.
+     */
+    public static @NotNull List<TestEditorAttributes> all(final @NotNull Can capability) {
+        return BY_CAPABILITY.get(capability);
     }
 
     /**

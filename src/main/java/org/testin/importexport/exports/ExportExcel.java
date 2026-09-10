@@ -1,12 +1,13 @@
 package org.testin.importexport.exports;
 
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 
 import java.io.File;
@@ -15,15 +16,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-@AllArgsConstructor
 public class ExportExcel {
 
     /**
      * Excel's limit on a sheet name, which POI enforces by throwing.
      */
     private static final int MAX_SHEET_NAME = 31;
-
-    private final @NotNull ExportAction exportAction;
 
     /**
      * Whether this name is still free in the workbook. POI answers with no
@@ -81,22 +79,22 @@ public class ExportExcel {
                 final @NotNull Sheet sheet = workbook.createSheet(uniqueSheetName(workbook, entry.getKey()));
 
                 final @NotNull Row headerRow = sheet.createRow(0);
-                for (int i = 0; i < exportAction.exportAttributes.size(); i++) {
+                for (int i = 0; i < TestEditorAttributes.all(Can.EXPORT).size(); i++) {
                     final @NotNull Cell cell = headerRow.createCell(i);
-                    cell.setCellValue(exportAction.exportAttributes.get(i).getName());
+                    cell.setCellValue(TestEditorAttributes.all(Can.EXPORT).get(i).getName());
                     cell.setCellStyle(headerStyle);
                 }
 
                 int rowIndex = 1;
                 for (final TestCaseDto tc : entry.getValue()) {
                     final @NotNull Row row = sheet.createRow(rowIndex++);
-                    for (int i = 0; i < exportAction.exportAttributes.size(); i++) {
+                    for (int i = 0; i < TestEditorAttributes.all(Can.EXPORT).size(); i++) {
                         final @NotNull Cell cell = row.createCell(i);
-                        cell.setCellValue(exportAction.exportAttributes.get(i).gridValue(tc));
+                        cell.setCellValue(TestEditorAttributes.all(Can.EXPORT).get(i).gridValue(tc));
                     }
                 }
 
-                for (int i = 0; i < exportAction.exportAttributes.size(); i++) {
+                for (int i = 0; i < TestEditorAttributes.all(Can.EXPORT).size(); i++) {
                     sheet.autoSizeColumn(i);
                 }
             }

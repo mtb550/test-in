@@ -2,10 +2,10 @@ package org.testin.importexport.exports;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Display;
 
@@ -15,9 +15,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
-@AllArgsConstructor
 public class ExportHtml {
-    private final @NotNull ExportAction exportAction;
 
     // UC-SHARE-002, Rule-SHARE-022
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
@@ -88,7 +86,7 @@ public class ExportHtml {
                 writer.newLine();
 
                 writer.write("<tr>");
-                for (final TestEditorAttributes attr : exportAction.exportAttributes) {
+                for (final TestEditorAttributes attr : TestEditorAttributes.all(Can.EXPORT)) {
                     writer.write("<th>" + StringUtil.escapeXmlEntities(attr.getName()) + "</th>");
                 }
                 writer.write("</tr>");
@@ -96,7 +94,7 @@ public class ExportHtml {
 
                 for (final TestCaseDto tc : testCases) {
                     writer.write("<tr>");
-                    for (final TestEditorAttributes attr : exportAction.exportAttributes) {
+                    for (final TestEditorAttributes attr : TestEditorAttributes.all(Can.EXPORT)) {
                         writer.write("<td>" + StringUtil.escapeXmlEntities(attr.gridValue(tc)) + "</td>");
                     }
                     writer.write("</tr>");
