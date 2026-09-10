@@ -23,7 +23,6 @@ import org.testin.model.TestSetStatus;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.report.GenerateReportAction;
 import org.testin.testrun.SetTestRunStatusAction;
-import org.testin.testset.UpdateTestSetStatusAction;
 import org.testin.undo.UndoAction;
 import org.testin.undo.UndoDirection;
 import org.testin.undo.UndoScope;
@@ -49,10 +48,9 @@ public class TreeContextMenu extends DefaultActionGroup {
         // tester reaches it, so one added there and not here would be a status
         // nothing could ever set - and nothing would have said so (#175, C9).
         final @NotNull List<DumbAwareAction> statusActions = new ArrayList<>();
-        for (final TestSetStatus status : TestSetStatus.values()) statusActions.add(new UpdateTestSetStatusAction(p, tree, status));
         for (final PackageStatus status : PackageStatus.values()) statusActions.add(new UpdatePackageStatusAction(p, tree, status));
 
-        add(actionsSubMenu(Declared.action("Testin.UpdateTestProjectStatus"), statusActions, List.of(
+        add(actionsSubMenu(List.of(Declared.action("Testin.UpdateTestProjectStatus"), Declared.action("Testin.UpdateTestSetStatus")), statusActions, List.of(
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.UNDO),
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.REDO),
                         Declared.action("Testin.ReCreateTestRun"),
@@ -157,9 +155,9 @@ public class TreeContextMenu extends DefaultActionGroup {
      * second is written out - and a generated group joined to a literal one reads
      * better than either a stream of both or a list nobody can tell apart.
      */
-    private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull AnAction declaredStatuses, final @NotNull List<? extends AnAction> statusActions, final @NotNull List<? extends AnAction> rest) {
+    private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends AnAction> declaredStatuses, final @NotNull List<? extends AnAction> statusActions, final @NotNull List<? extends AnAction> rest) {
         final @NotNull DefaultActionGroup group = ActionsMenu.group();
-        group.add(declaredStatuses);
+        declaredStatuses.forEach(group::add);
         statusActions.forEach(group::add);
         rest.forEach(group::add);
         return group;

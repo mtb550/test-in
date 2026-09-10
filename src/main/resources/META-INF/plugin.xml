@@ -536,6 +536,14 @@
                 popup="false"
         />
 
+        <group
+                id="Testin.UpdateTestSetStatus"
+                class="org.testin.testset.UpdateTestSetStatusGroup"
+                text="Set Test Set Status"
+                description="Mark the selected test set active or deprecated"
+                popup="false"
+        />
+
         <!-- No keyboard-shortcut: DELETE is the tree's key, the card list's and
              the grid's, and one keymap entry would answer for all three. The
              tree binds it on this action instead (#119). -->
