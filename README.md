@@ -108,7 +108,7 @@ or in this repository under [`docs/`](docs/README.md).
 
 Testin has eight parts. Each part gets a folder, and every thing a tester does
 in it gets a page of its own: the story, its rules, its screens, what happens
-step by step, and every way it can be refused. 152 use cases and 670 rules, each
+step by step, and every way it can be refused. 152 use cases and 671 rules, each
 checked against the code it describes.
 
 | Document | Covers |

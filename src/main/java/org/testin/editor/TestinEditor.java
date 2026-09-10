@@ -155,6 +155,12 @@ public interface TestinEditor extends Disposable {
     default void refreshSelectionStatus(final int @NotNull [] selectedIndices) {
         final int firstRow = selectedIndices.length == 0 ? 0 : selectedIndices[0];
 
+        // Rule-EDITOR-PANEL-215. Said on every refresh rather than once at
+        // construction: a node renamed or moved under an open editor changes its
+        // path, and the bar reads it from the node each time rather than
+        // remembering what it was called when the tab opened.
+        getStatusBar().showPath(getParent().getPath2());
+
         getStatusBar().updateSelectionState(
                 selectedIndices,
                 ((getCurrentPage() - 1) * getPageSize()) + firstRow,
