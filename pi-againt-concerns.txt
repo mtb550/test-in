@@ -1,0 +1,174 @@
+Testin — structural review of src/main/java (and modules)
+========================================================
+Reviewed against CLAUDE.md (the stated authority for architecture/conventions).
+Working tree clean at d851458e. 492 main files, 73 packages, 90 tests.
+This file records structure issues only. Nothing was changed or edited.
+
+Compliance check-summary (what is sound)
+----------------------------------------
+- File-access rule: only the indexer touches test data. Real disk I/O outside
+  indexer/exempt is limited to sftp/BaselineStore (bookkeeping, not test data —
+  see C3). Core UI/model packages use Path objects but no disk ops; existence
+  checks go through ProjectIndexer.nodeExists/find (EditorUtil, tree, etc.).
+- Exempt packages (codegen, config, git, importexport, report, setting, logger)
+  do not read/write test data. Git writes the working tree itself, as documented.
+- Indexer ordering (VFS op succeeds before cache update) is implemented and
+  documented inline (removeVf, renameNode, copyNodes).
+- Naming conventions largely followed: no I-prefixed interfaces, no Impl suffix,
+  Abstract* for abstract parents, Testin* prefix for platform-name collisions,
+  no wrapped method declarations (one-line signatures), final on params/locals,
+  @NotNull/@Nullable (no jspecify), no Optional-as-field, 4 documented throws
+  only (PendingChange/TestRunItems hits are Javadoc @throws tags, not declares).
+- DTOs and markers under model/dto, model/markers are clean leaves (no feature
+  imports). testin-java / testin-testng content modules are well-structured and
+  wired through the declared extension points.
+- Notification conventions (Notifier delivers, Done/Refused own the words,
+  softShow vs info) are followed.
+
+Structure issues
+----------------
+
+C1. editor/listeners — the one package named by an explicitly-prohibited kind
+    Rule: CLAUDE.md "There is no enums, listeners or mappers package: a type
+    lives with the feature that owns it (#53)."
+    src/main/java/org/testin/editor/listeners/ (14 files) is a grab-bag named
+    by kind. Worse, its name does not match its content: it holds renderers as
+    well as listeners —
+      renderers (not listeners): AbstractListRenderer, TestListRenderer,
+        RunListRenderer
+      listeners: CardMouseListener, GridContextMenuListener, GridEditListener,
+        GridListSelectionSynchronizer, GridSelectionListener,
+        ModelChangeNotifier, SelectionListener, StatusBarListener,
+        TransferListener, AbstractGridEditListener
+    Consumers outside the package are only editor/list/ListPanelBuilder,
+    editor/run/RunEditor, editor/test/TestEditor — i.e. the listeners belong
+    with those features. This is the one package matching the hard prohibition
+    exactly, and it mixes a second kind (renderers) under a "listeners" name.
+
+C2. model is still not a leaf — it imports feature packages
+    The f8eee5d6 commit removed one leg (Badges moved editor->ui) but model
+    still reaches into feature packages:
+      model/Automated              imports org.testin.editor.CardTitle
+          (model->editor edge remains; CardTitle is editor title geometry used
+           by Automated for icon sizing)
+      model/DirectoryType          imports codegen.*, creator.*, indexer,
+                                   services
+      model/RunEditorAttributes    imports ui.Badges, codegen.Fqcn, indexer,
+                                   services
+      model/TestEditorAttributes   imports ui.Badges, codegen.*, indexer,
+                                   services
+      model/DirectoryMapper        imports indexer, notifications.Notifier,
+                                   services
+      model/NodeStatistics         imports indexer.NodeCounter
+    Note: enums carrying presentation (RunEditorAttributes.applyToUI) is the
+    documented "enums carry their own presentation" convention — but the
+    dependency direction (model -> editor/creator/codegen/ui) breaks the leaf
+    assumption the commit message ("model-is-not-a-leaf") was trying to restore.
+    model/Automated -> editor.CardTitle is the clearest remaining model->editor
+    edge; CardTitle could move to ui (like Badges) to remove it.
+
+C3. sftp is not on the exempt list but writes files directly
+    Exempt list (may touch files): codegen, config, git, importexport, report,
+    setting, logger. sftp is absent. Yet sftp/BaselineStore performs real disk
+    I/O via java.nio.file.Files (isRegularFile, newInputStream, createDirectories,
+    newOutputStream, move, deleteIfExists) on a baseline bookkeeping file under
+    PathManager.getSystemPath()/testin/baseline/*.json.gz.
+    This is NOT test data and lives outside the Testin root, so it is compliant
+    in spirit (the rule is about test data); sftp also reads local test files
+    through ProjectIndexer.filesUnder (SftpSync line 125), so the data path is
+    correct. The concern is documentation/letter-of-the-rule: sftp touches disk
+    without being listed exempt. Either add sftp to the exempt list (it handles
+    a baseline, like the log/settings do) or route BaselineStore through the
+    indexer.
+
+C4. util holds the VFS file-layer functional interfaces used only by the indexer
+    Rule: CLAUDE.md "FilesUtil and VfsExecutor are the file layer the indexer
+    itself calls ... and they live in indexer now."
+    VfsExecutor is in indexer, but the two lambda shapes it uses —
+      util/VfsOperation, util/VfsBiOperation
+    — live in util. Their only consumers are indexer/VfsExecutor. So the file
+    layer is split: the executor is in indexer, its functional interfaces are in
+    util. Minor inconsistency with the stated rule; they could sit beside
+    VfsExecutor in indexer. (They import only the platform VirtualFile, so they
+    do not drag an editor into util — the "imports nothing above model" rule is
+    not violated.)
+
+C5. Packages named by kind rather than feature (softer deviations)
+    CLAUDE.md: "Packages are all-lowercase and named by feature, never by kind."
+    Beyond the hard-prohibited C1, several packages are named by kind:
+      editor/statusbar, editor/toolbar, editor/toolbar/components (19 files),
+      view/details/components (12 files), report/generators,
+      ui/dialogs, creator/dialogs, setting/dialogs, org.testin.dialogs
+    Some are feature-adjacent (creator/dialogs, setting/dialogs, report/generators
+    are feature subpackages and don't repeat their parent), but the shared
+    "components"/"toolbar"/"statusbar"/"dialogs" groupings are by-kind. The
+    toolbar/components package is consumed across editor, EditorFilters and
+    lightmode/ViewMenuBtn — a shared grab-bag of buttons rather than a feature
+    package.
+
+C6. Four "dialogs" packages; one stray top-level package with a single file
+      org.testin.dialogs        (one file: ZoomIndicatorDialog)
+      ui/dialogs                (DestinationForm, DialogStyle, FormRows, ShortcutMenuPopup, ShortcutMenuRenderer)
+      creator/dialogs           (CreateProjectDialog, CreateRunDialog, CreateTestDialog)
+      setting/dialogs           (TestinPathPanel)
+    org.testin.dialogs holding exactly one class is a stray by-kind package;
+    ZoomIndicatorDialog could live with its consumer (ui/FontSync).
+
+C7. Ambiguous near-duplicate package names: run vs runner, statusbar vs editor/statusbar
+      org.testin.run       — actions + entry points + TestRunner interface
+                             (RunTestCaseAction, RunTestCases, RunTestsAction, TestRunner)
+      org.testin.runner    — execution machinery
+                             (RunRegistry, TestCaseExecutionListener, TestCaseExecutionSubscriber,
+                              TestCaseExecutionTracker, TestNGExecution)
+      org.testin.statusbar         — shared base (MenuItem, StatusBarBase, StatusBarItem)
+      org.testin.editor.statusbar  — editor page controls (AbstractPageAction, PageBtn, PageStep, StatusBar)
+    "run" vs "runner" are near-duplicate names a reader cannot tell apart without
+    opening both; the split (actions vs execution engine) is real but the names
+    hide it. Same for the two statusbar packages.
+
+C8. The shared ui layer reaches into feature packages
+    ui is meant to be shared UI infrastructure, but it imports feature packages:
+      ui/FontSync                         imports org.testin.dialogs.ZoomIndicatorDialog,
+                                          org.testin.editor.grid.GridPanelBuilder
+      ui/dialogs/DestinationForm         imports importexport.FileTypes, services, setting
+      ui/dialogs/ShortcutMenuPopup       imports statusbar.MenuItem
+      ui/dialogs/ShortcutMenuRenderer    imports statusbar.MenuItem
+      ui/framework/AbstractFrameworkDialog imports statusbar.StatusBarBase / StatusBarItem
+    ui/framework (24 files) is a legitimate shared declarative dialog framework,
+    but its dependency on org.testin.statusbar means shared infrastructure leans
+    on a feature package. ui/FontSync reaching into editor.grid.GridPanelBuilder
+    is the sharpest edge.
+
+C9. Model carries UI-attribute descriptors that reach into the UI (design tension)
+    RunEditorAttributes / TestEditorAttributes in model define toolbar attributes
+    and applyToUI(badges, details). This matches the documented convention that
+    enums carry presentation, but combined with C2 it makes model depend on
+    ui/codegen/indexer/services. If model is meant to be a pure domain leaf, the
+    attribute descriptors are the load-bearing exception; otherwise the rule
+    "shared domain vocabulary lives in model" is being stretched to hold UI
+    rendering logic.
+
+Low-priority / observations
+---------------------------
+- editor/toolbar/components is the single largest by-kind package (19 files);
+  it is shared across editor and lightmode, which is why it was hoisted out of
+  a single toolbar — but "components" remains a kind name.
+- Optional-dependency descriptors (testin-java.xml, testin-testng.xml,
+  testin-git.xml) are intentionally empty declaration points (documented).
+- Content-module packages org.testin.java.* / org.testin.testng.* are cleanly
+  feature-named and correctly wired through the dynamic extension points.
+- No TODO/FIXME/HACK debt markers in main sources (two hits are doc comments
+  describing generated stub TODOs, not code debt).
+
+Suggested follow-ups (none applied)
+-----------------------------------
+1. Move CardTitle to ui (beside Badges) to remove the model/Automated -> editor edge (C2).
+2. Either list sftp among exempt packages in CLAUDE.md or move BaselineStore's
+   bookkeeping under the indexer (C3).
+3. Move VfsOperation/VfsBiOperation into indexer beside VfsExecutor (C4).
+4. Rename/rehome the editor/listeners package (C1): split renderers out, and
+   place listeners with editor/list, editor/grid, editor/run, editor/test.
+5. Collapse the four dialogs packages and rehome the single-file org.testin.dialogs (C6).
+6. Disambiguate run/runner and statusbar/editor.statusbar names (C7).
+7. Reduce ui -> feature imports (C8): move ZoomIndicatorDialog, FileTypes, and
+   the statusbar base types the framework needs into ui or their owners.
