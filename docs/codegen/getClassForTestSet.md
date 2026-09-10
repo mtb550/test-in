@@ -36,6 +36,9 @@ There is no key for this. It happens when a test set is created, which is
   never share a class and each one is in the same class every time. A test set
   with no name at all — which the tree does not let a tester make — becomes
   `DefaultTest`.
+- **Rule-CODEGEN-073** — A folder whose name is a word Java keeps for itself -
+  New, Class, Import - still becomes a package, named after what it was called,
+  so nothing generated under it lands in a file that will not compile.
 
 ## What is written
 

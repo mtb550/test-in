@@ -3,6 +3,7 @@ package org.testin.util;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -33,6 +34,14 @@ public class GeneratedNamesTest {
      * all.
      */
     private static final String[] UNNAMEABLE = {"!!!", "???", "...", "---", "@#$", "()"};
+
+    /**
+     * Ordinary words for a folder of test sets, every one of which sanitizes to
+     * a word Java keeps for itself. These reached the generator intact and were
+     * refused by javac instead - the tester found {@code package a.b.new;} in a
+     * file they had not written (#11).
+     */
+    private static final String[] KEYWORDS = {"New", "Class", "Import", "Return", "Do", "Switch", "Package"};
 
     @Test
     public void aPackageNameIsTheSameEveryTimeItIsAskedFor() {
@@ -83,6 +92,57 @@ public class GeneratedNamesTest {
             assertTrue(SourceVersion.isName(NameSanitizer.packageName(name)),
                     "'" + name + "' names the package " + NameSanitizer.packageName(name) + ", which Java will not accept");
         }
+    }
+
+    /**
+     * The other way a name arrives with no package in it, and the one that went
+     * unanswered until #11: the name sanitizes cleanly and the word it gives is
+     * one Java will not let a package be called.
+     */
+    @Test
+    public void aJavaKeywordNeverBecomesAPackageName() {
+        for (final String name : KEYWORDS) {
+            assertTrue(SourceVersion.isName(NameSanitizer.packageName(name)),
+                    "'" + name + "' names the package " + NameSanitizer.packageName(name)
+                            + ", which Java will not accept - every test case under it is in a file that does not compile");
+        }
+    }
+
+    /**
+     * And it is still a name, not a new one each time - the promise the whole of
+     * this test class is about.
+     */
+    @Test
+    public void aKeywordNamesTheSamePackageEveryTime() {
+        for (final String name : KEYWORDS) {
+            assertEquals(NameSanitizer.packageName(name), NameSanitizer.packageName(name));
+        }
+
+        for (int i = 0; i < KEYWORDS.length; i++) {
+            for (int j = i + 1; j < KEYWORDS.length; j++) {
+                assertNotEquals(NameSanitizer.packageName(KEYWORDS[i]), NameSanitizer.packageName(KEYWORDS[j]));
+            }
+        }
+    }
+
+    /**
+     * The tree asks before it stores, so the tester is told rather than left to
+     * find a package they did not name.
+     */
+    @Test
+    public void theTreeCanTellWhichNamesItWillHaveToRename() {
+        for (final String name : KEYWORDS) {
+            assertFalse(NameSanitizer.canMakePackageName(name),
+                    "'" + name + "' would be accepted by a create or rename dialog and then generate a package called something else");
+        }
+
+        for (final String name : UNNAMEABLE) {
+            assertFalse(NameSanitizer.canMakePackageName(name));
+        }
+
+        assertTrue(NameSanitizer.canMakePackageName("Checkout"));
+        assertTrue(NameSanitizer.canMakePackageName("payment methods"));
+        assertTrue(NameSanitizer.canMakePackageName("4 digit pin"));
     }
 
     /**

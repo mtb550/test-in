@@ -15,7 +15,49 @@ public final class NameSanitizer {
 
     private static final @NotNull Pattern INVALID_NAME = Pattern.compile("[^a-zA-Z0-9 _]");
 
+    /**
+     * UC-CODEGEN-002, Rule-CODEGEN-011, Rule-CODEGEN-073.
+     * <p>
+     * The package a name gives, and never one Java refuses.
+     * <p>
+     * There are two ways a name arrives with no package in it, and until #11
+     * only the first was answered. A name with no letters and no digits left
+     * after the illegal characters go has nothing to build from - that is
+     * {@code "generated"} and a {@link #tag}. A name that is a word Java keeps
+     * for itself comes through this whole method intact and is refused at the
+     * far end by javac instead: {@code New} names {@code new}, and the tester
+     * found {@code package a.b.new;} in a file they did not write and could not
+     * compile. {@code Class}, {@code Import}, {@code Return} and {@code Do} are
+     * the same, and every one of them is an ordinary word for a folder of test
+     * sets.
+     * <p>
+     * Both take a tag, for the reason {@link #tag} gives: the same name has to
+     * give the same package every time, and two names must never give one. A
+     * bare {@code _new} would break the second - {@code New} and {@code _new}
+     * would both land there.
+     * <p>
+     * The tree asks {@link #canMakePackageName} before storing such a name, so
+     * a tester is told rather than surprised. This is for the names that
+     * arrive some other way - an import, a sync, a hand-edited file.
+     */
     public static @NotNull String packageName(final @NotNull String value) {
+        final @NotNull String word = packageWord(value);
+
+        if (word.isEmpty()) return "generated" + tag(value);
+        if (!SourceVersion.isName(word)) return word + tag(value);
+        return word;
+    }
+
+    /**
+     * The package the name gives before anything is done about Java refusing
+     * it: empty when the name had nothing in it, a keyword when the name was
+     * one.
+     * <p>
+     * Split out so {@link #canMakePackageName} and {@link #packageName} ask one
+     * question of one method - the dialog and the generator cannot disagree
+     * about which names are usable, whatever either of them does about it.
+     */
+    private static @NotNull String packageWord(final @NotNull String value) {
         final @NotNull String cleanName = INVALID_NAME.matcher(value.replace("-test-cases", ""))
                 .replaceAll("").trim();
         final @NotNull StringBuilder result = new StringBuilder();
@@ -29,9 +71,24 @@ public final class NameSanitizer {
             }
         }
 
-        if (result.isEmpty()) return "generated" + tag(value);
-        if (Character.isDigit(result.charAt(0))) result.insert(0, '_');
+        if (!result.isEmpty() && Character.isDigit(result.charAt(0))) result.insert(0, '_');
         return result.toString();
+    }
+
+    /**
+     * UC-CODEGEN-002, Rule-CODEGEN-011.
+     * <p>
+     * Whether a name can be used as the tester typed it - the question the tree
+     * dialogs ask before a node that becomes a Java package takes a new name.
+     * <p>
+     * The twin of {@link #canMakeMethodName}, and asked for the same reason: a
+     * name is typed once and read from for the life of the node, so the moment
+     * to say no is while the tester is still looking at it. Answering false
+     * does not mean nothing can be generated - {@link #packageName} always has
+     * an answer - it means the answer would be a package name nobody chose.
+     */
+    public static boolean canMakePackageName(final @NotNull String value) {
+        return SourceVersion.isName(packageWord(value));
     }
 
     /**
