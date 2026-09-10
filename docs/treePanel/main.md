@@ -60,9 +60,10 @@ Each one is a page of its own: the story, its rules, its screens and its steps.
 ## Where the panel sits in the IDE
 
 Testin puts two tool windows in IntelliJ IDEA. The tree panel is docked on
-the left, beside the places the IDE keeps its own trees. The view panel is
-docked on the right. **Both stripes read Testin**, so the side they are on is
-the only thing that tells them apart.
+the left, beside the places the IDE keeps its own trees, and its stripe reads
+**Testin Tree**. The view panel is docked on the right, and its stripe reads
+**Testin View**. Both keep the plugin's name, so neither reads as a different
+plugin, and each says which of the two it is.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐

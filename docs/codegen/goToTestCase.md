@@ -58,7 +58,7 @@ There is no key for this. The mark is in the gutter beside the method.
 1. The tester is reading a generated method.
 2. The tester clicks the mark beside the identity.
 3. Testin waits for indexing, then looks the test case up by its identity.
-4. The Testin tool window comes up and the tree expands to the test set holding
+4. The **Testin Tree** tool window comes up and the tree expands to the test set holding
    it.
 5. That test set's editor opens and the test case is selected in it, with the
    view panel showing it.

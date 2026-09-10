@@ -56,7 +56,7 @@ There is no key for this. The path is at the top of the panel.
 1. The tester moves the pointer over a step of the path.
 2. The step turns to the link color and underlines itself.
 3. The tester clicks it.
-4. The Testin tool window comes up and the tree expands to that step.
+4. The **Testin Tree** tool window comes up and the tree expands to that step.
 5. If the step names a test set or a test run, its editor opens too, or comes to
    the front if it was already open.
 
