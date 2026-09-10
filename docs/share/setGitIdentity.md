@@ -35,6 +35,11 @@ name.
 - **Rule-SHARE-041** — The tester chooses whether this is for this one
   repository or for every repository on this machine.
 
+- **Rule-SHARE-108** — The email address is checked for its shape before it is
+  used: something, an at sign, something with a dot in it, and no spaces. A
+  value that is plainly not an address is refused while the tester is still
+  looking at it, rather than found out when somebody reads a commit.
+
 ## The screen
 
 ```
@@ -71,18 +76,18 @@ name.
 
 ## What Testin refuses
 
+**If the email address is not the shape of one** — a message reads
+*'Muteb' is not an email address*, the dialog stays open, and nothing is
+written to Git. The shape is all that is checked: no address can be proved to
+exist without sending to it, so what is refused is the answer that is plainly
+not one.
+
 **If the name is empty** — its gray hint turns red and the box takes the cursor.
 
 **If the email is empty** — the same.
 
 **If Git will not take the identity** — a message titled **Config Failed** reads
 *Failed to set Git identity:* and then the reason.
-
-## Where the plugin breaks its own rules
-
-The email is not checked at all. Any text is accepted. Git then makes of it
-what it will. That is difference 18 on
-[the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ## This is not the tester name
 

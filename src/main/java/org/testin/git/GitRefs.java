@@ -252,6 +252,34 @@ public final class GitRefs {
     // would not make anything more secure, it would stop plain-http remotes
     // being clonable at all.
     @SuppressWarnings("HttpUrlsUsage")
+    /**
+     * UC-SHARE-014, Rule-SHARE-108.
+     * <p>
+     * Whether this is the shape of an email address: something, an at sign,
+     * something with a dot in it, and no spaces anywhere.
+     * <p>
+     * The shape and nothing more. Git records whatever it is given and no
+     * address can be proved to exist without sending to it, so what is worth
+     * refusing is the answer that is plainly not one - a name typed into the
+     * wrong box, a path, a sentence. Anything narrower would refuse addresses
+     * that work.
+     * <p>
+     * Beside {@link #isRepositoryUrl} because it is the same kind of question
+     * asked of the other half of a Git identity, and a tester who typed one into
+     * the wrong dialog should hear the same sort of answer.
+     */
+    public static boolean isEmailAddress(final @NotNull String text) {
+        final @NotNull String value = text.trim();
+
+        final int at = value.indexOf('@');
+        if (at <= 0 || at != value.lastIndexOf('@')) return false;
+        if (value.chars().anyMatch(Character::isWhitespace)) return false;
+
+        final @NotNull String domain = value.substring(at + 1);
+
+        return domain.length() >= 3 && domain.indexOf('.') > 0 && !domain.endsWith(".");
+    }
+
     public static boolean isRepositoryUrl(final @NotNull String text) {
         final @NotNull String value = text.trim();
         return value.startsWith("http://")

@@ -78,11 +78,6 @@ not read the Git remote:* and then the reason.
 
 ## Where the plugin breaks its own rules
 
-**The Git email address is never checked.** Any text is taken. The failure
-arrives later in Git's own words. The remote address is checked, by the same
-rule the create project dialog uses. That is difference 18 on
-[the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
-
 **A commit made and not pushed leaves work on this machine.** If the push
 fails, the commit still stands. The work is recorded here and not sent. The
 next review offers to push it. That is [UC-SHARE-015](pushOldCommit.md).

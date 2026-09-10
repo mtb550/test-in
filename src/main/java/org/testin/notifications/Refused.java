@@ -104,6 +104,16 @@ public enum Refused {
     NOT_A_REPOSITORY_URL("'%s' is not a repository address"),
 
     /**
+     * UC-SHARE-014, Rule-SHARE-108.
+     * <p>
+     * The other half of a Git identity, refused the same way and for the same
+     * reason as {@link #NOT_A_REPOSITORY_URL}: while the tester is still looking
+     * at what they typed. Git takes whatever it is given, so an address typed
+     * wrong is not found out until somebody reads a commit (#272).
+     */
+    NOT_AN_EMAIL_ADDRESS("'%s' is not an email address"),
+
+    /**
      * UC-CODEGEN-007, Rule-CODEGEN-069.
      * <p>
      * The tester clicked the gutter mark beside a generated method whose test

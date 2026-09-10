@@ -10,7 +10,7 @@ team pulls, or a server the plugin syncs with.
 |---|---|
 | **Part of Testin** | Sharing work with the team |
 | **Answers** | How test cases leave Testin and come back, and how a test project is kept in step with a team |
-| **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` to `Rule-SHARE-107` |
+| **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` to `Rule-SHARE-108` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -172,7 +172,6 @@ bug report yet.
 | **Difference 12** | Rule-SHARE-005 — the same | The export, import and report bars cannot be canceled. |
 
 | **Difference 16** | Rule-SHARE-003 — the tester is told | A message can still be shown to nobody: with no status bar on the code project's window, the balloon is dropped. It is written to `testin.log` now rather than lost, so an export that finished with nobody told can be told from one that did not finish. Nothing is raised in its place — a notification about a failed notification is noise. |
-| **Difference 18** | Rule-SHARE-004 — a value is checked before it is used | The Git email address is not checked. Any text is taken, and the failure arrives later in Git's own words. The remote address is checked now, by the rule the create project dialog already used. |
 | **Difference 19** | Rule-SHARE-006 — a missing feature says so | Fixed. Both Git entries are in the menu in every IDE now, grayed and reading *(needs the Git plugin)* when it is missing, so the menu has one shape everywhere and the reason is on the entry (Rule-SHARE-105). |
 
 **Retired.** A use case or a rule that is gone keeps its number forever, so an
@@ -202,6 +201,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 17** | A refusal naming which nodes can be imported into, on nodes where the menu entry was already gray. The refusal is gone; the gray entry says it. Fixed 9 September 2026, [#271](https://github.com/mtb550/test-in/issues/271) |
 | **Difference 14** | A Git sync faded, a push stayed, a server sync faded. All three stay: a sync lands on its own time, so it is the message a tester comes back to. Fixed 9 September 2026, [#268](https://github.com/mtb550/test-in/issues/268) |
 | **Difference 2** | `Enter` did nothing in the export, import and review dialogs, which declared only `Escape`. All three answer it now, and the report dialog with them. Fixed 9 September 2026, [#252](https://github.com/mtb550/test-in/issues/252) |
+| **Difference 18** | The remote address had already been fixed under [#83](https://github.com/mtb550/test-in/issues/83); the email address had not, so Git recorded whatever it was handed and a name typed into that box was not found out until somebody read a commit and wondered who wrote it. Its shape is checked now, in the same dialog and with the same kind of sentence (Rule-SHARE-108). Fixed 10 September 2026, [#272](https://github.com/mtb550/test-in/issues/272) |
 | **Difference 11** | Every keystroke in the source box parsed the whole file, and nothing said it was happening - so a large workbook left the dialog looking frozen, and a tester could not tell that from a file Testin could not read. It waits three tenths of a second after the last keystroke now, and the form says which file it is reading (Rule-SHARE-107). Fixed 10 September 2026, [#266](https://github.com/mtb550/test-in/issues/266) |
 | **Difference 9** | An unreadable value was quietly replaced four different ways - a priority became the lowest, a group was dropped from the list, a date became blank, a status kept whatever the row had - so 200 rows whose priority column read High, Medium and Low all arrived at the lowest priority in silence. One answer now, and it is said once with a count (Rule-SHARE-106). Fixed 9 September 2026, [#264](https://github.com/mtb550/test-in/issues/264) |
 
