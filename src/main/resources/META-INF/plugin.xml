@@ -465,6 +465,14 @@
         />
 
         <action
+                id="Testin.Import"
+                class="org.testin.importexport.imports.ImportAction"
+                text="Import Test Cases"
+                description="Import test cases from a file into the selected node"
+                icon="AllIcons.ToolbarDecorator.Import"
+        />
+
+        <action
                 id="Testin.RunTests"
                 class="org.testin.run.RunTestsAction"
                 text="Run Tests"

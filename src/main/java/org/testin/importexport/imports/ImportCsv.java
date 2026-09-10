@@ -1,10 +1,10 @@
 package org.testin.importexport.imports;
 
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -13,9 +13,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-@AllArgsConstructor
 public class ImportCsv {
-    private final @NotNull ImportAction importAction;
 
     // UC-SHARE-006
     public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
@@ -49,7 +47,7 @@ public class ImportCsv {
 
         for (int i = 0; i < headers.length; i++) {
             final @NotNull String headerName = headers[i].trim();
-            for (final TestEditorAttributes reqCol : importAction.importAttributes) {
+            for (final TestEditorAttributes reqCol : TestEditorAttributes.all(Can.IMPORT)) {
                 if (reqCol.getName().equalsIgnoreCase(headerName)) byName.put(reqCol.getName().toLowerCase(), i);
             }
         }

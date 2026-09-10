@@ -8,7 +8,6 @@ import org.testin.importexport.exports.ExportCsv;
 import org.testin.importexport.exports.ExportExcel;
 import org.testin.importexport.exports.ExportHtml;
 import org.testin.importexport.exports.ExportJson;
-import org.testin.importexport.imports.ImportAction;
 import org.testin.importexport.imports.ImportCsv;
 import org.testin.importexport.imports.ImportExcel;
 import org.testin.importexport.imports.ImportJson;
@@ -42,7 +41,7 @@ public enum FileTypes {
             ".xls",
             "",
             ExportHandler.UNSUPPORTED,
-            (p, imports, importFile) -> new ImportExcel(imports).processImport(p, importFile),
+            (p, importFile) -> new ImportExcel().processImport(p, importFile),
             ReportHandler.UNSUPPORTED
     ),
 
@@ -57,7 +56,7 @@ public enum FileTypes {
                     Note: Missing columns will safely default to empty values.
                     You can also download a ready-to-use sample file using the button below.""",
             (p, destFile, sheets) -> new ExportExcel().exportToFile(p, destFile, sheets),
-            (p, imports, importFile) -> new ImportExcel(imports).processImport(p, importFile),
+            (p, importFile) -> new ImportExcel().processImport(p, importFile),
             (p, trDir, tr, detailsMap) -> new TestRunExcelGenerator().generate(p, trDir, tr, detailsMap)
     ),
 
@@ -66,7 +65,7 @@ public enum FileTypes {
             ".json",
             "",
             (p, destFile, sheets) -> new ExportJson().exportToFile(p, destFile, sheets),
-            (p, imports, importFile) -> new ImportJson().processImport(p, importFile),
+            (p, importFile) -> new ImportJson().processImport(p, importFile),
             ReportHandler.UNSUPPORTED
     ),
 
@@ -81,7 +80,7 @@ public enum FileTypes {
                     Note: Missing columns will safely default to empty values.
                     The CSV should use comma as delimiter. Values containing commas or newlines must be quoted with double quotes.""",
             (p, destFile, sheets) -> new ExportCsv().exportToFile(p, destFile, sheets),
-            (p, imports, importFile) -> new ImportCsv(imports).processImport(p, importFile),
+            (p, importFile) -> new ImportCsv().processImport(p, importFile),
             ReportHandler.UNSUPPORTED
     ),
 
@@ -148,9 +147,9 @@ public enum FileTypes {
         exportHandler.execute(p, destFile, sheetsData);
     }
 
-    public @NotNull Map<String, List<TestCaseDto>> importToFile(final @NotNull Project p, final @NotNull ImportAction importAction, final @NotNull File importFile) {
+    public @NotNull Map<String, List<TestCaseDto>> importToFile(final @NotNull Project p, final @NotNull File importFile) {
         if (!isImportable()) throw new IllegalStateException(label + " cannot be imported from");
-        return importHandler.execute(p, importAction, importFile);
+        return importHandler.execute(p, importFile);
     }
 
     public byte @NotNull [] generateReport(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {

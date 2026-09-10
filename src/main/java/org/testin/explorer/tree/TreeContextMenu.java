@@ -20,7 +20,6 @@ import org.testin.EscapeAction;
 import org.testin.explorer.TreePanel;
 import org.testin.git.SyncActionAction;
 import org.testin.git.ViewPendingCommitsAction;
-import org.testin.importexport.imports.ImportAction;
 import org.testin.model.PackageStatus;
 import org.testin.model.ProjectStatus;
 import org.testin.model.TestSetStatus;
@@ -80,7 +79,7 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         add(Declared.action("Testin.Export"));
 
-        add(new ImportAction(p, tree));
+        add(Declared.action("Testin.Import"));
 
         // Added in every IDE, and grayed with the reason when Git is missing.
         // Leaving them out gave the menu a different shape in two IDEs with

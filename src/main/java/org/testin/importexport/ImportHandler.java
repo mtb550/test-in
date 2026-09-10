@@ -2,7 +2,6 @@ package org.testin.importexport;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.importexport.imports.ImportAction;
 import org.testin.model.dto.TestCaseDto;
 
 import java.io.File;
@@ -14,9 +13,9 @@ public interface ImportHandler {
     /**
      * The formats that cannot be imported from — see {@link ExportHandler#UNSUPPORTED}.
      */
-    ImportHandler UNSUPPORTED = (p, importAction, importFile) -> {
+    ImportHandler UNSUPPORTED = (p, importFile) -> {
         throw new IllegalStateException("This format cannot be imported from");
     };
 
-    @NotNull Map<String, List<TestCaseDto>> execute(final @NotNull Project p, final @NotNull ImportAction importAction, final @NotNull File importFile);
+    @NotNull Map<String, List<TestCaseDto>> execute(final @NotNull Project p, final @NotNull File importFile);
 }
