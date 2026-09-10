@@ -14,6 +14,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
+import org.testin.logger.Logger;
 import org.testin.model.Automated;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunStatus;
@@ -334,6 +335,12 @@ public class StatusBar extends JBPanel<StatusBar> {
     public void showAutomated(final int written, final int known) {
         automatedLabel.setText(Automated.WRITTEN.getLabel() + " " + written + " of " + known);
         automatedLabel.setVisible(known > 0);
+
+        // What the corner was told and whether it can be seen, because "it is not
+        // there" and "it is there saying nothing" look identical on screen - the
+        // same silence AutomationState's own read had until it started logging.
+        Logger.debug("Automated count: written=" + written + " known=" + known
+                + " shown=" + automatedLabel.isVisible() + " text='" + automatedLabel.getText() + "'");
 
         // On the bar, not the label: the bar places its three regions itself
         // from their preferred widths, and the right-hand one just changed.
