@@ -59,6 +59,21 @@ public enum FailureDetail {
     private final @NotNull Consumer<TestRunItems> clear;
 
     /**
+     * UC-VIEW-PANEL-008, Rule-VIEW-PANEL-064.
+     * <p>
+     * Whether this row records a bug at all.
+     * <p>
+     * Two of the four say a bug was found - how bad it is and how soon it must
+     * be fixed - and the other two say what happened, which a case can carry
+     * without anybody having filed anything. Asked here because this enum
+     * already owns what "filled in" means for each of them, and the Open Bugs
+     * tab must not come to its own answer beside the Details tab's.
+     */
+    public static boolean recordsABug(final @NotNull TestRunItems item) {
+        return BUG_SEVERITY.filled.test(item) || BUG_PRIORITY.filled.test(item);
+    }
+
+    /**
      * Everything this row holds that a pass would erase, in the tester's words,
      * and empty when a pass would erase nothing - which is the ordinary case.
      */

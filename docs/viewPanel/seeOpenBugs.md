@@ -5,7 +5,12 @@
 **As a** tester, **I want** the defects already raised against this test case,
 **so that** I do not raise the same one twice.
 
-This tab is not built yet. It shows one line saying so.
+A bug in Testin is not a thing of its own. It is what a test run's row records
+about a failure — how bad it is and how soon it must be fixed — so a test case's
+bugs are found by looking through the runs it has been in.
+
+That is why the same test case can carry a **Blocker** from cycle 5 and nothing
+at all from cycle 14, and why both are worth seeing at once.
 
 There is no key for this. The tab is called **Open Bugs**.
 
@@ -30,8 +35,16 @@ There is no key for this. The tab is called **Open Bugs**.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
-- **Rule-VIEW-PANEL-038** — The Open Bugs tab is not built. It shows one line
-  saying so, and never looks at the test case.
+- **Rule-VIEW-PANEL-038** — With no test case shown, the Open Bugs tab says to
+  select one. It does not describe a test case that is not there.
+- **Rule-VIEW-PANEL-064** — The Open Bugs tab lists every bug the test case has
+  recorded, and which test run recorded it. A bug is what a run row says about a
+  failure - how bad it is and how soon it must be fixed - so a case that has
+  never failed has none, and the same case can carry a different bug in every
+  cycle.
+- **Rule-VIEW-PANEL-065** — The bugs are read from the test runs the indexer
+  already holds, so the tab costs a walk over what is in memory and reads
+  nothing from disk.
 
 ## The screen
 
@@ -39,41 +52,50 @@ There is no key for this. The tab is called **Open Bugs**.
 ┌────────────────────────────────────────────────────────────────────────────┐
 │   Details      History    | Open Bugs |                                    │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  No bugs found for this test case.                                         │
+│  cycle 5                                                                   │
+│  Blocker / High                                                            │
+│  The session was dropped after the second factor.                          │
 │                                                                            │
-│                                                                            │
+│  cycle14                                                                   │
+│  Major / Medium                                                            │
+│  Timed out waiting for the dashboard.                                      │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The line** — at the top left of the tab. It is the whole tab.
+1. **The run's name** — which cycle found this bug. It is the only thing that
+   says when, so it is the heading rather than a detail.
+2. **The severity and the priority** — in the severity's own color, the same one
+   the run grid and every report paint it.
+3. **What happened** — the actual result the tester wrote, when they wrote one.
+   Left out when they did not, like every other empty field in this panel.
+
+The newest run comes first.
 
 ## Main flow
 
 1. The tester clicks **Open Bugs**.
-2. The tab shows one line reading *No bugs found for this test case.*
+2. Testin looks through every test run for this test case's rows.
+3. Every row that recorded a bug is drawn, newest first.
 
 ## What Testin refuses
 
-**Always.** The line is the same whatever the test case says, and the same when
-there is no test case at all.
+**If the test case has never failed** — the tab reads *No bugs recorded for this
+test case in any test run*. That is an answer, not an apology: a case with no
+bugs is the ordinary case.
 
-## Where the plugin breaks its own rules
+**If a row records a failure but no bug** — it is not drawn. An actual result
+without a severity or a priority is somebody saying what happened, not somebody
+filing a defect.
 
-**The tab contradicts the tab beside it.** A failed test case can show
-**Blocker** and **High** on the Details tab while this tab says no bugs were
-found. That is difference 5 on
-[the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
-
-**The tab names a test case that is not there.** With nothing selected, Details
-reads *Select a test case to view details* and this tab still says *for this
-test case*. That is difference 6.
+**If no test case is shown** — the tab reads *Select a test case to view its
+bugs*, and says nothing about any test case (Rule-VIEW-PANEL-038).
 
 ## Not decided
 
-Testin records a bug severity and a bug priority against a failed verdict. It
-records nothing else about a bug. It has no link to a bug tracker either. What
-this tab should show is question 2 on
-[the view panel page](main.md#not-decided).
+Testin records a bug severity, a bug priority and what happened. It records
+nothing else about a bug, and has no link to a bug tracker. Whether a bug should
+be a thing of its own — raised once, carried across cycles, closed — is question
+2 on [the view panel page](main.md#not-decided).
 
 ---
 

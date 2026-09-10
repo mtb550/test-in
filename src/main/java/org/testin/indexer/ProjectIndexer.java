@@ -43,6 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -382,6 +383,21 @@ public final class ProjectIndexer {
      * The Details popup is the second kind: a run it cannot read is still a node
      * whose name, path and audit it can show.
      */
+    /**
+     * UC-VIEW-PANEL-008, Rule-VIEW-PANEL-065.
+     * <p>
+     * Every indexed test run, by the path it sits at - the run half of
+     * {@link #getAllTestCases()}.
+     * <p>
+     * By path because a run does not carry its own name: it is the folder's, and
+     * the folder is the key this cache is already held under. A tab that wants
+     * to say which cycle a bug was found in needs both.
+     */
+    public @NotNull Map<Path, TestRunDto> getAllTestRuns() {
+        return store.getTestRunsByPath().entrySet().stream()
+                .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), Map.Entry::getValue));
+    }
+
     public @NotNull Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
         return store.findTestRun(testRunPath);
     }

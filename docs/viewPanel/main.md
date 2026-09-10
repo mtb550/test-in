@@ -10,7 +10,7 @@ it.
 |---|---|
 | **Part of Testin** | The view panel |
 | **Answers** | What the panel shows, how a test case gets into it, and what a tester can do from it |
-| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-015`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-063` |
+| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-015`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-065` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -162,8 +162,6 @@ bug report yet.
 | | The rule it breaks | What a tester sees |
 |---|---|---|
 | **Difference 2** | Rule-VIEW-PANEL-004 — the tester closes the panel when they want the screen | Fixed. `Escape` is registered on the panel's three tabs, so it closes the panel from inside it as well as from the editor — including straight after `F2`, which is what puts the keyboard there. It takes the same step back as everywhere else: a pending cut first, then the panel. |
-| **Difference 5** | Rule-VIEW-PANEL-008 — the three tabs describe the same test case | A failed test case shows **Blocker** and **High** on the Details tab, while the tab beside it reads *No bugs found for this test case.* The Open Bugs tab is not built, and never looks at the test case. |
-| **Difference 6** | Rule-VIEW-PANEL-006 — nothing is drawn about a test case that is not there | With no test case selected, Details reads *Select a test case to view details* and Open Bugs reads *No bugs found for this test case.* There is no test case. |
 | **Difference 11** | Rule-VIEW-PANEL-008 — the panel redraws when its test case changes | Every result a running test reports redraws the whole panel, whichever test case reported. A test run of 50 test cases rebuilds the panel 50 times, including the two tabs that never change. |
 
 **Fixed since this list was written.** The numbers are left out rather than
