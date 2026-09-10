@@ -1,6 +1,6 @@
 [Documentation](../README.md) › [The view panel](main.md) › UC-VIEW-PANEL-009
 
-# UC-VIEW-PANEL-009: Copy a test case's identity
+# UC-VIEW-PANEL-009: Copy a test case's identity, or go to it
 
 **As a** tester, **I want** the test case's identity on my clipboard,
 **so that** I can paste it into a bug report and anyone can find the exact test
@@ -8,7 +8,10 @@ case again.
 
 The identity is a long code. It never changes, even when the title does.
 
-There is no key for this. The button sits beside the identity.
+It is also a link: clicking it goes to the test case. That is how a tester who
+opened this panel from a gutter mark gets to the case itself, when they want to.
+
+There is no key for either. The pill and the button sit side by side.
 
 ## Rules
 
@@ -35,6 +38,10 @@ There is no key for this. The button sits beside the identity.
   half seconds, then turns back.
 - **Rule-VIEW-PANEL-040** — Copying raises no message. The tick is the whole
   confirmation.
+- **Rule-VIEW-PANEL-063** — The identity is a link. Clicking it goes to the test
+  case: the tree expands to its test set, that set's editor opens, and the row
+  is selected. It is the same call the global search and the path bar make, so
+  all three mean the same thing by going to a test case.
 
 ## The screen
 
@@ -46,7 +53,9 @@ The identity sits in a gray pill under the path, with the button to its right.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The pill** — the test case's identity, in full.
+1. **The pill** — the test case's identity, in full. The pointer becomes a hand
+   over it and its tooltip reads **Go to this test case**. Clicking it expands
+   the tree to the test set, opens that set's editor and selects the row.
 2. **The button** — its tooltip reads **Copy ID**. The pointer becomes a hand
    over it.
 
@@ -56,6 +65,16 @@ The identity sits in a gray pill under the path, with the button to its right.
 2. The whole identity goes on the clipboard.
 3. The button becomes a green tick.
 4. One and a half seconds later it becomes the copy button again.
+
+## Going to the test case instead
+
+1. The tester clicks the identity itself rather than the button.
+2. The **Testin Tree** tool window comes up and the tree expands to the test set
+   holding the test case.
+3. That set's editor opens and the test case is selected in it.
+
+The same three things the global search and the path bar do, because all three
+make the same call.
 
 ## What Testin refuses
 

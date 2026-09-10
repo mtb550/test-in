@@ -1,13 +1,16 @@
 [Documentation](../README.md) › [Automation code and the gutter](main.md) › UC-CODEGEN-007
 
-# UC-CODEGEN-007: Go to the test case from the code
+# UC-CODEGEN-007: See the test case from the code
 
-**As a** tester, **I want** to be taken to the test case behind a method I am
-looking at, **so that** I can read what the automation is supposed to prove, and
-change it, without going looking for it.
+**As a** tester, **I want** to see the test case behind a method I am looking at,
+**so that** I can read what the automation is supposed to prove without leaving
+the code I am reading.
 
-This goes to the test case that a generated method was written from: the tree
-expands to its test set, the editor opens on it, and the row is selected.
+The view panel opens on that test case, showing its details. Nothing else moves:
+the tree stays where it was, no editor opens, and the caret stays on the method.
+
+Going to the test case is one more click, and it is
+[the identity in that panel](../viewPanel/copyIdentity.md).
 
 There is no key for this. The mark is in the gutter beside the method.
 
@@ -31,10 +34,10 @@ There is no key for this. The mark is in the gutter beside the method.
   Testin recognizes.
 - **Rule-CODEGEN-030** — The mark is drawn while the IDE is still indexing, and
   the jump waits for indexing to finish.
-- **Rule-CODEGEN-070** — The mark goes to the test case, not merely to what it
-  says: the tree expands to its test set, the editor opens on it and the row is
-  selected. Reading a generated method and being shown the case's details but
-  left nowhere near it is not going to it.
+- **Rule-CODEGEN-070** — The mark opens the view panel on the test case and
+  stops there. It moves nothing else: not the tree, not the editor tabs, not the
+  caret. A tester reading a method asked what it proves, and taking them out of
+  the code to answer is a bigger answer than the question.
 - **Rule-CODEGEN-069** — Clicking the mark of a method whose test case is gone
   says so, naming the method. Generated code outlives the test case it was
   written from, so this is an ordinary answer rather than a failure.
@@ -51,20 +54,19 @@ There is no key for this. The mark is in the gutter beside the method.
 ```
 
 1. **The mark** — on the line holding the identity, not the line holding the
-   method name. Its tooltip reads **Go to Test Case**.
+   method name. Its tooltip reads **View Test Case Details**.
 
 ## Main flow
 
 1. The tester is reading a generated method.
 2. The tester clicks the mark beside the identity.
 3. Testin waits for indexing, then looks the test case up by its identity.
-4. The **Testin Tree** tool window comes up and the tree expands to the test set holding
-   it.
-5. That test set's editor opens and the test case is selected in it, with the
-   view panel showing it.
+4. The view panel opens on that test case, with the Details tab in front.
+5. Nothing else moves. The tester is still in the code, on the same line.
 
-The same three things the global search does for a test case it found, because
-it is the same call.
+To go to the test case itself, click its identity in the panel that just
+opened — the tree expands to its test set, the editor opens and the row is
+selected (Rule-VIEW-PANEL-063).
 
 ## What Testin refuses
 

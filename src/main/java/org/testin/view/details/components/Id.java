@@ -11,6 +11,8 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.search.GoTo;
+import org.testin.search.Hit;
 import org.testin.ui.FontSync;
 
 import javax.swing.*;
@@ -27,6 +29,7 @@ public class Id extends BaseDetails {
     final int FLOW_GAP = 8;
     final int COPY_SUCCESS_DELAY_MS = 1500;
     final @NotNull String COPY_TOOLTIP = "Copy ID";
+    final @NotNull String GO_TOOLTIP = "Go to this test case";
     final @NotNull Color BG_COLOR = new JBColor(Gray._230, Gray._80);
     final @NotNull Color FG_COLOR = new JBColor(Gray._130, Gray._170);
     final int INSETS_TOP = 5;
@@ -55,6 +58,26 @@ public class Id extends BaseDetails {
         idBadge.setForeground(FG_COLOR);
         idBadge.setBorder(JBUI.Borders.empty(BADGE_BORDER_V, BADGE_BORDER_H));
         idBadge.setOpaque(false);
+
+        // UC-VIEW-PANEL-009, Rule-VIEW-PANEL-063.
+        //
+        // The identity is the link, because it is the one thing on the panel
+        // that names exactly one test case. The gutter mark opens this panel and
+        // stops there; from here going to the case is a deliberate second click
+        // rather than something that happens to a tester who wanted to read what
+        // a method proves.
+        //
+        // GoTo is the one owner of taking somebody somewhere - the tree expands
+        // to the test set, the editor opens on it, the row is selected - and the
+        // global search and the breadcrumb say it with the same call.
+        idBadge.setToolTipText(GO_TOOLTIP);
+        idBadge.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        idBadge.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                GoTo.the(p, Hit.of(dto));
+            }
+        });
 
         final @NotNull JBLabel copyIcon = new JBLabel(AllIcons.Actions.Copy);
         copyIcon.setToolTipText(COPY_TOOLTIP);
