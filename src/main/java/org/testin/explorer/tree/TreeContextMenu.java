@@ -26,7 +26,6 @@ import org.testin.model.TestSetStatus;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.report.GenerateReportAction;
 import org.testin.testproject.UpdateTestProjectStatusAction;
-import org.testin.testrun.EditTestRunAction;
 import org.testin.testrun.SetTestRunStatusAction;
 import org.testin.testset.UpdateTestSetStatusAction;
 import org.testin.undo.UndoAction;
@@ -92,7 +91,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         add(new SyncWithSftpAction(p, tree, tp));
 
         addSeparator();
-        add(new EditTestRunAction(p, tp, tree));
+        add(Declared.action("Testin.EditTestRun"));
         add(new SetTestRunStatusAction(p, tree));
         addSeparator();
 

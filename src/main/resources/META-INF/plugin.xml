@@ -433,6 +433,14 @@
         </action>
 
         <action
+                id="Testin.EditTestRun"
+                class="org.testin.testrun.EditTestRunAction"
+                text="Edit Test Run"
+                description="Change which test cases this run covers, its name and its configuration"
+                icon="AllIcons.Actions.Edit"
+        />
+
+        <action
                 id="Testin.ReCreateTestRun"
                 class="org.testin.testrun.ReCreateTestRunAction"
                 text="Re-create Test Run"
