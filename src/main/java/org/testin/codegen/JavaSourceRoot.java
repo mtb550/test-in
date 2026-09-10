@@ -6,6 +6,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
+import org.testin.util.Once;
 import org.testin.services.Services;
 
 import java.io.IOException;
@@ -80,18 +82,39 @@ public final class JavaSourceRoot {
     }
 
     /**
-     * UC-CODEGEN-020, Rule-CODEGEN-065.
+     * Said once for a project, however many test cases went past without a root
+     * to write into. Fifty saved cases are one absent source root, not fifty.
+     */
+    private static final @NotNull Key<Boolean> NO_ROOT_SAID = Key.create("testin.noJavaTestSourceRoot.said");
+
+    /**
+     * UC-CODEGEN-020, Rule-CODEGEN-065, Rule-CODEGEN-072.
      * <p>
      * Like {@link #find} and also says so, for the generators that create
      * something - the tester is left wondering why no code appeared otherwise.
+     * <p>
+     * At the point of use, and only there. Project open used to ask the same
+     * question and raise the same balloon before anything had been asked of it,
+     * so a tester who opened the IDE to read test cases was told about
+     * automation they were not doing, on every open, forever - and the check
+     * bought nothing, because reading test data is gated on the Testin root and
+     * every generator already skips for itself (#286).
+     * <p>
+     * And once for the project. The message is about the project, not about the
+     * test case that happened to be first.
+     *
+     * @param skipped what did not happen, in the tester's words - "creating the
+     *                class for LoginTest"
      */
-    public static @NotNull Optional<VirtualFile> findOrWarn(final @NotNull Project p) {
+    public static @NotNull Optional<VirtualFile> findOrWarn(final @NotNull Project p, final @NotNull String skipped) {
         final @NotNull Optional<VirtualFile> root = find(p);
-        if (root.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p,
-                    "Java Test Source Not Found",
-                    "Unable to find a Java test source package - automation code was not generated.");
+
+        if (root.isEmpty() && Once.claim(p, NO_ROOT_SAID)) {
+            Services.getInstance(p, Notifier.class).warn(p, "No Java Test Source Root",
+                    "This project has no Java test source folder, so " + skipped + " was skipped. "
+                            + "Test cases and test runs are read and written without one - only the automation code needs it.");
         }
+
         return root;
     }
 
@@ -219,7 +242,7 @@ public final class JavaSourceRoot {
      * {@link #findOrWarn}.
      */
     public static void inRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
-        run(findOrWarn(p), whatFailed, work);
+        run(findOrWarn(p, whatFailed), whatFailed, work);
     }
 
     private static void run(final @NotNull Optional<VirtualFile> root, final @NotNull String whatFailed, final @NotNull RootWork work) {

@@ -6,9 +6,11 @@
 **so that** I can mark a folder as holding tests and have it start working.
 
 No folder in the code project is marked as holding Java tests, so no code is
-written.
+written. Everything else works: the tree, both editors, the view panel, reports,
+import and export all read and write test data without one.
 
-Nothing starts this. It is the state of the code project.
+Nothing starts this. It is the state of the code project, and Testin says
+nothing about it until something would have written code.
 
 ## Rules
 
@@ -30,43 +32,54 @@ Nothing starts this. It is the state of the code project.
   only tidies up after a removal stays silent.
 - **Rule-CODEGEN-066** — The first test source folder of the first module that
   has one is the one Testin uses.
+- **Rule-CODEGEN-072** — Opening a code project says nothing about the test
+  source folder. The first thing that would have written code says it, names
+  what was skipped, and says it once for that project however many test cases
+  follow.
 
 ## The screen
 
-The message the tester sees when the code project opens. It is small and red,
-near the bottom right of the IDE.
+The message the tester sees the first time something would have written code. It
+stays in the Notifications log, because the work it interrupted was theirs.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  Java Test Source Not Found                                  │
-│  Unable to find a Java test source package in this project - │
-│  creation of automation packages, classes, and methods will  │
-│  be skipped.                                                 │
+│  No Java Test Source Root                                    │
+│  This project has no Java test source folder, so creating    │
+│  the class for LoginTest was skipped. Test cases and test    │
+│  runs are read and written without one - only the automation │
+│  code needs it.                                              │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **The title** — always these five words.
-2. **The line under it** — this wording when the code project opens. A shorter
-   one is used later, each time something would have created code.
-3. **How long it stays** — about five seconds, then it fades on its own.
+1. **The title** — always these four words.
+2. **What was skipped** — named, so the message is about the thing the tester
+   just did rather than about the project in general.
+3. **The second sentence** — what still works, which is everything a tester came
+   for.
+4. **Once for the project** — fifty saved test cases are one absent source
+   folder, not fifty messages.
 
 ## Main flow
 
 1. The tester opens a code project with no folder marked as holding Java tests.
-2. Testin looks through the modules in the background.
-3. It finds none.
-4. A message titled **Java Test Source Not Found** reads *Unable to find a Java
-   test source package in this project - creation of automation packages,
-   classes, and methods will be skipped.*
-5. The tester marks a folder as a test source folder in the IDE's own project
+2. **Nothing is said.** Testin does not look, and does not ask.
+3. The tester writes test cases, reads test runs, exports, imports and reports.
+   None of it needs the folder.
+4. The tester saves a test case whose description would name a method.
+5. Testin looks for the folder, finds none, and says so once — naming what was
+   skipped.
+6. The tester marks a folder as a test source folder in the IDE's own project
    settings.
-6. Testin looks again the next time it needs the folder.
+7. Testin looks again the next time it needs the folder.
 
 ## What Testin refuses
 
-**Every creation** — a message titled **Java Test Source Not Found** reads
-*Unable to find a Java test source package - automation code was not generated.*
-The test set or test case is still created.
+**The first creation** — a message titled **No Java Test Source Root** names
+what was skipped. The test set or test case is still created.
+
+**Every creation after it** — nothing more is said for that project. The answer
+has not changed and neither has the message.
 
 **Every removal, rename and move** — nothing at all is said. There was no code
 to tidy up, and reporting that would be alarming for something that does not
@@ -78,6 +91,14 @@ Test management is the point of Testin. The generated code is a convenience on
 top of it. A team that writes its automation somewhere else, or has not started
 yet, should still be able to use every other part of the plugin. So a missing
 folder is a skip with a message, never an error.
+
+**And nothing to hear about until it matters.** Project open used to raise this
+message before anything had been asked of the folder, so a tester who opened the
+IDE to read test cases was told about automation they were not doing, on every
+open, forever - and nothing about it was fixable from where they were standing.
+The check bought nothing either: reading test data is gated on the Testin root,
+not on this one, and every generator already skips for itself
+([#286](https://github.com/mtb550/test-in/issues/286)).
 
 ---
 

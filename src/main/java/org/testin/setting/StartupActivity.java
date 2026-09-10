@@ -7,7 +7,6 @@ import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.util.Key;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.JavaSourceRoot;
 import org.testin.config.TestinConfigService;
 import org.testin.config.TestinProjectConfig;
 import org.testin.indexer.DeletedNodes;
@@ -73,8 +72,6 @@ public final class StartupActivity implements ProjectActivity {
         Services.getInstance(p, TestinRoot.class).setPath(testinPath);
         Logger.info("testin Path: " + testinPath);
 
-        checkTestSourceRoot(p);
-
         // Before the first index, never after it: the config names the test
         // project this repository exercises, and an index that started without it
         // would have to be thrown away and run again (#6).
@@ -137,28 +134,6 @@ public final class StartupActivity implements ProjectActivity {
                     () -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class)
             );
         });
-    }
-
-    /**
-     * The Java test source root is detected automatically by JavaSourceRoot;
-     * warn when none exists so the user knows automation code generation
-     * (packages, classes, test methods) will be skipped.
-     * <p>
-     * It kept a claim of its own while this method could run twice. It cannot
-     * now, and a second flag for the same question is a second answer waiting to
-     * disagree with the first.
-     */
-    private static void checkTestSourceRoot(final @NotNull Project p) {
-        ApplicationManager.getApplication().executeOnPooledThread(() ->
-                ApplicationManager.getApplication().runReadAction(() -> {
-                    if (p.isDisposed()) return;
-                    if (JavaSourceRoot.find(p).isEmpty()) {
-                        Services.getInstance(p, Notifier.class).softRefuse(p,
-                                "Java Test Source Not Found",
-                                "Unable to find a Java test source package in this project - "
-                                        + "creation of automation packages, classes, and methods will be skipped.");
-                    }
-                }));
     }
 
     @Override
