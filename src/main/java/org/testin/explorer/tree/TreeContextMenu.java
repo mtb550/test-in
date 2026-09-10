@@ -15,7 +15,6 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.JComponent;
 import org.testin.logger.Logger;
-import org.testin.sftp.SyncWithSftpAction;
 import org.testin.EscapeAction;
 import org.testin.explorer.TreePanel;
 import org.testin.model.PackageStatus;
@@ -86,7 +85,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         add(Declared.action("Testin.ViewPendingCommits"));
 
         addSeparator();
-        add(new SyncWithSftpAction(p, tree, tp));
+        add(Declared.action("Testin.SyncWithSftp"));
 
         addSeparator();
         add(Declared.action("Testin.EditTestRun"));
