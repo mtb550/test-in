@@ -456,6 +456,14 @@
                 icon="AllIcons.General.IndentDetected"
         />
 
+        <action
+                id="Testin.OrderNode"
+                class="org.testin.order.OrderNodeAction"
+                text="Order Testin Node"
+                description="Set where this node sits among its siblings"
+                icon="AllIcons.ObjectBrowser.Sorted"
+        />
+
         <!-- No keyboard-shortcut on either: CTRL+C and CTRL+X are the grid's
              keys for its own cells and the card list's for a test case, and a
              registered shortcut is dispatched before a component's input map -

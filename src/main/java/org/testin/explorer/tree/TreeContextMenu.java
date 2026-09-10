@@ -25,7 +25,6 @@ import org.testin.importexport.imports.ImportAction;
 import org.testin.model.PackageStatus;
 import org.testin.model.ProjectStatus;
 import org.testin.model.TestSetStatus;
-import org.testin.order.OrderNodeAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.remove.RemoveAction;
 import org.testin.report.GenerateReportAction;
@@ -69,7 +68,7 @@ public class TreeContextMenu extends DefaultActionGroup {
                         Declared.action("Testin.ReCreateTestRun"),
                         new RemoveAction(p, tree, tp),
                         Declared.action("Testin.Rename"),
-                        new OrderNodeAction(p, tp, tree),
+                        Declared.action("Testin.OrderNode"),
                         Declared.action("Testin.CopyNode"),
                         Declared.action("Testin.CutNode"),
                         Declared.action("Testin.PasteNode"))));
