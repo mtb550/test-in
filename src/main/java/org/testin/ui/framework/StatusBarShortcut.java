@@ -83,6 +83,30 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
     }
 
     /**
+     * What moving between rows is called, wherever a dialog has rows.
+     * <p>
+     * Public for the same reason as {@link #SAVE}: the word is not only said by
+     * the arrows. The dialog that picks a test project calls Enter {@code Select},
+     * because there the key that moves and the key that chooses are one decision
+     * to a tester, and both should read as one word.
+     */
+    public static final @NotNull String SELECT = "Select";
+
+    /**
+     * The arrow keys, called Select, moving between rows - a list binds them
+     * itself, so this shows them and binds nothing.
+     * <p>
+     * Three dialogs and a menu declare exactly this, and the arrows are written
+     * as two characters that are easy to get subtly wrong. The same argument as
+     * {@link #cancel}: the key, the word and the fact that nothing binds it
+     * belong together, and a dialog that spelled the arrows differently would be
+     * a dialog whose strip does not match the one beside it.
+     */
+    public static @NotNull StatusBarShortcut select() {
+        return hint("↑ ↓", SELECT);
+    }
+
+    /**
      * True when this entry also binds a key; hints only render.
      */
     public boolean isBindable() {

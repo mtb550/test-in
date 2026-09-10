@@ -96,12 +96,20 @@ be nothing to put the cursor in.
 
 ## Where the plugin breaks its own rules
 
-**Six dialogs are not built on the shell.** The test case create and update
-dialogs, light mode's zoom indicator and the shortcut menu are hand-built, so
-Rule-INTERNAL-053 to Rule-INTERNAL-061 do not reach them. They behave the same
-way by hand, which is the problem: each is a copy that can drift. That is
-difference 6 on [the Inside Testin page](main.md#where-the-plugin-breaks-its-own-rules),
-and [#69](https://github.com/mtb550/test-in/issues/69).
+**Five surfaces are not built on the shell**, against twenty-four that are: the
+test case create and update dialogs, light mode's zoom indicator, the details
+popup button and the shortcut menu. Rule-INTERNAL-053 to Rule-INTERNAL-061 do
+not reach them. They behave the same way by hand, which is the problem: each is
+a copy that can drift. That is difference 6 on
+[the Inside Testin page](main.md#where-the-plugin-breaks-its-own-rules), and
+[#69](https://github.com/mtb550/test-in/issues/69).
+
+**The shortcut menu is the exception that keeps the promise.** It is still
+hand-built — a menu is rows and nothing else, and each row carries and prints
+its own letter, so the shell would give it nothing. What it does not do any more
+is answer a key it never mentions: its `Enter`, `Escape` and arrows come from
+one declaration that both binds the keys and draws the strip, the same two
+halves the shell uses. Rule-INTERNAL-067.
 
 ---
 

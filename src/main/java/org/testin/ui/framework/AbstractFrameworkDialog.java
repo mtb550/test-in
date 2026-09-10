@@ -85,16 +85,6 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     // What the shell provides.
     // ------------------------------------------------------------------
 
-    private static void installKey(final @NotNull JComponent component, final @MagicConstant(intValues = {JComponent.WHEN_FOCUSED, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, JComponent.WHEN_IN_FOCUSED_WINDOW}) int condition, final @NotNull KeyStroke key, final @NotNull String actionKey, final @NotNull Runnable action) {
-        component.getInputMap(condition).put(key, actionKey);
-        component.getActionMap().put(actionKey, new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                action.run();
-            }
-        });
-    }
-
     /**
      * What the dialog does when it is confirmed; wire it in {@link #shortcuts}.
      */
@@ -342,30 +332,19 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
      * component (exact pre-multi-component semantics, overriding any inert
      * default binding the field may carry) and on the content panel for
      * whenever the focus is elsewhere inside the dialog.
+     * <p>
+     * The loop itself is {@link DialogKeys}, because the menu popup makes the
+     * same promise from the same declaration and is not a dialog.
      */
     private void bindShortcutKeys(final @NotNull JBPanel<?> contentPanel) {
         final @NotNull List<StatusBarShortcut> declared = dto().shortcuts();
-        final @NotNull Set<KeyStroke> bound = new HashSet<>();
 
-        for (int i = 0; i < declared.size(); i++) {
-            final @NotNull StatusBarShortcut shortcut = declared.get(i);
-            if (!shortcut.isBindable()) continue;
+        DialogKeys.install(contentPanel, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, declared);
 
-            // isBindable guarantees both; requireNonNull makes that visible to dataflow.
-            final @NotNull KeyStroke key = Objects.requireNonNull(shortcut.shortcut()).getKey();
-            final @NotNull Runnable action = Objects.requireNonNull(shortcut.action());
+        for (final DialogComponent dialogComponent : builtComponents()) {
+            if (!dialogComponent.acceptsDialogKeys()) continue;
 
-            // Two entries on one key would silently shadow each other.
-            if (!bound.add(key)) {
-                throw new IllegalStateException("Duplicate dialog shortcut: " + shortcut.getShortcutText());
-            }
-
-            final @NotNull String actionKey = "testin.framework.shortcut." + i;
-            installKey(contentPanel, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, key, actionKey, action);
-            for (final DialogComponent dialogComponent : builtComponents()) {
-                if (!dialogComponent.acceptsDialogKeys()) continue;
-                installKey(dialogComponent.getFocusComponent(), JComponent.WHEN_FOCUSED, key, actionKey, action);
-            }
+            DialogKeys.install(dialogComponent.getFocusComponent(), JComponent.WHEN_FOCUSED, declared);
         }
     }
 

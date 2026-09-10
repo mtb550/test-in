@@ -38,7 +38,7 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
 
         shortcuts = List.of(
                 StatusBarShortcut.confirm(this::submit),
-                StatusBarShortcut.hint("↑ ↓", "Select"),
+                StatusBarShortcut.select(),
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
