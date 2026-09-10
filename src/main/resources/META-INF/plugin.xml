@@ -324,6 +324,14 @@
         <!-- The editors' actions. Each reads what the editor has selected from
              TestinData and grays itself outside one (#119). -->
         <action
+                id="Testin.NavigateToCode"
+                class="org.testin.navigate.NavigateToCodeAction"
+                text="Navigate to Test Code"
+                description="Jump from the selected test case to the method automating it"
+                icon="AllIcons.General.ArrowRight"
+        />
+
+        <action
                 id="Testin.ViewDetails"
                 class="org.testin.view.ViewDetailsAction"
                 text="View Test Case Details"

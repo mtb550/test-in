@@ -11,7 +11,6 @@ import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.navigate.NavigateToCodeAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.run.RunTestCaseAction;
 import org.testin.testcase.CreateTestCaseAction;
@@ -54,7 +53,7 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
 
         add(new AutomateTestCaseAction(p, list));
         add(new RunTestCaseAction(p, ui, list));
-        add(new NavigateToCodeAction(p, list));
+        add(Declared.action("Testin.NavigateToCode"));
 
     }
 

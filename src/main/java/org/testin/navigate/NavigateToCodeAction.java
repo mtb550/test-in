@@ -1,26 +1,24 @@
 package org.testin.navigate;
 
-import org.testin.editor.CardHoverAction;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectAction;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
+import org.testin.editor.CardHoverAction;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.OptionalPlugin;
-import org.testin.util.Shortcuts;
 
-
-public class NavigateToCodeAction extends AbstractProjectAction {
-    private final @NotNull JBList<TestCaseDto> list;
-
-    public NavigateToCodeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
-        super(p, CardHoverAction.NAVIGATE_TO_TEST_METHOD.getTooltip(), "Jump to the automated test case", AllIcons.General.ArrowRight);
-        this.list = list;
-        this.registerCustomShortcutSet(Shortcuts.NavigateToCode.getCustomShortcut(), list);
-    }
+/**
+ * UC-CODEGEN-005.
+ * <p>
+ * Declared in {@code plugin.xml} (#119) with Shift+F5 as its default, which is
+ * free in IntelliJ's keymap. A tester would look for this in Find Action, and it
+ * is the one gesture that crosses from a test case to the code behind it.
+ */
+public class NavigateToCodeAction extends DumbAwareAction {
 
     /**
      * Static because it reads nothing of the action it sits on. The two hover
@@ -35,7 +33,10 @@ public class NavigateToCodeAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        execute(p, list.getSelectedValue());
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
+
+        TestinData.selectedCases(e).stream().findFirst().ifPresent(tc -> execute(p, tc));
     }
 
     @Override
@@ -44,7 +45,7 @@ public class NavigateToCodeAction extends AbstractProjectAction {
         // the menu (#248).
         if (!CardHoverAction.NAVIGATE_TO_TEST_METHOD.enableOrExplain(e.getPresentation())) return;
 
-        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
+        e.getPresentation().setEnabled(!TestinData.selectedCases(e).isEmpty());
     }
 
     @Override
