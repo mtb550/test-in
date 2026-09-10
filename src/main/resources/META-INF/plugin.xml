@@ -335,6 +335,16 @@
         </action>
 
         <action
+                id="Testin.UpdateTestCase"
+                class="org.testin.testcase.UpdateTestCaseAction"
+                text="Update Test Case"
+                description="Change a field of the selected test cases"
+                icon="AllIcons.Actions.Edit"
+        >
+            <keyboard-shortcut keymap="$default" first-keystroke="F2"/>
+        </action>
+
+        <action
                 id="Testin.RemoveTestCase"
                 class="org.testin.testcase.RemoveTestCaseAction"
                 text="Delete Test Case"
