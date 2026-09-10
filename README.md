@@ -87,8 +87,14 @@ delete the findings list. Neither is committed.
 
 ## License and privacy
 
-Testin is built and maintained by [Muteb Almughyiri](https://github.com/mtb550),
-and released under the terms in [LICENSE.md](LICENSE.md).
+Testin is built and maintained by [Muteb Almughyiri](https://github.com/mtb550).
+The source is licensed under the **Apache License 2.0** — see
+[LICENSE](LICENSE). [EULA.md](EULA.md) is the end user agreement for the plugin
+as distributed through JetBrains Marketplace, and applies only if and when it is
+offered there as a paid or freemium plugin.
+
+If you want to contribute, the terms are in
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 It runs entirely on your machine: test cases, steps and JSON files stay on your
 disk or in your own version control, and the plugin embeds no telemetry, no

@@ -200,6 +200,54 @@ follows by handing every operation to `git4idea`.
 connects anyway connects to anything claiming to be the server, and the sync
 would then upload a whole test project to it.
 
+
+## Decision-008 — The source is Apache 2.0, and a contribution needs an agreement
+
+**Context.** `LICENSE.md` was JetBrains' developer EULA for paid plugins —
+Subscriptions, Fallback Versions, Paid Plugins — while the repository was being
+opened up: public, with an issue tracker, contributor documents and starter
+work. The two pull against each other. A proprietary EULA gives an outside
+contributor no clear right to submit or reuse anything, so the documents invited
+people to a door that was shut.
+
+The plugin was also not being sold. `plugin.xml` carries no `product-descriptor`,
+which is the tag that makes a Marketplace listing paid, so Testin was *licensed*
+as a paid plugin and distributed as a free one. Nothing was earning, so nothing
+was at risk in the decision itself.
+
+The question that decided it was not "open or closed" but **"does this stop
+Testin being sold later"** — to JetBrains, to a test-management vendor, to
+anyone.
+
+**Decision.** The source is licensed under the **Apache License 2.0**. The
+EULA is kept as `EULA.md` for the distributed plugin, if and when it is offered
+as paid or freemium. Contributions are accepted under Apache 2.0 **and** a
+contributor license agreement.
+
+**Consequences.**
+
+A licence is not ownership, and that is the whole of why this is safe. Apache
+2.0 says what others may do with the code; the copyright stays with the author.
+Testin can be relicensed going forward, offered under a separate commercial
+licence, or sold. What cannot be undone is a version already published: whoever
+received it keeps that grant for that code, forever.
+
+The contributor license agreement is the part that protects the rest. A patch
+sent under Apache 2.0 leaves its author owning it, and Testin holding a licence
+— which is enough to ship and not enough to relicense or to give a buyer clear
+title. Collected at the start it is a sentence; collected afterwards it is every
+past contributor, one at a time.
+
+Going paid is unaffected and starts elsewhere. The Marketplace product code
+"must be agreed with JetBrains in advance", so the paid route begins with a
+conversation rather than a commit — and the freemium shape, a free plugin with
+paid optional features, is compatible with an Apache-licensed source.
+
+**If you are about to reverse it.** Check who owns the code first. Every
+contribution merged without an agreement narrows what can be done with the whole
+of it, and the narrowing is not visible in the repository — it looks exactly
+like a merged pull request.
+
 ---
 
 ## Superseded decisions
@@ -222,3 +270,5 @@ persisted key depends on is.
 
 Take the next number, write the four parts, and link it from
 [the home page](README.md).
+
+---

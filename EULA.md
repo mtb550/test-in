@@ -1,3 +1,10 @@
+> **What this covers.** The source of Testin is licensed under the Apache
+> License 2.0 - see [LICENSE](LICENSE). This document is the end user agreement
+> for the plugin as distributed through JetBrains Marketplace, and applies only
+> if and when Testin is offered there as a paid or freemium plugin. It grants
+> nothing over the source and takes nothing away from the Apache license
+> ([#121](https://github.com/mtb550/test-in/issues/121)).
+
 ### Developer End User License Agreement (EULA)
 
 **Last Updated: April 30, 2026**
