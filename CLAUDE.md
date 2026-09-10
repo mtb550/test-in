@@ -243,27 +243,32 @@ silently does nothing costs more than the setting it was meant to hold.
 - Tests live under `src/test` only; the plugin distribution must never
   contain test classes or compile-time-only dependencies (Lombok is
   `compileOnly` + `annotationProcessor`, never `implementation`).
-- Verify with `./gradlew compileJava test` before presenting changes; do not
-  commit until Muteb has sandbox-tested (`./gradlew runIde`) and approved.
+
+- **The commands, the checks and the gate are in
+  [CONTRIBUTING.md](CONTRIBUTING.md)** — the toolchain, `compileJava test`,
+  `runIde`, the inspection gate and what it exits non-zero for, where the
+  sandbox logs are, the compatibility policy, the issue format and the label
+  scheme. One authority, and this file is not it: it was carried here as well
+  until #102, and two copies of a command is one of them going stale.
+
+  Read that page before running anything. What follows is only what changes
+  how *this* file's instructions are carried out.
+
+- **Verify with `./gradlew compileJava test` before presenting changes**, and do
+  not commit until Muteb has sandbox-tested (`./gradlew runIde`) and approved.
+
 - **A green build is not evidence of a working plugin.** `@NotNull` is not a
   compile-time contract: javac ignores it, and the IDE's instrumenter rewrites
   it into a throw that exists only inside a running IDE. `return null` from a
   method declared to return `Optional` compiles. A null literal passed to a
-  `@NotNull` parameter compiles. Both throw in front of the tester.
-- **So run `./gradlew inspect` before offering a change for a sandbox
-  test**, whenever it touched nullability, annotations, or many files at once.
-  It costs one indexing pass, 10-20 minutes, which makes it a sweep gate and
-  not a per-commit one. Drive `DataFlowIssue` and `ReturnNull` to zero; every
-  other survivor needs a reason written beside it. Run after the last edit, on
-  a still tree: editing a file while the inspector is reading it produces
-  findings about a version that no longer exists, which reads exactly like a
-  real defect.
-- The report lands in `.inspection/`, deliberately outside `build/` so
-  `./gradlew clean` does not delete the list you are working from. Start with
-  `summary.txt` for the counts and `findings.txt` for the lines.
-- The task shells out to `tools/inspect.ps1`, so **`pwsh` has to be installed** —
-  it is cross-platform and the script asks for version 7. The script finds the
-  downloaded IDE by the suffix of the platform it is running on and launches
-  `inspect.sh` where there is no `inspect.bat`, so the same gate runs on macOS
-  and Linux (#106). `pwsh tools/inspect.ps1` still works; the task is the form
-  CI and a newcomer should use.
+  `@NotNull` parameter compiles. Both throw in front of the tester. So a change
+  a tester can see is not finished until it has been run in a sandbox, whatever
+  the build says.
+
+- **Run `./gradlew inspect` before offering a change for a sandbox test**,
+  whenever it touched nullability, annotations, or many files at once — it is a
+  sweep gate, not a per-commit one, and CONTRIBUTING.md says why. Run it after
+  the last edit, on a still tree: editing a file while the inspector is reading
+  it produces findings about a version that no longer exists, which reads
+  exactly like a real defect. Drive `DataFlowIssue` and `ReturnNull` to zero;
+  every other survivor needs a reason written beside it.

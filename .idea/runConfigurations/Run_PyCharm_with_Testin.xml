@@ -1,0 +1,28 @@
+<component name="ProjectRunConfigurationManager">
+  <!--
+    The same sandbox against PyCharm rather than IDEA, which is what proves the
+    plugin still loads where there is no Java. It downloads a second IDE the
+    first time it runs, so it is slower than "Run IDE with Testin" and is not
+    the one to reach for by default.
+  -->
+  <configuration default="false" name="Run PyCharm with Testin" type="GradleRunConfiguration" factoryName="Gradle">
+    <ExternalSystemSettings>
+      <option name="executionName" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value="" />
+      <option name="taskDescriptions">
+        <list />
+      </option>
+      <option name="taskNames">
+        <list>
+          <option value="runPyCharm" />
+        </list>
+      </option>
+      <option name="vmOptions" />
+    </ExternalSystemSettings>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <method v="2" />
+  </configuration>
+</component>

@@ -1,0 +1,28 @@
+<component name="ProjectRunConfigurationManager">
+  <!--
+    Compile and the unit tests - the check every change must pass. Committed so a clone has it rather
+    than every machine rebuilding the same three fields - the same reason the
+    inspection profile and the code style are committed.
+  -->
+  <configuration default="false" name="Tests" type="GradleRunConfiguration" factoryName="Gradle">
+    <ExternalSystemSettings>
+      <option name="executionName" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value="" />
+      <option name="taskDescriptions">
+        <list />
+      </option>
+      <option name="taskNames">
+        <list>
+          <option value="compileJava" />
+          <option value="test" />
+        </list>
+      </option>
+      <option name="vmOptions" />
+    </ExternalSystemSettings>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <method v="2" />
+  </configuration>
+</component>

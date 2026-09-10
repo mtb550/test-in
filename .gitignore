@@ -8,6 +8,10 @@
 # The code style, shared for the same reason: one owner for the wrapping rules
 # so every machine formats the same way instead of re-wrapping each other's work.
 !.idea/codeStyles/
+# The run configurations, for the same reason again: a clone gets the three
+# commands that matter - the sandbox, the tests, the inspection gate - instead
+# of every machine rediscovering them (#102).
+!.idea/runConfigurations/
 .intellijPlatform/
 .run/
 .sandbox/
