@@ -216,10 +216,25 @@ public enum DirectoryType {
     private final @NotNull String description;
 
     /**
-     * The fixed label the node shows instead of its own name, empty when it
-     * shows its own — the two containers are the only ones with a label.
+     * UC-CODEGEN-001, Rule-CODEGEN-008.
+     * <p>
+     * <b>The folder this kind of node lives in on disk, and never anything a
+     * tester reads.</b> Empty for every kind but the two fixed containers, which
+     * are the only ones whose folder Testin names rather than the tester.
+     * <p>
+     * It was called {@code displayedName} and described as a label, and it is
+     * not one: all nine callers resolve a path with it, set a DTO name from it,
+     * build a {@code path2} out of it or strip it back off again in
+     * {@link org.testin.codegen.Fqcn}. Not one of them draws anything. The tree
+     * shows it only because the DTO takes its name from here.
+     * <p>
+     * The name mattered the moment the plugin was to be translated. "Test Cases"
+     * read as a caption, and a caption is exactly what gets translated - which
+     * would have pointed every existing test project at a folder called
+     * something else, and changed the package every generated class is written
+     * into. Called what it is, it is obviously not a string to translate (#11).
      */
-    private final @NotNull String displayedName;
+    private final @NotNull String folderName;
     private final @NotNull Icon icon;
     private final @NotNull String marker;
 

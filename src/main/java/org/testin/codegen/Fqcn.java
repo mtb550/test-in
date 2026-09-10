@@ -111,7 +111,7 @@ public final class Fqcn {
      */
     private static @NotNull ArrayList<String> withoutTestCasesDir(final @NotNull List<String> path2) {
         final @NotNull ArrayList<String> names = new ArrayList<>(path2);
-        names.remove(DirectoryType.TCD.getDisplayedName());
+        names.remove(DirectoryType.TCD.getFolderName());
         return names;
     }
 

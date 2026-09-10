@@ -79,7 +79,7 @@ public class ImportExcel {
         for (final Cell cell : headerRow) {
             final @NotNull String headerName = dataFormatter.formatCellValue(cell).trim();
             for (final TestEditorAttributes reqCol : TestEditorAttributes.all(Can.IMPORT)) {
-                if (reqCol.getName().equalsIgnoreCase(headerName)) {
+                if (reqCol.isColumn(headerName)) {
                     headerIndexMap.put(reqCol.getName().toLowerCase(), cell.getColumnIndex());
                 }
             }

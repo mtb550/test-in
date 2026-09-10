@@ -40,6 +40,9 @@ There is no key for this. The menu entry is **Import**.
   **Path** and **Status** are not.
 - **Rule-SHARE-030** — Importing the same file twice makes two copies of
   everything.
+- **Rule-SHARE-110** — A column heading is matched in the language on screen and
+  in English. A file exported by a colleague whose IDE runs in another language
+  still finds its columns, and so does the sample workbook the plugin ships.
 
 ## The screen
 

@@ -79,24 +79,24 @@ public final class DirectoryMapper {
     }
 
     public @NotNull TestCasesMainDirectoryDto getTestCasesRootNode(final @NotNull Project p, final @NotNull Path path, final @NotNull TestProjectDirectoryDto tp) {
-        final @NotNull Path dir = path.resolve(DirectoryType.TCD.getDisplayedName());
+        final @NotNull Path dir = path.resolve(DirectoryType.TCD.getFolderName());
         return TestCasesMainDirectoryDto.builder()
                 .path(dir)
-                .name(DirectoryType.TCD.getDisplayedName())
+                .name(DirectoryType.TCD.getFolderName())
                 .parent(tp)
-                .path2(DirectoryDto.pathOf(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
-                .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(dir, DirectoryType.TCD, TestCasesMainDirectoryMarker.class, DirectoryType.TCD.getDisplayedName()))
+                .path2(DirectoryDto.pathOf(tp.getPath2(), DirectoryType.TCD.getFolderName()))
+                .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(dir, DirectoryType.TCD, TestCasesMainDirectoryMarker.class, DirectoryType.TCD.getFolderName()))
                 .build();
     }
 
     public @NotNull TestRunsMainDirectoryDto getTestRunsRootNode(final @NotNull Project p, final @NotNull Path path, final @NotNull TestProjectDirectoryDto tp) {
-        final @NotNull Path dir = path.resolve(DirectoryType.TRD.getDisplayedName());
+        final @NotNull Path dir = path.resolve(DirectoryType.TRD.getFolderName());
         return TestRunsMainDirectoryDto.builder()
                 .path(dir)
-                .name(DirectoryType.TRD.getDisplayedName())
+                .name(DirectoryType.TRD.getFolderName())
                 .parent(tp)
-                .path2(DirectoryDto.pathOf(tp.getPath2(), DirectoryType.TRD.getDisplayedName()))
-                .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(dir, DirectoryType.TRD, TestRunsMainDirectoryMarker.class, DirectoryType.TRD.getDisplayedName()))
+                .path2(DirectoryDto.pathOf(tp.getPath2(), DirectoryType.TRD.getFolderName()))
+                .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(dir, DirectoryType.TRD, TestRunsMainDirectoryMarker.class, DirectoryType.TRD.getFolderName()))
                 .build();
     }
 

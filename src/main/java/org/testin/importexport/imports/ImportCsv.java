@@ -48,7 +48,7 @@ public class ImportCsv {
         for (int i = 0; i < headers.length; i++) {
             final @NotNull String headerName = headers[i].trim();
             for (final TestEditorAttributes reqCol : TestEditorAttributes.all(Can.IMPORT)) {
-                if (reqCol.getName().equalsIgnoreCase(headerName)) byName.put(reqCol.getName().toLowerCase(), i);
+                if (reqCol.isColumn(headerName)) byName.put(reqCol.getName().toLowerCase(), i);
             }
         }
 

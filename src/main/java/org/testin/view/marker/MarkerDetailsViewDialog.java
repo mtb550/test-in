@@ -54,10 +54,10 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
         final @NotNull ComponentDialogBase.DetailsBuilder details = ComponentDialogBase.details()
                 .row("Name", dto.getName())
                 .row("Path", dto.getPath().toString())
-                .row(TestEditorAttributes.CREATE_BY.getName(), marker.getCreatedBy())
-                .row(TestEditorAttributes.CREATE_AT.getName(), Display.formatDate(marker.getCreatedAt()))
-                .row(TestEditorAttributes.UPDATE_BY.getName(), marker.getModifiedBy())
-                .row(TestEditorAttributes.UPDATE_AT.getName(), Display.formatDate(marker.getModifiedAt()))
+                .row(TestEditorAttributes.CREATED_BY.getName(), marker.getCreatedBy())
+                .row(TestEditorAttributes.CREATED_AT.getName(), Display.formatDate(marker.getCreatedAt()))
+                .row(TestEditorAttributes.UPDATED_BY.getName(), marker.getModifiedBy())
+                .row(TestEditorAttributes.UPDATED_AT.getName(), Display.formatDate(marker.getModifiedAt()))
                 .row(TestEditorAttributes.STATUS.getName(), marker.getStatusLabel());
 
         // What the run has to say about its own execution, which the run file

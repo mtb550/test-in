@@ -200,7 +200,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.EDIT, Can.COPY, Can.EXPORT
     ),
 
-    CREATE_BY(
+    CREATED_BY(
             "Created By",
             ToolBarDefault.OFF,
             tc -> tc.getCreatedBy(),
@@ -209,7 +209,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.IMPORT, Can.EXPORT
     ),
 
-    UPDATE_BY(
+    UPDATED_BY(
             "Updated By",
             ToolBarDefault.OFF,
             tc -> tc.getUpdatedBy(),
@@ -218,7 +218,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.IMPORT, Can.EXPORT
     ),
 
-    CREATE_AT(
+    CREATED_AT(
             "Created At",
             ToolBarDefault.OFF,
             tc -> Display.formatDate(tc.getCreatedAt()),
@@ -227,7 +227,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.IMPORT, Can.EXPORT
     ),
 
-    UPDATE_AT(
+    UPDATED_AT(
             "Updated At",
             ToolBarDefault.OFF,
             tc -> Display.formatDate(tc.getUpdatedAt()),
@@ -317,6 +317,29 @@ public enum TestEditorAttributes implements ToolBarAttribute {
      */
     private static final @NotNull Set<TestEditorAttributes> PROSE =
             EnumSet.of(DESCRIPTION, EXPECTED_RESULT, STEPS, PRE_CONDITIONS);
+
+    /**
+     * UC-SHARE-005, UC-SHARE-006, Rule-SHARE-110.
+     * <p>
+     * Whether a spreadsheet column with that header is this attribute.
+     * <p>
+     * <b>Two spellings are accepted, and the second is the one that survives
+     * translation.</b> The caption is what an export writes and what a tester
+     * sees, so it is the natural header - and it is also the string that becomes
+     * French the day the plugin does. The constant name with its underscores
+     * opened out is the same words in English forever, so a file exported by a
+     * colleague on another language still finds its columns, and the sample
+     * workbook shipped in the plugin keeps working everywhere (#11).
+     * <p>
+     * Asked here rather than compared at the two importers, which had the same
+     * line each: the CSV reader and the Excel reader cannot come to different
+     * answers about what a column is called.
+     */
+    public boolean isColumn(final @NotNull String header) {
+        final @NotNull String wanted = header.trim();
+
+        return name.equalsIgnoreCase(wanted) || name().replace('_', ' ').equalsIgnoreCase(wanted);
+    }
 
     private final @NotNull String name;
     private final @NotNull ToolBarDefault toolBarDefault;
