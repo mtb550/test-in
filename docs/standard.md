@@ -191,9 +191,10 @@ the feature that was mended. `DifferenceNumbersTest` is what stops that: it
 fails when a page describes a difference its part has retired, when a page
 points at a number no part lists, when one number is live and retired at once,
 and when a difference names a rule nobody wrote. The link in a citation is what
-says whose difference it means, so *difference 6 on [the tree panel
-page](../treePanel/main.md)* is checked against the tree panel's list wherever
-it is written.
+says whose difference it means, so a page writing `difference 6 on [the tree
+panel page](../treePanel/main.md)` is checked against the tree panel's list
+wherever it is written. Written here as code rather than as a link, because it
+is an example of one - and a link is checked (`DocumentClaimsTest`).
 
 Whether a difference names the **right** rule is not checked and cannot be. The
 cell holds a paraphrase, and judging a paraphrase against a rule is reading. Six
@@ -322,6 +323,36 @@ Only `main.md` carries the header. A use case page starts with its story.
 
 So a reader can tell three things before reading a word of it: what the page
 is, whether it is finished, and how far it might have drifted.
+
+**`Checked against` is not checked, and cannot be.** A test can read the commit
+in the row and see that it is old; it cannot know whether anything since then
+touched what the page describes. A part untouched for a month is not stale, and
+one read yesterday against the wrong half of a change is. The row says when a
+person last read the page against the code, so only a person can move it — and a
+test that failed on age alone would be moved by editing the row, which is the one
+thing that must mean something.
+
+What holds it up is the rule below instead: behavior changes and its document
+changes in the same commit. A row that is old is a part nobody has re-read, which
+is worth seeing.
+
+---
+
+## What a machine checks about these documents
+
+Four tests, in the ordinary test run. Each of them has caught something real.
+
+| Test | What it settles |
+|---|---|
+| `RuleNumbersTest` | No number names two rules; every part's `Numbering` row is honest; every rule a marker in the Java cites is one a document writes; every copy of a rule says the same thing |
+| `DifferenceNumbersTest` | No page describes a difference its part has retired; no page points at a number no part lists; no number is live and retired at once; no difference names a rule nobody wrote |
+| `DocumentClaimsTest` | Every internal link goes somewhere; the README's per-part counts are the counts; its total is the sum of its own rows; every refusal Testin has words for is written on a page |
+| `SampleProjectTest` | The committed sample project still parses |
+
+What none of them can settle is whether a sentence is **true** — whether a
+difference names the right rule, whether a refusal's page describes the situation
+it actually happens in, whether `Checked against` is current. Those are reading,
+and reading is what the header is for.
 
 ---
 

@@ -75,6 +75,13 @@ project. It does not appear once for each test case.
 **If navigation is reached anyway** — the same message, every time rather than
 once.
 
+**If the IDE is still building its index** — the change is refused rather than
+waited for, and the message names the test case: *Log in with a valid user needs
+the IDE to finish indexing first*. No class can be found by name until the index
+is there, and deferring would be wrong for a rename or a move: those run while
+the old name still finds the code (Rule-CODEGEN-004), so one that waited would
+look for a class that has already been renamed.
+
 ## Where the plugin breaks its own rules
 
 **TestNG without Java is worse than neither.** In an IDE that has TestNG and not
