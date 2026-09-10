@@ -132,6 +132,23 @@ public class TestRunDirectoryDto extends DirectoryDto {
      * nothing about removing it - so the entry grayed for a reason written in
      * this class and nowhere a tester could read. Half of #184, reversed
      * deliberately on 10 September 2026.
+     * <p>
+     * Stated on the method it is about. It sat on {@link #isTransferable} for an
+     * evening, telling a reader that dragging a signed-off run was allowed while
+     * the line underneath refused it.
+     */
+    @Override
+    public boolean isRemovable() {
+        return true;
+    }
+
+    /**
+     * UC-TREE-PANEL-013, Rule-TREE-PANEL-009.
+     * <p>
+     * A signed-off run stays where it is. Dragged somewhere else it is still
+     * named in a report, at a place it no longer sits, and the reader has no way
+     * to know - the same reason it refuses a rename and a new number, and the
+     * reason removing it is a different question.
      */
     @Override
     public boolean isTransferable() {
