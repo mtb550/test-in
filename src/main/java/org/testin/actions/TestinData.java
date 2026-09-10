@@ -7,6 +7,8 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.TestinEditor;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 
 import java.util.List;
@@ -50,6 +52,50 @@ public final class TestinData {
      * is a state of the tree, not a missing answer.
      */
     public static final @NotNull DataKey<List<DirectoryDto>> SELECTED_NODES = DataKey.create("testin.selectedNodes");
+
+    /**
+     * The editor the keystroke arrived in - the test set editor or the run
+     * editor, which answer the same questions and are asked them the same way.
+     */
+    public static final @NotNull DataKey<TestinEditor> EDITOR = DataKey.create("testin.editor");
+
+    /**
+     * Every test case the editor has selected, in selection order, and an empty
+     * list when it has none.
+     */
+    public static final @NotNull DataKey<List<TestCaseDto>> SELECTED_CASES = DataKey.create("testin.selectedCases");
+
+    /**
+     * Puts this editor's answers where an action can find them.
+     */
+    public static void from(final @NotNull DataSink sink, final @NotNull TestinEditor editor, final @NotNull List<TestCaseDto> selected) {
+        sink.set(EDITOR, editor);
+        sink.set(SELECTED_CASES, selected);
+    }
+
+    /**
+     * The editor the keystroke arrived in, and empty when it did not arrive in
+     * one - which is how a declared editor action stays gray in a Java file.
+     */
+    public static @NotNull Optional<TestinEditor> editor(final @NotNull AnActionEvent e) {
+        return Optional.ofNullable(EDITOR.getData(e.getDataContext()));
+    }
+
+    /**
+     * Every selected test case, and none outside an editor.
+     */
+    public static @NotNull List<TestCaseDto> selectedCases(final @NotNull AnActionEvent e) {
+        return Optional.ofNullable(SELECTED_CASES.getData(e.getDataContext())).orElse(List.of());
+    }
+
+    /**
+     * The one selected test case, when exactly one is.
+     */
+    public static @NotNull Optional<TestCaseDto> singleSelectedCase(final @NotNull AnActionEvent e) {
+        final @NotNull List<TestCaseDto> selected = selectedCases(e);
+
+        return selected.size() == 1 ? Optional.of(selected.getFirst()) : Optional.empty();
+    }
 
     /**
      * Puts this tree's answers where an action can find them.

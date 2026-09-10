@@ -38,6 +38,8 @@ import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.editor.toolbar.TestToolbar;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.TestDetailsPopupBtn;
+import org.testin.actions.Declared;
+import org.testin.util.Shortcuts;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.statusbar.PageAction;
 import org.testin.codegen.GenType;
@@ -157,7 +159,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         this.mainPanel.setOpaque(true);
 
         // Shared list-view construction (see ListPanelBuilder, the counterpart of GridPanelBuilder).
-        final @NotNull ListView listView = ListPanelBuilder.build(p, projectDisposable);
+        final @NotNull ListView listView = ListPanelBuilder.build(p, projectDisposable, this);
         this.model = listView.model();
         this.list = listView.list();
         this.scrollPane = listView.scrollPane();
@@ -181,6 +183,10 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         // Not through the menu, which is about the selected test case. Paging
         // moves the view, so it is the editor's own key and the editor binds it.
         PageAction.bindTo(this, list);
+
+        // ENTER on a list is that list's gesture rather than a command, so it is
+        // not in the keymap - it is put on the declared action here (#119).
+        Declared.bindTo("Testin.ViewDetails", Shortcuts.Enter, list);
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
                 () -> grid.map(GridView::table),
                 () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);

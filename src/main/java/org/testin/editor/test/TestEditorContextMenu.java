@@ -3,6 +3,7 @@ package org.testin.editor.test;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
+import org.testin.actions.Declared;
 import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
 import org.testin.automate.AutomateTestCaseAction;
@@ -16,7 +17,6 @@ import org.testin.run.RunTestCaseAction;
 import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.UpdateTestCaseAction;
 import org.testin.testcase.UpdateTestCaseFields;
-import org.testin.view.ViewDetailsAction;
 
 public class TestEditorContextMenu extends AbstractEditorContextMenu {
 
@@ -34,7 +34,7 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
         this.p = p;
 
         add(new CreateTestCaseAction(p, ui, dir, list));
-        add(new ViewDetailsAction(p, list, dir.getPath2()));
+        add(Declared.action("Testin.ViewDetails"));
 
         addSeparator();
 

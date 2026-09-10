@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
+import org.testin.actions.Declared;
+import org.testin.util.Shortcuts;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.statusbar.PageAction;
 import org.testin.editor.BaseCard;
@@ -233,7 +235,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // Shared list-view construction (see ListPanelBuilder, the counterpart of
         // GridPanelBuilder). Built here rather than in buildOpeningPanel so the
         // three parts of it are final: the editor never exists without a list.
-        final @NotNull ListView listView = ListPanelBuilder.build(p, projectDisposable);
+        final @NotNull ListView listView = ListPanelBuilder.build(p, projectDisposable, this);
         this.model = listView.model();
         this.list = listView.list();
         this.listScrollPane = listView.scrollPane();
@@ -255,6 +257,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // Not through the menu, which is about the selected test case. Paging
         // moves the view, so it is the editor's own key and the editor binds it.
         PageAction.bindTo(this, list);
+
+        // ENTER on a list is that list's gesture rather than a command, so it is
+        // not in the keymap - it is put on the declared action here (#119).
+        Declared.bindTo("Testin.ViewDetails", Shortcuts.Enter, list);
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
                 () -> grid.map(GridView::table),
                 () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);

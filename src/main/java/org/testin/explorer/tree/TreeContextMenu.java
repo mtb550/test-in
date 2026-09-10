@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
+import org.testin.actions.Declared;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.util.Shortcuts;
@@ -51,8 +52,8 @@ public class TreeContextMenu extends DefaultActionGroup {
         super("Tree Popup Menu", true);
         this.p = p;
 
-        add(declared("Testin.Open"));
-        add(declared("Testin.CreateNode"));
+        add(Declared.action("Testin.Open"));
+        add(Declared.action("Testin.CreateNode"));
 
         addSeparator();
 
@@ -68,9 +69,9 @@ public class TreeContextMenu extends DefaultActionGroup {
         add(actionsSubMenu(statusActions, List.of(
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.UNDO),
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.REDO),
-                        declared("Testin.ReCreateTestRun"),
+                        Declared.action("Testin.ReCreateTestRun"),
                         new RemoveAction(p, tree, tp),
-                        declared("Testin.Rename"),
+                        Declared.action("Testin.Rename"),
                         new OrderNodeAction(p, tp, tree),
                         new CopyNodeAction(tree),
                         new CutNodeAction(tree),
@@ -105,7 +106,7 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         add(new GenerateReportAction(p, tree));
 
-        add(declared("Testin.ShowNodeDetails"));
+        add(Declared.action("Testin.ShowNodeDetails"));
 
     }
 

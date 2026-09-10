@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ListPanelBuilder {
 
-    public static @NotNull ListView build(final @NotNull Project p, final @NotNull Disposable fontSyncDisposable) {
+    public static @NotNull ListView build(final @NotNull Project p, final @NotNull Disposable fontSyncDisposable, final @NotNull TestinEditor editor) {
         final @NotNull CollectionListModel<TestCaseDto> model = new CollectionListModel<>(new ArrayList<>());
 
         // UC-EDITOR-PANEL-001 and UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-003.
@@ -55,12 +55,7 @@ public final class ListPanelBuilder {
         // Answered here rather than by making the zero-width case guess a column:
         // a card with nowhere to wrap really has no column, and the fix for that
         // is to give it the width, which is what this does.
-        final @NotNull JBList<TestCaseDto> list = new JBList<>(model) {
-            @Override
-            public boolean getScrollableTracksViewportWidth() {
-                return true;
-            }
-        };
+        final @NotNull JBList<TestCaseDto> list = new CaseList(model, editor);
         list.setBackground(UIUtil.getPanelBackground());
         list.setOpaque(true);
         list.setPaintBusy(true);

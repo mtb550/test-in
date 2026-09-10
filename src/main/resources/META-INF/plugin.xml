@@ -321,6 +321,16 @@
              finds them and Settings -> Keymap can rebind them; each reads what
              the tree has selected from TestinData and grays itself everywhere
              else, so a key declared here is inert outside Testin (#119). -->
+        <!-- The editors' actions. Each reads what the editor has selected from
+             TestinData and grays itself outside one (#119). -->
+        <action
+                id="Testin.ViewDetails"
+                class="org.testin.view.ViewDetailsAction"
+                text="View Test Case Details"
+                description="Show the selected test cases in the details panel"
+                icon="AllIcons.Actions.PreviewDetails"
+        />
+
         <action
                 id="Testin.CreateNode"
                 class="org.testin.creator.CreateTreeNodeAction"

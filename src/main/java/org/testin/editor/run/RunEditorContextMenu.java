@@ -3,6 +3,7 @@ package org.testin.editor.run;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
+import org.testin.actions.Declared;
 import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
 import org.testin.editor.AbstractEditorContextMenu;
@@ -16,7 +17,6 @@ import org.testin.report.GenerateReportAction;
 import org.testin.run.RunTestCaseAction;
 import org.testin.testrun.SetTestCaseStatusAction;
 import org.testin.testrun.UpdateRunItemAction;
-import org.testin.view.ViewDetailsAction;
 
 import java.util.Arrays;
 
@@ -38,7 +38,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         addSeparator();
         add(new UpdateRunItemAction(p, ui, list));
         addSeparator();
-        add(new ViewDetailsAction(p, list, dir.getPath2()));
+        add(Declared.action("Testin.ViewDetails"));
         addSeparator();
 
         // The same seven the test set editor offers, in the same place, under
