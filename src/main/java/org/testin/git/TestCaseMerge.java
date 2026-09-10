@@ -69,7 +69,14 @@ public final class TestCaseMerge {
      * @param questions the fields both sides changed to different values, in the
      *                  order the file lists them
      */
-    public record Merge(@NotNull ObjectNode merged, @NotNull List<Question> questions) {
+    /**
+     * UC-SHARE-017, Rule-SHARE-109.
+     *
+     * @param settled the fields both sides changed that were decided without
+     *                asking - reported so a tester knows a choice was made on
+     *                their behalf, which is the half that was missing (#261)
+     */
+    public record Merge(@NotNull ObjectNode merged, @NotNull List<Question> questions, @NotNull List<String> settled) {
 
         public boolean isSettled() {
             return questions.isEmpty();
@@ -127,6 +134,11 @@ public final class TestCaseMerge {
         final @NotNull ObjectNode merged = mineNode.deepCopy();
         final @NotNull List<Question> questions = new ArrayList<>();
 
+        // Only what reaches the branches below, which is only what both sides
+        // changed from the base: a field one of them left alone is settled by
+        // the ordinary three-way rule and is nobody's decision.
+        final @NotNull List<String> settled = new ArrayList<>();
+
         for (final String field : fields(mineNode, theirsNode)) {
             // path, not get: a field the JSON does not carry answers with
             // Jackson's own empty node rather than with null, so nothing below
@@ -148,8 +160,12 @@ public final class TestCaseMerge {
                 continue;
             }
 
-            if (UPDATED_AT.equals(field) || UPDATED_BY.equals(field)) continue;
+            if (UPDATED_AT.equals(field) || UPDATED_BY.equals(field)) {
+                settled.add(field);
+                continue;
+            }
             if (ORDER.contains(field)) {
+                settled.add(field);
                 set(merged, field, yours);
                 continue;
             }
@@ -160,7 +176,7 @@ public final class TestCaseMerge {
 
         stampTheLaterEdit(merged, mineNode, theirsNode);
 
-        return new Merge(merged, List.copyOf(questions));
+        return new Merge(merged, List.copyOf(questions), List.copyOf(settled));
     }
 
     /**

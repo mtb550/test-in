@@ -50,7 +50,7 @@ public final class ConflictResolution {
     /**
      * One conflicted test case the merge could not finish on its own.
      */
-    private record Pending(@NotNull String relativePath, @NotNull String name, @NotNull ObjectNode merged, @NotNull List<TestCaseMerge.Question> questions, @NotNull String theirs) {
+    private record Pending(@NotNull String relativePath, @NotNull String name, @NotNull ObjectNode merged, @NotNull List<TestCaseMerge.Question> questions, @NotNull List<String> settled, @NotNull String theirs) {
     }
 
     /**
@@ -166,7 +166,7 @@ public final class ConflictResolution {
 
             if (!merge.isSettled()) {
                 pending.add(new Pending(relativePath, name(mapper, mine, relativePath), merge.merged(),
-                        merge.questions(), theirs));
+                        merge.questions(), merge.settled(), theirs));
                 continue;
             }
 
@@ -205,7 +205,7 @@ public final class ConflictResolution {
             ask(p, git, mapper, repositoryPath, new ArrayList<>(rest), stillLeft, onResolved, onLeftOver);
         };
 
-        new ResolveConflictDialog(p, next.name(), next.questions(), takeTheirs -> {
+        new ResolveConflictDialog(p, next.name(), next.questions(), next.settled(), takeTheirs -> {
             for (final TestCaseMerge.Question question : next.questions()) {
                 TestCaseMerge.answer(mapper, next.merged(), question, takeTheirs.contains(question.field()),
                         next.theirs());

@@ -410,7 +410,7 @@ public final class SftpSync {
 
             if (!merge.isSettled()) {
                 unsettled.add(new Unsettled(path, name(mapper, mine, path), merge.merged(),
-                        merge.questions(), theirs));
+                        merge.questions(), merge.settled(), theirs));
                 continue;
             }
 

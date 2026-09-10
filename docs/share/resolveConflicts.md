@@ -38,6 +38,11 @@ There is no key for this. The offer appears on the message.
   pull.
 - **Rule-SHARE-078** — Where both sides changed different fields of one test
   case, Testin merges them and asks only about the fields that really disagree.
+- **Rule-SHARE-109** — Two fields are settled rather than asked about, and the
+  dialog says so. Who changed the test case last, and when, take the later of
+  the two edits; the order takes the remote's. Neither is a question a tester
+  can usefully answer about a merge, so the answer is given and named rather
+  than asked for.
 - **Rule-SHARE-079** — A pull that will not move on is reported only to the log.
 
 ## What the tester sees
@@ -82,11 +87,21 @@ names them again.
 Accepted** names the file and says what to do: resolve that file in Git, then
 sync again. The sync cannot go on without it.
 
-## Two fields are settled without asking
+## Two fields are settled without asking, and the dialog says which
 
-The order of a test case always takes the other side's value. Who changed it
-last, and when, always take the later of the two edits. The tester is not asked
-about either, and is not told afterwards. That is difference 6.
+The order of a test case takes the remote's value. Who changed it last, and
+when, take the later of the two edits. Neither is a question a tester can
+usefully answer about a merge - a position is not something either of them
+chose, and who edited last is already in the two timestamps.
+
+So they are not asked, and the dialog says what was decided:
+
+*Both changed Updated At, Updated By and Order, and Testin settled them without
+asking: the later edit for who changed it and when, and the remote's position
+for the order.*
+
+Only when it happened. A field one side never touched is settled by the ordinary
+three-way rule, which is nobody's decision, and nothing is said about it.
 
 ---
 

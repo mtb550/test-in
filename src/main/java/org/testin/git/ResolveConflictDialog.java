@@ -2,6 +2,7 @@ package org.testin.git;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Display;
 import org.testin.model.TestEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -49,7 +50,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
      *                   Named rather than numbered, so the caller applies them by
      *                   field and never by row order
      */
-    public ResolveConflictDialog(final @NotNull Project p, final @NotNull String testCase, final @NotNull List<TestCaseMerge.Question> questions, final @NotNull Consumer<Set<String>> onResolved, final @NotNull Runnable onSkipped) {
+    public ResolveConflictDialog(final @NotNull Project p, final @NotNull String testCase, final @NotNull List<TestCaseMerge.Question> questions, final @NotNull List<String> settled, final @NotNull Consumer<Set<String>> onResolved, final @NotNull Runnable onSkipped) {
         super(p);
         this.questions = questions;
         this.onResolved = onResolved;
@@ -58,6 +59,12 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
         title = "Both Changed " + testCase;
 
         final @NotNull List<ComponentDialogBase<?>> rows = new ArrayList<>();
+
+        // Said here, in the dialog that is already about this test case, rather
+        // than in a message afterwards: the tester is looking at the decisions
+        // they are being asked to make, and these are the ones that were made
+        // for them. Nothing is shown when nothing was settled (#261).
+        if (!settled.isEmpty()) rows.add(ComponentDialogBase.message(settledSentence(settled)));
 
         for (final TestCaseMerge.Question question : questions) {
             final @NotNull ComponentDialogBase<RadioSelection<Boolean>> row = ComponentDialogBase.<Boolean>radios(label(question.field()))
@@ -93,6 +100,24 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
      * dropped - the merge works on the file, which may hold more than the model
      * does.
      */
+    /**
+     * UC-SHARE-017, Rule-SHARE-109.
+     * <p>
+     * What the merge decided without asking, named.
+     * <p>
+     * The reason comes with it, because the fields differ in why they were not
+     * a question: who changed the case last has an answer in the two timestamps
+     * and none the tester could give, and a position is not something either of
+     * them can usefully choose about a merge.
+     */
+    private static @NotNull String settledSentence(final @NotNull List<String> settled) {
+        final @NotNull List<String> named = settled.stream().map(ResolveConflictDialog::label).toList();
+
+        return "Both changed " + Display.andJoin(named)
+                + ", and Testin settled " + (named.size() == 1 ? "it" : "them")
+                + " without asking: the later edit for who changed it and when, and the remote's position for the order.";
+    }
+
     private static @NotNull String label(final @NotNull String jsonField) {
         final @NotNull String constant = jsonField.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toUpperCase(Locale.ROOT);
 

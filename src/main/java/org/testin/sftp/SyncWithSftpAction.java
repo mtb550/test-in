@@ -350,7 +350,7 @@ public final class SyncWithSftpAction extends AbstractProjectTreeAction {
         final @NotNull List<Unsettled> rest = List.copyOf(unsettled.subList(1, unsettled.size()));
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
 
-        new ResolveConflictDialog(p, next.name(), next.questions(), takeTheirs -> {
+        new ResolveConflictDialog(p, next.name(), next.questions(), next.settled(), takeTheirs -> {
             for (final TestCaseMerge.Question question : next.questions()) {
                 TestCaseMerge.answer(mapper, next.merged(), question, takeTheirs.contains(question.field()),
                         next.theirs());
