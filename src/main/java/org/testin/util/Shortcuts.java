@@ -128,8 +128,6 @@ public enum Shortcuts {
     GenerateReport(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)),
 
     // Card actions (context menu + hover icons)
-    RunTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0)),
-    NavigateToCode(KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK)),
 
     // Forward and back, in whichever surface has the keyboard. Named for the
     // gesture and not for what it lands on, because the two surfaces move

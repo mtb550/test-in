@@ -14,6 +14,7 @@ import org.testin.notifications.Notifier;
 import org.testin.run.RunTestCases;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
+import org.testin.actions.Declared;
 import org.testin.services.OptionalPlugin;
 import org.testin.util.Shortcuts;
 
@@ -26,7 +27,7 @@ import java.util.function.BiConsumer;
 public enum CardHoverAction {
     NAVIGATE_TO_TEST_METHOD(
             "Navigate to Code",
-            Shortcuts.NavigateToCode,
+            "Testin.NavigateToCode",
             List.of(OptionalPlugin.JAVA),
             AllIcons.Nodes.Class,
             (p, cases) -> NavigateToCodeAction.execute(p, cases.getFirst())
@@ -38,7 +39,7 @@ public enum CardHoverAction {
             // an IDE with only TestNG offered Run and then resolved every case to
             // nothing - one "has no generated code yet" per case, with no
             // mention of the plugin that was missing (#248).
-            Shortcuts.RunTestCase,
+            "Testin.RunTestCase",
             List.of(OptionalPlugin.JAVA, OptionalPlugin.TESTNG),
             AllIcons.RunConfigurations.TestState.Run,
             RunTestCases::run
@@ -48,20 +49,27 @@ public enum CardHoverAction {
      * Its own button rather than the run button drawing a different icon, and
      * never beside it: the card offers whichever of the two its state calls for.
      * <p>
-     * Bound to no key: F5 runs a case and does not stop one, and
-     * {@link Shortcuts#EMPTY} is what carries that without a reader having to
-     * ask whether there is a shortcut at all.
+     * Bound to no key: F5 runs a case and does not stop one, and there is no
+     * declared action behind it either - an empty id is what carries that
+     * without a reader having to ask whether there is a shortcut at all.
      */
     STOP_TEST_CASE(
             "Stop Test Case",
-            Shortcuts.EMPTY,
+            "",
             List.of(OptionalPlugin.TESTNG),
             AllIcons.Actions.Suspend,
             CardHoverAction::stopRun
     );
 
     private final @NotNull String tooltip;
-    private final @NotNull Shortcuts shortcut;
+    /**
+     * The declared action this gesture is, by the id {@code plugin.xml} gives
+     * it, and empty for a gesture no action stands behind.
+     * <p>
+     * An id rather than a keystroke, so the hint prints whatever the tester has
+     * bound rather than what we shipped (#119).
+     */
+    private final @NotNull String actionId;
     /**
      * The IDE plugins this action needs to do anything at all - every one of
      * them, not the most obvious one.
@@ -174,9 +182,12 @@ public enum CardHoverAction {
      * there is one. Built from the two rather than written out beside them, so a
      * shortcut that changes cannot leave the hint naming the old key - and the
      * button with no key needs no second spelling of its name.
+     * <p>
+     * The key is asked of the keymap, so this is the tester's own binding rather
+     * than the default we shipped (#119).
      */
     public @NotNull String getHintText() {
-        return (tooltip + " " + shortcut.getShortcutText()).trim();
+        return (tooltip + " " + Declared.shortcutText(actionId)).trim();
     }
 
     /**

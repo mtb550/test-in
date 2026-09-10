@@ -8,6 +8,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.Declared;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.CardHoverAction;
 import org.testin.model.Automated;
@@ -84,7 +85,7 @@ public class ActionIcons extends BaseDetails {
 
         new HelpTooltip()
                 .setDescription(HtmlChunk.text(tooltip))
-                .setShortcut(action.getShortcut().getShortcutText())
+                .setShortcut(Declared.shortcutText(action.getActionId()))
                 .installOn(label);
 
         // From the hovered icon itself: scaling 16px by 1.8 gives 28.8, which the

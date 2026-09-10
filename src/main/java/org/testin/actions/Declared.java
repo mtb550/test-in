@@ -2,6 +2,9 @@ package org.testin.actions;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.actionSystem.ShortcutSet;
+import com.intellij.openapi.keymap.KeymapUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +41,35 @@ public final class Declared {
         }
 
         return action;
+    }
+
+    /**
+     * What key this action answers to <em>right now</em>, and nothing when it
+     * answers to none.
+     * <p>
+     * Asked of the keymap rather than of {@code Shortcuts}, which is the whole
+     * point of declaring an action: a tester who rebinds it sees their own key on
+     * the card and in the status bar, and a hint can no longer name a key that
+     * was ours and is not theirs (#119).
+     * <p>
+     * An empty id is not a mistake - it is a gesture with no action behind it,
+     * like the card's Stop button, and it prints nothing.
+     */
+    public static @NotNull String shortcutText(final @NotNull String id) {
+        if (id.isEmpty()) return "";
+
+        return KeymapUtil.getFirstKeyboardShortcutText(action(id));
+    }
+
+    /**
+     * The keys this action answers to, for another action that borrows them.
+     * <p>
+     * The view panel binds the card's two gestures to itself, and it has to bind
+     * whatever the tester has bound rather than what we shipped - so it asks the
+     * declared action instead of naming a keystroke of its own (#119).
+     */
+    public static @NotNull ShortcutSet shortcutSet(final @NotNull String id) {
+        return id.isEmpty() ? CustomShortcutSet.EMPTY : action(id).getShortcutSet();
     }
 
     /**

@@ -329,7 +329,9 @@
                 text="Run Test Case"
                 description="Run the selected test cases, or stop a run that is going"
                 icon="AllIcons.RunConfigurations.TestState.Run"
-        />
+        >
+            <keyboard-shortcut keymap="$default" first-keystroke="F5"/>
+        </action>
 
         <action
                 id="Testin.NavigateToCode"
@@ -337,7 +339,9 @@
                 text="Navigate to Test Code"
                 description="Jump from the selected test case to the method automating it"
                 icon="AllIcons.General.ArrowRight"
-        />
+        >
+            <keyboard-shortcut keymap="$default" first-keystroke="shift F5"/>
+        </action>
 
         <action
                 id="Testin.ViewDetails"

@@ -188,12 +188,6 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         // not in the keymap - it is put on the declared action here (#119).
         Declared.bindTo("Testin.ViewDetails", Shortcuts.Enter, list);
 
-        // Shift+F5 stays on the list for now, not in the keymap: the card's hover
-        // hint prints this key from Shortcuts, and moving the key without moving
-        // the hint is the two-owners problem #119 exists to end. Both move
-        // together when the last hover action is declared.
-        Declared.bindTo("Testin.NavigateToCode", Shortcuts.NavigateToCode, list);
-        Declared.bindTo("Testin.RunTestCase", Shortcuts.RunTestCase, list);
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
                 () -> grid.map(GridView::table),
                 () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);

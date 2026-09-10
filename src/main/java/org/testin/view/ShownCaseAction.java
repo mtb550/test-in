@@ -6,6 +6,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.Declared;
 import org.testin.editor.CardHoverAction;
 
 import javax.swing.JComponent;
@@ -37,10 +38,11 @@ final class ShownCaseAction extends DumbAwareAction {
      * <p>
      * The action's, not one chosen here - the same {@link CardHoverAction} that
      * printed the key into the tooltip is asked for it, so the two cannot
-     * disagree the way they did.
+     * disagree the way they did. It is now the tester's binding rather than our
+     * default, because the card's gestures are declared actions (#119).
      */
     static void bind(final @NotNull ViewPanel panel, final @NotNull CardHoverAction action, final @NotNull JComponent component) {
-        new ShownCaseAction(panel, action).registerCustomShortcutSet(action.getShortcut().getCustomShortcut(), component);
+        new ShownCaseAction(panel, action).registerCustomShortcutSet(Declared.shortcutSet(action.getActionId()), component);
     }
 
     @Override
