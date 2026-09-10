@@ -50,26 +50,6 @@ public class StatusBar extends JBPanel<StatusBar> {
     private final @NotNull JBLabel statusLabel = new JBLabel();
 
     /**
-     * UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-215.
-     * <p>
-     * Where this editor's node sits, as the tree says it - the test project,
-     * the folders above it, and the node itself.
-     * <p>
-     * Held rather than passed with the selection because it does not change
-     * while the editor is open: the node is what the editor was opened on. It is
-     * written into the same label the counts go in, so the sentence still has
-     * exactly one writer.
-     */
-    private @NotNull String path = "";
-
-    /**
-     * The counts, as {@link #updateSelectionState} last worked them out. Held for
-     * the same reason: the two halves of the sentence arrive at different times
-     * and neither may erase the other.
-     */
-    private @NotNull String sentence = "";
-
-    /**
      * Where the run is in its lifecycle, with the icon the project tree draws for
      * the same node. Only the run editor writes it; in the test case editor it
      * stays blank, which is what a label with nothing to say looks like.
@@ -491,65 +471,17 @@ public class StatusBar extends JBPanel<StatusBar> {
         final @NotNull String of = cases + narrowedFrom(shownCount, totalCount);
 
         if (selectedCount > 1) {
-            sentence = String.format(Locale.ENGLISH, "%d selected of %s", selectedCount, of);
+            statusLabel.setText(String.format(Locale.ENGLISH, "<html>%d selected of %s</html>", selectedCount, of));
 
         } else if (selectedCount == 1) {
-            sentence = String.format(Locale.ENGLISH, "%d of %s", firstSelectedPosition + 1, of);
+            statusLabel.setText(String.format(Locale.ENGLISH, "<html>%d of %s</html>", firstSelectedPosition + 1, of));
 
         } else {
             // The count alone. "0 of 12 test cases" put a position where a
             // tester reads a count, and with nothing selected there is no
             // position to give - a highlighted row is not a selected one (#213).
-            sentence = of;
+            statusLabel.setText(String.format(Locale.ENGLISH, "<html>%s</html>", of));
         }
-
-        paint();
-    }
-
-    /**
-     * UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-215.
-     * <p>
-     * Where the open node sits, said once when the editor opens.
-     * <p>
-     * The IDE's own bar under this one shows a Java file's whole breadcrumb and
-     * a Testin editor's bare node name, because that bar is built from PSI and a
-     * Testin editor has none - so the window carried two bars and only one knew
-     * where the tester was (#161). Answered here rather than by teaching the
-     * platform about a node it has never seen: the extension point for that is
-     * marked internal, and this plugin declares no upper build bound, so a
-     * tester would be carried onto the IDE version that broke it.
-     */
-    public void showPath(final @NotNull List<String> nodePath) {
-        path = String.join(" \u203A ", nodePath);
-
-        paint();
-    }
-
-    /**
-     * The one writer of the left label, and the reason there is one.
-     * <p>
-     * The counts come first because they are what changes and what a tester
-     * reads constantly; the path comes after because it does not change while
-     * the editor is open. A label ellipsizes from its end, so the half that gets
-     * cut on a narrow editor is the half a tester can widen the window once to
-     * read - which is the same order of priority {@code budget} already applies
-     * to the three regions.
-     */
-    private void paint() {
-        final @NotNull String separator = sentence.isEmpty() || path.isEmpty() ? "" : "  \u00B7  ";
-
-        statusLabel.setText(String.format(Locale.ENGLISH,
-                "<html>%s%s<font color='%s'>%s</font></html>",
-                sentence, separator, pathHex(), path));
-    }
-
-    /**
-     * The path's color, quieter than the sentence beside it - it is where you
-     * are rather than what you are doing, and furniture must never outshine the
-     * content.
-     */
-    private static @NotNull String pathHex() {
-        return String.format("#%06x", UIUtil.getInactiveTextColor().getRGB() & 0xFFFFFF);
     }
 
     /**

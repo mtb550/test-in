@@ -42,11 +42,6 @@ There is no key that starts this. Click, `Ctrl`-click and `Shift`-click.
   selection to what was clicked first.
 - **Rule-EDITOR-PANEL-111** — The grid's selection and the cards' selection are
   always the same. Changing one changes the other.
-- **Rule-EDITOR-PANEL-215** — The editor's own status bar names where the open
-  node sits - the test project, the folders above it and the node itself - after
-  the counts and in a quieter colour. The IDE's bar underneath shows a Testin
-  editor's bare node name and no ancestors, because that bar is built from PSI
-  and a Testin editor has none.
 
 ## What the tester sees
 
@@ -74,30 +69,6 @@ happens, and no message appears.
 | One test case | Its position, then *of 12 test cases* |
 | Several | The count, then *selected of 12 test cases* |
 | Anything, with a filter on | The same, then *(filtered from 120)* |
-
-Then, after a dot and in a quieter colour, **where this editor's node sits**:
-
-```
-3 of 120 test cases (filtered from 340)  ·  NAFATH › Test Cases › Login
-```
-
-The counts come first because they are what changes and what a tester reads
-constantly. The path comes second because it does not change while the editor is
-open, so on a narrow editor it is the half that gets cut — and it is the half a
-tester can widen the window once to read.
-
-### Why it is here and not in the IDE's bar
-
-The IDE's own bar, underneath this one, shows a Java file's whole breadcrumb —
-`testin_example > src > test > java > nafath > LoginTest` — and for a Testin
-editor shows the node's bare name with no ancestors. That bar is built from PSI
-and a Testin editor deliberately has none, so it has nothing to walk up.
-
-Teaching it about a Testin node means implementing `NavBarItemProvider`, which
-the platform marks **`@ApiStatus.Internal`** — no deprecation cycle, and a break
-on any IDE update. Testin declares `sinceBuild` and no upper bound on purpose, so
-a tester would be carried onto the version that broke it and told nothing. The
-path goes in the bar Testin owns instead (#161).
 
 ## What Testin refuses
 
