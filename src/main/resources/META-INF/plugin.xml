@@ -472,6 +472,17 @@
                 icon="AllIcons.ToolbarDecorator.Export"
         />
 
+        <!-- Declared here rather than in testin-git.xml, so the action exists in
+             every IDE and grays itself with the reason when Git is missing -
+             the same answer the tree menu gives (#273). -->
+        <action
+                id="Testin.SyncWithRemote"
+                class="org.testin.git.SyncActionAction"
+                text="Sync With Remote"
+                description="Pull the latest test cases, then push anything committed here"
+                icon="AllIcons.Actions.SyncPanels"
+        />
+
         <action
                 id="Testin.Import"
                 class="org.testin.importexport.imports.ImportAction"

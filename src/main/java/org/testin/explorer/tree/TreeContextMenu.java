@@ -18,7 +18,6 @@ import org.testin.logger.Logger;
 import org.testin.sftp.SyncWithSftpAction;
 import org.testin.EscapeAction;
 import org.testin.explorer.TreePanel;
-import org.testin.git.SyncActionAction;
 import org.testin.git.ViewPendingCommitsAction;
 import org.testin.model.PackageStatus;
 import org.testin.model.ProjectStatus;
@@ -84,7 +83,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         // nothing to say why, while Sync With SFTP below was added in both
         // (#273).
         addSeparator();
-        add(new SyncActionAction(p, tree));
+        add(Declared.action("Testin.SyncWithRemote"));
         add(new ViewPendingCommitsAction(p, tree));
 
         addSeparator();
