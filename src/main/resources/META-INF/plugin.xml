@@ -322,6 +322,17 @@
              the tree has selected from TestinData and grays itself everywhere
              else, so a key declared here is inert outside Testin (#119). -->
         <action
+                id="Testin.CreateNode"
+                class="org.testin.creator.CreateTreeNodeAction"
+                text="Create Testin Node"
+                description="Create a test set, package or test run under the selected node"
+                icon="AllIcons.General.Add"
+        >
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl M"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta M"/>
+        </action>
+
+        <action
                 id="Testin.ReCreateTestRun"
                 class="org.testin.testrun.ReCreateTestRunAction"
                 text="Re-create Test Run"

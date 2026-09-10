@@ -19,7 +19,6 @@ import org.testin.EscapeAction;
 import org.testin.clipboard.CopyNodeAction;
 import org.testin.clipboard.CutNodeAction;
 import org.testin.clipboard.PasteNodeAction;
-import org.testin.creator.CreateTreeNodeAction;
 import org.testin.explorer.TreePanel;
 import org.testin.git.SyncActionAction;
 import org.testin.git.ViewPendingCommitsAction;
@@ -53,7 +52,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         this.p = p;
 
         add(declared("Testin.Open"));
-        add(new CreateTreeNodeAction(p, tree));
+        add(declared("Testin.CreateNode"));
 
         addSeparator();
 

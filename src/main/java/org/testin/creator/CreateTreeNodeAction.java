@@ -1,17 +1,16 @@
 package org.testin.creator;
 
 import org.testin.notifications.Done;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectTreeAction;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
 import org.testin.creator.dialogs.CreateRunDialog;
 import org.testin.creator.dialogs.CreateTestDialog;
 import org.testin.explorer.TreePanel;
-import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -23,25 +22,55 @@ import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.editor.EditorUtil;
-import org.testin.util.Shortcuts;
 
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-public class CreateTreeNodeAction extends AbstractProjectTreeAction {
-
-    public CreateTreeNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, tree, "Create", "Create new node", AllIcons.General.Add);
-        this.registerCustomShortcutSet(Shortcuts.CreateItem.getCustomShortcut(), tree);
-    }
+/**
+ * UC-TREE-PANEL-007, UC-TREE-PANEL-009.
+ * <p>
+ * Declared in {@code plugin.xml} (#119), with Ctrl+M as its default: it is a
+ * command a tester would look for in Find Action and might want on another key,
+ * so it belongs in the keymap rather than nailed to the tree.
+ */
+public class CreateTreeNodeAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-007, UC-TREE-PANEL-009
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
 
-        TreeValueUtil.singleSelectedDirectory(tree).ifPresent(this::createUnder);
+        TestinData.singleSelectedNode(e).ifPresent(dir -> new Work(p).createUnder(dir));
     }
+
+    // UC-TREE-PANEL-007, Rule-TREE-PANEL-025
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+
+        // A test project holds its two fixed containers and nothing else, so there
+        // is nothing to create directly under it - which is what it answers, so
+        // the capability flag is the whole question. It used to be asked twice,
+        // once by name and once by capability, and the instanceof never removed
+        // anything the flag would have kept.
+        // And one parent to create under. With several selected there is no one
+        // answer to "under which", so the entry grays rather than picking the
+        // first (#192).
+        e.getPresentation().setEnabled(TestinData.singleSelectedNode(e)
+                .filter(DirectoryDto::canCreateChildren)
+                .isPresent());
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.EDT;
+    }
+
+    /**
+     * Creating one node, for a project that is there.
+     */
+    private record Work(@NotNull Project p) {
 
     /**
      * UC-TREE-PANEL-007, UC-TREE-PANEL-008, UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-004.
@@ -93,26 +122,5 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
         }
     }
 
-    // UC-TREE-PANEL-007, Rule-TREE-PANEL-025
-    @Override
-    public void update(final @NotNull AnActionEvent e) {
-
-        // A test project holds its two fixed containers and nothing else, so there
-        // is nothing to create directly under it - which is what it answers, so
-        // the capability flag is the whole question. It used to be asked twice,
-        // once by name and once by capability, and the instanceof never removed
-        // anything the flag would have kept.
-        // And one parent to create under. With several selected there is no one
-        // answer to "under which", so the entry grays rather than picking the
-        // first (#192).
-        e.getPresentation().setEnabled(TreeValueUtil.singleSelectedDirectory(tree)
-                .filter(DirectoryDto::canCreateChildren)
-                .isPresent());
     }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.EDT;
-    }
-
 }
