@@ -322,6 +322,14 @@
              the tree has selected from TestinData and grays itself everywhere
              else, so a key declared here is inert outside Testin (#119). -->
         <action
+                id="Testin.ReCreateTestRun"
+                class="org.testin.testrun.ReCreateTestRunAction"
+                text="Re-create Test Run"
+                description="Create the next cycle from the selected test run"
+                icon="AllIcons.Actions.Refresh"
+        />
+
+        <action
                 id="Testin.Open"
                 class="org.testin.open.OpenAction"
                 text="Open Testin Node"

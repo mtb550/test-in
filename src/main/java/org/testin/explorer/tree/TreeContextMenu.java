@@ -34,7 +34,6 @@ import org.testin.remove.RemoveAction;
 import org.testin.report.GenerateReportAction;
 import org.testin.run.RunTestsAction;
 import org.testin.testproject.UpdateTestProjectStatusAction;
-import org.testin.testrun.ReCreateTestRunAction;
 import org.testin.testrun.EditTestRunAction;
 import org.testin.testrun.SetTestRunStatusAction;
 import org.testin.testset.UpdateTestSetStatusAction;
@@ -70,7 +69,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         add(actionsSubMenu(statusActions, List.of(
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.UNDO),
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.REDO),
-                        new ReCreateTestRunAction(p, tree),
+                        declared("Testin.ReCreateTestRun"),
                         new RemoveAction(p, tree, tp),
                         declared("Testin.Rename"),
                         new OrderNodeAction(p, tp, tree),

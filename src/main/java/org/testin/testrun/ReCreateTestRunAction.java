@@ -1,12 +1,13 @@
 package org.testin.testrun;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectTreeAction;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
 import org.testin.creator.CreateTestRun;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
@@ -37,58 +38,71 @@ import java.util.stream.Collectors;
  * the run is written by the same path a new one is, which builds its items from
  * the ticked cases and gives it a fresh marker - so no verdict, duration or
  * stack trace from the last cycle can reach this one.
+ * <p>
+ * Declared in {@code plugin.xml} (#119), so the platform builds one instance for
+ * the whole IDE and what it acts on comes from the keystroke. The work is in
+ * {@link Work} for the same reason {@code JavaSourceRoot.RootWork} is separate:
+ * an action is a gesture and an answer to "is this available", and everything
+ * else it was carrying belongs to something that has a project to work with.
  */
-public class ReCreateTestRunAction extends AbstractProjectTreeAction {
-
-    public ReCreateTestRunAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, tree, "Re-create", "Create the next cycle from this test run", AllIcons.Actions.Refresh);
-    }
+public class ReCreateTestRunAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-021
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Optional.ofNullable(tree.getSelectionPath()).ifPresent(this::reCreateAt);
-    }
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
 
-    /**
-     * The run and the folder it sits in, read off the same path - the parent is
-     * taken from the tree rather than from the node, which carries it as a
-     * field that may not be set.
-     */
-    private void reCreateAt(final @NotNull TreePath path) {
-        TreeValueUtil.directoryAt(path)
-                .filter(TestRunDirectoryDto.class::isInstance)
-                .ifPresent(source -> TreeValueUtil.directoryAt(path.getParentPath())
-                        .ifPresent(parent -> reCreate(source, parent)));
-    }
-
-    private void reCreate(final @NotNull DirectoryDto source, final @NotNull DirectoryDto parent) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-
-        final @NotNull TestRunDto run = indexer.getTestRunByPath(source.getPath());
-        final @NotNull Set<UUID> cases = run.getResults().stream().map(TestRunItems::getId).collect(Collectors.toSet());
-
-        final @NotNull Set<String> taken = indexer.getChildren(parent.getPath()).stream()
-                .map(DirectoryDto::getName)
-                .collect(Collectors.toSet());
-
-        // A case removed since the source run is simply not in the tree, so it
-        // is not ticked and not carried. Nothing to report and nothing to skip:
-        // the tree is built from what exists now.
-        Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
-                tp -> new CreateTestRun(p).configureRun(tp.getTestCasesDirectory(), NextRunName.after(source.getName(), taken), parent, cases, run.getConfiguration()),
-                () -> Logger.warn("Re-create test run: no test project is bound to " + p.getName()));
+        TestinData.tree(e)
+                .map(SimpleTree::getSelectionPath)
+                .ifPresent(path -> new Work(p).reCreateAt(path));
     }
 
     // UC-TREE-PANEL-021, Rule-TREE-PANEL-069
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(TreeValueUtil.singleSelectedDirectory(tree).filter(TestRunDirectoryDto.class::isInstance).isPresent());
+        e.getPresentation().setEnabled(TestinData.singleSelected(e, TestRunDirectoryDto.class).isPresent());
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         // update() reads the tree's selection, which is Swing state.
         return ActionUpdateThread.EDT;
+    }
+
+    /**
+     * Re-creating one run, for a project that is there.
+     */
+    private record Work(@NotNull Project p) {
+
+        /**
+         * The run and the folder it sits in, read off the same path - the parent
+         * is taken from the tree rather than from the node, which carries it as
+         * a field that may not be set.
+         */
+        private void reCreateAt(final @NotNull TreePath path) {
+            TreeValueUtil.directoryAt(path)
+                    .filter(TestRunDirectoryDto.class::isInstance)
+                    .ifPresent(source -> TreeValueUtil.directoryAt(path.getParentPath())
+                            .ifPresent(parent -> reCreate(source, parent)));
+        }
+
+        private void reCreate(final @NotNull DirectoryDto source, final @NotNull DirectoryDto parent) {
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+
+            final @NotNull TestRunDto run = indexer.getTestRunByPath(source.getPath());
+            final @NotNull Set<UUID> cases = run.getResults().stream().map(TestRunItems::getId).collect(Collectors.toSet());
+
+            final @NotNull Set<String> taken = indexer.getChildren(parent.getPath()).stream()
+                    .map(DirectoryDto::getName)
+                    .collect(Collectors.toSet());
+
+            // A case removed since the source run is simply not in the tree, so it
+            // is not ticked and not carried. Nothing to report and nothing to skip:
+            // the tree is built from what exists now.
+            Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
+                    tp -> new CreateTestRun(p).configureRun(tp.getTestCasesDirectory(), NextRunName.after(source.getName(), taken), parent, cases, run.getConfiguration()),
+                    () -> Logger.warn("Re-create test run: no test project is bound to " + p.getName()));
+        }
     }
 }
