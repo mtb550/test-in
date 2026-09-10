@@ -324,7 +324,7 @@ editor toolbar, or a key. **A capability with no key says so, and says why.**
 | Rename, carrying the automation code with it | `Shift+F6` | Renames the generated method too, so the case stays runnable |
 | Reorder within the parent | — | Drag, or the menu. Order carries meaning: it is the execution order |
 | Copy / Cut / Paste a node | `Ctrl+C` `Ctrl+X` `Ctrl+V` | |
-| Copy / Cut / Paste a test case | `Ctrl+Shift+C` `Ctrl+Shift+X` `Ctrl+Shift+V` | Separate keys because the tree and the case list are different targets |
+| Copy / Cut / Paste a test case | `Alt+Shift+C` `Alt+Shift+X` `Alt+Shift+V` | Separate keys because the tree and the case list are different targets |
 | Undo / Redo the last tree change | `Ctrl+Z` / `Ctrl+Y` | |
 | Delete | `Delete` | Refused on the two fixed containers |
 | Edit one field of a case directly | `D` `E` `M` `T` `B` `S` `P` `G` | Description, expected result, module, test data, preconditions, steps, priority, group |

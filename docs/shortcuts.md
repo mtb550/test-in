@@ -54,9 +54,9 @@ table; this is all of them together.
 | `Ctrl+C` | On cards, opens the copy menu; a letter copies one value. In the grid, copies the cells |
 | `Ctrl+X` | In the grid, copies the cells and empties the ones that can be typed into |
 | `Ctrl+V` | In the grid, pastes text into the cells |
-| `Ctrl+Shift+C` | Copies the test cases themselves |
-| `Ctrl+Shift+X` | Cuts the test cases |
-| `Ctrl+Shift+V` | Pastes test cases into this test set |
+| `Alt+Shift+C` | Copies the test cases themselves |
+| `Alt+Shift+X` | Cuts the test cases |
+| `Alt+Shift+V` | Pastes test cases into this test set |
 | `F5` | Runs the selected test cases, or stops them |
 | `Shift+F5` | Goes to the automation code |
 | `Ctrl+F12` | **Automate Test Case**, which is not built |
@@ -209,7 +209,7 @@ these carry a default key:
 | `Ctrl+M` | Create Testin Node, Create Test Case | The tree, and a test set editor |
 | `Shift+F6` | Rename Testin Node | The tree |
 | `F2` | Update Test Case, Failed Test Case Details | Both editors, and the view panel |
-| `Ctrl+Shift+C` `Ctrl+Shift+X` `Ctrl+Shift+V` | Copy, Cut and Paste Test Case | Both editors |
+| `Alt+Shift+C` `Alt+Shift+X` `Alt+Shift+V` | Copy, Cut and Paste Test Case | Both editors |
 | `F5` | Run Test Case | Both editors and the view panel |
 | `Shift+F5` | Navigate to Test Code | Both editors and the view panel |
 | `Ctrl+F12` | Automate Test Case | Both editors |

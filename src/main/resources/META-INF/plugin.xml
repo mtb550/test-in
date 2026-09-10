@@ -313,7 +313,19 @@
 
          The search was the first of these and is still the plainest: it has to
          open from the tree, from either editor and from the view panel alike,
-         so it lives in the keymap (#29). -->
+         so it lives in the keymap (#29).
+
+         A key the IDE already owns is a key Testin loses. The platform gathers
+         every action bound to a keystroke, runs whichever one is enabled, and
+         says nothing when two are - and a component input map cannot rescue it,
+         because a registered shortcut is dispatched first. CTRL+SHIFT+C is
+         CopyPaths and CTRL+SHIFT+V is PasteMultiple, so the tester pressed copy
+         in a test editor and got a file path: the clipboard three are ALT+SHIFT
+         on this keymap now. Rule-INTERNAL-069, and DeclaredShortcutsTest reads
+         this file to check no two Testin actions ever claim one key by accident.
+
+         The Mac entries are unchanged: META+SHIFT+C, X and V are free on every
+         Mac keymap, so nothing there was ever competing (#25). -->
     <actions>
         <action
                 id="Testin.Search"
@@ -389,7 +401,7 @@
                 description="Paste the test cases on the clipboard into this test set"
                 icon="AllIcons.Actions.MenuPaste"
         >
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift V"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift V"/>
             <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift V"/>
         </action>
 
@@ -400,7 +412,7 @@
                 description="Put the selected test cases themselves on the clipboard"
                 icon="AllIcons.Actions.Copy"
         >
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift C"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift C"/>
             <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift C"/>
         </action>
 
@@ -411,7 +423,7 @@
                 description="Cut the selected test cases to the clipboard"
                 icon="AllIcons.Actions.MenuCut"
         >
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift X"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift X"/>
             <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift X"/>
         </action>
 

@@ -32,6 +32,14 @@ This is the fastest way to reach one test set, one test run or one test case.
   shortcut is dispatched before a component's own bindings and would take the
   key away from the tree, the card list or the grid. Which keys are which is
   written out on the shortcuts page.
+- **Rule-INTERNAL-068** — A key a surface gives an action is bound on a copy of
+  that action, never on the one the IDE holds. The Keymap page keeps showing
+  what it shipped with, and the tooltip that prints the key reads it from the
+  same place the binding does.
+- **Rule-INTERNAL-069** — Testin never takes a default key the IDE already uses.
+  When two actions claim one keystroke the IDE runs whichever is enabled and
+  says nothing, and a component binding cannot win it back - so the key is
+  changed instead.
 
 The tree panel's own rules do not govern this dialog. It opens from anywhere in
 the IDE, and the tree is only where it lands.

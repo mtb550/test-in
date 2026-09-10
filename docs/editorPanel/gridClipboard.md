@@ -84,8 +84,8 @@ gesture in Testin raises one message with a count. That is difference 6 on
 ## These keys are the grid's
 
 `Ctrl+C`, `Ctrl+X` and `Ctrl+V` mean cells in the grid, and test cases on the
-cards. The keys that always mean test cases are `Ctrl+Shift+C`,
-`Ctrl+Shift+X` and `Ctrl+Shift+V`, and they work in both views.
+cards. The keys that always mean test cases are `Alt+Shift+C`,
+`Alt+Shift+X` and `Alt+Shift+V`, and they work in both views.
 
 ---
 

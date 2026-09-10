@@ -8,7 +8,7 @@ test set, **so that** they end up where I am working.
 This is the second half of a copy or a cut. It is the press that really moves
 them.
 
-`Ctrl+Shift+V`.
+`Alt+Shift+V`.
 
 ## Rules
 
@@ -58,7 +58,7 @@ with a count after it for more than one test case.
 
 1. The tester has copied or cut test cases.
 2. The tester opens the test set they want them in.
-3. The tester presses `Ctrl+Shift+V`, or chooses **Paste Node**.
+3. The tester presses `Alt+Shift+V`, or chooses **Paste Node**.
 4. On a cut, the test cases are taken out of the test set they came from first.
 5. Each test case is written into this test set.
 6. The test set's order is worked out again and saved.

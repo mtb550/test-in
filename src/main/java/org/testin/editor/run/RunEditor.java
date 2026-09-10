@@ -14,7 +14,6 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
 import org.testin.actions.Declared;
-import org.testin.util.Shortcuts;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.statusbar.PageAction;
 import org.testin.editor.BaseCard;
@@ -260,15 +259,15 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         // ENTER on a list is that list's gesture rather than a command, so it is
         // not in the keymap - it is put on the declared action here (#119).
-        Declared.bindTo("Testin.ViewDetails", Shortcuts.Enter, list);
+        Declared.bindTo("Testin.ViewDetails", list);
 
         // Not in the keymap: the grid answers CTRL+C for its own cells, and a
         // registered shortcut is dispatched before a component's input map (#119).
-        Declared.bindTo("Testin.CopyTestCase", Shortcuts.CopyItem, list);
+        Declared.bindTo("Testin.CopyTestCase", list);
 
         // Not in the keymap either: DELETE is the tree's key and the grid's, and
         // a keymap entry would answer for all three (#119).
-        Declared.bindTo("Testin.RemoveTestCase", Shortcuts.DeletePackage, list);
+        Declared.bindTo("Testin.RemoveTestCase", list);
 
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
                 () -> grid.map(GridView::table),
