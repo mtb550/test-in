@@ -57,6 +57,10 @@ This changes a test run that is not signed off yet.
 - **Rule-TREE-PANEL-076** — A test case that was deleted from its test set after
   the test run was made is not in this dialog. What the test run recorded about
   it is kept, and saving the dialog never removes it.
+- **Rule-TREE-PANEL-093** — The dialog opens with every row saying what the run
+  actually covers, folders included. A folder is ticked only when everything
+  under it is ticked, so a folder is never ticked over cases the run does not
+  cover.
 
 ## What the tester sees
 

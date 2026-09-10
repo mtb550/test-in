@@ -68,19 +68,50 @@ public final class RunForm {
     }
 
     /**
-     * Ticks the cases wanted, and unticks everything else.
+     * UC-TREE-PANEL-022, Rule-TREE-PANEL-093.
+     * <p>
+     * Ticks the cases wanted, unticks everything else, and leaves every folder
+     * saying what is actually under it.
      * <p>
      * Both halves of that, because a node arrives ticked: {@code CheckedTreeNode}
      * defaults to checked, which is why creating a run opens with the whole
      * project selected. Opening on a run's own cases means that run's scope, so
      * everything outside it has to come off.
+     * <p>
+     * <b>Including the folders, which is the part that was missing.</b> This set
+     * the test case rows and left every folder at its default of ticked, so
+     * editing a run that covered two cases of fifty opened with all of its
+     * folders ticked - the tree said the run covered everything before the
+     * tester touched it.
+     * <p>
+     * And the tree is built on a {@code CheckPolicy} that propagates in all four
+     * directions, so a folder is not only wrong to read, it is dangerous to
+     * click: unticking one that looks ticked unticks every case beneath it, and
+     * unticking an executed case discards its verdict, its actual result, its
+     * bug severity and priority, its duration and its stack trace
+     * (Rule-TREE-PANEL-076). One click a tester makes to correct what the tree
+     * is telling them, and a cycle's results are gone.
+     *
+     * @return whether everything under this node is ticked, which is what makes
+     * a folder ticked - computed on the way back up, so a folder can only say
+     * what its children say
      */
-    private void checkOnly(final @NotNull CheckedTreeNode node, final @NotNull Set<UUID> wanted) {
-        if (node.getUserObject() instanceof TestCaseDto tc) node.setChecked(wanted.contains(tc.getId()));
+    private boolean checkOnly(final @NotNull CheckedTreeNode node, final @NotNull Set<UUID> wanted) {
+        if (node.getUserObject() instanceof TestCaseDto tc) {
+            final boolean covered = wanted.contains(tc.getId());
+            node.setChecked(covered);
 
-        for (int i = 0; i < node.getChildCount(); i++) {
-            checkOnly((CheckedTreeNode) node.getChildAt(i), wanted);
+            return covered;
         }
+
+        boolean allCovered = node.getChildCount() > 0;
+        for (int i = 0; i < node.getChildCount(); i++) {
+            allCovered &= checkOnly((CheckedTreeNode) node.getChildAt(i), wanted);
+        }
+
+        node.setChecked(allCovered);
+
+        return allCovered;
     }
 
     /**
