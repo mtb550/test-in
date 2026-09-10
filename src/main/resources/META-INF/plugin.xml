@@ -457,6 +457,14 @@
         />
 
         <action
+                id="Testin.RunTests"
+                class="org.testin.run.RunTestsAction"
+                text="Run Tests"
+                description="Run every test case the selected test set, package or test run holds"
+                icon="AllIcons.RunConfigurations.TestState.Run"
+        />
+
+        <action
                 id="Testin.OrderNode"
                 class="org.testin.order.OrderNodeAction"
                 text="Order Testin Node"

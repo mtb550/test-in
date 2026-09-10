@@ -1,14 +1,13 @@
 package org.testin.run;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectTreeAction;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditor;
-import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -44,28 +43,32 @@ import java.util.Optional;
  * <b>not</b> extended by making a run a test case container - that flag means
  * "test cases can be imported into or exported from this node", and Import and
  * Export read it too.
+ * <p>
+ * Declared in {@code plugin.xml} (#119), so Find Action offers it and a tester
+ * can bind a key to it - it has never had one. No constructor and no fields: the
+ * platform builds one instance for the whole IDE, so the node comes from the
+ * keystroke.
  */
-public class RunTestsAction extends AbstractProjectTreeAction {
-
-    public RunTestsAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, tree, "Run Tests", "Run every test case the selected node holds", AllIcons.RunConfigurations.TestState.Run);
-    }
+public class RunTestsAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(runnable().isPresent() || selectedRun().isPresent());
+        e.getPresentation().setEnabled(runnable(e).isPresent() || selectedRun(e).isPresent());
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        selectedRun().ifPresentOrElse(this::openAndRun, () -> runnable().ifPresent(this::run));
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
+
+        selectedRun(e).ifPresentOrElse(run -> openAndRun(p, run), () -> runnable(e).ifPresent(dir -> run(p, dir)));
     }
 
     /**
      * The selected node, when it is one that holds test cases.
      */
-    private @NotNull Optional<DirectoryDto> runnable() {
-        return TreeValueUtil.selected(tree, DirectoryDto.class).filter(DirectoryDto::isTestCaseContainer);
+    private @NotNull Optional<DirectoryDto> runnable(final @NotNull AnActionEvent e) {
+        return TestinData.firstSelected(e, DirectoryDto.class).filter(DirectoryDto::isTestCaseContainer);
     }
 
     /**
@@ -75,9 +78,12 @@ public class RunTestsAction extends AbstractProjectTreeAction {
      * everywhere else and what {@code SetTestRunStatusAction} does on this same
      * node. A completed or closed run records no more verdicts, so running it
      * would burn a compile and a JVM to throw the results away.
+     * <p>
+     * Empty outside the Testin tree as well, which is what keeps a key bound to
+     * this gray in a Java file (#119).
      */
-    private @NotNull Optional<TestRunDirectoryDto> selectedRun() {
-        return TreeValueUtil.selected(tree, TestRunDirectoryDto.class)
+    private @NotNull Optional<TestRunDirectoryDto> selectedRun(final @NotNull AnActionEvent e) {
+        return TestinData.firstSelected(e, TestRunDirectoryDto.class)
                 .filter(TestRunDirectoryDto::isStillOpen);
     }
 
@@ -99,7 +105,7 @@ public class RunTestsAction extends AbstractProjectTreeAction {
      * editor's answer and the same one the Start button beside it gives - so the
      * gesture means the same thing wherever it is reached from.
      */
-    private void openAndRun(final @NotNull TestRunDirectoryDto run) {
+    private void openAndRun(final @NotNull Project p, final @NotNull TestRunDirectoryDto run) {
         Services.getInstance(p, EditorUtil.class).openThen(p, run, TestinEditor::runWhenLoaded);
     }
 
@@ -114,7 +120,7 @@ public class RunTestsAction extends AbstractProjectTreeAction {
      * which is about running one process, and all of which is about not knowing
      * what is in it (#36).
      */
-    private void run(final @NotNull DirectoryDto dir) {
+    private void run(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final @NotNull List<TestCaseDto> cases = Services.getInstance(p, ProjectIndexer.class).getTestCasesUnder(dir);
 
         if (cases.isEmpty()) {

@@ -144,4 +144,24 @@ public final class TestinData {
     public static @NotNull Optional<DirectoryDto> singleSelectedNode(final @NotNull AnActionEvent e) {
         return singleSelected(e, DirectoryDto.class);
     }
+
+    /**
+     * The node the selection starts at, when it is of this kind, however many
+     * are selected.
+     * <p>
+     * The looser question, and the one a few actions have always asked: Run
+     * Tests, Sync and the pending-changes review act on the node the selection
+     * starts at and do not care what else is highlighted. It is
+     * {@code TreeValueUtil.selected} asked of the event, kept apart from
+     * {@link #singleSelected} so that neither group of actions has to change
+     * what it means in order to be declared.
+     * <p>
+     * The first node is filtered rather than searched for: a selection of a
+     * package and a test run answers nothing when asked for a run, which is what
+     * it answered before. Searching the rest of the selection would be a
+     * different action - one that reaches past the row the tester is standing on.
+     */
+    public static <T> @NotNull Optional<T> firstSelected(final @NotNull AnActionEvent e, final @NotNull Class<T> type) {
+        return selectedNodes(e).stream().findFirst().filter(type::isInstance).map(type::cast);
+    }
 }
