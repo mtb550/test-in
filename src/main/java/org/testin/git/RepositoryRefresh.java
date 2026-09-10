@@ -7,6 +7,7 @@ import git4idea.GitUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.EditorUtil;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.services.Services;
@@ -48,6 +49,17 @@ final class RepositoryRefresh {
         Services.getInstance(p, ProjectIndexer.class).scanSingleProject(repoPath);
 
         ApplicationManager.getApplication().invokeLater(() -> {
+            // Before the tree, and outside its guard: an editor is open whether
+            // or not the Testin tool window ever was, and a pull that changed a
+            // test case leaves it showing what was there before.
+            //
+            // Said by this path rather than left to the file watcher. The watcher
+            // would catch it - the VFS refresh above is exactly the event it
+            // listens for - but four tenths of a second after the sync says it
+            // succeeded, and only for a project whose panel exists. A sync that
+            // reports success owns what it changed (#20).
+            Services.getInstance(p, EditorUtil.class).refreshOpen(p);
+
             if (Services.isNotCreated(p, TreePanel.class)) return;
 
             Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
