@@ -137,6 +137,17 @@ public enum Shortcuts {
     Next(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK)),
     Previous(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK)),
 
+    // The ends of the same journey, on the same keys with Shift. A set of forty
+    // pages was reachable only one page at a time, and the two arrows that go
+    // straight there have been on the status bar since it was built with no key
+    // to press: the tester who wanted the last page clicked, and the tester who
+    // knew the keyboard could not get there at all.
+    //
+    // Shift adds reach to a direction everywhere else a keyboard does this, so
+    // there is nothing new to learn once Ctrl+Left is known.
+    First(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)),
+    Last(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)),
+
     // The copy menu's rows. Its own keys, not the update menu's: the two menus
     // hold different things - a tester copies the class name, the identity and
     // the path and can never edit them - so one enum over both would put rows

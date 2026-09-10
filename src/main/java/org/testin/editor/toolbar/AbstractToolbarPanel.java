@@ -140,32 +140,41 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
 
         addItems(getCustomComponents(), gbc);
 
-        // The search takes the slack, which is what puts everything before it on
-        // the left and everything after it hard against the right edge.
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(searchTxt, gbc);
-        toolbarItems.put(SearchTxt.class, searchTxt);
-
-        // After the search, so it sits against the right edge. Laid out here
-        // rather than offered to the subclasses, because both toolbars want the
-        // same button in the same place and an override point they would both
-        // fill in identically is a place for them to drift apart.
-        gbc.gridx++;
-        gbc.weightx = 0.0;
-        gbc.fill = GridBagConstraints.NONE;
-
         // What this toolbar alone puts on the right, before the button every
-        // toolbar has. Details stays last and stays here: both toolbars want it
-        // in the same place, and an override they would each fill in identically
-        // is a place for them to drift apart.
+        // toolbar has. Details stays last among the buttons and stays here: both
+        // toolbars want it in the same place, and an override they would each
+        // fill in identically is a place for them to drift apart.
         addItems(getTrailingComponents(), gbc);
 
         final @NotNull NodeDetailsBtn details = new NodeDetailsBtn(callbacks);
         add(details, gbc);
         toolbarItems.put(NodeDetailsBtn.class, details);
 
+        // Last, and this is the whole of why the bar looks the way it does: the
+        // search is the one component with a weight, so everything above packs
+        // to the left and the field fills whatever is left over.
+        gbc.gridx++;
+        addSearch(gbc);
+
         wireViewButtons();
+    }
+
+    /**
+     * UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-212.
+     * <p>
+     * The search field, and the slack.
+     * <p>
+     * It carries the only weight on the bar, so everything laid out before it is
+     * packed to the left and the field takes the rest. That is why it goes last
+     * rather than being pushed there with a strut, and why there is exactly one
+     * of it.
+     */
+    private void addSearch(final @NotNull GridBagConstraints gbc) {
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        add(searchTxt, gbc);
+        toolbarItems.put(SearchTxt.class, searchTxt);
     }
 
     private void wireViewButtons() {
@@ -199,12 +208,13 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     protected abstract @NotNull List<ToolbarItem> getCustomComponents();
 
     /**
-     * What this toolbar puts between the search field and the Details button.
-     * Empty for a toolbar with nothing of its own to put there.
+     * What this toolbar puts after the other buttons, beside Details. Empty for
+     * a toolbar with nothing of its own to put there.
      */
     protected @NotNull List<ToolbarItem> getTrailingComponents() {
         return List.of();
     }
+
 
     @Override
     public void dispose() {

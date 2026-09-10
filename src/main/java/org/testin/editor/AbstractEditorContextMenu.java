@@ -3,6 +3,18 @@ package org.testin.editor;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.project.Project;
+import com.intellij.ui.CollectionListModel;
+import org.testin.clipboard.CopyTestCaseAction;
+import org.testin.clipboard.CopyTestCaseNodeAction;
+import org.testin.clipboard.CutTestCaseNodeAction;
+import org.testin.clipboard.PasteTestCaseNodeAction;
+import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.ui.ActionsMenu;
+import org.testin.testcase.RemoveTestCaseAction;
+import org.testin.undo.UndoAction;
+import org.testin.undo.UndoDirection;
+import org.testin.undo.UndoScope;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +34,45 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
     public abstract void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu menu);
 
     /**
+     * UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-213.
+     * <p>
+     * Everything done <em>to</em> a test case, one level down: the clipboard,
+     * the delete, and this editor's own history.
+     * <p>
+     * Seven entries of the twelve were these, and none of them is what a tester
+     * opens the menu for - they all have keys, and the keys are what anybody
+     * uses after the first week. At the top level they pushed Automate, Run and
+     * Navigate to Code, which is what this plugin is for, off the end of a list
+     * nobody read that far down.
+     * <p>
+     * <b>The same seven in both editors</b>, which is why this is here and not in
+     * either menu. A test run cannot hold or lose a test case, so Cut, Paste and
+     * Delete are gray there with the reason on the entry - shown and refused
+     * rather than left out, so a tester learns the gesture exists and where it
+     * does work. Each entry decides that for itself, from the node the editor is
+     * open on.
+     */
+    protected @NotNull DefaultActionGroup actions(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
+        final @NotNull DefaultActionGroup actions = ActionsMenu.group();
+
+        actions.add(new CopyTestCaseAction(p, list));
+        actions.add(new CopyTestCaseNodeAction(p, list));
+        actions.add(new CutTestCaseNodeAction(p, ui, list));
+        actions.add(new PasteTestCaseNodeAction(p, ui, list));
+        actions.add(new RemoveTestCaseAction(p, ui, dir, list, model));
+
+        actions.addSeparator();
+
+        // This editor's own history, not the tree's and not another editor's:
+        // two cases removed here come back here, and the two removed in the
+        // editor beside it come back there (#165).
+        actions.add(new UndoAction(p, list, UndoScope.of(dir.getPath()), UndoDirection.UNDO));
+        actions.add(new UndoAction(p, list, UndoScope.of(dir.getPath()), UndoDirection.REDO));
+
+        return actions;
+    }
+
+    /**
      * Rule-EDITOR-PANEL-010.
      * <p>
      * Every shortcut this menu offers, live on the grid as well as on the list
@@ -38,7 +89,25 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
      * added to the menu is live in both views by being on the menu.
      */
     public void bindShortcutsTo(final @NotNull JBTable table) {
-        for (final AnAction action : getChildActionsOrStubs()) {
+        bindGroup(this, table);
+    }
+
+    /**
+     * The group's entries, and the entries of any group inside it.
+     * <p>
+     * A nested group is one child to the loop above and seven keys to a tester,
+     * so walking only the top level would take Copy, Cut, Paste, Delete, Undo
+     * and Redo off the grid the day they were gathered under one entry - and
+     * silently, because a shortcut that is never registered fails by doing
+     * nothing.
+     */
+    private static void bindGroup(final @NotNull DefaultActionGroup group, final @NotNull JBTable table) {
+        for (final AnAction action : group.getChildActionsOrStubs()) {
+            if (action instanceof DefaultActionGroup nested) {
+                bindGroup(nested, table);
+                continue;
+            }
+
             if (claimedByTheGrid(action)) continue;
 
             NotWhileEditing.bind(table, action);

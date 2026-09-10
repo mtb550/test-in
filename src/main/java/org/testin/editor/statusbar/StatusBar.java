@@ -14,6 +14,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
+import org.testin.model.Automated;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunStatus;
 
@@ -76,6 +77,18 @@ public class StatusBar extends JBPanel<StatusBar> {
     private final @NotNull JBLabel executionTimeLabel = new JBLabel();
 
     /**
+     * How much of this test set has automation behind it. The test case editor's
+     * counterpart to the run figures above, and blank in the run editor for the
+     * same reason they are blank here - a bar says the numbers its editor has.
+     * <p>
+     * Blank also while nobody has answered. The count and "nothing has been read
+     * yet" are the same arithmetic and opposite statements, which is what
+     * {@code Automated.UNKNOWN} exists to keep apart, so this is written from how
+     * many cases the answer covers rather than from how many there are.
+     */
+    private final @NotNull JBLabel automatedLabel = new JBLabel();
+
+    /**
      * One arrow per way of turning the page, built from the step itself. Held by
      * step rather than as four named fields so that adding one is adding a
      * constant (#175, C10).
@@ -127,6 +140,12 @@ public class StatusBar extends JBPanel<StatusBar> {
                 .setDescription(HtmlChunk.text("Time spent executing this run"))
                 .installOn(executionTimeLabel);
 
+        automatedLabel.setForeground(UIUtil.getInactiveTextColor());
+        automatedLabel.setBorder(JBUI.Borders.emptyRight(10));
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text("Test cases in this set with a generated test method behind them"))
+                .installOn(automatedLabel);
+
         // The three above start hidden, and each shows itself when it is given
         // something to say. Blank was not enough: a hidden label takes no room,
         // an empty one still takes its own margin - so the test case editor,
@@ -136,6 +155,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         runStatusLabel.setVisible(false);
         verdictsRow.setVisible(false);
         executionTimeLabel.setVisible(false);
+        automatedLabel.setVisible(false);
 
         pageSizeField.setHorizontalAlignment(SwingConstants.CENTER);
         // Its own border and nothing else: on a text field the border is the frame
@@ -147,7 +167,7 @@ public class StatusBar extends JBPanel<StatusBar> {
 
         navigationRow = centeredRow(button(PageStep.FIRST), button(PageStep.PREVIOUS), currentPageLabel,
                 button(PageStep.NEXT), button(PageStep.LAST));
-        rightRow = centeredRow(runStatusLabel, verdictsRow, executionTimeLabel, pageSizeField);
+        rightRow = centeredRow(runStatusLabel, verdictsRow, executionTimeLabel, automatedLabel, pageSizeField);
 
         add(statusLabel);
         add(navigationRow);
@@ -295,6 +315,30 @@ public class StatusBar extends JBPanel<StatusBar> {
     public void showExecutionTime(final @NotNull String formatted) {
         executionTimeLabel.setText(formatted);
         executionTimeLabel.setVisible(!formatted.isEmpty());
+    }
+
+    /**
+     * UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-210, Rule-EDITOR-PANEL-211.
+     * <p>
+     * How much of this test set is automated, in the words the state itself
+     * uses: {@code Automated.WRITTEN} is called Automated everywhere a tester
+     * meets it - the card's tooltip, the filter menu - and this asks it rather
+     * than spelling it a fourth time.
+     * <p>
+     * {@code known} is the denominator on purpose. It is how many cases the
+     * answer actually covers, not how many there are, so a set nobody has read
+     * yet and an IDE that cannot read one both come through as zero and say
+     * nothing at all. A bar reading "Automated 0 of 15" over a set the tester
+     * automated last week would be worse than an empty corner.
+     */
+    public void showAutomated(final int written, final int known) {
+        automatedLabel.setText(Automated.WRITTEN.getLabel() + " " + written + " of " + known);
+        automatedLabel.setVisible(known > 0);
+
+        // On the bar, not the label: the bar places its three regions itself
+        // from their preferred widths, and the right-hand one just changed.
+        revalidate();
+        repaint();
     }
 
     /**

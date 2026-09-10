@@ -41,6 +41,8 @@ table; this is all of them together.
 | `Ctrl+F` | Puts the cursor in the search box |
 | `Ctrl+Right` | Forward: the next page |
 | `Ctrl+Left` | Back: the previous page |
+| `Ctrl+Shift+Right` | All the way forward: the last page |
+| `Ctrl+Shift+Left` | All the way back: the first page |
 | `Enter` | Opens the details panel, or a grid cell |
 | `Escape` | Steps back one step |
 | `Context Menu` | Opens the menu on the selection |

@@ -14,6 +14,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
 import org.testin.codegen.AutomationState;
+import org.testin.editor.statusbar.PageAction;
 import org.testin.editor.BaseCard;
 import org.testin.editor.EditorCenter;
 import org.testin.editor.EditorFilters;
@@ -249,7 +250,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         // Run editor specifics: the run card renderer.
         list.setCellRenderer(new RunListRenderer(p, this));
 
-        this.contextMenu = new RunEditorContextMenu(p, this, parent, list);
+        this.contextMenu = new RunEditorContextMenu(p, this, parent, list, model);
+
+        // Not through the menu, which is about the selected test case. Paging
+        // moves the view, so it is the editor's own key and the editor binds it.
+        PageAction.bindTo(this, list);
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
                 () -> grid.map(GridView::table),
                 () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);
@@ -704,6 +709,9 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             // Every shortcut the menu offers - the verdict keys above all -
             // live on the grid too, and quiet while a cell is open (#74).
             contextMenu.bindShortcutsTo(table);
+            // And the page keys, which are not on the menu and so are not
+            // carried across by the line above.
+            PageAction.bindToGrid(this, table);
             new OpenContextMenuAction(table, contextMenu);
             grid = Optional.of(GridPanelBuilder.finishRebuild(table, list, pageItems, gridColumnToRestore, fontSync, keepKeyboard));
 

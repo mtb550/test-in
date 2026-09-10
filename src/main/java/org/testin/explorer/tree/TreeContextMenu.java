@@ -1,6 +1,6 @@
 package org.testin.explorer.tree;
 
-import com.intellij.icons.AllIcons;
+import org.testin.ui.ActionsMenu;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -132,8 +132,7 @@ public class TreeContextMenu extends DefaultActionGroup {
      * better than either a stream of both or a list nobody can tell apart.
      */
     private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends DumbAwareAction> statusActions, final @NotNull List<? extends DumbAwareAction> rest) {
-        final @NotNull DefaultActionGroup group = new DefaultActionGroup("Actions", true);
-        group.getTemplatePresentation().setIcon(AllIcons.Actions.Edit);
+        final @NotNull DefaultActionGroup group = ActionsMenu.group();
         statusActions.forEach(group::add);
         rest.forEach(group::add);
         return group;

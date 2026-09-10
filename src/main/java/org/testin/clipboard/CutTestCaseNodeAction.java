@@ -56,6 +56,14 @@ public class CutTestCaseNodeAction extends AbstractProjectAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
+        // Rule-EDITOR-PANEL-214. Gray with the reason on a node that cannot lose
+        // a test case, rather than absent from that editor's menu (#248).
+        if (!editor.getParent().isTestCaseContainer()) {
+            e.getPresentation().setEnabled(false);
+            e.getPresentation().setDescription("A test run's test cases were chosen when it was created. Cut the test case in its test set.");
+            return;
+        }
+
         e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
     }
 

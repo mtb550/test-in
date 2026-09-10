@@ -7,7 +7,8 @@
 
 Testin never draws the whole test set at once. It draws one page.
 
-`Ctrl+Right` and `Ctrl+Left`.
+`Ctrl+Right` and `Ctrl+Left` for one page. Add `Shift` for the ends of the
+set.
 
 ## Rules
 
@@ -52,11 +53,14 @@ The five controls sit in the middle of the status bar.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **First page** — no key. Its tooltip reads **First page**.
+1. **First page** — `Ctrl+Shift+Left`.
 2. **Previous page** — `Ctrl+Left`.
 3. **The label** — which page this is, of how many.
 4. **Next page** — `Ctrl+Right`.
-5. **Last page** — no key.
+5. **Last page** — `Ctrl+Shift+Right`.
+
+Every arrow prints its own key in its tooltip, because the key and the tooltip
+come from the same place.
 
 ## Main flow
 
@@ -68,9 +72,28 @@ The five controls sit in the middle of the status bar.
 ## What Testin refuses
 
 **If this is the first page** — the two arrows on the left are gray and drawn
-faded. `Ctrl+Left` does nothing.
+faded. `Ctrl+Left` and `Ctrl+Shift+Left` do nothing.
 
-**If this is the last page** — the two arrows on the right are the same.
+**If this is the last page** — the two arrows on the right are the same, and so
+are `Ctrl+Right` and `Ctrl+Shift+Right`.
+
+## The keys are the editor's, not the menu's
+
+The four keys work on the cards and in the grid, and they are on no menu. Paging
+moves the view and changes nothing about the test case under the pointer, so a
+menu about that test case is the wrong place to offer it — and the four arrows in
+the status bar are already there, each printing its own key.
+
+In the grid they are refused while a cell is open for editing, like every other
+key that would act on the row: a page turned under a half-typed Actual Result
+loses it.
+
+## Why Shift means the end
+
+Shift adds reach to a direction wherever a keyboard offers both, so a tester who
+knows `Ctrl+Left` has nothing new to learn. It also keeps the four keys in one
+shape: the same two arrow keys, told apart by one modifier, rather than a third
+pair chosen from somewhere else.
 
 ## The same key in the view panel
 

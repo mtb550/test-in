@@ -39,6 +39,16 @@ The `Context Menu` key.
 - **Rule-EDITOR-PANEL-123** — The menu opens on whatever is selected, in both
   views and in the tree.
 - **Rule-EDITOR-PANEL-124** — With nothing selected, nothing opens.
+- **Rule-EDITOR-PANEL-213** — The clipboard entries and the two history entries
+  are gathered under one Actions entry that opens onto them, so the top level of
+  the menu is what a tester opens it for. Every key those entries carry still
+  works, on the cards and in the grid.
+- **Rule-EDITOR-PANEL-214** — Actions holds the same seven entries in both
+  editors. Cut Node, Paste Node and Delete are gray in a test run editor with
+  the reason on the entry, because a test run's test cases were chosen when it
+  was created and it keeps what it recorded. They are shown and refused rather
+  than left out, so a tester who learns the gesture in one editor can find it in
+  the other.
 
 ## The screen
 
@@ -50,21 +60,11 @@ This is the menu in a test set editor.
 │  View Details                    │
 │  ──────────────────────────────  │
 │  Update                      >   │
-│  Copy                            │
-│  Copy Node                       │
-│  Cut Node                        │
-│  Paste Node                      │
-│  Delete                          │
-│  ──────────────────────────────  │
-│  Undo                            │
-│  Redo                            │
+│  Actions                       > │
 │  ──────────────────────────────  │
 │  Automate Test Case              │
 │  Run Test Case                   │
 │  Navigate to Code                │
-│  ──────────────────────────────  │
-│  Next page                       │
-│  Previous page                   │
 └──────────────────────────────────┘
 ```
 
@@ -92,9 +92,36 @@ In the grid the menu opens on the selected cell instead.
 ## What the menu holds
 
 In a test set editor, in this order: **Create Test Case**, **View Details**,
-**Update**, **Copy**, **Copy Node**, **Cut Node**, **Paste Node**, **Delete**,
-**Undo**, **Redo**, **Automate Test Case**, **Run Test Case**, **Navigate to
-Code**, **Next page**, **Previous page**.
+**Update**, **Actions**, **Automate Test Case**, **Run Test Case**, **Navigate
+to Code**.
+
+**Actions** opens onto the seven that act on the test case rather than on the
+automation: **Copy**, **Copy Node**, **Cut Node**, **Paste Node**, **Delete**,
+then **Undo** and **Redo**. They are one level down because they all have keys
+and none of them is what the menu is opened for — at the top level they pushed
+Automate, Run and Navigate to Code off the end of a list nobody read that far
+down.
+
+**The same seven are in the test run editor's menu**, in the same place and
+under the same word. Three of them are gray there, each saying why on the entry:
+
+| Entry | Why it is gray in a test run |
+|---|---|
+| **Cut Node** | A test run's test cases were chosen when it was created. Cut the test case in its test set. |
+| **Paste Node** | The same. Paste into a test set. |
+| **Delete** | A test run keeps what it recorded, including for a test case that is gone. Delete the test case in its test set. |
+
+Shown and refused rather than left out. A menu that changes shape between
+editors teaches a tester nothing, and they cannot learn that the gesture exists
+or where it does work.
+
+Each entry decides this for itself, from the node its editor is open on — the
+same flag Import and Export read to find out whether a node can hold test
+cases.
+
+Paging is not on it. It moves the view and does nothing to the test case the
+tester right-clicked, and the status bar already draws four arrows that each
+print their own key.
 
 The last group of three is not there at all in an IDE without the Java plugin
 and the TestNG plugin.

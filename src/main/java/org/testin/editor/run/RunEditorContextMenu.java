@@ -1,14 +1,12 @@
 package org.testin.editor.run;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
-import org.testin.clipboard.CopyTestCaseAction;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.statusbar.NextPageAction;
-import org.testin.editor.statusbar.PrevPageAction;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -27,7 +25,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
     private final @NotNull Project p;
     private final @NotNull TestinEditor ui;
 
-    public RunEditorContextMenu(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
+    public RunEditorContextMenu(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         super("Run Editor Context Menu", true);
         this.p = p;
         this.ui = ui;
@@ -42,9 +40,13 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         addSeparator();
         add(new ViewDetailsAction(p, list, dir.getPath2()));
         addSeparator();
-        add(new CopyTestCaseAction(p, list));
-        // See TestEditorContextMenu: present and grayed with the reason, which
-        // reverses what #66 decided here too (#248).
+
+        // The same seven the test set editor offers, in the same place, under
+        // the same word. Three of them cannot work on a run and say so on the
+        // entry rather than being left out - a tester who learns Actions in one
+        // editor finds it in the other (#248).
+        add(actions(p, ui, dir, list, model));
+
         addSeparator();
         add(new RunTestCaseAction(p, ui, list));
         add(new NavigateToCodeAction(p, list));
@@ -55,9 +57,6 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         // the toolbar, where it is a press about the run as a whole rather than
         // an answer to a right-click on a case.
 
-        addSeparator();
-        add(new NextPageAction(ui, list));
-        add(new PrevPageAction(ui, list));
     }
 
     /**

@@ -6,24 +6,14 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
 import org.testin.automate.AutomateTestCaseAction;
-import org.testin.clipboard.CopyTestCaseAction;
-import org.testin.clipboard.CopyTestCaseNodeAction;
-import org.testin.clipboard.CutTestCaseNodeAction;
-import org.testin.clipboard.PasteTestCaseNodeAction;
-import org.testin.undo.UndoAction;
-import org.testin.undo.UndoDirection;
-import org.testin.undo.UndoScope;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.statusbar.NextPageAction;
-import org.testin.editor.statusbar.PrevPageAction;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.navigate.NavigateToCodeAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.run.RunTestCaseAction;
 import org.testin.testcase.CreateTestCaseAction;
-import org.testin.testcase.RemoveTestCaseAction;
 import org.testin.testcase.UpdateTestCaseAction;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.view.ViewDetailsAction;
@@ -50,19 +40,8 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
 
         this.update = new UpdateTestCaseAction(p, ui, list, dir.getPath());
         add(update);
-        add(new CopyTestCaseAction(p, list));
-        add(new CopyTestCaseNodeAction(p, list));
-        add(new CutTestCaseNodeAction(p, ui, list));
-        add(new PasteTestCaseNodeAction(p, ui, list));
-        add(new RemoveTestCaseAction(p, ui, dir, list, model));
 
-        addSeparator();
-
-        // This editor's own history, not the tree's and not another editor's:
-        // two cases removed here come back here, and the two removed in the
-        // editor beside it come back there (#165).
-        add(new UndoAction(p, list, UndoScope.of(dir.getPath()), UndoDirection.UNDO));
-        add(new UndoAction(p, list, UndoScope.of(dir.getPath()), UndoDirection.REDO));
+        add(actions(p, ui, dir, list, model));
 
         // Present and grayed, with the reason on the entry. This is the reverse
         // of what #66 decided - absent rather than offered and refused - and the
@@ -77,11 +56,8 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
         add(new RunTestCaseAction(p, ui, list));
         add(new NavigateToCodeAction(p, list));
 
-        addSeparator();
-
-        add(new NextPageAction(ui, list));
-        add(new PrevPageAction(ui, list));
     }
+
 
     /**
      * UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194.

@@ -122,9 +122,46 @@ public final class AutomationState {
                 if (known.entrySet().containsAll(answers.entrySet())) return;
 
                 known.putAll(answers);
+
+                // What was found, so a sandbox pass can confirm the count on the
+                // status bar from the log rather than from looking at it. This
+                // method used to log only when the read failed, which made
+                // "it worked" and "it never ran" the same silence.
+                Logger.debug("Automation state read: " + answers.size() + " case(s), "
+                        + answers.values().stream().filter(state -> state == Automated.WRITTEN).count() + " automated");
+
                 onAnswered.run();
             });
         });
+    }
+
+    /**
+     * UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-210.
+     * <p>
+     * How many of these have automation behind them.
+     * <p>
+     * Counted here rather than by the status bar, for the reason
+     * {@link #matching} is here: automation is not a field of a test case, it is
+     * what this service last read, so a caller that counted for itself would be
+     * counting a copy of these answers.
+     */
+    public int writtenIn(final @NotNull List<TestCaseDto> cases) {
+        return (int) cases.stream().filter(tc -> of(tc.getId()) == Automated.WRITTEN).count();
+    }
+
+    /**
+     * UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-211.
+     * <p>
+     * How many of these this service can speak for at all - which is none until
+     * a read lands, and none in an IDE with no Java plugin.
+     * <p>
+     * The denominator of the count above, and the reason it is asked separately:
+     * "0 of 15 automated" and "nobody has looked yet" are the same arithmetic and
+     * opposite statements, and {@link Automated#UNKNOWN} exists precisely so the
+     * second is never said as the first.
+     */
+    public int knownIn(final @NotNull List<TestCaseDto> cases) {
+        return (int) cases.stream().filter(tc -> of(tc.getId()) != Automated.UNKNOWN).count();
     }
 
     /**

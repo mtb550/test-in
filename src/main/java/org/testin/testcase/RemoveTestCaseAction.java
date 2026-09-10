@@ -102,6 +102,16 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
+        // Rule-EDITOR-PANEL-214. Asked of the node rather than of the editor's
+        // type: a test run is not a test case container, which is the same flag
+        // Import and Export read, so a node kind added later answers without
+        // this method learning about it.
+        if (!dir.isTestCaseContainer()) {
+            e.getPresentation().setEnabled(false);
+            e.getPresentation().setDescription("A test run keeps what it recorded, including for a test case that is gone. Delete the test case in its test set.");
+            return;
+        }
+
         e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
     }
 

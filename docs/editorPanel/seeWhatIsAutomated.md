@@ -10,7 +10,7 @@ code.
 
 The icon that jumps to the generated method now also says whether there is any
 automation to jump to. The filter beside it is how a tester sees a whole test
-set at once.
+set at once, and the status bar says the same thing as a number.
 
 ## Rules
 
@@ -28,6 +28,13 @@ set at once.
 - **Rule-EDITOR-PANEL-198** — The filter offers the three states and behaves
   like the four filters beside it. Choosing none of them shows everything. It is
   offered in both editors, because a test run holds test cases too.
+- **Rule-EDITOR-PANEL-210** — The test case editor's status bar says how many of
+  the test set's cases have a generated test method behind them.
+- **Rule-EDITOR-PANEL-211** — That count says nothing at all until an answer is
+  in, and nothing in an IDE that cannot read one. Nobody has looked yet and none
+  are automated are the same arithmetic and opposite statements, so the count is
+  written from how many cases the answer covers rather than from how many there
+  are.
 
 ## What the tester sees
 
@@ -63,6 +70,29 @@ It is offered in the test set editor and in the test run editor. A test run is
 where the question matters most: a run whose test cases have no methods will not
 execute much, and the filter is how a tester sees that before starting it.
 
+## The count in the status bar
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│  1 of 15 test cases        |<  <  1 of 1  >  >|      Automated 10 of 15  [ 50 ]  │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Automated 10 of 15** — ten of this test set's fifteen test cases have a
+generated method with something in it. It counts the whole test set, not the
+page in front of the tester and not what the filter has left: automation is a
+property of the set, and a number that changed when a filter was switched on
+would be answering a different question every time it was read.
+
+The corner it sits in is the run editor's verdict counts, which are blank in a
+test set editor — so the two bars differ by exactly the figures their editor has.
+A test run editor shows the verdicts and no automation count.
+
+It is written twice, and that is deliberate: blank when the editor draws, filled
+in when the reading lands a moment later. Rule-EDITOR-PANEL-196 is why — nothing
+waits for the code to be read, so the bar says nothing until it has an answer
+rather than claiming a set is un-automated while nobody has looked.
+
 ## Main flow
 
 1. The tester opens a test set.
@@ -70,15 +100,17 @@ execute much, and the filter is how a tester sees that before starting it.
 3. Testin reads the generated code for every test case in the set, away from
    the screen. That is one class read once, whether the set holds fifty test
    cases or a thousand.
-4. Hovering a card shows its state on the navigate icon.
-5. To see the whole set at once, the tester opens the filter and picks a state.
+4. The status bar's count fills in.
+5. Hovering a card shows its state on the navigate icon.
+6. To see which cases they are, the tester opens the filter and picks a state.
 
 ## What Testin refuses
 
 **If the IDE has no Java plugin** — the icon is drawn as it always was and no
 test case is reported as un-automated. Testin cannot read Java there, and a
 tester who cannot generate automation has not failed to write it. The filter is
-not offered.
+not offered, and the status bar's corner is empty rather than reading
+**Automated 0 of 15**.
 
 **If a method is there but empty** — the test case is not automated. Testin
 writes every method as a name and a TODO comment, so a method on its own means
@@ -89,7 +121,7 @@ Asking sooner answers wrongly.
 
 **If the code cannot be read** — the icon is drawn as it always was and the
 reason goes to the log. Nothing on screen claims a test case has no automation
-because the reading failed.
+because the reading failed, and the count stays away for the same reason.
 
 ---
 

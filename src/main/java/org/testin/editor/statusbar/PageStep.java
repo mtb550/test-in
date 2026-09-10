@@ -30,7 +30,7 @@ import javax.swing.*;
 @AllArgsConstructor
 public enum PageStep {
 
-    FIRST("First page", "Navigate to the first page", AllIcons.Actions.Play_first, Shortcuts.EMPTY) {
+    FIRST("First page", "Navigate to the first page", AllIcons.Actions.Play_first, Shortcuts.First) {
         @Override
         public int deltaFrom(final int currentPage, final int totalPages) {
             return 1 - currentPage;
@@ -51,7 +51,7 @@ public enum PageStep {
         }
     },
 
-    LAST("Last page", "Navigate to the last page", AllIcons.Actions.Play_last, Shortcuts.EMPTY) {
+    LAST("Last page", "Navigate to the last page", AllIcons.Actions.Play_last, Shortcuts.Last) {
         @Override
         public int deltaFrom(final int currentPage, final int totalPages) {
             return totalPages - currentPage;
@@ -63,8 +63,13 @@ public enum PageStep {
     private final @NotNull Icon icon;
 
     /**
-     * The key that turns the page this way, {@link Shortcuts#EMPTY} for the two
-     * that have none. A button built with EMPTY prints no key in its tooltip.
+     * The key that turns the page this way. All four have one now, so all four
+     * arrows print theirs in their tooltip and all four are reachable without
+     * the pointer.
+     * <p>
+     * {@link Shortcuts#EMPTY} is still what a step with no key would carry - a
+     * button built with it prints none - and nothing else in the enum has to
+     * change to add one.
      */
     private final @NotNull Shortcuts shortcut;
 

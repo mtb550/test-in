@@ -9,7 +9,7 @@ in a tab. It is where test cases are written, and where a test run is executed.
 |---|---|
 | **Part of Testin** | The editor panel |
 | **Answers** | What a tester can do to test cases and to a test run, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-209` |
+| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-214` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -114,6 +114,8 @@ the same rows, a filter, a search, and a key for every gesture.
 | `Ctrl+F` | Puts the cursor in the search box | [UC-EDITOR-PANEL-019](searchTestCases.md) |
 | `Ctrl+Right` | The next page | [UC-EDITOR-PANEL-022](pageThrough.md) |
 | `Ctrl+Left` | The previous page | [UC-EDITOR-PANEL-022](pageThrough.md) |
+| `Ctrl+Shift+Right` | The last page | [UC-EDITOR-PANEL-022](pageThrough.md) |
+| `Ctrl+Shift+Left` | The first page | [UC-EDITOR-PANEL-022](pageThrough.md) |
 | `Enter` | Opens the details panel, or a grid cell | [UC-EDITOR-PANEL-025](openDetailsPanel.md) |
 | `Escape` | Steps back one step | [UC-EDITOR-PANEL-026](stepBack.md) |
 | `Context Menu` | Opens the menu on the selection | [UC-EDITOR-PANEL-029](keyboardMenu.md) |

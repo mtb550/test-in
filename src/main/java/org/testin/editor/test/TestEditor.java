@@ -39,6 +39,7 @@ import org.testin.editor.toolbar.TestToolbar;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.TestDetailsPopupBtn;
 import org.testin.codegen.AutomationState;
+import org.testin.editor.statusbar.PageAction;
 import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -176,6 +177,10 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         this.model.addListDataListener(modelChangeNotifier);
 
         this.contextMenu = new TestEditorContextMenu(p, this, parent, list, model);
+
+        // Not through the menu, which is about the selected test case. Paging
+        // moves the view, so it is the editor's own key and the editor binds it.
+        PageAction.bindTo(this, list);
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
                 () -> grid.map(GridView::table),
                 () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);
@@ -576,7 +581,16 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         //
         // The whole set rather than the page, because it is one class either
         // way - and because the filter narrows the set, not the page.
-        Services.getInstance(p, AutomationState.class).read(p, snapshotOfAll(), this::refreshView);
+        final @NotNull List<TestCaseDto> all = snapshotOfAll();
+        final @NotNull AutomationState automation = Services.getInstance(p, AutomationState.class);
+
+        automation.read(p, all, this::refreshView);
+
+        // Read from what the service holds now, not from what the call above
+        // will find: that one answers on its own time and calls back here, so
+        // the count is written twice - blank on the way in, filled in when the
+        // answers land.
+        statusBar.showAutomated(automation.writtenIn(all), automation.knownIn(all));
 
         statusBar.updatePaginationState(page.page(), page.totalPages());
 
@@ -724,6 +738,9 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             table.addMouseListener(new GridContextMenuListener(table, list, contextMenu, pageItems));
             // Every shortcut the menu offers, live on the grid too (#74).
             contextMenu.bindShortcutsTo(table);
+            // And the page keys, which are not on the menu and so are not
+            // carried across by the line above.
+            PageAction.bindToGrid(this, table);
             new OpenContextMenuAction(table, contextMenu);
 
             grid = Optional.of(GridPanelBuilder.finishRebuild(table, list, pageItems, gridColumnToRestore, fontSync, keepKeyboard));
