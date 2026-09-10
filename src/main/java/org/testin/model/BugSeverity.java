@@ -4,6 +4,7 @@ import com.intellij.ui.JBColor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -34,25 +35,25 @@ public enum BugSeverity {
     ),
 
     BLOCKER(
-            "Blocker",
+            Bundle.message("bug.severity.blocker"),
             JBColor.RED,
             ReportEmphasis.ALARMING
     ),
 
     MAJOR(
-            "Major",
+            Bundle.message("bug.severity.major"),
             JBColor.ORANGE,
             ReportEmphasis.CAUTIONARY
     ),
 
     MINOR(
-            "Minor",
+            Bundle.message("bug.severity.minor"),
             JBColor.YELLOW,
             ReportEmphasis.MUTED
     ),
 
     ENHANCEMENT(
-            "Enhancement",
+            Bundle.message("bug.severity.enhancement"),
             JBColor.GREEN.brighter().brighter(),
             ReportEmphasis.MUTED
     );

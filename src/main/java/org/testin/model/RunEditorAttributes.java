@@ -3,6 +3,7 @@ package org.testin.model;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 import org.testin.ui.Badges;
 import org.testin.codegen.Fqcn;
 import org.testin.indexer.ProjectIndexer;
@@ -92,7 +93,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
      * fourth way to record one.
      */
     ACTUAL_RESULT(
-            "Actual Result",
+            Bundle.message("attribute.run.actual.result"),
             ToolBarDefault.ON,
             (item, p) -> item.getActualResult(),
             TestRunItems::setActualResult
@@ -109,13 +110,13 @@ public enum RunEditorAttributes implements ToolBarAttribute {
      * Excel export alone, and nowhere a tester looks while executing.
      */
     STACKTRACE(
-            "Stacktrace",
+            Bundle.message("attribute.run.stacktrace"),
             ToolBarDefault.OFF,
             (item, p) -> item.getStacktrace()
     ),
 
     BUG_SEVERITY(
-            "Bug Severity",
+            Bundle.message("attribute.run.bug.severity"),
             ToolBarDefault.ON,
             (item, p) -> item.getBugSeverity().getLabel()
     ) {
@@ -126,7 +127,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     },
 
     BUG_PRIORITY(
-            "Bug Priority",
+            Bundle.message("attribute.run.bug.priority"),
             ToolBarDefault.ON,
             (item, p) -> item.getBugPriority().getLabel()
     ) {
@@ -139,25 +140,25 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     },
 
     RUN_STATUS(
-            "Run Status",
+            Bundle.message("attribute.run.run.status"),
             ToolBarDefault.ON,
             (item, p) -> item.getStatus().getLabel()
     ),
 
     DURATION(
-            "Duration",
+            Bundle.message("attribute.run.duration"),
             ToolBarDefault.ON,
             (item, p) -> Display.formatDuration(item.getDuration())
     ),
 
     EXECUTED_BY(
-            "Executed By",
+            Bundle.message("attribute.run.executed.by"),
             ToolBarDefault.OFF,
             (item, p) -> item.getExecutedBy()
     ),
 
     EXECUTED_AT(
-            "Executed At",
+            Bundle.message("attribute.run.executed.at"),
             ToolBarDefault.OFF,
             (item, p) -> Display.formatDate(item.getExecutedAt())
     ),

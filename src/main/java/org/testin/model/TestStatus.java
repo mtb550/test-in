@@ -8,6 +8,7 @@ import com.intellij.util.ui.UIUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +29,7 @@ public enum TestStatus {
             "008000",
             new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GREEN),
             JBColor.GREEN,
-            "Passed",
+            Bundle.message("status.verdict.passed"),
             new MenuEntry(AllIcons.Actions.Checked, KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
             false
     ),
@@ -37,7 +38,7 @@ public enum TestStatus {
             "FF0000",
             new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.RED),
             JBColor.RED.darker(),
-            "Failed",
+            Bundle.message("status.verdict.failed"),
             new MenuEntry(AllIcons.Actions.Cancel, KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)),
             true
     ),
@@ -46,7 +47,7 @@ public enum TestStatus {
             "FFA500",
             new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.ORANGE),
             JBColor.ORANGE,
-            "Blocked",
+            Bundle.message("status.verdict.blocked"),
             new MenuEntry(AllIcons.Actions.Pause, KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
             false
     ),
@@ -57,7 +58,7 @@ public enum TestStatus {
             // Lazy because it comes from the theme: resolved at class-load time it
             // would keep the color of whichever theme happened to be active then.
             JBColor.lazy(UIUtil::getContextHelpForeground),
-            "Pending",
+            Bundle.message("status.verdict.pending"),
             // No menu entry, so not on the menu: the run owns this status. It
             // means "queued to run", and a run only clears it on completion, so a
             // tester setting it afterward leaves a state nothing reconciles.
@@ -69,7 +70,7 @@ public enum TestStatus {
             "9E9E9E",
             SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES,
             JBColor.GRAY,
-            "Removed",
+            Bundle.message("status.verdict.removed"),
             // Off the menu, and the run sets it for itself: the test case this
             // result belongs to has been deleted, so there is nothing left to
             // execute and nothing left to judge. The row stays because the run
@@ -83,7 +84,7 @@ public enum TestStatus {
             "808080",
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             JBColor.GRAY.brighter(),
-            "Untested",
+            Bundle.message("status.verdict.untested"),
             // Off the menu, and the plugin sets it: a tester gives one of three
             // verdicts — passed, failed or blocked — and anything still pending
             // when the run completes or closes becomes untested by itself. It is

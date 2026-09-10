@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 import org.testin.statusbar.MenuItem;
 import org.testin.util.Shortcuts;
 
@@ -25,7 +26,7 @@ import java.awt.event.KeyEvent;
 @AllArgsConstructor
 public enum TestRunStatus implements MenuItem {
     CREATED(
-            "Created",
+            Bundle.message("status.run.created"),
             Shortcuts.NO_KEY,
             AllIcons.General.Add,
             Stage.MADE,
@@ -33,7 +34,7 @@ public enum TestRunStatus implements MenuItem {
     ),
 
     IN_PROGRESS(
-            "In Progress",
+            Bundle.message("status.run.in.progress"),
             Shortcuts.NO_KEY,
             AllIcons.Actions.BuildAutoReloadChanges,
             Stage.RUNNING,
@@ -41,7 +42,7 @@ public enum TestRunStatus implements MenuItem {
     ),
 
     COMPLETED(
-            "Completed",
+            Bundle.message("status.run.completed"),
             KeyStroke.getKeyStroke(KeyEvent.VK_2, 0),
             AllIcons.Toolwindows.ToolWindowCoverage,
             Stage.OVER,
@@ -49,7 +50,7 @@ public enum TestRunStatus implements MenuItem {
     ),
 
     ASSIGNED(
-            "Assigned",
+            Bundle.message("status.run.assigned"),
             KeyStroke.getKeyStroke(KeyEvent.VK_1, 0),
             AllIcons.Gutter.ExtAnnotation,
             Stage.HANDED_OUT,
@@ -57,7 +58,7 @@ public enum TestRunStatus implements MenuItem {
     ), //todo, later, use XML to add tester's name dynamic
 
     CLOSED(
-            "Closed",
+            Bundle.message("status.run.closed"),
             KeyStroke.getKeyStroke(KeyEvent.VK_3, 0),
             AllIcons.Actions.Cancel,
             Stage.OVER,

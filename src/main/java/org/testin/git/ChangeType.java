@@ -3,66 +3,67 @@ package org.testin.git;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 
 @Getter
 @AllArgsConstructor
 public enum ChangeType {
     CREATE_TEST_CASE(
-            "Create Test Case",
+            Bundle.message("change.create.test.case"),
             RevertAction.NONE
     ),
 
     REMOVE_TEST_CASE(
-            "Remove Test Case",
+            Bundle.message("change.remove.test.case"),
             RevertAction.NONE
     ),
 
     CHANGE_DESCRIPTION(
-            "Change Description",
+            Bundle.message("change.change.description"),
             (current, old) -> current.setDescription(old.getDescription())
     ),
 
     CHANGE_EXPECTED_RESULT(
-            "Change Expected Result",
+            Bundle.message("change.change.expected.result"),
             (current, old) -> current.setExpectedResult(old.getExpectedResult())),
 
     CHANGE_STEPS(
-            "Change Steps",
+            Bundle.message("change.change.steps"),
             (current, old) -> current.setSteps(new java.util.ArrayList<>(old.getSteps()))),
 
     CHANGE_PRIORITY(
-            "Change Priority",
+            Bundle.message("change.change.priority"),
             (current, old) -> current.setPriority(old.getPriority())
     ),
 
     CHANGE_GROUP(
-            "Change Group",
+            Bundle.message("change.change.group"),
             (current, old) -> current.setGroup(new java.util.ArrayList<>(old.getGroup()))
     ),
 
     CHANGE_STATUS(
-            "Change Status",
+            Bundle.message("change.change.status"),
             (current, old) -> current.setStatus(old.getStatus())
     ),
 
     CHANGE_REFERENCE(
-            "Change Reference",
+            Bundle.message("change.change.reference"),
             (current, old) -> current.setReference(old.getReference())
     ),
 
     CHANGE_MODULE(
-            "Change Module",
+            Bundle.message("change.change.module"),
             (current, old) -> current.setModule(old.getModule())
     ),
 
     CHANGE_TEST_DATA(
-            "Change Test Data",
+            Bundle.message("change.change.test.data"),
             (current, old) -> current.setTestData(old.getTestData())
     ),
 
     CHANGE_PRECONDITIONS(
-            "Change Preconditions",
+            Bundle.message("change.change.preconditions"),
             (current, old) -> current.setPreConditions(old.getPreConditions())
     ),
 
@@ -72,47 +73,47 @@ public enum ChangeType {
     // an edit. They are listed so they can be seen and committed (#66).
 
     CREATE_TEST_RUN(
-            "Create Test Run",
+            Bundle.message("change.create.test.run"),
             RevertAction.NONE
     ),
 
     CHANGE_TEST_RUN(
-            "Change Test Run",
+            Bundle.message("change.change.test.run"),
             RevertAction.NONE
     ),
 
     REMOVE_TEST_RUN(
-            "Remove Test Run",
+            Bundle.message("change.remove.test.run"),
             RevertAction.NONE
     ),
 
     CREATE_MARKER(
-            "Create Marker",
+            Bundle.message("change.create.marker"),
             RevertAction.NONE
     ),
 
     CHANGE_MARKER(
-            "Change Marker",
+            Bundle.message("change.change.marker"),
             RevertAction.NONE
     ),
 
     REMOVE_MARKER(
-            "Remove Marker",
+            Bundle.message("change.remove.marker"),
             RevertAction.NONE
     ),
 
     CREATE_FILE(
-            "Create File",
+            Bundle.message("change.create.file"),
             RevertAction.NONE
     ),
 
     CHANGE_FILE(
-            "Change File",
+            Bundle.message("change.change.file"),
             RevertAction.NONE
     ),
 
     REMOVE_FILE(
-            "Remove File",
+            Bundle.message("change.remove.file"),
             RevertAction.NONE
     );
 

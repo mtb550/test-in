@@ -3,24 +3,25 @@ package org.testin.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 @Getter
 @AllArgsConstructor
 public enum TestCaseStatus {
     REVIEWED(
-            "Reviewed"
+            Bundle.message("status.case.reviewed")
     ),
 
     PENDING(
-            "Pending"
+            Bundle.message("status.case.pending")
     ),
 
     DISABLED(
-            "Disabled"
+            Bundle.message("status.case.disabled")
     ),
 
     TO_BE_UPDATED(
-            "To Be Updated"
+            Bundle.message("status.case.to.be.updated")
     );
 
     private final @NotNull String label;

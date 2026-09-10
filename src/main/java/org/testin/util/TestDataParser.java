@@ -71,13 +71,35 @@ public final class TestDataParser {
      * the loudest half of #264: importing 200 cases whose priority column reads
      * High, Medium and Low gave 200 at the lowest priority and said nothing.
      */
+    /**
+     * UC-SHARE-005, Rule-SHARE-110.
+     * <p>
+     * Whether that text names this constant, in English, whatever language the
+     * IDE is running in.
+     * <p>
+     * The constant name is the one spelling of a value that never changes: a
+     * label becomes French the day the plugin does, and a file written by a
+     * colleague on another language still has to read. Underscores are opened
+     * out because a spreadsheet writes "To Be Updated" where the constant says
+     * TO_BE_UPDATED, and the two are the same words.
+     * <p>
+     * Here rather than at the three places that ask - a priority column, a
+     * status column and {@code TestEditorAttributes.isColumn} - because a value
+     * that imports one way and refuses the other is the same bug three times.
+     */
+    public static boolean namesConstant(final @NotNull Enum<?> constant, final @NotNull String text) {
+        final @NotNull String wanted = text.trim();
+
+        return constant.name().equalsIgnoreCase(wanted) || constant.name().replace('_', ' ').equalsIgnoreCase(wanted);
+    }
+
     public static @NotNull Optional<Priority> priority(final @NotNull String value, final @NotNull Priority current) {
         final @NotNull String wanted = value.trim();
         if (wanted.isEmpty()) return Optional.of(current);
 
         for (final Priority priority : Priority.values()) {
             if (priority.getLabel().equalsIgnoreCase(wanted)) return Optional.of(priority);
-            if (priority.name().equalsIgnoreCase(wanted)) return Optional.of(priority);
+            if (namesConstant(priority, wanted)) return Optional.of(priority);
         }
 
         return Optional.empty();
@@ -109,7 +131,7 @@ public final class TestDataParser {
 
         for (final TestCaseStatus status : TestCaseStatus.values()) {
             if (status.getLabel().equalsIgnoreCase(wanted)) return Optional.of(status);
-            if (status.name().equalsIgnoreCase(wanted)) return Optional.of(status);
+            if (namesConstant(status, wanted)) return Optional.of(status);
         }
 
         return Optional.empty();

@@ -20,8 +20,22 @@ import java.util.function.BiFunction;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class EditorType extends FakeFileType {
 
+    /**
+     * UC-EDITOR-PANEL-001.
+     * <p>
+     * The name is a literal and stays one in every language. This is a
+     * {@code FileType}, and the platform treats {@code getName()} as its
+     * identity: it must be unique among every file type registered in the IDE
+     * and it is what the IDE writes down when it remembers a file-type
+     * association. It took {@code DirectoryType.TR.getDescription()} until that
+     * became a translated string, which would have given the type a different
+     * identity in every language (#11).
+     * <p>
+     * The description beside it is the localizable half, and the platform says
+     * so by annotating it {@code @Nls}.
+     */
     public static final @NotNull EditorType TEST_RUN = new EditorType(
-            DirectoryType.TR.getDescription(),
+            "Test Run",
             "Test Run Editor",
             AllIcons.Nodes.Services,
             RunEditor::new

@@ -6,6 +6,7 @@ import com.intellij.ui.SimpleTextAttributes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.GenType;
 import org.testin.codegen.Moved;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public enum DirectoryType {
     TP(
-            "Test Project",
+            Bundle.message("node.tp"),
             "",
             AllIcons.Nodes.Project,
             ".tp",
@@ -49,7 +50,7 @@ public enum DirectoryType {
     ),
 
     TCD(
-            "Test Cases Directory",
+            Bundle.message("node.tcd"),
             "Test Cases",
             AllIcons.Nodes.Bookmark,
             ".tcd",
@@ -64,7 +65,7 @@ public enum DirectoryType {
     ),
 
     TRD(
-            "Test Runs Directory",
+            Bundle.message("node.trd"),
             "Test Runs",
             AllIcons.Nodes.Bookmark,
             ".trd",
@@ -79,7 +80,7 @@ public enum DirectoryType {
     ),
 
     TSP(
-            "Test Set Package",
+            Bundle.message("node.tsp"),
             "",
             AllIcons.Nodes.WebFolder,
             ".tsp",
@@ -97,7 +98,7 @@ public enum DirectoryType {
     ),
 
     TRP(
-            "Test Run Package",
+            Bundle.message("node.trp"),
             "",
             AllIcons.Nodes.WebFolder,
             ".trp",
@@ -112,7 +113,7 @@ public enum DirectoryType {
     ),
 
     TS(
-            "Test Set",
+            Bundle.message("node.ts"),
             "",
             AllIcons.Vcs.Changelist,
             ".ts",
@@ -130,7 +131,7 @@ public enum DirectoryType {
     ),
 
     TR(
-            "Test Run",
+            Bundle.message("node.tr"),
             "",
             AllIcons.Toolwindows.ToolWindowRunWithCoverage,
             ".tr",

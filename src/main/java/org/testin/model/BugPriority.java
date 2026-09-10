@@ -4,6 +4,7 @@ import com.intellij.ui.JBColor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -21,7 +22,7 @@ public enum BugPriority {
     ),
 
     HIGH(
-            "High",
+            Bundle.message("bug.priority.high"),
             1,
             JBColor.RED.brighter().brighter(),
             true,
@@ -29,7 +30,7 @@ public enum BugPriority {
     ),
 
     MEDIUM(
-            "Medium",
+            Bundle.message("bug.priority.medium"),
             2,
             JBColor.BLUE.brighter(),
             true,
@@ -37,7 +38,7 @@ public enum BugPriority {
     ),
 
     LOW(
-            "Low",
+            Bundle.message("bug.priority.low"),
             3,
             JBColor.GRAY.brighter(),
             true,

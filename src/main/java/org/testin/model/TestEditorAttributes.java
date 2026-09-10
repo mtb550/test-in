@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 import org.testin.ui.Badges;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenType;
@@ -46,7 +47,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
      * javadoc, and only the constant disagreed.
      */
     ORDER(
-            "Order",
+            Bundle.message("attribute.order"),
             ToolBarDefault.LOCKED_CHECKED,
             tc -> "",
             (p, tc, v) -> true,
@@ -59,7 +60,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     },
 
     DESCRIPTION(
-            "Description",
+            Bundle.message("attribute.description"),
             ToolBarDefault.LOCKED_CHECKED,
             tc -> tc.getDescription(),
             (p, tc, v) -> always(() -> tc.setDescription(NameSanitizer.description(v))),
@@ -73,7 +74,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     },
 
     ID(
-            "ID",
+            Bundle.message("attribute.id"),
             ToolBarDefault.LOCKED_UNCHECKED,
             tc -> String.valueOf(tc.getId()),
             (p, tc, v) -> true,
@@ -92,7 +93,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
      * not even look like a duplicated string.
      */
     EXPECTED_RESULT(
-            "Expected Result",
+            Bundle.message("attribute.expected.result"),
             ToolBarDefault.ON,
             tc -> tc.getExpectedResult(),
             (p, tc, v) -> always(() -> tc.setExpectedResult(v)),
@@ -101,7 +102,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ),
 
     STEPS(
-            "Steps",
+            Bundle.message("attribute.steps"),
             ToolBarDefault.OFF,
             tc -> String.join(", ", tc.getSteps()),
             (p, tc, v) -> always(() -> tc.setSteps(TestDataParser.steps(v))),
@@ -110,7 +111,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ),
 
     PRIORITY(
-            "Priority",
+            Bundle.message("attribute.priority"),
             ToolBarDefault.ON,
             tc -> tc.getPriority().getLabel(),
             (p, tc, v) -> took(TestDataParser.priority(v, tc.getPriority()), tc::setPriority),
@@ -124,7 +125,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     },
 
     FQCN(
-            "FQCN",
+            Bundle.message("attribute.fqcn"),
             ToolBarDefault.OFF,
             tc -> String.join(" > ", Fqcn.ofMethod(tc)),
             (p, tc, v) -> true,
@@ -133,7 +134,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ),
 
     REFERENCE(
-            "Reference",
+            Bundle.message("attribute.reference"),
             ToolBarDefault.OFF,
             tc -> tc.getReference(),
             (p, tc, v) -> always(() -> tc.setReference(v)),
@@ -142,7 +143,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ),
 
     TEST_DATA(
-            "Test Data",
+            Bundle.message("attribute.test.data"),
             ToolBarDefault.OFF,
             tc -> tc.getTestData(),
             (p, tc, v) -> always(() -> tc.setTestData(v)),
@@ -151,7 +152,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ),
 
     PRE_CONDITIONS(
-            "Pre Conditions",
+            Bundle.message("attribute.pre.conditions"),
             ToolBarDefault.OFF,
             tc -> tc.getPreConditions(),
             (p, tc, v) -> always(() -> tc.setPreConditions(v)),
@@ -160,7 +161,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ),
 
     GROUP(
-            "Group",
+            Bundle.message("attribute.group"),
             ToolBarDefault.ON,
             tc -> Groups.text(tc.getGroup()),
             (p, tc, v) -> took(TestDataParser.groups(v), tc::setGroup),
@@ -174,7 +175,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     },
 
     PATH(
-            "Path",
+            Bundle.message("attribute.path"),
             ToolBarDefault.OFF,
             tc -> String.join(" > ", tc.getParent().getPath2()),
             (p, tc, v) -> true,
@@ -183,7 +184,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ),
 
     MODULE(
-            "Module",
+            Bundle.message("attribute.module"),
             ToolBarDefault.OFF,
             tc -> tc.getModule(),
             (p, tc, v) -> always(() -> tc.setModule(v)),
@@ -192,7 +193,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ),
 
     STATUS(
-            "Status",
+            Bundle.message("attribute.status"),
             ToolBarDefault.OFF,
             tc -> tc.getStatus().getLabel(),
             (p, tc, v) -> took(TestDataParser.testCaseStatus(v, tc.getStatus()), tc::setStatus),
@@ -201,7 +202,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ),
 
     CREATED_BY(
-            "Created By",
+            Bundle.message("attribute.created.by"),
             ToolBarDefault.OFF,
             tc -> tc.getCreatedBy(),
             (p, tc, v) -> always(() -> tc.setCreatedBy(v)),
@@ -210,7 +211,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ),
 
     UPDATED_BY(
-            "Updated By",
+            Bundle.message("attribute.updated.by"),
             ToolBarDefault.OFF,
             tc -> tc.getUpdatedBy(),
             (p, tc, v) -> always(() -> tc.setUpdatedBy(v)),
@@ -219,7 +220,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ),
 
     CREATED_AT(
-            "Created At",
+            Bundle.message("attribute.created.at"),
             ToolBarDefault.OFF,
             tc -> Display.formatDate(tc.getCreatedAt()),
             (p, tc, v) -> took(TestDataParser.date(v), tc::setCreatedAt),
@@ -228,7 +229,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ),
 
     UPDATED_AT(
-            "Updated At",
+            Bundle.message("attribute.updated.at"),
             ToolBarDefault.OFF,
             tc -> Display.formatDate(tc.getUpdatedAt()),
             (p, tc, v) -> took(TestDataParser.date(v), tc::setUpdatedAt),
@@ -338,7 +339,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     public boolean isColumn(final @NotNull String header) {
         final @NotNull String wanted = header.trim();
 
-        return name.equalsIgnoreCase(wanted) || name().replace('_', ' ').equalsIgnoreCase(wanted);
+        return name.equalsIgnoreCase(wanted) || TestDataParser.namesConstant(this, wanted);
     }
 
     private final @NotNull String name;
