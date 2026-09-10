@@ -3,7 +3,6 @@ package org.testin.services;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBList;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -153,10 +152,9 @@ public final class RunStatusService {
         Services.getInstance(p, Notifier.class).softRefuse(p, "The test case was removed - the run keeps what it recorded");
     }
 
-    public void applyStatus(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
+    public void applyStatus(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull List<TestCaseDto> selectedItems, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
-        final @NotNull List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         final @NotNull List<String> losing = wouldBeErased(editor, selectedItems, status);

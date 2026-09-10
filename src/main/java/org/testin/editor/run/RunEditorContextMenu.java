@@ -8,14 +8,11 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
-import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.report.GenerateReportAction;
-import org.testin.testrun.SetTestCaseStatusAction;
-
-import java.util.Arrays;
+import org.testin.testrun.SetTestCaseStatusGroup;
 
 public class RunEditorContextMenu extends AbstractEditorContextMenu {
 
@@ -27,11 +24,10 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         this.p = p;
         this.ui = ui;
 
-        // One action per user-settable status: a new TestStatus constant shows
-        // up here automatically (issue #37).
-        Arrays.stream(TestStatus.values())
-                .filter(TestStatus::isVerdict)
-                .forEach(status -> add(new SetTestCaseStatusAction(p, ui, list, status, status.getMenuEntry())));
+        // One entry per user-settable status: a new TestStatus constant shows up
+        // here automatically (#37), which is why the group generates its
+        // children from the enum rather than plugin.xml listing them (#119).
+        add(Declared.action("Testin.SetTestCaseStatus"));
         addSeparator();
         add(Declared.action("Testin.UpdateRunItem"));
         addSeparator();
@@ -70,5 +66,9 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         new EscapeAction(p, list);
         new OpenContextMenuAction(list, menu);
         new GenerateReportAction(p, ui, list);
+
+        // P, F and B carry no modifier, so they are this list's gesture rather
+        // than keys the whole IDE answers - the group puts them here (#119).
+        SetTestCaseStatusGroup.bindLettersTo(list);
     }
 }

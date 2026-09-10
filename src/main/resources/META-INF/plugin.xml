@@ -344,6 +344,17 @@
             <keyboard-shortcut keymap="$default" first-keystroke="F2"/>
         </action>
 
+        <!-- One entry per verdict, generated from TestStatus. No key here: P, F
+             and B carry no modifier, so a keymap entry would answer them
+             everywhere in the IDE - the run editor's list binds them (#119). -->
+        <group
+                id="Testin.SetTestCaseStatus"
+                class="org.testin.testrun.SetTestCaseStatusGroup"
+                text="Set Test Case Verdict"
+                description="Record Passed, Failed or Blocked against the selected test cases"
+                popup="false"
+        />
+
         <action
                 id="Testin.UpdateRunItem"
                 class="org.testin.testrun.UpdateRunItemAction"
