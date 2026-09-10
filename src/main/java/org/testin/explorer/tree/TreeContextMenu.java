@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.testin.actions.Declared;
@@ -16,10 +15,6 @@ import org.testin.util.Shortcuts;
 import javax.swing.JComponent;
 import org.testin.logger.Logger;
 import org.testin.EscapeAction;
-import org.testin.explorer.TreePanel;
-import org.testin.model.PackageStatus;
-import org.testin.model.ProjectStatus;
-import org.testin.model.TestSetStatus;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.report.GenerateReportAction;
 import org.testin.testrun.SetTestRunStatusAction;
@@ -28,13 +23,12 @@ import org.testin.undo.UndoDirection;
 import org.testin.undo.UndoScope;
 import org.testin.services.OptionalPlugin;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TreeContextMenu extends DefaultActionGroup {
     private final @NotNull Project p;
 
-    public TreeContextMenu(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull SimpleTree tree) {
+    public TreeContextMenu(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("Tree Popup Menu", true);
         this.p = p;
 
@@ -47,10 +41,12 @@ public class TreeContextMenu extends DefaultActionGroup {
         // A status is a constant on its enum and this menu is the only place a
         // tester reaches it, so one added there and not here would be a status
         // nothing could ever set - and nothing would have said so (#175, C9).
-        final @NotNull List<DumbAwareAction> statusActions = new ArrayList<>();
-        for (final PackageStatus status : PackageStatus.values()) statusActions.add(new UpdatePackageStatusAction(p, tree, status));
-
-        add(actionsSubMenu(List.of(Declared.action("Testin.UpdateTestProjectStatus"), Declared.action("Testin.UpdateTestSetStatus")), statusActions, List.of(
+        // Each kind's statuses are one declared group, which generates its
+        // entries from that enum (#119).
+        add(actionsSubMenu(List.of(
+                        Declared.action("Testin.UpdateTestProjectStatus"),
+                        Declared.action("Testin.UpdateTestSetStatus"),
+                        Declared.action("Testin.UpdatePackageStatus")), List.of(
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.UNDO),
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.REDO),
                         Declared.action("Testin.ReCreateTestRun"),
@@ -155,10 +151,9 @@ public class TreeContextMenu extends DefaultActionGroup {
      * second is written out - and a generated group joined to a literal one reads
      * better than either a stream of both or a list nobody can tell apart.
      */
-    private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends AnAction> declaredStatuses, final @NotNull List<? extends AnAction> statusActions, final @NotNull List<? extends AnAction> rest) {
+    private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends AnAction> statusGroups, final @NotNull List<? extends AnAction> rest) {
         final @NotNull DefaultActionGroup group = ActionsMenu.group();
-        declaredStatuses.forEach(group::add);
-        statusActions.forEach(group::add);
+        statusGroups.forEach(group::add);
         rest.forEach(group::add);
         return group;
     }

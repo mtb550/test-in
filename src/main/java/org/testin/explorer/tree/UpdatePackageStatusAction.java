@@ -3,12 +3,13 @@ package org.testin.explorer.tree;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.SimpleTree;
 
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectTreeAction;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -20,17 +21,23 @@ import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 
 /**
- * Archives a package, or brings it back, from the tree context menu - one
- * instance per {@link PackageStatus}. A test set package and a test run package
- * are the same thing to this action: whichever node is selected, its marker is
- * a {@link PackageMarker}, and that is all it asks for. Shown only on a package,
- * and enabled only when it would change something.
+ * Archives a package, or brings it back - one instance per {@link
+ * PackageStatus}. A test set package and a test run package are the same thing
+ * to this action: whichever node is selected, its marker is a {@link
+ * PackageMarker}, and that is all it asks for. Shown only on a package, and
+ * enabled only when it would change something.
+ * <p>
+ * Built by {@link UpdatePackageStatusGroup}, which is what {@code plugin.xml}
+ * declares (#119): a status is a constant on an enum, so the entries are
+ * generated from {@code values()} rather than written out one XML element each.
+ * Which status it sets is the only thing it carries - the project and the tree
+ * come from the keystroke.
  */
-public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
+public class UpdatePackageStatusAction extends DumbAwareAction {
     private final @NotNull PackageStatus status;
 
-    public UpdatePackageStatusAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull PackageStatus status) {
-        super(p, tree, status.getButtonName(), status.getButtonDescription(), AllIcons.Actions.Edit);
+    public UpdatePackageStatusAction(final @NotNull PackageStatus status) {
+        super(status.getButtonName(), status.getButtonDescription(), AllIcons.Actions.Edit);
         this.status = status;
     }
 
@@ -38,8 +45,8 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
      * The package marker of the node selected on its own - empty on anything
      * that is not a package, which is what greys the entry out.
      */
-    private @NotNull Optional<PackageMarker> selectedMarker() {
-        return TreeValueUtil.singleSelectedDirectory(tree)
+    private @NotNull Optional<PackageMarker> selectedMarker(final @NotNull AnActionEvent e) {
+        return TestinData.singleSelectedNode(e)
                 .map(DirectoryDto::getMarker)
                 .filter(PackageMarker.class::isInstance)
                 .map(PackageMarker.class::cast);
@@ -48,13 +55,16 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
     // UC-TREE-PANEL-018, UC-TREE-PANEL-019
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        TreeValueUtil.singleSelectedDirectory(tree)
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
+
+        TestinData.singleSelectedNode(e)
                 .filter(dir -> dir.getMarker() instanceof PackageMarker)
-                .ifPresent(this::mark);
+                .ifPresent(dir -> mark(p, dir));
     }
 
     // UC-TREE-PANEL-018, Rule-TREE-PANEL-062
-    private void mark(final @NotNull DirectoryDto dir) {
+    private void mark(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final @NotNull PackageMarker marker = (PackageMarker) dir.getMarker();
         try {
             marker.setStatus(status);
@@ -75,7 +85,7 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
     // UC-TREE-PANEL-018, Rule-TREE-PANEL-065
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final @NotNull Optional<PackageMarker> marker = selectedMarker();
+        final @NotNull Optional<PackageMarker> marker = selectedMarker(e);
 
         e.getPresentation().setVisible(marker.isPresent());
         e.getPresentation().setEnabled(marker.filter(m -> m.getStatus() != status).isPresent());

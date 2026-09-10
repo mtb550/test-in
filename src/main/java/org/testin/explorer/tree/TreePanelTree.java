@@ -102,7 +102,7 @@ public class TreePanelTree implements Disposable {
         mainTree.setTransferHandler(transferHandler);
         mainTree.setDragEnabled(true);
 
-        final @NotNull TreeContextMenu treeContextMenu = new TreeContextMenu(p, tp, mainTree);
+        final @NotNull TreeContextMenu treeContextMenu = new TreeContextMenu(p, mainTree);
         mainTree.addMouseListener(new TreeMouseListener(p, mainTree, treeContextMenu));
         treeContextMenu.registerShortcuts(mainTree, transferHandler);
 
