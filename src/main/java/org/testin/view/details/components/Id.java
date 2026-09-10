@@ -10,9 +10,9 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.EditorUtil;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.search.GoTo;
-import org.testin.search.Hit;
+import org.testin.services.Services;
 import org.testin.ui.FontSync;
 
 import javax.swing.*;
@@ -62,20 +62,21 @@ public class Id extends BaseDetails {
         // UC-VIEW-PANEL-009, Rule-VIEW-PANEL-063.
         //
         // The identity is the link, because it is the one thing on the panel
-        // that names exactly one test case. The gutter mark opens this panel and
-        // stops there; from here going to the case is a deliberate second click
-        // rather than something that happens to a tester who wanted to read what
-        // a method proves.
+        // that names exactly one test case.
         //
-        // GoTo is the one owner of taking somebody somewhere - the tree expands
-        // to the test set, the editor opens on it, the row is selected - and the
-        // global search and the breadcrumb say it with the same call.
+        // The editor, and not the tree. GoTo is what the search and the path bar
+        // call, and it reveals the node in the tree first because for them
+        // "where is this" is half the question. It is not half of this one: the
+        // tester is looking at the case already and asked for the editor, so
+        // moving the tree underneath them is an answer to something nobody
+        // asked. openAndSelect is the other half of GoTo, and the one owner of
+        // opening a test set on a case.
         idBadge.setToolTipText(GO_TOOLTIP);
         idBadge.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         idBadge.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                GoTo.the(p, Hit.of(dto));
+                Services.getInstance(p, EditorUtil.class).openAndSelect(p, dto.getParent(), dto);
             }
         });
 

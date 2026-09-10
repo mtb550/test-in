@@ -65,8 +65,8 @@ There is no key for this. The mark is in the gutter beside the method.
 5. Nothing else moves. The tester is still in the code, on the same line.
 
 To go to the test case itself, click its identity in the panel that just
-opened — the tree expands to its test set, the editor opens and the row is
-selected (Rule-VIEW-PANEL-063).
+opened — its test set opens in an editor with the row selected, and the tree
+still does not move (Rule-VIEW-PANEL-063).
 
 ## What Testin refuses
 

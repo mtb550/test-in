@@ -8,8 +8,9 @@ case again.
 
 The identity is a long code. It never changes, even when the title does.
 
-It is also a link: clicking it goes to the test case. That is how a tester who
-opened this panel from a gutter mark gets to the case itself, when they want to.
+It is also a link: clicking it opens the test case in its own editor. That is
+how a tester who opened this panel from a gutter mark gets to the case itself,
+when they want to.
 
 There is no key for either. The pill and the button sit side by side.
 
@@ -38,10 +39,11 @@ There is no key for either. The pill and the button sit side by side.
   half seconds, then turns back.
 - **Rule-VIEW-PANEL-040** — Copying raises no message. The tick is the whole
   confirmation.
-- **Rule-VIEW-PANEL-063** — The identity is a link. Clicking it goes to the test
-  case: the tree expands to its test set, that set's editor opens, and the row
-  is selected. It is the same call the global search and the path bar make, so
-  all three mean the same thing by going to a test case.
+- **Rule-VIEW-PANEL-063** — The identity is a link. Clicking it opens the test
+  case's own test set editor and selects it there. The tree does not move: the
+  tester is already looking at the case and asked for the editor, so revealing
+  the node is an answer to a question nobody asked. The path bar above is what
+  moves the tree, and it still does.
 
 ## The screen
 
@@ -54,8 +56,8 @@ The identity sits in a gray pill under the path, with the button to its right.
 ```
 
 1. **The pill** — the test case's identity, in full. The pointer becomes a hand
-   over it and its tooltip reads **Go to this test case**. Clicking it expands
-   the tree to the test set, opens that set's editor and selects the row.
+   over it and its tooltip reads **Go to this test case**. Clicking it opens the
+   test set's editor and selects the row.
 2. **The button** — its tooltip reads **Copy ID**. The pointer becomes a hand
    over it.
 
@@ -69,12 +71,11 @@ The identity sits in a gray pill under the path, with the button to its right.
 ## Going to the test case instead
 
 1. The tester clicks the identity itself rather than the button.
-2. The **Testin Tree** tool window comes up and the tree expands to the test set
-   holding the test case.
-3. That set's editor opens and the test case is selected in it.
+2. The test set holding it opens in an editor, with the test case selected.
+3. Nothing else moves. The tree stays where it was.
 
-The same three things the global search and the path bar do, because all three
-make the same call.
+The path bar just above does move the tree, and that is the difference between
+the two: a path step names a place, and the identity names a test case.
 
 ## What Testin refuses
 
