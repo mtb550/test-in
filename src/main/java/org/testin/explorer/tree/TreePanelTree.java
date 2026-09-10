@@ -70,7 +70,19 @@ public class TreePanelTree implements Disposable {
         this.treeStructure = new TreePanelStructure(p, bound());
         this.structureModel = new StructureTreeModel<>(treeStructure, this);
         this.treeModel = new AsyncTreeModel(structureModel, this);
-        this.mainTree = new SimpleTree(treeModel);
+        // UC-INTERNAL-001, Rule-INTERNAL-002.
+        //
+        // The tree answers the platform's questions as well as its own, so an
+        // action the platform built - one declared in plugin.xml, with a
+        // no-arg constructor and no way to be handed a tree - can find out what
+        // is selected here. Nothing in this plugin published a data key before
+        // #119, which is why every action had to be constructed by hand and was
+        // invisible to Find Action and the Keymap.
+        //
+        // Subclassed here rather than in a file of its own: it is one method,
+        // and it belongs where the tree is built rather than one indirection
+        // away from it.
+        this.mainTree = new TestinTree(treeModel);
         this.scrollPane = new JBScrollPane(mainTree);
 
         mainTree.setRootVisible(true);

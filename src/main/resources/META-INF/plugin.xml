@@ -316,6 +316,20 @@
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt F"/>
             <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta alt F"/>
         </action>
+
+        <!-- The tree's actions. Declared rather than constructed so Find Action
+             finds them and Settings -> Keymap can rebind them; each reads what
+             the tree has selected from TestinData and grays itself everywhere
+             else, so a key declared here is inert outside Testin (#119). -->
+        <action
+                id="Testin.Rename"
+                class="org.testin.rename.RenameAction"
+                text="Rename Testin Node"
+                description="Rename the selected test project, test set, package or test run"
+                icon="AllIcons.Actions.Edit"
+        >
+            <keyboard-shortcut keymap="$default" first-keystroke="shift F6"/>
+        </action>
     </actions>
 
     <!-- close listeners -->

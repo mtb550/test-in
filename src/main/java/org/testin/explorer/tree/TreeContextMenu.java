@@ -2,11 +2,15 @@ package org.testin.explorer.tree;
 
 import org.testin.ui.ActionsMenu;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.testin.logger.Logger;
 import org.testin.sftp.SyncWithSftpAction;
 import org.testin.EscapeAction;
 import org.testin.ShowNodeDetailsAction;
@@ -26,7 +30,6 @@ import org.testin.open.OpenAction;
 import org.testin.order.OrderNodeAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.remove.RemoveAction;
-import org.testin.rename.RenameAction;
 import org.testin.report.GenerateReportAction;
 import org.testin.run.RunTestsAction;
 import org.testin.testproject.UpdateTestProjectStatusAction;
@@ -68,7 +71,7 @@ public class TreeContextMenu extends DefaultActionGroup {
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.REDO),
                         new ReCreateTestRunAction(p, tree),
                         new RemoveAction(p, tree, tp),
-                        new RenameAction(p, tp, tree),
+                        declared("Testin.Rename"),
                         new OrderNodeAction(p, tp, tree),
                         new CopyNodeAction(tree),
                         new CutNodeAction(tree),
@@ -125,13 +128,35 @@ public class TreeContextMenu extends DefaultActionGroup {
      * live in a shared utility class where this was the one caller.
      */
     /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-001.
+     * <p>
+     * An action the platform owns, by the id {@code plugin.xml} gives it (#119).
+     * <p>
+     * A declared action is one instance for the whole IDE, built by the
+     * platform, so it is fetched rather than constructed - and fetching it is
+     * what keeps the menu and the keymap showing the same thing. An id that
+     * names nothing is a wiring mistake rather than a state, so it is said once
+     * here instead of returning something that quietly does nothing.
+     */
+    private static @NotNull AnAction declared(final @NotNull String id) {
+        final @Nullable AnAction action = ActionManager.getInstance().getAction(id);
+
+        if (action == null) {
+            Logger.error("No action is registered as '" + id + "', so the menu is missing an entry");
+            throw new IllegalStateException("No action is registered as '" + id + "'");
+        }
+
+        return action;
+    }
+
+    /**
      * The Actions submenu: every status each kind can be set to, then the rest.
      * <p>
      * Two lists rather than one because the first is generated from enums and the
      * second is written out - and a generated group joined to a literal one reads
      * better than either a stream of both or a list nobody can tell apart.
      */
-    private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends DumbAwareAction> statusActions, final @NotNull List<? extends DumbAwareAction> rest) {
+    private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends AnAction> statusActions, final @NotNull List<? extends AnAction> rest) {
         final @NotNull DefaultActionGroup group = ActionsMenu.group();
         statusActions.forEach(group::add);
         rest.forEach(group::add);

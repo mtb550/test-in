@@ -19,7 +19,14 @@ import java.awt.event.KeyEvent;
  * binds.
  * <p>
  * The constants are the shared keys - a single-use keystroke stays a constant in
- * the action or enum that owns it. The four static helpers answer the same
+ * the action or enum that owns it.
+ * <p>
+ * <b>A declared action's key is not here.</b> An action declared in
+ * {@code plugin.xml} carries its default keystroke in that XML, because the
+ * Keymap page reads it from there and a tester can rebind it - so a constant
+ * here would be a second owner that goes stale the first time anybody does.
+ * Anything that wants to print such a key asks the platform for the tester's
+ * actual binding, not this file for the default (#119). The four static helpers answer the same
  * questions for those: what shortcut set is this, what does it read as, does
  * this event match. One owner either way, so a shared key and a single-use key
  * cannot start behaving differently.
@@ -106,7 +113,6 @@ public enum Shortcuts {
     HideDetails(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK)),
 
     /** The platform's own rename key, which is SHIFT+F6 on every desktop. */
-    Rename(KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK)),
 
     /** The keyboard's menu key. It carries no modifier anywhere. */
     ContextMenu(KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0)),
