@@ -47,6 +47,21 @@ dependencies {
             )
         )
 
+        // UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-216.
+        //
+        // The IDE's navigation bar. Its extension point is the only one that
+        // speaks in items rather than PsiElement, which is what lets a Testin
+        // node appear in that bar at all (#161) - but the module is not on the
+        // default compile classpath, and both of its interfaces are marked
+        // @ApiStatus.Internal. Named here so that dependency is deliberate and
+        // visible rather than something a reader finds in an import.
+        bundledModules(
+            listOf(
+                "intellij.platform.navbar",
+                "intellij.platform.navbar.backend"
+            )
+        )
+
         jetbrainsRuntime()
         pluginVerifier()
         zipSigner()

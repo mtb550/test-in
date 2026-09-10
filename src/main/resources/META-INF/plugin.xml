@@ -225,6 +225,15 @@
     <!-- testin-java.xml)                                                   -->
     <!-- ================================================================== -->
     <extensions defaultExtensionNs="com.intellij">
+        <!-- UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-216.
+
+             Testin nodes in the IDE's own navigation bar (#161). Both this
+             extension point and the interface behind it are marked
+             @ApiStatus.Internal, so they carry no deprecation cycle - see
+             TestinNavBarItem for why that is acceptable here and what a tester
+             loses if it ever stops working, which is nothing but this bar. -->
+        <navbar.item.provider implementation="org.testin.navigate.TestinNavBarItemProvider"/>
+
         <!-- Tab titles of Testin editors use the normal foreground, not the
              "unknown file" color their non-physical virtual file would get -->
         <editorTabColorProvider implementation="org.testin.editor.TestinTabColorProvider" order="first"/>

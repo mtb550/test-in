@@ -47,6 +47,10 @@ There is no key that starts this. Click, `Ctrl`-click and `Shift`-click.
   the counts and in a quieter colour. The IDE's bar underneath shows a Testin
   editor's bare node name and no ancestors, because that bar is built from PSI
   and a Testin editor has none.
+- **Rule-EDITOR-PANEL-216** — The IDE's own navigation bar names the open node
+  and every node above it, with the names and icons the project tree draws, and
+  each step goes where it says. A test project holds too many test cases for the
+  bar's drop-down to be worth offering, so a step navigates and offers no list.
 
 ## What the tester sees
 
@@ -86,18 +90,35 @@ constantly. The path comes second because it does not change while the editor is
 open, so on a narrow editor it is the half that gets cut — and it is the half a
 tester can widen the window once to read.
 
-### Why it is here and not in the IDE's bar
+### The IDE's navigation bar says it too
 
-The IDE's own bar, underneath this one, shows a Java file's whole breadcrumb —
-`testin_example > src > test > java > nafath > LoginTest` — and for a Testin
-editor shows the node's bare name with no ancestors. That bar is built from PSI
-and a Testin editor deliberately has none, so it has nothing to walk up.
+The IDE's own bar — the breadcrumb strip that shows a Java file as
+`testin_example > src > test > java > nafath > LoginTest` — now shows a Testin
+node the same way:
 
-Teaching it about a Testin node means implementing `NavBarItemProvider`, which
-the platform marks **`@ApiStatus.Internal`** — no deprecation cycle, and a break
-on any IDE update. Testin declares `sinceBuild` and no upper bound on purpose, so
-a tester would be carried onto the version that broke it and told nothing. The
-path goes in the bar Testin owns instead (#161).
+```
+NAFATH > Test Cases > Login
+```
+
+The names and icons are the project tree's own, asked for rather than restated,
+and **every step goes where it says**: the tree expands to that node and its
+editor opens if it has one. It is the same call the global search and the view
+panel's path make, so all three mean the same thing by going to a node.
+
+A step offers no drop-down. The bar uses that for a node's children, and a test
+project holds thousands of test cases — the tree is where you browse, and a list
+of two thousand would answer a question nobody asked.
+
+**This one is built on an internal platform API**, and that is worth knowing
+rather than hiding. `NavBarItemProvider` is the only extension point that speaks
+in items rather than `PsiElement`, which is what lets a Testin node appear at
+all — a Testin editor deliberately has no PSI — and the platform marks it
+`@ApiStatus.Internal`: no deprecation cycle, and it can change in any release.
+
+What a tester loses if it ever stops working is this bar and nothing else.
+Everything they do still works, and Testin's own status bar says where they are
+regardless (Rule-EDITOR-PANEL-215). That is the whole of why the risk is taken
+here and would not be taken for anything a tester depends on.
 
 ## What Testin refuses
 
