@@ -1,15 +1,12 @@
 package org.testin.editor.list;
 
-import com.intellij.model.Pointer;
 import com.intellij.openapi.actionSystem.DataSink;
-import com.intellij.platform.navbar.backend.NavBarItem;
 import com.intellij.openapi.actionSystem.UiDataProvider;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditor;
-import org.testin.navigate.TestinNavBarItem;
 import org.testin.model.dto.TestCaseDto;
 
 /**
@@ -54,13 +51,5 @@ public class CaseList extends JBList<TestCaseDto> implements UiDataProvider {
     @Override
     public void uiDataSnapshot(final @NotNull DataSink sink) {
         TestinData.from(sink, editor, getSelectedValuesList());
-
-        // UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-216.
-        //
-        // Where the IDE's navigation bar starts walking. It asks the focused
-        // component for one item and then asks TestinNavBarItemProvider for the
-        // node above, over and over, so this is the only place that has to say
-        // which node the tester is looking at (#161).
-        sink.set(NavBarItem.NAVBAR_ITEM_KEY, Pointer.hardPointer(new TestinNavBarItem(editor.getP(), editor.getParent())));
     }
 }
