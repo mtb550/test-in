@@ -106,4 +106,12 @@
 # this file already records. "Navigate to Code" is written on opposite sides of
 # the leaf rule: Automated is in model, CardHoverAction is in editor, and model
 # may not import editor.
-144
+#
+# 132 after #119 declared seventeen more actions and four action groups. Their
+# names and descriptions live in plugin.xml now, because that is where the
+# Keymap page reads them from - so "Copy", "Cut", "Paste", "Order", "Remove",
+# "Export", "Import", "Update", "Edit Run" and the seven status labels stopped
+# being written a second time in a super(...) call. A declared action has no
+# constructor to spell anything in, which is the point: the descriptor is the
+# owner, and there is nowhere else left to say it.
+132
