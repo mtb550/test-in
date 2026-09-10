@@ -8,7 +8,6 @@ import com.intellij.ui.CollectionListModel;
 import org.testin.actions.Declared;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.ui.ActionsMenu;
-import org.testin.testcase.RemoveTestCaseAction;
 import org.testin.undo.UndoAction;
 import org.testin.undo.UndoDirection;
 import org.testin.undo.UndoScope;
@@ -56,7 +55,7 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
         actions.add(Declared.action("Testin.CopyTestCaseNode"));
         actions.add(Declared.action("Testin.CutTestCaseNode"));
         actions.add(Declared.action("Testin.PasteTestCaseNode"));
-        actions.add(new RemoveTestCaseAction(p, ui, dir, list, model));
+        actions.add(Declared.action("Testin.RemoveTestCase"));
 
         actions.addSeparator();
 

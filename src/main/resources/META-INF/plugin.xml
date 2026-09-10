@@ -324,6 +324,14 @@
         <!-- The editors' actions. Each reads what the editor has selected from
              TestinData and grays itself outside one (#119). -->
         <action
+                id="Testin.RemoveTestCase"
+                class="org.testin.testcase.RemoveTestCaseAction"
+                text="Delete Test Case"
+                description="Delete the selected test cases from their test set"
+                icon="AllIcons.Actions.DeleteTag"
+        />
+
+        <action
                 id="Testin.PasteTestCaseNode"
                 class="org.testin.clipboard.PasteTestCaseNodeAction"
                 text="Paste Test Case"

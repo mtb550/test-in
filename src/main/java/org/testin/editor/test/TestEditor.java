@@ -192,6 +192,10 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         // registered shortcut is dispatched before a component's input map (#119).
         Declared.bindTo("Testin.CopyTestCase", Shortcuts.CopyItem, list);
 
+        // Not in the keymap either: DELETE is the tree's key and the grid's, and
+        // a keymap entry would answer for all three (#119).
+        Declared.bindTo("Testin.RemoveTestCase", Shortcuts.DeletePackage, list);
+
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
                 () -> grid.map(GridView::table),
                 () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);
