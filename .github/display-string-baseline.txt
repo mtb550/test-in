@@ -114,4 +114,10 @@
 # being written a second time in a super(...) call. A declared action has no
 # constructor to spell anything in, which is the point: the descriptor is the
 # owner, and there is nowhere else left to say it.
-132
+# 129 after StatusBarShortcut.select(), the third of the confirm/cancel family
+# and the same argument they made at 304. Three dialogs wrote the arrows out as
+# two characters that are easy to get subtly wrong, and a fourth called Enter
+# "Select" in a word that had no owner - so the menu popup could not have taken
+# the hint without becoming a fifth. The word is SELECT beside SAVE now, and the
+# arrows are spelled in one place.
+129
