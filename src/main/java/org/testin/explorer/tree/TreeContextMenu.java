@@ -2,18 +2,13 @@ package org.testin.explorer.tree;
 
 import org.testin.ui.ActionsMenu;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.testin.actions.Declared;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.testin.util.Shortcuts;
 
-import javax.swing.JComponent;
-import org.testin.logger.Logger;
 import org.testin.EscapeAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.report.GenerateReportAction;
@@ -103,53 +98,12 @@ public class TreeContextMenu extends DefaultActionGroup {
 
 
     /**
-     * The "Actions" submenu - everything that changes a node rather than opening
-     * one. Two lines of platform setup that only this menu needs; they used to
-     * live in a shared utility class where this was the one caller.
-     */
-    /**
-     * UC-TREE-PANEL-001, Rule-TREE-PANEL-001.
-     * <p>
-     * An action the platform owns, by the id {@code plugin.xml} gives it (#119).
-     * <p>
-     * A declared action is one instance for the whole IDE, built by the
-     * platform, so it is fetched rather than constructed - and fetching it is
-     * what keeps the menu and the keymap showing the same thing. An id that
-     * names nothing is a wiring mistake rather than a state, so it is said once
-     * here instead of returning something that quietly does nothing.
-     */
-    /**
-     * UC-TREE-PANEL-001.
-     * <p>
-     * Puts a declared action's key on one component rather than in the keymap.
-     * <p>
-     * For the keys that are a surface's gesture and not a command: ENTER opens
-     * what a tree has selected, and a global ENTER would fire in every editor in
-     * the IDE. The action is still declared - Find Action offers it, the Keymap
-     * lists it with no default - and there is still one action behind the menu
-     * entry and the key (#119).
-     */
-    public static void bindToTree(final @NotNull String id, final @NotNull Shortcuts shortcut, final @NotNull JComponent tree) {
-        declared(id).registerCustomShortcutSet(shortcut.getCustomShortcut(), tree);
-    }
-
-    private static @NotNull AnAction declared(final @NotNull String id) {
-        final @Nullable AnAction action = ActionManager.getInstance().getAction(id);
-
-        if (action == null) {
-            Logger.error("No action is registered as '" + id + "', so the menu is missing an entry");
-            throw new IllegalStateException("No action is registered as '" + id + "'");
-        }
-
-        return action;
-    }
-
-    /**
      * The Actions submenu: every status each kind can be set to, then the rest.
      * <p>
-     * Two lists rather than one because the first is generated from enums and the
-     * second is written out - and a generated group joined to a literal one reads
-     * better than either a stream of both or a list nobody can tell apart.
+     * Two lists rather than one because the first is the three declared status
+     * groups, each generating its entries from an enum, and the second is
+     * written out - and a generated group joined to a literal one reads better
+     * than either a stream of both or a list nobody can tell apart.
      */
     private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends AnAction> statusGroups, final @NotNull List<? extends AnAction> rest) {
         final @NotNull DefaultActionGroup group = ActionsMenu.group();
