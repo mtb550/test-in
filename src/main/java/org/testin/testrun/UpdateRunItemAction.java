@@ -1,14 +1,13 @@
 package org.testin.testrun;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectAction;
-import org.testin.editor.TestinEditor;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
 import org.testin.editor.run.RunEditor;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -20,39 +19,44 @@ import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.testrun.create.FailedResultDialog;
 import org.testin.view.ViewToolWindowFactory;
-import org.testin.util.ListValue;
 
 import java.util.List;
 import java.util.Optional;
-import org.testin.util.Shortcuts;
 
-
-public class UpdateRunItemAction extends AbstractProjectAction {
-    private final @NotNull TestinEditor editor;
-    private final @NotNull JBList<TestCaseDto> list;
-
-    public UpdateRunItemAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
-        super(p, "Failed Test Case Details", "Edit the failure details of the failed test case", AllIcons.Actions.Edit);
-        this.editor = editor;
-        this.list = list;
-        this.registerCustomShortcutSet(Shortcuts.UpdateItem.getCustomShortcut(), list);
-    }
+/**
+ * UC-EDITOR-PANEL-040.
+ * <p>
+ * Declared in {@code plugin.xml} (#119), which is what puts it in Find Action
+ * and makes F2 remappable in Settings -> Keymap. No constructor and no fields:
+ * the platform builds one instance for the whole IDE, so the run editor and the
+ * case come from the keystroke.
+ * <p>
+ * F2 as well as Update Test Case, and the two never compete: each grays itself
+ * where the other belongs, so only one of them is ever enabled. That is what
+ * lets one key mean "edit what is in front of me" in both editors.
+ */
+public class UpdateRunItemAction extends DumbAwareAction {
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
 
-        // Nothing selected is nothing to edit.
-        final @NotNull Optional<TestCaseDto> selected = ListValue.selected(list);
-        if (selected.isEmpty()) return;
+        // Nothing selected is nothing to edit, and neither is anywhere but a run.
+        final @NotNull Optional<TestCaseDto> selected = TestinData.singleSelectedCase(e);
+        final @NotNull Optional<RunEditor> runEditor = runEditor(e);
+        if (selected.isEmpty() || runEditor.isEmpty()) return;
 
-        if (!(editor instanceof RunEditor runEditor)) return;
+        edit(p, runEditor.orElseThrow(), selected.orElseThrow());
+    }
 
-        final @NotNull Optional<TestRunItems> found = runEditor.runItem(selected.orElseThrow().getId());
+    // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167
+    private void edit(final @NotNull Project p, final @NotNull RunEditor runEditor, final @NotNull TestCaseDto testCase) {
+        final @NotNull Optional<TestRunItems> found = runEditor.runItem(testCase.getId());
         if (found.isEmpty()) return;
 
         final @NotNull TestRunItems runItem = found.orElseThrow();
-        final @NotNull TestCaseDto testCase = selected.orElseThrow();
 
         // The test case is gone: what the run recorded against it stands as it is.
         if (runItem.isRemoved()) {
@@ -101,15 +105,20 @@ public class UpdateRunItemAction extends AbstractProjectAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
         // Details belong to failed test cases only - the dialog's title stays
-        // truthful and the action reads as what it is.
-        boolean enabled = false;
-        final @NotNull Optional<TestCaseDto> selected = ListValue.selected(list);
-        if (selected.isPresent() && list.getSelectedValuesList().size() == 1 && editor instanceof RunEditor runEditor) {
-            enabled = runEditor.runItem(selected.orElseThrow().getId())
-                    .filter(item -> item.getStatus() == TestStatus.FAILED)
-                    .isPresent();
-        }
-        e.getPresentation().setEnabled(enabled);
+        // truthful and the action reads as what it is. And to a run editor only,
+        // which is what keeps F2 to one meaning at a time (#119).
+        e.getPresentation().setEnabled(runEditor(e)
+                .flatMap(runEditor -> TestinData.singleSelectedCase(e).flatMap(tc -> runEditor.runItem(tc.getId())))
+                .filter(item -> item.getStatus() == TestStatus.FAILED)
+                .isPresent());
+    }
+
+    /**
+     * The run editor the keystroke arrived in, and empty anywhere else - a test
+     * set editor included, which answers the same data key and has no run.
+     */
+    private @NotNull Optional<RunEditor> runEditor(final @NotNull AnActionEvent e) {
+        return TestinData.editor(e).filter(RunEditor.class::isInstance).map(RunEditor.class::cast);
     }
 
     @Override

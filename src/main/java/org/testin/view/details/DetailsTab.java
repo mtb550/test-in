@@ -28,7 +28,7 @@ import org.testin.testcase.TestCaseSnapshot;
 import org.testin.testcase.create.TestCaseUpdateMenuDialog;
 import org.testin.util.Display;
 import org.testin.ui.FontSync;
-import org.testin.util.Shortcuts;
+import org.testin.actions.Declared;
 import org.testin.view.ViewToolWindowFactory;
 import org.testin.view.details.components.ActionIcons;
 import org.testin.view.details.components.AttributeRow;
@@ -243,7 +243,11 @@ public class DetailsTab {
                 // BGT on purpose - no update() here reads Swing state; do not switch to EDT (#52).
                 return ActionUpdateThread.BGT;
             }
-        }.registerCustomShortcutSet(Shortcuts.UpdateItem.getCustomShortcut(), detailsTab);
+        // Whatever Update Test Case is bound to, not a key of this panel's own:
+        // one key, one owner, and a tester who rebinds F2 rebinds it here too
+        // (#119). The action itself stays this panel's, because what it edits
+        // is the case the panel is showing rather than an editor's selection.
+        }.registerCustomShortcutSet(Declared.shortcutSet("Testin.UpdateTestCase"), detailsTab);
     }
 
     // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007

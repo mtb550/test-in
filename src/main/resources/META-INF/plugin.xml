@@ -345,6 +345,16 @@
         </action>
 
         <action
+                id="Testin.UpdateRunItem"
+                class="org.testin.testrun.UpdateRunItemAction"
+                text="Failed Test Case Details"
+                description="Edit the failure details of the selected failed test case"
+                icon="AllIcons.Actions.Edit"
+        >
+            <keyboard-shortcut keymap="$default" first-keystroke="F2"/>
+        </action>
+
+        <action
                 id="Testin.RemoveTestCase"
                 class="org.testin.testcase.RemoveTestCaseAction"
                 text="Delete Test Case"

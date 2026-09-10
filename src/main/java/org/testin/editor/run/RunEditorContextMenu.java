@@ -14,7 +14,6 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.report.GenerateReportAction;
 import org.testin.testrun.SetTestCaseStatusAction;
-import org.testin.testrun.UpdateRunItemAction;
 
 import java.util.Arrays;
 
@@ -34,7 +33,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
                 .filter(TestStatus::isVerdict)
                 .forEach(status -> add(new SetTestCaseStatusAction(p, ui, list, status, status.getMenuEntry())));
         addSeparator();
-        add(new UpdateRunItemAction(p, ui, list));
+        add(Declared.action("Testin.UpdateRunItem"));
         addSeparator();
         add(Declared.action("Testin.ViewDetails"));
         addSeparator();
