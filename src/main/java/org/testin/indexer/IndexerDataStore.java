@@ -90,6 +90,10 @@ final class IndexerDataStore {
         return testCaseStore.getForTestSet(testSetPath);
     }
 
+    @NotNull Map<String, TestRunDto> getTestRunsByPath() {
+        return testRunsByPath;
+    }
+
     @NotNull
     Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
         return Optional.ofNullable(testRunsByPath.get(testRunPath.toString()));

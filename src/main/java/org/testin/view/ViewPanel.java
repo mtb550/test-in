@@ -183,7 +183,7 @@ public class ViewPanel implements Disposable {
     public void refreshCurrentView() {
         new DetailsTab().load(p, detailsTab, currentFromIndex(), page.getCurrentPath());
         new HistoryTab().load(historyTab);
-        new OpenBugsTab().load(openBugsTab, currentFromIndex().isPresent());
+        new OpenBugsTab().load(p, openBugsTab, currentFromIndex());
 
         detailsTab.revalidate();
         detailsTab.repaint();

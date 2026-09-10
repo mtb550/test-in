@@ -217,6 +217,17 @@ silently does nothing costs more than the setting it was meant to hold.
 - **Verify with `./gradlew compileJava test` before presenting changes**, and do
   not commit until Muteb has sandbox-tested (`./gradlew runIde`) and approved.
 
+- **Two branches at once means two working trees.** `git checkout` moves the
+  whole directory, so a second piece of work never shares a checkout with the
+  first - `git worktree add ../testin-<what> <branch>`, and remove it when the
+  work is merged or abandoned. Switching a branch under work in progress
+  destroys it silently, and there is nothing to notice afterwards.
+
+- **A hundred compile errors are usually one.** An error in an annotation stops
+  Lombok's processing, so every member it would have generated is absent and
+  javac reports one error per use. Read the first error rather than the file the
+  hundredth blames. CONTRIBUTING.md has the worked example.
+
 - **A green build is not evidence of a working plugin.** `@NotNull` is not a
   compile-time contract: javac ignores it, and the IDE's instrumenter rewrites
   it into a throw that exists only inside a running IDE. `return null` from a

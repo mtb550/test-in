@@ -108,12 +108,15 @@ priority. Only **Run Status** and **Duration** are left.
 **If nothing was timed** — the **Duration** row disappears. A verdict recorded
 from the menu, or on several test cases at once, is never timed.
 
-## Where the plugin breaks its own rules
+## The same bug, on the tab beside this one
 
-The **Bug Severity** and **Bug Priority** rows can read **Blocker** and
-**High** while the Open Bugs tab beside them reads *No bugs found for this test
-case.* That is difference 5 on
-[the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
+The **Bug Severity** and **Bug Priority** rows say what *this* run recorded. The
+[Open Bugs tab](seeOpenBugs.md) says what every run recorded, so a case that has
+failed in more than one cycle shows one bug here and all of them there.
+
+The two used to disagree rather than differ: this panel read **Blocker** and
+**High** while the tab beside it said no bugs were found, because that tab never
+looked at the test case (#229).
 
 ---
 

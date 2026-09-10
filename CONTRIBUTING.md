@@ -58,6 +58,25 @@ retype them:
 | **Tests** | `compileJava test` |
 | **Inspection gate** | `inspect` |
 
+## Two branches at once means two working trees
+
+A clone is one working tree, and `git checkout` moves **all** of it. So two
+pieces of work on two branches cannot share one directory: switching branches
+under work in progress takes the files out from under it, and nothing warns you.
+
+```bash
+git worktree add ../testin-<what> <branch>     # its own directory, same repository
+git worktree remove ../testin-<what>           # when the work is merged or abandoned
+```
+
+Each worktree gets its own `build/`, so the first Gradle run in a new one is a
+full build. The downloaded IDE and the dependency cache are shared through
+`~/.gradle`, so it is minutes rather than a fresh setup.
+
+This is not hypothetical: it was written down after a branch was checked out in a
+directory that already had work running in it, which would have destroyed that
+work had it not been noticed immediately.
+
 ## The checks
 
 | Command | What it settles | When |
@@ -65,7 +84,24 @@ retype them:
 | `./gradlew compileJava test` | It compiles, and the unit tests and the documentation guards pass | Every change, before you offer it |
 | `./gradlew runIde` | It actually works | Anything a tester can see — see below |
 | `./gradlew inspect` | The six gate rules and the display-string ratchet | Before offering a change for a sandbox test, when it touched nullability, annotations, or many files |
+| `git worktree add ../testin-<what> <branch>` | A second branch, checked out at once | Whenever two pieces of work run at the same time — see below |
 | `./gradlew verifyDistribution` | No test classes and no compile-only dependencies reached the jar | Runs in CI; run it if you touched packaging |
+
+### A hundred compile errors are usually one
+
+Lombok writes most of this codebase's boilerplate, and it writes it during
+annotation processing. **An error in an annotation stops that processing**, so
+every getter, every all-args constructor and every enum field it would have
+generated is simply absent — and javac then reports one error per use of them.
+
+What you see is a hundred `cannot find symbol` errors blaming `TestCaseDto` and
+half the model. What is wrong is one line somewhere else entirely. A duplicated
+`@NotNull` produced exactly this: *"NotNull is not a repeatable annotation
+interface"* at the top of the list, and ninety-nine consequences under it.
+
+**Read the first error, not the last, and not the loudest.** If the list is long
+and blames generated members, look for an annotation error above it before you
+open any of the files it names.
 
 ### A green build is not evidence of a working plugin
 
