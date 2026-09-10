@@ -122,17 +122,22 @@ checked against the code it describes.
 | **[Sharing work with the team](docs/share/main.md)** | Export, import, Git and a server |
 | **[Inside Testin](docs/internal/main.md)** | The search, and the one thing that owns every file |
 
-Four pages sit outside the eight parts: [First run](docs/firstRun.md), [every
-shortcut](docs/shortcuts.md), [the formats on disk](docs/formats.md) and [the
-standing decisions](docs/decisions.md). The architecture guide is still to be
-written, and [the home page](docs/README.md) names the issue for it.
+Five pages sit outside the eight parts: [First run](docs/firstRun.md), [every
+shortcut](docs/shortcuts.md), [the formats on disk](docs/formats.md), [the
+standing decisions](docs/decisions.md) and [how Testin is put
+together](docs/ARCHITECTURE.md).
 
 Questions, ideas and feedback are welcome in
 [Discussions](https://github.com/mtb550/test-in/discussions).
 
 ## Contributing
 
-Issues and plans live in [GitHub issues](https://github.com/mtb550/test-in/issues).
-The architecture rules — indexer-owned file access, Swing on the EDT,
-display-only formatting — are in `CLAUDE.md`, which is the single authority for
-them.
+Everything between a clone and a reviewed change is in
+[CONTRIBUTING.md](CONTRIBUTING.md): what you need installed, the checks, the
+inspection gate, and the terms a contribution is accepted under.
+
+The four architecture rules — all test data file access through the indexer, the
+VFS before the cache, Swing on the EDT, formatting display-only — are in
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), with the layer map and two
+operations traced class by class. Issues and plans live in
+[GitHub issues](https://github.com/mtb550/test-in/issues).

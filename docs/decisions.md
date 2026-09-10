@@ -2,7 +2,7 @@
 
 # Standing decisions
 
-> Seven decisions in Testin look wrong until you know why they were made. Each
+> Eight decisions in Testin look wrong until you know why they were made. Each
 > one has been proposed for reversal at least once, and each reversal would have
 > broken something the decision exists to protect. They are written here so a
 > contributor reads the reason before writing the fix.

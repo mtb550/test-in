@@ -85,8 +85,8 @@ What a person needs before their first change.
 
 | Document | What it answers | Where it stands |
 |---|---|---|
-| **Architecture** | The layers, the rule that all file access goes through one place, and two walkthroughs | Not written — [#99](https://github.com/mtb550/test-in/issues/99) |
-| **Contributing** | Setup, the checks that must pass, and the run configurations | Not written — [#102](https://github.com/mtb550/test-in/issues/102) |
+| **[Architecture](ARCHITECTURE.md)** | The layers, the four rules the plugin is built on, and two operations traced class by class | Written |
+| **[Contributing](https://github.com/mtb550/test-in/blob/main/CONTRIBUTING.md)** | Setup, the checks that must pass, the run configurations and the terms | Written |
 | **[Standing decisions](decisions.md)** | Eight decisions made once, with the reason each one looks wrong, so they are not argued again in every review | Written |
 | **[The formats on disk](formats.md)** | Every marker, the test case and run files, and `testin.yml` — field by field, with the versioning rules | Written |
 | **[The indexer's budget](internal/readTestProject.md)** | What reading ten thousand test cases costs, measured, and the test that holds it there | Written |

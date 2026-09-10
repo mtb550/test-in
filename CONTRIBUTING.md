@@ -133,7 +133,8 @@ they govern, so they travel with a clone:
 
 | | |
 |---|---|
-| [`CLAUDE.md`](CLAUDE.md) | The architecture rules and the code conventions — file access through the indexer, threading, nullability, naming |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | **Start here.** The layer map, the four rules the plugin is built on, and two operations traced class by class |
+| [`CLAUDE.md`](CLAUDE.md) | The code conventions a change is reviewed against — naming, nullability, threading, what belongs in which class |
 | [`docs/`](docs/README.md) | What Testin does, one use case at a time, with every rule numbered |
 | [`docs/standard.md`](docs/standard.md) | How those documents are written, and what a machine checks about them |
 | [`docs/decisions.md`](docs/decisions.md) | Decisions that look wrong until you know why, and what each costs to reverse |

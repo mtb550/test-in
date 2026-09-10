@@ -2,73 +2,33 @@
 
 ## Architecture rules
 
-### File access goes through the indexer — no exceptions in tree/UI code
+**[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) is the authority on all four.**
+It carries the layer map, the reasoning, the exempt list and two operations
+traced class by class. Read it before a change that touches any of them; what is
+below is the rule itself, stated once, so this file is not a second copy of it
+going stale (#99).
 
-No class may read, write, or execute operations on virtual files (VFS) or
-physical files directly. The **indexer** (`org.testin.indexer`) is the single
-owner of file access, so its cache objects stay authoritative and every read
-is a fast in-memory lookup.
+1. **All test data file access goes through the indexer.** `org.testin.indexer`
+   is the single owner. No other package reads, writes or performs a VFS
+   operation on test data - it asks the indexer, whose cache is authoritative.
+   Seven packages are exempt because none of them touch test data; the list is
+   in ARCHITECTURE.md, and adding to it is a decision, not a convenience.
+2. **The VFS operation succeeds first, then the cache is updated.** Never the
+   other way round: the cache update persists markers, marker writes create
+   directories, and the reverse order produces phantom directories and "already
+   exists in VFS" errors.
+3. **Swing is read and written only on the EDT.** Short work with no UI of its
+   own goes to `executeOnPooledThread` and finishes with `invokeLater`; long
+   work the tester should be able to cancel goes to `Task.Backgroundable`.
+   Actions declare `ActionUpdateThread.EDT` when their `update()` reads Swing
+   state.
+4. **Formatting is display-only.** Rendering may reformat a value; saving never
+   does. The stored JSON is byte-identical to what the tester typed, so an
+   editable surface loads the raw value and a read-only one loads the formatted
+   value - `gridValue` and `displayValue` on `TestEditorAttributes`.
 
-- Need to know whether a node exists? Ask the indexer's cache — never `Files.exists`.
-- Need to create/move/rename/copy/delete? Call the indexer; it performs the VFS
-  operation and updates its cache in the correct order (VFS first, cache after).
-- UI code (tree, actions, dialogs, editors) holds `DirectoryDto`/`TestCaseDto`
-  objects served by the indexer and never touches disk.
-
-**Exempt packages** (may access files directly): `codegen`, `config`, `git`,
-`importexport`, `report`, `setting`, `logger`.
-
-What they have in common: none of them read or write **test data**. They handle
-generated source, the automation repository's own `testin.yml`, the Git working
-tree, files outside the tree, generated report output, the IDE settings path, and
-the log. The rule exists to keep the indexer's cache authoritative over test data,
-and none of these touch it.
-
-`config` reads a file that lives in the automation repository, not under the
-Testin root, and it runs before the indexer exists — it is what tells the indexer
-which project to index.
-
-`util` is not on the list and needs nothing on it. `FilesUtil` and `VfsExecutor`
-are the file layer the indexer itself calls rather than callers of it, and they
-live in `indexer` now, where that is obvious. What is left in `util` imports
-nothing above `model` — a name sanitizer, a parser, a clipboard, a bundle — so
-reaching for a helper can no longer drag an editor into the classpath (#112).
-Keep it that way: a helper that needs `editor`, `view`, `ui`, `services` or
-`notifications` is feature glue, and it belongs beside the feature.
-
-In particular: **test runs are saved and read only through the indexer**
-(`putTestRun`, `persistRun`, `persistRunMarker`, `addTestRunDir`,
-`updateRunMarker`, run lookups). The sequential run writer lives inside the
-indexer.
-
-### Ordering inside the indexer
-
-The cache update (which may persist markers — and marker writes create
-directories) must run **after** the VFS operation succeeds, never before.
-Violating this creates phantom directories and "already exists in VFS" errors.
-
-### Threading — Swing only on the EDT
-
-Swing components are read and written only on the EDT. Anything else that runs
-during a UI action moves off it.
-
-- Short work with no UI of its own (badge recomputes, filtering, sorting):
-  `ApplicationManager.getApplication().executeOnPooledThread(...)`, finishing
-  with `invokeLater` to touch Swing. No progress indicator.
-- Long work the user should see and be able to cancel (indexing, Git, report
-  generation): `Task.Backgroundable`, which gets an indicator and participates
-  in cancellation.
-
-If a pooled recompute is slow enough to want a progress bar, cache the result
-instead of backgrounding it harder. Actions declare `ActionUpdateThread.EDT`
-when their `update()` reads Swing state.
-
-### Formatting is display-only
-
-Rendering may reformat a value; saving never does. The stored JSON is always
-byte-identical to what the tester typed. Editable surfaces — grid cells, editor
-fields — load the **raw** value when editing begins, so formatted text can never
-be committed back into storage.
+The fifth is not in that document, because it is about where a value is kept
+rather than how the plugin is shaped:
 
 ### A setting is application level; project config is `testin.yml`
 
