@@ -41,6 +41,12 @@ public class DocumentClaimsTest {
     private static final @NotNull Path README = DOCS.resolve("README.md");
 
     /**
+     * The page a visitor lands on first, which says the same total in its own
+     * words and was the one file nothing checked (#66, finding 57).
+     */
+    private static final @NotNull Path ROOT_README = Paths.get("README.md");
+
+    /**
      * The vocabulary of saying no, which is where a refusal's words live.
      */
     private static final @NotNull Path REFUSED = Paths.get("src", "main", "java", "org", "testin", "notifications", "Refused.java");
@@ -85,7 +91,7 @@ public class DocumentClaimsTest {
 
     private static final @NotNull Pattern WHITESPACE = Pattern.compile("[\\s]+");
 
-    private static final @NotNull Pattern TOTALS = Pattern.compile("\\*\\*(\\d+) use cases and (\\d+) rules\\*\\*");
+    private static final @NotNull Pattern TOTALS = Pattern.compile("(\\d+) use cases and (\\d+) rules");
 
     /**
      * UC-INTERNAL-006.
@@ -98,6 +104,13 @@ public class DocumentClaimsTest {
      * at a stroke.
      * <p>
      * Code is skipped, fenced and inline alike - see {@link #withoutCode}.
+     * <p>
+     * <b>A target outside {@code docs/} is broken however plainly the file is
+     * there.</b> Only {@code docs/} is published, so
+     * {@code [Contributing](../CONTRIBUTING.md)} resolves against the working
+     * tree and passes, and resolves against the site root and serves a 404. Two
+     * were written while #99 and #102 landed and both were caught by somebody
+     * noticing. Such a link is written as the full repository URL instead.
      */
     @Test
     public void everyInternalLinkGoesSomewhere() {
@@ -116,7 +129,11 @@ public class DocumentClaimsTest {
                 final @NotNull String file = target.contains("#") ? target.substring(0, target.indexOf('#')) : target;
                 if (file.isEmpty()) continue;
 
-                if (!Files.exists(page.getParent().resolve(file).normalize())) {
+                final @NotNull Path resolved = page.getParent().resolve(file).normalize();
+
+                if (!resolved.startsWith(DOCS)) {
+                    broken.add(DOCS.relativize(page) + " points at " + target + ", which is outside docs/");
+                } else if (!Files.exists(resolved)) {
                     broken.add(DOCS.relativize(page) + " points at " + target);
                 }
             }
@@ -173,11 +190,44 @@ public class DocumentClaimsTest {
      */
     @Test
     public void theReadmeTotalIsTheSumOfItsOwnRows() {
-        final @NotNull Matcher totals = TOTALS.matcher(read(README));
-        if (!totals.find()) fail("The README no longer says how many use cases and rules there are");
+        final @NotNull Matcher totals = totalsOf(README);
 
         assertEquals(Integer.parseInt(totals.group(1)), sum(readmeUseCaseCounts()), "use cases: the total is not the sum of the rows");
         assertEquals(Integer.parseInt(totals.group(2)), sum(readmeRuleCounts()), "rules: the total is not the sum of the rows");
+    }
+
+    /**
+     * UC-INTERNAL-006.
+     * <p>
+     * The repository front page says the same total, and it is the count the
+     * parts actually hold.
+     * <p>
+     * It is the page a visitor reads first and it was the one nothing checked:
+     * the guard opened {@code docs/README.md} and no other file, so the front
+     * page was one use case over and three rules under at the same time. It was
+     * corrected by hand four times in one day while rules were being added,
+     * which is the whole argument for checking it (#66, finding 57).
+     * <p>
+     * Measured against the parts rather than against the other README, because
+     * the parts are what the other README is measured against.
+     */
+    @Test
+    public void theRootReadmeSaysTheSameTotal() {
+        final @NotNull Matcher totals = totalsOf(ROOT_README);
+
+        assertEquals(Integer.parseInt(totals.group(1)), sum(measuredUseCaseCounts()), "use cases: the front page is not what the parts hold");
+        assertEquals(Integer.parseInt(totals.group(2)), sum(measuredRuleCounts()), "rules: the front page is not what the parts write");
+    }
+
+    /**
+     * The sentence saying how many use cases and rules there are, on a page that
+     * has to carry one.
+     */
+    private static @NotNull Matcher totalsOf(final @NotNull Path page) {
+        final @NotNull Matcher totals = TOTALS.matcher(read(page));
+        if (!totals.find()) fail(page + " no longer says how many use cases and rules there are");
+
+        return totals;
     }
 
 
