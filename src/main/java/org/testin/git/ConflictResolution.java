@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.io.IOException;
@@ -234,8 +235,8 @@ public final class ConflictResolution {
 
         } catch (final IOException ex) {
             Logger.error("Could not write the merged test case " + relativePath + ": " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, "Merge Failed",
-                    "Could not write " + relativePath + ": " + ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.merge.failed.title"),
+                    Bundle.message("git.merge.failed.message", relativePath, ex.getMessage()));
             return false;
         }
 
@@ -245,9 +246,8 @@ public final class ConflictResolution {
         // again with no conflict on screen to explain it, so the tester saw a
         // sync that simply refused to finish and nothing about why (#259).
         Logger.error("Merged but could not stage " + relativePath);
-        Services.getInstance(p, Notifier.class).error(p, "Merge Not Accepted",
-                "Testin merged " + relativePath + " but Git would not stage it, so the sync cannot go on. "
-                        + "Resolve that file in Git yourself, then sync again.");
+        Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.merge.not.accepted.title"),
+                Bundle.message("git.merge.not.accepted.message", relativePath));
         return false;
     }
 

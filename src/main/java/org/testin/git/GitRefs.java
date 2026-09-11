@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import org.testin.util.Bundle;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -147,15 +148,16 @@ public final class GitRefs {
      */
     public static @NotNull String conflictMessage(final @NotNull List<String> unmergedPaths) {
         if (unmergedPaths.isEmpty()) {
-            return "The pull stopped on a conflict. Continue once it is resolved, or abort to roll the pull back.";
+            return Bundle.message("git.conflict.unnamed");
         }
 
         final int shown = Math.min(unmergedPaths.size(), 3);
         final @NotNull String names = String.join(", ", unmergedPaths.subList(0, shown));
-        final @NotNull String more = unmergedPaths.size() > shown ? " and " + (unmergedPaths.size() - shown) + " more" : "";
+        final int rest = unmergedPaths.size() - shown;
 
-        return "Both sides changed " + names + more + ". Resolve the conflict, then continue - or abort to roll "
-                + "the pull back and keep what is here.";
+        return rest == 0
+                ? Bundle.message("git.conflict.named", names)
+                : Bundle.message("git.conflict.named.more", names, String.valueOf(rest));
     }
 
     private static @NotNull DiffType typeOf(final @NotNull String code) {

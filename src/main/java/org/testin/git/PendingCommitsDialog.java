@@ -16,6 +16,7 @@ import org.testin.ui.framework.DialogSplitButton;
 import org.testin.ui.framework.SelectionTable;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextInput;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;
@@ -43,8 +44,8 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
      * The button's two answers. Push is first, so it is the default and what
      * Enter does.
      */
-    private static final @NotNull String PUSH = "Commit & Push";
-    private static final @NotNull String COMMIT = "Commit";
+    private static final @NotNull String PUSH = Bundle.message("dialog.pending.button.push");
+    private static final @NotNull String COMMIT = Bundle.message("dialog.pending.button.commit");
 
     /**
      * One entry per table row, holding the change the row was drawn from.
@@ -79,14 +80,14 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         this.repoRoot = repoRoot;
         this.onCommit = onCommit;
 
-        title = "Pending Changes";
+        title = Bundle.message("dialog.pending.title");
 
         final @NotNull ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
-                .column("Change Type", 150)
+                .column(Bundle.message("dialog.pending.column.change.type"), 150)
                 .column(DirectoryType.TS.getDescription(), 150)
-                .column("Name", 240)
-                .column("Before", 180)
-                .column("After", 180)
+                .column(Bundle.message("caption.name"), 240)
+                .column(Bundle.message("dialog.pending.column.before"), 180)
+                .column(Bundle.message("dialog.pending.column.after"), 180)
                 .build();
         // The branch is part of the review, not a thing to remember to do
         // first. It offers the branches this machine has, on the one that is
@@ -94,13 +95,13 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         // to start - which is how a tester keeps a cycle's results off main
         // without leaving the dialog.
         final @NotNull ComponentDialogBase<ChoiceInput> branchRow =
-                ComponentDialogBase.choice("Branch", offered(branches, currentBranch), currentBranch);
+                ComponentDialogBase.choice(Bundle.message("dialog.pending.caption.branch"), offered(branches, currentBranch), currentBranch);
 
         // Deliberately empty. Pre-filling it produced five commits called
         // "Updated test cases" in one afternoon of testing - a default that gets
         // accepted rather than read, and a history that tells a reviewer nothing.
         final @NotNull ComponentDialogBase<TextInput> messageField = ComponentDialogBase.textField()
-                .placeholder("what changed, in a line...")
+                .placeholder(Bundle.message("dialog.pending.placeholder"))
                 .build();
         // Push first, because a commit nobody pushed helps no colleague - the
         // review used to end in a commit and then offer the push in a
@@ -117,14 +118,14 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
 
         shortcuts = List.of(
                 StatusBarShortcut.build(Shortcuts.Enter, COMMIT, this::submit),
-                StatusBarShortcut.hint("Right click", "Revert a change"),
+                StatusBarShortcut.hint(Bundle.message("gesture.right.click"), Bundle.message("dialog.pending.hint.revert")),
                 StatusBarShortcut.cancel(this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(1000), JBUI.scale(500));
 
         fillRows(differences);
         changes.selectAll();
-        changes.onRowAction("Revert this change", row -> revertRow(p, row));
+        changes.onRowAction(Bundle.message("dialog.pending.revert.row"), row -> revertRow(p, row));
 
         // With nothing selected there is nothing to commit, and the tester can
         // deselect every row - so the button follows the selection rather than
@@ -211,7 +212,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         // project was never archived. Only a test case reverts.
         if (!diff.isRevertible()) {
             Services.getInstance(p, Notifier.class)
-                    .softRefuse(p, "Only a test case change can be reverted");
+                    .softRefuse(p, Bundle.message("dialog.pending.revert.only.test.case"));
             return;
         }
 
@@ -246,7 +247,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             Services.getInstance(p, Notifier.class).softShow(p, Done.REVERTED);
 
         } catch (final Exception ex) {
-            Services.getInstance(p, Notifier.class).error(p, "Revert Failed", "Could not revert change: " + ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("dialog.pending.revert.failed.title"), Bundle.message("dialog.pending.revert.failed.message", ex.getMessage()));
         }
     }
 
@@ -262,13 +263,13 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
      */
     private boolean revertField(final @NotNull ProjectIndexer indexer, final @NotNull Path testSetPath, final @NotNull ChangeType changeType, final @NotNull PendingChange diff) {
         if (!changeType.isRevertable()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, "A change to " + changeType.getLabel() + " cannot be reverted");
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("dialog.pending.revert.not.supported", changeType.getLabel()));
             return false;
         }
 
         final @NotNull Optional<TestCaseDto> current = indexer.findTestCase(UUID.fromString(diff.testCaseId()));
         if (current.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, "That test case is no longer in the project");
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("dialog.pending.revert.gone"));
             return false;
         }
 
