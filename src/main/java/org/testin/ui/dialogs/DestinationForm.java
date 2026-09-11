@@ -14,6 +14,7 @@ import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.ui.framework.DialogComponent;
 import org.testin.ui.framework.EmptyWarning;
+import org.testin.util.Bundle;
 
 import java.util.Optional;
 import javax.swing.*;
@@ -101,9 +102,9 @@ public final class DestinationForm implements DialogComponent {
 
     private @NotNull FormRows buildRows() {
         final @NotNull FormRows formRows = new FormRows()
-                .row("Destination:", folderField)
-                .row("File name:", fileNameField)
-                .row("Format:", formatCombo);
+                .row(Bundle.message("destination.caption.folder"), folderField)
+                .row(Bundle.message("destination.caption.file"), fileNameField)
+                .row(Bundle.message("destination.caption.format"), formatCombo);
 
         return formRows;
     }
@@ -124,17 +125,17 @@ public final class DestinationForm implements DialogComponent {
         // and nothing was written - which reads as a button that does not work
         // rather than as a field that needs filling in (#251).
         if (fileName.isEmpty()) {
-            EmptyWarning.show(fileNameField, "Name the file");
+            EmptyWarning.show(fileNameField, Bundle.message("destination.name.the.file"));
             return Optional.empty();
         }
         if (folder.isEmpty()) {
-            EmptyWarning.show(folderField.getTextField(), "Choose a folder");
+            EmptyWarning.show(folderField.getTextField(), Bundle.message("destination.choose.folder"));
             return Optional.empty();
         }
 
         final @NotNull Optional<FileTypes> selectedFormat = Optional.ofNullable((FileTypes) formatCombo.getSelectedItem());
         if (selectedFormat.isEmpty()) {
-            EmptyWarning.show(formatCombo, "Choose a format");
+            EmptyWarning.show(formatCombo, Bundle.message("destination.choose.format"));
             return Optional.empty();
         }
 

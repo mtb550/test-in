@@ -14,6 +14,7 @@ import org.testin.editor.EditorUtil;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.ui.FontSync;
+import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,8 +29,8 @@ public class Id extends BaseDetails {
     final int BADGE_BORDER_H = 10;
     final int FLOW_GAP = 8;
     final int COPY_SUCCESS_DELAY_MS = 1500;
-    final @NotNull String COPY_TOOLTIP = "Copy ID";
-    final @NotNull String GO_TOOLTIP = "Go to this test case";
+    final @NotNull String COPY_TOOLTIP = Bundle.message("view.id.copy");
+    final @NotNull String GO_TOOLTIP = Bundle.message("view.id.go");
     final @NotNull Color BG_COLOR = new JBColor(Gray._230, Gray._80);
     final @NotNull Color FG_COLOR = new JBColor(Gray._130, Gray._170);
     final int INSETS_TOP = 5;

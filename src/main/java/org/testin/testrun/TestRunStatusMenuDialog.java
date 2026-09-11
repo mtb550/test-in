@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunStatus;
 import org.testin.ui.dialogs.ShortcutMenuPopup;
+import org.testin.util.Bundle;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -39,6 +40,6 @@ public class TestRunStatusMenuDialog {
                 .filter(status -> status.canBeSetFrom(current))
                 .toArray(TestRunStatus[]::new);
 
-        new ShortcutMenuPopup<>(p, "Set Test Run Status", offered, onStatusSelected).show();
+        new ShortcutMenuPopup<>(p, Bundle.message("run.set.status.menu"), offered, onStatusSelected).show();
     }
 }

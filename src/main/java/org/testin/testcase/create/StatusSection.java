@@ -8,6 +8,7 @@ import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.UIAction;
 import org.testin.testcase.UpdateTestCaseFields;
+import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.util.Objects;
@@ -43,7 +44,7 @@ public class StatusSection implements CreateTestCaseSection {
                 // Swing renders the empty selection with no value at all, and
                 // there is nothing to draw for it.
                 Optional.ofNullable(value).ifPresent(current -> {
-                    append(" Status:  ");
+                    append(Bundle.message("section.status.caption"));
                     append(current.getLabel());
                 });
             }

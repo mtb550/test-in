@@ -6,6 +6,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
+import org.testin.util.Bundle;
 import javax.swing.*;
 import java.awt.*;
 
@@ -20,7 +21,7 @@ public class HistoryTab {
     public void load(final @NotNull JBPanel<?> historyTab) {
         historyTab.removeAll();
 
-        final @NotNull JBLabel emptyState = new JBLabel("No history available yet", SwingConstants.CENTER);
+        final @NotNull JBLabel emptyState = new JBLabel(Bundle.message("view.history.none"), SwingConstants.CENTER);
         emptyState.setForeground(UIUtil.getContextHelpForeground());
         emptyState.setBorder(JBUI.Borders.empty(20));
 

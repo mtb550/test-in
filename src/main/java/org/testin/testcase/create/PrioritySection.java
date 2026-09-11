@@ -8,6 +8,7 @@ import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
+import org.testin.util.Bundle;
 import org.testin.util.IconManager;
 import org.testin.util.Shortcuts;
 
@@ -36,7 +37,7 @@ public class PrioritySection implements CreateTestCaseSection {
                 // there is nothing to draw for it.
                 Optional.ofNullable(value).ifPresent(priority -> {
                     setIcon(IconManager.createIcon(priority.getColor()));
-                    append(" Priority:  ");
+                    append(Bundle.message("section.priority.caption"));
                     append(priority.getLabel());
                 });
             }

@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -25,7 +26,7 @@ public class UndoAction extends AbstractProjectAction {
     private final @NotNull UndoScope scope;
 
     public UndoAction(final @NotNull Project p, final @NotNull JComponent on, final @NotNull UndoScope scope, final @NotNull UndoDirection direction) {
-        super(p, direction.getTitle(), direction.getTitle() + " last action", direction.getIcon());
+        super(p, direction.getTitle(), Bundle.message("undo.action.description", direction.getTitle()), direction.getIcon());
         this.direction = direction;
         this.scope = scope;
         this.registerCustomShortcutSet(Shortcuts.customShortcut(direction.getShortcut()), on);

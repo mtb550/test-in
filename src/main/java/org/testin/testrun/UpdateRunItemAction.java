@@ -18,6 +18,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.testrun.create.FailedResultDialog;
+import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.util.List;
@@ -93,7 +94,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
 
             // After the persist: an edit that was dropped rather than saved must
             // not report itself as saved (#62).
-            Services.getInstance(p, Notifier.class).softShow(p, "Details updated");
+            Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("run.item.updated"));
 
             // The editor empties the run while it reloads. Persisting is the whole
             // point of the callback, so say the edit was dropped rather than lose it

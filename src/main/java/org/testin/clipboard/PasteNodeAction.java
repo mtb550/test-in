@@ -14,6 +14,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
 import org.testin.notifications.Notifier;
 import org.testin.ui.framework.ConfirmDialog;
+import org.testin.util.Bundle;
 import org.testin.util.ClipboardContents;
 
 import javax.swing.*;
@@ -105,7 +106,7 @@ public class PasteNodeAction extends DumbAwareAction {
                     // Ctrl+V and the tree did not move. Not said twice: a name
                     // collision has already named the nodes it stopped.
                     if (!collisionsReported) {
-                        Services.getInstance(p, Notifier.class).softRefuse(p, "Select a folder");
+                        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("paste.select.folder"));
                     }
 
                     return;
@@ -113,12 +114,14 @@ public class PasteNodeAction extends DumbAwareAction {
 
                 // Cut-paste moves, copy-paste duplicates - each says what it does.
                 final boolean move = payload.clipboardAction() == TransferHandler.MOVE;
-                final @NotNull String verb = move ? "Move" : "Copy";
-                final @NotNull String what = nodes.size() == 1 ? "'" + nodes.getFirst().getName() + "'" : nodes.size() + " items";
+                final @NotNull String verb = move ? Bundle.message("transfer.move") : Bundle.message("transfer.copy");
+                final @NotNull String what = nodes.size() == 1
+                        ? "'" + nodes.getFirst().getName() + "'"
+                        : Bundle.message("transfer.items", String.valueOf(nodes.size()));
                 final @NotNull Path fromPath = nodes.getFirst().getPath().getParent();
 
-                new ConfirmDialog(p, "Paste",
-                        verb + " " + what + " into '" + target.getName() + "'?",
+                new ConfirmDialog(p, Bundle.message("paste.title"),
+                        Bundle.message("transfer.confirm", verb, what, target.getName()),
                         Objects.toString(fromPath, ""),
                         target.getPath().toString(),
                         verb,

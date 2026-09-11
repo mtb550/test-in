@@ -1,5 +1,6 @@
 package org.testin.undo;
 
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 import com.intellij.icons.AllIcons;
 import lombok.AllArgsConstructor;
@@ -22,7 +23,7 @@ import javax.swing.*;
 @AllArgsConstructor
 public enum UndoDirection {
 
-    UNDO("Undo", AllIcons.Actions.Undo, Shortcuts.Undo.getKey(), Done.UNDONE) {
+    UNDO(Bundle.message("undo.undo"), AllIcons.Actions.Undo, Shortcuts.Undo.getKey(), Done.UNDONE) {
         @Override
         public boolean can(final @NotNull UndoService service, final @NotNull UndoScope scope) {
             return service.canUndo(scope);
@@ -39,7 +40,7 @@ public enum UndoDirection {
         }
     },
 
-    REDO("Redo", AllIcons.Actions.Redo, Shortcuts.Redo.getKey(), Done.REDONE) {
+    REDO(Bundle.message("undo.redo"), AllIcons.Actions.Redo, Shortcuts.Redo.getKey(), Done.REDONE) {
         @Override
         public boolean can(final @NotNull UndoService service, final @NotNull UndoScope scope) {
             return service.canRedo(scope);

@@ -26,6 +26,7 @@ import org.testin.testrun.RunFormAction;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.services.BackgroundWork;
 import org.testin.editor.EditorUtil;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -68,7 +69,7 @@ public class CreateTestRun implements NodeCreator {
      */
     public void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Set<UUID> sourceCases, final @NotNull Map<TestRunConfiguration, String> sourceConfiguration) {
         new RunForm(p).open(testCasesRoot, name, sourceCases, sourceConfiguration,
-                new RunFormAction("Create Test Run", "Create", (form, selection) -> create(form, selection, parentDir)));
+                new RunFormAction(Bundle.message("run.create.title"), Bundle.message("run.create.button"), (form, selection) -> create(form, selection, parentDir)));
     }
 
     /**
@@ -88,14 +89,14 @@ public class CreateTestRun implements NodeCreator {
 
         final @NotNull String name = form.getRunName();
         if (name.isEmpty()) {
-            notifier.softRefuse(p, "A test run needs a name");
+            notifier.softRefuse(p, Bundle.message("run.needs.a.name"));
             return false;
         }
 
         // The popup is not modal - the tree stays live while the dialog is open,
         // so the parent may have been removed.
         if (!indexer.nodeExists(parentDir.getPath())) {
-            notifier.softRefuse(p, "'" + parentDir.getName() + "' no longer exists - test run not created");
+            notifier.softRefuse(p, Bundle.message("run.parent.gone", parentDir.getName()));
             return false;
         }
 
@@ -132,7 +133,7 @@ public class CreateTestRun implements NodeCreator {
 
         // The form and the checked tree were read above, while the dialog was
         // still there; from here nothing touches a component (#87).
-        BackgroundWork.run(p, "Creating test run " + savePath.getFileName(), "Test Run Not Created", indicator -> {
+        BackgroundWork.run(p, Bundle.message("run.task.creating", savePath.getFileName()), Bundle.message("run.create.failed.title"), indicator -> {
             Services.getInstance(p, ProjectIndexer.class).putTestRun(savePath, tr);
 
             // Defaults are correct (status CREATED); addTestRunDir stamps the

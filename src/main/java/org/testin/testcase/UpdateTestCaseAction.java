@@ -19,6 +19,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.create.TestCaseUpdateMenuDialog;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -130,7 +131,7 @@ public class UpdateTestCaseAction extends DumbAwareAction {
                 // One operation for the whole selection, recorded outside the loop
                 // above. Inside it, a bulk edit over forty cases would cost forty
                 // presses of CTRL+Z to take back (#165).
-                TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Update", updatedItems), before, TestCaseSnapshot.of(p, path, ids));
+                TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.update"), updatedItems), before, TestCaseSnapshot.of(p, path, ids));
 
                 // Reordering says Re-sorted whichever way it was done. Dragging a
                 // card already said it and typing a position said Updated, so the

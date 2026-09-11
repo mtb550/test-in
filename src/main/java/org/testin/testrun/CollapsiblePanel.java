@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import org.testin.util.Bundle;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -42,7 +43,7 @@ public final class CollapsiblePanel {
         final @NotNull Runnable syncHeader = () -> {
             final boolean expanded = content.isVisible();
             titleLabel.setIcon(expanded ? AllIcons.General.ArrowDown : AllIcons.General.ArrowRight);
-            hintLabel.setText(expanded ? "Collapse" : "Expand");
+            hintLabel.setText(expanded ? Bundle.message("panel.collapse") : Bundle.message("panel.expand"));
         };
         syncHeader.run();
 

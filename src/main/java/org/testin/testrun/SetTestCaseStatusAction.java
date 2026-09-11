@@ -16,6 +16,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.testrun.create.FailedResultDialog;
+import org.testin.util.Bundle;
 
 import java.util.Optional;
 import java.util.List;
@@ -39,7 +40,7 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
     private final @NotNull TestStatus status;
 
     public SetTestCaseStatusAction(final @NotNull TestStatus status) {
-        super(status.getLabel(), "Set test case status to " + status.getLabel(), status.getMenuEntry().icon());
+        super(status.getLabel(), Bundle.message("run.case.status.description", status.getLabel()), status.getMenuEntry().icon());
         this.status = status;
     }
 

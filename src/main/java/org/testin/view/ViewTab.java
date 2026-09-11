@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import org.testin.util.Bundle;
 import javax.swing.*;
 import java.util.function.Function;
 
@@ -18,13 +19,13 @@ import java.util.function.Function;
 @Getter
 @AllArgsConstructor
 public enum ViewTab {
-    DETAILS("Details", ViewPanel::getDetailsScrollPane),
+    DETAILS(Bundle.message("view.tab.details"), ViewPanel::getDetailsScrollPane),
 
     // Reported as never used, and kept: these two tabs are declared and not yet
     // built, not dead. The view panel renders DETAILS only (ViewPanel:110) until
     // the history and bug views land (#61).
-    HISTORY("History", ViewPanel::getHistoryScrollPane),
-    OPEN_BUGS("Open Bugs", ViewPanel::getOpenBugsScrollPane);
+    HISTORY(Bundle.message("view.tab.history"), ViewPanel::getHistoryScrollPane),
+    OPEN_BUGS(Bundle.message("view.tab.open.bugs"), ViewPanel::getOpenBugsScrollPane);
 
     private final @NotNull String displayName;
 

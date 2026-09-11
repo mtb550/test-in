@@ -13,6 +13,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunConfiguration;
 import org.testin.ui.framework.DialogComponent;
+import org.testin.util.Bundle;
 
 import java.util.Optional;
 import javax.swing.*;
@@ -77,7 +78,7 @@ public class RunConfigurationForm implements DialogComponent {
 
         wrapper = new JBPanel<>(new BorderLayout());
         wrapper.setOpaque(false);
-        wrapper.add(CollapsiblePanel.build("Configuration details", buildConfigurationPanel(), EXPANDED), BorderLayout.CENTER);
+        wrapper.add(CollapsiblePanel.build(Bundle.message("run.form.section"), buildConfigurationPanel(), EXPANDED), BorderLayout.CENTER);
 
         // After the wrapper exists, because this asks it to lay itself out
         // again. Nothing is chosen yet, so the fields that wait on an answer
@@ -100,19 +101,19 @@ public class RunConfigurationForm implements DialogComponent {
         fieldGbc.insets = JBUI.insets(4, 0, 4, 4);
 
         runNameField.setColumns(50);
-        runNameField.getEmptyText().setText("Cycle-1");
-        addLabeledRow(configurationPanel, labelGbc, fieldGbc, 0, "Test Run name:", runNameField);
+        runNameField.getEmptyText().setText(Bundle.message("run.form.name.hint"));
+        addLabeledRow(configurationPanel, labelGbc, fieldGbc, 0, Bundle.message("run.form.name.caption"), runNameField);
 
         // Room for more than one story, because a run usually covers several.
         changeLog.setColumns(50);
         changeLog.setRows(3);
         changeLog.setLineWrap(true);
         changeLog.setWrapStyleWord(true);
-        changeLog.getEmptyText().setText("Story-002 (register new user), Story-003 (forget password)");
+        changeLog.getEmptyText().setText(Bundle.message("run.form.change.log.hint"));
         keepTabForNavigation(changeLog);
 
         commitIdField.setColumns(50);
-        commitIdField.getEmptyText().setText("Commit hash, like 9f3c1ab...");
+        commitIdField.getEmptyText().setText(Bundle.message("run.form.commit.hint"));
 
         // Registered like the dropdowns, so every answer is read through one
         // method. These two used to be reached by name from the creator, which

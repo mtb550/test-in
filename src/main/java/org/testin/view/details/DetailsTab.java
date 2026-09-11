@@ -280,7 +280,7 @@ public class DetailsTab {
                         // little of an update as one that never got there (#164).
                         if (!changed) return;
 
-                        before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Update", tcs), taken, TestCaseSnapshot.of(p, editPath, ids)));
+                        before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.update"), tcs), taken, TestCaseSnapshot.of(p, editPath, ids)));
 
                         Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
 

@@ -12,6 +12,7 @@ import org.testin.model.OpenBug;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.ui.FontSync;
+import org.testin.util.Bundle;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -47,7 +48,7 @@ public class OpenBugsTab {
         bugTab.setLayout(new BorderLayout());
 
         if (shown.isEmpty()) {
-            bugTab.add(note("Select a test case to view its bugs"), BorderLayout.NORTH);
+            bugTab.add(note(Bundle.message("view.bugs.no.selection")), BorderLayout.NORTH);
             return;
         }
 
@@ -55,7 +56,7 @@ public class OpenBugsTab {
                 Services.getInstance(p, ProjectIndexer.class).getAllTestRuns(), shown.orElseThrow().getId());
 
         if (bugs.isEmpty()) {
-            bugTab.add(note("No bugs recorded for this test case in any test run"), BorderLayout.NORTH);
+            bugTab.add(note(Bundle.message("view.bugs.none")), BorderLayout.NORTH);
             return;
         }
 

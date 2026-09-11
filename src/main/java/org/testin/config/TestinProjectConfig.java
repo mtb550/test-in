@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.sftp.SftpAddress;
+import org.testin.util.Bundle;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -100,8 +101,7 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
         if (!location.isRemote()) return;
 
         if (connection == ConnectionType.NONE) {
-            Logger.warn("testin.yml says the project is remote but does not say how to reach it - "
-                    + "set connection to git or sftp");
+            Logger.warn(Bundle.message("config.warn.remote.no.connection"));
         }
         if (connection == ConnectionType.GIT && repoUrl.isEmpty()) {
             Logger.warn("testin.yml says connection: git but has no RepoUrl");

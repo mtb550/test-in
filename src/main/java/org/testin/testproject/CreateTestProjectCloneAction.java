@@ -18,6 +18,7 @@ import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 
@@ -27,7 +28,7 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
     private final @NotNull TreePanel tp;
 
     public CreateTestProjectCloneAction(final @NotNull Project p, final @NotNull String gitUrl, final @NotNull String name, final @NotNull TreePanel tp) {
-        super(p, "Clone Git Project", "Import an existing test project from Git", AllIcons.Vcs.Clone);
+        super(p, Bundle.message("clone.action.text"), Bundle.message("clone.action.description"), AllIcons.Vcs.Clone);
         this.gitUrl = gitUrl;
         this.projectName = name;
         this.tp = tp;
@@ -47,15 +48,15 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
     public void execute() {
 
         if (gitUrl.trim().isEmpty() || projectName.trim().isEmpty()) {
-            Services.getInstance(p, Notifier.class).error(p, "Clone Error", "Missing parameters for cloning the project.");
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("clone.error.title"), Bundle.message("clone.error.missing"));
             return;
         }
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Cloning repository", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, Bundle.message("clone.task"), false) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                indicator.setText("Cloning into " + projectName + "...");
+                indicator.setText(Bundle.message("clone.progress", projectName));
 
                 try {
                     final @NotNull Path parentPath = Services.getInstance(p, TestinRoot.class).getPath();
@@ -79,7 +80,7 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
                     });
 
                 } catch (final Exception ex) {
-                    Services.getInstance(p, Notifier.class).error(p, "Clone Failed", "Could not clone repository:\n" + ex.getMessage());
+                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("clone.failed.title"), Bundle.message("clone.failed.message", ex.getMessage()));
                 }
             }
         });

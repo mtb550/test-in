@@ -9,6 +9,7 @@ import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.statusbar.MenuItem;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import javax.swing.Icon;
@@ -44,7 +45,7 @@ public enum CopyChoice implements MenuItem {
      * this menu existed - so it is the first row and the one already selected,
      * and CTRL+C then ENTER is the gesture it always was.
      */
-    ALL_DETAILS("All Details", Shortcuts.CopyAll),
+    ALL_DETAILS(Bundle.message("copy.all.details"), Shortcuts.CopyAll),
 
     DESCRIPTION(TestEditorAttributes.DESCRIPTION, Shortcuts.CopyDescription),
     EXPECTED_RESULT(TestEditorAttributes.EXPECTED_RESULT, Shortcuts.CopyExpectedResult),
@@ -127,7 +128,9 @@ public enum CopyChoice implements MenuItem {
      * shape every other copy in the plugin uses.
      */
     public @NotNull String copiedMessage(final int cases) {
-        return cases == 1 ? name + " copied" : name + " copied " + cases;
+        return cases == 1
+                ? Bundle.message("copy.done.one", name)
+                : Bundle.message("copy.done.many", name, String.valueOf(cases));
     }
 
     @Override
