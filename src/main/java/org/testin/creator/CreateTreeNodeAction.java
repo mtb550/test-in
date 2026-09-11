@@ -1,6 +1,7 @@
 package org.testin.creator;
 
 import org.testin.notifications.Done;
+import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -12,6 +13,7 @@ import org.testin.creator.dialogs.CreateRunDialog;
 import org.testin.creator.dialogs.CreateTestDialog;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestCasesMainDirectoryDto;
@@ -66,8 +68,18 @@ public class CreateTreeNodeAction extends DumbAwareAction {
         // answer to "under which", so the entry grays rather than picking the
         // first (#192).
         final @NotNull Optional<DirectoryDto> selected = TestinData.singleSelectedNode(e);
+        final boolean enabled = selected.filter(DirectoryDto::canCreateChildren).isPresent();
 
-        e.getPresentation().setEnabled(selected.filter(DirectoryDto::canCreateChildren).isPresent());
+        // TEMPORARY - delete once Ctrl+M is understood. Only on a keystroke:
+        // update() runs on every menu repaint, and a line per repaint would bury
+        // the one press being asked about.
+        if (ActionPlaces.KEYBOARD_SHORTCUT.equals(e.getPlace())) {
+            Logger.info("[ctrl-m] CreateNode enabled=" + enabled
+                    + " nodes=" + TestinData.selectedNodes(e).size()
+                    + " selected=" + selected.map(dir -> dir.getType() + " '" + dir.getName() + "'").orElse("none"));
+        }
+
+        e.getPresentation().setEnabled(enabled);
         e.getPresentation().setDescription(whyNot(selected));
     }
 

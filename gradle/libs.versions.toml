@@ -8,6 +8,9 @@ poi = "5.5.1"
 jsch = "2.28.7"
 sshd = "2.19.0"
 archunit = "1.4.1"
+# BasePlatformTestCase is a JUnit TestCase; the platform test framework brings no
+# JUnit of its own. Only the ideTest task uses it.
+junit = "4.13.2"
 
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
@@ -24,3 +27,4 @@ jsch = { module = "com.github.mwiede:jsch", version.ref = "jsch" }
 sshd-core = { module = "org.apache.sshd:sshd-core", version.ref = "sshd" }
 sshd-sftp = { module = "org.apache.sshd:sshd-sftp", version.ref = "sshd" }
 archunit = { module = "com.tngtech.archunit:archunit", version.ref = "archunit" }
+junit = { module = "junit:junit", version.ref = "junit" }

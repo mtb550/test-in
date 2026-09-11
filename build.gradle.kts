@@ -81,6 +81,7 @@ dependencies {
     // ships its own copy, so the verifier run is what proves they do not clash.
     implementation(libs.jackson.dataformat.yaml)
     testImplementation(libs.testng)
+    testImplementation(libs.junit)
     implementation(libs.iText.kernel)
     implementation(libs.iText.layout)
     implementation(libs.fastexcel)
@@ -253,9 +254,10 @@ tasks {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 
+    // Everything both test tasks need. The runner is not here: `test` is TestNG
+    // and `ideTest` is JUnit, because BasePlatformTestCase is a JUnit TestCase
+    // and the TestNG runner never sees one (#108).
     withType<Test> {
-        useTestNG()
-
         jvmArgs("--sun-misc-unsafe-memory-access=allow")
 
         // How many test cases IndexerBudgetTest measures against. Forwarded
@@ -277,9 +279,37 @@ tasks {
             events("passed", "skipped", "failed")
         }
     }
+
+    /**
+     * The ordinary tests: everything that needs no IDE, which is almost all of
+     * them. An IDE test is excluded by name rather than by living somewhere
+     * else, so the two kinds sit beside the code they are about.
+     */
+    named<Test>("test") {
+        useTestNG()
+        exclude("**/*IdeTest.class")
+    }
 }
 
 intellijPlatformTesting {
+    /**
+     * The tests that need a running IDE (#108).
+     *
+     * An indexer operation, an undo across two test sets and a card that asks a
+     * project service what is running cannot be checked without one - and three
+     * separate pieces of work wanted this in a single session, which is what
+     * settled it.
+     *
+     * Registered through the plugin rather than hand-rolled: a Test task needs
+     * the platform's own classpath, sandbox and JVM arguments, and this is where
+     * they come from. What is added here is the runner and which classes it
+     * takes, because BasePlatformTestCase is a JUnit TestCase and the TestNG
+     * runner that runs everything else would never see one.
+     */
+    testIde {
+        register("ideTest")
+    }
+
     runIde {
         register("runPyCharm") {
             type = IntelliJPlatformType.PyCharm
@@ -367,6 +397,37 @@ intellijPlatformTesting {
             }
         }
     }
+}
+
+
+/**
+ * The tests that need a running IDE.
+ *
+ * Registered just above under `intellijPlatformTesting` so that it carries the
+ * platform's classpath, sandbox and JVM arguments; what it needs on top is here,
+ * after the registration, because a task cannot be configured before it exists.
+ *
+ * An IDE test lives beside the code it is about rather than in a source set of
+ * its own, so the task is pointed at the classes the ordinary tests compile to
+ * and takes only the ones named for it.
+ */
+tasks.named<Test>("ideTest") {
+    group = "verification"
+    description = "The tests that need a running IDE"
+
+    useJUnit()
+
+    testClassesDirs = sourceSets["test"].output.classesDirs
+
+    // Three things, and the middle one is the trap. The test classes and their
+    // own dependencies come from the test source set; the platform's test
+    // framework - BasePlatformTestCase itself - is in a configuration of the
+    // plugin's own, and without it the scanner cannot resolve the superclass and
+    // skips every IDE test in silence, reporting that it found none.
+    classpath += sourceSets["test"].runtimeClasspath
+    classpath += configurations["intellijPlatformTestClasspath"]
+
+    include("**/*IdeTest.class")
 }
 
 configurations.all {
@@ -638,3 +699,4 @@ tasks.register<Exec>("inspect") {
     // so it is the task's verdict too.
     isIgnoreExitValue = false
 }
+
