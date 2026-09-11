@@ -40,6 +40,11 @@ This is the fastest way to reach one test set, one test run or one test case.
   When two actions claim one keystroke the IDE runs whichever is enabled and
   says nothing, and a component binding cannot win it back - so the key is
   changed instead.
+- **Rule-INTERNAL-071** — An action that acts on the editor is answered only by
+  the editor being typed into. The IDE offers every context the selected
+  editor's data whether or not it has the keyboard, so an action that took that
+  at face value was live in the tree as well - and where two actions share a
+  key, the first of them answered for both.
 
 The tree panel's own rules do not govern this dialog. It opens from anywhere in
 the IDE, and the tree is only where it lands.

@@ -13,7 +13,7 @@ up here rather than left to the code.
 |---|---|
 | **Part of Testin** | The parts that belong to no panel |
 | **Answers** | What the search finds, and what Testin does with the files under the Testin folder |
-| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-007`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-070` |
+| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-007`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-071` |
 | **State** | **Written** |
 | **Checked against** | `main` at `2cb8c1dc`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -24,7 +24,7 @@ up here rather than left to the code.
 
 | | What the tester does | Why a tester uses it | Where its rules are |
 |---|---|---|---|
-| **UC-INTERNAL-001** | [Find anything in the test project](globalSearch.md) | Reach one test case without scrolling a big tree. | Rule-INTERNAL-001 to Rule-INTERNAL-002, Rule-INTERNAL-066, Rule-INTERNAL-068 to Rule-INTERNAL-069 |
+| **UC-INTERNAL-001** | [Find anything in the test project](globalSearch.md) | Reach one test case without scrolling a big tree. | Rule-INTERNAL-001 to Rule-INTERNAL-002, Rule-INTERNAL-066, Rule-INTERNAL-068 to Rule-INTERNAL-069, Rule-INTERNAL-071 |
 | **UC-INTERNAL-002** | [Read a test project from disk](readTestProject.md) | Every panel answers at once, with no wait. | Rule-INTERNAL-003 to Rule-INTERNAL-015, Rule-INTERNAL-062, Rule-INTERNAL-070 |
 | **UC-INTERNAL-003** | [Pick up a change made outside the IDE](noticeOutsideChange.md) | See what a pull or a teammate changed. | Rule-INTERNAL-016 to Rule-INTERNAL-024 |
 | **UC-INTERNAL-004** | [Give a test case its number](numberTestCase.md) | Quote one number that means the same everywhere. | Rule-INTERNAL-025 to Rule-INTERNAL-035 |

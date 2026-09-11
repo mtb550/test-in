@@ -1,7 +1,6 @@
 package org.testin.testcase;
 
 import org.testin.notifications.Done;
-import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -10,7 +9,6 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
-import org.testin.logger.Logger;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
@@ -101,10 +99,6 @@ public class CreateTestCaseAction extends DumbAwareAction {
         // TEMPORARY - delete with the one in CreateTreeNodeAction. Two actions
         // share Ctrl+M, and if both are enabled the platform picks between them
         // rather than running ours.
-        if (ActionPlaces.KEYBOARD_SHORTCUT.equals(e.getPlace())) {
-            Logger.info("[ctrl-m] CreateTestCase enabled=" + enabled
-                    + " editor=" + TestinData.editor(e).map(any -> any.getClass().getSimpleName()).orElse("none"));
-        }
 
         e.getPresentation().setEnabled(enabled);
     }
