@@ -55,6 +55,28 @@ jobs:
 
           echo "Publishing $declared"
 
+      # The same reasoning as the step above, applied to what the version says
+      # about itself. 2.9.2-alpha was published with no change notes at all -
+      # the block in plugin.xml stopped at the version before it - and a tester
+      # looking at what that release changed was told about the previous one.
+      # Nobody noticed until the next release was being prepared.
+      #
+      # Before the upload rather than after, because the Marketplace takes the
+      # notes with the version and neither can be replaced (#66, finding 53).
+      - name: The version says what it changed
+        shell: bash
+        run: |
+          declared=$(sed -n 's/^version = "\(.*\)"$/\1/p' build.gradle.kts)
+
+          if ! grep -qF "<b>$declared</b>" src/main/resources/META-INF/plugin.xml; then
+            echo "plugin.xml has no <b>$declared</b> heading in its change-notes block,"
+            echo "so $declared would be published describing the release before it."
+            echo "Write the notes for $declared, or tag the version they describe."
+            exit 1
+          fi
+
+          echo "$declared says what it changed"
+
       # Tested and verified before it is signed. publishPlugin builds and signs
       # on its own but runs no tests, and a published version cannot be pulled
       # back.

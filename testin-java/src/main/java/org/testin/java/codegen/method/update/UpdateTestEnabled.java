@@ -3,6 +3,7 @@ package org.testin.java.codegen.method.update;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
+import java.util.List;
 import org.testin.codegen.GenAction;
 import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -28,5 +29,15 @@ public class UpdateTestEnabled extends UpdateTestBase implements GenAction {
         if (!(obj instanceof TestCaseDto tc)) return;
 
         applyUpdate(p, tc, "Update Test Case Enabled", pm -> writeEnabled(p, pm, tc));
+    }
+
+    /**
+     * A selection of cases as one command and one undo entry - see
+     * {@link UpdateTestBase#applyToEach} for what that is worth and what it
+     * cost before (#66, finding 56).
+     */
+    @Override
+    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+        applyToEach(p, items, "Update Test Case Enabled", (pm, tc) -> writeEnabled(p, pm, tc));
     }
 }

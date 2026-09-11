@@ -60,7 +60,7 @@ public record TestRunSummary(long total, long passed, long failed, long blocked,
                 // a case deleted under it, so a report whose tables ignored it
                 // would print a total its own sections do not add up to.
                 counts.getOrDefault(TestStatus.REMOVED, 0L),
-                executed > 0 ? (int) (passed * 100 / executed) : 0,
+                executed > 0 ? Math.round((float) passed * 100 / executed) : 0,
                 whoExecuted(results));
     }
 

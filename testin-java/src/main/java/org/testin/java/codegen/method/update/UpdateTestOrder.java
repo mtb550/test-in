@@ -109,6 +109,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
 
         @Nullable PsiElement after = null;
         int position = 0;
+        int written = 0;
 
         for (final TestCaseDto tc : inSet) {
             position++;
@@ -118,7 +119,15 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
 
             updateTestAnnotationAttribute(p, pm, "priority", String.valueOf(position));
             after = place(pc, pm, after);
+            written++;
         }
+
+        // Once for the set, after the moves. The attribute writer used to
+        // reformat each method as it wrote it, so a drag on a set of 120
+        // reformatted 120 times - and every one of those but the last was
+        // formatting a layout the moves below were about to change (#66,
+        // finding 55).
+        if (written > 0) reformat(p, pc);
     }
 
     /**

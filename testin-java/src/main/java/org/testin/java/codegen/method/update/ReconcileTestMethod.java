@@ -89,8 +89,10 @@ public class ReconcileTestMethod extends UpdateTestBase implements GenAction {
         final @NotNull Optional<PsiClass> target = classOf(p, inClass.getFirst());
         if (target.isEmpty()) return;
 
-        final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byCaseId(target.get());
+        final @NotNull PsiClass pc = target.orElseThrow();
+        final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byCaseId(pc);
 
+        int written = 0;
         for (final TestCaseDto tc : inClass) {
             final @Nullable PsiMethod pm = methods.get(tc.getId().toString());
             if (pm == null) continue;
@@ -98,6 +100,13 @@ public class ReconcileTestMethod extends UpdateTestBase implements GenAction {
             writeDescription(p, pm, tc);
             writeGroups(p, pm, tc);
             writeEnabled(p, pm, tc);
+            written++;
         }
+
+        // Once for the class, not three times per case. Each of the three
+        // writes above reformatted the method it had just touched until #66's
+        // finding 55, so reconciling a set of forty was a hundred and twenty
+        // passes where one does (#66, finding 55).
+        if (written > 0) reformat(p, pc);
     }
 }

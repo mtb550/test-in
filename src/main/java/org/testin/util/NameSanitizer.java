@@ -16,6 +16,15 @@ public final class NameSanitizer {
     private static final @NotNull Pattern INVALID_NAME = Pattern.compile("[^a-zA-Z0-9 _]");
 
     /**
+     * Two or more spaces where a stripped character used to be.
+     * <p>
+     * Stripping is what makes them: removing the {@code =} from "absher status =
+     * 0" leaves the space on each side of it, so the description was stored with
+     * a gap no tester typed (#66, finding 42).
+     */
+    private static final @NotNull Pattern SPACE_RUN = Pattern.compile("\\s{2,}");
+
+    /**
      * UC-CODEGEN-002, Rule-CODEGEN-011, Rule-CODEGEN-073.
      * <p>
      * The package a name gives, and never one Java refuses.
@@ -162,7 +171,12 @@ public final class NameSanitizer {
      * name is derived from the tree and is never stored.
      */
     public static @NotNull String description(final @NotNull String rawDescription) {
-        return INVALID_NAME.matcher(rawDescription).replaceAll("").trim();
+        // Collapsed after stripping, not before: removing a character from the
+        // middle of a sentence leaves the space on each side of it, so an
+        // imported "absher status = 0" was stored as "absher status  0" - wrong
+        // in every card and grid, and never again equal to the description in
+        // the code it came from (#66, finding 42).
+        return SPACE_RUN.matcher(INVALID_NAME.matcher(rawDescription).replaceAll("")).replaceAll(" ").trim();
     }
 
     /**

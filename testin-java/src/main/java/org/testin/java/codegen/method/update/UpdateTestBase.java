@@ -8,6 +8,12 @@ import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import java.util.function.BiConsumer;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import com.intellij.psi.PsiElement;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenType;
 import org.testin.java.codegen.GeneratedMethod;
@@ -141,14 +147,33 @@ public class UpdateTestBase {
     }
 
     /**
-     * Updates one attribute of the method's @Test annotation and reformats the method.
-     * The concrete update actions only differ in the attribute name and value expression.
+     * Updates one attribute of the method's {@code @Test} annotation. The
+     * concrete update actions only differ in the attribute name and value
+     * expression.
+     * <p>
+     * <b>It does not reformat.</b> Whoever asked for the write knows how many
+     * methods it is about to touch and reformats once at the end - see
+     * {@link #reformat}. This ended with a reformat of its own until #66's
+     * finding 55, which was one per gesture while callers changed one case at a
+     * time and became one per case the day a whole set went through in a single
+     * command: 120 reformats for one drag, the first 119 of them formatting a
+     * layout the moves after them were about to change.
      */
     protected void updateTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String attrName, final @NotNull String newValue) {
-        getTestAnnotation(pm).ifPresentOrElse(testAnnotation -> {
-            updateAnnotationAttribute(JavaPsiFacade.getElementFactory(p), testAnnotation, attrName, newValue);
-            CodeStyleManager.getInstance(p).reformat(pm);
-        }, () -> Logger.warn("Update: method has no @Test annotation"));
+        getTestAnnotation(pm).ifPresentOrElse(testAnnotation ->
+                        updateAnnotationAttribute(JavaPsiFacade.getElementFactory(p), testAnnotation, attrName, newValue),
+                () -> Logger.warn("Update: method has no @Test annotation"));
+    }
+
+    /**
+     * Tidies what the writes above left, once for whatever they were given.
+     * <p>
+     * A class when there is one - a batch touched several of its methods and
+     * one pass over the class costs less than one per method - and the method
+     * itself when a single update is all that happened.
+     */
+    protected void reformat(final @NotNull Project p, final @NotNull PsiElement element) {
+        CodeStyleManager.getInstance(p).reformat(element);
     }
 
     /**
@@ -161,10 +186,8 @@ public class UpdateTestBase {
      * annotation it builds to read the value from.
      */
     protected void removeTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String attrName) {
-        getTestAnnotation(pm).ifPresentOrElse(testAnnotation -> {
-            testAnnotation.setDeclaredAttributeValue(attrName, null);
-            com.intellij.psi.codeStyle.CodeStyleManager.getInstance(p).reformat(pm);
-        }, () -> Logger.warn("Update: method has no @Test annotation"));
+        getTestAnnotation(pm).ifPresentOrElse(testAnnotation -> testAnnotation.setDeclaredAttributeValue(attrName, null),
+                () -> Logger.warn("Update: method has no @Test annotation"));
     }
 
     /**
@@ -229,6 +252,78 @@ public class UpdateTestBase {
 
     // Shared boilerplate for all update actions: resolve the FQCN, locate the target class and
     // its @Test method by testName, then apply the specific update inside a write command action.
+    /**
+     * UC-CODEGEN-012, Rule-CODEGEN-045.
+     * <p>
+     * The same write applied to many cases, as <b>one</b> undo entry.
+     * <p>
+     * {@link org.testin.codegen.GenAction#executeAll} defaults to a loop over
+     * {@code execute}, and each {@code execute} opened its own {@code
+     * invokeLater} and its own write command - so changing the group on fifty
+     * selected cases was fifty events, fifty class lookups and fifty entries in
+     * the IDE's undo: fifty CTRL+Z presses to take back one gesture (#66,
+     * finding 56).
+     * <p>
+     * Grouped by class, because that is what a lookup costs and what a reformat
+     * is about: the class is resolved once, every one of its methods is written,
+     * and the class is reformatted once at the end (#66, finding 55).
+     * <p>
+     * A case whose method is missing is passed over rather than reported. A
+     * bulk edit over a set that was never generated would otherwise say so once
+     * per case, which is the noise this method exists to remove.
+     */
+    protected void applyToEach(final @NotNull Project p, final @NotNull List<?> items, final @NotNull String title, final @NotNull BiConsumer<PsiMethod, TestCaseDto> updater) {
+        final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
+
+        for (final Object item : items) {
+            if (!(item instanceof TestCaseDto tc)) continue;
+
+            final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
+            if (fqcn.size() < 2) continue;
+
+            byClass.computeIfAbsent(String.join(".", fqcn.subList(0, fqcn.size() - 1)), path -> new ArrayList<>()).add(tc);
+        }
+        if (byClass.isEmpty()) return;
+
+        final @NotNull Runnable inCommand = () ->
+                WriteCommandAction.runWriteCommandAction(p, title, null,
+                        () -> byClass.forEach((path, cases) -> writeAll(p, path, cases, updater)));
+
+        // The same rule the single form follows below: straight through when a
+        // command is already open, so a caller that wrapped this in one of its
+        // own still ends with one entry rather than two.
+        if (CommandProcessor.getInstance().getCurrentCommand() != null) inCommand.run();
+        else ApplicationManager.getApplication().invokeLater(inCommand);
+    }
+
+    private void writeAll(final @NotNull Project p, final @NotNull String path, final @NotNull List<TestCaseDto> cases, final @NotNull BiConsumer<PsiMethod, TestCaseDto> updater) {
+        final @NotNull Optional<PsiClass> target =
+                Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)));
+
+        if (target.isEmpty()) {
+            Logger.warn("Update: class not found: " + path);
+            return;
+        }
+
+        final @NotNull PsiClass pc = target.orElseThrow();
+
+        // Read once for the class rather than once per case, the same way the
+        // order sweep reads it - asking per case walks every method in the class
+        // for every case in it.
+        final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byCaseId(pc);
+
+        int written = 0;
+        for (final TestCaseDto tc : cases) {
+            final @Nullable PsiMethod pm = methods.get(tc.getId().toString());
+            if (pm == null) continue;
+
+            updater.accept(pm, tc);
+            written++;
+        }
+
+        if (written > 0) reformat(p, pc);
+    }
+
     private void applyToMethod(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater, final @NotNull Consumer<String> onMissing) {
         final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
         if (fqcn.size() < 2) return;
@@ -238,7 +333,11 @@ public class UpdateTestBase {
                 WriteCommandAction.runWriteCommandAction(p, title, null, () ->
                         Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)))
                                 .ifPresentOrElse(
-                                        targetClass -> findMethodByTestName(targetClass, tc).ifPresentOrElse(updater,
+                                        targetClass -> findMethodByTestName(targetClass, tc).ifPresentOrElse(
+                                                pm -> {
+                                                    updater.accept(pm);
+                                                    reformat(p, pm);
+                                                },
                                                 () -> onMissing.accept("no method with testName=" + tc.getId())),
                                         () -> onMissing.accept("class not found: " + path)));
 

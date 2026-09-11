@@ -8,6 +8,8 @@ import com.intellij.psi.PsiMethod;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.openapi.project.Project;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.LinkedHashMap;
@@ -96,7 +98,38 @@ public final class GeneratedMethod {
                 .map(String.class::cast);
     }
 
+    
     /**
+     * UC-CODEGEN-002, Rule-CODEGEN-001.
+     * <p>
+     * Writes this case's id into a method the tester wrote themselves, so that
+     * everything which finds a method by id can find it (#66, finding 41).
+     * <p>
+     * <b>Why the import needs it.</b> Navigate to Code, Run, and every updater
+     * find a case's method by the id in its {@code @Test(testName = ...)}, and a
+     * class automated by hand carries none. So importing that class's sheet used
+     * to skip every method as already there and leave every case answering "no
+     * automation has been generated yet" while the code sat right beside it -
+     * proved on a 150-case class where the ids had to be stamped in by an
+     * external script before a single case could navigate.
+     * <p>
+     * Only onto a method that has no id. One that carries another case's id
+     * belongs to that case, and overwriting it would take the method away from
+     * whoever owns it.
+     */
+    public static void adopt(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
+        if (caseIdOf(pm).isPresent()) return;
+
+        testAnnotationOf(pm).ifPresent(annotation -> {
+            final @NotNull PsiAnnotation written = JavaPsiFacade.getElementFactory(p)
+                    .createAnnotationFromText("@Test(" + TEST_NAME + " = " + JavaLiteral.of(tc.getId().toString()) + ")", pm);
+
+            Optional.ofNullable(written.findDeclaredAttributeValue(TEST_NAME))
+                    .ifPresent(value -> annotation.setDeclaredAttributeValue(TEST_NAME, value));
+        });
+    }
+
+/**
      * The method's {@code @Test} annotation, empty on a method that has none.
      */
     public static @NotNull Optional<PsiAnnotation> testAnnotationOf(final @NotNull PsiMethod pm) {

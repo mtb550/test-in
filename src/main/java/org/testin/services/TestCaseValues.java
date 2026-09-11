@@ -127,9 +127,8 @@ public final class TestCaseValues implements Disposable {
                 addTo(newDescriptions, tc.getDescription());
                 addTo(newExpectedResults, tc.getExpectedResult());
                 addTo(newModules, tc.getModule());
-                // Jackson can leave steps null on hand-edited JSON despite the field default.
-                Optional.of(tc.getSteps()).ifPresent(stepList -> stepList.forEach(s -> addTo(newSteps, s)));
-                Optional.of(tc.getGroup()).ifPresent(groupList -> groupList.forEach(g -> addTo(newGroups, g)));
+                tc.getSteps().forEach(s -> addTo(newSteps, s));
+                tc.getGroup().forEach(g -> addTo(newGroups, g));
             }
 
             replace(descriptions, newDescriptions);

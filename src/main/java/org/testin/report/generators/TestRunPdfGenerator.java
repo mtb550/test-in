@@ -205,29 +205,34 @@ public final class TestRunPdfGenerator {
             float leftMargin = document.getLeftMargin();
             float rightMargin = document.getRightMargin();
 
-            Canvas footerCanvas = new Canvas(pdf.getLastPage(),
-                    new Rectangle(leftMargin, 0, pageWidth - leftMargin - rightMargin, 28));
+            // Every page, not only the last one. It was built on getLastPage(), so a
+            // report of any length carried its footer on the final page alone -
+            // while the Word generator drew one on every page of the same report
+            // (#66, finding 34).
+            for (int page = 1; page <= pdf.getNumberOfPages(); page++) {
+                final @NotNull Canvas footerCanvas = new Canvas(pdf.getPage(page),
+                        new Rectangle(leftMargin, 0, pageWidth - leftMargin - rightMargin, 28));
 
-            // Horizontal rule above the footer text (HTML footer's border-top)
-            PdfCanvas pdfCanvas = footerCanvas.getPdfCanvas();
-            pdfCanvas.setStrokeColor(BORDER_GRAY);
-            pdfCanvas.setLineWidth(1.0f);
-            pdfCanvas.moveTo(leftMargin, 34);
-            pdfCanvas.lineTo(pageWidth - rightMargin, 34);
-            pdfCanvas.stroke();
+                // Horizontal rule above the footer text (HTML footer's border-top)
+                final @NotNull PdfCanvas pdfCanvas = footerCanvas.getPdfCanvas();
+                pdfCanvas.setStrokeColor(BORDER_GRAY);
+                pdfCanvas.setLineWidth(1.0f);
+                pdfCanvas.moveTo(leftMargin, 34);
+                pdfCanvas.lineTo(pageWidth - rightMargin, 34);
+                pdfCanvas.stroke();
 
+                // Footer — all text on a single line:
+                footerCanvas.add(new Paragraph()
+                        .setFont(regularFont).setFontSize(ReportFont.CAPTION.pt()).setFontColor(DARK_GRAY)
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .add(new Text(Display.formatDate(ZonedDateTime.now())))
+                        .add(new Text(Bundle.message("report.footer.prefix")))
+                        .add(new Link("Testin", PdfAction.createURI(ReportText.PLUGIN_URL))
+                                .setFontColor(LINK_BLUE))
+                        .add(new Text(Bundle.message("report.footer.suffix"))));
 
-            // Footer — all text on a single line:
-            footerCanvas.add(new Paragraph()
-                    .setFont(regularFont).setFontSize(ReportFont.CAPTION.pt()).setFontColor(DARK_GRAY)
-                    .setTextAlignment(TextAlignment.CENTER)
-                    .add(new Text(Display.formatDate(ZonedDateTime.now())))
-                    .add(new Text(Bundle.message("report.footer.prefix")))
-                    .add(new Link("Testin", PdfAction.createURI(ReportText.PLUGIN_URL))
-                            .setFontColor(LINK_BLUE))
-                    .add(new Text(Bundle.message("report.footer.suffix"))));
-
-            footerCanvas.close();
+                footerCanvas.close();
+            }
 
             document.close();
             return baos.toByteArray();

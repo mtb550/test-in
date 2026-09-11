@@ -28,6 +28,33 @@ public class TestRunSummaryTest {
         return TestRunItems.builder().id(UUID.randomUUID()).status(TestStatus.PASSED).executedBy(tester).build();
     }
 
+    /**
+     * UC-REPORT-001, Rule-REPORT-003.
+     * <p>
+     * The rate rounds rather than truncating, which is what a reader expects of
+     * a percentage and what every other tool answers.
+     * <p>
+     * It was integer division, so two passed of three read 66% and one of three
+     * read 33% - one whole point short, in every report that divides by three
+     * (#66, finding 35).
+     */
+    @Test
+    public void thePassRateRoundsRatherThanTruncating() {
+        assertEquals(rateOf(2, 1), 67, "two passed of three is 66.67%, which reads 67");
+        assertEquals(rateOf(1, 2), 33, "one passed of three is 33.33%, which reads 33");
+        assertEquals(rateOf(1, 1), 50, "one passed of two is exactly half");
+        assertEquals(rateOf(1, 0), 100, "everything that ran passed");
+        assertEquals(rateOf(0, 1), 0, "nothing that ran passed");
+    }
+
+    private static int rateOf(final int passed, final int failed) {
+        final List<TestRunItems> results = new java.util.ArrayList<>();
+        for (int i = 0; i < passed; i++) results.add(item(TestStatus.PASSED));
+        for (int i = 0; i < failed; i++) results.add(item(TestStatus.FAILED));
+
+        return TestRunSummary.of(results).passRate();
+    }
+
     @Test
     public void untestedCountsBothWaysOfNotHavingBeenRun() {
         // The regression: a completed run holds UNTESTED, not PENDING.
@@ -132,17 +159,6 @@ public class TestRunSummaryTest {
 
         assertEquals(summary.total(), 0);
         assertEquals(summary.passRate(), 0);
-    }
-
-    @Test
-    public void passRateTruncatesRatherThanRounding() {
-        // 1 of 3 is 33.33; the reports have always shown 33.
-        final TestRunSummary summary = TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.FAILED),
-                item(TestStatus.FAILED)));
-
-        assertEquals(summary.passRate(), 33);
     }
 
     // ------------------------------------------------------- what the rate is of

@@ -176,8 +176,12 @@ public class CreateTestMethod implements GenAction {
         // casing or underscores is the same method, and the exact compare wrote
         // a stub beside it (#66, finding 41).
         final @NotNull Map<String, String> owners = new HashMap<>();
+        final @NotNull Map<String, PsiMethod> byKey = new HashMap<>();
         for (final PsiMethod pm : targetClass.getMethods()) {
-            owners.putIfAbsent(NameSanitizer.methodKey(pm.getName()), GeneratedMethod.caseIdOf(pm).orElse(""));
+            final @NotNull String methodKey = NameSanitizer.methodKey(pm.getName());
+
+            owners.putIfAbsent(methodKey, GeneratedMethod.caseIdOf(pm).orElse(""));
+            byKey.putIfAbsent(methodKey, pm);
         }
 
         final @NotNull Map<String, PsiMethod> generated = GeneratedMethod.byCaseId(targetClass);
@@ -185,6 +189,7 @@ public class CreateTestMethod implements GenAction {
         final @NotNull StringBuilder methods = new StringBuilder();
         final @NotNull List<TestCaseDto> lostTheName = new ArrayList<>();
         int alreadyThere = 0;
+        int adopted = 0;
 
         for (final TestCaseDto tc : cases) {
             final @NotNull String id = tc.getId().toString();
@@ -203,9 +208,16 @@ public class CreateTestMethod implements GenAction {
 
             if (owner.isPresent()) {
                 // A method with no case id is the tester's own, written for this
-                // case by hand. Leaving it alone is what the key compare is for,
-                // and saying so every time would be noise on every generate.
-                if (owner.orElseThrow().isEmpty()) alreadyThere++;
+                // case by hand. Its body is left exactly as they wrote it - what
+                // is added is the case's id, so that Navigate to Code, Run and
+                // every updater can find it. Skipping silently is what left a
+                // hand-automated class reporting "no automation has been
+                // generated yet" for every case in it (#66, finding 41).
+                if (owner.orElseThrow().isEmpty()) {
+                    Optional.ofNullable(byKey.get(key)).ifPresent(pm -> GeneratedMethod.adopt(p, pm, tc));
+                    owners.put(key, id);
+                    adopted++;
+                }
                     // Another case already answers to that name, so this one would
                     // get no method - unrunnable, unreachable from the gutter, and
                     // until now silent (#244).
@@ -222,6 +234,11 @@ public class CreateTestMethod implements GenAction {
         if (alreadyThere > 0) {
             Logger.info(alreadyThere + " of " + testMethods(cases.size())
                     + " already in " + targetClass.getQualifiedName());
+        }
+
+        if (adopted > 0) {
+            Logger.info("Linked " + adopted + " hand-written method(s) in "
+                    + targetClass.getQualifiedName() + " to the cases that describe them");
         }
 
         reportLostTheName(p, targetClass, lostTheName);
