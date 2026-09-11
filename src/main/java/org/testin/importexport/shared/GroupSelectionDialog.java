@@ -89,9 +89,14 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
 
     /**
      * The selection as a test case stores it: the group names, comma separated.
+     * <p>
+     * Through {@link Groups#text}, which is the owner of that line for the cell,
+     * the card and the sheet alike. This wrote the join out itself, so the
+     * dialog that produces the value and the classes that read it agreed only by
+     * having been written the same day (#291).
      */
     private @NotNull String selectedGroupsStr() {
-        return String.join(", ", groups.getSelectedRows().stream()
+        return Groups.text(groups.getSelectedRows().stream()
                 .map(row -> groups.getValueAt(row, 0))
                 .toList());
     }
