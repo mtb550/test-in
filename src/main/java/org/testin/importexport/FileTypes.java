@@ -21,9 +21,12 @@ import org.testin.report.generators.TestRunWordGenerator;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
@@ -139,6 +142,31 @@ public enum FileTypes {
 
     public boolean isReportable() {
         return reportHandler != ReportHandler.UNSUPPORTED;
+    }
+
+    /**
+     * The format that can read this file name, empty when nothing can. Only
+     * formats with an import handler count; matching an .html file would NPE
+     * downstream.
+     * <p>
+     * Here rather than on the dialog's document listener, which is where it was
+     * until #291: which extension belongs to which format is what this enum is,
+     * and a listener that debounces keystrokes had no business answering it.
+     */
+    public static @NotNull Optional<FileTypes> importerFor(final @NotNull String fileName) {
+        return Arrays.stream(values())
+                .filter(type -> type.isImportable() && fileName.endsWith(type.getExtension()))
+                .findFirst();
+    }
+
+    /**
+     * The extensions an import understands, as a tester would say them.
+     */
+    public static @NotNull String importableExtensions() {
+        return Arrays.stream(values())
+                .filter(FileTypes::isImportable)
+                .map(FileTypes::getExtension)
+                .collect(Collectors.joining(", "));
     }
 
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
