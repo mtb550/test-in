@@ -32,16 +32,14 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         addSeparator();
 
-        // Every status each kind has, rather than the seven that were listed here.
-        // A status is a constant on its enum and this menu is the only place a
-        // tester reaches it, so one added there and not here would be a status
-        // nothing could ever set - and nothing would have said so (#175, C9).
-        // Each kind's statuses are one declared group, which generates its
-        // entries from that enum (#119).
+        // Every status the selected node has, rather than the seven that were
+        // listed here. A status is a constant on its enum and this menu is the
+        // only place a tester reaches it, so one added there and not here would
+        // be a status nothing could ever set - and nothing would have said so
+        // (#175, C9). One declared group generates them, from the node rather
+        // than from a group per kind of node (#119, #110).
         add(actionsSubMenu(List.of(
-                        Declared.forMenu("Testin.UpdateTestProjectStatus"),
-                        Declared.forMenu("Testin.UpdateTestSetStatus"),
-                        Declared.forMenu("Testin.UpdatePackageStatus")), List.of(
+                        Declared.forMenu("Testin.UpdateStatus")), List.of(
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.UNDO),
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.REDO),
                         Declared.forMenu("Testin.ReCreateTestRun"),

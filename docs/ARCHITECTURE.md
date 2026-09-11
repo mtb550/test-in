@@ -2,12 +2,12 @@
 
 # How Testin is put together
 
-The plugin is 500 classes in 37 top-level packages. This page is the map: which
+The plugin is 509 classes in 33 top-level packages. This page is the map: which
 packages are layers and which are side modules, the four rules the whole thing
 is built on, and two operations traced class by class — because everything else
 is a variation on one of them.
 
-Read this before your first change. It replaces reading 37 packages to find out
+Read this before your first change. It replaces reading 33 packages to find out
 where anything lives. It does **not** describe what Testin does for a tester —
 that is [the documentation](README.md) — and it does not describe any one
 package in detail.
@@ -26,11 +26,11 @@ explorer      editor       view    statusbar     lightmode      the surfaces
    |            |           |          |             |
    +------------------------+------------------------+
                             |
-              actions, dialogs, ui.framework                    how a surface
+              actions, ui.framework                             how a surface
               creator, clipboard, undo, search,                 asks for things
               navigate, open, order, rename, remove
                             |
-              testcase testset testproject testrun run          the operations
+              testcase  testproject  testrun                    the operations
                             |
                         services                                who to ask
                 (Services, Notifier, settings)
@@ -45,7 +45,7 @@ explorer      editor       view    statusbar     lightmode      the surfaces
    logger ..... written to by all of them, imports none of them
 
    side modules, each on the indexer and none on each other:
-   codegen   git   sftp   report   importexport   runner   automate   config
+   codegen   git   sftp   report   importexport   runner   config
 ```
 
 Two content modules sit outside this entirely, loaded only where their platform
@@ -60,13 +60,13 @@ modules](#the-two-content-modules).
 |---|---|---|
 | Surfaces | `explorer`, `editor`, `view`, `statusbar`, `lightmode` | No |
 | Gestures | `actions`, `ui`, `creator`, `clipboard`, `undo`, `search`, `navigate`, `open`, `order`, `rename`, `remove` | No |
-| Operations | `testcase`, `testset`, `testproject`, `testrun`, `run` | No |
+| Operations | `testcase`, `testproject`, `testrun` | No |
 | Services | `services`, `notifications`, `setting`, `config` | `config` and `setting` only, and neither touches test data |
 | Data | `indexer`, `model` | `indexer` only |
 | Side modules | `codegen`, `git`, `sftp`, `report`, `importexport`, `runner` | See the exempt list below |
 | Leaves | `logger`, `util` | `logger` only, and only its own log |
 
-**Two names left this table on 11 September 2026, and the root package emptied.**
+**Four names left this table on 11 September 2026, and the root package emptied.**
 `dialogs` held one class whose only caller is in `ui`, one letter away from
 `ui.dialogs` - two names that near each other are a coin toss rather than a
 choice. `automate` held one action, and automating a test case *is* generating
@@ -77,6 +77,22 @@ a package in the row it was already in.
 in no row of this table at all. They are in `actions` and `view.marker` now -
 where the first already extends `AbstractProjectAction`, and the second opens
 `MarkerDetailsViewDialog` and does nothing else.
+
+`testset` held one action and the group that built it, both of them a copy of
+the package pair two directories away and of the test project pair one
+directory further - three classes setting a status, differing in the name of a
+DTO and in nothing else. There is one now, in `explorer.tree` where the menu
+that offers it lives: a marker says which statuses its node has and applies the
+one it is given, so the tester sees the statuses of whatever they right-clicked
+and a fourth status anywhere appears with nothing else to change.
+
+`run` merged into `runner`, which is the documented pair #110 asked for. They
+were one concern split over two names - `run` started an execution and `runner`
+watched it - and a side module owning the actions that invoke it is what `git`
+and `importexport` already do. What is left is a pair that cannot be confused:
+`runner` executes test cases, `testrun` is the test run a tester creates, names
+and records verdicts into. Merging those two would lose the distinction, which
+is why the triple folded to two rather than to one.
 
 **The packages that are small and staying that way** are small because this table
 says so. `open`, `order` and `remove` hold two files, one and one; they are
@@ -244,9 +260,9 @@ how to run anything; a content module does.
 
 | # | Where | What happens |
 |---|---|---|
-| 1 | `run/RunTestsAction` | Asks the selected node which gesture this is. A node that *holds* cases hands them straight to the runner; a **test run** is opened in its editor first, because a verdict reaches a named run only through the editor that claimed the case. |
-| 2 | `run/RunTestCases.run` | Refuses if the TestNG plugin is absent, drops the cases already running, and starts what is left **as one run** — one compile and one JVM, not twelve. Notifies once, with a count. |
-| 3 | `run/TestRunner.available()` | The extension point `org.testin.testRunners`. Empty in an IDE where nothing can run — an answer, not a missing one. |
+| 1 | `runner/RunTestsAction` | Asks the selected node which gesture this is. A node that *holds* cases hands them straight to the runner; a **test run** is opened in its editor first, because a verdict reaches a named run only through the editor that claimed the case. |
+| 2 | `runner/RunTestCases.run` | Refuses if the TestNG plugin is absent, drops the cases already running, and starts what is left **as one run** — one compile and one JVM, not twelve. Notifies once, with a count. |
+| 3 | `runner/TestRunner.available()` | The extension point `org.testin.testRunners`. Empty in an IDE where nothing can run — an answer, not a missing one. |
 | 4 | `testin-testng/TestNGRunner.run` | Finds each case's generated method as a `PsiClass`, reports the ones with no generated code, and builds a `TestNGConfiguration` whose pattern set names class and method. |
 | 5 | `runner/TestNGExecution.launch` | Hands the configuration to the platform and remembers which cases this environment covers, so a stop knows what to put back. |
 | 6 | `runner/TestNGExecution.starting` | Broadcasts each case as running before the process exists, so the cards change at the click rather than at the first report. |
@@ -285,7 +301,7 @@ present.
 | Module | Needs | Contributes |
 |---|---|---|
 | `testin-java` | the Java plugin | Writing, moving, renaming and reconciling the generated test classes and methods, and the gutter mark beside a generated method |
-| `testin-testng` | the TestNG plugin | `TestNGRunner`, the one implementation of `run/TestRunner` |
+| `testin-testng` | the TestNG plugin | `TestNGRunner`, the one implementation of `runner/TestRunner` |
 
 The core declares the extension point and never learns whether anything answered:
 `TestRunner.available()` returns a runner that logs and starts nothing when the

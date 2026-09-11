@@ -65,7 +65,7 @@ import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.open.OpenContextMenuAction;
-import org.testin.run.RunTestCases;
+import org.testin.runner.RunTestCases;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.RunStatusService;

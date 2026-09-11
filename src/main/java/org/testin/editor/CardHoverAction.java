@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.NavigateToCodeAction;
 import org.testin.notifications.Notifier;
-import org.testin.run.RunTestCases;
+import org.testin.runner.RunTestCases;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
 import org.testin.actions.Declared;

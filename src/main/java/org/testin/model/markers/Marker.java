@@ -2,6 +2,7 @@ package org.testin.model.markers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.NodeStatus;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -78,6 +79,39 @@ public interface Marker {
     }
 
     /**
+     * What this node is: {@link NodeStatus#NONE} for a marker carrying no
+     * status, which is most of them.
+     * <p>
+     * Not named {@code getStatus}: the markers that have one declare a typed
+     * {@code getStatus} of their own, and a status is a persisted field on
+     * those. Two methods one overload apart, one of them serialized and one of
+     * them not, is a JSON key waiting to disappear.
+     */
+    default @NotNull NodeStatus status() {
+        return NodeStatus.NONE;
+    }
+
+    /**
+     * Every status this node can be set to, empty for a marker that carries
+     * none - so the menu is built from the node the tester right-clicked rather
+     * than from one group per kind of node, and a status added to an enum
+     * appears there with nothing else to change (#110).
+     */
+    default @NotNull List<NodeStatus> statuses() {
+        return List.of();
+    }
+
+    /**
+     * Sets it. Does nothing to a marker that carries no status, which is the
+     * same thing {@link #statuses()} says by being empty.
+     * <p>
+     * The implementations cast, and the cast holds because the only source of
+     * a status is {@link #statuses()} on this same marker.
+     */
+    default void applyStatus(final @NotNull NodeStatus status) {
+    }
+
+    /**
      * Human-readable status of the node; empty when the marker carries none.
      * Empty rather than null because the details popup drops a blank row
      * anyway, so no reader has to ask whether this marker has a status.
@@ -86,7 +120,7 @@ public interface Marker {
      */
     @JsonIgnore
     default @NotNull String getStatusLabel() {
-        return "";
+        return status().getLabel();
     }
 
     /**

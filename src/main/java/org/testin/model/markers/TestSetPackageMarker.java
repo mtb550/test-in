@@ -1,12 +1,10 @@
 package org.testin.model.markers;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.jetbrains.annotations.NotNull;
 import org.testin.model.PackageStatus;
 
 @Setter
@@ -20,10 +18,4 @@ public class TestSetPackageMarker extends AbstractMarker implements PackageMarke
      */
     @NonNull
     private PackageStatus status = PackageStatus.ACTIVE;
-
-    @JsonIgnore
-    @Override
-    public @NotNull String getStatusLabel() {
-        return status.getLabel();
-    }
 }

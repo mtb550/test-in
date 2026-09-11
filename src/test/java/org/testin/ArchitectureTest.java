@@ -77,10 +77,9 @@ public class ArchitectureTest {
             "org.testin.services..", "org.testin.creator..", "org.testin.explorer..", "org.testin.statusbar..",
             "org.testin.ui..", "org.testin.git..", "org.testin.sftp..", "org.testin.report..",
             "org.testin.importexport..", "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..",
-            "org.testin.testset..", "org.testin.search..", "org.testin.undo..", "org.testin.rename..",
-            "org.testin.remove..", "org.testin.open..", "org.testin.clipboard..", "org.testin.run..",
-            "org.testin.automate..", "org.testin.notifications..", "org.testin.setting..", "org.testin.config..",
-            "org.testin.actions..", "org.testin.dialogs.."
+            "org.testin.search..", "org.testin.undo..", "org.testin.rename..", "org.testin.remove..",
+            "org.testin.open..", "org.testin.clipboard..", "org.testin.runner..", "org.testin.notifications..",
+            "org.testin.setting..", "org.testin.config..", "org.testin.actions.."
     };
 
     /**
@@ -116,10 +115,9 @@ public class ArchitectureTest {
             "org.testin.indexer..", "org.testin.editor..", "org.testin.view..", "org.testin.codegen..",
             "org.testin.creator..", "org.testin.explorer..", "org.testin.statusbar..", "org.testin.ui..",
             "org.testin.git..", "org.testin.sftp..", "org.testin.report..", "org.testin.importexport..",
-            "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..", "org.testin.testset..",
-            "org.testin.search..", "org.testin.undo..", "org.testin.rename..", "org.testin.remove..",
-            "org.testin.open..", "org.testin.clipboard..", "org.testin.run..", "org.testin.automate..",
-            "org.testin.dialogs.."
+            "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..", "org.testin.search..",
+            "org.testin.undo..", "org.testin.rename..", "org.testin.remove..", "org.testin.open..",
+            "org.testin.clipboard..", "org.testin.runner.."
     };
 
     /**

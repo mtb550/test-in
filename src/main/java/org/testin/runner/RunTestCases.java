@@ -1,4 +1,4 @@
-package org.testin.run;
+package org.testin.runner;
 
 import org.testin.model.RunStatus;
 import com.intellij.openapi.project.Project;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
-import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
 import org.testin.services.OptionalPlugin;
 

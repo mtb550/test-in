@@ -210,7 +210,7 @@
     <!-- ================================================================== -->
     <extensionPoints>
         <extensionPoint name="testRunners"
-                        interface="org.testin.run.TestRunner"
+                        interface="org.testin.runner.TestRunner"
                         dynamic="true"/>
         <extensionPoint name="codeGenerators"
                         interface="org.testin.codegen.CodeGenerators"
@@ -425,7 +425,7 @@
 
         <action
                 id="Testin.RunTestCase"
-                class="org.testin.run.RunTestCaseAction"
+                class="org.testin.runner.RunTestCaseAction"
                 icon="AllIcons.RunConfigurations.TestState.Run"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="F5"/>
@@ -518,7 +518,7 @@
 
         <action
                 id="Testin.RunTests"
-                class="org.testin.run.RunTestsAction"
+                class="org.testin.runner.RunTestsAction"
                 icon="AllIcons.RunConfigurations.TestState.Run"
         />
 
@@ -528,26 +528,16 @@
                 icon="AllIcons.ObjectBrowser.Sorted"
         />
 
-        <!-- One entry per status, generated from the enum rather than written
-             out here: a status is a constant on ProjectStatus, and a second list
-             of them in this file is one that goes stale the day a status is
-             added (#175, C9). Compact, so the entries sit directly in the
-             Actions menu the way they always have. -->
+        <!-- One entry per status the selected node has, generated from its
+             enum rather than written out here: a status is a constant on
+             ProjectStatus, TestSetStatus or PackageStatus, and a second list of
+             them in this file is one that goes stale the day a status is added
+             (#175, C9). One group rather than one per kind of node - the node
+             says which statuses it has (#110). Compact, so the entries sit
+             directly in the Actions menu the way they always have. -->
         <group
-                id="Testin.UpdateTestProjectStatus"
-                class="org.testin.testproject.UpdateTestProjectStatusGroup"
-                popup="false"
-        />
-
-        <group
-                id="Testin.UpdateTestSetStatus"
-                class="org.testin.testset.UpdateTestSetStatusGroup"
-                popup="false"
-        />
-
-        <group
-                id="Testin.UpdatePackageStatus"
-                class="org.testin.explorer.tree.UpdatePackageStatusGroup"
+                id="Testin.UpdateStatus"
+                class="org.testin.explorer.tree.UpdateStatusGroup"
                 popup="false"
         />
 

@@ -1,7 +1,10 @@
 package org.testin.model.markers;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.NodeStatus;
 import org.testin.model.PackageStatus;
+
+import java.util.List;
 
 /**
  * A marker that carries a {@link PackageStatus}: the test set package and the
@@ -18,4 +21,19 @@ public interface PackageMarker extends Marker {
     @NotNull PackageStatus getStatus();
 
     PackageMarker setStatus(@NotNull PackageStatus status);
+
+    @Override
+    default @NotNull NodeStatus status() {
+        return getStatus();
+    }
+
+    @Override
+    default @NotNull List<NodeStatus> statuses() {
+        return List.of(PackageStatus.values());
+    }
+
+    @Override
+    default void applyStatus(final @NotNull NodeStatus status) {
+        setStatus((PackageStatus) status);
+    }
 }

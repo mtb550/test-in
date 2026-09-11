@@ -1,4 +1,4 @@
-package org.testin.run;
+package org.testin.runner;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;

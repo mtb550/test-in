@@ -17,7 +17,7 @@ import org.testin.util.Bundle;
  */
 @Getter
 @AllArgsConstructor
-public enum PackageStatus {
+public enum PackageStatus implements NodeStatus {
     ACTIVE(
             Bundle.message("status.package.active"),
             Bundle.message("status.package.active.action"),

@@ -16,7 +16,7 @@ import com.theoryinpractice.testng.configuration.TestNGConfigurationType;
 import com.theoryinpractice.testng.model.TestType;
 import org.jetbrains.annotations.NotNull;
 import org.testin.runner.TestNGExecution;
-import org.testin.run.TestRunner;
+import org.testin.runner.TestRunner;
 import org.testin.navigate.CodeNavigation;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
