@@ -33,7 +33,7 @@ explorer          editor           view          lightmode      the surfaces
               testcase  testproject  testrun                    the operations
                             |
                         services                                who to ask
-                (Services, Notifier, settings)
+             (Services, Notifier, settings, testin.yml)
                             |
                         indexer                                 the only door
              ProjectIndexer -> IndexerDataStore                 to test data
@@ -44,8 +44,8 @@ explorer          editor           view          lightmode      the surfaces
    model  ..... the vocabulary every layer above speaks
    logger ..... written to by all of them, imports none of them
 
-   side modules, each on the indexer and none on each other:
-   codegen   git   sftp   report   importexport   runner   config
+   side modules, each on the indexer and four pairs on each other:
+   codegen   git   sftp   report   importexport   runner
 ```
 
 Two content modules sit outside this entirely, loaded only where their platform
@@ -115,15 +115,60 @@ belongs beside the feature.
 
 ### Where the graph is not a tree
 
-Seven imports point the wrong way up that picture - a package importing one
-strictly above it in the table. They are listed rather than hidden, because a
-newcomer will find them and should know which are deliberate.
+Not every import points down that picture. Three shapes account for almost all
+of the ones that do not, and all three are deliberate, so they are described
+here rather than listed one by one:
+
+- **An action holds the surface it acts on**, and a feature owns the actions
+  that invoke it. `git/SyncActionAction` reaching `explorer` is a gesture
+  reaching its surface, filed under `git` because that is where sharing lives.
+- **A dialog reaches the dialog framework.** `ui/framework` is drawn in the
+  gestures row and is infrastructure: everything that opens a dialog reaches it,
+  which is what it is for.
+- **`testcase` and `testrun` hold vocabulary as well as operations.** #111 moved
+  `TestEditorAttributes` and `RunEditorAttributes` out of `model` into the
+  packages that own those fields, so a feature asking what a test case's columns
+  are now reaches the operations row to ask. `importexport` does it 30 times,
+  `report` 8, `git` twice. That is what the move cost, and it is not a package
+  reaching up to *do* anything.
+
+What is left is below. **There is no count here on purpose.** The sentence that
+stood here said eleven, defined as "a package importing one strictly above it in
+the table" - and by that definition the real number is about ninety, because the
+three shapes above are everywhere. A number nothing measures is a number that
+goes stale the same week (#66, findings 61 and 77).
 
 | From | To | Why |
 |---|---|---|
-| `indexer/ProjectIndexer`, `indexer/Rescan` | `editor/TestinEditors`, `explorer/TreePanel` | A rescan has to tell the open surfaces that what they are showing has changed. The alternative is a listener the indexer publishes to, which is worth doing and has not been. |
+| `indexer/ProjectIndexer` | `editor/LastOpenEditors` | Indexing finishes, and the editors the tester had open are reopened. |
+| `indexer/Rescan` | `explorer/TreePanel`, `editor/TestinEditors` | A rescan has to tell the open surfaces that what they are showing has changed. The alternative is a listener the indexer publishes to, and the reason it has not been done is below this table. |
+| `setting/SettingsConfigurable` | `explorer/TreePanel` | Applying the settings page rebuilds the tree, because the Testin root it names is what the tree is built from. Not an action, so it is not the first shape above. |
+| `codegen/AutomationState` | `navigate/CodeNavigation` | Whether a case has automation behind it is answered by resolving the generated method, and resolving is what `navigate` knows how to do. |
+| `codegen/ExecutionPosition` | `testcase/TestCaseOrder` | The number a generated method carries is the case's place in its set, and the set's order is `testcase`'s answer. The third shape above, in one import. |
 | `actions/TestinData`, `actions/Declared` | `editor`, `model`, `util`, `logger` | Deliberate, and new with #119. A declared action is built by the platform with a no-arg constructor, so it asks the surface that has the keyboard what is selected - and a data key has to name the type it answers with. `actions` was a leaf until then, and typing the keys as `Object` to keep it one would be worse than the edge. |
 | `testcase/TestEditorAttributes`, `testrun/RunEditorAttributes` | `ui/Badges` | Deliberate. An enum carries its own presentation and its own action rather than being read by an `instanceof` chain at every call site — see the conventions in [CLAUDE.md](https://github.com/mtb550/test-in/blob/main/CLAUDE.md). What is new is where it points *from*: these two were in `model` until 11 September 2026, so the vocabulary every layer speaks pulled the badge painter in behind it (#111). A field of a test case is a fact about `testcase`. What is left is one import each, for the badge a card draws; the other four - `codegen`, `importexport`, `notifications`, `indexer` - are a feature calling a side module and a service, which points down. |
+
+**Side modules are not quite "none on each other".** The drawing above says they
+are, and four pairs say otherwise:
+
+| | |
+|---|---|
+| `sftp` -> `git` | Both merge an incoming test case against the local one, and `git/TestCaseMerge` is the one that knows how. A copy in `sftp` would be a second answer to "what does a conflict look like", which is the divergence the merge dialog exists to prevent. |
+| `report` -> `importexport` | The report dialog offers four formats and `importexport/FileTypes` is where a format's extension lives. |
+| `importexport` -> `report` | And back: `FileTypes` names the four report generators, one per format. The pair is a cycle, and it is the only one between side modules. |
+| `importexport` -> `codegen` | An import creates test cases, and a created case gets its generated method like any other. |
+
+**Why the rescan still calls the surfaces.** `TestCaseExecutionListener` is the
+shape that would fix it - a topic the runner publishes to, with no idea who is
+listening - and the indexer saying "this path changed" is the same statement. It
+is not a rename, though. `Rescan` asks `Services.isNotCreated(p, TreePanel.class)`
+before it does anything at all, and that question decides whether the project is
+scanned, not only whether anything is redrawn: a project that never opened the
+Testin tool window must not be indexed behind the tester's back (#77). Moving the
+notification to a topic leaves that decision with nothing to ask, so the move is
+a new question for the indexer to answer about itself plus two subscribers plus
+the ordering - record first, tell the surfaces second - and it is worth doing on
+its own rather than inside a sweep (#66, finding 60).
 
 What is **not** there: **`model` imports nothing above it at all** - not
 `editor`, not `explorer`, not `view`, and since 11 September not `indexer`,
