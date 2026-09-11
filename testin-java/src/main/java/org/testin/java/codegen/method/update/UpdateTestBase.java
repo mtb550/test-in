@@ -166,11 +166,18 @@ public class UpdateTestBase {
     }
 
     /**
-     * Tidies what the writes above left, once for whatever they were given.
+     * Tidies what a write left, once for whatever it touched.
      * <p>
-     * A class when there is one - a batch touched several of its methods and
-     * one pass over the class costs less than one per method - and the method
-     * itself when a single update is all that happened.
+     * <b>Whoever wrote tidies, and only them.</b> A batch reformats its class,
+     * because one pass over the class costs less than one per method. A single
+     * update reformats its own method. A removal reformats nothing, because it
+     * wrote nothing - it deleted the method, and asking the formatter to tidy an
+     * element that has left the PSI tree throws "Invalid root block PSI element"
+     * out of the write command.
+     * <p>
+     * That is why this is not called from {@link #applyToMethod}, which serves
+     * the removal as well as the writes and cannot know which it is looking at
+     * (#66, finding 55).
      */
     protected void reformat(final @NotNull Project p, final @NotNull PsiElement element) {
         CodeStyleManager.getInstance(p).reformat(element);
@@ -333,11 +340,7 @@ public class UpdateTestBase {
                 WriteCommandAction.runWriteCommandAction(p, title, null, () ->
                         Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)))
                                 .ifPresentOrElse(
-                                        targetClass -> findMethodByTestName(targetClass, tc).ifPresentOrElse(
-                                                pm -> {
-                                                    updater.accept(pm);
-                                                    reformat(p, pm);
-                                                },
+                                        targetClass -> findMethodByTestName(targetClass, tc).ifPresentOrElse(updater,
                                                 () -> onMissing.accept("no method with testName=" + tc.getId())),
                                         () -> onMissing.accept("class not found: " + path)));
 

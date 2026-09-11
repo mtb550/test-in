@@ -28,7 +28,10 @@ public class UpdateTestEnabled extends UpdateTestBase implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        applyUpdate(p, tc, "Update Test Case Enabled", pm -> writeEnabled(p, pm, tc));
+        applyUpdate(p, tc, "Update Test Case Enabled", pm -> {
+            writeEnabled(p, pm, tc);
+            reformat(p, pm);
+        });
     }
 
     /**

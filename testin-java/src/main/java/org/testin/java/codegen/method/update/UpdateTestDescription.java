@@ -15,7 +15,10 @@ public class UpdateTestDescription extends UpdateTestBase implements GenAction {
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
-        applyOrCreate(p, tc, "Update Test Case Description", pm -> writeDescription(p, pm, tc));
+        applyOrCreate(p, tc, "Update Test Case Description", pm -> {
+            writeDescription(p, pm, tc);
+            reformat(p, pm);
+        });
     }
 
     /**

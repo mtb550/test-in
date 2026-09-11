@@ -129,7 +129,7 @@ public class ViewPanel implements Disposable {
     public @NotNull ViewPanel hide() {
         ViewToolWindowFactory.toolWindow(p)
                 .filter(ToolWindow::isVisible)
-                .ifPresent(tw -> tw.hide(null));
+                .ifPresent(ToolWindow::hide);
         return this;
     }
 

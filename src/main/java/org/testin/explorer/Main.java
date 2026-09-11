@@ -3,7 +3,6 @@ package org.testin.explorer;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
@@ -24,6 +23,10 @@ public class Main implements ToolWindowFactory, DumbAware {
             if (!p.isDisposed())
                 StartupActivity.execute(p);
 
+            // The panel is a project service, so the project disposes it. It was
+            // also registered as a child of this content, which is a second owner
+            // for one lifetime: closing the content disposed a service the project
+            // container still held and would dispose again.
             final @NotNull TreePanel tp = Services.getInstance(p, TreePanel.class);
             final @NotNull Content content = ContentFactory.getInstance().createContent(tp.getPanel(), null, false);
 
@@ -41,8 +44,6 @@ public class Main implements ToolWindowFactory, DumbAware {
 
             tw.setTitleActions(new TreePanelActions().create(p, tp));
             tw.getContentManager().addContent(content);
-
-            Disposer.register(content, tp);
         });
     }
 }
