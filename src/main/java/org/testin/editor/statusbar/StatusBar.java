@@ -18,6 +18,7 @@ import org.testin.logger.Logger;
 import org.testin.model.Automated;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunStatus;
+import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -96,7 +97,7 @@ public class StatusBar extends JBPanel<StatusBar> {
      */
     private final @NotNull Map<PageStep, PageBtn> pageButtons = new EnumMap<>(PageStep.class);
 
-    private final @NotNull JBLabel currentPageLabel = new JBLabel("1 of 1");
+    private final @NotNull JBLabel currentPageLabel = new JBLabel(Bundle.message("statusbar.page.of", "1", "1"));
 
     /**
      * Empty until the editor says what its page size is - see
@@ -126,7 +127,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         runStatusLabel.setBorder(JBUI.Borders.emptyRight(10));
         runStatusLabel.setIconTextGap(JBUI.scale(4));
         new HelpTooltip()
-                .setDescription(HtmlChunk.text("This run's status. A completed or closed run records no more verdicts"))
+                .setDescription(HtmlChunk.text(Bundle.message("statusbar.run.status.tip")))
                 .installOn(runStatusLabel);
 
         verdictsRow.setOpaque(false);
@@ -138,13 +139,13 @@ public class StatusBar extends JBPanel<StatusBar> {
         executionTimeLabel.setForeground(UIUtil.getInactiveTextColor());
         executionTimeLabel.setBorder(JBUI.Borders.emptyRight(10));
         new HelpTooltip()
-                .setDescription(HtmlChunk.text("Time spent executing this run"))
+                .setDescription(HtmlChunk.text(Bundle.message("statusbar.run.time.tip")))
                 .installOn(executionTimeLabel);
 
         automatedLabel.setForeground(UIUtil.getInactiveTextColor());
         automatedLabel.setBorder(JBUI.Borders.emptyRight(10));
         new HelpTooltip()
-                .setDescription(HtmlChunk.text("Test cases in this set with a generated test method behind them"))
+                .setDescription(HtmlChunk.text(Bundle.message("statusbar.automated.tip")))
                 .installOn(automatedLabel);
 
         // The three above start hidden, and each shows itself when it is given
@@ -162,7 +163,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         // Its own border and nothing else: on a text field the border is the frame
         // the tester sees, so replacing it to buy a margin erases the field. The
         // margin belongs to the row, below.
-        pageSizeField.setToolTipText("Test cases per page");
+        pageSizeField.setToolTipText(Bundle.message("statusbar.page.size.tip"));
 
         for (final PageStep step : PageStep.values()) pageButtons.put(step, new PageBtn(step));
 
@@ -333,7 +334,7 @@ public class StatusBar extends JBPanel<StatusBar> {
      * automated last week would be worse than an empty corner.
      */
     public void showAutomated(final int written, final int known) {
-        automatedLabel.setText(Automated.WRITTEN.getLabel() + " " + written + " of " + known);
+        automatedLabel.setText(Bundle.message("statusbar.automated.count", Automated.WRITTEN.getLabel(), String.valueOf(written), String.valueOf(known)));
         automatedLabel.setVisible(known > 0);
 
         // What the corner was told and whether it can be seen, because "it is not
@@ -391,7 +392,7 @@ public class StatusBar extends JBPanel<StatusBar> {
 
         label.setForeground(color);
         new HelpTooltip()
-                .setDescription(HtmlChunk.text("How this run is going"))
+                .setDescription(HtmlChunk.text(Bundle.message("statusbar.run.progress.tip")))
                 .installOn(label);
 
         return label;
@@ -436,7 +437,7 @@ public class StatusBar extends JBPanel<StatusBar> {
      * now, so nothing here has to guess what is selected.
      */
     public void updatePaginationState(final int currentPage, final int totalPages) {
-        currentPageLabel.setText(currentPage + " of " + Math.max(1, totalPages));
+        currentPageLabel.setText(Bundle.message("statusbar.page.of", String.valueOf(currentPage), String.valueOf(Math.max(1, totalPages))));
 
         // Whether an arrow goes anywhere is the step's own answer, and the same
         // one its keyboard shortcut asks - it used to be stated here four times
@@ -474,14 +475,16 @@ public class StatusBar extends JBPanel<StatusBar> {
      */
     public void updateSelectionState(final int @NotNull [] selectedIndices, final int firstSelectedPosition, final int shownCount, final int totalCount) {
         final int selectedCount = selectedIndices.length;
-        final @NotNull String cases = shownCount + (shownCount == 1 ? " test case" : " test cases");
+        final @NotNull String cases = shownCount == 1
+                ? Bundle.message("statusbar.cases.one")
+                : Bundle.message("statusbar.cases.many", String.valueOf(shownCount));
         final @NotNull String of = cases + narrowedFrom(shownCount, totalCount);
 
         if (selectedCount > 1) {
-            statusLabel.setText(String.format(Locale.ENGLISH, "<html>%d selected of %s</html>", selectedCount, of));
+            statusLabel.setText("<html>" + Bundle.message("statusbar.selected.of", String.valueOf(selectedCount), of) + "</html>");
 
         } else if (selectedCount == 1) {
-            statusLabel.setText(String.format(Locale.ENGLISH, "<html>%d of %s</html>", firstSelectedPosition + 1, of));
+            statusLabel.setText("<html>" + Bundle.message("statusbar.position.of", String.valueOf(firstSelectedPosition + 1), of) + "</html>");
 
         } else {
             // The count alone. "0 of 12 test cases" put a position where a
@@ -506,7 +509,7 @@ public class StatusBar extends JBPanel<StatusBar> {
     private static @NotNull String narrowedFrom(final int shownCount, final int totalCount) {
         if (shownCount == totalCount) return "";
 
-        return String.format(Locale.ENGLISH, " <font color='%s'>(filtered from %d)</font>",
-                EditorColors.filterActiveHex(), totalCount);
+        return String.format(Locale.ENGLISH, " <font color='%s'>%s</font>",
+                EditorColors.filterActiveHex(), Bundle.message("statusbar.filtered.from", String.valueOf(totalCount)));
     }
 }

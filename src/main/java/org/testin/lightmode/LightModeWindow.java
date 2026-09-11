@@ -164,7 +164,7 @@ final class LightModeWindow {
     private final @NotNull JBLabel set = new JBLabel();
     private final @NotNull JTextArea description = Prose.of(descriptionFont, JBUI.CurrentTheme.Label.foreground());
     private final @NotNull JTextArea expected = Prose.of(expectedFont, JBUI.CurrentTheme.ContextHelp.FOREGROUND);
-    private final @NotNull JBLabel idle = new JBLabel("Press the play button to start test execution", SwingConstants.CENTER);
+    private final @NotNull JBLabel idle = new JBLabel(Bundle.message("light.idle"), SwingConstants.CENTER);
 
     private final @NotNull JBLabel chosen = new JBLabel();
     private final @NotNull SlidingPanel caseView = new SlidingPanel(new BorderLayout());
@@ -191,8 +191,8 @@ final class LightModeWindow {
      */
     private final @NotNull JBPanel<?> underCase = new JBPanel<>(new BorderLayout());
 
-    private final @NotNull JBLabel caseClock = clock("Test case duration");
-    private final @NotNull JBLabel runClock = clock("Test Run duration");
+    private final @NotNull JBLabel caseClock = clock(Bundle.message("light.case.clock"));
+    private final @NotNull JBLabel runClock = clock(Bundle.message("light.run.clock"));
     private final @NotNull JBPanel<?> strip = new JBPanel<>(new BorderLayout());
     private final @NotNull JBPanel<?> setLine = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
@@ -309,7 +309,9 @@ final class LightModeWindow {
         final int index = editor.getCurrentlyExecutingIndex();
         final boolean executing = index >= 0 && index < cases.size();
 
-        counter.setText(executing ? (index + 1) + " / " + cases.size() : cases.size() + " cases");
+        counter.setText(executing
+                ? Bundle.message("light.counter.position", String.valueOf(index + 1), String.valueOf(cases.size()))
+                : Bundle.message("light.counter.cases", String.valueOf(cases.size())));
 
         idle.setVisible(!executing);
         caseView.setVisible(executing);
@@ -879,7 +881,7 @@ final class LightModeWindow {
      * the state rather than setting it, so the two cannot disagree.
      */
     private @NotNull TitleBarBtn pin() {
-        final @NotNull TitleBarBtn button = new TitleBarBtn("Keep above other windows", AllIcons.General.Pin_tab);
+        final @NotNull TitleBarBtn button = new TitleBarBtn(Bundle.message("light.pin"), AllIcons.General.Pin_tab);
 
         button.setOn(frame.isAlwaysOnTop());
         button.addActionListener(e -> {

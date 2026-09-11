@@ -58,6 +58,7 @@ import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.ui.FontSync;
 import org.testin.editor.grid.GridEnterAction;
+import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -282,7 +283,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
                     list.setPaintBusy(false);
                     loading = false;
-                    list.getEmptyText().setText("Unable to load this test set.");
+                    list.getEmptyText().setText(Bundle.message("editor.test.unreadable"));
                 });
             }
         });
@@ -339,8 +340,8 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         // this says where to look for it rather than refusing anything - which
         // is why the sentence is here and not beside Testin's refusals.
         if (!currentTestCases.contains(tc)) {
-            Services.getInstance(p, Notifier.class).softShow(p, "Hidden by the filter",
-                    "'" + tc.getDescription() + "' is not on screen. Clear the filter or the search to see it.");
+            Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("editor.hidden.title"),
+                    Bundle.message("editor.hidden.message", tc.getDescription()));
             return;
         }
 
@@ -515,7 +516,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         this.currentTestCases.clear();
         this.model.removeAll();
         this.list.setPaintBusy(true);
-        this.list.getEmptyText().setText("Refreshing...");
+        this.list.getEmptyText().setText(Bundle.message("editor.refreshing"));
 
         loadDataAsync(onLoaded);
     }
@@ -642,9 +643,9 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         if (totalItems > 0 || loading) return;
 
         if (allTestCases.isEmpty()) {
-            list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
+            list.getEmptyText().setText(Bundle.message("editor.test.empty")).appendLine(Bundle.message("editor.test.empty.hint"));
         } else {
-            list.getEmptyText().setText("No test cases match the search");
+            list.getEmptyText().setText(Bundle.message("editor.test.no.match"));
         }
     }
 
