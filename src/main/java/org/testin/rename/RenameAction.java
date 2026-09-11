@@ -9,7 +9,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import org.testin.actions.TestinData;
 import org.testin.explorer.TreePanel;
 import org.testin.undo.UndoScope;
-import org.testin.undo.UndoService;
+import org.testin.undo.UndoHistories;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -80,7 +80,7 @@ public class RenameAction extends DumbAwareAction {
 
         // The dto reference stays valid across renames, so undo and redo are
         // the same routine with the names swapped.
-        Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
+        Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                 Bundle.message("rename.undo", oldName),
                 () -> applyRename(p, dir, oldName),
                 () -> applyRename(p, dir, newName)));

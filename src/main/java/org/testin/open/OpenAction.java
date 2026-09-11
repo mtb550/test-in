@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
@@ -33,7 +33,7 @@ public class OpenAction extends DumbAwareAction {
                 .filter(DirectoryDto::isOpenableInEditor)
                 .forEach(dir -> {
                     Logger.info("open: " + dir.getPath());
-                    Services.getInstance(p, EditorUtil.class).open(p, dir);
+                    Services.getInstance(p, TestinEditors.class).open(p, dir);
                 });
     }
 

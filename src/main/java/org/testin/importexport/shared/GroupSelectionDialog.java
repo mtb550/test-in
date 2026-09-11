@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Groups;
 import org.testin.services.Services;
-import org.testin.services.TestCaseCacheService;
+import org.testin.services.TestCaseValues;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.SelectionTable;
@@ -56,7 +56,7 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
         // constants of an enum; a group is a word now, so the list is what the
         // cache has seen rather than what somebody shipped (#296).
         groups.addRow(Groups.NONE);
-        Services.getInstance(p, TestCaseCacheService.class).getGroups().stream().sorted().forEach(groups::addRow);
+        Services.getInstance(p, TestCaseValues.class).getGroups().stream().sorted().forEach(groups::addRow);
         groups.selectRows(rowsOf(currentSelection));
     }
 
@@ -89,9 +89,14 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
 
     /**
      * The selection as a test case stores it: the group names, comma separated.
+     * <p>
+     * Through {@link Groups#text}, which is the owner of that line for the cell,
+     * the card and the sheet alike. This wrote the join out itself, so the
+     * dialog that produces the value and the classes that read it agreed only by
+     * having been written the same day (#291).
      */
     private @NotNull String selectedGroupsStr() {
-        return String.join(", ", groups.getSelectedRows().stream()
+        return Groups.text(groups.getSelectedRows().stream()
                 .map(row -> groups.getValueAt(row, 0))
                 .toList());
     }

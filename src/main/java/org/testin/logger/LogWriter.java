@@ -16,7 +16,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 @Service(Service.Level.APP)
-public final class LoggerService implements Disposable {
+public final class LogWriter implements Disposable {
 
     private static final long MAX_LOG_SIZE = 5L * 1024 * 1024;
 
@@ -32,7 +32,7 @@ public final class LoggerService implements Disposable {
      * two of them under one name is how the wrong one gets called.
      */
     private static final com.intellij.openapi.diagnostic.@NotNull Logger IDE_LOG =
-            com.intellij.openapi.diagnostic.Logger.getInstance(LoggerService.class);
+            com.intellij.openapi.diagnostic.Logger.getInstance(LogWriter.class);
     /**
      * Not a log line. The queue holds Object so this can be one: a String
      * sentinel would have to be identity-compared against text a tester could
@@ -53,7 +53,7 @@ public final class LoggerService implements Disposable {
      */
     private @NotNull Optional<Thread> writerThread = Optional.empty();
 
-    public LoggerService() {
+    public LogWriter() {
         startWriterThread();
     }
 

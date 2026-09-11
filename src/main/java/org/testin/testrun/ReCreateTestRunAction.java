@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
 import org.testin.creator.CreateTestRun;
-import org.testin.explorer.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
@@ -81,9 +81,9 @@ public class ReCreateTestRunAction extends DumbAwareAction {
          * a field that may not be set.
          */
         private void reCreateAt(final @NotNull TreePath path) {
-            TreeValueUtil.directoryAt(path)
+            TreeValues.directoryAt(path)
                     .filter(TestRunDirectoryDto.class::isInstance)
-                    .ifPresent(source -> TreeValueUtil.directoryAt(path.getParentPath())
+                    .ifPresent(source -> TreeValues.directoryAt(path.getParentPath())
                             .ifPresent(parent -> reCreate(source, parent)));
         }
 

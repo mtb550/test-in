@@ -22,7 +22,7 @@ import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -144,7 +144,7 @@ public class CreateTreeNodeAction extends DumbAwareAction {
                 Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
 
                 if (dt == DirectoryType.TS)
-                    Services.getInstance(p, EditorUtil.class).open(p, dir);
+                    Services.getInstance(p, TestinEditors.class).open(p, dir);
 
                 dt.getCodegen().execute(p, dir);
             });

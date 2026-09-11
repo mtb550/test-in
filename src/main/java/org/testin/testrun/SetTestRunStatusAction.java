@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.explorer.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValues;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -24,7 +24,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
     // UC-TREE-PANEL-020
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        TreeValueUtil.selected(tree, TestRunDirectoryDto.class).ifPresent(this::askForStatus);
+        TreeValues.selected(tree, TestRunDirectoryDto.class).ifPresent(this::askForStatus);
     }
 
     /**
@@ -39,7 +39,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-067
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(TreeValueUtil.selected(tree, TestRunDirectoryDto.class)
+        e.getPresentation().setEnabled(TreeValues.selected(tree, TestRunDirectoryDto.class)
                 .filter(TestRunDirectoryDto::isStillOpen)
                 .isPresent());
     }

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.actions.TestinData;
 import org.testin.explorer.TreePanel;
-import org.testin.explorer.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunConfiguration;
@@ -27,9 +27,9 @@ import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.undo.UndoScope;
-import org.testin.undo.UndoService;
+import org.testin.undo.UndoHistories;
 import org.testin.services.BackgroundWork;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
@@ -125,8 +125,8 @@ public class EditTestRunAction extends DumbAwareAction {
          * that may not be set.
          */
         private void editAt(final @NotNull TreePath path) {
-            selectedRun(TreeValueUtil.directoryAt(path))
-                    .ifPresent(run -> TreeValueUtil.directoryAt(path.getParentPath())
+            selectedRun(TreeValues.directoryAt(path))
+                    .ifPresent(run -> TreeValues.directoryAt(path.getParentPath())
                             .ifPresent(parent -> edit(run, parent)));
         }
 
@@ -210,7 +210,7 @@ public class EditTestRunAction extends DumbAwareAction {
             // configuration together - because the tester made one gesture. The dto
             // reference stays valid across renames, so undo and redo are the same
             // routine with the two sides swapped.
-            Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
+            Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                     Bundle.message("run.undo.edit", oldName),
                     () -> applyEdit(run, oldName, before, () -> {
                     }),
@@ -252,7 +252,7 @@ public class EditTestRunAction extends DumbAwareAction {
 
                     // Nothing to reload when the name changed - the rename closed the
                     // editor before the node moved.
-                    Services.getInstance(p, EditorUtil.class).reloadOpen(p, runPath);
+                    Services.getInstance(p, TestinEditors.class).reloadOpen(p, runPath);
 
                     onDone.run();
                 });

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
@@ -145,7 +145,7 @@ public final class Rescan {
                             // wrong - and this is the same call the Refresh button
                             // makes, so a change noticed on disk lands exactly where a
                             // change the tester asked about lands.
-                            Services.getInstance(p, EditorUtil.class).refreshOpen(p);
+                            Services.getInstance(p, TestinEditors.class).refreshOpen(p);
                         });
                     }
                 });

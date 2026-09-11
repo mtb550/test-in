@@ -15,7 +15,7 @@ import java.util.Optional;
  * that falls back to its first row. Converted here, so an empty selection reads
  * as the same thing everywhere it is read.
  * <p>
- * The tree's side of this is {@link org.testin.explorer.tree.TreeValueUtil}.
+ * The tree's side of this is {@link org.testin.explorer.tree.TreeValues}.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ListValue {

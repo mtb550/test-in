@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 
 @Service(Service.Level.PROJECT)
-public final class TestCaseCacheService implements Disposable {
+public final class TestCaseValues implements Disposable {
 
     private final @NotNull Set<String> descriptions = ConcurrentHashMap.newKeySet();
     private final @NotNull Set<String> expectedResults = ConcurrentHashMap.newKeySet();

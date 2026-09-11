@@ -24,10 +24,11 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
-import org.testin.services.TestCaseCacheService;
+import org.testin.services.TestCaseValues;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.BoundTestProject;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.LastOpenEditors;
+import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
@@ -171,7 +172,7 @@ public final class ProjectIndexer {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (restoreEditorsOnComplete.getAndSet(false)) {
                 Logger.info("Indexing finished, restoring open editors.");
-                Services.getInstance(p, EditorUtil.class).restoreLastOpened(p);
+                Services.getInstance(p, LastOpenEditors.class).reopen(p);
             } else {
                 Logger.info("Indexing finished, skipping editor restore.");
             }
@@ -463,7 +464,7 @@ public final class ProjectIndexer {
 
         // The completion cache is derived from the test cases, so it has to shrink
         // with them - otherwise a deleted description keeps being offered.
-        Services.getInstance(p, TestCaseCacheService.class).reload(this::getAllTestCases);
+        Services.getInstance(p, TestCaseValues.class).reload(this::getAllTestCases);
     }
 
     /**
@@ -509,7 +510,7 @@ public final class ProjectIndexer {
         runWriter.execute(() -> {
             try {
                 registerTestRun(runPath, tr);
-                Services.getInstance(p, FilesUtil.class).write(p, TestRunDirectoryDto.resultsFile(runPath), snapshot);
+                Services.getInstance(p, TestDataFiles.class).write(p, TestRunDirectoryDto.resultsFile(runPath), snapshot);
                 Logger.trace("Run results persisted for " + runPath.getFileName());
             } catch (final Exception ex) {
                 Logger.error("Failed to persist test run data: " + ex.getMessage());
@@ -532,7 +533,7 @@ public final class ProjectIndexer {
 
         runWriter.execute(() -> {
             try {
-                Services.getInstance(p, FilesUtil.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), snapshot);
+                Services.getInstance(p, TestDataFiles.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), snapshot);
                 Logger.trace("Marker persisted -> " + marker.getStatus().getLabel());
             } catch (final Exception ex) {
                 Logger.error("Failed to persist marker: " + ex.getMessage());
@@ -797,7 +798,7 @@ public final class ProjectIndexer {
             final @NotNull UUID fresh = UUID.randomUUID();
 
             tc.setId(fresh);
-            Services.getInstance(p, FilesUtil.class).write(p, caseFile.resolveSibling(fresh + ".json"), tc);
+            Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(fresh + ".json"), tc);
             Files.delete(caseFile);
 
         } catch (final Exception ex) {
@@ -920,7 +921,7 @@ public final class ProjectIndexer {
      * Writes what arrived from a server into the project, and reads the project
      * again.
      * <p>
-     * Through {@code FilesUtil}, which refuses to write an empty file - exactly
+     * Through {@code TestDataFiles}, which refuses to write an empty file - exactly
      * the protection a transfer that was cut off halfway needs, because an empty
      * test case would be indexed as a case with no fields rather than as a
      * failure.
@@ -932,7 +933,7 @@ public final class ProjectIndexer {
      * mirror {@link #removeIncoming} always scanned.
      */
     public void acceptIncoming(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
-        final @NotNull FilesUtil writer = Services.getInstance(p, FilesUtil.class);
+        final @NotNull TestDataFiles writer = Services.getInstance(p, TestDataFiles.class);
 
         files.forEach((relative, content) -> writer.write(p, projectPath.resolve(relative), content));
         Logger.info("Wrote " + files.size() + " incoming files into " + projectPath);
@@ -951,7 +952,7 @@ public final class ProjectIndexer {
      * scan exists to answer.
      */
     public void removeIncoming(final @NotNull Path projectPath, final @NotNull Collection<String> relatives) {
-        final @NotNull FilesUtil files = Services.getInstance(p, FilesUtil.class);
+        final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
 
         relatives.forEach(relative -> files.delete(p, projectPath.resolve(relative), projectPath));
         Logger.info("Removed " + relatives.size() + " files the server no longer holds from " + projectPath);

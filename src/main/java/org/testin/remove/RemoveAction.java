@@ -12,13 +12,13 @@ import org.testin.explorer.TreePanel;
 import org.testin.indexer.NodeCounter;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.undo.UndoScope;
-import org.testin.undo.UndoService;
+import org.testin.undo.UndoHistories;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
@@ -127,7 +127,7 @@ public class RemoveAction extends DumbAwareAction {
                 // A node with an editor open has that editor closed with it. The
                 // pair tested for here is exactly the pair that declares one.
                 if (node.isOpenableInEditor())
-                    Services.getInstance(p, EditorUtil.class).close(p, node);
+                    Services.getInstance(p, TestinEditors.class).close(p, node);
 
                 // Copied aside before it goes, because the recycle bin the removal
                 // sends it to is somewhere the platform can put things and cannot
@@ -204,7 +204,7 @@ public class RemoveAction extends DumbAwareAction {
                     ? Bundle.message("remove.undo.one", asked.getFirst().getName())
                     : Bundle.message("remove.undo.many", String.valueOf(asked.size()));
 
-            Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
+            Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                     what,
                     () -> restoreAll(kept),
                     () -> {

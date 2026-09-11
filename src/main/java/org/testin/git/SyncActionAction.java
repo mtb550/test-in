@@ -9,7 +9,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
-import org.testin.explorer.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValues;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -75,7 +75,7 @@ public class SyncActionAction extends DumbAwareAction {
     private static @NotNull Optional<Path> activeProjectIn(final @NotNull SimpleTree tree) {
         return Optional.ofNullable(tree.getSelectionPath())
                 .flatMap(SyncActionAction::projectOn)
-                .or(() -> TreeValueUtil.projectPath(tree));
+                .or(() -> TreeValues.projectPath(tree));
     }
 
     /**
@@ -83,7 +83,7 @@ public class SyncActionAction extends DumbAwareAction {
      */
     private static @NotNull Optional<Path> projectOn(final @NotNull TreePath selectionPath) {
         for (final Object component : selectionPath.getPath()) {
-            final @NotNull Optional<Path> project = TreeValueUtil.valueOf(component, TestProjectDirectoryDto.class)
+            final @NotNull Optional<Path> project = TreeValues.valueOf(component, TestProjectDirectoryDto.class)
                     .map(TestProjectDirectoryDto::getPath);
             if (project.isPresent()) return project;
         }

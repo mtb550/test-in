@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.Moved;
 import org.testin.codegen.SubtreeCode;
 import org.testin.undo.UndoScope;
-import org.testin.undo.UndoService;
+import org.testin.undo.UndoHistories;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -228,7 +228,7 @@ public class TreeTransferHandler extends TransferHandler {
     public boolean canPasteFromClipboard() {
         // One target, so several selected grays Paste rather than pasting into
         // whichever row happened to be first (#192).
-        final @NotNull Optional<DirectoryDto> target = TreeValueUtil.singleSelectedDirectory(tree).filter(DirectoryDto::isTransferTarget);
+        final @NotNull Optional<DirectoryDto> target = TreeValues.singleSelectedDirectory(tree).filter(DirectoryDto::isTransferTarget);
         if (target.isEmpty()) return false;
 
         // The same second question a drop asks, and the reason Paste used to be
@@ -265,7 +265,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private @NotNull List<DirectoryDto> transferableSelection() {
-        return TreeValueUtil.selectedDirectories(tree.getSelectionPaths()).stream()
+        return TreeValues.selectedDirectories(tree.getSelectionPaths()).stream()
                 .filter(DirectoryDto::isTransferable)
                 .toList();
     }
@@ -446,8 +446,8 @@ public class TreeTransferHandler extends TransferHandler {
      */
     private @NotNull Optional<DirectoryDto> targetDirectory(final @NotNull TransferSupport support) {
         return support.isDrop()
-                ? dropPath(support).flatMap(TreeValueUtil::directoryAt)
-                : TreeValueUtil.selectedDirectory(tree);
+                ? dropPath(support).flatMap(TreeValues::directoryAt)
+                : TreeValues.selectedDirectory(tree);
     }
 
     /**
@@ -486,7 +486,7 @@ public class TreeTransferHandler extends TransferHandler {
 
         moveBatch(oldPaths, newPaths, moved -> confirmLanded(Done.MOVED, moved));
 
-        Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
+        Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                 Bundle.message("transfer.undo.move", describe(sources)),
                 () -> moveBatch(newPaths, oldPaths),
                 () -> moveBatch(oldPaths, newPaths)));

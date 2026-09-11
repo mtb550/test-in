@@ -253,12 +253,15 @@ public final class RunStatusService {
      * selection. Once per gesture — the single-selection branch of
      * {@link #applyStatus} routes through {@link #executeNext} or
      * {@link #executeManual}, which confirm for themselves (#62).
+     * <p>
+     * Counted by {@code softShowCounted} rather than here. Recording verdicts is
+     * this class's job; deciding that four of them read "Passed 4" and one reads
+     * "Passed" is the notifier's, and it was written out a second time here -
+     * so a change to how a bulk confirmation counts would have landed on every
+     * surface except this one (#291).
      */
     private void confirmVerdict(final @NotNull Project p, final @NotNull TestStatus status, final int count) {
-        if (count == 0) return;
-
-        final @NotNull String label = status.getLabel();
-        Services.getInstance(p, Notifier.class).softShow(p, count == 1 ? label : label + " " + count);
+        Services.getInstance(p, Notifier.class).softShowCounted(p, status.getLabel(), count);
     }
 
     /**

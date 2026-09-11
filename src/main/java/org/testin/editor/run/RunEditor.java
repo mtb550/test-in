@@ -48,6 +48,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.lightmode.LightMode;
 import org.testin.logger.Logger;
 import org.testin.model.Failure;
+import org.testin.model.Modules;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.RunEditorAttributes;
 import org.testin.model.RunStatus;
@@ -69,7 +70,7 @@ import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
-import org.testin.services.TestCaseCacheService;
+import org.testin.services.TestCaseValues;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testrun.ResultAnalysisDialog;
 import org.testin.testrun.TestRunStatusChange;
@@ -340,7 +341,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 }
 
                 final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(loadedItems);
-                Services.getInstance(p, TestCaseCacheService.class).load(ordered);
+                Services.getInstance(p, TestCaseValues.class).load(ordered);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (generation != loadGeneration.get()) return;
@@ -756,17 +757,17 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
 
-    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
+    /**
+     * UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095.
+     * <p>
+     * The modules this run's cases use, from {@link Modules} - which is what a
+     * module is, the same way the groups below come from the owner that holds
+     * those. Which cases to ask about is the editor's; what counts as a module
+     * is not (#291).
+     */
     @Override
     public @NotNull Set<String> getAvailableModules() {
-        final @NotNull Set<String> modules = new HashSet<>();
-        for (final TestCaseDto tc : allTestCases) {
-            final @NotNull String module = tc.getModule();
-            if (!module.trim().isEmpty()) {
-                modules.add(module.trim());
-            }
-        }
-        return modules;
+        return Modules.in(allTestCases);
     }
 
     /**
@@ -777,7 +778,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     @Override
     public @NotNull Set<String> getAvailableGroups() {
-        return Services.getInstance(p, TestCaseCacheService.class).getGroups();
+        return Services.getInstance(p, TestCaseValues.class).getGroups();
     }
 
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094

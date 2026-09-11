@@ -37,7 +37,7 @@ explorer      editor       view    statusbar     lightmode      the surfaces
                             |
                         indexer                                 the only door
              ProjectIndexer -> IndexerDataStore                 to test data
-             -> TestCaseSequenceStore -> FilesUtil
+             -> TestCaseSequenceStore -> TestDataFiles
                             |
                        VFS / disk
 
@@ -79,7 +79,7 @@ hidden, because a newcomer will find them and should know which are deliberate.
 
 | From | To | Why |
 |---|---|---|
-| `indexer/ProjectIndexer`, `indexer/Rescan` | `editor/EditorUtil`, `explorer/TreePanel` | A rescan has to tell the open surfaces that what they are showing has changed. The alternative is a listener the indexer publishes to, which is worth doing and has not been. |
+| `indexer/ProjectIndexer`, `indexer/Rescan` | `editor/TestinEditors`, `explorer/TreePanel` | A rescan has to tell the open surfaces that what they are showing has changed. The alternative is a listener the indexer publishes to, which is worth doing and has not been. |
 | `services/RunStatusService` | `editor/TestinEditor`, `editor/run/RunEditor`, `editor/toolbar/Toolbar`, `ui/framework/ConfirmDialog` | It records a verdict into the run an editor claimed, so it is filed under the wrong package: it is run-editor behavior living under `services`. |
 | `actions/TestinData`, `actions/Declared` | `editor`, `model`, `util`, `logger` | Deliberate, and new with #119. A declared action is built by the platform with a no-arg constructor, so it asks the surface that has the keyboard what is selected - and a data key has to name the type it answers with. `actions` was a leaf until then, and typing the keys as `Object` to keep it one would be worse than the edge. |
 | `model/TestEditorAttributes`, `model/RunEditorAttributes`, `model/DirectoryType`, `model/TestRunStatus` | `ui`, `codegen`, `creator`, `importexport`, `statusbar` | Deliberate. An enum carries its own presentation and its own action rather than being read by an `instanceof` chain at every call site — see the conventions in [CLAUDE.md](https://github.com/mtb550/test-in/blob/main/CLAUDE.md). |
@@ -108,7 +108,7 @@ Test runs in particular are saved and read only through the indexer —
 `putTestRun`, `persistRun`, `persistRunMarker`, `addTestRunDir`,
 `updateRunMarker`. The sequential run writer lives inside it.
 
-The rule is enforced by the compiler rather than by review: `FilesUtil` and
+The rule is enforced by the compiler rather than by review: `TestDataFiles` and
 `VfsExecutor` are package-private and live in `indexer`, so nothing outside the
 package can reach the writer at all.
 
@@ -185,10 +185,10 @@ anything else happens at all.
 | 3 | `indexer/ProjectIndexer.putTestCase` | The public door. Returns a boolean: did this have anything to save. |
 | 4 | `indexer/IndexerDataStore.putTestCase` | Delegates the write, then stamps the **set's** marker as modified — but only if the write happened. |
 | 5 | `indexer/TestCaseSequenceStore.put` | The funnel every save arrives at: the update dialog, a grid cell, the details panel, a paste. |
-| 6 | `indexer/FilesUtil.alreadyHolds` | Serializes the case and compares the bytes to the file. **Identical, and nothing below runs.** |
+| 6 | `indexer/TestDataFiles.alreadyHolds` | Serializes the case and compares the bytes to the file. **Identical, and nothing below runs.** |
 | 7 | `indexer/TestCaseSequenceStore.put` | Stamps the audit — `touch` if the index already knows this id, `stampCreated` if it does not. |
 | 8 | `indexer/TestCaseSequenceStore.store` | Updates the two maps, then writes. |
-| 9 | `indexer/FilesUtil.write` | Refuses a zero-byte write, claims the path in `OwnWrites` **before** `Files.write`, writes, then records what landed. |
+| 9 | `indexer/TestDataFiles.write` | Refuses a zero-byte write, claims the path in `OwnWrites` **before** `Files.write`, writes, then records what landed. |
 | 10 | back in `GridEditListener` | The attribute's `GenType` regenerates the test method, and `TestCaseSnapshot.record` files the undo entry. |
 
 **Why the bytes are identical.** Step 6 asks the question the rule states, in the

@@ -26,7 +26,7 @@ import java.util.stream.Stream;
  */
 @Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class FilesUtil {
+final class TestDataFiles {
 
     /**
      * UC-INTERNAL-004, Rule-INTERNAL-033.

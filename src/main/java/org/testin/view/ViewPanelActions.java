@@ -3,8 +3,6 @@ package org.testin.view;
 import com.intellij.openapi.actionSystem.AnAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.CardHoverAction;
-import org.testin.editor.statusbar.NextTestCaseAction;
-import org.testin.editor.statusbar.PreviousTestCaseAction;
 
 import javax.swing.JComponent;
 import java.util.List;

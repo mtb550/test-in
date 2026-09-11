@@ -78,7 +78,7 @@ final class TestCaseSequenceStore {
         // Asked before the stamp, because the stamp is itself a change: touch()
         // writes a new updatedAt, and anything compared after it differs by the
         // one field this exists to avoid writing.
-        if (Services.getInstance(p, FilesUtil.class).alreadyHolds(p, fileOf(testSetPath, testCase.getId()), testCase)) return false;
+        if (Services.getInstance(p, TestDataFiles.class).alreadyHolds(p, fileOf(testSetPath, testCase.getId()), testCase)) return false;
 
         // Known to the index means the case already exists, whatever its fields
         // say - the one question that separates a creation from an update without
@@ -129,7 +129,7 @@ final class TestCaseSequenceStore {
                 path, ignored -> Collections.synchronizedList(new ArrayList<>()));
         if (!ids.contains(testCase.getId())) ids.add(testCase.getId());
 
-        Services.getInstance(p, FilesUtil.class)
+        Services.getInstance(p, TestDataFiles.class)
                 .write(p, fileOf(testSetPath, testCase.getId()), testCase);
     }
 
@@ -142,7 +142,7 @@ final class TestCaseSequenceStore {
         // claims the delete and our own removal is not read as an external
         // change worth a rescan (#117). stopAt is the set itself: a set
         // outlives its last case, so nothing above the file is pruned.
-        Services.getInstance(p, FilesUtil.class)
+        Services.getInstance(p, TestDataFiles.class)
                 .delete(p, fileOf(testSetPath, testCaseId), testSetPath);
     }
 
@@ -183,7 +183,7 @@ final class TestCaseSequenceStore {
 
             if (!movedIds.contains(testCase.getId())) continue;
 
-            Services.getInstance(p, FilesUtil.class)
+            Services.getInstance(p, TestDataFiles.class)
                     .write(p, testSetPath.resolve(testCase.getId() + ".json"), testCase);
         }
 

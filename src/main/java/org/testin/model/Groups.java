@@ -19,7 +19,7 @@ import java.util.List;
  * boxes that only get wider.
  * <p>
  * A group is now what a module already was - free text, completed from what the
- * project has used, which {@code TestCaseCacheService} holds. This class is what
+ * project has used, which {@code TestCaseValues} holds. This class is what
  * is left over when the enum goes: the one word that is not a group, and the two
  * ways a list of them is read and written.
  */

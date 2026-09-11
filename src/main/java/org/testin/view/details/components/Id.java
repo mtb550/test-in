@@ -10,7 +10,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.ui.FontSync;
@@ -77,7 +77,7 @@ public class Id extends BaseDetails {
         idBadge.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                Services.getInstance(p, EditorUtil.class).openAndSelect(p, dto.getParent(), dto);
+                Services.getInstance(p, TestinEditors.class).openAndSelect(p, dto.getParent(), dto);
             }
         });
 

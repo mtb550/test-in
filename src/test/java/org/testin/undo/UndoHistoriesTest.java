@@ -13,18 +13,18 @@ import static org.testng.Assert.*;
  * surface keeps its own history, so a test case removed in one editor is not
  * what CTRL+Z reaches for in another (#165).
  */
-public class UndoServiceTest {
+public class UndoHistoriesTest {
 
     private static final UndoScope TREE = UndoScope.TREE;
     private static final UndoScope EDITOR = UndoScope.of(Path.of("root", "project", "Test Cases", "login"));
 
-    private static UndoService.Operation counting(final String description, final AtomicInteger undone, final AtomicInteger redone) {
-        return new UndoService.Operation(description, undone::incrementAndGet, redone::incrementAndGet);
+    private static UndoHistories.Operation counting(final String description, final AtomicInteger undone, final AtomicInteger redone) {
+        return new UndoHistories.Operation(description, undone::incrementAndGet, redone::incrementAndGet);
     }
 
     @Test
     public void undoRunsTheReverseAndEnablesRedo() {
-        final UndoService service = new UndoService();
+        final UndoHistories service = new UndoHistories();
         final AtomicInteger undone = new AtomicInteger();
         final AtomicInteger redone = new AtomicInteger();
 
@@ -44,7 +44,7 @@ public class UndoServiceTest {
 
     @Test
     public void redoRunsTheForwardAgainAndRestoresUndo() {
-        final UndoService service = new UndoService();
+        final UndoHistories service = new UndoHistories();
         final AtomicInteger undone = new AtomicInteger();
         final AtomicInteger redone = new AtomicInteger();
 
@@ -60,7 +60,7 @@ public class UndoServiceTest {
 
     @Test
     public void newOperationClearsTheRedoHistory() {
-        final UndoService service = new UndoService();
+        final UndoHistories service = new UndoHistories();
         final AtomicInteger ignored = new AtomicInteger();
 
         service.push(TREE, counting("first", ignored, ignored));
@@ -75,7 +75,7 @@ public class UndoServiceTest {
 
     @Test
     public void historyIsBounded() {
-        final UndoService service = new UndoService();
+        final UndoHistories service = new UndoHistories();
         final AtomicInteger undone = new AtomicInteger();
 
         for (int i = 0; i < 30; i++) {
@@ -95,7 +95,7 @@ public class UndoServiceTest {
      */
     @Test
     public void eachSurfaceKeepsItsOwnHistory() {
-        final UndoService service = new UndoService();
+        final UndoHistories service = new UndoHistories();
         final AtomicInteger tree = new AtomicInteger();
         final AtomicInteger editor = new AtomicInteger();
 
@@ -118,14 +118,14 @@ public class UndoServiceTest {
      */
     @Test
     public void anOperationPushedOffTheEndIsForgotten() {
-        final UndoService service = new UndoService();
+        final UndoHistories service = new UndoHistories();
         final AtomicInteger forgotten = new AtomicInteger();
         final AtomicInteger ignored = new AtomicInteger();
 
         for (int i = 0; i < 21; i++) {
             // Reversals answer whether the whole of the work went, so these say
             // yes: what is being counted here is that they were reached at all.
-            service.push(TREE, new UndoService.Operation("op " + i,
+            service.push(TREE, new UndoHistories.Operation("op " + i,
                     () -> ignored.incrementAndGet() > 0,
                     () -> ignored.incrementAndGet() > 0,
                     forgotten::incrementAndGet));
@@ -136,7 +136,7 @@ public class UndoServiceTest {
 
     @Test
     public void undoAndRedoOnEmptyStacksDoNothing() {
-        final UndoService service = new UndoService();
+        final UndoHistories service = new UndoHistories();
 
         service.undo(TREE);
         service.redo(TREE);

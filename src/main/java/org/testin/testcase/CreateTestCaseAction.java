@@ -17,7 +17,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.services.Services;
-import org.testin.services.TestCaseCacheService;
+import org.testin.services.TestCaseValues;
 import org.testin.testcase.create.CreateTestCaseDialog;
 import org.testin.util.Bundle;
 
@@ -75,7 +75,7 @@ public class CreateTestCaseAction extends DumbAwareAction {
             // save: the case is written here and placed by the sort that
             // follows, so what a redo would have to write is not readable yet.
             editor.appendNewTestCase(tc, () -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.create"), affectedNodes), before, TestCaseSnapshot.of(p, dir.getPath(), ids)));
-            Services.getInstance(p, TestCaseCacheService.class).addNewItems(affectedNodes);
+            Services.getInstance(p, TestCaseValues.class).addNewItems(affectedNodes);
 
             // Directly, as the other three savers do. This went through a
             // service that deferred the write behind an invokeLater and a write

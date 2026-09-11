@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 
 import java.awt.datatransfer.Transferable;
 
@@ -45,7 +45,7 @@ public class TreeDropHandler implements FileDropHandler {
                     if (!node.isOpenableInEditor()) continue;
 
                     Logger.info("dragged " + node.getType().getMarkerKind() + ": " + node.getName());
-                    Services.getInstance(p, EditorUtil.class).open(p, node);
+                    Services.getInstance(p, TestinEditors.class).open(p, node);
                 }
             });
             return true;

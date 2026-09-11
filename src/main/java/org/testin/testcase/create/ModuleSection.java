@@ -8,7 +8,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.services.TestCaseCacheService;
+import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
 import org.testin.util.Shortcuts;
@@ -22,7 +22,7 @@ public class ModuleSection implements CreateTestCaseSection {
     private final @NotNull JBPanel<?> wrapper;
 
     public ModuleSection(final @NotNull Project p) {
-        this.moduleField = SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getModules(), CreateTestCaseFields.MODULE.getIcon()), "");
+        this.moduleField = SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseValues.class).getModules(), CreateTestCaseFields.MODULE.getIcon()), "");
         this.moduleField.setOneLineMode(true);
         styleField(this.moduleField, CreateTestCaseFields.MODULE);
 

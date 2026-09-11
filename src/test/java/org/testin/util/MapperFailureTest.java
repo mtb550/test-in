@@ -9,7 +9,7 @@ import static org.testng.Assert.*;
 /**
  * What the serializer does when it cannot serialize.
  * <p>
- * It used to answer with an empty array, and {@code FilesUtil} wrote that over
+ * It used to answer with an empty array, and {@code TestDataFiles} wrote that over
  * the file - so a failure was logged and then committed to disk as a zero-byte
  * marker or test case, taking the real content with it. Six markers in a real
  * data root were found that way, across two projects.

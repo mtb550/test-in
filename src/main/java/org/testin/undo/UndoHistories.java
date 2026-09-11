@@ -29,7 +29,7 @@ import java.util.Objects;
  * that changes.
  */
 @Service(Service.Level.PROJECT)
-public final class UndoService {
+public final class UndoHistories {
 
     private static final int LIMIT = 20;
 

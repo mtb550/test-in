@@ -14,9 +14,6 @@ import org.testin.util.Bundle;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -67,17 +64,6 @@ public class FileDocumentListener implements DocumentListener {
         this.onStatus = onStatus;
         this.onDataLoaded = onDataLoaded;
         this.importLoader = importLoader;
-    }
-
-    /**
-     * The format that can read this file name, empty when nothing can. Only
-     * formats with an import handler count; matching an .html file would NPE
-     * downstream.
-     */
-    private static @NotNull Optional<FileTypes> importableFormatOf(final @NotNull String fileName) {
-        return Arrays.stream(FileTypes.values())
-                .filter(type -> type.isImportable() && fileName.endsWith(type.getExtension()))
-                .findFirst();
     }
 
     @Override
@@ -138,20 +124,10 @@ public class FileDocumentListener implements DocumentListener {
         // had no way to tell that from a file Testin was still reading (#267).
         // The formats are named rather than counted: the tester's next move is
         // to go and find one.
-        importableFormatOf(importFile.getName().toLowerCase())
+        FileTypes.importerFor(importFile.getName().toLowerCase())
                 .ifPresentOrElse(format -> loadFile(importFile, format),
                         () -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("import.cannot.title"),
-                                Bundle.message("import.cannot.message", importFile.getName(), importableFormats())));
-    }
-
-    /**
-     * The extensions an import understands, as a tester would say them.
-     */
-    private static @NotNull String importableFormats() {
-        return Arrays.stream(FileTypes.values())
-                .filter(FileTypes::isImportable)
-                .map(FileTypes::getExtension)
-                .collect(Collectors.joining(", "));
+                                Bundle.message("import.cannot.message", importFile.getName(), FileTypes.importableExtensions())));
     }
 
     /**
