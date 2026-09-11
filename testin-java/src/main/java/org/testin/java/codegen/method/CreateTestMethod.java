@@ -357,8 +357,16 @@ public class CreateTestMethod implements GenAction {
         Logger.warn("Writing " + cases.size() + " methods one at a time into "
                 + targetClass.getQualifiedName() + ": " + reason);
 
-        cases.forEach(tc -> injectMethod(p, targetClass, Fqcn.methodNameOf(tc), tc)
-                .ifPresent(added -> CodeStyleManager.getInstance(p).reformat(added)));
+        int written = 0;
+        for (final TestCaseDto tc : cases) {
+            if (injectMethod(p, targetClass, Fqcn.methodNameOf(tc), tc).isPresent()) written++;
+        }
+
+        // Once for the class, not once per method. This is the slow path
+        // already - it is here because the one edit could not be made - and
+        // reformatting each method as it landed made it slower for no reason
+        // the tester can see (#66, finding 25).
+        if (written > 0) CodeStyleManager.getInstance(p).reformat(targetClass);
     }
 
     /**
