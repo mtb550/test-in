@@ -11,7 +11,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
-import org.testin.dialogs.ZoomIndicatorDialog;
 import org.testin.editor.grid.GridPanelBuilder;
 
 import javax.swing.*;

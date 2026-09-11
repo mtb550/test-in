@@ -410,7 +410,7 @@
 
         <action
                 id="Testin.AutomateTestCase"
-                class="org.testin.automate.AutomateTestCaseAction"
+                class="org.testin.codegen.AutomateTestCaseAction"
                 icon="AllIcons.Actions.IntentionBulb"
         >
             <!-- F12 is JumpToLastWindow in the IDE's own keymap, and it is kept
@@ -479,7 +479,7 @@
 
         <action
                 id="Testin.ShowNodeDetails"
-                class="org.testin.ShowNodeDetailsAction"
+                class="org.testin.view.marker.ShowNodeDetailsAction"
                 icon="AllIcons.General.IndentDetected"
         />
 

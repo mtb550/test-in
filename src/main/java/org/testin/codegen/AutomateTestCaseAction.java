@@ -1,4 +1,4 @@
-package org.testin.automate;
+package org.testin.codegen;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;

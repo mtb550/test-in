@@ -64,7 +64,7 @@ public class GenerateReportAction extends AbstractProjectAction {
 
     /**
      * The keyboard route, registered on the list it is reached from - the same
-     * shape as {@link org.testin.EscapeAction}. The two-argument constructor is
+     * shape as {@link org.testin.actions.EscapeAction}. The two-argument constructor is
      * the toolbar button, which is clicked rather than typed and so registers
      * nothing.
      */

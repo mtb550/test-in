@@ -59,12 +59,30 @@ modules](#the-two-content-modules).
 | Layer | Packages | May touch test data files |
 |---|---|---|
 | Surfaces | `explorer`, `editor`, `view`, `statusbar`, `lightmode` | No |
-| Gestures | `actions`, `dialogs`, `ui`, `creator`, `clipboard`, `undo`, `search`, `navigate`, `open`, `order`, `rename`, `remove` | No |
+| Gestures | `actions`, `ui`, `creator`, `clipboard`, `undo`, `search`, `navigate`, `open`, `order`, `rename`, `remove` | No |
 | Operations | `testcase`, `testset`, `testproject`, `testrun`, `run` | No |
 | Services | `services`, `notifications`, `setting`, `config` | `config` and `setting` only, and neither touches test data |
 | Data | `indexer`, `model` | `indexer` only |
-| Side modules | `codegen`, `git`, `sftp`, `report`, `importexport`, `runner`, `automate` | See the exempt list below |
+| Side modules | `codegen`, `git`, `sftp`, `report`, `importexport`, `runner` | See the exempt list below |
 | Leaves | `logger`, `util` | `logger` only, and only its own log |
+
+**Two names left this table on 11 September 2026, and the root package emptied.**
+`dialogs` held one class whose only caller is in `ui`, one letter away from
+`ui.dialogs` - two names that near each other are a coin toss rather than a
+choice. `automate` held one action, and automating a test case *is* generating
+its code, which is what `codegen` is. Neither move crossed a layer: each went to
+a package in the row it was already in.
+
+`EscapeAction` and `ShowNodeDetailsAction` were in `org.testin` itself, which is
+in no row of this table at all. They are in `actions` and `view.marker` now -
+where the first already extends `AbstractProjectAction`, and the second opens
+`MarkerDetailsViewDialog` and does nothing else.
+
+**The packages that are small and staying that way** are small because this table
+says so. `open`, `order` and `remove` hold two files, one and one; they are
+Gestures, and the feature each acts on is a Surface. Merging a gesture into the
+surface it acts on is this table inverted, and a short package is a smaller price
+than a layer that is drawn here and not in the tree (#110).
 
 `logger` imports nothing from the plugin and is imported by 30 packages. `util`
 imports only `logger` and `model`, so reaching for a helper can never drag an

@@ -9,7 +9,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.testin.actions.Declared;
 import org.jetbrains.annotations.NotNull;
 
-import org.testin.EscapeAction;
+import org.testin.actions.EscapeAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.report.GenerateReportAction;
 import org.testin.testrun.SetTestRunStatusAction;

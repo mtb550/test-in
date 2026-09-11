@@ -5,7 +5,7 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.testin.actions.Declared;
 import org.jetbrains.annotations.NotNull;
-import org.testin.EscapeAction;
+import org.testin.actions.EscapeAction;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;

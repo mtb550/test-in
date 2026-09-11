@@ -1,4 +1,4 @@
-package org.testin.dialogs;
+package org.testin.ui;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.actions.ShowSettingsUtilImpl;

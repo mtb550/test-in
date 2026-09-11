@@ -13,7 +13,7 @@ import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.EscapeAction;
+import org.testin.actions.EscapeAction;
 import org.testin.editor.BaseCard;
 import org.testin.editor.EditorCenter;
 import org.testin.editor.EditorFilters;

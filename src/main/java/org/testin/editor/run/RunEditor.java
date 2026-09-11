@@ -12,7 +12,7 @@ import com.intellij.ui.table.JBTable;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.EscapeAction;
+import org.testin.actions.EscapeAction;
 import org.testin.actions.Declared;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.statusbar.PageAction;

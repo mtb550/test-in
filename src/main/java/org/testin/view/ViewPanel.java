@@ -10,7 +10,7 @@ import com.intellij.ui.content.Content;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.EscapeAction;
+import org.testin.actions.EscapeAction;
 import org.testin.services.Services;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestCaseExecutionSubscriber;

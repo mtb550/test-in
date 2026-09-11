@@ -1,4 +1,4 @@
-package org.testin;
+package org.testin.view.marker;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
