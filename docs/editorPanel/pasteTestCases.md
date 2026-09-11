@@ -46,6 +46,10 @@ own.
   history.
 - **Rule-EDITOR-PANEL-085** — The clipboard is read as test cases. Anything else
   is turned away.
+- **Rule-EDITOR-PANEL-215** — Undoing a move puts the test cases back in the set
+  they came from and nowhere else. A cut keeps each case's identity, so the undo
+  takes them out of where they landed before putting them back where they
+  started - never the other way round, which would delete them from both.
 
 ## What the tester sees
 

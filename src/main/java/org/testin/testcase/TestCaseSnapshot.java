@@ -138,7 +138,31 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
             return;
         }
 
-        target.forEach(TestCaseSnapshot::applyTo);
+        // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-215.
+        //
+        // Every removal first, then every restoration - not each snapshot in
+        // turn. A cut keeps the case's id, so undoing a cut-and-paste asks for
+        // the same id to be present in the source and absent in the destination,
+        // and the order those two are applied in decides whether the tester
+        // keeps their test cases.
+        //
+        // Snapshot at a time, the source put case X back and the destination
+        // then found that very case - by id, globally - and deleted it. The
+        // tester cut from A, pasted into B, pressed CTRL+Z, and the cases
+        // vanished from both: the JSON still on disk in A but out of the index,
+        // so nothing drew it, and the generated methods gone. Redo could not
+        // recover it either, because the before snapshot no longer stood (#66,
+        // finding 66 - the worst data-loss path found).
+        //
+        // In two phases it is right for every shape of move. Across two sets the
+        // destination gives X up before the source takes it back. Within one
+        // set - where both snapshots name the same path, so no test of the path
+        // could have told them apart - X is removed and then restored, which is
+        // the state being asked for. A copy-and-paste is unaffected either way:
+        // its ids are fresh, so nothing overlaps.
+        target.forEach(TestCaseSnapshot::removeAbsent);
+        target.forEach(TestCaseSnapshot::restorePresent);
+
         tellTheSurfaces(p, target);
     }
 
@@ -206,7 +230,33 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return present.stream().map(mapper::writeValueAsString).sorted().toList();
     }
 
-    private void applyTo() {
+    /**
+     * UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-215.
+     * <p>
+     * The cases this snapshot says are gone, taken out of the index.
+     * <p>
+     * Its own half of the work because {@link #restore} runs every snapshot's
+     * removals before any snapshot's restorations - see the comment there for
+     * what went wrong when it did not.
+     */
+    private void removeAbsent() {
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+
+        // Only what is actually there. An id that is already gone is the state
+        // this asks for, and deleting a file twice is a warning in the log for
+        // a job already done.
+        absent.forEach(id -> indexer.findTestCase(id).ifPresent(tc -> {
+            indexer.removeTestCase(testSetPath, id);
+            GenType.REMOVE_TEST_CASE.getAction().execute(p, tc);
+        }));
+    }
+
+    /**
+     * UC-EDITOR-PANEL-017.
+     * <p>
+     * The cases this snapshot holds, put back as they were.
+     */
+    private void restorePresent() {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         // The set the cases belong to, put back on them before anything reads
@@ -247,14 +297,6 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
 
             if (isComingBack) GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
         });
-
-        // Only what is actually there. An id that is already gone is the state
-        // this asks for, and deleting a file twice is a warning in the log for
-        // a job already done.
-        absent.forEach(id -> indexer.findTestCase(id).ifPresent(tc -> {
-            indexer.removeTestCase(testSetPath, id);
-            GenType.REMOVE_TEST_CASE.getAction().execute(p, tc);
-        }));
 
         // UC-CODEGEN-002, Rule-CODEGEN-068.
         //
