@@ -19,9 +19,16 @@ import java.util.regex.Pattern;
  * One owner for the redaction rather than one at each of those, because a token
  * reaching a log is not the kind of thing to fix in the places somebody
  * remembered.
+ * <p>
+ * Public for exactly that reason. Every Git command runs through
+ * {@link GitCommandRunner}, which redacts its own failures - except the clone,
+ * which runs through git4idea's own {@code Git.clone} because a clone creates
+ * the repository rather than looking one up. It is outside this package and it
+ * reports the one failure a tester can still put a token into, so it calls this
+ * rather than growing a second copy of the pattern (#66, finding 4).
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class GitSafeText {
+public final class GitSafeText {
 
     /**
      * The userinfo of a URL: everything between the scheme and the {@code @}
@@ -35,7 +42,7 @@ final class GitSafeText {
     private static final @NotNull Pattern CREDENTIALS = Pattern.compile("([a-zA-Z][a-zA-Z0-9+.\\-]*://)[^/@\\s]+@");
 
     // UC-SHARE-013, Rule-SHARE-062
-    static @NotNull String withoutCredentials(final @NotNull String text) {
+    public static @NotNull String withoutCredentials(final @NotNull String text) {
         return CREDENTIALS.matcher(text).replaceAll("$1***@");
     }
 }

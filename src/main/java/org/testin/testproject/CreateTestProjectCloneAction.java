@@ -13,6 +13,7 @@ import git4idea.commands.GitCommandResult;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.explorer.TreePanel;
+import org.testin.git.GitSafeText;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
@@ -21,6 +22,7 @@ import org.testin.setting.TestinRoot;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 public class CreateTestProjectCloneAction extends AbstractProjectAction {
     private final @NotNull String gitUrl;
@@ -60,6 +62,24 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
 
                 try {
                     final @NotNull Path parentPath = Services.getInstance(p, TestinRoot.class).getPath();
+
+                    // UC-TREE-PANEL-003.
+                    //
+                    // git4idea's own clone, and the one Git call in the plugin
+                    // that does not go through GitCommandRunner. That is not an
+                    // oversight: the runner builds its handler on a repository,
+                    // and the IDE knows only the repositories registered as VCS
+                    // roots in the open project - a Testin root is deliberately
+                    // not one. A clone has no repository to look up, it makes
+                    // one, so git4idea builds its handler on the parent
+                    // directory instead and the objection does not apply.
+                    //
+                    // It also does four things the runner would have to be
+                    // taught: it sets the URL, which is what turns on the
+                    // credential helper for a private HTTPS remote; it adds
+                    // core.longpaths=true on Windows, without which a deep test
+                    // project fails to check out; --progress; and the IDE's own
+                    // recurse-submodules setting (#66, finding 4).
                     final @NotNull GitCommandResult result = Git.getInstance().clone(p, parentPath, gitUrl, projectName);
                     result.throwOnError();
 
@@ -80,7 +100,18 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
                     });
 
                 } catch (final Exception ex) {
-                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("clone.failed.title"), Bundle.message("clone.failed.message", ex.getMessage()));
+                    // UC-TREE-PANEL-003, Rule-SHARE-062.
+                    //
+                    // Git names the remote it failed against, and this is the
+                    // last place a remote still reaches Testin with a token in
+                    // it: testin.yml has one stripped on the way in and on the
+                    // way out, but the URL for a clone is typed into New Test
+                    // Project and goes straight to Git as it was pasted. So a
+                    // wrong token, a wrong name or no network put the token
+                    // itself in the balloon and in the IDE's notification list.
+                    final @NotNull String said = GitSafeText.withoutCredentials(Objects.requireNonNullElse(ex.getMessage(), ex.toString()));
+
+                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("clone.failed.title"), Bundle.message("clone.failed.message", said));
                 }
             }
         });
