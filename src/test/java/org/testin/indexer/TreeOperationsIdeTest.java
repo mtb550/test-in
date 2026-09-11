@@ -4,6 +4,7 @@ import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.model.DirectoryType;
+import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
 
@@ -89,6 +90,42 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
             indexer().addTestProject(tp);
             return tp;
         });
+    }
+
+
+    /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-100.
+     * <p>
+     * An archived test project is a node, and holds nothing.
+     * <p>
+     * It used to be skipped whole: not in the index at all, so the tree could
+     * not draw it, the binding did not resolve, and the tester was sent to the
+     * welcome screen to read in a sentence what the tree exists to say. It is
+     * indexed now - drawn with "Archived" beside its name, like any other
+     * status - and its contents are not read, because an archived project is not
+     * worked on.
+     */
+    public void testAnArchivedProjectIsANodeWithNothingInIt() {
+        final Path testProject = root.resolve("NAFATH");
+
+        final TestProjectDirectoryDto tp = create(testProject);
+
+        WriteAction.runAndWait(() -> {
+            tp.getMarker().setStatus(ProjectStatus.ARCHIVED);
+            indexer().persistMarker(tp);
+        });
+
+        indexer().scanSingleProject(testProject);
+
+        assertTrue("an archived project is still a node, so the tree can say what it is",
+                indexer().nodeExists(testProject));
+
+        assertTrue("nothing under an archived project is read - it is not being worked on",
+                indexer().getChildren(testProject).isEmpty());
+
+        assertEquals("and it says which status it is",
+                ProjectStatus.ARCHIVED,
+                indexer().find(testProject).orElseThrow().getMarker().status());
     }
 
     /**

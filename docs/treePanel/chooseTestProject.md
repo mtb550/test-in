@@ -59,6 +59,10 @@ one.
 - **Rule-TREE-PANEL-021** — If the choice cannot be written, Testin says so.
   That holds whichever way the choice was made: the picker, creating a test project,
   cloning one, or the welcome screen. It never reports the choice as saved.
+- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
+  holds nothing. It is indexed as a node so the tree can say what it is - drawn
+  with Archived beside its name like any other status - and its test sets, cases
+  and runs are not read, because an archived project is not worked on.
 
 ## The Select Test Project dialog
 

@@ -74,6 +74,10 @@ The node keeps everything inside it. Only where it sits changes.
   code where it was. The Java moves before the node, because the old path is
   what finds it, so a node move that fails puts the code back rather than
   leaving the test set in one package and its class in another.
+- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
+  holds nothing. It is indexed as a node so the tree can say what it is - drawn
+  with Archived beside its name like any other status - and its test sets, cases
+  and runs are not read, because an archived project is not worked on.
 
 ## The Paste, Move and Copy dialog
 

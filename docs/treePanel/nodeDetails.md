@@ -56,6 +56,10 @@ It is a read-only window. Nothing in it can be changed.
   nothing. (Rule-TREE-PANEL-007)
 - **Rule-TREE-PANEL-088** — Testin counts what a node holds when the tester
   asks. It never saves the number.
+- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
+  holds nothing. It is indexed as a node so the tree can say what it is - drawn
+  with Archived beside its name like any other status - and its test sets, cases
+  and runs are not read, because an archived project is not worked on.
 
 ## The Details dialog
 

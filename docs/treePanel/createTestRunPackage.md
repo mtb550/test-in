@@ -58,6 +58,10 @@ A test run package is a folder that holds test runs. This makes one.
   opens.
 - **Rule-TREE-PANEL-034** — A test run package can hold another test run
   package, as deep as the tester needs.
+- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
+  holds nothing. It is indexed as a node so the tree can say what it is - drawn
+  with Archived beside its name like any other status - and its test sets, cases
+  and runs are not read, because an archived project is not worked on.
 
 ## What the tester sees
 

@@ -62,6 +62,10 @@ screens, and the tree is one of them.
   tree. Without that the IDE has nothing to give focus to and it stays in
   whatever was there before, so keys pressed over the tree are answered by the
   editor beside it.
+- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
+  holds nothing. It is indexed as a node so the tree can say what it is - drawn
+  with Archived beside its name like any other status - and its test sets, cases
+  and runs are not read, because an archived project is not worked on.
 
 Rule-TREE-PANEL-064 also holds here. It says an **Archived** test project is not
 opened on the next load. It is written on [UC-TREE-PANEL-018](retireNode.md).

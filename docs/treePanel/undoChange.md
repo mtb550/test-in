@@ -59,6 +59,10 @@ This puts the tree back the way it was before the last change.
 - **Rule-TREE-PANEL-060** — Four things can be undone: a move, a rename, a
   removal, and an edit of a test run. Four cannot: creating anything, an order
   number, a copy, and a status change.
+- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
+  holds nothing. It is indexed as a node so the tree can say what it is - drawn
+  with Archived beside its name like any other status - and its test sets, cases
+  and runs are not read, because an archived project is not worked on.
 
 ## What the tester sees
 

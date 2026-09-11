@@ -61,6 +61,10 @@ A smaller number sits higher in the list.
   number does not change that. (Rule-TREE-PANEL-008, Rule-TREE-PANEL-010)
 - **Rule-TREE-PANEL-058** — The test project and the two containers cannot be
   ordered.
+- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
+  holds nothing. It is indexed as a node so the tree can say what it is - drawn
+  with Archived beside its name like any other status - and its test sets, cases
+  and runs are not read, because an archived project is not worked on.
 
 ## The Order dialog
 

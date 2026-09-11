@@ -60,6 +60,10 @@ Retiring deletes nothing. It only moves the node out of the way.
   the next load. The panel says so, and offers the other test projects.
 - **Rule-TREE-PANEL-065** — A status is set on one node at a time. The status a
   node already has is offered gray, so the tester can see what it is now.
+- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
+  holds nothing. It is indexed as a node so the tree can say what it is - drawn
+  with Archived beside its name like any other status - and its test sets, cases
+  and runs are not read, because an archived project is not worked on.
 
 ## What the tester sees
 

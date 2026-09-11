@@ -55,6 +55,10 @@ This is the opposite of retiring. Nothing inside the node changes.
   the tree is read for.
 - **Rule-TREE-PANEL-066** — Bringing a node back undoes nothing but the status.
   Everything inside it is exactly as it was left.
+- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
+  holds nothing. It is indexed as a node so the tree can say what it is - drawn
+  with Archived beside its name like any other status - and its test sets, cases
+  and runs are not read, because an archived project is not worked on.
 
 Rule-TREE-PANEL-065 holds here too. It says a status is set on one node at a
 time, and it is on [UC-TREE-PANEL-018](retireNode.md).

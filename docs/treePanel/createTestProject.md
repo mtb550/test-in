@@ -56,6 +56,10 @@ A test project is the folder that holds all the test work for one product.
   folder. Any other folder there is ignored.
 - **Rule-TREE-PANEL-017** — Creating a test project binds this code project to
   it.
+- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
+  holds nothing. It is indexed as a node so the tree can say what it is - drawn
+  with Archived beside its name like any other status - and its test sets, cases
+  and runs are not read, because an archived project is not worked on.
 
 ## The Create Project dialog
 

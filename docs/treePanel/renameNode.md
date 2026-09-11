@@ -57,6 +57,10 @@ This changes the name of one node. Nothing inside it moves.
 - **Rule-TREE-PANEL-036** — Renaming a test set or a test set package renames
   its automation code with it, so the test case stays runnable.
 - **Rule-TREE-PANEL-037** — A rename can be undone.
+- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
+  holds nothing. It is indexed as a node so the tree can say what it is - drawn
+  with Archived beside its name like any other status - and its test sets, cases
+  and runs are not read, because an archived project is not worked on.
 
 ## The Rename dialog
 

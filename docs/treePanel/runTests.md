@@ -60,6 +60,10 @@ Testin hands the test cases to the IDE's own test runner.
 - **Rule-TREE-PANEL-080** — **Run Tests** is offered on **Test Cases**, a test
   set package, a test set and a test run. It is not offered on the test project
   row, on **Test Runs**, or on a test run package.
+- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
+  holds nothing. It is indexed as a node so the tree can say what it is - drawn
+  with Archived beside its name like any other status - and its test sets, cases
+  and runs are not read, because an archived project is not worked on.
 
 ## What the tester sees
 
