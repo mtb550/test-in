@@ -319,8 +319,6 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         // Run editor specifics: the run card renderer.
         list.setCellRenderer(new RunListRenderer(p, this));
 
-        this.contextMenu = new RunEditorContextMenu(p, this, parent, list, model);
-
         wireList();
 
         mainPanel.add(toolBar, BorderLayout.NORTH);
@@ -372,6 +370,11 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         return BaseCard.titleText(positionOf(tc),
                 selected.contains(RunEditorAttributes.ORDER),
                 selected.contains(RunEditorAttributes.DESCRIPTION) ? TestEditorAttributes.DESCRIPTION.displayValue(tc) : "");
+    }
+
+    @Override
+    protected @NotNull RunEditorContextMenu buildContextMenu() {
+        return new RunEditorContextMenu(p, this, parent, list, model);
     }
 
     @Override

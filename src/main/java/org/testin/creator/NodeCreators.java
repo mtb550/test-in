@@ -24,13 +24,15 @@ import java.util.function.Function;
  * <p>
  * Three kinds refuse rather than create: a test project and the two fixed
  * containers are not made from the tree, and {@link NotCreatableFromTree} says
- * so out loud rather than leaving a caller to find there is no creator.
+ * so out loud rather than leaving a caller to find there is no creator. What it
+ * says is the kind's own word, asked of {@link DirectoryType}, because a second
+ * spelling of "Test Cases directory" is one of them going stale.
  */
 @AllArgsConstructor
 public enum NodeCreators {
-    TP(p -> new NotCreatableFromTree("Test Project")),
-    TCD(p -> new NotCreatableFromTree("Test Cases directory")),
-    TRD(p -> new NotCreatableFromTree("Test Runs directory")),
+    TP(p -> new NotCreatableFromTree(DirectoryType.TP.getDescription())),
+    TCD(p -> new NotCreatableFromTree(DirectoryType.TCD.getDescription())),
+    TRD(p -> new NotCreatableFromTree(DirectoryType.TRD.getDescription())),
     TSP(CreateTestSetPackage::new),
     TRP(CreateTestRunPackage::new),
     TS(CreateTestSet::new),

@@ -28,7 +28,6 @@ import java.util.function.Consumer;
 
 final class IndexerDataStore {
 
-    private final @NotNull Project p;
     private final @NotNull DirectoryChildrenIndex childrenIndex = new DirectoryChildrenIndex();
 
     /**
@@ -75,7 +74,6 @@ final class IndexerDataStore {
             testRunsMainDirsByPath);
 
     IndexerDataStore(final @NotNull Project p) {
-        this.p = p;
         this.testCaseStore = new TestCaseSequenceStore(p);
         this.markers = new MarkerFiles(p);
     }
@@ -189,9 +187,8 @@ final class IndexerDataStore {
      * only the marker not being touched, so it is passed over rather than raised.
      */
     private void markTestSetModified(final @NotNull Path testSetPath) {
-        Optional.ofNullable(testSetsDirByPath.get(testSetPath.toString())).ifPresent(ts -> {
-            markers.touched(testSetPath, DirectoryType.TS.getMarker(), ts.getMarker());
-        });
+        Optional.ofNullable(testSetsDirByPath.get(testSetPath.toString()))
+                .ifPresent(ts -> markers.touched(testSetPath, DirectoryType.TS.getMarker(), ts.getMarker()));
     }
 
     /**
@@ -445,9 +442,8 @@ final class IndexerDataStore {
         // The renamed/moved node itself was modified - record it in the marker,
         // the persisted home of audit info. Descendants only changed location,
         // so their own audit stays untouched.
-        findByPath(newPath).ifPresent(renamed -> {
-            markers.touched(renamed.getPath(), renamed.getMarkerFileName(), renamed.getMarker());
-        });
+        findByPath(newPath)
+                .ifPresent(renamed -> markers.touched(renamed.getPath(), renamed.getMarkerFileName(), renamed.getMarker()));
     }
 
     /**

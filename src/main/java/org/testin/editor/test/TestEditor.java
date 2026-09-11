@@ -77,8 +77,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         this.modelChangeNotifier.setOnUpdateCallback(this::onDataSynced);
         this.model.addListDataListener(modelChangeNotifier);
 
-        this.contextMenu = new TestEditorContextMenu(p, this, parent, list, model);
-
         wireList();
 
         this.statusBar = new StatusBar();
@@ -281,6 +279,11 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     }
 
     @Override
+    protected @NotNull TestEditorContextMenu buildContextMenu() {
+        return new TestEditorContextMenu(p, this, parent, list, model);
+    }
+
+    @Override
     protected @NotNull Class<TestEditorAttributes> attributeType() {
         return TestEditorAttributes.class;
     }
@@ -291,24 +294,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     }
 
 
-    /**
-     * UC-EDITOR-PANEL-001.
-     * <p>
-     * What an empty list says, decided here because this is where the page is
-     * decided.
-     * <p>
-     * It used to be set only by the two places that load data, so a list emptied
-     * any other way kept whatever message was last written - remove the last
-     * test case after a refresh and the editor sat on "Refreshing..." forever,
-     * for a refresh that had finished minutes ago.
-     * <p>
-     * Two empties, two answers: nothing in the test set at all, which is an
-     * invitation to add one, and nothing matching the search, which is not - the
-     * cases are there and the filter is hiding them.
-     * <p>
-     * Silent while loading. The load paths own that message, and overwriting it
-     * here would flash "No test cases found" over data that is still on its way.
-     */
     /**
      * The replace is not an edit, so the notifier that watches for edits is
      * quiet while it happens.
@@ -351,6 +336,24 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         statusBar.updatePaginationState(page.page(), page.totalPages());
     }
 
+    /**
+     * UC-EDITOR-PANEL-001.
+     * <p>
+     * What an empty list says, decided here because this is where the page is
+     * decided.
+     * <p>
+     * It used to be set only by the two places that load data, so a list emptied
+     * any other way kept whatever message was last written - remove the last
+     * test case after a refresh and the editor sat on "Refreshing..." forever,
+     * for a refresh that had finished minutes ago.
+     * <p>
+     * Two empties, two answers: nothing in the test set at all, which is an
+     * invitation to add one, and nothing matching the search, which is not - the
+     * cases are there and the filter is hiding them.
+     * <p>
+     * Silent while loading. The load paths own that message, and overwriting it
+     * here would flash "No test cases found" over data that is still on its way.
+     */
     private void showEmptyStateIfNothingToDraw(final int totalItems) {
         if (totalItems > 0 || loading) return;
 

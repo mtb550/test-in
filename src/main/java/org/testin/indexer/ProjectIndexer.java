@@ -364,18 +364,6 @@ public final class ProjectIndexer {
     }
 
     /**
-     * UC-INTERNAL-006, Rule-INTERNAL-051.
-     * <p>
-     * The run recorded at this path, and empty when the tree has the directory
-     * but nothing could be read out of it - a run whose JSON is missing, or one
-     * that would not parse, both of which the scan logs and carries on past.
-     * <p>
-     * {@link #getTestRunByPath} is for callers that cannot continue without a
-     * run and should fail loudly; this is for the ones that can say so instead.
-     * The Details popup is the second kind: a run it cannot read is still a node
-     * whose name, path and audit it can show.
-     */
-    /**
      * UC-VIEW-PANEL-008, Rule-VIEW-PANEL-065.
      * <p>
      * Every indexed test run, by the path it sits at - the run half of
@@ -390,6 +378,18 @@ public final class ProjectIndexer {
                 .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), Map.Entry::getValue));
     }
 
+    /**
+     * UC-INTERNAL-006, Rule-INTERNAL-051.
+     * <p>
+     * The run recorded at this path, and empty when the tree has the directory
+     * but nothing could be read out of it - a run whose JSON is missing, or one
+     * that would not parse, both of which the scan logs and carries on past.
+     * <p>
+     * {@link #getTestRunByPath} is for callers that cannot continue without a
+     * run and should fail loudly; this is for the ones that can say so instead.
+     * The Details popup is the second kind: a run it cannot read is still a node
+     * whose name, path and audit it can show.
+     */
     public @NotNull Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
         return store.findTestRun(testRunPath);
     }

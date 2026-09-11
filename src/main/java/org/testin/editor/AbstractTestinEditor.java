@@ -100,10 +100,11 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     protected final @NotNull ListView listView;
 
     /**
-     * Assigned by the subclass: the menu is the editor's own, and every use of
-     * it here is one the base class it extends already declares.
+     * The menu this editor's list and grid answer with. The subclass says which
+     * menu; when it is built is not its business, so the field is final and
+     * nothing can be wired to a menu that is not there yet.
      */
-    protected @NotNull AbstractEditorContextMenu contextMenu;
+    protected final @NotNull AbstractEditorContextMenu contextMenu;
 
     /**
      * The grid, from the moment the tester first switches to it - table, scroll
@@ -181,7 +182,16 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         this.model = listView.model();
         this.list = listView.list();
         this.scrollPane = listView.scrollPane();
+
+        this.contextMenu = buildContextMenu();
     }
+
+    /**
+     * The menu for this editor's cases. Built from the list and the model above
+     * it, which is all either implementation reads - so it is safe to ask the
+     * subclass for it before the subclass constructor has run.
+     */
+    protected abstract @NotNull AbstractEditorContextMenu buildContextMenu();
 
     /**
      * The enum whose constants this editor's Details popup lists, so the grid

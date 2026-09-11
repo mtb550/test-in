@@ -15,9 +15,14 @@ import org.testin.model.DirectoryType;
  * the generators that do it.
  * <p>
  * Every kind answers all three, and the ones that generate nothing answer
- * {@link NoJavaCode} - a test run records what was executed and writes no Java.
- * Stated rather than left to a null, so every caller runs the answer
- * unconditionally.
+ * {@link NoJavaCode} - a test run records what was executed and writes no Java,
+ * and a test project never moves at all. Stated rather than left to a null, so
+ * every caller runs the answer unconditionally.
+ * <p>
+ * What it is told to say is {@link DirectoryType#getDescription()} rather than a
+ * phrase spelled here: the word for a kind of node belongs to the kind, which is
+ * the answer {@code CodeGenerators} already gives when no generator is
+ * installed.
  * <p>
  * {@link #of} asks for the constant of the same name; nothing branches on the
  * type, and {@code NodeKindTablesTest} says the two lists still match.
@@ -26,33 +31,33 @@ import org.testin.model.DirectoryType;
 @AllArgsConstructor
 public enum JavaCode {
     TP(
-            new NoJavaCode("a test project on its own"),
+            new NoJavaCode(DirectoryType.TP.getDescription()),
             (p, renamed) -> GenType.RENAME_TEST_PROJECT.getAction().execute(p, renamed),
-            new NoJavaCode("A test project never moves; it")
+            new NoJavaCode(DirectoryType.TP.getDescription())
     ),
 
     TCD(
-            new NoJavaCode("Test Cases directory"),
-            new NoJavaCode("Test Cases directory"),
-            new NoJavaCode("Test Cases directory")
+            new NoJavaCode(DirectoryType.TCD.getDescription()),
+            new NoJavaCode(DirectoryType.TCD.getDescription()),
+            new NoJavaCode(DirectoryType.TCD.getDescription())
     ),
 
     TRD(
-            new NoJavaCode("Test Runs directory"),
-            new NoJavaCode("Test Runs directory"),
-            new NoJavaCode("Test Runs directory")
+            new NoJavaCode(DirectoryType.TRD.getDescription()),
+            new NoJavaCode(DirectoryType.TRD.getDescription()),
+            new NoJavaCode(DirectoryType.TRD.getDescription())
     ),
 
     TSP(
-            new NoJavaCode("a test set package on its own"),
+            new NoJavaCode(DirectoryType.TSP.getDescription()),
             (p, renamed) -> GenType.RENAME_TEST_SET_PACKAGE.getAction().execute(p, renamed),
             (p, moved) -> GenType.MOVE_TEST_SET_PACKAGE.getAction().execute(p, moved)
     ),
 
     TRP(
-            new NoJavaCode("test run package"),
-            new NoJavaCode("test run package"),
-            new NoJavaCode("test run package")
+            new NoJavaCode(DirectoryType.TRP.getDescription()),
+            new NoJavaCode(DirectoryType.TRP.getDescription()),
+            new NoJavaCode(DirectoryType.TRP.getDescription())
     ),
 
     TS(
@@ -62,9 +67,9 @@ public enum JavaCode {
     ),
 
     TR(
-            new NoJavaCode("test run"),
-            new NoJavaCode("test run"),
-            new NoJavaCode("test run")
+            new NoJavaCode(DirectoryType.TR.getDescription()),
+            new NoJavaCode(DirectoryType.TR.getDescription()),
+            new NoJavaCode(DirectoryType.TR.getDescription())
     );
 
     /**

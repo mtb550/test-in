@@ -142,4 +142,20 @@
 #
 # Every one of those is a floor rather than work to do, which is why the number
 # is unlikely to fall again on its own.
-17
+#
+# 14 on 11 September, and the floor was not quite where that paragraph put it.
+# #111 moved DirectoryType's behaviour columns into tables of their own -
+# codegen/JavaCode and creator/NodeCreators - and the phrases that had been
+# written once in that enum were suddenly written in two files: "Test Cases
+# directory", "Test Runs directory", "test run". The ratchet caught it the same
+# day, which is the whole point of it.
+#
+# The fix was the rule itself rather than a spelling: both tables ask
+# DirectoryType.getDescription() for the word, which is what CodeGenerators
+# already did when no generator is installed. That took the three new ones out
+# and one of the old ones with them, because "Test Run" had been written in
+# three files and is now in two.
+#
+# What is left is the six-line list above minus that one: en_US 6, "test cases"
+# and "test runs" 4 between them, "Testin" 2, "Test Run" 1, "Tab" 1.
+14
