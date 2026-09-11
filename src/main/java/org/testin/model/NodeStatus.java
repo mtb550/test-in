@@ -42,7 +42,29 @@ public interface NodeStatus {
         public @NotNull String getButtonDescription() {
             return "";
         }
+
+        @Override
+        public boolean isActive() {
+            return true;
+        }
     };
+
+    /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-099.
+     * <p>
+     * Whether the node is in current work, which is what it is until somebody
+     * says otherwise.
+     * <p>
+     * <b>The tree draws a status beside a name only when this is false.</b>
+     * "Active" on every test project, every test set and every package is a
+     * word a tester reads a hundred times and needed never; "Inactive",
+     * "Deprecated" and "Archived" are the ones worth the space.
+     * <p>
+     * Declared per constant rather than worked out from the name or the
+     * declaration order, so a status added to any of the three enums says for
+     * itself which kind it is.
+     */
+    boolean isActive();
 
     /**
      * What the node is, as the tester reads it: "Archived", "Deprecated".

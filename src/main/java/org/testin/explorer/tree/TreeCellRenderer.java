@@ -74,11 +74,15 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
      * <b>A run always says where it stands</b>, because that is what a run is
      * for - a cycle's state is the first thing anyone wants from the tree.
      * <p>
-     * <b>Every other node says it only when it is retired.</b> A deprecated test
-     * set and an archived package are gray already; the word is what tells the
-     * tester which of the two it is, and why the node sorts last. "Active"
-     * beside every package in the tree would be a word they read a hundred times
-     * and needed never.
+     * <b>Every other node says it only when it is not active.</b> An inactive
+     * test project, a deprecated test set and an archived package each say which
+     * they are; a node in current work says nothing, because "Active" beside
+     * every name is a word the tester reads a hundred times and needed never.
+     * <p>
+     * Not the same question as {@code isRetired()}, which this asked first and
+     * which is a proxy: retired means gray, sorted last and left collapsed, and
+     * an inactive test project is none of those - it is simply not the one being
+     * worked on.
      * <p>
      * Asked of the marker rather than of the kind. Every marker answers
      * {@code getStatusLabel()} - it is one line on {@code Marker} since #110 -
@@ -86,9 +90,9 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
      * instead of knowing which enum each of them carries (#66, finding 7).
      */
     private static @NotNull String statusLabel(final @NotNull DirectoryDto dir) {
-        if (dir instanceof TestRunDirectoryDto || dir.isRetired()) return dir.getMarker().getStatusLabel();
+        if (dir instanceof TestRunDirectoryDto) return dir.getMarker().getStatusLabel();
 
-        return "";
+        return dir.getMarker().status().isActive() ? "" : dir.getMarker().getStatusLabel();
     }
 
     // todo, if (dir instanceof TestSetDirectoryDto setDir) {

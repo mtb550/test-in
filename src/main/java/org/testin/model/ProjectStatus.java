@@ -21,22 +21,31 @@ public enum ProjectStatus implements NodeStatus {
     ACTIVE(
             Bundle.message("status.project.active"),
             Bundle.message("status.project.active.action"),
-            Bundle.message("status.project.active.description")
+            Bundle.message("status.project.active.description"),
+            true
     ),
 
     INACTIVE(
             Bundle.message("status.project.inactive"),
             Bundle.message("status.project.inactive.action"),
-            Bundle.message("status.project.inactive.description")
+            Bundle.message("status.project.inactive.description"),
+            false
     ),
 
     ARCHIVED(
             Bundle.message("status.project.archived"),
             Bundle.message("status.project.archived.action"),
-            Bundle.message("status.project.archived.description")
+            Bundle.message("status.project.archived.description"),
+            false
     );
 
     private final @NotNull String label;
     private final @NotNull String buttonName;
     private final @NotNull String buttonDescription;
+
+    /**
+     * See {@link NodeStatus#isActive()} - the tree says nothing beside a node
+     * that is in current work.
+     */
+    private final boolean active;
 }

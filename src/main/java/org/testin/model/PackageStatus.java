@@ -21,16 +21,24 @@ public enum PackageStatus implements NodeStatus {
     ACTIVE(
             Bundle.message("status.package.active"),
             Bundle.message("status.package.active.action"),
-            Bundle.message("status.package.active.description")
+            Bundle.message("status.package.active.description"),
+            true
     ),
 
     ARCHIVED(
             Bundle.message("status.package.archived"),
             Bundle.message("status.package.archived.action"),
-            Bundle.message("status.package.archived.description")
+            Bundle.message("status.package.archived.description"),
+            false
     );
 
     private final @NotNull String label;
     private final @NotNull String buttonName;
     private final @NotNull String buttonDescription;
+
+    /**
+     * See {@link NodeStatus#isActive()} - the tree says nothing beside a node
+     * that is in current work.
+     */
+    private final boolean active;
 }

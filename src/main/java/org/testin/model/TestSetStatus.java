@@ -19,16 +19,24 @@ public enum TestSetStatus implements NodeStatus {
     ACTIVE(
             Bundle.message("status.testset.active"),
             Bundle.message("status.testset.active.action"),
-            Bundle.message("status.testset.active.description")
+            Bundle.message("status.testset.active.description"),
+            true
     ),
 
     DEPRECATED(
             Bundle.message("status.testset.deprecated"),
             Bundle.message("status.testset.deprecated.action"),
-            Bundle.message("status.testset.deprecated.description")
+            Bundle.message("status.testset.deprecated.description"),
+            false
     );
 
     private final @NotNull String label;
     private final @NotNull String buttonName;
     private final @NotNull String buttonDescription;
+
+    /**
+     * See {@link NodeStatus#isActive()} - the tree says nothing beside a node
+     * that is in current work.
+     */
+    private final boolean active;
 }
