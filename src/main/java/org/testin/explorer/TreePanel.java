@@ -9,7 +9,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +43,7 @@ public final class TreePanel implements Disposable {
      * The component the tool window shows.
      */
     @Getter
-    private final @NotNull JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
+    private final @NotNull TreeContent panel;
 
     private final @NotNull BranchSelector branchSelector;
 
@@ -85,6 +84,7 @@ public final class TreePanel implements Disposable {
 
     public TreePanel(final @NotNull Project p) {
         this.p = p;
+        this.panel = new TreeContent(p);
         Logger.info("TreePanel.TreePanel()");
 
         refreshAction = new RefreshAction(p, this);
