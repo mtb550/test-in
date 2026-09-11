@@ -9,12 +9,24 @@
 # written for PowerShell only, so it joins CI after the cross-platform story
 # lands (#106). It stays a sweep gate run by hand.
 #
-# Coverage. JaCoCo measures nothing in this project: the platform test framework
-# runs the suite under com.intellij.util.lang.PathClassLoader, and the agent
-# never sees a class it loads. Applied and run, it recorded 342 classes of
-# Gradle's own worker and none of the plugin, and reported 0% of 577 classes
-# while 492 tests passed. Getting a real figure needs offline instrumentation
-# alongside the platform's own, which is a build change of its own (#130).
+# Coverage. There is none, and that is decided rather than pending (#130, closed
+# 2026-09-11).
+#
+# JaCoCo measures nothing here. The platform test framework runs the suite under
+# com.intellij.util.lang.PathClassLoader and the agent never sees a class that
+# loader loads. Applied and run, it recorded 342 classes of Gradle's own worker
+# and none of the plugin: 0% of 577 classes while 492 tests passed. The report
+# renders and the build stays green, which is the dangerous part - a coverage
+# figure that is quietly a lie is worse than no figure.
+#
+# Do not re-apply it, and in particular do not "fix" it by pointing
+# classDirectories at the build output. That makes a plausible report out of an
+# empty exec file, which is the same lie with better formatting.
+#
+# What the test-gap work (#108) counts instead is packages with no test at all -
+# a proxy, and an honest one. If a real figure is ever wanted, the ideTest task
+# added in #108 is the opening: the tests that need no IDE could run under an
+# ordinary loader where the agent can see them.
 name: Build
 
 on:
