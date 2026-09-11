@@ -534,6 +534,10 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
 - **Rule-EDITOR-PANEL-204** — A key pressed while the window is still moving is
   taken at once. The movement in progress is dropped where it is and the next
   one starts from there; nothing waits for an animation to finish.
+- **Rule-EDITOR-PANEL-216** — A tester who turned Animate windows off in the IDE
+  sees no movement. Light mode floats above every other application, which is
+  the worst place to move when somebody has asked for stillness, and the switch
+  is the IDE's own rather than a second one of ours that could disagree with it.
 
 **Why 200 milliseconds.** `P` is pressed once per test case, so a hundred-case
 run is a hundred of these, and the tester is watching the application under test

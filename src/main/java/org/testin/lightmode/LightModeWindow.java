@@ -381,9 +381,9 @@ final class LightModeWindow {
         // mid-movement land at once instead of queueing behind it.
         heightMotion.ifPresent(Animator::dispose);
 
-        heightMotion = Optional.of(Motion.run(motionScope, "Testin light mode height",
+        heightMotion = Motion.run(motionScope, "Testin light mode height",
                 travelled -> frame.setSize(frame.getWidth(), from + (int) ((target - from) * travelled)),
-                () -> frame.setSize(frame.getWidth(), target)));
+                () -> frame.setSize(frame.getWidth(), target));
     }
 
     /**
@@ -435,9 +435,9 @@ final class LightModeWindow {
 
         slideMotion.ifPresent(Animator::dispose);
 
-        slideMotion = Optional.of(Motion.run(motionScope, "Testin light mode case",
+        slideMotion = Motion.run(motionScope, "Testin light mode case",
                 caseView::setTravelled,
-                () -> caseView.setTravelled(1.0)));
+                () -> caseView.setTravelled(1.0));
     }
 
     /**

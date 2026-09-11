@@ -1,11 +1,13 @@
 package org.testin.ui;
 
+import com.intellij.ide.ui.UISettings;
 import com.intellij.openapi.Disposable;
 import com.intellij.util.ui.Animator;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
 import java.util.function.DoubleConsumer;
 
 /**
@@ -45,15 +47,30 @@ public final class Motion {
     private static final int FRAMES = 12;
 
     /**
-     * Runs {@code step} with a fraction from just above 0 to exactly 1, eased,
-     * and calls {@code done} on the last frame.
+     * UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-216.
      * <p>
-     * The animator is handed back so a caller can cut a run short. Starting a
-     * second movement while the first is still going is ordinary here - a
-     * tester holding down a verdict key - and the answer is always to drop the
-     * old one and start from wherever it had reached, never to queue.
+     * Runs {@code step} with a fraction from just above 0 to exactly 1, eased,
+     * and calls {@code done} on the last frame - unless the tester has turned
+     * animation off, in which case {@code done} runs at once and nothing moves.
+     * <p>
+     * The answer is empty when nothing is moving, so a caller holding the
+     * animator to cut a run short has nothing to cut and nothing to check. That
+     * is the same shape the callers already had.
+     * <p>
+     * <b>Asked of the IDE, not of a setting of ours.</b> "Animate windows" on
+     * the Appearance page is where a tester turns motion off, and somebody who
+     * turned it off there means it - they are on a remote desktop, or they find
+     * movement distracting, or they need the screen to hold still. A window that
+     * floats above every other application is the worst place to ignore that,
+     * and asking again in our own settings would be a second switch that
+     * disagrees with the first.
      */
-    public static @NotNull Animator run(final @NotNull Disposable parent, final @NotNull String name, final @NotNull DoubleConsumer step, final @NotNull Runnable done) {
+    public static @NotNull Optional<Animator> run(final @NotNull Disposable parent, final @NotNull String name, final @NotNull DoubleConsumer step, final @NotNull Runnable done) {
+        if (!UISettings.getInstance().getAnimateWindows()) {
+            done.run();
+            return Optional.empty();
+        }
+
         final @NotNull Animator animator = new Animator(name, FRAMES, DURATION_MS, false, true, parent) {
             @Override
             public void paintNow(final int frame, final int totalFrames, final int cycle) {
@@ -65,7 +82,7 @@ public final class Motion {
         };
 
         animator.resume();
-        return animator;
+        return Optional.of(animator);
     }
 
     /**
