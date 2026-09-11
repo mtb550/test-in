@@ -31,12 +31,12 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
         this.p = p;
         this.ui = ui;
 
-        add(Declared.action("Testin.CreateTestCase"));
-        add(Declared.action("Testin.ViewDetails"));
+        add(Declared.forMenu("Testin.CreateTestCase"));
+        add(Declared.forMenu("Testin.ViewDetails"));
 
         addSeparator();
 
-        add(Declared.action("Testin.UpdateTestCase"));
+        add(Declared.forMenu("Testin.UpdateTestCase"));
 
         add(actions(p, ui, dir, list, model));
 
@@ -49,9 +49,9 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
         // that could not resolve a single case (#248).
         addSeparator();
 
-        add(Declared.action("Testin.AutomateTestCase"));
-        add(Declared.action("Testin.RunTestCase"));
-        add(Declared.action("Testin.NavigateToCode"));
+        add(Declared.forMenu("Testin.AutomateTestCase"));
+        add(Declared.forMenu("Testin.RunTestCase"));
+        add(Declared.forMenu("Testin.NavigateToCode"));
 
     }
 

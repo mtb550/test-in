@@ -27,11 +27,11 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         // One entry per user-settable status: a new TestStatus constant shows up
         // here automatically (#37), which is why the group generates its
         // children from the enum rather than plugin.xml listing them (#119).
-        add(Declared.action("Testin.SetTestCaseStatus"));
+        add(Declared.forMenu("Testin.SetTestCaseStatus"));
         addSeparator();
-        add(Declared.action("Testin.UpdateRunItem"));
+        add(Declared.forMenu("Testin.UpdateRunItem"));
         addSeparator();
-        add(Declared.action("Testin.ViewDetails"));
+        add(Declared.forMenu("Testin.ViewDetails"));
         addSeparator();
 
         // The same seven the test set editor offers, in the same place, under
@@ -41,8 +41,8 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         add(actions(p, ui, dir, list, model));
 
         addSeparator();
-        add(Declared.action("Testin.RunTestCase"));
-        add(Declared.action("Testin.NavigateToCode"));
+        add(Declared.forMenu("Testin.RunTestCase"));
+        add(Declared.forMenu("Testin.NavigateToCode"));
 
         // No Start Manual Execution here. Every entry in this menu acts on the
         // cases the tester highlighted, and that one ignores them - it walks the

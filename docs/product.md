@@ -345,7 +345,7 @@ editor toolbar, or a key. **A capability with no key says so, and says why.**
 | Move to the next / previous case | `Ctrl+→` / `Ctrl+←` | |
 | Set the run's status | `1` `2` `3` | Assigned, Completed, Closed |
 | Jump to the generated automation method | `Shift+F5` | |
-| Generate the automation method | `Ctrl+F12` | |
+| Generate the automation method | `F12` | |
 
 > **ℹ Light mode is missing from this table.** It was built after this draft: a
 > standalone always-on-top window showing one case at a time, so a tester can work

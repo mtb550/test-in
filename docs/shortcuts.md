@@ -59,7 +59,7 @@ table; this is all of them together.
 | `Alt+Shift+V` | Pastes test cases into this test set |
 | `F5` | Runs the selected test cases, or stops them |
 | `Shift+F5` | Goes to the automation code |
-| `Ctrl+F12` | **Automate Test Case**, which is not built |
+| `F12` | **Automate Test Case**, which is not built |
 | `Ctrl+P` | Generates a report on this test run |
 
 ## The editor panel: writing test cases
@@ -119,7 +119,7 @@ The always on top window, which has its own keys.
 |---|---|
 | `F5` | Runs the selected test cases, or stops them |
 | `Shift+F5` | Goes to the generated method |
-| `Ctrl+F12` | **Automate Test Case**, which is not built |
+| `F12` | **Automate Test Case**, which is not built |
 
 ## Reports
 
@@ -212,7 +212,7 @@ these carry a default key:
 | `Alt+Shift+C` `Alt+Shift+X` `Alt+Shift+V` | Copy, Cut and Paste Test Case | Both editors |
 | `F5` | Run Test Case | Both editors and the view panel |
 | `Shift+F5` | Navigate to Test Code | Both editors and the view panel |
-| `Ctrl+F12` | Automate Test Case | Both editors |
+| `F12`, `Cmd+F12` on a Mac | Automate Test Case | Both editors |
 
 Rebinding one of these moves it everywhere it works at once, including the
 tooltips and status bars that print it — those ask the keymap rather than

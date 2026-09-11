@@ -8,7 +8,7 @@ comment in it.
 
 Testin cannot do this yet. The entry says so when it is pressed.
 
-`Ctrl+F12`, or the menu entry **Automate Test Case**.
+`F12`, or the menu entry **Automate Test Case**.
 
 ## Rules
 
@@ -52,7 +52,7 @@ right of the IDE, above the status bar.
 
 ## What happens today
 
-1. The tester selects a test case and presses `Ctrl+F12`.
+1. The tester selects a test case and presses `F12`.
 2. A message titled **Not built yet** reads *Generating automation code for a
    test case is coming in a later release.*
 3. Nothing is written.

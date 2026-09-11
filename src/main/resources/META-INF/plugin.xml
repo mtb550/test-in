@@ -420,7 +420,14 @@
                 class="org.testin.automate.AutomateTestCaseAction"
                 icon="AllIcons.Actions.IntentionBulb"
         >
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl F12"/>
+            <!-- F12 is JumpToLastWindow in the IDE's own keymap, and it is kept
+                 anyway: a shared key is fine where it works, and no code goes in
+                 to win it. CTRL+F12 was worse - FileStructurePopup owns that and
+                 there was no Mac entry at all, so generating code was unreachable
+                 by key on a Mac. Rule-INTERNAL-069 says the opposite and this is
+                 the exception to it, decided deliberately. -->
+            <keyboard-shortcut keymap="$default" first-keystroke="F12"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta F12"/>
         </action>
 
         <action

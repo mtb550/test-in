@@ -51,11 +51,11 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
     protected @NotNull DefaultActionGroup actions(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         final @NotNull DefaultActionGroup actions = ActionsMenu.group();
 
-        actions.add(Declared.action("Testin.CopyTestCase"));
-        actions.add(Declared.action("Testin.CopyTestCaseNode"));
-        actions.add(Declared.action("Testin.CutTestCaseNode"));
-        actions.add(Declared.action("Testin.PasteTestCaseNode"));
-        actions.add(Declared.action("Testin.RemoveTestCase"));
+        actions.add(Declared.forMenu("Testin.CopyTestCase"));
+        actions.add(Declared.forMenu("Testin.CopyTestCaseNode"));
+        actions.add(Declared.forMenu("Testin.CutTestCaseNode"));
+        actions.add(Declared.forMenu("Testin.PasteTestCaseNode"));
+        actions.add(Declared.forMenu("Testin.RemoveTestCase"));
 
         actions.addSeparator();
 

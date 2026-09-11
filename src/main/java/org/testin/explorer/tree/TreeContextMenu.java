@@ -27,8 +27,8 @@ public class TreeContextMenu extends DefaultActionGroup {
         super("Tree Popup Menu", true);
         this.p = p;
 
-        add(Declared.action("Testin.Open"));
-        add(Declared.action("Testin.CreateNode"));
+        add(Declared.forMenu("Testin.Open"));
+        add(Declared.forMenu("Testin.CreateNode"));
 
         addSeparator();
 
@@ -39,49 +39,49 @@ public class TreeContextMenu extends DefaultActionGroup {
         // Each kind's statuses are one declared group, which generates its
         // entries from that enum (#119).
         add(actionsSubMenu(List.of(
-                        Declared.action("Testin.UpdateTestProjectStatus"),
-                        Declared.action("Testin.UpdateTestSetStatus"),
-                        Declared.action("Testin.UpdatePackageStatus")), List.of(
+                        Declared.forMenu("Testin.UpdateTestProjectStatus"),
+                        Declared.forMenu("Testin.UpdateTestSetStatus"),
+                        Declared.forMenu("Testin.UpdatePackageStatus")), List.of(
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.UNDO),
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.REDO),
-                        Declared.action("Testin.ReCreateTestRun"),
-                        Declared.action("Testin.RemoveNode"),
-                        Declared.action("Testin.Rename"),
-                        Declared.action("Testin.OrderNode"),
-                        Declared.action("Testin.CopyNode"),
-                        Declared.action("Testin.CutNode"),
-                        Declared.action("Testin.PasteNode"))));
+                        Declared.forMenu("Testin.ReCreateTestRun"),
+                        Declared.forMenu("Testin.RemoveNode"),
+                        Declared.forMenu("Testin.Rename"),
+                        Declared.forMenu("Testin.OrderNode"),
+                        Declared.forMenu("Testin.CopyNode"),
+                        Declared.forMenu("Testin.CutNode"),
+                        Declared.forMenu("Testin.PasteNode"))));
 
         if (OptionalPlugin.TESTNG.isAvailable()) {
             addSeparator();
-            add(Declared.action("Testin.RunTests"));
+            add(Declared.forMenu("Testin.RunTests"));
         }
 
         addSeparator();
 
-        add(Declared.action("Testin.Export"));
+        add(Declared.forMenu("Testin.Export"));
 
-        add(Declared.action("Testin.Import"));
+        add(Declared.forMenu("Testin.Import"));
 
         // Added in every IDE, and grayed with the reason when Git is missing.
         // Leaving them out gave the menu a different shape in two IDEs with
         // nothing to say why, while Sync With SFTP below was added in both
         // (#273).
         addSeparator();
-        add(Declared.action("Testin.SyncWithRemote"));
-        add(Declared.action("Testin.ViewPendingCommits"));
+        add(Declared.forMenu("Testin.SyncWithRemote"));
+        add(Declared.forMenu("Testin.ViewPendingCommits"));
 
         addSeparator();
-        add(Declared.action("Testin.SyncWithSftp"));
+        add(Declared.forMenu("Testin.SyncWithSftp"));
 
         addSeparator();
-        add(Declared.action("Testin.EditTestRun"));
+        add(Declared.forMenu("Testin.EditTestRun"));
         add(new SetTestRunStatusAction(p, tree));
         addSeparator();
 
         add(new GenerateReportAction(p, tree));
 
-        add(Declared.action("Testin.ShowNodeDetails"));
+        add(Declared.forMenu("Testin.ShowNodeDetails"));
 
     }
 

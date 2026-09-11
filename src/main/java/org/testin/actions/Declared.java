@@ -117,6 +117,48 @@ public final class Declared {
     /**
      * UC-INTERNAL-001, Rule-INTERNAL-066, Rule-INTERNAL-068.
      * <p>
+     * The action as a menu should show it: carrying the key its surface gives
+     * it, for the eight that have one, and the registered action itself for
+     * every other.
+     * <p>
+     * <b>A menu reads the key off the action.</b> So does
+     * {@code AbstractEditorContextMenu.claimedByTheGrid}, which asks what a menu
+     * entry answers to before deciding whether the grid keeps that key for its
+     * own cells. Both used to get an answer because {@link #bindTo} wrote the
+     * key onto the registered action - the global mutation the platform was
+     * logging a PluginException about. Removing that mutation took the answer
+     * away from both: the menu stopped printing CTRL+C beside Copy, and the grid
+     * lost CTRL+C, CTRL+X, CTRL+V and DELETE to the menu entries that no longer
+     * looked claimed.
+     * <p>
+     * So the key is put on a copy instead, which is the same thing {@link #bindTo}
+     * does and for the same reason: {@code ActionUtil.wrap} is not registered, so
+     * its shortcut set is ours to set and the instance the Keymap page shows is
+     * left alone. One declaration - {@link #SURFACE_KEYS} - now answers the
+     * binding, the printing and the grid's question, and they cannot come apart.
+     */
+    public static @NotNull AnAction forMenu(final @NotNull String id) {
+        final @NotNull AnAction action = action(id);
+
+        return Optional.ofNullable(SURFACE_KEYS.get(id))
+                .map(key -> carrying(action, key))
+                .orElse(action);
+    }
+
+    /**
+     * A copy of the action that answers to that key. Not registered, so nothing
+     * global changes.
+     */
+    private static @NotNull AnAction carrying(final @NotNull AnAction action, final @NotNull Shortcuts key) {
+        final @NotNull AnAction copy = ActionUtil.wrap(action);
+        copy.registerCustomShortcutSet(key.getCustomShortcut(), null);
+
+        return copy;
+    }
+
+    /**
+     * UC-INTERNAL-001, Rule-INTERNAL-066, Rule-INTERNAL-068.
+     * <p>
      * Puts a declared action key on one component rather than in the keymap,
      * through a wrapper rather than on the action itself.
      * <p>

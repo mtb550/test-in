@@ -154,7 +154,7 @@ the same rows, a filter, a search, and a key for every gesture.
 | `F2` | Changes the failure details without changing the verdict | [UC-EDITOR-PANEL-040](editFailureDetail.md) |
 | `F5` | Runs the selected test cases, or stops them | [UC-EDITOR-PANEL-043](runOneCase.md) |
 | `Shift+F5` | Goes to the automation code | [UC-CODEGEN-006](../codegen/goToCode.md) |
-| `Ctrl+F12` | **Automate Test Case**, which is not built | [UC-CODEGEN-005](../codegen/automateTestCase.md) |
+| `F12` | **Automate Test Case**, which is not built | [UC-CODEGEN-005](../codegen/automateTestCase.md) |
 | `Ctrl+P` | Generates a report on this test run | [UC-REPORT-001](../report/generateReport.md) |
 
 **Nothing has a key** for: the first page, the last page, **Refresh**,
