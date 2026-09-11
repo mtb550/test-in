@@ -509,7 +509,14 @@ public class StatusBar extends JBPanel<StatusBar> {
     private static @NotNull String narrowedFrom(final int shownCount, final int totalCount) {
         if (shownCount == totalCount) return "";
 
-        return String.format(Locale.ENGLISH, " <font color='%s'>%s</font>",
-                EditorColors.filterActiveHex(), Bundle.message("statusbar.filtered.from", String.valueOf(totalCount)));
+        // The color spelled into the markup here rather than turned into a hex
+        // string by EditorColors, which holds colors and does not format them.
+        // This is the one label in the plugin that colors part of a sentence
+        // rather than all of it, so there is nothing for a second caller to
+        // diverge from (#291).
+        return String.format(Locale.ENGLISH, " <font color='#%02x%02x%02x'>%s</font>",
+                EditorColors.FILTER_ACTIVE.getRed(), EditorColors.FILTER_ACTIVE.getGreen(),
+                EditorColors.FILTER_ACTIVE.getBlue(),
+                Bundle.message("statusbar.filtered.from", String.valueOf(totalCount)));
     }
 }

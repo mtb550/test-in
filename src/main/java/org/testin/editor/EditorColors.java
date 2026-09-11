@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.Locale;
 
 /**
  * Shared colors for list and grid selection states.
@@ -30,13 +29,4 @@ public final class EditorColors {
      * would say they were two.
      */
     public static final @NotNull Color FILTER_ACTIVE = JBUI.CurrentTheme.Link.Foreground.ENABLED;
-
-    /**
-     * That color as markup, for the one label that has to color part of a
-     * sentence rather than all of it.
-     */
-    public static @NotNull String filterActiveHex() {
-        return String.format(Locale.ENGLISH, "#%02x%02x%02x",
-                FILTER_ACTIVE.getRed(), FILTER_ACTIVE.getGreen(), FILTER_ACTIVE.getBlue());
-    }
 }
