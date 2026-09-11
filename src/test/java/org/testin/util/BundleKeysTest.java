@@ -144,8 +144,9 @@ public class BundleKeysTest {
      * <p>
      * The descriptor used to carry {@code text} and {@code description} on each
      * element; the platform reads them from here instead now, by id, so that a
-     * tester running in French sees French in Find Action and in Settings ->
-     * Keymap. A key that is missing does not fail anything - the platform falls
+     * tester running the IDE in another language sees that language in Find
+     * Action and in Settings -> Keymap. A key that is missing does not fail
+     * anything - the platform falls
      * back to the id, so the tester finds an action called
      * {@code Testin.RunTests} and nothing says why.
      */
@@ -178,7 +179,7 @@ public class BundleKeysTest {
     public void everyTranslationAnswersTheSameKeys() {
         final Properties english = bundle("messages.properties");
 
-        for (final String language : List.of("fr")) {
+        for (final String language : List.of("fr", "hi")) {
             final Properties other = bundle("messages_" + language + ".properties");
 
             assertEquals(other.stringPropertyNames(), english.stringPropertyNames(),
@@ -212,7 +213,7 @@ public class BundleKeysTest {
     public void everyPatternWithASlotDoublesItsApostrophes() {
         final Pattern slot = Pattern.compile("\\{\\d");
 
-        for (final String name : List.of("messages.properties", "messages_fr.properties")) {
+        for (final String name : List.of("messages.properties", "messages_fr.properties", "messages_hi.properties")) {
             final Properties properties = bundle(name);
 
             for (final String key : properties.stringPropertyNames()) {
