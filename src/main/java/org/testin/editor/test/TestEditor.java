@@ -46,6 +46,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
+import org.testin.model.Modules;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.open.OpenContextMenuAction;
@@ -849,18 +850,17 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
 
-    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
+    /**
+     * UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095.
+     * <p>
+     * The modules this test set uses, from {@link Modules} - which is what a
+     * module is, the same way the groups below come from the owner that holds
+     * those. Which cases to ask about is the editor's; what counts as a module
+     * is not (#291).
+     */
     @Override
     public @NotNull Set<String> getAvailableModules() {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        final @NotNull Set<String> modules = new HashSet<>();
-        for (final TestCaseDto tc : indexer.getTestCasesForTestSet(parent.getPath())) {
-            final @NotNull String module = tc.getModule();
-            if (!module.trim().isEmpty()) {
-                modules.add(module.trim());
-            }
-        }
-        return modules;
+        return Modules.in(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(parent.getPath()));
     }
 
     /**
