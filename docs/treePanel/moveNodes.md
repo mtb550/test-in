@@ -64,6 +64,10 @@ The node keeps everything inside it. Only where it sits changes.
   is set by ordering, in [UC-TREE-PANEL-015](orderNodes.md), not by dragging.
 - **Rule-TREE-PANEL-050** — Canceling a cut empties the clipboard. Nothing is
   left waiting to be pasted.
+- **Rule-TREE-PANEL-098** — A move that the tree refuses leaves the generated
+  code where it was. The Java moves before the node, because the old path is
+  what finds it, so a node move that fails puts the code back rather than
+  leaving the test set in one package and its class in another.
 
 ## The Paste, Move and Copy dialog
 

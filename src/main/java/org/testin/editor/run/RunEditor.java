@@ -503,28 +503,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         onPersisted.run();
     }
 
-    @Override
-    public void selectTestCase(final @NotNull TestCaseDto tc) {
-        final int index = currentTestCases.indexOf(tc);
-        if (index < 0) return;
 
-        final int targetPage = (index / Math.max(1, pageSize)) + 1;
-        final int localIndex = index % Math.max(1, pageSize);
-        if (targetPage != currentPage) {
-            currentPage = targetPage;
-            refreshView();
-            ApplicationManager.getApplication().invokeLater(() -> selectVisibleIndex(localIndex));
-            return;
-        }
-        selectVisibleIndex(localIndex);
-    }
-
-    private void selectVisibleIndex(final int index) {
-        if (index < 0 || index >= list.getModel().getSize()) return;
-        list.setSelectedIndex(index);
-        list.ensureIndexIsVisible(index);
-        list.requestFocusInWindow();
-    }
 
     /**
      * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130, Rule-EDITOR-PANEL-134.

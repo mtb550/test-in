@@ -566,6 +566,63 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     }
 
     /**
+     * UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-009.
+     * <p>
+     * Puts the tester on this case: the page it is on, the row, and the focus.
+     * <p>
+     * Both editors worked the page out for themselves, from the same two fields,
+     * in methods that had drifted - one bounds-checked the row and one did not
+     * (#66, finding 31). What differs is only what to do about a case that is
+     * not on any page, which is {@link #notOnAnyPage}.
+     */
+    @Override
+    public void selectTestCase(final @NotNull TestCaseDto tc) {
+        final int index = currentTestCases.indexOf(tc);
+        if (index < 0) {
+            notOnAnyPage(tc);
+            return;
+        }
+
+        final int safePageSize = Math.max(1, pageSize);
+        final int page = (index / safePageSize) + 1;
+        final int localIndex = index % safePageSize;
+
+        if (page == currentPage) {
+            selectVisibleIndex(localIndex);
+            return;
+        }
+
+        currentPage = page;
+        refreshView();
+
+        // After the redraw, because the row does not exist until the page it is
+        // on has been drawn.
+        ApplicationManager.getApplication().invokeLater(() -> selectVisibleIndex(localIndex));
+    }
+
+    /**
+     * The case the tester was sent to is not on any page - filtered out, or
+     * searched out. Nothing by default; the test editor says where to look.
+     */
+    protected void notOnAnyPage(final @NotNull TestCaseDto tc) {
+    }
+
+    /**
+     * The row on the page now showing, selected, scrolled to and focused.
+     * <p>
+     * Bounds-checked because a redraw can land between the page being chosen and
+     * this running, and a row that is no longer there is not an error - it is a
+     * tester who did something else in the meantime.
+     */
+    protected void selectVisibleIndex(final int index) {
+        if (index < 0 || index >= list.getModel().getSize()) return;
+
+        list.setSelectedIndex(index);
+        list.ensureIndexIsVisible(index);
+        list.requestFocusInWindow();
+    }
+
+    /**
      * The case to put the selection back on after a reload. Swing answers null
      * when nothing is selected, which is the one thing there is nothing to
      * remember about.

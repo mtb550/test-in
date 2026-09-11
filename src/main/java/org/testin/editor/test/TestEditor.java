@@ -206,44 +206,24 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         });
     }
 
-    // UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-009
+
+    /**
+     * UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-009.
+     * <p>
+     * Told, not revealed. Moving the view says nothing and changes nothing, and
+     * this used to change the most visible thing the tester had set up - every
+     * filter, thrown away to show one card, with no word about it. Creating a
+     * test case under a filter, dragging one, and choosing a search result all
+     * came through here (#205).
+     * <p>
+     * The test case is there either way, so this says where to look for it
+     * rather than refusing anything - which is why the sentence is here and not
+     * beside Testin's refusals.
+     */
     @Override
-    public void selectTestCase(final @NotNull TestCaseDto tc) {
-        // Told, not revealed. Moving the view says nothing and changes nothing,
-        // and this changed the most visible thing the tester had set up - every
-        // filter, thrown away to show one card, with no word about it. Creating
-        // a test case under a filter, dragging one, and choosing a search result
-        // all came through here (#205). The test case is there either way, so
-        // this says where to look for it rather than refusing anything - which
-        // is why the sentence is here and not beside Testin's refusals.
-        if (!currentTestCases.contains(tc)) {
-            Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("editor.hidden.title"),
-                    Bundle.message("editor.hidden.message", tc.getDescription()));
-            return;
-        }
-
-        final int index = currentTestCases.indexOf(tc);
-        if (index == -1) return;
-
-        final int safePageSize = Math.max(1, pageSize);
-        final int page = (index / safePageSize) + 1;
-        final int localIndex = index % safePageSize;
-
-        if (page == this.currentPage) {
-            list.setSelectedIndex(localIndex);
-            list.ensureIndexIsVisible(localIndex);
-            list.requestFocusInWindow();
-            return;
-        }
-
-        this.currentPage = page;
-        refreshView();
-
-        ApplicationManager.getApplication().invokeLater(() -> {
-            list.setSelectedIndex(localIndex);
-            list.ensureIndexIsVisible(localIndex);
-            list.requestFocusInWindow();
-        });
+    protected void notOnAnyPage(final @NotNull TestCaseDto tc) {
+        Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("editor.hidden.title"),
+                Bundle.message("editor.hidden.message", tc.getDescription()));
     }
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-030

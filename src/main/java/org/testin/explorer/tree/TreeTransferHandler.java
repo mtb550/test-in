@@ -514,11 +514,16 @@ public class TreeTransferHandler extends TransferHandler {
         syncCode(from, to);
 
         for (int i = 0; i < from.size(); i++) {
-            Services.getInstance(p, ProjectIndexer.class).moveNode(from.get(i), to.get(i), wasMoved -> {
+            final @NotNull Path source = from.get(i);
+
+            Services.getInstance(p, ProjectIndexer.class).moveNode(source, to.get(i), wasMoved -> {
                 // The move is asynchronous, so this can land after the project
                 // closed; refreshing a disposed tree throws.
                 if (p.isDisposed()) return;
+
                 if (wasMoved) moved.incrementAndGet();
+                else putCodeBack(source);
+
                 if (remaining.decrementAndGet() != 0) return;
 
                 refresh.run();
@@ -563,6 +568,33 @@ public class TreeTransferHandler extends TransferHandler {
         WriteCommandAction.runWriteCommandAction(p, Bundle.message("transfer.move.code.command"), null, () -> {
             for (int i = 0; i < from.size(); i++) moveCodeOf(from.get(i), to.get(i));
         });
+    }
+
+    /**
+     * UC-TREE-PANEL-016, Rule-TREE-PANEL-098.
+     * <p>
+     * The node did not move, so its code comes back.
+     * <p>
+     * The Java goes first and deliberately - the old path is what finds it, so
+     * it has to happen while the node is still where it was. The node move that
+     * follows is asynchronous and can fail: a name already taken at the target,
+     * an IO error. Nothing put the code back, so the tree showed the test set
+     * where it had always been while its class sat in the package it was going
+     * to, and every case under it stopped being runnable until the set was
+     * dragged again (#66, finding 21).
+     * <p>
+     * Hard to reach from a drag, because a drop onto a taken name is refused
+     * before it starts. Reachable from undo and redo, which call the same
+     * routine with the two lists swapped and checked nothing.
+     * <p>
+     * The reverse of moving a node's code to another parent is moving it to its
+     * own, which is what the node still has: the move failed, so it is where it
+     * started.
+     */
+    private void putCodeBack(final @NotNull Path source) {
+        Logger.warn("Move refused for " + source.getFileName() + "; putting its generated code back.");
+
+        syncCode(List.of(source), List.of(source));
     }
 
     /**
