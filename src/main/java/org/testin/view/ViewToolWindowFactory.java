@@ -81,24 +81,26 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
     public void createToolWindowContent(final @NotNull Project p, final @NotNull ToolWindow toolWindow) {
         Logger.info("ViewToolWindowFactory.createToolWindowContent()");
 
+        final @NotNull ViewPanel panel = new ViewPanel(p);
+        Services.getInstance(p, ViewPanelHolder.class).hold(panel);
+
+        final @NotNull ContentFactory contentFactory = ContentFactory.getInstance();
+
+        // In declaration order, which is the order they appear in - a tab
+        // added to the enum arrives here without this method changing.
+        for (final ViewTab tab : ViewTab.values()) {
+            toolWindow.getContentManager().addContent(
+                    contentFactory.createContent(tab.paneOf(panel), tab.getDisplayName(), false));
+        }
+
+        toolWindow.setTitleActions(new ViewPanelActions().create(panel, toolWindow.getComponent()));
+
+        // The startup work, and only that - see Main, which had the same shape
+        // and the defect that goes with it: a tool window filled in a later
+        // event is one whose header was built around nothing, and every title
+        // action on it throws before it runs (#66).
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (!p.isDisposed()) {
-                StartupActivity.execute(p);
-            }
-
-            final @NotNull ViewPanel panel = new ViewPanel(p);
-            Services.getInstance(p, ViewPanelHolder.class).hold(panel);
-
-            final @NotNull ContentFactory contentFactory = ContentFactory.getInstance();
-
-            // In declaration order, which is the order they appear in - a tab
-            // added to the enum arrives here without this method changing.
-            for (final ViewTab tab : ViewTab.values()) {
-                toolWindow.getContentManager().addContent(
-                        contentFactory.createContent(tab.paneOf(panel), tab.getDisplayName(), false));
-            }
-
-            toolWindow.setTitleActions(new ViewPanelActions().create(panel, toolWindow.getComponent()));
+            if (!p.isDisposed()) StartupActivity.execute(p);
         });
     }
 
