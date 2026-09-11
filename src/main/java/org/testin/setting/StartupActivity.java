@@ -17,6 +17,7 @@ import org.testin.notifications.Notifier;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.runner.TestCaseExecutionTracker;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.Once;
 
 import java.nio.file.Path;
@@ -91,9 +92,8 @@ public final class StartupActivity implements ProjectActivity {
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (p.isDisposed()) return;
 
-                Services.getInstance(p, Notifier.class).warn(p, "No Test Project Named",
-                        "testin.yml does not say which test project this repository is about. "
-                                + "Pick one in the Testin tool window, or set testinProject in the file.");
+                Services.getInstance(p, Notifier.class).warn(p, Bundle.message("startup.no.project.title"),
+                        Bundle.message("startup.no.project.message"));
             });
         }
 
@@ -128,9 +128,9 @@ public final class StartupActivity implements ProjectActivity {
             if (p.isDisposed()) return;
 
             Services.getInstance(p, Notifier.class).warnWithAction(p,
-                    "Testin Setup Required",
-                    "Please configure the Root Testin Folder to enable test management features.",
-                    "Open Settings",
+                    Bundle.message("startup.setup.title"),
+                    Bundle.message("startup.setup.message"),
+                    Bundle.message("startup.setup.action"),
                     () -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class)
             );
         });

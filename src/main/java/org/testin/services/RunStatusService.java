@@ -22,6 +22,7 @@ import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.setting.AppSettingsState;
 import org.testin.ui.framework.ConfirmDialog;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 
 import java.nio.file.Path;
@@ -149,7 +150,7 @@ public final class RunStatusService {
      * word it differently.
      */
     public void refuseRemoved(final @NotNull Project p) {
-        Services.getInstance(p, Notifier.class).softRefuse(p, "The test case was removed - the run keeps what it recorded");
+        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.case.removed"));
     }
 
     public void applyStatus(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull List<TestCaseDto> selectedItems, final @NotNull TestStatus status) {
@@ -191,11 +192,11 @@ public final class RunStatusService {
      * "actualResult will be reset".
      */
     private @NotNull String erasureWarning(final @NotNull List<String> losing, final int rows) {
-        final @NotNull String where = rows == 1 ? "this case" : "these " + rows + " cases";
+        final @NotNull String where = rows == 1
+                ? Bundle.message("run.status.this.case")
+                : Bundle.message("run.status.these.cases", String.valueOf(rows));
 
-        return "Passing " + where + " clears " + Display.andJoin(losing)
-                + ", because a case that passed has nothing to explain. "
-                + "There is no copy of it anywhere else.";
+        return Bundle.message("run.status.passing.clears", where, Display.andJoin(losing));
     }
 
     /**

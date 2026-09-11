@@ -7,11 +7,12 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
+import org.testin.util.Bundle;
 
 public class OpenSettingsAction extends AbstractProjectAction {
 
     public OpenSettingsAction(final @NotNull Project p) {
-        super(p, "Settings", "Configure Testin settings", AllIcons.General.Settings);
+        super(p, Bundle.message("settings.action.text"), Bundle.message("settings.action.description"), AllIcons.General.Settings);
     }
 
     // UC-SETTING-001, Rule-SETTING-007

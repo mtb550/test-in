@@ -14,6 +14,8 @@ import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.editor.EditorUtil;
 import org.testin.services.Services;
+import org.testin.notifications.Done;
+import org.testin.util.Bundle;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -22,7 +24,7 @@ public class RefreshAction extends AbstractProjectAction {
     /**
      * What the toolbar button reports when it is the tester pressing Refresh.
      */
-    private static final @NotNull String REFRESHED = "Refreshed";
+    private static final @NotNull String REFRESHED = Done.REFRESHED.getOutcome();
 
     private final @NotNull TreePanel tp;
 
@@ -36,7 +38,7 @@ public class RefreshAction extends AbstractProjectAction {
     private final @NotNull AtomicBoolean refreshGuard = new AtomicBoolean(false);
 
     public RefreshAction(final @NotNull Project p, final @NotNull TreePanel tp) {
-        super(p, "Refresh", "Re-index and reload tree", AllIcons.Actions.Refresh);
+        super(p, Bundle.message("toolbar.refresh"), Bundle.message("toolbar.refresh.description"), AllIcons.Actions.Refresh);
         this.tp = tp;
     }
 

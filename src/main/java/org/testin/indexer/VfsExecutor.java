@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.VfsBiOperation;
 import org.testin.util.VfsOperation;
 
@@ -60,7 +61,7 @@ final class VfsExecutor {
     // failure under is not a parameter: one caller, one word, and a second
     // operation would bring its own method rather than a second string.
     void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull VfsOperation operation) {
-        final @NotNull String errorTitle = "Rename Failed";
+        final @NotNull String errorTitle = Bundle.message("vfs.rename.failed.title");
         claim(path);
 
         // The lookup runs off the EDT and the operation on it: refreshAndFindFile
@@ -77,11 +78,11 @@ final class VfsExecutor {
                         } catch (final Exception ex) {
                             // A failed VFS operation is reported, never thrown into the
                             // EDT as an exception dialog (parity with the two-path form).
-                            Services.getInstance(p, Notifier.class).error(p, errorTitle, "Operation failed: " + ex.getMessage());
+                            Services.getInstance(p, Notifier.class).error(p, errorTitle, Bundle.message("vfs.operation.failed", ex.getMessage()));
                         }
                     }),
                     () -> Services.getInstance(p, Notifier.class)
-                            .error(p, errorTitle, "Could not find path on disk:\n" + path)));
+                            .error(p, errorTitle, Bundle.message("vfs.path.not.found", path))));
         });
     }
 
@@ -96,7 +97,7 @@ final class VfsExecutor {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (sourceVf.isEmpty() || targetVf.isEmpty()) {
-                    Services.getInstance(p, Notifier.class).error(p, errorTitle, "Could not find source or target path on disk.");
+                    Services.getInstance(p, Notifier.class).error(p, errorTitle, Bundle.message("vfs.source.or.target.not.found"));
                     onFailure.run();
                     return;
                 }
@@ -106,7 +107,7 @@ final class VfsExecutor {
                         operation.execute(sourceVf.get(), targetVf.get());
                         onSuccess.run();
                     } catch (final Exception ex) {
-                        Services.getInstance(p, Notifier.class).error(p, errorTitle, "Operation failed: " + ex.getMessage());
+                        Services.getInstance(p, Notifier.class).error(p, errorTitle, Bundle.message("vfs.operation.failed", ex.getMessage()));
                         onFailure.run();
                     }
                 });
@@ -155,7 +156,7 @@ final class VfsExecutor {
                         if (vf.isPresent()) vf.get().delete(requester);
                     } catch (final IOException ex) {
                         deleted.set(false);
-                        Services.getInstance(p, Notifier.class).error(p, "Delete Failed", "Could not delete file: " + ex.getMessage());
+                        Services.getInstance(p, Notifier.class).error(p, Bundle.message("vfs.delete.failed.title"), Bundle.message("vfs.delete.failed", ex.getMessage()));
                     }
                 });
 

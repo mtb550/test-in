@@ -22,6 +22,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.ClipboardContents;
 import org.testin.actions.TestinData;
 import org.testin.services.OptionalPlugin;
@@ -118,7 +119,9 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private static @NotNull String describe(final @NotNull List<DirectoryDto> sources) {
-        return sources.size() == 1 ? "'" + sources.getFirst().getName() + "'" : sources.size() + " items";
+        return sources.size() == 1
+                ? "'" + sources.getFirst().getName() + "'"
+                : Bundle.message("transfer.items", String.valueOf(sources.size()));
     }
 
     /**
@@ -326,10 +329,10 @@ public class TreeTransferHandler extends TransferHandler {
             // Drag-drop confirms before changing anything; clipboard paste
             // already confirmed in PasteNodeAction.
             if (support.isDrop()) {
-                final @NotNull String verb = action == COPY ? "Copy" : "Move";
+                final @NotNull String verb = action == COPY ? Bundle.message("transfer.copy") : Bundle.message("transfer.move");
                 final @NotNull Path fromPath = sources.getFirst().getPath().getParent();
                 new ConfirmDialog(p, verb,
-                        verb + " " + describe(sources) + " into '" + target.getName() + "'?",
+                        Bundle.message("transfer.confirm", verb, describe(sources), target.getName()),
                         Objects.toString(fromPath, ""),
                         target.getPath().toString(),
                         verb,
@@ -398,8 +401,10 @@ public class TreeTransferHandler extends TransferHandler {
         }
         if (collided.isEmpty()) return false;
 
-        final @NotNull String verb = collided.size() == 1 ? " already exists in '" : " already exist in '";
-        Services.getInstance(p, Notifier.class).softRefuse(p, describe(collided) + verb + target.getName() + "'");
+        final @NotNull String said = collided.size() == 1
+                ? Bundle.message("transfer.exists.one", describe(collided), target.getName())
+                : Bundle.message("transfer.exists.many", describe(collided), target.getName());
+        Services.getInstance(p, Notifier.class).softRefuse(p, said);
 
         return true;
     }
@@ -482,7 +487,7 @@ public class TreeTransferHandler extends TransferHandler {
         moveBatch(oldPaths, newPaths, moved -> confirmLanded(Done.MOVED, moved));
 
         Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
-                "Move " + describe(sources),
+                Bundle.message("transfer.undo.move", describe(sources)),
                 () -> moveBatch(newPaths, oldPaths),
                 () -> moveBatch(oldPaths, newPaths)));
     }
@@ -554,7 +559,7 @@ public class TreeTransferHandler extends TransferHandler {
     private void syncCode(final @NotNull List<Path> from, final @NotNull List<Path> to) {
         if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
 
-        WriteCommandAction.runWriteCommandAction(p, "Move Test Code", null, () -> {
+        WriteCommandAction.runWriteCommandAction(p, Bundle.message("transfer.move.code.command"), null, () -> {
             for (int i = 0; i < from.size(); i++) moveCodeOf(from.get(i), to.get(i));
         });
     }

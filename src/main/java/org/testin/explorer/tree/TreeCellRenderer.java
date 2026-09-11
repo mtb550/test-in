@@ -11,6 +11,7 @@ import org.testin.model.DirectoryType;
 import org.testin.model.TestRunStatus;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.util.Bundle;
 
 import java.util.Objects;
 import javax.swing.*;
@@ -59,7 +60,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
         } catch (final Exception ex) {
             Logger.error("Error rendering tree node: " + ex.getMessage());
             setIcon(AllIcons.General.Error);
-            append(Objects.toString(value, "Error"), SimpleTextAttributes.ERROR_ATTRIBUTES);
+            append(Objects.toString(value, Bundle.message("tree.render.error")), SimpleTextAttributes.ERROR_ATTRIBUTES);
         }
     }
 

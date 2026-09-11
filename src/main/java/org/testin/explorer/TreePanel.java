@@ -331,11 +331,11 @@ public final class TreePanel implements Disposable {
     private void showWelcome(final @NotNull PanelState state) {
         final @NotNull StatusText emptyText = panel.getEmptyText();
 
-        emptyText.setText(String.format("Welcome to %s", Bundle.getPluginName()), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
+        emptyText.setText(Bundle.message("welcome.title", Bundle.getPluginName()), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
         emptyText.appendLine("");
-        emptyText.appendSecondaryText("The new awesome test management tool", StatusText.DEFAULT_ATTRIBUTES, null);
+        emptyText.appendSecondaryText(Bundle.message("welcome.tagline"), StatusText.DEFAULT_ATTRIBUTES, null);
         emptyText.appendLine("");
-        emptyText.appendLine("By", SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
+        emptyText.appendLine(Bundle.message("welcome.by"), SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
         emptyText.appendLine("Muteb almughyiri", SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
         emptyText.appendLine("");
         emptyText.appendLine("");
@@ -366,7 +366,7 @@ public final class TreePanel implements Disposable {
     private void offerSettings(final @NotNull StatusText emptyText) {
         emptyText.appendLine(
                 AllIcons.General.Settings,
-                "Configure Testin settings",
+                Bundle.message("settings.action.description"),
                 SimpleTextAttributes.LINK_ATTRIBUTES,
                 e -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class));
     }
@@ -380,12 +380,12 @@ public final class TreePanel implements Disposable {
     private void offerClone(final @NotNull StatusText emptyText, final @NotNull BoundTestProject boundProject) {
         final @NotNull String url = Services.getInstance(p, TestinConfigService.class).get().repoUrl();
 
-        emptyText.appendLine(boundProject.name() + " is not on this machine yet",
+        emptyText.appendLine(Bundle.message("welcome.not.here", boundProject.name()),
                 SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
         emptyText.appendLine("");
         emptyText.appendLine(
                 AllIcons.Vcs.Clone,
-                "Clone " + boundProject.name(),
+                Bundle.message("welcome.clone", boundProject.name()),
                 SimpleTextAttributes.LINK_ATTRIBUTES,
                 e -> new CreateTestProjectCloneAction(p, url, boundProject.name(), this).execute());
     }
@@ -398,7 +398,7 @@ public final class TreePanel implements Disposable {
     private void offerFirstProject(final @NotNull StatusText emptyText) {
         emptyText.appendLine(
                 AllIcons.General.Add,
-                "Create your first test project",
+                Bundle.message("welcome.first.project"),
                 SimpleTextAttributes.LINK_ATTRIBUTES,
                 e -> new CreateTestProjectAction(p, this).execute());
     }
@@ -433,7 +433,7 @@ public final class TreePanel implements Disposable {
 
         emptyText.appendLine(
                 AllIcons.Actions.ModuleDirectory,
-                "Select the test project for this repository",
+                Bundle.message("welcome.select.project"),
                 SimpleTextAttributes.LINK_ATTRIBUTES,
                 e -> new BindTestProjectDialog(p, underRoot, this::reindex).show());
     }

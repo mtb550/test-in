@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.markers.DetailRow;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 
 import java.time.Duration;
@@ -36,12 +37,12 @@ import java.util.stream.Stream;
 public enum TestRunExecution {
 
     STARTED(
-            "Execution Started",
+            Bundle.message("execution.started"),
             TestRunDto::getExecutionStartedAt
     ),
 
     ENDED(
-            "Execution Ended",
+            Bundle.message("execution.ended"),
             TestRunDto::getExecutionEndedAt
     );
 
@@ -92,7 +93,7 @@ public enum TestRunExecution {
     public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunDto run) {
         return Stream.concat(
                         Arrays.stream(values()).map(field -> new DetailRow(field.displayName, field.valueIn(run))),
-                        Stream.of(new DetailRow("Execution Time", tookIn(run))))
+                        Stream.of(new DetailRow(Bundle.message("execution.time"), tookIn(run))))
                 .toList();
     }
 }

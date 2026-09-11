@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import org.testin.util.Bundle;
 import java.awt.*;
 import java.util.function.LongFunction;
 import java.util.function.ToLongFunction;
@@ -36,8 +37,8 @@ public enum NodeCount {
     //
     // The verdict captions below are safe by the same test: TestStatus names
     // nothing here, and this already read its colours from it.
-    TEST_SETS("Test sets", NodeFigures::testSets, NodeCount::plain, Uncharted.COLOR),
-    PACKAGES("Packages", NodeFigures::packages, NodeCount::plain, Uncharted.COLOR),
+    TEST_SETS(Bundle.message("count.test.sets"), NodeFigures::testSets, NodeCount::plain, Uncharted.COLOR),
+    PACKAGES(Bundle.message("count.packages"), NodeFigures::packages, NodeCount::plain, Uncharted.COLOR),
     /**
      * UC-INTERNAL-006, Rule-INTERNAL-046, Rule-INTERNAL-065.
      * <p>
@@ -54,23 +55,23 @@ public enum NodeCount {
      * otherwise carry the same number twice, which is furniture rather than an
      * answer.
      */
-    TEST_CASES("Test cases", NodeFigures::testCases, NodeCount::plain, Uncharted.COLOR) {
+    TEST_CASES(Bundle.message("count.test.cases"), NodeFigures::testCases, NodeCount::plain, Uncharted.COLOR) {
         @Override
         public @NotNull String of(final @NotNull NodeFigures figures) {
             if (figures.testCases() == figures.runnableTestCases()) return super.of(figures);
 
-            return super.of(figures) + " (" + figures.runnableTestCases() + " for a new test run)";
+            return Bundle.message("count.test.cases.runnable", super.of(figures), String.valueOf(figures.runnableTestCases()));
         }
     },
-    TEST_RUNS("Test runs", NodeFigures::testRuns, NodeCount::plain, Uncharted.COLOR),
+    TEST_RUNS(Bundle.message("count.test.runs"), NodeFigures::testRuns, NodeCount::plain, Uncharted.COLOR),
 
     PASSED(TestStatus.PASSED.getLabel(), figures -> figures.run().passed(), NodeCount::plain, TestStatus.PASSED.getRowColor()),
     FAILED(TestStatus.FAILED.getLabel(), figures -> figures.run().failed(), NodeCount::plain, TestStatus.FAILED.getRowColor()),
     BLOCKED(TestStatus.BLOCKED.getLabel(), figures -> figures.run().blocked(), NodeCount::plain, TestStatus.BLOCKED.getRowColor()),
     UNTESTED(TestStatus.UNTESTED.getLabel(), figures -> figures.run().untested(), NodeCount::plain, TestStatus.UNTESTED.getRowColor()),
     REMOVED(TestStatus.REMOVED.getLabel(), figures -> figures.run().removed(), NodeCount::plain, TestStatus.REMOVED.getRowColor()),
-    TOTAL("Total", figures -> figures.run().total(), NodeCount::plain, Uncharted.COLOR),
-    PASS_RATE("Pass rate", figures -> figures.run().passRate(), NodeCount::percentage, Uncharted.COLOR);
+    TOTAL(Bundle.message("count.total"), figures -> figures.run().total(), NodeCount::plain, Uncharted.COLOR),
+    PASS_RATE(Bundle.message("count.pass.rate"), figures -> figures.run().passRate(), NodeCount::percentage, Uncharted.COLOR);
 
     private final @NotNull String caption;
     private final @NotNull ToLongFunction<NodeFigures> reader;

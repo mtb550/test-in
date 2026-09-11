@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.util.Bundle;
 
 /**
  * Supplies the selected project hierarchy to IntelliJ's asynchronous tree models.
@@ -18,7 +19,7 @@ public final class TreePanelStructure extends AbstractTreeStructure {
      * word rather than a node, which is what the panel covers with its welcome
      * screen anyway.
      */
-    private static final @NotNull String NO_PROJECT = "Project";
+    private static final @NotNull String NO_PROJECT = Bundle.message("tree.root.project");
 
     private final @NotNull Project p;
     private volatile @NotNull TreePanelNode root;
