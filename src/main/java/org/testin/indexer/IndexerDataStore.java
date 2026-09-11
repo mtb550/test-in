@@ -18,13 +18,9 @@ import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
 import org.testin.model.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
-import org.testin.model.markers.Marker;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
-import org.testin.setting.AppSettingsState;
-import org.testin.util.Mapper;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +30,11 @@ final class IndexerDataStore {
 
     private final @NotNull Project p;
     private final @NotNull DirectoryChildrenIndex childrenIndex = new DirectoryChildrenIndex();
+
+    /**
+     * The marker files this index is built from, read and written in one place.
+     */
+    private final @NotNull MarkerFiles markers;
     private final @NotNull TestCaseSequenceStore testCaseStore;
 
     @Getter
@@ -76,6 +77,7 @@ final class IndexerDataStore {
     IndexerDataStore(final @NotNull Project p) {
         this.p = p;
         this.testCaseStore = new TestCaseSequenceStore(p);
+        this.markers = new MarkerFiles(p);
     }
 
     @NotNull Map<UUID, TestCaseDto> getTestCasesById() {
@@ -188,8 +190,7 @@ final class IndexerDataStore {
      */
     private void markTestSetModified(final @NotNull Path testSetPath) {
         Optional.ofNullable(testSetsDirByPath.get(testSetPath.toString())).ifPresent(ts -> {
-            ts.getMarker().touch(testerName());
-            writeMarker(testSetPath, DirectoryType.TS.getMarker(), ts.getMarker());
+            markers.touched(testSetPath, DirectoryType.TS.getMarker(), ts.getMarker());
         });
     }
 
@@ -218,123 +219,42 @@ final class IndexerDataStore {
     }
 
     private <V extends DirectoryDto> void addDir(final @NotNull Map<String, V> map, final @NotNull V dto, final @NotNull String markerFileName, final @NotNull Object marker) {
-        stampIfNew(marker);
         map.put(dto.getPath().toString(), dto);
         childrenIndex.invalidate();
-        writeMarker(dto.getPath(), markerFileName, marker);
+        markers.write(dto.getPath(), markerFileName, marker);
         refreshDir(dto.getPath());
     }
 
     /**
-     * New markers (createdBy still blank) get the full audit stamp before
-     * their first write; markers loaded from disk pass through untouched.
-     */
-    private void stampIfNew(final @NotNull Object marker) {
-        if (marker instanceof Marker m && m.getCreatedBy().isEmpty()) {
-            m.stampCreated(testerName());
-        }
-    }
-
-    private @NotNull String testerName() {
-        return Services.getInstance(p, AppSettingsState.class).testerName;
-    }
-
-    private void writeMarker(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Object marker) {
-        Services.getInstance(p, TestDataFiles.class).write(p, dirPath.resolve(markerFileName), marker);
-    }
-
-    /**
-     * The nodes whose marker would not parse, so the tester is told once for the
-     * project rather than once per node.
-     */
-    private final @NotNull Set<String> damagedMarkers = ConcurrentHashMap.newKeySet();
-
-    /**
      * UC-INTERNAL-002, Rule-INTERNAL-014.
      * <p>
-     * The other half of {@link #writeMarker}, so the marker round trip is owned
-     * by one class. It used to live in DirectoryMapper, which meant the indexer
-     * owned the write and a mapper owned the read — the debt #49 records, which
-     * grew from two markers to seven when #68 fixed the five that were written
-     * and never read.
-     * <p>
-     * A missing or unreadable marker falls back to a default instance rather than
-     * failing: the file is a type discriminator as well as a payload, so its
-     * directory is a real node either way, and dropping the node out of the tree
-     * would hide test cases over an unparsable audit stamp.
+     * A node's marker, read through the one class that owns both halves of that
+     * file - see {@link MarkerFiles}.
      */
     <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass, final @NotNull String name) {
-        final @NotNull Path markerFile = dirPath.resolve(kind.getMarker());
-
-        // Asked before reading, because a marker that is not there yet is the
-        // ordinary case: a node is created, its directory appears, and the marker
-        // follows. Handing an absent file to the mapper made it log an ERROR on
-        // the way out - one per node created, 135 in a single sandbox session -
-        // and those were the first thing a search for ERROR found. Now an ERROR
-        // from the mapper means what it says: a file that is there and will not
-        // parse (#66).
-        if (!Files.exists(markerFile)) return defaultMarker(markerClass, kind);
-
-        try {
-            return Services.getInstance(p, Mapper.class).readValue(markerFile.toFile(), markerClass);
-
-        } catch (final Exception ex) {
-            Logger.warn("Unreadable " + kind.getMarkerKind() + " marker '" + name + "', using defaults: " + ex.getMessage());
-
-            // Remembered as well as logged. The node is still drawn, and drawn
-            // looking ordinary - its number, its status and who made it are the
-            // defaults rather than what the file says - and the log is at a level
-            // most testers never turn on (#277). Whoever is scanning reports it.
-            damagedMarkers.add(name);
-            return defaultMarker(markerClass, kind);
-        }
+        return markers.read(dirPath, kind, markerClass, name);
     }
 
     /**
-     * UC-INTERNAL-002, Rule-INTERNAL-014.
-     * <p>
      * The nodes whose marker was there and would not parse, since the last time
      * anyone asked, and forgotten in the asking.
-     * <p>
-     * Collected here because this is where the failure happens, and handed to
-     * the scan to report because a notification per node would be one per node -
-     * a project whose markers were all damaged by one bad merge would raise
-     * dozens. The scan already reports the folders it could not read this way.
      */
     @NotNull List<String> takeDamagedMarkers() {
-        final @NotNull List<String> taken = List.copyOf(damagedMarkers);
-        damagedMarkers.clear();
-
-        return taken;
-    }
-
-    private <M> @NotNull M defaultMarker(final @NotNull Class<M> markerClass, final @NotNull DirectoryType kind) {
-        try {
-            return markerClass.getDeclaredConstructor().newInstance();
-        } catch (final Exception ex) {
-            throw new RuntimeException("Cannot create default " + kind.getMarkerKind() + " marker", ex);
-        }
+        return markers.takeDamaged();
     }
 
     /**
      * Whether a directory carries one kind's marker.
      */
     boolean hasMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind) {
-        return Files.exists(dirPath.resolve(kind.getMarker()));
+        return markers.has(dirPath, kind);
     }
 
     /**
-     * UC-INTERNAL-002, Rule-INTERNAL-009.
-     * <p>
      * What kind a directory is marked as, asked once.
-     * <p>
-     * The probe lives here rather than on the enum because reading the disk is
-     * the indexer's alone (CLAUDE.md), and the order lives on the enum because
-     * the precedence is a fact about the kinds rather than about this scan - the
-     * split #173 asked for, so {@code model} stays a leaf (#111).
      */
     @NotNull Optional<DirectoryType> markedAs(final @NotNull Path dirPath, final @NotNull List<DirectoryType> family) {
-        return family.stream().filter(kind -> hasMarker(dirPath, kind)).findFirst();
+        return markers.markedAs(dirPath, family);
     }
 
     /**
@@ -472,10 +392,8 @@ final class IndexerDataStore {
         testRunsMainDirsByPath.put(tp.getTestRunsDirectory().getPath().toString(), tp.getTestRunsDirectory());
         childrenIndex.invalidate();
 
-        stampIfNew(tp.getTestCasesDirectory().getMarker());
-        stampIfNew(tp.getTestRunsDirectory().getMarker());
-        writeMarker(tp.getTestCasesDirectory().getPath(), DirectoryType.TCD.getMarker(), tp.getTestCasesDirectory().getMarker());
-        writeMarker(tp.getTestRunsDirectory().getPath(), DirectoryType.TRD.getMarker(), tp.getTestRunsDirectory().getMarker());
+        markers.write(tp.getTestCasesDirectory().getPath(), DirectoryType.TCD.getMarker(), tp.getTestCasesDirectory().getMarker());
+        markers.write(tp.getTestRunsDirectory().getPath(), DirectoryType.TRD.getMarker(), tp.getTestRunsDirectory().getMarker());
         refreshDir(tp.getPath());
         refreshDir(tp.getTestCasesDirectory().getPath());
         refreshDir(tp.getTestRunsDirectory().getPath());
@@ -487,8 +405,7 @@ final class IndexerDataStore {
      * are stale the moment it is written.
      */
     void persistMarker(final @NotNull DirectoryDto dto) {
-        stampIfNew(dto.getMarker());
-        writeMarker(dto.getPath(), dto.getMarkerFileName(), dto.getMarker());
+        markers.write(dto.getPath(), dto.getMarkerFileName(), dto.getMarker());
         childrenIndex.invalidate();
         // As every other marker write does, so the VFS - and the Git paths that
         // read through it - see the change without waiting for something else.
@@ -529,8 +446,7 @@ final class IndexerDataStore {
         // the persisted home of audit info. Descendants only changed location,
         // so their own audit stays untouched.
         findByPath(newPath).ifPresent(renamed -> {
-            renamed.getMarker().touch(testerName());
-            writeMarker(renamed.getPath(), renamed.getMarkerFileName(), renamed.getMarker());
+            markers.touched(renamed.getPath(), renamed.getMarkerFileName(), renamed.getMarker());
         });
     }
 
