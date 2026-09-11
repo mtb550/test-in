@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
+import org.testin.util.Bundle;
 import org.testin.util.Once;
 import org.testin.services.Services;
 
@@ -110,9 +111,8 @@ public final class JavaSourceRoot {
         final @NotNull Optional<VirtualFile> root = find(p);
 
         if (root.isEmpty() && Once.claim(p, NO_ROOT_SAID)) {
-            Services.getInstance(p, Notifier.class).warn(p, "No Java Test Source Root",
-                    "This project has no Java test source folder, so " + skipped + " was skipped. "
-                            + "Test cases and test runs are read and written without one - only the automation code needs it.");
+            Services.getInstance(p, Notifier.class).warn(p, Bundle.message("codegen.no.source.root.title"),
+                    Bundle.message("codegen.no.source.root.message", skipped));
         }
 
         return root;

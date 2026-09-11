@@ -2,6 +2,7 @@ package org.testin.sftp;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.util.Bundle;
 
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
@@ -71,12 +72,12 @@ public record SyncLock(@NotNull SftpTransport transport) {
     private @NotNull String whoHasIt() {
         try {
             final @NotNull String[] said = new String(transport.read(HOLDER), StandardCharsets.UTF_8).split("\n");
-            if (said.length < 2) return "Another sync is running.";
+            if (said.length < 2) return Bundle.message("sftp.lock.unknown");
 
-            return said[0] + " started a sync at " + said[1] + ".";
+            return Bundle.message("sftp.lock.holder", said[0], said[1]);
         } catch (final RuntimeException ex) {
             Logger.warn("The sync lock is held but its holder could not be read: " + ex.getMessage());
-            return "Another sync is running.";
+            return Bundle.message("sftp.lock.unknown");
         }
     }
 

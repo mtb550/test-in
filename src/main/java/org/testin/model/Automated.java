@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import org.testin.util.Bundle;
 import javax.swing.*;
 import java.util.List;
 
@@ -42,18 +43,18 @@ public enum Automated {
      * reported as un-automated because nobody has looked yet would be worse
      * than saying nothing at all.
      */
-    UNKNOWN("Navigate to Code", AllIcons.Nodes.Class),
+    UNKNOWN(Bundle.message("automated.navigate"), AllIcons.Nodes.Class),
 
     /**
      * A generated method carries this case's id.
      */
-    WRITTEN("Automated", AllIcons.Nodes.Class),
+    WRITTEN(Bundle.message("automated.written"), AllIcons.Nodes.Class),
 
     /**
      * The case names a method and none carries its id: the automation was
      * written and is gone, or was never generated. Something to fix.
      */
-    MISSING("No test method", LayeredIcon.create(AllIcons.Nodes.Class, AllIcons.Nodes.ErrorMark)),
+    MISSING(Bundle.message("automated.missing"), LayeredIcon.create(AllIcons.Nodes.Class, AllIcons.Nodes.ErrorMark)),
 
     /**
      * Nothing has been automated here. Either the case names no method at all,
@@ -65,7 +66,7 @@ public enum Automated {
      * The first try faded the class icon with {@code getDisabledIcon} and that
      * rendered as a gray circle - unreadable, and telling a tester nothing.
      */
-    NONE("Not automated", AllIcons.Nodes.AbstractClass);
+    NONE(Bundle.message("automated.none"), AllIcons.Nodes.AbstractClass);
 
     /**
      * The states a tester can narrow a list to, in the order the filter offers

@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.util.Bundle;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -91,7 +92,7 @@ public final class SftpTransport implements AutoCloseable {
             if (session != null && session.isConnected()) session.disconnect();
 
             Logger.error("Could not connect to " + address.display() + ": " + ex.getMessage());
-            throw new IllegalStateException("Could not connect to " + address.display() + ": " + ex.getMessage());
+            throw new IllegalStateException(Bundle.message("sftp.failed.connect", address.display(), ex.getMessage()));
         }
     }
 
@@ -104,7 +105,7 @@ public final class SftpTransport implements AutoCloseable {
         try (InputStream in = sftp.get(path)) {
             return in.readAllBytes();
         } catch (final Exception ex) {
-            throw failed("read " + path, ex);
+            throw failed(Bundle.message("sftp.failed.read", path, ex.getMessage()));
         }
     }
 
@@ -122,7 +123,7 @@ public final class SftpTransport implements AutoCloseable {
             makeParentsOf(path);
             sftp.put(new ByteArrayInputStream(content), path);
         } catch (final Exception ex) {
-            throw failed("write " + path, ex);
+            throw failed(Bundle.message("sftp.failed.write", path, ex.getMessage()));
         }
     }
 
@@ -137,7 +138,7 @@ public final class SftpTransport implements AutoCloseable {
             sftp.rm(path);
         } catch (final SftpException ex) {
             if (ex.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) return;
-            throw failed("delete " + path, ex);
+            throw failed(Bundle.message("sftp.failed.delete", path, ex.getMessage()));
         }
     }
 
@@ -156,7 +157,7 @@ public final class SftpTransport implements AutoCloseable {
             sftp.rmdir(path);
         } catch (final SftpException ex) {
             if (ex.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) return;
-            throw failed("remove the directory " + path, ex);
+            throw failed(Bundle.message("sftp.failed.remove.directory", path, ex.getMessage()));
         }
     }
 
@@ -196,7 +197,7 @@ public final class SftpTransport implements AutoCloseable {
             // "another sync is running" sends the tester chasing a colleague who
             // is not there. So it is raised unless the folder now exists.
             if (exists(relative)) return false;
-            throw failed("make the directory " + path, ex);
+            throw failed(Bundle.message("sftp.failed.make.directory", path, ex.getMessage()));
         }
     }
 
@@ -231,7 +232,7 @@ public final class SftpTransport implements AutoCloseable {
             // A folder that is not there holds no files, which is the answer a
             // first sync to an empty server needs.
             if (ex.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) return;
-            throw failed("list " + path, ex);
+            throw failed(Bundle.message("sftp.failed.list", path, ex.getMessage()));
         }
     }
 
@@ -265,9 +266,18 @@ public final class SftpTransport implements AutoCloseable {
         }
     }
 
-    private @NotNull IllegalStateException failed(final @NotNull String what, final @NotNull Exception ex) {
-        Logger.error("Could not " + what + " on " + address.display() + ": " + ex.getMessage());
-        return new IllegalStateException("Could not " + what + ": " + ex.getMessage());
+    /**
+     * The sentence a failed SFTP operation carries: logged with the server it
+     * happened on, then thrown for the tester to read.
+     * <p>
+     * The whole sentence arrives rather than the verb alone. "Could not" plus an
+     * operation plus a colon is three pieces that only fit together in English -
+     * French puts a space before the colon, and a verb after "de" elides - so
+     * each operation is one key that says all of it.
+     */
+    private @NotNull IllegalStateException failed(final @NotNull String sentence) {
+        Logger.error(sentence + " on " + address.display());
+        return new IllegalStateException(sentence);
     }
 
     @Override

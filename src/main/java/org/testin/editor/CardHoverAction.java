@@ -16,6 +16,7 @@ import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
 import org.testin.actions.Declared;
 import org.testin.services.OptionalPlugin;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -26,7 +27,7 @@ import java.util.function.BiConsumer;
 @AllArgsConstructor
 public enum CardHoverAction {
     NAVIGATE_TO_TEST_METHOD(
-            "Navigate to Code",
+            Bundle.message("automated.navigate"),
             "Testin.NavigateToCode",
             List.of(OptionalPlugin.JAVA),
             AllIcons.Nodes.Class,
@@ -34,7 +35,7 @@ public enum CardHoverAction {
     ),
 
     RUN_TEST_CASE(
-            "Run Test Case",
+            Bundle.message("card.run.test.case"),
             // Both. TestNG starts the run and Java finds the method it starts, so
             // an IDE with only TestNG offered Run and then resolved every case to
             // nothing - one "has no generated code yet" per case, with no
@@ -54,7 +55,7 @@ public enum CardHoverAction {
      * without a reader having to ask whether there is a shortcut at all.
      */
     STOP_TEST_CASE(
-            "Stop Test Case",
+            Bundle.message("card.stop.test.case"),
             "",
             List.of(OptionalPlugin.TESTNG),
             AllIcons.Actions.Suspend,

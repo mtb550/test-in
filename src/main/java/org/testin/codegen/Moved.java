@@ -7,6 +7,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -81,9 +82,7 @@ public record Moved(@NotNull DirectoryDto dir, @NotNull Path newParent) {
         Logger.warn("Destination is not indexed, so " + fullName + " is left where it is");
 
         Services.getInstance(p, Notifier.class).warn(p,
-                "The automation code did not move with '" + dir.getName() + "'",
-                fullName + " is still in its old package, so the tree and the code now disagree. "
-                        + "Testin does not know the destination yet - refresh the panel and move the node again, "
-                        + "or move the code by hand.");
+                Bundle.message("codegen.moved.title", dir.getName()),
+                Bundle.message("codegen.moved.message", fullName));
     }
 }

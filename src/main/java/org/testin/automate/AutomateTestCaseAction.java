@@ -13,6 +13,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 
 /**
@@ -29,7 +30,7 @@ public class AutomateTestCaseAction extends DumbAwareAction {
      * in the same breath. On the entry rather than in a message, so a tester
      * reads it before pressing rather than after.
      */
-    private static final @NotNull String NOT_BUILT = "Automate Test Case (not built yet)";
+    private static final @NotNull String NOT_BUILT = Bundle.message("automate.not.built.text");
 
     // UC-CODEGEN-005, Rule-CODEGEN-025, Rule-CODEGEN-071
     @Override
@@ -48,8 +49,8 @@ public class AutomateTestCaseAction extends DumbAwareAction {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        Services.getInstance(p, Notifier.class).softRefuse(p, "Not built yet",
-                "Generating automation code for a test case is coming in a later release.");
+        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("automate.not.built.title"),
+                Bundle.message("automate.not.built.message"));
     }
 
     /**
@@ -75,7 +76,7 @@ public class AutomateTestCaseAction extends DumbAwareAction {
 
         e.getPresentation().setEnabled(false);
         e.getPresentation().setText(NOT_BUILT);
-        e.getPresentation().setDescription("Testin writes a test case's method when the case is saved with a description. Generating one for a case that already exists is a later release.");
+        e.getPresentation().setDescription(Bundle.message("automate.not.built.description"));
     }
 
     @Override

@@ -12,6 +12,7 @@ import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import java.util.List;
 
@@ -26,57 +27,57 @@ import java.util.List;
 @Getter
 public enum GenType {
     REMOVE_TEST_PROJECT(
-            "Remove Test Project",
+            Bundle.message("codegen.remove.test.project"),
             "Remove Automation Test Project"
     ),
 
     RENAME_TEST_PROJECT(
-            "Rename Test Project",
+            Bundle.message("codegen.rename.test.project"),
             "Rename Automation Test Project"
     ),
 
     REMOVE_TEST_SET_PACKAGE(
-            "Remove Test Set Package",
+            Bundle.message("codegen.remove.test.set.package"),
             "Remove Automation Test Package"
     ),
 
     RENAME_TEST_SET_PACKAGE(
-            "Rename Test Set Package",
+            Bundle.message("codegen.rename.test.set.package"),
             "Rename Automation Test Package"
     ),
 
     MOVE_TEST_SET_PACKAGE(
-            "Move Test Set Package",
+            Bundle.message("codegen.move.test.set.package"),
             "Move Automation Test Package"
     ),
 
     CREATE_TEST_SET(
-            "Create Test Set",
+            Bundle.message("codegen.create.test.set"),
             "Create Automation Test Class"
     ),
 
     REMOVE_TEST_SET(
-            "Remove Test Set",
+            Bundle.message("codegen.remove.test.set"),
             "Remove Automation Test Class"
     ),
 
     RENAME_TEST_SET(
-            "Rename Test Set",
+            Bundle.message("codegen.rename.test.set"),
             "Rename Automation Test Class"
     ),
 
     MOVE_TEST_SET(
-            "Move Test Set",
+            Bundle.message("codegen.move.test.set"),
             "Move Automation Test Class"
     ),
 
     CREATE_TEST_CASE(
-            "Create Test Case",
+            Bundle.message("codegen.create.test.case"),
             "Create Automation Test Method"
     ),
 
     REMOVE_TEST_CASE(
-            "Remove Test Case",
+            Bundle.message("codegen.remove.test.case"),
             "Remove Automation Test Method"
     ),
 
@@ -90,42 +91,42 @@ public enum GenType {
      * have left the @Test description saying what the case used to say.
      */
     UPDATE_TEST_CASE_DESCRIPTION(
-            "Update Test Case",
+            Bundle.message("codegen.update.test.case"),
             "Update Automation Test Method Description & Name"
     ),
 
     UPDATE_TEST_CASE_EXPECTED_RESULT(
-            "Update Test Case",
+            Bundle.message("codegen.update.test.case"),
             "Update Automation Test Method Expected Result",
             "expected result"
     ),
 
     UPDATE_TEST_CASE_MODULE(
-            "Update Test Case",
+            Bundle.message("codegen.update.test.case"),
             "Update Automation Test Method Module",
             "module"
     ),
 
     UPDATE_TEST_CASE_TEST_DATA(
-            "Update Test Case",
+            Bundle.message("codegen.update.test.case"),
             "Update Automation Test Method Test Data",
             "test data"
     ),
 
     UPDATE_TEST_CASE_PRE_CONDITIONS(
-            "Update Test Case",
+            Bundle.message("codegen.update.test.case"),
             "Update Automation Test Method Pre Conditions",
             "pre-conditions"
     ),
 
     UPDATE_TEST_CASE_STEPS(
-            "Update Test Case",
+            Bundle.message("codegen.update.test.case"),
             "Update Automation Test Method Steps",
             "steps"
     ),
 
     UPDATE_TEST_CASE_GROUP(
-            "Update Test Case",
+            Bundle.message("codegen.update.test.case"),
             "Update Automation Test Method Group"
     ),
 
@@ -136,7 +137,7 @@ public enum GenType {
      * field, shown and filtered and reported, and no concern of the automation.
      */
     UPDATE_TEST_CASE_PRIORITY(
-            "Update Test Case",
+            Bundle.message("codegen.update.test.case"),
             "Update Automation Test Method Priority",
             "priority"
     ),
@@ -146,7 +147,7 @@ public enum GenType {
      * methods in the order the priority attribute gives them.
      */
     UPDATE_TEST_CASE_ORDER(
-            "Update Test Case",
+            Bundle.message("codegen.update.test.case"),
             "Update Automation Test Method Order"
     ),
 
@@ -165,12 +166,12 @@ public enum GenType {
      * whichever one moved.
      */
     RECONCILE_TEST_CASE(
-            "Restore Test Case",
+            Bundle.message("codegen.restore.test.case"),
             "Restore Automation Test Method"
     ),
 
     UPDATE_TEST_CASE_STATUS(
-            "Update Test Case",
+            Bundle.message("codegen.update.test.case"),
             "Update Automation Test Method Enabled"
     ),
 
@@ -180,7 +181,7 @@ public enum GenType {
      * generator either way instead of asking whether it has one.
      */
     NO_CODE_CHANGE(
-            "No Code Change",
+            Bundle.message("codegen.no.code.change"),
             "This attribute has no generated code",
             "read-only attribute"
     );

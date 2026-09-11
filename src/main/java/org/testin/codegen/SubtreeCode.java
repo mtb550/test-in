@@ -10,6 +10,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 /**
  * Generates the Java for a node and everything beneath it.
@@ -40,7 +41,7 @@ public final class SubtreeCode {
      * (#51).
      */
     public static void generate(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        WriteCommandAction.runWriteCommandAction(p, "Generate Test Code", null, () -> walk(p, dir));
+        WriteCommandAction.runWriteCommandAction(p, Bundle.message("codegen.generate.command"), null, () -> walk(p, dir));
     }
 
     // UC-CODEGEN-004, Rule-CODEGEN-023
