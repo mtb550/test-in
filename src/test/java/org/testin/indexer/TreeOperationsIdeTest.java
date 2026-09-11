@@ -2,7 +2,7 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.testin.model.DirectoryMapper;
+import org.testin.indexer.DirectoryMapper;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;

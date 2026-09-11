@@ -23,7 +23,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.statusbar.StatusBarBase;
-import org.testin.statusbar.StatusBarItem;
+import org.testin.model.StatusBarItem;
 import org.testin.ui.Motion;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.StatusBarShortcut;

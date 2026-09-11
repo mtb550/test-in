@@ -3,7 +3,7 @@ package org.testin.testcase.create;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.statusbar.StatusBarBase;
-import org.testin.statusbar.StatusBarItem;
+import org.testin.model.StatusBarItem;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestCaseDialogKey;
 

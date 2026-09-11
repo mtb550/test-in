@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryMapper;
+import org.testin.indexer.DirectoryMapper;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;

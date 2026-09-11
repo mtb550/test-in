@@ -83,23 +83,26 @@ public class ArchitectureTest {
     };
 
     /**
-     * {@code model} is not a leaf yet, and these are the six that make it so
-     * (#111). Measured 2026-09-04.
+     * {@code model} is not a leaf yet, and these are the four that make it so
+     * (#111). Measured 2026-09-11, down from six.
      * <p>
-     * {@code TestRunStatus} is the newest and was added on 2026-09-04 by #175's
-     * C12, which gave the shortcut-menu rows an interface to implement. It did
-     * not breach that issue's own criterion - which named {@code editor},
-     * {@code view}, {@code indexer} and {@code codegen} - and it is a violation
-     * of this broader rule all the same. Recorded rather than quietly allowed,
-     * which is the whole argument for this file existing.
+     * Two left on that date and neither was the rule bending: {@code
+     * DirectoryMapper} was an indexer service filed under {@code model} - it
+     * read markers through {@code ProjectIndexer} and raised balloons - and is
+     * in {@code indexer} now. {@code TestRunStatus} implemented {@code MenuItem},
+     * an interface that lived in {@code statusbar} and is implemented by four
+     * enums in four packages; it is in {@code model} beside them.
+     * <p>
+     * What is left is one kind of thing: a table declaring, per constant, what a
+     * feature does for it. Splitting one would mean a second table keyed by the
+     * same enum, in the feature - which is a decision about the house pattern,
+     * not a cleanup, so it is recorded here rather than quietly allowed.
      */
     private static final @NotNull Set<String> MODEL_LEAF_EXCEPTIONS = Set.of(
-            "org.testin.model.DirectoryMapper",
             "org.testin.model.DirectoryType",
             "org.testin.model.NodeStatistics",
             "org.testin.model.RunEditorAttributes",
-            "org.testin.model.TestEditorAttributes",
-            "org.testin.model.TestRunStatus");
+            "org.testin.model.TestEditorAttributes");
 
     /**
      * What {@code util} may not import: the features, but not {@code services} or

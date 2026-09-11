@@ -4,7 +4,7 @@ import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.statusbar.MenuItem;
+import org.testin.model.MenuItem;
 
 import javax.swing.*;
 

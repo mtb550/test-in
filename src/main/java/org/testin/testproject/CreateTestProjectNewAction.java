@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.model.DirectoryMapper;
+import org.testin.indexer.DirectoryMapper;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;

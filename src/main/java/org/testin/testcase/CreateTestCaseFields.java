@@ -4,7 +4,7 @@ import org.testin.model.TestEditorAttributes;
 import com.intellij.icons.AllIcons;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.statusbar.StatusBarItem;
+import org.testin.model.StatusBarItem;
 import org.testin.testcase.create.CreateTestCaseSection;
 import org.testin.testcase.create.TestCaseBaseDialog;
 import org.testin.util.Bundle;

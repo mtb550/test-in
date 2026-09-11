@@ -5,6 +5,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.StatusBarItem;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.ui.framework.Keycap;

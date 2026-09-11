@@ -1,7 +1,7 @@
 package org.testin.ui.framework;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.statusbar.StatusBarItem;
+import org.testin.model.StatusBarItem;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 

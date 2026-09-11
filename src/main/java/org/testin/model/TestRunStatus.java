@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
-import org.testin.statusbar.MenuItem;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -148,7 +147,7 @@ public enum TestRunStatus implements MenuItem {
     /**
      * The same word {@link #getLabel()} gives, under the name a menu row is asked
      * for. {@code getLabel} is what a hundred callers already say for a display
-     * word and {@code getName} is what {@link org.testin.statusbar.StatusBarItem}
+     * word and {@code getName} is what {@link org.testin.model.StatusBarItem}
      * calls it, so one of the two has to bridge - and a status is read far more
      * often than it is put on a menu.
      */

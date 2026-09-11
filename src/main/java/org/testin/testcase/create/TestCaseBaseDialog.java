@@ -15,7 +15,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.statusbar.StatusBarItem;
+import org.testin.model.StatusBarItem;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
 import org.testin.testcase.UpdateTestCaseFields;

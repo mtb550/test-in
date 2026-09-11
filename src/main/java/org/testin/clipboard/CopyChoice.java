@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.statusbar.MenuItem;
+import org.testin.model.MenuItem;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 

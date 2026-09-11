@@ -1,4 +1,4 @@
-package org.testin.statusbar;
+package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
 

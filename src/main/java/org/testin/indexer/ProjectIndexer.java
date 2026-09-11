@@ -11,7 +11,6 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryMapper;
 import org.testin.model.DirectoryType;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.TestCaseDto;

@@ -1,4 +1,4 @@
-package org.testin.model;
+package org.testin.indexer;
 
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
