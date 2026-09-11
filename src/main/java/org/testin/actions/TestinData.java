@@ -117,7 +117,6 @@ public final class TestinData {
      */
     private static boolean isBeingTypedInto(final @NotNull TestinEditor editor, final @NotNull AnActionEvent e) {
         final @Nullable Component from = PlatformCoreDataKeys.CONTEXT_COMPONENT.getData(e.getDataContext());
-
         return from == null || SwingUtilities.isDescendingFrom(from, editor.getComponent());
     }
 

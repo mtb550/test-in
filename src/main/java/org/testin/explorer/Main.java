@@ -27,6 +27,21 @@ public class Main implements ToolWindowFactory, DumbAware {
             final @NotNull TreePanel tp = Services.getInstance(p, TreePanel.class);
             final @NotNull Content content = ContentFactory.getInstance().createContent(tp.getPanel(), null, false);
 
+            // UC-TREE-PANEL-001, Rule-TREE-PANEL-097.
+            //
+            // Which component holds the keyboard when this panel is activated.
+            // Without it the IDE has nothing to hand focus to - the content is a
+            // plain panel and not focusable - so focus stays wherever it was,
+            // usually an editor.
+            //
+            // That is not a cosmetic problem. An action decides what it acts on
+            // from the surface being typed into, so a tree nobody can focus is a
+            // tree whose keys are answered by the editor next to it: Ctrl+M
+            // created a test case while a test set directory sat selected in the
+            // tree, because Create Test Case only asks whether an editor exists
+            // and is declared first (Rule-INTERNAL-071).
+            content.setPreferredFocusableComponent(tp.getProjectTree().getMainTree());
+
             tw.setTitleActions(new TreePanelActions().create(p, tp));
             tw.getContentManager().addContent(content);
 

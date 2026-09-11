@@ -52,6 +52,10 @@ screens, and the tree is one of them.
 - **Rule-TREE-PANEL-015** — A code project does not have to name a test project.
   If it names none, and exactly one test project exists in the Testin folder,
   Testin binds it to that one without asking.
+- **Rule-TREE-PANEL-097** — Opening the tree panel puts the keyboard in the
+  tree. Without that the IDE has nothing to give focus to and it stays in
+  whatever was there before, so keys pressed over the tree are answered by the
+  editor beside it.
 
 Rule-TREE-PANEL-064 also holds here. It says an **Archived** test project is not
 opened on the next load. It is written on [UC-TREE-PANEL-018](retireNode.md).
