@@ -330,8 +330,6 @@
         <action
                 id="Testin.Search"
                 class="org.testin.search.SearchAction"
-                text="Search Test Project"
-                description="Find a test case, test set, package or run and go to it"
                 icon="AllIcons.Actions.Search"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt F"/>
@@ -347,8 +345,6 @@
         <action
                 id="Testin.CreateTestCase"
                 class="org.testin.testcase.CreateTestCaseAction"
-                text="Create Test Case"
-                description="Create a new test case in this test set"
                 icon="AllIcons.Actions.AddToDictionary"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl M"/>
@@ -358,8 +354,6 @@
         <action
                 id="Testin.UpdateTestCase"
                 class="org.testin.testcase.UpdateTestCaseAction"
-                text="Update Test Case"
-                description="Change a field of the selected test cases"
                 icon="AllIcons.Actions.Edit"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="F2"/>
@@ -371,16 +365,12 @@
         <group
                 id="Testin.SetTestCaseStatus"
                 class="org.testin.testrun.SetTestCaseStatusGroup"
-                text="Set Test Case Verdict"
-                description="Record Passed, Failed or Blocked against the selected test cases"
                 popup="false"
         />
 
         <action
                 id="Testin.UpdateRunItem"
                 class="org.testin.testrun.UpdateRunItemAction"
-                text="Failed Test Case Details"
-                description="Edit the failure details of the selected failed test case"
                 icon="AllIcons.Actions.Edit"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="F2"/>
@@ -389,16 +379,12 @@
         <action
                 id="Testin.RemoveTestCase"
                 class="org.testin.testcase.RemoveTestCaseAction"
-                text="Delete Test Case"
-                description="Delete the selected test cases from their test set"
                 icon="AllIcons.Actions.DeleteTag"
         />
 
         <action
                 id="Testin.PasteTestCaseNode"
                 class="org.testin.clipboard.PasteTestCaseNodeAction"
-                text="Paste Test Case"
-                description="Paste the test cases on the clipboard into this test set"
                 icon="AllIcons.Actions.MenuPaste"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift V"/>
@@ -408,8 +394,6 @@
         <action
                 id="Testin.CopyTestCaseNode"
                 class="org.testin.clipboard.CopyTestCaseNodeAction"
-                text="Copy Test Case"
-                description="Put the selected test cases themselves on the clipboard"
                 icon="AllIcons.Actions.Copy"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift C"/>
@@ -419,8 +403,6 @@
         <action
                 id="Testin.CutTestCaseNode"
                 class="org.testin.clipboard.CutTestCaseNodeAction"
-                text="Cut Test Case"
-                description="Cut the selected test cases to the clipboard"
                 icon="AllIcons.Actions.MenuCut"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift X"/>
@@ -430,16 +412,12 @@
         <action
                 id="Testin.CopyTestCase"
                 class="org.testin.clipboard.CopyTestCaseAction"
-                text="Copy Test Case Value"
-                description="Choose which of the test case's values to put on the clipboard"
                 icon="AllIcons.Actions.Copy"
         />
 
         <action
                 id="Testin.AutomateTestCase"
                 class="org.testin.automate.AutomateTestCaseAction"
-                text="Automate Test Case"
-                description="Generate automation code for the selected test case"
                 icon="AllIcons.Actions.IntentionBulb"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl F12"/>
@@ -448,8 +426,6 @@
         <action
                 id="Testin.RunTestCase"
                 class="org.testin.run.RunTestCaseAction"
-                text="Run Test Case"
-                description="Run the selected test cases, or stop a run that is going"
                 icon="AllIcons.RunConfigurations.TestState.Run"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="F5"/>
@@ -458,8 +434,6 @@
         <action
                 id="Testin.NavigateToCode"
                 class="org.testin.navigate.NavigateToCodeAction"
-                text="Navigate to Test Code"
-                description="Jump from the selected test case to the method automating it"
                 icon="AllIcons.General.ArrowRight"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="shift F5"/>
@@ -468,16 +442,12 @@
         <action
                 id="Testin.ViewDetails"
                 class="org.testin.view.ViewDetailsAction"
-                text="View Test Case Details"
-                description="Show the selected test cases in the details panel"
                 icon="AllIcons.Actions.PreviewDetails"
         />
 
         <action
                 id="Testin.CreateNode"
                 class="org.testin.creator.CreateTreeNodeAction"
-                text="Create Testin Node"
-                description="Create a test set, package or test run under the selected node"
                 icon="AllIcons.General.Add"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl M"/>
@@ -487,40 +457,30 @@
         <action
                 id="Testin.EditTestRun"
                 class="org.testin.testrun.EditTestRunAction"
-                text="Edit Test Run"
-                description="Change which test cases this run covers, its name and its configuration"
                 icon="AllIcons.Actions.Edit"
         />
 
         <action
                 id="Testin.ReCreateTestRun"
                 class="org.testin.testrun.ReCreateTestRunAction"
-                text="Re-create Test Run"
-                description="Create the next cycle from the selected test run"
                 icon="AllIcons.Actions.Refresh"
         />
 
         <action
                 id="Testin.Open"
                 class="org.testin.open.OpenAction"
-                text="Open Testin Node"
-                description="Open the selected test sets or test runs in an editor"
                 icon="AllIcons.Actions.MenuOpen"
         />
 
         <action
                 id="Testin.ShowNodeDetails"
                 class="org.testin.ShowNodeDetailsAction"
-                text="Testin Node Details"
-                description="Show who created the selected node and when"
                 icon="AllIcons.General.IndentDetected"
         />
 
         <action
                 id="Testin.Export"
                 class="org.testin.importexport.exports.ExportAction"
-                text="Export Test Cases"
-                description="Export the test cases under the selected node to a file"
                 icon="AllIcons.ToolbarDecorator.Export"
         />
 
@@ -530,48 +490,36 @@
         <action
                 id="Testin.SyncWithSftp"
                 class="org.testin.sftp.SyncWithSftpAction"
-                text="Sync With SFTP"
-                description="Send this test project to its server and take what is there"
                 icon="AllIcons.Actions.Upload"
         />
 
         <action
                 id="Testin.ViewPendingCommits"
                 class="org.testin.git.ViewPendingCommitsAction"
-                text="View Pending Commits"
-                description="Review and push the changed test cases, test runs and markers"
                 icon="AllIcons.Actions.Commit"
         />
 
         <action
                 id="Testin.SyncWithRemote"
                 class="org.testin.git.SyncActionAction"
-                text="Sync With Remote"
-                description="Pull the latest test cases, then push anything committed here"
                 icon="AllIcons.Actions.SyncPanels"
         />
 
         <action
                 id="Testin.Import"
                 class="org.testin.importexport.imports.ImportAction"
-                text="Import Test Cases"
-                description="Import test cases from a file into the selected node"
                 icon="AllIcons.ToolbarDecorator.Import"
         />
 
         <action
                 id="Testin.RunTests"
                 class="org.testin.run.RunTestsAction"
-                text="Run Tests"
-                description="Run every test case the selected test set, package or test run holds"
                 icon="AllIcons.RunConfigurations.TestState.Run"
         />
 
         <action
                 id="Testin.OrderNode"
                 class="org.testin.order.OrderNodeAction"
-                text="Order Testin Node"
-                description="Set where this node sits among its siblings"
                 icon="AllIcons.ObjectBrowser.Sorted"
         />
 
@@ -583,24 +531,18 @@
         <group
                 id="Testin.UpdateTestProjectStatus"
                 class="org.testin.testproject.UpdateTestProjectStatusGroup"
-                text="Set Test Project Status"
-                description="Activate, deactivate or archive the selected test project"
                 popup="false"
         />
 
         <group
                 id="Testin.UpdateTestSetStatus"
                 class="org.testin.testset.UpdateTestSetStatusGroup"
-                text="Set Test Set Status"
-                description="Mark the selected test set active or deprecated"
                 popup="false"
         />
 
         <group
                 id="Testin.UpdatePackageStatus"
                 class="org.testin.explorer.tree.UpdatePackageStatusGroup"
-                text="Set Package Status"
-                description="Archive the selected package, or bring it back"
                 popup="false"
         />
 
@@ -610,8 +552,6 @@
         <action
                 id="Testin.RemoveNode"
                 class="org.testin.remove.RemoveAction"
-                text="Remove Testin Node"
-                description="Remove the selected test projects, test sets, packages or runs"
                 icon="AllIcons.Actions.GC"
         />
 
@@ -623,32 +563,24 @@
         <action
                 id="Testin.CopyNode"
                 class="org.testin.clipboard.CopyNodeAction"
-                text="Copy Testin Node"
-                description="Put the selected test sets, packages or runs on the clipboard"
                 icon="AllIcons.Actions.Copy"
         />
 
         <action
                 id="Testin.CutNode"
                 class="org.testin.clipboard.CutNodeAction"
-                text="Cut Testin Node"
-                description="Cut the selected test sets, packages or runs to the clipboard"
                 icon="AllIcons.Actions.MenuCut"
         />
 
         <action
                 id="Testin.PasteNode"
                 class="org.testin.clipboard.PasteNodeAction"
-                text="Paste Testin Node"
-                description="Paste the test sets, packages or runs on the clipboard into this node"
                 icon="AllIcons.Actions.MenuPaste"
         />
 
         <action
                 id="Testin.Rename"
                 class="org.testin.rename.RenameAction"
-                text="Rename Testin Node"
-                description="Rename the selected test project, test set, package or test run"
                 icon="AllIcons.Actions.Edit"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="shift F6"/>

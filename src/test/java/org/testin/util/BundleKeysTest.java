@@ -137,6 +137,40 @@ public class BundleKeysTest {
     }
 
     /**
+     * UC-INTERNAL-001, Rule-INTERNAL-066.
+     * <p>
+     * Every declared action is named in the bundle, because plugin.xml no longer
+     * names it.
+     * <p>
+     * The descriptor used to carry {@code text} and {@code description} on each
+     * element; the platform reads them from here instead now, by id, so that a
+     * tester running in French sees French in Find Action and in Settings ->
+     * Keymap. A key that is missing does not fail anything - the platform falls
+     * back to the id, so the tester finds an action called
+     * {@code Testin.RunTests} and nothing says why.
+     */
+    @Test
+    public void everyDeclaredActionIsNamedInTheBundle() {
+        final Properties english = bundle("messages.properties");
+        final String xml = read(Path.of("src", "main", "resources", "META-INF", "plugin.xml"));
+
+        final String actions = xml.substring(xml.indexOf("<actions>"), xml.indexOf("</actions>"));
+        final Matcher element = Pattern.compile("<(action|group)\\b[^>]*?id=\"([^\"]+)\"").matcher(actions);
+
+        int found = 0;
+        while (element.find()) {
+            final String key = element.group(1) + "." + element.group(2) + ".text";
+
+            assertTrue(english.containsKey(key),
+                    element.group(2) + " is declared in plugin.xml and " + key + " is not in the bundle,"
+                            + " so Find Action and the Keymap page show the id instead of a name");
+            found++;
+        }
+
+        assertTrue(found > 0, "no declared actions were found, so this test is checking nothing");
+    }
+
+    /**
      * A translation answers the same keys as the English, or a tester running in
      * that language reads a mixture of the two.
      */
