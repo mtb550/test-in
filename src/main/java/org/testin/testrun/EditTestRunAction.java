@@ -29,7 +29,7 @@ import org.testin.ui.framework.SelectionTree;
 import org.testin.undo.UndoScope;
 import org.testin.undo.UndoService;
 import org.testin.services.BackgroundWork;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
@@ -252,7 +252,7 @@ public class EditTestRunAction extends DumbAwareAction {
 
                     // Nothing to reload when the name changed - the rename closed the
                     // editor before the node moved.
-                    Services.getInstance(p, EditorUtil.class).reloadOpen(p, runPath);
+                    Services.getInstance(p, TestinEditors.class).reloadOpen(p, runPath);
 
                     onDone.run();
                 });

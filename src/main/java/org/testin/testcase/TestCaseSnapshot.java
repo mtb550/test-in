@@ -11,7 +11,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.undo.UndoScope;
 import org.testin.undo.UndoService;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 import org.testin.view.ViewToolWindowFactory;
@@ -185,7 +185,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
      * means it; nobody pressing CTRL+Z does.
      */
     private static void tellTheSurfaces(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> written) {
-        final @NotNull EditorUtil editors = Services.getInstance(p, EditorUtil.class);
+        final @NotNull TestinEditors editors = Services.getInstance(p, TestinEditors.class);
 
         written.forEach(snapshot -> editors.reloadOpen(p, snapshot.testSetPath()));
 

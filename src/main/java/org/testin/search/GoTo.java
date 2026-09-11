@@ -10,7 +10,7 @@ import org.testin.explorer.tree.TreePanelTree;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -60,7 +60,7 @@ public final class GoTo {
     private static void toCase(final @NotNull Project p, final @NotNull Hit hit, final @NotNull TestCaseDto tc) {
         showTree(p, WITHOUT_FOCUS, tree -> tree.reveal(hit.node().getPath()));
 
-        Services.getInstance(p, EditorUtil.class).openAndSelect(p, hit.node(), tc);
+        Services.getInstance(p, TestinEditors.class).openAndSelect(p, hit.node(), tc);
     }
 
     /**
@@ -75,7 +75,7 @@ public final class GoTo {
     private static void toNode(final @NotNull Project p, final @NotNull Hit hit) {
         showTree(p, WITH_FOCUS, tree -> tree.reveal(hit.node().getPath(), tree::focus));
 
-        Services.getInstance(p, EditorUtil.class).open(p, hit.node());
+        Services.getInstance(p, TestinEditors.class).open(p, hit.node());
     }
 
     /**

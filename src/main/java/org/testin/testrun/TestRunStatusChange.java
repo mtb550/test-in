@@ -5,7 +5,7 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.editor.run.RunEditor;
 import org.testin.explorer.TreePanel;
 import org.testin.logger.Logger;
@@ -84,7 +84,7 @@ public final class TestRunStatusChange {
      * tree's usual case, and the editor's never.
      */
     private @NotNull Optional<RunEditor> openEditorOn(final @NotNull TestRunDirectoryDto run) {
-        return Services.getInstance(p, EditorUtil.class).editorFor(p, run)
+        return Services.getInstance(p, TestinEditors.class).editorFor(p, run)
                 .filter(RunEditor.class::isInstance)
                 .map(RunEditor.class::cast);
     }

@@ -11,7 +11,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.services.OptionalPlugin;
 
 import java.nio.file.Path;
@@ -41,7 +41,7 @@ public final class NodeRename {
      * never if it failed - {@code renameNode} reports and swallows that.
      */
     public static void apply(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull DirectoryDto dir, final @NotNull String newName, final @NotNull Runnable onDone) {
-        Services.getInstance(p, EditorUtil.class).close(p, dir);
+        Services.getInstance(p, TestinEditors.class).close(p, dir);
 
         // Before the data rename, while the old name is still what finds the
         // generated code. Which generator that is belongs to the node, not here.

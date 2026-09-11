@@ -123,12 +123,21 @@ public class ArchitectureTest {
     };
 
     /**
-     * {@code util} is not a util: these two import feature packages (#112).
-     * Measured 2026-09-04, down from the four that story counted.
+     * Empty, and that is the answer to #112 rather than a gap in this file.
+     * <p>
+     * It held {@code org.testin.util.EditorUtil} and {@code org.testin.util.FontSync},
+     * measured 2026-09-04 and down from the four that story counted. Neither is
+     * in {@code util} any more - the first is {@code editor/TestinEditors} and
+     * the second {@code ui/FontSync} - so both entries had stopped excusing
+     * anything: the predicate matches on the fully qualified name, and no class
+     * has answered to either of these for some time.
+     * <p>
+     * Two frozen names that freeze nothing read as two violations still
+     * outstanding, which is the opposite of what the package now looks like. No
+     * class under {@code util} depends on a feature package, so the rule holds
+     * unconditionally and the next one to break it fails here (#291).
      */
-    private static final @NotNull Set<String> UTIL_EXCEPTIONS = Set.of(
-            "org.testin.util.EditorUtil",
-            "org.testin.util.FontSync");
+    private static final @NotNull Set<String> UTIL_EXCEPTIONS = Set.of();
 
     /**
      * The one class outside the indexer and its exempt list that reads or writes

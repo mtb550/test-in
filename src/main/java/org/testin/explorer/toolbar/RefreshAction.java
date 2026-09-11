@@ -12,7 +12,7 @@ import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.services.Services;
 import org.testin.notifications.Done;
 import org.testin.util.Bundle;
@@ -93,7 +93,7 @@ public class RefreshAction extends AbstractProjectAction {
                 // Before the tree is rebuilt: an editor is holding the node
                 // it was opened on and the cases it read from it, and after a
                 // re-index either can be data that is gone.
-                Services.getInstance(p, EditorUtil.class).refreshOpen(p);
+                Services.getInstance(p, TestinEditors.class).refreshOpen(p);
 
                 tp.refresh();
 

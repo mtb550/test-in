@@ -27,7 +27,8 @@ import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.BoundTestProject;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.LastOpenEditors;
+import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
@@ -171,7 +172,7 @@ public final class ProjectIndexer {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (restoreEditorsOnComplete.getAndSet(false)) {
                 Logger.info("Indexing finished, restoring open editors.");
-                Services.getInstance(p, EditorUtil.class).restoreLastOpened(p);
+                Services.getInstance(p, LastOpenEditors.class).reopen(p);
             } else {
                 Logger.info("Indexing finished, skipping editor restore.");
             }

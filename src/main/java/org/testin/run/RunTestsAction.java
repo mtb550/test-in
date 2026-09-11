@@ -16,7 +16,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 
 import java.util.List;
 import java.util.Optional;
@@ -97,7 +97,7 @@ public class RunTestsAction extends DumbAwareAction {
      * what the tester asked for.
      * <p>
      * The editor may not exist yet and, once it does, may not have read its
-     * cases yet. {@link EditorUtil#openThen} owns the first wait and
+     * cases yet. {@link TestinEditors#openThen} owns the first wait and
      * {@link TestinEditor#runWhenLoaded()} owns the second, so this says only
      * what it wants: open that run, and start it.
      * <p>
@@ -106,7 +106,7 @@ public class RunTestsAction extends DumbAwareAction {
      * gesture means the same thing wherever it is reached from.
      */
     private void openAndRun(final @NotNull Project p, final @NotNull TestRunDirectoryDto run) {
-        Services.getInstance(p, EditorUtil.class).openThen(p, run, TestinEditor::runWhenLoaded);
+        Services.getInstance(p, TestinEditors.class).openThen(p, run, TestinEditor::runWhenLoaded);
     }
 
     /**

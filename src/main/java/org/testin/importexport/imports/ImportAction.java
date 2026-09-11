@@ -28,7 +28,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.services.BackgroundWork;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 import org.testin.util.NameSanitizer;
 import org.testin.services.OptionalPlugin;
@@ -189,7 +189,7 @@ public class ImportAction extends DumbAwareAction {
                 // The set the tester was standing on is reopened, so what they just
                 // imported is in front of them. A container has no editor of its own.
                 if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                    onEdt(() -> Services.getInstance(p, EditorUtil.class).closeThenOpen(p, ts));
+                    onEdt(() -> Services.getInstance(p, TestinEditors.class).closeThenOpen(p, ts));
                 }
 
                 // The count is the news, whichever shape was imported into (#62).

@@ -24,7 +24,7 @@ import org.testin.git.ResolveConflictDialog;
 import org.testin.git.TestCaseMerge;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.util.Mapper;
 import org.testin.setting.AppSettingsState;
 
@@ -266,7 +266,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                 // the open editors for their contents, because a sync can rewrite a
                 // case an editor is showing (#118).
                 Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
-                Services.getInstance(p, EditorUtil.class).refreshOpen(p);
+                Services.getInstance(p, TestinEditors.class).refreshOpen(p);
 
                 // One notification, always, and it always carries what the sync
                 // actually did. The pair of conditions this replaces had a gap
@@ -316,7 +316,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
 
                         ApplicationManager.getApplication().invokeLater(() -> {
                             Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
-                            Services.getInstance(p, EditorUtil.class).refreshOpen(p);
+                            Services.getInstance(p, TestinEditors.class).refreshOpen(p);
                             Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, count);
                         });
                     }),
@@ -403,7 +403,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
-                        Services.getInstance(p, EditorUtil.class).refreshOpen(p);
+                        Services.getInstance(p, TestinEditors.class).refreshOpen(p);
 
                         if (sent) {
                             Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("sftp.settled", String.valueOf(answered.size())));

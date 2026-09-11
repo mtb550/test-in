@@ -4,7 +4,7 @@ import org.testin.indexer.OwnWrites;
 import org.testin.indexer.Rescan;
 import org.testin.logger.LoggerService;
 import org.testin.setting.AppSettingsState;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -54,8 +54,8 @@ public class ServiceRoutingTest {
      */
     @Test
     public void aProjectServiceStaysWithItsProject() {
-        assertFalse(Services.isApplicationLevel(EditorUtil.class),
-                "EditorUtil is per project - one shared across projects would close the wrong editors");
+        assertFalse(Services.isApplicationLevel(TestinEditors.class),
+                "TestinEditors is per project - one shared across projects would close the wrong editors");
     }
 
     @Test
@@ -79,8 +79,8 @@ public class ServiceRoutingTest {
         assertTrue(first, "the settings are the application's on the first ask");
         assertEquals(cached, first, "the cache answered differently the second time");
 
-        final boolean firstProject = Services.isApplicationLevel(EditorUtil.class);
-        final boolean cachedProject = Services.isApplicationLevel(EditorUtil.class);
+        final boolean firstProject = Services.isApplicationLevel(TestinEditors.class);
+        final boolean cachedProject = Services.isApplicationLevel(TestinEditors.class);
 
         assertFalse(firstProject, "a project service stays with its project");
         assertEquals(cachedProject, firstProject, "the cache answered differently the second time");

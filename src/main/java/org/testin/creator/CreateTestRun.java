@@ -25,7 +25,7 @@ import org.testin.testrun.RunForm;
 import org.testin.testrun.RunFormAction;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.services.BackgroundWork;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
@@ -149,7 +149,7 @@ public class CreateTestRun implements NodeCreator {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 tp.getProjectTree().refresh();
-                Services.getInstance(p, EditorUtil.class).open(p, trDir);
+                Services.getInstance(p, TestinEditors.class).open(p, trDir);
 
                 // Here rather than in CreateTreeNodeAction: creating a run is
                 // asynchronous, and the action returns while the dialog is still

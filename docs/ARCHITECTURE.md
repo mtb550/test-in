@@ -79,7 +79,7 @@ hidden, because a newcomer will find them and should know which are deliberate.
 
 | From | To | Why |
 |---|---|---|
-| `indexer/ProjectIndexer`, `indexer/Rescan` | `editor/EditorUtil`, `explorer/TreePanel` | A rescan has to tell the open surfaces that what they are showing has changed. The alternative is a listener the indexer publishes to, which is worth doing and has not been. |
+| `indexer/ProjectIndexer`, `indexer/Rescan` | `editor/TestinEditors`, `explorer/TreePanel` | A rescan has to tell the open surfaces that what they are showing has changed. The alternative is a listener the indexer publishes to, which is worth doing and has not been. |
 | `services/RunStatusService` | `editor/TestinEditor`, `editor/run/RunEditor`, `editor/toolbar/Toolbar`, `ui/framework/ConfirmDialog` | It records a verdict into the run an editor claimed, so it is filed under the wrong package: it is run-editor behavior living under `services`. |
 | `actions/TestinData`, `actions/Declared` | `editor`, `model`, `util`, `logger` | Deliberate, and new with #119. A declared action is built by the platform with a no-arg constructor, so it asks the surface that has the keyboard what is selected - and a data key has to name the type it answers with. `actions` was a leaf until then, and typing the keys as `Object` to keep it one would be worse than the edge. |
 | `model/TestEditorAttributes`, `model/RunEditorAttributes`, `model/DirectoryType`, `model/TestRunStatus` | `ui`, `codegen`, `creator`, `importexport`, `statusbar` | Deliberate. An enum carries its own presentation and its own action rather than being read by an `instanceof` chain at every call site — see the conventions in [CLAUDE.md](https://github.com/mtb550/test-in/blob/main/CLAUDE.md). |

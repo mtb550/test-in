@@ -1,6 +1,5 @@
 package org.testin.editor;
 
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -20,14 +19,31 @@ import org.testin.view.ViewToolWindowFactory;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+/**
+ * The Testin editor showing a node: find it, open it, focus it, reload it,
+ * close it.
+ * <p>
+ * Was {@code EditorUtil}, which named no job - and there is a
+ * {@code com.intellij.openapi.editor.ex.util.EditorUtil} in the platform, so an
+ * import list held two of that name and the wrong one is one keystroke away.
+ * The {@code Testin} prefix is what CLAUDE.md already does where a plain noun
+ * collides with a platform type, as {@code TestinEditor} and
+ * {@code TestinFileSystem} do (#291).
+ * <p>
+ * Every lookup here matches on the node's <b>path</b>. Two test sets both called
+ * "Login" in different packages are one name and two nodes, and matching on the
+ * name answers for whichever happened to be open first.
+ * <p>
+ * Which tabs were open last time the project closed is not here: that is a list
+ * of paths outliving the editors it names, and it belongs to
+ * {@link LastOpenEditors}.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
-public final class EditorUtil {
-    private final @NotNull String OPEN_EDITORS_KEY = "testin.openEditors";
+public final class TestinEditors {
 
     /**
      * The open file showing this node, and empty when none is.
@@ -282,9 +298,10 @@ public final class EditorUtil {
 
     /**
      * The same, for a caller that is opening several at once and wants the
-     * cursor to land on one of them rather than on each in turn.
+     * cursor to land on one of them rather than on each in turn - which is
+     * {@link LastOpenEditors}, reopening what was open last time.
      */
-    private void open(final @NotNull Project p, final @NotNull DirectoryDto dir, final boolean focus) {
+    public void open(final @NotNull Project p, final @NotNull DirectoryDto dir, final boolean focus) {
         ApplicationManager.getApplication().invokeLater(() -> openNow(p, dir, focus));
     }
 
@@ -336,86 +353,21 @@ public final class EditorUtil {
         return true;
     }
 
-    public void saveOpen(final @NotNull Project p) {
-        try {
-            final @NotNull FileEditorManager fileEditorManager = FileEditorManager.getInstance(p);
-            final @NotNull List<String> entries = getEntries(fileEditorManager);
-
-            if (entries.isEmpty())
-                PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY, null);
-            else
-                PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY, String.join(";", entries));
-
-        } catch (final Exception ex) {
-            Logger.error("Failed to save open editors: " + ex.getMessage());
-        }
-    }
-
     /**
-     * A path per open editor, and nothing else. The entry used to carry a "ts"
-     * or "tr" prefix saying which kind of node it was, which the restore parsed
-     * back to pick a lookup.
+     * The node behind every Testin editor open right now, as absolute paths.
      * <p>
-     * The indexer finds a node of any kind by path, and {@link #open} already
-     * decides the editor type from the node's own class. The prefix said nothing
-     * the path did not.
+     * What is open is this class's answer to give; writing it down and reading
+     * it back on the next launch is {@link LastOpenEditors}, which is the one
+     * caller (#291).
      */
-    private @NotNull List<String> getEntries(final @NotNull FileEditorManager fed) {
-        final @NotNull List<String> entries = new ArrayList<>();
+    public @NotNull List<Path> openNodePaths(final @NotNull Project p) {
+        final @NotNull List<Path> paths = new ArrayList<>();
 
-        for (final VirtualFile vf : fed.getOpenFiles()) {
-            if (vf instanceof UnifiedVirtualFile uvf) {
-                entries.add(uvf.getDir().getPath().toAbsolutePath().toString());
-            }
+        for (final VirtualFile vf : FileEditorManager.getInstance(p).getOpenFiles()) {
+            if (vf instanceof UnifiedVirtualFile uvf) paths.add(uvf.getDir().getPath().toAbsolutePath());
         }
-        return entries;
-    }
 
-    // UC-INTERNAL-002
-    public void restoreLastOpened(final @NotNull Project p) {
-        try {
-            final @NotNull String saved = Objects.requireNonNullElse(
-                    PropertiesComponent.getInstance(p).getValue(OPEN_EDITORS_KEY), "");
-
-            if (saved.isEmpty()) {
-                Logger.debug("EditorStateService: no saved editors to restore");
-                return;
-            }
-
-            final String @NotNull[] entries = saved.split(";");
-            if (entries.length == 0)
-                return;
-
-            Logger.info("restoring " + entries.length + " open editors");
-
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-            final @NotNull List<DirectoryDto> found = new ArrayList<>();
-
-            for (final String entry : entries) {
-                // A remembered editor whose node is not there any more is not
-                // reopened: the path was written last time the project closed and
-                // the node may have been removed since.
-                indexer.find(Path.of(entry)).ifPresentOrElse(
-                        dir -> {
-                            Logger.debug("restoring editor for '" + entry + "' -> found");
-                            found.add(dir);
-                        },
-                        () -> Logger.debug("restoring editor for '" + entry + "' -> not indexed"));
-            }
-
-            // Only the last asks for the cursor. Every one of them used to, and
-            // each open pumps the event queue while it waits, so the second
-            // request arrived while the first was still focusing and the platform
-            // logged "Cannot focus editor ... reason=selection changed". The last
-            // tab won either way; now it wins without the race (#160).
-            for (int i = 0; i < found.size(); i++) open(p, found.get(i), i == found.size() - 1);
-
-            PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY, null);
-            Logger.info("EditorStateService: cleared saved editor state");
-
-        } catch (final Exception ex) {
-            Logger.error("Failed to restore open editors: " + ex.getMessage());
-        }
+        return paths;
     }
 
 }

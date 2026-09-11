@@ -7,7 +7,7 @@ import git4idea.GitUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.EditorUtil;
+import org.testin.editor.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.services.Services;
@@ -58,7 +58,7 @@ final class RepositoryRefresh {
             // listens for - but four tenths of a second after the sync says it
             // succeeded, and only for a project whose panel exists. A sync that
             // reports success owns what it changed (#20).
-            Services.getInstance(p, EditorUtil.class).refreshOpen(p);
+            Services.getInstance(p, TestinEditors.class).refreshOpen(p);
 
             if (Services.isNotCreated(p, TreePanel.class)) return;
 
