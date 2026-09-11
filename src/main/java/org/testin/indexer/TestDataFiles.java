@@ -117,7 +117,7 @@ final class TestDataFiles {
             // To the recycle bin, so a case removed by mistake is recovered the
             // way every other file on this machine is. One JSON file, so the
             // move is cheap enough for the thread the removal already runs on.
-            if (!Trash.accepted(path)) Files.deleteIfExists(path);
+            if (!Trash.accepted(p, path)) Files.deleteIfExists(path);
         } catch (final IOException ex) {
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", ex.getMessage()));
             Logger.error("unable to remove " + path + ": " + ex.getMessage());

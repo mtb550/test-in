@@ -75,8 +75,34 @@ public class TestinConfigTest {
      */
     @Test
     public void brokenFilesOpenUnbound() {
-        assertSame(TestinConfigLoader.parse("testinProject: [unclosed\n", "malformed"), TestinProjectConfig.EMPTY);
+        assertSame(TestinConfigLoader.parse("testinProject: [unclosed\n", "malformed"), TestinProjectConfig.UNREADABLE);
         assertSame(TestinConfigLoader.parse("   \n", "blank"), TestinProjectConfig.EMPTY);
+    }
+
+
+    /**
+     * UC-TREE-PANEL-001.
+     * <p>
+     * A file that would not parse says exactly what an absent one says, and is
+     * not the same state.
+     * <p>
+     * Both answer every question with nothing, which is why they were one value
+     * for so long. What they are not is the same thing to tell a tester: nobody
+     * has bound this repository yet is ordinary, and your file has a mistake in
+     * it is a line to correct - and until this was told apart, a mistyped indent
+     * was reported as the first and then bound over, writing a testinProject
+     * line into the file on every open (#66, finding 10).
+     */
+    @Test
+    public void aBrokenFileIsTheSameValueAndNotTheSameState() {
+        final TestinProjectConfig broken = TestinConfigLoader.parse("testinProject: [unclosed\n", "malformed");
+        final TestinProjectConfig absent = TestinConfigLoader.parse("   \n", "blank");
+
+        assertEquals(broken, absent, "a file that would not parse has told us no more than one that is not there");
+
+        assertTrue(broken.isUnreadable(), "the broken file is the one state a caller can act on differently");
+        assertFalse(absent.isUnreadable(), "an absent file is not a broken one, and must not be reported as one");
+        assertFalse(TestinProjectConfig.EMPTY.isUnreadable(), "saying nothing is not the same as failing to be read");
     }
 
     /**

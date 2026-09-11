@@ -188,6 +188,7 @@ public class CreateTestMethod implements GenAction {
 
         final @NotNull StringBuilder methods = new StringBuilder();
         final @NotNull List<TestCaseDto> lostTheName = new ArrayList<>();
+        final @NotNull List<TestCaseDto> cannotBeNamed = new ArrayList<>();
         int alreadyThere = 0;
         int adopted = 0;
 
@@ -199,6 +200,23 @@ public class CreateTestMethod implements GenAction {
             // whose description happens to sanitize the same way.
             if (generated.containsKey(id)) {
                 alreadyThere++;
+                continue;
+            }
+
+            // The last refusal, after the dialogs' first one. A description that
+            // cannot become a Java identifier - one starting with a digit, one
+            // that is only punctuation, one that lands on a keyword - is refused
+            // in the Create and Update dialogs, and reaches here anyway from the
+            // import wizard, a sync carrying a case written on another machine,
+            // and hand-edited JSON in the data root.
+            //
+            // It used to be written out as text: "public void 4redxkJfsdf()"
+            // went into the class with no error at the time, and the next
+            // description change threw IncorrectOperationException out of a
+            // write action. Skipped and said out loud instead, which is what a
+            // case with no method already gets (#66, finding 40).
+            if (!NameSanitizer.canMakeMethodName(tc.getDescription())) {
+                cannotBeNamed.add(tc);
                 continue;
             }
 
@@ -242,6 +260,7 @@ public class CreateTestMethod implements GenAction {
         }
 
         reportLostTheName(p, targetClass, lostTheName);
+        reportCannotBeNamed(p, targetClass, cannotBeNamed);
 
         if (methods.isEmpty()) return;
 
@@ -285,6 +304,35 @@ public class CreateTestMethod implements GenAction {
      * runs after an import, on its own time, and what it asks for - rewording
      * one of the two descriptions - is not something to do on the spot.
      */
+    /**
+     * UC-CODEGEN-002, Rule-CODEGEN-011.
+     * <p>
+     * These cases have no method because their description cannot become one.
+     * <p>
+     * Counted and named like its sibling above, and for the same reason: an
+     * import carrying thirty such cases is one problem with thirty examples, and
+     * thirty balloons is how a tester learns to dismiss the first.
+     * <p>
+     * It says what to do, because there is exactly one thing: give the case a
+     * description that starts with a letter. The dialogs refuse the same names
+     * while the tester is still typing, so a case that got here came in another
+     * way - an import, a sync, or a hand-edited file.
+     */
+    private void reportCannotBeNamed(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> cannotBeNamed) {
+        if (cannotBeNamed.isEmpty()) return;
+
+        final @NotNull String names = cannotBeNamed.stream().limit(3).map(TestCaseDto::getDescription).collect(Collectors.joining("\", \"", "\"", "\""));
+        final @NotNull String andMore = cannotBeNamed.size() > 3 ? " and " + (cannotBeNamed.size() - 3) + " more" : "";
+
+        Logger.warn("No method for " + cannotBeNamed.size() + " case(s) in " + targetClass.getQualifiedName()
+                + ": the description cannot name a Java method");
+
+        Services.getInstance(p, Notifier.class).warn(p,
+                cannotBeNamed.size() == 1 ? "A test case has no automation method" : cannotBeNamed.size() + " test cases have no automation method",
+                names + andMore + " cannot name a Java method - a description has to start with a letter "
+                        + "and hold something other than punctuation. Reword it and generate again.");
+    }
+
     private void reportLostTheName(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> lost) {
         if (lost.isEmpty()) return;
 

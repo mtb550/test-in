@@ -33,6 +33,14 @@ public final class TestinConfigService {
         this.config = TestinConfigLoader.load(p);
     }
 
+    /**
+     * What to call this repository's config file when telling a tester about
+     * it. Asked of the loader, which is what decides the name it reads.
+     */
+    public static @NotNull String fileName() {
+        return TestinConfigLoader.fileName();
+    }
+
     public @NotNull TestinProjectConfig get() {
         return config;
     }

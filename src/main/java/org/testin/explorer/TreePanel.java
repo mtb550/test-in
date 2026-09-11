@@ -227,6 +227,12 @@ public final class TreePanel implements Disposable {
      * the listing it decides from is the one that pass already read.
      */
     private boolean bindTheOnlyProject(final @NotNull Map<String, ProjectStatus> projects) {
+        // Never over a file that would not parse. Binding writes a testinProject
+        // line into it, so a mistyped indent used to be answered by writing into
+        // the broken file - on every open, still broken, and never said out loud
+        // (#66, finding 10).
+        if (Services.getInstance(p, TestinConfigService.class).get().isUnreadable()) return false;
+
         final @NotNull BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
         if (bound.isNamed() || projects.size() != 1) return false;
 
@@ -251,6 +257,7 @@ public final class TreePanel implements Disposable {
 
         return PanelState.of(
                 Services.getInstance(p, TestinRoot.class).isConfigured(),
+                Services.getInstance(p, TestinConfigService.class).get().isUnreadable(),
                 boundProject.isPresent(),
                 Services.getInstance(p, BoundTestProject.class).isMissing(underRoot),
                 Services.getInstance(p, TestinConfigService.class).get().hasRepoUrl(),
@@ -302,6 +309,7 @@ public final class TreePanel implements Disposable {
         switch (state) {
             case NO_ROOT -> offerSettings(emptyText);
             case CLONE_BOUND -> offerClone(emptyText, boundProject);
+            case BROKEN_CONFIG -> sayTheFileIsBroken(emptyText);
             case NO_PROJECTS -> offerFirstProject(emptyText);
             case CHOOSE -> offerChoice(emptyText, boundProject);
 
@@ -317,6 +325,25 @@ public final class TreePanel implements Disposable {
      * <p>
      * No root is set, so the only step out of here is the settings page.
      */
+    /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-002.
+     * <p>
+     * The repository has a {@code testin.yml} and it could not be read.
+     * <p>
+     * Named rather than offered a way out, because there is no button that
+     * corrects a file: the tester opens it and fixes the line. What the plugin
+     * can do is say which file and that the reason is in the log, instead of
+     * reporting the same "not bound to a test project" an unbound repository
+     * gets - which sent the tester to the picker to fix something the picker
+     * cannot reach (#66, finding 10).
+     */
+    private void sayTheFileIsBroken(final @NotNull StatusText emptyText) {
+        emptyText.appendLine(Bundle.message("welcome.config.broken", TestinConfigService.fileName()),
+                SimpleTextAttributes.ERROR_ATTRIBUTES, null);
+        emptyText.appendLine(Bundle.message("welcome.config.broken.detail"),
+                SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
+    }
+
     private void offerSettings(final @NotNull StatusText emptyText) {
         emptyText.appendLine(
                 AllIcons.General.Settings,

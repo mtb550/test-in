@@ -13,6 +13,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.Animator;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import java.awt.Toolkit;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.testcase.TestEditorAttributes;
@@ -365,7 +366,21 @@ final class LightModeWindow {
     private void fitHeight() {
         frame.validate();
 
-        final int target = frame.getPreferredSize().height;
+        // What the case wants, and what the screen has. A very long description
+        // at a large zoom asked for a window taller than the display, which put
+        // the verdict buttons and the status bar off the bottom of it - and
+        // those are the only things that finish a case (#66, finding 54).
+        final int wanted = frame.getPreferredSize().height;
+        final int usable = usableHeight();
+
+        // Said before it is done, so the tester knows the case goes on rather
+        // than believing they have read it. The notice makes the window taller
+        // still, which changes nothing: it is already at the screen's height and
+        // stays there.
+        details.setCutOff(wanted > usable);
+        frame.validate();
+
+        final int target = Math.min(frame.getPreferredSize().height, usable);
         final int from = frame.getHeight();
 
         // Nothing to move, and the two cases where moving would be wrong: a
@@ -384,6 +399,25 @@ final class LightModeWindow {
         heightMotion = Motion.run(motionScope, "Testin light mode height",
                 travelled -> frame.setSize(frame.getWidth(), from + (int) ((target - from) * travelled)),
                 () -> frame.setSize(frame.getWidth(), target));
+    }
+
+
+    /**
+     * UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-217.
+     * <p>
+     * How tall a window may be on the display this one is on: the screen, less
+     * whatever the desktop keeps for itself - a taskbar, a dock, a menu bar.
+     * <p>
+     * Asked of the frame's own device rather than of the primary one, because a
+     * tester working across two monitors is usually doing it so that the window
+     * can sit on the second.
+     */
+    private int usableHeight() {
+        return Optional.ofNullable(frame.getGraphicsConfiguration())
+                .map(gc -> gc.getBounds().height
+                        - Toolkit.getDefaultToolkit().getScreenInsets(gc).top
+                        - Toolkit.getDefaultToolkit().getScreenInsets(gc).bottom)
+                .orElseGet(() -> Toolkit.getDefaultToolkit().getScreenSize().height);
     }
 
     /**

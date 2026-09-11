@@ -39,6 +39,14 @@ final class TestinConfigLoader {
     private static final @NotNull String[] FILE_NAMES = {"testin.yml", "testin.yaml"};
 
     /**
+     * What to call the file when telling a tester about it: the name the plugin
+     * writes, which is the first of the two it reads.
+     */
+    public static @NotNull String fileName() {
+        return FILE_NAMES[0];
+    }
+
+    /**
      * Unknown keys are ignored, and each one is named in the log.
      * <p>
      * The handler is what names it. {@code FAIL_ON_UNKNOWN_PROPERTIES} alone
@@ -104,8 +112,13 @@ final class TestinConfigLoader {
         } catch (final Exception ex) {
             // A hand-edited file: the reason belongs in the log, and the plugin
             // carries on unbound rather than refusing to open the project.
+            //
+            // UNREADABLE rather than EMPTY, so the panel can say the file is
+            // broken instead of saying nothing is bound - and so nothing binds
+            // this repository to a project and writes into a file it could not
+            // read (#66, finding 10).
             Logger.warn("Malformed " + source + ", ignored: " + ex.getMessage());
-            return TestinProjectConfig.EMPTY;
+            return TestinProjectConfig.UNREADABLE;
         }
     }
 

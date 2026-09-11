@@ -140,7 +140,7 @@ final class VfsExecutor {
             // action below: trashing a whole test project is the platform
             // walking it file by file, which is not work for the EDT. A desktop
             // with no bin answers no and the VFS delete runs as it always did.
-            if (Trash.accepted(path)) {
+            if (Trash.accepted(p, path)) {
                 ApplicationManager.getApplication().invokeLater(() -> onDeleted.accept(true));
                 return;
             }

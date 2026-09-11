@@ -63,6 +63,16 @@ class CaseDetails extends JBPanel<CaseDetails> {
 
     private float zoom = 1.0f;
 
+    /**
+     * Whether the window ran out of screen before the case ran out of text.
+     * <p>
+     * The window clamps to the display and says so rather than growing past the
+     * bottom of it, which is where the verdict buttons would have gone (#66,
+     * finding 54). Held here because it is drawn here, and set by the window,
+     * which is the only thing that knows how much screen there is.
+     */
+    private boolean cutOff = false;
+
     CaseDetails(final @NotNull Project p) {
         super(new GridBagLayout());
         setOpaque(false);
@@ -78,6 +88,20 @@ class CaseDetails extends JBPanel<CaseDetails> {
     void show(final @NotNull TestCaseDto tc) {
         shown = Optional.of(tc);
 
+        render();
+    }
+
+    /**
+     * UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-217.
+     * <p>
+     * Told by the window, which is the only thing that knows how much screen
+     * there is. Redraws only when the answer changed, because this is asked on
+     * every refresh - a clock tick, a verdict, a resize.
+     */
+    void setCutOff(final boolean truncated) {
+        if (cutOff == truncated) return;
+
+        cutOff = truncated;
         render();
     }
 
@@ -113,6 +137,28 @@ class CaseDetails extends JBPanel<CaseDetails> {
         addRow(TestEditorAttributes.PRE_CONDITIONS.getName(), TestEditorAttributes.PRE_CONDITIONS.displayValue(tc));
 
         addTags(tc);
+
+        // Last, under everything it is about. A tester who cannot see the rest
+        // of the case has one thing to do about it, and the row says what.
+        if (cutOff) addCutOffNotice();
+    }
+
+    /**
+     * UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-217.
+     * <p>
+     * The case is longer than the screen, and the window stopped rather than
+     * putting its verdict buttons past the bottom of the display.
+     * <p>
+     * Said rather than left to be discovered: a window that simply stopped would
+     * have the tester believe they had read the whole case, which is the one
+     * thing this window exists to be trusted about.
+     */
+    private void addCutOffNotice() {
+        final @NotNull JBLabel notice = new JBLabel(Bundle.message("light.cut.off"));
+        notice.setFont(CaseFont.zoomed(CaseFont.label(), zoom));
+        notice.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+
+        addRow("", notice);
     }
 
     private void addRow(final @NotNull String name, final @NotNull String value) {

@@ -56,8 +56,7 @@ public enum FileTypes {
                     
                     %s
                     
-                    Note: Missing columns will safely default to empty values.
-                    You can also download a ready-to-use sample file using the button below.""",
+                    Note: Missing columns will safely default to empty values.""",
             (p, destFile, sheets) -> new ExportExcel().exportToFile(p, destFile, sheets),
             (p, importFile) -> new ImportExcel().processImport(p, importFile),
             (p, trDir, tr, detailsMap) -> new TestRunExcelGenerator().generate(p, trDir, tr, detailsMap)

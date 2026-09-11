@@ -61,6 +61,29 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
             TestinLocation.LOCAL, ConnectionType.NONE, "", "", DEFAULT_PORT, "", "");
 
     /**
+     * A repository whose file is there and could not be read.
+     * <p>
+     * Says nothing, exactly as {@link #EMPTY} says nothing - a file that will
+     * not parse has told us no more than a file that is absent, and every reader
+     * of a value gets the same blank either way. What it is not is the same
+     * <i>state</i>: a repository nobody has bound yet is ordinary, and one whose
+     * file is broken is a mistake somebody can fix.
+     * <p>
+     * Telling them apart is what stopped a mistyped indent from being answered
+     * with "this repository is not bound to a test project" and then quietly
+     * bound to whatever single project was under the root - writing a
+     * testinProject line into a file that was still broken, on every open, and
+     * never saying so (#66, finding 10).
+     * <p>
+     * <b>Its own instance, asked for by identity.</b> A record compares by
+     * value, so this equals EMPTY and must: two configs that say nothing are the
+     * same config. Only {@link TestinConfigLoader} ever hands this one out, and
+     * {@link #isUnreadable()} is the one question that can tell.
+     */
+    public static final @NotNull TestinProjectConfig UNREADABLE = new TestinProjectConfig(
+            TestinLocation.LOCAL, ConnectionType.NONE, "", "", DEFAULT_PORT, "", "");
+
+    /**
      * The forms {@code git clone} is given, and nothing else.
      * <p>
      * The URL arrives in a file that travels with a repository and ends up as an
@@ -207,6 +230,19 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
      * Whether the test project can be fetched when this machine does not have it
      * yet.
      */
+    /**
+     * UC-TREE-PANEL-001.
+     * <p>
+     * The file is there and could not be read - see {@link #UNREADABLE}.
+     * <p>
+     * Identity rather than equality, deliberately: by value this config says
+     * exactly what an absent one says, which is the point of it.
+     */
+    @SuppressWarnings("ObjectEquality")
+    public boolean isUnreadable() {
+        return this == UNREADABLE;
+    }
+
     public boolean hasRepoUrl() {
         return connection == ConnectionType.GIT && !repoUrl.isEmpty();
     }

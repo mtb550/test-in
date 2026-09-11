@@ -30,6 +30,17 @@ public enum PanelState {
     NO_PROJECTS,
 
     /**
+     * The repository has a {@code testin.yml} and it could not be read.
+     * <p>
+     * Its own state rather than {@link #CHOOSE}, because the two need opposite
+     * things of the tester: choosing is what an unbound repository offers, and
+     * a broken file is a line to correct. Answered before anything else that
+     * reads the file, so nothing acts on a config that said nothing because it
+     * could not be parsed (#66, finding 10).
+     */
+    BROKEN_CONFIG,
+
+    /**
      * Projects exist and this repository is not bound to a usable one - never
      * bound, bound to a name nobody uses, or bound to an archived project.
      */
@@ -46,13 +57,20 @@ public enum PanelState {
      * The state these facts add up to.
      *
      * @param rootConfigured       a Testin root is set
+     * @param configUnreadable     the repository has a testin.yml that could not be parsed
      * @param projectResolved      the bound project was found in the index
      * @param boundProjectMissing  the repository names a project that is nowhere under the root
      * @param cloneUrlKnown        the config says where the test project is cloned from
      * @param anyProjectsUnderRoot at least one test project folder exists under the root
      */
-    public static @NotNull PanelState of(final boolean rootConfigured, final boolean projectResolved, final boolean boundProjectMissing, final boolean cloneUrlKnown, final boolean anyProjectsUnderRoot) {
+    public static @NotNull PanelState of(final boolean rootConfigured, final boolean configUnreadable, final boolean projectResolved, final boolean boundProjectMissing, final boolean cloneUrlKnown, final boolean anyProjectsUnderRoot) {
         if (!rootConfigured) return NO_ROOT;
+
+        // Before the project is looked at, because a file that would not parse
+        // is why nothing is bound. Saying "choose a test project" over a broken
+        // file sends the tester to fix the wrong thing (#66, finding 10).
+        if (configUnreadable) return BROKEN_CONFIG;
+
         if (projectResolved) return TREE;
         if (boundProjectMissing && cloneUrlKnown) return CLONE_BOUND;
         if (!anyProjectsUnderRoot) return NO_PROJECTS;

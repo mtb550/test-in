@@ -538,6 +538,10 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
   sees no movement. Light mode floats above every other application, which is
   the worst place to move when somebody has asked for stillness, and the switch
   is the IDE's own rather than a second one of ours that could disagree with it.
+- **Rule-EDITOR-PANEL-217** — Light mode never grows past the display it is on.
+  A case longer than the screen stops at the edge and says so on its last row,
+  because the verdict buttons and the status bar finish a case and a window
+  taller than the screen puts them where nobody can reach them.
 
 **Why 200 milliseconds.** `P` is pressed once per test case, so a hundred-case
 run is a hundred of these, and the tester is watching the application under test
