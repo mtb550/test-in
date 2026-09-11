@@ -11,6 +11,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.JavaCode;
 import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.Moved;
 import org.testin.codegen.SubtreeCode;
@@ -573,7 +574,7 @@ public class TreeTransferHandler extends TransferHandler {
         // place a test set can land.
         Optional.ofNullable(to.getParent()).ifPresent(target ->
                 Services.getInstance(p, ProjectIndexer.class).find(from)
-                        .ifPresent(dir -> dir.getType().getMoveCodegen().execute(p, new Moved(dir, target))));
+                        .ifPresent(dir -> JavaCode.of(dir.getType()).getMoved().execute(p, new Moved(dir, target))));
     }
 
     // Both parameters are Swing's, and Swing passes null for either when the

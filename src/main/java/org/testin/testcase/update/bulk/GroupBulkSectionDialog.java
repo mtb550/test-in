@@ -1,16 +1,14 @@
 package org.testin.testcase.update.bulk;
 
-import org.testin.model.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.Groups;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Bundle;
-import org.testin.util.TestDataParser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {

@@ -10,6 +10,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.JavaCode;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
 import org.testin.codegen.GenType;
@@ -18,8 +19,8 @@ import org.testin.model.DirectoryType;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.TestEditorAttributes;
-import org.testin.model.TestEditorAttributes.Can;
+import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.testcase.Rank;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.model.dto.TestCaseDto;
@@ -245,7 +246,7 @@ public class ImportAction extends DumbAwareAction {
                     // this route has no such follow-up - so without this line an
                     // imported set would arrive with no class at all.
                     try {
-                        DirectoryType.TS.getCodegen().execute(p, made);
+                        JavaCode.of(DirectoryType.TS).getCreated().execute(p, made);
                     } catch (final Exception ex) {
                         Logger.error("Failed to create Java class: " + ex.getMessage());
                     }

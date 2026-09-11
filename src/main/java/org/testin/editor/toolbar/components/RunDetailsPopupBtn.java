@@ -1,7 +1,7 @@
 package org.testin.editor.toolbar.components;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.RunEditorAttributes;
+import org.testin.testrun.RunEditorAttributes;
 
 public class RunDetailsPopupBtn extends AbstractDetailsPopupBtn<RunEditorAttributes> {
 

@@ -1,9 +1,9 @@
 package org.testin.testrun.create;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.testrun.RunEditorAttributes;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
-import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;

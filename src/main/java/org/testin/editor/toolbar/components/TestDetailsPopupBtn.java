@@ -1,7 +1,7 @@
 package org.testin.editor.toolbar.components;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes;
 
 public class TestDetailsPopupBtn extends AbstractDetailsPopupBtn<TestEditorAttributes> {
 

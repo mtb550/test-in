@@ -74,7 +74,7 @@ public class ArchitectureTest {
      */
     private static final String @NotNull [] ABOVE_MODEL = {
             "org.testin.indexer..", "org.testin.editor..", "org.testin.view..", "org.testin.codegen..",
-            "org.testin.services..", "org.testin.creator..", "org.testin.explorer..", "org.testin.statusbar..",
+            "org.testin.services..", "org.testin.creator..", "org.testin.explorer..",
             "org.testin.ui..", "org.testin.git..", "org.testin.sftp..", "org.testin.report..",
             "org.testin.importexport..", "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..",
             "org.testin.search..", "org.testin.undo..", "org.testin.rename..", "org.testin.remove..",
@@ -83,26 +83,32 @@ public class ArchitectureTest {
     };
 
     /**
-     * {@code model} is not a leaf yet, and these are the four that make it so
-     * (#111). Measured 2026-09-11, down from six.
+     * Empty since 11 September 2026, and that is #111 answered rather than a gap
+     * in this file. It held six.
      * <p>
-     * Two left on that date and neither was the rule bending: {@code
-     * DirectoryMapper} was an indexer service filed under {@code model} - it
-     * read markers through {@code ProjectIndexer} and raised balloons - and is
-     * in {@code indexer} now. {@code TestRunStatus} implemented {@code MenuItem},
-     * an interface that lived in {@code statusbar} and is implemented by four
-     * enums in four packages; it is in {@code model} beside them.
+     * Two were misfiled: {@code DirectoryMapper} read markers through {@code
+     * ProjectIndexer} and raised balloons, so it is an indexer service and is in
+     * {@code indexer}; {@code TestRunStatus} reached up only to implement {@code
+     * MenuItem}, an interface four enums in four packages implement, which is in
+     * {@code model} beside them now.
      * <p>
-     * What is left is one kind of thing: a table declaring, per constant, what a
-     * feature does for it. Splitting one would mean a second table keyed by the
-     * same enum, in the feature - which is a decision about the house pattern,
-     * not a cleanup, so it is recorded here rather than quietly allowed.
+     * Two were tables: {@code DirectoryType} named a creator, three code
+     * generators and a remove handler per node kind, and {@code NodeStatistics}
+     * named two counting methods. Each is now an enum in the package that knows
+     * the answer, with one constant per kind named after it - {@code
+     * NodeCreators}, {@code JavaCode}, {@code Removals}, {@code
+     * NodeCounter.Gathered} - reached by {@code valueOf(type.name())} rather
+     * than by a switch, and held together by {@code NodeKindTablesTest}.
+     * <p>
+     * Two were in the wrong package outright: {@code TestEditorAttributes} and
+     * {@code RunEditorAttributes} declare what a test case's and a run item's
+     * fields are, which is {@code testcase} and {@code testrun}. Splitting them
+     * would have meant four parallel tables each; moving them whole cost two
+     * lines and kept the declaration in one piece. What they reach up to now -
+     * {@code ui.Badges} while a card is drawn - reaches up from a feature
+     * instead of from the vocabulary, and is written down in ARCHITECTURE.md.
      */
-    private static final @NotNull Set<String> MODEL_LEAF_EXCEPTIONS = Set.of(
-            "org.testin.model.DirectoryType",
-            "org.testin.model.NodeStatistics",
-            "org.testin.model.RunEditorAttributes",
-            "org.testin.model.TestEditorAttributes");
+    private static final @NotNull Set<String> MODEL_LEAF_EXCEPTIONS = Set.of();
 
     /**
      * What {@code util} may not import: the features, but not {@code services} or
@@ -116,7 +122,7 @@ public class ArchitectureTest {
      */
     private static final String @NotNull [] FEATURES = {
             "org.testin.indexer..", "org.testin.editor..", "org.testin.view..", "org.testin.codegen..",
-            "org.testin.creator..", "org.testin.explorer..", "org.testin.statusbar..", "org.testin.ui..",
+            "org.testin.creator..", "org.testin.explorer..", "org.testin.ui..",
             "org.testin.git..", "org.testin.sftp..", "org.testin.report..", "org.testin.importexport..",
             "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..", "org.testin.search..",
             "org.testin.undo..", "org.testin.rename..", "org.testin.remove..", "org.testin.open..",

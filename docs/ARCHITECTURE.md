@@ -2,12 +2,12 @@
 
 # How Testin is put together
 
-The plugin is 509 classes in 33 top-level packages. This page is the map: which
+The plugin is 512 classes in 32 top-level packages. This page is the map: which
 packages are layers and which are side modules, the four rules the whole thing
 is built on, and two operations traced class by class — because everything else
 is a variation on one of them.
 
-Read this before your first change. It replaces reading 33 packages to find out
+Read this before your first change. It replaces reading 32 packages to find out
 where anything lives. It does **not** describe what Testin does for a tester —
 that is [the documentation](README.md) — and it does not describe any one
 package in detail.
@@ -21,8 +21,8 @@ package in detail.
                             |
    +------------------------+------------------------+
    |            |           |          |             |
-explorer      editor       view    statusbar     lightmode      the surfaces
- (tree)     (test/run)   (details)  (badges)    (read-only)
+explorer          editor           view          lightmode      the surfaces
+  (tree)         (test/run)       (details)       (read-only)
    |            |           |          |             |
    +------------------------+------------------------+
                             |
@@ -58,7 +58,7 @@ modules](#the-two-content-modules).
 
 | Layer | Packages | May touch test data files |
 |---|---|---|
-| Surfaces | `explorer`, `editor`, `view`, `statusbar`, `lightmode` | No |
+| Surfaces | `explorer`, `editor`, `view`, `lightmode` | No |
 | Gestures | `actions`, `ui`, `creator`, `clipboard`, `undo`, `search`, `navigate`, `open`, `order`, `rename`, `remove` | No |
 | Operations | `testcase`, `testproject`, `testrun` | No |
 | Services | `services`, `notifications`, `setting`, `config` | `config` and `setting` only, and neither touches test data |
@@ -94,6 +94,13 @@ and `importexport` already do. What is left is a pair that cannot be confused:
 and records verdicts into. Merging those two would lose the distinction, which
 is why the triple folded to two rather than to one.
 
+`statusbar` left the table on the same day, and it was never the surface this
+picture drew. Nothing in Testin adds a widget to the IDE's status bar; what the
+package held was the shortcut-hint strip along the bottom of a dialog, plus the
+two interfaces a row on one implements. The strip is `ui/framework/StatusBarBase`
+now, beside `StatusBarShortcut`, which is what fills it; the interfaces are in
+`model`, beside the four enums that implement them (#111).
+
 **The packages that are small and staying that way** are small because this table
 says so. `open`, `order` and `remove` hold two files, one and one; they are
 Gestures, and the feature each acts on is a Surface. Merging a gesture into the
@@ -108,18 +115,31 @@ belongs beside the feature.
 
 ### Where the graph is not a tree
 
-Eleven imports point the wrong way up that picture. They are listed rather than
-hidden, because a newcomer will find them and should know which are deliberate.
+Eleven imports point the wrong way up that picture - a package importing one
+strictly above it in the table. They are listed rather than hidden, because a
+newcomer will find them and should know which are deliberate.
 
 | From | To | Why |
 |---|---|---|
 | `indexer/ProjectIndexer`, `indexer/Rescan` | `editor/TestinEditors`, `explorer/TreePanel` | A rescan has to tell the open surfaces that what they are showing has changed. The alternative is a listener the indexer publishes to, which is worth doing and has not been. |
 | `services/RunStatusService` | `editor/TestinEditor`, `editor/run/RunEditor`, `editor/toolbar/Toolbar`, `ui/framework/ConfirmDialog` | It records a verdict into the run an editor claimed, so it is filed under the wrong package: it is run-editor behavior living under `services`. |
 | `actions/TestinData`, `actions/Declared` | `editor`, `model`, `util`, `logger` | Deliberate, and new with #119. A declared action is built by the platform with a no-arg constructor, so it asks the surface that has the keyboard what is selected - and a data key has to name the type it answers with. `actions` was a leaf until then, and typing the keys as `Object` to keep it one would be worse than the edge. |
-| `model/TestEditorAttributes`, `model/RunEditorAttributes`, `model/DirectoryType`, `model/TestRunStatus` | `ui`, `codegen`, `creator`, `importexport`, `statusbar` | Deliberate. An enum carries its own presentation and its own action rather than being read by an `instanceof` chain at every call site — see the conventions in [CLAUDE.md](https://github.com/mtb550/test-in/blob/main/CLAUDE.md). |
+| `testcase/TestEditorAttributes`, `testrun/RunEditorAttributes` | `ui/Badges` | Deliberate. An enum carries its own presentation and its own action rather than being read by an `instanceof` chain at every call site — see the conventions in [CLAUDE.md](https://github.com/mtb550/test-in/blob/main/CLAUDE.md). What is new is where it points *from*: these two were in `model` until 11 September 2026, so the vocabulary every layer speaks pulled the badge painter in behind it (#111). A field of a test case is a fact about `testcase`. What is left is one import each, for the badge a card draws; the other four - `codegen`, `importexport`, `notifications`, `indexer` - are a feature calling a side module and a service, which points down. |
 
-What is **not** there: `model` imports nothing from `editor`, `explorer` or
-`view`. That is the leaf rule, and it is at zero.
+What is **not** there: **`model` imports nothing above it at all** - not
+`editor`, not `explorer`, not `view`, and since 11 September not `indexer`,
+`codegen`, `creator`, `services`, `notifications`, `importexport`, `ui` or
+`statusbar` either. The leaf rule is at zero and `ArchitectureTest` no longer
+carries a single exception to it (#111).
+
+Four of the six that had to move were tables: an enum naming, per node kind,
+what some feature does for it. Each is an enum of its own now, in the package
+that knows the answer, with one constant per kind **named after it** -
+`creator/NodeCreators`, `codegen/JavaCode`, `remove/Removals`,
+`NodeCounter.Gathered`. The bridge is `valueOf(type.name())`, so nothing
+branches on a node kind and no call site asks what it is holding; what the
+enum constructor used to guarantee - that a new kind supplies every column -
+`NodeKindTablesTest` guarantees instead, by name.
 
 ---
 

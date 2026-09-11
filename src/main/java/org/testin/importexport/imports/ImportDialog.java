@@ -5,7 +5,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.SheetPreview;
-import org.testin.model.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;

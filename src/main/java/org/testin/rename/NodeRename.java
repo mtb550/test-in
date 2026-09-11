@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.JavaCode;
 import org.testin.codegen.Renamed;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
@@ -46,7 +47,7 @@ public final class NodeRename {
         // Before the data rename, while the old name is still what finds the
         // generated code. Which generator that is belongs to the node, not here.
         if (OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) {
-            dir.getType().getRenameCodegen().execute(p, new Renamed(dir, newName));
+            JavaCode.of(dir.getType()).getRenamed().execute(p, new Renamed(dir, newName));
         }
 
         final @NotNull Path oldPath = dir.getPath();

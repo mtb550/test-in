@@ -3,7 +3,7 @@ package org.testin.importexport.shared;
 import com.intellij.openapi.project.Project;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;

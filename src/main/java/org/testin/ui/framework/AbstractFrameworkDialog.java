@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.statusbar.StatusBarBase;
 import org.testin.model.StatusBarItem;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Bundle;

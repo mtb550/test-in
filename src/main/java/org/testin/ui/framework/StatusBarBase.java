@@ -1,4 +1,4 @@
-package org.testin.statusbar;
+package org.testin.ui.framework;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.components.JBLabel;
@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.StatusBarItem;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
-import org.testin.ui.framework.Keycap;
 
 import javax.swing.*;
 import javax.swing.border.Border;

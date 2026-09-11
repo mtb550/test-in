@@ -47,7 +47,7 @@ import org.testin.logger.Logger;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.model.Modules;
-import org.testin.model.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.model.dto.dirs.DirectoryDto;

@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.RunEditorAttributes;
+import org.testin.testrun.RunEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 

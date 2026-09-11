@@ -1,6 +1,6 @@
 package org.testin.report.generators;
 
-import org.testin.model.RunEditorAttributes;
+import org.testin.testrun.RunEditorAttributes;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;

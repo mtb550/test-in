@@ -15,7 +15,7 @@ import org.testin.editor.toolbar.Toolbar;
 import org.testin.model.Automated;
 import org.testin.model.Groups;
 import org.testin.model.Priority;
-import org.testin.model.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.TestStatus;
 import org.testin.util.Bundle;
 import org.testin.util.Icons;

@@ -1,9 +1,13 @@
-package org.testin.model;
+package org.testin.testcase;
 
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.Groups;
+import org.testin.model.ToolBarAttribute;
+import org.testin.model.ToolBarDefault;
+import org.testin.model.ValueExtractor;
 import org.testin.util.Bundle;
 import org.testin.ui.Badges;
 import org.testin.codegen.Fqcn;

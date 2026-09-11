@@ -3,8 +3,8 @@ package org.testin.importexport.exports;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.TestEditorAttributes;
-import org.testin.model.TestEditorAttributes.Can;
+import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 
 import java.io.*;

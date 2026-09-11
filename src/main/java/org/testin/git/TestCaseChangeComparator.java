@@ -1,7 +1,7 @@
 package org.testin.git;
 
 import org.testin.model.Groups;
-import org.testin.model.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;

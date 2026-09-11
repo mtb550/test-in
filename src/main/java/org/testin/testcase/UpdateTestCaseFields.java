@@ -1,6 +1,5 @@
 package org.testin.testcase;
 
-import org.testin.model.TestEditorAttributes;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;

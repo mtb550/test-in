@@ -1,6 +1,8 @@
 package org.testin.model;
 
 import org.testng.annotations.Test;
+import org.testin.testrun.RunEditorAttributes;
+import org.testin.testcase.TestEditorAttributes;
 
 import static org.testng.Assert.assertSame;
 

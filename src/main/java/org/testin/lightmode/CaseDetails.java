@@ -7,7 +7,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Badges;
 import org.testin.ui.framework.Prose;
-import org.testin.model.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Bundle;
 import org.testin.util.Display;

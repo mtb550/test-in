@@ -1,7 +1,7 @@
 package org.testin.report.generators;
 
 import org.testin.model.TestRunConfiguration;
-import org.testin.model.RunEditorAttributes;
+import org.testin.testrun.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.*;

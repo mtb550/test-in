@@ -8,7 +8,7 @@ import org.testin.codegen.AutomationState;
 import org.testin.editor.BaseCard;
 import org.testin.editor.CardHoverAction;
 import org.testin.model.RunStatus;
-import org.testin.model.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;

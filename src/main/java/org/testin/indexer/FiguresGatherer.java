@@ -1,13 +1,14 @@
-package org.testin.model;
+package org.testin.indexer;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.NodeFigures;
 import org.testin.model.dto.dirs.DirectoryDto;
 
 /**
  * How one kind of node arrives at its numbers.
  * <p>
- * Named rather than a bare function so {@link NodeStatistics} reads as a
+ * Named rather than a bare function so {@link org.testin.model.NodeStatistics} reads as a
  * declaration - the same reason {@code GenAction} and {@code RemoveHandler}
  * are interfaces and not {@code BiConsumer}s.
  */

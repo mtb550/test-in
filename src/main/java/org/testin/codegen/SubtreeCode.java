@@ -49,7 +49,7 @@ public final class SubtreeCode {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         Logger.info("Generating code for " + dir.getName());
-        dir.getType().getCodegen().execute(p, dir);
+        JavaCode.of(dir.getType()).getCreated().execute(p, dir);
 
         // A set's own cases, before its children: the class has to exist before a
         // method can be put in it, and the create hook above is what made it.

@@ -9,7 +9,7 @@ import com.intellij.ui.components.JBScrollPane;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.MenuItem;
-import org.testin.statusbar.StatusBarBase;
+import org.testin.ui.framework.StatusBarBase;
 import org.testin.model.StatusBarItem;
 import org.testin.ui.framework.DialogKeys;
 import org.testin.ui.framework.StatusBarShortcut;

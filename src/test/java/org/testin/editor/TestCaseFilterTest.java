@@ -5,6 +5,7 @@ import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
+import org.testin.testcase.TestEditorAttributes;
 
 import java.util.List;
 import java.util.Map;
@@ -71,7 +72,7 @@ public class TestCaseFilterTest {
      * The defect #212 reported, and the reason #294 existed: the module has its
      * own column and its own filter, and the editor's search box could not see
      * it while the global search could. Both ask
-     * {@link org.testin.model.TestEditorAttributes#anyContains} now.
+     * {@link org.testin.testcase.TestEditorAttributes#anyContains} now.
      * <p>
      * That this test needs no IDE is the point. Routing the question through the
      * attributes used to mean handing them a Project, and there is no way to

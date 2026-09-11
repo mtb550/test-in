@@ -1,7 +1,7 @@
 package org.testin.report.generators;
 
 import org.testin.model.TestRunConfiguration;
-import org.testin.model.RunEditorAttributes;
+import org.testin.testrun.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.colors.DeviceRgb;

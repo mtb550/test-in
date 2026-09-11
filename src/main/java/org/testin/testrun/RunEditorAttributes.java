@@ -1,8 +1,15 @@
-package org.testin.model;
+package org.testin.testrun;
 
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.testcase.TestEditorAttributes;
+import org.testin.model.Groups;
+import org.testin.model.RunValueSetter;
+import org.testin.model.TestRunItems;
+import org.testin.model.ToolBarAttribute;
+import org.testin.model.ToolBarDefault;
+import org.testin.model.ValueExtractor;
 import org.testin.util.Bundle;
 import org.testin.ui.Badges;
 import org.testin.codegen.Fqcn;
@@ -13,7 +20,6 @@ import org.testin.util.Display;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Getter
 public enum RunEditorAttributes implements ToolBarAttribute {

@@ -1,11 +1,11 @@
 package org.testin.creator;
 
 import org.testin.notifications.Done;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.JavaCode;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
 import org.testin.creator.dialogs.CreateRunDialog;
@@ -134,7 +134,7 @@ public class CreateTreeNodeAction extends DumbAwareAction {
                 return;
             }
 
-            final @NotNull Optional<DirectoryDto> created = dt.getAction().apply(p).execute(s, pDir, newDirPath);
+            final @NotNull Optional<DirectoryDto> created = NodeCreators.of(p, dt).execute(s, pDir, newDirPath);
             Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
 
             // Asynchronous creators (test runs) answer with nothing and run their
@@ -146,7 +146,7 @@ public class CreateTreeNodeAction extends DumbAwareAction {
                 if (dt == DirectoryType.TS)
                     Services.getInstance(p, TestinEditors.class).open(p, dir);
 
-                dt.getCodegen().execute(p, dir);
+                JavaCode.of(dt).getCreated().execute(p, dir);
             });
 
         };

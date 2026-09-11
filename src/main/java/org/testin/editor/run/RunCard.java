@@ -6,7 +6,7 @@ import org.testin.ui.Badges;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.BaseCard;
 import org.testin.editor.CardHoverAction;
-import org.testin.model.RunEditorAttributes;
+import org.testin.testrun.RunEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.services.Services;
 

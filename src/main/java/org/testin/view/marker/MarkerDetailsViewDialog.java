@@ -1,9 +1,10 @@
 package org.testin.view.marker;
 
-import org.testin.model.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.NodeCounter;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.model.NodeFigures;
@@ -48,7 +49,7 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
 
         final @NotNull Marker marker = dto.getMarker();
         final @NotNull DirectoryType type = dto.getType();
-        final @NotNull NodeFigures figures = type.getStatistics().getGather().of(p, dto);
+        final @NotNull NodeFigures figures = NodeCounter.figures(p, dto);
 
         title = Bundle.message("dialog.details.title");
 

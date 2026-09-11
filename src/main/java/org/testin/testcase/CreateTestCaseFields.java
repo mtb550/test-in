@@ -1,6 +1,5 @@
 package org.testin.testcase;
 
-import org.testin.model.TestEditorAttributes;
 import com.intellij.icons.AllIcons;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

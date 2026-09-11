@@ -2,10 +2,12 @@ package org.testin.indexer;
 
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.NodeFigures;
+import org.testin.model.NodeStatistics;
 import org.testin.model.TestRunSummary;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
  * <p>
  * The two ways a node can be counted, and the whole of both: a container is the
  * sum of what is beneath it, and a test run is the verdicts it recorded. Which
- * of the two applies is {@link org.testin.model.NodeStatistics}'s declaration -
+ * of the two applies is {@link NodeStatistics}'s declaration -
  * every type names one - so neither method here asks what it was given.
  * <p>
  * Nothing is stored and nothing is cached. Every read behind these is RAM: the
@@ -30,6 +32,36 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NodeCounter {
+
+    /**
+     * How each way of counting arrives at its numbers, one constant per
+     * {@link NodeStatistics} and named after it.
+     * <p>
+     * Two enums rather than one field on that one, because the word belongs to
+     * the vocabulary and the walk belongs here: naming these two methods over
+     * there is what made {@code model} import the indexer (#111). Nothing looks
+     * a constant up by hand and nothing branches - {@link #figures} asks for the
+     * constant of the same name - and {@code NodeKindTablesTest} is what says
+     * the two lists still match.
+     */
+    @AllArgsConstructor
+    private enum Gathered {
+        CHILDREN(NodeCounter::childCounts),
+        VERDICTS(NodeCounter::runVerdicts);
+
+        private final @NotNull FiguresGatherer gather;
+    }
+
+    /**
+     * The node's numbers, counted the way its kind is counted.
+     * <p>
+     * Asked of the node rather than of the caller: the Details dialog used to
+     * reach through the type for the gatherer and call it itself, which is three
+     * facts about counting in a class that draws rows.
+     */
+    public static @NotNull NodeFigures figures(final @NotNull Project p, final @NotNull DirectoryDto dto) {
+        return Gathered.valueOf(dto.getType().getStatistics().name()).gather.of(p, dto);
+    }
 
     /**
      * UC-INTERNAL-006, Rule-INTERNAL-046, Rule-INTERNAL-047, Rule-INTERNAL-050.

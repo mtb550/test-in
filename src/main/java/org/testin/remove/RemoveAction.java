@@ -178,7 +178,7 @@ public class RemoveAction extends DumbAwareAction {
             final @NotNull AtomicInteger removed = new AtomicInteger();
 
             for (final DirectoryDto node : nodes) {
-                node.getType().getRemoveHandler().remove(p, node, wasRemoved -> {
+                Removals.of(node.getType()).remove(p, node, wasRemoved -> {
                     if (wasRemoved) removed.incrementAndGet();
                     if (pending.decrementAndGet() != 0) return;
 
