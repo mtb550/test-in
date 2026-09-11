@@ -46,6 +46,11 @@ The copy is new and separate. Changing it never changes the original.
   reached by opening its test set.
 - **Rule-TREE-PANEL-013** — Nodes move only within one test project. Nothing cut
   in one test project can be pasted into another.
+- **Rule-TREE-PANEL-099** — A node that is retired says which kind of retired it
+  is. A deprecated test set, an archived package and a test run all draw their
+  status in gray beside the name - a run always, because a cycle state is what
+  the tree is read for, and everything else only when it is retired, so the word
+  appears where it means something.
 - **Rule-TREE-PANEL-051** — A copied test case is a new test case, with its own
   id. Editing the copy never changes the original.
 - **Rule-TREE-PANEL-052** — A copy cannot be undone. To take one back, remove

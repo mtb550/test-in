@@ -55,13 +55,40 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
             final boolean grayed = selectedNodes.contains(dir) || dir.isRetired();
             append(dir.getName(), grayed ? SimpleTextAttributes.GRAYED_ATTRIBUTES : type.getAttributes());
             append(" ");
-            append(runStatus.map(TestRunStatus::getLabel).orElse(""), SimpleTextAttributes.GRAY_ATTRIBUTES);
+            append(statusLabel(dir), SimpleTextAttributes.GRAY_ATTRIBUTES);
 
         } catch (final Exception ex) {
             Logger.error("Error rendering tree node: " + ex.getMessage());
             setIcon(AllIcons.General.Error);
             append(Objects.toString(value, Bundle.message("tree.render.error")), SimpleTextAttributes.ERROR_ATTRIBUTES);
         }
+    }
+
+
+    /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-099.
+     * <p>
+     * The word beside the name: what this node's status is, in gray, and nothing
+     * for a node with nothing to say.
+     * <p>
+     * <b>A run always says where it stands</b>, because that is what a run is
+     * for - a cycle's state is the first thing anyone wants from the tree.
+     * <p>
+     * <b>Every other node says it only when it is retired.</b> A deprecated test
+     * set and an archived package are gray already; the word is what tells the
+     * tester which of the two it is, and why the node sorts last. "Active"
+     * beside every package in the tree would be a word they read a hundred times
+     * and needed never.
+     * <p>
+     * Asked of the marker rather than of the kind. Every marker answers
+     * {@code getStatusLabel()} - it is one line on {@code Marker} since #110 -
+     * so this reads the same sentence for a run, a package and a test set
+     * instead of knowing which enum each of them carries (#66, finding 7).
+     */
+    private static @NotNull String statusLabel(final @NotNull DirectoryDto dir) {
+        if (dir instanceof TestRunDirectoryDto || dir.isRetired()) return dir.getMarker().getStatusLabel();
+
+        return "";
     }
 
     // todo, if (dir instanceof TestSetDirectoryDto setDir) {

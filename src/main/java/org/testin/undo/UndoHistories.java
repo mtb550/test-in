@@ -2,6 +2,7 @@ package org.testin.undo;
 
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BooleanSupplier;
 import java.util.ArrayDeque;
@@ -113,6 +114,34 @@ public final class UndoHistories {
         history.undoStack.push(operation);
 
         return whole;
+    }
+
+    /**
+     * UC-INTERNAL-005, Rule-INTERNAL-045.
+     * <p>
+     * The surface is gone, so what it could take back goes with it.
+     * <p>
+     * <b>Every operation is told.</b> Some of them are holding something until
+     * they are sure nobody wants it back - a removed test set is kept aside so
+     * it can be restored - and this is that moment for all of them at once.
+     * Dropping the map entry without saying so would leave those copies on disk
+     * with nothing left that knows they are there.
+     * <p>
+     * <b>Why the history does not outlive its editor.</b> It used to, and the
+     * argument was that an editor closed and opened again on the same test set
+     * is the same history. What that costs is worse than what it buys: the
+     * copies a removal keeps aside are held for as long as the project is open,
+     * and a tester who closed a tab has no way to know that pressing CTRL+Z in
+     * the tab they open next will take back something they did an hour ago in a
+     * different one. Closing a surface is the tester saying they are done with
+     * it (#66, finding 45).
+     */
+    public void forget(final @NotNull UndoScope scope) {
+        final @Nullable History history = histories.remove(scope);
+        if (history == null) return;
+
+        history.undoStack.forEach(operation -> operation.forget().run());
+        history.redoStack.forEach(operation -> operation.forget().run());
     }
 
     private @NotNull History of(final @NotNull UndoScope scope) {

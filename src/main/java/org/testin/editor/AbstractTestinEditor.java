@@ -34,6 +34,8 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
+import org.testin.undo.UndoHistories;
+import org.testin.undo.UndoScope;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.util.Bundle;
@@ -775,6 +777,11 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
             list.removeMouseListener(listener);
 
         toolBar.dispose();
+
+        // The tab is closing, so what CTRL+Z could take back in it closes with
+        // it - and the copies those operations were holding aside are released
+        // rather than kept for the life of the project (#66, finding 45).
+        Services.getInstance(p, UndoHistories.class).forget(UndoScope.of(parent.getPath()));
 
         allTestCases.clear();
         currentTestCases.clear();

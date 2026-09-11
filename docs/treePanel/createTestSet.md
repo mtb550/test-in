@@ -46,6 +46,11 @@ A test set is the folder that holds test cases. This makes one.
   reached by opening its test set.
 - **Rule-TREE-PANEL-013** — Nodes move only within one test project. Nothing cut
   in one test project can be pasted into another.
+- **Rule-TREE-PANEL-099** — A node that is retired says which kind of retired it
+  is. A deprecated test set, an archived package and a test run all draw their
+  status in gray beside the name - a run always, because a cycle state is what
+  the tree is read for, and everything else only when it is retired, so the word
+  appears where it means something.
 - **Rule-TREE-PANEL-024** — Under **Test Cases** or a test set package, only a
   test set or a test set package can be created. The dialog offers nothing else.
 - **Rule-TREE-PANEL-025** — Nothing can be created directly under the test
