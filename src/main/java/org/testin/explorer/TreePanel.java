@@ -392,11 +392,6 @@ public final class TreePanel implements Disposable {
     }
 
     /**
-     * UC-TREE-PANEL-001.
-     * <p>
-     * No root is set, so the only step out of here is the settings page.
-     */
-    /**
      * UC-TREE-PANEL-001, Rule-TREE-PANEL-002.
      * <p>
      * The repository has a {@code testin.yml} and it could not be read.
@@ -415,6 +410,11 @@ public final class TreePanel implements Disposable {
                 SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
     }
 
+    /**
+     * UC-TREE-PANEL-001.
+     * <p>
+     * No root is set, so the only step out of here is the settings page.
+     */
     private void offerSettings(final @NotNull StatusText emptyText) {
         emptyText.appendLine(
                 AllIcons.General.Settings,

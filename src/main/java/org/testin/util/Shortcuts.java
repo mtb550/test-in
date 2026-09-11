@@ -82,16 +82,6 @@ public enum Shortcuts {
     PasteItem(KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask())),
 
     /**
-     * The same three gestures for a test case, which is not a node of the tree
-     * and so needs a key of its own on the list (product.md).
-     * <p>
-     * The platform modifier, for the reason {@link #CopyItem} gives one line
-     * up: these three hard-coded CTRL, inside the actions themselves rather than
-     * here, so the sweep that made copy CMD+C on a Mac could not see them. A
-     * tester there had Copy on CMD and Copy Node on CTRL, on one list (#25).
-     */
-
-    /**
      * Testin's own keys, declared here rather than inside the action that binds
      * them.
      * <p>
@@ -105,8 +95,6 @@ public enum Shortcuts {
      */
     ShowDetails(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK)),
     HideDetails(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK)),
-
-    /** The platform's own rename key, which is SHIFT+F6 on every desktop. */
 
     /** The keyboard's menu key. It carries no modifier anywhere. */
     ContextMenu(KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0)),

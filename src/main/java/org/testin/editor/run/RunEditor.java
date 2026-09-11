@@ -967,10 +967,6 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
      * either is live state that a reload under the tester would throw away, so an
      * on-disk refresh leaves this editor be until it is done (#20, #74).
      */
-    /**
-     * A run is busy while it is executing as well as while a cell is open: a
-     * reload would throw away the walk it is on.
-     */
     @Override
     public boolean isBusy() {
         return isExecuting() || super.isBusy();

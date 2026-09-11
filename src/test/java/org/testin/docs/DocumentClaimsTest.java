@@ -75,22 +75,20 @@ public class DocumentClaimsTest {
             Pattern.compile("^\\| \\*\\*\\[[^]]+]\\((\\w+)/main\\.md\\)\\*\\* \\|[^|]*\\| (\\d+) \\| (\\d+) \\|$", Pattern.MULTILINE);
 
     /**
-     * The sentence under the table that adds the two columns up.
-     */
-    /**
      * One refusal: its name and the sentence it says.
      */
     private static final @NotNull Pattern REFUSAL = Pattern.compile("\\n    ([A-Z_]+)\\(\"([^\"]+)\"\\)");
 
-    /** Any run of whitespace, so a sentence wrapped across two lines is one sentence. */
     /** A fenced code block: a screen drawing, a page template, a snippet. */
     private static final @NotNull Pattern FENCED = Pattern.compile("(?s)```.*?```");
 
     /** An inline code span. Code is not prose, and a link inside it is not a link. */
     private static final @NotNull Pattern INLINE = Pattern.compile("(?s)`[^`]*`");
 
+    /** Any run of whitespace, so a sentence wrapped across two lines is one sentence. */
     private static final @NotNull Pattern WHITESPACE = Pattern.compile("[\\s]+");
 
+    /** The sentence that adds a part table's two columns up. */
     private static final @NotNull Pattern TOTALS = Pattern.compile("(\\d+) use cases and (\\d+) rules");
 
     /**

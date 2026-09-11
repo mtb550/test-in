@@ -42,10 +42,6 @@ public class GitWorkflowTest {
     // ------------------------------------------------------------------ setup
 
     /**
-     * Runs Git and returns its output, or null when it failed - which is how the
-     * plugin treats a failure too: no answer rather than an exception.
-     */
-    /**
      * What the command printed, and empty when it did not succeed - a git that
      * is not installed and a git that returned non-zero are the same answer to
      * the caller, and both are ordinary here.

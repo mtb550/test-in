@@ -163,21 +163,6 @@ public interface TestinEditor extends Disposable {
     }
 
     /**
-     * UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014.
-     * <p>
-     * The case's place in the whole test set, counting from one - the number a
-     * card and a grid row show.
-     * <p>
-     * Not a row number. A row counts in the page of whatever the filter left, so
-     * the cards renumbered themselves from one whenever a filter was on and a
-     * case seventeenth in its set was drawn as third (#163). The set's own list
-     * is asked instead, which is the list the ranks were written along, so the
-     * number on screen is the number the generated method carries.
-     * <p>
-     * Default rather than repeated: both editors hold that list and neither has
-     * a different answer to give.
-     */
-    /**
      * A copy of every test case this editor holds, taken under the lock the list
      * is written behind.
      * <p>
@@ -200,6 +185,21 @@ public interface TestinEditor extends Disposable {
      */
     @NotNull Project getProject();
 
+    /**
+     * UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014.
+     * <p>
+     * The case's place in the whole test set, counting from one - the number a
+     * card and a grid row show.
+     * <p>
+     * Not a row number. A row counts in the page of whatever the filter left, so
+     * the cards renumbered themselves from one whenever a filter was on and a
+     * case seventeenth in its set was drawn as third (#163). The set's own list
+     * is asked instead, which is the list the ranks were written along, so the
+     * number on screen is the number the generated method carries.
+     * <p>
+     * Default rather than repeated: both editors hold that list and neither has
+     * a different answer to give.
+     */
     default int positionOf(final @NotNull TestCaseDto tc) {
         final @NotNull List<TestCaseDto> all = getAllTestCases();
 

@@ -117,6 +117,12 @@ public final class Badges {
      * Added rather than returned, so the rule lives here and every caller stays
      * unconditional - the same reason {@link #addBugBadge} is shaped this way.
      */
+    public static void addPriorityBadge(final @NotNull List<Badge> badges, final @NotNull TestCaseDto tc) {
+        if (tc.getPriority() == Priority.LOW) return;
+
+        badges.add(new Pill(tc.getPriority().getLabel(), tc.getPriority().getColor()));
+    }
+
     /**
      * UC-EDITOR-PANEL-001.
      * <p>
@@ -133,12 +139,6 @@ public final class Badges {
         }
 
         return badges;
-    }
-
-    public static void addPriorityBadge(final @NotNull List<Badge> badges, final @NotNull TestCaseDto tc) {
-        if (tc.getPriority() == Priority.LOW) return;
-
-        badges.add(new Pill(tc.getPriority().getLabel(), tc.getPriority().getColor()));
     }
 
     /**

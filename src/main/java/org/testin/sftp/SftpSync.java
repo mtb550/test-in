@@ -286,21 +286,6 @@ public final class SftpSync {
 
 
     /**
-     * UC-SHARE-021, Rule-SHARE-098.
-     * <p>
-     * Puts the cases a tester answered onto both sides, and records that they
-     * now agree (#94).
-     * <p>
-     * Its own pass rather than part of the sync that raised the questions,
-     * because that sync runs on a background thread and the questions are a
-     * dialog. Blocking a background task on the tester is how an IDE freezes;
-     * asking afterward costs one more connection on the rarest path there is.
-     * <p>
-     * Both sides and the record, in that order and all three: writing only this
-     * machine's copy would leave the case unsettled on the server and ask the
-     * same question again on the next sync, forever.
-     */
-    /**
      * UC-SHARE-022, Rule-SHARE-100.
      * <p>
      * Keeps files the server deleted, and means it: the next sync sends them
@@ -326,6 +311,21 @@ public final class SftpSync {
                 BaselineStore.read(mapper, baselineFile).forgetting(paths));
     }
 
+    /**
+     * UC-SHARE-021, Rule-SHARE-098.
+     * <p>
+     * Puts the cases a tester answered onto both sides, and records that they
+     * now agree (#94).
+     * <p>
+     * Its own pass rather than part of the sync that raised the questions,
+     * because that sync runs on a background thread and the questions are a
+     * dialog. Blocking a background task on the tester is how an IDE freezes;
+     * asking afterward costs one more connection on the rarest path there is.
+     * <p>
+     * Both sides and the record, in that order and all three: writing only this
+     * machine's copy would leave the case unsettled on the server and ask the
+     * same question again on the next sync, forever.
+     */
     public static boolean finish(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull String user, final @NotNull SftpAuth auth, final @NotNull Path knownHosts, final @NotNull Map<String, String> answered) {
         if (answered.isEmpty()) return false;
 

@@ -62,19 +62,17 @@ public final class TestCaseMerge {
     private static final @NotNull Set<String> SETTLED = Set.of("id", "createdAt", "createdBy");
 
     /**
+     * UC-SHARE-017, Rule-SHARE-109.
+     * <p>
      * The merged case, and what could not be merged without asking.
      *
      * @param merged    every field settled so far - complete when
      *                  {@code questions} is empty
      * @param questions the fields both sides changed to different values, in the
      *                  order the file lists them
-     */
-    /**
-     * UC-SHARE-017, Rule-SHARE-109.
-     *
-     * @param settled the fields both sides changed that were decided without
-     *                asking - reported so a tester knows a choice was made on
-     *                their behalf, which is the half that was missing (#261)
+     * @param settled   the fields both sides changed that were decided without
+     *                  asking - reported so a tester knows a choice was made on
+     *                  their behalf, which is the half that was missing (#261)
      */
     public record Merge(@NotNull ObjectNode merged, @NotNull List<Question> questions, @NotNull List<String> settled) {
 

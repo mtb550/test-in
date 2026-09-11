@@ -152,12 +152,6 @@ public enum GenType {
     ),
 
     /**
-     * Whether the case runs at all. Disabled is the one status that says
-     * anything about that, and it used to say it to Testin alone: the card
-     * showed it, the JSON stored it, and the suite ran the case exactly as
-     * before (#166).
-     */
-    /**
      * Everything Testin writes about a case, written again from the case.
      * <p>
      * For CTRL+Z, which restores the case and knows nothing about the code. A
@@ -170,6 +164,12 @@ public enum GenType {
             "Restore Automation Test Method"
     ),
 
+    /**
+     * Whether the case runs at all. Disabled is the one status that says
+     * anything about that, and it used to say it to Testin alone: the card
+     * showed it, the JSON stored it, and the suite ran the case exactly as
+     * before (#166).
+     */
     UPDATE_TEST_CASE_STATUS(
             Bundle.message("codegen.update.test.case"),
             "Update Automation Test Method Enabled"
