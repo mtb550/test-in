@@ -25,7 +25,7 @@ import java.util.Optional;
  * rather than fetching a path and taking it apart itself (#71).
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class TreeValueUtil {
+public final class TreeValues {
 
     private static final TreePath @NotNull [] NO_PATHS = new TreePath[0];
     private static final int @NotNull [] NO_ROWS = new int[0];
@@ -122,7 +122,7 @@ public final class TreeValueUtil {
      */
     public static @NotNull List<DirectoryDto> selectedDirectories(final TreePath @Nullable [] paths) {
         return Arrays.stream(Objects.requireNonNullElse(paths, NO_PATHS))
-                .map(TreeValueUtil::directoryAt)
+                .map(TreeValues::directoryAt)
                 .flatMap(Optional::stream)
                 .toList();
     }

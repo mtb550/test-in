@@ -240,7 +240,7 @@ final class IndexerDataStore {
     }
 
     private void writeMarker(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Object marker) {
-        Services.getInstance(p, FilesUtil.class).write(p, dirPath.resolve(markerFileName), marker);
+        Services.getInstance(p, TestDataFiles.class).write(p, dirPath.resolve(markerFileName), marker);
     }
 
     /**
@@ -500,7 +500,7 @@ final class IndexerDataStore {
                 .ifPresentOrElse(trd -> trd.setMarker(marker),
                         () -> Logger.warn("updateRunMarker: run dir not indexed, updating marker on disk only: " + runPath));
 
-        Services.getInstance(p, FilesUtil.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), marker);
+        Services.getInstance(p, TestDataFiles.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), marker);
     }
 
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {

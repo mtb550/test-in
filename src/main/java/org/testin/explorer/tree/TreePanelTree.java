@@ -154,7 +154,7 @@ public class TreePanelTree implements Disposable {
         if (disposed) return;
 
         TreeUtil.promiseSelect(mainTree, (final @NotNull TreePath path) -> {
-            final @NotNull Optional<Path> at = TreeValueUtil.directoryAt(path).map(DirectoryDto::getPath);
+            final @NotNull Optional<Path> at = TreeValues.directoryAt(path).map(DirectoryDto::getPath);
             if (at.isEmpty()) return TreeVisitor.Action.CONTINUE;
 
             if (at.get().equals(target)) return TreeVisitor.Action.INTERRUPT;

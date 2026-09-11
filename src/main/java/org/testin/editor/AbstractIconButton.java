@@ -8,7 +8,7 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.IconManager;
+import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -65,7 +65,7 @@ public abstract class AbstractIconButton extends JButton {
         setOpaque(false);
 
         this.restIcon = icon;
-        this.zoomedIcon = IconManager.zoomStandardIcon(icon, this);
+        this.zoomedIcon = Icons.zoomStandardIcon(icon, this);
 
         // Measured once, from a standard platform icon rather than from this
         // button's own, then frozen.
@@ -84,7 +84,7 @@ public abstract class AbstractIconButton extends JButton {
         // toolbar button look alike. That is PageBtn extending this class at all.
         // It is here so the answer stops depending on which look and feel is
         // loaded, which is not something a screenshot would ever have shown.
-        setIcon(IconManager.zoomStandardIcon(AllIcons.Actions.Refresh, this));
+        setIcon(Icons.zoomStandardIcon(AllIcons.Actions.Refresh, this));
         final @NotNull Dimension size = getPreferredSize();
         setIcon(restIcon);
 

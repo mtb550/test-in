@@ -6,7 +6,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.explorer.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValues;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
@@ -70,7 +70,7 @@ public class OpenContextMenuAction extends DumbAwareAction {
      * empty selection, and for the bounds of a row that is not showing.
      */
     private static @NotNull Optional<Point> selectedRow(final @NotNull SimpleTree tree) {
-        final int[] rows = TreeValueUtil.selectedRows(tree);
+        final int[] rows = TreeValues.selectedRows(tree);
         if (rows.length == 0) return Optional.empty();
 
         return Optional.ofNullable(tree.getRowBounds(rows[0]))

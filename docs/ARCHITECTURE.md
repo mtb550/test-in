@@ -37,7 +37,7 @@ explorer      editor       view    statusbar     lightmode      the surfaces
                             |
                         indexer                                 the only door
              ProjectIndexer -> IndexerDataStore                 to test data
-             -> TestCaseSequenceStore -> FilesUtil
+             -> TestCaseSequenceStore -> TestDataFiles
                             |
                        VFS / disk
 
@@ -108,7 +108,7 @@ Test runs in particular are saved and read only through the indexer —
 `putTestRun`, `persistRun`, `persistRunMarker`, `addTestRunDir`,
 `updateRunMarker`. The sequential run writer lives inside it.
 
-The rule is enforced by the compiler rather than by review: `FilesUtil` and
+The rule is enforced by the compiler rather than by review: `TestDataFiles` and
 `VfsExecutor` are package-private and live in `indexer`, so nothing outside the
 package can reach the writer at all.
 
@@ -185,10 +185,10 @@ anything else happens at all.
 | 3 | `indexer/ProjectIndexer.putTestCase` | The public door. Returns a boolean: did this have anything to save. |
 | 4 | `indexer/IndexerDataStore.putTestCase` | Delegates the write, then stamps the **set's** marker as modified — but only if the write happened. |
 | 5 | `indexer/TestCaseSequenceStore.put` | The funnel every save arrives at: the update dialog, a grid cell, the details panel, a paste. |
-| 6 | `indexer/FilesUtil.alreadyHolds` | Serializes the case and compares the bytes to the file. **Identical, and nothing below runs.** |
+| 6 | `indexer/TestDataFiles.alreadyHolds` | Serializes the case and compares the bytes to the file. **Identical, and nothing below runs.** |
 | 7 | `indexer/TestCaseSequenceStore.put` | Stamps the audit — `touch` if the index already knows this id, `stampCreated` if it does not. |
 | 8 | `indexer/TestCaseSequenceStore.store` | Updates the two maps, then writes. |
-| 9 | `indexer/FilesUtil.write` | Refuses a zero-byte write, claims the path in `OwnWrites` **before** `Files.write`, writes, then records what landed. |
+| 9 | `indexer/TestDataFiles.write` | Refuses a zero-byte write, claims the path in `OwnWrites` **before** `Files.write`, writes, then records what landed. |
 | 10 | back in `GridEditListener` | The attribute's `GenType` regenerates the test method, and `TestCaseSnapshot.record` files the undo entry. |
 
 **Why the bytes are identical.** Step 6 asks the question the rule states, in the

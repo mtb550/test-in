@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
 import org.testin.config.TestinConfigService;
-import org.testin.explorer.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValues;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
@@ -47,7 +47,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        TestinData.tree(e).flatMap(TreeValueUtil::projectPath).ifPresent(path -> reviewFor(p, path));
+        TestinData.tree(e).flatMap(TreeValues::projectPath).ifPresent(path -> reviewFor(p, path));
     }
 
     // UC-SHARE-010

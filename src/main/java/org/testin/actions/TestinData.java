@@ -35,7 +35,7 @@ import java.util.Optional;
  * empty somewhere: the tool window is closed, the tree is drawing a message
  * instead of a tree, nothing is selected, or the keystroke arrived in a Java
  * file that has never heard of Testin. An action asks and is disabled when the
- * answer is empty - which is the same shape {@code TreeValueUtil} already gives
+ * answer is empty - which is the same shape {@code TreeValues} already gives
  * the actions that hold their tree.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -144,7 +144,7 @@ public final class TestinData {
      * <p>
      * The enablement rule almost every tree action shares, and the reason it is
      * here rather than in each of them: a change to what counts as a selection is
-     * made once. It is the same question {@code TreeValueUtil.singleSelected}
+     * made once. It is the same question {@code TreeValues.singleSelected}
      * answers for an action that holds its tree, asked of the event instead.
      */
     public static <T> @NotNull Optional<T> singleSelected(final @NotNull AnActionEvent e, final @NotNull Class<T> type) {
@@ -167,7 +167,7 @@ public final class TestinData {
      * The looser question, and the one a few actions have always asked: Run
      * Tests, Sync and the pending-changes review act on the node the selection
      * starts at and do not care what else is highlighted. It is
-     * {@code TreeValueUtil.selected} asked of the event, kept apart from
+     * {@code TreeValues.selected} asked of the event, kept apart from
      * {@link #singleSelected} so that neither group of actions has to change
      * what it means in order to be declared.
      * <p>

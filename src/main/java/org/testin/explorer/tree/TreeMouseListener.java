@@ -40,7 +40,7 @@ public class TreeMouseListener extends PopupHandler {
         if (nodeAt(e.getX(), e.getY()).isEmpty()) return;
 
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-            OpenAction.execute(p, TreeValueUtil.selectedDirectories(tree.getSelectionPaths()));
+            OpenAction.execute(p, TreeValues.selectedDirectories(tree.getSelectionPaths()));
             e.consume();
         }
     }
@@ -63,6 +63,6 @@ public class TreeMouseListener extends PopupHandler {
         return Optional.ofNullable(tree.getRowBounds(row))
                 .filter(bounds -> y >= bounds.y && y < bounds.y + bounds.height)
                 .map(bounds -> tree.getPathForRow(row))
-                .filter(path -> TreeValueUtil.directoryAt(path).isPresent());
+                .filter(path -> TreeValues.directoryAt(path).isPresent());
     }
 }

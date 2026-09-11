@@ -18,7 +18,7 @@ import org.testin.model.Priority;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestStatus;
 import org.testin.util.Bundle;
-import org.testin.util.IconManager;
+import org.testin.util.Icons;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -184,7 +184,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         // priority menu
         final @NotNull DefaultActionGroup filterPriorityMenu = new DefaultActionGroup(TestEditorAttributes.PRIORITY.getName(), true);
         Arrays.stream(Priority.values()).forEach(p ->
-                filterPriorityMenu.add(new ToggleFilterAction<>(p.getLabel(), IconManager.createIcon(p.getColor()),
+                filterPriorityMenu.add(new ToggleFilterAction<>(p.getLabel(), Icons.dot(p.getColor()),
                         p, selectedPriority, FilterMembership.plain(), onChanged)));
         filterResetBtn.add(filterPriorityMenu);
 

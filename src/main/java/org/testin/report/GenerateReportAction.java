@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.run.RunEditor;
-import org.testin.explorer.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValues;
 import org.testin.importexport.FileTypes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -53,7 +53,7 @@ public class GenerateReportAction extends AbstractProjectAction {
      */
     public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, Bundle.message("report.action.text"), Bundle.message("report.action.description"), AllIcons.ToolbarDecorator.Export);
-        this.selectedRun = () -> TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
+        this.selectedRun = () -> TreeValues.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
         registerCustomShortcutSet(Shortcuts.GenerateReport.getCustomShortcut(), tree);
     }
 

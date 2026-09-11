@@ -36,6 +36,6 @@ public class TestinTree extends SimpleTree implements UiDataProvider {
     // UC-INTERNAL-001, Rule-INTERNAL-002
     @Override
     public void uiDataSnapshot(final @NotNull DataSink sink) {
-        TestinData.from(sink, this, TreeValueUtil.selectedDirectories(getSelectionPaths()));
+        TestinData.from(sink, this, TreeValues.selectedDirectories(getSelectionPaths()));
     }
 }

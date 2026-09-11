@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.actions.TestinData;
 import org.testin.explorer.TreePanel;
-import org.testin.explorer.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunConfiguration;
@@ -125,8 +125,8 @@ public class EditTestRunAction extends DumbAwareAction {
          * that may not be set.
          */
         private void editAt(final @NotNull TreePath path) {
-            selectedRun(TreeValueUtil.directoryAt(path))
-                    .ifPresent(run -> TreeValueUtil.directoryAt(path.getParentPath())
+            selectedRun(TreeValues.directoryAt(path))
+                    .ifPresent(run -> TreeValues.directoryAt(path.getParentPath())
                             .ifPresent(parent -> edit(run, parent)));
         }
 
