@@ -10,6 +10,7 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.SelectionTable;
 import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.util.List;
@@ -42,11 +43,11 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
         super(p);
         this.onBound = onBound;
 
-        title = "Select Test Project";
+        title = Bundle.message("dialog.bind.title");
 
         final @NotNull ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
                 .column(DirectoryType.TP.getDescription(), 260)
-                .column("Status", 100)
+                .column(Bundle.message("caption.status"), 100)
                 .build();
 
         components = List.of(table);
@@ -97,7 +98,7 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
 
         // Announced after the file is written, not before: what the panel draws is
         // read back from the file, so it can only be right once the file says so.
-        Services.getInstance(p, Notifier.class).softShow(p, "Bound", name);
+        Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("notification.bound"), name);
         onBound.run();
     }
 }

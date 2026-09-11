@@ -9,6 +9,7 @@ import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.SelectionList;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextFieldWithSelections;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.util.List;
@@ -38,17 +39,17 @@ public final class SearchDialog extends AbstractFrameworkDialog<TextFieldWithSel
     public SearchDialog(final @NotNull Project p) {
         super(p);
 
-        title = "Search Test Project";
+        title = Bundle.message("dialog.search.title");
 
         components = List.of(
                 ComponentDialogBase.<Hit>textFieldWithSelections()
                         .icon(AllIcons.Actions.Search)
-                        .placeholder("Go to a test set or run, or search for anything...")
+                        .placeholder(Bundle.message("dialog.search.placeholder"))
                         .rows(query -> rowsFor(p, query))
                         .build());
 
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, "Go To", this::submit),
+                StatusBarShortcut.build(Shortcuts.Enter, Bundle.message("dialog.search.shortcut.goto"), this::submit),
                 StatusBarShortcut.select(),
                 StatusBarShortcut.cancel(this::closeCancel)
         );

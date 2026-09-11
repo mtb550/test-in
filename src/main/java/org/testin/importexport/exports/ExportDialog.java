@@ -14,6 +14,7 @@ import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;
@@ -40,15 +41,15 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
         super(p);
         this.onExport = onExport;
 
-        title = "Export Test Cases";
+        title = Bundle.message("dialog.export.title");
 
         // Offer only formats that actually have an export handler (PDF/Word are report-only).
         final @NotNull DestinationForm form = new DestinationForm(p,
                 Arrays.stream(FileTypes.values()).filter(FileTypes::isExportable).toArray(FileTypes[]::new),
                 FileTypes.XLSX,
                 exportTarget.getName(),
-                "Select Export Folder",
-                "Choose the folder to save the export file in");
+                Bundle.message("dialog.export.folder.title"),
+                Bundle.message("dialog.export.folder.message"));
 
         preview = new SheetPreview(p, exportAttributes);
         preview.show(sheetsData);
@@ -71,7 +72,7 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
         component().resolve().ifPresent(destination -> {
             final @NotNull Map<String, List<TestCaseDto>> selected = preview.selected();
             if (selected.isEmpty()) {
-                Services.getInstance(p, Notifier.class).softRefuse(p, "Export Empty", "Select at least one test case to export.");
+                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("notification.export.empty.title"), Bundle.message("notification.export.empty.message"));
                 return;
             }
 

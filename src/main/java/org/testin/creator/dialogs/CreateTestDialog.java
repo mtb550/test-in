@@ -8,6 +8,7 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextFieldWithSelections;
+import org.testin.util.Bundle;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -26,14 +27,14 @@ public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWit
         super(p);
         this.onCreate = onCreate;
 
-        title = "Create Test Node";
+        title = Bundle.message("dialog.create.test.title");
 
         components = List.of(
                 ComponentDialogBase.<DirectoryType>textFieldWithSelections()
                         .icon(DirectoryType.TS.getIcon())
-                        .placeholder("set name...")
-                        .selection(DirectoryType.TS.getIcon(), DirectoryType.TS.getDescription(), "Holds test cases", DirectoryType.TS)
-                        .selection(DirectoryType.TSP.getIcon(), DirectoryType.TSP.getDescription(), "Groups test sets", DirectoryType.TSP)
+                        .placeholder(Bundle.message("dialog.create.test.placeholder"))
+                        .selection(DirectoryType.TS.getIcon(), DirectoryType.TS.getDescription(), Bundle.message("dialog.create.test.hint.ts"), DirectoryType.TS)
+                        .selection(DirectoryType.TSP.getIcon(), DirectoryType.TSP.getDescription(), Bundle.message("dialog.create.test.hint.tsp"), DirectoryType.TSP)
                         .build());
 
         shortcuts = List.of(

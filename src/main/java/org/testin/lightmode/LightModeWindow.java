@@ -27,6 +27,7 @@ import org.testin.statusbar.StatusBarItem;
 import org.testin.ui.Motion;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.util.Shortcuts;
 
@@ -1065,9 +1066,9 @@ final class LightModeWindow {
      */
     private StatusBarItem @NotNull [] caseKeys() {
         final @NotNull List<StatusBarItem> items = new ArrayList<>();
-        items.add(StatusBarShortcut.hint(Shortcuts.ShowDetails.getShortcutText(), "Details"));
-        items.add(StatusBarShortcut.hint(Shortcuts.HideDetails.getShortcutText(), "Hide"));
-        items.add(StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), "Close"));
+        items.add(StatusBarShortcut.hint(Shortcuts.ShowDetails.getShortcutText(), Bundle.message("shortcut.details")));
+        items.add(StatusBarShortcut.hint(Shortcuts.HideDetails.getShortcutText(), Bundle.message("shortcut.hide")));
+        items.add(StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), Bundle.message("shortcut.close")));
 
         for (final TestStatus status : TestStatus.values()) {
             if (status.isVerdict()) items.add(StatusBarShortcut.hint(keyOf(status), status.getLabel()));
@@ -1083,8 +1084,8 @@ final class LightModeWindow {
      */
     private StatusBarItem @NotNull [] commitKeys() {
         return new StatusBarItem[]{
-                StatusBarShortcut.hint(Shortcuts.Enter.getShortcutText(), "Save & next"),
-                StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), "Cancel")};
+                StatusBarShortcut.hint(Shortcuts.Enter.getShortcutText(), Bundle.message("shortcut.save.and.next")),
+                StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), Bundle.message("shortcut.cancel"))};
     }
 
     private static @NotNull JBLabel clock(final @NotNull String meaning) {

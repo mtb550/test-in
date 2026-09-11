@@ -8,6 +8,7 @@ import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextInput;
+import org.testin.util.Bundle;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -36,22 +37,22 @@ final class GitIdentityDialog extends AbstractFrameworkDialog<TextInput> {
         super(p);
         this.onSet = onSet;
 
-        title = "Set Git Identity and Commit";
+        title = Bundle.message("dialog.git.identity.title");
 
         final @NotNull ComponentDialogBase<TextInput> name = ComponentDialogBase.textField()
-                .placeholder("your name...")
+                .placeholder(Bundle.message("dialog.git.identity.placeholder.name"))
                 .build();
         final @NotNull ComponentDialogBase<TextInput> email = ComponentDialogBase.textField()
-                .placeholder("your email address...")
+                .placeholder(Bundle.message("dialog.git.identity.placeholder.email"))
                 .build();
-        final @NotNull ComponentDialogBase<RadioSelection<Boolean>> where = ComponentDialogBase.<Boolean>radios("Apply to")
-                .option("This repository", false)
-                .option("Every repository on this machine", true)
+        final @NotNull ComponentDialogBase<RadioSelection<Boolean>> where = ComponentDialogBase.<Boolean>radios(Bundle.message("dialog.git.identity.caption.apply"))
+                .option(Bundle.message("dialog.git.identity.option.repository"), false)
+                .option(Bundle.message("dialog.git.identity.option.machine"), true)
                 .select(false)
                 .build();
 
         components = List.of(
-                ComponentDialogBase.message("Git records who made a commit, and has no name or email to record yet."),
+                ComponentDialogBase.message(Bundle.message("dialog.git.identity.message")),
                 name,
                 email,
                 where);

@@ -6,6 +6,7 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextArea;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;
@@ -36,7 +37,7 @@ public final class ErrorDetailsDialog extends AbstractFrameworkDialog<TextArea> 
     public ErrorDetailsDialog(final @NotNull Project p, final @NotNull String caseDescription, final @NotNull String message, final @NotNull String stacktrace) {
         super(p);
 
-        title = "Error";
+        title = Bundle.message("dialog.error.title");
 
         // Sized rather than left to its content: a stacktrace sizes to its
         // longest line, which is a fully qualified name with a path in it, and
@@ -46,14 +47,14 @@ public final class ErrorDetailsDialog extends AbstractFrameworkDialog<TextArea> 
 
         components = List.of(
                 ComponentDialogBase.details()
-                        .row("Test Case", caseDescription)
+                        .row(Bundle.message("caption.test.case"), caseDescription)
                         .build(),
                 ComponentDialogBase.textArea()
                         .value(fullText(message, stacktrace))
                         .rows(VISIBLE_ROWS)
                         .build());
 
-        shortcuts = List.of(StatusBarShortcut.build(Shortcuts.Escape, "Close", this::closeCancel));
+        shortcuts = List.of(StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("shortcut.close"), this::closeCancel));
     }
 
     /**

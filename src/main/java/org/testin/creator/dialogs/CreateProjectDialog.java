@@ -9,6 +9,7 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextInput;
+import org.testin.util.Bundle;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -31,12 +32,12 @@ public final class CreateProjectDialog extends AbstractFrameworkDialog<TextInput
         super(p);
         this.onCreate = onCreate;
 
-        title = "Create Project";
+        title = Bundle.message("dialog.create.project.title");
 
         components = List.of(
                 ComponentDialogBase.textField()
                         .icon(DirectoryType.TP.getIcon())
-                        .placeholder("set name or paste url...")
+                        .placeholder(Bundle.message("dialog.create.project.placeholder"))
                         .build());
 
         shortcuts = List.of(

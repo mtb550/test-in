@@ -9,6 +9,7 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextArea;
+import org.testin.util.Bundle;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -37,13 +38,13 @@ public final class ResultAnalysisDialog extends AbstractFrameworkDialog<TextArea
         super(p);
         this.onSave = onSave;
 
-        title = "Result Analysis";
+        title = Bundle.message("dialog.analysis.title");
 
         final @NotNull List<ComponentDialogBase<?>> parts = new ArrayList<>();
 
         for (final ResultAnalysis section : ResultAnalysis.values()) {
             final @NotNull ComponentDialogBase<TextArea> area = ComponentDialogBase.textArea()
-                    .placeholder("what the " + section.getLabel().toLowerCase() + " cases say about this run...")
+                    .placeholder(Bundle.message("dialog.analysis.placeholder", section.getLabel().toLowerCase()))
                     .value(section.writtenIn(current))
                     .rows(3)
                     .build();
@@ -63,7 +64,7 @@ public final class ResultAnalysisDialog extends AbstractFrameworkDialog<TextArea
         components = List.copyOf(parts);
 
         shortcuts = List.of(
-                StatusBarShortcut.hint("Tab", "Navigate"),
+                StatusBarShortcut.hint("Tab", Bundle.message("shortcut.navigate")),
                 StatusBarShortcut.cancel(this::closeCancel));
 
         // Sized rather than packed: four areas over four headings is a tall

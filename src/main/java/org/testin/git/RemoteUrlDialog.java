@@ -7,6 +7,7 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextInput;
+import org.testin.util.Bundle;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -40,15 +41,14 @@ final class RemoteUrlDialog extends AbstractFrameworkDialog<TextInput> {
         super(p);
         this.onUrl = onUrl;
 
-        title = "Configure Remote";
+        title = Bundle.message("dialog.remote.title");
 
         final @NotNull ComponentDialogBase<TextInput> url = ComponentDialogBase.textField()
                 .placeholder("https://github.com/user/repo.git")
                 .build();
 
         components = List.of(
-                ComponentDialogBase.message("This repository has nowhere to push to yet. What you type is added as the remote '"
-                        + remoteName + "', and every push from here goes to it."),
+                ComponentDialogBase.message(Bundle.message("dialog.remote.message", remoteName)),
                 url);
 
         shortcuts = List.of(

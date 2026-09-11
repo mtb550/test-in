@@ -10,6 +10,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;
@@ -57,7 +58,7 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
                 StatusBarShortcut.build(Shortcuts.ArrowDown, "Next", () -> editors.navigate(1, false)),
                 StatusBarShortcut.build(Shortcuts.ArrowUp, "Previous", () -> editors.navigate(-1, false)),
                 StatusBarShortcut.build(Shortcuts.CaretOnEveryValue, "All Carets", editors::caretOnEveryValue),
-                StatusBarShortcut.hint("Ctrl+Click", "Multi-Caret"),
+                StatusBarShortcut.hint("Ctrl+Click", Bundle.message("shortcut.multi.caret")),
                 StatusBarShortcut.cancel(this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(1000), JBUI.scale(450));
