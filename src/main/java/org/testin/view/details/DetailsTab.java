@@ -1,10 +1,5 @@
 package org.testin.view.details;
 
-import org.testin.notifications.Done;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
@@ -14,23 +9,16 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.logger.Logger;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.codegen.ExecutionPosition;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
-import org.testin.testcase.TestCaseSnapshot;
-import org.testin.testcase.create.TestCaseUpdateMenuDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.ui.FontSync;
-import org.testin.actions.Declared;
-import org.testin.view.ViewToolWindowFactory;
 import org.testin.view.details.components.ActionIcons;
 import org.testin.view.details.components.AttributeRow;
 import org.testin.view.details.components.BadgeRow;
@@ -44,15 +32,22 @@ import org.testin.view.details.components.Title;
 
 import javax.swing.*;
 import java.awt.*;
-import java.nio.file.Path;
 import java.util.Optional;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Stream;
 
+/**
+ * What a test case is, drawn: its title, its rows, the run's record of it, and
+ * its badges.
+ * <p>
+ * Only that. Editing the case it is showing is {@link EditShownCase}, which took
+ * 85 of this class's 322 lines with it when #302 split them - the key that opens
+ * the update menu, the write that follows, and the question of where a case
+ * shown from a search result would even be written to. Drawing a case and
+ * opening the editor for it are two jobs, and this one is the first.
+ */
 public class DetailsTab {
 
-    private static final @NotNull String SHORTCUT_REGISTERED_KEY = "DetailsTab.f2.registered";
 
     final int SCROLL_UNIT_INCREMENT = 16;
     final @NotNull String PLACEHOLDER_TEXT = Bundle.message("details.placeholder");
@@ -88,7 +83,7 @@ public class DetailsTab {
 
         detailsTab.add(scrollPane, BorderLayout.CENTER);
 
-        registerEditShortcutOnce(p, detailsTab);
+        EditShownCase.bindTo(p, detailsTab);
     }
 
     /**
@@ -225,97 +220,6 @@ public class DetailsTab {
         panel.add(Box.createVerticalGlue(), spacerGbc);
     }
 
-    private void registerEditShortcutOnce(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab) {
-        if (Boolean.TRUE.equals(detailsTab.getClientProperty(SHORTCUT_REGISTERED_KEY))) {
-            return;
-        }
-        detailsTab.putClientProperty(SHORTCUT_REGISTERED_KEY, Boolean.TRUE);
 
-        new DumbAwareAction() {
-            // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-044
-            @Override
-            public void actionPerformed(final @NotNull AnActionEvent e) {
-                ViewToolWindowFactory.panel(p).ifPresent(viewPanel -> viewPanel.getCurrentTestCase()
-                        .ifPresent(currentDto -> openUpdateMenu(p, currentDto, viewPanel.getPage().getCurrentPath())));
-            }
 
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                // BGT on purpose - no update() here reads Swing state; do not switch to EDT (#52).
-                return ActionUpdateThread.BGT;
-            }
-        // Whatever Update Test Case is bound to, not a key of this panel's own:
-        // one key, one owner, and a tester who rebinds F2 rebinds it here too
-        // (#119). The action itself stays this panel's, because what it edits
-        // is the case the panel is showing rather than an editor's selection.
-        }.registerCustomShortcutSet(Declared.shortcutSet("Testin.UpdateTestCase"), detailsTab);
-    }
-
-    // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007
-    private void openUpdateMenu(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
-        final @NotNull List<TestCaseDto> items = List.of(dto);
-
-        // Before the menu, for the same reason the editor's own update takes it
-        // there: the dialog edits the DTO it was given.
-        final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(items);
-        final @NotNull Optional<Path> undoPath = resolveEditPath(p, dto, currentPath);
-        final @NotNull Optional<TestCaseSnapshot> before = undoPath.map(editPath -> TestCaseSnapshot.of(p, editPath, ids));
-
-        new TestCaseUpdateMenuDialog(p, items, (tcs, gt) -> {
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-
-            // Both inside the branch that wrote something. The confirmation and
-            // the code generation used to fire whatever happened, and there is a
-            // case where nothing happens by design: a test case opened from a
-            // search result has no path and no parent, so resolveEditPath is
-            // empty and not a byte reaches disk. The tester was told "Updated"
-            // and closed the dialog on an edit that was never saved.
-            resolveEditPath(p, dto, currentPath).ifPresentOrElse(editPath -> {
-                        boolean changed = false;
-                        for (final TestCaseDto tc : tcs) changed |= indexer.putTestCase(editPath, tc);
-
-                        // Nothing written, so nothing to confirm - the same
-                        // reason the branch above exists, one step further in:
-                        // a save that reached disk and changed nothing is as
-                        // little of an update as one that never got there (#164).
-                        if (!changed) return;
-
-                        before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.update"), tcs), taken, TestCaseSnapshot.of(p, editPath, ids)));
-
-                        Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
-
-                        ApplicationManager.getApplication().invokeLater(() -> TestCaseUpdateMenuDialog.applyAftermath(p, tcs, gt));
-                    },
-                    // Said once, where it happened, and said to the tester as
-                    // well as to the log. An edit that reaches no disk and no
-                    // screen is one the tester believes they made - and they
-                    // find out at the next open, with no idea which change went
-                    // (#234).
-                    () -> {
-                        Logger.warn("No test set to write '" + dto.getDescription()
-                                + "' to - the edit was not saved");
-
-                        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("details.not.saved.title"),
-                                Bundle.message("details.not.saved.message"));
-                    });
-        }).show();
-    }
-
-    /**
-     * Where an update writes: the case's own parent when it has one, otherwise
-     * the test set the navigation path names. Empty when neither says - a case
-     * shown from a search result, with no path and no parent read yet.
-     */
-    private @NotNull Optional<Path> resolveEditPath(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
-        final @NotNull DirectoryDto parent = dto.getParent();
-        if (!parent.getPath().toString().isEmpty()) {
-            return Optional.of(parent.getPath());
-        }
-
-        if (currentPath.isEmpty()) return Optional.empty();
-
-        final @NotNull Path resolved = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
-
-        return Optional.of(Services.getInstance(p, ProjectIndexer.class).getTestSetByPath(resolved).getPath());
-    }
 }
