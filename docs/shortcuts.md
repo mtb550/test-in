@@ -54,9 +54,7 @@ table; this is all of them together.
 | `Ctrl+C` | On cards, opens the copy menu; a letter copies one value. In the grid, copies the cells |
 | `Ctrl+X` | In the grid, copies the cells and empties the ones that can be typed into |
 | `Ctrl+V` | In the grid, pastes text into the cells |
-| `Alt+Shift+C` | Copies the test cases themselves |
-| `Alt+Shift+X` | Cuts the test cases |
-| `Alt+Shift+V` | Pastes test cases into this test set |
+| *no key* | **Copy Test Case**, **Cut Test Case** and **Paste Test Case** are right-click menu entries. They had `Ctrl+Shift+C/X/V`, lost that fight to the IDE's own Copy Path and Paste from History, moved to `Alt+Shift`, and then carried no key at all: a tester who wants them clicks them |
 | `F5` | Runs the selected test cases, or stops them |
 | `Shift+F5` | Goes to the automation code |
 | `F12` | **Automate Test Case**, which is not built |
@@ -209,7 +207,7 @@ these carry a default key:
 | `Ctrl+M` | Create Testin Node, Create Test Case | The tree, and a test set editor |
 | `Shift+F6` | Rename Testin Node | The tree |
 | `F2` | Update Test Case, Failed Test Case Details | Both editors, and the view panel |
-| `Alt+Shift+C` `Alt+Shift+X` `Alt+Shift+V` | Copy, Cut and Paste Test Case | Both editors |
+| *none by default* | Copy, Cut and Paste Test Case | Both editors. Declared with no key, so Find Action offers them and a tester who wants one can set it |
 | `F5` | Run Test Case | Both editors and the view panel |
 | `Shift+F5` | Navigate to Test Code | Both editors and the view panel |
 | `F12`, `Cmd+F12` on a Mac | Automate Test Case | Both editors |

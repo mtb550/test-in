@@ -7,7 +7,7 @@
 
 A cut on its own changes nothing. The test cases move when the tester pastes.
 
-`Alt+Shift+X`.
+the **Cut Test Case** entry on the right-click menu. It has no key of its own.
 
 ## Rules
 
@@ -53,10 +53,10 @@ a count after it for more than one test case.
 ## Main flow
 
 1. The tester selects two cards.
-2. The tester presses `Alt+Shift+X`, or chooses **Cut Node**.
+2. The tester chooses **Cut Test Case** from the right-click menu.
 3. The two cards are drawn faded.
 4. A message reads *Cut 2*.
-5. The tester opens the other test set and presses `Alt+Shift+V`.
+5. The tester opens the other test set and chooses **Paste Test Case**.
 6. The two test cases leave the first test set and appear in the second.
 
 ## What Testin refuses

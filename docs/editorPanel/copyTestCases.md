@@ -8,7 +8,8 @@
 This copies the test cases themselves, ready to be pasted. It does not copy
 words a person can read.
 
-`Alt+Shift+C`.
+the **Copy Test Case** entry on the right-click menu. It has no key of its
+own.
 
 ## Rules
 
@@ -53,10 +54,10 @@ with a count after it for more than one test case.
 ## Main flow
 
 1. The tester selects three cards.
-2. The tester presses `Alt+Shift+C`, or chooses **Copy Node**.
+2. The tester chooses **Copy Test Case** from the right-click menu.
 3. The three test cases go on the clipboard.
 4. A message reads *Copied 3*.
-5. The tester opens another test set and presses `Alt+Shift+V`.
+5. The tester opens another test set and chooses **Paste Test Case**.
 
 ## What Testin refuses
 
@@ -73,7 +74,7 @@ Pasting is [UC-EDITOR-PANEL-017](pasteTestCases.md).
 
 ## Two different copies
 
-`Ctrl+C` and `Alt+Shift+C` are not the same. The first copies text a person can
+`Ctrl+C` and **Copy Test Case** are not the same. The first copies text a person can
 read. The second copies test cases Testin can paste. They are two different
 things, so they have two different keys.
 

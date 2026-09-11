@@ -84,8 +84,9 @@ gesture in Testin raises one message with a count. That is difference 6 on
 ## These keys are the grid's
 
 `Ctrl+C`, `Ctrl+X` and `Ctrl+V` mean cells in the grid, and test cases on the
-cards. The keys that always mean test cases are `Alt+Shift+C`,
-`Alt+Shift+X` and `Alt+Shift+V`, and they work in both views.
+cards. Copying a test case itself is the right-click menu - **Copy Test Case**,
+**Cut Test Case**, **Paste Test Case** - and those entries mean the same thing in
+both views. They carry no key, so `Ctrl+C` in a grid is always about cells.
 
 ---
 

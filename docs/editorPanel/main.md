@@ -140,9 +140,9 @@ the same rows, a filter, a search, and a key for every gesture.
 | `Ctrl+C` | On cards, opens the copy menu; a letter copies one value. In the grid, copies the cells | [UC-EDITOR-PANEL-014](copyAsText.md) |
 | `Ctrl+X` | In the grid, copies the cells and empties the ones that can be typed into | [UC-EDITOR-PANEL-018](gridClipboard.md) |
 | `Ctrl+V` | In the grid, pastes text into the cells | [UC-EDITOR-PANEL-018](gridClipboard.md) |
-| `Alt+Shift+C` | Copies the test cases themselves | [UC-EDITOR-PANEL-015](copyTestCases.md) |
-| `Alt+Shift+X` | Cuts the test cases | [UC-EDITOR-PANEL-016](cutTestCases.md) |
-| `Alt+Shift+V` | Pastes test cases into this test set | [UC-EDITOR-PANEL-017](pasteTestCases.md) |
+| *no key* | **Copy Test Case** on the right-click menu | [UC-EDITOR-PANEL-015](copyTestCases.md) |
+| *no key* | **Cut Test Case** on the right-click menu | [UC-EDITOR-PANEL-016](cutTestCases.md) |
+| *no key* | **Paste Test Case** on the right-click menu | [UC-EDITOR-PANEL-017](pasteTestCases.md) |
 
 **Executing a test run**
 

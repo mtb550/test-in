@@ -318,14 +318,16 @@
          A key the IDE already owns is a key Testin loses. The platform gathers
          every action bound to a keystroke, runs whichever one is enabled, and
          says nothing when two are - and a component input map cannot rescue it,
-         because a registered shortcut is dispatched first. CTRL+SHIFT+C is
-         CopyPaths and CTRL+SHIFT+V is PasteMultiple, so the tester pressed copy
-         in a test editor and got a file path: the clipboard three are ALT+SHIFT
-         on this keymap now. Rule-INTERNAL-069, and DeclaredShortcutsTest reads
-         this file to check no two Testin actions ever claim one key by accident.
+         because a registered shortcut is dispatched first. That is how
+         CTRL+SHIFT+C quietly did CopyPaths in a test editor for weeks.
+         DeclaredShortcutsTest reads this file to check no two Testin actions
+         ever claim one key by accident.
 
-         The Mac entries are unchanged: META+SHIFT+C, X and V are free on every
-         Mac keymap, so nothing there was ever competing (#25). -->
+         Copy, Cut and Paste Test Case carry no key at all. They were moved off
+         CTRL+SHIFT to ALT+SHIFT to stop losing that fight, and then the fight
+         turned out not to be worth having: they are context menu entries, and
+         a tester who wants them clicks them. They are still declared, so Find
+         Action offers them and a tester who does want a key can set one. -->
     <actions>
         <action
                 id="Testin.Search"
@@ -386,28 +388,19 @@
                 id="Testin.PasteTestCaseNode"
                 class="org.testin.clipboard.PasteTestCaseNodeAction"
                 icon="AllIcons.Actions.MenuPaste"
-        >
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift V"/>
-            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift V"/>
-        </action>
+        />
 
         <action
                 id="Testin.CopyTestCaseNode"
                 class="org.testin.clipboard.CopyTestCaseNodeAction"
                 icon="AllIcons.Actions.Copy"
-        >
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift C"/>
-            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift C"/>
-        </action>
+        />
 
         <action
                 id="Testin.CutTestCaseNode"
                 class="org.testin.clipboard.CutTestCaseNodeAction"
                 icon="AllIcons.Actions.MenuCut"
-        >
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift X"/>
-            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift X"/>
-        </action>
+        />
 
         <action
                 id="Testin.CopyTestCase"
