@@ -5,6 +5,7 @@ import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.model.TestRunItems;
@@ -28,6 +29,7 @@ import java.util.List;
  * that threw, and enough beneath it to recognize where. Everything else is read
  * in {@link ErrorDetailsDialog}, once, by a tester who has decided they need it.
  */
+@AllArgsConstructor
 public final class StacktraceRow extends BaseDetails {
 
     /**
@@ -39,9 +41,6 @@ public final class StacktraceRow extends BaseDetails {
 
     private final @NotNull TestRunItems item;
 
-    public StacktraceRow(final @NotNull TestRunItems item) {
-        this.item = item;
-    }
 
     /**
      * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-035.

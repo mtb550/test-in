@@ -4,6 +4,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.ui.components.JBPanel;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Notifier;
@@ -28,6 +30,7 @@ import java.util.function.Predicate;
  * is generated from the same declarations that bind the keys, and the first
  * declared component holds the focus.
  */
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
 
     protected final @NotNull Project p;
@@ -67,9 +70,6 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     private @NotNull Optional<List<DialogComponent>> built = Optional.empty();
     private @NotNull Optional<JBPopup> popup = Optional.empty();
 
-    protected AbstractFrameworkDialog(final @NotNull Project p) {
-        this.p = p;
-    }
 
     private static @NotNull JBPanel<?> verticalStack(final @NotNull List<DialogComponent> dialogComponents) {
         final @NotNull JBPanel<?> stack = new JBPanel<>();

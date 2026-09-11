@@ -2,6 +2,7 @@ package org.testin.view;
 
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 
@@ -13,6 +14,7 @@ import java.util.Optional;
  * them. Showing nothing is an empty list rather than no list, so every question
  * here has an answer without asking whether there is one (#71).
  */
+@RequiredArgsConstructor
 public class ViewPagination {
     private final @NotNull ViewPanel viewPanel;
     private @NotNull List<TestCaseDto> items = List.of();
@@ -26,9 +28,6 @@ public class ViewPagination {
     @Getter
     private @NotNull List<String> currentPath = List.of();
 
-    public ViewPagination(final @NotNull ViewPanel viewPanel) {
-        this.viewPanel = viewPanel;
-    }
 
     // UC-VIEW-PANEL-002, Rule-VIEW-PANEL-018
     public void updateList(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {

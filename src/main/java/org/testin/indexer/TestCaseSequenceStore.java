@@ -1,6 +1,8 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.project.Project;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestCaseOrder;
@@ -14,15 +16,13 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Owns test-case lookup and the persisted linked-list sequence for each test set.
  */
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 final class TestCaseSequenceStore {
 
     private final @NotNull Project p;
     private final @NotNull Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
     private final @NotNull Map<String, List<UUID>> testSetCaseIds = new ConcurrentHashMap<>();
 
-    TestCaseSequenceStore(final @NotNull Project p) {
-        this.p = p;
-    }
 
     @NotNull Map<UUID, TestCaseDto> getTestCasesById() {
         return testCasesById;

@@ -3,6 +3,7 @@ package org.testin.importexport.shared;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.testcase.TestEditorAttributes;
@@ -24,6 +25,7 @@ import java.util.Map;
  * be read back is decorative, and the export dialog was exactly that for as
  * long as it built its tabs and dropped them.
  */
+@RequiredArgsConstructor
 public final class SheetPreview implements DialogComponent {
 
     /**
@@ -41,10 +43,6 @@ public final class SheetPreview implements DialogComponent {
 
     private @NotNull Map<String, List<TestCaseDto>> sheets = new LinkedHashMap<>();
 
-    public SheetPreview(final @NotNull Project p, final @NotNull List<TestEditorAttributes> attributes) {
-        this.p = p;
-        this.attributes = attributes;
-    }
 
     /**
      * UC-SHARE-007, Rule-SHARE-036.

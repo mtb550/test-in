@@ -7,8 +7,6 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
@@ -27,20 +25,13 @@ import org.testin.services.TestCaseValues;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.BoundTestProject;
 import org.testin.editor.LastOpenEditors;
-import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
-import org.testin.util.Mapper;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
@@ -68,18 +59,18 @@ public final class ProjectIndexer {
     private final @NotNull AtomicBoolean indexed = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean indexing = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean restoreEditorsOnComplete = new AtomicBoolean(true);
-    /**
-     * All run-status disk writes go through this one sequential executor,
-     * so writes can never interleave or race each other.
-     */
-    private final @NotNull ExecutorService runWriter =
-            AppExecutorUtil.createBoundedApplicationPoolExecutor("Testin Run Status Writer", 1);
+    private final @NotNull RunWriter runWriter;
+    private final @NotNull SyncFiles syncFiles;
+    private final @NotNull NodeFiles nodeFiles;
     private volatile @NotNull CountDownLatch indexingLatch = new CountDownLatch(1);
 
     public ProjectIndexer(final @NotNull Project p) {
         this.p = p;
         this.store = new IndexerDataStore(p);
         this.scanCoordinator = new ProjectScanCoordinator(new IndexingScanner(p, store));
+        this.runWriter = new RunWriter(p, store);
+        this.syncFiles = new SyncFiles(p);
+        this.nodeFiles = new NodeFiles(p, this, store);
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-013
@@ -492,52 +483,19 @@ public final class ProjectIndexer {
     }
 
     /**
-     * Single-writer persistence for run results: the JSON snapshot is taken on
-     * the calling (EDT) thread — so it can never observe a half-applied
-     * mutation — and the sequential writer performs only the disk I/O, in
-     * submission order.
+     * The run's results, written by the one writer that owns the file - see
+     * {@link RunWriter} for why there is only one and why the snapshot is taken
+     * here rather than there.
      */
     public void persistRun(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
-        final byte[] snapshot;
-        try {
-            snapshot = Services.getInstance(p, Mapper.class).writeValueAsBytes(tr);
-        } catch (final Exception ex) {
-            Logger.error("Failed to snapshot test run data: " + ex.getMessage());
-            return;
-        }
-
-        runWriter.execute(() -> {
-            try {
-                registerTestRun(runPath, tr);
-                Services.getInstance(p, TestDataFiles.class).write(p, TestRunDirectoryDto.resultsFile(runPath), snapshot);
-                Logger.trace("Run results persisted for " + runPath.getFileName());
-            } catch (final Exception ex) {
-                Logger.error("Failed to persist test run data: " + ex.getMessage());
-            }
-        });
+        runWriter.persist(runPath, tr);
     }
 
     /**
-     * Same single-writer discipline for the run marker: snapshot on the
-     * calling thread, sequential disk write.
+     * The run's marker, through the same writer and the same queue.
      */
     public void persistRunMarker(final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
-        final byte[] snapshot;
-        try {
-            snapshot = Services.getInstance(p, Mapper.class).writeValueAsBytes(marker);
-        } catch (final Exception ex) {
-            Logger.error("Failed to snapshot run marker: " + ex.getMessage());
-            return;
-        }
-
-        runWriter.execute(() -> {
-            try {
-                Services.getInstance(p, TestDataFiles.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), snapshot);
-                Logger.trace("Marker persisted -> " + marker.getStatus().getLabel());
-            } catch (final Exception ex) {
-                Logger.error("Failed to persist marker: " + ex.getMessage());
-            }
-        });
+        runWriter.persistMarker(runPath, marker);
     }
 
     /**
@@ -614,158 +572,26 @@ public final class ProjectIndexer {
     }
 
     /**
-     * Deletes on disk, refreshes, and only then updates the cache — the order
-     * CLAUDE.md requires. The refresh is asynchronous now: the synchronous one
-     * ran on the EDT, and a full VFS refresh there is a slow operation.
-     * <p>
-     * The cache update runs only when the deletion succeeded. It used to run either
-     * way, so a file the VFS refused to delete was dropped from the cache and the
-     * tree stopped showing a node that was still on disk (#66, F2).
+     * Deletes the node's files, then updates the cache - see {@link NodeFiles},
+     * which owns that order and the reason for it.
      */
     private void removeVf(final @NotNull Path path, final @NotNull Runnable cacheUpdate, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
-        Services.getInstance(p, VfsExecutor.class).removeVf(p, this, path,
-                deleted -> VirtualFileManager.getInstance().asyncRefresh(() -> {
-                    if (deleted) cacheUpdate.run();
-                    onRemoved.accept(deleted);
-                }));
+        nodeFiles.remove(path, cacheUpdate, onRemoved);
     }
 
     /**
-     * Reports whether the node moved, not merely that the attempt is over. The
-     * callback used to be one Runnable passed as both outcomes, so a caller that
-     * wanted to confirm the move had to read the cache back afterward to find
-     * out (#66, F2).
+     * Reports whether the node moved, not merely that the attempt is over.
      */
     public void moveNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Consumer<@NotNull Boolean> onFinished) {
-        final @NotNull Optional<Path> found = Optional.ofNullable(newPath.getParent());
-        if (found.isEmpty()) {
-            Logger.warn("Move refused, target has no parent directory: " + newPath);
-            onFinished.accept(false);
-            return;
-        }
-
-        final @NotNull Path targetParent = found.orElseThrow();
-
-        Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, targetParent, Bundle.message("vfs.move.failed.title"), (sourceVf, targetVf) -> {
-            try {
-                sourceVf.move(this, targetVf);
-            } catch (final IOException ex) {
-                Logger.error(ex.getMessage());
-                throw new RuntimeException(ex);
-            }
-        }, () -> {
-            store.renameNode(oldPath, newPath);
-            Logger.info("Moved successfully to: " + newPath);
-            onFinished.accept(true);
-        }, () -> onFinished.accept(false));
+        nodeFiles.move(oldPath, newPath, onFinished);
     }
 
     /**
-     * Copies each source into the target, and reports how many arrived — not how
-     * many were attempted. Every copy runs its own VFS action and any of them can
-     * fail on its own, so the count is the only honest answer; the callback used
-     * to be a bare Runnable that fired either way, and callers could not tell a
-     * finished copy from a failed one (#66, F2).
+     * Copies each source into the target, and reports how many arrived - not how
+     * many were attempted.
      */
     public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final @NotNull IntConsumer onComplete) {
-        if (sourcePaths.isEmpty()) {
-            onComplete.accept(0);
-            return;
-        }
-
-        final @NotNull AtomicInteger pending = new AtomicInteger(sourcePaths.size());
-        final @NotNull AtomicInteger copied = new AtomicInteger();
-
-        // The subtrees that actually arrived, waiting to be given fresh ids.
-        // Collected rather than rewritten in place, because the rewrite is a
-        // directory walk plus a read, a write and a delete for every case in
-        // the copy - and the callback that used to do it runs on the UI thread
-        // inside the write action the copy holds. A test set of any size froze
-        // the whole IDE for as long as it took, with no progress bar and no way
-        // to cancel, while the much cheaper re-index beside it had already been
-        // moved off the UI thread.
-        final @NotNull List<Path> arrived = new CopyOnWriteArrayList<>();
-
-        // Both outcomes drain the counter, so the tree is still rebuilt when a
-        // copy fails; only the success path raises the count.
-        final @NotNull Runnable operationFinished = () -> {
-            if (pending.decrementAndGet() != 0) return;
-            ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                // Before the re-index, which is the ordering that matters: the
-                // scanner takes a case's identity from its file name, so the
-                // new ids have to be on disk before the index reads them.
-                arrived.forEach(this::reidentifyCopiedCases);
-
-                refreshIndexedProject(targetPath);
-                ApplicationManager.getApplication().invokeLater(() -> onComplete.accept(copied.get()));
-            });
-        };
-        final @NotNull Runnable operationSucceeded = () -> {
-            copied.incrementAndGet();
-            operationFinished.run();
-        };
-
-        for (final Path sourcePath : sourcePaths) {
-            final @NotNull Path copiedRoot = targetPath.resolve(sourcePath.getFileName());
-
-            final @NotNull Runnable copySucceeded = () -> {
-                arrived.add(copiedRoot);
-                operationSucceeded.run();
-            };
-
-            Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, sourcePath, targetPath, Bundle.message("vfs.copy.failed.title"), (sourceVf, targetVf) -> {
-                try {
-                    sourceVf.copy(this, targetVf, sourceVf.getName());
-                } catch (final IOException ex) {
-                    Logger.error(ex.getMessage());
-                    throw new RuntimeException(ex);
-                }
-            }, copySucceeded, operationFinished);
-        }
-    }
-
-    /**
-     * UC-TREE-PANEL-014, Rule-TREE-PANEL-051.
-     * <p>
-     * Gives every test case in a freshly copied subtree an id of its own.
-     * <p>
-     * A copy is a copy of the files, so the cases in it arrive carrying the ids
-     * of the cases they came from - and a case's id is its identity here: the
-     * index holds one case per id, so the copy and the original would resolve to
-     * the same case, and editing either would edit both. Pasting a single case
-     * has always taken a fresh id; copying a whole set never went through that
-     * code (#51).
-     * <p>
-     * Before the index reads them, and by the file name, because the file name
-     * is what the scanner takes the identity from - the id inside is rewritten
-     * to match so the two never disagree.
-     * <p>
-     * Test runs are left alone. Their file is named for their folder rather than
-     * for an id, so they are not touched by this, and a copied run still refers
-     * to the cases it actually executed.
-     * <p>
-     * A case whose file a tester named by hand comes through here like any
-     * other, and leaves with the name Testin gives - a fresh id, and the file
-     * called after it. The name it had was the tester's on the original, which
-     * keeps it; the copy is a case Testin wrote.
-     */
-    private void reidentifyCopiedCases(final @NotNull Path copiedRoot) {
-        final List<Path> caseFiles;
-
-        try (Stream<Path> files = Files.walk(copiedRoot)) {
-            // Collected before rewriting: the walk is lazy, and creating and
-            // deleting files under it while it runs is not its contract.
-            caseFiles = files.filter(Files::isRegularFile)
-                    .filter(file -> isCaseFile(file, dir -> store.hasMarker(dir, DirectoryType.TS)))
-                    .toList();
-
-        } catch (final IOException ex) {
-            Logger.error("Could not read the copied nodes at " + copiedRoot + ": " + ex.getMessage());
-            return;
-        }
-
-        caseFiles.forEach(this::reidentify);
-        Logger.info("Gave " + caseFiles.size() + " copied test case(s) new ids under " + copiedRoot.getFileName());
+        nodeFiles.copy(sourcePaths, targetPath, onComplete);
     }
 
     /**
@@ -789,20 +615,6 @@ public final class ProjectIndexer {
      */
     static boolean isCaseFile(final @NotNull Path file, final @NotNull Predicate<Path> isTestSet) {
         return file.getFileName().toString().endsWith(".json") && isTestSet.test(file.getParent());
-    }
-
-    private void reidentify(final @NotNull Path caseFile) {
-        try {
-            final @NotNull TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(caseFile.toFile(), TestCaseDto.class);
-            final @NotNull UUID fresh = UUID.randomUUID();
-
-            tc.setId(fresh);
-            Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(fresh + ".json"), tc);
-            Files.delete(caseFile);
-
-        } catch (final Exception ex) {
-            Logger.error("Could not give the copied case " + caseFile.getFileName() + " a new id: " + ex.getMessage());
-        }
     }
 
     /**
@@ -841,7 +653,12 @@ public final class ProjectIndexer {
         Services.getInstance(DeletedNodes.class).forget(kept);
     }
 
-    private void refreshIndexedProject(final @NotNull Path changedPath) {
+    /**
+     * Re-reads the test project a change landed in, innermost first. Package
+     * private because {@link NodeFiles} reaches back for it when a copy has
+     * finished arriving.
+     */
+    void refreshIndexedProject(final @NotNull Path changedPath) {
         store.getTestProjectsByPath().keySet().stream()
                 .map(Path::of)
                 .filter(changedPath::startsWith)
@@ -870,36 +687,11 @@ public final class ProjectIndexer {
     }
 
     /**
-     * Every file in a test project, by the path a server names it with (#94).
-     * <p>
-     * Walked from disk rather than read out of the cache, and that is not a
-     * detail: two directories in the sandbox project carry no marker, so the
-     * scan skips them - and the four test cases inside them have never been in
-     * the cache. A sync built on {@code getAllTestCases} would not upload those
-     * four, and would then delete them from the server as files that no longer
-     * exist.
-     * <p>
-     * Here rather than in the server package because reading test data is the
-     * indexer's job. The {@code git} package is exempt from that rule because
-     * Git writes the working tree itself; a transfer has no such claim.
+     * Every file in a test project, by the path a server names it with (#94) -
+     * see {@link SyncFiles} for why a sync deals in files rather than nodes.
      */
     public @NotNull Map<String, byte[]> filesUnder(final @NotNull Path projectPath) {
-        final @NotNull Map<String, byte[]> files = new TreeMap<>();
-
-        try (Stream<Path> paths = Files.walk(projectPath)) {
-            for (final Path file : paths.filter(Files::isRegularFile).toList()) {
-                final @NotNull String relative =
-                        projectPath.relativize(file).toString().replace(File.separatorChar, '/');
-
-                if (isGitsOwn(relative)) continue;
-
-                files.put(relative, Files.readAllBytes(file));
-            }
-        } catch (final IOException ex) {
-            Logger.error("Could not read the project at " + projectPath + ": " + ex.getMessage());
-        }
-
-        return files;
+        return syncFiles.under(projectPath);
     }
 
     /**
@@ -920,11 +712,6 @@ public final class ProjectIndexer {
      * Writes what arrived from a server into the project, and reads the project
      * again.
      * <p>
-     * Through {@code TestDataFiles}, which refuses to write an empty file - exactly
-     * the protection a transfer that was cut off halfway needs, because an empty
-     * test case would be indexed as a case with no fields rather than as a
-     * failure.
-     * <p>
      * The scan is not optional: these writes are claimed as our own, so the
      * watcher rightly ignores them, and no other path will ever index what they
      * put on disk. Without it the next tree refresh repainted the old cache and
@@ -932,29 +719,18 @@ public final class ProjectIndexer {
      * mirror {@link #removeIncoming} always scanned.
      */
     public void acceptIncoming(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
-        final @NotNull TestDataFiles writer = Services.getInstance(p, TestDataFiles.class);
-
-        files.forEach((relative, content) -> writer.write(p, projectPath.resolve(relative), content));
-        Logger.info("Wrote " + files.size() + " incoming files into " + projectPath);
+        syncFiles.accept(projectPath, files);
 
         scanSingleProject(projectPath);
     }
 
     /**
      * Removes files the server no longer holds, once the tester has agreed to
-     * it, and reads the project again.
-     * <p>
-     * The mirror of {@link #acceptIncoming}, and file-level for the same reason:
-     * a sync exchanges files rather than nodes, and the node those files add up
-     * to comes back from the scan. Going node by node would mean the sync
-     * knowing which of them is a case, a set or a run, which is the question the
-     * scan exists to answer.
+     * it, and reads the project again - the mirror of {@link #acceptIncoming},
+     * scanning for the same reason.
      */
     public void removeIncoming(final @NotNull Path projectPath, final @NotNull Collection<String> relatives) {
-        final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
-
-        relatives.forEach(relative -> files.delete(p, projectPath.resolve(relative), projectPath));
-        Logger.info("Removed " + relatives.size() + " files the server no longer holds from " + projectPath);
+        syncFiles.remove(projectPath, relatives);
 
         scanSingleProject(projectPath);
     }
@@ -1057,32 +833,11 @@ public final class ProjectIndexer {
     }
 
     /**
-     * The callback runs only when the rename succeeded. Unlike the copy and move
-     * forms, this needs no success flag: the whole body is one VFS operation, and
-     * {@code executeVfsAction} reports and swallows a failure before the cache
-     * update and the callback are reached.
-     * <p>
-     * Nothing here knows what kind of node it is renaming, and nothing needs to.
-     * A test run briefly did - its results were named after the folder, so the
-     * rename had to carry them - and that special case went away when the name
-     * stopped depending on the folder (#177).
+     * Renames the node, and calls back only when it worked - {@link NodeFiles}
+     * says why that needs no flag and why the cache update comes second.
      */
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
-        Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, vf -> {
-            try {
-                vf.rename(this, newPath.getFileName().toString());
-            } catch (final IOException ex) {
-                Logger.error(ex.getMessage());
-                throw new RuntimeException(ex);
-            }
-
-            // The cache update persists the touched marker at the NEW path, and
-            // that write creates directories. So it must run only after the VFS
-            // rename succeeded: otherwise the target directory already exists
-            // and the rename fails with "already exists in VFS".
-            store.renameNode(oldPath, newPath);
-            onFinished.run();
-        });
+        nodeFiles.rename(oldPath, newPath, onFinished);
     }
 
 }

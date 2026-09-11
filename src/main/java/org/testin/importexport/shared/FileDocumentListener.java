@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.util.concurrency.AppExecutorUtil;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.logger.Logger;
@@ -23,6 +24,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+@AllArgsConstructor
 public class FileDocumentListener implements DocumentListener {
 
     /**
@@ -58,13 +60,6 @@ public class FileDocumentListener implements DocumentListener {
      */
     private final @NotNull AtomicReference<String> awaiting = new AtomicReference<>("");
 
-    public FileDocumentListener(final @NotNull TextFieldWithBrowseButton fileField, final @NotNull Project p, final @NotNull Consumer<String> onStatus, final @NotNull BiConsumer<FileTypes, Map<String, List<TestCaseDto>>> onDataLoaded, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {
-        this.fileField = fileField;
-        this.p = p;
-        this.onStatus = onStatus;
-        this.onDataLoaded = onDataLoaded;
-        this.importLoader = importLoader;
-    }
 
     @Override
     public void insertUpdate(final @NotNull DocumentEvent e) {

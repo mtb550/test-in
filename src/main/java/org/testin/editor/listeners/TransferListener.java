@@ -1,5 +1,6 @@
 package org.testin.editor.listeners;
 
+import lombok.AllArgsConstructor;
 import org.testin.notifications.Done;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
@@ -23,15 +24,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor
 public class TransferListener extends TransferHandler {
     private static final @NotNull DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
     private final @NotNull Project p;
     private final @NotNull TestinEditor editor;
 
-    public TransferListener(final @NotNull Project p, final @NotNull TestinEditor editor) {
-        this.p = p;
-        this.editor = editor;
-    }
 
     // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-058
     @Override
