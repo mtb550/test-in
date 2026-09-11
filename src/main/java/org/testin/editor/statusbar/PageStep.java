@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -30,28 +31,28 @@ import javax.swing.*;
 @AllArgsConstructor
 public enum PageStep {
 
-    FIRST("First page", "Navigate to the first page", AllIcons.Actions.Play_first, Shortcuts.First) {
+    FIRST(Bundle.message("page.first"), Bundle.message("page.first.description"), AllIcons.Actions.Play_first, Shortcuts.First) {
         @Override
         public int deltaFrom(final int currentPage, final int totalPages) {
             return 1 - currentPage;
         }
     },
 
-    PREVIOUS("Previous page", "Navigate to the previous page", AllIcons.Actions.Play_back, Shortcuts.Previous) {
+    PREVIOUS(Bundle.message("page.previous"), Bundle.message("page.previous.description"), AllIcons.Actions.Play_back, Shortcuts.Previous) {
         @Override
         public int deltaFrom(final int currentPage, final int totalPages) {
             return currentPage > 1 ? -1 : 0;
         }
     },
 
-    NEXT("Next page", "Navigate to the next page", AllIcons.Actions.Play_forward, Shortcuts.Next) {
+    NEXT(Bundle.message("page.next"), Bundle.message("page.next.description"), AllIcons.Actions.Play_forward, Shortcuts.Next) {
         @Override
         public int deltaFrom(final int currentPage, final int totalPages) {
             return currentPage < totalPages ? 1 : 0;
         }
     },
 
-    LAST("Last page", "Navigate to the last page", AllIcons.Actions.Play_last, Shortcuts.Last) {
+    LAST(Bundle.message("page.last"), Bundle.message("page.last.description"), AllIcons.Actions.Play_last, Shortcuts.Last) {
         @Override
         public int deltaFrom(final int currentPage, final int totalPages) {
             return totalPages - currentPage;

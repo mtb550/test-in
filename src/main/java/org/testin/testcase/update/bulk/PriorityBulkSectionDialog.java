@@ -3,6 +3,7 @@ package org.testin.testcase.update.bulk;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Bundle;
 import org.testin.util.TestDataParser;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class PriorityBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
     @Override
     protected @NotNull String getPopupTitle() {
-        return "Bulk Edit Priorities";
+        return Bundle.message("bulk.title.priority");
     }
 
     @Override

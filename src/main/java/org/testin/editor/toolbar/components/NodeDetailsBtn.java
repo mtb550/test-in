@@ -4,6 +4,7 @@ import org.testin.editor.AbstractIconButton;
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.toolbar.Toolbar;
+import org.testin.util.Bundle;
 import org.testin.view.marker.MarkerDetailsViewDialog;
 
 /**
@@ -30,7 +31,7 @@ public class NodeDetailsBtn extends AbstractIconButton implements ToolbarItem {
     public NodeDetailsBtn(final @NotNull Toolbar editor) {
         // The icon the tree's Details action already uses, so one command does
         // not look like two things depending on where it is reached from.
-        super("Details", AllIcons.General.IndentDetected);
+        super(Bundle.message("toolbar.node.details"), AllIcons.General.IndentDetected);
 
         addActionListener(e -> new MarkerDetailsViewDialog(editor.getProject(), editor.getEditedNode()).show());
     }

@@ -12,6 +12,7 @@ import org.testin.services.Services;
 import org.testin.statusbar.StatusBarBase;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -194,7 +195,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
             return;
         }
 
-        new ConfirmDialog(p, "Discard what you typed?", unsavedInputMessage(), "", "", "Discard",
+        new ConfirmDialog(p, Bundle.message("dialog.discard.title"), unsavedInputMessage(), "", "", Bundle.message("dialog.discard.confirm"),
                 () -> getPopup().cancel()).show();
     }
 
@@ -223,7 +224,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
      * that knows it has something to lose is the only thing that knows what.
      */
     protected @NotNull String unsavedInputMessage() {
-        return "What you typed here has not been saved, and there is no copy of it anywhere else.";
+        return Bundle.message("dialog.discard.message");
     }
 
     protected final @NotNull JBPopup getPopup() {

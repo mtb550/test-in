@@ -9,6 +9,7 @@ import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Bundle;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -52,7 +53,7 @@ public final class GridEnterAction extends AbstractProjectAction {
     private final @NotNull ArrayList<String> path;
 
     public GridEnterAction(final @NotNull Project p, final @NotNull JBTable table, final @NotNull List<TestCaseDto> pageItems, final @NotNull ArrayList<String> path) {
-        super(p, "Edit Cell Or Show Details", "Edit the selected grid cell, or show the row in the details panel", AllIcons.Actions.PreviewDetails);
+        super(p, Bundle.message("grid.enter.text"), Bundle.message("grid.enter.description"), AllIcons.Actions.PreviewDetails);
         this.table = table;
         this.pageItems = pageItems;
         this.path = path;

@@ -17,6 +17,7 @@ import org.testin.model.Groups;
 import org.testin.model.Priority;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestStatus;
+import org.testin.util.Bundle;
 import org.testin.util.IconManager;
 
 import java.util.*;
@@ -65,7 +66,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     private final Toolbar callbacks;
 
     public FilterPopupBtn(final @NotNull Toolbar callbacks, final @NotNull Runnable onToolBarFilterReset, final @NotNull Runnable onToolBarFilterSelectedChanged, final @NotNull Supplier<Set<String>> availableModulesSupplier, final @NotNull Supplier<Set<String>> availableGroupsSupplier) {
-        super("Filter", AllIcons.General.Filter);
+        super(Bundle.message("filter.button"), AllIcons.General.Filter);
         this.callbacks = callbacks;
         this.onToolBarFilterReset = onToolBarFilterReset;
 
@@ -127,11 +128,11 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
 
         if (activeFiltersCount == 0) {
             setText(null);
-            setToolTipText("Filter");
+            setToolTipText(Bundle.message("filter.button"));
             setForeground(JBColor.foreground());
         } else {
             setText("(" + activeFiltersCount + ")");
-            setToolTipText("Filter [" + activeFiltersCount + " active]");
+            setToolTipText(Bundle.message("filter.button.active", String.valueOf(activeFiltersCount)));
             setForeground(EditorColors.FILTER_ACTIVE);
         }
     }
@@ -161,7 +162,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
 
         final @NotNull DefaultActionGroup filterResetBtn = new DefaultActionGroup();
 
-        filterResetBtn.add(new DumbAwareAction("Reset Filters", "Clear active filters", AllIcons.Actions.Cancel) {
+        filterResetBtn.add(new DumbAwareAction(Bundle.message("filter.reset"), Bundle.message("filter.reset.description"), AllIcons.Actions.Cancel) {
             @Override
             public void update(final @NotNull AnActionEvent e) {
                 e.getPresentation().setEnabledAndVisible(hasActiveFilters());
@@ -190,7 +191,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         // automation menu: only the states a tester can act on. "Not read yet"
         // is not one of them - by the time this popup is open the answer is in,
         // and nobody can look for cases nobody has looked at.
-        final @NotNull DefaultActionGroup filterAutomationMenu = new DefaultActionGroup("Automation", true);
+        final @NotNull DefaultActionGroup filterAutomationMenu = new DefaultActionGroup(Bundle.message("filter.automation"), true);
         Automated.FILTERABLE.forEach(a -> filterAutomationMenu.add(new ToggleFilterAction<>(a.getLabel(), a.getIcon(),
                 a, selectedAutomation, FilterMembership.plain(), onChanged)));
         filterResetBtn.add(filterAutomationMenu);

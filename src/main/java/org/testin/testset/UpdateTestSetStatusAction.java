@@ -18,6 +18,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.util.Bundle;
 
 /**
  * Sets a test set's status - one instance per {@link TestSetStatus}, the way the
@@ -61,7 +62,7 @@ public class UpdateTestSetStatusAction extends DumbAwareAction {
 
         } catch (final Exception ex) {
             Logger.error("Unable to mark test set '" + ts.getName() + "' " + status.getLabel() + ": " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, "Unable to mark test set " + status.getLabel());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("testset.status.failed", status.getLabel()));
         }
     }
 

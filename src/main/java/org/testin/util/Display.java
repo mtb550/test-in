@@ -36,7 +36,7 @@ public final class Display {
         if (parts.isEmpty()) return "";
         if (parts.size() == 1) return parts.getFirst();
 
-        return String.join(", ", parts.subList(0, parts.size() - 1)) + " and " + parts.getLast();
+        return Bundle.message("display.and.join", String.join(", ", parts.subList(0, parts.size() - 1)), parts.getLast());
     }
 
     /**
@@ -80,7 +80,7 @@ public final class Display {
         if (who.isBlank()) return when;
         if (when.isEmpty()) return who;
 
-        return who + " on " + when;
+        return Bundle.message("display.who.and.when", who, when);
     }
 
     /**

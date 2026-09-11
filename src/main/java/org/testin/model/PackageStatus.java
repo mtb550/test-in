@@ -3,6 +3,7 @@ package org.testin.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 /**
  * Whether a package still holds current work. Persisted in the test set package
@@ -18,15 +19,15 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public enum PackageStatus {
     ACTIVE(
-            "Active",
-            "Mark Active",
-            "Sort this package with the current work"
+            Bundle.message("status.package.active"),
+            Bundle.message("status.package.active.action"),
+            Bundle.message("status.package.active.description")
     ),
 
     ARCHIVED(
-            "Archived",
-            "Archive",
-            "Keep the contents, but sort the package last and leave it collapsed"
+            Bundle.message("status.package.archived"),
+            Bundle.message("status.package.archived.action"),
+            Bundle.message("status.package.archived.description")
     );
 
     private final @NotNull String label;

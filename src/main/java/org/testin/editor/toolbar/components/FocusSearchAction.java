@@ -3,6 +3,7 @@ package org.testin.editor.toolbar.components;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -16,7 +17,7 @@ public class FocusSearchAction extends DumbAwareAction {
     private final @NotNull SearchTxt searchTxt;
 
     public FocusSearchAction(final @NotNull SearchTxt searchTxt, final @NotNull JComponent scope) {
-        super("Focus Search");
+        super(Bundle.message("toolbar.focus.search"));
         this.searchTxt = searchTxt;
         registerCustomShortcutSet(Shortcuts.FocusSearch.getCustomShortcut(), scope);
     }

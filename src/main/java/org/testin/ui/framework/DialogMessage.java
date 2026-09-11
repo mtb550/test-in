@@ -5,6 +5,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
+import org.testin.util.Bundle;
 import javax.swing.*;
 import java.awt.*;
 
@@ -26,8 +27,8 @@ public final class DialogMessage implements DialogComponent {
         message.setAlignmentX(Component.LEFT_ALIGNMENT);
         content.add(message);
 
-        addPathRow(content, "From", from, 8);
-        addPathRow(content, "To", to, 2);
+        addPathRow(content, Bundle.message("caption.from"), from, 8);
+        addPathRow(content, Bundle.message("caption.to"), to, 2);
 
         panel = new JBPanel<>(new BorderLayout());
         panel.setOpaque(false);

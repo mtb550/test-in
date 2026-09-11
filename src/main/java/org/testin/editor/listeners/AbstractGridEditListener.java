@@ -9,6 +9,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.util.List;
@@ -175,8 +176,8 @@ public abstract class AbstractGridEditListener implements TableModelListener {
     private void sayIfRewritten(final @NotNull String typed, final @NotNull String stored) {
         if (typed.equals(stored)) return;
 
-        Services.getInstance(p, Notifier.class).softShow(p, "Adjusted",
-                "Testin stored '" + shortened(stored) + "' rather than '" + shortened(typed) + "'.");
+        Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("grid.adjusted.title"),
+                Bundle.message("grid.adjusted.message", shortened(stored), shortened(typed)));
     }
 
     /**

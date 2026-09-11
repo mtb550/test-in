@@ -18,6 +18,7 @@ import org.testin.undo.UndoScope;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.ClipboardContents;
 import org.testin.util.Mapper;
 
@@ -53,7 +54,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
         // a test case, rather than absent from that editor's menu (#248).
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             e.getPresentation().setEnabled(false);
-            e.getPresentation().setDescription("A test run's test cases were chosen when it was created. Paste into a test set.");
+            e.getPresentation().setDescription(Bundle.message("paste.case.disabled.description"));
             return;
         }
 
@@ -148,7 +149,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                     cutFrom.ifPresent(taken -> after.add(TestCaseSnapshot.of(p, taken.testSetPath(), taken.ids())));
                     after.add(TestCaseSnapshot.of(p, destPath, pastedIds));
 
-                    TestCaseSnapshot.record(p, UndoScope.of(destPath), TestCaseSnapshot.describe(isCut ? "Move" : "Paste", pastedHere), before, after);
+                    TestCaseSnapshot.record(p, UndoScope.of(destPath), TestCaseSnapshot.describe(isCut ? Bundle.message("snapshot.verb.move") : Bundle.message("snapshot.verb.paste"), pastedHere), before, after);
                 });
 
                 if (isCut) cutState.clear();
@@ -206,7 +207,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 clonedTc.setUpdatedAt(now);
             } else {
                 clonedTc.setId(UUID.randomUUID())
-                        .setDescription(original.getDescription() + " (Copy)")
+                        .setDescription(Bundle.message("paste.copy.suffix", original.getDescription()))
                         .setCreatedAt(now)
                         .setUpdatedAt(now);
             }

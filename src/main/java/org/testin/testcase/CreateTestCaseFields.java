@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.testcase.create.CreateTestCaseSection;
 import org.testin.testcase.create.TestCaseBaseDialog;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -32,7 +33,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             Shortcuts.CreateTestCaseDescription,
             AllIcons.Actions.Edit,
             TestCaseBaseDialog::getDescriptionSection,
-            "set description",
+            Bundle.message("field.set.description"),
             CORRECTIONS, NAVIGATE_TAB
     ),
 
@@ -41,7 +42,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             Shortcuts.CreateTestCaseExpectedResult,
             AllIcons.General.InspectionsOK,
             TestCaseBaseDialog::getExpectedResultSection,
-            "set expected result",
+            Bundle.message("field.set.expected.result"),
             CORRECTIONS, NAVIGATE_TAB
     ),
 
@@ -50,7 +51,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             Shortcuts.CreateTestCaseModule,
             AllIcons.General.ContextHelp,
             TestCaseBaseDialog::getModuleSection,
-            "set module",
+            Bundle.message("field.set.module"),
             CORRECTIONS, NAVIGATE_TAB
     ),
 
@@ -59,7 +60,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             Shortcuts.CreateTestCaseTestData,
             AllIcons.Nodes.DataTables,
             TestCaseBaseDialog::getTestDataSection,
-            "set test data",
+            Bundle.message("field.set.test.data"),
             NAVIGATE_TAB
     ),
 
@@ -68,7 +69,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             Shortcuts.CreateTestCasePreConditions,
             AllIcons.Actions.StepOut,
             TestCaseBaseDialog::getPreConditionsSection,
-            "set pre conditions",
+            Bundle.message("field.set.pre.conditions"),
             CORRECTIONS, NAVIGATE_TAB
     ),
 
@@ -77,7 +78,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             Shortcuts.CreateTestCaseAddStep,
             AllIcons.Actions.ListFiles,
             TestCaseBaseDialog::getStepsSection,
-            "set step",
+            Bundle.message("field.set.step"),
             CORRECTIONS, ADD_STEP, AUTO_COMPLETE, NAVIGATE_TAB
     ),
 

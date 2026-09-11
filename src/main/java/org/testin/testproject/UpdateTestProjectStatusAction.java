@@ -18,6 +18,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.util.Bundle;
 
 /**
  * Sets a test project's status - one instance per {@link ProjectStatus}. Shown
@@ -65,7 +66,7 @@ public class UpdateTestProjectStatusAction extends DumbAwareAction {
         } catch (final Exception ex) {
             Logger.error("Unable to update status to " + projectStatus.getLabel());
             Logger.error(ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, "Unable to update status to " + projectStatus.getLabel());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("project.status.failed", projectStatus.getLabel()));
         }
     }
 

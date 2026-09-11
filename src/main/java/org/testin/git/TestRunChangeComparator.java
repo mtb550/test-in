@@ -8,6 +8,7 @@ import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.TestRunExecution;
 import org.testin.model.dto.TestRunDto;
+import org.testin.util.Bundle;
 
 import java.util.*;
 
@@ -30,7 +31,7 @@ final class TestRunChangeComparator {
     static @NotNull List<FieldChange> compare(final @NotNull TestRunDto oldRun, final @NotNull TestRunDto newRun) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
 
-        addIfChanged(changes, "Results", verdictSummary(oldRun), verdictSummary(newRun));
+        addIfChanged(changes, Bundle.message("git.change.results"), verdictSummary(oldRun), verdictSummary(newRun));
         // Walked, not listed - the eight were written out here directly above
         // a loop whose comment explains why walking is right.
         for (final TestRunConfiguration field : TestRunConfiguration.values()) {
@@ -49,7 +50,7 @@ final class TestRunChangeComparator {
         // an id, a field this comparator does not read - and it has to be
         // selectable, because the commit stages only what the review lists.
         if (changes.isEmpty()) {
-            changes.add(new FieldChange("Test Run", "", "changed", ChangeType.CHANGE_TEST_RUN));
+            changes.add(new FieldChange(Bundle.message("node.tr"), "", Bundle.message("git.change.changed"), ChangeType.CHANGE_TEST_RUN));
         }
 
         return changes;
@@ -61,14 +62,14 @@ final class TestRunChangeComparator {
      */
     static @NotNull String verdictSummary(final @NotNull TestRunDto run) {
         final @NotNull List<TestRunItems> results = run.getResults();
-        if (results.isEmpty()) return "no cases";
+        if (results.isEmpty()) return Bundle.message("git.summary.no.cases");
 
         final @NotNull Map<TestStatus, Integer> counts = new EnumMap<>(TestStatus.class);
         for (final TestRunItems item : results) {
             counts.merge(item.getStatus(), 1, Integer::sum);
         }
 
-        final @NotNull StringBuilder line = new StringBuilder(results.size() + " case" + (results.size() == 1 ? "" : "s") + ": ");
+        final @NotNull StringBuilder line = new StringBuilder();
         boolean first = true;
         for (final Map.Entry<TestStatus, Integer> entry : counts.entrySet()) {
             if (!first) line.append(", ");
@@ -76,7 +77,9 @@ final class TestRunChangeComparator {
             first = false;
         }
 
-        return line.toString();
+        return results.size() == 1
+                ? Bundle.message("git.summary.cases.one", line.toString())
+                : Bundle.message("git.summary.cases.many", String.valueOf(results.size()), line.toString());
     }
 
     private static void addIfChanged(final @NotNull List<FieldChange> changes, final @NotNull String field, final @NotNull String oldValue, final @NotNull String newValue) {

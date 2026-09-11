@@ -21,6 +21,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.nio.file.Files;
@@ -67,7 +68,7 @@ final class IndexingScanner {
             store.getTestProjectsByPath().put(projectPath.toString(), tp);
 
                 indicator.setFraction(0.1);
-                indicator.setText(tp.getName() + " - test sets...");
+                indicator.setText(Bundle.message("indexer.progress.test.sets", tp.getName()));
 
             // Per scan, not a field: one scanner is built per project and reused
             // for every rescan, so a field would carry the last pass's folders
@@ -79,14 +80,14 @@ final class IndexingScanner {
             scanTestSets(tcd.getPath(), tcd, indicator, unread);
 
                 indicator.setFraction(0.5);
-                indicator.setText(tp.getName() + " - test runs...");
+                indicator.setText(Bundle.message("indexer.progress.test.runs", tp.getName()));
 
             final @NotNull TestRunsMainDirectoryDto trd = tp.getTestRunsDirectory();
             store.getTestRunsMainDirsByPath().put(trd.getPath().toString(), trd);
             scanTestRunDirs(trd.getPath(), trd, indicator, unread);
 
                 indicator.setFraction(1.0);
-                indicator.setText(tp.getName() + " - done.");
+                indicator.setText(Bundle.message("indexer.progress.project.done", tp.getName()));
 
             reportUnread(tp.getName(), unread);
             reportDamaged(tp.getName(), Services.getInstance(p, ProjectIndexer.class).takeDamagedMarkers());
@@ -177,7 +178,7 @@ final class IndexingScanner {
 
             store.getTestSetCaseIds().put(path.toString(), caseIds);
 
-            indicator.setText("Test set: " + ts.getName() + " (" + caseIds.size() + " cases)");
+            indicator.setText(Bundle.message("indexer.progress.test.set", ts.getName(), String.valueOf(caseIds.size())));
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test set '" +
@@ -278,12 +279,15 @@ final class IndexingScanner {
         if (unread.isEmpty()) return;
 
         final @NotNull String named = unread.stream().limit(5).map(path -> path.getFileName().toString()).collect(Collectors.joining(", "));
-        final @NotNull String rest = unread.size() > 5 ? ", and " + (unread.size() - 5) + " more" : "";
-        final @NotNull String count = unread.size() == 1 ? "One folder holds" : unread.size() + " folders hold";
+        final @NotNull String rest = unread.size() > 5
+                ? Bundle.message("indexer.more", String.valueOf(unread.size() - 5))
+                : "";
+        final @NotNull String count = unread.size() == 1
+                ? Bundle.message("indexer.unread.one")
+                : Bundle.message("indexer.unread.many", String.valueOf(unread.size()));
 
-        Services.getInstance(p, Notifier.class).warn(p, "Folders not read in " + projectName,
-                count + " test cases and carry no marker, so nothing in them was read: " + named + rest
-                        + ". Create a test set of that name, or move the test cases into one.");
+        Services.getInstance(p, Notifier.class).warn(p, Bundle.message("indexer.unread.title", projectName),
+                Bundle.message("indexer.unread.message", count, named, rest));
     }
 
     /**
@@ -303,12 +307,15 @@ final class IndexingScanner {
         if (damaged.isEmpty()) return;
 
         final @NotNull String named = damaged.stream().limit(5).collect(Collectors.joining(", "));
-        final @NotNull String rest = damaged.size() > 5 ? ", and " + (damaged.size() - 5) + " more" : "";
-        final @NotNull String count = damaged.size() == 1 ? "One node is" : damaged.size() + " nodes are";
+        final @NotNull String rest = damaged.size() > 5
+                ? Bundle.message("indexer.more", String.valueOf(damaged.size() - 5))
+                : "";
+        final @NotNull String count = damaged.size() == 1
+                ? Bundle.message("indexer.damaged.one")
+                : Bundle.message("indexer.damaged.many", String.valueOf(damaged.size()));
 
-        Services.getInstance(p, Notifier.class).warn(p, "Markers not read in " + projectName,
-                count + " drawn with default values, because the marker file could not be read: " + named + rest
-                        + ". Their number, their status and who made them are not what is on disk.");
+        Services.getInstance(p, Notifier.class).warn(p, Bundle.message("indexer.damaged.title", projectName),
+                Bundle.message("indexer.damaged.message", count, named, rest));
     }
 
     // UC-INTERNAL-002
@@ -327,7 +334,7 @@ final class IndexingScanner {
                 store.getTestRunsByPath().put(path.toString(), trr);
             }
 
-            indicator.setText("Test run: " + path.getFileName());
+            indicator.setText(Bundle.message("indexer.progress.test.run", path.getFileName()));
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test run '" +

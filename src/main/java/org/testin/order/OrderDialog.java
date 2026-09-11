@@ -11,6 +11,7 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextInput;
+import org.testin.util.Bundle;
 
 import java.util.List;
 import java.util.function.IntConsumer;
@@ -35,12 +36,12 @@ final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
         super(p);
         this.onSubmit = onSubmit;
 
-        title = "Order";
+        title = Bundle.message("dialog.order.title");
 
         components = List.of(
                 ComponentDialogBase.textField()
                         .icon(AllIcons.Actions.Edit)
-                        .placeholder("1, 2, 3... or empty for date order")
+                        .placeholder(Bundle.message("dialog.order.placeholder"))
                         .value(shown(current))
                         .accepting("[1-9][0-9]*")
                         .build());
@@ -78,8 +79,11 @@ final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
         final @NotNull OptionalInt number = typed(text);
 
         if (number.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, "Too Large",
-                    "A position has to be a whole number below " + Marker.NOT_ORDERED + ".");
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("dialog.order.refused.title"),
+                    // The number as digits, not as a formatted number: MessageFormat
+                    // would group an int into 2,147,483,647, which is a different
+                    // sentence from the one this has always printed.
+                    Bundle.message("dialog.order.refused.message", String.valueOf(Marker.NOT_ORDERED)));
             return;
         }
 

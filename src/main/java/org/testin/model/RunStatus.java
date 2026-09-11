@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import org.testin.util.Bundle;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public enum RunStatus {
 
     RUNNING(
             AllIcons.Actions.Suspend,
-            new Badge("Running", new JBColor(new Color(255, 200, 100), new Color(200, 150, 50))),
+            new Badge(Bundle.message("run.status.running"), new JBColor(new Color(255, 200, 100), new Color(200, 150, 50))),
             Optional.empty()
     );
 

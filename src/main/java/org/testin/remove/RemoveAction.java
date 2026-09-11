@@ -19,6 +19,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.editor.EditorUtil;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -99,14 +100,14 @@ public class RemoveAction extends DumbAwareAction {
                     : "";
 
             final @NotNull String msg = (nodesToRemove.size() == 1
-                    ? "Remove '" + nodesToRemove.getFirst().getName() + "'?"
-                    : "Remove these " + nodesToRemove.size() + " items?")
+                    ? Bundle.message("remove.confirm.one", nodesToRemove.getFirst().getName())
+                    : Bundle.message("remove.confirm.many", String.valueOf(nodesToRemove.size())))
                     + (holds.isEmpty() ? "" : System.lineSeparator() + holds);
 
             // Single node: its path shows exactly what is being deleted. Several, and
             // there is no one path to show, which the dialog reads as no From row.
             final @NotNull String from = nodesToRemove.size() == 1 ? nodesToRemove.getFirst().getPath().toString() : "";
-            new ConfirmDialog(p, "Confirm Removing", msg, from, "", "Remove", () -> removeNodes(nodesToRemove)).show();
+            new ConfirmDialog(p, Bundle.message("remove.confirm.title"), msg, from, "", Bundle.message("remove.confirm.button"), () -> removeNodes(nodesToRemove)).show();
         }
 
         // UC-TREE-PANEL-012, Rule-TREE-PANEL-041
@@ -148,10 +149,10 @@ public class RemoveAction extends DumbAwareAction {
                 // used to say (#196).
                 final int lost = count - kept.size();
                 if (lost > 0) {
-                    Services.getInstance(p, Notifier.class).softRefuse(p, "Cannot Be Undone",
+                    Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("remove.not.undoable.title"),
                             lost == 1
-                                    ? "One of these could not be copied aside first, so CTRL+Z cannot put it back."
-                                    : lost + " of these could not be copied aside first, so CTRL+Z cannot put them back.");
+                                    ? Bundle.message("remove.not.undoable.one")
+                                    : Bundle.message("remove.not.undoable.many", String.valueOf(lost)));
                 }
             });
         }
@@ -199,7 +200,9 @@ public class RemoveAction extends DumbAwareAction {
          */
         // UC-TREE-PANEL-012, Rule-TREE-PANEL-040
         private void recordRemoval(final @NotNull List<DirectoryDto> asked, final @NotNull List<Kept> kept) {
-            final @NotNull String what = asked.size() == 1 ? "Remove '" + asked.getFirst().getName() + "'" : "Remove " + asked.size() + " items";
+            final @NotNull String what = asked.size() == 1
+                    ? Bundle.message("remove.undo.one", asked.getFirst().getName())
+                    : Bundle.message("remove.undo.many", String.valueOf(asked.size()));
 
             Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
                     what,
@@ -221,9 +224,8 @@ public class RemoveAction extends DumbAwareAction {
          */
         private boolean restoreAll(final @NotNull List<Kept> kept) {
             if (kept.isEmpty()) {
-                Services.getInstance(p, Notifier.class).softRefuse(p, "Cannot Be Undone",
-                        "No copy of what was removed could be kept aside, so there is nothing to put back. "
-                                + "The recycle bin may still have it.");
+                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("remove.not.undoable.title"),
+                        Bundle.message("remove.nothing.kept"));
                 return false;
             }
 
@@ -234,7 +236,7 @@ public class RemoveAction extends DumbAwareAction {
 
             if (lost.isEmpty()) return true;
 
-            Services.getInstance(p, Notifier.class).softRefuse(p, "Undo Incomplete", lost.size() + " of " + kept.size() + " could not be put back");
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("remove.undo.incomplete.title"), Bundle.message("remove.undo.incomplete.message", String.valueOf(lost.size()), String.valueOf(kept.size())));
             return false;
         }
 

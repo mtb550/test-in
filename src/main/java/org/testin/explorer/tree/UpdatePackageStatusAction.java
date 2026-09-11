@@ -19,6 +19,7 @@ import org.testin.model.markers.PackageMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.util.Bundle;
 
 /**
  * Archives a package, or brings it back - one instance per {@link
@@ -78,7 +79,7 @@ public class UpdatePackageStatusAction extends DumbAwareAction {
 
         } catch (final Exception ex) {
             Logger.error("Unable to mark package '" + dir.getName() + "' " + status.getLabel() + ": " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, "Unable to mark package " + status.getLabel());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("package.status.failed", status.getLabel()));
         }
     }
 

@@ -16,6 +16,7 @@ import org.testin.testcase.Rank;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.UIAction;
 import org.testin.testcase.UpdateTestCaseFields;
+import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,11 +52,11 @@ public class OrderSection implements CreateTestCaseSection {
         // knows a range, refuses what is outside it and says why. Nothing to
         // write here for any of that - no filter on the document, no pattern,
         // no clamp on the way out - and the range is set when the set is known.
-        this.position = new IntegerField("Position", 1, 1);
+        this.position = new IntegerField(Bundle.message("order.section.position"), 1, 1);
         this.position.setFont(fieldFont());
         this.position.setColumns(4);
 
-        this.outOf = new JBLabel("of 1");
+        this.outOf = new JBLabel(Bundle.message("order.section.of", "1"));
         this.outOf.setFont(fieldFont());
         this.outOf.setBorder(JBUI.Borders.emptyLeft(10));
 
@@ -91,7 +92,7 @@ public class OrderSection implements CreateTestCaseSection {
         position.setDefaultValue(current);
         position.setValue(current);
 
-        outOf.setText("of " + size);
+        outOf.setText(Bundle.message("order.section.of", String.valueOf(size)));
     }
 
     /**

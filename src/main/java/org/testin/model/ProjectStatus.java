@@ -3,6 +3,7 @@ package org.testin.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 /**
  * What a test project is, as far as the tree is concerned.
@@ -18,21 +19,21 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public enum ProjectStatus {
     ACTIVE(
-            "Active",
-            "Activate",
-            "Activate test project"
+            Bundle.message("status.project.active"),
+            Bundle.message("status.project.active.action"),
+            Bundle.message("status.project.active.description")
     ),
 
     INACTIVE(
-            "Inactive",
-            "Deactivate",
-            "Deactivate test project"
+            Bundle.message("status.project.inactive"),
+            Bundle.message("status.project.inactive.action"),
+            Bundle.message("status.project.inactive.description")
     ),
 
     ARCHIVED(
-            "Archived",
-            "Archive",
-            "Archive test project"
+            Bundle.message("status.project.archived"),
+            Bundle.message("status.project.archived.action"),
+            Bundle.message("status.project.archived.description")
     );
 
     private final @NotNull String label;

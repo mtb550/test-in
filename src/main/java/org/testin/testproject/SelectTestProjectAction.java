@@ -13,6 +13,7 @@ import org.testin.model.ProjectStatus;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
+import org.testin.util.Bundle;
 
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
     private final @NotNull TreePanel tp;
 
     public SelectTestProjectAction(final @NotNull Project p, final @NotNull TreePanel tp) {
-        super(p, "Select Test Project", "Choose the test project this repository exercises", AllIcons.Actions.ModuleDirectory);
+        super(p, Bundle.message("project.select.text"), Bundle.message("project.select.description"), AllIcons.Actions.ModuleDirectory);
         this.tp = tp;
     }
 
@@ -49,8 +50,8 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
                 // this one is the answer, so the message points at it rather
                 // than opening a dialog with no rows in it.
                 if (underRoot.isEmpty()) {
-                    Services.getInstance(p, Notifier.class).softRefuse(p, "No Test Projects",
-                            "Create one under the Testin root first");
+                    Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("project.none.title"),
+                            Bundle.message("project.none.message"));
                     return;
                 }
 

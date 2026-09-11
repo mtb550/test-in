@@ -10,13 +10,14 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 
 public class SetTestRunStatusAction extends AbstractProjectAction {
     final @NotNull SimpleTree tree;
 
     public SetTestRunStatusAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, "Set Status", "Set test run status", AllIcons.Nodes.Test);
+        super(p, Bundle.message("run.set.status.text"), Bundle.message("run.set.status.description"), AllIcons.Nodes.Test);
         this.tree = tree;
     }
 

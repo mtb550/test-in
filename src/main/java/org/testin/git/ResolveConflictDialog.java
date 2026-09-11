@@ -2,6 +2,7 @@ package org.testin.git;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.model.TestEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;
@@ -56,7 +57,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
         this.onResolved = onResolved;
         this.onSkipped = onSkipped;
 
-        title = "Both Changed " + testCase;
+        title = Bundle.message("dialog.conflict.title", testCase);
 
         final @NotNull List<ComponentDialogBase<?>> rows = new ArrayList<>();
 
@@ -68,8 +69,8 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
 
         for (final TestCaseMerge.Question question : questions) {
             final @NotNull ComponentDialogBase<RadioSelection<Boolean>> row = ComponentDialogBase.<Boolean>radios(label(question.field()))
-                    .option("Mine: " + shortened(question.mine()), Boolean.FALSE)
-                    .option("Remote: " + shortened(question.theirs()), Boolean.TRUE)
+                    .option(Bundle.message("dialog.conflict.option.mine", shortened(question.mine())), Boolean.FALSE)
+                    .option(Bundle.message("dialog.conflict.option.remote", shortened(question.theirs())), Boolean.TRUE)
                     .select(Boolean.FALSE)
                     .build();
 
@@ -77,7 +78,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
             answers.add(row.getComponent());
         }
 
-        final @NotNull ComponentDialogBase<DialogButton> keep = ComponentDialogBase.button("Keep Selected");
+        final @NotNull ComponentDialogBase<DialogButton> keep = ComponentDialogBase.button(Bundle.message("dialog.conflict.button.keep"));
         rows.add(keep);
 
         components = List.copyOf(rows);
@@ -87,8 +88,8 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
         // were never asked about, and the tester was left mid-rebase with no
         // word about any of it (#258).
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, "Keep Selected", this::submit),
-                StatusBarShortcut.build(Shortcuts.Escape, "Skip This One", this::skip));
+                StatusBarShortcut.build(Shortcuts.Enter, Bundle.message("dialog.conflict.button.keep"), this::submit),
+                StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("dialog.conflict.shortcut.skip"), this::skip));
 
         preferredSize = new Dimension(JBUI.scale(700), JBUI.scale(120 + (60 * questions.size())));
     }
@@ -113,9 +114,9 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
     private static @NotNull String settledSentence(final @NotNull List<String> settled) {
         final @NotNull List<String> named = settled.stream().map(ResolveConflictDialog::label).toList();
 
-        return "Both changed " + Display.andJoin(named)
-                + ", and Testin settled " + (named.size() == 1 ? "it" : "them")
-                + " without asking: the later edit for who changed it and when, and the remote's position for the order.";
+        return named.size() == 1
+                ? Bundle.message("dialog.conflict.settled.one", Display.andJoin(named))
+                : Bundle.message("dialog.conflict.settled.many", Display.andJoin(named));
     }
 
     private static @NotNull String label(final @NotNull String jsonField) {
@@ -130,7 +131,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
     // UC-SHARE-018, Rule-SHARE-083
     private static @NotNull String shortened(final @NotNull String value) {
         final @NotNull String oneLine = value.replace('\n', ' ').trim();
-        if (oneLine.isEmpty()) return "(empty)";
+        if (oneLine.isEmpty()) return Bundle.message("dialog.conflict.empty");
 
         return oneLine.length() <= SHOWN ? oneLine : oneLine.substring(0, SHOWN - 1) + "…";
     }

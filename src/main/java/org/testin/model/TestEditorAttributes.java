@@ -423,7 +423,9 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     public static void sayWhatWasRefused(final @NotNull Project p, final int refused) {
         if (refused == 0) return;
 
-        Services.getInstance(p, Notifier.class).softRefuse(p, Refused.UNREADABLE, refused + (refused == 1 ? " value" : " values"));
+        Services.getInstance(p, Notifier.class).softRefuse(p, Refused.UNREADABLE, refused == 1
+                ? Bundle.message("attribute.value.one")
+                : Bundle.message("attribute.value.many", String.valueOf(refused)));
     }
 
     /**

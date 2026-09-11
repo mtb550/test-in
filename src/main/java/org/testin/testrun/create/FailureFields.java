@@ -9,6 +9,7 @@ import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
 import org.testin.ui.framework.TextArea;
 import org.testin.ui.framework.TextInput;
+import org.testin.util.Bundle;
 
 import java.util.List;
 
@@ -38,7 +39,7 @@ public final class FailureFields {
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-147
     public FailureFields(final @NotNull TestRunItems runItem) {
         actualResult = ComponentDialogBase.textField()
-                .placeholder("set actual result..")
+                .placeholder(Bundle.message("dialog.failure.placeholder.actual"))
                 .value(runItem.getActualResult())
                 .build();
 
@@ -53,7 +54,7 @@ public final class FailureFields {
                 .build();
 
         errorCapture = ComponentDialogBase.textArea()
-                .placeholder("paste error or exception or screenshot..")
+                .placeholder(Bundle.message("dialog.failure.placeholder.error"))
                 .value(runItem.getStacktrace())
                 .rows(5)
                 .build();

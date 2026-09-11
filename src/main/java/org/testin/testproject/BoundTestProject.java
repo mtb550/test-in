@@ -11,6 +11,7 @@ import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import java.util.Optional;
 import java.util.Map;
@@ -101,9 +102,9 @@ public final class BoundTestProject {
         final @NotNull String name = name();
         final @NotNull Optional<ProjectStatus> status = Optional.ofNullable(underRoot.get(name));
 
-        if (status.isEmpty()) return "testin.yml names " + name + ", which is not under the Testin root";
-        if (status.orElseThrow() == ProjectStatus.ARCHIVED) return name + " is archived, so it is not opened";
-        return "testin.yml names " + name + ", which could not be read";
+        if (status.isEmpty()) return Bundle.message("bound.not.under.root", name);
+        if (status.orElseThrow() == ProjectStatus.ARCHIVED) return Bundle.message("bound.archived", name);
+        return Bundle.message("bound.unreadable", name);
     }
 
     /**
@@ -127,8 +128,8 @@ public final class BoundTestProject {
 
         if (Services.getInstance(p, TestinConfigService.class).bind(projectName)) return true;
 
-        Services.getInstance(p, Notifier.class).error(p, "Not Bound",
-                "testin.yml could not be written, so " + projectName + " will not be remembered.");
+        Services.getInstance(p, Notifier.class).error(p, Bundle.message("bound.not.bound.title"),
+                Bundle.message("bound.not.bound.message", projectName));
         return false;
     }
 }

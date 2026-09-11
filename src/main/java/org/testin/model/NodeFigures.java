@@ -1,6 +1,7 @@
 package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 /**
  * Every number a tree node can report about itself, gathered in one pass.
@@ -54,7 +55,7 @@ public record NodeFigures(long testSets, long packages, long testCases, long run
      * not a second one written here.
      */
     public @NotNull String rateLabel() {
-        return run.executed() == 0 ? "Not run" : run.passRate() + "%";
+        return run.executed() == 0 ? Bundle.message("figures.not.run") : run.passRate() + "%";
     }
 
     /**
@@ -77,12 +78,22 @@ public record NodeFigures(long testSets, long packages, long testCases, long run
     public @NotNull String describe() {
         if (testSets == 0 && testCases == 0 && testRuns == 0) return "";
 
-        return "Holds " + testSets + " test set" + plural(testSets)
-                + ", " + testCases + " test case" + plural(testCases)
-                + " and " + testRuns + " test run" + plural(testRuns);
-    }
+        // Two keys per noun rather than a noun with an s appended: French does
+        // not make a plural by adding a letter to the end of every word. Written
+        // out here rather than through a helper taking the key names, because a
+        // key that arrives as a parameter is a key no checker can see - and
+        // BundleKeysTest, which reads the literal after the bracket, reported
+        // all six as keys nothing asks for.
+        final @NotNull String sets = testSets == 1
+                ? Bundle.message("figures.test.sets.one")
+                : Bundle.message("figures.test.sets.many", String.valueOf(testSets));
+        final @NotNull String cases = testCases == 1
+                ? Bundle.message("figures.test.cases.one")
+                : Bundle.message("figures.test.cases.many", String.valueOf(testCases));
+        final @NotNull String runs = testRuns == 1
+                ? Bundle.message("figures.test.runs.one")
+                : Bundle.message("figures.test.runs.many", String.valueOf(testRuns));
 
-    private @NotNull String plural(final long count) {
-        return count == 1 ? "" : "s";
+        return Bundle.message("figures.holds", sets, cases, runs);
     }
 }

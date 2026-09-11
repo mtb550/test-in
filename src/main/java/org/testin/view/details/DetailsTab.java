@@ -26,6 +26,7 @@ import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.testcase.TestCaseSnapshot;
 import org.testin.testcase.create.TestCaseUpdateMenuDialog;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.ui.FontSync;
 import org.testin.actions.Declared;
@@ -54,7 +55,7 @@ public class DetailsTab {
     private static final @NotNull String SHORTCUT_REGISTERED_KEY = "DetailsTab.f2.registered";
 
     final int SCROLL_UNIT_INCREMENT = 16;
-    final @NotNull String PLACEHOLDER_TEXT = "Select a test case to view details";
+    final @NotNull String PLACEHOLDER_TEXT = Bundle.message("details.placeholder");
     final int INSETS_DEFAULT = 5;
     final double WEIGHT_X = 1.0;
     final double SPACER_WEIGHT_Y = 1.0;
@@ -204,8 +205,8 @@ public class DetailsTab {
                 // Two rows for two facts, not four. Who and when read as one
                 // thing, and four captions to say two of them filled a quarter
                 // of the panel with words nobody needed twice (#23).
-                new AttributeRow("Created", (p, dto) -> Display.whoAndWhen(dto.getCreatedBy(), dto.getCreatedAt())),
-                new AttributeRow("Updated", (p, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt()))
+                new AttributeRow(Bundle.message("details.created"), (p, dto) -> Display.whoAndWhen(dto.getCreatedBy(), dto.getCreatedAt())),
+                new AttributeRow(Bundle.message("details.updated"), (p, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt()))
         );
     }
 
@@ -279,7 +280,7 @@ public class DetailsTab {
                         // little of an update as one that never got there (#164).
                         if (!changed) return;
 
-                        before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Update", tcs), taken, TestCaseSnapshot.of(p, editPath, ids)));
+                        before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.update"), tcs), taken, TestCaseSnapshot.of(p, editPath, ids)));
 
                         Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
 
@@ -294,9 +295,8 @@ public class DetailsTab {
                         Logger.warn("No test set to write '" + dto.getDescription()
                                 + "' to - the edit was not saved");
 
-                        Services.getInstance(p, Notifier.class).softRefuse(p, "Not Saved",
-                                "This test case was opened without its test set, so there is nowhere to write the "
-                                        + "change. Open it from the tree and edit it there.");
+                        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("details.not.saved.title"),
+                                Bundle.message("details.not.saved.message"));
                     });
         }).show();
     }

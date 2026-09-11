@@ -22,6 +22,7 @@ import org.testin.testcase.TestCaseOrder;
 import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.services.BackgroundWork;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.io.InputStream;
@@ -43,7 +44,7 @@ import java.util.*;
 public class ExportAction extends DumbAwareAction {
 
     /** The gesture's name, which its dialog reads rather than spells. */
-    public static final @NotNull String NAME = "Export";
+    public static final @NotNull String NAME = Bundle.message("export.action.name");
 
     // UC-SHARE-001, UC-SHARE-002
     @Override
@@ -89,12 +90,12 @@ public class ExportAction extends DumbAwareAction {
             if (resolved.isEmpty()) return;
             final @NotNull VirtualFile targetDir = resolved.orElseThrow();
 
-            BackgroundWork.run(p, "Reading test cases in " + dirDto.getName(), "Export Failed", gathering -> {
+            BackgroundWork.run(p, Bundle.message("export.task.reading", dirDto.getName()), Bundle.message("export.failed.title"), gathering -> {
                 final @NotNull Gathered gathered = gather(targetDir);
                 final @NotNull Map<String, List<TestCaseDto>> sheets = gathered.sheets();
                 if (sheets.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(p, Notifier.class).softRefuse(p, "Export Empty", "No test cases found."));
+                            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("notification.export.empty.title"), Bundle.message("export.none.found")));
                     return;
                 }
 
@@ -108,8 +109,8 @@ public class ExportAction extends DumbAwareAction {
                     // cases looks exactly like a whole one, and the count in the
                     // Exported message counts what was gathered, so it looks right
                     // too (#263).
-                    new ConfirmDialog(p, "Some test cases could not be read", unreadableWarning(gathered.unreadable()),
-                            "", "", "Export anyway", () -> chooseWhatToExport(sheets, targetDir)).show();
+                    new ConfirmDialog(p, Bundle.message("export.unreadable.title"), unreadableWarning(gathered.unreadable()),
+                            "", "", Bundle.message("export.anyway"), () -> chooseWhatToExport(sheets, targetDir)).show();
                 });
             });
         }
@@ -134,8 +135,8 @@ public class ExportAction extends DumbAwareAction {
         private void writeExport(final DestinationForm.@NotNull Destination destination, final @NotNull Map<String, List<TestCaseDto>> selected) {
             final int cases = selected.values().stream().mapToInt(List::size).sum();
 
-            BackgroundWork.run(p, "Exporting " + cases + " test cases to " + destination.file().getName(),
-                    "Export Failed", indicator -> {
+            BackgroundWork.run(p, Bundle.message("export.task.writing", String.valueOf(cases), destination.file().getName()),
+                    Bundle.message("export.failed.title"), indicator -> {
                         destination.format().exportToFile(p, destination.file(), selected);
 
                         ApplicationManager.getApplication().invokeLater(() ->
@@ -233,10 +234,14 @@ public class ExportAction extends DumbAwareAction {
      */
     private static @NotNull String unreadableWarning(final @NotNull List<String> unreadable) {
         final @NotNull String named = String.join(", ", unreadable.subList(0, Math.min(5, unreadable.size())));
-        final @NotNull String rest = unreadable.size() > 5 ? ", and " + (unreadable.size() - 5) + " more" : "";
-        final @NotNull String count = unreadable.size() == 1 ? "One test case file" : unreadable.size() + " test case files";
+        final @NotNull String rest = unreadable.size() > 5
+                ? Bundle.message("export.unreadable.more", String.valueOf(unreadable.size() - 5))
+                : "";
+        final @NotNull String count = unreadable.size() == 1
+                ? Bundle.message("export.unreadable.one")
+                : Bundle.message("export.unreadable.many", String.valueOf(unreadable.size()));
 
-        return count + " could not be read and will not be in the export: " + named + rest + ".";
+        return Bundle.message("export.unreadable.message", count, named, rest);
     }
 
     /**

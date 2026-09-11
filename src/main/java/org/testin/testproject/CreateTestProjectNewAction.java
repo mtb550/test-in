@@ -15,6 +15,7 @@ import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 
@@ -23,7 +24,7 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
     private final @NotNull String tpName;
 
     public CreateTestProjectNewAction(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull String name) {
-        super(p, "New Test Project", "Create a new test project", AllIcons.General.Add);
+        super(p, Bundle.message("project.new.text"), Bundle.message("project.new.only.description"), AllIcons.General.Add);
         this.tp = tp;
         this.tpName = name;
     }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.ToolBarDefault;
+import org.testin.util.Bundle;
 
 /**
  * The parts of the light mode window a tester can turn off (#13).
@@ -42,10 +43,10 @@ import org.testin.model.ToolBarDefault;
 @AllArgsConstructor
 public enum LightModePart implements ToolBarAttribute {
 
-    SET_NAME("Test set name"),
-    DURATION("Duration"),
-    VERDICT_BUTTONS("Verdict buttons"),
-    STATUS_BAR("Status bar");
+    SET_NAME(Bundle.message("light.part.set.name")),
+    DURATION(Bundle.message("light.part.duration")),
+    VERDICT_BUTTONS(Bundle.message("light.part.verdict.buttons")),
+    STATUS_BAR(Bundle.message("light.part.status.bar"));
 
     private final @NotNull String name;
 

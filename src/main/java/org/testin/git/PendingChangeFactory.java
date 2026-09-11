@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.nio.file.Path;
@@ -111,13 +112,13 @@ final class PendingChangeFactory {
                 final @NotNull TestCaseDto newState = read(mapper, afterJson, TestCaseDto.class);
                 yield new PendingChange(ChangeSubject.TEST_CASE, newState.getDescription(), testSet,
                         newState.getId().toString(), relativePath, DiffType.ADDED, null, newState,
-                        List.of(new FieldChange("Test Case", "", newState.getDescription(), ChangeType.CREATE_TEST_CASE)));
+                        List.of(new FieldChange(Bundle.message("caption.test.case"), "", newState.getDescription(), ChangeType.CREATE_TEST_CASE)));
             }
             case DELETED -> {
                 final @NotNull TestCaseDto oldState = read(mapper, beforeJson, TestCaseDto.class);
                 yield new PendingChange(ChangeSubject.TEST_CASE, oldState.getDescription(), testSet,
                         oldState.getId().toString(), relativePath, DiffType.DELETED, oldState, null,
-                        List.of(new FieldChange("Test Case", oldState.getDescription(), "", ChangeType.REMOVE_TEST_CASE)));
+                        List.of(new FieldChange(Bundle.message("caption.test.case"), oldState.getDescription(), "", ChangeType.REMOVE_TEST_CASE)));
             }
             case MODIFIED -> {
                 final @NotNull TestCaseDto oldState = read(mapper, beforeJson, TestCaseDto.class);
@@ -130,7 +131,7 @@ final class PendingChangeFactory {
                 yield new PendingChange(ChangeSubject.TEST_CASE, newState.getDescription(), testSet,
                         newState.getId().toString(), relativePath, DiffType.MODIFIED, oldState, newState,
                         fieldChanges.isEmpty()
-                                ? List.of(new FieldChange("Test Case", "", "reordered or restamped", ChangeType.CHANGE_FILE))
+                                ? List.of(new FieldChange(Bundle.message("caption.test.case"), "", Bundle.message("git.change.reordered"), ChangeType.CHANGE_FILE))
                                 : fieldChanges);
             }
         };

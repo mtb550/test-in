@@ -17,6 +17,7 @@ import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 import org.testin.notifications.Done;
 import org.testin.git.ResolveConflictDialog;
@@ -107,15 +108,15 @@ public final class SyncWithSftpAction extends DumbAwareAction {
             // logged warning would keep saying so afterwards, about a setup that is
             // correct.
             if (!address.isConfigured()) {
-                Services.getInstance(p, Notifier.class).softRefuse(p, "No SFTP Server Configured",
-                        "Set connection: sftp and sftpHost in testin.yml");
+                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("sftp.not.configured.title"),
+                        Bundle.message("sftp.not.configured.message"));
                 return;
             }
 
             selectedProject.ifPresentOrElse(
                     projectRoot -> askThenSync(address, projectRoot),
-                    () -> Services.getInstance(p, Notifier.class).error(p, "Nothing to Sync",
-                            "Select a test project in the tree first."));
+                    () -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("sftp.nothing.title"),
+                            Bundle.message("sftp.nothing.message")));
         }
 
         /**
@@ -154,7 +155,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
 
         // UC-SHARE-019, Rule-SHARE-091
         private void syncInBackground(final @NotNull SftpAddress address, final @NotNull Path projectRoot, final @NotNull SftpAccountDialog.Account account, final @NotNull String keyFile) {
-            ProgressManager.getInstance().run(new Task.Backgroundable(p, "Syncing with " + address.display(), true) {
+            ProgressManager.getInstance().run(new Task.Backgroundable(p, Bundle.message("sftp.task.syncing", address.display()), true) {
                 @Override
                 public void run(final @NotNull ProgressIndicator indicator) {
                     indicator.setIndeterminate(true);
@@ -168,7 +169,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                         // says must not happen.
                         if (!account.password().isEmpty() && !SftpSecret.ACCOUNT_PASSWORD.store(address, account.user(), account.password())) {
                             ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class)
-                                    .softRefuse(p, "Password Not Kept", "This machine's keychain refused it, so the next sync asks again"));
+                                    .softRefuse(p, Bundle.message("sftp.password.not.kept.title"), Bundle.message("sftp.password.not.kept.message")));
                         }
 
                         final @NotNull SftpAuth auth = authFor(address, account, keyFile);
@@ -190,7 +191,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                             return;
                         }
 
-                        indicator.setText("Rereading the project...");
+                        indicator.setText(Bundle.message("sftp.progress.rereading"));
                         Services.getInstance(p, ProjectIndexer.class).refreshDirectory(projectRoot);
                         Services.getInstance(p, ProjectIndexer.class).scanSingleProject(projectRoot);
 
@@ -256,8 +257,8 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                 final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
                 if (outcome.isBlocked()) {
-                    notifier.warn(p, "Somebody else is syncing this project", outcome.blockedBy()
-                            + " Nothing was sent or fetched. Try again when they have finished.");
+                    notifier.warn(p, Bundle.message("sftp.blocked.title"),
+                            Bundle.message("sftp.blocked.message", outcome.blockedBy()));
                     return;
                 }
 
@@ -277,12 +278,10 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                     // Stays, like the Git sync and the push. A sync that worked
                     // while the tester was elsewhere is exactly the message they
                     // come back to (#268).
-                    notifier.info(p, "Synced", outcome.describe());
+                    notifier.info(p, Bundle.message("sftp.synced.title"), outcome.describe());
                 } else {
-                    notifier.warn(p, "Synced, with " + outcome.conflicts() + " left to you",
-                            outcome.describe() + " Both sides changed " + naming(outcome.conflicting())
-                                    + ". This machine kept its copies and sent nothing for them; "
-                                    + "you'll be asked about anything that can be merged field by field.");
+                    notifier.warn(p, Bundle.message("sftp.synced.conflicts.title", String.valueOf(outcome.conflicts())),
+                            Bundle.message("sftp.synced.conflicts.message", outcome.describe(), naming(outcome.conflicting())));
                 }
 
                 askAboutDeletions(outcome, projectRoot);
@@ -304,14 +303,13 @@ public final class SyncWithSftpAction extends DumbAwareAction {
             if (outcome.removedOnServer().isEmpty()) return;
 
             final int count = outcome.removedOnServer().size();
-            final @NotNull String what = count == 1 ? "1 file" : count + " files";
+            final @NotNull String what = count == 1
+                    ? Bundle.message("sftp.removed.file.one")
+                    : Bundle.message("sftp.removed.file.many", String.valueOf(count));
 
-            new ConfirmDialog(p, "Removed On The Server",
-                    what + " here were deleted on the server by somebody else, and this machine has not "
-                            + "touched them since: " + naming(outcome.removedOnServer())
-                            + ". Removing them here agrees with that. Keeping them sends them back to "
-                            + "the server on the next sync.",
-                    "", "", "Remove " + what,
+            new ConfirmDialog(p, Bundle.message("sftp.removed.title"),
+                    Bundle.message("sftp.removed.message", what, naming(outcome.removedOnServer())),
+                    "", "", Bundle.message("sftp.removed.confirm", what),
                     () -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
                         Services.getInstance(p, ProjectIndexer.class)
                                 .removeIncoming(projectRoot, outcome.removedOnServer());
@@ -322,7 +320,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                             Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, count);
                         });
                     }),
-                    List.of(new ConfirmDialog.Alternative(Shortcuts.ConfirmAlternative, "Keep " + what,
+                    List.of(new ConfirmDialog.Alternative(Shortcuts.ConfirmAlternative, Bundle.message("sftp.removed.keep", what),
                             () -> keepThem(outcome, projectRoot, count)))).show();
         }
 
@@ -339,9 +337,8 @@ public final class SyncWithSftpAction extends DumbAwareAction {
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (!kept) {
-                        Services.getInstance(p, Notifier.class).softRefuse(p, "Not Kept",
-                                "The record of what was last transferred could not be written, so these files "
-                                        + "will be offered for removal again at the next sync.");
+                        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("sftp.not.kept.title"),
+                                Bundle.message("sftp.not.kept.message"));
                         return;
                     }
 
@@ -409,11 +406,10 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                         Services.getInstance(p, EditorUtil.class).refreshOpen(p);
 
                         if (sent) {
-                            Services.getInstance(p, Notifier.class).softShow(p, "Settled " + answered.size());
+                            Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("sftp.settled", String.valueOf(answered.size())));
                         } else {
-                            Services.getInstance(p, Notifier.class).warn(p, "Nothing Settled",
-                                    "Somebody else is syncing this project, so your answers were not sent. "
-                                            + "You will be asked again on the next sync.");
+                            Services.getInstance(p, Notifier.class).warn(p, Bundle.message("sftp.nothing.settled.title"),
+                                    Bundle.message("sftp.nothing.settled.message"));
                         }
                     });
 
@@ -437,7 +433,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
             Logger.error(whatFailed + " failed: " + ex.getMessage());
 
             ApplicationManager.getApplication().invokeLater(() ->
-                    Services.getInstance(p, Notifier.class).error(p, "Sync Failed", ex.getMessage()));
+                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("sftp.sync.failed.title"), ex.getMessage()));
         }
 
         /**
@@ -449,7 +445,9 @@ public final class SyncWithSftpAction extends DumbAwareAction {
         private static @NotNull String naming(final @NotNull List<String> paths) {
             final @NotNull String first = String.join(", ", paths.stream().limit(3).toList());
 
-            return paths.size() > 3 ? first + " and " + (paths.size() - 3) + " more" : first;
+            return paths.size() > 3
+                    ? Bundle.message("sftp.naming.more", first, String.valueOf(paths.size() - 3))
+                    : first;
         }
     }
 }

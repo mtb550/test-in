@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.util.Bundle;
 
 import java.awt.*;
 import java.util.Optional;
@@ -179,7 +180,7 @@ public final class Notifier {
      * plugin wrote can offer the same thing.
      */
     public @NotNull NotificationAction copyPath(final @NotNull File file) {
-        final @NotNull NotificationAction copy = action("Copy path",
+        final @NotNull NotificationAction copy = action(Bundle.message("notification.copy.path"),
                 () -> CopyPasteManager.getInstance().setContents(new StringSelection(file.getAbsolutePath())));
 
         copy.getTemplatePresentation().setIcon(AllIcons.Actions.Copy);

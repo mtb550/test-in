@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.util.Set;
@@ -34,7 +35,7 @@ public interface Toolbar {
      * one watched the first case get selected and a clock start while nothing
      * ran.
      */
-    @NotNull String START_MANUAL_EXECUTION = "Start Manual Execution";
+    @NotNull String START_MANUAL_EXECUTION = Bundle.message("toolbar.start.manual.execution");
 
     /**
      * And the icon, for the same reason. The menu entry drew
@@ -53,7 +54,7 @@ public interface Toolbar {
      * same pair of buttons. Light mode drew the platform's run arrow, which is
      * the very icon the comment above records as the wrong one.
      */
-    @NotNull String STOP_EXECUTION = "Stop Execution";
+    @NotNull String STOP_EXECUTION = Bundle.message("toolbar.stop.execution");
 
     @NotNull Icon STOP_EXECUTION_ICON = AllIcons.Debugger.ThreadFrozen;
     /**

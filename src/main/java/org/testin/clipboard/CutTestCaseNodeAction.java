@@ -14,6 +14,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.awt.datatransfer.StringSelection;
@@ -61,7 +62,7 @@ public class CutTestCaseNodeAction extends DumbAwareAction {
         // a test case, rather than absent from that editor's menu (#248).
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             e.getPresentation().setEnabled(false);
-            e.getPresentation().setDescription("A test run's test cases were chosen when it was created. Cut the test case in its test set.");
+            e.getPresentation().setDescription(Bundle.message("cut.case.disabled.description"));
             return;
         }
 

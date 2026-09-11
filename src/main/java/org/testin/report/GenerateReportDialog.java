@@ -7,6 +7,7 @@ import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.io.File;
@@ -28,21 +29,21 @@ public final class GenerateReportDialog extends AbstractFrameworkDialog<Destinat
         super(p);
         this.onGenerate = onGenerate;
 
-        title = "Generate Report";
+        title = Bundle.message("dialog.report.title");
 
         final @NotNull DestinationForm form = new DestinationForm(p,
                 Arrays.stream(FileTypes.values()).filter(FileTypes::isReportable).toArray(FileTypes[]::new),
                 FileTypes.PDF,
                 suggestedFileName,
-                "Select Destination Folder",
-                "Choose the folder to save the report in");
+                Bundle.message("dialog.report.folder.title"),
+                Bundle.message("dialog.report.folder.message"));
 
         components = List.of(
                 ComponentDialogBase.of(form),
-                ComponentDialogBase.button("Generate"));
+                ComponentDialogBase.button(Bundle.message("dialog.report.button.generate")));
 
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, "Generate", this::submit),
+                StatusBarShortcut.build(Shortcuts.Enter, Bundle.message("dialog.report.button.generate"), this::submit),
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 

@@ -55,7 +55,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
      * tester, not twenty-eight answers about dialogs, and a tester who has
      * learned the keys wants the row gone from all of them at once.
      */
-    private final @NotNull JBCheckBox showShortcutHintsBox = new JBCheckBox("Show keyboard shortcuts in dialogs");
+    private final @NotNull JBCheckBox showShortcutHintsBox = new JBCheckBox(Bundle.message("settings.show.shortcuts"));
 
     public SettingsConfigurable() {
         testinPathPanel = new TestinPathPanel();
@@ -90,25 +90,25 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         // needs one only to seed a starting directory, and an application-level
         // page has none to give it (#70).
         downloadFolderField.addBrowseFolderListener(null, FileChooserDescriptorFactory.createSingleFolderDescriptor()
-                        .withTitle("Select Default Download Folder")
-                        .withDescription("Choose the default folder for imports, exports, and reports"),
+                        .withTitle(Bundle.message("settings.download.folder.title"))
+                        .withDescription(Bundle.message("settings.download.folder.description")),
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         );
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(new JBLabel("Testin source root: "), testinPathPanel.getComponent(), 1, false)
+                .addLabeledComponent(new JBLabel(Bundle.message("settings.label.source.root")), testinPathPanel.getComponent(), 1, false)
                 .addVerticalGap(5)
-                .addLabeledComponent("Log level: ", logLevelComboBox)
+                .addLabeledComponent(Bundle.message("settings.label.log.level"), logLevelComboBox)
                 .addVerticalGap(5)
-                .addLabeledComponent(new JBLabel("Tester name: "), testerNameField, 1, false)
+                .addLabeledComponent(new JBLabel(Bundle.message("settings.label.tester.name")), testerNameField, 1, false)
                 .addVerticalGap(5)
-                .addLabeledComponent(new JBLabel("Tester role: "), testerRoleField, 1, false)
+                .addLabeledComponent(new JBLabel(Bundle.message("settings.label.tester.role")), testerRoleField, 1, false)
                 .addVerticalGap(5)
-                .addLabeledComponent(new JBLabel("Default download folder: "), downloadFolderField, 1, false)
+                .addLabeledComponent(new JBLabel(Bundle.message("settings.label.download.folder")), downloadFolderField, 1, false)
                 .addVerticalGap(5)
-                .addLabeledComponent(new JBLabel("SFTP account: "), sftpUserField, 1, false)
+                .addLabeledComponent(new JBLabel(Bundle.message("settings.label.sftp.account")), sftpUserField, 1, false)
                 .addVerticalGap(5)
-                .addLabeledComponent(new JBLabel("SFTP key file: "), sftpKeyFileField, 1, false)
+                .addLabeledComponent(new JBLabel(Bundle.message("settings.label.sftp.key")), sftpKeyFileField, 1, false)
                 .addVerticalGap(5)
                 .addComponent(showShortcutHintsBox)
                 .addVerticalGap(10)
@@ -130,8 +130,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
      * here (#124).
      */
     private @NotNull JBLabel whereSettingsLive() {
-        final @NotNull JBLabel note = new JBLabel("<html>Everything here belongs to this machine and this person, and is never committed.<br>"
-                + "Which test project a repository is about, and how it is shared, live in that repository's <b>testin.yml</b>.</html>");
+        final @NotNull JBLabel note = new JBLabel(Bundle.message("settings.note"));
 
         note.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         note.setFont(JBUI.Fonts.smallFont());
@@ -178,11 +177,10 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         final @NotNull Path root = Path.of(typed);
 
         if (!Files.exists(root))
-            throw new ConfigurationException("There is no folder at " + root + ".", "Testin Folder Not Found");
+            throw new ConfigurationException(Bundle.message("settings.no.folder", root), Bundle.message("settings.no.folder.title"));
 
         if (!Files.isDirectory(root))
-            throw new ConfigurationException(root + " is a file. The Testin folder has to be a folder, "
-                    + "because test projects are folders inside it.", "Testin Folder Is Not A Folder");
+            throw new ConfigurationException(Bundle.message("settings.not.a.folder", root), Bundle.message("settings.not.a.folder.title"));
     }
 
     /**

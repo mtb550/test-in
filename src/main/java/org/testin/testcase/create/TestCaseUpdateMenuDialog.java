@@ -9,6 +9,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testcase.update.UpdateTestCaseDialog;
 import org.testin.ui.dialogs.ShortcutMenuPopup;
+import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.util.List;
@@ -49,7 +50,9 @@ public class TestCaseUpdateMenuDialog {
 
     // UC-EDITOR-PANEL-006
     public void show() {
-        final @NotNull String title = items.size() == 1 ? "Update Test Case" : "Update " + items.size() + " Test Cases";
+        final @NotNull String title = items.size() == 1
+                ? Bundle.message("update.dialog.title.one")
+                : Bundle.message("update.dialog.title.many", String.valueOf(items.size()));
 
         new ShortcutMenuPopup<>(p, title, UpdateTestCaseFields.values(), this::open).show();
     }

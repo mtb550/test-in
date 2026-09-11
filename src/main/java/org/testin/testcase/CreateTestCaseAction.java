@@ -19,6 +19,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.create.CreateTestCaseDialog;
+import org.testin.util.Bundle;
 
 import java.util.List;
 import java.util.UUID;
@@ -73,7 +74,7 @@ public class CreateTestCaseAction extends DumbAwareAction {
             // Recorded from the callback, because the rank arrives after the
             // save: the case is written here and placed by the sort that
             // follows, so what a redo would have to write is not readable yet.
-            editor.appendNewTestCase(tc, () -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Create", affectedNodes), before, TestCaseSnapshot.of(p, dir.getPath(), ids)));
+            editor.appendNewTestCase(tc, () -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.create"), affectedNodes), before, TestCaseSnapshot.of(p, dir.getPath(), ids)));
             Services.getInstance(p, TestCaseCacheService.class).addNewItems(affectedNodes);
 
             // Directly, as the other three savers do. This went through a

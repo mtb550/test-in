@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.io.IOException;
@@ -75,7 +76,7 @@ final class FilesUtil {
         // pair of braces.
         if (jsonBytes.length == 0) {
             Logger.error("Refusing to write an empty file, which would erase it: " + path);
-            Services.getInstance(p, Notifier.class).error(p, "Nothing was written to " + path.getFileName());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.nothing.written", path.getFileName()));
             return;
         }
 
@@ -118,7 +119,7 @@ final class FilesUtil {
             // move is cheap enough for the thread the removal already runs on.
             if (!Trash.accepted(path)) Files.deleteIfExists(path);
         } catch (final IOException ex) {
-            Services.getInstance(p, Notifier.class).error(p, "unable to remove: " + ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", ex.getMessage()));
             Logger.error("unable to remove " + path + ": " + ex.getMessage());
             return;
         }
@@ -152,7 +153,7 @@ final class FilesUtil {
     }
 
     private void reportWriteFailure(final @NotNull Project p, final @NotNull Path path, final @NotNull IOException ex) {
-        Services.getInstance(p, Notifier.class).error(p, "unable to write content: " + ex.getMessage());
+        Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.write", ex.getMessage()));
         Logger.error("unable to write content: " + ex.getMessage());
         Logger.error("path" + path);
     }

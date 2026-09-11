@@ -10,6 +10,7 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextInput;
+import org.testin.util.Bundle;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -34,12 +35,12 @@ final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
         this.onSubmit = onSubmit;
         this.type = dir.getType();
 
-        title = "Rename";
+        title = Bundle.message("dialog.rename.title");
 
         components = List.of(
                 ComponentDialogBase.textField()
                         .icon(AllIcons.Actions.Edit)
-                        .placeholder("set new name...")
+                        .placeholder(Bundle.message("dialog.rename.placeholder"))
                         .value(dir.getName())
                         .build());
 

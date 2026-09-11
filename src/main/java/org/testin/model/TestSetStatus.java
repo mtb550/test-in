@@ -3,6 +3,7 @@ package org.testin.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 /**
  * Whether a test set is still current. Persisted in the test set marker.
@@ -16,15 +17,15 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public enum TestSetStatus {
     ACTIVE(
-            "Active",
-            "Mark Active",
-            "Offer this test set when configuring a run"
+            Bundle.message("status.testset.active"),
+            Bundle.message("status.testset.active.action"),
+            Bundle.message("status.testset.active.description")
     ),
 
     DEPRECATED(
-            "Deprecated",
-            "Mark Deprecated",
-            "Keep the test set and its history, but stop offering it for new runs"
+            Bundle.message("status.testset.deprecated"),
+            Bundle.message("status.testset.deprecated.action"),
+            Bundle.message("status.testset.deprecated.description")
     );
 
     private final @NotNull String label;

@@ -30,6 +30,7 @@ import org.testin.undo.UndoScope;
 import org.testin.undo.UndoService;
 import org.testin.services.BackgroundWork;
 import org.testin.editor.EditorUtil;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import javax.swing.tree.TreePath;
@@ -139,7 +140,7 @@ public class EditTestRunAction extends DumbAwareAction {
         }
 
         private @NotNull RunFormAction saves(final @NotNull TestRunDirectoryDto run, final @NotNull DirectoryDto parent, final @NotNull TestRunDto current) {
-            return new RunFormAction("Edit Test Run", StatusBarShortcut.SAVE, (form, selection) -> save(run, parent, current, form, selection));
+            return new RunFormAction(Bundle.message("run.edit.title"), StatusBarShortcut.SAVE, (form, selection) -> save(run, parent, current, form, selection));
         }
 
         /**
@@ -154,19 +155,19 @@ public class EditTestRunAction extends DumbAwareAction {
 
             final @NotNull String name = form.getRunName();
             if (name.isEmpty()) {
-                notifier.softRefuse(p, "A test run needs a name");
+                notifier.softRefuse(p, Bundle.message("run.needs.a.name"));
                 return false;
             }
 
             // The dialog is not modal - the tree stays live while it is open, so the
             // run may have been removed, or signed off from its own editor, since.
             if (!indexer.nodeExists(run.getPath())) {
-                notifier.softRefuse(p, "'" + run.getName() + "' no longer exists - nothing saved");
+                notifier.softRefuse(p, Bundle.message("run.gone", run.getName()));
                 return false;
             }
 
             if (!run.isStillOpen()) {
-                notifier.softRefuse(p, "'" + run.getName() + "' was " + run.getMarker().getStatusLabel() + " while this was open - nothing saved");
+                notifier.softRefuse(p, Bundle.message("run.status.changed", run.getName(), run.getMarker().getStatusLabel()));
                 return false;
             }
 
@@ -210,7 +211,7 @@ public class EditTestRunAction extends DumbAwareAction {
             // reference stays valid across renames, so undo and redo are the same
             // routine with the two sides swapped.
             Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
-                    "Edit '" + oldName + "'",
+                    Bundle.message("run.undo.edit", oldName),
                     () -> applyEdit(run, oldName, before, () -> {
                     }),
                     () -> applyEdit(run, name, after, () -> {
@@ -240,7 +241,7 @@ public class EditTestRunAction extends DumbAwareAction {
         }
 
         private void write(final @NotNull Path runPath, final @NotNull TestRunDto content, final @NotNull Runnable onDone) {
-            BackgroundWork.run(p, "Updating test run " + runPath.getFileName(), "Test Run Not Updated", indicator -> {
+            BackgroundWork.run(p, Bundle.message("run.task.updating", runPath.getFileName()), Bundle.message("run.update.failed.title"), indicator -> {
                 Services.getInstance(p, ProjectIndexer.class).putTestRun(runPath, content);
 
                 // File access is the indexer's alone (see CLAUDE.md).

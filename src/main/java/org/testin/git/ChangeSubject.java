@@ -1,6 +1,7 @@
 package org.testin.git;
 
 import org.testin.model.DirectoryType;
+import org.testin.util.Bundle;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 public enum ChangeSubject {
 
     TEST_CASE(
-            "Test Case"
+            Bundle.message("caption.test.case")
     ),
 
     TEST_RUN(
@@ -39,7 +40,7 @@ public enum ChangeSubject {
      * set - is worth committing on its own.
      */
     MARKER(
-            "Marker"
+            Bundle.message("change.subject.marker")
     ),
 
     /**
@@ -48,7 +49,7 @@ public enum ChangeSubject {
      * nobody accounted for is exactly the one that goes missing.
      */
     OTHER(
-            "File"
+            Bundle.message("change.subject.file")
     );
 
     private final @NotNull String label;

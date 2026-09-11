@@ -14,6 +14,7 @@ import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
+import org.testin.util.Bundle;
 import org.testin.util.NameSanitizer;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
@@ -104,10 +105,8 @@ public class DescriptionSection implements CreateTestCaseSection {
         if (!NameSanitizer.canMakeMethodName(description)) {
             setError(true);
             Services.getInstance(p, Notifier.class).softRefuse(p,
-                    "That description cannot name a test method",
-                    "The generated method would be called \"" + methodName
-                            + "\", which Java will not accept. A description has to begin with a letter, "
-                            + "and cannot be a single word Java keeps for itself such as new or class.");
+                    Bundle.message("description.not.a.method.title"),
+                    Bundle.message("description.not.a.method.message", methodName));
 
             return false;
         }
@@ -120,10 +119,8 @@ public class DescriptionSection implements CreateTestCaseSection {
         if (takenMethodKeys.contains(NameSanitizer.methodKey(methodName))) {
             setError(true);
             Services.getInstance(p, Notifier.class).softRefuse(p,
-                    "Another test case already names that test method",
-                    "The generated method would be called \"" + methodName
-                            + "\", and a test case in this test set already has it. Punctuation and "
-                            + "capitals do not make two methods, so this description has to differ by a word.");
+                    Bundle.message("description.taken.title"),
+                    Bundle.message("description.taken.message", methodName));
 
             return false;
         }

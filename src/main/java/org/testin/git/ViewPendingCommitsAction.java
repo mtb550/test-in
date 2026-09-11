@@ -16,6 +16,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -89,7 +90,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
      * so a successful push is never reported as "Commit  is on origin/main".
      */
     private static @NotNull String commitLabel(final @NotNull String commitId) {
-        return commitId.isBlank() ? "The commit" : "Commit " + commitId;
+        return commitId.isBlank() ? Bundle.message("git.commit.label.none") : Bundle.message("git.commit.label", commitId);
     }
 
     /**
@@ -114,9 +115,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         private void openFor(final @NotNull Path path) {
             if (git.isNotRepository(path)) {
                 Services.getInstance(p, Notifier.class).warnWithAction(p,
-                        "Git repository not found",
-                        "The selected project (" + path.getFileName() + ") is not a Git repository.",
-                        "Initialize Git (git init)",
+                        Bundle.message("git.no.repository.title"),
+                        Bundle.message("git.no.repository.message", path.getFileName()),
+                        Bundle.message("git.no.repository.action"),
                         () -> initializeGitRepository(path)
                 );
 
@@ -128,7 +129,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
         // UC-SHARE-010, Rule-SHARE-050
         private void scanForChanges(final @NotNull Path path) {
-            GitBackgroundTask.run(p, "Scanning for changes", true,
+            GitBackgroundTask.run(p, Bundle.message("git.task.scanning"), true,
                     indicator -> {
                         // Nothing can be committed while a rebase is unfinished, and
                         // Git says so in its own words - "interactive rebase in
@@ -157,7 +158,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         ApplicationManager.getApplication().invokeLater(() ->
                                 reviewChanges(path, changes, branches, current, unpushed));
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to calculate diffs: " + ex.getMessage()));
+                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.diffs", ex.getMessage())));
         }
 
         // UC-SHARE-010
@@ -192,7 +193,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         private void commitOnBranch(final @NotNull Path repoPath, final @NotNull PendingCommitsDialog.Request request) {
             final @NotNull String target = request.branch();
 
-            GitBackgroundTask.run(p, "Preparing the branch", false,
+            GitBackgroundTask.run(p, Bundle.message("git.task.preparing.branch"), false,
                     indicator -> {
                         final @NotNull String current = git.getCurrentBranch(repoPath);
 
@@ -201,7 +202,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                             return;
                         }
 
-                        indicator.setText((request.newBranch() ? "Starting " : "Checking out ") + target);
+                        indicator.setText(request.newBranch()
+                                ? Bundle.message("git.progress.starting.branch", target)
+                                : Bundle.message("git.progress.checking.out", target));
 
                         final boolean moved = request.newBranch()
                                 ? git.startBranch(repoPath, target)
@@ -209,9 +212,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
                         if (!moved) {
                             ApplicationManager.getApplication().invokeLater(() ->
-                                    Services.getInstance(p, Notifier.class).error(p, "Branch Not Switched",
-                                            target + " could not be checked out, so nothing was committed. "
-                                                    + "The changes are still here and still yours."));
+                                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.branch.not.switched.title"),
+                                            Bundle.message("git.branch.not.switched.message", target)));
                             return;
                         }
 
@@ -229,13 +231,13 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                             final @NotNull TreePanel panel = Services.getInstance(p, TreePanel.class);
 
                             if (request.newBranch()) panel.refresh();
-                            else panel.reindex("Switched to " + target);
+                            else panel.reindex(Bundle.message("git.switched.to", target));
 
                             performCommitWorkflow(repoPath, request, target);
                         });
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error",
-                            "Could not prepare " + target + ": " + ex.getMessage()));
+                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"),
+                            Bundle.message("git.error.prepare", target, ex.getMessage())));
         }
 
         /**
@@ -254,15 +256,17 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
             if (unpushed == 0) {
-                notifier.softRefuse(p, "No changes");
+                notifier.softRefuse(p, Bundle.message("git.no.changes"));
                 return;
             }
 
-            final @NotNull String waiting = unpushed == 1 ? "1 commit is" : unpushed + " commits are";
+            final @NotNull String waiting = unpushed == 1
+                    ? Bundle.message("git.not.pushed.one")
+                    : Bundle.message("git.not.pushed.many", String.valueOf(unpushed));
 
-            notifier.warnWithAction(p, "Not Pushed",
-                    waiting + " committed here and not on the remote.",
-                    "Push",
+            notifier.warnWithAction(p, Bundle.message("git.not.pushed.title"),
+                    waiting,
+                    Bundle.message("git.push.action"),
                     () -> pushToRemote(path, commits.headCommitId(path), currentBranch));
         }
 
@@ -272,9 +276,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             final @NotNull Collection<PendingChange> selectedChanges = request.changes();
             final boolean push = request.push();
 
-            GitBackgroundTask.run(p, push ? "Committing and pushing" : "Committing to local Git", false,
+            GitBackgroundTask.run(p, push ? Bundle.message("git.task.committing.and.pushing") : Bundle.message("git.task.committing"), false,
                     indicator -> {
-                        indicator.setText("Staging and committing files");
+                        indicator.setText(Bundle.message("git.progress.staging"));
                         commits.stageAndCommit(repoPath, commitMessage, selectedChanges);
 
                         // Read here, while the commit just made is still HEAD: the
@@ -288,25 +292,25 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                                 return;
                             }
 
-                            Services.getInstance(p, Notifier.class).softShow(p, "Committed", commitLabel(commitId));
+                            Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("git.committed"), commitLabel(commitId));
                         });
                     },
                     ex -> {
                         if (isIdentityError(Objects.toString(ex.getMessage(), ""))) {
                             promptAndSetGitIdentity(repoPath, request, branch);
                         } else {
-                            Services.getInstance(p, Notifier.class).error(p, "Commit Failed", "Failed to commit changes:" + System.lineSeparator() + ex.getMessage());
+                            Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.commit.failed.title"), Bundle.message("git.commit.failed.message") + System.lineSeparator() + ex.getMessage());
                         }
                     });
         }
 
         // UC-SHARE-009, Rule-SHARE-043
         private void initializeGitRepository(final @NotNull Path repoPath) {
-            GitBackgroundTask.run(p, "Initializing git repository", false,
+            GitBackgroundTask.run(p, Bundle.message("git.task.init"), false,
                     indicator -> {
                         commits.initialize(repoPath);
                         ApplicationManager.getApplication().invokeLater(() -> {
-                            Services.getInstance(p, Notifier.class).softShow(p, "Git initialized");
+                            Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("git.initialized"));
 
                             // The tester asked to see pending commits. Initializing was
                             // what stood in the way, not what they wanted, so the review
@@ -314,7 +318,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                             scanForChanges(repoPath);
                         });
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage()));
+                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.init.failed.title"), Bundle.message("git.init.failed.message", ex.getMessage())));
         }
 
         /**
@@ -329,13 +333,13 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
          *                    not choose
          */
         private void pushToRemote(final @NotNull Path repoPath, final @NotNull String commitId, final @NotNull String committedOn) {
-            GitBackgroundTask.run(p, "Checking Git remote", false,
+            GitBackgroundTask.run(p, Bundle.message("git.task.checking.remote"), false,
                     indicator -> {
                         final @NotNull String remoteName = git.getRemoteName(repoPath);
                         final @NotNull String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
                         final @NotNull String branch = committedOn.isBlank() ? git.syncBranch(repoPath) : committedOn;
                         if (branch.isBlank()) {
-                            throw new IllegalStateException("Could not determine which branch to push.");
+                            throw new IllegalStateException(Bundle.message("git.error.no.push.branch"));
                         }
                         ApplicationManager.getApplication().invokeLater(() -> {
                             // A repository with no remote yields an empty URL above, and
@@ -347,7 +351,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                             }
                         });
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Could not read the Git remote: " + ex.getMessage()));
+                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.read.remote", ex.getMessage())));
         }
 
         // UC-SHARE-013, Rule-SHARE-060
@@ -380,19 +384,19 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
         // UC-SHARE-013, Rule-SHARE-060
         private void addRemoteAndPush(final @NotNull Path repoPath, final @NotNull String remoteName, final @NotNull String branch, final @NotNull String commitId, final @NotNull String remoteUrl) {
-            GitBackgroundTask.run(p, "Configuring remote", false,
+            GitBackgroundTask.run(p, Bundle.message("git.task.configuring.remote"), false,
                     indicator -> {
                         commits.configureRemote(repoPath, remoteName, remoteUrl);
                         ApplicationManager.getApplication().invokeLater(() -> executeGitPush(repoPath, remoteName, branch, commitId));
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage()));
+                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.add.remote", ex.getMessage())));
         }
 
         // UC-SHARE-013, Rule-SHARE-061
         private void executeGitPush(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final @NotNull String commitId) {
-            GitBackgroundTask.run(p, "Pushing to Remote", false,
+            GitBackgroundTask.run(p, Bundle.message("git.task.pushing.remote"), false,
                     indicator -> {
-                        indicator.setText("Syncing with remote: pull --rebase, then push");
+                        indicator.setText(Bundle.message("git.progress.pull.rebase"));
                         commits.pullAndPush(repoPath, remote, branch);
 
                         // The pull above rebases a colleague's test cases into the
@@ -404,8 +408,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         // and it names the commit, so the tester can find it on the
                         // remote without going back to look it up.
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(p, Notifier.class).info(p, "Pushed",
-                                        commitLabel(commitId) + " is on " + remote + "/" + branch));
+                                Services.getInstance(p, Notifier.class).info(p, Bundle.message("git.pushed.title"),
+                                        Bundle.message("git.pushed.message", commitLabel(commitId), remote, branch)));
                     },
                     ex -> {
                         if (git.hasConflicts(repoPath)) {
@@ -417,8 +421,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         // review and no second route back to a push. The retry travels
                         // with the failure that needs it.
                         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-                        notifier.errorWithActions(p, "Push Failed", ex.getMessage(),
-                                notifier.action("Try Again", () -> pushToRemote(repoPath, commitId, branch)));
+                        notifier.errorWithActions(p, Bundle.message("git.push.failed.title"), ex.getMessage(),
+                                notifier.action(Bundle.message("git.try.again"), () -> pushToRemote(repoPath, commitId, branch)));
                     });
         }
 
@@ -446,7 +450,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             ApplicationManager.getApplication().executeOnPooledThread(() ->
                     ConflictResolution.resolveRebase(p, repoPath,
                             () -> pushAfterRebase(repoPath, remote, branch),
-                            leftOver -> Services.getInstance(p, Notifier.class).warn(p, "Still Conflicting",
+                            leftOver -> Services.getInstance(p, Notifier.class).warn(p, Bundle.message("git.still.conflicting.title"),
                                     GitRefs.conflictMessage(leftOver))));
         }
 
@@ -461,31 +465,31 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
          * with "no rebase in progress".
          */
         private void pushAfterRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
-            GitBackgroundTask.run(p, "Pushing " + branch, false,
+            GitBackgroundTask.run(p, Bundle.message("git.task.pushing.branch", branch), false,
                     indicator -> {
                         commits.push(repoPath, remote, branch);
                         RepositoryRefresh.after(p, repoPath);
 
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(p, Notifier.class).info(p, "Rebase continued",
-                                        "Changes pushed to the remote"));
+                                Services.getInstance(p, Notifier.class).info(p, Bundle.message("git.rebase.continued.title"),
+                                        Bundle.message("git.rebase.continued.message")));
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, "Push Failed", ex.getMessage()));
+                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.push.failed.title"), ex.getMessage()));
         }
 
         // UC-SHARE-017, Rule-SHARE-077
         private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final boolean abort) {
-            GitBackgroundTask.run(p, abort ? "Aborting rebase" : "Continuing rebase", false,
+            GitBackgroundTask.run(p, abort ? Bundle.message("git.task.aborting.rebase") : Bundle.message("git.task.continuing.rebase"), false,
                     indicator -> {
                         // GitTaskWork declares throws so a lambda can report failure
                         // to the task's error handler - which is where the conflict
                         // recovery below lives. The git reason is already logged (#63).
                         if (abort) {
                             if (git.couldNotAbortRebase(repoPath))
-                                throw new IllegalStateException("Could not abort the rebase.");
+                                throw new IllegalStateException(Bundle.message("git.error.abort.rebase"));
                         } else {
                             if (git.couldNotContinueRebase(repoPath))
-                                throw new IllegalStateException("Could not continue the rebase.");
+                                throw new IllegalStateException(Bundle.message("git.error.continue.rebase"));
                             commits.push(repoPath, remote, branch);
                         }
 
@@ -497,13 +501,13 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
                         ApplicationManager.getApplication().invokeLater(() ->
                                 Services.getInstance(p, Notifier.class).info(p,
-                                        abort ? "Rebase aborted" : "Rebase continued",
-                                        abort ? "Nothing was pushed" : "Changes pushed to the remote"));
+                                        abort ? Bundle.message("git.rebase.aborted.title") : Bundle.message("git.rebase.continued.title"),
+                                        abort ? Bundle.message("git.rebase.aborted.message") : Bundle.message("git.rebase.continued.message")));
                     },
                     ex -> {
                         if (git.hasConflicts(repoPath)) showConflictActions(repoPath, remote, branch);
                         else
-                            Services.getInstance(p, Notifier.class).error(p, "Git Conflict Operation Failed", ex.getMessage());
+                            Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), ex.getMessage());
                     });
         }
 
@@ -512,20 +516,20 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             // The dialog validates what it collected - a blank name or email never
             // leaves it - so this is the workflow resuming, not a second check.
             ApplicationManager.getApplication().invokeLater(() -> new GitIdentityDialog(p, identity ->
-                    GitBackgroundTask.run(p, "Configuring git identity", false,
+                    GitBackgroundTask.run(p, Bundle.message("git.task.configuring.identity"), false,
                             indicator -> {
                                 commits.configureIdentity(repoPath, identity.name(), identity.email(), identity.global());
                                 ApplicationManager.getApplication().invokeLater(() -> {
                                     // The tester is watching: they just filled the dialog
                                     // in and the commit resumes on the next line.
-                                    Services.getInstance(p, Notifier.class).softShow(p, "Identity set");
+                                    Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("git.identity.set"));
                                     // The branch is settled by now - this is the
                                     // same commit resuming, not a second decision.
                                     performCommitWorkflow(repoPath, request, branch);
                                 });
                             },
-                            ex -> Services.getInstance(p, Notifier.class).error(p, "Config Failed",
-                                    "Failed to set Git identity:" + System.lineSeparator() + ex.getMessage()))
+                            ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.config.failed.title"),
+                                    Bundle.message("git.config.failed.message") + System.lineSeparator() + ex.getMessage()))
             ).show());
         }
 

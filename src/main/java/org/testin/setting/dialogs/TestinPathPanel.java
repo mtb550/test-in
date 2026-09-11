@@ -10,6 +10,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import org.jetbrains.annotations.NotNull;
 
+import org.testin.util.Bundle;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -21,7 +22,7 @@ import java.nio.file.Path;
 public final class TestinPathPanel {
 
     private final @NotNull TextFieldWithBrowseButton pathField = new TextFieldWithBrowseButton();
-    private final @NotNull JButton openFolderBtn = new JButton("Open");
+    private final @NotNull JButton openFolderBtn = new JButton(Bundle.message("settings.path.open"));
 
     public TestinPathPanel() {
         setupField();
@@ -31,13 +32,13 @@ public final class TestinPathPanel {
 
     private void setupField() {
         ((JBTextField) pathField.getTextField()).getEmptyText()
-                .setText("Example -> C:\\Users\\{username}\\Documents\\Testin");
+                .setText(Bundle.message("settings.path.example"));
 
         pathField.addBrowseFolderListener(
                 null,
                 FileChooserDescriptorFactory.createSingleFolderDescriptor()
-                        .withTitle("Select Root Folder")
-                        .withDescription("Choose the directory where your test projects are stored"),
+                        .withTitle(Bundle.message("settings.path.root.title"))
+                        .withDescription(Bundle.message("settings.path.root.description")),
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         );
     }
@@ -55,7 +56,7 @@ public final class TestinPathPanel {
                 // application-level and has no project to notify through, and it
                 // is modal anyway, so a balloon behind it would go unread (#70).
                 Messages.showErrorDialog(openFolderBtn,
-                        "Could not open folder: " + ex.getMessage(), "Open Folder Failed");
+                        Bundle.message("settings.path.open.failed", ex.getMessage()), Bundle.message("settings.path.open.failed.title"));
             }
         });
     }

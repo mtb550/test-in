@@ -10,6 +10,7 @@ import org.testin.model.TestRunSummary;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.DetailRow;
+import org.testin.util.Bundle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,14 +42,14 @@ public final class ReportOverview {
      * is there to say whether this run is pinned to a commit, and an empty cell
      * reads as a question the report forgot to answer.
      */
-    private static final @NotNull String NOT_RECORDED = "n/a";
+    private static final @NotNull String NOT_RECORDED = Bundle.message("report.overview.not.recorded");
 
     // Rule-REPORT-002
     public static @NotNull List<DetailRow> rowsFor(final @NotNull String projectName, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull TestRunSummary summary) {
         final @NotNull List<DetailRow> rows = new ArrayList<>();
 
-        rows.add(new DetailRow("Project", projectName));
-        rows.add(new DetailRow("Test Run", trDir.getName()));
+        rows.add(new DetailRow(Bundle.message("report.overview.project"), projectName));
+        rows.add(new DetailRow(Bundle.message("node.tr"), trDir.getName()));
 
         // Every configuration field, walked rather than listed. Listed, it
         // printed five of the eight: the language, the browser and the device

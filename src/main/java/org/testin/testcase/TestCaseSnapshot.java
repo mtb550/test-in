@@ -12,6 +12,7 @@ import org.testin.services.Services;
 import org.testin.undo.UndoScope;
 import org.testin.undo.UndoService;
 import org.testin.editor.EditorUtil;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -71,7 +72,9 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
      * by, and a count when there are more of them than a sentence would hold.
      */
     public static @NotNull String describe(final @NotNull String verb, final @NotNull List<TestCaseDto> cases) {
-        return cases.size() == 1 ? verb + " '" + cases.getFirst().getDescription() + "'" : verb + " " + cases.size() + " test cases";
+        return cases.size() == 1
+                ? Bundle.message("snapshot.undo.one", verb, cases.getFirst().getDescription())
+                : Bundle.message("snapshot.undo.many", verb, String.valueOf(cases.size()));
     }
 
     /**
@@ -133,8 +136,8 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
     private static void restore(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> target, final @NotNull List<TestCaseSnapshot> expected) {
         if (!expected.stream().allMatch(TestCaseSnapshot::stillStands)) {
             Services.getInstance(p, Notifier.class).softRefuse(p,
-                    "These test cases changed since",
-                    "Something else has written them - a sync, a pull, or another IDE - so taking this back would write over work that is not yours. Nothing was changed.");
+                    Bundle.message("snapshot.changed.title"),
+                    Bundle.message("snapshot.changed.message"));
             return;
         }
 

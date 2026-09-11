@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Groups;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Bundle;
 import org.testin.util.TestDataParser;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
 
     @Override
     protected @NotNull String getPopupTitle() {
-        return "Bulk Edit Group";
+        return Bundle.message("bulk.title.group");
     }
 
     @Override

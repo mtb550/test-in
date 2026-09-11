@@ -2,6 +2,7 @@ package org.testin.ui.framework;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.statusbar.StatusBarItem;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 /**
@@ -41,7 +42,7 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
      * {@link #build} and says so.
      */
     public static @NotNull StatusBarShortcut cancel(final @NotNull Runnable action) {
-        return build(Shortcuts.Escape, "Cancel", action);
+        return build(Shortcuts.Escape, Bundle.message("shortcut.cancel"), action);
     }
 
     /**
@@ -53,7 +54,7 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
      * imposed.
      */
     public static @NotNull StatusBarShortcut confirm(final @NotNull Runnable action) {
-        return build(Shortcuts.Enter, "Confirm", action);
+        return build(Shortcuts.Enter, Bundle.message("shortcut.confirm"), action);
     }
 
     /**
@@ -65,7 +66,7 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
      * more, and all three should be one word. It was six files before this
      * existed.
      */
-    public static final @NotNull String SAVE = "Save";
+    public static final @NotNull String SAVE = Bundle.message("shortcut.save");
 
     /**
      * Enter, called Save, submitting - {@link #confirm} in the words those
@@ -90,7 +91,7 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
      * because there the key that moves and the key that chooses are one decision
      * to a tester, and both should read as one word.
      */
-    public static final @NotNull String SELECT = "Select";
+    public static final @NotNull String SELECT = Bundle.message("shortcut.select");
 
     /**
      * The arrow keys, called Select, moving between rows - a list binds them

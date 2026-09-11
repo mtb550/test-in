@@ -10,6 +10,7 @@ import org.testin.model.dto.TestRunDto;
 
 import javax.swing.*;
 import org.testin.model.markers.DetailRow;
+import org.testin.util.Bundle;
 
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -22,42 +23,42 @@ import java.util.Objects;
 public enum TestRunConfiguration {
 
     TEST_TYPE(
-            "Test Type",
+            Bundle.message("config.test.type"),
             AllIcons.Nodes.Type,
             new String[]{"", "Functional Test", "Performance Test"},
             ShownWhen.ALWAYS
     ),
 
     CHANGE_LOG(
-            "Change Log",
+            Bundle.message("config.change.log"),
             AllIcons.Nodes.Type,
             Free.OPTIONS,
             ShownWhen.ALWAYS
     ),
 
     COMMIT_ID(
-            "Commit ID",
+            Bundle.message("config.commit.id"),
             AllIcons.Nodes.Type,
             Free.OPTIONS,
             ShownWhen.ALWAYS
     ),
 
     PLATFORM(
-            "Platform",
+            Bundle.message("config.platform"),
             AllIcons.Nodes.PpLib,
             new String[]{"", Answer.WEB, Answer.MOBILE},
             ShownWhen.ALWAYS
     ),
 
     COMPONENT(
-            "Component",
+            Bundle.message("config.component"),
             AllIcons.Nodes.PpLib,
             new String[]{"", Answer.FRONTEND, "Backend"},
             ShownWhen.ALWAYS
     ),
 
     LANGUAGE(
-            "Language",
+            Bundle.message("config.language"),
             AllIcons.Nodes.Lambda,
             new String[]{"", "English", "Arabic", "French"},
             ShownWhen.ALWAYS
@@ -69,7 +70,7 @@ public enum TestRunConfiguration {
      * mobile one has a handset instead.
      */
     BROWSER(
-            "Browser",
+            Bundle.message("config.browser"),
             AllIcons.Nodes.WebFolder,
             new String[]{"", "Chrome", "Firefox", "Safari", "Edge"},
             chosen -> chosen.is(PLATFORM, Answer.WEB) && chosen.is(COMPONENT, Answer.FRONTEND)
@@ -80,7 +81,7 @@ public enum TestRunConfiguration {
      * browser, on the other platform.
      */
     DEVICE_TYPE(
-            "Device Type",
+            Bundle.message("config.device.type"),
             AllIcons.Nodes.Include,
             new String[]{"", "iPhone", "Samsung", "Huawei"},
             chosen -> chosen.is(PLATFORM, Answer.MOBILE) && chosen.is(COMPONENT, Answer.FRONTEND)

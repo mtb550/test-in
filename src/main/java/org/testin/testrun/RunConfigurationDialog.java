@@ -8,6 +8,7 @@ import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogButton;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Bundle;
 
 import java.awt.*;
 import java.util.List;
@@ -42,8 +43,8 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunCon
                 confirm);
 
         shortcuts = List.of(
-                StatusBarShortcut.hint("Tab", "Navigate"),
-                StatusBarShortcut.hint("Space", "Check"),
+                StatusBarShortcut.hint("Tab", Bundle.message("shortcut.navigate")),
+                StatusBarShortcut.hint("Space", Bundle.message("shortcut.check")),
                 StatusBarShortcut.cancel(this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(900), JBUI.scale(600));

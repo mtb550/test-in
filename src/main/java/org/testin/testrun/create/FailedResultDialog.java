@@ -9,6 +9,7 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextInput;
+import org.testin.util.Bundle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,20 +39,20 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
 
         fields = new FailureFields(runItem);
 
-        title = "Failed Test Case Details";
+        title = Bundle.message("dialog.failed.result.title");
 
         // The dialog still opens without the test case: the tester came here to
         // read and edit the recorded result, which lives on the run item. Only
         // the two rows describing the case are affected, and the Expected row
         // is left blank rather than filled with an apology - DialogDetails drops
         // blank rows, so it simply does not appear.
-        final @NotNull String description = tc.map(TestCaseDto::getDescription).orElse("No longer in the test set");
+        final @NotNull String description = tc.map(TestCaseDto::getDescription).orElse(Bundle.message("dialog.failed.result.gone"));
         final @NotNull String expectedResult = tc.map(TestCaseDto::getExpectedResult).orElse("");
 
         final @NotNull List<ComponentDialogBase<?>> all = new ArrayList<>();
         all.add(ComponentDialogBase.details()
                 .row(TestEditorAttributes.DESCRIPTION.getName(), description)
-                .row("Expected", expectedResult)
+                .row(Bundle.message("caption.expected"), expectedResult)
                 .build());
         all.addAll(fields.components());
 
@@ -70,8 +71,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
 
     @Override
     protected @NotNull String unsavedInputMessage() {
-        return "The actual result, the severity, the priority and the error pasted here are not recorded yet, "
-                + "and neither is the Failed verdict. There is no copy of any of it.";
+        return Bundle.message("dialog.failed.result.unsaved");
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145

@@ -12,6 +12,7 @@ import org.testin.logger.Logger;
 import org.testin.git.TestCaseMerge;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.nio.charset.StandardCharsets;
@@ -92,16 +93,26 @@ public final class SftpSync {
             if (isBlocked()) return blockedBy;
 
             if (uploaded == 0 && downloaded == 0 && merged == 0 && conflicts == 0 && removedOnServer.isEmpty()) {
-                return "Already up to date";
+                return Bundle.message("sftp.describe.up.to.date");
             }
 
             final @NotNull StringBuilder said = new StringBuilder();
-            if (uploaded > 0) said.append("Sent ").append(uploaded);
-            if (downloaded > 0) said.append(said.isEmpty() ? "Took " : ", took ").append(downloaded);
-            if (merged > 0) said.append(said.isEmpty() ? "Merged " : ", merged ").append(merged);
-            if (conflicts > 0) said.append(said.isEmpty() ? "" : ", ").append(conflicts).append(" need you");
+            if (uploaded > 0) said.append(Bundle.message("sftp.describe.sent", String.valueOf(uploaded)));
+            if (downloaded > 0) {
+                said.append(said.isEmpty()
+                        ? Bundle.message("sftp.describe.took.first", String.valueOf(downloaded))
+                        : ", " + Bundle.message("sftp.describe.took", String.valueOf(downloaded)));
+            }
+            if (merged > 0) {
+                said.append(said.isEmpty()
+                        ? Bundle.message("sftp.describe.merged.first", String.valueOf(merged))
+                        : ", " + Bundle.message("sftp.describe.merged", String.valueOf(merged)));
+            }
+            if (conflicts > 0) {
+                said.append(said.isEmpty() ? "" : ", ").append(Bundle.message("sftp.describe.need.you", String.valueOf(conflicts)));
+            }
             if (!removedOnServer.isEmpty()) {
-                said.append(said.isEmpty() ? "" : ", ").append(removedOnServer.size()).append(" gone from the server");
+                said.append(said.isEmpty() ? "" : ", ").append(Bundle.message("sftp.describe.gone", String.valueOf(removedOnServer.size())));
             }
 
             return said.toString();
@@ -121,7 +132,7 @@ public final class SftpSync {
         // The address already points at it - composed once in the config, from
         // the root and the project's name - so nothing here joins one on.
 
-        indicator.setText("Reading this machine's copy...");
+        indicator.setText(Bundle.message("sftp.progress.reading.local"));
         final @NotNull Map<String, byte[]> local = indexer.filesUnder(projectRoot);
         final @NotNull Baseline baseline = BaselineStore.read(mapper, baselineFile);
 
@@ -153,7 +164,7 @@ public final class SftpSync {
      * tester on the team until somebody deletes a hidden folder over SSH.
      */
     private static @NotNull Outcome inside(final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull ProgressIndicator indicator, final @NotNull SftpTransport transport, final @NotNull ProjectIndexer indexer, final @NotNull Mapper mapper, final @NotNull Path baselineFile, final @NotNull Map<String, byte[]> local, final @NotNull Baseline baseline) {
-        indicator.setText("Asking the server what it has...");
+        indicator.setText(Bundle.message("sftp.progress.asking.server"));
         final @NotNull Manifest remote = readManifest(transport, mapper);
 
         // A server with no manifest has never heard of this project - which
@@ -204,11 +215,11 @@ public final class SftpSync {
                 settle(transport, mapper, indicator, plan, local, onServer, agreed, incoming);
 
         if (!incoming.isEmpty()) {
-            indicator.setText("Writing " + incoming.size() + " files from the server...");
+            indicator.setText(Bundle.message("sftp.progress.writing", String.valueOf(incoming.size())));
             indexer.acceptIncoming(projectRoot, incoming);
         }
 
-        indicator.setText("Recording what both sides now hold...");
+        indicator.setText(Bundle.message("sftp.progress.recording"));
         writeManifest(transport, mapper, new Manifest(onServer));
         BaselineStore.write(mapper, baselineFile, new Baseline(agreed));
 
@@ -229,7 +240,7 @@ public final class SftpSync {
         int done = 0;
 
         indicator.setIndeterminate(total == 0);
-        if (total > 0) indicator.setText("Moving " + total + " files...");
+        if (total > 0) indicator.setText(Bundle.message("sftp.progress.moving", String.valueOf(total)));
 
         for (final String path : plan.toUpload) {
             indicator.setText2(path);
@@ -389,7 +400,7 @@ public final class SftpSync {
 
         if (mergeable.isEmpty()) return List.of();
 
-        indicator.setText("Merging " + mergeable.size() + " changed on both sides...");
+        indicator.setText(Bundle.message("sftp.progress.merging", String.valueOf(mergeable.size())));
 
         for (final String path : mergeable) {
             indicator.setText2(path);

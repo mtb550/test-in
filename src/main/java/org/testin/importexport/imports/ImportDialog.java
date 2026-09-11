@@ -12,6 +12,7 @@ import org.testin.services.Services;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;
@@ -39,7 +40,7 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
         super(p);
         this.onImport = onImport;
 
-        title = "Import Test Cases";
+        title = Bundle.message("dialog.import.title");
 
         preview = new SheetPreview(p, importAttributes);
         final @NotNull SourceForm form = new SourceForm(p, importAttributes, importLoader, preview::show);
@@ -66,13 +67,13 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
         if (component().resolve().isEmpty()) return;
 
         if (preview.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, "Import Empty", "No data loaded from the selected file.");
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("notification.import.empty.title"), Bundle.message("notification.import.empty.nothing.loaded"));
             return;
         }
 
         final @NotNull Map<String, List<TestCaseDto>> selected = preview.selected();
         if (selected.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, "Import Empty", "Select at least one test case to import.");
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("notification.import.empty.title"), Bundle.message("notification.import.empty.none.selected"));
             return;
         }
 

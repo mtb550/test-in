@@ -16,12 +16,13 @@ import org.testin.setting.TestinRoot;
 import org.testin.testproject.CreateTestProjectCloneAction;
 import org.testin.testproject.CreateTestProjectNewAction;
 import org.testin.services.OptionalPlugin;
+import org.testin.util.Bundle;
 
 public class CreateTestProjectAction extends AbstractProjectAction {
     private final @NotNull TreePanel tp;
 
     public CreateTestProjectAction(final @NotNull Project p, final @NotNull TreePanel tp) {
-        super(p, "New Test Project", "Create or Clone test project", AllIcons.General.Add);
+        super(p, Bundle.message("project.new.text"), Bundle.message("project.new.description"), AllIcons.General.Add);
         this.tp = tp;
     }
 
@@ -56,9 +57,8 @@ public class CreateTestProjectAction extends AbstractProjectAction {
             final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
 
             if (projectName.isEmpty()) {
-                Services.getInstance(p, Notifier.class).warn(p, "No Test Project Named",
-                        "testin.yml must say which test project this repository is about before one can be "
-                                + "cloned. Set testinProject in it, or pick a project with Select Test Project.");
+                Services.getInstance(p, Notifier.class).warn(p, Bundle.message("project.no.name.title"),
+                        Bundle.message("project.no.name.message"));
                 return;
             }
 

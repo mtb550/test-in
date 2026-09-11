@@ -16,6 +16,7 @@ import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogDetails;
 import org.testin.services.Services;
 import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.util.Shortcuts;
 
@@ -49,11 +50,11 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
         final @NotNull DirectoryType type = dto.getType();
         final @NotNull NodeFigures figures = type.getStatistics().getGather().of(p, dto);
 
-        title = "Details";
+        title = Bundle.message("dialog.details.title");
 
         final @NotNull ComponentDialogBase.DetailsBuilder details = ComponentDialogBase.details()
-                .row("Name", dto.getName())
-                .row("Path", dto.getPath().toString())
+                .row(Bundle.message("caption.name"), dto.getName())
+                .row(Bundle.message("caption.path"), dto.getPath().toString())
                 .row(TestEditorAttributes.CREATED_BY.getName(), marker.getCreatedBy())
                 .row(TestEditorAttributes.CREATED_AT.getName(), Display.formatDate(marker.getCreatedAt()))
                 .row(TestEditorAttributes.UPDATED_BY.getName(), marker.getModifiedBy())
@@ -94,7 +95,7 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
                 details.build(),
                 ComponentDialogBase.of(new VerdictDonut(type.getStatistics().getSlices(), figures)));
 
-        shortcuts = List.of(StatusBarShortcut.build(Shortcuts.Escape, "Close", this::closeCancel));
+        shortcuts = List.of(StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("shortcut.close"), this::closeCancel));
 
         // Sized rather than packed so it stays movable and resizable, as it was,
         // and tall enough for the node that shows the most: the counts add a row

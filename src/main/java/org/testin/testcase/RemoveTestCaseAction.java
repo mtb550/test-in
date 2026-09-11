@@ -17,6 +17,7 @@ import org.testin.notifications.Notifier;
 import org.testin.clipboard.CutState;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
+import org.testin.util.Bundle;
 
 import java.util.*;
 public class RemoveTestCaseAction extends DumbAwareAction {
@@ -38,7 +39,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
         // this method learning about it.
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             e.getPresentation().setEnabled(false);
-            e.getPresentation().setDescription("A test run keeps what it recorded, including for a test case that is gone. Delete the test case in its test set.");
+            e.getPresentation().setDescription(Bundle.message("remove.case.disabled.description"));
             return;
         }
 
@@ -72,10 +73,10 @@ public class RemoveTestCaseAction extends DumbAwareAction {
             }
 
             final @NotNull String msg = selectedItems.size() == 1
-                    ? "Remove '" + selectedItems.getFirst().getDescription() + "'?"
-                    : "Remove these " + selectedItems.size() + " test cases?";
+                    ? Bundle.message("remove.case.confirm.one", selectedItems.getFirst().getDescription())
+                    : Bundle.message("remove.case.confirm.many", String.valueOf(selectedItems.size()));
 
-            new ConfirmDialog(p, "Confirm Removing", msg, dir.getPath().toString(), "", "Remove", () -> {
+            new ConfirmDialog(p, Bundle.message("remove.confirm.title"), msg, dir.getPath().toString(), "", Bundle.message("remove.confirm.button"), () -> {
                 delete.run();
 
                 // Inside the confirmation callback, not around actionPerformed: a
@@ -115,7 +116,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
             // the next page instead of standing at forty-seven.
             editor.refreshView();
 
-            TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Remove", selectedItems), before, TestCaseSnapshot.of(p, dir.getPath(), ids));
+            TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.remove"), selectedItems), before, TestCaseSnapshot.of(p, dir.getPath(), ids));
         }
 
 

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import org.testin.util.Bundle;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -24,25 +25,25 @@ import java.util.function.Predicate;
 public enum FailureDetail {
 
     ACTUAL_RESULT(
-            "the actual result",
+            Bundle.message("failure.detail.actual.result"),
             item -> !item.getActualResult().isBlank(),
             item -> item.setActualResult("")
     ),
 
     STACKTRACE(
-            "the stacktrace",
+            Bundle.message("failure.detail.stacktrace"),
             item -> !item.getStacktrace().isBlank(),
             item -> item.setStacktrace("")
     ),
 
     BUG_SEVERITY(
-            "the bug severity",
+            Bundle.message("failure.detail.bug.severity"),
             item -> item.getBugSeverity() != BugSeverity.EMPTY,
             item -> item.setBugSeverity(BugSeverity.EMPTY)
     ),
 
     BUG_PRIORITY(
-            "the bug priority",
+            Bundle.message("failure.detail.bug.priority"),
             item -> item.getBugPriority() != BugPriority.EMPTY,
             item -> item.setBugPriority(BugPriority.EMPTY)
     );

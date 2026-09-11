@@ -15,6 +15,7 @@ import org.testin.explorer.TreePanel;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
 import org.testin.editor.EditorUtil;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -111,7 +112,7 @@ public final class Rescan {
         if (p.isDisposed() || Services.isNotCreated(p, TreePanel.class)) return;
 
         ProgressManager.getInstance().run(
-                new Task.Backgroundable(p, "Reading test data that changed on disk", true) {
+                new Task.Backgroundable(p, Bundle.message("indexer.task.rescan"), true) {
                     @Override
                     public void run(final @NotNull ProgressIndicator indicator) {
                         indicator.setIndeterminate(false);

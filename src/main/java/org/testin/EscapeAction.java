@@ -17,6 +17,7 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -25,7 +26,7 @@ import java.awt.datatransfer.StringSelection;
 public class EscapeAction extends AbstractProjectAction {
 
     /** One name for the four surfaces, so a rename cannot reach three of them. */
-    private static final @NotNull String TITLE = "Escape Action";
+    private static final @NotNull String TITLE = Bundle.message("escape.title");
 
     /**
      * What ESC does on the surface this action was registered on, chosen by the
@@ -38,13 +39,13 @@ public class EscapeAction extends AbstractProjectAction {
     private final @NotNull Runnable onEscape;
 
     public EscapeAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
-        super(p, TITLE, "Clear a pending cut or copy in the tree", AllIcons.Actions.InlayGear);
+        super(p, TITLE, Bundle.message("escape.tree"), AllIcons.Actions.InlayGear);
         this.onEscape = () -> clearTreeTransfer(transferHandler);
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), tree);
     }
 
     public EscapeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
-        super(p, TITLE, "Clear a pending cut or copy, close the details panel, then clear the selection", AllIcons.Actions.InlayGear);
+        super(p, TITLE, Bundle.message("escape.editor"), AllIcons.Actions.InlayGear);
         this.onEscape = () -> stepBack(list::clearSelection);
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), list);
     }
@@ -66,7 +67,7 @@ public class EscapeAction extends AbstractProjectAction {
      * the tester means by then.
      */
     public EscapeAction(final @NotNull Project p, final @NotNull JBPanel<?> tab) {
-        super(p, TITLE, "Clear a pending cut, then close the details panel", AllIcons.Actions.InlayGear);
+        super(p, TITLE, Bundle.message("escape.run"), AllIcons.Actions.InlayGear);
         this.onEscape = () -> stepBack(() -> {
         });
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), tab);
@@ -76,7 +77,7 @@ public class EscapeAction extends AbstractProjectAction {
      * Grid view: same behavior as the list, except while a cell is being edited.
      */
     public EscapeAction(final @NotNull Project p, final @NotNull JBTable table) {
-        super(p, TITLE, "Cancel the cell being edited, or clear the selection when not editing", AllIcons.Actions.InlayGear);
+        super(p, TITLE, Bundle.message("escape.grid"), AllIcons.Actions.InlayGear);
         this.onEscape = () -> escapeInGrid(table);
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), table);
     }

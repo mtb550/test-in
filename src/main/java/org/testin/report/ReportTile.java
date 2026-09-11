@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunSummary;
 import org.testin.model.TestStatus;
+import org.testin.util.Bundle;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +36,7 @@ import java.util.function.Function;
 @AllArgsConstructor
 public enum ReportTile {
 
-    TOTAL_CASES("Total Cases", "1F3864", "var(--heading)", summary -> String.valueOf(summary.total())),
+    TOTAL_CASES(Bundle.message("report.tile.total.cases"), "1F3864", "var(--heading)", summary -> String.valueOf(summary.total())),
 
     PASSED(TestStatus.PASSED.getLabel(), "2E7D32", "var(--verdict-passed)", summary -> String.valueOf(summary.passed())),
 
@@ -60,7 +61,7 @@ public enum ReportTile {
         }
     },
 
-    PASS_RATE("Pass Rate", "2E5496", "var(--heading)", summary -> summary.passRate() + "%");
+    PASS_RATE(Bundle.message("report.tile.pass.rate"), "2E5496", "var(--heading)", summary -> summary.passRate() + "%");
 
     private final @NotNull String label;
 

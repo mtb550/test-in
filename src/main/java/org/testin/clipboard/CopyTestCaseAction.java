@@ -11,6 +11,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.dialogs.ShortcutMenuPopup;
+import org.testin.util.Bundle;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -53,7 +54,7 @@ public class CopyTestCaseAction extends DumbAwareAction {
         final @NotNull List<TestCaseDto> selected = TestinData.selectedCases(e);
         if (selected.isEmpty()) return;
 
-        new ShortcutMenuPopup<>(p, "Copy", CopyChoice.values(), choice -> copy(p, choice, selected)).show();
+        new ShortcutMenuPopup<>(p, Bundle.message("copy.menu.title"), CopyChoice.values(), choice -> copy(p, choice, selected)).show();
     }
 
     private static void copy(final @NotNull Project p, final @NotNull CopyChoice choice, final @NotNull List<TestCaseDto> selected) {

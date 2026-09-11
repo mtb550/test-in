@@ -120,4 +120,26 @@
 # "Select" in a word that had no owner - so the menu popup could not have taken
 # the hint without becoming a fifth. The word is SELECT beside SAVE now, and the
 # arrows are spelled in one place.
-129
+# 17 after the French translation (#11). The largest drop this file has ever
+# recorded, and almost none of it was aimed at this number: a string a tester
+# reads is a key now, and a key is not a display string. About 780 literals over
+# 190 files went into messages.properties, and the check counts literals.
+#
+# So this number has stopped meaning what it meant. It used to be "how many
+# places write a user-facing string another file also writes"; it is now that,
+# minus everything that has already left the Java. The seventeen that remain are
+# worth reading, because they are what a bundle cannot own:
+#
+#   "en_US"          6 - a Jackson date locale on four DTOs. Machinery.
+#   "Test Run"       4 - DirectoryType's folder name on disk, and the kind name
+#                        IndexerDataStore logs. Neither is a caption, and the
+#                        folder name must never be translated.
+#   "test cases"     4 - the same folder names, and the family IndexingScanner
+#   "test runs"          names in its skipped-directory warning.
+#   "Testin"         2 - the keychain subsystem and the Word document's author.
+#   "Tab"            1 - a key name, which stays a literal by the rule the
+#                        bundle's own header states.
+#
+# Every one of those is a floor rather than work to do, which is why the number
+# is unlikely to fall again on its own.
+17

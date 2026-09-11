@@ -16,6 +16,7 @@ import org.testin.model.BugSeverity;
 import org.testin.model.ResultAnalysis;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 
 import java.time.ZonedDateTime;
@@ -71,17 +72,17 @@ public final class TestRunHtmlGenerator {
                 .append(styles())
                 .append("</head><body>");
 
-        html.append("<button class='theme-toggle' type='button' onclick='testinToggleTheme()'>Dark mode</button>");
+        html.append("<button class='theme-toggle' type='button' onclick='testinToggleTheme()'>").append(Bundle.message("report.theme.toggle")).append("</button>");
 
         // HEADER
-        html.append("<div class='report-title'>TEST SUMMARY REPORT</div>")
+        html.append("<div class='report-title'>").append(Bundle.message("report.title")).append("</div>")
                 .append("<div class='report-subtitle'>")
                 .append(StringUtil.escapeXmlEntities(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(tr), TestRunConfiguration.COMPONENT.valueIn(tr))))).append("</div>")
                 .append("<div class='report-runname'>").append(StringUtil.escapeXmlEntities(runName)).append("</div>")
-                .append("<div class='report-conf'>Confidential — QA Test Execution Summary</div>");
+                .append("<div class='report-conf'>").append(Bundle.message("report.confidential")).append("</div>");
 
         // SECTION 1: Report Overview
-        html.append("<div class='section-title-bar'><div class='section-title'>1. Report Overview</div></div>");
+        html.append("<div class='section-title-bar'><div class='section-title'>").append(Bundle.message("report.heading.overview")).append("</div></div>");
         html.append("<table class='overview-table'>");
         for (final DetailRow row : ReportOverview.rowsFor(projectName, trDir, tr, summary)) {
             overviewRow(html, row.caption(), row.value());
@@ -89,12 +90,17 @@ public final class TestRunHtmlGenerator {
         html.append("</table>");
 
         // SECTION 2: Execution Summary
-        html.append("<div class='section-title-bar'><div class='section-title'>2. Execution Summary</div></div>");
+        html.append("<div class='section-title-bar'><div class='section-title'>").append(Bundle.message("report.heading.execution")).append("</div></div>");
 
+        // The four values arrive already wrapped in their bold tags, so the
+        // sentence itself is one key a translator can reorder freely - which
+        // French does: the count and the noun do not sit where English puts them.
         html.append("<div class='summary-text'>")
-                .append("<b>").append(StringUtil.escapeXmlEntities(runName)).append("</b> holds <b>").append(total).append("</b> test cases, of which <b>")
-                .append(summary.executed()).append("</b> were executed. Of those, <b>").append(passRate).append("%</b> passed. ")
-                .append("The results below summarize the outcome.")
+                .append(Bundle.message("report.summary.named",
+                        "<b>" + StringUtil.escapeXmlEntities(runName) + "</b>",
+                        "<b>" + total + "</b>",
+                        "<b>" + summary.executed() + "</b>",
+                        "<b>" + passRate + "%</b>"))
                 .append("</div>");
 
         // Summary cards
@@ -111,7 +117,7 @@ public final class TestRunHtmlGenerator {
         final boolean analysed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
 
         if (analysed) {
-            html.append("<div class='section-title-bar'><div class='section-title'>3. Result Analysis</div></div>");
+            html.append("<div class='section-title-bar'><div class='section-title'>").append(Bundle.message("report.heading.analysis")).append("</div></div>");
 
             for (final ResultAnalysis section : ResultAnalysis.values()) {
                 final @NotNull String written = section.writtenIn(tr.getResultAnalysis());
@@ -154,9 +160,9 @@ public final class TestRunHtmlGenerator {
         // generated the report.
         html.append("<div class='footer'>")
                 .append(Display.formatDate(ZonedDateTime.now()))
-                .append("  |  Generated automatically by ")
+                .append(Bundle.message("report.footer.prefix"))
                 .append("<a href='").append(ReportText.PLUGIN_URL).append("' target='_blank'>Testin</a>")
-                .append(" IntelliJ plugin.")
+                .append(Bundle.message("report.footer.suffix"))
                 .append("</div>");
 
         html.append(themeScript());

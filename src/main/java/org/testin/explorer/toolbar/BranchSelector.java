@@ -18,6 +18,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -104,11 +105,11 @@ public class BranchSelector {
         if (!showable) {
             // Still said, for the log and for a project declared as Git that has
             // not been cloned here yet.
-            showPlaceholder(connection.isShowsBranches() ? "Not a Git repository" : "Not shared through Git");
+            showPlaceholder(connection.isShowsBranches() ? Bundle.message("branch.not.a.repository") : Bundle.message("branch.not.shared"));
             return;
         }
 
-        showPlaceholder("Loading branches...");
+        showPlaceholder(Bundle.message("branch.loading"));
         loadGitBranches(path);
     }
 
@@ -185,7 +186,7 @@ public class BranchSelector {
         final @NotNull Path repositoryPath = projectPath;
         if (repositoryPath.toString().isEmpty()) return;
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Checking branch " + targetBranch, false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, Bundle.message("branch.task.checking", targetBranch), false) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -224,22 +225,21 @@ public class BranchSelector {
         restoreSelectedBranch();
 
         final @NotNull String changes = pending == 1
-                ? "One change in this test project is not committed"
-                : pending + " changes in this test project are not committed";
+                ? Bundle.message("branch.uncommitted.one")
+                : Bundle.message("branch.uncommitted.many", String.valueOf(pending));
 
-        new ConfirmDialog(p, "Uncommitted Changes",
-                changes + ". Switching does not leave them behind - "
-                        + "they come with you, and can be committed onto " + targetBranch + " by mistake.",
+        new ConfirmDialog(p, Bundle.message("branch.uncommitted.title"),
+                Bundle.message("branch.uncommitted.message", changes, targetBranch),
                 currentBranch, targetBranch,
-                "Switch Anyway", () -> checkout(repositoryPath, targetBranch),
-                List.of(new ConfirmDialog.Alternative(Shortcuts.ConfirmAlternative, "Review Changes",
+                Bundle.message("branch.switch.anyway"), () -> checkout(repositoryPath, targetBranch),
+                List.of(new ConfirmDialog.Alternative(Shortcuts.ConfirmAlternative, Bundle.message("branch.review.changes"),
                         () -> ViewPendingCommitsAction.reviewFor(p, repositoryPath))))
                 .show();
     }
 
     // UC-TREE-PANEL-026, Rule-TREE-PANEL-086
     private void checkout(final @NotNull Path repositoryPath, final @NotNull String targetBranch) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Checking out branch: " + targetBranch, false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, Bundle.message("branch.task.checkout", targetBranch), false) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -260,7 +260,7 @@ public class BranchSelector {
                 // which owns file access, and before the re-index reads them.
                 Services.getInstance(p, ProjectIndexer.class).refreshDirectory(repositoryPath);
 
-                ApplicationManager.getApplication().invokeLater(() -> tp.reindex("Switched to " + checkedOut));
+                ApplicationManager.getApplication().invokeLater(() -> tp.reindex(Bundle.message("git.switched.to", checkedOut)));
             }
         });
     }
@@ -277,10 +277,9 @@ public class BranchSelector {
         restoreSelectedBranch();
 
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-        notifier.warnWithAction(p, "Branch Not Switched",
-                targetBranch + " was not checked out. There are uncommitted changes in this test project "
-                        + "that switching would overwrite - commit them first.",
-                "Review Changes",
+        notifier.warnWithAction(p, Bundle.message("git.branch.not.switched.title"),
+                Bundle.message("branch.not.switched.message", targetBranch),
+                Bundle.message("branch.review.changes"),
                 // Built on the panel's own tree: the review belongs to the
                 // project the tree is showing, which is the one whose branch
                 // would not switch.
@@ -320,15 +319,15 @@ public class BranchSelector {
      * the whole time.
      */
     private void loadGitBranches(final @NotNull Path repositoryPath) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Loading Git branches", true) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, Bundle.message("branch.task.loading"), true) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
 
-                indicator.setText("Reading branches");
+                indicator.setText(Bundle.message("branch.progress.reading"));
                 readBranchesInto(repositoryPath);
 
-                indicator.setText("Fetching from remote");
+                indicator.setText(Bundle.message("branch.progress.fetching"));
                 fetchQuietly(repositoryPath);
                 if (indicator.isCanceled()) return;
 
@@ -353,9 +352,9 @@ public class BranchSelector {
         } catch (final Exception ex) {
             Logger.error("Could not read branches: " + ex.getMessage());
             ApplicationManager.getApplication().invokeLater(() -> {
-                showPlaceholder("Failed to load branches");
+                showPlaceholder(Bundle.message("branch.load.failed"));
                 Services.getInstance(p, Notifier.class)
-                        .error(p, "Git Error", "Failed to load branches: " + ex.getMessage());
+                        .error(p, Bundle.message("git.error.title"), Bundle.message("branch.load.failed.message", ex.getMessage()));
             });
         }
     }
@@ -373,8 +372,8 @@ public class BranchSelector {
         } catch (final Exception fetchError) {
             Logger.error("Could not refresh remote branches: " + fetchError.getMessage());
             ApplicationManager.getApplication().invokeLater(() ->
-                    Services.getInstance(p, Notifier.class).warn(p, "Git Fetch Warning",
-                            "Could not refresh remote branches: " + fetchError.getMessage()));
+                    Services.getInstance(p, Notifier.class).warn(p, Bundle.message("branch.fetch.warning.title"),
+                            Bundle.message("branch.fetch.warning.message", fetchError.getMessage())));
         }
     }
 
@@ -391,7 +390,7 @@ public class BranchSelector {
      */
     private void showBranches(final @NotNull List<String> branches) {
         if (branches.isEmpty()) {
-            showPlaceholder("No branches found");
+            showPlaceholder(Bundle.message("branch.none"));
             return;
         }
         if (branches.equals(shown)) return;

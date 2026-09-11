@@ -8,6 +8,7 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextFieldWithSelections;
+import org.testin.util.Bundle;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -26,14 +27,14 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
         super(p);
         this.onCreate = onCreate;
 
-        title = "Create Run Node";
+        title = Bundle.message("dialog.create.run.title");
 
         components = List.of(
                 ComponentDialogBase.<DirectoryType>textFieldWithSelections()
                         .icon(DirectoryType.TR.getIcon())
-                        .placeholder("set name, like Sprint 3 Cycle 1...")
-                        .selection(DirectoryType.TR.getIcon(), DirectoryType.TR.getDescription(), "Records execution results", DirectoryType.TR)
-                        .selection(DirectoryType.TRP.getIcon(), DirectoryType.TRP.getDescription(), "Groups test runs", DirectoryType.TRP)
+                        .placeholder(Bundle.message("dialog.create.run.placeholder"))
+                        .selection(DirectoryType.TR.getIcon(), DirectoryType.TR.getDescription(), Bundle.message("dialog.create.run.hint.tr"), DirectoryType.TR)
+                        .selection(DirectoryType.TRP.getIcon(), DirectoryType.TRP.getDescription(), Bundle.message("dialog.create.run.hint.trp"), DirectoryType.TRP)
                         .build());
 
         shortcuts = List.of(

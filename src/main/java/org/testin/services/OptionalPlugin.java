@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Notifier;
+import org.testin.util.Bundle;
 import org.testin.util.Once;
 
 import java.util.Objects;
@@ -22,19 +23,19 @@ public enum OptionalPlugin {
     JAVA(
             "com.intellij.java",
             "Java",
-            "Automation code generation and navigation require the Java plugin, which is not available in this IDE."
+            Bundle.message("plugin.java.requirement")
     ),
 
     TESTNG(
             "TestNG-J",
             "TestNG",
-            "Executing tests requires the TestNG plugin, which is not available in this IDE."
+            Bundle.message("plugin.testng.requirement")
     ),
 
     GIT(
             "Git4Idea",
             "Git",
-            "Git synchronization and cloning require the Git plugin, which is not available in this IDE."
+            Bundle.message("plugin.git.requirement")
     );
 
     private final @NotNull String pluginId;
@@ -118,7 +119,7 @@ public enum OptionalPlugin {
     }
 
     private void warn(final @NotNull Project p) {
-        Services.getInstance(p, Notifier.class).softRefuse(p, label + " Plugin Not Available", requirement);
+        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("plugin.not.available.title", label), requirement);
     }
 
     /**
@@ -164,7 +165,7 @@ public enum OptionalPlugin {
         if (isAvailable()) return true;
 
         presentation.setEnabled(false);
-        presentation.setText(entryName + " (needs the " + label + " plugin)");
+        presentation.setText(Bundle.message("plugin.needs", entryName, label));
         presentation.setDescription(requirement);
 
         return false;

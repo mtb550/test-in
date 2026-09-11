@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import java.util.List;
 
@@ -33,10 +34,10 @@ final class GitConflictOffer {
 
         notifier.warnWithActions(
                 p,
-                "Git Conflicts",
+                Bundle.message("git.conflicts.title"),
                 GitRefs.conflictMessage(conflicting),
-                notifier.action("Resolve", onResolve),
-                notifier.action("Continue rebase", onContinue),
-                notifier.action("Abort rebase", onAbort));
+                notifier.action(Bundle.message("git.conflicts.resolve"), onResolve),
+                notifier.action(Bundle.message("git.conflicts.continue.rebase"), onContinue),
+                notifier.action(Bundle.message("git.conflicts.abort.rebase"), onAbort));
     }
 }

@@ -6,6 +6,7 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextInput;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.util.List;
@@ -34,24 +35,23 @@ final class SftpAccountDialog extends AbstractFrameworkDialog<TextInput> {
         super(p);
         this.onGiven = onGiven;
 
-        title = "Connect to " + address.display();
+        title = Bundle.message("dialog.sftp.title", address.display());
 
         final @NotNull ComponentDialogBase<TextInput> user = ComponentDialogBase.textField()
-                .placeholder("account on the server...")
+                .placeholder(Bundle.message("dialog.sftp.placeholder.account"))
                 .value(knownUser)
                 .build();
         final @NotNull ComponentDialogBase<TextInput> password = ComponentDialogBase.textField()
-                .placeholder("password, if no key is set up...")
+                .placeholder(Bundle.message("dialog.sftp.placeholder.password"))
                 .build();
 
         components = List.of(
-                ComponentDialogBase.message("The server address comes from testin.yml and is shared with the team. "
-                        + "The account is yours, and is kept on this machine only."),
+                ComponentDialogBase.message(Bundle.message("dialog.sftp.message")),
                 user,
                 password);
 
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, "Connect", this::submit),
+                StatusBarShortcut.build(Shortcuts.Enter, Bundle.message("dialog.sftp.button.connect"), this::submit),
                 StatusBarShortcut.cancel(this::closeCancel));
 
         userField = user.getComponent();

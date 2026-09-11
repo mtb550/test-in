@@ -73,6 +73,7 @@ import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testrun.ResultAnalysisDialog;
 import org.testin.testrun.TestRunStatusChange;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.ui.FontSync;
 import org.testin.editor.grid.GridEnterAction;
@@ -301,7 +302,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         final int generation = loadGeneration.incrementAndGet();
         loaded = false;
         list.setPaintBusy(true);
-        list.getEmptyText().setText("Loading...");
+        list.getEmptyText().setText(Bundle.message("editor.loading"));
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
@@ -354,7 +355,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
                     list.setPaintBusy(false);
                     if (allTestCases.isEmpty()) {
-                        list.getEmptyText().setText("No test cases found in this run.");
+                        list.getEmptyText().setText(Bundle.message("editor.run.empty"));
                     }
                     // Also the first paint's answer: Stop starts hidden because a run
                     // that has just loaded is not executing.
@@ -370,7 +371,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 Logger.error("Failed to load Test Run data from disk: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
                     list.setPaintBusy(false);
-                    list.getEmptyText().setText("Unable to load this test run.");
+                    list.getEmptyText().setText(Bundle.message("editor.run.unreadable"));
 
                     // The request goes with the load that could not serve it.
                     startWhenLoaded = false;
@@ -530,7 +531,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         this.model.removeAll();
 
         this.list.setPaintBusy(true);
-        this.list.getEmptyText().setText("Refreshing...");
+        this.list.getEmptyText().setText(Bundle.message("editor.refreshing"));
 
         loadDataAsync(onLoaded);
     }
@@ -1235,9 +1236,9 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         final @NotNull List<String> cleared = runItem(tc.getId()).map(item -> item.wouldClear(verdict)).orElseGet(List::of);
         if (cleared.isEmpty()) return;
 
-        Services.getInstance(p, Notifier.class).info(p, "Failure detail cleared",
-                "'" + tc.getDescription() + "' " + verdict.getLabel().toLowerCase(Locale.ROOT) + " when it ran, which cleared "
-                        + Display.andJoin(cleared) + ". There is no copy of it anywhere else.");
+        Services.getInstance(p, Notifier.class).info(p, Bundle.message("editor.cleared.title"),
+                Bundle.message("editor.cleared.message", tc.getDescription(),
+                        verdict.getLabel().toLowerCase(Locale.ROOT), Display.andJoin(cleared)));
     }
 
     /**

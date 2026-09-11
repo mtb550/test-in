@@ -15,6 +15,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import javax.swing.tree.TreePath;
 import java.util.Optional;
@@ -43,8 +44,8 @@ public class SyncActionAction extends DumbAwareAction {
         if (p == null) return;
 
         activeProjectPath(e).ifPresentOrElse(path -> new Work(p).syncRepository(path), () ->
-                Services.getInstance(p, Notifier.class).error(p, "Sync Error",
-                        "Could not determine the active project. Please select a project in the tree."));
+                Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.sync.error.title"),
+                        Bundle.message("git.sync.no.project")));
     }
 
     // UC-SHARE-016
@@ -116,27 +117,27 @@ public class SyncActionAction extends DumbAwareAction {
             // project and where the repository comes from - the review is what
             // offers to create one.
             if (git.isNotRepository(repoPath)) {
-                Services.getInstance(p, Notifier.class).softRefuse(p, "Nothing to Sync",
-                        "'" + repoPath.getFileName() + "' is not under Git yet. Open Pending Commits to create the repository.");
+                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("git.sync.nothing.title"),
+                        Bundle.message("git.sync.nothing.message", repoPath.getFileName()));
                 return;
             }
 
-            GitBackgroundTask.run(p, "Syncing with remote", true,
+            GitBackgroundTask.run(p, Bundle.message("git.task.syncing"), true,
                     indicator -> {
-                        indicator.setText("Checking remote configuration...");
+                        indicator.setText(Bundle.message("git.progress.checking.remote"));
                         final @NotNull String remoteName = git.getRemoteName(repoPath);
                         final @NotNull String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
 
                         if (remoteUrl.isEmpty()) {
                             ApplicationManager.getApplication().invokeLater(() ->
-                                    Services.getInstance(p, Notifier.class).warn(p, "Sync Aborted", "No remote URL is configured for this project. Push a commit first to configure the remote.")
+                                    Services.getInstance(p, Notifier.class).warn(p, Bundle.message("git.sync.aborted.title"), Bundle.message("git.sync.aborted.message"))
                             );
                             return;
                         }
 
                         final @NotNull String branch = git.syncBranch(repoPath);
                         if (branch.isBlank()) {
-                            throw new IllegalStateException("Could not determine which branch to sync.");
+                            throw new IllegalStateException(Bundle.message("git.error.no.sync.branch"));
                         }
 
                         // A pull into a rebase that is still halfway through is
@@ -150,7 +151,7 @@ public class SyncActionAction extends DumbAwareAction {
                             return;
                         }
 
-                        indicator.setText("Pulling latest changes from " + branch + "...");
+                        indicator.setText(Bundle.message("git.progress.pulling", branch));
                         commits.pull(repoPath, remoteUrl, remoteName, branch);
 
                         // Both directions, because the button says Sync. It used to
@@ -158,10 +159,10 @@ public class SyncActionAction extends DumbAwareAction {
                         // tester's own commits still sitting here - which is how a
                         // whole afternoon of work stayed on one machine while the
                         // message said it had not (#89).
-                        indicator.setText("Pushing what is committed here...");
+                        indicator.setText(Bundle.message("git.progress.pushing.committed"));
                         final int pushed = pushUnpushed(repoPath, remoteName, branch);
 
-                        indicator.setText("Refreshing files...");
+                        indicator.setText(Bundle.message("git.progress.refreshing"));
                         refreshAfterSync(repoPath, pushed);
 
                     },
@@ -182,7 +183,7 @@ public class SyncActionAction extends DumbAwareAction {
                             if (conflicts) {
                                 showConflictActions(repoPath, conflicting);
                             } else {
-                                reportSyncFailure("Could not sync with the remote:\n" + ex.getMessage());
+                                reportSyncFailure(Bundle.message("git.sync.failed.remote", ex.getMessage()));
                             }
                         });
                     });
@@ -221,7 +222,7 @@ public class SyncActionAction extends DumbAwareAction {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (conflicts) showConflictActions(repoPath, conflicting);
-                else Services.getInstance(p, Notifier.class).error(p, "Git Conflict Operation Failed", message);
+                else Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), message);
             });
         }
 
@@ -233,16 +234,16 @@ public class SyncActionAction extends DumbAwareAction {
          * that stops agreeing the day one is reworded.
          */
         private void reportSyncFailure(final @NotNull String detail) {
-            Services.getInstance(p, Notifier.class).error(p, "Sync Failed", detail);
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.sync.failed.title"), detail);
         }
 
         // UC-SHARE-017, Rule-SHARE-077
         private void finishRebase(final @NotNull Path repoPath, final boolean abort) {
             // One sentence for this attempt, whichever way it fails - the body's
             // refusal and the handler's both say it.
-            final @NotNull String failure = abort ? "Could not abort the rebase." : "Could not continue the rebase.";
+            final @NotNull String failure = abort ? Bundle.message("git.error.abort.rebase") : Bundle.message("git.error.continue.rebase");
 
-            GitBackgroundTask.run(p, abort ? "Aborting rebase" : "Continuing rebase", false,
+            GitBackgroundTask.run(p, abort ? Bundle.message("git.task.aborting.rebase") : Bundle.message("git.task.continuing.rebase"), false,
                     indicator -> {
                         // The reason is logged by the service; what is left here is
                         // the choice it cannot make - conflicts that remain are
@@ -254,7 +255,7 @@ public class SyncActionAction extends DumbAwareAction {
                             }
                             refreshRepository(repoPath);
                             ApplicationManager.getApplication().invokeLater(() ->
-                                    Services.getInstance(p, Notifier.class).info(p, "Rebase aborted", "The pull was rolled back"));
+                                    Services.getInstance(p, Notifier.class).info(p, Bundle.message("git.rebase.aborted.title"), Bundle.message("git.rebase.aborted.pull.message")));
                             return;
                         }
 
@@ -289,7 +290,7 @@ public class SyncActionAction extends DumbAwareAction {
          * this one has to ask.
          */
         private void finishSyncInBackground(final @NotNull Path repoPath) {
-            GitBackgroundTask.run(p, "Finishing sync", false,
+            GitBackgroundTask.run(p, Bundle.message("git.task.finishing.sync"), false,
                     indicator -> {
                         // The same ending as a sync that never stopped: the commits
                         // the rebase just replayed are still only here, and a
@@ -299,7 +300,7 @@ public class SyncActionAction extends DumbAwareAction {
                         try {
                             final @NotNull String remoteName = git.getRemoteName(repoPath);
                             if (!remoteName.isEmpty()) {
-                                indicator.setText("Pushing what is committed here...");
+                                indicator.setText(Bundle.message("git.progress.pushing.committed"));
                                 pushed = pushUnpushed(repoPath, remoteName, git.syncBranch(repoPath));
                             }
                         } catch (final Exception ex) {
@@ -309,11 +310,11 @@ public class SyncActionAction extends DumbAwareAction {
                             // arrived - so this is not the end of the work.
                             Logger.error("Could not push after resolving: " + ex.getMessage());
                             ApplicationManager.getApplication().invokeLater(() ->
-                                    Services.getInstance(p, Notifier.class).error(p, "Push Failed",
-                                            "The conflicts were resolved, but the push did not go through:\n" + ex.getMessage()));
+                                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.push.failed.title"),
+                                            Bundle.message("git.push.failed.after.resolve", ex.getMessage())));
                         }
 
-                        indicator.setText("Refreshing files...");
+                        indicator.setText(Bundle.message("git.progress.refreshing"));
                         refreshAfterSync(repoPath, pushed);
                     },
                     // The refresh had no error path. A throw there left the tester
@@ -322,7 +323,7 @@ public class SyncActionAction extends DumbAwareAction {
                     ex -> {
                         Logger.error(ex.getMessage());
                         ApplicationManager.getApplication().invokeLater(() ->
-                                reportSyncFailure("The sync did not finish:\n" + ex.getMessage()));
+                                reportSyncFailure(Bundle.message("git.sync.did.not.finish", ex.getMessage())));
                     });
         }
 
@@ -356,10 +357,25 @@ public class SyncActionAction extends DumbAwareAction {
                 // bug report while it finishes had no way to learn it had (#268).
                 // CLAUDE.md draws that line: work that completes while nobody is
                 // looking is the work that must still be there afterwards.
-                Services.getInstance(p, Notifier.class).info(p, "Synced", pushed == 0
-                        ? "Up to date with the remote"
-                        : "Pushed " + pushed + (pushed == 1 ? " commit" : " commits"));
+                Services.getInstance(p, Notifier.class).info(p, Bundle.message("git.synced.title"), pushedMessage(pushed));
             });
+        }
+
+        /**
+         * UC-SHARE-016, Rule-SHARE-070.
+         * <p>
+         * What a finished sync says: up to date, or how many commits went.
+         * <p>
+         * Three sentences rather than one built from pieces, because the count
+         * and the word for it do not sit in the same order in every language -
+         * and the count is passed as digits, so it reads 1234 rather than 1,234.
+         */
+        private static @NotNull String pushedMessage(final int pushed) {
+            if (pushed == 0) return Bundle.message("git.synced.up.to.date");
+
+            return pushed == 1
+                    ? Bundle.message("git.synced.pushed.one")
+                    : Bundle.message("git.synced.pushed.many", String.valueOf(pushed));
         }
 
         private void refreshRepository(final @NotNull Path repoPath) {

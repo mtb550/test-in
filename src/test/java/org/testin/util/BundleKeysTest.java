@@ -144,8 +144,9 @@ public class BundleKeysTest {
      * <p>
      * The descriptor used to carry {@code text} and {@code description} on each
      * element; the platform reads them from here instead now, by id, so that a
-     * tester running in French sees French in Find Action and in Settings ->
-     * Keymap. A key that is missing does not fail anything - the platform falls
+     * tester running the IDE in another language sees that language in Find
+     * Action and in Settings -> Keymap. A key that is missing does not fail
+     * anything - the platform falls
      * back to the id, so the tester finds an action called
      * {@code Testin.RunTests} and nothing says why.
      */
@@ -178,12 +179,52 @@ public class BundleKeysTest {
     public void everyTranslationAnswersTheSameKeys() {
         final Properties english = bundle("messages.properties");
 
-        for (final String language : List.of("fr")) {
+        for (final String language : List.of("fr", "hi")) {
             final Properties other = bundle("messages_" + language + ".properties");
 
             assertEquals(other.stringPropertyNames(), english.stringPropertyNames(),
                     "messages_" + language + ".properties does not answer the same keys as the English bundle,"
                             + " so a tester in that language reads some of each");
+        }
+    }
+
+    /**
+     * UC-INTERNAL-001, Rule-INTERNAL-066.
+     * <p>
+     * A sentence with a slot in it has its apostrophes doubled, in every
+     * language.
+     * <p>
+     * {@code Bundle.message} runs MessageFormat only when arguments are passed -
+     * without them the value comes back exactly as written. So a key carrying
+     * {@code {0}} is a MessageFormat pattern, and in one of those a lone
+     * apostrophe is the quoting character: it is eaten, and it takes the text
+     * after it with it. "l'exécution est arrêtée" prints as "lexécution est
+     * arrêtée" and "{0}" inside a quoted run prints as the literal braces.
+     * <p>
+     * Nothing fails when this is wrong. The sentence is simply missing a letter,
+     * in one language, on one screen - which is why it is checked here rather
+     * than left to be noticed.
+     * <p>
+     * A key with {@code %s} and no {@code {0}} is not a MessageFormat pattern -
+     * {@link org.testin.notifications.Refused} formats those itself - so an
+     * apostrophe in one of those is written once and left alone.
+     */
+    @Test
+    public void everyPatternWithASlotDoublesItsApostrophes() {
+        final Pattern slot = Pattern.compile("\\{\\d");
+
+        for (final String name : List.of("messages.properties", "messages_fr.properties", "messages_hi.properties")) {
+            final Properties properties = bundle(name);
+
+            for (final String key : properties.stringPropertyNames()) {
+                final String value = properties.getProperty(key);
+                if (!slot.matcher(value).find()) continue;
+
+                assertFalse(value.replace("''", "").contains("'"),
+                        name + " has " + key + "=" + value + ", which carries a {0} and so is read as a"
+                                + " MessageFormat pattern - a lone apostrophe there is swallowed along with"
+                                + " whatever follows it. Write it as ''.");
+            }
         }
     }
 }

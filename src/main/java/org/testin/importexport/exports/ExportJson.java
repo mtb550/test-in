@@ -7,6 +7,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.io.File;
@@ -33,7 +34,7 @@ public class ExportJson {
 
             Files.write(destFile.toPath(), Services.getInstance(p, Mapper.class).writeValueAsBytes(sheetsData));
         } catch (final IOException ex) {
-            Services.getInstance(p, Notifier.class).error(p, "Export failed: " + ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("export.json.failed", ex.getMessage()));
             Logger.error("export failed: " + destFile + " - " + ex.getMessage());
             return;
         }

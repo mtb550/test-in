@@ -28,6 +28,7 @@ import org.testin.services.TestCaseCacheService;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.BoundTestProject;
 import org.testin.editor.EditorUtil;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.io.File;
@@ -112,12 +113,12 @@ public final class ProjectIndexer {
                 final @NotNull String projectName = projectPath.getFileName().toString();
 
                 ProgressManager.getInstance()
-                        .run(new Task.Backgroundable(p, "Testin indexing - " + projectName, true) {
+                        .run(new Task.Backgroundable(p, Bundle.message("indexer.task.title", projectName), true) {
                             @Override
                             public void run(final @NotNull ProgressIndicator indicator) {
                                 indicator.setIndeterminate(false);
                                 indicator.setFraction(0.0);
-                                indicator.setText("Indexing " + projectName + "...");
+                                indicator.setText(Bundle.message("indexer.progress.indexing", projectName));
 
                                 try {
                                     scanCoordinator.scan(projectPath, indicator);
@@ -126,7 +127,7 @@ public final class ProjectIndexer {
                                 }
 
                                 indicator.setFraction(1.0);
-                                indicator.setText("Done - " + projectName);
+                                indicator.setText(Bundle.message("indexer.progress.done", projectName));
                             }
 
                             @Override
@@ -645,7 +646,7 @@ public final class ProjectIndexer {
 
         final @NotNull Path targetParent = found.orElseThrow();
 
-        Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, targetParent, "Move Failed", (sourceVf, targetVf) -> {
+        Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, targetParent, Bundle.message("vfs.move.failed.title"), (sourceVf, targetVf) -> {
             try {
                 sourceVf.move(this, targetVf);
             } catch (final IOException ex) {
@@ -712,7 +713,7 @@ public final class ProjectIndexer {
                 operationSucceeded.run();
             };
 
-            Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
+            Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, sourcePath, targetPath, Bundle.message("vfs.copy.failed.title"), (sourceVf, targetVf) -> {
                 try {
                     sourceVf.copy(this, targetVf, sourceVf.getName());
                 } catch (final IOException ex) {

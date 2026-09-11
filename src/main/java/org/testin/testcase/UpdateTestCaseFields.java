@@ -23,6 +23,7 @@ import org.testin.testcase.update.bulk.PriorityBulkSectionDialog;
 import org.testin.testcase.update.bulk.StatusBulkSectionDialog;
 import org.testin.testcase.update.bulk.StepsBulkSectionDialog;
 import org.testin.testcase.update.bulk.TestDataBulkSectionDialog;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -155,7 +156,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Shortcuts.UpdateTestCaseOrder,
             AllIcons.ObjectBrowser.Sorted,
             GenType.UPDATE_TEST_CASE_ORDER,
-            (p, items, updatedItems) -> Services.getInstance(p, Notifier.class).softRefuse(p, "Order is set one test case at a time"),
+            (p, items, updatedItems) -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("update.order.one.at.a.time")),
             TestCaseBaseDialog::getOrderSection,
             new TestCaseDialogKey[]{}
     );
