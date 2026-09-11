@@ -62,6 +62,10 @@ These seven buttons act on the whole panel, not on one node.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-101** — Every button in the panel's title bar works in every
+  state the panel can be in, the welcome screen included. The IDE aims a
+  title-bar button at whatever component the panel says it is showing, and will
+  not run the button at all when that component is hidden.
 
 ## The toolbar
 

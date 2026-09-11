@@ -36,19 +36,14 @@ public class Main implements ToolWindowFactory, DumbAware {
         // would dispose a service the project container still holds.
         final @NotNull Content content = ContentFactory.getInstance().createContent(tp.getPanel(), null, false);
 
-        // The tree, and it does two jobs.
-        //
-        // It is what the IDE hands the keyboard to when this panel is activated.
-        // Without it there is nothing to focus - the content is a plain panel -
-        // so focus stays wherever it was, usually an editor, and a tree nobody
-        // can focus is a tree whose keys are answered by whatever does have the
-        // keyboard.
-        //
-        // It is also what the platform anchors the title bar's data context on,
-        // which is why TreePanel keeps it in the panel at all times rather than
-        // rebuilding around it. The rule and what breaks without it are written
-        // there, on the field that holds it.
-        content.setPreferredFocusableComponent(tp.getProjectTree().getMainTree());
+        // Which component the IDE hands the keyboard to, and aims the title
+        // bar at. It is the tree whenever there is one - a tree nobody can
+        // focus is a tree whose keys are answered by whatever does have the
+        // keyboard - and the panel while the welcome screen is up, because a
+        // hidden component is one the platform will not run a title action
+        // against. The panel answers it, being what knows which of the two it
+        // is drawing.
+        tp.showIn(content);
 
         tw.setTitleActions(new TreePanelActions().create(p, tp));
         tw.getContentManager().addContent(content);

@@ -9,9 +9,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.content.Content;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import javax.swing.JComponent;
 import java.awt.BorderLayout;
 import com.intellij.ui.components.JBPanelWithEmptyText;
 import org.testin.git.ClonedFrom;
@@ -52,16 +54,11 @@ public final class TreePanel implements Disposable {
      * <p>
      * The branch bar and the tree. Added to the panel once and <b>hidden</b>
      * rather than removed when there is no project to show, because the tree may
-     * never leave the component hierarchy.
-     * <p>
-     * <b>Why.</b> The tree is the content's preferred focusable component, and
-     * the platform anchors the data context for every title-bar button on
-     * exactly that - {@code ToolWindowHeader}'s toolbar asks the content for it
-     * before each press. A component with no parent has no frame above it, so
-     * that context cannot say which project it belongs to, and the platform
-     * reads {@code event.project!!} before any title action runs: the tester
-     * presses a button in the title bar and gets a NullPointerException from a
-     * stack with no Testin frame in it.
+     * never leave the component hierarchy: the platform reads
+     * {@code event.project!!} before any title action runs, and it reads it from
+     * a data context anchored on a component of this panel. A component with no
+     * parent has no frame above it to answer with, and the tester gets a
+     * NullPointerException from a stack with no Testin frame in it.
      * <p>
      * The panel was emptied and rebuilt on every draw until #66, so this held
      * for as long as the welcome screen was showing - which is whenever no test
@@ -69,9 +66,19 @@ public final class TreePanel implements Disposable {
      * <p>
      * Hiding keeps the welcome screen too: {@code JBPanelWithEmptyText} draws
      * its empty text while no child is <i>visible</i>, rather than while it has
-     * none.
+     * none. Which component the title bar is anchored on while the tree is
+     * hidden is {@link #aimTheTitleBar()}.
      */
     private final @NotNull JBPanel<?> treeView = new JBPanel<>(new BorderLayout());
+
+    /**
+     * UC-TREE-PANEL-028, Rule-TREE-PANEL-101.
+     * <p>
+     * The tool window content this panel fills, so every draw can aim the title
+     * bar at whatever is on screen. Empty until the platform makes it: this is
+     * a project service, and it is built before the tool window asks for one.
+     */
+    private @NotNull Optional<Content> content = Optional.empty();
 
     private final @NotNull BranchSelector branchSelector;
 
@@ -208,12 +215,47 @@ public final class TreePanel implements Disposable {
         // Hidden, not removed - see the field. What the welcome screen replaces
         // is what the panel draws, not what it contains.
         treeView.setVisible(boundProject.isPresent());
+        aimTheTitleBar();
         panel.getEmptyText().clear();
 
         boundProject.ifPresentOrElse(this::showTree, () -> showWelcome(state));
 
         panel.revalidate();
         panel.repaint();
+    }
+
+    /**
+     * UC-TREE-PANEL-028, Rule-TREE-PANEL-101.
+     * <p>
+     * Takes the content the platform built around this panel, and aims the
+     * title bar for the first time.
+     */
+    public void showIn(final @NotNull Content shownIn) {
+        content = Optional.of(shownIn);
+        aimTheTitleBar();
+    }
+
+    /**
+     * UC-TREE-PANEL-028, Rule-TREE-PANEL-101.
+     * <p>
+     * Points the title bar at whatever this panel is showing: the tree while
+     * there is one, the panel itself while the welcome screen is up.
+     * <p>
+     * <b>It has to be a component that is showing.</b> The platform aims every
+     * title-bar button at the content's preferred focusable component - it
+     * builds the button's data context there, and it refuses to run the action
+     * at all when that component is not showing. The tree is hidden for as long
+     * as the welcome screen is up, so Settings, Refresh and Select Test Project
+     * each did nothing whatever in the one state where a tester most needs
+     * them, leaving one line in the log and nothing on screen (#66).
+     * <p>
+     * The tree keeps it whenever it is there, because that is also where the
+     * keyboard belongs (Rule-TREE-PANEL-097) and where the tree's own keys are
+     * answered.
+     */
+    private void aimTheTitleBar() {
+        final @NotNull JComponent onScreen = treeView.isVisible() ? projectTree.getMainTree() : panel;
+        content.ifPresent(shownIn -> shownIn.setPreferredFocusableComponent(onScreen));
     }
 
     /**
