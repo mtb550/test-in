@@ -29,6 +29,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.services.BackgroundWork;
 import org.testin.editor.EditorUtil;
+import org.testin.util.Bundle;
 import org.testin.util.NameSanitizer;
 import org.testin.services.OptionalPlugin;
 
@@ -56,7 +57,7 @@ import java.util.function.Supplier;
 public class ImportAction extends DumbAwareAction {
 
     /** The gesture's name, which its dialog reads rather than spells. */
-    public static final @NotNull String NAME = "Import";
+    public static final @NotNull String NAME = Bundle.message("import.action.name");
 
     /**
      * How many test methods go into one write command.
@@ -132,8 +133,8 @@ public class ImportAction extends DumbAwareAction {
             // Off the EDT and under a bar. Every case is a file of its own, written
             // through java.nio by the indexer, so the loop belongs on a background
             // thread; what needs the EDT asks for it by name below (#87).
-            BackgroundWork.run(p, "Importing " + total + " test cases into " + selectedDirDto.getName(),
-                    "Import Failed", indicator -> {
+            BackgroundWork.run(p, Bundle.message("import.task.importing", String.valueOf(total), selectedDirDto.getName()),
+                    Bundle.message("import.failed.title"), indicator -> {
                 indicator.setIndeterminate(false);
                 final long startedAt = System.currentTimeMillis();
 
@@ -143,7 +144,7 @@ public class ImportAction extends DumbAwareAction {
                 // rebuild. Waiting here costs a background thread; waiting inside a
                 // write action costs the whole IDE.
                 if (generateCode) {
-                    indicator.setText2("Waiting for indexing to finish");
+                    indicator.setText2(Bundle.message("import.progress.indexing"));
                     DumbService.getInstance(p).waitForSmartMode();
                 }
                 final long readyAt = System.currentTimeMillis();
@@ -180,9 +181,8 @@ public class ImportAction extends DumbAwareAction {
                     // can act on: the sets before it are whole.
                     Logger.error("Import failed after at least " + imported + " of " + total + ": " + ex.getMessage());
 
-                    Services.getInstance(p, Notifier.class).error(p, "Import Failed",
-                            "At least " + imported + " of " + total + " test cases were written before it stopped, and "
-                                    + "they are still there. " + ex.getMessage());
+                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.failed.title"),
+                            Bundle.message("import.failed.partial", String.valueOf(imported), String.valueOf(total), ex.getMessage()));
                     return;
                 }
 
@@ -283,7 +283,7 @@ public class ImportAction extends DumbAwareAction {
                         testCases.subList(from, Math.min(from + METHODS_PER_COMMAND, testCases.size()));
                 final int written = from + batch.size();
 
-                indicator.setText2("Generating test methods: " + written + " of " + testCases.size());
+                indicator.setText2(Bundle.message("import.progress.generating", String.valueOf(written), String.valueOf(testCases.size())));
                 // The batch as one, not case by case: the generator finds the
                 // class and reformats it once for the whole group.
                 onEdt(() -> GenType.CREATE_TEST_CASE.executeAll(p, batch));

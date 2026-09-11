@@ -22,6 +22,7 @@ import org.testin.importexport.exports.ExportNotice;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.services.BackgroundWork;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.io.File;
@@ -51,13 +52,13 @@ public class GenerateReportAction extends AbstractProjectAction {
      * tree's own registerShortcuts to add that would not bind the key twice.
      */
     public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, "Generate Report", "Generate test run report", AllIcons.ToolbarDecorator.Export);
+        super(p, Bundle.message("report.action.text"), Bundle.message("report.action.description"), AllIcons.ToolbarDecorator.Export);
         this.selectedRun = () -> TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
         registerCustomShortcutSet(Shortcuts.GenerateReport.getCustomShortcut(), tree);
     }
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor) {
-        super(p, "Generate Report", "Generate test run report", AllIcons.Actions.Report);
+        super(p, Bundle.message("report.action.text"), Bundle.message("report.action.description"), AllIcons.Actions.Report);
         this.selectedRun = () -> editor instanceof RunEditor re ? Optional.of(re.getParent()) : Optional.empty();
     }
 
@@ -116,7 +117,7 @@ public class GenerateReportAction extends AbstractProjectAction {
         // Under a bar rather than on a bare pooled thread: the dialog is gone by
         // now, and without one the tester sees nothing at all between pressing
         // Generate and the notification arriving (#87).
-        BackgroundWork.run(p, "Generating the " + format.getLabel() + " report for " + tr.getName(), "Report Error", indicator -> {
+        BackgroundWork.run(p, Bundle.message("report.task.generating", format.getLabel(), tr.getName()), Bundle.message("report.error.title"), indicator -> {
             try {
                 final @NotNull Path dirPath = tr.getPath();
 
@@ -142,14 +143,14 @@ public class GenerateReportAction extends AbstractProjectAction {
                 final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
                 notifier.infoWithActions(p,
-                        format.getLabel() + " Report Generated",
-                        "Saved successfully: " + outputFile.getName(),
-                        notifier.action("Open report", () -> ExportNotice.open(p, outputFile)),
+                        Bundle.message("report.generated.title", format.getLabel()),
+                        Bundle.message("report.generated.message", outputFile.getName()),
+                        notifier.action(Bundle.message("report.open"), () -> ExportNotice.open(p, outputFile)),
                         notifier.copyPath(outputFile)
                 );
 
             } catch (final Exception ex) {
-                Services.getInstance(p, Notifier.class).error(p, "Report Error", "Failed to generate " + format.getLabel() + " report: " + ex.getMessage());
+                Services.getInstance(p, Notifier.class).error(p, Bundle.message("report.error.title"), Bundle.message("report.failed.message", format.getLabel(), ex.getMessage()));
                 Logger.error("Exception: " + ex.getMessage());
             }
         });

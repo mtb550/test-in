@@ -46,18 +46,18 @@ public final class TestRunExcelGenerator {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 
             final @NotNull Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
-            final @NotNull Worksheet ws = wb.newWorksheet("Test Run Report");
+            final @NotNull Worksheet ws = wb.newWorksheet(Bundle.message("report.excel.sheet"));
 
-            ws.value(0, 0, "Test Run Report:");
+            ws.value(0, 0, Bundle.message("report.excel.caption.run"));
             ws.style(0, 0).bold().fontSize(14).set();
             // The run's own name, not its change log - see the HTML generator.
             ws.value(0, 1, trDir.getName());
 
-            ws.value(1, 0, "Platform:");
+            ws.value(1, 0, Bundle.message("report.excel.caption.platform"));
             ws.style(1, 0).bold().set();
             ws.value(1, 1, TestRunConfiguration.PLATFORM.valueIn(tr));
 
-            ws.value(2, 0, "Status:");
+            ws.value(2, 0, Bundle.message("report.excel.caption.status"));
             ws.style(2, 0).bold().set();
             ws.value(2, 1, trDir.getMarker().getStatus().getLabel());
 
@@ -79,7 +79,7 @@ public final class TestRunExcelGenerator {
             }
 
             int row = 7;
-            ws.value(row, 0, "Test Case ID");
+            ws.value(row, 0, Bundle.message("report.excel.caption.id"));
             ws.value(row, 1, RunEditorAttributes.DESCRIPTION.getName());
             ws.value(row, 2, RunEditorAttributes.RUN_STATUS.getName());
             ws.value(row, 3, RunEditorAttributes.ACTUAL_RESULT.getName());

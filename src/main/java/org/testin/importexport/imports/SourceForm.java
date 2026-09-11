@@ -19,6 +19,7 @@ import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.ui.dialogs.FormRows;
 import org.testin.ui.framework.DialogComponent;
+import org.testin.util.Bundle;
 
 import java.util.Optional;
 import javax.swing.*;
@@ -55,8 +56,8 @@ public final class SourceForm implements DialogComponent {
 
         descriptor = new FileChooserDescriptor(true, false, false, false, false, false)
                 .withExtensionFilter("", "xls", "xlsx", "csv", "json")
-                .withTitle("Select Import File")
-                .withDescription("Choose a file to import test cases from (.xls, .xlsx, .json, .csv)");
+                .withTitle(Bundle.message("import.file.title"))
+                .withDescription(Bundle.message("import.file.description"));
 
         fileField.addBrowseFolderListener(p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
 
@@ -71,7 +72,7 @@ public final class SourceForm implements DialogComponent {
         formatHint.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         formatHint.setVisible(false);
 
-        rows = new FormRows().row("Source:", fileField);
+        rows = new FormRows().row(Bundle.message("import.caption.source"), fileField);
         rows.wideRow(formatHint);
     }
 

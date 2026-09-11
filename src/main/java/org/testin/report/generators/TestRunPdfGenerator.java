@@ -34,6 +34,7 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 
 import java.io.ByteArrayOutputStream;
@@ -73,7 +74,7 @@ public final class TestRunPdfGenerator {
             final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
 
             // TITLE
-            document.add(new Paragraph("TEST SUMMARY REPORT")
+            document.add(new Paragraph(Bundle.message("report.title"))
                     .setFont(boldFont).setFontSize(ReportFont.TITLE.pt()).setFontColor(DARK_NAVY)
                     .setMarginBottom(2));
 
@@ -92,12 +93,12 @@ public final class TestRunPdfGenerator {
                     .setBorderBottom(new SolidBorder(DARK_NAVY, 2f))
                     .setMarginBottom(1));
 
-            document.add(new Paragraph("Confidential — QA Test Execution Summary")
+            document.add(new Paragraph(Bundle.message("report.confidential"))
                     .setFont(italicFont).setFontSize(ReportFont.CAPTION.pt()).setFontColor(DARK_GRAY)
                     .setMarginBottom(20));
 
             // SECTION 1: REPORT OVERVIEW
-            Paragraph sec1 = new Paragraph("1. Report Overview")
+            Paragraph sec1 = new Paragraph(Bundle.message("report.heading.overview"))
                     .setFont(boldFont)
                     .setFontSize(ReportFont.SECTION.pt())
                     .setFontColor(DARK_NAVY)
@@ -122,7 +123,7 @@ public final class TestRunPdfGenerator {
             document.add(overviewTable);
 
             // SECTION 2: EXECUTION SUMMARY
-            Paragraph sec2 = new Paragraph("2. Execution Summary")
+            Paragraph sec2 = new Paragraph(Bundle.message("report.heading.execution"))
                     .setFont(boldFont)
                     .setFontSize(ReportFont.SECTION.pt())
                     .setFontColor(DARK_NAVY)
@@ -133,7 +134,7 @@ public final class TestRunPdfGenerator {
             document.add(sec2);
 
             document.add(new Paragraph(
-                    String.format("This run holds %d test cases, of which %d were executed. Of those, %d%% passed. The results below summarize the outcome.",
+                    String.format(Bundle.message("report.summary.this.run"),
                             summary.total(), summary.executed(), summary.passRate()))
                     .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(BLACK)
                     .setMarginBottom(12));
@@ -162,7 +163,7 @@ public final class TestRunPdfGenerator {
             final boolean analysed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
 
             if (analysed) {
-                document.add(new Paragraph("3. Result Analysis")
+                document.add(new Paragraph(Bundle.message("report.heading.analysis"))
                         .setFont(boldFont)
                         .setFontSize(ReportFont.SECTION.pt())
                         .setFontColor(DARK_NAVY)
@@ -221,10 +222,10 @@ public final class TestRunPdfGenerator {
                     .setFont(regularFont).setFontSize(ReportFont.CAPTION.pt()).setFontColor(DARK_GRAY)
                     .setTextAlignment(TextAlignment.CENTER)
                     .add(new Text(Display.formatDate(ZonedDateTime.now())))
-                    .add(new Text("  |  Generated automatically by "))
+                    .add(new Text(Bundle.message("report.footer.prefix")))
                     .add(new Link("Testin", PdfAction.createURI(ReportText.PLUGIN_URL))
                             .setFontColor(LINK_BLUE))
-                    .add(new Text(" IntelliJ plugin.")));
+                    .add(new Text(Bundle.message("report.footer.suffix"))));
 
             footerCanvas.close();
 
@@ -278,7 +279,7 @@ public final class TestRunPdfGenerator {
 
         // Header row
         addCaseTableHeader(table, "#", headerBg, headerFg, boldFont);
-        addCaseTableHeader(table, "Test Case", headerBg, headerFg, boldFont);
+        addCaseTableHeader(table, Bundle.message("caption.test.case"), headerBg, headerFg, boldFont);
         if (withFailureDetail) addCaseTableHeader(table, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg, boldFont);
         if (withFailureDetail) addCaseTableHeader(table, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg, boldFont);
 
@@ -313,7 +314,7 @@ public final class TestRunPdfGenerator {
             if (withFailureDetail) {
                 String actualResult = item.getActualResult();
                 if (actualResult.isEmpty()) actualResult = "—";
-                testCaseCell.add(new Paragraph("Actual result: " + actualResult)
+                testCaseCell.add(new Paragraph(Bundle.message("report.actual.result", actualResult))
                         .setFont(regularFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY));
 
                 // Only when there is one. The actual result prints an em dash

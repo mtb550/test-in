@@ -7,6 +7,7 @@ import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 
 import java.io.*;
@@ -43,7 +44,7 @@ public class ExportHtml {
             writer.newLine();
             writer.write("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
             writer.newLine();
-            writer.write("<title>Test Cases Export</title>");
+            writer.write("<title>" + Bundle.message("export.html.title") + "</title>");
             writer.newLine();
             writer.write("<style>");
             writer.newLine();
@@ -68,7 +69,7 @@ public class ExportHtml {
             writer.write("<body>");
             writer.newLine();
 
-            writer.write("<h1>Test Cases Export</h1>");
+            writer.write("<h1>" + Bundle.message("export.html.title") + "</h1>");
             writer.newLine();
 
             int totalExported = 0;
@@ -106,11 +107,11 @@ public class ExportHtml {
                 writer.newLine();
             }
 
-            writer.write("<p><em>Total test cases exported: " + totalExported + "</em></p>");
+            writer.write("<p><em>" + Bundle.message("export.html.total", String.valueOf(totalExported)) + "</em></p>");
             writer.newLine();
 
             final @NotNull String exportDate = Display.formatDate(ZonedDateTime.now());
-            writer.write("<p><em>Exported on: " + StringUtil.escapeXmlEntities(exportDate) + "</em></p>");
+            writer.write("<p><em>" + Bundle.message("export.html.on", StringUtil.escapeXmlEntities(exportDate)) + "</em></p>");
             writer.newLine();
 
             writer.write("</body>");

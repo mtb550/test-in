@@ -10,6 +10,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -139,9 +140,8 @@ public class FileDocumentListener implements DocumentListener {
         // to go and find one.
         importableFormatOf(importFile.getName().toLowerCase())
                 .ifPresentOrElse(format -> loadFile(importFile, format),
-                        () -> Services.getInstance(p, Notifier.class).softRefuse(p, "Cannot Be Imported",
-                                importFile.getName() + " is not a kind of file Testin can read. It reads "
-                                        + importableFormats() + "."));
+                        () -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("import.cannot.title"),
+                                Bundle.message("import.cannot.message", importFile.getName(), importableFormats())));
     }
 
     /**
@@ -168,7 +168,7 @@ public class FileDocumentListener implements DocumentListener {
      * never outlives the work it describes.
      */
     private void loadFile(final @NotNull File importFile, final @NotNull FileTypes format) {
-        onStatus.accept("Reading " + importFile.getName() + "...");
+        onStatus.accept(Bundle.message("import.reading", importFile.getName()));
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
@@ -178,7 +178,7 @@ public class FileDocumentListener implements DocumentListener {
                     onStatus.accept("");
 
                     if (parsedData.isEmpty()) {
-                        Services.getInstance(p, Notifier.class).softRefuse(p, "No Data", "No test cases found in the selected file.");
+                        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("import.no.data.title"), Bundle.message("import.no.data.message"));
                         return;
                     }
                     onDataLoaded.accept(format, parsedData);
@@ -188,7 +188,7 @@ public class FileDocumentListener implements DocumentListener {
                 Logger.error("Import parse failed: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
                     onStatus.accept("");
-                    Services.getInstance(p, Notifier.class).error(p, "Parse Error", ex.getMessage());
+                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.parse.error.title"), ex.getMessage());
                 });
             }
         });

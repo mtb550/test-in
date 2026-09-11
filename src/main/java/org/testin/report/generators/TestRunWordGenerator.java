@@ -20,6 +20,7 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 
 import java.io.ByteArrayOutputStream;
@@ -59,7 +60,7 @@ public final class TestRunWordGenerator {
 
                 final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
 
-                addText(doc, "TEST SUMMARY REPORT", ReportFont.TITLE.ptRounded(), true, DARK_NAVY, NO_BORDER, 2);
+                addText(doc, Bundle.message("report.title"), ReportFont.TITLE.ptRounded(), true, DARK_NAVY, NO_BORDER, 2);
 
                 // The project, and the run under it - the same two lines the PDF
                 // prints, for the same reason.
@@ -68,10 +69,10 @@ public final class TestRunWordGenerator {
                 // The rule closes the two names, above the notice.
                 addText(doc, trDir.getName(), ReportFont.LEAD.ptRounded(), false, MEDIUM_BLUE, DARK_NAVY, 1);
 
-                XWPFParagraph conf = addText(doc, "Confidential — QA Test Execution Summary", ReportFont.CAPTION.ptRounded(), false, DARK_GRAY, NO_BORDER, 20);
+                XWPFParagraph conf = addText(doc, Bundle.message("report.confidential"), ReportFont.CAPTION.ptRounded(), false, DARK_GRAY, NO_BORDER, 20);
                 setItalic(conf);
 
-                addHeading(doc, "1. Report Overview", 0, 15);
+                addHeading(doc, Bundle.message("report.heading.overview"), 0, 15);
 
                 // One traversal of the results serves the whole report: the
                 // counts below, the pass rate, and who executed it.
@@ -90,10 +91,10 @@ public final class TestRunWordGenerator {
 
                 setTableBorders(overviewTable);
 
-                addHeading(doc, "2. Execution Summary", 20, 12);
+                addHeading(doc, Bundle.message("report.heading.execution"), 20, 12);
 
                 addText(doc, String.format(
-                        "This run holds %d test cases, of which %d were executed. Of those, %d%% passed. The results below summarize the outcome.",
+                        Bundle.message("report.summary.this.run"),
                         summary.total(), summary.executed(), summary.passRate()),
                         ReportFont.LEAD.ptRounded(), false, BLACK, NO_BORDER, 12);
 
@@ -115,7 +116,7 @@ public final class TestRunWordGenerator {
                 final boolean analysed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
 
                 if (analysed) {
-                    addHeading(doc, "3. Result Analysis", 20, 12);
+                    addHeading(doc, Bundle.message("report.heading.analysis"), 20, 12);
 
                     for (final ResultAnalysis section : ResultAnalysis.values()) {
                         final @NotNull String written = section.writtenIn(tr.getResultAnalysis());
@@ -253,7 +254,7 @@ public final class TestRunWordGenerator {
 
         XWPFTableRow headerRow = table.getRow(0);
         addCaseHeader(headerRow, 0, "#", headerBg, headerFg);
-        addCaseHeader(headerRow, 1, "Test Case", headerBg, headerFg);
+        addCaseHeader(headerRow, 1, Bundle.message("caption.test.case"), headerBg, headerFg);
         if (withFailureDetail) addCaseHeader(headerRow, 2, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg);
         if (withFailureDetail) addCaseHeader(headerRow, 3, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg);
 
@@ -284,7 +285,7 @@ public final class TestRunWordGenerator {
                 if (actualResult.isEmpty()) actualResult = "—";
                 XWPFParagraph ap = tcCell.addParagraph();
                 XWPFRun arun = ap.createRun();
-                arun.setText("Actual result: " + actualResult);
+                arun.setText(Bundle.message("report.actual.result", actualResult));
                 arun.setFontSize(ReportFont.SMALL.ptRounded());
                 arun.setFontFamily("Calibri");
                 arun.setColor(DARK_GRAY);
@@ -495,7 +496,7 @@ public final class TestRunWordGenerator {
         final @NotNull XWPFFooter footer = doc.createFooter(HeaderFooterType.DEFAULT);
         final @NotNull XWPFParagraph p = footer.createParagraph();
         p.setAlignment(ParagraphAlignment.CENTER);
-        footerRun(p.createRun(), date + "  |  Generated automatically by ", DARK_GRAY);
+        footerRun(p.createRun(), date + Bundle.message("report.footer.prefix"), DARK_GRAY);
 
         // The plugin's name is a link here too. The PDF and the HTML report both
         // linked it and this one printed it as plain text, so the one format a

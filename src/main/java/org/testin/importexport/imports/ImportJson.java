@@ -7,6 +7,8 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.importexport.FileTypes;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.io.File;
@@ -21,7 +23,7 @@ public class ImportJson {
             result.putAll(parseFile(p, file));
         } catch (final Exception ex) {
             Logger.error("JSON import parse failed: " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, "JSON Parse Error", ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.parse.error.format", FileTypes.JSON.getLabel()), ex.getMessage());
         }
         return result;
     }

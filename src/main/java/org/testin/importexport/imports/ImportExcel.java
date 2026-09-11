@@ -9,6 +9,8 @@ import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.importexport.FileTypes;
+import org.testin.util.Bundle;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +27,7 @@ public class ImportExcel {
             result.putAll(parseFile(p, file));
         } catch (final Exception ex) {
             Logger.error("Excel import parse failed: " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, "Excel Parse Error", ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.parse.error.format", FileTypes.XLSX.getLabel()), ex.getMessage());
         }
 
         // The count the file gave, against the count the tester ticks and the

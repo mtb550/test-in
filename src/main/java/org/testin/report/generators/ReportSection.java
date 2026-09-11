@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunSummary;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
+import org.testin.util.Bundle;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -29,16 +30,16 @@ import java.util.function.ToLongFunction;
  */
 enum ReportSection {
 
-    FAILED("Failed Test Cases",
-            "The following %s cases failed and require remediation.",
+    FAILED(Bundle.message("report.section.failed.title"),
+            Bundle.message("report.section.failed.description"),
             "F2685A", TestRunSummary::failed, true, TestStatus.FAILED),
 
-    PASSED("Passed Test Cases",
-            "The following %s cases passed validation and behaved as expected across all verification points.",
+    PASSED(Bundle.message("report.section.passed.title"),
+            Bundle.message("report.section.passed.description"),
             "4FBF60", TestRunSummary::passed, false, TestStatus.PASSED),
 
-    BLOCKED("Blocked Test Cases",
-            "The following %s cases were attempted but could not complete, typically because of an environment or data dependency.",
+    BLOCKED(Bundle.message("report.section.blocked.title"),
+            Bundle.message("report.section.blocked.description"),
             "F5B940", TestRunSummary::blocked, false, TestStatus.BLOCKED),
 
     /**
@@ -49,8 +50,8 @@ enum ReportSection {
      * So one table. Two would mean a completed run printing a heading and a
      * count above an empty one.
      */
-    UNTESTED("Untested Test Cases",
-            "The following %s cases were not executed in this cycle and carry forward to the next run.",
+    UNTESTED(Bundle.message("report.section.untested.title"),
+            Bundle.message("report.section.untested.description"),
             "96A1B0", TestRunSummary::untested, false, TestStatus.PENDING, TestStatus.UNTESTED),
 
     /**
@@ -59,8 +60,8 @@ enum ReportSection {
      * that - so the report says so rather than dropping a row and leaving its
      * own total unexplained.
      */
-    REMOVED("Removed Test Cases",
-            "The following %s cases were removed from the test suite after this run recorded them.",
+    REMOVED(Bundle.message("report.section.removed.title"),
+            Bundle.message("report.section.removed.description"),
             "96A1B0", TestRunSummary::removed, false, TestStatus.REMOVED);
 
     private final @NotNull String title;

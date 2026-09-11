@@ -8,6 +8,8 @@ import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.importexport.FileTypes;
+import org.testin.util.Bundle;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +28,7 @@ public class ImportCsv {
             }
         } catch (final Exception ex) {
             Logger.error("CSV import parse failed: " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, "CSV Parse Error", ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.parse.error.format", FileTypes.CSV.getLabel()), ex.getMessage());
         }
         return result;
     }

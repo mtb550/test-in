@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import java.awt.*;
 import java.util.Locale;
@@ -56,7 +57,7 @@ public final class ExportNotice {
                 .filter(VirtualFile::exists)
                 .ifPresentOrElse(found -> openWithAssociatedProgram(p, found),
                         () -> Services.getInstance(p, Notifier.class)
-                                .error(p, "Open Error", "The file does not exist."));
+                                .error(p, Bundle.message("export.open.error.title"), Bundle.message("export.open.missing")));
     }
 
     /**
@@ -77,7 +78,7 @@ public final class ExportNotice {
         }
 
         if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
-            notifier.error(p, "System Error", "Opening a file is not supported on this system.");
+            notifier.error(p, Bundle.message("export.system.error.title"), Bundle.message("export.system.unsupported"));
             return;
         }
 
@@ -87,7 +88,7 @@ public final class ExportNotice {
                 Desktop.getDesktop().open(toOpen);
             } catch (final IOException ex) {
                 ApplicationManager.getApplication().invokeLater(() ->
-                        notifier.error(p, "Execution Error", "Failed to open the file: " + ex.getMessage()));
+                        notifier.error(p, Bundle.message("export.execution.error.title"), Bundle.message("export.execution.failed", ex.getMessage())));
             }
         });
     }
@@ -106,7 +107,7 @@ public final class ExportNotice {
         ApplicationManager.getApplication().invokeLater(() -> {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
             notifier.infoWithActions(p, Done.EXPORTED.getOutcome(), file.getName(),
-                    notifier.action("Open file", open), notifier.copyPath(file));
+                    notifier.action(Bundle.message("export.open.file"), open), notifier.copyPath(file));
         });
     }
 }
