@@ -458,7 +458,15 @@
                 id="Testin.EditTestRun"
                 class="org.testin.testrun.EditTestRunAction"
                 icon="AllIcons.Actions.Edit"
-        />
+        >
+            <!-- The third action on F2, and the same argument as the two before
+                 it: F2 changes the thing in front of you, and which thing that
+                 is depends on where you are standing. Update Test Case answers
+                 in the test editor, Failed Test Case Details in the run editor,
+                 and this one in the tree. Each is gray where the others answer,
+                 so only one can ever take the key. -->
+            <keyboard-shortcut keymap="$default" first-keystroke="F2"/>
+        </action>
 
         <action
                 id="Testin.ReCreateTestRun"

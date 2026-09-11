@@ -20,7 +20,7 @@ table; this is all of them together.
 |---|---|
 | `Enter` | Opens the selected test set or test run |
 | `Context Menu` | Opens the menu on the selected node, without the mouse |
-| `Ctrl+M` | Creates a node under the selected one |
+| `Ctrl+M` | Creates a node under the selected one. Gray on a test project, a test set or a test run, which hold what they hold - the entry says so |
 | `Shift+F6` | Renames the selected node |
 | `Delete` | Removes the selected nodes |
 | `Ctrl+X` | Cuts the selected nodes, to move them |
@@ -206,7 +206,7 @@ these carry a default key:
 | `Ctrl+Alt+F` | Search Test Project | Anywhere in the IDE |
 | `Ctrl+M` | Create Testin Node, Create Test Case | The tree, and a test set editor |
 | `Shift+F6` | Rename Testin Node | The tree |
-| `F2` | Update Test Case, Failed Test Case Details | Both editors, and the view panel |
+| `F2` | Update Test Case, Failed Test Case Details, Edit Test Run | Both editors, the view panel, and the tree |
 | *none by default* | Copy, Cut and Paste Test Case | Both editors. Declared with no key, so Find Action offers them and a tester who wants one can set it |
 | `F5` | Run Test Case | Both editors and the view panel |
 | `Shift+F5` | Navigate to Test Code | Both editors and the view panel |

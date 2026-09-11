@@ -52,6 +52,10 @@ A test set is the folder that holds test cases. This makes one.
   project, under a test set, or under a test run.
 - **Rule-TREE-PANEL-026** — A new test set opens in its editor at once. Its
   automation code is written where the Java plugin allows it.
+- **Rule-TREE-PANEL-096** — Create Testin Node is gray on a node that cannot
+  hold one, and the entry says which node kinds can. A test project, a test set
+  and a test run hold what they hold; the two directories under a test project
+  and the two package kinds are what a new node is created under.
 
 ## The Create Test Node dialog
 

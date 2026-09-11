@@ -110,8 +110,11 @@ public class DeclaredShortcutsTest {
      * <p>
      * Both are one command worded for the surface the tester is standing in:
      * Ctrl+M creates the obvious thing here, F2 changes the obvious thing here.
-     * Each pair is enabled in one surface and gray in the other, so only one of
-     * them can ever answer the key.
+     * Each member is enabled in one surface and gray in the others, so only one
+     * of them can ever answer the key.
+     * <p>
+     * F2 has three: Update Test Case in the test editor, Failed Test Case
+     * Details in the run editor, and Edit Test Run in the tree.
      * <p>
      * <b>Pinned to the exact pair rather than allowed as a key.</b> A list that
      * said "Ctrl+M may be shared" would keep passing when a third action joined
@@ -121,7 +124,7 @@ public class DeclaredShortcutsTest {
      */
     private static final Map<String, List<String>> SHARED_ON_PURPOSE = Map.of(
             "ctrl M", List.of("Testin.CreateTestCase", "Testin.CreateNode"),
-            "F2", List.of("Testin.UpdateTestCase", "Testin.UpdateRunItem"),
+            "F2", List.of("Testin.UpdateTestCase", "Testin.UpdateRunItem", "Testin.EditTestRun"),
             "meta M", List.of("Testin.CreateTestCase", "Testin.CreateNode"));
 
     /**

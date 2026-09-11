@@ -21,6 +21,7 @@ import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.editor.EditorUtil;
 
 import java.nio.file.Path;
@@ -35,6 +36,13 @@ import java.util.function.BiConsumer;
  * so it belongs in the keymap rather than nailed to the tree.
  */
 public class CreateTreeNodeAction extends DumbAwareAction {
+
+    /**
+     * What the entry says when it does work. Taken from the bundle rather than
+     * written here, because it is the same sentence plugin.xml gives the action
+     * and the Keymap page shows (#11).
+     */
+    private static final @NotNull String CREATES = Bundle.message("action.Testin.CreateNode.description");
 
     // UC-TREE-PANEL-007, UC-TREE-PANEL-009
     @Override
@@ -57,9 +65,39 @@ public class CreateTreeNodeAction extends DumbAwareAction {
         // And one parent to create under. With several selected there is no one
         // answer to "under which", so the entry grays rather than picking the
         // first (#192).
-        e.getPresentation().setEnabled(TestinData.singleSelectedNode(e)
-                .filter(DirectoryDto::canCreateChildren)
-                .isPresent());
+        final @NotNull Optional<DirectoryDto> selected = TestinData.singleSelectedNode(e);
+
+        e.getPresentation().setEnabled(selected.filter(DirectoryDto::canCreateChildren).isPresent());
+        e.getPresentation().setDescription(whyNot(selected));
+    }
+
+    /**
+     * UC-TREE-PANEL-007, Rule-TREE-PANEL-096.
+     * <p>
+     * Why the entry is gray, in the tester's words - or what it does when it is
+     * not.
+     * <p>
+     * It said nothing. A tester standing on a test project, a test set or a test
+     * run pressed CTRL+M and got silence, because those three hold what they
+     * hold and nothing is created directly under them: only the two fixed
+     * containers and the two package kinds can take a new node. Correct, and
+     * indistinguishable from a key that is not bound - which is the whole of
+     * what the no-hidden-buttons rule is against.
+     * <p>
+     * The reason names the node kind rather than listing the four that work,
+     * because a tester is standing on one node and wants to know about that one.
+     */
+    private static @NotNull String whyNot(final @NotNull Optional<DirectoryDto> selected) {
+        if (selected.isEmpty()) {
+            return "Select one test cases directory, test runs directory, or package to create under.";
+        }
+
+        final @NotNull DirectoryDto dir = selected.orElseThrow();
+        if (dir.canCreateChildren()) return CREATES;
+
+        return "A " + dir.getType().getMarkerKind() + " holds what it already holds - create under a "
+                + DirectoryType.TSP.getDescription() + ", a " + DirectoryType.TRP.getDescription()
+                + ", or one of the two directories under the test project.";
     }
 
     @Override
