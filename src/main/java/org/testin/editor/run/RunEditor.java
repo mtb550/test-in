@@ -1,40 +1,22 @@
 package org.testin.editor.run;
 
-import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.ui.CollectionListModel;
-import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.EscapeAction;
-import org.testin.actions.Declared;
 import org.testin.codegen.AutomationState;
-import org.testin.editor.statusbar.PageAction;
 import org.testin.editor.BaseCard;
-import org.testin.editor.EditorCenter;
 import org.testin.editor.EditorFilters;
 import org.testin.editor.PageWindow;
 import org.testin.editor.TestCaseFilter;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.UnifiedVirtualFile;
-import org.testin.editor.ViewMode;
-import org.testin.editor.grid.GridPanelBuilder;
-import org.testin.editor.grid.GridView;
-import org.testin.editor.list.ListPanelBuilder;
-import org.testin.editor.list.ListView;
-import org.testin.editor.listeners.GridContextMenuListener;
-import org.testin.editor.listeners.GridSelectionListener;
 import org.testin.editor.listeners.RunGridEditListener;
 import org.testin.editor.listeners.RunListRenderer;
 import org.testin.editor.listeners.StatusBarListener;
 import org.testin.editor.statusbar.StatusBar;
-import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.editor.toolbar.RunToolbar;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.FilterPopupBtn;
@@ -59,12 +41,10 @@ import org.testin.model.TestRunSummary;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
-import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
-import org.testin.open.OpenContextMenuAction;
 import org.testin.runner.RunTestCases;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.runner.TestNGExecution;
@@ -76,12 +56,10 @@ import org.testin.testrun.ResultAnalysisDialog;
 import org.testin.testrun.TestRunStatusChange;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
-import org.testin.ui.FontSync;
-import org.testin.editor.grid.GridEnterAction;
+import org.testin.editor.AbstractTestinEditor;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseListener;
 import java.time.Duration;
 import java.util.*;
 import java.util.List;
@@ -89,19 +67,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class RunEditor implements Disposable, Toolbar, TestinEditor {
-
-    @Getter
-    private final @NotNull Project p;
-
-    @Getter
-    private final @NotNull TestRunDirectoryDto parent;
-
-    @Getter
-    private final @NotNull List<TestCaseDto> allTestCases;
-
-    @Getter
-    private final @NotNull List<TestCaseDto> currentTestCases;
+public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRunDirectoryDto> implements Toolbar {
 
     /**
      * What the run recorded for each case, by case id. Not handed out: callers
@@ -110,8 +76,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     private final @NotNull Map<UUID, TestRunItems> resultsMap;
 
-    private final @NotNull GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
-    private final @NotNull Disposable projectDisposable;
     private final @NotNull RunExecutionTimer executionTimer = new RunExecutionTimer();
 
     /**
@@ -126,171 +90,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * Guards against a stale in-flight load overwriting a newer one (e.g. double refresh).
      */
     private final @NotNull AtomicInteger loadGeneration = new AtomicInteger();
-    /**
-     * The grid, from the moment the tester first switches to it - table, scroll
-     * pane and the font-sync subscription that goes with them. Empty until then,
-     * and after a rebuild that failed (#66, finding 18).
-     */
-    private @NotNull Optional<GridView> grid = Optional.empty();
-    private @NotNull JBPanel<?> mainPanel;
-    private @NotNull EditorCenter center;
-    private final @NotNull JBList<TestCaseDto> list;
-    private final @NotNull CollectionListModel<TestCaseDto> model;
-    private final @NotNull JBScrollPane listScrollPane;
-    private @NotNull RunEditorContextMenu contextMenu;
-    @Getter
-    @Setter
-    private int currentPage = 1;
 
-    @Getter
-    @Setter
-    private int pageSize = TestinEditor.DEFAULT_PAGE_SIZE;
-
-    @Getter
-    private @NotNull StatusBar statusBar;
-
-    @Getter
-    @NotNull
-    private AbstractToolbarPanel toolBar;
-
-    @Getter
-    @Setter
-    private @NotNull String hoveredIconAction = "";
-
-    @Getter
-    @Setter
-    private int hoveredIndex = -1;
     /**
      * The run being edited, and empty while a reload is replacing it. Volatile:
      * loaded off the EDT and read on it.
      */
     private volatile @NotNull Optional<TestRunDto> tr = Optional.empty();
-
-    /**
-     * What the run recorded for this case, empty when it recorded nothing - a
-     * case added to the test set after the run was created, or a map still being
-     * refilled by a reload.
-     */
-    public @NotNull Optional<TestRunItems> runItem(final @NotNull UUID id) {
-        return Optional.ofNullable(resultsMap.get(id));
-    }
-
-    /**
-     * The run being edited, empty while a reload is replacing it.
-     */
-    public @NotNull Optional<TestRunDto> run() {
-        return tr;
-    }
-
-    @Getter
-    private int currentlyExecutingIndex = -1;
-
-    /**
-     * Test case selected before a reload. Held as an id, not as a dto: a reload
-     * hands back different objects for the same test cases and TestCaseDto has no
-     * equals, so identity would not survive it.
-     */
-    private @NotNull Optional<UUID> selectionToRestore = Optional.empty();
-
-    /**
-     * Grid column selected before a reload, so the cell comes back, not just the row.
-     */
-    private int gridColumnToRestore = -1;
-
-    /**
-     * Whether the cases have been read.
-     * <p>
-     * Not answerable from {@code tr}, which is set on the pooled thread before the
-     * cases it points at have been resolved - so an editor asked to start in that
-     * window would have found an empty list and started nothing.
-     */
-    private boolean loaded;
-
-    /**
-     * Whether something asked this editor to start as soon as it could, and has
-     * not been served yet. Cleared when it is served and when a load fails, so a
-     * request that could not be met does not sit armed and fire on the next
-     * unrelated reload - a toolbar Refresh, or a sync catching the editor up.
-     */
-    private boolean startWhenLoaded;
-
-    public RunEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
-        this.p = p;
-        this.parent = vf.getTestRun();
-
-        final @NotNull Disposable projectDisposable = Disposer.newDisposable();
-        Disposer.register(p, projectDisposable);
-        this.projectDisposable = projectDisposable;
-
-        this.allTestCases = Collections.synchronizedList(new ArrayList<>());
-        this.currentTestCases = Collections.synchronizedList(new ArrayList<>());
-
-        this.resultsMap = new ConcurrentHashMap<>();
-
-        // The run editor hears about executions for the first time here. The
-        // test editor and the view panel only ever repainted on a report; this
-        // one records what the report said, because a run is where a verdict
-        // belongs.
-        TestCaseExecutionSubscriber.onReported(p, projectDisposable, this::executionReported);
-
-        // Shared list-view construction (see ListPanelBuilder, the counterpart of
-        // GridPanelBuilder). Built here rather than in buildOpeningPanel so the
-        // three parts of it are final: the editor never exists without a list.
-        final @NotNull ListView listView = ListPanelBuilder.build(p, projectDisposable, this);
-        this.model = listView.model();
-        this.list = listView.list();
-        this.listScrollPane = listView.scrollPane();
-
-        buildOpeningPanel(listView);
-        loadDataAsync();
-    }
-
-    private void buildOpeningPanel(final @NotNull ListView listView) {
-        toolBar = new RunToolbar(p, this);
-        statusBar = new StatusBar();
-        StatusBarListener.attach(this);
-
-        // Run editor specifics: the run card renderer.
-        list.setCellRenderer(new RunListRenderer(p, this));
-
-        this.contextMenu = new RunEditorContextMenu(p, this, parent, list, model);
-
-        // Not through the menu, which is about the selected test case. Paging
-        // moves the view, so it is the editor's own key and the editor binds it.
-        PageAction.bindTo(this, list);
-
-        // ENTER on a list is that list's gesture rather than a command, so it is
-        // not in the keymap - it is put on the declared action here (#119).
-        Declared.bindTo("Testin.ViewDetails", list);
-
-        // Not in the keymap: the grid answers CTRL+C for its own cells, and a
-        // registered shortcut is dispatched before a component's input map (#119).
-        Declared.bindTo("Testin.CopyTestCase", list);
-
-        // Not in the keymap either: DELETE is the tree's key and the grid's, and
-        // a keymap entry would answer for all three (#119).
-        Declared.bindTo("Testin.RemoveTestCase", list);
-
-        ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
-                () -> grid.map(GridView::table),
-                () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);
-
-        mainPanel = new JBPanel<>(new BorderLayout());
-        center = new EditorCenter(mainPanel);
-        mainPanel.add(toolBar, BorderLayout.NORTH);
-        mainPanel.add(statusBar, BorderLayout.SOUTH);
-        toolBar.installSearchFocusShortcut(mainPanel);
-
-        // List view is the default mode when the editor opens.
-        onToolBarSwitchedToListView();
-
-        refreshView();
-    }
-
-    private void loadDataAsync() {
-        loadDataAsync(() -> {
-        });
-    }
 
     /**
      * UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126.
@@ -299,7 +104,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * the only moment a refresh can honestly be confirmed. The failure branch
      * says nothing, because nothing was refreshed.
      */
-    private void loadDataAsync(final @NotNull Runnable onLoaded) {
+    @Override
+    protected void loadDataAsync(final @NotNull Runnable onLoaded) {
         final int generation = loadGeneration.incrementAndGet();
         loaded = false;
         list.setPaintBusy(true);
@@ -381,23 +187,149 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         });
     }
 
-    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-092
+    /**
+     * A refresh reads the run again from disk and the walk goes with the old
+     * copy, so the message has to carry both (#218).
+     */
     @Override
-    public void onToolBarSearchValueChanged() {
-        currentPage = 1;
-        refreshView();
+    protected @NotNull Done refreshed() {
+        return isExecuting() ? Done.REFRESHED_EXECUTION_STOPPED : Done.REFRESHED;
     }
 
-    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-093
+    /**
+     * The walk stops before the copy it is walking is thrown away.
+     */
     @Override
-    public void onToolBarSearchFocusReleased() {
-        list.requestFocusInWindow();
+    protected void beforeReload() {
+        haltExecution();
     }
 
-    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-097
+    /**
+     * What the run recorded goes with the cases it was recorded against: both
+     * are about to be read again, and a result map left behind would answer for
+     * cases that are no longer the ones on screen.
+     */
     @Override
-    public void onToolBarFilterSelectionChanged() {
-        currentPage = 1;
+    protected void clearLoadedData() {
+        resultsMap.clear();
+
+        tr = Optional.empty();
+    }
+
+    /**
+     * Closing the tab is the same gesture as pressing Stop, so it does the same
+     * thing: the automation this editor launched is ended, the walk is halted,
+     * and the run is written.
+     * <p>
+     * Stopping the automation first, because halting the walk is what stops this
+     * editor claiming to execute, and the cases to stop are read from that
+     * claim. Without it the TestNG process outlived the tab, the cards kept
+     * filling in, and every verdict it went on to report was written into no run
+     * at all - the only subscription that could have recorded them went with
+     * this editor (#222).
+     */
+    @Override
+    protected void beforeDispose() {
+        // The light mode window reads this editor every time it draws, so it
+        // must not outlive it. Here rather than a Disposer child registered on
+        // this editor, which never ran - this dispose is called directly rather
+        // than through the Disposer - and which quietly adopted the editor under
+        // the application root, where nothing removed it and the IDE reported it
+        // as a leak on every quit (#292).
+        Services.getInstance(p, LightMode.class).editorClosing(parent);
+
+        // The guard is inside the try, not around it: isExecuting() asks the
+        // service container for TestNGExecution, and during a project close that
+        // is exactly the call that throws. Outside, it threw past the catch and
+        // skipped every teardown line below.
+        try {
+            if (isExecuting()) {
+                stopAutomation();
+                stopExecution();
+                Services.getInstance(p, RunStatusService.class).persistRun(p, this);
+            }
+        } catch (final Exception ex) {
+            Logger.warn("Run not persisted on editor close: " + ex.getMessage());
+        }
+
+        executionTimer.dispose();
+    }
+
+    @Override
+    protected void disposeLoadedData() {
+        resultsMap.clear();
+    }
+
+    /**
+     * What the run recorded for this case, empty when it recorded nothing - a
+     * case added to the test set after the run was created, or a map still being
+     * refilled by a reload.
+     */
+    public @NotNull Optional<TestRunItems> runItem(final @NotNull UUID id) {
+        return Optional.ofNullable(resultsMap.get(id));
+    }
+
+    /**
+     * The run being edited, empty while a reload is replacing it.
+     */
+    public @NotNull Optional<TestRunDto> run() {
+        return tr;
+    }
+
+    @Getter
+    private int currentlyExecutingIndex = -1;
+
+    /**
+     * Whether the cases have been read.
+     * <p>
+     * Not answerable from {@code tr}, which is set on the pooled thread before the
+     * cases it points at have been resolved - so an editor asked to start in that
+     * window would have found an empty list and started nothing.
+     */
+    private boolean loaded;
+
+    /**
+     * Whether something asked this editor to start as soon as it could, and has
+     * not been served yet. Cleared when it is served and when a load fails, so a
+     * request that could not be met does not sit armed and fire on the next
+     * unrelated reload - a toolbar Refresh, or a sync catching the editor up.
+     */
+    private boolean startWhenLoaded;
+
+    public RunEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
+        super(p, vf.getTestRun());
+
+        this.resultsMap = new ConcurrentHashMap<>();
+
+        // The run editor hears about executions for the first time here. The
+        // test editor and the view panel only ever repainted on a report; this
+        // one records what the report said, because a run is where a verdict
+        // belongs.
+        TestCaseExecutionSubscriber.onReported(p, projectDisposable, this::executionReported);
+
+        buildOpeningPanel();
+        loadDataAsync();
+    }
+
+    private void buildOpeningPanel() {
+        toolBar = new RunToolbar(p, this);
+        statusBar = new StatusBar();
+        StatusBarListener.attach(this);
+
+        // Run editor specifics: the run card renderer.
+        list.setCellRenderer(new RunListRenderer(p, this));
+
+        this.contextMenu = new RunEditorContextMenu(p, this, parent, list, model);
+
+        wireList();
+
+        mainPanel.add(toolBar, BorderLayout.NORTH);
+        mainPanel.add(statusBar, BorderLayout.SOUTH);
+        toolBar.installSearchFocusShortcut(mainPanel);
+
+        // List view is the default mode when the editor opens.
+        onToolBarSwitchedToListView();
+
         refreshView();
     }
 
@@ -406,62 +338,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     public void refreshAfterStatusChange() {
         refreshView();
-    }
-
-    // UC-EDITOR-PANEL-021, Rule-EDITOR-PANEL-099
-    @Override
-    public void onToolBarFilterResetButtonClicked() {
-        currentPage = 1;
-        refreshView();
-    }
-
-    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-021
-    @Override
-    public void onToolBarDetailsSelectionChanged() {
-        Logger.debug("[details] selectedDetails changed -> " + getSelectedDetails());
-
-        // Only what is on screen. Re-measuring the cards costs a full pass over
-        // the page, and doing it while the grid is showing buys nothing - the
-        // list is re-measured when it comes back instead.
-        if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
-            Logger.debug("[details] grid active -> toggling column visibility");
-            updateGridColumns();
-        } else {
-            refreshCards();
-        }
-    }
-
-    private void refreshCards() {
-        model.allContentsChanged();
-    }
-
-    private void updateGridColumns() {
-        grid.ifPresent(view ->
-                gridPanelBuilder.applyColumnVisibility(view.table(), RunEditorAttributes.class, getSelectedDetails()));
-    }
-
-    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-018
-    @Override
-    public void onToolBarSwitchedToListView() {
-        Logger.debug("[switch] -> LIST view, currentView=" + toolBar.getCurrentView());
-        center.set(listScrollPane);
-
-        // Attributes ticked while the grid was showing did not touch the cards;
-        // they are re-measured here, once, rather than on every tick.
-        refreshCards();
-    }
-
-    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-017
-    @Override
-    public void onToolBarSwitchedToGridView() {
-        Logger.debug("[switch] -> GRID view, currentView=" + toolBar.getCurrentView());
-        rebuildGrid();
-        // rebuildGrid() swallows failures; the grid is then still empty and the
-        // previous center stays visible instead of an NPE.
-        grid.ifPresent(view -> {
-            center.set(view.scrollPane());
-            ApplicationManager.getApplication().invokeLater(view.table()::requestFocusInWindow);
-        });
     }
 
     /**
@@ -488,55 +364,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 }).show());
     }
 
-    // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-120
-    @Override
-    public void onToolBarRefreshButtonClicked() {
-        Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
-
-        // Asked before the reload, because the reload is what ends it. Refresh
-        // reads the run again from disk and the walk goes with the old copy, so
-        // the message has to carry both (#218).
-        final boolean wasExecuting = isExecuting();
-
-        // Said when the run is back on screen, not when the button went down -
-        // the read waits for indexing and finishes on another thread (#62).
-        reloadData(() -> Services.getInstance(p, Notifier.class)
-                .softShow(p, wasExecuting ? Done.REFRESHED_EXECUTION_STOPPED : Done.REFRESHED));
-    }
-
-
-    /**
-     * UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-117.
-     * <p>
-     * Re-read and redrawn. The execution stops first: the timer holds the item
-     * it is counting and everything it is counted into is about to be thrown
-     * away.
-     */
-    @Override
-    public void reloadData() {
-        reloadData(() -> {
-        });
-    }
-
-    private void reloadData(final @NotNull Runnable onLoaded) {
-        haltExecution();
-
-        rememberSelection();
-
-        this.allTestCases.clear();
-        this.currentTestCases.clear();
-        this.resultsMap.clear();
-
-        this.tr = Optional.empty();
-
-        this.model.removeAll();
-
-        this.list.setPaintBusy(true);
-        this.list.getEmptyText().setText(Bundle.message("editor.refreshing"));
-
-        loadDataAsync(onLoaded);
-    }
-
     // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014
     @Override
     public @NotNull String cardTitle(final @NotNull TestCaseDto tc) {
@@ -548,94 +375,53 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     @Override
+    protected @NotNull Class<RunEditorAttributes> attributeType() {
+        return RunEditorAttributes.class;
+    }
+
+    @Override
     public @NotNull Set<RunEditorAttributes> getSelectedDetails() {
         return getToolBar().getToolbarItem(RunDetailsPopupBtn.class).getSelectedDetails();
     }
 
+
+    /**
+     * UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-101.
+     * <p>
+     * The page count, and how much of this run is automated.
+     */
     @Override
-    public int getTotalPageCount() {
-        return PageWindow.of(currentTestCases.size(), currentPage, pageSize).totalPages();
-    }
-
-    @Override
-    public int getShownItemsCount() {
-        return currentTestCases.size();
-    }
-
-    @Override
-    public int getTotalItemsCount() {
-        return allTestCases.size();
-    }
-
-    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-101
-    public void refreshView() {
-        // Recomputed here rather than by the callers, as the test editor does.
-        // The view is a filtered page of the master list, so anything that
-        // changes that list has to show at once - and leaving it to whoever
-        // changed the data means the one caller that forgets leaves a deleted
-        // test case on screen. Four callers hand-copied these two lines before
-        // every call, which is four chances to be the one that forgets.
-        currentTestCases.clear();
-        currentTestCases.addAll(getFilteredList());
-
-        final int total = currentTestCases.size();
-        final @NotNull PageWindow page = PageWindow.of(total, currentPage, pageSize);
-        currentPage = page.page();
-        // Copy: listeners retain this list, and a live subList view would throw
-        // ConcurrentModificationException after currentTestCases is next mutated.
-        final @NotNull List<TestCaseDto> pageItems = new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
-
-        // What was selected before the reload, or what is selected right now.
-        // Swing answers null for an empty selection, which is converted here.
-        final @NotNull Optional<UUID> selectedId = selectionToRestore
-                .or(() -> Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId));
-
-        model.replaceAll(pageItems);
-
-        // Matched by id: a reload hands back different dto instances for the same
-        // test cases, so comparing objects would drop the selection.
-        selectedId.ifPresent(id -> {
-            for (final TestCaseDto item : pageItems) {
-                if (id.equals(item.getId())) {
-                    // Selected by value, not by index: the list model owns its own
-                    // ordering, so an index into pageItems is not safe to reuse.
-                    list.setSelectedValue(item, true);
-                    break;
-                }
-            }
-        });
-        selectionToRestore = Optional.empty();
-
+    protected void drawStatus(final @NotNull PageWindow page, final int totalItems) {
         statusBar.updatePaginationState(page.page(), page.totalPages());
 
         // The same fired-and-forgotten read the test editor makes, into the same
         // service: a run holds test cases, and whether one has a generated method
         // is what says how much of this run will actually execute.
         Services.getInstance(p, AutomationState.class).read(p, snapshotOfAll(), this::refreshView);
+    }
 
-        // After the selection has been restored above, which is the whole point:
-        // the label says what is selected, so it cannot be written before that
-        // is known.
-        refreshSelectionStatus(list.getSelectedIndices());
+    /**
+     * What the run has recorded so far, beside what is selected.
+     */
+    @Override
+    protected void afterSelectionShown() {
         showRunTotals();
+    }
 
-        if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
-            Logger.debug("[refreshView] grid active -> rebuilding grid");
-            rebuildGrid();
-            grid.ifPresent(view -> center.set(view.scrollPane()));
-        }
-
-        // What there is to walk is this list, so a filter that empties it grays
-        // Start on the same redraw rather than at whatever happens next. Through
-        // the one method that owns the buttons, so light mode's copy of them is
-        // told at the same moment (Rule-EDITOR-PANEL-135).
+    /**
+     * What there is to walk is this list, so a filter that empties it grays
+     * Start on the same redraw rather than at whatever happens next. Through the
+     * one method that owns the buttons, so light mode's copy of them is told at
+     * the same moment (Rule-EDITOR-PANEL-135).
+     */
+    @Override
+    protected void afterViewRefreshed() {
         onExecutionStateChanged();
     }
 
     /**
      * A run editor draws run statuses; a test set editor does not.
      */
-    @Override
     public boolean hasRunStatuses() {
         return true;
     }
@@ -660,102 +446,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         onExecutionStateChanged();
     }
 
-    /**
-     * Records the selected test case (and grid column) before the data is reloaded.
-     */
-    private void rememberSelection() {
-        // Swing answers null when nothing is selected, which is the one thing
-        // there is nothing to remember about.
-        selectionToRestore = Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId);
-        gridColumnToRestore = grid.map(view -> view.table().getSelectedColumn()).orElse(-1);
-    }
-
-    /**
-     * UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-118.
-     * <p>
-     * Moves to whichever page now holds the remembered test case, so a selection
-     * that a reload pushed onto another page is not lost.
-     */
-    private void jumpToPageOfPendingSelection() {
-        final int page = selectionToRestore
-                .map(id -> PageWindow.pageContaining(id, currentTestCases, pageSize))
-                .orElse(0);
-
-        // Not on any page anymore - the case was deleted or filtered out, so
-        // there is nothing left to restore.
-        if (page == 0) selectionToRestore = Optional.empty();
-        else currentPage = page;
-    }
-
-    private @NotNull List<TestCaseDto> getCurrentPageItems() {
-        final int total = currentTestCases.size();
-        final @NotNull PageWindow page = PageWindow.of(total, currentPage, pageSize);
-        return new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
-    }
-
-    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-019
-    private void rebuildGrid() {
-        // Before the page is read, not after: the committed value has to be in the
-        // data the new grid is built from, or the tester watches their own
-        // sentence disappear and come back on the next refresh.
-        final boolean keepKeyboard = grid.map(GridView::handOver).orElse(false);
-
-        final @NotNull List<TestCaseDto> pageItems = getCurrentPageItems();
-        final @NotNull Set<RunEditorAttributes> attributes = getSelectedDetails();
-        Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
-        try {
-            final @NotNull JBTable table = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap, this::positionOf);
-
-            // The previous grid's subscription goes with the previous grid, so
-            // they do not accumulate one per rebuild.
-            grid.ifPresent(previous -> Disposer.dispose(previous.fontSync()));
-            final @NotNull Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin.runEditor.gridFontSync");
-            FontSync.syncWithNativeEditor(p, table, fontSync);
-
-            table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, list, pageItems));
-            // Typing into the Actual Result cell writes it to the run (#74).
-            table.getModel().addTableModelListener(
-                    new RunGridEditListener(p, this, pageItems, model::allContentsChanged));
-            // ESC in grid view behaves like ESC in the list: hide the view panel, then clear the selection.
-            new EscapeAction(p, table);
-            // Everything ENTER does in this grid, and the double click on the sequence.
-            new GridEnterAction(p, table, pageItems, parent.getPath2());
-
-            table.addMouseListener(new GridContextMenuListener(table, list, contextMenu, pageItems));
-            // Every shortcut the menu offers - the verdict keys above all -
-            // live on the grid too, and quiet while a cell is open (#74).
-            contextMenu.bindShortcutsTo(table);
-            // And the page keys, which are not on the menu and so are not
-            // carried across by the line above.
-            PageAction.bindToGrid(this, table);
-            new OpenContextMenuAction(table, contextMenu);
-            grid = Optional.of(GridPanelBuilder.finishRebuild(table, list, pageItems, gridColumnToRestore, fontSync, keepKeyboard));
-
-            // Cleared regardless of whether the row was found, so a stale column can
-            // never be applied to an unrelated rebuild.
-            gridColumnToRestore = -1;
-            Logger.debug("[grid] rebuildGrid done, rows=" + table.getRowCount() + ", cols=" + table.getColumnCount());
-        } catch (final Exception ex) {
-            Logger.error("[grid] rebuildGrid FAILED: " + ex);
-        }
-    }
-
-
-    /**
-     * This editor's own node, for the toolbar's Details button. The field is
-     * called parent because the test cases are its children; what the toolbar
-     * wants is the node itself, so it is named for that.
-     */
-    @Override
-    public @NotNull Project getProject() {
-        return p;
-    }
-
-    @Override
-    public @NotNull DirectoryDto getEditedNode() {
-        return parent;
-    }
-
 
     /**
      * UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095.
@@ -770,19 +460,20 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         return Modules.in(allTestCases);
     }
 
-    /**
-     * UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095.
-     * <p>
-     * Every group the project has used, from the cache that already holds them
-     * for the completion field (#296).
-     */
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
     @Override
-    public @NotNull Set<String> getAvailableGroups() {
-        return Services.getInstance(p, TestCaseValues.class).getGroups();
+    protected @NotNull JBTable buildTable(final @NotNull List<TestCaseDto> pageItems, final @NotNull Set<RunEditorAttributes> attributes) {
+        return gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap, this::positionOf);
     }
 
-    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
-    private @NotNull List<TestCaseDto> getFilteredList() {
+    @Override
+    protected void installEditListener(final @NotNull JBTable table, final @NotNull List<TestCaseDto> pageItems) {
+        // Typing into the Actual Result cell writes it to the run (#74).
+        table.getModel().addTableModelListener(new RunGridEditListener(p, this, pageItems, model::allContentsChanged));
+    }
+
+    @Override
+    protected @NotNull List<TestCaseDto> getFilteredList() {
         final @NotNull EditorFilters filters = EditorFilters.of(toolBar);
         // Status is the run editor's alone - a test case does not have one.
         final @NotNull Set<TestStatus> statusFilter = toolBar.getToolbarItem(FilterPopupBtn.class).getSelectedStatus();
@@ -800,70 +491,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         }
 
         return Services.getInstance(p, AutomationState.class).matching(matched, filters.automation());
-    }
-
-    @Override
-    public void dispose() {
-        // Before anything is torn down: the light mode window reads this editor
-        // every time it draws, so it must not outlive it. Here rather than a
-        // Disposer child registered on this editor, which never ran - this
-        // dispose is called directly rather than through the Disposer - and
-        // which quietly adopted the editor under the application root, where
-        // nothing removed it and the IDE reported it as a leak on every quit
-        // (#292).
-        Services.getInstance(p, LightMode.class).editorClosing(parent);
-
-        // Closing the tab is the same gesture as pressing Stop, so it does the
-        // same thing: the automation this editor launched is ended, the walk is
-        // halted, and the run is written. Stopping the automation first, because
-        // halting the walk is what stops this editor claiming to execute, and the
-        // cases to stop are read from that claim.
-        //
-        // Without the first line the TestNG process outlived the tab, the cards
-        // kept filling in, and every verdict it went on to report was written
-        // into no run at all - the only subscription that could have recorded
-        // them went with this editor (#222).
-        //
-        // The guard is inside the try, not around it: isExecuting() asks the
-        // service container for TestNGExecution, and during a project close that
-        // is exactly the call that throws. Outside, it threw past the catch and
-        // skipped every teardown line below.
-        try {
-            if (isExecuting()) {
-                stopAutomation();
-                stopExecution();
-                Services.getInstance(p, RunStatusService.class).persistRun(p, this);
-            }
-        } catch (final Exception ex) {
-            Logger.warn("Run not persisted on editor close: " + ex.getMessage());
-        }
-
-        // Releases the message-bus subscriptions (font sync) registered against this editor's lifetime.
-        Disposer.dispose(projectDisposable);
-
-        executionTimer.dispose();
-        for (final MouseListener listener : list.getMouseListeners())
-            list.removeMouseListener(listener);
-
-        toolBar.dispose();
-
-        allTestCases.clear();
-        resultsMap.clear();
-        model.removeAll();
-        mainPanel.removeAll();
-        TestinEditor.super.dispose();
-
-        Logger.debug("dispose run editor: " + parent.getName() + " - " + parent.getPath());
-
-    }
-
-    @Override
-    public @NotNull JComponent getPreferredFocusedComponent() {
-        return list;
-    }
-
-    public @NotNull JComponent getComponent() {
-        return mainPanel;
     }
 
     @Override
@@ -889,62 +516,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         selectVisibleIndex(localIndex);
     }
 
-    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-104
-    @Override
-    public void selectWhenLoaded(final @NotNull UUID id) {
-        final @NotNull Optional<TestCaseDto> loaded = currentTestCases.stream()
-                .filter(tc -> id.equals(tc.getId()))
-                .findFirst();
-
-        // Already holding it, so nothing is coming to do this later: go now,
-        // through the one method that owns going somewhere - it turns to the
-        // right page and takes the focus with it.
-        if (loaded.isPresent()) {
-            selectTestCase(loaded.get());
-            return;
-        }
-
-        // Not loaded yet. The load ends by moving to the page that holds the
-        // remembered case and repainting, which is exactly what is wanted -
-        // all that is missing is the focus, because this is a tester asking to
-        // be taken somewhere rather than a reload putting things back.
-        selectionToRestore = Optional.of(id);
-        goingTo = true;
-    }
-
-    /**
-     * Whether the pending selection is somewhere the tester asked to go, rather
-     * than where they already were before a reload.
-     * <p>
-     * The difference is only the focus, and it matters both ways: a refresh that
-     * grabbed focus would take it off whatever they were doing, and a Go To that
-     * did not would leave them looking at the right row with the keyboard still
-     * pointed somewhere else.
-     */
-    private boolean goingTo = false;
-
-    /**
-     * Focuses the list when the case that has just been restored is one the
-     * tester asked to be taken to. Called once the page and the selection are
-     * settled, because focusing a row that is about to be replaced is no use.
-     */
-    private void focusIfGoingTo() {
-        if (!goingTo) return;
-
-        goingTo = false;
-        list.requestFocusInWindow();
-    }
-
     private void selectVisibleIndex(final int index) {
         if (index < 0 || index >= list.getModel().getSize()) return;
         list.setSelectedIndex(index);
         list.ensureIndexIsVisible(index);
         list.requestFocusInWindow();
-    }
-
-    @Override
-    public @NotNull List<TestCaseDto> getSelectedTestCases() {
-        return list.getSelectedValuesList();
     }
 
     /**
@@ -1409,9 +985,13 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * either is live state that a reload under the tester would throw away, so an
      * on-disk refresh leaves this editor be until it is done (#20, #74).
      */
+    /**
+     * A run is busy while it is executing as well as while a cell is open: a
+     * reload would throw away the walk it is on.
+     */
     @Override
     public boolean isBusy() {
-        return isExecuting() || grid.map(GridView::isCellOpen).orElse(false);
+        return isExecuting() || super.isBusy();
     }
 
     /**
@@ -1600,6 +1180,5 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         Services.getInstance(p, RunStatusService.class).persistRun(p, this);
         Services.getInstance(p, Notifier.class).softShow(p, Done.STOPPED);
     }
-
 
 }
