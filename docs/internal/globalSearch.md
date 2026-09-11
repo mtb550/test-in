@@ -40,11 +40,12 @@ This is the fastest way to reach one test set, one test run or one test case.
   When two actions claim one keystroke the IDE runs whichever is enabled and
   says nothing, and a component binding cannot win it back - so the key is
   changed instead.
-- **Rule-INTERNAL-071** — An action that acts on the editor is answered only by
-  the editor being typed into. The IDE offers every context the selected
-  editor's data whether or not it has the keyboard, so an action that took that
-  at face value was live in the tree as well - and where two actions share a
-  key, the first of them answered for both.
+- **Rule-INTERNAL-071** — A default key carries one action. Two may share one
+  only where their conditions cannot both hold at once, which has to be argued
+  rather than assumed: `F2` works because each of its three needs a selection in
+  its own surface, and `Ctrl+M` did not, because creating a test case needs only
+  an open editor and so was live in the tree as well. Where two are enabled the
+  IDE runs whichever is declared first and says nothing.
 
 The tree panel's own rules do not govern this dialog. It opens from anywhere in
 the IDE, and the tree is only where it lands.

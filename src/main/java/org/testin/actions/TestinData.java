@@ -3,8 +3,6 @@ package org.testin.actions;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKey;
 import com.intellij.openapi.actionSystem.DataSink;
-import com.intellij.openapi.actionSystem.PlatformCoreDataKeys;
-import com.intellij.openapi.actionSystem.UiDataProvider;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -14,8 +12,6 @@ import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 
-import javax.swing.SwingUtilities;
-import java.awt.Component;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,45 +75,25 @@ public final class TestinData {
     }
 
     /**
-     * UC-INTERNAL-001, Rule-INTERNAL-071.
+     * UC-INTERNAL-001, Rule-INTERNAL-066.
      * <p>
      * The editor the keystroke arrived in, and empty when it did not arrive in
      * one - which is how a declared editor action stays gray in a Java file.
      * <p>
-     * <b>The second half of that sentence was not true, and it cost Ctrl+M.</b>
-     * {@code CaseList} publishes this key as a {@link UiDataProvider}, which is
-     * scoped to the focus - but the platform also merges the <em>selected</em>
-     * file editor's data into every context, so the key answered anywhere in the
-     * IDE while a Testin tab was open, focus or no focus.
+     * The platform answers this from the <em>selected</em> file editor as well as
+     * the focused one, so it is true wherever the tester is standing while a
+     * Testin tab is open. That is deliberate and it is why Ctrl+M creates a test
+     * case from anywhere: the action needs an editor to create the case in, not
+     * the tester's attention.
      * <p>
-     * Create Test Case and Create Testin Node share Ctrl+M, each meant to be the
-     * only one enabled in its own surface. With this key answering everywhere,
-     * Create Test Case was enabled in the tree too - and it is declared first, so
-     * the dispatcher ran it and never asked the tree's action at all. Pressing
-     * Ctrl+M on a test set directory did the wrong thing, and the right action's
-     * {@code update} was never even called (#119).
-     * <p>
-     * So the editor has to be the thing being typed into. Asked of the component
-     * the action was invoked from rather than of the focus manager: a context
-     * menu and a toolbar button inside the editor are both descendants of it, so
-     * all three ways in agree, and the tree is not a descendant of any of them.
-     * <p>
-     * No component at all means the action came from somewhere with no UI - a
-     * test, or code calling it directly - and those are answered as before.
+     * It briefly required the editor to hold the keyboard, to break a tie on
+     * Ctrl+M with the tree's create action. The tie is gone - one key now has one
+     * action - and with it the reason. A key whose meaning depends on where the
+     * mouse was last clicked is worse than one that always does the same thing,
+     * and it was three lines to say so.
      */
     public static @NotNull Optional<TestinEditor> editor(final @NotNull AnActionEvent e) {
-        return Optional.ofNullable(EDITOR.getData(e.getDataContext()))
-                .filter(editor -> isBeingTypedInto(editor, e));
-    }
-
-    /**
-     * UC-INTERNAL-001, Rule-INTERNAL-071.
-     * <p>
-     * Whether this editor is the surface the action came from.
-     */
-    private static boolean isBeingTypedInto(final @NotNull TestinEditor editor, final @NotNull AnActionEvent e) {
-        final @Nullable Component from = PlatformCoreDataKeys.CONTEXT_COMPONENT.getData(e.getDataContext());
-        return from == null || SwingUtilities.isDescendingFrom(from, editor.getComponent());
+        return Optional.ofNullable(EDITOR.getData(e.getDataContext()));
     }
 
     /**

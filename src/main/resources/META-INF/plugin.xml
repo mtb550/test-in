@@ -449,10 +449,7 @@
                 id="Testin.CreateNode"
                 class="org.testin.creator.CreateTreeNodeAction"
                 icon="AllIcons.General.Add"
-        >
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl M"/>
-            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta M"/>
-        </action>
+        />
 
         <action
                 id="Testin.EditTestRun"

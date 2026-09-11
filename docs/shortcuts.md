@@ -20,7 +20,7 @@ table; this is all of them together.
 |---|---|
 | `Enter` | Opens the selected test set or test run |
 | `Context Menu` | Opens the menu on the selected node, without the mouse |
-| `Ctrl+M` | Creates a node under the selected one. Gray on a test project, a test set or a test run, which hold what they hold - the entry says so |
+| *no key* | **Create Testin Node** is a right-click entry. It shared `Ctrl+M` with Create Test Case and lost every press: creating a test case needs only an open editor, so that action was enabled here too and is declared first. Gray on a test project, a test set or a test run, which hold what they hold - the entry says so |
 | `Shift+F6` | Renames the selected node |
 | `Delete` | Removes the selected nodes |
 | `Ctrl+X` | Cuts the selected nodes, to move them |
@@ -204,7 +204,7 @@ these carry a default key:
 | Key | The action | Where it works |
 |---|---|---|
 | `Ctrl+Alt+F` | Search Test Project | Anywhere in the IDE |
-| `Ctrl+M` | Create Testin Node, Create Test Case | The tree, and a test set editor |
+| `Ctrl+M` | Create Test Case | A test set editor. Create Testin Node is declared with no key - it is in Find Action and the Keymap page, so a tester who wants one can set it |
 | `Shift+F6` | Rename Testin Node | The tree |
 | `F2` | Update Test Case, Failed Test Case Details, Edit Test Run | Both editors, the view panel, and the tree |
 | *none by default* | Copy, Cut and Paste Test Case | Both editors. Declared with no key, so Find Action offers them and a tester who wants one can set it |

@@ -34,12 +34,9 @@ public class Main implements ToolWindowFactory, DumbAware {
             // plain panel and not focusable - so focus stays wherever it was,
             // usually an editor.
             //
-            // That is not a cosmetic problem. An action decides what it acts on
-            // from the surface being typed into, so a tree nobody can focus is a
-            // tree whose keys are answered by the editor next to it: Ctrl+M
-            // created a test case while a test set directory sat selected in the
-            // tree, because Create Test Case only asks whether an editor exists
-            // and is declared first (Rule-INTERNAL-071).
+            // Not cosmetic. A tree nobody can focus is a tree whose keys are
+            // answered by whatever does have the keyboard, and that is how a
+            // press over the tree came to be handled by the editor beside it.
             content.setPreferredFocusableComponent(tp.getProjectTree().getMainTree());
 
             tw.setTitleActions(new TreePanelActions().create(p, tp));
