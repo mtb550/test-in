@@ -10,6 +10,8 @@ import org.testin.util.NameSanitizer;
 
 import javax.swing.*;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
@@ -85,6 +87,57 @@ public enum DirectoryType {
             NodeStatistics.VERDICTS,
             List.of(NodeCount.TOTAL)
     );
+
+
+    /**
+     * UC-TREE-PANEL-014, Rule-TREE-PANEL-049.
+     * <p>
+     * What may be dropped or pasted into each kind of node, as one table.
+     * <p>
+     * It was five predicates over seven files until #176: {@code
+     * isTransferTarget} on the target, {@code acceptsTransferred} overridden
+     * five times, and three {@code isAllowedIn...} questions that existed only
+     * to be asked by those overrides and by nothing else. One fact - which kinds
+     * go inside which - answered in thirteen method bodies, where no reader
+     * could see the whole of it and no two rows could be compared.
+     * <p>
+     * A test run accepts nothing, which is the one thing this table changed. It
+     * answered {@code isTransferTarget() == true} before and refused every
+     * source that reached it, so the tree flashed a drop highlight over a node
+     * that was never going to take the drop.
+     * <p>
+     * Empty for the three that take nothing: a test project holds its two fixed
+     * containers and nothing a tester puts there, a test set holds test cases
+     * rather than nodes, and a run holds run items.
+     */
+    private static final @NotNull Map<DirectoryType, Set<DirectoryType>> ACCEPTS = Map.of(
+            TP, Set.of(),
+            TCD, Set.of(TS, TSP),
+            TRD, Set.of(TR, TRP),
+            TSP, Set.of(TS, TSP),
+            TRP, Set.of(TR, TRP),
+            TS, Set.of(),
+            TR, Set.of());
+
+    /**
+     * Whether a node of that kind may be dropped or pasted into a node of this
+     * one.
+     */
+    public boolean accepts(final @NotNull DirectoryType source) {
+        return ACCEPTS.getOrDefault(this, Set.of()).contains(source);
+    }
+
+    /**
+     * Whether anything at all may be put into this kind - what the tree asks
+     * before it draws a drop highlight.
+     * <p>
+     * {@code getOrDefault} rather than {@code get}: a kind missing from the
+     * table takes nothing, which is the safe answer, and {@code
+     * NodeKindTablesTest} is what says none is missing.
+     */
+    public boolean acceptsAnything() {
+        return !ACCEPTS.getOrDefault(this, Set.of()).isEmpty();
+    }
 
     /**
      * What a directory directly under Test Cases may be marked as, and in which

@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.SpellChecker;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
@@ -29,7 +30,11 @@ import javax.swing.*;
 public class TestDataSection extends AbstractMultiLineSection {
 
     public TestDataSection(final @NotNull Project p) {
-        super(p, new EditorTextField(), CreateTestCaseFields.TEST_DATA);
+        // Spell checked, like every other field a tester writes a sentence in.
+        // It was a plain EditorTextField until #176, so the one section nobody
+        // compared with its siblings was the one that quietly checked nothing -
+        // and the tester had no way to tell it apart from a word it accepted.
+        super(p, SpellChecker.createField(p), CreateTestCaseFields.TEST_DATA);
     }
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032

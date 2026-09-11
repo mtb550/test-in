@@ -20,21 +20,8 @@ public class TestRunPackageDirectoryDto extends DirectoryDto {
 
 
 
-    @Override
-    public boolean isAllowedInTestSetFamily() {
-        return false;
-    }
 
-    @Override
-    public boolean isAllowedInsideTestRun() {
-        return false;
-    }
 
-    @Override
-    public boolean acceptsTransferred(final @NotNull DirectoryDto source) {
-        // Test-set nodes never land in the run family.
-        return super.acceptsTransferred(source) && source.isAllowedInTestRunFamily();
-    }
 
     @Override
     public @NotNull DirectoryType getType() {

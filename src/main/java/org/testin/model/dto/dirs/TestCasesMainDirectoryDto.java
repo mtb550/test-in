@@ -39,11 +39,6 @@ public class TestCasesMainDirectoryDto extends DirectoryDto {
     }
 
 
-    @Override
-    public boolean acceptsTransferred(final @NotNull DirectoryDto source) {
-        // Run nodes never land in the test-set family.
-        return super.acceptsTransferred(source) && source.isAllowedInTestSetFamily();
-    }
 
     @Override
     public @NotNull DirectoryType getType() {

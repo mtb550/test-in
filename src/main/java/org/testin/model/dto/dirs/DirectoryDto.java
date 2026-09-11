@@ -165,44 +165,27 @@ public abstract class DirectoryDto {
     }
 
     /**
-     * True when transferred nodes may be pasted or dropped into this node;
-     * the test project says no.
+     * True when anything at all may be pasted or dropped into this node - the
+     * question the tree asks before it draws a drop highlight.
+     * <p>
+     * The kind answers it, from the one table that says which kinds go inside
+     * which (#176). It was two overrides and three helper predicates until then,
+     * and a test run said yes here while refusing every source that arrived.
      */
     public boolean isTransferTarget() {
-        return true;
+        return getType().acceptsAnything();
     }
 
-    /**
-     * True when this node may be pasted or dropped into the test-set family;
-     * run nodes say no — they live only under the test-runs directory.
-     */
-    public boolean isAllowedInTestSetFamily() {
-        return true;
-    }
+
+
 
     /**
-     * True when this node may be pasted or dropped into the run family;
-     * test-set nodes say no — they live only under the test-cases directory.
-     */
-    public boolean isAllowedInTestRunFamily() {
-        return true;
-    }
-
-    /**
-     * True when this node may be pasted or dropped into a test run;
-     * test runs and run packages say no — a run holds run items only,
-     * never nested run structure.
-     */
-    public boolean isAllowedInsideTestRun() {
-        return true;
-    }
-
-    /**
-     * True when the given node may be pasted or dropped into this one; the
-     * test-set family additionally rejects run nodes.
+     * True when the given node may be pasted or dropped into this one, which is
+     * {@link DirectoryType#accepts} asked of the two kinds - see the table there
+     * for what goes inside what, and why it is one table (#176).
      */
     public boolean acceptsTransferred(final @NotNull DirectoryDto source) {
-        return isTransferTarget();
+        return getType().accepts(source.getType());
     }
 
     /**

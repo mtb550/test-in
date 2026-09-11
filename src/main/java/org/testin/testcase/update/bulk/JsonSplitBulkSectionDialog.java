@@ -78,18 +78,39 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
      */
     protected abstract @NotNull String getJsonFieldName();
 
-    protected abstract @NotNull String getOriginalValue(final @NotNull TestCaseDto tc);
 
     /**
-     * Applies one edited, trimmed value to the test case. Called only for rows
-     * the tester actually changed.
-     *
-     * @return true when the value was written, false when Testin could not read
-     * it and the test case was left as it was - the same answer
-     * {@link org.testin.importexport.imports.ImportSetter#execute} gives, and
-     * for the same reason (#295)
+     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-039.
+     * <p>
+     * Which field of a test case this dialog edits. The two questions a bulk
+     * edit asks of it - what is in there now, and write this back - are the two
+     * {@link TestEditorAttributes} already answers for the grid, the import and
+     * the update menu.
+     * <p>
+     * The seven dialogs answered them themselves until #176, and one of the
+     * seven had drifted: a description typed here went in unsanitized, while the
+     * same description typed into a grid cell or imported from a sheet did not.
+     * Nothing failed - the two just stopped agreeing about what a description is.
      */
-    protected abstract boolean setValue(final @NotNull TestCaseDto tc, final @NotNull String value);
+    protected abstract @NotNull TestEditorAttributes attribute();
+
+    /**
+     * What the field holds now, as the tester will see it in the JSON - the raw
+     * value, because this is an editable surface and a formatted one would be
+     * committed back (Rule-EDITOR-PANEL-005).
+     */
+    protected @NotNull String getOriginalValue(final @NotNull TestCaseDto tc) {
+        return attribute().gridValue(tc);
+    }
+
+    /**
+     * Writes what the tester typed, through the one setter that owns the field:
+     * it sanitizes where the field is sanitized, parses where it is parsed, and
+     * refuses a word it cannot read by leaving the case as it was.
+     */
+    protected boolean setValue(final @NotNull TestCaseDto tc, final @NotNull String value) {
+        return attribute().getImportSetter().execute(p, tc, value);
+    }
 
     /**
      * Whether a value edited to blank may be applied (e.g. a description must not be blanked).

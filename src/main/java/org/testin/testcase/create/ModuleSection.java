@@ -1,65 +1,35 @@
 package org.testin.testcase.create;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.EditorTextField;
 import com.intellij.ui.TextFieldWithAutoCompletion;
-import com.intellij.ui.components.JBPanel;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
-import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
+import org.testin.util.Shortcuts;
 
-import javax.swing.*;
-
-public class ModuleSection implements CreateTestCaseSection {
-    @Getter
-    private final @NotNull EditorTextField moduleField;
-    private final @NotNull JBPanel<?> wrapper;
+/**
+ * The module this test case belongs to, completing from the modules the project
+ * already uses.
+ */
+public class ModuleSection extends AbstractOneLineSection {
 
     public ModuleSection(final @NotNull Project p) {
-        this.moduleField = SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseValues.class).getModules(), CreateTestCaseFields.MODULE.getIcon()), "");
-        this.moduleField.setOneLineMode(true);
-        styleField(this.moduleField, CreateTestCaseFields.MODULE);
-
-        this.wrapper = createWrapper(CreateTestCaseFields.MODULE.getIcon(), this.moduleField);
-    }
-
-    @Override
-    public @NotNull JBPanel<?> getWrapper() {
-        return wrapper;
+        super(SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseValues.class).getModules(), CreateTestCaseFields.MODULE.getIcon()), ""),
+                CreateTestCaseFields.MODULE, Shortcuts.CreateTestCaseModule);
     }
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        dto.setModule(moduleField.getText().trim());
-    }
-
-    @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
-        base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseModule.getCustomShortcut(), () -> {
-            showSection(slot);
-            repackAction.execute();
-        });
-    }
-
-    @Override
-    public @NotNull JComponent getFocusComponent() {
-        return moduleField;
-    }
-
-    @Override
-    public void setEditable(final boolean editable) {
-        moduleField.setEnabled(editable);
+        dto.setModule(field.getText().trim());
     }
 
     @Override
     public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
-        moduleField.setText(dto.getModule());
+        field.setText(dto.getModule());
     }
 }

@@ -30,17 +30,7 @@ public class TestSetDirectoryDto extends DirectoryDto {
     }
 
 
-    @Override
-    public boolean isTransferTarget() {
-        // A test set holds test cases only - no directory node ever lands
-        // inside it (not a package, not another test set, not run nodes).
-        return false;
-    }
 
-    @Override
-    public boolean isAllowedInTestRunFamily() {
-        return false;
-    }
 
     @Override
     public @NotNull DirectoryType getType() {

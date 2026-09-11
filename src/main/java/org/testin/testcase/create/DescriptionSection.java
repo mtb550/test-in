@@ -1,12 +1,9 @@
 package org.testin.testcase.create;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.EditorTextField;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.TextFieldWithAutoCompletion;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.UIUtil;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -24,11 +21,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DescriptionSection implements CreateTestCaseSection {
+public class DescriptionSection extends AbstractOneLineSection {
     private final @NotNull Project p;
-    @Getter
-    private final @NotNull EditorTextField descriptionField;
-    private final @NotNull JBPanel<?> wrapper;
 
     /**
      * The test methods the other test cases in this test set already name.
@@ -40,12 +34,10 @@ public class DescriptionSection implements CreateTestCaseSection {
     private @NotNull Set<String> takenMethodKeys = Set.of();
 
     public DescriptionSection(final @NotNull Project p) {
-        this.p = p;
-        this.descriptionField = SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseValues.class).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), "");
-        this.descriptionField.setOneLineMode(true);
-        styleField(this.descriptionField, CreateTestCaseFields.DESCRIPTION);
+        super(SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseValues.class).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), ""),
+                CreateTestCaseFields.DESCRIPTION, Shortcuts.CreateTestCaseDescription);
 
-        this.wrapper = createWrapper(CreateTestCaseFields.DESCRIPTION.getIcon(), this.descriptionField);
+        this.p = p;
     }
 
     /**
@@ -67,15 +59,15 @@ public class DescriptionSection implements CreateTestCaseSection {
     // UC-EDITOR-PANEL-005
     public void setError(final boolean error) {
         if (error) {
-            descriptionField.setForeground(JBColor.RED);
-            descriptionField.requestFocus();
+            field.setForeground(JBColor.RED);
+            field.requestFocus();
         } else
             // The foreground, which is what the error turned red. This set the
             // background instead, so a field that had once been refused stayed
             // red however it was corrected - invisible while nothing cleared the
             // error, and visible the moment something did.
-            descriptionField.setForeground(UIUtil.getTextFieldForeground());
-        descriptionField.repaint();
+            field.setForeground(UIUtil.getTextFieldForeground());
+        field.repaint();
     }
 
     /**
@@ -94,7 +86,7 @@ public class DescriptionSection implements CreateTestCaseSection {
      */
     @Override
     public boolean accepts() {
-        final @NotNull String description = descriptionField.getText().trim();
+        final @NotNull String description = field.getText().trim();
         if (description.isEmpty()) {
             setError(false);
             return true;
@@ -129,37 +121,18 @@ public class DescriptionSection implements CreateTestCaseSection {
         return true;
     }
 
-    @Override
-    public @NotNull JBPanel<?> getWrapper() {
-        return wrapper;
-    }
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        dto.setDescription(descriptionField.getText().trim());
+        dto.setDescription(field.getText().trim());
     }
 
-    @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
-        base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseDescription.getCustomShortcut(), () -> {
-            showSection(slot);
-            repackAction.execute();
-        });
-    }
 
-    @Override
-    public @NotNull JComponent getFocusComponent() {
-        return descriptionField;
-    }
 
-    @Override
-    public void setEditable(final boolean editable) {
-        descriptionField.setEnabled(editable);
-    }
 
     @Override
     public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
-        descriptionField.setText(dto.getDescription());
+        field.setText(dto.getDescription());
     }
 }
