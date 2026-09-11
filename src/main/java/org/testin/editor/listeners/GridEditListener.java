@@ -13,6 +13,7 @@ import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseSnapshot;
+import org.testin.util.Bundle;
 
 import javax.swing.table.DefaultTableModel;
 import java.nio.file.Path;
@@ -92,7 +93,7 @@ public class GridEditListener extends AbstractGridEditListener {
      * "Urgent" is refused by Priority and taken by Module.
      */
     private static @NotNull String quoted(final @NotNull String typed, final @NotNull TestEditorAttributes attr) {
-        return "\"" + typed.trim() + "\" as a " + attr.getName();
+        return Bundle.message("grid.refused.as", typed.trim(), attr.getName());
     }
 
     /**
@@ -114,7 +115,7 @@ public class GridEditListener extends AbstractGridEditListener {
             Services.getInstance(p, ProjectIndexer.class).putTestCase(testSetPath, tc);
             generator.getAction().execute(p, tc);
 
-            TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Edit", List.of(tc)), undoFrom, TestCaseSnapshot.of(p, testSetPath, List.of(tc.getId())));
+            TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.edit"), List.of(tc)), undoFrom, TestCaseSnapshot.of(p, testSetPath, List.of(tc.getId())));
         });
     }
 }

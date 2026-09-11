@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 import org.testin.view.ViewPagination;
 
@@ -14,7 +15,7 @@ public class PreviousTestCaseAction extends DumbAwareAction {
     private final @NotNull ViewPagination controller;
 
     public PreviousTestCaseAction(final @NotNull ViewPagination controller, final @NotNull JComponent component) {
-        super("Previous Test Case", "Previous test case", AllIcons.Actions.Back);
+        super(Bundle.message("page.previous.case"), Bundle.message("page.previous.case.description"), AllIcons.Actions.Back);
         this.controller = controller;
 
         this.registerCustomShortcutSet(Shortcuts.Previous.getCustomShortcut(), component);

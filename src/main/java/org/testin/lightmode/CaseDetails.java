@@ -9,6 +9,7 @@ import org.testin.ui.Badges;
 import org.testin.ui.framework.Prose;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 
 import javax.swing.*;
@@ -40,7 +41,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
      * What the last row is called. Not GROUP: it draws the priority badge as
      * well, so a High-priority case in no group read "GROUP: High".
      */
-    private static final @NotNull String TAGS = "Tags";
+    private static final @NotNull String TAGS = Bundle.message("light.tags");
 
     /**
      * The label column, in the design's own figure. Narrow because the window is

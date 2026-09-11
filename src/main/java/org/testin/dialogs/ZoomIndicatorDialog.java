@@ -14,6 +14,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.services.Services;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.Bundle;
 
 import java.util.Optional;
 import javax.swing.*;
@@ -77,7 +78,7 @@ public final class ZoomIndicatorDialog implements Disposable {
         panel.setBorder(JBUI.Borders.empty(6, 12));
         DialogStyle.styleContent(panel);
 
-        panel.add(new JBLabel("Font size: " + (int) currentSize + "pt"));
+        panel.add(new JBLabel(Bundle.message("zoom.font.size", String.valueOf((int) currentSize))));
         panel.add(Box.createHorizontalStrut(JBUI.scale(12)));
 
         final @NotNull JBLabel gearIcon = new JBLabel(AllIcons.General.GearPlain);
@@ -87,7 +88,7 @@ public final class ZoomIndicatorDialog implements Disposable {
             public void mouseClicked(final @NotNull MouseEvent e) {
                 hide();
                 if (!p.isDisposed()) {
-                    ShowSettingsUtilImpl.showSettingsDialog(p, "preferences.editor", "Change font size");
+                    ShowSettingsUtilImpl.showSettingsDialog(p, "preferences.editor", Bundle.message("zoom.change.font.size"));
                 }
             }
         });

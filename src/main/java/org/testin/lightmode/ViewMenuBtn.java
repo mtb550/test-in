@@ -2,6 +2,7 @@ package org.testin.lightmode;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.toolbar.components.AbstractDetailsPopupBtn;
+import org.testin.util.Bundle;
 
 /**
  * The light mode window's view menu: four checkboxes for what it shows (#13).
@@ -18,7 +19,7 @@ class ViewMenuBtn extends AbstractDetailsPopupBtn<LightModePart> {
         // option that no longer exists, and reading it back would log an
         // unknown-attribute error on every open. The versioning rule is
         // AbstractDetailsPopupBtn's; what is local is that it had to be used.
-        super("Choose what the window shows",
+        super(Bundle.message("light.view.menu"),
                 "testin.lightMode.parts.v2",
                 LightModePart.class,
                 onChanged);

@@ -505,7 +505,7 @@ public final class TestRunWordGenerator {
         footerRun(link, "Testin", LINK_BLUE);
         link.setUnderline(UnderlinePatterns.SINGLE);
 
-        footerRun(p.createRun(), " IntelliJ plugin.", DARK_GRAY);
+        footerRun(p.createRun(), Bundle.message("report.footer.suffix"), DARK_GRAY);
     }
 
     /**

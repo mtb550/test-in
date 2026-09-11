@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.Bundle;
 
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +38,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
      * mode's title bar opens the same list under its own word - but written
      * once, because those two do share it.
      */
-    protected static final @NotNull String FIELDS = "Fields";
+    protected static final @NotNull String FIELDS = Bundle.message("toolbar.fields");
 
     @Getter
     private final @NotNull Set<E> selectedDetails = new HashSet<>();

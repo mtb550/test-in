@@ -11,6 +11,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -121,7 +122,7 @@ public class TransferListener extends TransferHandler {
             final @NotNull Path setPath = editor.getParent().getPath();
             final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, setPath, ids);
 
-            editor.updateSequenceAndSaveAll(() -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe("Reorder", itemsToMove), before, TestCaseSnapshot.of(p, setPath, ids)));
+            editor.updateSequenceAndSaveAll(() -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.reorder"), itemsToMove), before, TestCaseSnapshot.of(p, setPath, ids)));
 
             // After the save, inside the try: a drop that threw on the way here
             // is logged, not confirmed (#62).

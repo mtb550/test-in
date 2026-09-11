@@ -5,6 +5,7 @@ import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.model.TestRunStatus;
+import org.testin.util.Bundle;
 
 /**
  * Writes what the run means: a paragraph per verdict, printed in the reports
@@ -32,7 +33,7 @@ public class ResultAnalysisBtn extends AbstractIconButton implements ToolbarItem
         // Off rather than On: the two differ only in color, and the On variant is
         // green. Green on a toolbar reads as something being switched on, and
         // this is a button that opens a dialog.
-        super("Result Analysis", AllIcons.Actions.ProjectWideAnalysisOff);
+        super(Bundle.message("toolbar.analysis"), AllIcons.Actions.ProjectWideAnalysisOff);
         this.editor = editor;
 
         addActionListener(e -> onResultAnalysisClicked.run());
@@ -46,7 +47,7 @@ public class ResultAnalysisBtn extends AbstractIconButton implements ToolbarItem
 
         setEnabled(completed);
         setToolTipText(completed
-                ? "Result Analysis"
-                : "Result Analysis is written once the run is completed — it is " + status.getLabel());
+                ? Bundle.message("toolbar.analysis")
+                : Bundle.message("toolbar.analysis.disabled", status.getLabel()));
     }
 }

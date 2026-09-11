@@ -7,6 +7,7 @@ import org.testin.editor.AbstractIconButton;
 import org.testin.editor.run.RunEditor;
 import org.testin.lightmode.LightMode;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 /**
  * Opens light mode, and says whether it is open (#13).
@@ -32,7 +33,7 @@ public class LightModeBtn extends AbstractIconButton implements ToolbarItem {
     // UC-EDITOR-PANEL-046
     public LightModeBtn(final @NotNull RunEditor editor) {
         // https://intellij-icons.jetbrains.design/
-        super("Light Mode - one test case, above other windows", AllIcons.MeetNewUi.LightTheme);
+        super(Bundle.message("toolbar.light.mode"), AllIcons.MeetNewUi.LightTheme);
         this.p = editor.getProject();
         this.editor = editor;
 

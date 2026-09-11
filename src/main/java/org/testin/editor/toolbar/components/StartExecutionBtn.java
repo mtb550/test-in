@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.model.TestRunStatus;
+import org.testin.util.Bundle;
 
 public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem {
 
@@ -27,14 +28,14 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
      * three of which left the button live and startable (#215).
      */
     private static @NotNull String tooltipFor(final @NotNull RunEditor editor) {
-        if (editor.isExecuting()) return "Execution in progress";
+        if (editor.isExecuting()) return Bundle.message("toolbar.executing");
 
         final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();
-        if (status.isTerminal()) return "Execution disabled — run status is " + status.getLabel();
+        if (status.isTerminal()) return Bundle.message("toolbar.execution.disabled", status.getLabel());
 
         return editor.hasSomethingToWalk()
                 ? Toolbar.START_MANUAL_EXECUTION
-                : "Nothing to execute — no test case is waiting for a verdict";
+                : Bundle.message("toolbar.nothing.to.execute");
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135

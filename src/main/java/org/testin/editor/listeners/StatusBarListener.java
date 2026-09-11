@@ -5,6 +5,7 @@ import org.testin.editor.TestinEditor;
 import org.testin.services.Services;
 import org.testin.notifications.Notifier;
 import org.testin.editor.statusbar.PageStep;
+import org.testin.util.Bundle;
 
 
 public class StatusBarListener {
@@ -46,7 +47,7 @@ public class StatusBarListener {
             if (!typed.isEmpty() && typed.chars().allMatch(Character::isDigit)
                     && !typed.equals(String.valueOf(size))) {
                 Services.getInstance(editor.getProject(), Notifier.class).softRefuse(editor.getProject(),
-                        "A page holds between 1 and " + TestinEditor.MAX_PAGE_SIZE + " test cases");
+                        Bundle.message("statusbar.page.size.refused", String.valueOf(TestinEditor.MAX_PAGE_SIZE)));
             }
 
             // Silent, and deliberately so: this only changes how much of the list

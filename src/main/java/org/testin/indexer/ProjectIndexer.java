@@ -646,7 +646,7 @@ public final class ProjectIndexer {
 
         final @NotNull Path targetParent = found.orElseThrow();
 
-        Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, targetParent, "Move Failed", (sourceVf, targetVf) -> {
+        Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, targetParent, Bundle.message("vfs.move.failed.title"), (sourceVf, targetVf) -> {
             try {
                 sourceVf.move(this, targetVf);
             } catch (final IOException ex) {
@@ -713,7 +713,7 @@ public final class ProjectIndexer {
                 operationSucceeded.run();
             };
 
-            Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
+            Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, sourcePath, targetPath, Bundle.message("vfs.copy.failed.title"), (sourceVf, targetVf) -> {
                 try {
                     sourceVf.copy(this, targetVf, sourceVf.getName());
                 } catch (final IOException ex) {

@@ -10,6 +10,7 @@ import org.testin.model.Config;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.util.Bundle;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -135,7 +136,7 @@ public final class TestCaseDto {
     public static @NotNull TestCaseDto deleted(final @NotNull UUID id) {
         return TestCaseDto.builder()
                 .id(id)
-                .description("Deleted test case (" + id + ")")
+                .description(Bundle.message("testcase.deleted", id))
                 .build();
     }
 

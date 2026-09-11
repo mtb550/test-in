@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.model.TestRunStatus;
 import org.testin.report.GenerateReportAction;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 public class GenerateReportBtn extends AbstractIconButton implements ToolbarItem {
@@ -20,7 +21,7 @@ public class GenerateReportBtn extends AbstractIconButton implements ToolbarItem
 
     // UC-REPORT-001
     public GenerateReportBtn(final @NotNull Project p, final @NotNull RunEditor editor) {
-        super("Generate Test Summary Report", AllIcons.ToolbarDecorator.Export, Shortcuts.GenerateReport);
+        super(Bundle.message("toolbar.report"), AllIcons.ToolbarDecorator.Export, Shortcuts.GenerateReport);
         this.editor = editor;
 
         // The run this toolbar belongs to, not whatever the explorer tree happens
@@ -45,7 +46,8 @@ public class GenerateReportBtn extends AbstractIconButton implements ToolbarItem
         final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();
 
         setEnabled(status.isReportable());
-        setToolTipText(status.isReportable() ? "Generate Test Summary Report"
-                : "A report is written once the run has stopped — it is " + status.getLabel());
+        setToolTipText(status.isReportable()
+                ? Bundle.message("toolbar.report")
+                : Bundle.message("toolbar.report.disabled", status.getLabel()));
     }
 }

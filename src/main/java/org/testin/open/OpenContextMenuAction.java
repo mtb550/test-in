@@ -7,6 +7,7 @@ import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.tree.TreeValueUtil;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -49,7 +50,7 @@ public class OpenContextMenuAction extends DumbAwareAction {
     }
 
     private OpenContextMenuAction(final @NotNull JComponent owner, final @NotNull DefaultActionGroup cm, final @NotNull Supplier<Optional<Point>> anchor) {
-        super("Show Context Menu");
+        super(Bundle.message("menu.show.context"));
         this.owner = owner;
         this.cm = cm;
         this.anchor = anchor;

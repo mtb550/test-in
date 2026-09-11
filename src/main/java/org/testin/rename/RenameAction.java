@@ -16,6 +16,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -80,7 +81,7 @@ public class RenameAction extends DumbAwareAction {
         // The dto reference stays valid across renames, so undo and redo are
         // the same routine with the names swapped.
         Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
-                "Rename '" + oldName + "'",
+                Bundle.message("rename.undo", oldName),
                 () -> applyRename(p, dir, oldName),
                 () -> applyRename(p, dir, newName)));
     }
