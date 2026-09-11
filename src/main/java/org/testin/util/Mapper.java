@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.intellij.openapi.components.Service;
@@ -14,15 +15,51 @@ import org.testin.logger.Logger;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.TimeZone;
 
 @Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Mapper {
+
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-070.
+     * <p>
+     * <b>A timestamp is stored in the zone it happened in, on every machine.</b>
+     * <p>
+     * This used to call {@code setTimeZone(TimeZone.getDefault())}, and Jackson
+     * reads that as an instruction to convert a {@code ZonedDateTime} into the
+     * machine's zone before formatting it. So one test case saved the same
+     * instant two ways:
+     * <pre>
+     * in Riyadh   "createdAt" : "Wednesday 02-09-2026 At 23:29:28 [Asia/Riyadh]"
+     * in London   "createdAt" : "Wednesday 02-09-2026 At 20:29:28 [UTC]"
+     * </pre>
+     * Three things follow, and the first is the one that matters. <b>The stored
+     * bytes were not byte-identical across machines</b>, which is the rule this
+     * project states hardest. A colleague in another zone who opened a test set
+     * and saved rewrote every timestamp in it - a commit full of changes that
+     * mean nothing, over test data two people are meant to share. And the zone
+     * the work actually happened in was destroyed on the way through, replaced
+     * by the zone of whoever last wrote the file.
+     * <p>
+     * Disabled rather than pinned to UTC: the instant is not the only fact a
+     * timestamp carries. A run executed at nine in the morning in Riyadh reads
+     * as six in the morning in UTC, and the first is what the tester wants to
+     * see about their own run. The value already knows its zone; nothing else
+     * has to.
+     * <p>
+     * The read side is disabled for the same reason - a file that says
+     * {@code [Asia/Riyadh]} parses back as Riyadh rather than as the reader's
+     * zone, so reading and writing are inverses.
+     * <p>
+     * Nothing is pinned in place of it. {@code setTimeZone} governed no other
+     * type here: there is not one {@code java.util.Date} or {@code Calendar} in
+     * anything this serializes.
+     */
     private final @NotNull ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .enable(SerializationFeature.INDENT_OUTPUT)
-            .setTimeZone(TimeZone.getDefault());
+            .disable(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
+            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
 
     public @NotNull <T> T readValue(final @NotNull File src, final @NotNull Class<T> valueType) {
         try {

@@ -2,9 +2,9 @@ package org.testin.sftp;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.testin.util.Mapper;
+import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
-import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -24,19 +24,9 @@ public class ManifestJsonTest {
     private static final TypeReference<Map<String, Manifest.Entry>> ENTRIES = new TypeReference<>() {
     };
 
-    private static Mapper mapper() {
-        try {
-            final Constructor<Mapper> constructor = Mapper.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
-        } catch (final ReflectiveOperationException ex) {
-            throw new IllegalStateException("Could not build a Mapper for the test", ex);
-        }
-    }
-
     @Test
     public void aManifestSurvivesBeingWrittenAndReadBack() {
-        final Mapper mapper = mapper();
+        final Mapper mapper = RealMapper.build();
         final Manifest before = Manifest.of(Map.of(
                 "Test Cases/pkg1/Login/a.json", "{\"description\":\"Sign in\"}".getBytes(StandardCharsets.UTF_8),
                 ".tp", "{}".getBytes(StandardCharsets.UTF_8)));
@@ -57,7 +47,7 @@ public class ManifestJsonTest {
      */
     @Test
     public void nothingDerivedIsWrittenIntoTheFile() {
-        final String json = mapper().writeValueAsString(
+        final String json = RealMapper.build().writeValueAsString(
                 Manifest.of(Map.of("a.json", "{}".getBytes(StandardCharsets.UTF_8))).entries());
 
         assertFalse(json.contains("absent"), "the file should hold the hash and the size, and nothing else: " + json);

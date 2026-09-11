@@ -3,14 +3,13 @@ package org.testin.git;
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestCaseOrder;
-import org.testin.util.Mapper;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,16 +40,6 @@ public class GitWorkflowTest {
     private Path work;
 
     // ------------------------------------------------------------------ setup
-
-    private static Mapper mapper() {
-        try {
-            final Constructor<Mapper> constructor = Mapper.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
-        } catch (final ReflectiveOperationException ex) {
-            throw new IllegalStateException("Could not build a Mapper for the test", ex);
-        }
-    }
 
     /**
      * Runs Git and returns its output, or null when it failed - which is how the
@@ -208,7 +197,7 @@ public class GitWorkflowTest {
         try {
             final Path file = root.resolve(relativePath);
             Files.createDirectories(file.getParent() == null ? root : file.getParent());
-            Files.writeString(file, content instanceof String text ? text : mapper().writeValueAsString(content),
+            Files.writeString(file, content instanceof String text ? text : RealMapper.build().writeValueAsString(content),
                     StandardCharsets.UTF_8);
 
         } catch (final IOException ex) {
@@ -252,7 +241,7 @@ public class GitWorkflowTest {
         final List<String> status = mustGit(work, "status", "--porcelain", "-uall")
                 .lines().filter(line -> !line.isBlank()).toList();
 
-        return GitDiffProcessor.toDiffs(status, work, mapper(),
+        return GitDiffProcessor.toDiffs(status, work, RealMapper.build(),
                 // Empty rather than absent for a path HEAD does not hold, which is
                 // what production feeds this: GitRepositoryService.showAtHead ends
                 // in orElse(""). Handing it a null here tested a shape the plugin
@@ -482,8 +471,8 @@ public class GitWorkflowTest {
             mustGit(colleague, "config", "user.email", "colleague@example.invalid");
 
             final Path theirCopy = colleague.resolve(relativePath);
-            final TestCaseDto theirs = mapper().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
-            Files.writeString(theirCopy, mapper().writeValueAsString(
+            final TestCaseDto theirs = RealMapper.build().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+            Files.writeString(theirCopy, RealMapper.build().writeValueAsString(
                     theirs.setExpectedResult("the dashboard opens within two seconds").setUpdatedBy("colleague")),
                     StandardCharsets.UTF_8);
             mustGit(colleague, "commit", "-am", "tightened the expected result");
@@ -491,8 +480,8 @@ public class GitWorkflowTest {
 
             // The tester rewords the description of the same case, and commits.
             final Path myCopy = work.resolve(relativePath);
-            final TestCaseDto mine = mapper().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
-            Files.writeString(myCopy, mapper().writeValueAsString(
+            final TestCaseDto mine = RealMapper.build().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+            Files.writeString(myCopy, RealMapper.build().writeValueAsString(
                     mine.setDescription("a registered user signs in with a valid password").setUpdatedBy("muteb")),
                     StandardCharsets.UTF_8);
             commit(stagedFor(review()), "reworded the description");
@@ -512,7 +501,7 @@ public class GitWorkflowTest {
             final String remote = mustGit(work, "show", ":2:" + relativePath);
             final String replayed = mustGit(work, "show", ":3:" + relativePath);
 
-            final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), base, replayed, remote);
+            final TestCaseMerge.Merge merge = TestCaseMerge.of(RealMapper.build(), base, replayed, remote);
             assertTrue(merge.isSettled(), "different fields are not a disagreement");
 
             Files.writeString(myCopy, merge.merged().toPrettyString(), StandardCharsets.UTF_8);
@@ -520,7 +509,7 @@ public class GitWorkflowTest {
             mustGit(work, "-c", "core.editor=true", "rebase", "--continue");
 
             // Both edits survived, and the repository is not mid-rebase any more.
-            final TestCaseDto merged = mapper().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+            final TestCaseDto merged = RealMapper.build().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
             assertEquals(merged.getDescription(), "a registered user signs in with a valid password");
             assertEquals(merged.getExpectedResult(), "the dashboard opens within two seconds");
             assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
@@ -572,7 +561,7 @@ public class GitWorkflowTest {
             final List<TestCaseDto> after = new ArrayList<>();
             try (Stream<Path> files = Files.list(work.resolve("Test Cases/login flow"))) {
                 for (final Path file : files.filter(f -> f.getFileName().toString().endsWith(".json")).sorted().toList()) {
-                    after.add(mapper().readValue(Files.readString(file, StandardCharsets.UTF_8), TestCaseDto.class));
+                    after.add(RealMapper.build().readValue(Files.readString(file, StandardCharsets.UTF_8), TestCaseDto.class));
                 }
             }
 
@@ -607,8 +596,8 @@ public class GitWorkflowTest {
             mustGit(colleague, "config", "user.email", "colleague@example.invalid");
 
             final Path theirCopy = colleague.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json");
-            final TestCaseDto theirs = mapper().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
-            Files.writeString(theirCopy, mapper().writeValueAsString(theirs.setExpectedResult("the dashboard opens within two seconds")),
+            final TestCaseDto theirs = RealMapper.build().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+            Files.writeString(theirCopy, RealMapper.build().writeValueAsString(theirs.setExpectedResult("the dashboard opens within two seconds")),
                     StandardCharsets.UTF_8);
 
             mustGit(colleague, "commit", "-am", "tightened the expected result");
@@ -616,7 +605,7 @@ public class GitWorkflowTest {
 
             mustGit(work, "pull", "--rebase", "--autostash", "origin", "main");
 
-            final TestCaseDto pulled = mapper().readValue(
+            final TestCaseDto pulled = RealMapper.build().readValue(
                     Files.readString(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json"),
                             StandardCharsets.UTF_8), TestCaseDto.class);
 

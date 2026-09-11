@@ -2,13 +2,12 @@ package org.testin.git;
 
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.util.Mapper;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,16 +34,6 @@ public class GitDiffProcessorTest {
 
     private final Map<String, String> committed = new HashMap<>();
     private Path root;
-
-    private static Mapper mapper() {
-        try {
-            final Constructor<Mapper> constructor = Mapper.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
-        } catch (final ReflectiveOperationException ex) {
-            throw new IllegalStateException("Could not build a Mapper for the test", ex);
-        }
-    }
 
     @BeforeMethod
     public void createRepositoryRoot() {
@@ -85,14 +74,14 @@ public class GitDiffProcessorTest {
         try {
             final Path file = root.resolve(relativePath);
             Files.createDirectories(file.getParent());
-            Files.writeString(file, mapper().writeValueAsString(testCase), StandardCharsets.UTF_8);
+            Files.writeString(file, RealMapper.build().writeValueAsString(testCase), StandardCharsets.UTF_8);
         } catch (final IOException ex) {
             throw new AssertionError(ex);
         }
     }
 
     private List<PendingChange> review(final String... statusLines) {
-        return GitDiffProcessor.toDiffs(List.of(statusLines), root, mapper(), committed::get);
+        return GitDiffProcessor.toDiffs(List.of(statusLines), root, RealMapper.build(), committed::get);
     }
 
     /**
@@ -116,7 +105,7 @@ public class GitDiffProcessorTest {
         final TestCaseDto before = testCase("the original");
         final TestCaseDto after = testCase("the original").setId(before.getId()).setModule("billing");
 
-        committed.put("Test Cases/login/case.json", mapper().writeValueAsString(before));
+        committed.put("Test Cases/login/case.json", RealMapper.build().writeValueAsString(before));
         onDisk("Test Cases/login/case.json", after);
 
         final List<PendingChange> review = review(" M \"Test Cases/login/case.json\"");
@@ -134,7 +123,7 @@ public class GitDiffProcessorTest {
     @Test
     public void aDeletedTestCaseIsReviewedFromWhatWasCommitted() {
         final TestCaseDto removed = testCase("a case that is going away");
-        committed.put("Test Cases/login/case.json", mapper().writeValueAsString(removed));
+        committed.put("Test Cases/login/case.json", RealMapper.build().writeValueAsString(removed));
 
         final List<PendingChange> review = review(" D \"Test Cases/login/case.json\"");
 
@@ -177,7 +166,7 @@ public class GitDiffProcessorTest {
     public void aFileGitCallsModifiedIsAlwaysARow() {
         final TestCaseDto unchanged = testCase("identical on both sides");
 
-        committed.put("Test Cases/login/case.json", mapper().writeValueAsString(unchanged));
+        committed.put("Test Cases/login/case.json", RealMapper.build().writeValueAsString(unchanged));
         onDisk("Test Cases/login/case.json", unchanged);
 
         final List<PendingChange> review = review(" M \"Test Cases/login/case.json\"");

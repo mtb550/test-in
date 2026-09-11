@@ -1,0 +1,18 @@
+{
+  "order" : "zo",
+  "id" : "11111111-2222-3333-4444-555555555555",
+  "description" : "Log in with a valid user",
+  "expectedResult" : "The tester reaches the dashboard.",
+  "status" : "TO_BE_UPDATED",
+  "steps" : [ "Open \"/login\"", "Type C:\\Users\\test", "Press Enter" ],
+  "priority" : "HIGH",
+  "reference" : "JIRA-1",
+  "group" : [ "smoke", "régression" ],
+  "createdBy" : "Muteb",
+  "updatedBy" : "",
+  "createdAt" : "Wednesday 02-09-2026 At 23:29:28 [Asia/Riyadh]",
+  "updatedAt" : "Thursday 10-09-2026 At 01:23:59 [Europe/London]",
+  "module" : "",
+  "testData" : "{\"user\": \"admin\"}",
+  "preConditions" : ""
+}

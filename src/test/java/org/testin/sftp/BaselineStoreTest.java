@@ -3,10 +3,10 @@ package org.testin.sftp;
 import org.testin.util.Mapper;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,21 +33,11 @@ public class BaselineStoreTest {
     private Path directory;
     private Mapper mapper;
 
-    private static Mapper mapper() {
-        try {
-            final Constructor<Mapper> constructor = Mapper.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
-        } catch (final ReflectiveOperationException ex) {
-            throw new IllegalStateException("Could not build a Mapper for the test", ex);
-        }
-    }
-
     @BeforeMethod
     public void createDirectory() {
         try {
             directory = Files.createTempDirectory("testin-baseline");
-            mapper = mapper();
+            mapper = RealMapper.build();
         } catch (final IOException ex) {
             throw new AssertionError(ex);
         }

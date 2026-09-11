@@ -42,6 +42,10 @@ There is no key for this. It starts on its own.
 - **Rule-INTERNAL-062** — Reading a test case costs no more than 40 microseconds
   and holds no more than 4 kilobytes. Ten thousand test cases is the size the
   budget is stated at.
+- **Rule-INTERNAL-070** — A timestamp is stored in the zone it happened in, on
+  every machine. Testin never converts one into the zone of whoever is reading,
+  so the same test case is the same bytes wherever it is saved and a colleague
+  elsewhere does not rewrite a file by opening it.
 
 ## The budget
 
