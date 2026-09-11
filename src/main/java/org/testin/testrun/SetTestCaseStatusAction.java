@@ -13,7 +13,6 @@ import org.testin.editor.run.RunEditor;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.testrun.create.FailedResultDialog;
 import org.testin.util.Bundle;

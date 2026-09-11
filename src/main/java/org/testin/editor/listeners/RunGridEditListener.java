@@ -4,9 +4,9 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.testrun.RunEditorAttributes;
+import org.testin.testrun.RunStatusService;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 
 import javax.swing.table.DefaultTableModel;
