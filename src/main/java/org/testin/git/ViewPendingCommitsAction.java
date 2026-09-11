@@ -100,10 +100,10 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
      * @param commits the commit and the push, through the one service they go
      *                through everywhere
      */
-    private record Work(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommitService commits) {
+    private record Work(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits) {
 
         private Work(final @NotNull Project p) {
-            this(p, new GitRepositoryService(p), new GitCommitService(p));
+            this(p, new GitRepositoryService(p), new GitCommits(p));
         }
 
         /**
@@ -308,7 +308,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         private void initializeGitRepository(final @NotNull Path repoPath) {
             GitBackgroundTask.run(p, Bundle.message("git.task.init"), false,
                     indicator -> {
-                        commits.initialize(repoPath);
+                        git.initialize(repoPath);
                         ApplicationManager.getApplication().invokeLater(() -> {
                             Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("git.initialized"));
 
@@ -386,7 +386,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         private void addRemoteAndPush(final @NotNull Path repoPath, final @NotNull String remoteName, final @NotNull String branch, final @NotNull String commitId, final @NotNull String remoteUrl) {
             GitBackgroundTask.run(p, Bundle.message("git.task.configuring.remote"), false,
                     indicator -> {
-                        commits.configureRemote(repoPath, remoteName, remoteUrl);
+                        git.configureRemote(repoPath, remoteName, remoteUrl);
                         ApplicationManager.getApplication().invokeLater(() -> executeGitPush(repoPath, remoteName, branch, commitId));
                     },
                     ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.add.remote", ex.getMessage())));
@@ -518,7 +518,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             ApplicationManager.getApplication().invokeLater(() -> new GitIdentityDialog(p, identity ->
                     GitBackgroundTask.run(p, Bundle.message("git.task.configuring.identity"), false,
                             indicator -> {
-                                commits.configureIdentity(repoPath, identity.name(), identity.email(), identity.global());
+                                git.configureIdentity(repoPath, identity.name(), identity.email(), identity.global());
                                 ApplicationManager.getApplication().invokeLater(() -> {
                                     // The tester is watching: they just filled the dialog
                                     // in and the commit resumes on the next line.

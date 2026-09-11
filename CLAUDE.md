@@ -76,6 +76,18 @@ silently does nothing costs more than the setting it was meant to hold.
   plain noun would collide with a platform type, the plugin prefixes with
   `Testin`: `TestinEditor` against `com.intellij.openapi.editor.Editor`, as
   `TestinFileSystem` and `TestinTabColorProvider` already do.
+- **A `*Service`, `*Handler`, `*Provider` or `*Manager` suffix has to earn its
+  place.** The suffix names no job, so the default answer is to name the job
+  instead - #291 renamed seven that way. Four reasons keep one, and there are no
+  others: the class implements a platform or Swing interface of that name
+  (`UnifiedEditorProvider` for `FileEditorProvider`, `TreeTransferHandler` for
+  `TransferHandler`); it is a `@FunctionalInterface` where the suffix *is* the
+  job (`RemoveHandler`, `ImportHandler`); the plain noun would collide with a
+  platform type (`GitRepositoryService` against git4idea's `GitRepository`); or
+  it distinguishes the reader from the value it serves (`TestinConfigService`
+  answering with `TestinProjectConfig`). A fifth `*Manager` is not a reason, it
+  is a class nobody has read yet.
+
 - **Renaming anything is a three-step check, not a find-and-replace.** Persisted
   keys read like code — `@State(name = "testin.settings.AppSettingsState")`,
   `"testin.pageSize"` — and log lines contain ordinary words like `Setting`, so

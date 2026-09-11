@@ -27,7 +27,7 @@ import static org.testng.Assert.*;
  * push is a push. What is exercised is the plugin's own logic driving it: the
  * review comes from {@link GitDiffProcessor} reading real {@code git status}
  * output, and what gets staged is what {@link GitRefs} and
- * {@link GitCommitService} decide it should be.
+ * {@link GitCommits} decide it should be.
  * <p>
  * The parsing tests elsewhere prove the rules are right about text we typed.
  * This proves they are right about text Git produced, which is the difference
@@ -255,14 +255,14 @@ public class GitWorkflowTest {
      */
     private Set<String> stagedFor(final List<PendingChange> review) {
         final Set<String> paths = new LinkedHashSet<>(GitRefs.repoRelativePaths(review));
-        paths.addAll(GitCommitService.markersAlongside(work, paths));
+        paths.addAll(GitCommits.markersAlongside(work, paths));
         return paths;
     }
 
     private void commit(final Set<String> paths, final String message) {
         // Through the plugin's own rule, not a copy of it: which paths git add
         // may be given is the thing being tested when a rename is involved.
-        final Set<String> stageable = GitCommitService.stageable(work, paths);
+        final Set<String> stageable = GitCommits.stageable(work, paths);
 
         if (!stageable.isEmpty()) {
             final List<String> add = new ArrayList<>(List.of("add", "--"));

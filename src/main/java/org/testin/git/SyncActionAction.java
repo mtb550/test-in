@@ -99,10 +99,10 @@ public class SyncActionAction extends DumbAwareAction {
      *                pushes through - so there is one way commits leave this
      *                machine rather than two
      */
-    private record Work(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommitService commits) {
+    private record Work(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits) {
 
         private Work(final @NotNull Project p) {
-            this(p, new GitRepositoryService(p), new GitCommitService(p));
+            this(p, new GitRepositoryService(p), new GitCommits(p));
         }
 
         /**

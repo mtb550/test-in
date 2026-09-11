@@ -30,7 +30,36 @@ public final class GitRepositoryService {
 
     private final @NotNull Project p;
 
+        /**
+     * UC-SHARE-009.
+     * <p>
+     * Makes a repository where there is none.
+     */
+    public void initialize(final @NotNull Path repositoryPath) {
+        GitCommandRunner.execute(p, repositoryPath, "git", "init");
+    }
+
     /**
+     * UC-SHARE-013.
+     * <p>
+     * Names the remote this repository exchanges with.
+     */
+    public void configureRemote(final @NotNull Path repositoryPath, final @NotNull String remoteName, final @NotNull String remoteUrl) {
+        GitCommandRunner.execute(p, repositoryPath, "git", "remote", "add", remoteName, remoteUrl);
+    }
+
+    /**
+     * UC-SHARE-008, Rule-SHARE-041.
+     * <p>
+     * Says who is committing, for this repository or for the machine.
+     */
+    public void configureIdentity(final @NotNull Path repositoryPath, final @NotNull String name, final @NotNull String email, final boolean global) {
+        final @NotNull String scope = global ? "--global" : "--local";
+        GitCommandRunner.execute(p, repositoryPath, "git", "config", scope, "user.name", name);
+        GitCommandRunner.execute(p, repositoryPath, "git", "config", scope, "user.email", email);
+    }
+
+/**
      * True when the directory is not a Git repository at all.
      * <p>
      * Asked in the negative because that is the only way it is ever asked - all

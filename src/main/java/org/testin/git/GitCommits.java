@@ -13,9 +13,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Local Git repository operations used by the pending-commit workflow.
+ * A commit, and the commits moved between here and the remote.
+ * <p>
+ * Making a repository, naming its remote and setting who is committing are not
+ * that, and were here until #291: they are three things done to a repository,
+ * and {@link GitRepositoryService} is the repository. What is left is what the
+ * name says.
  */
-public final class GitCommitService {
+public final class GitCommits {
 
     private final @NotNull Project p;
 
@@ -27,7 +32,7 @@ public final class GitCommitService {
      */
     private final @NotNull GitRepositoryService repositories;
 
-    public GitCommitService(final @NotNull Project p) {
+    public GitCommits(final @NotNull Project p) {
         this.p = p;
         this.repositories = new GitRepositoryService(p);
     }
@@ -51,11 +56,6 @@ public final class GitCommitService {
             }
         }
         return markers;
-    }
-
-    // UC-SHARE-009
-    public void initialize(final @NotNull Path repositoryPath) {
-        GitCommandRunner.execute(p, repositoryPath, "git", "init");
     }
 
     /**
@@ -130,18 +130,6 @@ public final class GitCommitService {
             Logger.warn("Could not read the commit id: " + ex.getMessage());
             return "";
         }
-    }
-
-    // UC-SHARE-013
-    public void configureRemote(final @NotNull Path repositoryPath, final @NotNull String remoteName, final @NotNull String remoteUrl) {
-        GitCommandRunner.execute(p, repositoryPath, "git", "remote", "add", remoteName, remoteUrl);
-    }
-
-    // UC-SHARE-008, Rule-SHARE-041
-    public void configureIdentity(final @NotNull Path repositoryPath, final @NotNull String name, final @NotNull String email, final boolean global) {
-        final @NotNull String scope = global ? "--global" : "--local";
-        GitCommandRunner.execute(p, repositoryPath, "git", "config", scope, "user.name", name);
-        GitCommandRunner.execute(p, repositoryPath, "git", "config", scope, "user.email", email);
     }
 
     /**
