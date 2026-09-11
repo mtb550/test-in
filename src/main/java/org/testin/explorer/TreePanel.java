@@ -47,6 +47,27 @@ public final class TreePanel implements Disposable {
     @Getter
     private final @NotNull JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
 
+    /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-097.
+     * <p>
+     * The branch bar and the tree, added to the panel once and hidden rather
+     * than removed when there is no project to show.
+     * <p>
+     * <b>The tree may never leave the component hierarchy.</b> The content's
+     * preferred focusable component is the tree, and the platform anchors the
+     * data context for every title-bar button on exactly that component -
+     * {@code ToolWindowHeader}'s toolbar asks the selected content for it before
+     * each press. A component with no parent has no frame above it, so that
+     * context cannot answer which project it belongs to, and the platform reads
+     * {@code event.project!!} before any title action runs.
+     * <p>
+     * The panel used to be emptied and rebuilt on every draw, so archiving the
+     * bound test project took the tree out of the hierarchy - and the next press
+     * on Settings threw a NullPointerException out of the platform, from a stack
+     * with no Testin frame in it (#66).
+     */
+    private final @NotNull JBPanel<?> treeView = new JBPanel<>(new BorderLayout());
+
     private final @NotNull BranchSelector branchSelector;
 
     /**
@@ -92,6 +113,14 @@ public final class TreePanel implements Disposable {
         branchSelector = new BranchSelector(p, this, bound());
         projectTree = new TreePanelTree(p, this);
         Disposer.register(this, projectTree);
+
+        final @NotNull JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
+        topBar.add(branchSelector.getComponent(), BorderLayout.SOUTH);
+
+        treeView.add(topBar, BorderLayout.NORTH);
+        treeView.add(projectTree.getComponent(), BorderLayout.CENTER);
+
+        panel.add(treeView, BorderLayout.CENTER);
 
         refresh();
         refreshWhenIndexed();
@@ -171,7 +200,9 @@ public final class TreePanel implements Disposable {
      * included, which is the one it used to go and read for itself.
      */
     private void draw(final @NotNull PanelState state, final @NotNull Optional<TestProjectDirectoryDto> boundProject) {
-        panel.removeAll();
+        // Hidden, not removed - see the field. What the welcome screen replaces
+        // is what the panel draws, not what it contains.
+        treeView.setVisible(boundProject.isPresent());
         panel.getEmptyText().clear();
 
         boundProject.ifPresentOrElse(this::showTree, () -> showWelcome(state));
@@ -268,14 +299,6 @@ public final class TreePanel implements Disposable {
     // UC-TREE-PANEL-001
     private void showTree(final @NotNull TestProjectDirectoryDto tp) {
         Logger.info("TreePanel.refresh(): showing '" + tp.getName() + "'");
-
-        panel.setLayout(new BorderLayout());
-
-        final @NotNull JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
-        topBar.add(branchSelector.getComponent(), BorderLayout.SOUTH);
-        panel.add(topBar, BorderLayout.NORTH);
-
-        panel.add(projectTree.getComponent(), BorderLayout.CENTER);
 
         projectTree.refresh();
         branchSelector.updateProject(Optional.of(tp));
