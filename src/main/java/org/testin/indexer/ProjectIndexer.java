@@ -24,7 +24,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
-import org.testin.services.TestCaseCacheService;
+import org.testin.services.TestCaseValues;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.BoundTestProject;
 import org.testin.editor.LastOpenEditors;
@@ -464,7 +464,7 @@ public final class ProjectIndexer {
 
         // The completion cache is derived from the test cases, so it has to shrink
         // with them - otherwise a deleted description keeps being offered.
-        Services.getInstance(p, TestCaseCacheService.class).reload(this::getAllTestCases);
+        Services.getInstance(p, TestCaseValues.class).reload(this::getAllTestCases);
     }
 
     /**

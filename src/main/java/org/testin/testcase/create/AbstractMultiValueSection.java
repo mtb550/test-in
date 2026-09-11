@@ -10,7 +10,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.services.TestCaseCacheService;
+import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
 import org.testin.util.Shortcuts;
@@ -68,7 +68,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
     /**
      * What the completion offers: every value the project has already used.
      */
-    protected abstract @NotNull Set<String> completions(final @NotNull TestCaseCacheService cache);
+    protected abstract @NotNull Set<String> completions(final @NotNull TestCaseValues cache);
 
     /**
      * The values as the test case holds them.
@@ -119,7 +119,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
 
     public void addField(final @NotNull String text, final @NotNull UIAction repackAction) {
         final @NotNull EditorTextField box = SpellChecker.createCompletionField(p,
-                new TextFieldWithAutoCompletion.StringsCompletionProvider(completions(Services.getInstance(p, TestCaseCacheService.class)), field().getIcon()), text);
+                new TextFieldWithAutoCompletion.StringsCompletionProvider(completions(Services.getInstance(p, TestCaseValues.class)), field().getIcon()), text);
 
         box.setOneLineMode(true);
         box.setFont(fieldFont());

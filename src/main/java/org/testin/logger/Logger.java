@@ -66,8 +66,8 @@ public final class Logger {
      * means a disposed application is still answered for, which is exactly what
      * a test running two of them in one JVM would hit.
      */
-    private static @NotNull Optional<LoggerService> getService() {
+    private static @NotNull Optional<LogWriter> getService() {
         return Optional.ofNullable(ApplicationManager.getApplication())
-                .map(application -> application.getService(LoggerService.class));
+                .map(application -> application.getService(LogWriter.class));
     }
 }

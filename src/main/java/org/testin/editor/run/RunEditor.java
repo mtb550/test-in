@@ -70,7 +70,7 @@ import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
-import org.testin.services.TestCaseCacheService;
+import org.testin.services.TestCaseValues;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testrun.ResultAnalysisDialog;
 import org.testin.testrun.TestRunStatusChange;
@@ -341,7 +341,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 }
 
                 final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(loadedItems);
-                Services.getInstance(p, TestCaseCacheService.class).load(ordered);
+                Services.getInstance(p, TestCaseValues.class).load(ordered);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (generation != loadGeneration.get()) return;
@@ -778,7 +778,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     @Override
     public @NotNull Set<String> getAvailableGroups() {
-        return Services.getInstance(p, TestCaseCacheService.class).getGroups();
+        return Services.getInstance(p, TestCaseValues.class).getGroups();
     }
 
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094

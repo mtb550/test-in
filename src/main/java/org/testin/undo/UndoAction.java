@@ -35,7 +35,7 @@ public class UndoAction extends AbstractProjectAction {
     // UC-TREE-PANEL-016, UC-EDITOR-PANEL-012
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @NotNull UndoService service = Services.getInstance(p, UndoService.class);
+        final @NotNull UndoHistories service = Services.getInstance(p, UndoHistories.class);
 
         // Asked before, not after: the service returns silently on an empty
         // stack, so notifying unconditionally would claim something that never
@@ -53,7 +53,7 @@ public class UndoAction extends AbstractProjectAction {
     // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-067
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final @NotNull UndoService service = Services.getInstance(p, UndoService.class);
+        final @NotNull UndoHistories service = Services.getInstance(p, UndoHistories.class);
 
         e.getPresentation().setEnabled(direction.can(service, scope));
         e.getPresentation().setText((direction.getTitle() + " " + direction.next(service, scope)).trim());

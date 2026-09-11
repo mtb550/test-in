@@ -165,7 +165,7 @@ about twenty seconds before the index exists.
 level a tester can turn up to TRACE. Writing that through the platform's own
 logger puts it in `idea.log` at whatever level the IDE is set to.
 
-**Decision.** `LoggerService` is an application service holding a bounded queue
+**Decision.** `LogWriter` is an application service holding a bounded queue
 and one daemon thread named `Testin-Async-Logger`, writing to
 `PathManager.getLogPath()/testin.log` and rolling at 5 MB. `Logger` is the
 static front door and reads the caller's class name from a `StackWalker`.

@@ -2,7 +2,7 @@ package org.testin.services;
 
 import org.testin.indexer.OwnWrites;
 import org.testin.indexer.Rescan;
-import org.testin.logger.LoggerService;
+import org.testin.logger.LogWriter;
 import org.testin.setting.AppSettingsState;
 import org.testin.editor.TestinEditors;
 import org.testng.annotations.Test;
@@ -42,7 +42,7 @@ public class ServiceRoutingTest {
 
     @Test
     public void everyApplicationServiceIsRecognized() {
-        for (final Class<?> service : new Class<?>[]{AppSettingsState.class, OwnWrites.class, Rescan.class, LoggerService.class}) {
+        for (final Class<?> service : new Class<?>[]{AppSettingsState.class, OwnWrites.class, Rescan.class, LogWriter.class}) {
             assertTrue(Services.isApplicationLevel(service),
                     service.getSimpleName() + " declares Service.Level.APP but would be built per project");
         }

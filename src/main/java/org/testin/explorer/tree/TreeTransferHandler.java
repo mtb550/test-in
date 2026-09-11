@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.Moved;
 import org.testin.codegen.SubtreeCode;
 import org.testin.undo.UndoScope;
-import org.testin.undo.UndoService;
+import org.testin.undo.UndoHistories;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -486,7 +486,7 @@ public class TreeTransferHandler extends TransferHandler {
 
         moveBatch(oldPaths, newPaths, moved -> confirmLanded(Done.MOVED, moved));
 
-        Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
+        Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                 Bundle.message("transfer.undo.move", describe(sources)),
                 () -> moveBatch(newPaths, oldPaths),
                 () -> moveBatch(oldPaths, newPaths)));

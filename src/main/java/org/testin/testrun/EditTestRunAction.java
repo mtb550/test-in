@@ -27,7 +27,7 @@ import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.undo.UndoScope;
-import org.testin.undo.UndoService;
+import org.testin.undo.UndoHistories;
 import org.testin.services.BackgroundWork;
 import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
@@ -210,7 +210,7 @@ public class EditTestRunAction extends DumbAwareAction {
             // configuration together - because the tester made one gesture. The dto
             // reference stays valid across renames, so undo and redo are the same
             // routine with the two sides swapped.
-            Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
+            Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                     Bundle.message("run.undo.edit", oldName),
                     () -> applyEdit(run, oldName, before, () -> {
                     }),

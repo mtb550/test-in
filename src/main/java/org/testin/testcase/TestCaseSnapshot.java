@@ -10,7 +10,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.undo.UndoScope;
-import org.testin.undo.UndoService;
+import org.testin.undo.UndoHistories;
 import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
@@ -119,7 +119,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         // update(), which the platform runs on the EDT, and a grid cell
         // persists from a pooled thread. Said in one place so that no call site
         // has to remember which thread it is on.
-        ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, UndoService.class).push(scope, new UndoService.Operation(
+        ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, UndoHistories.class).push(scope, new UndoHistories.Operation(
                 description,
                 () -> restore(p, before, after),
                 () -> restore(p, after, before))));

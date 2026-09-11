@@ -54,7 +54,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.services.Services;
-import org.testin.services.TestCaseCacheService;
+import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.ui.FontSync;
@@ -247,7 +247,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
                     return;
                 }
 
-                Services.getInstance(p, TestCaseCacheService.class).load(items);
+                Services.getInstance(p, TestCaseValues.class).load(items);
 
                 final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(items);
 
@@ -871,7 +871,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
      */
     @Override
     public @NotNull Set<String> getAvailableGroups() {
-        return Services.getInstance(p, TestCaseCacheService.class).getGroups();
+        return Services.getInstance(p, TestCaseValues.class).getGroups();
     }
 
     // UC-EDITOR-PANEL-020

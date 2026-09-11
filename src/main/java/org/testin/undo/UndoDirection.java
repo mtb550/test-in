@@ -25,34 +25,34 @@ public enum UndoDirection {
 
     UNDO(Bundle.message("undo.undo"), AllIcons.Actions.Undo, Shortcuts.Undo.getKey(), Done.UNDONE) {
         @Override
-        public boolean can(final @NotNull UndoService service, final @NotNull UndoScope scope) {
+        public boolean can(final @NotNull UndoHistories service, final @NotNull UndoScope scope) {
             return service.canUndo(scope);
         }
 
         @Override
-        public boolean apply(final @NotNull UndoService service, final @NotNull UndoScope scope) {
+        public boolean apply(final @NotNull UndoHistories service, final @NotNull UndoScope scope) {
             return service.undo(scope);
         }
 
         @Override
-        public @NotNull String next(final @NotNull UndoService service, final @NotNull UndoScope scope) {
+        public @NotNull String next(final @NotNull UndoHistories service, final @NotNull UndoScope scope) {
             return service.undoDescription(scope);
         }
     },
 
     REDO(Bundle.message("undo.redo"), AllIcons.Actions.Redo, Shortcuts.Redo.getKey(), Done.REDONE) {
         @Override
-        public boolean can(final @NotNull UndoService service, final @NotNull UndoScope scope) {
+        public boolean can(final @NotNull UndoHistories service, final @NotNull UndoScope scope) {
             return service.canRedo(scope);
         }
 
         @Override
-        public boolean apply(final @NotNull UndoService service, final @NotNull UndoScope scope) {
+        public boolean apply(final @NotNull UndoHistories service, final @NotNull UndoScope scope) {
             return service.redo(scope);
         }
 
         @Override
-        public @NotNull String next(final @NotNull UndoService service, final @NotNull UndoScope scope) {
+        public @NotNull String next(final @NotNull UndoHistories service, final @NotNull UndoScope scope) {
             return service.redoDescription(scope);
         }
     };
@@ -65,18 +65,18 @@ public enum UndoDirection {
     /**
      * Whether this surface has anything to go back or forward to.
      */
-    public abstract boolean can(final @NotNull UndoService service, final @NotNull UndoScope scope);
+    public abstract boolean can(final @NotNull UndoHistories service, final @NotNull UndoScope scope);
 
     /**
      * Goes one step, and answers whether the whole of it went. False means the
      * operation has already said why not, so the caller confirms nothing on top
      * of it (#275).
      */
-    public abstract boolean apply(final @NotNull UndoService service, final @NotNull UndoScope scope);
+    public abstract boolean apply(final @NotNull UndoHistories service, final @NotNull UndoScope scope);
 
     /**
      * What the next press would do, and nothing at all when there is nothing -
      * which is what the menu entry then appends to its own word.
      */
-    public abstract @NotNull String next(final @NotNull UndoService service, final @NotNull UndoScope scope);
+    public abstract @NotNull String next(final @NotNull UndoHistories service, final @NotNull UndoScope scope);
 }

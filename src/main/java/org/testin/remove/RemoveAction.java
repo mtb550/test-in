@@ -12,7 +12,7 @@ import org.testin.explorer.TreePanel;
 import org.testin.indexer.NodeCounter;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.undo.UndoScope;
-import org.testin.undo.UndoService;
+import org.testin.undo.UndoHistories;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
@@ -204,7 +204,7 @@ public class RemoveAction extends DumbAwareAction {
                     ? Bundle.message("remove.undo.one", asked.getFirst().getName())
                     : Bundle.message("remove.undo.many", String.valueOf(asked.size()));
 
-            Services.getInstance(p, UndoService.class).push(UndoScope.TREE, new UndoService.Operation(
+            Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                     what,
                     () -> restoreAll(kept),
                     () -> {
