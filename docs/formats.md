@@ -87,7 +87,7 @@ for it, and what is written back is that answer rather than an invented one.
 
 | File | Node | Adds | Values |
 |---|---|---|---|
-| `.tp` | Test project | `status` | `ACTIVE` `INACTIVE` `ARCHIVED` |
+| `.tp` | Test project | `status` | `ACTIVE` `INACTIVE` |
 | `.tcd` | The `Test Cases` directory | — | |
 | `.trd` | The `Test Runs` directory | — | |
 | `.tsp` | Test set package | `status` | `ACTIVE` `ARCHIVED` |

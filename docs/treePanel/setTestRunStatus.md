@@ -66,10 +66,11 @@ The status says how far the test run has got.
 - **Rule-TREE-PANEL-091** — A test run's status is set on the test run, not on
   whichever surface set it. The tree row and any open editor of that test run
   both follow it, whichever of them the tester used.
-- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
-  holds nothing. It is indexed as a node so the tree can say what it is - drawn
-  with Archived beside its name like any other status - and its test sets, cases
-  and runs are not read, because an archived project is not worked on.
+- **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
+  tree and holds nothing. It is indexed as a node so the tree can say what it
+  is - drawn with Inactive beside its name like any other status - and its test
+  sets, cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 
 ## The Set Test Run Status popup
 

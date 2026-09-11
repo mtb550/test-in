@@ -16,7 +16,8 @@ There is no key for this. It starts on its own.
   named `.tp`.
 - **Rule-INTERNAL-004** — Only the folders directly inside the Testin folder are
   looked at. A test project one level deeper is not found.
-- **Rule-INTERNAL-005** — An archived test project is not read at all.
+- **Rule-INTERNAL-005** — A test project that is not **Active** is read,
+  and nothing inside it is.
 - **Rule-INTERNAL-006** — When `testin.yml` names a test project, only that one
   is read.
 - **Rule-INTERNAL-007** — Inside a test project, Testin reads two folders. They

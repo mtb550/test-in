@@ -50,21 +50,26 @@ public final class TreePanel implements Disposable {
     /**
      * UC-TREE-PANEL-001, Rule-TREE-PANEL-097.
      * <p>
-     * The branch bar and the tree, added to the panel once and hidden rather
-     * than removed when there is no project to show.
+     * The branch bar and the tree. Added to the panel once and <b>hidden</b>
+     * rather than removed when there is no project to show, because the tree may
+     * never leave the component hierarchy.
      * <p>
-     * <b>The tree may never leave the component hierarchy.</b> The content's
-     * preferred focusable component is the tree, and the platform anchors the
-     * data context for every title-bar button on exactly that component -
-     * {@code ToolWindowHeader}'s toolbar asks the selected content for it before
-     * each press. A component with no parent has no frame above it, so that
-     * context cannot answer which project it belongs to, and the platform reads
-     * {@code event.project!!} before any title action runs.
+     * <b>Why.</b> The tree is the content's preferred focusable component, and
+     * the platform anchors the data context for every title-bar button on
+     * exactly that - {@code ToolWindowHeader}'s toolbar asks the content for it
+     * before each press. A component with no parent has no frame above it, so
+     * that context cannot say which project it belongs to, and the platform
+     * reads {@code event.project!!} before any title action runs: the tester
+     * presses a button in the title bar and gets a NullPointerException from a
+     * stack with no Testin frame in it.
      * <p>
-     * The panel used to be emptied and rebuilt on every draw, so archiving the
-     * bound test project took the tree out of the hierarchy - and the next press
-     * on Settings threw a NullPointerException out of the platform, from a stack
-     * with no Testin frame in it (#66).
+     * The panel was emptied and rebuilt on every draw until #66, so this held
+     * for as long as the welcome screen was showing - which is whenever no test
+     * project is bound.
+     * <p>
+     * Hiding keeps the welcome screen too: {@code JBPanelWithEmptyText} draws
+     * its empty text while no child is <i>visible</i>, rather than while it has
+     * none.
      */
     private final @NotNull JBPanel<?> treeView = new JBPanel<>(new BorderLayout());
 
@@ -251,9 +256,9 @@ public final class TreePanel implements Disposable {
      * than asking a tester who has nothing to choose between.
      * <p>
      * Only when the repository names nothing at all. A name that resolves to
-     * nothing - a renamed folder, an archived project - is a different state
-     * with a different sentence, and silently rebinding it would hide the thing
-     * the tester needs to know (#8).
+     * nothing - a renamed folder, a name nobody uses - is a different state with
+     * a different sentence, and silently rebinding it would hide the thing the
+     * tester needs to know (#8).
      * <p>
      * On the pooled thread that gathers, because it writes {@code testin.yml};
      * the listing it decides from is the one that pass already read.
@@ -416,7 +421,7 @@ public final class TreePanel implements Disposable {
      */
     private void offerChoice(final @NotNull StatusText emptyText, final @NotNull BoundTestProject boundProject) {
         // Say why before offering the picker, so a binding that stopped
-        // resolving - a renamed folder, an archived project - reads as a
+        // resolving - a renamed folder, a name nobody uses - reads as a
         // fact and not as a first run.
         final @NotNull String problem = boundProject.problem(underRoot);
         if (!problem.isEmpty()) {

@@ -96,35 +96,35 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
     /**
      * UC-TREE-PANEL-001, Rule-TREE-PANEL-100.
      * <p>
-     * An archived test project is a node, and holds nothing.
+     * A test project that is not active is a node, and holds nothing.
      * <p>
      * It used to be skipped whole: not in the index at all, so the tree could
      * not draw it, the binding did not resolve, and the tester was sent to the
      * welcome screen to read in a sentence what the tree exists to say. It is
-     * indexed now - drawn with "Archived" beside its name, like any other
-     * status - and its contents are not read, because an archived project is not
-     * worked on.
+     * indexed now - drawn with "Inactive" beside its name, like any other
+     * status - and its contents are not read, because a project nobody is
+     * working on is not worth a directory walk.
      */
-    public void testAnArchivedProjectIsANodeWithNothingInIt() {
+    public void testAnInactiveProjectIsANodeWithNothingInIt() {
         final Path testProject = root.resolve("NAFATH");
 
         final TestProjectDirectoryDto tp = create(testProject);
 
         WriteAction.runAndWait(() -> {
-            tp.getMarker().setStatus(ProjectStatus.ARCHIVED);
+            tp.getMarker().setStatus(ProjectStatus.INACTIVE);
             indexer().persistMarker(tp);
         });
 
         indexer().scanSingleProject(testProject);
 
-        assertTrue("an archived project is still a node, so the tree can say what it is",
+        assertTrue("an inactive project is still a node, so the tree can say what it is",
                 indexer().nodeExists(testProject));
 
-        assertTrue("nothing under an archived project is read - it is not being worked on",
+        assertTrue("nothing under an inactive project is read - it is not being worked on",
                 indexer().getChildren(testProject).isEmpty());
 
         assertEquals("and it says which status it is",
-                ProjectStatus.ARCHIVED,
+                ProjectStatus.INACTIVE,
                 indexer().find(testProject).orElseThrow().getMarker().status());
     }
 

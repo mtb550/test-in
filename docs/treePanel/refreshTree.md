@@ -59,10 +59,11 @@ Testin reads the folders again and draws the tree from what it finds.
   The other editors are reloaded, unless a tester is in the middle of something.
 - **Rule-TREE-PANEL-083** — Only one refresh runs at a time. A second request
   while one is running is ignored.
-- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
-  holds nothing. It is indexed as a node so the tree can say what it is - drawn
-  with Archived beside its name like any other status - and its test sets, cases
-  and runs are not read, because an archived project is not worked on.
+- **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
+  tree and holds nothing. It is indexed as a node so the tree can say what it
+  is - drawn with Inactive beside its name like any other status - and its test
+  sets, cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 
 ## What the tester sees
 

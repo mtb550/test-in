@@ -60,10 +60,11 @@ A test set package is a folder that holds test sets. This makes one.
   name Java refuses - New, Class, Import - whether it is being created or
   renamed. The tester is told while they are still looking at what they typed,
   rather than finding a package named something else.
-- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
-  holds nothing. It is indexed as a node so the tree can say what it is - drawn
-  with Archived beside its name like any other status - and its test sets, cases
-  and runs are not read, because an archived project is not worked on.
+- **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
+  tree and holds nothing. It is indexed as a node so the tree can say what it
+  is - drawn with Inactive beside its name like any other status - and its test
+  sets, cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 
 Rule-TREE-PANEL-024 and Rule-TREE-PANEL-025 hold here too. They say what can be
 created where, and they are on [UC-TREE-PANEL-007](createTestSet.md).

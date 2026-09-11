@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
-import org.testin.model.ProjectStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -61,26 +60,20 @@ final class IndexingScanner {
 
             // UC-TREE-PANEL-001, Rule-TREE-PANEL-100.
             //
-            // The project itself, and nothing under it. An archived project used
-            // to be skipped whole, so it was not in the index at all - the tree
-            // could not show it, the binding did not resolve, and the tester was
-            // sent to the welcome screen to be told in a sentence what the tree
-            // is for saying.
-            //
-            // It is a node now, drawn with "Archived" beside its name like any
-            // other status, and it holds nothing: an archived project is not
+            // The node, and nothing under it. An inactive project is not being
             // worked on, so reading its test sets, cases and runs is a directory
-            // walk nobody asked for.
+            // walk nobody asked for - but it is still a project, and the tree
+            // says so by drawing it with "Inactive" beside its name.
             //
-            // Whatever an earlier scan read is dropped first. Archiving does not
-            // re-index by itself, so without this the contents of the project
-            // stayed in the index and the tree kept drawing children under a
-            // node that is meant to hold none.
-            if (tp.getMarker().getStatus() == ProjectStatus.ARCHIVED) {
+            // Dropped first, because the status change does not re-index: the
+            // action writes the marker and redraws, so whatever an earlier scan
+            // read would stay and the tree would draw children under a node that
+            // is meant to hold none.
+            if (!tp.getMarker().getStatus().isActive()) {
                 store.removeTestProject(projectPath);
                 store.getTestProjectsByPath().put(projectPath.toString(), tp);
 
-                Logger.info("Archived project, indexed without its contents: " + projectPath.getFileName());
+                Logger.info("Inactive project, indexed without its contents: " + projectPath.getFileName());
                 indicator.setFraction(1.0);
                 return;
             }

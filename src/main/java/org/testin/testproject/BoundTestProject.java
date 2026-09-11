@@ -57,8 +57,9 @@ public final class BoundTestProject {
      * UC-TREE-PANEL-001, Rule-TREE-PANEL-001.
      * <p>
      * The named project as the indexer holds it, empty when the name matches
-     * nothing there - no file, a name nobody uses, or a project that is archived
-     * and therefore never indexed.
+     * nothing there - no file, or a name nobody uses. A project that is not
+     * active resolves like any other: it is indexed as a node, and only its
+     * contents are left unread (#66).
      * <p>
      * Matched on the folder name, which is what a test project is identified by
      * everywhere else. Renaming the folder breaks the binding, and the tester is
@@ -93,8 +94,11 @@ public final class BoundTestProject {
      * UC-TREE-PANEL-001, Rule-TREE-PANEL-064.
      * <p>
      * Why the named project is not showing, in one sentence a tester can act on,
-     * or empty when there is nothing wrong. Archived is called by its name
-     * because it is the one cause with an obvious fix.
+     * or empty when there is nothing wrong.
+     * <p>
+     * Two causes are left, and being put aside is not one of them: an inactive
+     * project is indexed and drawn in the tree like any other, so it resolves
+     * and never reaches here (#66).
      */
     public @NotNull String problem(final @NotNull Map<String, ProjectStatus> underRoot) {
         if (!isNamed() || get().isPresent()) return "";
@@ -102,9 +106,7 @@ public final class BoundTestProject {
         final @NotNull String name = name();
         final @NotNull Optional<ProjectStatus> status = Optional.ofNullable(underRoot.get(name));
 
-        if (status.isEmpty()) return Bundle.message("bound.not.under.root", name);
-        if (status.orElseThrow() == ProjectStatus.ARCHIVED) return Bundle.message("bound.archived", name);
-        return Bundle.message("bound.unreadable", name);
+        return status.isEmpty() ? Bundle.message("bound.not.under.root", name) : Bundle.message("bound.unreadable", name);
     }
 
     /**

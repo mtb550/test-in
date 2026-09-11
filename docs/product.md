@@ -267,9 +267,10 @@ These four are never saved to disk. They are what a card shows while tests are
 actually running: *idle*, *running*, *passed*, *failed*. They last only as long
 as the IDE is open. The test run's own record is the one that is kept.
 
-### 5.4 A test project's status — three values
+### 5.4 A test project's status — two values
 
-**Active**, **Inactive**, **Archived**. There is no removed state, because
+**Active** and **Inactive**. One word for "not now", because a tester should
+not have to tell two kinds of it apart. There is no removed state, because
 removing a test project deletes it.
 
 ### 5.5 A test set's status — two values

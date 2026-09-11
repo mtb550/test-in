@@ -209,7 +209,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
 
         // A run's verdicts and a node's marker are records of work rather than
         // edits: putting one back would say a case was never run, or that a
-        // project was never archived. Only a test case reverts.
+        // project status was never changed. Only a test case reverts.
         if (!diff.isRevertible()) {
             Services.getInstance(p, Notifier.class)
                     .softRefuse(p, Bundle.message("dialog.pending.revert.only.test.case"));

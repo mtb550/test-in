@@ -60,10 +60,11 @@ The copy is new and separate. Changing it never changes the original.
   as its test cases: its order number, and its **Deprecated** or **Archived**
   status. A copy of a retired test set is retired too. A copied test run keeps
   the results the original recorded.
-- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
-  holds nothing. It is indexed as a node so the tree can say what it is - drawn
-  with Archived beside its name like any other status - and its test sets, cases
-  and runs are not read, because an archived project is not worked on.
+- **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
+  tree and holds nothing. It is indexed as a node so the tree can say what it
+  is - drawn with Inactive beside its name like any other status - and its test
+  sets, cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 
 Rule-TREE-PANEL-043, Rule-TREE-PANEL-044, Rule-TREE-PANEL-045 and
 Rule-TREE-PANEL-049 hold here too. They say where a node can land, and they are

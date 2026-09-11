@@ -71,7 +71,7 @@ public final class GitCommits {
      * their tree.
      * <p>
      * The review lists markers in their own right now, so one can be committed
-     * deliberately: archiving a project is a marker edit and nothing else. The
+     * deliberately: deactivating a project is a marker edit and nothing else. The
      * ones above a selected case travel whether they were picked or not, because
      * without them the case lands somewhere nothing recognizes.
      */

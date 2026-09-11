@@ -3,9 +3,10 @@ package org.testin.model;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * What a node is, as far as the tree is concerned: active, archived,
- * deprecated. Three enums answer it - {@link ProjectStatus} for a test project,
- * {@link TestSetStatus} for a test set, {@link PackageStatus} for a package -
+ * What a node is, as far as the tree is concerned: active, inactive,
+ * deprecated, archived. Three enums answer it - {@link ProjectStatus} for a
+ * test project, {@link TestSetStatus} for a test set, {@link PackageStatus}
+ * for a package -
  * and this is the part they have in common, so the menu entry that sets one and
  * the Details popup that shows one never ask which kind of node they are
  * holding (#110).

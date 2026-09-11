@@ -246,7 +246,7 @@ public final class ProjectIndexer {
 
     /**
      * Every test project folder under the root with the status its marker gives,
-     * archived ones included. The listing behind the picker that binds a
+     * inactive ones included. The listing behind the picker that binds a
      * repository, and behind the sentence that says why a bound project is not
      * showing - both of which have to know about a project the index skipped.
      * <p>

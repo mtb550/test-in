@@ -224,7 +224,7 @@ in the past tense wherever one word will do. (Rule-TREE-PANEL-007)
 | *Ordered* | A node's number was set or cleared | [UC-TREE-PANEL-015](orderNodes.md) |
 | *Undone* | The last change was taken back | [UC-TREE-PANEL-016](undoChange.md) |
 | *Redone* | The undone change was put back | [UC-TREE-PANEL-016](undoChange.md) |
-| *Active*, *Inactive*, *Archived*, *Deprecated* | The new status of a test project, package or test set | [UC-TREE-PANEL-018](retireNode.md) |
+| *Active*, *Inactive*, *Archived*, *Deprecated* | The new status of a test project (Active, Inactive), a package (Active, Archived) or a test set (Active, Deprecated) | [UC-TREE-PANEL-018](retireNode.md) |
 | *Assigned*, *Completed*, *Closed* | The new status of a test run | [UC-TREE-PANEL-020](setTestRunStatus.md) |
 | *Updated* | A test run's name, test cases or settings were saved | [UC-TREE-PANEL-022](editTestRun.md) |
 | *Running*, *Running N* | The automation started | [UC-TREE-PANEL-023](runTests.md) |
@@ -273,7 +273,6 @@ than feedback on what the tester just typed.
 | What the tester sees | Means |
 |---|---|
 | *Could not load '\<folder name\>'*, in red, as a child row | That folder's contents could not be read |
-| *\<name\> is archived, so it is not opened*, in red, above the list of test projects | The bound test project is **Archived**. See [UC-TREE-PANEL-001](reachTheTree.md) |
 | *testin.yml names \<name\>, which is not under the Testin root*, in red | The code project names a test project the Testin folder does not hold. See [UC-TREE-PANEL-001](reachTheTree.md) |
 | *testin.yml names \<name\>, which could not be read*, in red | The test project's folder is there, but Testin could not read it |
 

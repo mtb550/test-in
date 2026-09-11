@@ -37,7 +37,6 @@ public class StatusWorthShowingTest {
     @Test
     public void theStatusesATesterSeesAreTheOnesThatAreNotActive() {
         assertFalse(ProjectStatus.INACTIVE.isActive(), "an inactive test project says so beside its name");
-        assertFalse(ProjectStatus.ARCHIVED.isActive(), "and an archived one would, if it were ever indexed");
         assertFalse(TestSetStatus.DEPRECATED.isActive(), "a deprecated test set says so");
         assertFalse(PackageStatus.ARCHIVED.isActive(), "an archived package says so");
     }

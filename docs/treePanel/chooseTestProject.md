@@ -59,10 +59,11 @@ one.
 - **Rule-TREE-PANEL-021** — If the choice cannot be written, Testin says so.
   That holds whichever way the choice was made: the picker, creating a test project,
   cloning one, or the welcome screen. It never reports the choice as saved.
-- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
-  holds nothing. It is indexed as a node so the tree can say what it is - drawn
-  with Archived beside its name like any other status - and its test sets, cases
-  and runs are not read, because an archived project is not worked on.
+- **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
+  tree and holds nothing. It is indexed as a node so the tree can say what it
+  is - drawn with Inactive beside its name like any other status - and its test
+  sets, cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 
 ## The Select Test Project dialog
 
@@ -73,7 +74,7 @@ one.
 │  Test Project                         Status            (1)  │
 │  Demo                                 Active            (2)  │
 │  Mobile                               Active                 │
-│  Legacy                               Archived               │
+│  Legacy                               Inactive               │
 ├──────────────────────────────────────────────────────────────┤
 │  Enter Select    Escape Cancel                          (3)  │
 └──────────────────────────────────────────────────────────────┘
@@ -107,9 +108,9 @@ first*, is shown in red.
 **If no row is selected** — `Enter` does nothing, and says nothing. That happens
 when nothing is bound yet, or when the bound name matches no row.
 
-**If the chosen test project is Archived** — Testin binds to it and says *Bound*
-all the same. The panel then shows *\<name\> is archived, so it is not opened*
-instead of a tree.
+**If the chosen test project is Inactive** — Testin binds to it and says *Bound*
+all the same, and the tree shows it with **Inactive** beside its name. It holds
+nothing: a project nobody is working on is not read (Rule-TREE-PANEL-100).
 
 **If the project file is edited by hand** — the tree does not notice. Testin
 reads that file when the project opens. After that it reads the file again only

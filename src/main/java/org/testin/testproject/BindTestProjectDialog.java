@@ -25,8 +25,8 @@ import java.util.Map;
  * another dropdown: the pairing is a fact about the repository, so it is chosen
  * once and committed, not re-picked on every machine that opens it.
  * <p>
- * Archived projects are listed with their status rather than hidden. A tester
- * whose project is archived would otherwise look at a list that does not contain
+ * Inactive projects are listed with their status rather than hidden. A tester
+ * whose project is inactive would otherwise look at a list that does not contain
  * the project they know is there, with nothing saying why.
  */
 public final class BindTestProjectDialog extends AbstractFrameworkDialog<SelectionTable> {

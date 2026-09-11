@@ -42,7 +42,7 @@ public enum PanelState {
 
     /**
      * Projects exist and this repository is not bound to a usable one - never
-     * bound, bound to a name nobody uses, or bound to an archived project.
+     * bound, or bound to a name nobody uses.
      */
     CHOOSE,
 

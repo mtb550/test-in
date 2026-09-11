@@ -62,13 +62,15 @@ screens, and the tree is one of them.
   tree. Without that the IDE has nothing to give focus to and it stays in
   whatever was there before, so keys pressed over the tree are answered by the
   editor beside it.
-- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
-  holds nothing. It is indexed as a node so the tree can say what it is - drawn
-  with Archived beside its name like any other status - and its test sets, cases
-  and runs are not read, because an archived project is not worked on.
+- **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
+  tree and holds nothing. It is indexed as a node so the tree can say what it
+  is - drawn with Inactive beside its name like any other status - and its test
+  sets, cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 
-Rule-TREE-PANEL-064 also holds here. It says an **Archived** test project is not
-opened on the next load. It is written on [UC-TREE-PANEL-018](retireNode.md).
+Rule-TREE-PANEL-100 also holds here. It says a test project that is not
+**Active** is drawn in the tree and holds nothing. It is written on
+[UC-TREE-PANEL-018](retireNode.md).
 
 ## No Testin folder
 
@@ -139,13 +141,9 @@ hold one link each.
 | The bound test project is found | The tree |
 | This code project names a test project that is not on this machine, and gives its Git address | *\<name\> is not on this machine yet* and the link **Clone \<name\>** |
 | No test project exists in the Testin folder | The link **Create your first test project** |
-| Otherwise | One link per test project, showing its name and then **Active**, **Inactive** or **Archived**. With more than six test projects, one link instead: **Select the test project for this repository** |
+| Otherwise | One link per test project, showing its name and then **Active** or **Inactive**. With more than six test projects, one link instead: **Select the test project for this repository** |
 
 ## What Testin refuses
-
-**If the bound test project is Archived** — the panel shows, in red, *\<name\>
-is archived, so it is not opened*. Under that line sits the list of test
-projects to choose from.
 
 **If the project file cannot be read** — the panel shows, in red, *testin.yml
 names \<name\>, which could not be read*.
@@ -153,10 +151,6 @@ names \<name\>, which could not be read*.
 **If the project file is malformed** — Testin reads it as naming nothing. There
 is no red line at all, and the tester gets the plain list of test projects with
 no explanation.
-
-> **The one project it binds to may be Archived.** Rule-TREE-PANEL-015 does not
-> look at the status. A tester with one archived test project is bound to it.
-> The panel then says it is not opened, above a list holding only that project.
 
 > **Showing a Git-shared test project writes to the code project.** The first
 > time the panel draws one, Testin asks Git for the remote address. Testin then

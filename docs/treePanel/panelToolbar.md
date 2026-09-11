@@ -57,10 +57,11 @@ These seven buttons act on the whole panel, not on one node.
   gray until a Testin folder is set. Nothing else on the toolbar is ever gray.
 - **Rule-TREE-PANEL-090** — Every button says what it does when the tester
   hovers over it.
-- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
-  holds nothing. It is indexed as a node so the tree can say what it is - drawn
-  with Archived beside its name like any other status - and its test sets, cases
-  and runs are not read, because an archived project is not worked on.
+- **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
+  tree and holds nothing. It is indexed as a node so the tree can say what it
+  is - drawn with Inactive beside its name like any other status - and its test
+  sets, cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 
 ## The toolbar
 

@@ -62,10 +62,11 @@ This copies a test run's test cases and settings into a new, empty one.
   *smoke-2*. A name already taken is skipped.
 - **Rule-TREE-PANEL-072** — The new test run is created in the same folder as
   the one it was made from.
-- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
-  holds nothing. It is indexed as a node so the tree can say what it is - drawn
-  with Archived beside its name like any other status - and its test sets, cases
-  and runs are not read, because an archived project is not worked on.
+- **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
+  tree and holds nothing. It is indexed as a node so the tree can say what it
+  is - drawn with Inactive beside its name like any other status - and its test
+  sets, cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 
 ## What the tester sees
 

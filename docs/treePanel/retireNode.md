@@ -56,14 +56,17 @@ Retiring deletes nothing. It only moves the node out of the way.
 - **Rule-TREE-PANEL-062** — Retiring deletes nothing. (Rule-TREE-PANEL-008)
 - **Rule-TREE-PANEL-063** — A test project that is not **Active** shows nothing
   under it.
-- **Rule-TREE-PANEL-064** — An **Archived** test project is not opened at all on
-  the next load. The panel says so, and offers the other test projects.
+- **Rule-TREE-PANEL-064** — An **Inactive** test project is still opened, and
+  still bound. What it does not do is hold anything: the tree draws the node and
+  its contents are not read. Until #66 there was an **Archived** status as well,
+  which meant the same thing and was not opened at all.
 - **Rule-TREE-PANEL-065** — A status is set on one node at a time. The status a
   node already has is offered gray, so the tester can see what it is now.
-- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
-  holds nothing. It is indexed as a node so the tree can say what it is - drawn
-  with Archived beside its name like any other status - and its test sets, cases
-  and runs are not read, because an archived project is not worked on.
+- **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
+  tree and holds nothing. It is indexed as a node so the tree can say what it
+  is - drawn with Inactive beside its name like any other status - and its test
+  sets, cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 
 ## What the tester sees
 
@@ -81,7 +84,7 @@ shows above the status bar at the bottom right of the IDE. It reads *Inactive*,
 
    | Node | Retire it with | Statuses it can have |
    |---|---|---|
-   | Test project | **Deactivate**, **Archive** | Active, Inactive, Archived |
+   | Test project | **Deactivate** | Active, Inactive |
    | Test set | **Mark Deprecated** | Active, Deprecated |
    | Package | **Archive** | Active, Archived |
 
@@ -89,15 +92,19 @@ shows above the status bar at the bottom right of the IDE. It reads *Inactive*,
 4. Testin writes the status, refreshes the tree, and shows the new status word:
    *Inactive*, *Archived* or *Deprecated*.
 
+   A test project takes **Deactivate** and nothing else. Until #66 it took
+   **Archive** as well, which put it aside the same way and asked the tester to
+   tell two kinds of "not now" apart.
+
 **What retiring does.** A **Deprecated** test set or an **Archived** package is
 drawn gray, and it sorts last. **Expand All** leaves it closed. It is not
 offered when a test run is created. Its test cases are skipped when a parent is
 run. Nothing inside it is deleted.
 
-**What an inactive test project does.** Its row shows no children. If it is
-**Archived**, the next load skips it. The panel then shows *\<name\> is
-archived, so it is not opened*. That screen is drawn under
-[UC-TREE-PANEL-001](reachTheTree.md).
+**What an inactive test project does.** It is still bound, still drawn in the
+tree, and still says **Inactive** beside its name. What it does not do is hold
+anything: its row shows no children, because a project nobody is working on is
+not read (Rule-TREE-PANEL-100).
 
 To bring one back, see [UC-TREE-PANEL-019](reactivateNode.md).
 

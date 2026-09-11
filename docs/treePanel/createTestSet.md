@@ -62,10 +62,11 @@ A test set is the folder that holds test cases. This makes one.
   hold one, and the entry says which node kinds can. A test project, a test set
   and a test run hold what they hold; the two directories under a test project
   and the two package kinds are what a new node is created under.
-- **Rule-TREE-PANEL-100** — An archived test project is shown in the tree and
-  holds nothing. It is indexed as a node so the tree can say what it is - drawn
-  with Archived beside its name like any other status - and its test sets, cases
-  and runs are not read, because an archived project is not worked on.
+- **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
+  tree and holds nothing. It is indexed as a node so the tree can say what it
+  is - drawn with Inactive beside its name like any other status - and its test
+  sets, cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 
 ## The Create Test Node dialog
 

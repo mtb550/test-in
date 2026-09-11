@@ -95,10 +95,9 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
 
         toolWindow.setTitleActions(new ViewPanelActions().create(panel, toolWindow.getComponent()));
 
-        // The startup work, and only that - see Main, which had the same shape
-        // and the defect that goes with it: a tool window filled in a later
-        // event is one whose header was built around nothing, and every title
-        // action on it throws before it runs (#66).
+        // The startup work, and only that: it reads settings, reads testin.yml
+        // and starts the first index, none of which this call is waiting for.
+        // Everything the platform asked for is done above, as in Main.
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!p.isDisposed()) StartupActivity.execute(p);
         });
