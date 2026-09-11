@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 /**
  * What the entry that opens onto the rest is called, and what it looks like.
@@ -27,7 +28,7 @@ public final class ActionsMenu {
      * An empty Actions submenu for the caller to fill.
      */
     public static @NotNull DefaultActionGroup group() {
-        final @NotNull DefaultActionGroup group = new DefaultActionGroup("Actions", true);
+        final @NotNull DefaultActionGroup group = new DefaultActionGroup(Bundle.message("menu.actions"), true);
         group.getTemplatePresentation().setIcon(AllIcons.Actions.Edit);
 
         return group;

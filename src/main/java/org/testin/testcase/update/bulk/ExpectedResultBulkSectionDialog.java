@@ -3,6 +3,7 @@ package org.testin.testcase.update.bulk;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Bundle;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -17,7 +18,7 @@ public class ExpectedResultBulkSectionDialog extends JsonSplitBulkSectionDialog 
 
     @Override
     protected @NotNull String getPopupTitle() {
-        return "Bulk Edit Expected Results";
+        return Bundle.message("bulk.title.expected.result");
     }
 
     @Override

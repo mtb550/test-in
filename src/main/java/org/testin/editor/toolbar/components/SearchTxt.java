@@ -5,6 +5,7 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.SearchTextField;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -23,8 +24,8 @@ public class SearchTxt extends SearchTextField implements Disposable, ToolbarIte
         setOpaque(false);
         getTextEditor().setOpaque(false);
         getTextEditor().setBackground(JBUI.CurrentTheme.EditorTabs.background());
-        getTextEditor().setToolTipText("Search (" + Shortcuts.FocusSearch.getShortcutText() + "), "
-                + Shortcuts.Escape.getShortcutText() + " to leave");
+        getTextEditor().setToolTipText(Bundle.message("search.tooltip",
+                Shortcuts.FocusSearch.getShortcutText(), Shortcuts.Escape.getShortcutText()));
 
         searchDebounceTimer = new Timer(300, e -> onToolBarSearchValueChanged.run());
         searchDebounceTimer.setRepeats(false);

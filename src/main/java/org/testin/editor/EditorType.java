@@ -12,6 +12,7 @@ import org.testin.editor.run.RunEditor;
 import org.testin.editor.test.TestEditor;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.util.function.BiFunction;
@@ -36,14 +37,14 @@ public class EditorType extends FakeFileType {
      */
     public static final @NotNull EditorType TEST_RUN = new EditorType(
             "Test Run",
-            "Test Run Editor",
+            Bundle.message("editor.type.run.description"),
             AllIcons.Nodes.Services,
             RunEditor::new
     );
 
     public static final @NotNull EditorType TEST_CASE = new EditorType(
             "Test Case",
-            "Test Case Editor",
+            Bundle.message("editor.type.case.description"),
             AllIcons.FileTypes.Text,
             TestEditor::new
     );

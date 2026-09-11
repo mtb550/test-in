@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Failure;
 import org.testin.model.RunStatus;
+import org.testin.util.Bundle;
 
 import java.time.Duration;
 
@@ -42,7 +43,7 @@ public class TestCaseExecutionTracker {
                     TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED, durationOf(test), failureOf(test, ""));
 
                 } else {
-                    TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED, durationOf(test), failureOf(test, "Skipped/Terminated"));
+                    TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED, durationOf(test), failureOf(test, Bundle.message("runner.skipped")));
                 }
             }
         });
@@ -105,6 +106,6 @@ public class TestCaseExecutionTracker {
         final DiffHyperlink comparison = test.getDiffViewerProvider();
         if (comparison == null) return message;
 
-        return message + "\nExpected :" + comparison.getLeft() + "\nActual   :" + comparison.getRight();
+        return Bundle.message("runner.comparison", message, comparison.getLeft(), comparison.getRight());
     }
 }

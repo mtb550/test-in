@@ -66,15 +66,15 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         shortcuts = List.of(
                 StatusBarShortcut.save(this::submit),
                 StatusBarShortcut.hint("Shift+Enter", StatusBarShortcut.SAVE),
-                StatusBarShortcut.build(Shortcuts.AddArrayItem, "Add", this::addItemAtCarets),
-                StatusBarShortcut.build(Shortcuts.RemoveArrayItem, "Remove", this::removeItemAtCarets),
-                StatusBarShortcut.build(Shortcuts.TabNext, "Next", () -> editors.navigate(1, true)),
-                StatusBarShortcut.build(Shortcuts.TabPrevious, "Previous", () -> editors.navigate(-1, true)),
+                StatusBarShortcut.build(Shortcuts.AddArrayItem, Bundle.message("bulk.shortcut.add"), this::addItemAtCarets),
+                StatusBarShortcut.build(Shortcuts.RemoveArrayItem, Bundle.message("bulk.shortcut.remove"), this::removeItemAtCarets),
+                StatusBarShortcut.build(Shortcuts.TabNext, Bundle.message("bulk.shortcut.next"), () -> editors.navigate(1, true)),
+                StatusBarShortcut.build(Shortcuts.TabPrevious, Bundle.message("bulk.shortcut.previous"), () -> editors.navigate(-1, true)),
                 // The arrows wrap here, unlike the value dialog: an array item is
                 // one line, so the caret has nowhere else to go.
-                StatusBarShortcut.build(Shortcuts.ArrowDown, "Next", () -> editors.navigate(1, true)),
-                StatusBarShortcut.build(Shortcuts.ArrowUp, "Previous", () -> editors.navigate(-1, true)),
-                StatusBarShortcut.build(Shortcuts.CaretOnEveryValue, "All Carets", this::caretOnEveryValue),
+                StatusBarShortcut.build(Shortcuts.ArrowDown, Bundle.message("bulk.shortcut.next"), () -> editors.navigate(1, true)),
+                StatusBarShortcut.build(Shortcuts.ArrowUp, Bundle.message("bulk.shortcut.previous"), () -> editors.navigate(-1, true)),
+                StatusBarShortcut.build(Shortcuts.CaretOnEveryValue, Bundle.message("bulk.shortcut.all.carets"), this::caretOnEveryValue),
                 StatusBarShortcut.hint("Ctrl+Click", Bundle.message("shortcut.multi.caret")),
                 StatusBarShortcut.cancel(this::closeCancel));
 

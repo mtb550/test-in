@@ -53,11 +53,11 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
         shortcuts = List.of(
                 StatusBarShortcut.save(this::submit),
                 StatusBarShortcut.hint("Shift+Enter", StatusBarShortcut.SAVE),
-                StatusBarShortcut.build(Shortcuts.TabNext, "Next", () -> editors.navigate(1, true)),
-                StatusBarShortcut.build(Shortcuts.TabPrevious, "Previous", () -> editors.navigate(-1, true)),
-                StatusBarShortcut.build(Shortcuts.ArrowDown, "Next", () -> editors.navigate(1, false)),
-                StatusBarShortcut.build(Shortcuts.ArrowUp, "Previous", () -> editors.navigate(-1, false)),
-                StatusBarShortcut.build(Shortcuts.CaretOnEveryValue, "All Carets", editors::caretOnEveryValue),
+                StatusBarShortcut.build(Shortcuts.TabNext, Bundle.message("bulk.shortcut.next"), () -> editors.navigate(1, true)),
+                StatusBarShortcut.build(Shortcuts.TabPrevious, Bundle.message("bulk.shortcut.previous"), () -> editors.navigate(-1, true)),
+                StatusBarShortcut.build(Shortcuts.ArrowDown, Bundle.message("bulk.shortcut.next"), () -> editors.navigate(1, false)),
+                StatusBarShortcut.build(Shortcuts.ArrowUp, Bundle.message("bulk.shortcut.previous"), () -> editors.navigate(-1, false)),
+                StatusBarShortcut.build(Shortcuts.CaretOnEveryValue, Bundle.message("bulk.shortcut.all.carets"), editors::caretOnEveryValue),
                 StatusBarShortcut.hint("Ctrl+Click", Bundle.message("shortcut.multi.caret")),
                 StatusBarShortcut.cancel(this::closeCancel));
 

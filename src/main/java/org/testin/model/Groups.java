@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import org.testin.util.Bundle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +33,7 @@ public final class Groups {
      * empty list. It is a word on a menu, and the angle brackets are what say it
      * is not a name somebody typed.
      */
-    public static final @NotNull String NONE = "<No Group>";
+    public static final @NotNull String NONE = Bundle.message("groups.none");
 
     /**
      * The groups in a comma-separated line, as a cell and a sheet hold them.

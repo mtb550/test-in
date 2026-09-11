@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Bundle;
 
 import java.util.List;
 
@@ -47,6 +48,6 @@ public interface TestRunner {
         return EP.getExtensionList().stream()
                 .findFirst()
                 .orElseGet(() -> (p, cases) -> Logger.debug(
-                        "No test runner in this IDE; " + cases.size() + " case(s) not started"));
+                        Bundle.message("runner.none", String.valueOf(cases.size()))));
     }
 }
