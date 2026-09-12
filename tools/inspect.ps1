@@ -432,7 +432,13 @@ function Read-DriftedCaptions([string[]] $enums) {
     $captions = @{}
 
     foreach ($file in $enums) {
-        if (-not (Test-Path $file)) { continue }
+        # Loud, not skipped. A path that is not there used to be passed over in
+        # silence, so this check shrank from four enums to two on the day #111
+        # moved the other two - and printed "Gate clear" either way for
+        # everything it had stopped looking at (#66, finding 98).
+        if (-not (Test-Path $file)) {
+            throw "Read-DriftedCaptions was given a file that is not there: $file"
+        }
 
         $lines = [System.IO.File]::ReadAllLines($file)
         $short = (Split-Path $file -Leaf) -replace '\.java$', ''
@@ -441,9 +447,13 @@ function Read-DriftedCaptions([string[]] $enums) {
             if ($lines[$i] -notmatch '^    ([A-Z][A-Z0-9_]+)\($') { continue }
             $constant = $matches[1]
 
-            # The caption is the first argument, on the line below.
+            # The caption is the first argument, on the line below: a literal, or
+            # the bundle key it is looked up under since the captions were
+            # translated. Either form is the one thing two enums naming the same
+            # constant have to agree on, and reading only the literal meant this
+            # saw nothing at all once every caption became a key.
             $argument = $lines[$i + 1].Trim()
-            if ($argument -notmatch '^"((?:[^"\\]|\\.)*)"') { continue }
+            if ($argument -notmatch '^(?:Bundle\.message\()?"((?:[^"\\]|\\.)*)"') { continue }
 
             $value = $matches[1]
             if (-not $captions.ContainsKey($constant)) { $captions[$constant] = @() }
@@ -835,9 +845,12 @@ $problems += @(Read-ModelStatics @((Join-Path $repo 'src/main/java/org/testin/mo
 
 # The enums that name a test case's fields, compared against each other. Same
 # constant, same concept, so the caption is the same question.
+# A path that no longer exists is skipped in silence, so two of these four went
+# on being listed after #111 moved them and the check quietly shrank to comparing
+# one pair - printing "Gate clear" either way (#66, finding 98).
 $problems += @(Read-DriftedCaptions @(
-        (Join-Path $repo 'src/main/java/org/testin/model/TestEditorAttributes.java'),
-        (Join-Path $repo 'src/main/java/org/testin/model/RunEditorAttributes.java'),
+        (Join-Path $repo 'src/main/java/org/testin/testcase/TestEditorAttributes.java'),
+        (Join-Path $repo 'src/main/java/org/testin/testrun/RunEditorAttributes.java'),
         (Join-Path $repo 'src/main/java/org/testin/testcase/CreateTestCaseFields.java'),
         (Join-Path $repo 'src/main/java/org/testin/testcase/UpdateTestCaseFields.java')))
 
