@@ -53,6 +53,10 @@ This is how every test case in Testin begins.
 - **Rule-EDITOR-PANEL-200** — There is one strip and it is never empty, because
   Save and Cancel are always on it. A field with no keys of its own adds
   nothing to it.
+- **Rule-EDITOR-PANEL-218** — A key is stood down only while a popup is actually
+  using it. An open suggestion list takes Enter and Escape; every other key
+  reaches the field underneath, which is what lets CTRL+ENTER add a line while
+  the list is up.
 
 ## The screen
 

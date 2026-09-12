@@ -22,6 +22,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -249,6 +250,24 @@ public abstract class TestCaseBaseDialog {
         return cachedSections;
     }
 
+    /**
+     * UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-201.
+     * <p>
+     * Binds a key in this dialog, standing it down while a popup is using it.
+     * <p>
+     * <b>Only the keys a popup actually uses.</b> Every binding stood down
+     * while the completion lookup or a combo was open, which is right for Enter
+     * and Escape - the popup owns those, and a dialog that saved itself over an
+     * open suggestion list would be saving the value the tester was in the
+     * middle of replacing. It is wrong for everything else: the expected-result
+     * and test-data fields suggest as the tester types, so the lookup is open
+     * most of the time they are in one - and CTRL+ENTER, the key that puts a
+     * line break in those very fields, was dead for exactly as long (#66).
+     * <p>
+     * Derived from the keystroke rather than from a list of exceptions kept
+     * beside it: a popup claims the plain key, never a combination. A list
+     * would be right today and stale at the next binding.
+     */
     public void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull UIAction action) {
         new DumbAwareAction() {
             @Override
@@ -258,7 +277,7 @@ public abstract class TestCaseBaseDialog {
 
             @Override
             public void update(final @NotNull AnActionEvent e) {
-                e.getPresentation().setEnabled(!completionIsOpen() && getAllSections().stream().noneMatch(CreateTestCaseSection::isPopupOpen));
+                e.getPresentation().setEnabled(!(aPopupIsOpen() && popupClaims(shortcutSet)));
             }
 
             @Override
@@ -274,6 +293,31 @@ public abstract class TestCaseBaseDialog {
      */
     private boolean completionIsOpen() {
         return LookupManager.getInstance(p).getActiveLookup() != null;
+    }
+
+    /**
+     * Whether anything is open over this dialog that reads keys before it does -
+     * the completion lookup, or a section's own list.
+     */
+    private boolean aPopupIsOpen() {
+        return completionIsOpen() || getAllSections().stream().anyMatch(CreateTestCaseSection::isPopupOpen);
+    }
+
+    /**
+     * UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-201.
+     * <p>
+     * Whether an open popup is using this key.
+     * <p>
+     * It uses the plain ones - Enter to take what is highlighted, Escape to
+     * close - and nothing else. A combination reaches the field underneath,
+     * which is what makes CTRL+ENTER a line break while a suggestion list is up.
+     */
+    private static boolean popupClaims(final @NotNull CustomShortcutSet shortcutSet) {
+        return Arrays.stream(shortcutSet.getShortcuts())
+                .filter(KeyboardShortcut.class::isInstance)
+                .map(KeyboardShortcut.class::cast)
+                .map(KeyboardShortcut::getFirstKeyStroke)
+                .anyMatch(stroke -> stroke.getModifiers() == 0);
     }
 
     // Rule-EDITOR-PANEL-029, Rule-EDITOR-PANEL-035
