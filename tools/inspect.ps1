@@ -658,9 +658,10 @@ function Test-DisplayStringBaseline([object[]] $problems, [string] $baselinePath
     <#
         The duplicated-string count can go down and must not go up.
 
-        Gating it outright would paint the build red today over work nobody has
-        scheduled - there were 136 of these when the check was written. A
-        ratchet is the same answer verify.yml already gives the Plugin Verifier:
+        Gating it outright would paint the build red over work nobody has
+        scheduled. How many there were when the check was written is recorded
+        once, in the baseline file itself (#66, finding 107). A ratchet is the
+        same answer verify.yml already gives the Plugin Verifier:
         the number is recorded, a rise fails, and a fall is reported so the
         recorded number can follow it down.
     #>
@@ -924,23 +925,29 @@ if (-not $ReportOnly) {
 $scopes = if ($narrowed) { @(Join-Path $repo $Subdirectory) } else { Get-SourceRoots }
 
 $problems = @(Read-Problems $outPath)
-foreach ($scope in $scopes) { $problems += @(Read-WrappedDeclarations $scope) }
 
-# The design checks, which no IntelliJ inspection makes: a string a tester reads
-# written in two places, a static that is not final in the packages that model
-# the data, an empty private constructor where the annotation says it better,
-# and a javadoc block followed by a second one, which javac throws away.
+# Two kinds of rule, and they read different trees.
+#
+# How code is written - one-line signatures, Lombok for the boilerplate, a doc
+# block javac keeps, the licence header - holds for every Java file, tests
+# included: CLAUDE.md states them for the whole tree, and a rule that looks at
+# only part of it is a rule the rest can quietly break. Until #66 finding 106
+# only the header read the tests, so a hand-written private constructor sat in
+# src/test with nothing to see it.
+#
+# What a tester reads - a caption written in two places - is production alone.
+# A string duplicated between two test harnesses is read by nobody.
+#
+# An explicit -Subdirectory still wins over both, for the caller narrowing a run.
+$everyTree = if ($narrowed) { $scopes } else { Get-JavaSourceRoots }
+
+foreach ($scope in $everyTree) { $problems += @(Read-WrappedDeclarations $scope) }
+$problems += @(Read-HandWrittenPrivateConstructors $everyTree)
+$problems += @(Read-OrphanedJavadoc $everyTree)
+$problems += @(Read-MissingCopyright $everyTree)
+
 $problems += @(Read-DuplicatedDisplayStrings $scopes)
-$problems += @(Read-HandWrittenPrivateConstructors $scopes)
-$problems += @(Read-OrphanedJavadoc $scopes)
 $problems += @(Read-ModelStatics @((Join-Path $repo 'src/main/java/org/testin/model')))
-
-# The one check that reads the test sources too. A file says who owns it and on
-# what terms wherever it lives, because a test file is as readable in a fork as a
-# main one - so this is the four source roots rather than the production three
-# (#303). An explicit -Subdirectory still wins, as everywhere above.
-$copyrightScopes = if ($narrowed) { $scopes } else { Get-JavaSourceRoots }
-$problems += @(Read-MissingCopyright $copyrightScopes)
 
 # The enums that name a test case's fields, compared against each other. Same
 # constant, same concept, so the caption is the same question.
@@ -970,8 +977,8 @@ Write-DisplayStringInventory $scopes $outPath
 # Everything else the inspector reports is a judgement call and needs a person,
 # so it is listed and not gated: this exits non-zero for these only, which is
 # what lets the scheduled run in .github/workflows/inspect.yml mean something.
-# DuplicatedDisplayString is not here: there were 136 when the check was
-# written, and it is ratcheted below instead.
+# DuplicatedDisplayString is not here: it is ratcheted below instead, and
+# .github/display-string-baseline.txt is where its history is written.
 $gate = @('DataFlowIssue', 'ReturnNull', 'WrappedMethodDeclaration', 'StaticMutableState', 'HandWrittenPrivateConstructor', 'DriftedCaption', 'OrphanedJavadoc', 'MissingCopyright')
 $breaches = @($problems | Where-Object { $gate -contains $_.Inspection })
 

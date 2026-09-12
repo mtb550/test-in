@@ -16,6 +16,9 @@
 
 package org.testin.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.lang.reflect.Constructor;
 
 /**
@@ -33,10 +36,8 @@ import java.lang.reflect.Constructor;
  * the sftp ones and {@code MapperFailureTest} - and a helper copied seven times
  * is seven places to fix when the constructor changes.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RealMapper {
-
-    private RealMapper() {
-    }
 
     public static Mapper build() {
         try {

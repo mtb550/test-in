@@ -28,10 +28,10 @@
 # first one that appears is the one to look at.
 #
 # DuplicatedDisplayString is counted rather than forbidden: a string a tester
-# reads that another file also writes has no owner, and there were 304 of them
-# when the check was written. .github/display-string-baseline.txt records the
-# number, a rise fails the run and a fall is reported so the number can follow it
-# down - the same ratchet verify.yml gives the Plugin Verifier.
+# reads that another file also writes has no owner.
+# .github/display-string-baseline.txt records the number and its history, a rise
+# fails the run and a fall is reported so the number can follow it down - the same
+# ratchet verify.yml gives the Plugin Verifier.
 #
 # Everything else needs a person and is listed in the artifact.
 name: Inspect
