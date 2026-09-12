@@ -86,6 +86,10 @@ bottom right of the IDE.
 
 **If a refresh is already running** — nothing happens.
 
+**If Testin cannot read the test project again** — a *Refresh Failed*
+notification says what went wrong. The tree stays as it was, and the button
+works again.
+
 ---
 
 [Documentation](../README.md) › [The tree panel](main.md)
