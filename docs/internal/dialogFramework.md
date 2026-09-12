@@ -54,6 +54,8 @@ and which keys it answers, and the shell builds the rest.
 - **Rule-INTERNAL-078** — The shortcut strip is one row. A dialog narrower than
   its own hints shortens the strip rather than folding it onto a second line and
   growing a line taller to hold it.
+- **Rule-INTERNAL-079** — A surface has one shortcut strip. It cannot be built
+  as half of a pair, so no dialog is two tinted rows tall to say six words.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

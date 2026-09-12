@@ -64,23 +64,19 @@ public class StatusBarBase {
     private final @NotNull Border border = JBUI.Borders.emptyRight(6);
 
     /**
-     * Whether this strip introduces itself with the keyboard icon.
+     * UC-INTERNAL-007, Rule-INTERNAL-079.
      * <p>
-     * It does, unless it is the second strip of a pair: two of them on two
-     * stacked rows read as two unrelated bars rather than one hint area, and
-     * the icon belongs to the row a tester reads first (#56).
+     * <b>A surface has one of these.</b> It could be built without its keyboard
+     * icon, which existed for one reason: to be the second strip of a pair, so
+     * that two stacked rows read as one hint area rather than as two bars. The
+     * pair is gone - a dialog two tinted rows tall to say six words was paying
+     * for a redraw nobody could see - and with it the only way to build a strip
+     * that is half of something (#56, and undone here).
+     * <p>
+     * So there is one constructor, every strip carries its icon, and a surface
+     * that wants more keys puts them on the strip it has.
      */
-    public static final boolean WITH_ICON = true;
-    public static final boolean WITHOUT_ICON = false;
-
-    private final boolean withIcon;
-
     public StatusBarBase(final StatusBarItem @NotNull [] items) {
-        this(items, WITH_ICON);
-    }
-
-    public StatusBarBase(final StatusBarItem @NotNull [] items, final boolean withIcon) {
-        this.withIcon = withIcon;
         this.statusBar = new JBPanel<>(new BorderLayout());
         this.statusBar.setBorder(JBUI.Borders.empty(4, 10));
         this.statusBar.setOpaque(true);
@@ -134,7 +130,7 @@ public class StatusBarBase {
         onOneRow.gridy = 0;
         onOneRow.anchor = GridBagConstraints.WEST;
 
-        if (withIcon) contentPanel.add(setStatusBarIcon(), onOneRow);
+        contentPanel.add(setStatusBarIcon(), onOneRow);
 
         for (int i = 0; i < items.length; i++) {
             final @NotNull StatusBarItem item = items[i];
