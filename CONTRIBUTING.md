@@ -132,14 +132,21 @@ your change touches one of those, it has not been tested until it has been run.
 
 ### The inspection gate
 
+**It runs in CI on every push to `main`, and that is where to read it.**
+`inspect.yml` does the work and keeps the full list as an artifact; the summary
+is on the run.
+
 ```bash
 ./gradlew inspect
 ```
 
-It costs one indexing pass — ten to twenty minutes — which makes it a sweep gate,
-not a per-commit one. Run it after the last edit, on a still tree: editing a file
-while the inspector is reading it produces findings about a version that no
-longer exists, which reads exactly like a real defect.
+Locally it is for the one case CI cannot serve: checking a change before it is
+pushed at all, usually because it touched nullability or annotations across many
+files. It costs one indexing pass — ten to twenty minutes — so it is a sweep
+gate rather than a per-commit one, and a gate that takes twenty minutes by hand
+is a gate that gets skipped. Run it after the last edit, on a still tree:
+editing a file while the inspector is reading it produces findings about a
+version that no longer exists, which reads exactly like a real defect.
 
 It exits non-zero for eight rules and no others: `DataFlowIssue`, `ReturnNull`,
 `WrappedMethodDeclaration`, `StaticMutableState`, `HandWrittenPrivateConstructor`,
@@ -174,7 +181,7 @@ string a tester reads should have one owner; the number may go down and never up
 |---|---|
 | `build.yml` | Every push and pull request |
 | `verify.yml` | The JetBrains plugin verifier, against IntelliJ IDEA, PyCharm and Rider |
-| `inspect.yml` | Every two days |
+| `inspect.yml` | Every push to `main`, and on demand against a branch |
 | `release.yml` | On a release |
 
 ## Compatibility: `since-build`, never `until-build`

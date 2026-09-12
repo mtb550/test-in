@@ -102,7 +102,8 @@ silently does nothing costs more than the setting it was meant to hold.
   the first question about the method can be asked. No IntelliJ inspection says
   this, so `tools/inspect.ps1` does: it reports a wrapped signature as
   `WrappedMethodDeclaration` and exits non-zero for one, alongside `DataFlowIssue`
-  and `ReturnNull`. `.github/workflows/inspect.yml` runs it every two days.
+  and `ReturnNull`. `.github/workflows/inspect.yml` runs it on every push to
+  `main`.
 - `final` on parameters and locals wherever possible.
 - Nullability: org.jetbrains `@NotNull`/`@Nullable` everywhere; Lombok
   `@NonNull` only on DTO/marker fields (it generates runtime checks there).
@@ -248,10 +249,18 @@ silently does nothing costs more than the setting it was meant to hold.
   a tester can see is not finished until it has been run in a sandbox, whatever
   the build says.
 
-- **Run `./gradlew inspect` before offering a change for a sandbox test**,
-  whenever it touched nullability, annotations, or many files at once — it is a
-  sweep gate, not a per-commit one, and CONTRIBUTING.md says why. Run it after
-  the last edit, on a still tree: editing a file while the inspector is reading
-  it produces findings about a version that no longer exists, which reads
-  exactly like a real defect. Drive `DataFlowIssue` and `ReturnNull` to zero;
+- **Do not run `./gradlew inspect` by hand.** It runs in CI on every push to
+  `main` and the result is read from the run afterwards — twenty minutes of
+  indexing is not something to spend between one edit and the next, and a gate
+  somebody waits on is a gate that gets skipped. `compileJava test` is the check
+  to run while working; `ideTest` when the change reaches the indexer or the
+  tree.
+  <p>
+  Run it locally only for the case CI cannot serve: a sweep that touched
+  nullability, annotations or many files at once, before it is pushed at all.
+  Then run it after the last edit, on a still tree — editing a file while the
+  inspector is reading it produces findings about a version that no longer
+  exists, which reads exactly like a real defect.
+  <p>
+  Either way the bar is the same: `DataFlowIssue` and `ReturnNull` at zero, and
   every other survivor needs a reason written beside it.

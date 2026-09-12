@@ -1,9 +1,14 @@
-# The IDE inspections, on a schedule rather than on every push.
+# The IDE inspections, on a push to main.
 #
 # They cost a full indexing pass - fifteen to twenty minutes - which is why this
-# is not part of build.yml. Every two days is often enough that a finding is
-# still about code somebody remembers writing, and rare enough that nobody waits
-# on it.
+# is not part of build.yml and why nobody runs it by hand: a gate that takes
+# twenty minutes is one that gets skipped, and a gate that gets skipped is not a
+# gate. A push is the right moment for it - the code is finished, and nothing is
+# waiting on the answer.
+#
+# It was on a two-day schedule until 2026-09-12. A calendar runs it over code
+# nobody touched and misses the push that mattered; this runs it over exactly
+# what arrived, and the run is read afterwards rather than waited on.
 #
 # It gates on eight findings, ratchets a ninth, and lists the rest.
 #
@@ -32,18 +37,22 @@
 name: Inspect
 
 on:
-  schedule:
-    # 02:00 UTC on every odd day of the month. Cron counts days within a month
-    # rather than continuously, so a month boundary is not exactly two days:
-    # after a 31-day month it fires again the next day. That errs towards
-    # running more often and never less, which is the right way round for a gate.
-    - cron: '0 2 */2 * *'
+  push:
+    branches:
+      - main
 
-  # So it can be run against a branch on demand, without waiting for the date.
+  # So it can be run against a branch before the branch lands.
   workflow_dispatch:
 
 permissions:
   contents: read
+
+# One run per branch. Two pushes a minute apart would otherwise start two
+# twenty-minute inspections of nearly the same tree, and only the later answer
+# is about code that still exists.
+concurrency:
+  group: inspect-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   inspect:
