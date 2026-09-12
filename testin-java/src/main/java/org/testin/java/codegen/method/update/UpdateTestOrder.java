@@ -168,10 +168,16 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
     /**
      * The generated method that sits highest in the class, and null in a class
      * that holds none.
+     * <p>
+     * Asked by the case id Testin writes into the annotation, not by the
+     * annotation itself. Any {@code @Test} matched here until now, so a
+     * {@code @Test} the tester wrote by hand above the generated block was taken
+     * for the top of that block and every generated method was moved above it -
+     * a drag rewriting part of a file the tester owns (#66, finding 87).
      */
     private static @Nullable PsiMethod firstGenerated(final @NotNull PsiClass pc) {
         for (final PsiMethod pm : pc.getMethods()) {
-            if (GeneratedMethod.testAnnotationOf(pm).isPresent()) return pm;
+            if (GeneratedMethod.caseIdOf(pm).isPresent()) return pm;
         }
 
         return null;
