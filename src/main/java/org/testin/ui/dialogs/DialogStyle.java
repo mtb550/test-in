@@ -107,14 +107,25 @@ public final class DialogStyle {
         };
     }
 
-    public static @NotNull ComponentPopupBuilder createPopupBuilder(final @NotNull JComponent content, final @NotNull JComponent focusComponent, final @NotNull String title) {
+    /**
+     * UC-INTERNAL-007, Rule-INTERNAL-076.
+     *
+     * @param dismissOnClickOutside whether clicking away closes it. False for
+     *                              almost every dialog: one holding something
+     *                              the tester typed must not lose it to a
+     *                              stray click, so Escape is what cancels. True
+     *                              for the ones that hold nothing and are asked
+     *                              a question of - the search is looked at and
+     *                              left, and a tester who clicks away has
+     *                              finished with it
+     */
+    public static @NotNull ComponentPopupBuilder createPopupBuilder(final @NotNull JComponent content, final @NotNull JComponent focusComponent, final @NotNull String title, final boolean dismissOnClickOutside) {
         return JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(content, focusComponent)
                 .setTitle(title)
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
-                // A click outside never dismisses a dialog - Escape cancels.
-                .setCancelOnClickOutside(false)
+                .setCancelOnClickOutside(dismissOnClickOutside)
                 .setMovable(false)
                 .setResizable(false)
                 .setMinSize(new Dimension(JBUI.scale(350), 0));

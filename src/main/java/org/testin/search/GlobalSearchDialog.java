@@ -56,6 +56,12 @@ public final class GlobalSearchDialog extends AbstractFrameworkDialog<TextFieldW
         );
 
         preferredSize = JBUI.size(700, 460);
+
+        // Nothing is typed into this that is worth keeping: it holds a query,
+        // not an answer. A tester who clicks somewhere else has gone there
+        // instead, and the dialog should not be waiting behind it
+        // (Rule-INTERNAL-076).
+        dismissOnClickOutside = true;
     }
 
     /**

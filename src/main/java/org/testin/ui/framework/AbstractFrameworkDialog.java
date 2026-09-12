@@ -62,6 +62,24 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     protected @NotNull Dimension preferredSize = new Dimension();
 
     /**
+     * UC-INTERNAL-007, Rule-INTERNAL-076.
+     * <p>
+     * Whether clicking away closes this dialog.
+     * <p>
+     * <b>False by default, and that is the important half.</b> A dialog holding
+     * something the tester typed - a name, a commit message, a bulk edit - must
+     * not lose it to a stray click on the editor behind it; Escape cancels, and
+     * it asks first when there is something to lose.
+     * <p>
+     * True for a dialog that holds nothing and is only asked a question: the
+     * search is looked at and left, and a tester who clicks somewhere else has
+     * finished with it. Left open it sits behind whatever they clicked, and the
+     * next press of its shortcut looks to them like it did nothing (#66,
+     * finding 104).
+     */
+    protected boolean dismissOnClickOutside;
+
+    /**
      * Built on first show and kept: the declaration, the components that hold
      * the Swing state, and the popup itself. Empty until then, because a
      * subclass has not finished declaring itself while its constructor runs.
@@ -151,8 +169,31 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
         return (C) primaryComponent();
     }
 
-    // UC-INTERNAL-007, Rule-INTERNAL-061
+    /**
+     * UC-INTERNAL-007, Rule-INTERNAL-061, Rule-INTERNAL-075.
+     * <p>
+     * Puts this dialog on screen - unless one of its kind is already there, in
+     * which case that one is brought forward and this instance is dropped.
+     * <p>
+     * <b>One of a kind at a time.</b> These are popups rather than modal
+     * windows, and none of them closes on losing the focus: a click outside
+     * never dismisses a Testin dialog, Escape does. So anything that can open a
+     * dialog twice did - the global search is in the keymap, so its shortcut
+     * fires from inside the search dialog already open, and two ended up
+     * stacked (#66, finding 104).
+     * <p>
+     * Here rather than in the openers, because there is one rule and twenty-odd
+     * of them, and the next one cannot forget it.
+     */
     public final void show() {
+        final @NotNull OpenDialogs open = Services.getInstance(p, OpenDialogs.class);
+
+        final @NotNull Optional<JBPopup> already = open.shown(getClass());
+        if (already.isPresent()) {
+            already.orElseThrow().getContent().requestFocusInWindow();
+            return;
+        }
+
         // Assembled on first show: by now the subclass is fully constructed,
         // so its declaration (and its this:: references) is safe to use.
         if (popup.isEmpty()) {
@@ -162,6 +203,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
             throw new IllegalStateException("This dialog was already shown and closed - create a new instance");
         }
 
+        open.remember(getClass(), getPopup());
         getPopup().showCenteredInCurrentWindow(p);
     }
 
@@ -170,7 +212,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
         bindShortcutKeys(contentPanel);
         bindSubmitGesture();
 
-        final @NotNull ComponentPopupBuilder builder = DialogStyle.createPopupBuilder(contentPanel, focusComponent(), dto().title());
+        final @NotNull ComponentPopupBuilder builder = DialogStyle.createPopupBuilder(contentPanel, focusComponent(), dto().title(), dismissOnClickOutside);
         if (preferredSize.width > 0) {
             contentPanel.setPreferredSize(preferredSize);
             builder.setResizable(true).setMovable(true);

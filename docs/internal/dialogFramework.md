@@ -40,6 +40,13 @@ and which keys it answers, and the shell builds the rest.
   stays open with the value still in the field. An empty field is marked as the
   one holding the dialog open; a value the dialog refuses for any other reason
   is refused in one sentence naming the value.
+- **Rule-INTERNAL-075** — A dialog of a kind already on screen is brought
+  forward rather than opened again. Testin dialogs do not close when they lose
+  the focus, so nothing else would have stopped a second one.
+- **Rule-INTERNAL-076** — A dialog says whether clicking away closes it. Almost
+  none do - one holding what the tester typed must not lose it to a stray click,
+  and Escape is what cancels. The search does, because it holds a question
+  rather than an answer.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.
