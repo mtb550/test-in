@@ -76,14 +76,22 @@ public class RenameAction extends DumbAwareAction {
         final @NotNull String oldName = dir.getName();
         final @NotNull TreePanel tp = Services.getInstance(p, TreePanel.class);
 
-        NodeRename.apply(p, tp, dir, newName, () -> Services.getInstance(p, Notifier.class).softShow(p, Done.RENAMED));
+        // Both inside the callback. NodeRename.apply's onDone runs when the
+        // rename has finished and never if it failed, and the entry used to be
+        // pushed on the line after it regardless - so a tester who saw "Rename
+        // Failed" then found CTRL+Z offering Undo Rename, which renamed the node
+        // to the name it already had and reported Undone, while the operation
+        // they wanted back was one press further down (#66, finding 74).
+        NodeRename.apply(p, tp, dir, newName, () -> {
+            Services.getInstance(p, Notifier.class).softShow(p, Done.RENAMED);
 
-        // The dto reference stays valid across renames, so undo and redo are
-        // the same routine with the names swapped.
-        Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
-                Bundle.message("rename.undo", oldName),
-                () -> applyRename(p, dir, oldName),
-                () -> applyRename(p, dir, newName)));
+            // The dto reference stays valid across renames, so undo and redo are
+            // the same routine with the names swapped.
+            Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
+                    Bundle.message("rename.undo", oldName),
+                    () -> applyRename(p, dir, oldName),
+                    () -> applyRename(p, dir, newName)));
+        });
     }
 
     /**
