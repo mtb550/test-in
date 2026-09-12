@@ -1,6 +1,5 @@
 package org.testin.ui.framework;
 
-import com.intellij.ui.components.fields.ExtendableTextField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
@@ -27,7 +26,7 @@ public final class TextInput implements DialogComponent, TextValue {
     static final @NotNull String ANYTHING = ".*";
 
     private final @NotNull FrameworkTextField input;
-    private final @NotNull ExtendableTextField textField;
+    private final @NotNull JTextField textField;
 
     /**
      * @param accepts what the field is allowed to hold, as a regular expression
@@ -35,9 +34,10 @@ public final class TextInput implements DialogComponent, TextValue {
      *                a field that means a number, a version or an id cannot be
      *                made to hold anything else - there is nothing to validate
      *                on submit and nothing to explain afterward
+     * @param secret  whether what the tester types is shown as dots
      */
-    TextInput(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull String initialValue, final @NotNull String accepts) {
-        input = new FrameworkTextField(icon, placeHolderText, initialValue);
+    TextInput(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull String initialValue, final @NotNull String accepts, final boolean secret) {
+        input = new FrameworkTextField(icon, placeHolderText, initialValue, secret);
         textField = input.component();
 
         if (!ANYTHING.equals(accepts)) accept(Pattern.compile(accepts));

@@ -41,6 +41,9 @@ There is no key for this. The menu entry is **Sync With SFTP**.
   for it.
 - **Rule-SHARE-091** — Testin reads the test project again itself after a sync,
   because it ignores its own writes.
+- **Rule-SHARE-111** — The password box shows dots rather than the characters
+  typed into it. A tester on a shared screen, a projector or a recorded session
+  never shows their server password.
 
 ## The screen
 
@@ -68,8 +71,9 @@ The account is asked for when this machine cannot prove who it is.
    than the usual one is shown too.
 2. **The account box** — filled with the stored account, or with this machine's
    own user name.
-3. **The password box** — always empty when the window opens. An empty
-   password is a real answer. It means a key will prove who this is.
+3. **The password box** — always empty when the window opens. What the tester
+   types into it is shown as dots. An empty password is a real answer. It means
+   a key will prove who this is.
 
 ## Main flow
 

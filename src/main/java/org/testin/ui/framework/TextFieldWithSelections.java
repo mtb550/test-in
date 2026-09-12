@@ -9,11 +9,9 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.ListValue;
 
 import javax.swing.*;
@@ -48,7 +46,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
     private static final int DEBOUNCE_MILLIS = 300;
 
     private final @NotNull FrameworkTextField input;
-    private final @NotNull ExtendableTextField textField;
+    private final @NotNull JTextField textField;
     private final @NotNull CollectionListModel<SelectionList<T>> rowModel = new CollectionListModel<>();
     private final @NotNull JBList<SelectionList<T>> list;
     private final @NotNull JBPanel<?> panel;
@@ -69,7 +67,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
 
     TextFieldWithSelections(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull List<SelectionList<T>> shownBeforeAsking, final @NotNull Rows<T> rows, final int visibleRows) {
         this.rows = rows;
-        input = new FrameworkTextField(icon, placeHolderText, "");
+        input = new FrameworkTextField(icon, placeHolderText, "", false);
         textField = input.component();
 
         list = new JBList<>(rowModel);
@@ -264,7 +262,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
         // setExtensions does not refresh the field on its own; without this
         // the icon goes stale when the selection moves by keyboard.
         ListValue.selected(list).ifPresent(selected -> {
-            DialogStyle.setLeadingIcon(textField, selected.icon());
+            input.setLeadingIcon(selected.icon());
             textField.revalidate();
             textField.repaint();
         });
