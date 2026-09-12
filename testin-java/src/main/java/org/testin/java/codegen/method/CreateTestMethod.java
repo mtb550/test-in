@@ -381,11 +381,35 @@ public class CreateTestMethod implements GenAction {
         final @NotNull Optional<PsiClass> existing = Optional.ofNullable(psiFacade.findClass(path, scope));
         if (existing.isPresent()) return existing;
 
-        JavaSourceRoot.inRootOrWarn(p, "creating the class for " + className,
-                root -> JavaSourceRoot.classFile(root, packageList, className));
+        JavaSourceRoot.fileInRootOrWarn(p, "creating the class for " + className,
+                root -> JavaSourceRoot.classFile(root, packageList, className)).ifPresent(written -> commit(p, written));
 
-        PsiDocumentManager.getInstance(p).commitAllDocuments();
         return Optional.ofNullable(psiFacade.findClass(path, scope));
+    }
+
+    /**
+     * UC-CODEGEN-002, Rule-CODEGEN-011.
+     * <p>
+     * The file that was just written, given to the PSI so the class in it can be
+     * found on the next line.
+     * <p>
+     * <b>One document, not every document.</b> This was
+     * {@code commitAllDocuments()}, which flushes every open document in the
+     * project - so generating a method while the tester had six files open paid
+     * for all six, and the file it was actually waiting on was the one it could
+     * not name: {@code inRootOrWarn} answered nothing, so the file it had just
+     * created was not reachable from here (#66, finding 22).
+     * <p>
+     * Nothing to commit is an answer, not a failure. A file created through the
+     * virtual file system has no document loaded against it until something
+     * opens one, and the PSI reads it either way.
+     */
+    private static void commit(final @NotNull Project p, final @NotNull VirtualFile written) {
+        final @NotNull PsiDocumentManager documents = PsiDocumentManager.getInstance(p);
+
+        Optional.ofNullable(PsiManager.getInstance(p).findFile(written))
+                .map(documents::getDocument)
+                .ifPresent(documents::commitDocument);
     }
 
     private void retryInjectPhysically(final @NotNull Project p, final @NotNull List<String> packageList, final @NotNull String className, final @NotNull String methodName, final @NotNull TestCaseDto tc) {

@@ -56,6 +56,21 @@ public final class JavaSourceRoot {
     }
 
     /**
+     * The same, for work that makes a file and whose caller needs the file it
+     * made.
+     * <p>
+     * {@link RootWork} answers nothing, so what it created was reachable only by
+     * looking it up again - which is why writing a class ended in
+     * {@code commitAllDocuments()}, a flush of every open document in the
+     * project standing in for the one document that had just been written (#66,
+     * finding 22).
+     */
+    @FunctionalInterface
+    public interface RootFile {
+        @NotNull Optional<VirtualFile> from(final @NotNull VirtualFile root) throws IOException;
+    }
+
+    /**
      * UC-CODEGEN-020, Rule-CODEGEN-064, Rule-CODEGEN-066.
      * <p>
      * Detected once and cached; the modules are scanned again only if the cached
@@ -241,8 +256,28 @@ public final class JavaSourceRoot {
      * The same, and tells the tester when there is no root - see
      * {@link #findOrWarn}.
      */
-    public static void inRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
+    private static void inRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
         run(findOrWarn(p, whatFailed), whatFailed, work);
+    }
+
+    /**
+     * UC-CODEGEN-020, Rule-CODEGEN-064.
+     * <p>
+     * Runs work that makes a file and answers with the file, empty when there
+     * was no root, when the work made nothing, or when it failed - the same
+     * three ways its void sibling stays silent, said in a value the caller can
+     * read.
+     */
+    public static @NotNull Optional<VirtualFile> fileInRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootFile work) {
+        final @NotNull Optional<VirtualFile> root = findOrWarn(p, whatFailed);
+        if (root.isEmpty()) return Optional.empty();
+
+        try {
+            return work.from(root.orElseThrow());
+        } catch (final IOException ex) {
+            Logger.info("Error " + whatFailed + ": " + ex.getMessage());
+            return Optional.empty();
+        }
     }
 
     private static void run(final @NotNull Optional<VirtualFile> root, final @NotNull String whatFailed, final @NotNull RootWork work) {
