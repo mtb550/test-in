@@ -31,6 +31,7 @@ import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.StatusBarItem;
 import org.testin.testcase.CreateTestCaseFields;
@@ -100,15 +101,55 @@ public abstract class TestCaseBaseDialog {
     }
 
     /**
-     * Re-measures the popup around a section that just grew or shrank, and
-     * scrolls whatever holds focus back into view.
+     * What a component would ask for if nobody had told it a size.
+     * <p>
+     * A resizable popup writes an explicit preferred size onto its content -
+     * that is how it remembers a width the tester dragged - and an explicit one
+     * is what {@code getPreferredSize} then answers with, forever. Asking the
+     * layout instead is what the platform's own pack does, and it is the whole
+     * reason a dialog that had been sized once never grew again.
+     * <p>
+     * The explicit size is put back, because it is the tester's.
+     */
+    private static int naturalHeightOf(final @NotNull JComponent content) {
+        final @NotNull Optional<Dimension> told = content.isPreferredSizeSet()
+                ? Optional.of(content.getPreferredSize())
+                : Optional.empty();
+
+        content.setPreferredSize(null);
+        final int natural = content.getPreferredSize().height;
+        told.ifPresent(content::setPreferredSize);
+
+        return natural;
+    }
+
+    /**
+     * Re-sizes the popup around a section that just grew or shrank, and scrolls
+     * whatever holds focus back into view.
      * <p>
      * Does nothing before the popup exists: a section's fillData can fire this
      * while the dialog is still being built.
      */
     protected final void repack() {
         popup.ifPresent(open -> {
-            open.pack(false, true);
+            // The height is set rather than packed.
+            //
+            // pack() asks the popup to work the size out again, and on a
+            // resizable popup it does not: the create dialog grew by exactly
+            // nothing while the log showed it being re-packed to 61, 90, 119,
+            // 148. The update dialog, which is built not resizable, grew every
+            // time - the only difference between the two builders. A tester
+            // dragging the dialog taller then saw the line that had been added
+            // several keystrokes earlier.
+            //
+            // Nothing is being worked around: the height wanted is already
+            // known here - the section measured it and that is why this was
+            // called - so it is said rather than asked for. The width is left
+            // exactly as it is, including a width the tester chose themselves.
+            final int wanted = naturalHeightOf(open.getContent());
+            Logger.debug("Resizing the dialog: " + open.getSize().height + " -> " + wanted);
+
+            open.setSize(new Dimension(open.getSize().width, wanted));
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 final @NotNull Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
