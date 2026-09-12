@@ -764,35 +764,72 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
      * <p>
      * The two hooks are what each editor holds of its own - a run editor stops
      * the walk it was on and writes the run before any of this happens.
+     * <p>
+     * <b>Steps rather than statements</b>, because a tab can close while the
+     * project is closing and the two that ask the service container throw
+     * exactly then. As one run of statements the first throw skipped every line
+     * after it - the TestNG process this editor launched left running, its
+     * verdicts written into no run, the subscriptions never released and a live
+     * Swing timer never stopped (#66, finding 70).
      */
     @Override
     public void dispose() {
-        beforeDispose();
+        teardown(
+                this::beforeDispose,
 
-        // Releases the message-bus subscriptions (font sync) registered against
-        // this editor's lifetime.
-        Disposer.dispose(projectDisposable);
+                // Releases the message-bus subscriptions (font sync) registered
+                // against this editor's lifetime.
+                () -> Disposer.dispose(projectDisposable),
 
-        for (final MouseListener listener : list.getMouseListeners())
-            list.removeMouseListener(listener);
+                this::stopListening,
+                toolBar::dispose,
 
-        toolBar.dispose();
+                // The tab is closing, so what CTRL+Z could take back in it
+                // closes with it - and the copies those operations were holding
+                // aside are released rather than kept for the life of the
+                // project (#66, finding 45).
+                () -> Services.getInstance(p, UndoHistories.class).forget(UndoScope.of(parent.getPath())),
 
-        // The tab is closing, so what CTRL+Z could take back in it closes with
-        // it - and the copies those operations were holding aside are released
-        // rather than kept for the life of the project (#66, finding 45).
-        Services.getInstance(p, UndoHistories.class).forget(UndoScope.of(parent.getPath()));
+                allTestCases::clear,
+                currentTestCases::clear,
+                this::disposeLoadedData,
 
-        allTestCases.clear();
-        currentTestCases.clear();
-        disposeLoadedData();
+                model::removeAll,
+                mainPanel::removeAll,
 
-        model.removeAll();
-        mainPanel.removeAll();
-
-        TestinEditor.super.dispose();
+                TestinEditor.super::dispose);
 
         Logger.debug("dispose " + getClass().getSimpleName() + ": " + parent.getName() + " - " + parent.getPath());
+    }
+
+    /**
+     * Runs every step, whatever the one before it did.
+     * <p>
+     * A teardown is a list of independent releases, and the caller that started
+     * it is the platform closing a tab - there is nobody above to retry or to
+     * report to, so a step that fails is written down and the next one runs. The
+     * alternative is the one this replaced: the first failure keeps everything
+     * after it, which is the opposite of what a dispose is for.
+     * <p>
+     * Protected because the run editor tears down in steps of its own, for the
+     * same reason (#66, finding 70).
+     */
+    protected final void teardown(final @NotNull Runnable... steps) {
+        for (final Runnable step : steps) {
+            try {
+                step.run();
+            } catch (final Exception ex) {
+                Logger.warn("Teardown step failed in " + getClass().getSimpleName() + ", the rest still ran: " + ex);
+            }
+        }
+    }
+
+    /**
+     * The listeners this editor put on the list, taken off again.
+     */
+    private void stopListening() {
+        for (final MouseListener listener : list.getMouseListeners())
+            list.removeMouseListener(listener);
     }
 
     /**

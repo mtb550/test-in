@@ -230,29 +230,35 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
      */
     @Override
     protected void beforeDispose() {
-        // The light mode window reads this editor every time it draws, so it
-        // must not outlive it. Here rather than a Disposer child registered on
-        // this editor, which never ran - this dispose is called directly rather
-        // than through the Disposer - and which quietly adopted the editor under
-        // the application root, where nothing removed it and the IDE reported it
-        // as a leak on every quit (#292).
-        Services.getInstance(p, LightMode.class).editorClosing(parent);
+        teardown(
+                // The light mode window reads this editor every time it draws,
+                // so it must not outlive it. Here rather than a Disposer child
+                // registered on this editor, which never ran - this dispose is
+                // called directly rather than through the Disposer - and which
+                // quietly adopted the editor under the application root, where
+                // nothing removed it and the IDE reported it as a leak on every
+                // quit (#292).
+                () -> Services.getInstance(p, LightMode.class).editorClosing(parent),
 
-        // The guard is inside the try, not around it: isExecuting() asks the
-        // service container for TestNGExecution, and during a project close that
-        // is exactly the call that throws. Outside, it threw past the catch and
-        // skipped every teardown line below.
-        try {
-            if (isExecuting()) {
-                stopAutomation();
-                stopExecution();
-                Services.getInstance(p, RunStatusService.class).persistRun(p, this);
-            }
-        } catch (final Exception ex) {
-            Logger.warn("Run not persisted on editor close: " + ex.getMessage());
-        }
+                this::stopAndWriteTheRunDown,
+                executionTimer::dispose);
+    }
 
-        executionTimer.dispose();
+    /**
+     * The walk this editor was on, stopped and written down.
+     * <p>
+     * Its own step, because it is the one that can fail: {@code isExecuting()}
+     * asks the service container for {@code TestNGExecution}, and during a
+     * project close that is exactly the call that throws. Beside the others as
+     * plain statements it took the timer and the light mode window with it
+     * (#66, finding 70).
+     */
+    private void stopAndWriteTheRunDown() {
+        if (!isExecuting()) return;
+
+        stopAutomation();
+        stopExecution();
+        Services.getInstance(p, RunStatusService.class).persistRun(p, this);
     }
 
     @Override
