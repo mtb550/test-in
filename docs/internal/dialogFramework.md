@@ -47,6 +47,10 @@ and which keys it answers, and the shell builds the rest.
   none do - one holding what the tester typed must not lose it to a stray click,
   and Escape is what cancels. The search does, because it holds a question
   rather than an answer.
+- **Rule-INTERNAL-077** — Every icon a framework surface draws is gray. A stock
+  platform icon may ship colored, and one colored glyph among gray ones is the
+  loudest thing on the row. A color that means something - an error, a verdict -
+  is not an icon that names a thing and is drawn as it is.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

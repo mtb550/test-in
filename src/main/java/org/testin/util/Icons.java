@@ -38,14 +38,31 @@ public final class Icons {
      * same picture, and of the two it is the Java class that has the better
      * claim to it.
      * <p>
-     * <b>Drawn gray.</b> {@code Nodes.Type} ships blue - a {@code #3574F0} ring
-     * and stem over a pale fill - and Testin's own surfaces are gray: a single
-     * colored glyph in a list of gray ones is the loudest thing on the row, and
-     * the row is for reading the test case. Desaturated by the platform rather
-     * than by a second copy of the file, so it follows the icon if JetBrains
-     * redraws it.
+     * <b>Drawn gray</b>, like everything else - see {@link #gray}.
      */
-    public static final @NotNull Icon TEST_CASE = IconUtil.desaturate(AllIcons.Nodes.Type);
+    public static final @NotNull Icon TEST_CASE = gray(AllIcons.Nodes.Type);
+
+    /**
+     * UC-INTERNAL-007, Rule-INTERNAL-077.
+     * <p>
+     * The same icon with the color taken out of it.
+     * <p>
+     * <b>Testin's surfaces are gray.</b> A plugin draws stock platform icons,
+     * and a handful of them ship colored - {@code Nodes.Type} is a
+     * {@code #3574F0} ring and stem over a pale blue fill. One colored glyph in
+     * a list of gray ones is the loudest thing on the row, and the row is for
+     * reading what it says rather than for looking at its icon.
+     * <p>
+     * Desaturated through the platform rather than by keeping a second copy of
+     * the file, so it follows the icon if JetBrains redraws it.
+     * <p>
+     * <b>Not for a color that means something.</b> An error is red and a passed
+     * test is green because the color is the fact, not decoration - those are
+     * drawn as they are. This is for an icon that names a thing.
+     */
+    public static @NotNull Icon gray(final @NotNull Icon icon) {
+        return IconUtil.desaturate(icon);
+    }
 
     private static final float SCALE_FACTOR = 1.3f;
     private static final int DOT_SIZE = 10;

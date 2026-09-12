@@ -12,6 +12,7 @@ import com.intellij.util.ui.NamedColorUtil;
 import com.intellij.util.ui.JBFont;
 import com.intellij.ui.TextIcon;
 import com.intellij.util.ui.UIUtil;
+import org.testin.util.Icons;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -71,10 +72,15 @@ public final class DialogStyle {
     }
 
     private static @NotNull ExtendableTextComponent.Extension leading(final @NotNull Icon icon) {
+        // UC-INTERNAL-007, Rule-INTERNAL-077. Grayed once, here, because this is
+        // where the framework draws a field's icon - and it follows the list's
+        // selection, so it has to match the rows it is following.
+        final @NotNull Icon quiet = Icons.gray(icon);
+
         return new ExtendableTextComponent.Extension() {
             @Override
             public @NotNull Icon getIcon(final boolean hovered) {
-                return icon;
+                return quiet;
             }
 
             @Override
