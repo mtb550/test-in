@@ -260,7 +260,6 @@ bug report yet.
 | **Difference 6** | Rule-EDITOR-PANEL-008 — one message with a count | Fixed. Pasting or cutting a block raises one message with the number of cells written. The writes of one gesture all happen in one event, so they are counted together without the clipboard actions having to know about it. |
 | **Difference 7** | Rule-EDITOR-PANEL-005 — what the tester typed is stored | A description typed into a grid cell loses characters Testin will not keep. If nothing else changed, nothing is saved and nothing is said, and the tester watches their text change. |
 | **Difference 9** | Rule-EDITOR-PANEL-005 — a key works the same on every machine | `Ctrl+M` is not made into `Cmd+M` on a Mac, though `Ctrl+C` and `Ctrl+F` are. The empty editor's second line reads *Press Ctrl+M to add* whatever machine it is on. |
-| **Difference 15** | Rule-EDITOR-PANEL-008 — one word for one act | Dragging cards says *Re-sorted*. Moving a test case by typing its number says *Updated*. The same act, two words. |
 
 ## Where the plugin breaks its own rules, executing a test run
 
@@ -287,6 +286,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 28** | Closing the tab left the automation running and its verdicts homeless. Fixed 7 September 2026, [#222](https://github.com/mtb550/test-in/issues/222) |
 | **Difference 29** | `Escape` in the failure dialog threw away everything typed with no confirmation. Fixed 7 September 2026, [#223](https://github.com/mtb550/test-in/issues/223) |
 | **Difference 2** | **Test Data** and **Pre Conditions** were drawn in the create dialog with no key that opened either. Fixed 8 September 2026, [#198](https://github.com/mtb550/test-in/issues/198) |
+| **Difference 15** | Dragging cards said *Re-sorted* and moving a test case by typing its number said *Updated* - the same act, two words. Reordering says *Re-sorted* whichever way it was done. Fixed 9 September 2026, [#210](https://github.com/mtb550/test-in/issues/210) |
 | **Difference 16** | `Shift+Enter` saved a bulk edit and the strip named only `Enter`. Fixed 9 September 2026, [#211](https://github.com/mtb550/test-in/issues/211) |
 | **Difference 3** | The group tick boxes read **REGRESSION** where every other surface reads **Regression**, because the box's own text was the group's identity. Fixed 9 September 2026, [#199](https://github.com/mtb550/test-in/issues/199) |
 | **Difference 5** | Two buttons on one toolbar were both tooltipped **Details**. The one that picks what a card shows is **Fields**, which is what this document already called it. Fixed 9 September 2026, [#201](https://github.com/mtb550/test-in/issues/201) |

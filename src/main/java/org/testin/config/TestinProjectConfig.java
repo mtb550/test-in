@@ -227,10 +227,6 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
     }
 
     /**
-     * Whether the test project can be fetched when this machine does not have it
-     * yet.
-     */
-    /**
      * UC-TREE-PANEL-001.
      * <p>
      * The file is there and could not be read - see {@link #UNREADABLE}.
@@ -243,6 +239,10 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
         return this == UNREADABLE;
     }
 
+    /**
+     * Whether the test project can be fetched when this machine does not have it
+     * yet.
+     */
     public boolean hasRepoUrl() {
         return connection == ConnectionType.GIT && !repoUrl.isEmpty();
     }

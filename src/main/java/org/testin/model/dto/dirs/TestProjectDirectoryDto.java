@@ -23,8 +23,6 @@ public class TestProjectDirectoryDto extends DirectoryDto {
     @Builder.Default
     private TestRunsMainDirectoryDto testRunsDirectory = new TestRunsMainDirectoryDto();
 
-    @NotNull
-    private String pathName;
 
     @NotNull
     @Builder.Default

@@ -1,4 +1,4 @@
-package org.testin.services;
+package org.testin.testrun;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
@@ -20,6 +20,7 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;

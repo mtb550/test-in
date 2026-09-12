@@ -3,16 +3,9 @@ package org.testin.codegen;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.testin.actions.TestinData;
 
-import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
-import org.testin.services.Services;
 import org.testin.util.Bundle;
 
 
@@ -32,25 +25,19 @@ public class AutomateTestCaseAction extends DumbAwareAction {
      */
     private static final @NotNull String NOT_BUILT = Bundle.message("automate.not.built.text");
 
-    // UC-CODEGEN-005, Rule-CODEGEN-025, Rule-CODEGEN-071
+    /**
+     * UC-CODEGEN-005, Rule-CODEGEN-025, Rule-CODEGEN-071.
+     * <p>
+     * Nothing, and nothing can reach it: {@link #update} ends disabled on every
+     * path, so neither the menu entry nor the shortcut invokes this. The entry
+     * says why it is gray, which is the whole of what this action does today.
+     * <p>
+     * It held a refusal balloon saying "not built yet", which no tester could
+     * ever have read - a sentence to keep right forever for no reader. The work
+     * goes here when #243 builds it and enables the entry.
+     */
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        // update() disables the action on an empty selection, but the shortcut
-        // and the selection can race, so Swing can still answer with nothing.
-        //
-        // Generating the code is #243, which also decides whether this entry
-        // stays on the menu until it is built.
-        TestinData.selectedCases(e).stream().findFirst().ifPresent(tc -> Logger.info(tc.getDescription()));
-
-        // Says so until then. This is the one action in the menu that changes
-        // nothing, and silence here reads as a bug rather than as unbuilt: after
-        // #62 every other action confirms itself, so the odd one out is the one
-        // that answers with nothing at all (#66, F4).
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
-        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("automate.not.built.title"),
-                Bundle.message("automate.not.built.message"));
     }
 
     /**

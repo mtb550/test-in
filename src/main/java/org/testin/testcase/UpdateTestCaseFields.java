@@ -124,15 +124,6 @@ public enum UpdateTestCaseFields implements MenuItem {
     ),
 
     /**
-     * The one field with no bulk form. A position is a place between two other
-     * cases, and "move these eight to third" has no single meaning - so the
-     * bulk action says so rather than guessing, which is the same answer the
-     * tester would get from dragging eight cards onto one row.
-     * <p>
-     * Also the one field the create dialog does not offer: see
-     * {@link org.testin.testcase.create.OrderSection}.
-     */
-    /**
      * UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194.
      * <p>
      * Where the case is in its own life, which is the one field here that no key
@@ -150,6 +141,15 @@ public enum UpdateTestCaseFields implements MenuItem {
             new TestCaseDialogKey[]{}
     ),
 
+    /**
+     * The one field with no bulk form. A position is a place between two other
+     * cases, and "move these eight to third" has no single meaning - so the
+     * bulk action says so rather than guessing, which is the same answer the
+     * tester would get from dragging eight cards onto one row.
+     * <p>
+     * Also the one field the create dialog does not offer: see
+     * {@link org.testin.testcase.create.OrderSection}.
+     */
     ORDER(
             TestEditorAttributes.ORDER.getName(),
             Shortcuts.UpdateTestCaseOrder,

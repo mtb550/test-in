@@ -4,6 +4,7 @@ import org.testin.model.DirectoryType;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ProjectStatus;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.AbstractFrameworkDialog;
@@ -98,7 +99,12 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
 
         // Announced after the file is written, not before: what the panel draws is
         // read back from the file, so it can only be right once the file says so.
-        Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("notification.bound"), name);
+        //
+        // The outcome and nothing else. It was the name under it as well, which
+        // is the one noun left in a confirmation anywhere in the plugin - and the
+        // tester chose that name from the list they are looking at, and the tree
+        // behind the balloon has already reloaded onto it (#66, finding 94).
+        Services.getInstance(p, Notifier.class).softShow(p, Done.BOUND);
         onBound.run();
     }
 }

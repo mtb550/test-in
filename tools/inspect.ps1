@@ -23,11 +23,13 @@
     Costs one full indexing pass, so expect 10-20 minutes. A deliberate sweep, not
     a per-commit gate - .github/workflows/inspect.yml runs it every two days.
 
-    Exits non-zero for three findings and no others: DataFlowIssue, ReturnNull and
-    WrappedMethodDeclaration. The first two are the standing rule, a null contract
-    the checker can prove is broken. The third is this script's own check - a
-    method declaration belongs on one line, which no IntelliJ inspection says.
-    Everything else is listed for a person to judge.
+    Exits non-zero for seven findings and no others. Two are the inspector's and
+    are the standing rule, a null contract the checker can prove is broken:
+    DataFlowIssue and ReturnNull. Five are this script's own, each a rule no
+    IntelliJ inspection makes: WrappedMethodDeclaration, StaticMutableState,
+    HandWrittenPrivateConstructor, DriftedCaption and OrphanedJavadoc. The list
+    is written once, in $gate at the foot of this file. Everything else is
+    listed for a person to judge.
 
 .EXAMPLE
     pwsh tools/inspect.ps1
@@ -702,6 +704,64 @@ function Read-WrappedDeclarations([string] $scope) {
     }
 }
 
+function Read-OrphanedJavadoc([string[]] $scopes) {
+    <#
+        A javadoc block the compiler throws away.
+
+        Java keeps only the last doc comment before a declaration, so a block
+        followed by another block documents nothing, and the member the first
+        one was written for is left bare. Twenty were found on 12 September
+        2026 and eight of them carried a rule marker - so a grep from the
+        documentation landed on the wrong method, and the method that carries
+        the rule cited nothing (#66, finding 76).
+
+        Mechanically checkable, which is what makes it worth a rule rather than
+        a sweep: the shape is exact. A block whose next line that is neither
+        blank nor an annotation of its own opens another block.
+
+        "Of its own" is the whole subtlety. An annotation on a line by itself
+        is skipped and one carrying a declaration after it is not - "@NotNull
+        String cardTitle(..)" is the member, and reading that as an annotation
+        made every documented method of every interface in the tree look
+        orphaned.
+
+        One file is frozen by name, the way ArchitectureTest freezes a known
+        violation: TestRunDto's block separates a @JsonIgnore from the method
+        it was written for, which is a data bug rather than a documentation
+        one - the derived field reaches every run file a tester commits. It is
+        #73's, and deleting that name is how that story closes.
+    #>
+    $frozen = @('src/main/java/org/testin/model/dto/TestRunDto.java')
+
+    foreach ($scope in $scopes) {
+        if (-not (Test-Path $scope)) { continue }
+
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+            $path = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+            if ($frozen -contains $path) { continue }
+
+            $lines = [System.IO.File]::ReadAllLines($file.FullName)
+
+            for ($i = 0; $i -lt $lines.Count; $i++) {
+                if ($lines[$i].Trim() -notmatch '\*/$') { continue }
+
+                $j = $i + 1
+                while ($j -lt $lines.Count -and ($lines[$j].Trim() -eq '' -or $lines[$j].Trim() -match '^@[A-Za-z_][\w.]*(\(.*\))?$')) { $j++ }
+
+                if ($j -ge $lines.Count -or $lines[$j].Trim() -notmatch '^/\*\*') { continue }
+
+                [pscustomobject]@{
+                    Path       = $path
+                    Line       = $i + 1
+                    Inspection = 'OrphanedJavadoc'
+                    Severity   = 'ERROR'
+                    Message    = "A second block opens at line $($j + 1), so javac keeps that one and this documents nothing."
+                }
+            }
+        }
+    }
+}
+
 function Write-Reports([object[]] $problems, [string] $outPath) {
     # A project model that did not resolve floods the output with unresolved
     # symbols and every other count becomes meaningless. Say so rather than
@@ -766,9 +826,11 @@ foreach ($scope in $scopes) { $problems += @(Read-WrappedDeclarations $scope) }
 
 # The design checks, which no IntelliJ inspection makes: a string a tester reads
 # written in two places, a static that is not final in the packages that model
-# the data, and an empty private constructor where the annotation says it better.
+# the data, an empty private constructor where the annotation says it better,
+# and a javadoc block followed by a second one, which javac throws away.
 $problems += @(Read-DuplicatedDisplayStrings $scopes)
 $problems += @(Read-HandWrittenPrivateConstructors $scopes)
+$problems += @(Read-OrphanedJavadoc $scopes)
 $problems += @(Read-ModelStatics @((Join-Path $repo 'src/main/java/org/testin/model')))
 
 # The enums that name a test case's fields, compared against each other. Same
@@ -787,18 +849,18 @@ Write-Reports $problems $outPath
 # this says what already exists, which is what stops the next duplicate.
 Write-DisplayStringInventory $scopes $outPath
 
-# The three that are not allowed to survive a sweep. The first two are the
-# project's standing rule - a null contract the checker can prove is broken is a
-# defect, not a style note. The third is the one-line signature.
+# What is not allowed to survive a sweep. The first two are the project's
+# standing rule - a null contract the checker can prove is broken is a defect,
+# not a style note. The rest are this script's own rules, and every one of them
+# is at zero, so each gates outright: the first that appears is the one to look
+# at.
 #
 # Everything else the inspector reports is a judgement call and needs a person,
-# so it is listed and not gated: this exits non-zero for these three only, which
-# is what lets the scheduled run in .github/workflows/inspect.yml mean something.
-# StaticMutableState and HandWrittenPrivateConstructor are both at zero, so
-# they gate outright - the first one that appears is the one to look at.
+# so it is listed and not gated: this exits non-zero for these only, which is
+# what lets the scheduled run in .github/workflows/inspect.yml mean something.
 # DuplicatedDisplayString is not here: there were 136 when the check was
 # written, and it is ratcheted below instead.
-$gate = @('DataFlowIssue', 'ReturnNull', 'WrappedMethodDeclaration', 'StaticMutableState', 'HandWrittenPrivateConstructor', 'DriftedCaption')
+$gate = @('DataFlowIssue', 'ReturnNull', 'WrappedMethodDeclaration', 'StaticMutableState', 'HandWrittenPrivateConstructor', 'DriftedCaption', 'OrphanedJavadoc')
 $breaches = @($problems | Where-Object { $gate -contains $_.Inspection })
 
 if ($breaches) {

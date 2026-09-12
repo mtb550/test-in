@@ -43,13 +43,6 @@ public record Baseline(@NotNull Map<String, String> contents) {
     }
 
     /**
-     * What that file held at the last transfer, and empty when it held nothing -
-     * because it was new here, new there, or never transferred at all.
-     * <p>
-     * Empty is the honest ancestor for a file with no history: a three-way merge
-     * given an empty base treats both sides as additions, which is what they are.
-     */
-    /**
      * UC-SHARE-022, Rule-SHARE-100.
      * <p>
      * The same baseline without these paths, so the next sync reads them as
@@ -71,6 +64,13 @@ public record Baseline(@NotNull Map<String, String> contents) {
         return new Baseline(left);
     }
 
+    /**
+     * What that file held at the last transfer, and empty when it held nothing -
+     * because it was new here, new there, or never transferred at all.
+     * <p>
+     * Empty is the honest ancestor for a file with no history: a three-way merge
+     * given an empty base treats both sides as additions, which is what they are.
+     */
     public @NotNull String at(final @NotNull String path) {
         return contents.getOrDefault(path, "");
     }

@@ -95,13 +95,6 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
     }
 
     /**
-     * The field as the tester knows it, from the enum that already names every
-     * test case field for the editor, the details panel and the importer. A
-     * field that enum does not carry keeps its own name rather than being
-     * dropped - the merge works on the file, which may hold more than the model
-     * does.
-     */
-    /**
      * UC-SHARE-017, Rule-SHARE-109.
      * <p>
      * What the merge decided without asking, named.
@@ -119,6 +112,13 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
                 : Bundle.message("dialog.conflict.settled.many", Display.andJoin(named));
     }
 
+    /**
+     * The field as the tester knows it, from the enum that already names every
+     * test case field for the editor, the details panel and the importer. A
+     * field that enum does not carry keeps its own name rather than being
+     * dropped - the merge works on the file, which may hold more than the model
+     * does.
+     */
     private static @NotNull String label(final @NotNull String jsonField) {
         final @NotNull String constant = jsonField.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toUpperCase(Locale.ROOT);
 

@@ -324,8 +324,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         /**
          * UC-SHARE-013.
          *
-         * @param committedOn the branch the commit went onto, or null when Git could
-         *                    not say which one that was. A push follows the commit
+         * @param committedOn the branch the commit went onto, and blank when Git
+         *                    could not say which one that was. A push follows the commit
          *                    rather than the remote's default: they are the same
          *                    branch on almost every push, and on the one that
          *                    matters - a cycle committed onto its own branch - the

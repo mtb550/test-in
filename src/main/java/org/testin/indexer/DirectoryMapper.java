@@ -40,7 +40,6 @@ public final class DirectoryMapper {
         final @NotNull TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
                 .name(fileName)
                 .path(path)
-                .pathName(fileName)
                 .path2(DirectoryDto.pathOf(List.of(), fileName))
                 .build();
 
@@ -59,7 +58,6 @@ public final class DirectoryMapper {
             final @NotNull TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
                     .name(fileName)
                     .path(path)
-                    .pathName(fileName)
                     .path2(DirectoryDto.pathOf(List.of(), fileName))
                     .marker(marker)
                     .build();

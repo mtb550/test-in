@@ -38,9 +38,26 @@ public final class ViewPanelHolder {
     /**
      * Forgets the panel, if the one closing is still the one held.
      * <p>
-     * Checked rather than cleared outright: a tool window that is closed and
-     * reopened builds the new panel before disposing the old one, and clearing
-     * outright then threw the live panel away.
+     * <b>Which today means at project close and nowhere else.</b> A panel
+     * registers itself on the project, so the project is what disposes it, and
+     * by then nothing is going to ask for it again. The check is cheap
+     * insurance rather than a live case: it is here so that a panel disposed
+     * while a newer one is held cannot throw the newer one away.
+     * <p>
+     * <b>Why the project and not the tool window's Content.</b> Registering on
+     * the Content would tie the panel to what builds it, which is the shape that
+     * would make this method matter - but the view tool window has three
+     * Contents, one per tab, and they all draw scroll panes of the same panel.
+     * There is no single Content to be its owner, and picking one of three is a
+     * lifetime decided by which tab happens to close first. So the project owns
+     * it, the way the tree panel is owned by the project rather than by the
+     * content that shows it (#66, finding 78).
+     * <p>
+     * The cost is a panel that outlives its tool window if the platform ever
+     * builds the content twice: the old one keeps its font subscriptions and its
+     * execution subscriber, refreshing tabs nobody can see. Nothing in the
+     * plugin causes that today, and the fix for it is a single owner for the
+     * three Contents rather than a second Disposer parent here.
      */
     void release(final @NotNull ViewPanel closing) {
         if (panel.filter(held -> held == closing).isPresent()) panel = Optional.empty();

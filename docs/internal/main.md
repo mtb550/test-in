@@ -106,10 +106,9 @@ bug report yet.
 | **Difference 5** | Rule-INTERNAL-019 — Testin ignores its own writes for five seconds | Fixed. The five seconds still bound how long a claim is kept, but what decides is whether the file still says what Testin wrote (Rule-INTERNAL-064). A hand edit changes the content, so it is read again whenever it arrives. A write still in flight, and a delete or a rename, have no content to compare and keep the window as their whole answer. |
 | **Difference 6** | Rule-INTERNAL-053 — every dialog has the same three parts | Twenty-three dialogs are built on the shell and six are not: the test case create and update dialogs, light mode's zoom indicator and the shortcut menu. They behave the same way by hand, so each is a copy that can drift. [#69](https://github.com/mtb550/test-in/issues/69) |
 
-A sixth belongs to the tree panel and is written there. A removal whose copy
-could not be kept aside still happens, is not undoable, and says nothing. That
-is difference 15 on
-[the tree panel page](../treePanel/main.md#where-the-plugin-breaks-its-own-rules).
+A sixth belonged to the tree panel and is dealt with. A removal whose copy could
+not be kept aside was not undoable and said nothing; it is the tree panel's
+retired difference 15.
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.

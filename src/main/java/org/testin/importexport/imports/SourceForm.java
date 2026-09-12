@@ -114,11 +114,6 @@ public final class SourceForm implements DialogComponent {
     }
 
     /**
-     * The format's hint, with the importable column names filled in. Built from
-     * the attributes the form was given, so it can never list a column the
-     * import would ignore.
-     */
-    /**
      * UC-SHARE-005, Rule-SHARE-107.
      * <p>
      * What the form says while it is reading a file, on the row the format hint
@@ -134,6 +129,11 @@ public final class SourceForm implements DialogComponent {
         formatHint.setVisible(!status.isBlank());
     }
 
+    /**
+     * The format's hint, with the importable column names filled in. Built from
+     * the attributes the form was given, so it can never list a column the
+     * import would ignore.
+     */
     private void showFormatHint(final @NotNull FileTypes format) {
         final @NotNull String message = format.getInfoMessage();
         if (message.isBlank()) {
@@ -167,6 +167,8 @@ public final class SourceForm implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // The dialog confirms by its Import button, not by Enter in a field.
+        // Nothing, because Enter is the dialog's rather than this field's:
+        // ImportDialog binds it to Import on the status bar, so a form that
+        // answered it too would give one key two handlers.
     }
 }

@@ -288,23 +288,6 @@ public class CreateTestMethod implements GenAction {
     }
 
     /**
-     * UC-CODEGEN-002, Rule-CODEGEN-001.
-     * <p>
-     * Says which test cases got no method because another case already answers
-     * to the name theirs would have had.
-     * <p>
-     * The dialogs refuse a description that clashes, so a tester cannot type one
-     * in. These arrive by the doors that cannot be refused - an imported sheet,
-     * a paste, a branch switch, a sync - or were already on disk before the
-     * refusal existed. Left silent they were counted in with the methods that
-     * were skipped for already existing, and the tester found out at the first
-     * F5 that a case could not be run and could not be jumped to (#244).
-     * <p>
-     * A notification that stays rather than a balloon that fades: generation
-     * runs after an import, on its own time, and what it asks for - rewording
-     * one of the two descriptions - is not something to do on the spot.
-     */
-    /**
      * UC-CODEGEN-002, Rule-CODEGEN-011.
      * <p>
      * These cases have no method because their description cannot become one.
@@ -333,6 +316,23 @@ public class CreateTestMethod implements GenAction {
                         + "and hold something other than punctuation. Reword it and generate again.");
     }
 
+    /**
+     * UC-CODEGEN-002, Rule-CODEGEN-001.
+     * <p>
+     * Says which test cases got no method because another case already answers
+     * to the name theirs would have had.
+     * <p>
+     * The dialogs refuse a description that clashes, so a tester cannot type one
+     * in. These arrive by the doors that cannot be refused - an imported sheet,
+     * a paste, a branch switch, a sync - or were already on disk before the
+     * refusal existed. Left silent they were counted in with the methods that
+     * were skipped for already existing, and the tester found out at the first
+     * F5 that a case could not be run and could not be jumped to (#244).
+     * <p>
+     * A notification that stays rather than a balloon that fades: generation
+     * runs after an import, on its own time, and what it asks for - rewording
+     * one of the two descriptions - is not something to do on the spot.
+     */
     private void reportLostTheName(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> lost) {
         if (lost.isEmpty()) return;
 

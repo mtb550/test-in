@@ -12,7 +12,6 @@ import org.testin.logger.Logger;
 import org.testin.model.TestRunStatus;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 
 import java.util.Optional;

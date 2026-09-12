@@ -24,7 +24,12 @@ public class TreeContextMenu extends DefaultActionGroup {
     private final @NotNull Project p;
 
     public TreeContextMenu(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super("Tree Popup Menu", true);
+        // No short name: it is the label a group shows when nested as a submenu,
+        // this one is only ever the root of an ActionPopupMenu, and it carried
+        // "Tree Popup Menu" in English wherever the IDE was running. See
+        // AbstractEditorContextMenu, which says the same for the two editors
+        // (#66, finding 95).
+        super("", true);
         this.p = p;
 
         add(Declared.forMenu("Testin.Open"));

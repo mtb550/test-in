@@ -94,7 +94,7 @@ one.
 3. The tester selects one and presses `Enter`.
 4. Testin writes the choice into this code project.
 5. The tree reloads on that test project.
-6. Testin shows *Bound*, with the test project's name.
+6. Testin shows *Bound*.
 
 ## What Testin refuses
 

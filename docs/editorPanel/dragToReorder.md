@@ -72,12 +72,6 @@ A small message then appears at the bottom of the IDE and fades. It reads
 
 **If anything fails on the way** — nothing is said, and only the log records it.
 
-## Where the plugin breaks its own rules
-
-**This says *Re-sorted* and typing a position says *Updated*.** The same act,
-two words. That is difference 15 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
-
 ## Why only some files are written
 
 A test case carries its own place in the order rather than pointing at the one

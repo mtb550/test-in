@@ -44,7 +44,8 @@ public class CreateTestRun implements NodeCreator {
      * UC-TREE-PANEL-009.
      * <p>
      * Asynchronous creator: shows the run configuration dialog and completes on OK,
-     * including its own tree refresh and editor opening. Always returns null.
+     * including its own tree refresh and editor opening. Always answers empty,
+     * because the node does not exist yet when this returns.
      */
     @Override
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {

@@ -47,10 +47,6 @@ public final class TestRunHtmlGenerator {
         // One traversal counts every status; a new TestStatus constant is
         // included automatically instead of needing another filter pass.
         final @NotNull TestRunSummary summary = TestRunSummary.of(results);
-        final long passed = summary.passed();
-        final long failed = summary.failed();
-        final long blocked = summary.blocked();
-        final long untested = summary.untested();
         final int passRate = summary.passRate();
 
         // Run-level metadata. The name is the run's own, taken from the node -

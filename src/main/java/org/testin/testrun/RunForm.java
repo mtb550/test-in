@@ -15,7 +15,6 @@ import org.testin.ui.framework.SelectionTree;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +59,7 @@ public final class RunForm {
                 final @NotNull RunConfigurationForm form = new RunConfigurationForm(name);
                 if (!configuration.isEmpty()) form.fillFrom(configuration);
 
-                final @NotNull SelectionTree selection = new SelectionTree(root, RunTreeCellRenderer.create(Collections.emptyMap()));
+                final @NotNull SelectionTree selection = new SelectionTree(root, RunTreeCellRenderer.create());
 
                 new RunConfigurationDialog(p, form, selection, action).show();
             });

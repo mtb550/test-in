@@ -25,8 +25,8 @@ import java.util.function.BiConsumer;
 
 /**
  * The export working dialog: destination form on top, the sheets to export
- * filling the middle, a visible Export button at the bottom — a working dialog
- * confirms by button, not by Enter; Escape cancels.
+ * filling the middle, a visible Export button at the bottom. Enter exports and
+ * Escape cancels, and the status bar names both.
  * <p>
  * What the tester ticks is what gets written. The preview used to draw its
  * checkboxes and then export everything regardless.

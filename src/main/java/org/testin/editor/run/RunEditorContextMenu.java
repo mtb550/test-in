@@ -20,7 +20,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
     private final @NotNull TestinEditor ui;
 
     public RunEditorContextMenu(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
-        super("Run Editor Context Menu", true);
+        super();
         this.p = p;
         this.ui = ui;
 

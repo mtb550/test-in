@@ -48,11 +48,11 @@ import org.testin.notifications.Refused;
 import org.testin.runner.RunTestCases;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.runner.TestNGExecution;
-import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testrun.ResultAnalysisDialog;
+import org.testin.testrun.RunStatusService;
 import org.testin.testrun.TestRunStatusChange;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
@@ -972,10 +972,6 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
      * Busy while a run is being executed or a grid cell is open for editing -
      * either is live state that a reload under the tester would throw away, so an
      * on-disk refresh leaves this editor be until it is done (#20, #74).
-     */
-    /**
-     * A run is busy while it is executing as well as while a cell is open: a
-     * reload would throw away the walk it is on.
      */
     @Override
     public boolean isBusy() {

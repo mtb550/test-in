@@ -27,58 +27,47 @@ import java.util.List;
 @Getter
 public enum GenType {
     REMOVE_TEST_PROJECT(
-            Bundle.message("codegen.remove.test.project"),
-            "Remove Automation Test Project"
+            Bundle.message("codegen.remove.test.project")
     ),
 
     RENAME_TEST_PROJECT(
-            Bundle.message("codegen.rename.test.project"),
-            "Rename Automation Test Project"
+            Bundle.message("codegen.rename.test.project")
     ),
 
     REMOVE_TEST_SET_PACKAGE(
-            Bundle.message("codegen.remove.test.set.package"),
-            "Remove Automation Test Package"
+            Bundle.message("codegen.remove.test.set.package")
     ),
 
     RENAME_TEST_SET_PACKAGE(
-            Bundle.message("codegen.rename.test.set.package"),
-            "Rename Automation Test Package"
+            Bundle.message("codegen.rename.test.set.package")
     ),
 
     MOVE_TEST_SET_PACKAGE(
-            Bundle.message("codegen.move.test.set.package"),
-            "Move Automation Test Package"
+            Bundle.message("codegen.move.test.set.package")
     ),
 
     CREATE_TEST_SET(
-            Bundle.message("codegen.create.test.set"),
-            "Create Automation Test Class"
+            Bundle.message("codegen.create.test.set")
     ),
 
     REMOVE_TEST_SET(
-            Bundle.message("codegen.remove.test.set"),
-            "Remove Automation Test Class"
+            Bundle.message("codegen.remove.test.set")
     ),
 
     RENAME_TEST_SET(
-            Bundle.message("codegen.rename.test.set"),
-            "Rename Automation Test Class"
+            Bundle.message("codegen.rename.test.set")
     ),
 
     MOVE_TEST_SET(
-            Bundle.message("codegen.move.test.set"),
-            "Move Automation Test Class"
+            Bundle.message("codegen.move.test.set")
     ),
 
     CREATE_TEST_CASE(
-            Bundle.message("codegen.create.test.case"),
-            "Create Automation Test Method"
+            Bundle.message("codegen.create.test.case")
     ),
 
     REMOVE_TEST_CASE(
-            Bundle.message("codegen.remove.test.case"),
-            "Remove Automation Test Method"
+            Bundle.message("codegen.remove.test.case")
     ),
 
     /**
@@ -91,43 +80,36 @@ public enum GenType {
      * have left the @Test description saying what the case used to say.
      */
     UPDATE_TEST_CASE_DESCRIPTION(
-            Bundle.message("codegen.update.test.case"),
-            "Update Automation Test Method Description & Name"
+            Bundle.message("codegen.update.test.case")
     ),
 
     UPDATE_TEST_CASE_EXPECTED_RESULT(
             Bundle.message("codegen.update.test.case"),
-            "Update Automation Test Method Expected Result",
             "expected result"
     ),
 
     UPDATE_TEST_CASE_MODULE(
             Bundle.message("codegen.update.test.case"),
-            "Update Automation Test Method Module",
             "module"
     ),
 
     UPDATE_TEST_CASE_TEST_DATA(
             Bundle.message("codegen.update.test.case"),
-            "Update Automation Test Method Test Data",
             "test data"
     ),
 
     UPDATE_TEST_CASE_PRE_CONDITIONS(
             Bundle.message("codegen.update.test.case"),
-            "Update Automation Test Method Pre Conditions",
             "pre-conditions"
     ),
 
     UPDATE_TEST_CASE_STEPS(
             Bundle.message("codegen.update.test.case"),
-            "Update Automation Test Method Steps",
             "steps"
     ),
 
     UPDATE_TEST_CASE_GROUP(
-            Bundle.message("codegen.update.test.case"),
-            "Update Automation Test Method Group"
+            Bundle.message("codegen.update.test.case")
     ),
 
     /**
@@ -138,7 +120,6 @@ public enum GenType {
      */
     UPDATE_TEST_CASE_PRIORITY(
             Bundle.message("codegen.update.test.case"),
-            "Update Automation Test Method Priority",
             "priority"
     ),
 
@@ -147,16 +128,9 @@ public enum GenType {
      * methods in the order the priority attribute gives them.
      */
     UPDATE_TEST_CASE_ORDER(
-            Bundle.message("codegen.update.test.case"),
-            "Update Automation Test Method Order"
+            Bundle.message("codegen.update.test.case")
     ),
 
-    /**
-     * Whether the case runs at all. Disabled is the one status that says
-     * anything about that, and it used to say it to Testin alone: the card
-     * showed it, the JSON stored it, and the suite ran the case exactly as
-     * before (#166).
-     */
     /**
      * Everything Testin writes about a case, written again from the case.
      * <p>
@@ -166,13 +140,17 @@ public enum GenType {
      * whichever one moved.
      */
     RECONCILE_TEST_CASE(
-            Bundle.message("codegen.restore.test.case"),
-            "Restore Automation Test Method"
+            Bundle.message("codegen.restore.test.case")
     ),
 
+    /**
+     * Whether the case runs at all. Disabled is the one status that says
+     * anything about that, and it used to say it to Testin alone: the card
+     * showed it, the JSON stored it, and the suite ran the case exactly as
+     * before (#166).
+     */
     UPDATE_TEST_CASE_STATUS(
-            Bundle.message("codegen.update.test.case"),
-            "Update Automation Test Method Enabled"
+            Bundle.message("codegen.update.test.case")
     ),
 
     /**
@@ -182,12 +160,20 @@ public enum GenType {
      */
     NO_CODE_CHANGE(
             Bundle.message("codegen.no.code.change"),
-            "This attribute has no generated code",
             "read-only attribute"
     );
 
+    /**
+     * What this operation is called where a tester meets it: the entry on the
+     * IDE's undo history, and the thing the "still indexing" refusal names.
+     * <p>
+     * Every constant carried an English phrase beside this one as well - "Update
+     * Automation Test Method Description &amp; Name", and twenty-two more - read
+     * by one log line and shown to nobody. They were either dead weight or a
+     * gutter mark that was never built; they were the first, and the log names
+     * the constant instead (#66, finding 93).
+     */
     private final @NotNull String description;
-    private final @NotNull String tooltip;
 
     /**
      * What this operation does to the generated code.
@@ -201,15 +187,13 @@ public enum GenType {
      */
     private final @NotNull GenAction action;
 
-    GenType(final @NotNull String description, final @NotNull String tooltip) {
+    GenType(final @NotNull String description) {
         this.description = description;
-        this.tooltip = tooltip;
         this.action = new JavaCodeUpdate();
     }
 
-    GenType(final @NotNull String description, final @NotNull String tooltip, final @NotNull String dataOnlyField) {
+    GenType(final @NotNull String description, final @NotNull String dataOnlyField) {
         this.description = description;
-        this.tooltip = tooltip;
         this.action = new NoOpCodeUpdate(dataOnlyField);
     }
 
@@ -281,7 +265,9 @@ public enum GenType {
             if (!DumbService.isDumb(p)) return true;
 
             Services.getInstance(p, Notifier.class).softRefuse(p, Refused.WHILE_INDEXING, description);
-            Logger.info("Skipped " + tooltip + ": the IDE is indexing");
+            // The constant, not the description: a log line reads the same in
+            // every language the plugin speaks, and the description does not.
+            Logger.info("Skipped " + name() + ": the IDE is indexing");
             return false;
         }
     }

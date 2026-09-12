@@ -7,7 +7,6 @@ import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
 import org.testin.model.dto.dirs.DirectoryDto;
 
-import java.util.List;
 
 public class RemoveJavaPackage implements GenAction {
 
@@ -16,9 +15,9 @@ public class RemoveJavaPackage implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof DirectoryDto dir)) return;
 
-        final @NotNull List<String> fqcn = Fqcn.ofPackage(dir);
-        if (fqcn.isEmpty()) return;
-        final @NotNull String packagePath = String.join("/", fqcn);
+        // Never empty: Fqcn.ofPackage answers "generated" for a node with no
+        // packages above it, so there is nothing to guard against here.
+        final @NotNull String packagePath = String.join("/", Fqcn.ofPackage(dir));
 
         JavaSourceRoot.writeInRoot(p, "removing package", testSourceRoot ->
                 JavaSourceRoot.deleteUnder(testSourceRoot, packagePath, this));

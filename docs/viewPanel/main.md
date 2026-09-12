@@ -122,8 +122,8 @@ in front of them while they write down what actually happened.
 
 1. **The two arrows** — move to the previous and the next test case. They are
    gray when the panel was handed only one.
-2. **The three tabs** — **Details**, **History** and **Open Bugs**. Only
-   **Details** has anything in it today.
+2. **The three tabs** — **Details**, **History** and **Open Bugs**. **History**
+   is empty today, because a test case records only its last edit.
 3. **The path** — one step for each folder above the test case. Only the last
    step opens anything.
 4. **The identity** — the test case's own identity, with a button that copies

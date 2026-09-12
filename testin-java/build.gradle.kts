@@ -55,6 +55,16 @@ tasks.withType<Test> {
     useTestNG()
     jvmArgs("--sun-misc-unsafe-memory-access=allow")
 
+    // A --tests filter is applied to every module, and a module with no matching
+    // test fails rather than being skipped - so `./gradlew test --tests
+    // "*DocumentClaimsTest*"` was a red build naming the filter rather than the
+    // reason, which reads like the test does not exist (#66, finding 62). The
+    // root module keeps the default: nearly every test lives there, so a filter
+    // that matches nothing at all is still a misspelling worth failing on.
+    filter {
+        isFailOnNoMatchingTests = false
+    }
+
     testLogging {
         events("passed", "skipped", "failed")
     }

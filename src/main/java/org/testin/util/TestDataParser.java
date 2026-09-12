@@ -51,27 +51,6 @@ public final class TestDataParser {
     }
 
     /**
-     * Reads a priority back out of the text a cell or a sheet holds.
-     * <p>
-     * By the label first, because that is what the surface printed and therefore
-     * what the tester is editing - the same reason {@link #testCaseStatus} looks
-     * there first, and the same failure if it does not: the column shows P1 and
-     * {@code valueOf} takes the constant name, so retyping the very word on
-     * screen would quietly become P3.
-     * <p>
-     * Then the constant name, which is what a sheet exported before the labels
-     * became P1 to P3 still says - High, Medium, Low - so an older export
-     * imports as the priority it meant rather than as the fallback.
-     * <p>
-     * Blank keeps what the case has, because a priority has no empty form - a
-     * new case starts at P3 and a cell cleared by hand is a cell that says
-     * nothing, not a cell that says P3.
-     * <p>
-     * A word it cannot read is refused rather than answered with P3. That was
-     * the loudest half of #264: importing 200 cases whose priority column reads
-     * High, Medium and Low gave 200 at the lowest priority and said nothing.
-     */
-    /**
      * UC-SHARE-005, Rule-SHARE-110.
      * <p>
      * Whether that text names this constant, in English, whatever language the
@@ -93,6 +72,27 @@ public final class TestDataParser {
         return constant.name().equalsIgnoreCase(wanted) || constant.name().replace('_', ' ').equalsIgnoreCase(wanted);
     }
 
+    /**
+     * Reads a priority back out of the text a cell or a sheet holds.
+     * <p>
+     * By the label first, because that is what the surface printed and therefore
+     * what the tester is editing - the same reason {@link #testCaseStatus} looks
+     * there first, and the same failure if it does not: the column shows P1 and
+     * {@code valueOf} takes the constant name, so retyping the very word on
+     * screen would quietly become P3.
+     * <p>
+     * Then the constant name, which is what a sheet exported before the labels
+     * became P1 to P3 still says - High, Medium, Low - so an older export
+     * imports as the priority it meant rather than as the fallback.
+     * <p>
+     * Blank keeps what the case has, because a priority has no empty form - a
+     * new case starts at P3 and a cell cleared by hand is a cell that says
+     * nothing, not a cell that says P3.
+     * <p>
+     * A word it cannot read is refused rather than answered with P3. That was
+     * the loudest half of #264: importing 200 cases whose priority column reads
+     * High, Medium and Low gave 200 at the lowest priority and said nothing.
+     */
     public static @NotNull Optional<Priority> priority(final @NotNull String value, final @NotNull Priority current) {
         final @NotNull String wanted = value.trim();
         if (wanted.isEmpty()) return Optional.of(current);
