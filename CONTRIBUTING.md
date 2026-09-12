@@ -150,6 +150,13 @@ The report lands in `.inspection/`, deliberately outside `build/` so
 `./gradlew clean` does not delete the list you are working from. Start with
 `summary.txt` for the counts and `findings.txt` for the lines.
 
+**An "unused" verdict is evidence, not a fact.** Two runs minutes apart over the
+same tree returned 74 findings and 13. The 74 included a whole cascade — three
+classes and twenty-eight unused imports — that the second run did not reproduce
+and that reading the code disproved: a global unused check depends on how far the
+index had got. So confirm one by finding the call site before deleting anything,
+and re-run before reporting a count.
+
 **The display-string ratchet** lives in `.github/display-string-baseline.txt`. A
 string a tester reads should have one owner; the number may go down and never up.
 
