@@ -213,7 +213,7 @@ in the past tense wherever one word will do. (Rule-TREE-PANEL-007)
 | *Created* | A node was created | [UC-TREE-PANEL-007](createTestSet.md), [UC-TREE-PANEL-009](createTestRun.md) |
 | *Project created* | A test project was created | [UC-TREE-PANEL-002](createTestProject.md) |
 | *Project cloned* | A test project was brought down from Git | [UC-TREE-PANEL-003](importTestProject.md) |
-| *Bound* | This code project now uses that test project. The name follows | [UC-TREE-PANEL-004](chooseTestProject.md) |
+| *Bound* | This code project now uses the test project that was chosen | [UC-TREE-PANEL-004](chooseTestProject.md) |
 | *Run created* | A test run was created | [UC-TREE-PANEL-009](createTestRun.md), [UC-TREE-PANEL-021](reCreateTestRun.md) |
 | *Renamed* | A node was renamed | [UC-TREE-PANEL-011](renameNode.md) |
 | *Removed*, *Removed N* | One or more nodes went to the recycle bin | [UC-TREE-PANEL-012](removeNode.md) |
