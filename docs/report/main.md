@@ -81,8 +81,9 @@ The PDF, the Word document and the web page each hold these, in this order.
    run, the commit, the platform and component, the language, the browser, the
    device type, everyone who recorded a verdict, when execution started and
    ended, and the run's status. A row nobody answered is left out.
-3. **Execution Summary** — one sentence saying how many test cases the run
-   holds, how many were executed and what share passed. Under it a row of
+3. **Execution Summary** — one sentence naming the run and saying how many test
+   cases it holds, how many were executed and what share passed. All four
+   formats open it with the same sentence. Under it a row of
    figures: **Total Cases**, **Passed**, **Failed**, **Blocked**, **Untested**,
    **Removed** and **Pass Rate**. **Removed** appears only when the run has any.
 4. **Result Analysis** — what the tester wrote about the run, under a heading

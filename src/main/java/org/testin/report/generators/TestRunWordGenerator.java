@@ -93,9 +93,10 @@ public final class TestRunWordGenerator {
 
                 addHeading(doc, Bundle.message("report.heading.execution"), 20, 12);
 
-                addText(doc, String.format(
-                        Bundle.message("report.summary.this.run"),
-                        summary.total(), summary.executed(), summary.passRate()),
+                // The same sentence the other three open with - see the PDF
+                // generator for why there is only one of them now.
+                addText(doc, Bundle.message("report.summary.named", trDir.getName(),
+                        String.valueOf(summary.total()), String.valueOf(summary.executed()), summary.passRate() + "%"),
                         ReportFont.LEAD.ptRounded(), false, BLACK, NO_BORDER, 12);
 
                 final @NotNull List<ReportTile> headline = ReportTile.shownFor(summary);
