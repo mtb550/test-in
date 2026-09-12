@@ -119,26 +119,43 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         // update(), which the platform runs on the EDT, and a grid cell
         // persists from a pooled thread. Said in one place so that no call site
         // has to remember which thread it is on.
+        // The four-argument form, so both reversals can answer. The
+        // three-argument one wraps a Runnable in a supplier that returns true
+        // whatever happened, and restore can refuse - the tester then read
+        // "These test cases changed since" and "Undone" on one press, saying
+        // opposite things (#66, finding 75). Nothing is held aside here, which
+        // is what the empty forget says.
         ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, UndoHistories.class).push(scope, new UndoHistories.Operation(
                 description,
                 () -> restore(p, before, after),
-                () -> restore(p, after, before))));
+                () -> restore(p, after, before),
+                () -> {
+                })));
     }
 
     /**
+     * UC-INTERNAL-004, Rule-INTERNAL-063.
+     * <p>
      * Puts a moment back, unless something else has changed the cases since.
      * <p>
      * {@code expected} is how they stood when this operation was recorded. A
      * sync, a Git pull or another IDE may have written over them in the
      * meantime, and their work is not this operation's to overwrite - so it
      * refuses and says so rather than writing.
+     * <p>
+     * <b>Answers whether it wrote</b>, because the refusal above is the
+     * tester's answer and nothing may be said over it. It returned void, so
+     * every undo of a test-case change reported {@code true} and CTRL+Z after a
+     * colleague's sync raised two balloons that contradicted each other: the
+     * refusal, and "Undone" on top of it. The tree path has answered since
+     * #275; this is the other half of that pair (#66, finding 75).
      */
-    private static void restore(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> target, final @NotNull List<TestCaseSnapshot> expected) {
+    private static boolean restore(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> target, final @NotNull List<TestCaseSnapshot> expected) {
         if (!expected.stream().allMatch(TestCaseSnapshot::stillStands)) {
             Services.getInstance(p, Notifier.class).softRefuse(p,
                     Bundle.message("snapshot.changed.title"),
                     Bundle.message("snapshot.changed.message"));
-            return;
+            return false;
         }
 
         // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-215.
@@ -167,6 +184,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         target.forEach(TestCaseSnapshot::restorePresent);
 
         tellTheSurfaces(p, target);
+        return true;
     }
 
     /**
