@@ -9,6 +9,7 @@ import org.testin.logger.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.OptionalInt;
 import java.util.Optional;
 import java.util.List;
 
@@ -299,18 +300,23 @@ public final class GitRepositoryService {
      * failed leave a repository with nothing pending and work that has not left
      * the machine, which read as "nothing to commit" and no way forward.
      * <p>
-     * Zero when Git cannot answer - a branch with no upstream that the remote
-     * has never heard of has nothing to be ahead of.
+     * Empty when Git cannot answer, which is what a branch with no upstream
+     * does: {@code rev-list @{upstream}..HEAD} fails outright because there is
+     * nothing to count against. It used to come back as zero, and zero is a real
+     * answer meaning nothing is ahead - so Sync pushed nothing, reported "Up to
+     * date with the remote", and the branch could never acquire an upstream
+     * through Sync at all, because the push that would have set one was the thing
+     * being skipped (#66, finding 81).
      */
-    public int unpushedCount(final @NotNull Path path) {
+    public @NotNull OptionalInt unpushedCount(final @NotNull Path path) {
         final @NotNull String counted = run(path, "git", "rev-list", "--count", "@{upstream}..HEAD").orElse("").trim();
-        if (counted.isEmpty()) return 0;
+        if (counted.isEmpty()) return OptionalInt.empty();
 
         try {
-            return Integer.parseInt(counted);
+            return OptionalInt.of(Integer.parseInt(counted));
         } catch (final NumberFormatException ex) {
             Logger.debug("Could not read the unpushed count in " + path + ": " + counted);
-            return 0;
+            return OptionalInt.empty();
         }
     }
 

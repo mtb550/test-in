@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
@@ -62,7 +63,20 @@ public final class ProjectIndexer {
     private final @NotNull RunWriter runWriter;
     private final @NotNull SyncFiles syncFiles;
     private final @NotNull NodeFiles nodeFiles;
+    /**
+     * Counts the whole indexing pass, not the projects in it.
+     * <p>
+     * It used to be replaced with one latch per project once the list was known,
+     * so a thread that had already entered {@link #awaitIndexing} was left
+     * waiting on a latch nobody could reach (#66, finding 67).
+     */
     private volatile @NotNull CountDownLatch indexingLatch = new CountDownLatch(1);
+
+    /**
+     * How many projects this pass is still scanning. The pass is over when it
+     * reaches zero, and that is what counts the latch down.
+     */
+    private final @NotNull AtomicInteger projectsLeftToIndex = new AtomicInteger();
 
     public ProjectIndexer(final @NotNull Project p) {
         this.p = p;
@@ -97,7 +111,7 @@ public final class ProjectIndexer {
                 return;
             }
 
-            indexingLatch = new CountDownLatch(validProjects.size());
+            projectsLeftToIndex.set(validProjects.size());
             Logger.info("Indexing " + validProjects.size() + " projects..");
 
             for (final Path projectPath : validProjects) {
@@ -123,39 +137,54 @@ public final class ProjectIndexer {
 
                             @Override
                             public void onSuccess() {
-                                indexingLatch.countDown();
                                 Logger.info("Project '" + projectName + "' indexed.");
-                                finishSuccessfully();
+                                if (oneProjectFinished()) finishSuccessfully();
                             }
 
                             @Override
                             public void onThrowable(final @NotNull Throwable error) {
-                                indexingLatch.countDown();
                                 Logger.error("Error indexing '" + projectName + "': " + error.getMessage());
-                                finishWithFailure();
+                                if (oneProjectFinished()) finishWithFailure();
                             }
                         });
             }
         } catch (final Exception ex) {
             Logger.error("indexWithProgress: " + ex.getMessage());
             indexing.set(false);
+
+            // Nothing below is going to count the latch down now, and
+            // awaitIndexing blocks on it. One failed re-index used to leave
+            // Refresh, the branch dropdown and the welcome screen's links dead
+            // for the rest of the session (#66, finding 67).
+            indexingLatch.countDown();
         }
     }
 
+    /**
+     * One project's scan is over, whichever way it ended.
+     *
+     * @return whether that was the last project of the pass, so the caller knows
+     * whether there is anything left to wait for
+     */
+    private boolean oneProjectFinished() {
+        if (projectsLeftToIndex.decrementAndGet() != 0) return false;
+
+        indexingLatch.countDown();
+        return true;
+    }
+
     private void finishSuccessfully() {
-        if (indexingLatch.getCount() == 0 && indexed.compareAndSet(false, true)) {
-            indexing.set(false);
-            logSummary();
-            restoreOpenEditorsOnce();
-        }
+        if (!indexed.compareAndSet(false, true)) return;
+
+        indexing.set(false);
+        logSummary();
+        restoreOpenEditorsOnce();
     }
 
     // UC-INTERNAL-002
     private void finishWithFailure() {
-        if (indexingLatch.getCount() == 0) {
-            indexing.set(false);
-            Logger.warn("Indexing finished with errors; will retry on the next request.");
-        }
+        indexing.set(false);
+        Logger.warn("Indexing finished with errors; will retry on the next request.");
     }
 
     private void restoreOpenEditorsOnce() {
@@ -510,11 +539,11 @@ public final class ProjectIndexer {
      * found their analysis gone after the next reload.
      * <p>
      * The registration stays immediate. Creating a run needs the index to know
-     * about it on the next line, and only the disk write belongs in the queue.
+     * about it on the next line, and only the disk write belongs in the queue -
+     * which {@link RunWriter#persist} now does for every caller, so this one is
+     * the plain write it always read as.
      */
     public void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
-        store.registerTestRun(testRunPath, tr);
-
         persistRun(testRunPath, tr);
     }
 
@@ -803,10 +832,6 @@ public final class ProjectIndexer {
      */
     public @NotNull Optional<DirectoryDto> find(final @NotNull Path path) {
         return store.findByPath(path);
-    }
-
-    public void updateRunMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
-        store.updateRunMarker(p, runPath, marker);
     }
 
     /**

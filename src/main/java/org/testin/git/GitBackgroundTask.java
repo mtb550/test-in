@@ -1,6 +1,7 @@
 package org.testin.git;
 
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -43,6 +44,10 @@ public final class GitBackgroundTask extends Task.Backgroundable {
         indicator.setIndeterminate(true);
         try {
             work.run(indicator);
+        } catch (final ProcessCanceledException stopped) {
+            // A cancel is not an error, so it does not go to the error handler.
+            // The platform is the one that knows what to do with it.
+            throw stopped;
         } catch (final Exception ex) {
             onError.accept(ex);
         }

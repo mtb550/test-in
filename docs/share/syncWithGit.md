@@ -51,7 +51,8 @@ bar, and its line changes as the sync works. At the end a message titled
 5. If anything is waiting, the bar reads *Pushing what is committed here...*.
 6. The bar reads *Refreshing files...*.
 7. A message titled **Synced** reads *Up to date with the remote*, or *Pushed*
-   and the count.
+   and the count. A branch that had never been pushed reads *Pushed, and this
+   branch now tracks the remote*.
 
 ## What Testin refuses
 

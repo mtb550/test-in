@@ -242,16 +242,7 @@ public abstract class TestCaseBaseDialog {
 
             @Override
             public void update(final @NotNull AnActionEvent e) {
-                if (completionIsOpen()) {
-                    e.getPresentation().setEnabled(false);
-                    return;
-                }
-                if (prioritySection.getCombo().isPopupVisible()) {
-                    e.getPresentation().setEnabled(false);
-                    return;
-                }
-
-                e.getPresentation().setEnabled(true);
+                e.getPresentation().setEnabled(!completionIsOpen() && getAllSections().stream().noneMatch(CreateTestCaseSection::isPopupOpen));
             }
 
             @Override

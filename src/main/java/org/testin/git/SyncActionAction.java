@@ -20,6 +20,7 @@ import org.testin.util.Bundle;
 import javax.swing.tree.TreePath;
 import java.util.Optional;
 import java.nio.file.Path;
+import java.util.OptionalInt;
 import java.util.List;
 
 /**
@@ -160,7 +161,7 @@ public class SyncActionAction extends DumbAwareAction {
                         // whole afternoon of work stayed on one machine while the
                         // message said it had not (#89).
                         indicator.setText(Bundle.message("git.progress.pushing.committed"));
-                        final int pushed = pushUnpushed(repoPath, remoteName, branch);
+                        final @NotNull OptionalInt pushed = pushUnpushed(repoPath, remoteName, branch);
 
                         indicator.setText(Bundle.message("git.progress.refreshing"));
                         refreshAfterSync(repoPath, pushed);
@@ -296,7 +297,7 @@ public class SyncActionAction extends DumbAwareAction {
                         // the rebase just replayed are still only here, and a
                         // refresh that reported "up to date" over them would be the
                         // same untruth from the other door.
-                        int pushed = 0;
+                        OptionalInt pushed = OptionalInt.of(0);
                         try {
                             final @NotNull String remoteName = git.getRemoteName(repoPath);
                             if (!remoteName.isEmpty()) {
@@ -336,17 +337,24 @@ public class SyncActionAction extends DumbAwareAction {
          * Asked rather than attempted: a push with nothing to push still contacts
          * the remote, and on a sync pressed out of habit that is a network round
          * trip - and, over SSH, possibly a passphrase prompt - for no reason.
+         * <p>
+         * A count Git could not give is not the same as a count of zero. It means
+         * this branch has no upstream, which is the one case where the push has to
+         * happen anyway: the push is what sets the upstream, so skipping it left
+         * the branch unable to acquire one through Sync ever again. What went is
+         * then unknown rather than zero, so the tester is told the branch was
+         * pushed rather than that it was already up to date.
          */
-        private int pushUnpushed(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
-            final int unpushed = git.unpushedCount(repoPath);
-            if (unpushed == 0) return 0;
+        private @NotNull OptionalInt pushUnpushed(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
+            final @NotNull OptionalInt unpushed = git.unpushedCount(repoPath);
+            if (unpushed.orElse(-1) == 0) return OptionalInt.of(0);
 
             commits.push(repoPath, remote, branch);
             return unpushed;
         }
 
         // UC-SHARE-016
-        private void refreshAfterSync(final @NotNull Path repoPath, final int pushed) {
+        private void refreshAfterSync(final @NotNull Path repoPath, final @NotNull OptionalInt pushed) {
             RepositoryRefresh.after(p, repoPath);
             ApplicationManager.getApplication().invokeLater(() -> {
                 // It stays in the Notifications log, like the push beside it and
@@ -369,12 +377,17 @@ public class SyncActionAction extends DumbAwareAction {
          * and the word for it do not sit in the same order in every language -
          * and the count is passed as digits, so it reads 1234 rather than 1,234.
          */
-        private static @NotNull String pushedMessage(final int pushed) {
-            if (pushed == 0) return Bundle.message("git.synced.up.to.date");
+        private static @NotNull String pushedMessage(final @NotNull OptionalInt pushed) {
+            // Git could not count, so the branch had no upstream and the push
+            // above has just given it one. Saying "up to date" for that was the
+            // one sentence a tester could not act on.
+            if (pushed.isEmpty()) return Bundle.message("git.synced.pushed.upstream");
 
-            return pushed == 1
+            if (pushed.getAsInt() == 0) return Bundle.message("git.synced.up.to.date");
+
+            return pushed.getAsInt() == 1
                     ? Bundle.message("git.synced.pushed.one")
-                    : Bundle.message("git.synced.pushed.many", String.valueOf(pushed));
+                    : Bundle.message("git.synced.pushed.many", String.valueOf(pushed.getAsInt()));
         }
 
         private void refreshRepository(final @NotNull Path repoPath) {

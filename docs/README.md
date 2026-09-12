@@ -50,10 +50,10 @@ tell you what changes and which message appears.
 | **[The settings page](setting/main.md)** | Everything set once per machine, and where each value is kept | 11 | 42 |
 | **[Automation code and the gutter](codegen/main.md)** | The test methods Testin writes, and how they are kept in step with the tree | 20 | 72 |
 | **[Reports](report/main.md)** | Writing a test run out as a document, in four formats | 3 | 16 |
-| **[Sharing work with the team](share/main.md)** | Export, import, Git and a server. Every way test data leaves and arrives | 22 | 107 |
+| **[Sharing work with the team](share/main.md)** | Export, import, Git and a server. Every way test data leaves and arrives | 22 | 108 |
 | **[Inside Testin](internal/main.md)** | The parts that belong to no panel: the search, and the one thing that owns every file | 7 | 71 |
 
-**152 use cases and 690 rules**, each one checked against the code it describes.
+**152 use cases and 691 rules**, each one checked against the code it describes.
 
 Every part also lists two more things at the end of its page: where the plugin
 breaks its own rules today, and what nobody has decided yet. Both are honest
@@ -65,7 +65,7 @@ lists, not apologies.
 |---|---|
 | **[Every shortcut](shortcuts.md)** | Every key Testin answers to, what it does, and where |
 | **[The product](product.md)** | Who uses Testin, what they work with, every status, and the rules that hold everywhere |
-| **[Standing decisions](decisions.md)** | Eight designs that look wrong until you know why, and what each one costs to reverse |
+| **[Standing decisions](decisions.md)** | Ten designs that look wrong until you know why, and what each one costs to reverse |
 | **[The formats on disk](formats.md)** | Every file Testin writes, field by field, and what a version bump promises |
 | **[How a document is written](standard.md)** | Read this before writing one |
 
@@ -87,6 +87,6 @@ What a person needs before their first change.
 |---|---|---|
 | **[Architecture](ARCHITECTURE.md)** | The layers, the four rules the plugin is built on, and two operations traced class by class | Written |
 | **[Contributing](https://github.com/mtb550/test-in/blob/main/CONTRIBUTING.md)** | Setup, the checks that must pass, the run configurations and the terms | Written |
-| **[Standing decisions](decisions.md)** | Eight decisions made once, with the reason each one looks wrong, so they are not argued again in every review | Written |
+| **[Standing decisions](decisions.md)** | Ten decisions made once, with the reason each one looks wrong, so they are not argued again in every review | Written |
 | **[The formats on disk](formats.md)** | Every marker, the test case and run files, and `testin.yml` — field by field, with the versioning rules | Written |
 | **[The indexer's budget](internal/readTestProject.md)** | What reading ten thousand test cases costs, measured, and the test that holds it there | Written |

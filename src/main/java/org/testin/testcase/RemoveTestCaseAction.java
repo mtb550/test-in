@@ -62,15 +62,15 @@ public class RemoveTestCaseAction extends DumbAwareAction {
 
             final @NotNull Runnable delete = () -> ApplicationManager.getApplication().runWriteAction(() -> performDeletion(selectedItems));
 
-            // A pending cut removes its source as the second half of a move the
-            // tester already asked for, so it is not confirmed again.
-            final boolean isCutAndSelected = Services.getInstance(p, CutState.class).isCutting() &&
-                    selectedItems.stream().allMatch(tc -> Services.getInstance(p, CutState.class).isPending(tc.getId()));
-
-            if (isCutAndSelected) {
-                delete.run();
-                return;
-            }
+            // Delete is Delete, whatever is on the clipboard. This used to skip
+            // both the confirmation and the "Removed" balloon when every selected
+            // row was pending a cut, on the grounds that a paste removes the
+            // source as the second half of a move the tester already asked for -
+            // but a paste has not gone through here since PasteTestCaseNodeAction
+            // took over removing its own source rows. What was left was the
+            // tester pressing Delete on rows they had cut: the rows vanished,
+            // nothing was asked, nothing was said, and the cut stayed pending on
+            // ids that no longer exist (#66, finding 81).
 
             final @NotNull String msg = selectedItems.size() == 1
                     ? Bundle.message("remove.case.confirm.one", selectedItems.getFirst().getDescription())
@@ -104,11 +104,21 @@ public class RemoveTestCaseAction extends DumbAwareAction {
             // deleted, and comes back on the next re-index as an unsorted orphan.
             editor.getAllTestCases().removeAll(selectedItems);
 
+            // Whatever route removed these rows, a cut waiting to paste them is
+            // waiting for ids that have gone: the cards would draw faded for a
+            // move that can never land.
+            Services.getInstance(p, CutState.class).clear();
+
             final var indexer = Services.getInstance(p, org.testin.indexer.ProjectIndexer.class);
             for (final TestCaseDto tc : selectedItems) {
                 indexer.removeTestCase(dir.getPath(), tc.getId());
-                GenType.REMOVE_TEST_CASE.getAction().execute(p, tc);
             }
+
+            // One call for the whole selection. Only executeAll opens the single
+            // write command, so removing forty cases a case at a time was forty
+            // entries on the IDE's own undo history - the defect the batching in
+            // #153 was written to fix (#66, finding 80).
+            GenType.REMOVE_TEST_CASE.executeAll(p, selectedItems);
 
             // Redrawn from the master list rather than by taking rows out of the
             // page's model, which a declared action has no way to reach. It is also

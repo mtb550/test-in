@@ -67,45 +67,67 @@ public class RefreshAction extends AbstractProjectAction {
         Logger.info("Refresh: re-indexing started");
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            // The repository's testin.yml is on disk too, and Refresh is the
-            // tester saying "read the disk again". It was read once when the
-            // service was created and never after, so a file that was deleted,
-            // hand-edited, or brought in by a branch switch left the plugin
-            // acting on what it said at startup (#6).
-            //
-            // Before the index, exactly as at startup: the file names the test
-            // project, and indexing is scoped to it.
-            Services.getInstance(p, TestinConfigService.class).reload();
+            try {
+                // The repository's testin.yml is on disk too, and Refresh is the
+                // tester saying "read the disk again". It was read once when the
+                // service was created and never after, so a file that was deleted,
+                // hand-edited, or brought in by a branch switch left the plugin
+                // acting on what it said at startup (#6).
+                //
+                // Before the index, exactly as at startup: the file names the test
+                // project, and indexing is scoped to it.
+                Services.getInstance(p, TestinConfigService.class).reload();
 
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-            indexer.resetForReindex();
-            indexer.indexWithProgress();
-            indexer.awaitIndexing();
+                final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                indexer.resetForReindex();
+                indexer.indexWithProgress();
+                indexer.awaitIndexing();
 
-            Logger.info("Refresh: re-indexing complete, rebuilding tree");
+                Logger.info("Refresh: re-indexing complete, rebuilding tree");
 
-            ApplicationManager.getApplication().invokeLater(() -> {
-                if (p.isDisposed()) {
-                    refreshGuard.set(false);
-                    return;
-                }
+                ApplicationManager.getApplication().invokeLater(() -> rebuildTree(outcome));
 
-                // Before the tree is rebuilt: an editor is holding the node
-                // it was opened on and the cases it read from it, and after a
-                // re-index either can be data that is gone.
-                Services.getInstance(p, TestinEditors.class).refreshOpen(p);
-
-                tp.refresh();
-
+            } catch (final Exception ex) {
+                // Every step above can fail, and the guard used to be released
+                // only inside the rebuild at the end - so one failed re-index
+                // left it set and Refresh, the branch dropdown and the welcome
+                // screen's Create, Clone and Select links stopped responding for
+                // the rest of the session, saying nothing but one log line
+                // written for a different case (#66, finding 67).
                 refreshGuard.set(false);
-                Logger.info("Refresh: tree rebuilt");
-
-                // At the end, not the start: the tree is only usable now, and a
-                // click that found a refresh already running returned above
-                // without saying anything.
-                Services.getInstance(p, Notifier.class).softShow(p, outcome);
-            });
+                Logger.error("Refresh: re-indexing failed - " + ex.getMessage());
+                Services.getInstance(p, Notifier.class).error(p, Bundle.message("toolbar.refresh.failed.title"), ex.getMessage());
+            }
         });
+    }
+
+    /**
+     * UC-TREE-PANEL-025, Rule-TREE-PANEL-081.
+     * <p>
+     * The half that runs on the EDT once the index is rebuilt, and the one place
+     * that releases the guard when the work reached this far - whatever happens
+     * while it draws.
+     */
+    private void rebuildTree(final @NotNull String outcome) {
+        try {
+            if (p.isDisposed()) return;
+
+            // Before the tree is rebuilt: an editor is holding the node
+            // it was opened on and the cases it read from it, and after a
+            // re-index either can be data that is gone.
+            Services.getInstance(p, TestinEditors.class).refreshOpen(p);
+
+            tp.refresh();
+            Logger.info("Refresh: tree rebuilt");
+
+            // At the end, not the start: the tree is only usable now, and a
+            // click that found a refresh already running returned above
+            // without saying anything.
+            Services.getInstance(p, Notifier.class).softShow(p, outcome);
+
+        } finally {
+            refreshGuard.set(false);
+        }
     }
 
     // UC-TREE-PANEL-025

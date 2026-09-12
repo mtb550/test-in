@@ -133,9 +133,17 @@ public final class TestRunPdfGenerator {
                     .setMarginTop(20);
             document.add(sec2);
 
+            // The same sentence the HTML report opens with, naming the run. The
+            // four formats used to open one run two ways - "Sprint 3 Cycle 1
+            // holds 12 test cases" here and "This run holds 12 test cases"
+            // there - drift the duplicated-string gate could not catch, because
+            // the two literals were never the same literal (#66, finding 91).
+            //
+            // The values go in as text rather than as numbers, so the digits are
+            // the same digits the tiles beside this paragraph are built from.
             document.add(new Paragraph(
-                    String.format(Bundle.message("report.summary.this.run"),
-                            summary.total(), summary.executed(), summary.passRate()))
+                    Bundle.message("report.summary.named", trDir.getName(),
+                            String.valueOf(summary.total()), String.valueOf(summary.executed()), summary.passRate() + "%"))
                     .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(BLACK)
                     .setMarginBottom(12));
 

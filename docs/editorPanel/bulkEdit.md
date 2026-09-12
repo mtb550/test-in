@@ -109,9 +109,10 @@ item and `Shift+Delete` to drop one.
 **If the tester chooses Order** — a message reads *Order is set one test case at
 a time*. There is no bulk editor for it.
 
-**If a description is edited to nothing** — that row is skipped without a word.
+**If a description is edited to nothing** — that row is left as it was and
+counted with the values Testin could not read.
 
-**If a priority is edited to nothing** — that row is skipped without a word.
+**If a priority is edited to nothing** — the same: left as it was, and counted.
 
 **If a value is not one Testin can read** — a priority, a status or a group name
 it does not know — that test case is left exactly as it was and is not counted

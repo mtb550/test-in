@@ -11,6 +11,7 @@ import org.testin.setting.AppSettingsState;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -30,6 +31,26 @@ final class TestCaseSequenceStore {
 
     @NotNull Map<String, List<UUID>> getTestSetCaseIds() {
         return testSetCaseIds;
+    }
+
+    /**
+     * The list a test set's case ids are kept in, built in one place so every
+     * one of them is the same kind.
+     * <p>
+     * Copy on write. The scan fills a set's list from a parallel stream, the EDT
+     * iterates it to draw the cards, and a save, a removal or a drag rewrites
+     * it - so an iteration must never see a half-applied change, and a copy on
+     * each of the rare writes is cheaper than a lock on each of the many reads.
+     * <p>
+     * It has one owner because it did not: the scan built a synchronized list
+     * and a drag-reorder put a plain ArrayList back over it, so after the first
+     * rearrangement the set's ids were shared with no protection at all - and
+     * even the scan's list was iterated without the monitor a synchronized list
+     * requires, which is a ConcurrentModificationException out of a paint or a
+     * card silently missing (#66, finding 84).
+     */
+    static @NotNull List<UUID> caseIds(final @NotNull Collection<UUID> initial) {
+        return new CopyOnWriteArrayList<>(initial);
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-030
@@ -125,8 +146,7 @@ final class TestCaseSequenceStore {
     private void store(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
         final @NotNull String path = testSetPath.toString();
         testCasesById.put(testCase.getId(), testCase);
-        final @NotNull List<UUID> ids = testSetCaseIds.computeIfAbsent(
-                path, ignored -> Collections.synchronizedList(new ArrayList<>()));
+        final @NotNull List<UUID> ids = testSetCaseIds.computeIfAbsent(path, ignored -> caseIds(List.of()));
         if (!ids.contains(testCase.getId())) ids.add(testCase.getId());
 
         Services.getInstance(p, TestDataFiles.class)
@@ -191,7 +211,7 @@ final class TestCaseSequenceStore {
         Optional.ofNullable(testSetCaseIds.get(path)).ifPresent(oldIds -> oldIds.stream()
                 .filter(id -> !newIds.contains(id))
                 .forEach(testCasesById::remove));
-        testSetCaseIds.put(path, ids);
+        testSetCaseIds.put(path, caseIds(ids));
     }
 
     void removeForTestSet(final @NotNull String path) {

@@ -1,6 +1,7 @@
 package org.testin.services;
 
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -57,6 +58,15 @@ public final class BackgroundWork {
                 indicator.setIndeterminate(true);
                 try {
                     work.accept(indicator);
+                } catch (final ProcessCanceledException stopped) {
+                    // The tester pressed Cancel. That is an answer, not a
+                    // failure, and they already know they gave it - so it is
+                    // handed back to the platform, which closes the bar the way
+                    // it closes every canceled task. Caught before the line
+                    // below because that one would have shown them "Import
+                    // Failed" for doing what the Cancel button is for
+                    // (#66, finding 83).
+                    throw stopped;
                 } catch (final Exception ex) {
                     Logger.error(whatFailed + ": " + ex.getMessage());
                     Services.getInstance(p, Notifier.class).error(p, whatFailed, String.valueOf(ex.getMessage()));

@@ -18,8 +18,6 @@ import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
 import org.testin.model.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
-import org.testin.model.markers.TestRunMarker;
-import org.testin.services.Services;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -215,10 +213,22 @@ final class IndexerDataStore {
         addDir(testRunPackagesByPath, trp, DirectoryType.TRP.getMarker(), trp.getMarker());
     }
 
+    /**
+     * A new node: the marker is written first, and the cache learns about it
+     * only if that landed.
+     * <p>
+     * Architecture rule 2, and this method used to be it inverted. Creating a
+     * node performs no VFS operation of its own - the directory comes into
+     * existence as a side effect of the marker write - so a cache updated first
+     * left a fully indexed test set drawn in the tree with nothing on disk,
+     * which then survived every rescan until the tester pressed Refresh. Now a
+     * failed write reports itself and nothing is drawn (#66, finding 85).
+     */
     private <V extends DirectoryDto> void addDir(final @NotNull Map<String, V> map, final @NotNull V dto, final @NotNull String markerFileName, final @NotNull Object marker) {
+        if (!markers.write(dto.getPath(), markerFileName, marker)) return;
+
         map.put(dto.getPath().toString(), dto);
         childrenIndex.invalidate();
-        markers.write(dto.getPath(), markerFileName, marker);
         refreshDir(dto.getPath());
     }
 
@@ -294,6 +304,11 @@ final class IndexerDataStore {
     /**
      * Drops a whole test project out of the cache: the project itself, its two
      * main directories, and every package, set and run beneath it.
+     * <p>
+     * Two callers, and the log line says the cache-level fact both of them mean:
+     * a test project the tester deleted, and the start of a scan that is about
+     * to read the same project again and must not carry the last pass's nodes
+     * into this one.
      */
     void removeTestProject(final @NotNull Path path) {
         final @NotNull String pathStr = path.toString();
@@ -307,7 +322,7 @@ final class IndexerDataStore {
         removeTestRunsUnder(path);
         childrenIndex.invalidate();
 
-        Logger.info("Removed test project at: " + pathStr);
+        Logger.info("Test project dropped from the index: " + pathStr);
     }
 
     private void removeTestSetPackagesUnder(final @NotNull Path path) {
@@ -383,14 +398,21 @@ final class IndexerDataStore {
         Logger.info("Removed test run package at: " + pathStr);
     }
 
+    /**
+     * A new test project, under the same order as {@link #addDir}: the two
+     * markers that bring Test Cases and Test Runs into existence are written
+     * first, and the cache learns about the project only if both landed.
+     */
     void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
+        final boolean casesWritten = markers.write(tp.getTestCasesDirectory().getPath(), DirectoryType.TCD.getMarker(), tp.getTestCasesDirectory().getMarker());
+        final boolean runsWritten = markers.write(tp.getTestRunsDirectory().getPath(), DirectoryType.TRD.getMarker(), tp.getTestRunsDirectory().getMarker());
+        if (!casesWritten || !runsWritten) return;
+
         testProjectsByPath.put(tp.getPath().toString(), tp);
         testCasesMainDirsByPath.put(tp.getTestCasesDirectory().getPath().toString(), tp.getTestCasesDirectory());
         testRunsMainDirsByPath.put(tp.getTestRunsDirectory().getPath().toString(), tp.getTestRunsDirectory());
         childrenIndex.invalidate();
 
-        markers.write(tp.getTestCasesDirectory().getPath(), DirectoryType.TCD.getMarker(), tp.getTestCasesDirectory().getMarker());
-        markers.write(tp.getTestRunsDirectory().getPath(), DirectoryType.TRD.getMarker(), tp.getTestRunsDirectory().getMarker());
         refreshDir(tp.getPath());
         refreshDir(tp.getTestCasesDirectory().getPath());
         refreshDir(tp.getTestRunsDirectory().getPath());
@@ -409,14 +431,6 @@ final class IndexerDataStore {
         refreshDir(dto.getPath());
     }
 
-    void updateRunMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
-        Optional.ofNullable(testRunsDirByPath.get(runPath.toString()))
-                .ifPresentOrElse(trd -> trd.setMarker(marker),
-                        () -> Logger.warn("updateRunMarker: run dir not indexed, updating marker on disk only: " + runPath));
-
-        Services.getInstance(p, TestDataFiles.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), marker);
-    }
-
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
         final @NotNull String oldStr = oldPath.toString();
         final @NotNull String newStr = newPath.toString();
@@ -427,9 +441,11 @@ final class IndexerDataStore {
                 .orElse(null);
 
         for (final Map<String, ? extends DirectoryDto> map : dirMaps) {
-            renameMapEntry(map, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
+            renameMapEntry(map, oldStr, newStr, dto -> updatePathAndParent(dto, newPath, newParentDto));
             renameDescendants(map, oldPath, newPath);
         }
+
+        rebuildPath2Under(newPath);
 
         renameMapEntry(testCaseStore.getTestSetCaseIds(), oldStr, newStr, ids -> {
         });
@@ -451,11 +467,32 @@ final class IndexerDataStore {
      *                  the filesystem-root boundary above, carried one call
      *                  deep rather than re-derived here (#71)
      */
-    private void updatePathAndPath2(final @NotNull DirectoryDto dto, final @NotNull Path newPath, final @Nullable DirectoryDto newParent) {
+    private void updatePathAndParent(final @NotNull DirectoryDto dto, final @NotNull Path newPath, final @Nullable DirectoryDto newParent) {
         dto.setPath(newPath);
         dto.setName(newPath.getFileName().toString());
         dto.setParent(newParent);
-        rebuildPath2(dto);
+    }
+
+    /**
+     * Every breadcrumb at or below a moved node, rebuilt once every node above
+     * it already carries its new name.
+     * <p>
+     * It has to be a second pass. A breadcrumb is read off the live parent
+     * objects, and the seven maps are renamed in a fixed order with test sets
+     * (index 1) before the packages that hold them (index 3) - so rebuilding as
+     * each map was visited read the package's old name for every set beneath it.
+     * Renaming a package Login to Auth left every test set under it saying
+     * {@code [NAFATH, Test Cases, Login, ts2]}, and path2 is not cosmetic: the
+     * code generator builds the generated Java package and class name from it,
+     * and NodeRename runs the codegen rename first - so the generated subtree
+     * moved to auth while the index still believed every set lived in login, and
+     * the next case saved there regenerated its method into the old package
+     * (#66, finding 69).
+     */
+    private void rebuildPath2Under(final @NotNull Path newPath) {
+        allDirectories().stream()
+                .filter(node -> node.getPath().startsWith(newPath))
+                .forEach(this::rebuildPath2);
     }
 
     @NotNull
@@ -483,7 +520,6 @@ final class IndexerDataStore {
             map.remove(e.getKey());
             map.put(newChildPath.toString(), dto);
             dto.setPath(newChildPath);
-            rebuildPath2(dto);
         }
     }
 

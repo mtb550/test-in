@@ -153,7 +153,10 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
                         // A commit that succeeded and a push that failed leave
                         // nothing pending and work that never left the machine.
-                        final int unpushed = git.unpushedCount(path);
+                        // Zero when Git could not answer, which on this screen is
+                        // the right reading: a branch with no upstream has nothing
+                        // the review can show as waiting to be pushed.
+                        final int unpushed = git.unpushedCount(path).orElse(0);
 
                         ApplicationManager.getApplication().invokeLater(() ->
                                 reviewChanges(path, changes, branches, current, unpushed));

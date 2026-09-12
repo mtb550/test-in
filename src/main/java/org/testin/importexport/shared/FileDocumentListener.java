@@ -102,7 +102,7 @@ public class FileDocumentListener implements DocumentListener {
      * The read, unless the box has moved on since it was booked.
      */
     private void readIfStillWanted(final @NotNull String typed) {
-        if (!typed.equals(awaiting.get())) return;
+        if (!isStillWanted(typed)) return;
 
         final @NotNull File importFile = new File(typed);
 
@@ -110,17 +110,29 @@ public class FileDocumentListener implements DocumentListener {
         // still typing it, which is not a mistake to report.
         if (!importFile.exists() || !importFile.isFile()) return;
 
-        loadFile(importFile);
+        loadFile(importFile, typed);
     }
 
-    private void loadFile(final @NotNull File importFile) {
+    /**
+     * Whether the box still holds the path this read was booked for.
+     * <p>
+     * Asked before the read starts and again when it comes back, because
+     * parsing a workbook is slow and typing is not. It used to be asked only
+     * before: a large file A finishing after the tester had picked B showed A's
+     * sheets under B's name, and Import then wrote A's cases (#66, finding 87).
+     */
+    private boolean isStillWanted(final @NotNull String typed) {
+        return typed.equals(awaiting.get());
+    }
+
+    private void loadFile(final @NotNull File importFile, final @NotNull String typed) {
         // Said out loud. A file no format can read fell through here in silence,
         // so a tester who picked a .pdf watched the dialog do nothing at all and
         // had no way to tell that from a file Testin was still reading (#267).
         // The formats are named rather than counted: the tester's next move is
         // to go and find one.
         FileTypes.importerFor(importFile.getName().toLowerCase())
-                .ifPresentOrElse(format -> loadFile(importFile, format),
+                .ifPresentOrElse(format -> loadFile(importFile, format, typed),
                         () -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("import.cannot.title"),
                                 Bundle.message("import.cannot.message", importFile.getName(), FileTypes.importableExtensions())));
     }
@@ -138,7 +150,7 @@ public class FileDocumentListener implements DocumentListener {
      * The line is cleared on every way out - read, empty, or failed - so it
      * never outlives the work it describes.
      */
-    private void loadFile(final @NotNull File importFile, final @NotNull FileTypes format) {
+    private void loadFile(final @NotNull File importFile, final @NotNull FileTypes format, final @NotNull String typed) {
         onStatus.accept(Bundle.message("import.reading", importFile.getName()));
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -147,6 +159,10 @@ public class FileDocumentListener implements DocumentListener {
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     onStatus.accept("");
+
+                    // The box may have moved on while this was parsing, and what
+                    // came back is then the wrong file's contents.
+                    if (!isStillWanted(typed)) return;
 
                     if (parsedData.isEmpty()) {
                         Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("import.no.data.title"), Bundle.message("import.no.data.message"));
@@ -159,7 +175,12 @@ public class FileDocumentListener implements DocumentListener {
                 Logger.error("Import parse failed: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
                     onStatus.accept("");
-                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.parse.error.title"), ex.getMessage());
+
+                    // Nor is a file the tester has already typed over worth a
+                    // complaint about.
+                    if (isStillWanted(typed)) {
+                        Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.parse.error.title"), ex.getMessage());
+                    }
                 });
             }
         });

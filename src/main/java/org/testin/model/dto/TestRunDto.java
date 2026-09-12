@@ -104,18 +104,6 @@ public class TestRunDto {
     private List<TestRunItems> results = new ArrayList<>();
 
     /**
-     * Whether every case in this run has been judged.
-     * <p>
-     * Asked of the run rather than counted at a call site, because the answer
-     * decides when a run is over and two places counting it would eventually
-     * disagree about a deleted case.
-     * <p>
-     * A run with no cases is not finished, it is empty - completing it the
-     * moment it is created would be the wrong answer to a question nobody
-     * asked.
-     */
-    @JsonIgnore
-    /**
      * The same run, covering exactly these cases (#96).
      * <p>
      * A case that stays keeps its result <b>whole</b> - the verdict, the actual
@@ -152,6 +140,18 @@ public class TestRunDto {
                 .setResults(covered);
     }
 
+    /**
+     * Whether every case in this run has been judged.
+     * <p>
+     * Asked of the run rather than counted at a call site, because the answer
+     * decides when a run is over and two places counting it would eventually
+     * disagree about a deleted case.
+     * <p>
+     * A run with no cases is not finished, it is empty - completing it the
+     * moment it is created would be the wrong answer to a question nobody
+     * asked.
+     */
+    @JsonIgnore
     public boolean isFullyJudged() {
         return !results.isEmpty() && results.stream().allMatch(TestRunItems::isJudged);
     }

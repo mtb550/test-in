@@ -51,32 +51,49 @@ public class ImportExcel {
         return result;
     }
 
+    // UC-SHARE-005, Rule-SHARE-106
     private void parseWorkbook(final @NotNull Workbook workbook, final @NotNull Project p, final @NotNull Map<String, List<TestCaseDto>> result) {
         final @NotNull DataFormatter dataFormatter = new DataFormatter();
+        int refused = 0;
 
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             if (workbook.isSheetHidden(i) || workbook.isSheetVeryHidden(i)) continue;
 
             final @NotNull Sheet sheet = workbook.getSheetAt(i);
-            final @NotNull List<TestCaseDto> sheetList = parseSheet(p, sheet, dataFormatter);
+            final @NotNull Parsed parsed = parseSheet(p, sheet, dataFormatter);
+            refused += parsed.refused();
 
-            if (!sheetList.isEmpty()) {
-                result.put(sheet.getSheetName(), sheetList);
+            if (!parsed.cases().isEmpty()) {
+                result.put(sheet.getSheetName(), parsed.cases());
             }
         }
+
+        // Once for the workbook, which is what Rule-SHARE-106 says. Each sheet
+        // used to say it for itself, so a five-sheet file raised five balloons
+        // each carrying its own part of one number (#66, finding 81).
+        TestEditorAttributes.sayWhatWasRefused(p, refused);
     }
 
     /**
-     * The cases on one sheet, and none at all for a sheet with no header row -
-     * an empty sheet, or one whose first row the file never wrote.
+     * What one sheet held: its test cases, and how many values Testin could not
+     * read from them.
      */
-    private @NotNull List<TestCaseDto> parseSheet(final @NotNull Project p, final @NotNull Sheet sheet, final @NotNull DataFormatter dataFormatter) {
-        return Optional.ofNullable(sheet.getRow(0))
-                .map(headerRow -> readRows(p, sheet, headerRow, dataFormatter))
-                .orElseGet(List::of);
+    private record Parsed(@NotNull List<TestCaseDto> cases, int refused) {
+
+        /**
+         * A sheet with no header row - an empty one, or one whose first row the
+         * file never wrote.
+         */
+        private static final @NotNull Parsed NOTHING = new Parsed(List.of(), 0);
     }
 
-    private @NotNull List<TestCaseDto> readRows(final @NotNull Project p, final @NotNull Sheet sheet, final @NotNull Row headerRow, final @NotNull DataFormatter dataFormatter) {
+    private @NotNull Parsed parseSheet(final @NotNull Project p, final @NotNull Sheet sheet, final @NotNull DataFormatter dataFormatter) {
+        return Optional.ofNullable(sheet.getRow(0))
+                .map(headerRow -> readRows(p, sheet, headerRow, dataFormatter))
+                .orElse(Parsed.NOTHING);
+    }
+
+    private @NotNull Parsed readRows(final @NotNull Project p, final @NotNull Sheet sheet, final @NotNull Row headerRow, final @NotNull DataFormatter dataFormatter) {
         final @NotNull Map<String, Integer> headerIndexMap = new HashMap<>();
         for (final Cell cell : headerRow) {
             final @NotNull String headerName = dataFormatter.formatCellValue(cell).trim();
@@ -107,9 +124,7 @@ public class ImportExcel {
             sheetList.add(currentTestCase);
         }
 
-        TestEditorAttributes.sayWhatWasRefused(p, refused);
-
-        return sheetList;
+        return new Parsed(sheetList, refused);
     }
 
     /**

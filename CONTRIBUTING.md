@@ -25,6 +25,20 @@ cd test-in
 `runIde` opens a second IDE with the plugin loaded. It keeps its own settings and
 its own logs under `.sandbox/`, so nothing it does touches the IDE you work in.
 
+**To see Testin in French or Hindi, start the sandbox with the locale.** The
+IDE's own language setting cannot reach either bundle: JetBrains ships
+localization plugins for Chinese, Japanese and Korean only, so Settings offers no
+French or Hindi entry to pick. The bundles resolve from the JVM's default locale
+instead.
+
+```bash
+./gradlew runIde -Ptestin.language=fr     # or hi
+```
+
+A sandbox started the ordinary way reads English, and that is correct rather
+than a broken translation. [Decision-010](docs/decisions.md) says why the plugin
+does not register a language of its own.
+
 **If `prepareSandbox` fails with *"cannot be performed on a file with a
 user-mapped section open"***, a sandbox IDE is still running and holding the
 jars. Close it; nothing else clears it.
@@ -135,6 +149,13 @@ listed rather than gated.
 The report lands in `.inspection/`, deliberately outside `build/` so
 `./gradlew clean` does not delete the list you are working from. Start with
 `summary.txt` for the counts and `findings.txt` for the lines.
+
+**An "unused" verdict is evidence, not a fact.** Two runs minutes apart over the
+same tree returned 74 findings and 13. The 74 included a whole cascade — three
+classes and twenty-eight unused imports — that the second run did not reproduce
+and that reading the code disproved: a global unused check depends on how far the
+index had got. So confirm one by finding the call site before deleting anything,
+and re-run before reporting a count.
 
 **The display-string ratchet** lives in `.github/display-string-baseline.txt`. A
 string a tester reads should have one owner; the number may go down and never up.

@@ -159,13 +159,22 @@ public class ImportAction extends DumbAwareAction {
                         final @NotNull List<TestCaseDto> cases = set.getValue();
                         final @NotNull Path setPath = into.getPath();
 
-                        linkAndSaveTestCases(setPath, cases, rankOfTail(setPath), indicator, imported, total);
+                        final int written = linkAndSaveTestCases(setPath, cases, rankOfTail(setPath), indicator, imported, total);
 
                         for (final TestCaseDto tc : cases) tc.setParent(into);
 
-                        if (generateCode) generateTestMethods(cases, into.getName(), indicator);
+                        if (generateCode) generateTestMethods(cases.subList(0, written), into.getName(), indicator);
 
-                        imported += cases.size();
+                        imported += written;
+
+                        // UC-SHARE-007, Rule-SHARE-037.
+                        //
+                        // A Cancel is an answer, so it stops the loop rather than
+                        // throwing past the count into the catch below, which would
+                        // have told the tester their import failed for pressing the
+                        // button the bar offers them. The count above is exact:
+                        // every case it includes is written (#66, finding 83).
+                        if (indicator.isCanceled()) break;
                     }
                 } catch (final Exception ex) {
                     // UC-SHARE-007, Rule-SHARE-037.
@@ -281,6 +290,10 @@ public class ImportAction extends DumbAwareAction {
             final long startedAt = System.currentTimeMillis();
 
             for (int from = 0; from < testCases.size(); from += METHODS_PER_COMMAND) {
+                // Between batches, which is where a Cancel can land without
+                // leaving a write command half open.
+                if (indicator.isCanceled()) return;
+
                 final @NotNull List<TestCaseDto> batch =
                         testCases.subList(from, Math.min(from + METHODS_PER_COMMAND, testCases.size()));
                 final int written = from + batch.size();
@@ -295,8 +308,13 @@ public class ImportAction extends DumbAwareAction {
                     + (System.currentTimeMillis() - startedAt) + "ms");
         }
 
-        // UC-SHARE-005, Rule-SHARE-025
-        private void linkAndSaveTestCases(final @NotNull Path dirPath, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
+        /**
+         * UC-SHARE-005, Rule-SHARE-025, Rule-SHARE-037.
+         *
+         * @return how many cases were written. Every one of them is on disk, so a
+         * tester who stopped the import part way is told a number they can act on
+         */
+        private int linkAndSaveTestCases(final @NotNull Path dirPath, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             // After what is already in the set, in the order the sheet listed them.
@@ -314,12 +332,19 @@ public class ImportAction extends DumbAwareAction {
             // recorded as modified by whoever ran the import.
             int written = 0;
             for (final TestCaseDto tc : testCases) {
+                // Asked rather than thrown, as the indexing scan asks it: stopping
+                // is an answer, and an exception here would have to be sorted back
+                // out from a real failure by every caller above.
+                if (indicator.isCanceled()) break;
+
                 indexer.putTestCaseVerbatim(dirPath, tc);
 
                 written++;
                 indicator.setFraction((done + written) / (double) total);
                 indicator.setText2(tc.getDescription());
             }
+
+            return written;
         }
 
         /**

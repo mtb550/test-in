@@ -143,7 +143,6 @@ public class CreateTestRun implements NodeCreator {
             trDir.setMarker(marker);
 
             Services.getInstance(p, ProjectIndexer.class).addTestRunDir(trDir);
-            Services.getInstance(p, ProjectIndexer.class).updateRunMarker(p, savePath, marker);
 
             // File access is the indexer's alone (see CLAUDE.md).
             Services.getInstance(p, ProjectIndexer.class).refreshDirectory(savePath);

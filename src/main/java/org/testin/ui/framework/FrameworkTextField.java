@@ -2,8 +2,11 @@ package org.testin.ui.framework;
 
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.SimpleTextAttributes;
+import com.intellij.ui.components.JBPasswordField;
 import com.intellij.ui.components.TextComponentEmptyText;
 import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.util.ui.ComponentWithEmptyText;
+import com.intellij.util.ui.StatusText;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.intellij.lang.annotations.MagicConstant;
@@ -17,6 +20,7 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.function.Consumer;
 
 /**
  * The framework's single-line input: its look, its placeholder, and the red cue
@@ -39,14 +43,43 @@ import java.awt.event.KeyEvent;
  */
 final class FrameworkTextField {
 
-    private final @NotNull ExtendableTextField field;
+    private final @NotNull JTextField field;
     private final @NotNull String placeholder;
+
+    /**
+     * How this field takes a leading icon, decided once by which kind it is.
+     */
+    private final @NotNull Consumer<@NotNull Icon> leadingIcon;
 
     private boolean emptyWarningShown;
 
-    FrameworkTextField(final @NotNull Icon icon, final @NotNull String placeholder, final @NotNull String initialValue) {
+    /**
+     * @param secret whether what the tester types is shown as dots. A server
+     *               password is typed into a dialog somebody may be projecting,
+     *               screen-sharing or recording, so the field that takes one
+     *               does not echo it (#66, finding 64)
+     */
+    FrameworkTextField(final @NotNull Icon icon, final @NotNull String placeholder, final @NotNull String initialValue, final boolean secret) {
         this.placeholder = placeholder;
-        this.field = new ExtendableTextField(initialValue);
+
+        if (secret) {
+            // A password field carries no extensions, so there is no icon to
+            // put in front of it - now or when a caller asks later. A secret
+            // has nothing worth saying beside it anyway.
+            final @NotNull JBPasswordField dots = new JBPasswordField();
+            dots.setText(initialValue);
+
+            this.field = dots;
+            this.leadingIcon = ignored -> {
+            };
+        } else {
+            final @NotNull ExtendableTextField plain = new ExtendableTextField(initialValue);
+
+            this.field = plain;
+            this.leadingIcon = wanted -> DialogStyle.setLeadingIcon(plain, wanted);
+        }
+
+        setLeadingIcon(icon);
 
         // Derived from the label font at construction, so every dialog open
         // picks up the current IDE font-size setting.
@@ -55,7 +88,7 @@ final class FrameworkTextField {
         field.setBorder(JBUI.Borders.empty(10, 12));
 
         if (!placeholder.isBlank()) {
-            field.getEmptyText().setText(placeholder);
+            emptyText().setText(placeholder);
             TextComponentEmptyText.setupPlaceholderVisibility(field);
 
             // Typing clears a red empty-submit warning back to the normal look.
@@ -70,11 +103,20 @@ final class FrameworkTextField {
             });
         }
 
-        DialogStyle.setLeadingIcon(field, icon);
         bindClipboard(field);
     }
 
-    @NotNull ExtendableTextField component() {
+    /**
+     * The icon drawn before the text, which the field whose icon follows the
+     * selection changes after construction. Here rather than at that caller,
+     * because which kind of field this is - and therefore whether it can carry
+     * an icon at all - is this class's own knowledge.
+     */
+    void setLeadingIcon(final @NotNull Icon icon) {
+        leadingIcon.accept(icon);
+    }
+
+    @NotNull JTextField component() {
         return field;
     }
 
@@ -97,9 +139,17 @@ final class FrameworkTextField {
     private void showPlaceholder(final @NotNull SimpleTextAttributes attributes) {
         if (placeholder.isBlank()) return;
 
-        field.getEmptyText().clear();
-        field.getEmptyText().appendText(placeholder, attributes);
+        emptyText().clear();
+        emptyText().appendText(placeholder, attributes);
         field.repaint();
+    }
+
+    /**
+     * The placeholder line of whichever field this is. Both kinds draw one, and
+     * asking here is what lets the rest of this class be written once.
+     */
+    private @NotNull StatusText emptyText() {
+        return ((ComponentWithEmptyText) field).getEmptyText();
     }
 
     /**

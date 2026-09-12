@@ -39,6 +39,22 @@ public interface CreateTestCaseSection {
     }
 
     /**
+     * Whether this section has a popup open, which takes Enter for itself.
+     * <p>
+     * A combo with its list down answers Enter by choosing the value the tester
+     * highlighted, so the dialog's own Enter has to stand down for it. Asked of
+     * the sections rather than named one at a time where the keystroke is
+     * guarded: that guard knew about the Priority combo and nothing else, so
+     * Enter with the Status list open saved the dialog on the value that was
+     * selected before the list was opened (#66, finding 87).
+     * <p>
+     * No by default: a section with nothing to drop down takes nothing.
+     */
+    default boolean isPopupOpen() {
+        return false;
+    }
+
+    /**
      * Whether what this section is holding can be written to the test case.
      * <p>
      * Asked before anything is applied, so a section that refuses stops the save

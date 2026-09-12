@@ -216,6 +216,14 @@ Rebinding one of these moves it everywhere it works at once, including the
 tooltips and status bars that print it — those ask the keymap rather than
 remembering our default.
 
+**`Ctrl+Alt+F` is also IntelliJ's Refactor › Introduce Field**, and `Cmd+Alt+F`
+on a Mac. Two actions on one keystroke, and the IDE settles it by where the
+cursor is: in a Java file the refactoring answers, in the Testin panel the search
+does. It is kept, because it is the right key for the feature and a tester who
+does not refactor Java never meets the other one. `Ctrl+Alt+Shift+F` is free in
+the default keymap if it ever bites, and either action can be rebound in
+**Settings › Keymap**.
+
 **A key on its surface.** The action is still declared, so Find Action offers it
 and the Keymap lists it — with no default key, because the key belongs to the
 component. A declared shortcut is dispatched before a component's own bindings,

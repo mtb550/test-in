@@ -72,7 +72,9 @@ One field, one small dialog. The rest of the test case is left alone.
 1. **Each row** — the field, then the letter that opens it.
 2. **The first row** — selected when the menu opens.
 3. **Status** — the one row with no letter. It is opened from this menu and
-   nowhere else.
+   nowhere else. While its list is open, `Enter` chooses the status the tester
+   highlighted. It does not save the dialog. The **Priority** list answers
+   `Enter` the same way.
 
 Pressing the letter on the card skips this menu and opens the field straight
 away.

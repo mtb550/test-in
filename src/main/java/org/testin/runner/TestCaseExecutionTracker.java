@@ -6,6 +6,7 @@ import com.intellij.execution.testframework.sm.runner.SMTestProxy;
 import com.intellij.execution.testframework.stacktrace.DiffHyperlink;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import java.util.Locale;
 import org.testin.model.Failure;
 import org.testin.model.RunStatus;
 import org.testin.util.Bundle;
@@ -29,12 +30,12 @@ public class TestCaseExecutionTracker {
         p.getMessageBus().connect(p).subscribe(SMTRunnerEventsListener.TEST_STATUS, new SMTRunnerEventsAdapter() {
             @Override
             public void onTestStarted(final @NotNull SMTestProxy test) {
-                TestCaseExecutionListener.broadcast(p, test.getPresentableName().toLowerCase(), RunStatus.RUNNING, Duration.ZERO, Failure.NONE);
+                TestCaseExecutionListener.broadcast(p, test.getPresentableName().toLowerCase(Locale.ROOT), RunStatus.RUNNING, Duration.ZERO, Failure.NONE);
             }
 
             @Override
             public void onTestFinished(final @NotNull SMTestProxy test) {
-                final @NotNull String testName = test.getPresentableName().toLowerCase();
+                final @NotNull String testName = test.getPresentableName().toLowerCase(Locale.ROOT);
 
                 if (test.isPassed()) {
                     TestCaseExecutionListener.broadcast(p, testName, RunStatus.PASSED, durationOf(test), Failure.NONE);

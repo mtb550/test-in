@@ -475,7 +475,10 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
      */
     @Override
     public @NotNull Set<String> getAvailableModules() {
-        return Modules.in(allTestCases);
+        // Through the snapshot, not the live list: this is reached from an
+        // ActionGroup the platform may build off the EDT while loadDataAsync is
+        // between its clear() and its addAll() (#66, finding 84).
+        return Modules.in(snapshotOfAll());
     }
 
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
@@ -711,7 +714,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
-        final @NotNull List<TestCaseDto> pending = allTestCases.stream()
+        final @NotNull List<TestCaseDto> pending = snapshotOfAll().stream()
                 .filter(tc -> runItem(tc.getId()).filter(item -> item.getStatus() == TestStatus.PENDING).isPresent())
                 .filter(tc -> !execution.isRunning(tc.getId()))
                 .toList();

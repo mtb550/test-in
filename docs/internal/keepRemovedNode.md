@@ -97,10 +97,13 @@ offers the change before it instead.
 put it back. Writing over it would destroy one thing to restore another. The
 tester sees **Undo Incomplete**.
 
-**If putting a node back fails** — the tester sees two messages on the same
-press. *Undone* arrives first, because the undo itself ran. **Undo Incomplete**
-arrives after it, saying how many did not make it. Reading only the first one
-leaves the tester believing a node is back when it is not.
+**If an undo could not put everything back** — the press is not spent. `Ctrl+Z`
+still offers the same change, and `Ctrl+Y` is not given a change the tester
+never got back.
+
+**If putting a node back fails** — the tester sees one message, **Undo
+Incomplete**, saying how many did not make it. *Undone* is not raised, because
+the press did not undo what it said it would.
 
 **If the removal has fallen off the undo history** — the kept copy went with it.
 The recycle bin still has the tester's copy.

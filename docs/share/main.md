@@ -10,7 +10,7 @@ team pulls, or a server the plugin syncs with.
 |---|---|
 | **Part of Testin** | Sharing work with the team |
 | **Answers** | How test cases leave Testin and come back, and how a test project is kept in step with a team |
-| **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` to `Rule-SHARE-110` |
+| **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` to `Rule-SHARE-111` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -168,7 +168,7 @@ bug report yet.
 | | The rule it breaks | What a tester sees |
 |---|---|---|
 | **Difference 1** | No rule covers it — nothing in this part says a refusal must be stated | Fixed. An empty folder, file name or format now turns that box's own placeholder red and puts the cursor in it, the way every dialog on the framework already did. |
-| **Difference 12** | Rule-SHARE-005 — the same | The export, import and report bars cannot be canceled. |
+| **Difference 12** | Rule-SHARE-005 — the same | The import bar stops between test cases now, and still says how many were written. The sync bar stops between files, where it used to finish all 2,246 of them before noticing. The report bar offers **Cancel** and nothing inside asks: the four generators are handed the document to write and never the bar, so the press takes effect only once the document is finished. An export has nothing long left to stop, because it reads the tree from memory and writes one file at the end. |
 
 | **Difference 16** | Rule-SHARE-003 — the tester is told | A message can still be shown to nobody: with no status bar on the code project's window, the balloon is dropped. It is written to `testin.log` now rather than lost, so an export that finished with nobody told can be told from one that did not finish. Nothing is raised in its place — a notification about a failed notification is noise. |
 | **Difference 19** | Rule-SHARE-006 — a missing feature says so | Fixed. Both Git entries are in the menu in every IDE now, grayed and reading *(needs the Git plugin)* when it is missing, so the menu has one shape everywhere and the reason is on the entry (Rule-SHARE-105). |

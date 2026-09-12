@@ -41,8 +41,12 @@ final class SftpAccountDialog extends AbstractFrameworkDialog<TextInput> {
                 .placeholder(Bundle.message("dialog.sftp.placeholder.account"))
                 .value(knownUser)
                 .build();
+        // UC-SHARE-019, Rule-SHARE-110. Dots, not characters: a tester on a
+        // shared screen, a projector or a recorded session was showing their
+        // server password (#66, finding 64).
         final @NotNull ComponentDialogBase<TextInput> password = ComponentDialogBase.textField()
                 .placeholder(Bundle.message("dialog.sftp.placeholder.password"))
+                .secret()
                 .build();
 
         components = List.of(

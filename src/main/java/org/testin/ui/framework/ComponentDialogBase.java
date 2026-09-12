@@ -278,6 +278,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         private @NotNull String placeholder = "";
         private @NotNull String value = "";
         private @NotNull String accepts = TextInput.ANYTHING;
+        private boolean secret = false;
 
         public @NotNull TextInputBuilder icon(final @NotNull Icon icon) {
             this.icon = desaturate(icon);
@@ -311,8 +312,22 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             return this;
         }
 
+        /**
+         * UC-SHARE-019, Rule-SHARE-110.
+         * <p>
+         * Shows what the tester types as dots instead of characters.
+         * <p>
+         * A state of this field rather than a field of its own, so a secret box
+         * is the same box with the same placeholder, the same empty-submit cue
+         * and the same clipboard keys - one surface, one more thing it can be.
+         */
+        public @NotNull TextInputBuilder secret() {
+            this.secret = true;
+            return this;
+        }
+
         public @NotNull ComponentDialogBase<TextInput> build() {
-            return new ComponentDialogBase<>(new TextInput(icon, placeholder, value, accepts));
+            return new ComponentDialogBase<>(new TextInput(icon, placeholder, value, accepts, secret));
         }
     }
 

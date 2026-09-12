@@ -15,6 +15,7 @@ import org.testin.ui.FontSync;
 import org.testin.util.Bundle;
 
 import javax.swing.Box;
+import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -47,20 +48,28 @@ public class OpenBugsTab {
         bugTab.removeAll();
         bugTab.setLayout(new BorderLayout());
 
-        if (shown.isEmpty()) {
-            bugTab.add(note(Bundle.message("view.bugs.no.selection")), BorderLayout.NORTH);
-            return;
-        }
+        bugTab.add(contents(p, shown), BorderLayout.NORTH);
+
+        // Its own, as the details tab's load does its own. This tab is the one
+        // that draws something different per test case, and it swapped its rows
+        // without painting them - so paging to the next case, or a running test
+        // reporting a result, left the previous case's bugs on screen until the
+        // tester switched tabs away and back (#66, finding 79).
+        bugTab.revalidate();
+        bugTab.repaint();
+    }
+
+    /**
+     * What this tab is showing: the open bugs, or the one sentence that says why
+     * there are none to show.
+     */
+    private @NotNull JComponent contents(final @NotNull Project p, final @NotNull Optional<TestCaseDto> shown) {
+        if (shown.isEmpty()) return note(Bundle.message("view.bugs.no.selection"));
 
         final @NotNull List<OpenBug> bugs = OpenBug.of(
                 Services.getInstance(p, ProjectIndexer.class).getAllTestRuns(), shown.orElseThrow().getId());
 
-        if (bugs.isEmpty()) {
-            bugTab.add(note(Bundle.message("view.bugs.none")), BorderLayout.NORTH);
-            return;
-        }
-
-        bugTab.add(rows(bugs), BorderLayout.NORTH);
+        return bugs.isEmpty() ? note(Bundle.message("view.bugs.none")) : rows(bugs);
     }
 
     /**

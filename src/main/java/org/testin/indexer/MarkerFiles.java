@@ -86,13 +86,18 @@ final class MarkerFiles {
      * <p>
      * The two steps are one call because every caller made both, in this order,
      * and a write that forgot the stamp is a node with no author.
+     *
+     * @return whether the marker landed. Writing it is what brings the node's
+     * directory into existence, so a creation that indexed first and wrote
+     * afterwards drew a test set in the tree with nothing on disk (#66,
+     * finding 85).
      */
-    void write(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Object marker) {
+    boolean write(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Object marker) {
         if (marker instanceof Marker m && m.getCreatedBy().isEmpty()) {
             m.stampCreated(tester());
         }
 
-        Services.getInstance(p, TestDataFiles.class).write(p, dirPath.resolve(markerFileName), marker);
+        return Services.getInstance(p, TestDataFiles.class).write(p, dirPath.resolve(markerFileName), marker);
     }
 
     /**

@@ -4,6 +4,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import java.util.Locale;
 import org.testin.model.Config;
 
 import java.time.Duration;
@@ -128,7 +129,7 @@ public final class Display {
      * the stored value is a separate method.
      */
     public static @NotNull String formatCaseClock(final @NotNull Duration duration) {
-        final @NotNull String minutes = String.format("%02d:%02d", duration.toMinutesPart(), duration.toSecondsPart());
+        final @NotNull String minutes = String.format(Locale.ROOT, "%02d:%02d", duration.toMinutesPart(), duration.toSecondsPart());
 
         return duration.toHours() == 0 ? minutes : duration.toHours() + ":" + minutes;
     }
@@ -155,7 +156,7 @@ public final class Display {
      * bar already draws on - it hides the label when there is nothing to show.
      */
     public static @NotNull String formatRunClock(final @NotNull Duration duration) {
-        return duration.isZero() ? "" : String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
+        return duration.isZero() ? "" : String.format(Locale.ROOT, "%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
     }
 
     /**

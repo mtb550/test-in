@@ -6,14 +6,25 @@ import org.testin.model.dto.dirs.DirectoryDto;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
  * Cached parent-to-children lookup used by the asynchronous project tree.
  */
 final class DirectoryChildrenIndex {
-    private final @NotNull Map<Path, List<DirectoryDto>> childrenByParent = new ConcurrentHashMap<>();
+
+    /**
+     * Replaced whole, never edited in place.
+     * <p>
+     * A reader that finds the index clean goes straight to the map without
+     * taking the lock, which is the point of the flag. The rebuild used to clear
+     * the live map and put the entries back one at a time, so such a reader
+     * could look between the two and get {@code List.of()} - a node drawn with
+     * no children under it, for no reason it could ever repeat. The rebuild
+     * already built its answer separately, and now it swaps that in as one
+     * assignment: a reader sees the old map or the new one (#66, finding 84).
+     */
+    private volatile @NotNull Map<Path, List<DirectoryDto>> childrenByParent = Map.of();
     private volatile boolean dirty = true;
 
     @NotNull
@@ -27,7 +38,7 @@ final class DirectoryChildrenIndex {
     }
 
     void clear() {
-        childrenByParent.clear();
+        childrenByParent = Map.of();
         dirty = true;
     }
 
@@ -54,7 +65,7 @@ final class DirectoryChildrenIndex {
         synchronized (this) {
             if (!dirty) return;
 
-            final @NotNull Map<Path, List<DirectoryDto>> rebuilt = new ConcurrentHashMap<>();
+            final @NotNull Map<Path, List<DirectoryDto>> rebuilt = new HashMap<>();
             for (final DirectoryDto directory : source.get()) {
                 // A test project sits under nothing, so it is nobody's child.
                 Optional.ofNullable(directory.getParent()).ifPresent(parent ->
@@ -69,9 +80,9 @@ final class DirectoryChildrenIndex {
             // exactly as it always did, which is why nothing had to be converted
             // when nodes learned to carry a rank.
             rebuilt.values().forEach(children -> children.sort(BY_ARRANGEMENT));
+            rebuilt.replaceAll((parent, children) -> List.copyOf(children));
 
-            childrenByParent.clear();
-            rebuilt.forEach((parent, children) -> childrenByParent.put(parent, List.copyOf(children)));
+            childrenByParent = Map.copyOf(rebuilt);
             dirty = false;
         }
     }

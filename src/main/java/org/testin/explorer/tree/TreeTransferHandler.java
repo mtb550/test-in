@@ -483,12 +483,22 @@ public class TreeTransferHandler extends TransferHandler {
                 .map(source -> target.getPath().resolve(source.getName()))
                 .toList();
 
-        moveBatch(oldPaths, newPaths, moved -> confirmLanded(Done.MOVED, moved));
+        // Inside the callback, not on the line after it. moveBatch is
+        // asynchronous - pooled thread, invokeLater, write action - so the entry
+        // used to be filed before a single node had moved, and without asking
+        // the count the callback reports. A drop that moved nothing was silent
+        // and still left a Move entry whose undo moved paths that do not exist,
+        // one press above the operation the tester actually wanted back
+        // (#66, finding 74).
+        moveBatch(oldPaths, newPaths, moved -> {
+            confirmLanded(Done.MOVED, moved);
+            if (moved == 0) return;
 
-        Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
-                Bundle.message("transfer.undo.move", describe(sources)),
-                () -> moveBatch(newPaths, oldPaths),
-                () -> moveBatch(oldPaths, newPaths)));
+            Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
+                    Bundle.message("transfer.undo.move", describe(sources)),
+                    () -> moveBatch(newPaths, oldPaths),
+                    () -> moveBatch(oldPaths, newPaths)));
+        });
     }
 
     private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to) {
