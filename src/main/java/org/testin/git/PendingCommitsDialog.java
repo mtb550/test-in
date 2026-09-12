@@ -116,8 +116,14 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         message = messageField.getComponent();
         commit = commitButton.getComponent();
 
+        // Captioned by the button rather than by hand. Enter submits, and a
+        // submit does whatever the split button's default does - which is
+        // Commit & Push, the first label. Typed as COMMIT, the status bar
+        // promised a local commit and the press sent the work to the remote,
+        // which is the one thing DialogSplitButton's own contract forbids
+        // (#66, finding 72).
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Enter, COMMIT, this::submit),
+                StatusBarShortcut.build(Shortcuts.Enter, commit.getChosen(), this::submit),
                 StatusBarShortcut.hint(Bundle.message("gesture.right.click"), Bundle.message("dialog.pending.hint.revert")),
                 StatusBarShortcut.cancel(this::closeCancel));
 
