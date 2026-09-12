@@ -90,7 +90,12 @@ public final class GlobalSearchDialog extends AbstractFrameworkDialog<TextFieldW
         // Nothing to say before anything is typed: the field is showing its
         // placeholder, and "everywhere you can go, 214 of them" is a number
         // about the project rather than about a search.
-        return query.isBlank() ? Rows.Answer.of(rows) : new Rows.Answer<>(rows, Bundle.message("dialog.search.found", found.matched()));
+        //
+        // Nothing to say when nothing matched either - the list draws its own
+        // "Nothing to show", and "0 found" above it is the same news twice.
+        if (query.isBlank() || found.matched() == 0) return Rows.Answer.of(rows);
+
+        return new Rows.Answer<>(rows, Bundle.message("dialog.search.found", found.matched()));
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-002

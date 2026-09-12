@@ -60,6 +60,14 @@ public final class DialogStyle {
         if (!note.isEmpty()) extensions.add(trailing(note, textField));
 
         textField.setExtensions(extensions);
+
+        // The field paints its extensions and nothing asks it to paint again.
+        // A note that changed while the typed text did not - which is every
+        // note, since it answers what was typed a moment ago - left the
+        // previous one on screen: a search narrowed from two hits to none kept
+        // reading "2 found" over an empty list (#66, finding 105).
+        textField.revalidate();
+        textField.repaint();
     }
 
     private static @NotNull ExtendableTextComponent.Extension leading(final @NotNull Icon icon) {
