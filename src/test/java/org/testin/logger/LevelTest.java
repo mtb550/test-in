@@ -70,4 +70,23 @@ public class LevelTest {
                         .allMatch(level -> level.priority >= 0),
                 "a level that writes is at or below DISABLED, so turning the log off would not turn it off");
     }
+
+    /**
+     * UC-SETTING-007, Rule-SETTING-025.
+     * <p>
+     * A stored level that names nothing comes back INFO, because the reader is
+     * {@code Level.valueOf} in the startup activity and it runs after the
+     * once-per-project claim is spent: a word this enum does not know threw from
+     * there, and the tester had an unindexed, empty tree for the session (#66,
+     * finding 87).
+     */
+    @Test
+    public void aStoredLevelThatNamesNothingIsRead() {
+        for (final Level level : Level.values())
+            assertEquals(Level.known(level.name()), level.name(), "a level this enum declares is kept as it was stored");
+
+        assertEquals(Level.known("VERBOSE"), Level.INFO.name(), "a level from another build does not stop the project opening");
+        assertEquals(Level.known("info"), Level.INFO.name(), "the stored form is the constant's own name, so case matters and a mismatch is unknown");
+        assertEquals(Level.known(""), Level.INFO.name(), "nothing stored is nothing to parse");
+    }
 }

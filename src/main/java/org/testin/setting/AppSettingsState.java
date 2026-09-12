@@ -74,11 +74,6 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
         return Objects.requireNonNullElse(value, "");
     }
 
-    private static @NotNull String orDefault(final @Nullable String value, final @NotNull String fallback) {
-        final @NotNull String stored = orEmpty(value);
-        return stored.isBlank() ? fallback : stored;
-    }
-
     @Override
     public @NotNull AppSettingsState getState() {
         return this;
@@ -94,7 +89,7 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
         // here, in the one place it can happen, rather than by every reader:
         // Level.valueOf(logLevel) and every marker write would fail on a null.
         rootTestinPath = orEmpty(rootTestinPath);
-        logLevel = orDefault(logLevel, Level.INFO.name());
+        logLevel = Level.known(orEmpty(logLevel));
         defaultDownloadFolder = orEmpty(defaultDownloadFolder);
         testerName = orEmpty(testerName);
         testerRole = orEmpty(testerRole);

@@ -59,8 +59,11 @@ public final class StartupActivity implements ProjectActivity {
             Logger.info("First run detected — saving default settings to testinSettings.xml");
         }
 
-        // AppSettingsState.loadState defaults a missing or blank level, so
-        // Level.valueOf always has something to parse.
+        // AppSettingsState.loadState answers with a level that parses - missing,
+        // blank and unrecognised all come back INFO - so valueOf has something to
+        // read whatever the file held. It used to default only the first two, and
+        // a word that named no level threw from here, after Once.claim had been
+        // spent: nothing indexed and no door retried (#66, finding 87).
         Logger.setLogLevel(Level.valueOf(settings.logLevel));
 
         Logger.info("StartupActivity.execute()");

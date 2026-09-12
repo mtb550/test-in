@@ -177,6 +177,15 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
             } catch (final Exception ex) {
                 Logger.error("Failed to load Test Run data from disk: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
+                    // The same guard the success branch takes, and for the same
+                    // reason. Without it a slow read that failed landed after a
+                    // newer one that worked, wrote "Unable to read this test
+                    // run" over a run the tester was already looking at, and
+                    // cancelled the start they had asked for. TestEditor's
+                    // failure branch has guarded since it was written (#66,
+                    // finding 87).
+                    if (generation != loadGeneration.get()) return;
+
                     list.setPaintBusy(false);
                     list.getEmptyText().setText(Bundle.message("editor.run.unreadable"));
 

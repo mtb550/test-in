@@ -147,8 +147,11 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         modified |= !testerNameField.getText().trim().equals(settings.testerName);
         modified |= !testerRoleField.getText().trim().equals(settings.testerRole);
         modified |= !downloadFolderField.getText().trim().equals(settings.defaultDownloadFolder);
-        modified |= !sftpUserField.getText().equals(settings.sftpUser);
-        modified |= !sftpKeyFileField.getText().equals(settings.sftpKeyFile);
+        // Trimmed, because apply() trims them before storing. Compared as typed,
+        // a trailing space was a difference applying could never remove, so Apply
+        // stayed enabled for the rest of the dialog's life (#66, finding 87).
+        modified |= !sftpUserField.getText().trim().equals(settings.sftpUser);
+        modified |= !sftpKeyFileField.getText().trim().equals(settings.sftpKeyFile);
         modified |= showShortcutHintsBox.isSelected() != settings.showShortcutHints;
         return modified;
     }
