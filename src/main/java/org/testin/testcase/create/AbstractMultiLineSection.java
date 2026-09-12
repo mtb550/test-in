@@ -86,10 +86,14 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
      *   <li>Tab / Shift+Tab move to the next / previous field,</li>
      *   <li>Alt+Enter is left to the platform - it opens the spelling corrections.</li>
      * </ul>
-     * Bound through the dialog's own registrar, which already stands these keys
-     * down while an autocomplete popup is open, and so through the action system -
-     * the only place an IntelliJ editor reads its keys from (a Swing binding on it
-     * is never reached).
+     * Bound through the dialog's own registrar, which stands a key down while a
+     * popup is actually using it, and so through the action system - the only
+     * place an IntelliJ editor reads its keys from (a Swing binding on it is
+     * never reached).
+     * <p>
+     * <b>Enter on the field, CTRL+ENTER on the editor.</b> Which component a key
+     * is registered against decides whether the editor gets it first, and the
+     * editor swallows what it is offered before anything outside it is asked.
      */
     public void enableMultiLine(final @NotNull TestCaseBaseDialog base, final @NotNull Runnable onSave) {
         field.setOneLineMode(false);
@@ -107,6 +111,22 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
             // this is the thing that works - and why the two Tab registrations
             // that used to be here are gone rather than kept alongside it.
             editor.getContentComponent().setFocusTraversalKeysEnabled(true);
+
+            // CTRL+ENTER, bound on the editor's own content component and not
+            // on the field around it.
+            //
+            // It was on the field, and the log says it never once ran: while the
+            // focus is in an editor, the editor's own handling of a key comes
+            // first, and a key it does not use is swallowed rather than passed
+            // on. The line breaks a tester did get came from the editor, which
+            // is why they arrived sometimes and not others - an open suggestion
+            // list takes the key before the editor sees it, and the list is
+            // open exactly when somebody has just started typing.
+            //
+            // The same rule the Tab comment above records, found the same way.
+            // Registered per editor, so an editor rebuilt for this field gets
+            // its own and there is never a second one on the same component.
+            base.registerShortcut(editor.getContentComponent(), Shortcuts.InsertNewLine.getCustomShortcut(), this::insertNewLine);
 
             // The frame and its blue focus ring - the platform's own border, so
             // it follows the theme and repaints on focus by itself.
@@ -157,8 +177,9 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
             }
         });
 
+        // Enter stays on the field: saving is the dialog's, and the editor has
+        // nothing of its own to do with a key the dialog has claimed.
         base.registerShortcut(field, Shortcuts.Enter.getCustomShortcut(), onSave::run);
-        base.registerShortcut(field, Shortcuts.InsertNewLine.getCustomShortcut(), this::insertNewLine);
     }
 
     /**
