@@ -67,4 +67,25 @@ public enum Done {
      * string it holds.
      */
     private final @NotNull String outcome;
+
+    /**
+     * Rule-TREE-PANEL-007, Rule-EDITOR-PANEL-008.
+     * <p>
+     * One outcome for a gesture that reached several things: <i>Removed</i> for
+     * one and <i>Removed 4</i> for four.
+     * <p>
+     * Here rather than in {@code Notifier}, which delivers messages and does not
+     * write them, and as a sentence from the bundle rather than the word with a
+     * space and a number glued after it. That glue was the last counted sentence
+     * in the plugin still assembled in code: it reads correctly in English,
+     * French and Hindi by luck, and a language that puts the count first or
+     * inflects the past participle by it had nowhere to say so (#66, finding 92).
+     * <p>
+     * A {@link String} rather than a {@code Done}, because a count is put on
+     * words this enum does not own as well - a test status label after a walk, a
+     * badge label when an automated run starts.
+     */
+    public static @NotNull String counted(final @NotNull String outcome, final int count) {
+        return count == 1 ? outcome : Bundle.message("done.counted", outcome, String.valueOf(count));
+    }
 }

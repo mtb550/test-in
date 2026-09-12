@@ -72,9 +72,12 @@ public final class Notifier {
     /**
      * Rule-TREE-PANEL-007, Rule-EDITOR-PANEL-008.
      * <p>
-     * Confirms an operation that ran over a selection: "Node copied" for one,
-     * "Nodes copied 3" for several. Here rather than at the call sites so that
-     * every bulk action pluralizes and counts the same way (#62).
+     * Confirms an operation that ran over a selection: <i>Copied</i> for one,
+     * <i>Copied 3</i> for several. Here rather than at the call sites so that
+     * every bulk action counts the same way (#62).
+     * <p>
+     * What the sentence looks like is {@link Done#counted}'s, not this class's -
+     * delivering it is the job here.
      */
     public void softShowCounted(final @NotNull Project p, final @NotNull String outcome, final int count) {
         // Nothing happened, so there is nothing to confirm. It used to say
@@ -83,7 +86,7 @@ public final class Notifier {
         // that expected something says so itself (#269).
         if (count <= 0) return;
 
-        softShow(p, count == 1 ? outcome : outcome + " " + count);
+        softShow(p, Done.counted(outcome, count));
     }
 
     /**
