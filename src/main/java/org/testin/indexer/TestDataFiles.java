@@ -55,20 +55,25 @@ final class TestDataFiles {
         }
     }
 
-    <T> void write(final @NotNull Project p, final @NotNull Path path, final @NotNull T content) {
-        writeBytes(p, path, Services.getInstance(p, Mapper.class).writeValueAsBytes(content));
+    /**
+     * @return whether the bytes landed. A caller that updates the cache after
+     * the write has to know, because architecture rule 2 makes the write the
+     * thing that decides whether the node exists at all (#66, finding 85).
+     */
+    <T> boolean write(final @NotNull Project p, final @NotNull Path path, final @NotNull T content) {
+        return writeBytes(p, path, Services.getInstance(p, Mapper.class).writeValueAsBytes(content));
     }
 
     /**
      * Writes pre-serialized JSON. Used by the run-status writer, which snapshots
      * the bytes on the EDT and performs only the disk I/O on its worker thread.
      */
-    void write(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
-        writeBytes(p, path, jsonBytes);
+    boolean write(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
+        return writeBytes(p, path, jsonBytes);
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-019
-    private void writeBytes(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
+    private boolean writeBytes(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
         // The last line of defense for test data: writing nothing over a file
         // empties it, and an empty marker takes its node's audit info with it.
         // Six markers in a real data root were left at zero bytes this way.
@@ -77,7 +82,7 @@ final class TestDataFiles {
         if (jsonBytes.length == 0) {
             Logger.error("Refusing to write an empty file, which would erase it: " + path);
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.nothing.written", path.getFileName()));
-            return;
+            return false;
         }
 
         try {
@@ -94,8 +99,10 @@ final class TestDataFiles {
             // What actually landed, so an edit a tester makes inside the window
             // is told from this write rather than swallowed with it (#278).
             Services.getInstance(OwnWrites.class).wrote(path, jsonBytes);
+            return true;
         } catch (final IOException ex) {
             reportWriteFailure(p, path, ex);
+            return false;
         }
     }
 

@@ -215,10 +215,22 @@ final class IndexerDataStore {
         addDir(testRunPackagesByPath, trp, DirectoryType.TRP.getMarker(), trp.getMarker());
     }
 
+    /**
+     * A new node: the marker is written first, and the cache learns about it
+     * only if that landed.
+     * <p>
+     * Architecture rule 2, and this method used to be it inverted. Creating a
+     * node performs no VFS operation of its own - the directory comes into
+     * existence as a side effect of the marker write - so a cache updated first
+     * left a fully indexed test set drawn in the tree with nothing on disk,
+     * which then survived every rescan until the tester pressed Refresh. Now a
+     * failed write reports itself and nothing is drawn (#66, finding 85).
+     */
     private <V extends DirectoryDto> void addDir(final @NotNull Map<String, V> map, final @NotNull V dto, final @NotNull String markerFileName, final @NotNull Object marker) {
+        if (!markers.write(dto.getPath(), markerFileName, marker)) return;
+
         map.put(dto.getPath().toString(), dto);
         childrenIndex.invalidate();
-        markers.write(dto.getPath(), markerFileName, marker);
         refreshDir(dto.getPath());
     }
 
@@ -383,14 +395,21 @@ final class IndexerDataStore {
         Logger.info("Removed test run package at: " + pathStr);
     }
 
+    /**
+     * A new test project, under the same order as {@link #addDir}: the two
+     * markers that bring Test Cases and Test Runs into existence are written
+     * first, and the cache learns about the project only if both landed.
+     */
     void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
+        final boolean casesWritten = markers.write(tp.getTestCasesDirectory().getPath(), DirectoryType.TCD.getMarker(), tp.getTestCasesDirectory().getMarker());
+        final boolean runsWritten = markers.write(tp.getTestRunsDirectory().getPath(), DirectoryType.TRD.getMarker(), tp.getTestRunsDirectory().getMarker());
+        if (!casesWritten || !runsWritten) return;
+
         testProjectsByPath.put(tp.getPath().toString(), tp);
         testCasesMainDirsByPath.put(tp.getTestCasesDirectory().getPath().toString(), tp.getTestCasesDirectory());
         testRunsMainDirsByPath.put(tp.getTestRunsDirectory().getPath().toString(), tp.getTestRunsDirectory());
         childrenIndex.invalidate();
 
-        markers.write(tp.getTestCasesDirectory().getPath(), DirectoryType.TCD.getMarker(), tp.getTestCasesDirectory().getMarker());
-        markers.write(tp.getTestRunsDirectory().getPath(), DirectoryType.TRD.getMarker(), tp.getTestRunsDirectory().getMarker());
         refreshDir(tp.getPath());
         refreshDir(tp.getTestCasesDirectory().getPath());
         refreshDir(tp.getTestRunsDirectory().getPath());
