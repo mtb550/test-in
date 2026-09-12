@@ -12,6 +12,13 @@
 # commands that matter - the sandbox, the tests, the inspection gate - instead
 # of every machine rediscovering them (#102).
 !.idea/runConfigurations/
+# The copyright profile and the scope it applies to, so a file created in the
+# IDE opens with the Apache notice every other file carries instead of somebody
+# pasting it. The scope has to travel with the profile: a profile mapped to a
+# scope this machine alone knows about applies to nothing on the next clone
+# (#303).
+!.idea/copyright/
+!.idea/scopes/
 .intellijPlatform/
 .run/
 .sandbox/

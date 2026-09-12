@@ -1,0 +1,17 @@
+<component name="CopyrightManager">
+  <!--
+    Which files the Testin notice applies to: the Java sources, and nothing
+    else.
+
+    No default profile, deliberately. A default applies to every file type the
+    Copyright plugin can write into - build.gradle.kts, plugin.xml, the message
+    bundles - and whether those carry a header is a decision #303 explicitly
+    declined to take. Mapping the scope instead means the profile reaches
+    exactly what the 656 files it was written for are.
+  -->
+  <settings>
+    <module2copyright>
+      <element module="Java sources" copyright="Testin" />
+    </module2copyright>
+  </settings>
+</component>

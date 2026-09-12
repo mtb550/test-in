@@ -23,13 +23,13 @@
     Costs one full indexing pass, so expect 10-20 minutes. A deliberate sweep, not
     a per-commit gate - .github/workflows/inspect.yml runs it every two days.
 
-    Exits non-zero for seven findings and no others. Two are the inspector's and
+    Exits non-zero for eight findings and no others. Two are the inspector's and
     are the standing rule, a null contract the checker can prove is broken:
-    DataFlowIssue and ReturnNull. Five are this script's own, each a rule no
+    DataFlowIssue and ReturnNull. Six are this script's own, each a rule no
     IntelliJ inspection makes: WrappedMethodDeclaration, StaticMutableState,
-    HandWrittenPrivateConstructor, DriftedCaption and OrphanedJavadoc. The list
-    is written once, in $gate at the foot of this file. Everything else is
-    listed for a person to judge.
+    HandWrittenPrivateConstructor, DriftedCaption, OrphanedJavadoc and
+    MissingCopyright. The list is written once, in $gate at the foot of this
+    file. Everything else is listed for a person to judge.
 
 .EXAMPLE
     pwsh tools/inspect.ps1
@@ -173,6 +173,23 @@ function Get-SourceRoots {
         should not fail the run.
     #>
     return @('src/main', 'testin-java/src/main', 'testin-testng/src/main') |
+        ForEach-Object { Join-Path $repo $_ } |
+        Where-Object { Test-Path $_ }
+}
+
+function Get-JavaSourceRoots {
+    <#
+        Every source tree, tests included.
+
+        Get-SourceRoots is the production ones, which is what the design checks
+        want: a caption duplicated between two test harnesses is read by nobody.
+        The copyright header is the other kind of rule - a test file is as
+        readable in a fork, a decompiler or a paste as a main one, and a rule
+        with an exception is a rule somebody has to remember (#303).
+
+        Only the ones that exist, for the same reason as above.
+    #>
+    return @('src/main', 'src/test', 'testin-java/src', 'testin-testng/src') |
         ForEach-Object { Join-Path $repo $_ } |
         Where-Object { Test-Path $_ }
 }
@@ -714,6 +731,28 @@ function Read-WrappedDeclarations([string] $scope) {
     }
 }
 
+function Test-DocComment([string[]] $lines, [int] $close) {
+    <#
+        Whether the block comment that ends at $close is a doc comment.
+
+        Only /** is documentation. Every file opens with the copyright notice in
+        a plain /* block, and javac never held that as documentation - so the
+        package javadoc below it in a package-info.java is still attached to the
+        package, and nothing is thrown away. Asking only whether a line ends in
+        "*/" read those three files as orphaned the day the headers landed
+        (#303).
+
+        Walks back to the line that opened the block, which is the line itself
+        for a one-line /** .. */.
+    #>
+    for ($i = $close; $i -ge 0; $i--) {
+        if (-not $lines[$i].Trim().StartsWith('/*')) { continue }
+        return $lines[$i].Trim().StartsWith('/**')
+    }
+
+    return $false
+}
+
 function Read-OrphanedJavadoc([string[]] $scopes) {
     <#
         A javadoc block the compiler throws away.
@@ -754,6 +793,7 @@ function Read-OrphanedJavadoc([string[]] $scopes) {
 
             for ($i = 0; $i -lt $lines.Count; $i++) {
                 if ($lines[$i].Trim() -notmatch '\*/$') { continue }
+                if (-not (Test-DocComment $lines $i)) { continue }
 
                 $j = $i + 1
                 while ($j -lt $lines.Count -and ($lines[$j].Trim() -eq '' -or $lines[$j].Trim() -match '^@[A-Za-z_][\w.]*(\(.*\))?$')) { $j++ }
@@ -767,6 +807,58 @@ function Read-OrphanedJavadoc([string[]] $scopes) {
                     Severity   = 'ERROR'
                     Message    = "A second block opens at line $($j + 1), so javac keeps that one and this documents nothing."
                 }
+            }
+        }
+    }
+}
+
+function Read-MissingCopyright([string[]] $scopes) {
+    <#
+        A file that does not say who owns it or on what terms.
+
+        The license used to live in LICENSE at the repository root and nowhere
+        else, so a file that traveled out of the repository - into a jar, a
+        decompiler, a search result, a fork - traveled without it. All 656 got
+        the Apache 2.0 notice from LICENSE's own appendix in #303, and this is
+        what keeps the 657th from being the one that has none: a header nothing
+        checks is the header missing from the next file somebody adds.
+
+        The expected first two lines are read from LICENSE rather than written
+        out here, so the year and the owner have one owner. Changing the year
+        there is meant to be loud: every file disagreeing with it is reported.
+
+        The first non-blank line, not the first line, so a stray blank at the
+        top is a header in the wrong place rather than no header at all - the
+        finding says the same thing either way.
+    #>
+    $appendix = [System.IO.File]::ReadAllLines((Join-Path $repo 'LICENSE')) |
+        Where-Object { $_ -cmatch '^\s*Copyright \d{4} \S' } |
+        Select-Object -First 1
+
+    if (-not $appendix) {
+        throw "No 'Copyright <year> <owner>' line in LICENSE, so there is nothing to check the file headers against."
+    }
+
+    $expected = '* ' + $appendix.Trim()
+
+    foreach ($scope in $scopes) {
+        if (-not (Test-Path $scope)) { continue }
+
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+            $lines = [System.IO.File]::ReadAllLines($file.FullName)
+
+            $first = 0
+            while ($first -lt $lines.Count -and $lines[$first].Trim() -eq '') { $first++ }
+
+            $opens = ($first -lt ($lines.Count - 1)) -and ($lines[$first].Trim() -eq '/*')
+            if ($opens -and $lines[$first + 1].Trim() -ceq $expected) { continue }
+
+            [pscustomobject]@{
+                Path       = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+                Line       = 1
+                Inspection = 'MissingCopyright'
+                Severity   = 'ERROR'
+                Message    = "No copyright header. A file opens with the Apache 2.0 notice from LICENSE - '/*' and then '$expected' - above everything else, one blank line before package."
             }
         }
     }
@@ -843,6 +935,13 @@ $problems += @(Read-HandWrittenPrivateConstructors $scopes)
 $problems += @(Read-OrphanedJavadoc $scopes)
 $problems += @(Read-ModelStatics @((Join-Path $repo 'src/main/java/org/testin/model')))
 
+# The one check that reads the test sources too. A file says who owns it and on
+# what terms wherever it lives, because a test file is as readable in a fork as a
+# main one - so this is the four source roots rather than the production three
+# (#303). An explicit -Subdirectory still wins, as everywhere above.
+$copyrightScopes = if ($narrowed) { $scopes } else { Get-JavaSourceRoots }
+$problems += @(Read-MissingCopyright $copyrightScopes)
+
 # The enums that name a test case's fields, compared against each other. Same
 # constant, same concept, so the caption is the same question.
 # A path that no longer exists is skipped in silence, so two of these four went
@@ -873,7 +972,7 @@ Write-DisplayStringInventory $scopes $outPath
 # what lets the scheduled run in .github/workflows/inspect.yml mean something.
 # DuplicatedDisplayString is not here: there were 136 when the check was
 # written, and it is ratcheted below instead.
-$gate = @('DataFlowIssue', 'ReturnNull', 'WrappedMethodDeclaration', 'StaticMutableState', 'HandWrittenPrivateConstructor', 'DriftedCaption', 'OrphanedJavadoc')
+$gate = @('DataFlowIssue', 'ReturnNull', 'WrappedMethodDeclaration', 'StaticMutableState', 'HandWrittenPrivateConstructor', 'DriftedCaption', 'OrphanedJavadoc', 'MissingCopyright')
 $breaches = @($problems | Where-Object { $gate -contains $_.Inspection })
 
 if ($breaches) {

@@ -5,18 +5,22 @@
 # still about code somebody remembers writing, and rare enough that nobody waits
 # on it.
 #
-# It gates on five findings, ratchets a sixth, and lists the rest.
+# It gates on eight findings, ratchets a ninth, and lists the rest.
 #
 # DataFlowIssue and ReturnNull are the standing rule: a null contract the checker
 # can prove is broken is a defect, not a style note.
 #
-# The other four are the script's own, because no IntelliJ inspection makes them.
+# The other six are the script's own, because no IntelliJ inspection makes them.
 # WrappedMethodDeclaration - a method declaration belongs on one line.
 # StaticMutableState - a static that is not final in the packages that model the
 # data is one slot for the whole IDE, which is how a cached test source root came
 # to be shared between projects. HandWrittenPrivateConstructor - an empty one
-# where @NoArgsConstructor(access = PRIVATE) says it better. All three are at
-# zero, so the first one that appears is the one to look at.
+# where @NoArgsConstructor(access = PRIVATE) says it better. DriftedCaption - one
+# concept spelled two ways in front of the same tester. OrphanedJavadoc - a doc
+# block followed by a second one, which javac throws away. MissingCopyright - a
+# .java file that does not open with the Apache 2.0 notice, so a file read away
+# from the repository says nothing about who owns it. All six are at zero, so the
+# first one that appears is the one to look at.
 #
 # DuplicatedDisplayString is counted rather than forbidden: a string a tester
 # reads that another file also writes has no owner, and there were 304 of them

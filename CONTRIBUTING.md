@@ -141,10 +141,18 @@ not a per-commit one. Run it after the last edit, on a still tree: editing a fil
 while the inspector is reading it produces findings about a version that no
 longer exists, which reads exactly like a real defect.
 
-It exits non-zero for six rules and no others: `DataFlowIssue`, `ReturnNull`,
-`WrappedMethodDeclaration`, `StaticMutableState`, `HandWrittenPrivateConstructor`
-and `DriftedCaption`. Everything else it reports is a judgement call and is
-listed rather than gated.
+It exits non-zero for eight rules and no others: `DataFlowIssue`, `ReturnNull`,
+`WrappedMethodDeclaration`, `StaticMutableState`, `HandWrittenPrivateConstructor`,
+`DriftedCaption`, `OrphanedJavadoc` and `MissingCopyright`. Everything else it
+reports is a judgement call and is listed rather than gated.
+
+`MissingCopyright` is the one that reads the test sources as well: every `.java`
+file opens with the Apache 2.0 notice from `LICENSE`'s own appendix, above
+`package` and one blank line before it, so a file read in a jar, a decompiler or
+a fork still says who owns it and on what terms (#303). The year and the owner
+are read from `LICENSE` rather than written into the script, so there is one
+place to change them. A new file created in the IDE gets the header from the
+copyright profile in `.idea/copyright/`, which is committed for that reason.
 
 The report lands in `.inspection/`, deliberately outside `build/` so
 `./gradlew clean` does not delete the list you are working from. Start with
