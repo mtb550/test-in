@@ -26,5 +26,11 @@ public class HistoryTab {
         emptyState.setBorder(JBUI.Borders.empty(20));
 
         historyTab.add(emptyState, BorderLayout.CENTER);
+
+        // Its own, as the details tab's load does its own. A tab that swapped its
+        // contents and left them unpainted showed the previous test case's rows
+        // until the tester switched away and back (#66, finding 79).
+        historyTab.revalidate();
+        historyTab.repaint();
     }
 }

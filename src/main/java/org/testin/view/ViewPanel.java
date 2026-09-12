@@ -180,9 +180,6 @@ public class ViewPanel implements Disposable {
         new DetailsTab().load(p, detailsTab, currentFromIndex(), page.getCurrentPath());
         new HistoryTab().load(historyTab);
         new OpenBugsTab().load(p, openBugsTab, currentFromIndex());
-
-        detailsTab.revalidate();
-        detailsTab.repaint();
     }
 
     /**
