@@ -23,8 +23,24 @@ import org.testin.model.dto.TestCaseDto;
 
 public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
 
-    public AbstractEditorContextMenu(final @NotNull String name, final boolean popup) {
-        super(name, popup);
+    /**
+     * No short name, and neither subclass may pass one.
+     * <p>
+     * A {@code DefaultActionGroup}'s short name is the label it shows when it is
+     * nested inside another menu as a submenu. These two are roots of an
+     * {@code ActionPopupMenu} and are nothing else, so the platform never asks
+     * for it - and each carried an English sentence there, "Test Editor Context
+     * Menu" and "Run Editor Context Menu", left untranslated because nobody can
+     * read them (#66, finding 95).
+     * <p>
+     * Deleted rather than given a bundle key, which would be three keys in three
+     * languages for text that is never drawn. If one of these is ever nested,
+     * the label is blank and obviously wrong, which is the failure worth having:
+     * the English one reads as deliberate in a French menu and fails nothing.
+     * The name goes back, from the bundle, in the commit that nests it.
+     */
+    protected AbstractEditorContextMenu() {
+        super("", true);
     }
 
     public abstract void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu menu);

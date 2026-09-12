@@ -27,7 +27,7 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
     private final @NotNull TestinEditor ui;
 
     public TestEditorContextMenu(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
-        super("Test Editor Context Menu", true);
+        super();
         this.p = p;
         this.ui = ui;
 
