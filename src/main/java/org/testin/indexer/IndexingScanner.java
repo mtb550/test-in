@@ -25,7 +25,6 @@ import org.testin.util.Mapper;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -171,7 +170,7 @@ final class IndexingScanner {
 
             store.getTestSetsDirByPath().put(path.toString(), ts);
 
-            final @NotNull List<UUID> caseIds = Collections.synchronizedList(new ArrayList<>());
+            final @NotNull List<UUID> caseIds = TestCaseSequenceStore.caseIds(List.of());
             final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
 
             try (Stream<Path> files = Files.list(path)) {
