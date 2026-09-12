@@ -117,6 +117,7 @@ tables**. A tester who wants the whole report should not choose this format.
 | **Difference 1** | Rule-REPORT-003 — a refusal is stated | Fixed. An empty folder, file name or format turns that box's own placeholder red — *Choose a folder*, *Name the file* — and puts the cursor in it, which is what the commit message box already did. |
 | **Difference 2** | Rule-REPORT-003 — `Enter` confirms a dialog | `Enter` does nothing in the report dialog. The tester has to press **Generate**. |
 | **Difference 3** | Rule-REPORT-001 — a report is about one test run | Fixed, and the row overstated it: the button could never actually be unavailable, because it is only ever built with a run editor. What it did offer was a report on a run still being written, which it now grays with the reason in the tooltip (Rule-REPORT-016). |
+| **Difference 8** | Rule-REPORT-002 — every format reads the same figures | The PDF drops any text outside Latin-1 without saying so. An Arabic test case description comes out of the PDF as an empty cell, while the HTML, Word and Excel reports print it. The three fonts the PDF is built from are the standard Helvetica faces, which carry Western encoding only, so the fix is a Unicode font shipped inside the plugin — a decision about what Testin distributes, not a line to change. |
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.

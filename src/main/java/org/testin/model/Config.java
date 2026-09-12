@@ -19,7 +19,15 @@ import java.util.Locale;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Config {
-    public static final @NotNull DateTimeFormatter EXCEL_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    /**
+     * How a spreadsheet writes a date, and therefore how the import reads one.
+     * <p>
+     * Pinned to one locale, like the pattern below it and for the same reason: a
+     * formatter without one takes the machine's, so the same workbook parsed on
+     * an Arabic-locale IDE meets digits the pattern cannot read and the import
+     * refuses a column it took on the machine next to it (#66, finding 82).
+     */
+    public static final @NotNull DateTimeFormatter EXCEL_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.US);
 
     public static final @NotNull String DATE_FORMAT_PATTERN = "EEEE dd-MM-yyyy 'At' HH:mm:ss '['VV']'";
     /**

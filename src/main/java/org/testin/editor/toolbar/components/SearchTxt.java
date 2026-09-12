@@ -54,8 +54,17 @@ public class SearchTxt extends SearchTextField implements Disposable, ToolbarIte
         return super.preprocessEventForTextField(e);
     }
 
+    /**
+     * What the tester typed, trimmed, and nothing else done to it.
+     * <p>
+     * It used to be lowercased here with no locale, and lowercased again by the
+     * filter with {@code Locale.ROOT}, so the second one could not undo the
+     * first: on a Turkish or Azeri IDE this turned the I of Login into a dotless
+     * i, and the search came back empty for a word that was on screen. One owner
+     * for the question, and it is the filter (#66, finding 82).
+     */
     public @NotNull String getSearchQuery() {
-        return getText().trim().toLowerCase();
+        return getText().trim();
     }
 
     @Override
