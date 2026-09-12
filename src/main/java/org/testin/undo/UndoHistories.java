@@ -98,22 +98,35 @@ public final class UndoHistories {
         if (history.undoStack.isEmpty()) return false;
 
         final @NotNull Operation operation = history.undoStack.pop();
-        final boolean whole = operation.undo().getAsBoolean();
-        history.redoStack.push(operation);
 
-        return whole;
+        // Nothing came back whole, so nothing moves. The operation used to go
+        // onto the redo stack regardless: the press was spent, the change the
+        // tester asked for was now behind CTRL+Y, and the next CTRL+Z took back
+        // the operation before it - one they had said nothing about (#66,
+        // finding 101).
+        if (!operation.undo().getAsBoolean()) {
+            history.undoStack.push(operation);
+            return false;
+        }
+
+        history.redoStack.push(operation);
+        return true;
     }
 
-    /** The same, the other way. */
+    /** The same, the other way, and it is spent under the same condition. */
     public boolean redo(final @NotNull UndoScope scope) {
         final @NotNull History history = of(scope);
         if (history.redoStack.isEmpty()) return false;
 
         final @NotNull Operation operation = history.redoStack.pop();
-        final boolean whole = operation.redo().getAsBoolean();
-        history.undoStack.push(operation);
 
-        return whole;
+        if (!operation.redo().getAsBoolean()) {
+            history.redoStack.push(operation);
+            return false;
+        }
+
+        history.undoStack.push(operation);
+        return true;
     }
 
     /**

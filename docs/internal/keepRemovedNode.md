@@ -97,6 +97,10 @@ offers the change before it instead.
 put it back. Writing over it would destroy one thing to restore another. The
 tester sees **Undo Incomplete**.
 
+**If an undo could not put everything back** — the press is not spent. `Ctrl+Z`
+still offers the same change, and `Ctrl+Y` is not given a change the tester
+never got back.
+
 **If putting a node back fails** — the tester sees two messages on the same
 press. *Undone* arrives first, because the undo itself ran. **Undo Incomplete**
 arrives after it, saying how many did not make it. Reading only the first one
