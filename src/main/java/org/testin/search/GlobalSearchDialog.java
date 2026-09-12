@@ -67,24 +67,24 @@ public final class GlobalSearchDialog extends AbstractFrameworkDialog<TextFieldW
     /**
      * UC-INTERNAL-001, Rule-INTERNAL-072, Rule-INTERNAL-073.
      * <p>
-     * One row per hit - the name, the badge saying what kind of thing it is,
-     * and where it lives - and beside the field, how many matched.
+     * One row per hit - its icon, its name, and underneath it where it lives -
+     * and beside the field, how many matched.
      * <p>
-     * The kind is on the row because one query answers with four of them at
-     * once, and until this the only thing telling a test case from a test set
-     * was a 16-pixel icon. The count is beside the field because the list stops
-     * at fifty: a common word matches hundreds and shows fifty, and the number
-     * is the only thing that says so.
+     * The icon says which kind of thing the row is, and nothing else does: it
+     * is the icon the tree draws for that node, so a test set looks in the
+     * search as it looks in the tree.
      * <p>
-     * Where it lives is on the row for its own reason: a description does not
-     * say which test set it came from, and three cases can be called the same
-     * thing in three different sets.
+     * Where it lives is on the row because a description does not say which
+     * test set it came from, and three cases can be called the same thing in
+     * three different sets. The count is beside the field because the list
+     * stops at fifty: a common word matches hundreds and shows fifty, and the
+     * number is the only thing that says so.
      */
     private static @NotNull Rows.Answer<Hit> rowsFor(final @NotNull Project p, final @NotNull String query) {
         final @NotNull Hits.Found found = Hits.forQuery(p, query);
 
         final @NotNull List<SelectionList<Hit>> rows = found.hits().stream()
-                .map(hit -> SelectionList.tagged(hit.icon(), hit.name(), hit.kind(), hit.where(), hit))
+                .map(hit -> SelectionList.add(hit.icon(), hit.name(), hit.where(), hit))
                 .toList();
 
         // Nothing to say before anything is typed: the field is showing its

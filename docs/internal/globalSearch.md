@@ -46,14 +46,15 @@ This is the fastest way to reach one test set, one test run or one test case.
   its own surface, and `Ctrl+M` did not, because creating a test case needs only
   an open editor and so was live in the tree as well. Where two are enabled the
   IDE runs whichever is declared first and says nothing.
-- **Rule-INTERNAL-072** — Every row in the search says what kind of thing it is,
-  as a badge beside its name. One query answers with test sets, test cases, test
-  runs and packages at once.
+- **Rule-INTERNAL-072** — What kind of thing a row is, its icon says and
+  nothing else does. It is the icon the tree draws for that node, so a test set
+  looks in the search as it looks in the tree. A word beside the name was built
+  and taken out again: the icon already carries it, and the row is for reading
+  the name.
 - **Rule-INTERNAL-073** — The search says how many things matched, beside what
   was typed. That is not how many it shows: the list stops at fifty.
-- **Rule-INTERNAL-074** — Nothing in a search row is lined up into a column. The
-  badge sits against the name it belongs to and the path sits against the badge,
-  whatever length the name is.
+- **Rule-INTERNAL-074** — Nothing in a search row is lined up into a column.
+  The path sits against the name it belongs to, whatever length the name is.
 
 The tree panel's own rules do not govern this dialog. It opens from anywhere in
 the IDE, and the tree is only where it lands.
@@ -67,9 +68,12 @@ the IDE, and the tree is only where it lands.
 │                                                                            │
 │  [find]  login                                     49 found      (1)       │
 │                                                                            │
-│  [set]  Login ( Test Set ) Demo > Test Cases > Accounts          (2)       │
-│  [run]  cycle-2 ( Test Run ) Demo > Test Runs > Sprint 7                   │
-│  [tc]   Sign in with a correct… ( Test Case ) Demo > … > Login   (3)       │
+│  [set]  Login                                                    (2)       │
+│         Demo > Test Cases > Accounts > Login                               │
+│  [run]  cycle-2                                                            │
+│         Demo > Test Runs > Sprint 7 > cycle-2                              │
+│  [tc]   Sign in with a correct username and password             (3)       │
+│         Demo > Test Cases > Accounts > Login                               │
 │                                                                            │
 ├────────────────────────────────────────────────────────────────────────────┤
 │  Enter Go To    ↑ ↓ Select    Escape Cancel                                │
@@ -81,15 +85,12 @@ the IDE, and the tree is only where it lands.
    only. Those are the ones with something to open. Once the tester types,
    packages, the two containers and the test project row match by name too — and
    the end of the field says how many matched, in gray.
-2. **A result row** — the icon, the name, a badge saying what kind of thing it
-   is, then the path in gray. Twelve rows are visible and the rest scroll. The
-   icon at the front of the field changes to the icon of whichever row is
-   selected.
-3. **Each part sits against the one before it.** The badge is beside the name it
-   belongs to, and the path is beside the badge, whatever length the name is.
-   Nothing is lined up into columns, so a short name leaves no gap between
-   itself and its own badge. A name too long for the row is shortened with an
-   ellipsis rather than pushing the badge off the end.
+2. **A result row** — the icon, the name, then the path after it in gray. The
+   icon is what says which kind of thing the row is: the same one the tree draws
+   for it. Twelve rows are visible and the rest scroll. The icon at the front of
+   the field changes to the icon of whichever row is selected.
+3. **Nothing is lined up into columns.** The path sits against the name it
+   belongs to, whatever length the name is.
 4. **At most 50 rows in all.** Nodes are taken first, so 50 matching nodes leave
    no room for test cases. The count beside the field is what matched, so a
    common word reads *612 found* over a list of fifty — which is how the tester

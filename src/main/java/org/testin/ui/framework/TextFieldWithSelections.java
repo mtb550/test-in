@@ -7,9 +7,6 @@ import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBList;
-import org.testin.ui.Badges;
-import com.intellij.util.ui.NamedColorUtil;
-import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBFont;
@@ -309,31 +306,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
         list.ensureIndexIsVisible(newIdx);
     }
 
-    /**
-     * UC-INTERNAL-001, Rule-INTERNAL-072, Rule-INTERNAL-074.
-     * <p>
-     * Draws a row, in one of two shapes.
-     * <p>
-     * A row with no badge is drawn by exactly the component that drew every row
-     * before badges existed, untouched - which is what keeps the six dialogs
-     * with fixed choices looking as they did. A badge cannot be appended to a
-     * {@code SimpleColoredComponent}, so a row that carries one is a small panel
-     * instead, and only the search answers with those.
-     */
-    private static final class SelectionRenderer<T> implements ListCellRenderer<SelectionList<T>> {
-
-        private final @NotNull PlainRow<T> plain = new PlainRow<>();
-        private final @NotNull TaggedRow<T> tagged = new TaggedRow<>();
-
-        @Override
-        public @NotNull Component getListCellRendererComponent(final @NotNull JList<? extends SelectionList<T>> list, final SelectionList<T> value, final int index, final boolean selected, final boolean hasFocus) {
-            if (value.tag().isEmpty()) return plain.getListCellRendererComponent(list, value, index, selected, hasFocus);
-
-            return tagged.bind(list, value, selected);
-        }
-    }
-
-    private static final class PlainRow<T> extends ColoredListCellRenderer<SelectionList<T>> {
+    private static final class SelectionRenderer<T> extends ColoredListCellRenderer<SelectionList<T>> {
         @Override
         protected void customizeCellRenderer(final @NotNull JList<? extends SelectionList<T>> list, final SelectionList<T> value, final int index, final boolean selected, final boolean hasFocus) {
             setIcon(value.icon());
@@ -344,83 +317,6 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
                 append("   " + value.hint(), SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES);
             }
             setBorder(JBUI.Borders.empty(8, 12));
-        }
-    }
-
-    /**
-     * UC-INTERNAL-001, Rule-INTERNAL-072, Rule-INTERNAL-074.
-     * <p>
-     * A row that says what kind of thing it is: the name, then the badge, then
-     * where it lives.
-     * <p>
-     * Each directly after the one before it, at the width it needs. Laid out in
-     * columns the badges lined up, and every short name left a gap of empty row
-     * between itself and its own badge - a badge belongs to the name it is
-     * beside, and a column put it somewhere else on the row.
-     * <p>
-     * The slack is all at the end, in one filler, so nothing before it is
-     * stretched. A name too long for the row shrinks and ellipsizes rather than
-     * pushing the badge off the edge.
-     * <p>
-     * One instance, bound again for each row the list paints, and the badge
-     * panel keeps its pill between rows - {@link Badges#showBadges} exists for
-     * exactly that.
-     */
-    private static final class TaggedRow<T> {
-
-        private final @NotNull JBPanel<?> row = new JBPanel<>(new GridBagLayout());
-        private final @NotNull JBLabel name = new JBLabel();
-        private final @NotNull JBPanel<?> badge = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        private final @NotNull JBLabel where = new JBLabel();
-
-        private TaggedRow() {
-            row.setOpaque(true);
-            row.setBorder(JBUI.Borders.empty(6, 12));
-            badge.setOpaque(false);
-            name.setIconTextGap(JBUI.scale(8));
-
-            row.add(name, at(0, 0));
-            row.add(badge, at(1, 0));
-            row.add(where, at(2, 0));
-
-            // The row's leftover width, and nothing drawn in it - opaque, it
-            // would paint its own background over the selection.
-            final @NotNull JBPanel<?> filler = new JBPanel<>();
-            filler.setOpaque(false);
-            row.add(filler, at(3, 1.0));
-        }
-
-        /**
-         * Its own width and no more, hard against what came before it. The last
-         * column carries the weight, so the row's leftover space collects at
-         * the end instead of being shared out between the three that hold
-         * something.
-         */
-        private static @NotNull GridBagConstraints at(final int column, final double weight) {
-            final @NotNull GridBagConstraints c = new GridBagConstraints();
-            c.gridx = column;
-            c.weightx = weight;
-            c.fill = GridBagConstraints.HORIZONTAL;
-            c.anchor = GridBagConstraints.WEST;
-            c.insets = JBUI.insetsLeft(column == 0 ? 0 : 4);
-            return c;
-        }
-
-        private @NotNull Component bind(final @NotNull JList<? extends SelectionList<T>> list, final @NotNull SelectionList<T> value, final boolean selected) {
-            row.setBackground(selected ? list.getSelectionBackground() : list.getBackground());
-
-            name.setIcon(value.icon());
-            name.setText(value.name());
-            name.setFont(list.getFont());
-            name.setForeground(selected ? list.getSelectionForeground() : list.getForeground());
-
-            Badges.showBadges(badge, List.of(Badges.createKindBadge(value.tag())));
-
-            where.setText(value.hint());
-            where.setFont(list.getFont().deriveFont(Font.ITALIC));
-            where.setForeground(selected ? list.getSelectionForeground() : NamedColorUtil.getInactiveTextColor());
-
-            return row;
         }
     }
 }
