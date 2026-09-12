@@ -4,6 +4,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
+import java.util.Locale;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -43,7 +44,12 @@ public final class LogWriter implements Disposable {
      */
     private static final @NotNull Object SHUTDOWN = new Object();
     private final @NotNull BlockingQueue<Object> logQueue = new ArrayBlockingQueue<>(10000);
-    private final @NotNull DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    /**
+     * Pinned, so two testers' logs read the same beside each other. Without a
+     * locale the timestamps follow the machine, and an Arabic-locale IDE writes
+     * them in Arabic-Indic digits (#66, finding 103).
+     */
+    private final @NotNull DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
     // The IDE's log directory - beside idea.log, so Help -> Show Log in
     // Explorer finds it and Collect Logs and Diagnostic Data bundles it.
     // Resolved once; the location never depends on any open project.

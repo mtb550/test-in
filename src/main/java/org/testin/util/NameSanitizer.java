@@ -3,6 +3,7 @@ package org.testin.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import java.util.Locale;
 
 import javax.lang.model.SourceVersion;
 import java.util.regex.Pattern;
@@ -73,10 +74,10 @@ public final class NameSanitizer {
         for (final String word : cleanName.split("[\\s_]+")) {
             if (word.isEmpty()) continue;
             if (result.isEmpty()) {
-                result.append(word.toLowerCase());
+                result.append(word.toLowerCase(Locale.ROOT));
             } else {
                 result.append(Character.toUpperCase(word.charAt(0)))
-                        .append(word.substring(1).toLowerCase());
+                        .append(word.substring(1).toLowerCase(Locale.ROOT));
             }
         }
 
@@ -193,10 +194,10 @@ public final class NameSanitizer {
         for (final String word : description.split("[^a-zA-Z0-9]+")) {
             if (word.isEmpty()) continue;
             if (result.isEmpty()) {
-                result.append(word.toLowerCase());
+                result.append(word.toLowerCase(Locale.ROOT));
             } else {
                 result.append(Character.toUpperCase(word.charAt(0)));
-                if (word.length() > 1) result.append(word.substring(1).toLowerCase());
+                if (word.length() > 1) result.append(word.substring(1).toLowerCase(Locale.ROOT));
             }
         }
         return result.toString();
@@ -214,7 +215,7 @@ public final class NameSanitizer {
      * test (#66, finding 41).
      */
     public static @NotNull String methodKey(final @NotNull String methodName) {
-        return methodName.replace("_", "").toLowerCase();
+        return methodName.replace("_", "").toLowerCase(Locale.ROOT);
     }
 
     /**
