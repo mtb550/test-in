@@ -62,15 +62,15 @@ public class RemoveTestCaseAction extends DumbAwareAction {
 
             final @NotNull Runnable delete = () -> ApplicationManager.getApplication().runWriteAction(() -> performDeletion(selectedItems));
 
-            // A pending cut removes its source as the second half of a move the
-            // tester already asked for, so it is not confirmed again.
-            final boolean isCutAndSelected = Services.getInstance(p, CutState.class).isCutting() &&
-                    selectedItems.stream().allMatch(tc -> Services.getInstance(p, CutState.class).isPending(tc.getId()));
-
-            if (isCutAndSelected) {
-                delete.run();
-                return;
-            }
+            // Delete is Delete, whatever is on the clipboard. This used to skip
+            // both the confirmation and the "Removed" balloon when every selected
+            // row was pending a cut, on the grounds that a paste removes the
+            // source as the second half of a move the tester already asked for -
+            // but a paste has not gone through here since PasteTestCaseNodeAction
+            // took over removing its own source rows. What was left was the
+            // tester pressing Delete on rows they had cut: the rows vanished,
+            // nothing was asked, nothing was said, and the cut stayed pending on
+            // ids that no longer exist (#66, finding 81).
 
             final @NotNull String msg = selectedItems.size() == 1
                     ? Bundle.message("remove.case.confirm.one", selectedItems.getFirst().getDescription())
@@ -103,6 +103,11 @@ public class RemoveTestCaseAction extends DumbAwareAction {
             // So a case left there is written back to disk after its file has been
             // deleted, and comes back on the next re-index as an unsorted orphan.
             editor.getAllTestCases().removeAll(selectedItems);
+
+            // Whatever route removed these rows, a cut waiting to paste them is
+            // waiting for ids that have gone: the cards would draw faded for a
+            // move that can never land.
+            Services.getInstance(p, CutState.class).clear();
 
             final var indexer = Services.getInstance(p, org.testin.indexer.ProjectIndexer.class);
             for (final TestCaseDto tc : selectedItems) {

@@ -87,16 +87,21 @@ public abstract class AbstractGridEditListener implements TableModelListener {
             // at a value they did not type.
             final @NotNull String typed = String.valueOf(model.getValueAt(row, col));
 
-            final boolean changed = apply(model, edited, row, col);
+            final @NotNull GridEdit outcome = apply(model, edited, row, col);
 
             // Before the question of whether anything was saved, and asked even
             // when nothing was. A description that loses the characters Testin
             // will not keep can come back as the value the row already had, so
             // nothing is written, nothing is confirmed - and the tester watches
             // their own text change with nothing said about it (#203).
-            sayIfRewritten(typed, String.valueOf(model.getValueAt(row, col)));
+            //
+            // Not after a refusal, though. The grid has already said, in words
+            // about the value, why it would not take it; saying next that Testin
+            // stored something else is the same event described twice, the
+            // second time as though it were a different one (#66, finding 81).
+            if (!outcome.isSaid()) sayIfRewritten(typed, String.valueOf(model.getValueAt(row, col)));
 
-            if (!changed) return;
+            if (!outcome.isWritten()) return;
 
             confirmEdit();
 
@@ -128,7 +133,7 @@ public abstract class AbstractGridEditListener implements TableModelListener {
      * @param onThisRow the test case this row stands for, which both grids are a
      *                  view of even where what they write is not the case itself
      */
-    protected abstract boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto onThisRow, final int row, final int col);
+    protected abstract @NotNull GridEdit apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto onThisRow, final int row, final int col);
 
     /**
      * UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-008.

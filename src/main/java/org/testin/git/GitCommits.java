@@ -3,6 +3,7 @@ package org.testin.git;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.util.Bundle;
 import org.testin.model.DirectoryType;
 
 import java.nio.file.Files;
@@ -191,8 +192,21 @@ public final class GitCommits {
         }
     }
 
-    // UC-SHARE-013
+    /**
+     * UC-SHARE-013, Rule-SHARE-077.
+     * <p>
+     * Pushes the branch, and sets its upstream on the way - so a branch that had
+     * none acquires one the first time it is pushed.
+     * <p>
+     * A repository with no remote is refused here, in Testin's own words. Three
+     * call sites ask for a push and only the push action itself checked, so
+     * continuing a rebase in a repository with no remote ran
+     * {@code git push -u "" <branch>} and showed the tester Git's complaint about
+     * an empty remote name instead (#66, finding 81).
+     */
     public void push(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
+        if (remote.isBlank()) throw new IllegalStateException(Bundle.message("git.error.no.remote"));
+
         GitCommandRunner.executeRemote(p, repositoryPath, repositories.getRemoteUrl(repositoryPath, remote),
                 "git", "push", "-u", remote, branch);
         Logger.info("Git push completed for " + repositoryPath);

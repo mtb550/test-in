@@ -153,7 +153,16 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
         for (int i = 0; i < items.size(); i++) {
             final @NotNull EditedValue edited = newValues.get(i);
             if (!edited.changed()) continue;
-            if (edited.value().isEmpty() && !acceptsBlank()) continue;
+
+            // Counted, not passed over. A field that will not take a blank is
+            // refusing the value the tester typed, and skipping it silently
+            // closed the dialog with nothing changed and nothing said - three
+            // descriptions cleared to blank looked exactly like three saved
+            // (#66, finding 81).
+            if (edited.value().isEmpty() && !acceptsBlank()) {
+                refused++;
+                continue;
+            }
 
             if (!setValue(items.get(i), edited.value())) {
                 refused++;

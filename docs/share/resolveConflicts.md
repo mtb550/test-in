@@ -80,6 +80,10 @@ rebase.*
 **If conflicts remain after the merge** — a message titled **Still Conflicting**
 names them again.
 
+**If the repository has no remote** — the rebase is carried to the end and the
+push is refused, reading *This repository has no remote, so there is nothing to
+push to*.
+
 **If a merged file cannot be written** — a message titled **Merge Failed** reads
 *Could not write*, the path, then the reason.
 

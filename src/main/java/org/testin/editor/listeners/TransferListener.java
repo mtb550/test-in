@@ -78,6 +78,11 @@ public class TransferListener extends TransferHandler {
         // nothing about a drag that was simply not ours to take.
         if (!support.isDataFlavorSupported(FLAVOR)) return false;
 
+        // Before the try, because the try rearranges it: the master list is the
+        // one thing here that is changed in memory and persisted afterward, so a
+        // failure between the two has to be able to put it back.
+        final @NotNull List<TestCaseDto> orderBefore = editor.snapshotOfAll();
+
         try {
             final @NotNull Object data = support.getTransferable().getTransferData(FLAVOR);
             if (!(data instanceof List<?> rawList)) return false;
@@ -133,9 +138,32 @@ public class TransferListener extends TransferHandler {
 
             return true;
         } catch (final Exception ex) {
+            // The list was rearranged inside the try and the save comes after it,
+            // so a throw between the two left the editor holding an order nothing
+            // had written - and said nothing at all, to anybody but the log. The
+            // order goes back and the tester is told (#66, finding 81).
+            putBack(orderBefore);
+
             Logger.error("Reordering the test cases failed: " + ex.getMessage());
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("reorder.failed"));
             return false;
         }
+    }
+
+    /**
+     * UC-EDITOR-PANEL-015.
+     * <p>
+     * The order the editor had before the drop, put back and redrawn.
+     */
+    private void putBack(final @NotNull List<TestCaseDto> orderBefore) {
+        final @NotNull List<TestCaseDto> allItems = editor.getAllTestCases();
+
+        synchronized (allItems) {
+            allItems.clear();
+            allItems.addAll(orderBefore);
+        }
+
+        editor.refreshView();
     }
 
     /**

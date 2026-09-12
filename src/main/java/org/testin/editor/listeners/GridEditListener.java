@@ -50,13 +50,13 @@ public class GridEditListener extends AbstractGridEditListener {
 
     // UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-050
     @Override
-    protected boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto tc, final int row, final int col) {
+    protected @NotNull GridEdit apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto tc, final int row, final int col) {
         final @NotNull TestEditorAttributes attr = TestEditorAttributes.values()[col];
 
         // The table model refuses these columns already; asked again of the same
         // attribute because a programmatic setValueAt never goes through the
         // model's answer.
-        if (!attr.can(Can.EDIT)) return false;
+        if (!attr.can(Can.EDIT)) return GridEdit.UNCHANGED;
 
         // Taken first of all: the setter below writes into the DTO the index is
         // holding, so a snapshot after it would be a snapshot of the edit.
@@ -68,23 +68,27 @@ public class GridEditListener extends AbstractGridEditListener {
         final boolean took = attr.getImportSetter().execute(p, tc, typed);
         final @NotNull Object after = attr.gridValue(tc);
 
-        // Rule-EDITOR-PANEL-206. The cell redraws with the old value either way,
-        // so without this a refused typo and an edit that changed nothing look
-        // identical to the tester (#204).
-        if (!took) Services.getInstance(p, Notifier.class).softRefuse(p, Refused.UNREADABLE, quoted(typed, attr));
-
         // Always write the normalized value back to the cell - it renumbers
         // steps and drops blank entries even when nothing really changed. That
         // the cell may now differ from what was typed is said by the parent,
         // which both grids run through (#203).
         model.setValueAt(after, row, col);
 
-        if (Objects.equals(before, after)) return false;
+        // Rule-EDITOR-PANEL-206. The cell redraws with the old value either way,
+        // so without this a refused typo and an edit that changed nothing look
+        // identical to the tester (#204). The parent is told this was a refusal,
+        // so it does not say the same thing again in other words.
+        if (!took) {
+            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.UNREADABLE, quoted(typed, attr));
+            return GridEdit.REFUSED;
+        }
+
+        if (Objects.equals(before, after)) return GridEdit.UNCHANGED;
 
         persistAndGenerate(tc, attr, undoFrom);
         onEdited.run();
 
-        return true;
+        return GridEdit.WROTE;
     }
 
     /**

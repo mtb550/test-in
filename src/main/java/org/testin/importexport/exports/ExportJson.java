@@ -5,9 +5,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.io.File;
@@ -34,9 +32,13 @@ public class ExportJson {
 
             Files.write(destFile.toPath(), Services.getInstance(p, Mapper.class).writeValueAsBytes(sheetsData));
         } catch (final IOException ex) {
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("export.json.failed", ex.getMessage()));
+            // Raised, not reported and swallowed, which is what the other three
+            // exporters do. Returning here left the caller to carry on and show
+            // "Exported 200" under the failure it had just raised, so only the
+            // JSON export told the tester both things about one attempt (#66,
+            // finding 81). The one owner above catches it and says it once.
             Logger.error("export failed: " + destFile + " - " + ex.getMessage());
-            return;
+            throw new RuntimeException(ex);
         }
 
         ExportNotice.show(p, destFile);

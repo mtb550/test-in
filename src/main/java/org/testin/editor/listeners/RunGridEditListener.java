@@ -45,16 +45,16 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
     // UC-EDITOR-PANEL-041, Rule-EDITOR-PANEL-174
     @Override
-    protected boolean apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto onThisRow, final int row, final int col) {
+    protected @NotNull GridEdit apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto onThisRow, final int row, final int col) {
         final @NotNull RunEditorAttributes attr = RunEditorAttributes.values()[col];
 
         // The table model refuses these columns already; asked again of the same
         // attribute because a programmatic setValueAt never goes through the
         // model's answer.
-        if (!attr.isEdited()) return false;
+        if (!attr.isEdited()) return GridEdit.UNCHANGED;
 
         final @NotNull Optional<TestRunItems> found = editor.runItem(onThisRow.getId());
-        if (found.isEmpty()) return false;
+        if (found.isEmpty()) return GridEdit.UNCHANGED;
         final @NotNull TestRunItems item = found.get();
 
         final @NotNull String before = attr.getRunValueExtractor().execute(item, p);
@@ -64,7 +64,7 @@ public class RunGridEditListener extends AbstractGridEditListener {
         if (item.isRemoved()) {
             model.setValueAt(before, row, col);
             Services.getInstance(p, RunStatusService.class).refuseRemoved(p);
-            return false;
+            return GridEdit.REFUSED;
         }
 
         attr.getRunValueSetter().execute(item, String.valueOf(model.getValueAt(row, col)));
@@ -74,11 +74,11 @@ public class RunGridEditListener extends AbstractGridEditListener {
         // cell must show, even where the setter normalized what was typed.
         model.setValueAt(after, row, col);
 
-        if (Objects.equals(before, after)) return false;
+        if (Objects.equals(before, after)) return GridEdit.UNCHANGED;
 
         Services.getInstance(p, RunStatusService.class).persistRun(p, editor);
         onEdited.run();
 
-        return true;
+        return GridEdit.WROTE;
     }
 }
