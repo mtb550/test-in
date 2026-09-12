@@ -286,7 +286,20 @@ tasks {
      * else, so the two kinds sit beside the code they are about.
      */
     named<Test>("test") {
-        useTestNG()
+        // The indexer's parsing budget runs alone: ./gradlew test -Pbudget.
+        //
+        // It measures time, and a machine that is also compiling or running a
+        // second build is slower - on a developer's machine it failed with no
+        // code change and passed on the next run, which teaches everybody to
+        // re-run rather than read (#66, finding 108). CI runs it as its own
+        // step, on a runner doing nothing else.
+        //
+        // The same task rather than a second one, because this one carries the
+        // platform plugin's launcher: a separately registered Test task starts
+        // on the daemon's JDK, which refuses the JVM flag every test task gets.
+        useTestNG {
+            if (providers.gradleProperty("budget").isPresent) includeGroups("budget") else excludeGroups("budget")
+        }
         exclude("**/*IdeTest.class")
     }
 }

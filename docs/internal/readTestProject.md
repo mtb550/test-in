@@ -60,8 +60,10 @@ A test project of ten thousand test cases, measured rather than estimated.
 | **Held in memory, ten thousand** | 14.6 MB | 40 MB |
 
 Measured on 9 September 2026, Windows 11 with JBR 25, by
-`IndexerBudgetTest`. That test asserts the budget on every build, so a change
-that doubles the cost fails rather than ships.
+`IndexerBudgetTest`. CI asserts the budget on every push, on a runner doing
+nothing else, so a change that doubles the cost fails rather than ships. It is
+its own run - `./gradlew test -Pbudget` - and not part of the ordinary one,
+because a clock on a machine that is also compiling measures the machine.
 
 **What the budget covers is the reading, not the disk.** The same ten thousand
 cases written out as files and walked took **3.5 seconds warm and 150 seconds

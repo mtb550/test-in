@@ -93,7 +93,11 @@ jobs:
       # full sweep by hand.
       - name: Build, test and verify
         shell: bash
-        run: ./gradlew compileJava test verifyPlugin verifyDistribution
+        # The budget second and alone, so the clock it reads is not shared with
+        # compiling and verifying (#66, finding 108).
+        run: |
+          ./gradlew compileJava test verifyPlugin verifyDistribution
+          ./gradlew test -Pbudget
 
       - name: Keep the reports
         if: always()

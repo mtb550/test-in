@@ -65,8 +65,7 @@ public class IndexerBudgetTest {
 
     /**
      * The reference size the budget is stated at. Ten thousand is the number
-     * #125 asked for, and it parses in well under a second from memory, so it
-     * runs on every build rather than behind a flag.
+     * #125 asked for, and it parses in well under a second from memory.
      */
     private static final int CASES = 10_000;
 
@@ -94,8 +93,15 @@ public class IndexerBudgetTest {
     /**
      * The budget. Ten thousand documents already in memory, parsed into the DTO
      * the plugin actually holds.
+     * <p>
+     * <b>In the budget group</b>, which the ordinary test run leaves out and
+     * {@code ./gradlew test -Pbudget} runs on its own. A wall-clock budget measures the
+     * machine as well as the parser: on a developer's machine running a second
+     * build it failed with no code change and passed on the next run. CI runs
+     * it on a runner doing nothing else, where the number means what it says
+     * (#66, finding 108).
      */
-    @Test
+    @Test(groups = "budget")
     public void parsingTenThousandTestCasesStaysInsideTheBudget() {
         final @NotNull List<String> documents = documents(CASES);
 
