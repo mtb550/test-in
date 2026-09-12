@@ -1,9 +1,9 @@
 package org.testin.search;
 
-import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.util.Icons;
 
 import javax.swing.*;
 import java.util.Optional;
@@ -29,7 +29,7 @@ public record Hit(@NotNull Icon icon, @NotNull String name, @NotNull String wher
      * A test case, shown under the test set that holds it.
      */
     public static @NotNull Hit of(final @NotNull TestCaseDto tc) {
-        return new Hit(AllIcons.Nodes.Class, tc.getDescription(), where(tc.getParent()),
+        return new Hit(Icons.TEST_CASE, tc.getDescription(), where(tc.getParent()),
                 tc.getParent(), Optional.of(tc));
     }
 

@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Icons;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.NavigateToCodeAction;
 import org.testin.notifications.Notifier;
@@ -30,7 +31,7 @@ public enum CardHoverAction {
             Bundle.message("automated.navigate"),
             "Testin.NavigateToCode",
             List.of(OptionalPlugin.JAVA),
-            AllIcons.Nodes.Class,
+            Icons.TEST_CASE,
             (p, cases) -> NavigateToCodeAction.execute(p, cases.getFirst())
     ),
 

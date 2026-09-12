@@ -1,5 +1,6 @@
 package org.testin.util;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
@@ -20,6 +21,32 @@ import java.awt.*;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Icons {
+
+    /**
+     * UC-EDITOR-PANEL-001, UC-INTERNAL-001.
+     * <p>
+     * What a test case looks like, wherever one is drawn: the card, the card's
+     * hover action, and a row in the search.
+     * <p>
+     * Here rather than at each of the three, because it is one answer to one
+     * question and they were three copies of it - a change had to be made three
+     * times and noticed three times.
+     * <p>
+     * <b>Not the class icon.</b> It was, and that picture means a Java class -
+     * which is what {@link org.testin.model.Automated} still draws for the
+     * generated method, on the same card. Two things on one card cannot be the
+     * same picture, and of the two it is the Java class that has the better
+     * claim to it.
+     * <p>
+     * <b>Drawn gray.</b> {@code Nodes.Type} ships blue - a {@code #3574F0} ring
+     * and stem over a pale fill - and Testin's own surfaces are gray: a single
+     * colored glyph in a list of gray ones is the loudest thing on the row, and
+     * the row is for reading the test case. Desaturated by the platform rather
+     * than by a second copy of the file, so it follows the icon if JetBrains
+     * redraws it.
+     */
+    public static final @NotNull Icon TEST_CASE = IconUtil.desaturate(AllIcons.Nodes.Type);
+
     private static final float SCALE_FACTOR = 1.3f;
     private static final int DOT_SIZE = 10;
 

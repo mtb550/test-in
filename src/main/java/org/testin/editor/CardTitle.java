@@ -1,11 +1,11 @@
 package org.testin.editor;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Icons;
 import org.testin.model.Automated;
 
 import javax.swing.Icon;
@@ -40,7 +40,7 @@ public final class CardTitle {
      * band no longer covered the icon it belonged to.
      */
     public static @NotNull ActionIcons descriptionActionIcons(final int titleWidth) {
-        final @NotNull Icon icon = AllIcons.Nodes.Class;
+        final @NotNull Icon icon = Icons.TEST_CASE;
         final int x = JBUI.scale(16) + titleWidth + JBUI.scale(10);
         final int y = JBUI.scale(12);
 
@@ -65,7 +65,7 @@ public final class CardTitle {
      * clickable band that stops covering the icon it belongs to.
      */
     public static int titleColumnWidth(final int listWidth) {
-        final @NotNull Icon icon = AllIcons.Nodes.Class;
+        final @NotNull Icon icon = Icons.TEST_CASE;
         final int forIcons = JBUI.scale(10) + icon.getIconWidth() + JBUI.scale(8) + icon.getIconWidth();
         final int column = listWidth - JBUI.scale(16) * 2 - forIcons;
 
