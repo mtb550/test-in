@@ -31,7 +31,6 @@ import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.StatusBarItem;
 import org.testin.testcase.CreateTestCaseFields;
@@ -132,24 +131,13 @@ public abstract class TestCaseBaseDialog {
      */
     protected final void repack() {
         popup.ifPresent(open -> {
-            // The height is set rather than packed.
-            //
-            // pack() asks the popup to work the size out again, and on a
-            // resizable popup it does not: the create dialog grew by exactly
-            // nothing while the log showed it being re-packed to 61, 90, 119,
-            // 148. The update dialog, which is built not resizable, grew every
-            // time - the only difference between the two builders. A tester
-            // dragging the dialog taller then saw the line that had been added
-            // several keystrokes earlier.
-            //
-            // Nothing is being worked around: the height wanted is already
-            // known here - the section measured it and that is why this was
-            // called - so it is said rather than asked for. The width is left
-            // exactly as it is, including a width the tester chose themselves.
-            final int wanted = naturalHeightOf(open.getContent());
-            Logger.debug("Resizing the dialog: " + open.getSize().height + " -> " + wanted);
-
-            open.setSize(new Dimension(open.getSize().width, wanted));
+            // Set, not packed. pack() asks the popup to work its size out
+            // again and a resizable one will not - the create dialog grew by
+            // nothing while this ran, and dragging it taller showed the lines
+            // that had been added several keystrokes before. The height is
+            // already known here, so it is said. The width is left alone,
+            // including one the tester chose.
+            open.setSize(new Dimension(open.getSize().width, naturalHeightOf(open.getContent())));
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 final @NotNull Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();

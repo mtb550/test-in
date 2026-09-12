@@ -28,8 +28,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.logger.Logger;
-import org.jetbrains.annotations.Nullable;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.util.Shortcuts;
 
@@ -60,17 +58,9 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
      */
     private int packedHeight;
 
-    /**
-     * Which field this is, for the log alone - the lines that say whether
-     * CTRL+ENTER arrived, what it did, and whether the dialog was re-measured
-     * for it.
-     */
-    private final @NotNull CreateTestCaseFields describes;
-
     protected AbstractMultiLineSection(final @NotNull Project p, final @NotNull EditorTextField field, final @NotNull CreateTestCaseFields describes) {
         this.p = p;
         this.field = field;
-        this.describes = describes;
         styleField(this.field, describes);
 
         this.wrapper = createWrapper(describes.getIcon(), this.field);
@@ -126,7 +116,7 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
             // The same rule the Tab comment above records, found the same way.
             // Registered per editor, so an editor rebuilt for this field gets
             // its own and there is never a second one on the same component.
-            base.registerShortcut(editor.getContentComponent(), Shortcuts.InsertNewLine.getCustomShortcut(), this::insertNewLine);
+            base.registerShortcut(editor.getContentComponent(), Shortcuts.InsertNewLine.getCustomShortcut(), () -> insertNewLine(editor));
 
             // The frame and its blue focus ring - the platform's own border, so
             // it follows the theme and repaints on focus by itself.
@@ -169,8 +159,6 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
                     final int height = field.getPreferredSize().height;
                     if (height == packedHeight) return;
 
-                    Logger.debug("Repacking " + describes + ": height " + packedHeight + " -> " + height);
-
                     packedHeight = height;
                     base.repack();
                 });
@@ -183,22 +171,14 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
     }
 
     /**
-     * Inserts a line break at the caret. The editor exists only while the field
-     * is on screen and focused, which is the only time this key can fire.
+     * Inserts a line break at the caret.
+     * <p>
+     * The editor is the one the key was bound on, handed over rather than asked
+     * for again: {@code field.getEditor()} is null until the editor exists, and
+     * this key is registered on that editor's own component, so there was never
+     * a case to check for.
      */
-    private void insertNewLine() {
-        final @Nullable Editor editor = field.getEditor();
-        if (editor == null) {
-            // Said rather than returned silently. This is the one way the key
-            // can reach here and do nothing, so "CTRL+ENTER did nothing" is
-            // answered by the log rather than by guessing.
-            Logger.debug("CTRL+ENTER in " + describes + ": the field has no editor, so no line was added");
-            return;
-        }
-
-        Logger.debug("CTRL+ENTER in " + describes + ": adding a line, field height "
-                + field.getPreferredSize().height + ", packed at " + packedHeight);
-
+    private void insertNewLine(final @NotNull Editor editor) {
         final int caret = editor.getCaretModel().getOffset();
         WriteCommandAction.runWriteCommandAction(p, () -> {
             editor.getDocument().insertString(caret, "\n");
