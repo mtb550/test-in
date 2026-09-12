@@ -25,6 +25,20 @@ cd test-in
 `runIde` opens a second IDE with the plugin loaded. It keeps its own settings and
 its own logs under `.sandbox/`, so nothing it does touches the IDE you work in.
 
+**To see Testin in French or Hindi, start the sandbox with the locale.** The
+IDE's own language setting cannot reach either bundle: JetBrains ships
+localization plugins for Chinese, Japanese and Korean only, so Settings offers no
+French or Hindi entry to pick. The bundles resolve from the JVM's default locale
+instead.
+
+```bash
+./gradlew runIde -Ptestin.language=fr     # or hi
+```
+
+A sandbox started the ordinary way reads English, and that is correct rather
+than a broken translation. [Decision-010](docs/decisions.md) says why the plugin
+does not register a language of its own.
+
 **If `prepareSandbox` fails with *"cannot be performed on a file with a
 user-mapped section open"***, a sandbox IDE is still running and holding the
 jars. Close it; nothing else clears it.

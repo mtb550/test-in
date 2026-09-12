@@ -2,7 +2,7 @@
 
 # Standing decisions
 
-> Nine decisions in Testin look wrong until you know why they were made. Each
+> Ten decisions in Testin look wrong until you know why they were made. Each
 > one has been proposed for reversal at least once, and each reversal would have
 > broken something the decision exists to protect. They are written here so a
 > contributor reads the reason before writing the fix.
@@ -285,6 +285,36 @@ reads differently in a report generated in English. The way out is the
 `TestStatus` shape - a small enum per field, the constant stored and the label
 shown, plus a read that maps the old stored strings onto the constants - and it
 is that read, not the enums, that is the work.
+
+---
+
+## Decision-010 — Testin's own translations are reached by the IDE's locale, not by a language plugin
+
+**Context.** `Bundle` extends `DynamicBundle`, which picks its locale from the
+IDE's language. JetBrains ships localization plugins for Chinese, Japanese and
+Korean only, so Settings offers no French entry and no Hindi entry: no amount of
+clicking selects either of Testin's bundles.
+
+They do resolve. `DynamicBundle` falls back to the JVM's default locale, so an
+IDE started with `-Duser.language=fr`, or with `hi`, reads `messages_fr` or
+`messages_hi`. That is how the sandbox has to be run to see any of the
+translation work at all.
+
+**Decision.** Testin does not register a `DynamicBundle.LanguageBundleEP`. The
+translations ship, and the way to reach one is the IDE's own locale.
+
+**Consequences.** Nobody can switch Testin's language on its own, and nobody
+sees a Testin language setting that the rest of the IDE would not follow. A
+sandbox pass that starts the IDE normally reads English, which is correct and
+is not evidence that the translation is broken - this line is here so that
+finding is not made twice.
+
+**If you are about to reverse it.** Registering the extension point is a
+decision about what the plugin ships rather than about the strings: it puts
+Testin's language in a list beside the IDE's own, so a tester can have a French
+Testin inside an English IDE. Every dialog then has to read correctly with two
+languages on screen at once, which is a thing to design rather than a flag to
+set.
 
 ---
 
