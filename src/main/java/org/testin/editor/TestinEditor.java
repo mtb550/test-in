@@ -392,19 +392,10 @@ public interface TestinEditor extends Disposable {
     void setHoveredIndex(final int index);
 
     /**
-     * The project this editor belongs to.
-     * <p>
-     * Declared because {@code dispose} needs it: the view panel is now asked
-     * for by project, and an editor closing in one project must not reset
-     * another project's panel.
-     */
-    @NotNull Project getP();
-
-    /**
      * Takes this editor's own cases off the view panel as it closes, and leaves
      * the panel alone when it is showing another editor's (#233).
      */
     default void dispose() {
-        ViewToolWindowFactory.panel(getP()).ifPresent(viewer -> viewer.hide(getParent().getPath2()));
+        ViewToolWindowFactory.panel(getProject()).ifPresent(viewer -> viewer.hide(getParent().getPath2()));
     }
 }

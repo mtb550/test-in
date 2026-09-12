@@ -6,21 +6,16 @@ import com.intellij.ui.SimpleTextAttributes;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunItems;
 
-import java.util.Optional;
-import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 
 import javax.swing.*;
-import java.util.Map;
-import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RunTreeCellRenderer {
 
-    public static @NotNull CheckboxTree.CheckboxTreeCellRenderer create(final @NotNull Map<@NotNull UUID, @NotNull TestRunItems> resultsMap) {
+    public static @NotNull CheckboxTree.CheckboxTreeCellRenderer create() {
         return new CheckboxTree.CheckboxTreeCellRenderer() {
             // Both @NotNull because the platform says so, not because it looks
             // right: CheckboxTreeCellRendererBase is Kotlin, and its bytecode
@@ -38,21 +33,12 @@ public final class RunTreeCellRenderer {
                     if (userObj instanceof DirectoryDto dir)
                         getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 
-                    else if (userObj instanceof TestCaseDto tc) {
-                        // A case the run has no row for is drawn plainly: it is in the
-                        // tree to be picked, not to report a verdict it never got.
-                        Optional.ofNullable(resultsMap.get(tc.getId())).ifPresentOrElse(result -> {
-                            final @NotNull TestStatus status = result.getStatus();
-                            getTextRenderer().append(tc.getDescription(), status.getStyle());
-                            // Built from the label rather than stored beside it.
-                            // Every status carried its own " [Passed]" string, a
-                            // second caption that had to agree with the first -
-                            // and the brackets are this tree's decoration, not
-                            // a fact about the status.
-                            getTextRenderer().append(" [" + status.getLabel() + "]", SimpleTextAttributes.GRAYED_ATTRIBUTES);
-                        }, () -> getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES));
+                    // A case is drawn plainly: it is in the tree to be picked,
+                    // not to report a verdict.
+                    else if (userObj instanceof TestCaseDto tc)
+                        getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 
-                    } else if (userObj instanceof String str)
+                    else if (userObj instanceof String str)
                         getTextRenderer().append(str, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
                 }
             }

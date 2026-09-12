@@ -321,7 +321,7 @@ public class TreeTransferHandler extends TransferHandler {
             final @NotNull DirectoryDto target = landing.get();
 
             final int action = resolveAction(support, payload);
-            final @NotNull List<DirectoryDto> sources = transferableSources(payload.nodes(), target, action);
+            final @NotNull List<DirectoryDto> sources = transferableSources(payload.nodes(), target);
 
             // Clipboard pastes are notified by PasteNodeAction before this runs.
             if (support.isDrop()) notifyNameCollisions(payload.nodes(), target);
@@ -353,9 +353,7 @@ public class TreeTransferHandler extends TransferHandler {
     /**
      * Only the sources the target accepts and that can actually land on it.
      */
-    private @NotNull List<DirectoryDto> transferableSources(final DirectoryDto @NotNull [] nodes, final @NotNull DirectoryDto target, final int action) {
-        if (action != COPY && action != MOVE) return List.of();
-
+    private @NotNull List<DirectoryDto> transferableSources(final DirectoryDto @NotNull [] nodes, final @NotNull DirectoryDto target) {
         final @NotNull List<DirectoryDto> accepted = new ArrayList<>();
         for (final DirectoryDto source : nodes) {
             if (canTransferInto(source, target)) accepted.add(source);

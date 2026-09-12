@@ -82,17 +82,13 @@ public class ViewPanel implements Disposable {
     }
 
     // UC-VIEW-PANEL-001, Rule-VIEW-PANEL-010, Rule-VIEW-PANEL-012
-    public void show(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
+    public void show(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
         if (testCases.isEmpty()) return;
 
         ViewToolWindowFactory.toolWindow(p).ifPresent(tw -> tw.show(() -> {
             selectDetailsTab();
             this.updateList(testCases, path);
         }));
-    }
-
-    public void show(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
-        this.show(p, testCases, path);
     }
 
     /**

@@ -58,15 +58,6 @@ public class SearchTxt extends SearchTextField implements Disposable, ToolbarIte
         return getText().trim().toLowerCase();
     }
 
-    public void resetSearchQuery() {
-        if (!getText().isEmpty()) {
-            setText("");
-            if (searchDebounceTimer.isRunning()) {
-                searchDebounceTimer.stop();
-            }
-        }
-    }
-
     @Override
     public void dispose() {
         if (searchDebounceTimer.isRunning()) {
