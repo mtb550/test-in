@@ -441,9 +441,11 @@ final class IndexerDataStore {
                 .orElse(null);
 
         for (final Map<String, ? extends DirectoryDto> map : dirMaps) {
-            renameMapEntry(map, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
+            renameMapEntry(map, oldStr, newStr, dto -> updatePathAndParent(dto, newPath, newParentDto));
             renameDescendants(map, oldPath, newPath);
         }
+
+        rebuildPath2Under(newPath);
 
         renameMapEntry(testCaseStore.getTestSetCaseIds(), oldStr, newStr, ids -> {
         });
@@ -465,11 +467,32 @@ final class IndexerDataStore {
      *                  the filesystem-root boundary above, carried one call
      *                  deep rather than re-derived here (#71)
      */
-    private void updatePathAndPath2(final @NotNull DirectoryDto dto, final @NotNull Path newPath, final @Nullable DirectoryDto newParent) {
+    private void updatePathAndParent(final @NotNull DirectoryDto dto, final @NotNull Path newPath, final @Nullable DirectoryDto newParent) {
         dto.setPath(newPath);
         dto.setName(newPath.getFileName().toString());
         dto.setParent(newParent);
-        rebuildPath2(dto);
+    }
+
+    /**
+     * Every breadcrumb at or below a moved node, rebuilt once every node above
+     * it already carries its new name.
+     * <p>
+     * It has to be a second pass. A breadcrumb is read off the live parent
+     * objects, and the seven maps are renamed in a fixed order with test sets
+     * (index 1) before the packages that hold them (index 3) - so rebuilding as
+     * each map was visited read the package's old name for every set beneath it.
+     * Renaming a package Login to Auth left every test set under it saying
+     * {@code [NAFATH, Test Cases, Login, ts2]}, and path2 is not cosmetic: the
+     * code generator builds the generated Java package and class name from it,
+     * and NodeRename runs the codegen rename first - so the generated subtree
+     * moved to auth while the index still believed every set lived in login, and
+     * the next case saved there regenerated its method into the old package
+     * (#66, finding 69).
+     */
+    private void rebuildPath2Under(final @NotNull Path newPath) {
+        allDirectories().stream()
+                .filter(node -> node.getPath().startsWith(newPath))
+                .forEach(this::rebuildPath2);
     }
 
     @NotNull
@@ -497,7 +520,6 @@ final class IndexerDataStore {
             map.remove(e.getKey());
             map.put(newChildPath.toString(), dto);
             dto.setPath(newChildPath);
-            rebuildPath2(dto);
         }
     }
 
