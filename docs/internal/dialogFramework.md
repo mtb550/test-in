@@ -51,6 +51,9 @@ and which keys it answers, and the shell builds the rest.
   platform icon may ship colored, and one colored glyph among gray ones is the
   loudest thing on the row. A color that means something - an error, a verdict -
   is not an icon that names a thing and is drawn as it is.
+- **Rule-INTERNAL-078** — The shortcut strip is one row. A dialog narrower than
+  its own hints shortens the strip rather than folding it onto a second line and
+  growing a line taller to hold it.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

@@ -110,22 +110,40 @@ public class StatusBarBase {
         statusBar.setVisible(wanted && Services.getInstance(AppSettingsState.class).showShortcutHints);
     }
 
+    /**
+     * UC-INTERNAL-007, Rule-INTERNAL-078.
+     * <p>
+     * The strip, as one row.
+     * <p>
+     * <b>{@link GridBagLayout} rather than a {@link FlowLayout}</b>, which is
+     * the same choice the editors' own status bar made and for a neighbouring
+     * reason. A flow wraps: given less width than its items need it starts a
+     * second row, so a dialog narrower than its own hints - the test case
+     * attribute dialogs, and the bulk editor on CTRL+M - drew the strip on two
+     * lines and grew a line taller to hold it. Every item sits on {@code gridy
+     * 0} here, so there is no second row for it to wrap onto; a strip wider
+     * than the dialog is shortened rather than folded.
+     */
     public void updateItems(final StatusBarItem @NotNull [] items) {
         this.statusBar.removeAll();
 
-        final @NotNull JBPanel<?> contentPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        final @NotNull JBPanel<?> contentPanel = new JBPanel<>(new GridBagLayout());
         contentPanel.setOpaque(false);
 
-        if (withIcon) contentPanel.add(setStatusBarIcon());
+        final @NotNull GridBagConstraints onOneRow = new GridBagConstraints();
+        onOneRow.gridy = 0;
+        onOneRow.anchor = GridBagConstraints.WEST;
+
+        if (withIcon) contentPanel.add(setStatusBarIcon(), onOneRow);
 
         for (int i = 0; i < items.length; i++) {
             final @NotNull StatusBarItem item = items[i];
-            contentPanel.add(Keycap.of(item.getShortcutText()));
-            contentPanel.add(createDot());
-            contentPanel.add(createLabel(item.getName()));
+            contentPanel.add(Keycap.of(item.getShortcutText()), onOneRow);
+            contentPanel.add(createDot(), onOneRow);
+            contentPanel.add(createLabel(item.getName()), onOneRow);
 
             if (i < items.length - 1) {
-                contentPanel.add(createSeparator());
+                contentPanel.add(createSeparator(), onOneRow);
             }
         }
 
