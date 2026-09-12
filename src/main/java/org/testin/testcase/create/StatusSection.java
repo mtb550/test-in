@@ -58,8 +58,9 @@ public class StatusSection implements CreateTestCaseSection {
         return wrapper;
     }
 
-    public @NotNull ComboBox<TestCaseStatus> getCombo() {
-        return status;
+    @Override
+    public boolean isPopupOpen() {
+        return status.isPopupVisible();
     }
 
     @Override

@@ -51,8 +51,9 @@ public class PrioritySection implements CreateTestCaseSection {
         return wrapper;
     }
 
-    public @NotNull ComboBox<Priority> getCombo() {
-        return priority;
+    @Override
+    public boolean isPopupOpen() {
+        return priority.isPopupVisible();
     }
 
     @Override
