@@ -193,7 +193,6 @@ exists: a case removed from the test set keeps its result here.
 | `resultAnalysis` | map | no, **omitted when empty** | Keys are `PASSED` `FAILED` `BLOCKED` `UNTESTED`; values are free text |
 | `executionStartedAt` | date | no, defaults to the epoch | |
 | `executionEndedAt` | date | no, defaults to the epoch | |
-| `fullyJudged` | boolean | no | Whether every case in the run has a verdict |
 | `results` | array | no | One entry per case the run covers, below |
 
 Each entry in `results`:
