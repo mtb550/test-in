@@ -1,0 +1,17 @@
+<component name="DependencyValidationManager">
+  <!--
+    Every .java file in the project, wherever it lives - the four source roots
+    and any module added later. The scope the copyright profile is mapped to
+    (#303), which is why it is committed rather than left per-machine: a scope
+    only this laptop knows about is a profile that applies to nothing on the
+    next clone.
+
+    Both spellings of "every .java file", deliberately. A bare "file:*.java"
+    reads as a match on the file name anywhere in the project, and
+    "file:*//*.java" as a match on any path below the root; nothing here can run
+    the scope engine to settle which it applies. A union is correct under either,
+    and a scope that quietly matches nothing is a profile that quietly adds no
+    header - the one failure that would go unnoticed.
+  -->
+  <scope name="Java sources" pattern="file:*.java||file:*//*.java" />
+</component>
