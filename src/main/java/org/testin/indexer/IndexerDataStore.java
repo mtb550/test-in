@@ -18,8 +18,6 @@ import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
 import org.testin.model.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
-import org.testin.model.markers.TestRunMarker;
-import org.testin.services.Services;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -426,14 +424,6 @@ final class IndexerDataStore {
         // As every other marker write does, so the VFS - and the Git paths that
         // read through it - see the change without waiting for something else.
         refreshDir(dto.getPath());
-    }
-
-    void updateRunMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
-        Optional.ofNullable(testRunsDirByPath.get(runPath.toString()))
-                .ifPresentOrElse(trd -> trd.setMarker(marker),
-                        () -> Logger.warn("updateRunMarker: run dir not indexed, updating marker on disk only: " + runPath));
-
-        Services.getInstance(p, TestDataFiles.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), marker);
     }
 
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {

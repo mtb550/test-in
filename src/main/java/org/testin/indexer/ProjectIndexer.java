@@ -510,11 +510,11 @@ public final class ProjectIndexer {
      * found their analysis gone after the next reload.
      * <p>
      * The registration stays immediate. Creating a run needs the index to know
-     * about it on the next line, and only the disk write belongs in the queue.
+     * about it on the next line, and only the disk write belongs in the queue -
+     * which {@link RunWriter#persist} now does for every caller, so this one is
+     * the plain write it always read as.
      */
     public void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
-        store.registerTestRun(testRunPath, tr);
-
         persistRun(testRunPath, tr);
     }
 
@@ -803,10 +803,6 @@ public final class ProjectIndexer {
      */
     public @NotNull Optional<DirectoryDto> find(final @NotNull Path path) {
         return store.findByPath(path);
-    }
-
-    public void updateRunMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
-        store.updateRunMarker(p, runPath, marker);
     }
 
     /**
