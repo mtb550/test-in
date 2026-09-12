@@ -187,19 +187,33 @@ public class DifferenceNumbersTest {
     }
 
     /**
-     * Every pointer at a difference on every page but the lists themselves.
+     * Every pointer at a difference, on every page.
+     * <p>
+     * A part's front page is read too, with its own two tables taken out first.
+     * It used to be skipped whole, because every row of those tables reads as a
+     * citation of itself - and the cost of that shortcut was the one thing these
+     * tests exist to catch: a front page describing a difference another part
+     * has retired went unnoticed, which docs/internal/main.md was doing (#66,
+     * finding 99).
      */
     private static void forEachCitation(final Citation tell) {
         for (final Path page : pages()) {
             final String part = page.getParent().getFileName().toString();
-            if ("main.md".equals(page.getFileName().toString())) continue;
 
-            final Matcher cited = CITATION.matcher(oneLine(read(page)));
+            final Matcher cited = CITATION.matcher(oneLine(withoutDifferenceRows(read(page))));
             while (cited.find()) {
                 tell.found(part + "/" + page.getFileName(), cited.group(2) == null ? part : cited.group(2),
                         Integer.parseInt(cited.group(1)));
             }
         }
+    }
+
+    /**
+     * The page with its differences tables taken out, so what is left is the
+     * prose that points at them.
+     */
+    private static String withoutDifferenceRows(final String text) {
+        return ROW.matcher(text).replaceAll("");
     }
 
     /**

@@ -542,7 +542,6 @@ closed up, so an issue that quotes one still points at the right thing.
 
 | | Question | Why it is open |
 |---|---|---|
-| **Question 2** | Should a signed-off test run be locked in the tree, as well as in its editor? | Today it is not (difference 3). Its own description says its name must not change. The tree's rename does not check. |
 | **Question 3** | What should the paste refusal say? | *Select a folder* is shown for six different reasons. Four of them are: the wrong side of the tree, the node itself, another test project, and a test run. Choosing a different folder only fixes one of the six. |
 | **Question 4** | On a Mac, should cut, paste, undo and redo in the tree use the Mac's own key for those actions, the way copy already does? | Today copy does. The other four do not. The keys are named in the key table above. |
 
@@ -551,6 +550,11 @@ closed up, so an issue that quotes one still points at the right thing.
 **Assigned** to **Created** or from **In Progress** to **Created**. It may not:
 the popup offers only the statuses ahead of where the run is now, so there is no
 way to ask (Rule-TREE-PANEL-092, [#186](https://github.com/mtb550/test-in/issues/186)).
+
+Question 2 asked whether a signed-off test run should be locked in the tree as
+well as in its editor. It is. A **Completed** or **Closed** run cannot be
+renamed, moved, reordered or removed from the tree
+([#184](https://github.com/mtb550/test-in/issues/184)).
 The same question for the whole product is [question 1 in the product's own
 document](../product.md#9-undecided).
 
