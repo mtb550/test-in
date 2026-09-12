@@ -20,7 +20,7 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 /**
  * The framework's single-line input: its look, its placeholder, and the red cue
@@ -47,9 +47,17 @@ final class FrameworkTextField {
     private final @NotNull String placeholder;
 
     /**
-     * How this field takes a leading icon, decided once by which kind it is.
+     * How this field takes what is drawn around its text, decided once by which
+     * kind it is - a password field carries nothing.
      */
-    private final @NotNull Consumer<@NotNull Icon> leadingIcon;
+    private final @NotNull BiConsumer<@NotNull Icon, @NotNull String> decorations;
+
+    /**
+     * What is drawn around the text right now. Held because the two are set
+     * from different places at different times and applied together.
+     */
+    private @NotNull Icon icon;
+    private @NotNull String note = "";
 
     private boolean emptyWarningShown;
 
@@ -70,16 +78,17 @@ final class FrameworkTextField {
             dots.setText(initialValue);
 
             this.field = dots;
-            this.leadingIcon = ignored -> {
+            this.decorations = (ignoredIcon, ignoredNote) -> {
             };
         } else {
             final @NotNull ExtendableTextField plain = new ExtendableTextField(initialValue);
 
             this.field = plain;
-            this.leadingIcon = wanted -> DialogStyle.setLeadingIcon(plain, wanted);
+            this.decorations = (wanted, saying) -> DialogStyle.setDecorations(plain, wanted, saying);
         }
 
-        setLeadingIcon(icon);
+        this.icon = icon;
+        decorations.accept(icon, note);
 
         // Derived from the label font at construction, so every dialog open
         // picks up the current IDE font-size setting.
@@ -113,7 +122,19 @@ final class FrameworkTextField {
      * an icon at all - is this class's own knowledge.
      */
     void setLeadingIcon(final @NotNull Icon icon) {
-        leadingIcon.accept(icon);
+        this.icon = icon;
+        decorations.accept(icon, note);
+    }
+
+    /**
+     * UC-INTERNAL-001, Rule-INTERNAL-073.
+     * <p>
+     * One short thing said at the end of the field - how many the search
+     * matched - and empty to say nothing.
+     */
+    void setNote(final @NotNull String note) {
+        this.note = note;
+        decorations.accept(icon, note);
     }
 
     @NotNull JTextField component() {

@@ -6,6 +6,11 @@ import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.JBUI;
+import java.util.List;
+import java.util.ArrayList;
+import com.intellij.util.ui.NamedColorUtil;
+import com.intellij.util.ui.JBFont;
+import com.intellij.ui.TextIcon;
 import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -33,13 +38,32 @@ public final class DialogStyle {
         return component;
     }
 
-    public static void setLeadingIcon(final @NotNull ExtendableTextField textField, final @NotNull Icon icon) {
-        if (icon == NO_ICON) {
-            textField.setExtensions();
-            return;
-        }
+    /**
+     * UC-INTERNAL-001, Rule-INTERNAL-073.
+     * <p>
+     * Everything drawn inside a field but outside its text: the icon in front,
+     * and one short note at the end.
+     * <p>
+     * Both at once, because {@code setExtensions} replaces the lot. Set
+     * separately, whichever ran last wiped the other - and the icon is set again
+     * every time the selection moves, so a note would have survived until the
+     * first arrow key.
+     *
+     * @param note said at the right of the field, empty for no note. Drawn on
+     *             the field's own background so it reads as a word in the field
+     *             rather than a chip on it
+     */
+    public static void setDecorations(final @NotNull ExtendableTextField textField, final @NotNull Icon icon, final @NotNull String note) {
+        final @NotNull List<ExtendableTextComponent.Extension> extensions = new ArrayList<>();
 
-        textField.setExtensions(new ExtendableTextComponent.Extension() {
+        if (icon != NO_ICON) extensions.add(leading(icon));
+        if (!note.isEmpty()) extensions.add(trailing(note, textField));
+
+        textField.setExtensions(extensions);
+    }
+
+    private static @NotNull ExtendableTextComponent.Extension leading(final @NotNull Icon icon) {
+        return new ExtendableTextComponent.Extension() {
             @Override
             public @NotNull Icon getIcon(final boolean hovered) {
                 return icon;
@@ -54,7 +78,33 @@ public final class DialogStyle {
             public int getIconGap() {
                 return JBUI.scale(8);
             }
-        });
+        };
+    }
+
+    /**
+     * The note, as the platform's own text-drawing icon - so the font metrics,
+     * the scaling and the painting are its problem rather than ours.
+     * <p>
+     * The background is the field's, which is what makes the rounded rectangle
+     * {@code TextIcon} draws invisible: what is wanted here is a word, not a
+     * chip.
+     */
+    private static @NotNull ExtendableTextComponent.Extension trailing(final @NotNull String note, final @NotNull ExtendableTextField textField) {
+        final @NotNull TextIcon drawn = new TextIcon(note, NamedColorUtil.getInactiveTextColor(), textField.getBackground(), JBUI.scale(2));
+        drawn.setFont(JBFont.label());
+        drawn.setWithBorders(false);
+
+        return new ExtendableTextComponent.Extension() {
+            @Override
+            public @NotNull Icon getIcon(final boolean hovered) {
+                return drawn;
+            }
+
+            @Override
+            public int getIconGap() {
+                return JBUI.scale(8);
+            }
+        };
     }
 
     public static @NotNull ComponentPopupBuilder createPopupBuilder(final @NotNull JComponent content, final @NotNull JComponent focusComponent, final @NotNull String title) {

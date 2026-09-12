@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.CollapseAllAction;
 import org.testin.explorer.toolbar.ExpandAllAction;
-import org.testin.search.SearchAction;
+import org.testin.search.GlobalSearchAction;
 import org.testin.setting.OpenSettingsAction;
 import org.testin.testproject.SelectTestProjectAction;
 
@@ -20,7 +20,7 @@ public class TreePanelActions {
                 // The keystroke reaches the search from anywhere, which is the
                 // point of it - and is also why nothing on screen says the
                 // search exists. The button is where a tester finds out.
-                SearchAction.registered(),
+                GlobalSearchAction.registered(),
                 new OpenSettingsAction(p),
                 new ExpandAllAction(tp),
                 new CollapseAllAction(tp),

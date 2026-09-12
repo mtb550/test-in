@@ -107,6 +107,13 @@ public final class Badges {
     private static final @NotNull Color GROUP_COLOR = JBColor.darkGray;
 
     /**
+     * One color for every kind of node, for the same reason {@link
+     * #GROUP_COLOR} is one color for every group. Quieter than any value badge,
+     * because what kind of thing a row is matters less than what it says.
+     */
+    private static final @NotNull Color KIND_COLOR = new JBColor(Gray._130, Gray._85);
+
+    /**
      * The case's priority, and nothing at all when it is Low.
      * <p>
      * Low is what a case is unless somebody said otherwise, so a Low pill is a
@@ -192,6 +199,24 @@ public final class Badges {
      */
     public static @NotNull Badge createGroupBadge(final @NotNull String group) {
         return new Tag(group, GROUP_COLOR);
+    }
+
+    /**
+     * UC-INTERNAL-001, Rule-INTERNAL-072.
+     * <p>
+     * What kind of thing a row is - a test set, a test case, a test run, a
+     * package - for the one list that answers with all four at once.
+     * <p>
+     * A plain pill, like a run status and for the same reason given above: the
+     * word is its own explanation, and on a search row it collides with nothing
+     * - there is no priority and no group beside it to be told apart from.
+     * <p>
+     * One color for every kind, the way every group shares one. Four hues
+     * across a list of fifty rows would be a wall, and what tells them apart is
+     * the word.
+     */
+    public static @NotNull Badge createKindBadge(final @NotNull String kind) {
+        return new Pill(kind, KIND_COLOR);
     }
 
     /**

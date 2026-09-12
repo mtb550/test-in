@@ -13,7 +13,7 @@ up here rather than left to the code.
 |---|---|
 | **Part of Testin** | The parts that belong to no panel |
 | **Answers** | What the search finds, and what Testin does with the files under the Testin folder |
-| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-007`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-071` |
+| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-007`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-074` |
 | **State** | **Written** |
 | **Checked against** | `main` at `2cb8c1dc`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |

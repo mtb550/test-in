@@ -88,7 +88,7 @@ public class OpeningRowsTest {
 
         assertTrue(picker.contains("show(shownBeforeAsking)"),
                 "rows known at construction must go on screen there, or Enter has nothing to take");
-        assertTrue(builder.contains("placeholder, fixed, query -> fixed"),
+        assertTrue(builder.contains("placeholder, fixed, query -> always"),
                 "the fixed-choice picker must be handed its rows as well as its Rows, so it shows them at once");
         assertTrue(builder.contains("placeholder, List.of(), rows.orElseThrow()"),
                 "the searching picker opens with nothing and fills in off the painting thread");

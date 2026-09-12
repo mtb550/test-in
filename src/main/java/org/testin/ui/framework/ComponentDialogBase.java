@@ -394,8 +394,10 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             // hold rows rather than two, and one of them declared as a special
             // case of the other.
             final @NotNull List<SelectionList<T>> fixed = List.copyOf(selections);
+            final @NotNull Rows.Answer<T> always = Rows.Answer.of(fixed);
+
             return new ComponentDialogBase<>(
-                    new TextFieldWithSelections<>(icon, placeholder, fixed, query -> fixed, fixed.size()));
+                    new TextFieldWithSelections<>(icon, placeholder, fixed, query -> always, fixed.size()));
         }
     }
 }

@@ -331,7 +331,7 @@
     <actions>
         <action
                 id="Testin.Search"
-                class="org.testin.search.SearchAction"
+                class="org.testin.search.GlobalSearchAction"
                 icon="AllIcons.Actions.Search"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt F"/>

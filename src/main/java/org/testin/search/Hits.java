@@ -56,18 +56,29 @@ public final class Hits {
      * then narrows what is already on screen, which is how a tester learns what
      * the field does without being told.
      */
-    public static @NotNull List<Hit> forQuery(final @NotNull Project p, final @NotNull String query) {
+    public static @NotNull Found forQuery(final @NotNull Project p, final @NotNull String query) {
         final @NotNull String wanted = query.trim().toLowerCase(Locale.ROOT);
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         // Nodes first, and by name only: a tester who types a test set's name
         // wants the set, not the ninety cases inside it that mention it.
-        final @NotNull List<Hit> found = new ArrayList<>(
-                wanted.isEmpty() ? everywhereToGo(indexer) : nodesNamed(indexer, wanted));
+        final @NotNull List<DirectoryDto> nodes = wanted.isEmpty() ? everywhereToGo(indexer) : nodesNamed(indexer, wanted);
+        final @NotNull List<TestCaseDto> cases = casesMatching(indexer, wanted);
 
-        found.addAll(cases(indexer, wanted, SHOWN - found.size()));
+        final @NotNull List<Hit> found = new ArrayList<>(nodes.stream().limit(SHOWN).map(Hit::of).toList());
+        found.addAll(topCases(cases, wanted, SHOWN - found.size()));
 
-        return List.copyOf(found);
+        return new Found(List.copyOf(found), nodes.size() + cases.size());
+    }
+
+    /**
+     * UC-INTERNAL-001, Rule-INTERNAL-073.
+     * <p>
+     * What a query came back with: the hits to draw, and how many things
+     * matched altogether - which is not the same number, because the list stops
+     * at {@link #SHOWN} and a common word matches hundreds.
+     */
+    public record Found(@NotNull List<Hit> hits, int matched) {
     }
 
     /**
@@ -79,12 +90,10 @@ public final class Hits {
      * package or a main folder is somewhere to look through rather than
      * somewhere to go, and a list of all of them is the tree again, in a dialog.
      */
-    private static @NotNull List<Hit> everywhereToGo(final @NotNull ProjectIndexer indexer) {
+    private static @NotNull List<DirectoryDto> everywhereToGo(final @NotNull ProjectIndexer indexer) {
         return indexer.getAllNodes().stream()
                 .filter(DirectoryDto::isOpenableInEditor)
                 .sorted(Hits::inTreeOrder)
-                .limit(SHOWN)
-                .map(Hit::of)
                 .toList();
     }
 
@@ -92,12 +101,10 @@ public final class Hits {
      * Every node the tester has named, packages and folders included - because
      * once they have typed the name, that is the thing they are after.
      */
-    private static @NotNull List<Hit> nodesNamed(final @NotNull ProjectIndexer indexer, final @NotNull String wanted) {
+    private static @NotNull List<DirectoryDto> nodesNamed(final @NotNull ProjectIndexer indexer, final @NotNull String wanted) {
         return indexer.getAllNodes().stream()
                 .filter(node -> contains(node.getName(), wanted))
                 .sorted(Hits::byClosestName)
-                .limit(SHOWN)
-                .map(Hit::of)
                 .toList();
     }
 
@@ -109,11 +116,25 @@ public final class Hits {
      * against every attribute of every case in the project is both the slowest
      * query there is and the least useful: it matches nearly all of them.
      */
-    private static @NotNull List<Hit> cases(final @NotNull ProjectIndexer indexer, final @NotNull String wanted, final int room) {
-        if (room <= 0 || tooShort(wanted)) return List.of();
+    private static @NotNull List<TestCaseDto> casesMatching(final @NotNull ProjectIndexer indexer, final @NotNull String wanted) {
+        if (tooShort(wanted)) return List.of();
 
         return indexer.getAllTestCases().stream()
                 .filter(tc -> TestEditorAttributes.anyContains(tc, wanted))
+                .toList();
+    }
+
+    /**
+     * The best of them, and only as many as there is room for.
+     * <p>
+     * Sorted here rather than where they were matched, because the matching
+     * pass answers the count as well as the rows and sorting a thousand cases
+     * to show fifty is work nobody sees.
+     */
+    private static @NotNull List<Hit> topCases(final @NotNull List<TestCaseDto> cases, final @NotNull String wanted, final int room) {
+        if (room <= 0) return List.of();
+
+        return cases.stream()
                 .sorted(byDescriptionMatchThenText(wanted))
                 .limit(room)
                 .map(Hit::of)

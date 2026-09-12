@@ -23,7 +23,7 @@ import java.util.Optional;
  * So the keystroke lives in the keymap, which is also where a tester changes it
  * when it collides with something they already use.
  */
-public final class SearchAction extends DumbAwareAction {
+public final class GlobalSearchAction extends DumbAwareAction {
 
     private static final @NotNull String ID = "Testin.Search";
 
@@ -34,7 +34,7 @@ public final class SearchAction extends DumbAwareAction {
      * a second copy of it: its text, its description and its icon are the ones
      * declared in {@code plugin.xml}, and its tooltip carries whatever keystroke
      * the keymap currently holds - including one the tester rebound. A
-     * {@code new SearchAction()} would be unregistered, so the platform could
+     * {@code new GlobalSearchAction()} would be unregistered, so the platform could
      * not name a shortcut for it and the button would quietly disagree with the
      * key (#29).
      */
@@ -45,7 +45,7 @@ public final class SearchAction extends DumbAwareAction {
     // UC-INTERNAL-001
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Optional.ofNullable(e.getProject()).ifPresent(p -> new SearchDialog(p).show());
+        Optional.ofNullable(e.getProject()).ifPresent(p -> new GlobalSearchDialog(p).show());
     }
 
     @Override

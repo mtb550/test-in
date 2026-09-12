@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.util.Optional;
@@ -17,29 +18,38 @@ import java.util.Optional;
  * a case, the case to select inside it. Nothing downstream asks which kind it
  * got.
  *
+ * @param kind     what this is, in one word beside the name - a test set, a test
+ *                 case, a test run, a package. One query answers with all four,
+ *                 and a 16-pixel icon was the only thing telling them apart
+ *                 (#66, finding 51)
  * @param node     what the tree expands to and what the editor opens. For a test
  *                 case this is the test set it lives in, because a case is not a
  *                 node of its own
  * @param testCase the row to land on, and empty for a node - which is a node
  *                 selected and nothing more
  */
-public record Hit(@NotNull Icon icon, @NotNull String name, @NotNull String where, @NotNull DirectoryDto node, @NotNull Optional<TestCaseDto> testCase) {
+public record Hit(@NotNull Icon icon, @NotNull String name, @NotNull String kind, @NotNull String where, @NotNull DirectoryDto node, @NotNull Optional<TestCaseDto> testCase) {
 
     /**
      * A test case, shown under the test set that holds it.
      */
     public static @NotNull Hit of(final @NotNull TestCaseDto tc) {
-        return new Hit(AllIcons.Nodes.Class, tc.getDescription(), where(tc.getParent()),
-                tc.getParent(), Optional.of(tc));
+        return new Hit(AllIcons.Nodes.Class, tc.getDescription(), Bundle.message("caption.test.case"),
+                where(tc.getParent()), tc.getParent(), Optional.of(tc));
     }
 
     /**
      * A node, shown under whatever leads to it, and drawn with the icon its own
      * type declares - so a test set, a package and a run look in the search
      * exactly as they look in the tree.
+     * <p>
+     * Its kind is the type's own description, which is where that word already
+     * lives: the tree and the Details popup read the same one, so the search
+     * cannot come to call a test set something else.
      */
     public static @NotNull Hit of(final @NotNull DirectoryDto node) {
-        return new Hit(node.getType().getIcon(), node.getName(), where(node), node, Optional.empty());
+        return new Hit(node.getType().getIcon(), node.getName(), node.getType().getDescription(),
+                where(node), node, Optional.empty());
     }
 
     /**

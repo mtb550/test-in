@@ -6,6 +6,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.Rows;
 import org.testin.ui.framework.SelectionList;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextFieldWithSelections;
@@ -33,10 +34,10 @@ import java.util.List;
  * <p>
  * Sized rather than packed, so it does not resize as results come and go.
  */
-public final class SearchDialog extends AbstractFrameworkDialog<TextFieldWithSelections<Hit>> {
+public final class GlobalSearchDialog extends AbstractFrameworkDialog<TextFieldWithSelections<Hit>> {
 
     // UC-INTERNAL-001
-    public SearchDialog(final @NotNull Project p) {
+    public GlobalSearchDialog(final @NotNull Project p) {
         super(p);
 
         title = Bundle.message("dialog.search.title");
@@ -58,14 +59,32 @@ public final class SearchDialog extends AbstractFrameworkDialog<TextFieldWithSel
     }
 
     /**
-     * One row per hit: what it is, and underneath it where it lives - because a
-     * description on its own does not say which test set it came from, and three
-     * cases can be called the same thing in three different sets.
+     * UC-INTERNAL-001, Rule-INTERNAL-072, Rule-INTERNAL-073.
+     * <p>
+     * One row per hit - the name, the badge saying what kind of thing it is,
+     * and where it lives - and beside the field, how many matched.
+     * <p>
+     * The kind is on the row because one query answers with four of them at
+     * once, and until this the only thing telling a test case from a test set
+     * was a 16-pixel icon. The count is beside the field because the list stops
+     * at fifty: a common word matches hundreds and shows fifty, and the number
+     * is the only thing that says so.
+     * <p>
+     * Where it lives is on the row for its own reason: a description does not
+     * say which test set it came from, and three cases can be called the same
+     * thing in three different sets.
      */
-    private static @NotNull List<SelectionList<Hit>> rowsFor(final @NotNull Project p, final @NotNull String query) {
-        return Hits.forQuery(p, query).stream()
-                .map(hit -> SelectionList.add(hit.icon(), hit.name(), hit.where(), hit))
+    private static @NotNull Rows.Answer<Hit> rowsFor(final @NotNull Project p, final @NotNull String query) {
+        final @NotNull Hits.Found found = Hits.forQuery(p, query);
+
+        final @NotNull List<SelectionList<Hit>> rows = found.hits().stream()
+                .map(hit -> SelectionList.tagged(hit.icon(), hit.name(), hit.kind(), hit.where(), hit))
                 .toList();
+
+        // Nothing to say before anything is typed: the field is showing its
+        // placeholder, and "everywhere you can go, 214 of them" is a number
+        // about the project rather than about a search.
+        return query.isBlank() ? Rows.Answer.of(rows) : new Rows.Answer<>(rows, Bundle.message("dialog.search.found", found.matched()));
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-002
