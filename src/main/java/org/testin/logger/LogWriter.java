@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service(Service.Level.APP)
 public final class LogWriter implements Disposable {
@@ -27,9 +28,11 @@ public final class LogWriter implements Disposable {
     private static final int JOIN_TIMEOUT = 2000;
 
     /**
-     * The IDE's log, used by {@link #report} alone. Named for what it is rather
-     * than imported, because {@code Logger} in this package is Testin's own and
-     * two of them under one name is how the wrong one gets called.
+     * The IDE's log, and the only thing in this class that may be told anything.
+     * Both callers are failures of the log itself, which cannot be reported
+     * through the log. Named for what it is rather than imported, because
+     * {@code Logger} in this package is Testin's own and two of them under one
+     * name is how the wrong one gets called.
      */
     private static final com.intellij.openapi.diagnostic.@NotNull Logger IDE_LOG =
             com.intellij.openapi.diagnostic.Logger.getInstance(LogWriter.class);
@@ -52,6 +55,12 @@ public final class LogWriter implements Disposable {
      * IDE created and threw away without ever starting has no thread to join.
      */
     private @NotNull Optional<Thread> writerThread = Optional.empty();
+
+    /**
+     * Whether lines are being dropped right now, so the fact is said once per
+     * episode rather than once per dropped line.
+     */
+    private final @NotNull AtomicBoolean dropping = new AtomicBoolean();
 
     public LogWriter() {
         startWriterThread();
@@ -134,15 +143,40 @@ public final class LogWriter implements Disposable {
         }
     }
 
-    public void log(@NotNull Level level, @NotNull String callerClass, @NotNull String message) {
-
+    public void log(final @NotNull Level level, final @NotNull String callerClass, final @NotNull String message) {
         if (!isRunning || currentLogLevel == Level.DISABLED || level.priority < currentLogLevel.priority) return;
 
-        String formattedMessage = "[" + LocalDateTime.now().format(formatter) + "] " + "[" + level.paddedName + "] " + "[" + callerClass + "] " + message;
+        final @NotNull String formattedMessage = "[" + LocalDateTime.now().format(formatter) + "] " + "[" + level.paddedName + "] " + "[" + callerClass + "] " + message;
 
-        if (!logQueue.offer(formattedMessage))
-            Logger.error("Testin Logger queue full! Dropped log: " + message);
+        if (logQueue.offer(formattedMessage)) {
+            dropping.set(false);
+            return;
+        }
 
+        sayTheQueueIsFull();
+    }
+
+    /**
+     * That lines are being dropped, said where it can still be read.
+     * <p>
+     * This used to be {@code Logger.error("Testin Logger queue full!")}, which
+     * came straight back into the method above, found the queue still full and
+     * said it again - unbounded recursion, and a {@code StackOverflowError} on
+     * whatever thread happened to be logging, inside indexing, a save or a run.
+     * It was reachable rather than theoretical: {@link #writeLoop} exits on an
+     * {@code IOException}, so a log directory that stops being writable kills
+     * the drain and fills the queue behind it (#66, finding 65).
+     * <p>
+     * The rule {@link #rollOver} states is the rule here: the log's own failure
+     * cannot be reported through the log. Said once per episode, because a
+     * queue that is full is full for every line after it too, and re-armed by
+     * the first line that gets in.
+     */
+    private void sayTheQueueIsFull() {
+        if (dropping.getAndSet(true)) return;
+
+        IDE_LOG.warn("Testin's log queue is full and lines are being dropped - the writer thread"
+                + " has stopped draining it, so " + logFile + " ends where it stopped.");
     }
 
     @Override
@@ -182,14 +216,15 @@ public final class LogWriter implements Disposable {
     /**
      * How long the shutdown took, in the IDE's own log (#292).
      * <p>
-     * <b>The one place in the plugin that writes to {@code idea.log}.</b> Two
-     * reasons, and both are about this method only. It runs after Testin's own
-     * log has been told to stop, so a {@code Logger} call here would be queued
-     * to a writer that is closing and never appear. And what it answers is a
-     * question asked of {@code idea.log}: quitting the IDE stalls for about nine
-     * seconds between two of the platform's own lines, and the only way to say
-     * whether this method is inside that gap is to put the number in the same
-     * timeline, beside {@code ComponentStoreImpl} and the rest.
+     * <b>One of the two places in the plugin that write to {@code idea.log}</b>,
+     * the other being {@link #sayTheQueueIsFull}. Two reasons, and both are
+     * about this method only. It runs after Testin's own log has been told to
+     * stop, so a {@code Logger} call here would be queued to a writer that is
+     * closing and never appear. And what it answers is a question asked of
+     * {@code idea.log}: quitting the IDE stalls for about nine seconds between
+     * two of the platform's own lines, and the only way to say whether this
+     * method is inside that gap is to put the number in the same timeline,
+     * beside {@code ComponentStoreImpl} and the rest.
      * <p>
      * At INFO and one line, so it costs a quit nothing and cannot be asked a
      * second time without an answer.
