@@ -393,20 +393,22 @@ public final class SyncWithSftpAction extends DumbAwareAction {
 
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 try {
-                    // Whether it sent, not whether it was called. finish returns
-                    // early when another machine holds the sync lock - it writes a
-                    // log line and nothing else - so a tester who had just answered
-                    // six merge questions was told "Settled 6" when not a byte had
-                    // left the machine, and met the same six questions on the next
-                    // sync with no explanation.
-                    final boolean sent = SftpSync.finish(p, projectRoot, address, account.user(), auth, knownHosts(), answered);
+                    // How many reached the server, not how many were answered.
+                    // finish returns early when another machine holds the sync
+                    // lock - it writes a log line and nothing else - so a tester
+                    // who had just answered six merge questions was told
+                    // "Settled 6" when not a byte had left the machine, and met
+                    // the same six questions on the next sync with no
+                    // explanation. A connection that drops half way down the
+                    // list is the same lie with a smaller number behind it.
+                    final int settled = SftpSync.finish(p, projectRoot, address, account.user(), auth, knownHosts(), answered);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
                         Services.getInstance(p, TestinEditors.class).refreshOpen(p);
 
-                        if (sent) {
-                            Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("sftp.settled", String.valueOf(answered.size())));
+                        if (settled > 0) {
+                            Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("sftp.settled", String.valueOf(settled)));
                         } else {
                             Services.getInstance(p, Notifier.class).warn(p, Bundle.message("sftp.nothing.settled.title"),
                                     Bundle.message("sftp.nothing.settled.message"));

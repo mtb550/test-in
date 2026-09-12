@@ -325,9 +325,13 @@ public final class SftpSync {
      * Both sides and the record, in that order and all three: writing only this
      * machine's copy would leave the case unsettled on the server and ask the
      * same question again on the next sync, forever.
+     *
+     * @return how many cases were settled, which is how many actually reached
+     * the server. Not how many were answered: the sync lock can be held by
+     * somebody else, and a connection can drop part way down the list
      */
-    public static boolean finish(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull String user, final @NotNull SftpAuth auth, final @NotNull Path knownHosts, final @NotNull Map<String, String> answered) {
-        if (answered.isEmpty()) return false;
+    public static int finish(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull String user, final @NotNull SftpAuth auth, final @NotNull Path knownHosts, final @NotNull Map<String, String> answered) {
+        if (answered.isEmpty()) return 0;
 
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
@@ -337,31 +341,52 @@ public final class SftpSync {
             final @NotNull SyncLock lock = new SyncLock(transport);
             if (lock.takenBy(Services.getInstance(AppSettingsState.class).testerName).isPresent()) {
                 Logger.warn("Somebody else is syncing " + address.path() + ", so the answers were not sent");
-                return false;
+                return 0;
             }
 
             try {
+                // Both seeded without Git's own files, exactly as a sync seeds
+                // them. Reading them raw put back every entry an earlier build
+                // had written there, so this pass undid the cleanup the sync
+                // had just done (#66, finding 87).
                 final @NotNull Map<String, Manifest.Entry> onServer =
-                        new TreeMap<>(readManifest(transport, mapper).entries());
+                        withoutGit(readManifest(transport, mapper).entries());
                 final @NotNull Map<String, String> agreed =
-                        new TreeMap<>(BaselineStore.read(mapper, baselineFile).contents());
+                        withoutGit(BaselineStore.read(mapper, baselineFile).contents());
                 final @NotNull Map<String, byte[]> incoming = new TreeMap<>();
 
-                answered.forEach((path, settled) -> {
-                    final byte @NotNull [] content = settled.getBytes(StandardCharsets.UTF_8);
+                try {
+                    answered.forEach((path, settled) -> {
+                        final byte @NotNull [] content = settled.getBytes(StandardCharsets.UTF_8);
 
-                    transport.write(path, content);
-                    incoming.put(path, content);
-                    onServer.put(path, Manifest.Entry.of(content));
-                    agreed.put(path, settled);
-                });
+                        // The three records are updated per file and only after
+                        // the file itself landed, so they describe exactly what
+                        // reached the server however far down the list this got.
+                        transport.write(path, content);
+                        incoming.put(path, content);
+                        onServer.put(path, Manifest.Entry.of(content));
+                        agreed.put(path, settled);
+                    });
+                } finally {
+                    // Whatever landed is recorded, even when the connection
+                    // dropped part way. All three used to be written only if
+                    // every file went, so the ones that had gone sat on the
+                    // server with nothing describing them - not its manifest,
+                    // not the baseline, not this machine - and the next sync
+                    // asked the tester the same questions all over again.
+                    //
+                    // This machine first, because it cannot fail on the network
+                    // and a local copy ahead of the baseline is simply a file to
+                    // send next time. Then the manifest, then the baseline: a
+                    // baseline calling a file agreed while the server's own
+                    // record does not list it reads as a file the server deleted.
+                    if (!incoming.isEmpty()) indexer.acceptIncoming(projectRoot, incoming);
+                    writeManifest(transport, mapper, new Manifest(onServer));
+                    BaselineStore.write(mapper, baselineFile, new Baseline(agreed));
+                }
 
-                indexer.acceptIncoming(projectRoot, incoming);
-                writeManifest(transport, mapper, new Manifest(onServer));
-                BaselineStore.write(mapper, baselineFile, new Baseline(agreed));
-
-                Logger.info("Settled " + answered.size() + " test cases on both sides of " + address.display());
-                return true;
+                Logger.info("Settled " + incoming.size() + " test cases on both sides of " + address.display());
+                return incoming.size();
             } finally {
                 lock.release();
             }
