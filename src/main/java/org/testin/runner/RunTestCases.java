@@ -1,12 +1,10 @@
 package org.testin.runner;
 
-import org.testin.model.RunStatus;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.services.OptionalPlugin;
 
@@ -62,11 +60,11 @@ public final class RunTestCases {
 
         if (starting.isEmpty()) return;
 
+        // Nothing is said here. What a run turns out to be is only known a
+        // second later, when the runner has looked for each case's generated
+        // method, so a count taken at the click said "Running 12" over twelve
+        // cases that could not run. The runner says it once it knows - see
+        // TestNGExecution.started (#66, finding 18).
         TestRunner.available().run(p, starting);
-
-        // Once for the click, not once per case: running a page of twelve used
-        // to raise twelve balloons. Nothing is said when every case was already
-        // running, because nothing was started.
-        Services.getInstance(p, Notifier.class).softShowCounted(p, RunStatus.RUNNING.getBadge().label(), starting.size());
     }
 }

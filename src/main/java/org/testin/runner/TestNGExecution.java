@@ -187,12 +187,44 @@ public final class TestNGExecution implements Disposable {
      * marked at the click, a second before the launch - so a path that returned
      * quietly left the case looking like it was running for the rest of the
      * session.
+     * <p>
+     * Says nothing. Twelve cases with no code raised twelve balloons, one per
+     * case; {@link #started} says it once, with the count, when the runner has
+     * finished looking (#66, finding 18).
      */
     public void noGeneratedCode(final @NotNull TestCaseDto tc) {
         Logger.warn("Not running '" + tc.getDescription() + "': it has no generated code");
         notStarting(tc);
+    }
 
-        Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NO_GENERATED_CODE, tc.getDescription());
+    /**
+     * UC-CODEGEN-008, Rule-CODEGEN-033, Rule-CODEGEN-074.
+     * <p>
+     * What the run turned out to be, said once and only once the runner knows.
+     * <p>
+     * <b>After the gesture, not at it.</b> Whether a case can run is answered by
+     * looking for its generated method, which happens on a pooled thread a
+     * moment after the press - so the count taken at the click was the count
+     * asked for rather than the count starting. Twelve cases with no code read
+     * "Running 12" and were then refused one by one, twelve balloons saying the
+     * opposite of the first (#66, finding 18).
+     * <p>
+     * The cards answer for the gap: they turn to running at the press
+     * (Rule-CODEGEN-034), so the gesture is never unacknowledged while this is
+     * being worked out.
+     * <p>
+     * The refusal names the case when there is one of it and counts them when
+     * there are more, because a tester who asked for one already knows which.
+     */
+    public void started(final @NotNull List<TestCaseDto> running, final @NotNull List<TestCaseDto> withoutCode) {
+        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+
+        notifier.softShowCounted(p, RunStatus.RUNNING.getBadge().label(), running.size());
+        if (withoutCode.isEmpty()) return;
+
+        final boolean one = withoutCode.size() == 1;
+        notifier.softRefuse(p, one ? Refused.NO_GENERATED_CODE : Refused.NO_GENERATED_CODE_COUNTED,
+                one ? withoutCode.getFirst().getDescription() : String.valueOf(withoutCode.size()));
     }
 
     /**

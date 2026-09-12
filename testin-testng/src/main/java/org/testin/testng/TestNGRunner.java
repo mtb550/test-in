@@ -103,6 +103,7 @@ public final class TestNGRunner implements TestRunner {
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         final @NotNull List<Generated> found = new ArrayList<>();
+        final @NotNull List<TestCaseDto> withoutCode = new ArrayList<>();
         Optional<Module> module = Optional.empty();
 
         for (final TestCaseDto tc : cases) {
@@ -116,12 +117,18 @@ public final class TestNGRunner implements TestRunner {
 
             if (method.isEmpty()) {
                 execution.noGeneratedCode(tc);
+                withoutCode.add(tc);
                 continue;
             }
 
             found.add(new Generated(tc, method.orElseThrow()));
             if (module.isEmpty()) module = moduleOf(p, method.orElseThrow());
         }
+
+        // Before the launch and before the empty return, because this is the
+        // one place that knows what the run turned out to be. Nothing was said
+        // at the click (#66, finding 18).
+        execution.started(found.stream().map(Generated::tc).toList(), withoutCode);
 
         if (found.isEmpty()) return;
 

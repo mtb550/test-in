@@ -49,6 +49,16 @@ public enum Refused {
     NO_GENERATED_CODE(Bundle.message("refused.no.generated.code")),
 
     /**
+     * UC-CODEGEN-008, Rule-CODEGEN-074.
+     * <p>
+     * The same, for the several. A tester who selected a page and pressed Run
+     * gets the number rather than a balloon per case, because the number is the
+     * fact and the descriptions are on the cards in front of them (#66,
+     * finding 18).
+     */
+    NO_GENERATED_CODE_COUNTED(Bundle.message("refused.no.generated.code.counted")),
+
+    /**
      * UC-TREE-PANEL-023, Rule-TREE-PANEL-078.
      * <p>
      * The tester asked to run a node that has nothing left to run: a test set
