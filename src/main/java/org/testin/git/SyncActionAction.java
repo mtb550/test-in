@@ -349,7 +349,6 @@ public class SyncActionAction extends DumbAwareAction {
         private void refreshAfterSync(final @NotNull Path repoPath, final int pushed) {
             RepositoryRefresh.after(p, repoPath);
             ApplicationManager.getApplication().invokeLater(() -> {
-                // A balloon, not a log entry. A sync is pressed and watched: it
                 // It stays in the Notifications log, like the push beside it and
                 // the server sync beside that. This used to fade, on the argument
                 // that the rebuilt tree is what it leaves behind - but a sync runs

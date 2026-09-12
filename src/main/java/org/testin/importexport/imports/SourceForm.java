@@ -167,6 +167,8 @@ public final class SourceForm implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // The dialog confirms by its Import button, not by Enter in a field.
+        // Nothing, because Enter is the dialog's rather than this field's:
+        // ImportDialog binds it to Import on the status bar, so a form that
+        // answered it too would give one key two handlers.
     }
 }

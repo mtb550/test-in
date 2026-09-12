@@ -21,10 +21,10 @@ import java.util.function.Consumer;
  * <p>
  * The dialog closes on the button now, and the work reports itself here (#87).
  * <p>
- * None of them can be canceled. An import writes one file per test case and an
- * export or a report writes one file whole, so a stop part-way through leaves
- * something half-made that nobody asked for; the bar moves and nothing
- * interrupts it.
+ * All of them can be canceled, unlike the Git tasks. None of the four can leave
+ * the repository in a state the tester cannot see, which is the reason a push or
+ * a rebase cannot be stopped and these can (#257). The reasoning per operation
+ * is at the one place that builds the task, in {@link #run}.
  * <p>
  * A failure is logged and shown once. It is caught here because a task that
  * throws past {@code run} leaves the bar up and says nothing.

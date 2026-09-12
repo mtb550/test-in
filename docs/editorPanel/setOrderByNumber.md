@@ -69,7 +69,7 @@ The tester types the position they want. Testin moves the test case there.
 4. Testin works out a new place for it, between the two test cases it now sits
    between.
 5. Only this test case's file is written.
-6. A message reads *Updated*.
+6. A message reads *Re-sorted*, the same word dragging a card gives.
 7. Every card is renumbered.
 
 ## What Testin refuses
@@ -81,12 +81,6 @@ message says so, in the platform's own words, and nothing is saved.
 
 **If several test cases are selected** — a message reads *Order is set one test
 case at a time*.
-
-## Where the plugin breaks its own rules
-
-This says *Updated* when it finishes. Dragging cards to do the same thing says
-*Re-sorted*. One act, two words. That is difference 15 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
 
 ---
 

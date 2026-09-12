@@ -27,7 +27,15 @@ import java.nio.file.Path;
  * bind it, never a failed start.
  * <p>
  * Read with {@code java.nio} rather than through the VFS: this runs before
- * indexing, off the EDT, on a file the plugin has never opened.
+ * indexing, on a file the plugin has never opened, so there is nothing in the
+ * virtual file system to ask.
+ * <p>
+ * Not off the EDT, whatever the thread. Two of the three startup doors reach
+ * {@code StartupActivity.execute} inside an {@code invokeLater}, so this reads
+ * on the EDT for both of them. It is one small file read once per project and it
+ * is deliberately left there rather than moved behind a background task, because
+ * the config names the test project the first index is about - an index started
+ * without it would have to be thrown away and run again (#6).
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class TestinConfigLoader {

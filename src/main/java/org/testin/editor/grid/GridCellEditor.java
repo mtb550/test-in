@@ -73,7 +73,7 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
     }
 
     /**
-     * A line added with ALT+ENTER needs somewhere to go: grow the row while the
+     * A line added with CTRL+ENTER needs somewhere to go: grow the row while the
      * cell is still open, so the caret stays visible instead of typing into a
      * clipped area. The row is re-measured for real when the edit is committed.
      */

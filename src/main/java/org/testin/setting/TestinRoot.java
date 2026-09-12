@@ -24,10 +24,17 @@ import java.util.Objects;
  * Project-level for the convenience of callers that already hold a project, not
  * because the value is per-project. It reads {@link AppSettingsState}, which is
  * an application-level service over one file, so every open project sees the
- * same root and a change made in one is visible in all of them. Keeping the
- * scope here costs nothing — a project container resolves an application-level
- * service to the same object — and saves passing the project at twenty call
- * sites that already have it (#70).
+ * same root and a change made in one is visible in all of them. The scope here
+ * costs nothing and saves passing the project at twenty call sites that already
+ * have it (#70).
+ * <p>
+ * <b>The application-level service is reached through {@link Services}, and that
+ * is not a convenience.</b> A project container asked for an application service
+ * does not hand back the application's - it builds a second instance inside the
+ * project, with its own persisted state, which is the bug that produced two
+ * files called testinSettings.xml holding different tester names.
+ * {@code Services.getInstance} is what decides which container to ask, and its
+ * javadoc records what happened when nothing did.
  */
 @Service(Service.Level.PROJECT)
 @AllArgsConstructor

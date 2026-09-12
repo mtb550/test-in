@@ -270,10 +270,11 @@ public class ImportAction extends DumbAwareAction {
          * asked for and what froze the IDE for forty-nine seconds on a sheet of five
          * hundred and fifty. A write action cannot be interrupted, so one command
          * around every case holds the EDT until the last one is written - the
-         * progress bar cannot even repaint. Twenty-five at a time releases it
-         * between batches. The cost is an undo entry per batch instead of one for
-         * the sheet, and a single undo of a fifty-second operation was not a thing
-         * anyone could use.
+         * progress bar cannot even repaint. {@link #METHODS_PER_COMMAND} at a time
+         * releases it between batches, and that constant says why it is the size
+         * it is. The cost is an undo entry per batch instead of one for the sheet,
+         * and a single undo of a fifty-second operation was not a thing anyone
+         * could use.
          */
         private void generateTestMethods(final @NotNull List<TestCaseDto> testCases, final @NotNull String targetName, final @NotNull ProgressIndicator indicator) {
             Logger.info("Import: generating test methods for '" + targetName + "' with " + testCases.size() + " cases");

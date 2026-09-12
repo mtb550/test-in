@@ -28,9 +28,11 @@ import java.util.function.Function;
  * code said whether that was meant. It was not: decided 2026-09-04, the
  * spreadsheet adopts this list like everything else.
  * <p>
- * Executed is not here and is not lost. It is Total minus Untested, the
- * narrative sentence above the HTML tiles still says it, and a figure a reader
- * can work out does not need a tile of its own in four formats.
+ * Executed is not here and is not lost. It is Passed, Failed and Blocked added
+ * up - which is Total minus Untested and Removed, because the total counts a
+ * removed case and nobody ran one. The narrative sentence above the HTML tiles
+ * still says it, and a figure a reader can work out does not need a tile of its
+ * own in four formats.
  */
 @Getter
 @AllArgsConstructor
