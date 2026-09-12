@@ -243,6 +243,12 @@ public final class SftpSync {
         if (total > 0) indicator.setText(Bundle.message("sftp.progress.moving", String.valueOf(total)));
 
         for (final String path : plan.toUpload) {
+            // Between files, which is where a cancel can land: a first sync is
+            // up to 2,246 round trips and about six minutes over a 20 ms link,
+            // and the Cancel button did nothing at all until the whole of it had
+            // finished. The lock is released in a finally above, so stopping
+            // here leaves nothing behind (#66, finding 83).
+            indicator.checkCanceled();
             indicator.setText2(path);
             transport.write(path, local.get(path));
 
@@ -252,6 +258,7 @@ public final class SftpSync {
         }
 
         for (final String path : plan.toDownload) {
+            indicator.checkCanceled();
             indicator.setText2(path);
             final byte @NotNull [] content = transport.read(path);
 
@@ -262,6 +269,7 @@ public final class SftpSync {
         }
 
         for (final String path : plan.toDeleteRemotely) {
+            indicator.checkCanceled();
             indicator.setText2(path);
             transport.delete(path);
 
@@ -428,6 +436,7 @@ public final class SftpSync {
         indicator.setText(Bundle.message("sftp.progress.merging", String.valueOf(mergeable.size())));
 
         for (final String path : mergeable) {
+            indicator.checkCanceled();
             indicator.setText2(path);
 
             final @NotNull String base = agreed.getOrDefault(path, "");
