@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.method.update.NoOpCodeUpdate;
@@ -13,6 +14,7 @@ import org.testin.notifications.Refused;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.Once;
 
 import java.util.List;
 
@@ -198,6 +200,12 @@ public enum GenType {
     }
 
     /**
+     * Marks that this project has already been told the IDE is indexing, so it is
+     * told once rather than once per item of a bulk operation.
+     */
+    private static final @NotNull Key<Boolean> INDEXING_SAID = Key.create("testin.codegen.indexingSaid");
+
+    /**
      * Runs the Java-backed generator for this operation - or, in an IDE with no
      * Java plugin, says so once per project and skips quietly.
      * <p>
@@ -264,7 +272,15 @@ public enum GenType {
             if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return false;
             if (!DumbService.isDumb(p)) return true;
 
-            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.WHILE_INDEXING, description);
+            // Once for the project, the way the missing-Java-plugin half one line
+            // above already says it. The refusal is about the IDE, not about the
+            // test case that happened to be first, and it had no guard at all - so
+            // removing forty cases while the IDE was indexing was forty red
+            // balloons for one gesture (#66, finding 80).
+            if (Once.claim(p, INDEXING_SAID)) {
+                Services.getInstance(p, Notifier.class).softRefuse(p, Refused.WHILE_INDEXING, description);
+            }
+
             // The constant, not the description: a log line reads the same in
             // every language the plugin speaks, and the description does not.
             Logger.info("Skipped " + name() + ": the IDE is indexing");

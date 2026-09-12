@@ -107,8 +107,13 @@ public class RemoveTestCaseAction extends DumbAwareAction {
             final var indexer = Services.getInstance(p, org.testin.indexer.ProjectIndexer.class);
             for (final TestCaseDto tc : selectedItems) {
                 indexer.removeTestCase(dir.getPath(), tc.getId());
-                GenType.REMOVE_TEST_CASE.getAction().execute(p, tc);
             }
+
+            // One call for the whole selection. Only executeAll opens the single
+            // write command, so removing forty cases a case at a time was forty
+            // entries on the IDE's own undo history - the defect the batching in
+            // #153 was written to fix (#66, finding 80).
+            GenType.REMOVE_TEST_CASE.executeAll(p, selectedItems);
 
             // Redrawn from the master list rather than by taking rows out of the
             // page's model, which a declared action has no way to reach. It is also

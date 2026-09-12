@@ -266,10 +266,17 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         // Only what is actually there. An id that is already gone is the state
         // this asks for, and deleting a file twice is a warning in the log for
         // a job already done.
+        final @NotNull List<TestCaseDto> removed = new ArrayList<>();
         absent.forEach(id -> indexer.findTestCase(id).ifPresent(tc -> {
             indexer.removeTestCase(testSetPath, id);
-            GenType.REMOVE_TEST_CASE.getAction().execute(p, tc);
+            removed.add(tc);
         }));
+
+        // One call for all of them, as the reconcile at the end of restorePresent
+        // already does. Only executeAll opens the single write command, so taking
+        // back a removal of forty cases used to put forty entries on the IDE's own
+        // undo history (#66, finding 80).
+        if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
     }
 
     /**
@@ -305,19 +312,21 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         // A copy per write for the same reason the snapshot is a copy: the
         // indexer keeps the object it is given, and this snapshot may be
         // applied again by the next redo.
+        final @NotNull List<TestCaseDto> comingBack = new ArrayList<>();
         present.forEach(tc -> {
             // A case the index has never heard of is one coming back from a
             // removal rather than one being edited back, and only the first
             // needs a method written. Asked before the save, because after it
             // every case is there.
-            final boolean isComingBack = indexer.findTestCase(tc.getId()).isEmpty();
+            if (indexer.findTestCase(tc.getId()).isEmpty()) comingBack.add(tc);
 
             final @NotNull TestCaseDto stored = copy(p, tc);
             stored.setParent(parent);
             indexer.putTestCaseVerbatim(testSetPath, stored);
-
-            if (isComingBack) GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
         });
+
+        // One call, like the two below and above it.
+        if (!comingBack.isEmpty()) GenType.CREATE_TEST_CASE.executeAll(p, comingBack);
 
         // UC-CODEGEN-002, Rule-CODEGEN-068.
         //
