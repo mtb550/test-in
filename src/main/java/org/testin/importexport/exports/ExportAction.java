@@ -11,21 +11,18 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
-import org.testin.logger.Logger;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseOrder;
 import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.services.BackgroundWork;
 import org.testin.util.Bundle;
-import org.testin.util.Mapper;
 
-import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -91,7 +88,7 @@ public class ExportAction extends DumbAwareAction {
             final @NotNull VirtualFile targetDir = resolved.orElseThrow();
 
             BackgroundWork.run(p, Bundle.message("export.task.reading", dirDto.getName()), Bundle.message("export.failed.title"), gathering -> {
-                final @NotNull Gathered gathered = gather(targetDir);
+                final @NotNull Gathered gathered = gather(dirDto);
                 final @NotNull Map<String, List<TestCaseDto>> sheets = gathered.sheets();
                 if (sheets.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
@@ -157,12 +154,18 @@ public class ExportAction extends DumbAwareAction {
          * One walk for both kinds of node. A test set holds its cases directly and
          * has no folders under it, so the recursion simply stops - which is what the
          * two branches here used to say the long way.
+         * <p>
+         * <b>Through the indexer.</b> It used to walk the VFS and parse every
+         * .json for itself, so an export could serve content the tree was not
+         * showing, and re-read the whole project to do it - 2,246 files in the
+         * sandbox, every one of them already read and already in memory. The
+         * import half asks the indexer for the same data (#66, finding 87).
          */
-        private @NotNull Gathered gather(final @NotNull VirtualFile targetDirectory) {
+        private @NotNull Gathered gather(final @NotNull DirectoryDto node) {
             final @NotNull List<Sheet> found = new ArrayList<>();
             final @NotNull List<String> unreadable = new ArrayList<>();
 
-            walk(targetDirectory, List.of(targetDirectory.getName()), found, unreadable);
+            walk(node, List.of(node.getName()), found, unreadable);
 
             final @NotNull Map<String, List<TestCaseDto>> sheets = new LinkedHashMap<>();
             for (final Sheet sheet : found) sheets.put(uniqueKey(sheets, sheet.path()), sheet.cases());
@@ -170,13 +173,18 @@ public class ExportAction extends DumbAwareAction {
             return new Gathered(sheets, unreadable);
         }
 
-        private void walk(final @NotNull VirtualFile dir, final @NotNull List<String> path, final @NotNull List<Sheet> found, final @NotNull List<String> unreadable) {
-            final @NotNull List<TestCaseDto> here = loadTestCasesInOrder(dir, unreadable);
+        private void walk(final @NotNull DirectoryDto node, final @NotNull List<String> path, final @NotNull List<Sheet> found, final @NotNull List<String> unreadable) {
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+
+            // Already in the order the editor shows, because the indexer answers
+            // with the rule the screen is drawn from - so a sheet's rows and the
+            // screen they were exported from cannot disagree.
+            final @NotNull List<TestCaseDto> here = indexer.getTestCasesForTestSet(node.getPath());
             if (!here.isEmpty()) found.add(new Sheet(path, here));
 
-            for (final VirtualFile child : childrenOf(dir)) {
-                if (!child.isDirectory()) continue;
+            unreadable.addAll(unreadableIn(node, here));
 
+            for (final DirectoryDto child : indexer.getChildren(node.getPath())) {
                 final @NotNull List<String> under = new ArrayList<>(path);
                 under.add(child.getName());
                 walk(child, under, found, unreadable);
@@ -186,28 +194,44 @@ public class ExportAction extends DumbAwareAction {
         /**
          * UC-SHARE-002, Rule-SHARE-001.
          * <p>
-         * The test cases in one folder, and the names of the files that would not
-         * read. The failures used to go to the log alone, where nothing points at
-         * them (#263).
+         * The test case files in this folder that the index has no case for, which
+         * are the ones that would not read when the project was scanned. Named
+         * rather than counted: a tester who recognizes the file knows whether the
+         * export is worth sending (#263).
+         * <p>
+         * Asked of the folder listing rather than by parsing anything. Testin names
+         * a case file after the case's id, so a file named for a UUID the index
+         * does not know is one the scan could not read. A file named anything else
+         * is not one Testin wrote, and is nobody's missing test case.
          */
-        private @NotNull List<TestCaseDto> loadTestCasesInOrder(final @NotNull VirtualFile dir, final @NotNull List<String> unreadable) {
-            final @NotNull List<TestCaseDto> loaded = new ArrayList<>();
+        private @NotNull List<String> unreadableIn(final @NotNull DirectoryDto node, final @NotNull List<TestCaseDto> indexed) {
+            final @NotNull Set<String> known = new HashSet<>();
+            for (final TestCaseDto tc : indexed) known.add(tc.getId() + ".json");
 
-            for (final VirtualFile file : childrenOf(dir)) {
-                if (!file.isDirectory() && file.getName().endsWith(".json")) {
-                    try (InputStream is = file.getInputStream()) {
-                        loaded.add(Services.getInstance(p, Mapper.class).readValue(is, TestCaseDto.class));
-                    } catch (final Exception ex) {
-                        Logger.error("Loading test cases failed: " + ex.getMessage());
-                        unreadable.add(file.getName());
-                    }
+            final @NotNull List<String> missing = new ArrayList<>();
+            resolveTargetDir(node).ifPresent(dir -> {
+                for (final VirtualFile file : childrenOf(dir)) {
+                    if (file.isDirectory() || known.contains(file.getName())) continue;
+                    if (isCaseFileName(file.getName())) missing.add(file.getName());
                 }
-            }
+            });
 
-            // The same order the editor shows, from the same rule - a sheet whose
-            // rows are in a different order from the screen they were exported from
-            // is a sheet nobody trusts.
-            return new ArrayList<>(TestCaseOrder.ordered(loaded));
+            return missing;
+        }
+    }
+
+    /**
+     * Whether a file name is one Testin wrote for a test case: a UUID, then
+     * {@code .json}.
+     */
+    private static boolean isCaseFileName(final @NotNull String name) {
+        if (!name.endsWith(".json")) return false;
+
+        try {
+            UUID.fromString(name.substring(0, name.length() - ".json".length()));
+            return true;
+        } catch (final IllegalArgumentException notACase) {
+            return false;
         }
     }
 
