@@ -304,6 +304,11 @@ final class IndexerDataStore {
     /**
      * Drops a whole test project out of the cache: the project itself, its two
      * main directories, and every package, set and run beneath it.
+     * <p>
+     * Two callers, and the log line says the cache-level fact both of them mean:
+     * a test project the tester deleted, and the start of a scan that is about
+     * to read the same project again and must not carry the last pass's nodes
+     * into this one.
      */
     void removeTestProject(final @NotNull Path path) {
         final @NotNull String pathStr = path.toString();
@@ -317,7 +322,7 @@ final class IndexerDataStore {
         removeTestRunsUnder(path);
         childrenIndex.invalidate();
 
-        Logger.info("Removed test project at: " + pathStr);
+        Logger.info("Test project dropped from the index: " + pathStr);
     }
 
     private void removeTestSetPackagesUnder(final @NotNull Path path) {

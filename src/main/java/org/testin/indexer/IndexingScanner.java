@@ -58,27 +58,30 @@ final class IndexingScanner {
         try {
             final @NotNull TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).getTestProjectNode(p, projectPath);
 
+            // UC-INTERNAL-003, Rule-INTERNAL-021.
+            //
+            // Everything this project held is dropped before the pass that reads
+            // it again, so a rescan forgets what disappeared instead of only
+            // learning what arrived. The scan used to put and never remove, and
+            // the one path that cleared was Refresh - so a test set deleted by a
+            // Git pull, a branch switch or an SFTP sync stayed in the tree with
+            // its cases still in global search, the completion cache and every
+            // export, until the tester pressed the button Rule-INTERNAL-021
+            // exists so they do not have to (#66, finding 68).
+            store.removeTestProject(projectPath);
+            store.getTestProjectsByPath().put(projectPath.toString(), tp);
+
             // UC-TREE-PANEL-001, Rule-TREE-PANEL-100.
             //
             // The node, and nothing under it. An inactive project is not being
             // worked on, so reading its test sets, cases and runs is a directory
             // walk nobody asked for - but it is still a project, and the tree
             // says so by drawing it with "Inactive" beside its name.
-            //
-            // Dropped first, because the status change does not re-index: the
-            // action writes the marker and redraws, so whatever an earlier scan
-            // read would stay and the tree would draw children under a node that
-            // is meant to hold none.
             if (!tp.getMarker().getStatus().isActive()) {
-                store.removeTestProject(projectPath);
-                store.getTestProjectsByPath().put(projectPath.toString(), tp);
-
                 Logger.info("Inactive project, indexed without its contents: " + projectPath.getFileName());
                 indicator.setFraction(1.0);
                 return;
             }
-
-            store.getTestProjectsByPath().put(projectPath.toString(), tp);
 
                 indicator.setFraction(0.1);
                 indicator.setText(Bundle.message("indexer.progress.test.sets", tp.getName()));
