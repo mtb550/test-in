@@ -78,7 +78,15 @@ reads *Could not abort the rebase.*
 rebase.*
 
 **If conflicts remain after the merge** — a message titled **Still Conflicting**
-names them again.
+names them again, and the pull is not carried on.
+
+**If the conflicted file is not a test case** — a conflicted test run, a marker
+or anything else is named in that same message and left as it is. Testin merges
+test cases field by field, and a test run's result is a list of verdicts per
+test case: merging one means asking about each of them, which is its own thing
+to design rather than a variation of the case merge. The tester settles those by
+hand, in files the IDE may not draw as conflicted, because a Testin root is not
+a version control root.
 
 **If the repository has no remote** — the rebase is carried to the end and the
 push is refused, reading *This repository has no remote, so there is nothing to
