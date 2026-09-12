@@ -80,10 +80,12 @@ final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
 
         if (number.isEmpty()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("dialog.order.refused.title"),
-                    // The number as digits, not as a formatted number: MessageFormat
-                    // would group an int into 2,147,483,647, which is a different
-                    // sentence from the one this has always printed.
-                    Bundle.message("dialog.order.refused.message", String.valueOf(Marker.NOT_ORDERED)));
+                    // The int, so MessageFormat groups it: 2,147,483,647 rather
+                    // than ten undivided digits, and grouped the way the reader's
+                    // own locale groups numbers. It was passed as a string while
+                    // the sentence moved into the bundle, because a translation
+                    // commit must change nothing a tester sees (#66, finding 97).
+                    Bundle.message("dialog.order.refused.message", Marker.NOT_ORDERED));
             return;
         }
 
