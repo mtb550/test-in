@@ -200,7 +200,7 @@ Each entry in `results`:
 | Field | Type | Meaning |
 |---|---|---|
 | `id` | UUID string | The test case this result is about |
-| `status` | enum | `PASSED` `FAILED` `BLOCKED` `UNTESTED` |
+| `status` | enum | `PASSED` `FAILED` `BLOCKED` as a tester or the automation judged it; `PENDING` until then; `UNTESTED` for a case still pending when the run completed or closed; `REMOVED` for a case whose test case was deleted since the run |
 | `duration` | number, seconds | Nanosecond precision, written as a decimal |
 | `executedBy` | string | |
 | `executedAt` | date | |
