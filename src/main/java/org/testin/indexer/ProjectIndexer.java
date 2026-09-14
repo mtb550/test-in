@@ -723,10 +723,34 @@ public final class ProjectIndexer {
      * finished arriving.
      */
     void refreshIndexedProject(final @NotNull Path changedPath) {
-        store.getTestProjectsByPath().keySet().stream()
+        testProjectHolding(changedPath).ifPresent(scanCoordinator::rescanExclusively);
+    }
+
+    /**
+     * The folder of the indexed test project this path sits in, innermost first,
+     * and empty when none holds it.
+     */
+    private @NotNull Optional<Path> testProjectHolding(final @NotNull Path path) {
+        return store.getTestProjectsByPath().keySet().stream()
                 .map(Path::of)
-                .filter(changedPath::startsWith)
-                .max(Comparator.comparingInt(Path::getNameCount)).ifPresent(scanCoordinator::rescanExclusively);
+                .filter(path::startsWith)
+                .max(Comparator.comparingInt(Path::getNameCount));
+    }
+
+    /**
+     * UC-INTERNAL-004, Rule-INTERNAL-034.
+     * <p>
+     * Where a test case's file sits: the test project folder holding it, and the
+     * file's path inside that folder - what a bug report links to in the test
+     * project's repository (#28). Empty when no indexed test project holds the
+     * case's test set.
+     * <p>
+     * Answered here because the file's name is the indexer's to decide; a link
+     * builder spelling {@code <id>.json} itself would be one more copy of it.
+     */
+    public @NotNull Optional<TestCaseFile> testCaseFile(final @NotNull TestCaseDto tc) {
+        final @NotNull Path file = TestCaseSequenceStore.fileOf(tc.getParent().getPath(), tc.getId());
+        return testProjectHolding(file).map(testProject -> new TestCaseFile(testProject, testProject.relativize(file)));
     }
 
     public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {

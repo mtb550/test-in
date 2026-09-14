@@ -133,10 +133,11 @@ final class TestCaseSequenceStore {
 
     /**
      * Where a test case lives, from the set that holds it and its id. One owner,
-     * because three things ask - the save, the unchanged check that now precedes
-     * it, and the delete.
+     * because four things ask - the save, the unchanged check that now precedes
+     * it, the delete, and {@link ProjectIndexer#testCaseFile} for a bug report's
+     * link (#28).
      */
-    private static @NotNull Path fileOf(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
+    static @NotNull Path fileOf(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
         return testSetPath.resolve(testCaseId + ".json");
     }
 
