@@ -30,6 +30,7 @@ import org.testin.util.Mapper;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -114,6 +115,56 @@ final class RunWriter {
                 Logger.error("Failed to persist marker: " + ex.getMessage());
             }
         }));
+    }
+
+    /**
+     * UC-SHARE-019, Rule-SHARE-003.
+     * <p>
+     * Whether a file is one of the two this writer owns: a run's results or its
+     * marker. Asked by a sync bringing files in, so a run's files that arrive from
+     * a server join this queue instead of landing beside it.
+     */
+    boolean owns(final @NotNull Path file) {
+        return file.endsWith(DirectoryType.TR.getMarker())
+                || Optional.ofNullable(file.getParent()).map(TestRunDirectoryDto::resultsFile).filter(file::equals).isPresent();
+    }
+
+    /**
+     * UC-SHARE-019, Rule-SHARE-003.
+     * <p>
+     * Writes bytes that arrived from a server into one of a run's files, in this
+     * queue's order. Written straight to disk, they landed while a verdict write
+     * for the same run was still queued, holding a snapshot taken before the
+     * sync - and that write then put the older run back over them (#66, finding
+     * 121).
+     * <p>
+     * No "is the run still indexed" question, unlike {@link #persist}: a run that
+     * arrives from a server is not in the index until the scan that follows.
+     */
+    void write(final @NotNull Path file, final byte @NotNull [] bytes) {
+        queue.execute(() -> {
+            try {
+                Services.getInstance(p, TestDataFiles.class).write(p, file, bytes);
+            } catch (final Exception ex) {
+                Logger.error("Failed to write an incoming run file " + file + ": " + ex.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Returns once every write queued so far has landed, so a scan that follows
+     * reads what was written instead of racing it.
+     */
+    void awaitQueued() {
+        try {
+            queue.submit(() -> {
+            }).get();
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            Logger.warn("Interrupted while waiting for the run writer: " + ex.getMessage());
+        } catch (final ExecutionException ex) {
+            Logger.error("The run writer failed while it was waited for: " + ex.getMessage());
+        }
     }
 
     /**

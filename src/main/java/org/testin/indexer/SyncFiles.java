@@ -51,6 +51,11 @@ final class SyncFiles {
     private final @NotNull Project p;
 
     /**
+     * The one writer of a run's files, which incoming run files go through.
+     */
+    private final @NotNull RunWriter runWriter;
+
+    /**
      * Every file in a test project, by the path a server names it with (#94).
      * <p>
      * Walked from disk rather than read out of the cache, and that is not a
@@ -90,7 +95,16 @@ final class SyncFiles {
     void accept(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
         final @NotNull TestDataFiles writer = Services.getInstance(p, TestDataFiles.class);
 
-        files.forEach((relative, content) -> writer.write(p, projectPath.resolve(relative), content));
+        files.forEach((relative, content) -> {
+            final @NotNull Path file = projectPath.resolve(relative);
+
+            // A run's files join the run writer's queue, so a verdict write
+            // already waiting there cannot land after them and put the older run
+            // back (#66, finding 121). Every other file has one writer and no
+            // queue to race.
+            if (runWriter.owns(file)) runWriter.write(file, content);
+            else writer.write(p, file, content);
+        });
         Logger.info("Wrote " + files.size() + " incoming files into " + projectPath);
     }
 

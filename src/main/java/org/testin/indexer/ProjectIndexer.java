@@ -99,7 +99,7 @@ public final class ProjectIndexer {
         this.store = new IndexerDataStore(p);
         this.scanCoordinator = new ProjectScanCoordinator(new IndexingScanner(p, store));
         this.runWriter = new RunWriter(p, store);
-        this.syncFiles = new SyncFiles(p);
+        this.syncFiles = new SyncFiles(p, runWriter);
         this.nodeFiles = new NodeFiles(p, this, store);
     }
 
@@ -784,6 +784,11 @@ public final class ProjectIndexer {
      */
     public void acceptIncoming(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
         syncFiles.accept(projectPath, files);
+
+        // A run's incoming files went through the run writer's queue; the scan
+        // reads them once they have landed rather than racing them (#66, finding
+        // 121).
+        runWriter.awaitQueued();
 
         scanSingleProject(projectPath);
     }
