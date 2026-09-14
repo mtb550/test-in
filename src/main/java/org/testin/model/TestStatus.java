@@ -87,11 +87,12 @@ public enum TestStatus {
             SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES,
             JBColor.GRAY,
             Bundle.message("status.verdict.removed"),
-            // Off the menu, and the run sets it for itself: the test case this
-            // result belongs to has been deleted, so there is nothing left to
-            // execute and nothing left to judge. The row stays because the run
-            // executed it once, and what it recorded is history rather than a
-            // verdict anyone can still give (#66).
+            // Off the menu, and shown rather than set: the test case this result
+            // belongs to has been deleted, so there is nothing left to execute
+            // and nothing left to judge. The row stays because the run executed
+            // it once, and what it recorded is history rather than a verdict
+            // anyone can still give (#66). The file keeps that verdict; only
+            // TestRunItems.shownStatus answers Removed (#66, finding 110).
             MenuEntry.NONE,
             false
     ),

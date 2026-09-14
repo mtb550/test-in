@@ -178,7 +178,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     RUN_STATUS(
             Bundle.message("attribute.run.run.status"),
             ToolBarDefault.ON,
-            (item, p) -> item.getStatus().getLabel()
+            (item, p) -> item.shownStatus().getLabel()
     ),
 
     DURATION(

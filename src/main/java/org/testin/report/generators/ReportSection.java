@@ -170,6 +170,6 @@ enum ReportSection {
     }
 
     public boolean matches(final @NotNull TestRunItems item) {
-        return statuses.contains(item.getStatus());
+        return statuses.contains(item.shownStatus());
     }
 }

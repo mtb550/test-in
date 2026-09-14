@@ -76,7 +76,7 @@ public final class RunStatusService {
         // (#66, finding 152).
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
         Services.getInstance(p, ProjectIndexer.class).changeRun(editor.getParent().getPath(),
-                run -> run.resultOf(currentTc.getId()).ifPresent(runItem -> runItem.recordVerdict(status, tester)));
+                run -> run.resultOf(currentTc.getId()).filter(runItem -> !runItem.isRemoved()).ifPresent(runItem -> runItem.recordVerdict(status, tester)));
 
         Logger.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
 
@@ -391,7 +391,9 @@ public final class RunStatusService {
         Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, tr -> {
             int closed = 0;
             for (final TestRunItems item : tr.getResults()) {
-                if (item.getStatus() == TestStatus.PENDING) {
+                // A removed item is left as its file holds it: deleting a test
+                // case never changes a run item (#66, finding 110).
+                if (item.shownStatus() == TestStatus.PENDING) {
                     item.setStatus(TestStatus.UNTESTED);
                     closed++;
                 }

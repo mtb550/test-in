@@ -71,6 +71,24 @@ public class TestRunSummaryTest {
         return TestRunSummary.of(results).passRate();
     }
 
+    /**
+     * #66, finding 110: a removed test case counts under Removed and nowhere
+     * else, whatever verdict its file holds, so the pass rate is of the test
+     * cases still in the test set.
+     */
+    @Test
+    public void aRemovedCaseIsOutsideThePassRateWhateverItsFileHolds() {
+        final TestRunSummary summary = TestRunSummary.of(List.of(
+                item(TestStatus.PASSED),
+                item(TestStatus.FAILED),
+                TestRunItems.builder().id(UUID.randomUUID()).status(TestStatus.PASSED).removed(true).build()));
+
+        assertEquals(summary.passed(), 1, "the removed row's Passed is not counted");
+        assertEquals(summary.removed(), 1);
+        assertEquals(summary.passRate(), 50, "one passed of the two still in the test set");
+        assertEquals(summary.total(), 3, "the total still counts the row");
+    }
+
     @Test
     public void untestedCountsBothWaysOfNotHavingBeenRun() {
         // The regression: a completed run holds UNTESTED, not PENDING.

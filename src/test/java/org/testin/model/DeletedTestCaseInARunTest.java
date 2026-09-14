@@ -18,8 +18,10 @@ package org.testin.model;
 
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
+import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -117,5 +119,32 @@ public class DeletedTestCaseInARunTest {
 
         assertTrue(Config.isNotExecuted(run.getResults().getFirst().getExecutedAt()),
                 "a row nobody ran carries no execution time");
+    }
+
+    /**
+     * #66, finding 110: a removed row is shown as Removed, while the run written
+     * back still carries the verdict it recorded. Opening a run used to set
+     * REMOVED on the run the indexer holds, and the next save from anywhere wrote
+     * it over the verdict.
+     */
+    @Test
+    public void aRemovedRowIsShownRemovedAndWrittenWithItsVerdict() {
+        final TestRunItems item = TestRunItems.builder()
+                .id(UUID.randomUUID())
+                .status(TestStatus.PASSED)
+                .removed(true)
+                .build();
+
+        assertTrue(item.isRemoved(), "the verdict path, the details editor and the walker refuse it");
+        assertEquals(item.shownStatus(), TestStatus.REMOVED, "the tester sees Removed");
+
+        try {
+            final String written = new String(RealMapper.build().writeValueAsBytes(TestRunDto.builder().results(List.of(item)).build()), StandardCharsets.UTF_8);
+
+            assertTrue(written.contains("\"PASSED\""), "the file keeps the verdict: " + written);
+            assertFalse(written.contains("removed"), "the mark is never written: " + written);
+        } catch (final Exception e) {
+            throw new AssertionError("the run could not be written", e);
+        }
     }
 }

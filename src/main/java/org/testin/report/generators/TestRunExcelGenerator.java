@@ -121,7 +121,7 @@ public final class TestRunExcelGenerator {
 
                 ws.value(row, 1, title);
 
-                final @NotNull TestStatus statusEnum = result.getStatus();
+                final @NotNull TestStatus statusEnum = result.shownStatus();
                 ws.value(row, 2, statusEnum.getLabel());
                 ws.style(row, 2).fontColor(statusEnum.getHex()).bold().set();
 

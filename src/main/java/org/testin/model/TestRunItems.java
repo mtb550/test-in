@@ -118,16 +118,45 @@ public class TestRunItems {
     private String bugIssueUrl = "";
 
     /**
+     * UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126.
+     * <p>
+     * Whether the test case behind this result is no longer indexed. Decided by
+     * the indexer each time it hands the run out, and never written: the file
+     * keeps the verdict the run recorded, so deleting a test case cannot change
+     * what an executed run found (#66, finding 110).
+     */
+    @JsonIgnore
+    @Getter(AccessLevel.NONE)
+    private boolean removed;
+
+    /**
      * True when the test case behind this result has been deleted since the run.
      * <p>
      * The row is drawn from what the run recorded and takes nothing new: a
      * verdict means "we ran it and this is what happened", and a case that is
      * gone cannot be run again. Asked by name so the verdict path, the details
      * editor and the execution walker all ask the same question.
+     * <p>
+     * A file written by 2.11.0-alpha or earlier can hold REMOVED as the status
+     * itself, where the verdict it replaced is already gone; that reads as
+     * removed too.
      */
     @JsonIgnore
     public boolean isRemoved() {
-        return status == TestStatus.REMOVED;
+        return removed || status == TestStatus.REMOVED;
+    }
+
+    /**
+     * UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126.
+     * <p>
+     * The status a tester sees and every figure counts: Removed for a result
+     * whose test case is gone, and the stored status otherwise. Everything that
+     * draws, filters or counts a result asks this, so a removed row is never
+     * counted as the verdict its file still holds and stays outside the pass
+     * rate.
+     */
+    public @NotNull TestStatus shownStatus() {
+        return isRemoved() ? TestStatus.REMOVED : status;
     }
 
     /**

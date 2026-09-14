@@ -146,14 +146,11 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
                     // A case deleted since the run leaves its result behind, and
                     // the result is what the run is a record of. The row stays,
-                    // says so, and takes the one status a tester cannot give.
-                    //
-                    // In memory only. The file heals the next time the run is
-                    // written, the way the missing-stamp repair already does -
-                    // opening a run rewrites nothing.
+                    // drawn from a placeholder. The indexer has already marked it
+                    // removed on the run it handed out, and the verdict the file
+                    // holds is left alone (#66, finding 110).
                     if (indexed.isEmpty()) {
                         Logger.warn("Test run references a deleted test case id=" + item.getId());
-                        item.setStatus(TestStatus.REMOVED);
                     }
 
                     final @NotNull TestCaseDto testCase = indexed.orElseGet(() -> TestCaseDto.deleted(item.getId()));
@@ -623,8 +620,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     public int nextPendingIndex(final int from) {
         for (int i = Math.max(from, 0); i < currentTestCases.size(); i++) {
             if (runItem(currentTestCases.get(i).getId())
-                    .filter(item -> !item.isRemoved())
-                    .filter(item -> item.getStatus() == TestStatus.PENDING)
+                    .filter(item -> item.shownStatus() == TestStatus.PENDING)
                     .isPresent()) return i;
         }
 
@@ -731,7 +727,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         final @NotNull List<TestCaseDto> pending = snapshotOfAll().stream()
-                .filter(tc -> runItem(tc.getId()).filter(item -> item.getStatus() == TestStatus.PENDING).isPresent())
+                .filter(tc -> runItem(tc.getId()).filter(item -> item.shownStatus() == TestStatus.PENDING).isPresent())
                 .filter(tc -> !execution.isRunning(tc.getId()))
                 .toList();
 

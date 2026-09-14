@@ -109,13 +109,15 @@ The status says how far the test run has got.
 5. Testin writes the status. In the tree, the test run's icon and its gray
    status word both change. Testin shows the new status word.
 6. Setting **Completed** or **Closed** signs the test run off. Every test case
-   still **Pending** becomes **Untested**. Testin records the time the test run
+   still **Pending** becomes **Untested**, except one removed from its test set,
+   which stays as the test run recorded it. Testin records the time the test run
    finished, but only if it had been started. From then on **Set Status**,
    **Edit Run** and **Run Tests** are gray on it.
 
 **Signing a test run off cannot be undone.** A status change is not on the
 tree's history (Rule-TREE-PANEL-060). Testin asks for no confirmation before it.
-Every **Pending** verdict becomes **Untested** at that moment.
+Every **Pending** verdict becomes **Untested** at that moment, except on a test
+case removed from its test set.
 
 ## What Testin refuses
 

@@ -16,14 +16,19 @@
 
 package org.testin.bug;
 
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.util.TimeoutUtil;
+import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
@@ -88,13 +93,35 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
     }
 
     /**
-     * A run the indexer holds, with one run item in it.
+     * A run the indexer holds, with one run item in it whose test case the
+     * indexer holds too: a run item whose test case is gone is removed, and
+     * takes no link (#66, finding 110).
      */
     private BugReports.RunItem indexedRunItem(final TestStatus status) {
-        final UUID id = UUID.randomUUID();
-        final TestRunItems item = TestRunItems.builder().id(id).status(status).build();
+        return runItem(indexedCase(), status);
+    }
+
+    private BugReports.RunItem runItem(final UUID caseId, final TestStatus status) {
+        final TestRunItems item = TestRunItems.builder().id(caseId).status(status).build();
         indexer().registerTestRun(runPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
-        return new BugReports.RunItem(runPath(), id);
+        return new BugReports.RunItem(runPath(), caseId);
+    }
+
+    private UUID indexedCase() {
+        final TestSetDirectoryDto ts = WriteAction.computeAndWait(() -> {
+            final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
+            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
+            indexer().addTestProject(tp);
+
+            final TestSetDirectoryDto set = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            indexer().addTestSet(set);
+            return set;
+        });
+
+        final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
+        tc.setParent(ts);
+        indexer().putTestCase(ts.getPath(), tc);
+        return tc.getId();
     }
 
     private String storedLink(final BugReports.RunItem item) {
@@ -145,6 +172,16 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
 
     public void testARemovedRunItemIsNotWritten() {
         final BugReports.RunItem item = indexedRunItem(TestStatus.REMOVED);
+
+        assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), item, ISSUE));
+    }
+
+    /**
+     * #66, finding 110: a failed run item whose test case is no longer indexed is
+     * removed, though its file still says Failed, so it takes no link.
+     */
+    public void testARunItemWhoseTestCaseIsGoneIsNotWritten() {
+        final BugReports.RunItem item = runItem(UUID.randomUUID(), TestStatus.FAILED);
 
         assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), item, ISSUE));
     }

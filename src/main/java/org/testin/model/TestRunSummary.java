@@ -59,7 +59,7 @@ public record TestRunSummary(long total, long passed, long failed, long blocked,
     // UC-INTERNAL-006, Rule-INTERNAL-048, Rule-INTERNAL-049
     public static @NotNull TestRunSummary of(final @NotNull List<TestRunItems> results) {
         final @NotNull Map<TestStatus, Long> counts = results.stream()
-                .collect(Collectors.groupingBy(TestRunItems::getStatus, Collectors.counting()));
+                .collect(Collectors.groupingBy(TestRunItems::shownStatus, Collectors.counting()));
 
         final long passed = counts.getOrDefault(TestStatus.PASSED, 0L);
         final long failed = counts.getOrDefault(TestStatus.FAILED, 0L);
@@ -74,7 +74,9 @@ public record TestRunSummary(long total, long passed, long failed, long blocked,
                 counts.getOrDefault(TestStatus.PENDING, 0L) + counts.getOrDefault(TestStatus.UNTESTED, 0L),
                 // Counted, because the total counts them: a run keeps the row for
                 // a case deleted under it, so a report whose tables ignored it
-                // would print a total its own sections do not add up to.
+                // would print a total its own sections do not add up to. Never as
+                // the verdict its file still holds, so it stays outside the pass
+                // rate (#66, finding 110).
                 counts.getOrDefault(TestStatus.REMOVED, 0L),
                 executed > 0 ? Math.round((float) passed * 100 / executed) : 0,
                 whoExecuted(results));

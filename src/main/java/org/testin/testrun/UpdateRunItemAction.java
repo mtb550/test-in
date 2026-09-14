@@ -125,7 +125,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
         // which is what keeps F2 to one meaning at a time (#119).
         e.getPresentation().setEnabled(runEditor(e)
                 .flatMap(runEditor -> TestinData.singleSelectedCase(e).flatMap(tc -> runEditor.runItem(tc.getId())))
-                .filter(item -> item.getStatus() == TestStatus.FAILED)
+                .filter(item -> item.shownStatus() == TestStatus.FAILED)
                 .isPresent());
     }
 

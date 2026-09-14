@@ -431,7 +431,21 @@ public final class ProjectIndexer {
     }
 
     public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
-        return store.getTestRunByPath(testRunPath);
+        return withRemovedMarked(store.getTestRunByPath(testRunPath));
+    }
+
+    /**
+     * UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126.
+     * <p>
+     * Marks each result whose test case is no longer indexed as removed, on the
+     * run about to be handed out. Decided here, on every read, because the
+     * indexer is the one place that knows which test cases exist: a case deleted
+     * or put back since the last read is answered by the next one. The mark is
+     * never written, so the file keeps the verdict (#66, finding 110).
+     */
+    private @NotNull TestRunDto withRemovedMarked(final @NotNull TestRunDto run) {
+        run.getResults().forEach(item -> item.setRemoved(store.findTestCase(item.getId()).isEmpty()));
+        return run;
     }
 
     /**
@@ -446,7 +460,7 @@ public final class ProjectIndexer {
      */
     public @NotNull Map<Path, TestRunDto> getAllTestRuns() {
         return store.getTestRunsByPath().entrySet().stream()
-                .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), Map.Entry::getValue));
+                .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), entry -> withRemovedMarked(entry.getValue())));
     }
 
     /**
@@ -462,7 +476,7 @@ public final class ProjectIndexer {
      * whose name, path and audit it can show.
      */
     public @NotNull Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
-        return store.findTestRun(testRunPath);
+        return store.findTestRun(testRunPath).map(this::withRemovedMarked);
     }
 
     /**

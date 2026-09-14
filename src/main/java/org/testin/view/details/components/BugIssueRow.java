@@ -70,7 +70,7 @@ public final class BugIssueRow extends BaseDetails {
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final @NotNull Optional<String> bugIssue = item.bugIssue();
-        if (item.getStatus() != TestStatus.FAILED && bugIssue.isEmpty()) return currentRow;
+        if (item.shownStatus() != TestStatus.FAILED && bugIssue.isEmpty()) return currentRow;
 
         // Found rather than demanded: a run whose results are indexed before its
         // folder is has no folder node yet, and drawing the panel must not throw

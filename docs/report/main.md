@@ -86,6 +86,8 @@ The PDF, the Word document and the web page each hold these, in this order.
    formats open it with the same sentence. Under it a row of
    figures: **Total Cases**, **Passed**, **Failed**, **Blocked**, **Untested**,
    **Removed** and **Pass Rate**. **Removed** appears only when the run has any.
+   A removed test case is counted only under **Removed**, never under the
+   verdict it recorded, so it is left out of **Pass Rate**.
 4. **Result Analysis** — what the tester wrote about the run, under a heading
    for each verdict with its count. The whole section is left out when the
    tester wrote nothing.

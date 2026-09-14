@@ -71,7 +71,7 @@ public final class TestCaseFilter {
 
     private static boolean matchesStatus(final @NotNull UUID id, final @NotNull Set<TestStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
         return runItemProvider.apply(id)
-                .map(TestRunItems::getStatus)
+                .map(TestRunItems::shownStatus)
                 .filter(statuses::contains)
                 .isPresent();
     }

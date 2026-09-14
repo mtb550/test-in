@@ -26,9 +26,11 @@ import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunStatus;
 import org.testin.model.TestStatus;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.testrun.RunStatusService;
@@ -108,6 +110,25 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
             indexer().addTestProject(tp);
             return tp;
         });
+    }
+
+    /**
+     * A test case on disk in the test project, so a run's result belongs to a
+     * test case the indexer holds after every scan: a result whose test case is
+     * not indexed is removed, and takes no verdict (#66, finding 110).
+     */
+    private UUID indexedCase(final TestProjectDirectoryDto tp) {
+        final TestSetDirectoryDto ts = WriteAction.computeAndWait(() -> {
+            final TestSetDirectoryDto set = Services.getInstance(getProject(), DirectoryMapper.class)
+                    .getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            indexer().addTestSet(set);
+            return set;
+        });
+
+        final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
+        tc.setParent(ts);
+        indexer().putTestCase(ts.getPath(), tc);
+        return tc.getId();
     }
 
     private static TestRunDto run(final String analysis) {
@@ -241,7 +262,7 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
     public void testAVerdictRecordedDuringASyncLandsOnTheRunThatArrived() {
         final TestProjectDirectoryDto tp = testProject();
         final Path runPath = tp.getTestRunsDirectory().getPath().resolve("Cycle 1");
-        final UUID caseId = UUID.randomUUID();
+        final UUID caseId = indexedCase(tp);
 
         indexer().persistRunMarker(runPath, new TestRunMarker());
         indexer().putTestRun(runPath, run("written here before the sync", caseId));
@@ -294,7 +315,7 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
     public void testAVerdictRecordedBeforeTheFilesArriveIsShownAtOnceAndLandsOnTheRunThatArrived() {
         final TestProjectDirectoryDto tp = testProject();
         final Path runPath = tp.getTestRunsDirectory().getPath().resolve("Cycle 1");
-        final UUID caseId = UUID.randomUUID();
+        final UUID caseId = indexedCase(tp);
 
         indexer().persistRunMarker(runPath, new TestRunMarker());
         indexer().putTestRun(runPath, run("written here before the sync", caseId));
@@ -347,7 +368,7 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
     public void testARunCompletedDuringASyncClosesTheRunThatArrived() {
         final TestProjectDirectoryDto tp = testProject();
         final Path runPath = tp.getTestRunsDirectory().getPath().resolve("Cycle 1");
-        final UUID caseId = UUID.randomUUID();
+        final UUID caseId = indexedCase(tp);
 
         indexer().persistRunMarker(runPath, new TestRunMarker());
         indexer().putTestRun(runPath, run("written here before the sync", caseId));
@@ -386,6 +407,37 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
         } finally {
             planned.countDown();
         }
+    }
+
+    /**
+     * Rule-EDITOR-PANEL-126.
+     * <p>
+     * A run item never changes when its test case is removed. Completing the run
+     * turns a pending test case untested, and leaves a pending one whose test
+     * case is gone exactly as its file holds it (#66, finding 110).
+     */
+    public void testCompletingARunLeavesARemovedItemAsItsFileHoldsIt() {
+        final TestProjectDirectoryDto tp = testProject();
+        final Path runPath = tp.getTestRunsDirectory().getPath().resolve("Cycle 1");
+        final UUID kept = indexedCase(tp);
+        final UUID gone = UUID.randomUUID();
+
+        final TestRunDto tr = run("before completion", kept);
+        tr.getResults().add(TestRunItems.builder().id(gone).build());
+
+        indexer().persistRunMarker(runPath, new TestRunMarker());
+        indexer().putTestRun(runPath, tr);
+        // Lands both writes and reads the project, so the run is on disk and indexed.
+        indexer().acceptIncoming(tp.getPath(), Map.of());
+
+        Services.getInstance(getProject(), RunStatusService.class).persistMarker(getProject(), runPath, TestRunStatus.COMPLETED);
+        // Lets the completion's write land.
+        indexer().acceptIncoming(tp.getPath(), Map.of());
+
+        final TestRunDto onDisk = Services.getInstance(getProject(), Mapper.class).readValue(TestRunDirectoryDto.resultsFile(runPath).toFile(), TestRunDto.class);
+
+        assertEquals("a pending test case that is still there was not closed", TestStatus.UNTESTED, onDisk.resultOf(kept).orElseThrow().getStatus());
+        assertEquals("completing the run changed the item of a removed test case", TestStatus.PENDING, onDisk.resultOf(gone).orElseThrow().getStatus());
     }
 
     /**
