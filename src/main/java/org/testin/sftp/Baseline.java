@@ -59,7 +59,7 @@ public record Baseline(@NotNull Map<String, String> contents) {
     }
 
     /**
-     * UC-SHARE-022, Rule-SHARE-100.
+     * UC-SHARE-022, Rule-SHARE-101.
      * <p>
      * The same baseline without these paths, so the next sync reads them as
      * files this machine has that the server has never seen.

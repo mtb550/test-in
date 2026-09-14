@@ -341,7 +341,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
         }
 
         /**
-         * UC-SHARE-022, Rule-SHARE-100.
+         * UC-SHARE-022, Rule-SHARE-101.
          * <p>
          * Keeping them, and meaning it. Escape still leaves the question open for
          * next time, which is what a tester who has not decided wants; this is the

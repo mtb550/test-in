@@ -310,7 +310,7 @@ public final class SftpSync {
 
 
     /**
-     * UC-SHARE-022, Rule-SHARE-100.
+     * UC-SHARE-022, Rule-SHARE-101.
      * <p>
      * Keeps files the server deleted, and means it: the next sync sends them
      * back rather than offering the same question again.
