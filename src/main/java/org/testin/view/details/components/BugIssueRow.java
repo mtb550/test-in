@@ -100,9 +100,14 @@ public final class BugIssueRow extends BaseDetails {
     /**
      * Typed rather than inline: ActionLink also takes a Kotlin function of the
      * same shape, and an untyped lambda matches both.
+     * <p>
+     * Auto-hide off, because ActionLink hides itself when disabled by default,
+     * and a Report Bug that cannot work is shown gray with its reason
+     * (Rule-VIEW-PANEL-072; #66, finding 150).
      */
     private @NotNull ActionLink link(final @NotNull String text, final @NotNull ActionListener onClick) {
         final @NotNull ActionLink link = new ActionLink(text, onClick);
+        link.setAutoHideOnDisable(false);
         link.setFont(JBFont.label().deriveFont(getValueFontSize()));
         return link;
     }
