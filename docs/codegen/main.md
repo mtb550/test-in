@@ -148,7 +148,7 @@ and the IDE's index.
 
 **Without the Java plugin**, nothing is generated at all. A message says so once
 for the whole code project, and every later operation is a silent skip. That is
-[UC-CODEGEN-021](noJavaPlugin.md).
+[UC-CODEGEN-019](noJavaPlugin.md).
 
 **While the IDE is indexing**, Testin refuses and says so. Every generated file
 is found by the name of the class it belongs to, and looking a class up by name
