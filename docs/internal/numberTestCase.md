@@ -26,7 +26,9 @@ panel.
 - **Rule-INTERNAL-030** — A test case with no place yet sorts after every test
   case that has one. Among those, the oldest comes first.
 - **Rule-INTERNAL-031** — Moving one test case writes only the test cases that
-  actually moved. Dropping one into a test set of 200 writes one file.
+  actually moved. Dropping one into a test set of 200 writes one file. A test
+  case the test set has never held is always written, whether its place moved or
+  not.
 - **Rule-INTERNAL-032** — A place between any two places always exists, so a
   test case can always be dropped between two others.
 - **Rule-INTERNAL-033** — A save that would leave the file exactly as it is

@@ -187,10 +187,11 @@ final class TestCaseSequenceStore {
      * <p>
      * The set's membership and order after a rearrangement.
      *
-     * @param moved the cases whose rank actually changed. Only these are
-     *              written: the order is a value each case carries now, so a
-     *              case that stayed put has nothing new to say, and rewriting it
-     *              would put an untouched file in the tester's next commit
+     * @param moved the cases whose rank actually changed. These are written, and
+     *              so is any case seen here for the first time; nothing else is.
+     *              The order is a value each case carries now, so a case that
+     *              stayed put has nothing new to say, and rewriting it would put
+     *              an untouched file in the tester's next commit
      */
     void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
         final @NotNull String path = testSetPath.toString();
@@ -213,11 +214,17 @@ final class TestCaseSequenceStore {
             // created case first, registered it unstamped, and put then found it
             // already known and recorded an update: the case was born with a
             // modifier and no creator, which is what the details panel showed.
-            if (!testCasesById.containsKey(testCase.getId())) testCase.stampCreated(tester);
+            final boolean firstSight = !testCasesById.containsKey(testCase.getId());
+            if (firstSight) testCase.stampCreated(tester);
 
             testCasesById.put(testCase.getId(), testCase);
 
-            if (!movedIds.contains(testCase.getId())) continue;
+            // A case seen for the first time is written whatever its rank did. A
+            // pasted case keeps the rank it was copied with, and one that already
+            // sorts in place is not among the moved - so it lived in memory only,
+            // after a cut had deleted its file, until the next rescan lost it
+            // (#66, finding 112).
+            if (!firstSight && !movedIds.contains(testCase.getId())) continue;
 
             Services.getInstance(p, TestDataFiles.class)
                     .write(p, testSetPath.resolve(testCase.getId() + ".json"), testCase);
