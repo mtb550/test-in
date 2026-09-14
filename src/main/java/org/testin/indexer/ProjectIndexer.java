@@ -575,9 +575,10 @@ public final class ProjectIndexer {
      * Deletes a test project from disk and from the cache, in that order.
      * <p>
      * The largest delete the plugin performs: the directory holds every test
-     * set, case and run of that project, and removal is not recorded by the undo
-     * service. What guards it is the confirmation, which counts what is inside
-     * before it asks.
+     * set, case and run of that project. It goes to the recycle bin, and the
+     * removal keeps a copy aside first so CTRL+Z can put it back
+     * (UC-INTERNAL-005); the confirmation still counts what is inside before it
+     * asks.
      */
     public void removeTestProject(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         removeVf(path, () -> store.removeTestProject(path), onRemoved);

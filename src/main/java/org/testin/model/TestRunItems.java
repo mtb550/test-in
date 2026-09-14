@@ -211,13 +211,14 @@ public class TestRunItems {
     /**
      * The test case, for the rendering path, where it is always present.
      * <p>
-     * {@code RunEditor} skips run items whose test case has been deleted and
-     * assigns {@code tc} to every one it keeps, so an item that reaches a
-     * renderer or a grid row has one. This states that invariant where it is
-     * relied on, instead of unchecked reads that look like oversights. If it
-     * ever fails, it fails by name rather than as an NPE inside a Swing paint.
+     * {@code RunEditor} assigns {@code tc} to every run item it loads - one whose
+     * test case has been deleted since the run is wired to
+     * {@link TestCaseDto#deleted} - so an item that reaches a renderer or a grid
+     * row has one. This states that invariant where it is relied on, instead of
+     * unchecked reads that look like oversights. If it ever fails, it fails by
+     * name rather than as an NPE inside a Swing paint.
      *
-     * @throws IllegalStateException if called on an item the editor filtered out
+     * @throws IllegalStateException if called on an item the editor has not wired
      */
     public @NotNull TestCaseDto requireTc() {
         return Optional.ofNullable(tc).orElseThrow(() -> new IllegalStateException(

@@ -96,16 +96,19 @@ final class TestCaseSequenceStore {
      * <p>
      * Saves a test case, and says whether it had anything to save.
      * <p>
-     * Every save arrives here - the update dialog, a grid cell, the details
-     * panel, a paste - so the audit is stamped once, here, instead of at each of
-     * them. Reading does not come through: the indexing scanner fills the maps
-     * straight from the JSON, so opening a project stamps nothing.
+     * Every edit arrives here - the update dialog, a grid cell, the details
+     * panel - so the audit is stamped once, here, instead of at each of them. A
+     * paste does not: a pasted copy is stamped by {@link #updateSequence}, the
+     * first to see it, and a pasted cut is saved as it is through
+     * {@link #putVerbatim}. Reading does not come through either: the indexing
+     * scanner fills the maps straight from the JSON, so opening a project stamps
+     * nothing.
      * <p>
      * Which is also why a save that changes nothing is refused here. Opening a
      * field to read it and pressing Enter used to record the tester as having
      * edited the case, because the stamp was written on the fact of a save
      * rather than on anything having changed (#164). One funnel, one answer, and
-     * the four ways in are fixed together.
+     * every way in is fixed together.
      *
      * @return false when the file already holds this case exactly - nothing
      * stamped and nothing written, so the caller has nothing to confirm and
