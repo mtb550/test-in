@@ -78,10 +78,20 @@ public final class TestRunPdfGenerator {
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
     public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         // try-with-resources: closing the Document also closes the PdfDocument and
-        // PdfWriter, including on any failure path inside the body.
+        // PdfWriter, including on any failure path inside the body. The PdfDocument
+        // is a resource in its own right so it still closes if the Document
+        // constructor is what fails; closing it twice is a no-op.
+        //
+        // The false is immediate flush, and it has to be off. On - the default -
+        // iText writes each page out as soon as the layout moves onto the next one,
+        // and a page already written cannot be drawn on again. The footer pass below
+        // draws on every page after the whole body is laid out, so on any report
+        // that ran to a second page it reached a page iText had closed behind it and
+        // threw "Cannot draw elements on already flushed pages". Off, nothing is
+        // written until close(), so every page is still open when the footers go on.
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             Document document = new Document(new PdfDocument(new PdfWriter(baos)))) {
-            PdfDocument pdf = document.getPdfDocument();
+             PdfDocument pdf = new PdfDocument(new PdfWriter(baos));
+             Document document = new Document(pdf, pdf.getDefaultPageSize(), false)) {
 
             PdfFont boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
             PdfFont regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
