@@ -182,7 +182,13 @@ string a tester reads should have one owner; the number may go down and never up
 | `build.yml` | Every push and pull request |
 | `verify.yml` | The JetBrains plugin verifier, against IntelliJ IDEA, PyCharm and Rider |
 | `inspect.yml` | Every push to `main`, and on demand against a branch |
-| `release.yml` | On a release |
+
+No workflow publishes a release. It is published from a maintainer's machine
+with `./gradlew publishPlugin`, which reads the Marketplace token from
+`JETBRAINS_TOKEN` and signs with `CERTIFICATE_CHAIN`, `PRIVATE_KEY` and
+`PRIVATE_KEY_PASSWORD`. It uploads to the alpha channel, and a release is
+promoted to the default channel from the Marketplace page rather than uploaded
+again.
 
 ## Compatibility: `since-build`, never `until-build`
 
