@@ -59,7 +59,11 @@ public class BugReportsTest {
         assertEquals(reports.whyReportBugIsOff(ITEM, "", true), Optional.of(Bundle.message("bug.sending")),
                 "while sending the run item has no link yet, so the stage is what keeps it off");
 
-        reports.end(ITEM);
+        reports.end(ITEM, BugReports.Stage.OPEN);
+        assertEquals(reports.whyReportBugIsOff(ITEM, "", true), Optional.of(Bundle.message("bug.sending")),
+                "a dialog closing on Send does not end the send");
+
+        reports.end(ITEM, BugReports.Stage.SENDING);
         assertEquals(reports.whyReportBugIsOff(ITEM, "", true), Optional.empty());
     }
 
@@ -80,6 +84,8 @@ public class BugReportsTest {
 
         reports.moveTo(SAME_CASE_OTHER_RUN, BugReports.Stage.OPEN);
         assertEquals(reports.whyReportBugIsOff(ITEM, "", true), Optional.of(Bundle.message("bug.finish.open.report")));
+        assertTrue(reports.anotherIsOpen(ITEM));
+        assertFalse(reports.anotherIsOpen(SAME_CASE_OTHER_RUN), "its own dialog is not another one");
     }
 
     @Test
@@ -88,7 +94,6 @@ public class BugReportsTest {
         final BugReports.Edits edits = new BugReports.Edits("Log in fails", "body");
 
         reports.keep(ITEM, edits);
-        reports.end(ITEM);
         assertEquals(reports.unsent(ITEM), Optional.of(edits), "a failed send reopens with them");
 
         reports.discard(ITEM);

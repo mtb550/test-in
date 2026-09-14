@@ -20,7 +20,9 @@ import com.intellij.openapi.components.Service;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.model.TestRunItems;
+import org.testin.model.TestStatus;
 import org.testin.model.dto.TestRunDto;
 import org.testin.util.Bundle;
 
@@ -79,6 +81,14 @@ public final class BugReports {
                     .filter(result -> !result.isRemoved())
                     .findFirst();
         }
+
+        /**
+         * This run item as the indexer holds it now, and empty unless it is
+         * still failed: only a failure is reported.
+         */
+        public @NotNull Optional<TestRunItems> stillFailed(final @NotNull ProjectIndexer indexer) {
+            return indexer.findTestRun(run).flatMap(this::in).filter(result -> result.getStatus() == TestStatus.FAILED);
+        }
     }
 
     /**
@@ -102,8 +112,21 @@ public final class BugReports {
         onTheWay.replace(item, stage);
     }
 
-    void end(final @NotNull RunItem item) {
-        onTheWay.remove(item);
+    /**
+     * Lets the run item go, but only from the stage the caller was holding it
+     * at: a preparation that ends after its dialog opened must not close the
+     * dialog's claim, and a dialog that closes on Send must not end the send.
+     */
+    void end(final @NotNull RunItem item, final @NotNull Stage stage) {
+        onTheWay.remove(item, stage);
+    }
+
+    /**
+     * Whether a report for some other run item is open in the dialog, which
+     * shows one of a kind at a time.
+     */
+    boolean anotherIsOpen(final @NotNull RunItem item) {
+        return onTheWay.entrySet().stream().anyMatch(entry -> entry.getValue() == Stage.OPEN && !entry.getKey().equals(item));
     }
 
     /**
@@ -125,8 +148,7 @@ public final class BugReports {
     /**
      * Why Report Bug is off for this run item, and empty when it is on: its own
      * report on the way, the bug already reported, a run signed off, or another
-     * run item's report open - the dialog framework shows one dialog of a kind
-     * at a time.
+     * run item's report open.
      */
     public @NotNull Optional<String> whyReportBugIsOff(final @NotNull RunItem item, final @NotNull String bugIssueUrl, final boolean runIsStillOpen) {
         final @NotNull Optional<Stage> stage = Optional.ofNullable(onTheWay.get(item));
@@ -134,7 +156,7 @@ public final class BugReports {
 
         if (!bugIssueUrl.isBlank()) return Optional.of(Bundle.message("bug.already.reported"));
         if (!runIsStillOpen) return Optional.of(Bundle.message("bug.run.completed"));
-        if (onTheWay.containsValue(Stage.OPEN)) return Optional.of(Bundle.message("bug.finish.open.report"));
+        if (anotherIsOpen(item)) return Optional.of(Bundle.message("bug.finish.open.report"));
 
         return Optional.empty();
     }

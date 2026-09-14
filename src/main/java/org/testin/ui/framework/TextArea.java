@@ -16,6 +16,7 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.ui.JBFont;
@@ -26,6 +27,7 @@ import org.testin.util.ClipboardContents;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -174,6 +176,18 @@ public final class TextArea implements DialogComponent {
 
     public @NotNull String getText() {
         return area.getText();
+    }
+
+    /**
+     * Runs after every change to the text, typed or pasted.
+     */
+    public void onTextChanged(final @NotNull Runnable changed) {
+        area.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
+                changed.run();
+            }
+        });
     }
 
     @Override

@@ -63,7 +63,7 @@ public final class BugFiling {
                 indicator -> answer.set(GitHubCli.onPath(indicator).create(repository, edits.title(), edits.body(), screenshots)),
                 () -> record(p, item, answer.get()),
                 () -> {
-                    reports.end(item);
+                    reports.end(item, BugReports.Stage.SENDING);
                     redraw.run();
                 });
     }

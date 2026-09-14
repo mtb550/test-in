@@ -16,11 +16,13 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.ui.DocumentAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -133,6 +135,18 @@ public final class TextInput implements DialogComponent, TextValue {
     @Override
     public void showEmptyWarning() {
         input.showEmptyWarning();
+    }
+
+    /**
+     * Runs after every change to the text, typed or pasted.
+     */
+    public void onTextChanged(final @NotNull Runnable changed) {
+        textField.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
+                changed.run();
+            }
+        });
     }
 
     @Override

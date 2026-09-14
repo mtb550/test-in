@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Optional;
 
 /**
  * A confirm button row — for working dialogs where a visible OK button reads
@@ -50,6 +51,18 @@ public final class DialogButton implements DialogComponent {
      */
     public void setEnabled(final boolean enabled) {
         button.setEnabled(enabled);
+    }
+
+    /**
+     * UC-INTERNAL-007, Rule-INTERNAL-080.
+     * <p>
+     * Enabled when there is no reason against pressing it, and disabled with
+     * the reason on hover when there is - so a button the tester cannot press
+     * never leaves them guessing why (#28).
+     */
+    public void enableUnless(final @NotNull Optional<String> reason) {
+        button.setEnabled(reason.isEmpty());
+        button.setToolTipText(reason.orElse(""));
     }
 
     @Override

@@ -56,6 +56,8 @@ and which keys it answers, and the shell builds the rest.
   growing a line taller to hold it.
 - **Rule-INTERNAL-079** — A surface has one shortcut strip. It cannot be built
   as half of a pair, so no dialog is two tinted rows tall to say six words.
+- **Rule-INTERNAL-080** — A button a dialog will not act on yet is drawn
+  disabled, and hovering over it says why.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.
