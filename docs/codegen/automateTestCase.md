@@ -6,7 +6,8 @@
 does, **so that** I get a working test rather than an empty method with a
 comment in it.
 
-Testin cannot do this yet. The entry says so when it is pressed.
+Testin cannot do this yet. The entry is on the menu, gray, and its own name says
+so.
 
 `F12`, or the menu entry **Automate Test Case**.
 
@@ -28,34 +29,31 @@ Testin cannot do this yet. The entry says so when it is pressed.
   Java plugin or a missing test folder is a skip, never a failure.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
-- **Rule-CODEGEN-025** — This is not built. The menu entry and the key both
-  answer with a message saying so, rather than doing nothing quietly.
+- **Rule-CODEGEN-025** — This is not built. The menu entry is gray and says so
+  in its name. The key does nothing.
 
 ## The screen
 
-The only thing this use case draws. It is a small red message near the bottom
-right of the IDE, above the status bar.
+The only thing this use case draws is its own menu entry, gray.
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│  Not built yet                                               │
-│  Generating automation code for a test case is coming in a   │
-│  later release.                                              │
-└──────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────┐
+│  Automate Test Case (not built yet)      │
+└──────────────────────────────────────────┘
 ```
 
-1. **The title** — always these three words.
-2. **The line under it** — always the same sentence.
-3. **The color** — red, because nothing happened.
-4. **How long it stays** — about five seconds, then it fades on its own. It is
-   not kept in the IDE's notification list.
+1. **The name** — the entry's name, with *(not built yet)* after it.
+2. **The gray** — the entry cannot be chosen.
+3. **The description** — shown where the IDE shows one, such as **Find Action**.
+   It says a test case's method is written when the case is saved with a
+   description, and that generating one for a case that already exists is a
+   later release.
 
 ## What happens today
 
-1. The tester selects a test case and presses `F12`.
-2. A message titled **Not built yet** reads *Generating automation code for a
-   test case is coming in a later release.*
-3. Nothing is written.
+1. The tester right-clicks a test case.
+2. The menu shows **Automate Test Case (not built yet)**, gray.
+3. Pressing `F12` does nothing. Nothing is written.
 
 ## What Testin refuses
 

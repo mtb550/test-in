@@ -72,7 +72,7 @@ with a count after it for more than one test case.
 
 ## What Testin refuses
 
-**If the clipboard does not hold test cases** — **Paste Node** is gray.
+**If the clipboard does not hold test cases** — **Paste Test Case** is gray.
 
 **If the clipboard holds text that is not test cases** — it is turned away
 without being read, and nothing is said.

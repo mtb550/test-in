@@ -61,7 +61,7 @@ a count after it for more than one test case.
 
 ## What Testin refuses
 
-**If nothing is selected** — **Cut Node** is gray and the key does nothing.
+**If nothing is selected** — **Cut Test Case** is gray.
 
 **If writing to the clipboard fails** — nothing is said, and only the log
 records it.

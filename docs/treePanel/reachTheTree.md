@@ -113,7 +113,6 @@ Rule-TREE-PANEL-100 also holds here. It says a test project that is not
 1. **The reason** — in red. It is shown when this code project named a test
    project Testin could not use. The reason is one of:
    - *not in the Testin folder*
-   - *archived*
    - *could not be read*
 2. **One link per test project** — the name, then the status. The tester
    clicks a link. This code project is then set to use that test project, and
