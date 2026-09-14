@@ -80,7 +80,13 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
                     .filter(item -> !item.isRemoved());
 
             if (runItem.isPresent()) {
-                new FailedResultDialog(p, runItem.orElseThrow(), fields -> applyStatus(p, editor, selectedItems)).show();
+                new FailedResultDialog(p, runItem.orElseThrow(), fields -> {
+                    // Onto the run the indexer holds now, as F2's edit is, rather than
+                    // the editor's own row, which a sync may have replaced (#66, finding 145).
+                    if (Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, runEditor.getParent().getPath(), selectedItems.getFirst().getId(), fields)) {
+                        applyStatus(p, editor, selectedItems);
+                    }
+                }).show();
                 return;
             }
         }

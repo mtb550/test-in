@@ -94,11 +94,10 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145
     @Override
     protected void submit() {
-        // Applied only on save - Escape must never commit the edit.
-        fields.applyTo(runItem);
-
-        // The fields go with it, so a caller whose row may be stale can write
-        // them onto the run as it is now (#66, finding 131).
+        // Handed to the caller rather than applied to this row: the caller writes
+        // them onto the run as the indexer holds it now, which a sync may have
+        // replaced since this row was read (#66, findings 131 and 145). Escape
+        // never reaches here, so it never commits the edit.
         onSave.accept(fields);
         closeOk();
     }
