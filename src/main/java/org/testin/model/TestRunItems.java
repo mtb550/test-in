@@ -222,6 +222,6 @@ public class TestRunItems {
      */
     public @NotNull TestCaseDto requireTc() {
         return Optional.ofNullable(tc).orElseThrow(() -> new IllegalStateException(
-                "Run item " + id + " has no test case; it should not have reached the editor"));
+                "Run item " + id + " has no test case; the run editor wires one to every item it loads, so this item was read without being wired"));
     }
 }
