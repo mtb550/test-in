@@ -38,6 +38,7 @@ import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.testrun.create.FailureFields;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
@@ -131,33 +132,82 @@ public final class RunStatusService {
     public boolean recordVerdict(final @NotNull Project p, final @NotNull Path runPath, final @NotNull UUID caseId, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         final @NotNull TestRunDto run = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(runPath);
 
-        final @NotNull Optional<TestRunItems> found = run.getResults().stream()
-                .filter(item -> item.getId().equals(caseId))
-                .findFirst();
+        if (liveItem(p, run, runPath, caseId).isEmpty()) return false;
 
-        if (found.isEmpty()) {
-            Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' does not cover " + caseId + " - verdict not recorded");
-            return false;
-        }
-
-        final @NotNull TestRunItems item = found.get();
-        if (item.isRemoved()) {
-            refuseRemoved(p);
-            return false;
-        }
-
-        // Before the verdict, not after: passing clears everything a failure
-        // described, so a message written afterward would survive onto a case
-        // that passed. Written first, the verdict decides whether it stays.
-        item.recordDuration(duration);
-        failure.recordOn(item);
-        item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
+        // Through the indexer rather than on the run read above: while a sync is
+        // bringing this run's files in, the change waits for them and lands on
+        // the run that arrived (#66, finding 129).
+        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, current -> itemOf(current, caseId).ifPresentOrElse(item -> {
+            // Before the verdict, not after: passing clears everything a failure
+            // described, so a message written afterward would survive onto a case
+            // that passed. Written first, the verdict decides whether it stays.
+            item.recordDuration(duration);
+            failure.recordOn(item);
+            item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
+        }, () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + caseId + " - verdict not recorded")));
 
         Logger.trace("[RunStatusService]: Status updated -> " + caseId + " = " + status);
 
-        Services.getInstance(p, ProjectIndexer.class).persistRun(runPath, run);
+        return true;
+    }
+
+    /**
+     * UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167.
+     * <p>
+     * Records what a tester wrote about a failure on one case of one run, and
+     * reports whether it landed.
+     * <p>
+     * On the run the indexer holds now, as {@link #recordVerdict} does, and not
+     * on the run the editor holds. A sync that brings this run in replaces it in
+     * the index while the editor still shows the old one, so persisting the
+     * editor's run put the run back as it was before the sync (#66, finding 131).
+     * A run the sync took away is not there to write, and the log says so.
+     */
+    public boolean recordFailureDetails(final @NotNull Project p, final @NotNull Path runPath, final @NotNull UUID caseId, final @NotNull FailureFields fields) {
+        final @NotNull Optional<TestRunDto> run = Services.getInstance(p, ProjectIndexer.class).findTestRun(runPath);
+        if (run.isEmpty()) {
+            Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' is no longer indexed - failure details not recorded");
+            return false;
+        }
+
+        if (liveItem(p, run.orElseThrow(), runPath, caseId).isEmpty()) return false;
+
+        // Through the indexer, as a verdict is, so details saved while a sync is
+        // bringing this run in land on the run that arrived (#66, finding 129).
+        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, current -> itemOf(current, caseId).ifPresentOrElse(fields::applyTo,
+                () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + caseId + " - failure details not recorded")));
 
         return true;
+    }
+
+    /**
+     * The run's row for one case, when it can still take something new. A case
+     * the run does not cover goes to the log; a removed one is refused to the
+     * tester, because they just asked for something to be recorded on it.
+     */
+    private @NotNull Optional<TestRunItems> liveItem(final @NotNull Project p, final @NotNull TestRunDto run, final @NotNull Path runPath, final @NotNull UUID caseId) {
+        final @NotNull Optional<TestRunItems> found = itemOf(run, caseId);
+
+        if (found.isEmpty()) {
+            Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' does not cover " + caseId + " - nothing recorded");
+            return Optional.empty();
+        }
+
+        if (found.orElseThrow().isRemoved()) {
+            refuseRemoved(p);
+            return Optional.empty();
+        }
+
+        return found;
+    }
+
+    /**
+     * The run's row for one case, whatever state it is in.
+     */
+    private static @NotNull Optional<TestRunItems> itemOf(final @NotNull TestRunDto run, final @NotNull UUID caseId) {
+        return run.getResults().stream()
+                .filter(item -> item.getId().equals(caseId))
+                .findFirst();
     }
 
     /**

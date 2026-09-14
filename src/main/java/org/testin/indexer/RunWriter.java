@@ -152,6 +152,31 @@ final class RunWriter {
     }
 
     /**
+     * UC-SHARE-019, Rule-SHARE-003.
+     * <p>
+     * Removes one of a run's files that a server no longer holds, in this queue's
+     * order, and takes the run out of the index at once.
+     * <p>
+     * Deleted straight away, the file was gone while a write for the same run
+     * was still queued, and that write put it back (#66, finding 130). Queued,
+     * the deletion lands after anything already waiting. Out of the index, the
+     * run answers {@link #persist}'s question with no, so a write that has not
+     * started yet writes nothing. The scan that follows reads back whatever of
+     * the run is left.
+     */
+    void delete(final @NotNull Path file, final @NotNull Path stopAt) {
+        Optional.ofNullable(file.getParent()).ifPresent(store::removeTestRun);
+
+        queue.execute(() -> {
+            try {
+                Services.getInstance(p, TestDataFiles.class).delete(p, file, stopAt);
+            } catch (final Exception ex) {
+                Logger.error("Failed to remove a run file the server no longer holds " + file + ": " + ex.getMessage());
+            }
+        });
+    }
+
+    /**
      * Returns once every write queued so far has landed, so a scan that follows
      * reads what was written instead of racing it.
      */

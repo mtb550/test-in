@@ -13,7 +13,7 @@ test case they came from.
 | **Numbering** | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-020`. Rules are `Rule-CODEGEN-001` to `Rule-CODEGEN-074` |
 | **Retired** | `Rule-CODEGEN-015` said what `Rule-CODEGEN-046` says — the groups attribute is written only when the test case belongs to one. Retired 8 September 2026; read Rule-CODEGEN-046 instead. The number is not given to anything else |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
+| **Checked against** | `main` at `779fe6b4`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-CODEGEN-008](runAutomation.md) were read from the code again |
 | **Written to** | [How a document is written](../standard.md) |
 
 ---
@@ -148,7 +148,7 @@ and the IDE's index.
 
 **Without the Java plugin**, nothing is generated at all. A message says so once
 for the whole code project, and every later operation is a silent skip. That is
-[UC-CODEGEN-021](noJavaPlugin.md).
+[UC-CODEGEN-019](noJavaPlugin.md).
 
 **While the IDE is indexing**, Testin refuses and says so. Every generated file
 is found by the name of the class it belongs to, and looking a class up by name

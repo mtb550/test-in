@@ -115,7 +115,15 @@ final class SyncFiles {
     void remove(final @NotNull Path projectPath, final @NotNull Collection<String> relatives) {
         final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
 
-        relatives.forEach(relative -> files.delete(p, projectPath.resolve(relative), projectPath));
+        relatives.forEach(relative -> {
+            final @NotNull Path file = projectPath.resolve(relative);
+
+            // A run's files leave through the run writer's queue, so a write
+            // already waiting there cannot land after the deletion and put the
+            // run back (#66, finding 130).
+            if (runWriter.owns(file)) runWriter.delete(file, projectPath);
+            else files.delete(p, file, projectPath);
+        });
         Logger.info("Removed " + relatives.size() + " files the server no longer holds from " + projectPath);
     }
 }

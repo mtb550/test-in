@@ -74,8 +74,8 @@ anything else. That is [UC-SHARE-017](resolveConflicts.md).
 **If anything else fails** — a message titled **Sync Failed** reads *Could not
 sync with the remote:*. The reason is on the next line.
 
-**If the IDE has no Git plugin** — the menu entry is not there, and nothing says
-why.
+**If the IDE has no Git plugin** — the menu entry is still there, grayed,
+reading *(needs the Git plugin)*.
 
 ---
 

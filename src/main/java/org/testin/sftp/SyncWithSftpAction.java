@@ -129,9 +129,11 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                 return;
             }
 
+            // A balloon for the same reason as above: nothing failed, the tester
+            // pressed the button with no test project selected (#66, finding 137).
             selectedProject.ifPresentOrElse(
                     projectRoot -> askThenSync(address, projectRoot),
-                    () -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("sftp.nothing.title"),
+                    () -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("sftp.nothing.title"),
                             Bundle.message("sftp.nothing.message")));
         }
 

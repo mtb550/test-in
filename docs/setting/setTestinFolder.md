@@ -39,7 +39,7 @@ The row is the first one on the page.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│  Testin source root:  [ Example -> C:\Users\...\Testin ] [...] [Open]    │
+│  Testin folder:       [ Example -> C:\Users\...\Testin ] [...] [Open]    │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -50,7 +50,7 @@ The row is the first one on the page.
 4. **Open** — opens the folder in the file manager. It is
    [UC-SETTING-003](openTestinFolder.md).
 
-The folder chooser is titled **Select Root Folder**. The line under that title
+The folder chooser is titled **Select Testin Folder**. The line under that title
 reads *Choose the directory where your test projects are stored*.
 
 The whole page is drawn on [the settings page](main.md#the-page).
@@ -76,7 +76,7 @@ but spaces. That is difference 1 on
 ## What happens when no folder is set
 
 **When a code project opens** — a message titled **Testin Setup Required** reads
-*Please configure the Root Testin Folder to enable test management features.*
+*Please set the Testin folder to enable test management features.*
 It carries a link reading **Open Settings**.
 
 **In the tree panel** — the empty state is shown, with a link reading

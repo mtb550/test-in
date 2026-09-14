@@ -109,7 +109,8 @@ Git said about the file.
 **If Git listed a new file that is already gone** — the row is dropped. Only
 the log says so.
 
-**If the IDE has no Git plugin** — the menu entry is not there at all.
+**If the IDE has no Git plugin** — the menu entry is still there, grayed,
+reading *(needs the Git plugin)*, as Rule-SHARE-105 says.
 
 ---
 

@@ -60,8 +60,10 @@ public class SyncActionAction extends DumbAwareAction {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
+        // A fading refusal, not an error in the log: nothing failed, the tester
+        // pressed Sync with no test project selected (#66, finding 137).
         activeProjectPath(e).ifPresentOrElse(path -> new Work(p).syncRepository(path), () ->
-                Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.sync.error.title"),
+                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("git.sync.error.title"),
                         Bundle.message("git.sync.no.project")));
     }
 

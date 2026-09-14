@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
 import org.testin.editor.run.RunEditor;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
@@ -84,8 +83,13 @@ public class UpdateRunItemAction extends DumbAwareAction {
 
         // The same details dialog that opens automatically on a Failed status;
         // F2 edits without touching the status.
-        new FailedResultDialog(p, runItem, () -> runEditor.run().ifPresentOrElse(tr -> {
-            Services.getInstance(p, ProjectIndexer.class).persistRun(runEditor.getParent().getPath(), tr);
+        new FailedResultDialog(p, runItem, fields -> {
+            // Onto the run the indexer holds now, not the editor's own run. A sync
+            // that brought this run in has replaced it in the index while the
+            // editor still shows the old one, and persisting that put the run
+            // back as it was before the sync (#66, finding 131). A run that is
+            // gone, or a case it no longer covers, says so and reports nothing.
+            if (!Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, runEditor.getParent().getPath(), testCase.getId(), fields)) return;
 
             // After the dialog has gone, not inside its submit. FailedResultDialog
             // runs this callback before it closes, so a rebuild started here would
@@ -110,11 +114,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
             // After the persist: an edit that was dropped rather than saved must
             // not report itself as saved (#62).
             Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("run.item.updated"));
-
-            // The editor empties the run while it reloads. Persisting is the whole
-            // point of the callback, so say the edit was dropped rather than lose it
-            // quietly.
-        }, () -> Logger.warn("Run item edited while the run was reloading; not persisted"))).show();
+        }).show();
     }
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-168

@@ -99,7 +99,7 @@ one.
 ## What Testin refuses
 
 **If no test project folder exists in the Testin folder** — no dialog opens, and
-the message *No Test Projects*, with the line *Create one under the Testin root
+the message *No Test Projects*, with the line *Create one in the Testin folder
 first*, is shown in red.
 
 **If the code project's configuration file cannot be written** — an error titled

@@ -63,7 +63,8 @@ right of the IDE, above the status bar.
 
 **If nothing is selected** — the entry is gray.
 
-**If the IDE has no Java plugin** — the entry is not on the menu at all.
+**If the IDE has no Java plugin** — the entry is still on the menu, grayed,
+reading *(needs the Java plugin)*.
 
 ## What really writes a missing method
 

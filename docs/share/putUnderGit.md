@@ -57,9 +57,9 @@ it makes the repository, and a small message reads *Git initialized*.
 **If the repository cannot be made** — a message titled **Git Init Failed**
 carries the reason.
 
-**If the IDE has no Git plugin** — neither menu entry is there, and nothing
-says why. That is difference 19 on
-[the sharing page](main.md#where-the-plugin-breaks-its-own-rules).
+**If the IDE has no Git plugin** — both menu entries are still there, grayed,
+each reading *(needs the Git plugin)*. That was difference 19 on
+[the sharing page](main.md#where-the-plugin-breaks-its-own-rules), now fixed.
 
 ## What comes next
 
