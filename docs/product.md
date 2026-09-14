@@ -239,6 +239,8 @@ anything in it is executed, however it was started.
 
 **A signed-off test run records nothing further.** Its verdicts are history.
 It cannot be started, and any result arriving from anywhere else is refused.
+The one thing it still takes is the bug issue a failed test case is reported
+as. That changes no verdict. (UC-VIEW-PANEL-016)
 
 ```mermaid
 stateDiagram-v2
@@ -435,7 +437,7 @@ Numbered so an issue or a commit can cite one.
 | **Rule-PRODUCT-008** | A result is written into the run the tester started, and no other. The same case running in another run does not affect this one. |
 | **Rule-PRODUCT-009** | A test case may belong to any number of runs and carry a different verdict in each. The verdict belongs to the run. |
 | **Rule-PRODUCT-010** | Every verdict records who gave it and when, whether a person typed it or the automation reported it. |
-| **Rule-PRODUCT-011** | A signed-off run records nothing further. Once Completed or Closed, execution cannot be started on it and no result arriving from anywhere is written into it. |
+| **Rule-PRODUCT-011** | A signed-off run records nothing further. Once Completed or Closed, execution cannot be started on it and no result arriving from anywhere is written into it. The one exception is the bug issue link a failed test case is reported as, which changes no verdict (UC-VIEW-PANEL-016). |
 
 ### Verdicts
 
@@ -526,7 +528,7 @@ answered.
 | **Pending** | This run holds the case and has not reached it yet |
 | **Untested** | The run ended without ever reaching the case |
 | **Removed** | The test case has been deleted. The test run keeps what it recorded |
-| **Signed off** | Completed or Closed. A signed-off test run records nothing further |
+| **Signed off** | Completed or Closed. A signed-off test run records nothing further, apart from a bug issue link |
 | **Deprecated** | A test set kept for its history but no longer offered for new runs |
 | **Archived** | A package kept but moved out of the way |
 | **Automation** | The generated test method that executes a case without a person |

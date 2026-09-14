@@ -62,7 +62,7 @@ public final class ReportBug {
         final @NotNull Optional<TestRunItems> failed = item.stillFailed(indexer);
         final @NotNull Optional<TestRunDto> run = indexer.findTestRun(item.run());
         if (failed.isEmpty() || run.isEmpty()) return;
-        if (reports.whyReportBugIsOff(item, failed.orElseThrow().getBugIssueUrl(), runDirectory.isStillOpen()).isPresent()) return;
+        if (reports.whyReportBugIsOff(item, failed.orElseThrow().getBugIssueUrl()).isPresent()) return;
         if (!reports.begin(item)) return;
         redraw.run();
 

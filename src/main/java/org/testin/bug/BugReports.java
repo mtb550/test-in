@@ -149,15 +149,15 @@ public final class BugReports {
      * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-072.
      * <p>
      * Why Report Bug is off for this run item, and empty when it is on: its own
-     * report on the way, the bug already reported, a run signed off, or another
-     * run item's report open.
+     * report on the way, the bug already reported, or another run item's report
+     * open. A signed-off run is not a reason: the issue link is the one change
+     * it takes, because it moves no verdict (P23).
      */
-    public @NotNull Optional<String> whyReportBugIsOff(final @NotNull RunItem item, final @NotNull String bugIssueUrl, final boolean runIsStillOpen) {
+    public @NotNull Optional<String> whyReportBugIsOff(final @NotNull RunItem item, final @NotNull String bugIssueUrl) {
         final @NotNull Optional<Stage> stage = Optional.ofNullable(onTheWay.get(item));
         if (stage.isPresent()) return stage.map(Stage::getReason);
 
         if (!bugIssueUrl.isBlank()) return Optional.of(Bundle.message("bug.already.reported"));
-        if (!runIsStillOpen) return Optional.of(Bundle.message("bug.run.completed"));
         if (anotherIsOpen(item)) return Optional.of(Bundle.message("bug.finish.open.report"));
 
         return Optional.empty();

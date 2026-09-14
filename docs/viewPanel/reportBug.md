@@ -53,15 +53,16 @@ the Details tab.
   Hovering over it says why.
 - **Rule-VIEW-PANEL-072** — Report Bug is gray while this test case's report is
   prepared, open or sent. It is also gray while another test case's report is
-  open, once the test case is reported, and when the test run is completed or
-  closed. Hovering over it says why.
+  open, and once the test case is reported. Hovering over it says why.
 - **Rule-VIEW-PANEL-073** — Sending runs in the background and cannot be
   canceled. After 120 seconds it stops, and says it is not known whether the
   issue was created.
 - **Rule-VIEW-PANEL-074** — The issue's address is stored on the test case's
   result only when the test run and the result still exist, and the test case is
   still failed. The message says *Reported* either way. It says why when the
-  address was not stored.
+  address was not stored. A completed or closed test run takes the address too.
+  It is the one change a signed-off test run accepts, because it changes no
+  verdict.
 - **Rule-VIEW-PANEL-075** — A reported test case shows its issue as
   `owner/repo#123`. It is a link, and it opens the issue in the browser.
 - **Rule-VIEW-PANEL-076** — Every screenshot pasted into the error is attached
@@ -229,9 +230,6 @@ over it reads *Finish the open bug report first*.
 
 **If the test case is already reported** — **Report Bug** is gray. Hovering over
 it reads *Already reported*.
-
-**If the test run is completed or closed** — **Report Bug** is gray. Hovering
-over it reads *This test run is completed*.
 
 **If the tester presses `Escape` after editing** — Testin asks first. The
 question reads *The title and body edited here have not been sent, and there is

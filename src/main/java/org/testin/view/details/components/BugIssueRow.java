@@ -50,7 +50,7 @@ import java.util.Optional;
  * <p>
  * Its own row type rather than a {@link RunAttributeRow}: the value is two
  * links, and one of them is disabled for reasons that are not on the run item -
- * a report already on its way, another one open, a run signed off.
+ * a report already on its way, or another one open.
  */
 @AllArgsConstructor
 public final class BugIssueRow extends BaseDetails {
@@ -77,7 +77,7 @@ public final class BugIssueRow extends BaseDetails {
         final @NotNull TestRunDirectoryDto runDirectory = Services.getInstance(p, ProjectIndexer.class)
                 .getTestRunDirByPath(Services.getInstance(p, TestinRoot.class).resolve(currentPath));
         final @NotNull Optional<String> off = Services.getInstance(p, BugReports.class)
-                .whyReportBugIsOff(new BugReports.RunItem(runDirectory.getPath(), item.getId()), bugIssueUrl, runDirectory.isStillOpen());
+                .whyReportBugIsOff(new BugReports.RunItem(runDirectory.getPath(), item.getId()), bugIssueUrl);
 
         final @NotNull JBPanel<?> links = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         links.setOpaque(false);
