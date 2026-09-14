@@ -41,8 +41,8 @@ duration.
 - **Rule-EDITOR-PANEL-137** — A verdict recorded on the test case the walk is
   timing also records how long it took.
 - **Rule-EDITOR-PANEL-138** — Recording a pass clears the actual result, the
-  error, the bug severity and the bug priority. A test case that passed has
-  nothing to explain.
+  error, the bug severity, the bug priority and the bug issue link. A test case
+  that passed has nothing to explain.
 - **Rule-EDITOR-PANEL-139** — The walk then moves to the next test case and
   starts timing it.
 - **Rule-EDITOR-PANEL-140** — One test case is one message. Several at once is

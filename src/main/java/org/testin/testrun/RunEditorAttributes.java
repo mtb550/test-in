@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.model.BugIssueUrl;
 import org.testin.model.Groups;
 import org.testin.model.RunValueSetter;
 import org.testin.model.TestRunItems;
@@ -160,6 +161,19 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             Badges.addBugBadge(badges, runItem.getBugPriority().getLabel(), runItem.getBugPriority().getColor());
         }
     },
+
+    /**
+     * The GitHub issue a failure was reported as (#28), read as
+     * {@code owner/repo#123}.
+     * <p>
+     * Off by default and never typed into: Report Bug writes it and a pass
+     * clears it. The one place it can be clicked is the details panel.
+     */
+    BUG_ISSUE(
+            Bundle.message("attribute.run.bug.issue"),
+            ToolBarDefault.OFF,
+            (item, p) -> BugIssueUrl.reference(item.getBugIssueUrl())
+    ),
 
     RUN_STATUS(
             Bundle.message("attribute.run.run.status"),

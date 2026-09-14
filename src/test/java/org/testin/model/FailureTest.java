@@ -92,4 +92,19 @@ public class FailureTest {
         assertEquals(item.getActualResult(), "expected [true] but found [false]");
         assertEquals(item.getExecutedBy(), "tester");
     }
+
+    /**
+     * An automated failure replaces what the last failure said and keeps the bug
+     * it was reported as: the same run item failing again in the same run is
+     * most often the same bug, and only a pass clears the link (#28, P26).
+     */
+    @Test
+    public void anAutomatedFailureKeepsTheBugIssueLink() {
+        final TestRunItems item = row().setBugIssueUrl("https://github.com/mtb550/product/issues/123");
+
+        new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
+        item.recordVerdict(TestStatus.FAILED, "tester");
+
+        assertEquals(item.getBugIssueUrl(), "https://github.com/mtb550/product/issues/123");
+    }
 }

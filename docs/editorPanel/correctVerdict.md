@@ -41,7 +41,7 @@ Press the right verdict's key on the test case.
 - **Rule-EDITOR-PANEL-160** — Correcting a verdict re-stamps who recorded it and
   when. The original tester and the original time are gone.
 - **Rule-EDITOR-PANEL-161** — Changing a failed test case to passed asks first,
-  because it clears four things.
+  because it clears five things.
 - **Rule-EDITOR-PANEL-162** — Only passing clears anything. Failing and blocking
   clear nothing.
 
@@ -62,7 +62,7 @@ Press the right verdict's key on the test case.
 ```
 
 1. **The title** — the verdict being recorded.
-2. **The message** — names exactly what will be cleared, from the four.
+2. **The message** — names exactly what will be cleared, from the five.
 3. **The confirm word** — the verdict, again.
 
 ## Main flow
@@ -72,7 +72,7 @@ Press the right verdict's key on the test case.
 3. The tester selects it and presses `P`.
 4. The confirmation opens, naming what will be cleared.
 5. The tester presses `Enter`.
-6. **Passed** is recorded, and the four fields are cleared.
+6. **Passed** is recorded, and the five fields are cleared.
 7. A message reads *Passed*.
 
 ## What Testin refuses

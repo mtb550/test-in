@@ -38,8 +38,8 @@ run.
   and a report on the same test run can never disagree.
 - **Rule-VIEW-PANEL-031** — A run row with nothing in it is not drawn.
 - **Rule-VIEW-PANEL-032** — Recording a pass clears the actual result, the
-  stacktrace, the bug severity and the bug priority. Four of the six rows go
-  with it.
+  stacktrace, the bug severity, the bug priority and the bug issue link. Four of
+  the six rows go with it.
 - **Rule-VIEW-PANEL-033** — A test case the test run has not reached yet reads
   **Pending**.
 

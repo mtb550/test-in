@@ -208,6 +208,7 @@ Each entry in `results`:
 | `stacktrace` | string | Empty unless the case failed |
 | `bugSeverity` | enum | `EMPTY` `BLOCKER` `MAJOR` `MINOR` `ENHANCEMENT` |
 | `bugPriority` | enum | `EMPTY` `HIGH` `MEDIUM` `LOW` |
+| `bugIssueUrl` | string | The GitHub issue the failure was reported as, written by Report Bug. Empty until then; cleared by a pass, kept by an automated failure |
 
 `EMPTY` is a real constant, not a missing value. A passed case carries
 `"bugSeverity" : "EMPTY"`, and nothing reading it has to test for absence.

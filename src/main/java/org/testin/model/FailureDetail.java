@@ -27,13 +27,14 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * The four things on a run row that exist only to explain why a case is not
- * passing: what happened, the stacktrace behind it, and how bad the bug is.
+ * The five things on a run row that exist only to explain why a case is not
+ * passing: what happened, the stacktrace behind it, how bad the bug is, and the
+ * GitHub issue it was reported as.
  * <p>
  * They are declared here as one list because two places need the same answer
  * about them and used to hold their own copies of it:
  * {@link TestRunItems#recordVerdict} clears them when a case passes, and the
- * verdict has to say what it would erase before it does. A fifth such field
+ * verdict has to say what it would erase before it does. Another such field
  * added to the row is one constant here, and both places already know about it.
  */
 @Getter
@@ -62,6 +63,17 @@ public enum FailureDetail {
             Bundle.message("failure.detail.bug.priority"),
             item -> item.getBugPriority() != BugPriority.EMPTY,
             item -> item.setBugPriority(BugPriority.EMPTY)
+    ),
+
+    /**
+     * The GitHub issue the failure was reported as (#28). A passed case reports
+     * no bug, so the link goes with the rest - and a later failure can be
+     * reported again.
+     */
+    BUG_ISSUE_URL(
+            Bundle.message("failure.detail.bug.issue.link"),
+            item -> !item.getBugIssueUrl().isBlank(),
+            item -> item.setBugIssueUrl("")
     );
 
     /**

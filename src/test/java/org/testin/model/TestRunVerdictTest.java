@@ -33,6 +33,8 @@ import static org.testng.Assert.assertFalse;
  */
 public class TestRunVerdictTest {
 
+    private static final String ISSUE = "https://github.com/mtb550/product/issues/123";
+
     private static TestRunItems failedWithBug() {
         return TestRunItems.builder()
                 .id(UUID.randomUUID())
@@ -41,6 +43,7 @@ public class TestRunVerdictTest {
                 .bugPriority(BugPriority.HIGH)
                 .actualResult("NPE on the login button")
                 .stacktrace("java.lang.NullPointerException at Login.click(Login.java:42)")
+                .bugIssueUrl(ISSUE)
                 .build();
     }
 
@@ -55,6 +58,7 @@ public class TestRunVerdictTest {
         assertEquals(item.getBugPriority(), BugPriority.EMPTY);
         assertEquals(item.getActualResult(), "", "the failure text describes a failure that no longer exists");
         assertEquals(item.getStacktrace(), "", "likewise the stacktrace");
+        assertEquals(item.getBugIssueUrl(), "", "and the bug it was reported as: a later failure can be reported again (#28)");
     }
 
     @Test
@@ -66,6 +70,7 @@ public class TestRunVerdictTest {
         assertEquals(item.getBugSeverity(), BugSeverity.MAJOR, "re-failing must not wipe the details");
         assertEquals(item.getBugPriority(), BugPriority.HIGH);
         assertEquals(item.getActualResult(), "NPE on the login button");
+        assertEquals(item.getBugIssueUrl(), ISSUE);
     }
 
     @Test
@@ -105,6 +110,7 @@ public class TestRunVerdictTest {
         assertEquals(item.getBugPriority(), BugPriority.EMPTY);
         assertEquals(item.getActualResult(), "");
         assertEquals(item.getStacktrace(), "");
+        assertEquals(item.getBugIssueUrl(), "");
     }
 
     @Test
@@ -119,5 +125,6 @@ public class TestRunVerdictTest {
         assertEquals(item.getBugPriority(), BugPriority.HIGH);
         assertEquals(item.getActualResult(), "NPE on the login button");
         assertFalse(item.getStacktrace().isEmpty());
+        assertEquals(item.getBugIssueUrl(), ISSUE);
     }
 }

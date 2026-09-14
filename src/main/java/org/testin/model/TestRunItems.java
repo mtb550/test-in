@@ -104,6 +104,20 @@ public class TestRunItems {
     private String stacktrace = "";
 
     /**
+     * The GitHub issue this failure was reported as, and empty until one is
+     * (#28).
+     * <p>
+     * Written by Report Bug from the address {@code gh} printed, and by nothing
+     * else. A pass clears it with the rest of what a failure recorded - it is one
+     * of the {@link FailureDetail}s - and an automated failure leaves it alone,
+     * because the same run item failing again in the same run is most often the
+     * same bug.
+     */
+    @NotNull
+    @Builder.Default
+    private String bugIssueUrl = "";
+
+    /**
      * True when the test case behind this result has been deleted since the run.
      * <p>
      * The row is drawn from what the run recorded and takes nothing new: a
@@ -155,10 +169,11 @@ public class TestRunItems {
      * Records a tester's verdict: the status, when it was reached, and by whom.
      * <p>
      * Passing clears everything a failure described - the bug severity and
-     * priority, the actual result, and the stacktrace. All four exist only to
-     * explain why a case is not passing, so a passing case cannot legitimately
-     * carry any of them, and they would otherwise survive into the run JSON and
-     * into every report generated from it.
+     * priority, the actual result, the stacktrace, and the bug issue it was
+     * reported as. All five exist only to explain why a case is not passing, so a
+     * passing case cannot legitimately carry any of them, and they would
+     * otherwise survive into the run JSON and into every report generated from
+     * it.
      * <p>
      * The clearing keys on the new status alone, not on the one it replaces: a
      * case can collect failure details, be moved to Blocked, and then pass, and

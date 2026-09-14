@@ -47,15 +47,15 @@ public class RunAttributeCoverageTest {
      */
     @Test
     public void everyFailureDetailIsAlsoARunAttribute() {
-        assertEquals(FailureDetail.values().length, 4,
-                "a fifth thing a failure records needs a RunEditorAttributes constant too, "
+        assertEquals(FailureDetail.values().length, 5,
+                "a sixth thing a failure records needs a RunEditorAttributes constant too, "
                         + "or it is stored, cleared on a pass, and shown nowhere");
 
         final List<String> named = Arrays.stream(RunEditorAttributes.values())
                 .map(RunEditorAttributes::getName)
                 .toList();
 
-        for (final String expected : List.of("Actual Result", "Stacktrace", "Bug Severity", "Bug Priority")) {
+        for (final String expected : List.of("Actual Result", "Stacktrace", "Bug Severity", "Bug Priority", "Bug Issue")) {
             assertTrue(named.contains(expected), expected + " is recorded on a run row but has no attribute: " + named);
         }
     }
