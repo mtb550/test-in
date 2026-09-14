@@ -277,7 +277,7 @@ public final class ProjectIndexer {
         if (bound.isEmpty()) return projects;
 
         final @NotNull List<Path> scoped = projects.stream()
-                .filter(path -> bound.equals(path.getFileName().toString()))
+                .filter(this::isBound)
                 .toList();
 
         if (scoped.isEmpty()) {
@@ -287,6 +287,15 @@ public final class ProjectIndexer {
 
         Logger.info("Indexing only the bound project '" + bound + "'");
         return scoped;
+    }
+
+    /**
+     * Whether this is the project {@code testin.yml} binds - or any project,
+     * when it binds none. Asked by startup and by a rescan alike.
+     */
+    private boolean isBound(final @NotNull Path projectPath) {
+        final @NotNull String bound = Services.getInstance(p, BoundTestProject.class).name();
+        return bound.isEmpty() || bound.equals(projectPath.getFileName().toString());
     }
 
     /**
@@ -335,7 +344,7 @@ public final class ProjectIndexer {
 
         final @NotNull List<Path> valid = new ArrayList<>();
         Arrays.stream(projectPaths).forEach(p -> {
-            if (store.hasMarker(p, DirectoryType.TP)) {
+            if (isTestProjectFolder(p)) {
                 valid.add(p);
             } else {
                 Logger.warn("Skipping directory without a " + DirectoryType.TP.getMarker()
@@ -343,6 +352,14 @@ public final class ProjectIndexer {
             }
         });
         return valid;
+    }
+
+    /**
+     * Whether a folder under the Testin root is a test project: it carries the
+     * {@code .tp} marker. Asked by startup and by a rescan alike.
+     */
+    private boolean isTestProjectFolder(final @NotNull Path folder) {
+        return store.hasMarker(folder, DirectoryType.TP);
     }
 
     private void logSummary() {
@@ -780,6 +797,32 @@ public final class ProjectIndexer {
         syncFiles.remove(projectPath, relatives);
 
         scanSingleProject(projectPath);
+    }
+
+    /**
+     * UC-INTERNAL-003, Rule-INTERNAL-016.
+     * <p>
+     * Reads a test project again after a change on disk, or forgets it when the
+     * folder is not one Testin reads: it has no {@code .tp} marker, or it is not
+     * the project {@code testin.yml} binds.
+     * <p>
+     * The watcher knows only a path, and a scan puts whatever folder it is given
+     * into the index as a test project - so a folder of notes beside the
+     * projects became one, and a project {@code testin.yml} leaves out was read
+     * in although startup had left it out (#66, finding 120). These are the two
+     * questions startup asks through {@link #collectValidProjects} and
+     * {@link #boundOnly}; a folder that has stopped being a test project, its
+     * marker gone with it, is dropped rather than read back.
+     */
+    public void rescanChangedProject(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
+        if (isTestProjectFolder(projectPath) && isBound(projectPath)) {
+            scanSingleProject(projectPath, indicator);
+            return;
+        }
+
+        Logger.info("Not a test project Testin reads, so not scanned: " + projectPath);
+        store.removeTestProject(projectPath);
+        store.invalidateChildrenIndex();
     }
 
     public void scanSingleProject(final @NotNull Path projectPath) {

@@ -143,7 +143,7 @@ public final class Rescan {
                         for (final Path testProject : testProjects) {
                             if (indicator.isCanceled()) break;
 
-                            indexer.scanSingleProject(testProject, indicator);
+                            indexer.rescanChangedProject(testProject, indicator);
                         }
 
                         // After a cancel as well as after a finish. Whatever was

@@ -67,14 +67,19 @@ public class ScanProgressTest {
      * The rescan passes its own indicator down. Reading the file is the point:
      * calling the one-argument overload compiles perfectly and silently throws
      * the bar away, which is exactly the defect.
+     * <p>
+     * Two links of one wire since the rescan first asks whether the folder is a
+     * test project Testin reads (#66, finding 120): the rescan hands the bar to
+     * that question, and the question hands it to the scan.
      */
     @Test
     public void theRescanHandsItsIndicatorToTheScan() {
-        final @NotNull String source = read("Rescan.java");
-
-        assertTrue(source.contains("scanSingleProject(testProject, indicator)"),
-                "Rescan builds a progress bar and must hand it to the scan; calling the overload without it "
+        assertTrue(read("Rescan.java").contains("rescanChangedProject(testProject, indicator)"),
+                "Rescan builds a progress bar and must hand it to the rescan; calling it without the bar "
                         + "leaves the tester watching a bar that names nothing and cannot be stopped");
+
+        assertTrue(read("ProjectIndexer.java").contains("scanSingleProject(projectPath, indicator)"),
+                "rescanChangedProject must hand the rescan's progress bar to the scan, not start one of its own");
     }
 
     /**

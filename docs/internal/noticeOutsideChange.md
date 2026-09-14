@@ -14,7 +14,10 @@ by hand, and is on [UC-TREE-PANEL-025](../treePanel/refreshTree.md).
 ## Rules
 
 - **Rule-INTERNAL-016** — Testin watches every file the IDE watches. A change
-  counts only if the file is inside a test project under the Testin folder.
+  counts only if the file is inside a test project Testin reads: a folder under
+  the Testin folder with a `.tp` marker, and only the one `testin.yml` names when
+  it names one. A changed folder that is not one is dropped from what Testin
+  shows.
 - **Rule-INTERNAL-017** — Anything inside a `.git` folder is ignored, however
   deep it is.
 - **Rule-INTERNAL-018** — The Testin folder itself is not watched. It holds test
