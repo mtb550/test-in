@@ -54,8 +54,6 @@ public record BugRepository(@NotNull String host, @NotNull String owner, @NotNul
      */
     private static final @NotNull Pattern PART = Pattern.compile("^[A-Za-z0-9._-]+$");
 
-    private static final @NotNull String SCP_PREFIX = "git@";
-
     /**
      * The repository an address names, and empty when it does not name exactly
      * one.
@@ -64,11 +62,11 @@ public record BugRepository(@NotNull String host, @NotNull String owner, @NotNul
         final @NotNull String value = TestinProjectConfig.withoutCredentials(address.strip());
         if (value.isEmpty()) return Optional.empty();
 
-        if (value.startsWith(SCP_PREFIX)) {
+        if (value.startsWith(TestinProjectConfig.SCP_PREFIX)) {
             final int colon = value.indexOf(':');
             if (colon < 0) return Optional.empty();
 
-            return fromParts(value.substring(SCP_PREFIX.length(), colon), value.substring(colon + 1));
+            return fromParts(value.substring(TestinProjectConfig.SCP_PREFIX.length(), colon), value.substring(colon + 1));
         }
 
         final @NotNull Matcher scheme = SCHEME.matcher(value);

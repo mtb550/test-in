@@ -118,6 +118,13 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
             Pattern.compile("^(https://|ssh://|git@)[A-Za-z0-9._~:/?#@%+-]+$");
 
     /**
+     * How an SSH address written without a scheme begins: {@code git@host:owner/repo}.
+     * One owner, because Git's own check and Report Bug's parser both read it
+     * (#66, finding 149).
+     */
+    public static final @NotNull String SCP_PREFIX = "git@";
+
+    /**
      * A host name or address, and nothing that could be anything else.
      */
     private static final @NotNull Pattern HOST = Pattern.compile("^[A-Za-z0-9.-]+$");
