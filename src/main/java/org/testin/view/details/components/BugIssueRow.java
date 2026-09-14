@@ -72,8 +72,20 @@ public final class BugIssueRow extends BaseDetails {
         final @NotNull Optional<String> bugIssue = item.bugIssue();
         if (item.getStatus() != TestStatus.FAILED && bugIssue.isEmpty()) return currentRow;
 
-        final @NotNull TestRunDirectoryDto runDirectory = Services.getInstance(p, ProjectIndexer.class)
-                .getTestRunDirByPath(Services.getInstance(p, TestinRoot.class).resolve(currentPath));
+        // Found rather than demanded: a run whose results are indexed before its
+        // folder is has no folder node yet, and drawing the panel must not throw
+        // over it (#66, finding 140).
+        return Services.getInstance(p, ProjectIndexer.class).find(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
+                .filter(TestRunDirectoryDto.class::isInstance)
+                .map(TestRunDirectoryDto.class::cast)
+                .map(runDirectory -> drawLinks(p, panel, gbc, dto, currentRow, bugIssue, runDirectory))
+                .orElse(currentRow);
+    }
+
+    /**
+     * The row, once the run's folder is there to report from.
+     */
+    private int drawLinks(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow, final @NotNull Optional<String> bugIssue, final @NotNull TestRunDirectoryDto runDirectory) {
         final @NotNull Optional<String> off = Services.getInstance(p, BugReports.class)
                 .whyReportBugIsOff(new BugReports.RunItem(runDirectory.getPath(), item.getId()), item);
 
