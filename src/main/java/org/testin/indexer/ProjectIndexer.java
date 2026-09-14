@@ -78,6 +78,14 @@ public final class ProjectIndexer {
     private final @NotNull AtomicBoolean restoreEditorsOnComplete = new AtomicBoolean(true);
     private final @NotNull RunWriter runWriter;
     private final @NotNull SyncFiles syncFiles;
+
+    /**
+     * UC-SHARE-019, Rule-SHARE-003.
+     * <p>
+     * The test projects a sync is writing into right now, each with the run
+     * changes waiting for it to be read again. Guarded by itself.
+     */
+    private final @NotNull Map<Path, List<Runnable>> heldForSync = new HashMap<>();
     private final @NotNull NodeFiles nodeFiles;
     /**
      * Counts the whole indexing pass, not the projects in it.
@@ -555,6 +563,41 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-SHARE-019, Rule-SHARE-003.
+     * <p>
+     * Changes a run as the index holds it when the change is applied, and writes
+     * it.
+     * <p>
+     * <b>Held while a sync is bringing files into the run's test project.</b>
+     * Between the incoming files landing and the scan that reads them, the index
+     * still holds the run as it was - so a verdict recorded then was applied to
+     * the older run, and its write put that run back over the one that had just
+     * arrived (#66, finding 129). Held, the change waits for the scan and is
+     * applied to the run that arrived, on the EDT, where a verdict is recorded.
+     * A run the sync took away is not there to change, and the log says so.
+     */
+    public void changeRun(final @NotNull Path runPath, final @NotNull Consumer<TestRunDto> change) {
+        final @NotNull Runnable apply = () -> findTestRun(runPath).ifPresentOrElse(run -> {
+            change.accept(run);
+            persistRun(runPath, run);
+        }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
+
+        synchronized (heldForSync) {
+            final @NotNull Optional<List<Runnable>> held = heldForSync.entrySet().stream()
+                    .filter(entry -> runPath.startsWith(entry.getKey()))
+                    .map(Map.Entry::getValue)
+                    .findFirst();
+
+            if (held.isPresent()) {
+                held.orElseThrow().add(apply);
+                return;
+            }
+        }
+
+        apply.run();
+    }
+
+    /**
      * The run's marker, through the same writer and the same queue.
      */
     public void persistRunMarker(final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
@@ -783,14 +826,30 @@ public final class ProjectIndexer {
      * mirror {@link #removeIncoming} always scanned.
      */
     public void acceptIncoming(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
-        syncFiles.accept(projectPath, files);
+        // A run change made from here until the scan has read what arrived waits
+        // for it, and lands on the run that arrived (#66, finding 129).
+        synchronized (heldForSync) {
+            heldForSync.putIfAbsent(projectPath, new ArrayList<>());
+        }
 
-        // A run's incoming files went through the run writer's queue; the scan
-        // reads them once they have landed rather than racing them (#66, finding
-        // 121).
-        runWriter.awaitQueued();
+        try {
+            syncFiles.accept(projectPath, files);
 
-        scanSingleProject(projectPath);
+            // A run's incoming files went through the run writer's queue; the scan
+            // reads them once they have landed rather than racing them (#66,
+            // finding 121).
+            runWriter.awaitQueued();
+
+            scanSingleProject(projectPath);
+        } finally {
+            final @NotNull List<Runnable> held;
+            synchronized (heldForSync) {
+                held = Optional.ofNullable(heldForSync.remove(projectPath)).orElse(List.of());
+            }
+
+            // On the EDT, where a verdict is recorded and the run's rows are read.
+            if (!held.isEmpty()) ApplicationManager.getApplication().invokeLater(() -> held.forEach(Runnable::run));
+        }
     }
 
     /**
