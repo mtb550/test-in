@@ -34,6 +34,7 @@ import org.testin.undo.UndoScope;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.setting.AppSettingsState;
 import org.testin.util.Bundle;
 import org.testin.util.ClipboardContents;
 import org.testin.util.Mapper;
@@ -160,6 +161,17 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 cutFrom.ifPresent(before::add);
                 before.add(TestCaseSnapshot.of(p, destPath, pastedIds));
 
+                // Rule-EDITOR-PANEL-082, Rule-INTERNAL-035. A cut is the same
+                // test case in a new place, so it keeps who created it. Saved as
+                // it is before the order is, so the sequence write already knows
+                // it and does not record the paster as its creator (#66, finding
+                // 114) - and after the snapshot above, which has to read the cases
+                // as absent.
+                if (isCut) {
+                    final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                    pastedHere.forEach(moved -> indexer.putTestCaseVerbatim(destPath, moved));
+                }
+
                 destUI.reorderAndPersist(() -> {
                     final @NotNull List<TestCaseSnapshot> after = new ArrayList<>();
                     cutFrom.ifPresent(taken -> after.add(TestCaseSnapshot.of(p, taken.testSetPath(), taken.ids())));
@@ -220,7 +232,9 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
             final @NotNull TestCaseDto clonedTc = Services.getInstance(p, Mapper.class).convertValue(original, TestCaseDto.class);
 
             if (isCut) {
-                clonedTc.setUpdatedAt(now);
+                // Moved, so changed by whoever pasted it: the name beside the time,
+                // not the previous modifier's name beside a new time.
+                clonedTc.touch(Services.getInstance(p, AppSettingsState.class).testerName);
             } else {
                 clonedTc.setId(UUID.randomUUID())
                         .setDescription(Bundle.message("paste.copy.suffix", original.getDescription()))

@@ -39,8 +39,9 @@ own.
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-081** — A pasted copy is a new test case with a new
   identity, and its description gains the word `(Copy)`.
-- **Rule-EDITOR-PANEL-082** — A pasted cut keeps its identity, because it is the
-  same test case in a new place.
+- **Rule-EDITOR-PANEL-082** — A pasted cut keeps its identity and who created it,
+  because it is the same test case in a new place. The tester who pasted it is
+  recorded as the one who changed it.
 - **Rule-EDITOR-PANEL-083** — Pasted test cases land at the end of the test set.
 - **Rule-EDITOR-PANEL-084** — A cut and its paste are one entry on the undo
   history.

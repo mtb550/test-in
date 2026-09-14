@@ -127,4 +127,25 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         assertTrue("a pasted case whose rank did not move never reached disk",
                 Files.isRegularFile(fileOf(ts, pasted)));
     }
+
+    /**
+     * Rule-INTERNAL-035, Rule-EDITOR-PANEL-082.
+     * <p>
+     * A case saved as it is before its set's order is saved keeps who created
+     * it. That is what a pasted cut now does: the cut had taken the case out of
+     * the index, so the sequence write saw it for the first time and recorded
+     * the paster as its creator (#66, finding 114).
+     */
+    public void testACaseSavedAsItIsBeforeTheOrderKeepsItsCreator() {
+        final TestSetDirectoryDto ts = testSet();
+        final TestCaseDto moved = testCase(ts, "m").setCreatedBy("Sara Al-Otaibi");
+        final var createdAt = moved.getCreatedAt();
+
+        indexer().putTestCaseVerbatim(ts.getPath(), moved);
+        indexer().updateSequence(ts.getPath(), List.of(moved), List.of());
+
+        final TestCaseDto indexed = indexer().findTestCase(moved.getId()).orElseThrow();
+        assertEquals("a moved case took the paster's name as its creator", "Sara Al-Otaibi", indexed.getCreatedBy());
+        assertEquals("a moved case took a new creation date", createdAt, indexed.getCreatedAt());
+    }
 }
