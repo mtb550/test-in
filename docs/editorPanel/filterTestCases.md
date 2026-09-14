@@ -62,6 +62,8 @@ There is no key for this. The button's tooltip reads **Filter**.
    [UC-EDITOR-PANEL-021](clearFilters.md).
 2. **Priority** — **P1**, **P2** and **P3**, each with its own color.
 3. **Group** — every group Testin knows, with **No Group** first.
+   [When that list changes](refreshEditor.md#what-completion-and-the-group-filter-offer)
+   is written on the refresh page.
 4. **Module** — the modules the test cases in this test set actually carry.
 5. **Status** — the run statuses. It is on a test run only.
 

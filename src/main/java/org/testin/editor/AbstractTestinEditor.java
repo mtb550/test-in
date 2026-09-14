@@ -48,6 +48,7 @@ import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.undo.UndoHistories;
@@ -536,6 +537,11 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         // waits for indexing and finishes on another thread, so a balloon here
         // would announce a refresh that has not happened yet (#62).
         reloadData(() -> Services.getInstance(p, Notifier.class).softShow(p, message));
+
+        // Fire and forget: what the completion fields and the group filter offer
+        // is rebuilt from every indexed test case, so a group renamed with Update
+        // Test Cases is no longer offered under its old name (#66, finding 156).
+        Services.getInstance(p, TestCaseValues.class).reload(Services.getInstance(p, ProjectIndexer.class)::getAllTestCases);
     }
 
     /**

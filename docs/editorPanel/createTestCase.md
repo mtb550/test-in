@@ -96,6 +96,10 @@ This is how every test case in Testin begins.
 | Test Data | `Ctrl+T` | *set test data* |
 | Pre Conditions | `Ctrl+B` | *set pre conditions* |
 
+Description, Expected Result, Module, Steps and Group complete the values Testin
+knows. [When that list changes](refreshEditor.md#what-completion-and-the-group-filter-offer)
+is written on the refresh page.
+
 ## Main flow
 
 1. The tester presses `Ctrl+M` in the editor.
