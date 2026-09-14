@@ -137,7 +137,7 @@ public final class RunStatusService {
         // Through the indexer rather than on the run read above: while a sync is
         // bringing this run's files in, the change waits for them and lands on
         // the run that arrived (#66, finding 129).
-        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, current -> itemOf(current, caseId).ifPresentOrElse(item -> {
+        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, current -> current.resultOf(caseId).ifPresentOrElse(item -> {
             // Before the verdict, not after: passing clears everything a failure
             // described, so a message written afterward would survive onto a case
             // that passed. Written first, the verdict decides whether it stays.
@@ -174,7 +174,7 @@ public final class RunStatusService {
 
         // Through the indexer, as a verdict is, so details saved while a sync is
         // bringing this run in land on the run that arrived (#66, finding 129).
-        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, current -> itemOf(current, caseId).ifPresentOrElse(fields::applyTo,
+        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, current -> current.resultOf(caseId).ifPresentOrElse(fields::applyTo,
                 () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + caseId + " - failure details not recorded")));
 
         return true;
@@ -186,7 +186,7 @@ public final class RunStatusService {
      * tester, because they just asked for something to be recorded on it.
      */
     private @NotNull Optional<TestRunItems> liveItem(final @NotNull Project p, final @NotNull TestRunDto run, final @NotNull Path runPath, final @NotNull UUID caseId) {
-        final @NotNull Optional<TestRunItems> found = itemOf(run, caseId);
+        final @NotNull Optional<TestRunItems> found = run.resultOf(caseId);
 
         if (found.isEmpty()) {
             Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' does not cover " + caseId + " - nothing recorded");
@@ -199,15 +199,6 @@ public final class RunStatusService {
         }
 
         return found;
-    }
-
-    /**
-     * The run's row for one case, whatever state it is in.
-     */
-    private static @NotNull Optional<TestRunItems> itemOf(final @NotNull TestRunDto run, final @NotNull UUID caseId) {
-        return run.getResults().stream()
-                .filter(item -> item.getId().equals(caseId))
-                .findFirst();
     }
 
     /**

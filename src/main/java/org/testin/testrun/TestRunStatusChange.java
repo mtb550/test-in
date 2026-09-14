@@ -75,7 +75,7 @@ public final class TestRunStatusChange {
      * are the same run found the same way.
      */
     public void apply(final @NotNull TestRunDirectoryDto run, final @NotNull TestRunStatus newStatus) {
-        final @NotNull Optional<RunEditor> open = openEditorOn(run);
+        final @NotNull Optional<RunEditor> open = Services.getInstance(p, TestinEditors.class).runEditorFor(p, run);
 
         Logger.trace("Test run status changed: " + run.getName() + " = " + newStatus.getLabel());
 
@@ -92,16 +92,6 @@ public final class TestRunStatusChange {
         // The status names itself. Start Run routes through here rather than
         // notifying for itself, so pressing it says "In Progress" once (#62).
         Services.getInstance(p, Notifier.class).softShow(p, newStatus.getLabel());
-    }
-
-    /**
-     * The run editor open on this run, and empty when nothing has it open - the
-     * tree's usual case, and the editor's never.
-     */
-    private @NotNull Optional<RunEditor> openEditorOn(final @NotNull TestRunDirectoryDto run) {
-        return Services.getInstance(p, TestinEditors.class).editorFor(p, run)
-                .filter(RunEditor.class::isInstance)
-                .map(RunEditor.class::cast);
     }
 
     /**

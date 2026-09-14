@@ -58,10 +58,10 @@ public final class TestCaseLink {
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);
         if (git.isNotRepository(file.testProject())) return Optional.empty();
 
-        final @NotNull String remote = git.getRemoteName(file.testProject());
-        if (remote.isEmpty()) return Optional.empty();
+        final @NotNull String remoteUrl = git.remoteUrl(file.testProject());
+        if (remoteUrl.isEmpty()) return Optional.empty();
 
-        return of(git.getRemoteUrl(file.testProject(), remote), git.getCurrentBranch(file.testProject()), file.inProject());
+        return of(remoteUrl, git.getCurrentBranch(file.testProject()), file.inProject());
     }
 
     /**

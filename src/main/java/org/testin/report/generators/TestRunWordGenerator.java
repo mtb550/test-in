@@ -61,7 +61,7 @@ public final class TestRunWordGenerator {
     final String DARK_NAVY = "1F3864";
     final String MEDIUM_BLUE = "2E5496";
     final String DARK_GRAY = "595959";
-    final String LINK_BLUE = "0052CC";
+    final String LINK_BLUE = ReportText.LINK_BLUE;
     final String GREEN = "2E7D32";
     final String RED = "C0392B";
     final String DARK_YELLOW = "B8860B";
@@ -301,19 +301,17 @@ public final class TestRunWordGenerator {
             if (withFailureDetail) {
                 String actualResult = item.getActualResult();
                 if (actualResult.isEmpty()) actualResult = "—";
-                XWPFParagraph ap = tcCell.addParagraph();
-                detailRun(ap.createRun(), Bundle.message("report.actual.result", actualResult), DARK_GRAY);
+                final @NotNull XWPFParagraph ap = tcCell.addParagraph();
+                styledRun(ap.createRun(), Bundle.message("report.actual.result", actualResult), ReportFont.SMALL, DARK_GRAY);
 
-                // The issue the failure was reported as, right after what
-                // happened, and nothing when there is none (#50, D5 and D10).
-                final @NotNull String bugIssueUrl = item.getBugIssueUrl();
-                if (!bugIssueUrl.isBlank()) {
-                    detailRun(ap.createRun(), " (", DARK_GRAY);
-                    final @NotNull XWPFHyperlinkRun issue = ap.createHyperlinkRun(bugIssueUrl);
-                    detailRun(issue, BugIssueUrl.shortReference(bugIssueUrl), LINK_BLUE);
+                // The issue it was reported as, right after what happened (#50).
+                item.bugIssue().ifPresent(url -> {
+                    styledRun(ap.createRun(), " (", ReportFont.SMALL, DARK_GRAY);
+                    final @NotNull XWPFHyperlinkRun issue = ap.createHyperlinkRun(url);
+                    styledRun(issue, BugIssueUrl.shortReference(url), ReportFont.SMALL, LINK_BLUE);
                     issue.setUnderline(UnderlinePatterns.SINGLE);
-                    detailRun(ap.createRun(), ")", DARK_GRAY);
-                }
+                    styledRun(ap.createRun(), ")", ReportFont.SMALL, DARK_GRAY);
+                });
 
                 // Only when there is one, and monospaced: a stacktrace read in
                 // a proportional font loses the indentation that makes it
@@ -521,36 +519,26 @@ public final class TestRunWordGenerator {
         final @NotNull XWPFFooter footer = doc.createFooter(HeaderFooterType.DEFAULT);
         final @NotNull XWPFParagraph p = footer.createParagraph();
         p.setAlignment(ParagraphAlignment.CENTER);
-        footerRun(p.createRun(), date + Bundle.message("report.footer.prefix"), DARK_GRAY);
+        styledRun(p.createRun(), date + Bundle.message("report.footer.prefix"), ReportFont.CAPTION, DARK_GRAY);
 
         // The plugin's name is a link here too. The PDF and the HTML report both
         // linked it and this one printed it as plain text, so the one format a
         // reader is most likely to have open was the one they could not click.
         final @NotNull XWPFHyperlinkRun link = p.createHyperlinkRun(ReportText.PLUGIN_URL);
-        footerRun(link, "Testin", LINK_BLUE);
+        styledRun(link, "Testin", ReportFont.CAPTION, LINK_BLUE);
         link.setUnderline(UnderlinePatterns.SINGLE);
 
-        footerRun(p.createRun(), Bundle.message("report.footer.suffix"), DARK_GRAY);
+        styledRun(p.createRun(), Bundle.message("report.footer.suffix"), ReportFont.CAPTION, DARK_GRAY);
     }
 
     /**
-     * One piece of the footer line, so the three of them cannot drift in size or
-     * face while only their color differs.
+     * One piece of a line whose pieces differ only in color - the footer, and a
+     * failed test case's actual result with its issue - so they cannot drift in
+     * size or face.
      */
-    private void footerRun(final @NotNull XWPFRun run, final @NotNull String text, final @NotNull String color) {
+    private void styledRun(final @NotNull XWPFRun run, final @NotNull String text, final @NotNull ReportFont font, final @NotNull String color) {
         run.setText(text);
-        run.setFontSize(ReportFont.CAPTION.ptRounded());
-        run.setFontFamily("Calibri");
-        run.setColor(color);
-    }
-
-    /**
-     * A run in a failed test case's detail line: the actual result, and the
-     * issue it was reported as after it.
-     */
-    private void detailRun(final @NotNull XWPFRun run, final @NotNull String text, final @NotNull String color) {
-        run.setText(text);
-        run.setFontSize(ReportFont.SMALL.ptRounded());
+        run.setFontSize(font.ptRounded());
         run.setFontFamily("Calibri");
         run.setColor(color);
     }

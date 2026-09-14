@@ -195,6 +195,15 @@ public final class GitRepositoryService {
     }
 
     /**
+     * The address of the remote to work with, and empty when the repository has
+     * none - the two lookups every caller made one after the other.
+     */
+    public @NotNull String remoteUrl(final @NotNull Path path) {
+        final @NotNull String remoteName = getRemoteName(path);
+        return remoteName.isEmpty() ? "" : getRemoteUrl(path, remoteName);
+    }
+
+    /**
      * The branch that is now checked out, and nothing at all when the checkout
      * did not happen — which the caller reads as "put the branch box back where
      * it was". The git reason goes to the log rather than into the caller's

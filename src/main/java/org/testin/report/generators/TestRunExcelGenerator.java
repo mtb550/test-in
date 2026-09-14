@@ -143,13 +143,12 @@ public final class TestRunExcelGenerator {
                 ws.value(row, 8, result.getStacktrace());
                 ws.style(row, 8).wrapText(true).set();
 
-                // Its own column, and empty when the run item was not
-                // reported (#50, D5 and D9).
-                final @NotNull String bugIssueUrl = result.getBugIssueUrl();
-                if (!bugIssueUrl.isBlank()) {
-                    ws.hyperlink(row, 9, HyperLink.external(bugIssueUrl, BugIssueUrl.shortReference(bugIssueUrl)));
-                    ws.style(row, 9).fontColor("0052CC").underlined().set();
-                }
+                // Its own column, empty when the run item was not reported (#50).
+                final int line = row;
+                result.bugIssue().ifPresent(url -> {
+                    ws.hyperlink(line, 9, HyperLink.external(url, BugIssueUrl.shortReference(url)));
+                    ws.style(line, 9).fontColor(ReportText.LINK_BLUE).underlined().set();
+                });
 
                 row++;
             }

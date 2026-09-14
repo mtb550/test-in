@@ -107,8 +107,9 @@ final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
                 final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
                 if (!event.isOk()) reports.discard(item);
 
-                reports.end(item, BugReports.Stage.OPEN);
-                redraw.run();
+                // Send has already moved the report on and redrawn; only a
+                // cancel lets it go here.
+                if (reports.end(item, BugReports.Stage.OPEN)) redraw.run();
             }
         });
     }
@@ -147,12 +148,12 @@ final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
         sendButton.getComponent().enableUnless(whyNot);
         if (whyNot.isPresent()) return;
 
-        bug.repository().ifPresent(repository -> {
-            sent = true;
-            final @NotNull BugReports.Edits edits = new BugReports.Edits(titleField.getComponent().getText().strip(), bodyArea.getComponent().getText());
-            BugFiling.send(p, item, repository, edits, bug.facts().stacktrace().screenshots(), redraw);
-            closeOk();
-        });
+        // Ready means a repository: readiness was decided from the same reading
+        // of bugRepoUrl that found it.
+        sent = true;
+        final @NotNull BugReports.Edits edits = new BugReports.Edits(titleField.getComponent().getText().strip(), bodyArea.getComponent().getText());
+        BugFiling.send(p, item, bug.repository().orElseThrow(), edits, bug.facts().stacktrace().screenshots(), redraw);
+        closeOk();
     }
 
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-070

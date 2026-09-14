@@ -16,6 +16,8 @@
 
 package org.testin.bug;
 
+import org.testin.model.TestRunItems;
+import org.testin.model.TestStatus;
 import org.testin.util.Bundle;
 import org.testng.annotations.Test;
 
@@ -36,13 +38,8 @@ public class BugReportsTest {
     private static final BugReports.RunItem ITEM = new BugReports.RunItem(Path.of("NAFATH", "Test Runs", "Sprint 7"), UUID.randomUUID());
     private static final BugReports.RunItem SAME_CASE_OTHER_RUN = new BugReports.RunItem(Path.of("NAFATH", "Test Runs", "Sprint 8"), ITEM.id());
 
-    @Test
-    public void aSecondReportForTheSameRunItemIsRefused() {
-        final BugReports reports = new BugReports();
-
-        assertTrue(reports.begin(ITEM));
-        assertFalse(reports.begin(ITEM), "a second click before the first was drawn");
-        assertTrue(reports.begin(SAME_CASE_OTHER_RUN), "the same test case in another run is another run item");
+    private static TestRunItems failed() {
+        return TestRunItems.builder().id(ITEM.id()).status(TestStatus.FAILED).build();
     }
 
     @Test
@@ -50,28 +47,28 @@ public class BugReportsTest {
         final BugReports reports = new BugReports();
 
         reports.begin(ITEM);
-        assertEquals(reports.whyReportBugIsOff(ITEM, ""), Optional.of(Bundle.message("bug.preparing")));
+        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.preparing")));
 
         reports.moveTo(ITEM, BugReports.Stage.OPEN);
-        assertEquals(reports.whyReportBugIsOff(ITEM, ""), Optional.of(Bundle.message("bug.open")));
+        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.open")));
 
         reports.moveTo(ITEM, BugReports.Stage.SENDING);
-        assertEquals(reports.whyReportBugIsOff(ITEM, ""), Optional.of(Bundle.message("bug.sending")),
+        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.sending")),
                 "while sending the run item has no link yet, so the stage is what keeps it off");
 
-        reports.end(ITEM, BugReports.Stage.OPEN);
-        assertEquals(reports.whyReportBugIsOff(ITEM, ""), Optional.of(Bundle.message("bug.sending")),
-                "a dialog closing on Send does not end the send");
+        assertFalse(reports.end(ITEM, BugReports.Stage.OPEN), "a dialog closing on Send does not end the send");
+        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.sending")));
 
-        reports.end(ITEM, BugReports.Stage.SENDING);
-        assertEquals(reports.whyReportBugIsOff(ITEM, ""), Optional.empty());
+        assertTrue(reports.end(ITEM, BugReports.Stage.SENDING));
+        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.empty());
     }
 
     @Test
     public void aReportedBugKeepsReportBugOff() {
         final BugReports reports = new BugReports();
+        final TestRunItems reported = TestRunItems.builder().id(ITEM.id()).status(TestStatus.FAILED).bugIssueUrl("https://github.com/mtb550/test-in/issues/412").build();
 
-        assertEquals(reports.whyReportBugIsOff(ITEM, "https://github.com/mtb550/test-in/issues/412"), Optional.of(Bundle.message("bug.already.reported")));
+        assertEquals(reports.whyReportBugIsOff(ITEM, reported), Optional.of(Bundle.message("bug.already.reported")));
     }
 
     @Test
@@ -79,10 +76,10 @@ public class BugReportsTest {
         final BugReports reports = new BugReports();
         reports.begin(SAME_CASE_OTHER_RUN);
 
-        assertEquals(reports.whyReportBugIsOff(ITEM, ""), Optional.empty(), "one being prepared does not hold the others");
+        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.empty(), "one being prepared, even for the same test case in another run, does not hold the others");
 
         reports.moveTo(SAME_CASE_OTHER_RUN, BugReports.Stage.OPEN);
-        assertEquals(reports.whyReportBugIsOff(ITEM, ""), Optional.of(Bundle.message("bug.finish.open.report")));
+        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.finish.open.report")));
         assertTrue(reports.anotherIsOpen(ITEM));
         assertFalse(reports.anotherIsOpen(SAME_CASE_OTHER_RUN), "its own dialog is not another one");
     }

@@ -22,10 +22,10 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.BugRepository;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
-import org.testin.model.dto.TestRunDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
@@ -35,7 +35,6 @@ import org.testin.util.Bundle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Sends the bug report a tester wrote, and records the issue it became (#28).
@@ -60,10 +59,9 @@ public final class BugFiling {
         reports.moveTo(item, BugReports.Stage.SENDING);
         redraw.run();
 
-        final @NotNull AtomicReference<IssueCreation> answer = new AtomicReference<>(IssueCreation.failed(""));
         BackgroundWork.run(p, Bundle.message("bug.sending"), Bundle.message("bug.send.failed.title"), false,
-                indicator -> answer.set(GitHubCli.onPath(indicator).create(repository, edits.title(), edits.body(), screenshots)),
-                () -> record(p, item, answer.get()),
+                indicator -> GitHubCli.onPath(indicator).create(repository, edits.title(), edits.body(), screenshots),
+                answer -> record(p, item, answer),
                 () -> {
                     reports.end(item, BugReports.Stage.SENDING);
                     redraw.run();
@@ -99,15 +97,14 @@ public final class BugFiling {
      */
     static @NotNull Optional<String> store(final @NotNull Project p, final @NotNull BugReports.RunItem item, final @NotNull String url) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        final @NotNull Optional<TestRunDto> run = indexer.findTestRun(item.run());
-        final @NotNull Optional<TestRunItems> found = run.flatMap(item::in);
+        final @NotNull Optional<TestRunItems> found = indexer.findTestRun(item.run()).flatMap(item::in);
         if (found.isEmpty()) return Optional.of(Bundle.message("bug.not.stored.moved"));
+        if (found.orElseThrow().getStatus() != TestStatus.FAILED) return Optional.of(Bundle.message("bug.not.stored.no.longer.failed"));
 
-        final @NotNull TestRunItems result = found.orElseThrow();
-        if (result.getStatus() != TestStatus.FAILED) return Optional.of(Bundle.message("bug.not.stored.no.longer.failed"));
-
-        result.setBugIssueUrl(url);
-        indexer.persistRun(item.run(), run.orElseThrow());
+        // Through the indexer's change, as a verdict is, so a link stored while a
+        // sync brings the run in lands on the run that arrived (#66, finding 151).
+        indexer.changeRun(item.run(), run -> item.failedIn(run).ifPresentOrElse(result -> result.setBugIssueUrl(url),
+                () -> Logger.warn("The run a sync brought in no longer has this failure, so its bug link was not stored: " + url)));
         return Optional.empty();
     }
 }

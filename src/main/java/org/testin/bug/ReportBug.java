@@ -16,12 +16,13 @@
 
 package org.testin.bug;
 
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.config.BugRepository;
 import org.testin.config.TestinConfigService;
+import org.testin.config.TestinProjectConfig;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCaseFile;
 import org.testin.model.TestRunItems;
@@ -35,7 +36,6 @@ import org.testin.util.Bundle;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Report Bug: prepares a failed run item's bug report and opens it (#28).
@@ -59,38 +59,41 @@ public final class ReportBug {
         final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
         final @NotNull BugReports.RunItem item = new BugReports.RunItem(runDirectory.getPath(), runItemId);
 
-        final @NotNull Optional<TestRunItems> failed = item.stillFailed(indexer);
         final @NotNull Optional<TestRunDto> run = indexer.findTestRun(item.run());
-        if (failed.isEmpty() || run.isEmpty()) return;
-        if (reports.whyReportBugIsOff(item, failed.orElseThrow().getBugIssueUrl()).isPresent()) return;
-        if (!reports.begin(item)) return;
+        final @NotNull Optional<TestRunItems> failed = run.flatMap(item::failedIn);
+        if (failed.isEmpty() || reports.whyReportBugIsOff(item, failed.orElseThrow()).isPresent()) return;
+
+        reports.begin(item);
         redraw.run();
 
         final @NotNull BugFacts facts = BugFacts.of(failed.orElseThrow(), tc, run.orElseThrow(), runDirectory.getName());
         final @NotNull Optional<TestCaseFile> file = indexer.testCaseFile(tc);
-        final @NotNull AtomicReference<Optional<PreparedBug>> prepared = new AtomicReference<>(Optional.empty());
 
         BackgroundWork.run(p, Bundle.message("bug.preparing"), Bundle.message("bug.send.failed.title"), true,
-                indicator -> {
-                    // Read again, as Refresh does: a bugRepoUrl added by hand
-                    // counts without one.
-                    final @NotNull TestinConfigService config = Services.getInstance(p, TestinConfigService.class);
-                    config.reload();
-                    final @NotNull String bugRepoUrl = config.get().bugRepoUrl();
-
-                    final @NotNull Optional<String> link = file.flatMap(where -> TestCaseLink.read(p, where));
-                    indicator.checkCanceled();
-
-                    final @NotNull Optional<String> whyNotReady = GitHubCli.onPath(indicator).whyItCannotSend(bugRepoUrl);
-                    indicator.checkCanceled();
-
-                    prepared.set(Optional.of(new PreparedBug(facts, BugTemplate.body(facts, link), BugRepository.of(bugRepoUrl), whyNotReady)));
-                },
-                () -> prepared.get().ifPresent(bug -> open(p, item, bug, redraw)),
+                indicator -> prepare(p, facts, file, indicator),
+                bug -> open(p, item, bug, redraw),
                 () -> {
                     reports.end(item, BugReports.Stage.PREPARING);
                     redraw.run();
                 });
+    }
+
+    /**
+     * Off the EDT, under the progress bar. The configuration is read again, as
+     * Refresh does, so a {@code bugRepoUrl} added by hand counts without one.
+     */
+    private static @NotNull PreparedBug prepare(final @NotNull Project p, final @NotNull BugFacts facts, final @NotNull Optional<TestCaseFile> file, final @NotNull ProgressIndicator indicator) {
+        final @NotNull TestinConfigService config = Services.getInstance(p, TestinConfigService.class);
+        config.reload();
+        final @NotNull TestinProjectConfig current = config.get();
+
+        final @NotNull Optional<String> link = file.flatMap(where -> TestCaseLink.read(p, where));
+        indicator.checkCanceled();
+
+        final @NotNull Optional<String> whyNotReady = GitHubCli.onPath(indicator).whyItCannotSend(current.bugRepoUrl());
+        indicator.checkCanceled();
+
+        return new PreparedBug(facts, BugTemplate.body(facts, link), current.bugRepository(), whyNotReady);
     }
 
     /**

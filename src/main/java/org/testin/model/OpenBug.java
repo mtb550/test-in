@@ -56,10 +56,10 @@ public record OpenBug(@NotNull Path runPath, @NotNull TestRunItems item) {
      */
     public static @NotNull List<OpenBug> of(final @NotNull Map<Path, TestRunDto> runs, final @NotNull UUID caseId) {
         return runs.entrySet().stream()
-                .flatMap(run -> run.getValue().getResults().stream()
-                        .filter(item -> item.getId().equals(caseId))
+                .flatMap(run -> run.getValue().resultOf(caseId)
                         .filter(FailureDetail::recordsABug)
-                        .map(item -> new OpenBug(run.getKey(), item)))
+                        .map(item -> new OpenBug(run.getKey(), item))
+                        .stream())
                 .sorted(Comparator.comparing((OpenBug bug) -> bug.item().getExecutedAt()).reversed())
                 .toList();
     }

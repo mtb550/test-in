@@ -59,7 +59,7 @@ public final class GitHubCli {
     /**
      * The first {@code gh} that attaches files to a new issue.
      */
-    static final @NotNull List<Integer> OLDEST = List.of(2, 99, 0);
+    private static final @NotNull List<Integer> OLDEST = List.of(2, 99, 0);
 
     /**
      * How long {@code gh} is given before it is stopped: long enough for fifty
@@ -149,8 +149,7 @@ public final class GitHubCli {
         try {
             folder = Files.createTempDirectory("testin-bug-");
         } catch (final IOException ex) {
-            Logger.warn("No temporary folder for a bug report: " + ex.getMessage());
-            return IssueCreation.failed(Bundle.message("bug.send.not.written", String.valueOf(ex.getMessage())));
+            return notWritten(ex);
         }
 
         try {
@@ -163,11 +162,19 @@ public final class GitHubCli {
                     .map(answer -> IssueCreation.of(answer, repository.host(), screenshots.size()))
                     .orElseGet(() -> IssueCreation.failed(Bundle.message("bug.reason.no.gh")));
         } catch (final IOException ex) {
-            Logger.warn("A bug report could not be written for gh: " + ex.getMessage());
-            return IssueCreation.failed(Bundle.message("bug.send.not.written", String.valueOf(ex.getMessage())));
+            return notWritten(ex);
         } finally {
             FileUtil.delete(folder.toFile());
         }
+    }
+
+    /**
+     * The body or a screenshot could not be written for {@code gh}, so nothing
+     * was sent.
+     */
+    private static @NotNull IssueCreation notWritten(final @NotNull IOException ex) {
+        Logger.warn("A bug report could not be written for gh: " + ex.getMessage());
+        return IssueCreation.failed(Bundle.message("bug.send.not.written", String.valueOf(ex.getMessage())));
     }
 
     /**

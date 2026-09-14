@@ -72,7 +72,7 @@ public enum FailureDetail {
      */
     BUG_ISSUE_URL(
             Bundle.message("failure.detail.bug.issue.link"),
-            item -> !item.getBugIssueUrl().isBlank(),
+            item -> item.bugIssue().isPresent(),
             item -> item.setBugIssueUrl("")
     );
 

@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,9 +49,7 @@ public final class BugIssueUrl {
      * hidden behind a reformatting.
      */
     public static @NotNull String reference(final @NotNull String bugIssueUrl) {
-        final @NotNull Matcher issue = ISSUE.matcher(bugIssueUrl.strip());
-
-        return issue.matches() ? issue.group(1) + "/" + issue.group(2) + "#" + issue.group(3) : bugIssueUrl;
+        return issue(bugIssueUrl).map(issue -> issue.group(1) + "/" + issue.group(2) + "#" + issue.group(3)).orElse(bugIssueUrl);
     }
 
     /**
@@ -59,9 +58,16 @@ public final class BugIssueUrl {
      * (#50, D10 revised). An address that is not an issue's reads as itself.
      */
     public static @NotNull String shortReference(final @NotNull String bugIssueUrl) {
-        final @NotNull Matcher issue = ISSUE.matcher(bugIssueUrl.strip());
+        return issue(bugIssueUrl).map(issue -> "#" + issue.group(3)).orElse(bugIssueUrl);
+    }
 
-        return issue.matches() ? "#" + issue.group(3) : bugIssueUrl;
+    /**
+     * The address read as an issue's - owner, repository, number - and empty
+     * when it is not one.
+     */
+    private static @NotNull Optional<MatchResult> issue(final @NotNull String bugIssueUrl) {
+        final @NotNull Matcher issue = ISSUE.matcher(bugIssueUrl.strip());
+        return issue.matches() ? Optional.of(issue.toMatchResult()) : Optional.empty();
     }
 
     /**

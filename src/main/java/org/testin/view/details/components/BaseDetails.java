@@ -17,13 +17,16 @@
 package org.testin.view.details.components;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.JBFont;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.FontSync;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public abstract class BaseDetails {
 
@@ -33,6 +36,21 @@ public abstract class BaseDetails {
 
     protected float getValueFontSize() {
         return FontSync.getBaseFontSize();
+    }
+
+    /**
+     * A link in the value's font.
+     * <p>
+     * Typed rather than inline: ActionLink also takes a Kotlin function of the
+     * same shape, and an untyped lambda matches both. Auto-hide is off, because
+     * ActionLink hides itself when disabled, and a link that cannot work is shown
+     * gray with its reason (#66, finding 150).
+     */
+    protected @NotNull ActionLink link(final @NotNull String text, final @NotNull ActionListener onClick) {
+        final @NotNull ActionLink link = new ActionLink(text, onClick);
+        link.setAutoHideOnDisable(false);
+        link.setFont(JBFont.label().deriveFont(getValueFontSize()));
+        return link;
     }
 
     public abstract int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow);

@@ -30,7 +30,6 @@ import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 /**
@@ -104,14 +103,9 @@ public final class StacktraceRow extends BaseDetails {
      * clicking whether the rest is two lines or eighty.
      */
     private @NotNull ActionLink showAllLink(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull String stacktrace, final int total) {
-        // Typed rather than inline: ActionLink also takes a Kotlin function of
-        // the same shape, and an untyped lambda matches both.
-        final @NotNull ActionListener onClick = event ->
-                new ErrorDetailsDialog(p, dto.getDescription(), item.getActualResult(), stacktrace).show();
+        final @NotNull ActionLink link = link(Bundle.message("view.stacktrace.show.all", String.valueOf(total)),
+                event -> new ErrorDetailsDialog(p, dto.getDescription(), item.getActualResult(), stacktrace).show());
 
-        final @NotNull ActionLink link = new ActionLink(Bundle.message("view.stacktrace.show.all", String.valueOf(total)), onClick);
-
-        link.setFont(JBFont.label().deriveFont(getValueFontSize()));
         link.setBorder(JBUI.Borders.emptyTop(LINK_MARGIN_TOP));
         link.setAlignmentX(Component.LEFT_ALIGNMENT);
         return link;

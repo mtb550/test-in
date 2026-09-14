@@ -19,7 +19,6 @@ package org.testin.view.details.components;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +39,6 @@ import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,22 +69,22 @@ public final class BugIssueRow extends BaseDetails {
      */
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        final @NotNull String bugIssueUrl = item.getBugIssueUrl();
-        if (item.getStatus() != TestStatus.FAILED && bugIssueUrl.isBlank()) return currentRow;
+        final @NotNull Optional<String> bugIssue = item.bugIssue();
+        if (item.getStatus() != TestStatus.FAILED && bugIssue.isEmpty()) return currentRow;
 
         final @NotNull TestRunDirectoryDto runDirectory = Services.getInstance(p, ProjectIndexer.class)
                 .getTestRunDirByPath(Services.getInstance(p, TestinRoot.class).resolve(currentPath));
         final @NotNull Optional<String> off = Services.getInstance(p, BugReports.class)
-                .whyReportBugIsOff(new BugReports.RunItem(runDirectory.getPath(), item.getId()), bugIssueUrl);
+                .whyReportBugIsOff(new BugReports.RunItem(runDirectory.getPath(), item.getId()), item);
 
         final @NotNull JBPanel<?> links = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         links.setOpaque(false);
 
-        if (!bugIssueUrl.isBlank()) {
-            final @NotNull ActionLink issue = link(BugIssueUrl.reference(bugIssueUrl), event -> BugIssueUrl.open(bugIssueUrl));
+        bugIssue.ifPresent(url -> {
+            final @NotNull ActionLink issue = link(BugIssueUrl.reference(url), event -> BugIssueUrl.open(url));
             issue.setBorder(JBUI.Borders.emptyRight(LINK_GAP));
             links.add(issue);
-        }
+        });
 
         final @NotNull ActionLink report = link(Bundle.message("bug.dialog.title"),
                 event -> ReportBug.start(p, runDirectory, item.getId(), dto, () -> redraw(p, dto, runDirectory)));
@@ -98,29 +96,11 @@ public final class BugIssueRow extends BaseDetails {
     }
 
     /**
-     * Typed rather than inline: ActionLink also takes a Kotlin function of the
-     * same shape, and an untyped lambda matches both.
-     * <p>
-     * Auto-hide off, because ActionLink hides itself when disabled by default,
-     * and a Report Bug that cannot work is shown gray with its reason
-     * (Rule-VIEW-PANEL-072; #66, finding 150).
-     */
-    private @NotNull ActionLink link(final @NotNull String text, final @NotNull ActionListener onClick) {
-        final @NotNull ActionLink link = new ActionLink(text, onClick);
-        link.setAutoHideOnDisable(false);
-        link.setFont(JBFont.label().deriveFont(getValueFontSize()));
-        return link;
-    }
-
-    /**
      * Every surface showing the run item: this panel, and the run editor whose
      * Bug Issue column changes when the link is stored.
      */
     private static void redraw(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto runDirectory) {
         ViewToolWindowFactory.refreshIfShowing(p, List.of(dto));
-        Services.getInstance(p, TestinEditors.class).editorFor(p, runDirectory)
-                .filter(RunEditor.class::isInstance)
-                .map(RunEditor.class::cast)
-                .ifPresent(RunEditor::refreshAfterStatusChange);
+        Services.getInstance(p, TestinEditors.class).runEditorFor(p, runDirectory).ifPresent(RunEditor::refreshAfterStatusChange);
     }
 }

@@ -224,15 +224,10 @@ public final class TestRunHtmlGenerator {
                         html.append("<div class='actual'>Actual result: ")
                                 .append(StringUtil.escapeXmlEntities(actual.isEmpty() ? "—" : actual));
 
-                        // The issue the failure was reported as, right after
-                        // what happened, and nothing when there is none (#50,
-                        // D5 and D10), as the PDF and the Word document do.
-                        final @NotNull String bugIssueUrl = item.getBugIssueUrl();
-                        if (!bugIssueUrl.isBlank()) {
-                            html.append(" (<a href='").append(StringUtil.escapeXmlEntities(bugIssueUrl)).append("' target='_blank'>")
-                                    .append(StringUtil.escapeXmlEntities(BugIssueUrl.shortReference(bugIssueUrl)))
-                                    .append("</a>)");
-                        }
+                        // The issue it was reported as, right after what happened (#50).
+                        item.bugIssue().ifPresent(url -> html.append(" (<a href='").append(StringUtil.escapeXmlEntities(url)).append("' target='_blank'>")
+                                .append(StringUtil.escapeXmlEntities(BugIssueUrl.shortReference(url)))
+                                .append("</a>)"));
                         html.append("</div>");
 
                         // No em dash for an absent one, unlike the actual

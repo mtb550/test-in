@@ -56,8 +56,12 @@ public final class BugTemplate {
      */
     static final @NotNull String NOT_AVAILABLE = "n\\a";
 
+    /**
+     * Between the values that share one cell or line of the report.
+     */
+    static final @NotNull String SEPARATOR = " · ";
+
     private static final @NotNull String RESOURCE = "bugReport.md";
-    private static final @NotNull String SEPARATOR = " · ";
 
     /**
      * A zero-width space, as an entity. Between {@code @} and a name, or

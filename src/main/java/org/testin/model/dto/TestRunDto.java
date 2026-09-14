@@ -37,6 +37,7 @@ import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -170,6 +171,14 @@ public class TestRunDto {
     @JsonIgnore
     public boolean isFullyJudged() {
         return !results.isEmpty() && results.stream().allMatch(TestRunItems::isJudged);
+    }
+
+    /**
+     * This run's result for one test case, whatever state it is in, and empty
+     * when the run does not cover the test case. Every lookup by id asks here.
+     */
+    public @NotNull Optional<TestRunItems> resultOf(final @NotNull UUID testCaseId) {
+        return results.stream().filter(item -> item.getId().equals(testCaseId)).findFirst();
     }
 
     /**

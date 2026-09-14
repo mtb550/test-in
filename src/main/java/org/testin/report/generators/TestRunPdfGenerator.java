@@ -74,7 +74,7 @@ public final class TestRunPdfGenerator {
     private final @NotNull DeviceRgb BORDER_GRAY = new DeviceRgb(0xD0, 0xD7, 0xE5);
     private final @NotNull DeviceRgb WHITE = new DeviceRgb(0xFF, 0xFF, 0xFF);
     private final @NotNull DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
-    private final @NotNull DeviceRgb LINK_BLUE = new DeviceRgb(0x00, 0x52, 0xCC);
+    private final @NotNull DeviceRgb LINK_BLUE = rgb(ReportText.LINK_BLUE);
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
     public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
@@ -357,14 +357,10 @@ public final class TestRunPdfGenerator {
                 final @NotNull Paragraph actual = new Paragraph(Bundle.message("report.actual.result", actualResult))
                         .setFont(regularFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY);
 
-                // The issue the failure was reported as, right after what
-                // happened, and nothing when there is none (#50, D5 and D10).
-                final @NotNull String bugIssueUrl = item.getBugIssueUrl();
-                if (!bugIssueUrl.isBlank()) {
-                    actual.add(new Text(" ("))
-                            .add(new Link(BugIssueUrl.shortReference(bugIssueUrl), PdfAction.createURI(bugIssueUrl)).setFontColor(LINK_BLUE))
-                            .add(new Text(")"));
-                }
+                // The issue it was reported as, right after what happened (#50).
+                item.bugIssue().ifPresent(url -> actual.add(new Text(" ("))
+                        .add(new Link(BugIssueUrl.shortReference(url), PdfAction.createURI(url)).setFontColor(LINK_BLUE))
+                        .add(new Text(")")));
                 testCaseCell.add(actual);
 
                 // Only when there is one. The actual result prints an em dash

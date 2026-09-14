@@ -144,6 +144,6 @@ public record Stacktrace(@NotNull List<Segment> segments) {
      * when there is no text at all.
      */
     public @NotNull String firstLine() {
-        return text().lines().filter(line -> !line.isBlank()).findFirst().orElse("").strip();
+        return text().lines().findFirst().orElse("").strip();
     }
 }

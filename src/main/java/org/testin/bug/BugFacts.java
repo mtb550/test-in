@@ -47,8 +47,6 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public record BugFacts(@NotNull String title, @NotNull BugSeverity severity, @NotNull BugPriority priority, @NotNull String platform, @NotNull String actualResult, @NotNull String expectedResult, @NotNull List<String> steps, @NotNull String testData, @NotNull Stacktrace stacktrace, @NotNull String testRun, @NotNull String executed, @NotNull String browser, @NotNull String device, @NotNull String language, @NotNull String commit, @NotNull UUID testCaseId, @NotNull String testSetName) {
 
-    private static final @NotNull String SEPARATOR = " · ";
-
     /**
      * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068.
      * <p>
@@ -63,14 +61,14 @@ public record BugFacts(@NotNull String title, @NotNull BugSeverity severity, @No
                 TestEditorAttributes.DESCRIPTION.displayValue(tc),
                 item.getBugSeverity(),
                 item.getBugPriority(),
-                ReportText.joined(SEPARATOR, TestRunConfiguration.PLATFORM.valueIn(run), TestRunConfiguration.COMPONENT.valueIn(run)),
+                ReportText.joined(BugTemplate.SEPARATOR, TestRunConfiguration.PLATFORM.valueIn(run), TestRunConfiguration.COMPONENT.valueIn(run)),
                 item.getActualResult(),
                 TestEditorAttributes.EXPECTED_RESULT.displayValue(tc),
                 tc.getSteps().stream().map(Display::format).toList(),
                 tc.getTestData(),
                 Stacktrace.of(item.getStacktrace()),
                 testRun,
-                ReportText.joined(SEPARATOR, item.getExecutedBy(), Display.formatDate(item.getExecutedAt())),
+                ReportText.joined(BugTemplate.SEPARATOR, item.getExecutedBy(), Display.formatDate(item.getExecutedAt())),
                 TestRunConfiguration.BROWSER.valueIn(run),
                 TestRunConfiguration.DEVICE_TYPE.valueIn(run),
                 TestRunConfiguration.LANGUAGE.valueIn(run),

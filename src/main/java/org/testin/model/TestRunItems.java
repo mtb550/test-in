@@ -131,6 +131,16 @@ public class TestRunItems {
     }
 
     /**
+     * The issue this failure was reported as, and empty when it was not (#28).
+     * <p>
+     * Every reader asks here - the Details tab, Report Bug and the four reports -
+     * so none of them decides for itself what an unset link looks like.
+     */
+    public @NotNull Optional<String> bugIssue() {
+        return bugIssueUrl.isBlank() ? Optional.empty() : Optional.of(bugIssueUrl);
+    }
+
+    /**
      * How long the case took, as the framework that ran it measured.
      * <p>
      * It overrides whatever the editor's own clock counted, because the two are

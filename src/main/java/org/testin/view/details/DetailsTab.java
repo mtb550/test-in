@@ -122,7 +122,7 @@ public class DetailsTab {
 
         return Services.getInstance(p, ProjectIndexer.class)
                 .findTestRun(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
-                .flatMap(run -> run.getResults().stream().filter(item -> item.getId().equals(dto.getId())).findFirst());
+                .flatMap(run -> run.resultOf(dto.getId()));
     }
 
     private void renderPlaceholder(final @NotNull JBPanel<?> panel) {

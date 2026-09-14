@@ -71,10 +71,7 @@ public final class ClonedFrom {
             final @NotNull GitRepositoryService git = new GitRepositoryService(p);
             if (git.isNotRepository(projectPath)) return;
 
-            final @NotNull String remote = git.getRemoteName(projectPath);
-            if (remote.isEmpty()) return;
-
-            final @NotNull String url = git.getRemoteUrl(projectPath, remote);
+            final @NotNull String url = git.remoteUrl(projectPath);
             if (url.isEmpty()) return;
 
             config.rememberRepoUrl(url);

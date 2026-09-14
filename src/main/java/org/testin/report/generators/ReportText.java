@@ -44,6 +44,13 @@ public final class ReportText {
      */
     public static final @NotNull String PLUGIN_URL = "https://plugins.jetbrains.com/plugin/31514-testin";
 
+    /**
+     * The blue a link is drawn in, as hex. The PDF, the Word document and the
+     * spreadsheet each draw their links in it, so a link looks the same in all
+     * three.
+     */
+    public static final @NotNull String LINK_BLUE = "0052CC";
+
     public static @NotNull String joined(final @NotNull String separator, final String @NotNull ... parts) {
         return Arrays.stream(parts)
                 .map(String::trim)

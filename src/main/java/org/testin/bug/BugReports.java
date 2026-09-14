@@ -76,18 +76,22 @@ public final class BugReports {
          * or it was removed from the run.
          */
         public @NotNull Optional<TestRunItems> in(final @NotNull TestRunDto testRun) {
-            return testRun.getResults().stream()
-                    .filter(result -> result.getId().equals(id))
-                    .filter(result -> !result.isRemoved())
-                    .findFirst();
+            return testRun.resultOf(id).filter(result -> !result.isRemoved());
         }
 
         /**
-         * This run item as the indexer holds it now, and empty unless it is
-         * still failed: only a failure is reported.
+         * This run item in that run, and empty unless it is still failed: only a
+         * failure is reported.
+         */
+        public @NotNull Optional<TestRunItems> failedIn(final @NotNull TestRunDto testRun) {
+            return in(testRun).filter(result -> result.getStatus() == TestStatus.FAILED);
+        }
+
+        /**
+         * The same, for the run as the indexer holds it now.
          */
         public @NotNull Optional<TestRunItems> stillFailed(final @NotNull ProjectIndexer indexer) {
-            return indexer.findTestRun(run).flatMap(this::in).filter(result -> result.getStatus() == TestStatus.FAILED);
+            return indexer.findTestRun(run).flatMap(this::failedIn);
         }
     }
 
@@ -101,11 +105,11 @@ public final class BugReports {
     private final @NotNull Map<RunItem, Edits> unsent = new HashMap<>();
 
     /**
-     * Claims the run item for a new report, and false when one is already on
-     * the way for it - a second click that arrived before the first was drawn.
+     * Claims the run item for a new report, once {@link #whyReportBugIsOff} has
+     * found nothing against it in the same click.
      */
-    boolean begin(final @NotNull RunItem item) {
-        return onTheWay.putIfAbsent(item, Stage.PREPARING) == null;
+    void begin(final @NotNull RunItem item) {
+        onTheWay.put(item, Stage.PREPARING);
     }
 
     void moveTo(final @NotNull RunItem item, final @NotNull Stage stage) {
@@ -116,9 +120,10 @@ public final class BugReports {
      * Lets the run item go, but only from the stage the caller was holding it
      * at: a preparation that ends after its dialog opened must not close the
      * dialog's claim, and a dialog that closes on Send must not end the send.
+     * True when it let go.
      */
-    void end(final @NotNull RunItem item, final @NotNull Stage stage) {
-        onTheWay.remove(item, stage);
+    boolean end(final @NotNull RunItem item, final @NotNull Stage stage) {
+        return onTheWay.remove(item, stage);
     }
 
     /**
@@ -153,11 +158,11 @@ public final class BugReports {
      * open. A signed-off run is not a reason: the issue link is the one change
      * it takes, because it moves no verdict (P23).
      */
-    public @NotNull Optional<String> whyReportBugIsOff(final @NotNull RunItem item, final @NotNull String bugIssueUrl) {
+    public @NotNull Optional<String> whyReportBugIsOff(final @NotNull RunItem item, final @NotNull TestRunItems result) {
         final @NotNull Optional<Stage> stage = Optional.ofNullable(onTheWay.get(item));
         if (stage.isPresent()) return stage.map(Stage::getReason);
 
-        if (!bugIssueUrl.isBlank()) return Optional.of(Bundle.message("bug.already.reported"));
+        if (result.bugIssue().isPresent()) return Optional.of(Bundle.message("bug.already.reported"));
         if (anotherIsOpen(item)) return Optional.of(Bundle.message("bug.finish.open.report"));
 
         return Optional.empty();

@@ -27,7 +27,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Work that runs off the EDT under the IDE's own progress bar.
@@ -76,18 +79,25 @@ public final class BackgroundWork {
     }
 
     /**
-     * The same, saying whether it can be canceled and what happens after it.
+     * The same, for work that answers something, saying whether it can be
+     * canceled and what happens after it.
      * <p>
-     * The two hooks are what lets work that holds something - a link disabled
-     * while its work runs - let go of it on every way out, a cancel and a failure
-     * included. Without them nothing ran after a canceled task at all (#28).
+     * The answer is handed to {@code onSuccess} here, so no caller keeps a holder
+     * of its own for it to cross from the task's thread to the EDT. The two hooks
+     * are what lets work that holds something - a link disabled while its work
+     * runs - let go of it on every way out, a cancel and a failure included (#28).
      *
      * @param cancellable false for work that must not stop half way
-     * @param onSuccess   on the EDT, once the work finished without failing and
-     *                    without being canceled
+     * @param onSuccess   on the EDT, with the answer, once the work finished
+     *                    without failing and without being canceled
      * @param onFinished  on the EDT, always, and after {@code onSuccess}
      */
-    public static void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final boolean cancellable, final @NotNull Consumer<@NotNull ProgressIndicator> work, final @NotNull Runnable onSuccess, final @NotNull Runnable onFinished) {
+    public static <T> void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final boolean cancellable, final @NotNull Function<@NotNull ProgressIndicator, @NotNull T> work, final @NotNull Consumer<@NotNull T> onSuccess, final @NotNull Runnable onFinished) {
+        final @NotNull AtomicReference<Optional<T>> answer = new AtomicReference<>(Optional.empty());
+        run(p, title, whatFailed, cancellable, indicator -> answer.set(Optional.of(work.apply(indicator))), () -> answer.get().ifPresent(onSuccess), onFinished);
+    }
+
+    private static void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final boolean cancellable, final @NotNull Consumer<@NotNull ProgressIndicator> work, final @NotNull Runnable onSuccess, final @NotNull Runnable onFinished) {
         ProgressManager.getInstance().run(new Task.Backgroundable(p, title, cancellable) {
 
             /**

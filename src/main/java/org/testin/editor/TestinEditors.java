@@ -25,10 +25,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.run.RunEditor;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -247,6 +249,13 @@ public final class TestinEditors {
             // the editor has read its cases or not.
             ViewToolWindowFactory.showPanel(p, List.of(tc), dir.getPath2());
         });
+    }
+
+    /**
+     * The run editor open on this run, and empty when nothing has it open.
+     */
+    public @NotNull Optional<RunEditor> runEditorFor(final @NotNull Project p, final @NotNull TestRunDirectoryDto run) {
+        return editorFor(p, run).filter(RunEditor.class::isInstance).map(RunEditor.class::cast);
     }
 
     /**
