@@ -96,7 +96,7 @@ folder is a skip with a message, never an error.
 message before anything had been asked of the folder, so a tester who opened the
 IDE to read test cases was told about automation they were not doing, on every
 open, forever - and nothing about it was fixable from where they were standing.
-The check bought nothing either: reading test data is gated on the Testin root,
+The check bought nothing either: reading test data is gated on the Testin folder,
 not on this one, and every generator already skips for itself
 ([#286](https://github.com/mtb550/test-in/issues/286)).
 

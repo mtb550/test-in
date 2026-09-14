@@ -33,7 +33,7 @@ they exercise.
 
 ## How the data is stored
 
-Everything Testin owns is plain files under the Testin root you configure:
+Everything Testin owns is plain files under the Testin folder you configure:
 
 | Marker | Node |
 |---|---|
@@ -62,9 +62,9 @@ and restart.
 
 Or install it from the listing: **[Testin on the JetBrains Marketplace](https://plugins.jetbrains.com/plugin/31514-testin)**.
 
-Then set the Testin root in **Settings → Tools → Testin** — the folder where
+Then set the Testin folder in **Settings → Tools → Testin** — the folder where
 your test cases will live — and create your first test project from the panel.
-Each test project under that root is its own Git repository, kept separate from
+Each test project in that folder is its own Git repository, kept separate from
 the automation project it tests, so test data and code have their own histories.
 Testin's settings are per-IDE, not per-project: the root you choose is the one
 every open project uses.

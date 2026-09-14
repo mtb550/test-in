@@ -142,7 +142,7 @@ goes stale the same week (#66, findings 61 and 77).
 |---|---|---|
 | `indexer/ProjectIndexer` | `editor/LastOpenEditors` | Indexing finishes, and the editors the tester had open are reopened. |
 | `indexer/Rescan` | `explorer/TreePanel`, `editor/TestinEditors` | A rescan has to tell the open surfaces that what they are showing has changed. The alternative is a listener the indexer publishes to, and the reason it has not been done is below this table. |
-| `setting/SettingsConfigurable` | `explorer/TreePanel` | Applying the settings page rebuilds the tree, because the Testin root it names is what the tree is built from. Not an action, so it is not the first shape above. |
+| `setting/SettingsConfigurable` | `explorer/TreePanel` | Applying the settings page rebuilds the tree, because the Testin folder it names is what the tree is built from. Not an action, so it is not the first shape above. |
 | `codegen/AutomationState` | `navigate/CodeNavigation` | Whether a case has automation behind it is answered by resolving the generated method, and resolving is what `navigate` knows how to do. |
 | `codegen/ExecutionPosition` | `testcase/TestCaseOrder` | The number a generated method carries is the case's place in its set, and the set's order is `testcase`'s answer. The third shape above, in one import. |
 | `actions/TestinData`, `actions/Declared` | `editor`, `model`, `util`, `logger` | Deliberate, and new with #119. A declared action is built by the platform with a no-arg constructor, so it asks the surface that has the keyboard what is selected - and a data key has to name the type it answers with. `actions` was a leaf until then, and typing the keys as `Object` to keep it one would be worse than the edge. |
@@ -217,7 +217,7 @@ What they have in common is that none of them read or write **test data**. They
 handle generated source, the automation repository's own `testin.yml`, the Git
 working tree, files outside the tree, generated report output, the IDE settings
 path, the log, and the temporary folder a bug report is sent from. `config` in particular reads a file that lives in the
-automation repository rather than under the Testin root, and it runs before the
+automation repository rather than under the Testin folder, and it runs before the
 indexer exists — it is what tells the indexer which project to index.
 
 `bug` joined the list with #28. It writes a bug report's body and screenshots

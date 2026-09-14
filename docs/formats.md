@@ -233,7 +233,7 @@ repository drives, so a clone needs no setup. `testin.yaml` is read too;
 | `testinProject` | string | yes | Which test project. Read for local, Git and SFTP alike |
 | `bugRepoUrl` | string | only to report bugs | The GitHub repository [Report Bug](viewPanel/reportBug.md) files issues in, as its address: `https://github.com/owner/repo`, `https://host/owner/repo.git`, `ssh://git@host:2222/owner/repo` or `git@host:owner/repo`. Any account and token in it are dropped as it is read. An address that does not name exactly a host, an owner and a repository - one ending in `/issues`, a file or a local path - is kept, and Report Bug refuses to send with the reason |
 
-**No machine and no person appears here.** The Testin root folder, the tester's
+**No machine and no person appears here.** The Testin folder, the tester's
 name, the log level and every password are application settings — see
 `CLAUDE.md`, and Decision-003 on [the decisions page](decisions.md) for why
 there is no third store. An unknown key is logged and skipped, never fatal.

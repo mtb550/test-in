@@ -91,13 +91,13 @@ public final class BoundTestProject {
     }
 
     /**
-     * Whether the named project is nowhere under the Testin root.
+     * Whether the named project is nowhere in the Testin folder.
      * <p>
      * The case the config file exists for: a machine that has the automation
      * repository and not the test data. Worth telling apart from every other
      * reason a binding does not resolve, because it is the one a clone fixes.
      *
-     * @param underRoot what is under the Testin root, by name - taken as an
+     * @param underRoot what is in the Testin folder, by name - taken as an
      *                  argument because it is a directory read, and the caller
      *                  that draws the panel needs the same listing for its own
      *                  decision

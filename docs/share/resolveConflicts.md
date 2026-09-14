@@ -85,7 +85,7 @@ or anything else is named in that same message and left as it is. Testin merges
 test cases field by field, and a test run's result is a list of verdicts per
 test case: merging one means asking about each of them, which is its own thing
 to design rather than a variation of the case merge. The tester settles those by
-hand, in files the IDE may not draw as conflicted, because a Testin root is not
+hand, in files the IDE may not draw as conflicted, because a Testin folder is not
 a version control root.
 
 **If the repository has no remote** — the rebase is carried to the end and the
