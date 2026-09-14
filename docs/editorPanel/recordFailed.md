@@ -39,8 +39,8 @@ form before it records anything.
 - **Rule-EDITOR-PANEL-143** — Failing is the one verdict that asks for detail.
   The dialog opens before the verdict is recorded.
 - **Rule-EDITOR-PANEL-144** — `Escape` in the dialog records nothing at all,
-  neither the detail nor the verdict, and asks first when there is something
-  typed to lose. A dialog opened and closed unchanged still goes at once.
+  neither the detail nor the verdict. The dialog closes at once, without asking,
+  even when something was typed.
 - **Rule-EDITOR-PANEL-145** — Nothing is written as the tester types. Only
   saving writes.
 - **Rule-EDITOR-PANEL-146** — The dialog opens for one test case. Several at
@@ -100,10 +100,9 @@ form before it records anything.
 
 ## What Testin refuses
 
-**If the tester presses `Escape`** — nothing at all is recorded, and the test
-case keeps whatever verdict it had. When something has been typed, Testin asks
-first before throwing it away. A dialog opened and closed unchanged goes at
-once.
+**If the tester presses `Escape`** — the dialog closes at once, without asking.
+Nothing at all is recorded, what was typed is gone, and the test case keeps
+whatever verdict it had.
 
 **If the test case was deleted from its test set** — a message reads *The test
 case was removed - the run keeps what it recorded.*

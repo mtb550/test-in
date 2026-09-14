@@ -170,7 +170,7 @@ While the create or update dialog is open.
 | `Up` `Down` | Moves through a list of choices |
 | `Space` | Selects the group under the cursor |
 | `Enter` | Saves |
-| `Escape` | Cancels, and asks first when something was typed |
+| `Escape` | Cancels |
 
 ## Inside the bulk editors
 

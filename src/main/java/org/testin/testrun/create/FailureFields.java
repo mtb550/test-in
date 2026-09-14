@@ -103,22 +103,6 @@ public final class FailureFields {
     }
 
     /**
-     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-144.
-     * <p>
-     * Whether the four say something other than what the run row already holds.
-     * <p>
-     * The mirror of {@link #applyTo}, and written next to it on purpose: a field
-     * added to one and forgotten in the other is a field the tester loses
-     * without being asked (#223).
-     */
-    public boolean changedFrom(final @NotNull TestRunItems runItem) {
-        return !actualResult.getComponent().getText().trim().equals(runItem.getActualResult().trim())
-                || severity.getComponent().getSelected() != BugSeverity.orDefault(runItem.getBugSeverity())
-                || priority.getComponent().getSelected() != BugPriority.orDefault(runItem.getBugPriority())
-                || !errorCapture.getComponent().getText().trim().equals(runItem.getStacktrace().trim());
-    }
-
-    /**
      * Where the tester starts typing.
      */
     public @NotNull TextInput firstField() {
