@@ -41,8 +41,8 @@ Testin asks first. The test case's file and its generated test method both go.
 - **Rule-EDITOR-PANEL-064** — Nothing is renumbered. The removed test case
   simply leaves a gap in the order, and the numbers on screen close up on their
   own.
-- **Rule-EDITOR-PANEL-065** — A test case that is waiting to be pasted is
-  removed without asking again, because the move was already agreed to.
+- **Rule-EDITOR-PANEL-065** — A test case that is waiting to be pasted is asked
+  about like any other, and removing it calls off the waiting cut.
 
 ## The screen
 

@@ -39,8 +39,8 @@ the **Cut Test Case** entry on the right-click menu. It has no key of its own.
   see what is waiting to move.
 - **Rule-EDITOR-PANEL-079** — Nothing is removed until the paste. A cut on its
   own changes nothing.
-- **Rule-EDITOR-PANEL-080** — A cut is called off by a paste, by a copy, and by
-  `Escape`.
+- **Rule-EDITOR-PANEL-080** — A cut is called off by a paste, by a copy, by
+  `Escape`, and by removing test cases.
 
 ## What the tester sees
 
