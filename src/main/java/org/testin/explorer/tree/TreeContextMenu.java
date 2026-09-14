@@ -32,7 +32,6 @@ import org.testin.testrun.SetTestRunStatusAction;
 import org.testin.undo.UndoAction;
 import org.testin.undo.UndoDirection;
 import org.testin.undo.UndoScope;
-import org.testin.services.OptionalPlugin;
 
 import java.util.List;
 
@@ -71,10 +70,10 @@ public class TreeContextMenu extends DefaultActionGroup {
                         Declared.forMenu("Testin.CutNode"),
                         Declared.forMenu("Testin.PasteNode"))));
 
-        if (OptionalPlugin.TESTNG.isAvailable()) {
-            addSeparator();
-            add(Declared.forMenu("Testin.RunTests"));
-        }
+        // Added in every IDE, and grayed with the reason when TestNG is missing,
+        // like every other entry that needs a plugin (#66, finding 142).
+        addSeparator();
+        add(Declared.forMenu("Testin.RunTests"));
 
         addSeparator();
 

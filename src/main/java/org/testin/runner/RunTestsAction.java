@@ -31,6 +31,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
+import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.editor.TestinEditors;
 
@@ -67,8 +68,11 @@ import java.util.Optional;
  */
 public class RunTestsAction extends DumbAwareAction {
 
+    // Rule-TREE-PANEL-079
     @Override
     public void update(final @NotNull AnActionEvent e) {
+        if (!OptionalPlugin.TESTNG.enableOrExplain(this, e.getPresentation())) return;
+
         e.getPresentation().setEnabled(runnable(e).isPresent() || selectedRun(e).isPresent());
     }
 

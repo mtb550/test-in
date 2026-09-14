@@ -56,7 +56,7 @@ Testin hands the test cases to the IDE's own test runner.
 - **Rule-TREE-PANEL-078** — A node with no test cases to run says so. It runs
   nothing.
 - **Rule-TREE-PANEL-079** — Running needs the TestNG plugin. Without it, the
-  item is not offered.
+  item stays on the menu, grayed, reading *(needs the TestNG plugin)*.
 - **Rule-TREE-PANEL-080** — **Run Tests** is offered on **Test Cases**, a test
   set package, a test set and a test run. It is not offered on the test project
   row, on **Test Runs**, or on a test run package.
@@ -115,7 +115,8 @@ again.*
 **If every test case under the node was already running** — nothing starts, and
 Testin says nothing at all.
 
-**If the TestNG plugin is not installed** — **Run Tests** is not in the menu.
+**If the TestNG plugin is not installed** — **Run Tests** is still in the menu,
+grayed, reading *(needs the TestNG plugin)*.
 
 ---
 
