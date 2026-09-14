@@ -260,6 +260,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         private @NotNull String placeholder = "";
         private @NotNull String value = "";
         private int rows = 5;
+        private boolean acceptsImages = false;
 
         public @NotNull TextAreaBuilder placeholder(final @NotNull String placeholder) {
             this.placeholder = placeholder;
@@ -279,8 +280,19 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             return this;
         }
 
+        /**
+         * Lets Ctrl+V with an image on the clipboard insert it as a base64 PNG
+         * data URI. Off unless asked for: only a failure's Error Capture keeps
+         * screenshots, and a box that took one anywhere else stored letters a
+         * report then printed (#66, finding 127).
+         */
+        public @NotNull TextAreaBuilder acceptsImages() {
+            this.acceptsImages = true;
+            return this;
+        }
+
         public @NotNull ComponentDialogBase<TextArea> build() {
-            return new ComponentDialogBase<>(new TextArea(placeholder, value, rows));
+            return new ComponentDialogBase<>(new TextArea(placeholder, value, rows, acceptsImages));
         }
     }
 

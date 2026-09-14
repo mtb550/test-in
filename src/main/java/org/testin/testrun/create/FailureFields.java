@@ -73,6 +73,7 @@ public final class FailureFields {
                 .placeholder(Bundle.message("dialog.failure.placeholder.error"))
                 .value(runItem.getStacktrace())
                 .rows(5)
+                .acceptsImages()
                 .build();
     }
 

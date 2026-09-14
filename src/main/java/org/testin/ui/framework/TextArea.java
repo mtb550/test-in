@@ -39,8 +39,9 @@ import java.util.Base64;
 import java.util.Objects;
 
 /**
- * A multi-line text area — for pasted content like an error, an exception, or
- * a screenshot (pasted images become a base64 PNG data-URI). Enter inserts a
+ * A multi-line text area — for pasted content like an error or an exception,
+ * and, where the dialog asks for it with {@code acceptsImages()}, a screenshot
+ * (a pasted image becomes a base64 PNG data-URI). Enter inserts a
  * newline (the dialog keys stay off this component), Tab moves the focus like
  * everywhere else, and it claims the dialog's remaining space.
  */
@@ -60,7 +61,7 @@ public final class TextArea implements DialogComponent {
     private final @NotNull JBTextArea area;
     private final @NotNull JBScrollPane panel;
 
-    TextArea(final @NotNull String placeholder, final @NotNull String value, final int rows) {
+    TextArea(final @NotNull String placeholder, final @NotNull String value, final int rows, final boolean acceptsImages) {
         area = new JBTextArea(value);
         area.setFont(JBFont.label().biggerOn(2f));
         area.setLineWrap(true);
@@ -83,7 +84,7 @@ public final class TextArea implements DialogComponent {
         // to it - so the image paste rested on a binding nothing here made.
         FrameworkTextField.bindClipboard(area);
 
-        installImagePaste();
+        if (acceptsImages) installImagePaste();
 
         panel = new JBScrollPane(area);
         panel.setBorder(JBUI.Borders.emptyTop(8));

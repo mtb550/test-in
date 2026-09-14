@@ -41,8 +41,9 @@ There is no key for this. The button's tooltip reads **Result Analysis**.
   each carrying its own count in the heading.
 - **Rule-EDITOR-PANEL-191** — A section left blank is not saved, and does not
   appear in the report.
-- **Rule-EDITOR-PANEL-192** — `Enter` in a box makes a new paragraph. **Save**
-  is a button.
+- **Rule-EDITOR-PANEL-192** — `Enter` in a box makes a new paragraph. A box
+  takes text only: a screenshot on the clipboard pastes nothing. **Save** is a
+  button.
 - **Rule-EDITOR-PANEL-193** — The analysis appears in the PDF, Word and web
   reports. The spreadsheet report leaves it out.
 
