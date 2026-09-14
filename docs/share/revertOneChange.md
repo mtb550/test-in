@@ -26,7 +26,8 @@ Right click the row in the review.
   be canceled: none of them leaves anything the tester cannot see.
 - **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
   keys can be changed there.
-- **Rule-SHARE-051** — Only a change to a test case's field can be put back.
+- **Rule-SHARE-051** — Only a change to a test case can be put back: one changed
+  field, a new test case, or a removed one.
 - **Rule-SHARE-052** — Only that one field is put back. Everything else on the
   test case stays as it is. When it was the test case's last change, who created
   and changed it goes back to what was committed too, so the test case leaves the
@@ -69,19 +70,26 @@ Right click the row in the review.
 case change can be reverted*.
 
 **If that kind of change cannot be put back** — a message reads *A change to*,
-then the kind, then *cannot be reverted*. A new file is one of those, and so is
-a removed file.
+then the kind, then *cannot be reverted*. A test case that changed with no field
+different - a **Change File** row reading *reordered or restamped* - is the one
+of those.
 
 **If the test case is no longer in the test project** — a message reads *That
 test case is no longer in the project*.
 
 **If the write fails** — a message titled **Revert Failed** carries the reason.
 
+## A new or removed test case
+
+Reverting a **Create Test Case** row removes that new test case. Reverting a
+**Remove Test Case** row puts the removed test case back as it was committed,
+with who created it and when.
+
 ## What cannot be put back this way
 
-A whole file. A new test case. A removed test case. A change to a test run, a
-marker, or anything Testin did not read as a test case. For those, use Git's
-own tools.
+A reordering or a restamp of a test case with no field changed. A change to a
+test run, a marker, or anything Testin did not read as a test case. For those,
+use Git's own tools.
 
 ---
 
