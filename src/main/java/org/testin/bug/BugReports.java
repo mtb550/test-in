@@ -146,6 +146,8 @@ public final class BugReports {
     }
 
     /**
+     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-072.
+     * <p>
      * Why Report Bug is off for this run item, and empty when it is on: its own
      * report on the way, the bug already reported, a run signed off, or another
      * run item's report open.

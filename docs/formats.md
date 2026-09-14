@@ -208,7 +208,7 @@ Each entry in `results`:
 | `stacktrace` | string | Empty unless the case failed |
 | `bugSeverity` | enum | `EMPTY` `BLOCKER` `MAJOR` `MINOR` `ENHANCEMENT` |
 | `bugPriority` | enum | `EMPTY` `HIGH` `MEDIUM` `LOW` |
-| `bugIssueUrl` | string | The GitHub issue the failure was reported as, written by Report Bug. Empty until then; cleared by a pass, kept by an automated failure |
+| `bugIssueUrl` | string | The GitHub issue the failure was reported as, written by [Report Bug](viewPanel/reportBug.md). Empty until then; cleared by a pass, kept by an automated failure |
 
 `EMPTY` is a real constant, not a missing value. A passed case carries
 `"bugSeverity" : "EMPTY"`, and nothing reading it has to test for absence.
@@ -231,7 +231,7 @@ repository drives, so a clone needs no setup. `testin.yaml` is read too;
 | `sftpPort` | integer | no, defaults `22` | |
 | `sftpPath` | string | only for `sftp` | The folder on the server holding the projects |
 | `testinProject` | string | yes | Which test project. Read for local, Git and SFTP alike |
-| `bugRepoUrl` | string | only to report bugs | The GitHub repository Report Bug files issues in, as its address: `https://github.com/owner/repo`, `https://host/owner/repo.git`, `ssh://git@host:2222/owner/repo` or `git@host:owner/repo`. Any account and token in it are dropped as it is read. An address that does not name exactly a host, an owner and a repository - one ending in `/issues`, a file or a local path - is kept, and Report Bug refuses to send with the reason |
+| `bugRepoUrl` | string | only to report bugs | The GitHub repository [Report Bug](viewPanel/reportBug.md) files issues in, as its address: `https://github.com/owner/repo`, `https://host/owner/repo.git`, `ssh://git@host:2222/owner/repo` or `git@host:owner/repo`. Any account and token in it are dropped as it is read. An address that does not name exactly a host, an owner and a repository - one ending in `/issues`, a file or a local path - is kept, and Report Bug refuses to send with the reason |
 
 **No machine and no person appears here.** The Testin root folder, the tester's
 name, the log level and every password are application settings — see

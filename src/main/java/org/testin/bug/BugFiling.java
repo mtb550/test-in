@@ -49,6 +49,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class BugFiling {
 
     /**
+     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-073, Rule-VIEW-PANEL-077.
+     * <p>
      * Sends it. What to redraw once the answer is recorded is the caller's to
      * say, because the surfaces showing the run item are the caller's to know.
      */
@@ -89,6 +91,8 @@ public final class BugFiling {
     }
 
     /**
+     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-074.
+     * <p>
      * Writes the issue's address on the run item, and says why not when it
      * cannot: the run was renamed or removed, or the run item is gone or no
      * longer failed.

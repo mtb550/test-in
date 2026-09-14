@@ -118,6 +118,8 @@ final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
     }
 
     /**
+     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-071.
+     * <p>
      * Why Send will not send, as the tester types: what preparing found, and
      * what GitHub will not take.
      */
@@ -136,6 +138,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
                 : Optional.of(Bundle.message("bug.no.longer.failed"));
     }
 
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-069, Rule-VIEW-PANEL-070
     @Override
     protected void submit() {
         if (sent) return;
@@ -152,6 +155,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
         });
     }
 
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-070
     @Override
     protected boolean holdsUnsavedInput() {
         return !titleField.getComponent().getText().equals(bug.facts().title()) || !bodyArea.getComponent().getText().equals(bug.body());

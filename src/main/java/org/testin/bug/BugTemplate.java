@@ -77,6 +77,8 @@ public final class BugTemplate {
     private static final @NotNull String TEMPLATE = load();
 
     /**
+     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068, Rule-VIEW-PANEL-076.
+     * <p>
      * The issue's body, from the facts and the link to the test case's file,
      * which is left out when it could not be built.
      */

@@ -61,7 +61,7 @@ public final class BugIssueRow extends BaseDetails {
     private final @NotNull List<String> currentPath;
 
     /**
-     * UC-VIEW-PANEL-005, Rule-VIEW-PANEL-031.
+     * UC-VIEW-PANEL-005, UC-VIEW-PANEL-016, Rule-VIEW-PANEL-031, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075.
      * <p>
      * Drawn for a failed run item, which can be reported, and for any run item
      * that has been - a link, once there, stays until a pass clears it. Report

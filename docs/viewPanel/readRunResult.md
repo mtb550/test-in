@@ -84,7 +84,7 @@ The run rows sit under the badges and above the test case's own rows.
 | **Stacktrace** | The first three lines of the error, and a link to the rest |
 | **Bug Severity** | **Blocker**, **Major**, **Minor** or **Enhancement** |
 | **Bug Priority** | **High**, **Medium** or **Low** |
-| **Bug Issue** | The GitHub issue the failure was reported as, as `owner/repo#123`, and the **Report Bug** link that files one. Drawn for a failed test case, and for any test case that has been reported |
+| **Bug Issue** | The GitHub issue the failure was reported as, as `owner/repo#123`, and the **Report Bug** link that files one. That is [UC-VIEW-PANEL-016](reportBug.md). Drawn for a failed test case, and for any test case that has been reported |
 
 ## Main flow
 

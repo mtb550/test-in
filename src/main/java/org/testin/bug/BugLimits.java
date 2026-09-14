@@ -38,6 +38,8 @@ public final class BugLimits {
     static final int SCREENSHOTS = 50;
 
     /**
+     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-071.
+     * <p>
      * Why this would be refused, and empty when it would not. Counted in the
      * string's own characters, which is never fewer than GitHub counts.
      */

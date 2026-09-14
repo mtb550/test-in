@@ -44,6 +44,8 @@ import java.util.stream.StreamSupport;
 public final class TestCaseLink {
 
     /**
+     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068.
+     * <p>
      * The link, read off Git, and empty when it cannot be built: no Git plugin,
      * a test project folder that is not its repository's root, no remote, no
      * branch, or a remote that does not name a host, an owner and a repository.

@@ -102,6 +102,8 @@ public final class GitHubCli {
     }
 
     /**
+     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-071, Rule-VIEW-PANEL-078.
+     * <p>
      * Why a bug cannot be sent, stopping at the first thing that fails, and
      * empty when it can: {@code bugRepoUrl} missing or not a repository address,
      * no {@code gh}, a {@code gh} too old to attach files, not signed in to the
@@ -132,6 +134,8 @@ public final class GitHubCli {
     }
 
     /**
+     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-073, Rule-VIEW-PANEL-076.
+     * <p>
      * Files the issue with the title and body the tester left, the screenshots
      * attached.
      * <p>

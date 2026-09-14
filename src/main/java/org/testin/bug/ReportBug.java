@@ -48,6 +48,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class ReportBug {
 
     /**
+     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-067.
+     * <p>
      * On the EDT, at the click. Nothing starts when Report Bug is off for the
      * run item or it is no longer failed. What to redraw as the report moves on
      * is the caller's to say.

@@ -10,7 +10,7 @@ it.
 |---|---|
 | **Part of Testin** | The view panel |
 | **Answers** | What the panel shows, how a test case gets into it, and what a tester can do from it |
-| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-015`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-065` |
+| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-016`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-078` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -39,6 +39,7 @@ it.
 | **UC-VIEW-PANEL-013** | [Stop a test case from the panel](stopFromPanel.md) | Stop a run that is taking too long. |
 | **UC-VIEW-PANEL-014** | [Go to the automation code](goToCode.md) | Read or change the code behind the test case. |
 | **UC-VIEW-PANEL-015** | [Close the panel](closePanel.md) | Give the editor the whole width of the screen. |
+| **UC-VIEW-PANEL-016** | [Report a failed test case as a bug](reportBug.md) | File the failure on GitHub without retyping it, and never twice. |
 
 ---
 
