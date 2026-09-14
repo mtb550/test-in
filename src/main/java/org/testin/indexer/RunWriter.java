@@ -69,24 +69,45 @@ final class RunWriter {
             AppExecutorUtil.createBoundedApplicationPoolExecutor("Testin Run Status Writer", 1);
 
     /**
-     * The run's results, and the index entry that says the run exists.
+     * A new run's results, and the index entry that says the run exists.
      * <p>
      * <b>The cache is written here, the file there.</b> The registration used to
      * sit inside the queued task, so the worker mutated the index on its own
      * thread, outside any order the caller could see - and a caller that created
      * a run and read it back on the next line was racing the queue for it.
+     */
+    void create(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
+        store.registerTestRun(runPath, tr);
+        write(runPath, tr);
+    }
+
+    /**
+     * An existing run's results.
      * <p>
-     * <b>A run that has gone is not written back.</b> Between the submit and the
-     * execution the tester can delete the run, and the queued task would then
-     * put the entry back into the cache and recreate {@code run.json} with its
-     * parent directories: a run folder on disk with no marker, and a cache entry
-     * for a run nobody can see. So the write asks whether the run is still
-     * indexed, which is the one question that separates a pending write from a
-     * resurrection (#66, finding 86).
+     * <b>A run that has gone is not written back.</b> Only {@link #create} puts a
+     * run into the index. This used to register whatever it was handed first, so
+     * a write for a run a sync or a delete had just taken away - a verdict, a
+     * grid edit, an editor closing - put it back and wrote its file again (#66,
+     * finding 143).
      */
     void persist(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
-        store.registerTestRun(runPath, tr);
+        if (store.findTestRun(runPath).isEmpty()) {
+            Logger.info("Test run no longer indexed, so it was not written back: " + runPath.getFileName());
+            return;
+        }
 
+        store.registerTestRun(runPath, tr);
+        write(runPath, tr);
+    }
+
+    /**
+     * Between the submit and the execution the tester can delete the run, and
+     * the queued task would then recreate {@code run.json} with its parent
+     * directories: a run folder on disk with no marker. So the write asks again
+     * whether the run is still indexed, which is the one question that separates
+     * a pending write from a resurrection (#66, finding 86).
+     */
+    private void write(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
         snapshot(tr, "test run data").ifPresent(bytes -> queue.execute(() -> {
             try {
                 if (store.findTestRun(runPath).isEmpty()) {

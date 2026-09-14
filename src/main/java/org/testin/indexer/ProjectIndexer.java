@@ -616,12 +616,12 @@ public final class ProjectIndexer {
      * found their analysis gone after the next reload.
      * <p>
      * The registration stays immediate. Creating a run needs the index to know
-     * about it on the next line, and only the disk write belongs in the queue -
-     * which {@link RunWriter#persist} now does for every caller, so this one is
-     * the plain write it always read as.
+     * about it on the next line, and only the disk write belongs in the queue.
+     * This is the one door that puts a run into the index: {@link #persistRun}
+     * refuses a run that is not there (#66, finding 143).
      */
     public void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
-        persistRun(testRunPath, tr);
+        runWriter.create(testRunPath, tr);
     }
 
     /**
