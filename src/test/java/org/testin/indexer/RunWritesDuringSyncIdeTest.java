@@ -16,6 +16,7 @@
 
 package org.testin.indexer;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.testin.model.DirectoryType;
@@ -26,10 +27,19 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * UC-SHARE-019.
@@ -47,6 +57,17 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
      * the queue is still working through them when the incoming file arrives.
      */
     private static final int QUEUED = 200;
+
+    /**
+     * The run's results file, by the path a server names it with.
+     */
+    private static final String RESULTS = DirectoryType.TRD.getFolderName() + "/Cycle 1/" + TestRunDirectoryDto.resultsFile(Path.of("")).getFileName();
+
+    /**
+     * How many other files the server dropped, deleted after the run's own - the
+     * time a write held until the run's file is gone has to land in.
+     */
+    private static final int DROPPED = 200;
 
     private Path root;
 
@@ -108,8 +129,7 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
         final TestRunDto older = run("written here before the sync");
         for (int i = 0; i < QUEUED; i++) indexer().putTestRun(runPath, older);
 
-        final String relative = DirectoryType.TRD.getFolderName() + "/Cycle 1/" + TestRunDirectoryDto.resultsFile(Path.of("")).getFileName();
-        indexer().acceptIncoming(tp.getPath(), Map.of(relative, bytesOf(run("arrived from the server"))));
+        indexer().acceptIncoming(tp.getPath(), Map.of(RESULTS, bytesOf(run("arrived from the server"))));
 
         final Path file = TestRunDirectoryDto.resultsFile(runPath);
         try {
@@ -124,6 +144,92 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
             throw new AssertionError("interrupted while the queue drained", ex);
         } catch (final java.io.IOException ex) {
             throw new AssertionError("the run's results file is not there", ex);
+        }
+    }
+
+    /**
+     * Rule-SHARE-003.
+     * <p>
+     * A run the server no longer holds stays off disk once the sync removes it.
+     * The removal deleted the file straight away while a write for the same run
+     * was still queued, and that write then put the run back (#66, finding 130).
+     * <p>
+     * The window is narrow: the scan after the removal drops the run, and a
+     * write that starts after that writes nothing. So the writer is held on a
+     * latch and let go at the one moment that matters - once the file is gone,
+     * or once the run has left the index, whichever the removal does first -
+     * while the sync is still deleting everything else the server dropped.
+     */
+    public void testARemovedRunIsNotWrittenBackByAWriteQueuedBeforeIt() {
+        final TestProjectDirectoryDto tp = testProject();
+        final Path runPath = tp.getTestRunsDirectory().getPath().resolve("Cycle 1");
+        final Path file = TestRunDirectoryDto.resultsFile(runPath);
+
+        indexer().putTestRun(runPath, run("written here before the sync"));
+        // Lands the write and reads the project, so the run is on disk and indexed.
+        indexer().acceptIncoming(tp.getPath(), Map.of());
+
+        final List<String> dropped = new ArrayList<>(List.of(RESULTS));
+        try {
+            for (int i = 0; i < DROPPED; i++) {
+                final String note = "notes/note " + i + ".txt";
+                Files.createDirectories(tp.getPath().resolve(note).getParent());
+                Files.writeString(tp.getPath().resolve(note), "dropped by the server");
+                dropped.add(note);
+            }
+        } catch (final java.io.IOException ex) {
+            throw new AssertionError("could not write the files the server dropped", ex);
+        }
+
+        final CountDownLatch held = new CountDownLatch(1);
+        writerQueue().execute(() -> awaitQuietly(held));
+        indexer().putTestRun(runPath, run("written here before the sync"));
+
+        final Future<?> release = ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final long giveUpAt = System.currentTimeMillis() + 10_000;
+            while (Files.exists(file) && indexer().findTestRun(runPath).isPresent() && System.currentTimeMillis() < giveUpAt) {
+                Thread.onSpinWait();
+            }
+            held.countDown();
+        });
+
+        indexer().removeIncoming(tp.getPath(), dropped);
+
+        try {
+            release.get(15, TimeUnit.SECONDS);
+            // Lets anything still queued land before the file is looked for.
+            indexer().acceptIncoming(tp.getPath(), Map.of());
+
+            assertFalse("a write queued before the sync put the removed run back on disk", Files.exists(file));
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError("interrupted while the writer was held", ex);
+        } catch (final ExecutionException | TimeoutException ex) {
+            throw new AssertionError("the writer was never let go", ex);
+        }
+    }
+
+    /**
+     * The run writer's queue, reached by reflection because nothing outside the
+     * writer submits to it - and this test needs to hold it at one moment.
+     */
+    private ExecutorService writerQueue() {
+        try {
+            final Field writer = ProjectIndexer.class.getDeclaredField("runWriter");
+            writer.setAccessible(true);
+            final Field queue = RunWriter.class.getDeclaredField("queue");
+            queue.setAccessible(true);
+            return (ExecutorService) queue.get(writer.get(indexer()));
+        } catch (final ReflectiveOperationException ex) {
+            throw new AssertionError("the run writer's queue is not where this test looks for it", ex);
+        }
+    }
+
+    private static void awaitQuietly(final CountDownLatch latch) {
+        try {
+            latch.await(15, TimeUnit.SECONDS);
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
         }
     }
 }

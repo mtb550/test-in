@@ -801,6 +801,10 @@ public final class ProjectIndexer {
     public void removeIncoming(final @NotNull Path projectPath, final @NotNull Collection<String> relatives) {
         syncFiles.remove(projectPath, relatives);
 
+        // A run's files were removed through the run writer's queue; the scan
+        // reads the project once they are gone (#66, finding 130).
+        runWriter.awaitQueued();
+
         scanSingleProject(projectPath);
     }
 
