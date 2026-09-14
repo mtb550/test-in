@@ -203,8 +203,10 @@ lookup rather than a disk hit.
   never touches disk.
 
 Test runs in particular are saved and read only through the indexer —
-`putTestRun`, `persistRun`, `persistRunMarker`, `addTestRunDir`,
-`updateRunMarker`. The sequential run writer lives inside it.
+`putTestRun` to create one, `changeRun` and `saveRun` to change one,
+`persistRunMarker`, `addTestRunDir`, `updateRunMarker`. The sequential run
+writer lives inside it, and a change to a run waits while a sync brings the
+run's project in.
 
 The rule is enforced by the compiler rather than by review: `TestDataFiles` and
 `VfsExecutor` are package-private and live in `indexer`, so nothing outside the

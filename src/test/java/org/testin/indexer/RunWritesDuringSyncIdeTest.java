@@ -24,6 +24,7 @@ import org.testin.model.DirectoryType;
 import org.testin.model.Failure;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunItems;
+import org.testin.model.TestRunStatus;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -328,6 +329,57 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
 
             assertEquals("the verdict put the older run back over the one that arrived", "arrived from the server", onDisk.getResultAnalysis().get(ResultAnalysis.PASSED));
             assertEquals("the verdict recorded before the files arrived was lost", TestStatus.FAILED, onDisk.getResults().getFirst().getStatus());
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError("interrupted while the sync ran", ex);
+        } finally {
+            planned.countDown();
+        }
+    }
+
+    /**
+     * Rule-SHARE-003.
+     * <p>
+     * A run completed while a sync is bringing it in closes the run that arrived.
+     * Completing wrote the run it held straight away, so the file that arrived
+     * then brought its pending test cases back (#66, finding 152).
+     */
+    public void testARunCompletedDuringASyncClosesTheRunThatArrived() {
+        final TestProjectDirectoryDto tp = testProject();
+        final Path runPath = tp.getTestRunsDirectory().getPath().resolve("Cycle 1");
+        final UUID caseId = UUID.randomUUID();
+
+        indexer().persistRunMarker(runPath, new TestRunMarker());
+        indexer().putTestRun(runPath, run("written here before the sync", caseId));
+        // Lands both writes and reads the project, so the run is on disk and indexed.
+        indexer().acceptIncoming(tp.getPath(), Map.of());
+
+        final CountDownLatch started = new CountDownLatch(1);
+        final CountDownLatch planned = new CountDownLatch(1);
+        final Thread sync = new Thread(() -> indexer().whileSyncing(tp.getPath(), () -> {
+            started.countDown();
+            awaitQuietly(planned);
+            indexer().acceptIncoming(tp.getPath(), Map.of(RESULTS, bytesOf(run("arrived from the server", caseId))));
+            return true;
+        }), "sync under test");
+        sync.start();
+
+        try {
+            assertTrue("the sync never started", started.await(10, TimeUnit.SECONDS));
+
+            Services.getInstance(getProject(), RunStatusService.class).persistMarker(getProject(), runPath, TestRunStatus.COMPLETED);
+
+            planned.countDown();
+            sync.join(15_000);
+            // A held change is applied on the EDT, which this test runs on.
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+            // Lets the change's write land.
+            indexer().acceptIncoming(tp.getPath(), Map.of());
+
+            final TestRunDto onDisk = Services.getInstance(getProject(), Mapper.class).readValue(TestRunDirectoryDto.resultsFile(runPath).toFile(), TestRunDto.class);
+
+            assertEquals("completing put the older run back over the one that arrived", "arrived from the server", onDisk.getResultAnalysis().get(ResultAnalysis.PASSED));
+            assertEquals("the run that arrived was not closed: its pending test case is still pending", TestStatus.UNTESTED, onDisk.getResults().getFirst().getStatus());
         } catch (final InterruptedException ex) {
             Thread.currentThread().interrupt();
             throw new AssertionError("interrupted while the sync ran", ex);

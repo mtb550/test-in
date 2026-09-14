@@ -45,6 +45,7 @@ import org.testin.util.Display;
 
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -69,12 +70,16 @@ public final class RunStatusService {
 
         final @NotNull TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
         final @NotNull Optional<TestRunItems> item = editor.runItem(currentTc.getId());
-        item.ifPresent(runItem ->
-                runItem.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName));
+
+        // As a change on the run the indexer holds, so a verdict given while a
+        // sync brings the run in waits for it and lands on the run that arrived
+        // (#66, finding 152).
+        final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
+        Services.getInstance(p, ProjectIndexer.class).changeRun(editor.getParent().getPath(),
+                run -> run.resultOf(currentTc.getId()).ifPresent(runItem -> runItem.recordVerdict(status, tester)));
 
         Logger.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
 
-        persistRun(p, editor);
         triggerFilterRefresh(editor);
 
         // Only when a verdict was actually recorded: a missing run item leaves
@@ -276,27 +281,28 @@ public final class RunStatusService {
                 if (executeManual(p, editor, tc, status, Duration.ZERO, Failure.NONE)) confirmVerdict(p, status, 1);
             }
         } else {
-            int recorded = 0;
+            final @NotNull List<UUID> judged = new ArrayList<>();
 
             for (final TestCaseDto tc : selectedItems) {
-                final @NotNull Optional<TestRunItems> found = editor.runItem(tc.getId())
-                        .filter(item -> !item.isRemoved());
+                if (editor.runItem(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) continue;
 
-                if (found.isPresent()) {
-                    found.get().recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
-                    recorded++;
+                judged.add(tc.getId());
 
-                    final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
-                    if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
-                        editor.stopExecution();
-                    }
+                final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
+                if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
+                    editor.stopExecution();
                 }
             }
 
-            persistRun(p, editor);
+            // One change on the run the indexer holds, so verdicts given while a
+            // sync brings the run in wait for it and land on the run that arrived
+            // (#66, finding 152).
+            final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
+            Services.getInstance(p, ProjectIndexer.class).changeRun(editor.getParent().getPath(), run -> judged.forEach(id ->
+                    run.resultOf(id).filter(item -> !item.isRemoved()).ifPresent(item -> item.recordVerdict(status, tester))));
             triggerFilterRefresh(editor);
 
-            confirmVerdict(p, status, recorded);
+            confirmVerdict(p, status, judged.size());
         }
 
         // Whichever way the last verdict arrived. Only a walk reaching its end
@@ -323,13 +329,16 @@ public final class RunStatusService {
     }
 
     /**
-     * Persistence goes through the indexer — the single owner of file access
-     * (see CLAUDE.md). The indexer snapshots on this thread and writes through
-     * its sequential run writer.
+     * Writes what an open editor changed on its run - a stamp, a duration ticked
+     * so far - through the indexer, the single owner of file access.
+     * <p>
+     * The editor's run is the object the index holds, so its change is already on
+     * the run that is written. Written straight from the editor, a save made
+     * while a sync was bringing the run in put the editor's run, the one from
+     * before the sync, back over the run that arrived (#66, finding 152).
      */
     public void persistRun(final @NotNull Project p, final @NotNull RunEditor editor) {
-        editor.run().ifPresent(tr ->
-                Services.getInstance(p, ProjectIndexer.class).persistRun(editor.getParent().getPath(), tr));
+        Services.getInstance(p, ProjectIndexer.class).saveRun(editor.getParent().getPath());
     }
 
     /**
@@ -377,21 +386,22 @@ public final class RunStatusService {
      * the report's Executed By line. When the run closed is on the run's own marker.
      */
     private void finishRun(final @NotNull Project p, final @NotNull Path runPath) {
-        final @NotNull TestRunDto tr = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(runPath);
-
-        int closed = 0;
-        for (final TestRunItems item : tr.getResults()) {
-            if (item.getStatus() == TestStatus.PENDING) {
-                item.setStatus(TestStatus.UNTESTED);
-                closed++;
+        // As a change on the run the indexer holds, so a run completed while a
+        // sync brings it in closes the run that arrived (#66, finding 152).
+        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, tr -> {
+            int closed = 0;
+            for (final TestRunItems item : tr.getResults()) {
+                if (item.getStatus() == TestStatus.PENDING) {
+                    item.setStatus(TestStatus.UNTESTED);
+                    closed++;
+                }
             }
-        }
 
-        tr.markExecutionEnded();
-        Services.getInstance(p, ProjectIndexer.class).persistRun(runPath, tr);
+            tr.markExecutionEnded();
 
-        if (closed > 0)
-            Logger.info("Run finished with " + closed + " case(s) not executed; marked untested: " + runPath);
+            if (closed > 0)
+                Logger.info("Run finished with " + closed + " case(s) not executed; marked untested: " + runPath);
+        });
     }
 
     /**

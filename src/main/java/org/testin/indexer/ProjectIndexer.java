@@ -558,8 +558,13 @@ public final class ProjectIndexer {
      * The run's results, written by the one writer that owns the file - see
      * {@link RunWriter} for why there is only one and why the snapshot is taken
      * here rather than there.
+     * <p>
+     * Private: every write of an existing run goes through {@link #changeRun} or
+     * {@link #saveRun}, which a sync can hold. Written from outside, a run an
+     * editor held put the run from before a sync back over the one that arrived
+     * (#66, finding 152).
      */
-    public void persistRun(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
+    private void persistRun(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
         runWriter.persist(runPath, tr);
     }
 
@@ -605,6 +610,16 @@ public final class ProjectIndexer {
         }
 
         apply.run();
+    }
+
+    /**
+     * Writes a run as the index holds it, under the same hold as
+     * {@link #changeRun}: for a caller whose change is already on that run, such
+     * as an open editor's execution stamps (#66, finding 152).
+     */
+    public void saveRun(final @NotNull Path runPath) {
+        changeRun(runPath, run -> {
+        });
     }
 
     /**

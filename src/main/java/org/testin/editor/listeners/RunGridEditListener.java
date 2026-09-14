@@ -19,6 +19,7 @@ package org.testin.editor.listeners;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.testrun.RunStatusService;
 import org.testin.model.TestRunItems;
@@ -83,7 +84,8 @@ public class RunGridEditListener extends AbstractGridEditListener {
             return GridEdit.REFUSED;
         }
 
-        attr.getRunValueSetter().execute(item, String.valueOf(model.getValueAt(row, col)));
+        final @NotNull String typed = String.valueOf(model.getValueAt(row, col));
+        attr.getRunValueSetter().execute(item, typed);
         final @NotNull String after = attr.getRunValueExtractor().execute(item, p);
 
         // Written back whatever happened: the value the run now holds is what the
@@ -92,7 +94,11 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
         if (Objects.equals(before, after)) return GridEdit.UNCHANGED;
 
-        Services.getInstance(p, RunStatusService.class).persistRun(p, editor);
+        // As a change on the run the indexer holds, so an edit made while a sync
+        // brings the run in waits for it and lands on the run that arrived (#66,
+        // finding 152).
+        Services.getInstance(p, ProjectIndexer.class).changeRun(editor.getParent().getPath(),
+                run -> run.resultOf(onThisRow.getId()).ifPresent(result -> attr.getRunValueSetter().execute(result, typed)));
         onEdited.run();
 
         return GridEdit.WROTE;
