@@ -27,6 +27,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import com.intellij.openapi.util.text.StringUtil;
+import org.testin.model.BugIssueUrl;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.ResultAnalysis;
@@ -221,8 +222,18 @@ public final class TestRunHtmlGenerator {
                         // in a strip. The PDF puts it in the same cell.
                         final @NotNull String actual = item.getActualResult();
                         html.append("<div class='actual'>Actual result: ")
-                                .append(StringUtil.escapeXmlEntities(actual.isEmpty() ? "—" : actual))
-                                .append("</div>");
+                                .append(StringUtil.escapeXmlEntities(actual.isEmpty() ? "—" : actual));
+
+                        // The issue the failure was reported as, right after
+                        // what happened, and nothing when there is none (#50,
+                        // D5 and D10), as the PDF and the Word document do.
+                        final @NotNull String bugIssueUrl = item.getBugIssueUrl();
+                        if (!bugIssueUrl.isBlank()) {
+                            html.append(" (<a href='").append(StringUtil.escapeXmlEntities(bugIssueUrl)).append("' target='_blank'>")
+                                    .append(StringUtil.escapeXmlEntities(BugIssueUrl.shortReference(bugIssueUrl)))
+                                    .append("</a>)");
+                        }
+                        html.append("</div>");
 
                         // No em dash for an absent one, unlike the actual
                         // result above it. A missing sentence is worth saying;

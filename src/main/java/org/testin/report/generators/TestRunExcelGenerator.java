@@ -19,9 +19,11 @@ package org.testin.report.generators;
 import org.testin.model.TestRunConfiguration;
 import org.testin.testrun.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
+import org.dhatim.fastexcel.HyperLink;
 import org.dhatim.fastexcel.Workbook;
 import org.dhatim.fastexcel.Worksheet;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.BugIssueUrl;
 import org.testin.model.TestRunSummary;
 import org.testin.logger.Logger;
 import org.testin.model.TestStatus;
@@ -104,8 +106,9 @@ public final class TestRunExcelGenerator {
             ws.value(row, 6, RunEditorAttributes.DURATION.getName());
             ws.value(row, 7, RunEditorAttributes.EXPECTED_RESULT.getName());
             ws.value(row, 8, RunEditorAttributes.STACKTRACE.getName());
+            ws.value(row, 9, RunEditorAttributes.BUG_ISSUE.getName());
 
-            ws.range(row, 0, row, 8).style().bold().fillColor("E0E0E0").set();
+            ws.range(row, 0, row, 9).style().bold().fillColor("E0E0E0").set();
 
             row++;
             for (final var result : tr.getResults()) {
@@ -140,6 +143,14 @@ public final class TestRunExcelGenerator {
                 ws.value(row, 8, result.getStacktrace());
                 ws.style(row, 8).wrapText(true).set();
 
+                // Its own column, and empty when the run item was not
+                // reported (#50, D5 and D9).
+                final @NotNull String bugIssueUrl = result.getBugIssueUrl();
+                if (!bugIssueUrl.isBlank()) {
+                    ws.hyperlink(row, 9, HyperLink.external(bugIssueUrl, BugIssueUrl.shortReference(bugIssueUrl)));
+                    ws.style(row, 9).fontColor("0052CC").underlined().set();
+                }
+
                 row++;
             }
 
@@ -152,6 +163,7 @@ public final class TestRunExcelGenerator {
             ws.width(6, 15); // Duration
             ws.width(7, 40); // Expected Result
             ws.width(8, 60); // Stacktrace
+            ws.width(9, 15); // Bug Issue
 
 
             wb.finish();

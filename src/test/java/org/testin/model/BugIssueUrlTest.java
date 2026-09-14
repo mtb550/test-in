@@ -34,6 +34,13 @@ public class BugIssueUrlTest {
     }
 
     @Test
+    public void anIssueReadsAsItsNumberWhereRoomIsShort() {
+        assertEquals(BugIssueUrl.shortReference("https://github.com/mtb550/test-01/issues/12"), "#12");
+        assertEquals(BugIssueUrl.shortReference(""), "", "no link is no text");
+        assertEquals(BugIssueUrl.shortReference("https://github.com/mtb550/product/pull/5"), "https://github.com/mtb550/product/pull/5");
+    }
+
+    @Test
     public void somethingElseReadsAsItself() {
         assertEquals(BugIssueUrl.reference(""), "", "no link is no text");
         assertEquals(BugIssueUrl.reference("https://github.com/mtb550/product/pull/5"), "https://github.com/mtb550/product/pull/5");

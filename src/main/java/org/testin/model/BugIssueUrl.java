@@ -54,6 +54,17 @@ public final class BugIssueUrl {
     }
 
     /**
+     * {@code #123}, how GitHub writes a reference inside one repository. Short
+     * enough to sit right after a sentence, which is where the PDF report puts it
+     * (#50, D10 revised). An address that is not an issue's reads as itself.
+     */
+    public static @NotNull String shortReference(final @NotNull String bugIssueUrl) {
+        final @NotNull Matcher issue = ISSUE.matcher(bugIssueUrl.strip());
+
+        return issue.matches() ? "#" + issue.group(3) : bugIssueUrl;
+    }
+
+    /**
      * The first issue address in some text - what {@code gh issue create}
      * printed - and empty when there is none.
      */

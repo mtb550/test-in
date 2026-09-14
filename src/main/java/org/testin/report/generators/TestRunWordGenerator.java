@@ -27,6 +27,7 @@ import org.testin.model.TestRunSummary;
 import org.testin.report.ReportTile;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.testin.logger.Logger;
+import org.testin.model.BugIssueUrl;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.ResultAnalysis;
@@ -301,11 +302,18 @@ public final class TestRunWordGenerator {
                 String actualResult = item.getActualResult();
                 if (actualResult.isEmpty()) actualResult = "—";
                 XWPFParagraph ap = tcCell.addParagraph();
-                XWPFRun arun = ap.createRun();
-                arun.setText(Bundle.message("report.actual.result", actualResult));
-                arun.setFontSize(ReportFont.SMALL.ptRounded());
-                arun.setFontFamily("Calibri");
-                arun.setColor(DARK_GRAY);
+                detailRun(ap.createRun(), Bundle.message("report.actual.result", actualResult), DARK_GRAY);
+
+                // The issue the failure was reported as, right after what
+                // happened, and nothing when there is none (#50, D5 and D10).
+                final @NotNull String bugIssueUrl = item.getBugIssueUrl();
+                if (!bugIssueUrl.isBlank()) {
+                    detailRun(ap.createRun(), " (", DARK_GRAY);
+                    final @NotNull XWPFHyperlinkRun issue = ap.createHyperlinkRun(bugIssueUrl);
+                    detailRun(issue, BugIssueUrl.shortReference(bugIssueUrl), LINK_BLUE);
+                    issue.setUnderline(UnderlinePatterns.SINGLE);
+                    detailRun(ap.createRun(), ")", DARK_GRAY);
+                }
 
                 // Only when there is one, and monospaced: a stacktrace read in
                 // a proportional font loses the indentation that makes it
@@ -532,6 +540,17 @@ public final class TestRunWordGenerator {
     private void footerRun(final @NotNull XWPFRun run, final @NotNull String text, final @NotNull String color) {
         run.setText(text);
         run.setFontSize(ReportFont.CAPTION.ptRounded());
+        run.setFontFamily("Calibri");
+        run.setColor(color);
+    }
+
+    /**
+     * A run in a failed test case's detail line: the actual result, and the
+     * issue it was reported as after it.
+     */
+    private void detailRun(final @NotNull XWPFRun run, final @NotNull String text, final @NotNull String color) {
+        run.setText(text);
+        run.setFontSize(ReportFont.SMALL.ptRounded());
         run.setFontFamily("Calibri");
         run.setColor(color);
     }

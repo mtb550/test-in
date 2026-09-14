@@ -41,6 +41,7 @@ import org.testin.model.markers.DetailRow;
 import org.testin.model.TestRunSummary;
 import org.testin.report.ReportTile;
 import org.testin.logger.Logger;
+import org.testin.model.BugIssueUrl;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.ResultAnalysis;
@@ -353,8 +354,18 @@ public final class TestRunPdfGenerator {
             if (withFailureDetail) {
                 String actualResult = item.getActualResult();
                 if (actualResult.isEmpty()) actualResult = "—";
-                testCaseCell.add(new Paragraph(Bundle.message("report.actual.result", actualResult))
-                        .setFont(regularFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY));
+                final @NotNull Paragraph actual = new Paragraph(Bundle.message("report.actual.result", actualResult))
+                        .setFont(regularFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY);
+
+                // The issue the failure was reported as, right after what
+                // happened, and nothing when there is none (#50, D5 and D10).
+                final @NotNull String bugIssueUrl = item.getBugIssueUrl();
+                if (!bugIssueUrl.isBlank()) {
+                    actual.add(new Text(" ("))
+                            .add(new Link(BugIssueUrl.shortReference(bugIssueUrl), PdfAction.createURI(bugIssueUrl)).setFontColor(LINK_BLUE))
+                            .add(new Text(")"));
+                }
+                testCaseCell.add(actual);
 
                 // Only when there is one. The actual result prints an em dash
                 // for absent because a failure with nothing written about it is

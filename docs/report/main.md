@@ -99,11 +99,18 @@ The failed table is the only one with more than two columns. It also carries the
 bug priority and the bug severity, and under each test case the actual result
 and the whole error.
 
+A test case reported as a bug shows its issue right after the actual result, as
+*(#12)*. Clicking it opens the issue. A test case with no issue shows nothing
+there. (UC-VIEW-PANEL-016)
+
 ## What the spreadsheet report contains
 
 One sheet, named *Test Run Report*. The test run's name, the platform and the
 status on the first three rows, the same figures on rows five and six, then a
 header row and one row for each test case.
+
+The last column, **Bug Issue**, holds the issue a test case was reported as, as
+*#12*. Clicking it opens the issue. It is empty for a test case with no issue.
 
 It carries **no overview, no result analysis and none of the per-verdict
 tables**. A tester who wants the whole report should not choose this format.
