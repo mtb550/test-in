@@ -40,14 +40,12 @@ import java.util.function.Consumer;
  */
 public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
 
-    private final @NotNull TestRunItems runItem;
     private final @NotNull Consumer<FailureFields> onSave;
     private final @NotNull FailureFields fields;
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-143
     public FailedResultDialog(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull Consumer<FailureFields> onSave) {
         super(p);
-        this.runItem = runItem;
         this.onSave = onSave;
 
         // The case is wired lazily by the run editor; a run item whose test case
@@ -78,17 +76,6 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
         shortcuts = List.of(
                 StatusBarShortcut.save(this::submit),
                 StatusBarShortcut.cancel(this::closeCancel));
-    }
-
-    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-144
-    @Override
-    protected boolean holdsUnsavedInput() {
-        return fields.changedFrom(runItem);
-    }
-
-    @Override
-    protected @NotNull String unsavedInputMessage() {
-        return Bundle.message("dialog.failed.result.unsaved");
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145

@@ -29,7 +29,6 @@ import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.model.StatusBarItem;
 import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -84,8 +83,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
      * <p>
      * <b>False by default, and that is the important half.</b> A dialog holding
      * something the tester typed - a name, a commit message, a bulk edit - must
-     * not lose it to a stray click on the editor behind it; Escape cancels, and
-     * it asks first when there is something to lose.
+     * not lose it to a stray click on the editor behind it; Escape cancels.
      * <p>
      * True for a dialog that holds nothing and is only asked a question: the
      * search is looked at and left, and a tester who clicks somewhere else has
@@ -247,41 +245,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
 
     // UC-INTERNAL-007, Rule-INTERNAL-059
     protected final void closeCancel() {
-        if (!holdsUnsavedInput()) {
-            getPopup().cancel();
-            return;
-        }
-
-        new ConfirmDialog(p, Bundle.message("dialog.discard.title"), unsavedInputMessage(), "", "", Bundle.message("dialog.discard.confirm"),
-                () -> getPopup().cancel()).show();
-    }
-
-    /**
-     * UC-INTERNAL-007, Rule-INTERNAL-059.
-     * <p>
-     * Whether this dialog is holding something the tester typed that closing
-     * would throw away.
-     * <p>
-     * False for a dialog that shows rather than collects, and for one whose
-     * fields are still exactly as they opened - so Escape stays instant
-     * everywhere it costs nothing, and only asks where there is something to
-     * lose (#223).
-     * <p>
-     * Asked here rather than by each dialog wiring its own Escape, so every
-     * dialog built on the framework gets the question the moment it can answer
-     * it, and none of them can word the asking differently.
-     */
-    protected boolean holdsUnsavedInput() {
-        return false;
-    }
-
-    /**
-     * What is about to go, named in the tester's own words rather than in
-     * fields. Overridden beside {@link #holdsUnsavedInput}, because a dialog
-     * that knows it has something to lose is the only thing that knows what.
-     */
-    protected @NotNull String unsavedInputMessage() {
-        return Bundle.message("dialog.discard.message");
+        getPopup().cancel();
     }
 
     protected final @NotNull JBPopup getPopup() {

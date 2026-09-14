@@ -28,8 +28,8 @@ and which keys it answers, and the shell builds the rest.
   the dialog opens, so the tester can type straight away.
 - **Rule-INTERNAL-058** — `Tab` moves to the next field in the order the fields
   are drawn, and `Shift+Tab` back to the one before.
-- **Rule-INTERNAL-059** — `Escape` closes the dialog and saves nothing. When
-  something typed would be lost, it asks first, and says what is about to go.
+- **Rule-INTERNAL-059** — `Escape` closes the dialog at once and saves nothing.
+  It never asks first, even when something was typed.
 - **Rule-INTERNAL-060** — A field's own way of saying yes does what the dialog's
   confirming key does. Clicking a row in a list, or pressing the dialog's
   button, is the same as pressing `Enter`.
@@ -98,12 +98,9 @@ holds, and what its keys mean, is on the page for that dialog.
 
 ## What Testin refuses
 
-**If the tester presses `Escape` with nothing typed** — the dialog closes at
-once and nothing is saved.
-
-**If the tester presses `Escape` after typing something** — Testin asks first,
-in a dialog headed **Discard what you typed?**, and says what is about to go.
-Answering **Discard** closes it; answering nothing leaves it open.
+**If the tester presses `Escape`** — the dialog closes at once and nothing is
+saved. Testin does not ask first, even when something was typed, and what was
+typed is gone.
 
 **If a dialog is written with two meanings for one key** — it does not open, and
 the plugin says which key. A key that silently replaced another is the failure
