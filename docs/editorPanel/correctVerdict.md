@@ -96,7 +96,7 @@ So is anything that clearing it removed.
 
 ## Where the plugin breaks its own rules
 
-**The warning is only on this path.** An automated pass clears the same four
+**The warning is only on this path.** An automated pass clears the same five
 fields with no dialog at all. That is difference 26 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
 

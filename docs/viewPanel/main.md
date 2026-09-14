@@ -107,6 +107,7 @@ in front of them while they write down what actually happened.
 │                       Show all 42 lines                                    │
 │   Bug Severity        Blocker                                              │
 │   Bug Priority        High                                                 │
+│   Bug Issue           Report Bug                                           │
 │                                                                            │
 │   Expected Result:    The dashboard opens.                                 │
 │   Steps:              1- Open the login page.                              │

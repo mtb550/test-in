@@ -38,8 +38,8 @@ run.
   and a report on the same test run can never disagree.
 - **Rule-VIEW-PANEL-031** — A run row with nothing in it is not drawn.
 - **Rule-VIEW-PANEL-032** — Recording a pass clears the actual result, the
-  stacktrace, the bug severity, the bug priority and the bug issue link. Four of
-  the six rows go with it.
+  stacktrace, the bug severity, the bug priority and the bug issue link. Five of
+  the seven rows go with it.
 - **Rule-VIEW-PANEL-033** — A test case the test run has not reached yet reads
   **Pending**.
 
@@ -60,13 +60,14 @@ The run rows sit under the badges and above the test case's own rows.
 │                       Show all 42 lines                                  │
 │   Bug Severity        Blocker                                            │
 │   Bug Priority        High                                               │
+│   Bug Issue           Report Bug                                         │
 │                                                                          │
 │   Expected Result:    The dashboard opens.                               │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
 1. **The badges** — the last badge is the verdict.
-2. **The six run rows** — what one test run recorded. Their captions have no
+2. **The seven run rows** — what one test run recorded. Their captions have no
    colon after them.
 3. **Show all 42 lines** — opens the whole error in a window. That is
    [UC-VIEW-PANEL-006](readStacktrace.md).
@@ -83,13 +84,14 @@ The run rows sit under the badges and above the test case's own rows.
 | **Stacktrace** | The first three lines of the error, and a link to the rest |
 | **Bug Severity** | **Blocker**, **Major**, **Minor** or **Enhancement** |
 | **Bug Priority** | **High**, **Medium** or **Low** |
+| **Bug Issue** | The GitHub issue the failure was reported as, as `owner/repo#123`, and the **Report Bug** link that files one. Drawn for a failed test case, and for any test case that has been reported |
 
 ## Main flow
 
 1. The tester opens a test run and selects a test case in it.
 2. The tester presses `Enter`.
 3. Testin looks for that test case in that test run's recorded results.
-4. The six run rows are drawn above the test case's own rows.
+4. The seven run rows are drawn above the test case's own rows.
 5. Below them, the test case's own fields are drawn as usual.
 
 ## What Testin refuses
@@ -101,9 +103,9 @@ are drawn. There is no test run to read from.
 test case is drawn on its own. It then looks like a test case nobody has run.
 That is question 3 on [the view panel page](main.md#not-decided).
 
-**If the test case passed** — four rows were cleared when the pass was
-recorded: the actual result, the stacktrace, the bug severity and the bug
-priority. Only **Run Status** and **Duration** are left.
+**If the test case passed** — five rows were cleared when the pass was
+recorded: the actual result, the stacktrace, the bug severity, the bug priority
+and the bug issue link. Only **Run Status** and **Duration** are left.
 
 **If nothing was timed** — the **Duration** row disappears. A verdict recorded
 from the menu, or on several test cases at once, is never timed.

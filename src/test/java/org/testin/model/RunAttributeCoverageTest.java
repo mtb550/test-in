@@ -76,9 +76,10 @@ public class RunAttributeCoverageTest {
                 RunEditorAttributes.ACTUAL_RESULT,
                 RunEditorAttributes.STACKTRACE,
                 RunEditorAttributes.BUG_SEVERITY,
-                RunEditorAttributes.BUG_PRIORITY);
+                RunEditorAttributes.BUG_PRIORITY,
+                RunEditorAttributes.BUG_ISSUE);
 
-        assertEquals(shown.size(), 6, "the rows DetailsTab appends for a case viewed under a run");
-        assertEquals(shown.stream().distinct().count(), 6L, "each drawn once");
+        assertEquals(shown.size(), 7, "the rows DetailsTab appends for a case viewed under a run");
+        assertEquals(shown.stream().distinct().count(), 7L, "each drawn once");
     }
 }

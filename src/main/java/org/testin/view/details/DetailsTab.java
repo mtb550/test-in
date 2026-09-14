@@ -39,6 +39,7 @@ import org.testin.view.details.components.ActionIcons;
 import org.testin.view.details.components.AttributeRow;
 import org.testin.view.details.components.BadgeRow;
 import org.testin.view.details.components.BaseDetails;
+import org.testin.view.details.components.BugIssueRow;
 import org.testin.view.details.components.Id;
 import org.testin.view.details.components.NavigationBar;
 import org.testin.view.details.components.RunAttributeRow;
@@ -156,15 +157,15 @@ public class DetailsTab {
                         new Title(),
                         new ActionIcons(),
                         new BadgeRow()),
-                runItem.stream().flatMap(DetailsTab::runRows),
+                runItem.stream().flatMap(item -> runRows(item, currentPath)),
                 caseRows()
         ).flatMap(rows -> rows).toList();
     }
 
     /**
      * What one execution of this case recorded, in the order a tester asks it:
-     * the verdict, how long it took, what actually happened, why, and how bad
-     * the bug is.
+     * the verdict, how long it took, what actually happened, why, how bad the
+     * bug is, and the issue it was reported as.
      * <p>
      * Above the case's own attributes, because a tester who opened this panel
      * during a run came for these. Below the badges, because the case still has
@@ -172,17 +173,18 @@ public class DetailsTab {
      * <p>
      * Present only when the case is being viewed under a run - opened from a run
      * editor rather than from the test editor or a search result. A case nobody
-     * has run has no verdict and no duration, and six rows saying so with a dash
-     * are six lines read on every case to learn nothing.
+     * has run has no verdict and no duration, and seven rows saying so with a
+     * dash are seven lines read on every case to learn nothing.
      */
-    private static @NotNull Stream<BaseDetails> runRows(final @NotNull TestRunItems item) {
+    private static @NotNull Stream<BaseDetails> runRows(final @NotNull TestRunItems item, final @NotNull List<String> currentPath) {
         return Stream.of(
                 new RunAttributeRow(RunEditorAttributes.RUN_STATUS, item),
                 new RunAttributeRow(RunEditorAttributes.DURATION, item),
                 new RunAttributeRow(RunEditorAttributes.ACTUAL_RESULT, item),
                 new StacktraceRow(item),
                 new RunAttributeRow(RunEditorAttributes.BUG_SEVERITY, item),
-                new RunAttributeRow(RunEditorAttributes.BUG_PRIORITY, item));
+                new RunAttributeRow(RunEditorAttributes.BUG_PRIORITY, item),
+                new BugIssueRow(item, currentPath));
     }
 
     /**
