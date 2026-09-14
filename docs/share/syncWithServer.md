@@ -84,7 +84,10 @@ The account is asked for when this machine cannot prove who it is.
 5. The account is stored on this machine at once.
 6. A background task named *Syncing with*, then the server, starts.
 7. Testin sends what is newer here and takes what is newer there.
-8. A message titled **Synced** says what was sent, taken and merged.
+8. A verdict or a failure detail the tester records meanwhile shows at once. It
+   is written when the sync has read back what it brought, onto the test run as
+   it arrived.
+9. A message titled **Synced** says what was sent, taken and merged.
 
 ## What Testin refuses
 

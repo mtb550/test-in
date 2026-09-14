@@ -250,7 +250,10 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
         final CountDownLatch held = new CountDownLatch(1);
         writerQueue().execute(() -> awaitQuietly(held));
 
-        final Thread sync = new Thread(() -> indexer().acceptIncoming(tp.getPath(), Map.of(RESULTS, bytesOf(run("arrived from the server", caseId)))), "sync under test");
+        final Thread sync = new Thread(() -> indexer().whileSyncing(tp.getPath(), () -> {
+            indexer().acceptIncoming(tp.getPath(), Map.of(RESULTS, bytesOf(run("arrived from the server", caseId))));
+            return true;
+        }), "sync under test");
         sync.start();
 
         try {
@@ -274,6 +277,62 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
             throw new AssertionError("interrupted while the sync ran", ex);
         } finally {
             held.countDown();
+        }
+    }
+
+    /**
+     * Rule-SHARE-003.
+     * <p>
+     * A verdict recorded after a sync has started, before its files are
+     * accepted, is shown at once and lands on the run that arrived. The hold
+     * started only when the files were accepted, so the verdict was written
+     * straight away and the incoming file then replaced it (#66, finding 144);
+     * and a held verdict showed nothing until the sync's refresh (#66, finding
+     * 146).
+     */
+    public void testAVerdictRecordedBeforeTheFilesArriveIsShownAtOnceAndLandsOnTheRunThatArrived() {
+        final TestProjectDirectoryDto tp = testProject();
+        final Path runPath = tp.getTestRunsDirectory().getPath().resolve("Cycle 1");
+        final UUID caseId = UUID.randomUUID();
+
+        indexer().persistRunMarker(runPath, new TestRunMarker());
+        indexer().putTestRun(runPath, run("written here before the sync", caseId));
+        // Lands both writes and reads the project, so the run is on disk and indexed.
+        indexer().acceptIncoming(tp.getPath(), Map.of());
+
+        final CountDownLatch started = new CountDownLatch(1);
+        final CountDownLatch planned = new CountDownLatch(1);
+        final Thread sync = new Thread(() -> indexer().whileSyncing(tp.getPath(), () -> {
+            started.countDown();
+            awaitQuietly(planned);
+            indexer().acceptIncoming(tp.getPath(), Map.of(RESULTS, bytesOf(run("arrived from the server", caseId))));
+            return true;
+        }), "sync under test");
+        sync.start();
+
+        try {
+            assertTrue("the sync never started", started.await(10, TimeUnit.SECONDS));
+
+            Services.getInstance(getProject(), RunStatusService.class).recordVerdict(getProject(), runPath, caseId, TestStatus.FAILED, Duration.ZERO, Failure.NONE);
+            assertEquals("a verdict held by the sync is not shown on the run the index holds", TestStatus.FAILED,
+                    indexer().findTestRun(runPath).orElseThrow().getResults().getFirst().getStatus());
+
+            planned.countDown();
+            sync.join(15_000);
+            // A held verdict is applied on the EDT, which this test runs on.
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+            // Lets the verdict's write land.
+            indexer().acceptIncoming(tp.getPath(), Map.of());
+
+            final TestRunDto onDisk = Services.getInstance(getProject(), Mapper.class).readValue(TestRunDirectoryDto.resultsFile(runPath).toFile(), TestRunDto.class);
+
+            assertEquals("the verdict put the older run back over the one that arrived", "arrived from the server", onDisk.getResultAnalysis().get(ResultAnalysis.PASSED));
+            assertEquals("the verdict recorded before the files arrived was lost", TestStatus.FAILED, onDisk.getResults().getFirst().getStatus());
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError("interrupted while the sync ran", ex);
+        } finally {
+            planned.countDown();
         }
     }
 

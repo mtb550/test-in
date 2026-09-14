@@ -199,19 +199,23 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                             return;
                         }
 
-                        final @NotNull SftpSync.Outcome outcome = SftpSync.run(
-                                p, projectRoot, address, account.user(), auth, knownHosts(), indicator);
+                        // A run change made from before the sync reads this project
+                        // until after its last scan waits for it, and lands on the
+                        // runs that arrived (#66, findings 129 and 144).
+                        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                        final @NotNull SftpSync.Outcome outcome = indexer.whileSyncing(projectRoot, () -> {
+                            final @NotNull SftpSync.Outcome synced = SftpSync.run(
+                                    p, projectRoot, address, account.user(), auth, knownHosts(), indicator);
 
-                        // Nothing moved and nothing to reread: somebody else is
-                        // syncing this project, and the tester is told who.
-                        if (outcome.isBlocked()) {
-                            report(outcome, projectRoot, address, account, auth);
-                            return;
-                        }
-
-                        indicator.setText(Bundle.message("sftp.progress.rereading"));
-                        Services.getInstance(p, ProjectIndexer.class).refreshDirectory(projectRoot);
-                        Services.getInstance(p, ProjectIndexer.class).scanSingleProject(projectRoot);
+                            // Nothing moved and nothing to reread: somebody else is
+                            // syncing this project, and the tester is told who.
+                            if (!synced.isBlocked()) {
+                                indicator.setText(Bundle.message("sftp.progress.rereading"));
+                                indexer.refreshDirectory(projectRoot);
+                                indexer.scanSingleProject(projectRoot);
+                            }
+                            return synced;
+                        });
 
                         report(outcome, projectRoot, address, account, auth);
                     } catch (final Exception ex) {
@@ -419,7 +423,11 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                     // the same six questions on the next sync with no
                     // explanation. A connection that drops half way down the
                     // list is the same lie with a smaller number behind it.
-                    final int settled = SftpSync.finish(p, projectRoot, address, account.user(), auth, knownHosts(), answered);
+                    //
+                    // Under the same hold as the sync, since settling writes the
+                    // answers into this project too (#66, finding 144).
+                    final int settled = Services.getInstance(p, ProjectIndexer.class).whileSyncing(projectRoot,
+                            () -> SftpSync.finish(p, projectRoot, address, account.user(), auth, knownHosts(), answered));
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         Services.getInstance(p, TreePanel.class).getProjectTree().refresh();

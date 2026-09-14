@@ -52,6 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -568,13 +569,18 @@ public final class ProjectIndexer {
      * Changes a run as the index holds it when the change is applied, and writes
      * it.
      * <p>
-     * <b>Held while a sync is bringing files into the run's test project.</b>
-     * Between the incoming files landing and the scan that reads them, the index
-     * still holds the run as it was - so a verdict recorded then was applied to
-     * the older run, and its write put that run back over the one that had just
-     * arrived (#66, finding 129). Held, the change waits for the scan and is
-     * applied to the run that arrived, on the EDT, where a verdict is recorded.
-     * A run the sync took away is not there to change, and the log says so.
+     * <b>Held while a sync of the run's test project is under way</b> - see
+     * {@link #whileSyncing}. Until the sync has read back what it brought, the
+     * index still holds the run as it was, so a change written then put the older
+     * run back over the one that arrived (#66, findings 129 and 144). Held, the
+     * change is applied to the run that arrived once the sync lets go, on the
+     * EDT, where a verdict is recorded. A run the sync took away is not there to
+     * change, and the log says so.
+     * <p>
+     * <b>And shown at once.</b> Meanwhile the change is applied, without being
+     * written, to the run the index holds now, so the grid and the panels show
+     * what the tester just recorded rather than nothing until the sync's refresh
+     * (#66, finding 146). It records the same thing when it is applied again.
      */
     public void changeRun(final @NotNull Path runPath, final @NotNull Consumer<TestRunDto> change) {
         final @NotNull Runnable apply = () -> findTestRun(runPath).ifPresentOrElse(run -> {
@@ -582,16 +588,20 @@ public final class ProjectIndexer {
             persistRun(runPath, run);
         }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
 
+        final boolean held;
         synchronized (heldForSync) {
-            final @NotNull Optional<List<Runnable>> held = heldForSync.entrySet().stream()
+            final @NotNull Optional<List<Runnable>> waiting = heldForSync.entrySet().stream()
                     .filter(entry -> runPath.startsWith(entry.getKey()))
                     .map(Map.Entry::getValue)
                     .findFirst();
 
-            if (held.isPresent()) {
-                held.orElseThrow().add(apply);
-                return;
-            }
+            waiting.ifPresent(changes -> changes.add(apply));
+            held = waiting.isPresent();
+        }
+
+        if (held) {
+            findTestRun(runPath).ifPresent(change);
+            return;
         }
 
         apply.run();
@@ -840,8 +850,39 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-SHARE-019, Rule-SHARE-003.
+     * <p>
+     * Runs one sync of a test project with every change to its runs held, and
+     * applies what was held once the sync is over.
+     * <p>
+     * From before the sync reads the project's files until after its last scan.
+     * The hold started only when the incoming files were accepted, so a verdict
+     * recorded while the sync was still planning or moving files was written at
+     * once, and the file that arrived then replaced it (#66, finding 144). What
+     * was held is applied on the EDT, where a verdict is recorded, ahead of
+     * anything the caller redraws once this returns.
+     */
+    public <T> @NotNull T whileSyncing(final @NotNull Path projectPath, final @NotNull Supplier<@NotNull T> sync) {
+        synchronized (heldForSync) {
+            heldForSync.putIfAbsent(projectPath, new ArrayList<>());
+        }
+
+        try {
+            return sync.get();
+        } finally {
+            final @NotNull List<Runnable> held;
+            synchronized (heldForSync) {
+                held = Optional.ofNullable(heldForSync.remove(projectPath)).orElse(List.of());
+            }
+
+            if (!held.isEmpty()) ApplicationManager.getApplication().invokeLater(() -> held.forEach(Runnable::run));
+        }
+    }
+
+    /**
      * Writes what arrived from a server into the project, and reads the project
-     * again.
+     * again. A sync calls it inside {@link #whileSyncing}, which holds the run
+     * changes made meanwhile.
      * <p>
      * The scan is not optional: these writes are claimed as our own, so the
      * watcher rightly ignores them, and no other path will ever index what they
@@ -850,30 +891,14 @@ public final class ProjectIndexer {
      * mirror {@link #removeIncoming} always scanned.
      */
     public void acceptIncoming(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
-        // A run change made from here until the scan has read what arrived waits
-        // for it, and lands on the run that arrived (#66, finding 129).
-        synchronized (heldForSync) {
-            heldForSync.putIfAbsent(projectPath, new ArrayList<>());
-        }
+        syncFiles.accept(projectPath, files);
 
-        try {
-            syncFiles.accept(projectPath, files);
+        // A run's incoming files went through the run writer's queue; the scan
+        // reads them once they have landed rather than racing them (#66,
+        // finding 121).
+        runWriter.awaitQueued();
 
-            // A run's incoming files went through the run writer's queue; the scan
-            // reads them once they have landed rather than racing them (#66,
-            // finding 121).
-            runWriter.awaitQueued();
-
-            scanSingleProject(projectPath);
-        } finally {
-            final @NotNull List<Runnable> held;
-            synchronized (heldForSync) {
-                held = Optional.ofNullable(heldForSync.remove(projectPath)).orElse(List.of());
-            }
-
-            // On the EDT, where a verdict is recorded and the run's rows are read.
-            if (!held.isEmpty()) ApplicationManager.getApplication().invokeLater(() -> held.forEach(Runnable::run));
-        }
+        scanSingleProject(projectPath);
     }
 
     /**
