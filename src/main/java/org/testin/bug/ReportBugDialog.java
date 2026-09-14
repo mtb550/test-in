@@ -39,7 +39,7 @@ import java.util.Optional;
  * <p>
  * Only a click on Send sends. There is no Enter key: Enter in the title does
  * nothing and Enter in the body starts a new line, because filing cannot be
- * taken back. Escape cancels, and asks first when anything was edited.
+ * taken back. Escape cancels.
  */
 final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
 
@@ -96,8 +96,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
 
     /**
      * Shows the dialog, and lets the run item go however it closes. A cancel
-     * throws the edits away - Escape has already asked - and Send keeps them
-     * until the issue exists.
+     * throws the edits away, and Send keeps them until the issue exists.
      */
     void open() {
         show();
@@ -154,16 +153,5 @@ final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
         final @NotNull BugReports.Edits edits = new BugReports.Edits(titleField.getComponent().getText().strip(), bodyArea.getComponent().getText());
         BugFiling.send(p, item, bug.repository().orElseThrow(), edits, bug.facts().stacktrace().screenshots(), redraw);
         closeOk();
-    }
-
-    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-070
-    @Override
-    protected boolean holdsUnsavedInput() {
-        return !titleField.getComponent().getText().equals(bug.facts().title()) || !bodyArea.getComponent().getText().equals(bug.body());
-    }
-
-    @Override
-    protected @NotNull String unsavedInputMessage() {
-        return Bundle.message("bug.dialog.unsaved");
     }
 }

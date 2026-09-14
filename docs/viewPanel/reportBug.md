@@ -48,8 +48,7 @@ the Details tab.
 - **Rule-VIEW-PANEL-069** — The title and the body can be edited. **Send** files
   exactly what the dialog holds.
 - **Rule-VIEW-PANEL-070** — Only a click on **Send** sends, and it sends once.
-  `Enter` does not send. `Escape` closes the dialog, and asks first when anything
-  was edited.
+  `Enter` does not send. `Escape` closes the dialog without asking.
 - **Rule-VIEW-PANEL-071** — When the bug cannot be sent, **Send** is gray.
   Hovering over it says why.
 - **Rule-VIEW-PANEL-072** — Report Bug is gray while this test case's report is
@@ -232,10 +231,6 @@ over it reads *Finish the open bug report first*.
 
 **If the test case is already reported** — **Report Bug** is gray. Hovering over
 it reads *Already reported*.
-
-**If the tester presses `Escape` after editing** — Testin asks first. The
-question reads *The title and body edited here have not been sent, and there is
-no copy of them anywhere else.*
 
 **If `gh` does not answer within 120 seconds** — sending stops. A message titled
 *Report Bug Failed* reads *gh did not answer within 120 seconds. It is not known
