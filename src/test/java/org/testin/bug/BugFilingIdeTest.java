@@ -132,7 +132,7 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
     public void testARunItemNoLongerFailedIsNotWritten() {
         final BugReports.RunItem item = indexedRunItem(TestStatus.PASSED);
 
-        assertEquals(Optional.of(Bundle.message("bug.not.stored.passed")), BugFiling.store(getProject(), item, ISSUE));
+        assertEquals(Optional.of(Bundle.message("bug.not.stored.no.longer.failed")), BugFiling.store(getProject(), item, ISSUE));
         assertEquals("a passed run item was given a bug", "", storedLink(item));
     }
 

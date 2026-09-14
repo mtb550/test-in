@@ -100,7 +100,7 @@ public final class BugFiling {
         if (found.isEmpty()) return Optional.of(Bundle.message("bug.not.stored.moved"));
 
         final @NotNull TestRunItems result = found.orElseThrow();
-        if (result.getStatus() != TestStatus.FAILED) return Optional.of(Bundle.message("bug.not.stored.passed"));
+        if (result.getStatus() != TestStatus.FAILED) return Optional.of(Bundle.message("bug.not.stored.no.longer.failed"));
 
         result.setBugIssueUrl(url);
         indexer.persistRun(item.run(), run.orElseThrow());
