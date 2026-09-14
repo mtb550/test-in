@@ -30,7 +30,7 @@ explorer          editor           view          lightmode      the surfaces
               creator, clipboard, undo, search,                 asks for things
               navigate, open, order, rename, remove
                             |
-              testcase  testproject  testrun                    the operations
+              testcase  testproject  testrun  bug               the operations
                             |
                         services                                who to ask
              (Services, Notifier, settings, testin.yml)
@@ -60,7 +60,7 @@ modules](#the-two-content-modules).
 |---|---|---|
 | Surfaces | `explorer`, `editor`, `view`, `lightmode` | No |
 | Gestures | `actions`, `ui`, `creator`, `clipboard`, `undo`, `search`, `navigate`, `open`, `order`, `rename`, `remove` | No |
-| Operations | `testcase`, `testproject`, `testrun` | No |
+| Operations | `testcase`, `testproject`, `testrun`, `bug` | `bug` only, and only the temporary folder a bug report is sent from |
 | Services | `services`, `notifications`, `setting`, `config` | `config` and `setting` only, and neither touches test data |
 | Data | `indexer`, `model` | `indexer` only |
 | Side modules | `codegen`, `git`, `sftp`, `report`, `importexport`, `runner` | See the exempt list below |
@@ -211,14 +211,21 @@ The rule is enforced by the compiler rather than by review: `TestDataFiles` and
 package can reach the writer at all.
 
 **The exempt packages**, which may open files directly: `codegen`, `config`,
-`git`, `importexport`, `report`, `setting`, `logger`.
+`git`, `importexport`, `report`, `setting`, `logger`, `bug`.
 
 What they have in common is that none of them read or write **test data**. They
 handle generated source, the automation repository's own `testin.yml`, the Git
 working tree, files outside the tree, generated report output, the IDE settings
-path, and the log. `config` in particular reads a file that lives in the
+path, the log, and the temporary folder a bug report is sent from. `config` in particular reads a file that lives in the
 automation repository rather than under the Testin root, and it runs before the
 indexer exists — it is what tells the indexer which project to index.
+
+`bug` joined the list with #28. It writes a bug report's body and screenshots
+into a fresh temporary folder, runs `gh` from there, and deletes the folder
+afterwards. The test case's own file is asked of the indexer
+(`ProjectIndexer.testCaseFile`), never built. Its other edges point down: `git`
+for the test project's remote and branch, `report` for `ReportText.joined`, and
+`config` for `bugRepoUrl`.
 
 One package not on that list opens a file anyway, and it is worth knowing why
 before you grep and think you have found a violation. `sftp/BaselineStore` reads

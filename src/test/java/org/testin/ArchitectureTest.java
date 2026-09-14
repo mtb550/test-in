@@ -95,7 +95,7 @@ public class ArchitectureTest {
             "org.testin.importexport..", "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..",
             "org.testin.search..", "org.testin.undo..", "org.testin.rename..", "org.testin.remove..",
             "org.testin.open..", "org.testin.clipboard..", "org.testin.runner..", "org.testin.notifications..",
-            "org.testin.setting..", "org.testin.config..", "org.testin.actions.."
+            "org.testin.setting..", "org.testin.config..", "org.testin.actions..", "org.testin.bug.."
     };
 
     /**
@@ -142,7 +142,7 @@ public class ArchitectureTest {
             "org.testin.git..", "org.testin.sftp..", "org.testin.report..", "org.testin.importexport..",
             "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..", "org.testin.search..",
             "org.testin.undo..", "org.testin.rename..", "org.testin.remove..", "org.testin.open..",
-            "org.testin.clipboard..", "org.testin.runner.."
+            "org.testin.clipboard..", "org.testin.runner..", "org.testin.bug.."
     };
 
     /**
@@ -227,14 +227,16 @@ public class ArchitectureTest {
      * The exempt packages are exempt for one reason: none of them reads or writes
      * <b>test data</b>. They handle generated source, the automation repository's
      * own {@code testin.yml}, the Git working tree, files outside the tree,
-     * generated report output, the IDE settings path, and the log.
+     * generated report output, the IDE settings path, the log, and the
+     * temporary folder a bug report is sent from (#28).
      */
     @Test
     public void onlyTheIndexerAndItsExemptListTouchFiles() {
         final @NotNull ArchRule rule = noClasses()
                 .that().resideOutsideOfPackages("org.testin.indexer..", "org.testin.codegen..",
                         "org.testin.config..", "org.testin.git..", "org.testin.importexport..",
-                        "org.testin.report..", "org.testin.setting..", "org.testin.logger..")
+                        "org.testin.report..", "org.testin.setting..", "org.testin.logger..",
+                        "org.testin.bug..")
                 .and(notOneOf(FILE_ACCESS_EXCEPTIONS))
                 .should().dependOnClassesThat().haveFullyQualifiedName("java.nio.file.Files")
                 .because("the indexer is the single owner of file access, so its cache stays authoritative over"
