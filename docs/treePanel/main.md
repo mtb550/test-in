@@ -114,8 +114,7 @@ tree. It is always one click away.
 - A **node** is anything the tree shows: a test project, a folder, a test set or
   a test run. A test case is not a node, because the tree does not show one.
 - The **Testin folder** is the one folder that holds every test project. The
-  settings page calls it *Testin source root*, and two of Testin's own messages
-  call it *the Testin root*.
+  settings page and Testin's own messages call it that too.
 - **Bound** means this code project is set to use one test project. The choice
   is written into the code project, so everyone who opens it gets the same test
   project.
@@ -245,7 +244,7 @@ A refusal fades too. It says what stopped the action, and nothing was changed.
 | *'\<run\>' no longer exists - nothing saved* | The test run went away while the dialog was open | [UC-TREE-PANEL-022](editTestRun.md) |
 | *'\<run\>' was \<status\> while this was open - nothing saved* | Someone signed the test run off while the dialog was open | [UC-TREE-PANEL-022](editTestRun.md) |
 | *\<name\> has no test cases to run* | Nothing under the node can be run | [UC-TREE-PANEL-023](runTests.md) |
-| *No Test Projects* | There is nothing to choose. It adds *Create one under the Testin root first* | [UC-TREE-PANEL-004](chooseTestProject.md) |
+| *No Test Projects* | There is nothing to choose. It adds *Create one in the Testin folder first* | [UC-TREE-PANEL-004](chooseTestProject.md) |
 | *Java Test Source Not Found* | The IDE project has no Java test folder, so no automation code is written | [UC-TREE-PANEL-007](createTestSet.md) |
 | *'\<name\>' cannot name a Java package* | The name is a word Java keeps for itself, on a folder that becomes a package | [UC-TREE-PANEL-002](createTestProject.md), [UC-TREE-PANEL-008](createTestSetPackage.md), [UC-TREE-PANEL-011](renameNode.md) |
 
@@ -273,7 +272,7 @@ than feedback on what the tester just typed.
 | What the tester sees | Means |
 |---|---|
 | *Could not load '\<folder name\>'*, in red, as a child row | That folder's contents could not be read |
-| *testin.yml names \<name\>, which is not under the Testin root*, in red | The code project names a test project the Testin folder does not hold. See [UC-TREE-PANEL-001](reachTheTree.md) |
+| *testin.yml names \<name\>, which is not in the Testin folder*, in red | The code project names a test project the Testin folder does not hold. See [UC-TREE-PANEL-001](reachTheTree.md) |
 | *testin.yml names \<name\>, which could not be read*, in red | The test project's folder is there, but Testin could not read it |
 
 ---

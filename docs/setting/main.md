@@ -56,7 +56,7 @@ The two are kept apart on purpose, and the reason is who they belong to.
 **Three words, before the rules use them.**
 
 - The **Testin folder** is the one folder on this machine that holds test
-  projects. The page calls it *Testin source root*.
+  projects. The page calls it that too.
 - **This machine's settings** are one set of values shared by every code project
   open in this IDE.
 - The **password store** is the IDE's own keychain. Testin puts passwords there
@@ -74,7 +74,7 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 │  Testin                                                                    │
 ├────────────────────────────────────────────────────────────────────────────┤
 │                                                                            │
-│   Testin source root:      [ Example -> C:\Users\...\Testin ] [...] [Open] │
+│   Testin folder:           [ Example -> C:\Users\...\Testin ] [...] [Open] │
 │                                                                            │
 │   Log level:               [ INFO                                     v ]  │
 │                                                                            │
@@ -97,7 +97,7 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **Testin source root** — the folder holding every test project. The only
+1. **Testin folder** — the folder holding every test project. The only
    field with a gray example in it.
 2. **The browse button** — opens a folder chooser. Three fields have one.
 3. **Open** — opens the Testin folder in the file manager. It is gray until the
@@ -128,7 +128,7 @@ highlighted.
 
 | Setting | Where it lives | Committed |
 |---|---|---|
-| Testin source root | This machine's settings | No |
+| Testin folder | This machine's settings | No |
 | Log level | This machine's settings | No |
 | Tester name | This machine's settings | No |
 | Tester role | This machine's settings | No |
