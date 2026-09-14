@@ -16,6 +16,7 @@
 
 package org.testin.model;
 
+import com.intellij.ide.BrowserUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -60,5 +61,13 @@ public final class BugIssueUrl {
         final @NotNull Matcher issue = ISSUE.matcher(text);
 
         return issue.find() ? Optional.of(issue.group()) : Optional.empty();
+    }
+
+    /**
+     * Opens the issue in the browser, through the platform. The details panel's
+     * link and the Reported notification's Open both come here.
+     */
+    public static void open(final @NotNull String bugIssueUrl) {
+        BrowserUtil.browse(bugIssueUrl);
     }
 }

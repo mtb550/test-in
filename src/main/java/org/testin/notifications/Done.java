@@ -58,6 +58,11 @@ public enum Done {
     IMPORTED(Bundle.message("done.imported")),
     EXPORTED(Bundle.message("done.exported")),
 
+    /**
+     * A failure filed as a GitHub issue (#28).
+     */
+    REPORTED(Bundle.message("done.reported")),
+
     ORDERED(Bundle.message("done.ordered")),
     RE_SORTED(Bundle.message("done.re.sorted")),
     REFRESHED(Bundle.message("done.refreshed")),

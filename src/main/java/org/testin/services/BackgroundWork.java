@@ -38,16 +38,20 @@ import java.util.function.Consumer;
  * <p>
  * The dialog closes on the button now, and the work reports itself here (#87).
  * <p>
- * All of them can be canceled, unlike the Git tasks. None of the four can leave
- * the repository in a state the tester cannot see, which is the reason a push or
- * a rebase cannot be stopped and these can (#257). The reasoning per operation
- * is at the one place that builds the task, in {@link #run}.
+ * Those four can be canceled, unlike the Git tasks. None of them can leave the
+ * repository in a state the tester cannot see, which is the reason a push or a
+ * rebase cannot be stopped and these can (#257). Sending a bug report cannot be
+ * stopped either, for the same kind of reason: a cancel after GitHub created the
+ * issue would leave an issue nothing links to (#28).
  * <p>
  * A failure is logged and shown once. It is caught here because a task that
  * throws past {@code run} leaves the bar up and says nothing.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BackgroundWork {
+
+    private static final @NotNull Runnable NOTHING = () -> {
+    };
 
     /**
      * Runs {@code work} under a progress bar titled for the operation.
@@ -68,7 +72,31 @@ public final class BackgroundWork {
         // how many were written when it stops part way (Rule-SHARE-037). None of
         // the three can leave the repository in a state the tester cannot see,
         // which is the reason a push or a rebase cannot be stopped (#257).
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, title, true) {
+        run(p, title, whatFailed, true, work, NOTHING, NOTHING);
+    }
+
+    /**
+     * The same, saying whether it can be canceled and what happens after it.
+     * <p>
+     * The two hooks are what lets work that holds something - a link disabled
+     * while its work runs - let go of it on every way out, a cancel and a failure
+     * included. Without them nothing ran after a canceled task at all (#28).
+     *
+     * @param cancellable false for work that must not stop half way
+     * @param onSuccess   on the EDT, once the work finished without failing and
+     *                    without being canceled
+     * @param onFinished  on the EDT, always, and after {@code onSuccess}
+     */
+    public static void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final boolean cancellable, final @NotNull Consumer<@NotNull ProgressIndicator> work, final @NotNull Runnable onSuccess, final @NotNull Runnable onFinished) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, title, cancellable) {
+
+            /**
+             * Set on the task's thread and read on the EDT. The platform calls
+             * {@code onSuccess} for a run that returned, and a failure caught
+             * below returns too.
+             */
+            private volatile boolean failed;
+
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -84,9 +112,20 @@ public final class BackgroundWork {
                     // (#66, finding 83).
                     throw stopped;
                 } catch (final Exception ex) {
+                    failed = true;
                     Logger.error(whatFailed + ": " + ex.getMessage());
                     Services.getInstance(p, Notifier.class).error(p, whatFailed, String.valueOf(ex.getMessage()));
                 }
+            }
+
+            @Override
+            public void onSuccess() {
+                if (!failed) onSuccess.run();
+            }
+
+            @Override
+            public void onFinished() {
+                onFinished.run();
             }
         });
     }

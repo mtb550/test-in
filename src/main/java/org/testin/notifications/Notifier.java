@@ -192,6 +192,17 @@ public final class Notifier {
     }
 
     /**
+     * A link on a notification that keeps working after it is clicked (#28).
+     * <p>
+     * For the offer that is not one-shot: opening what the notification is
+     * about. A reported bug's Open is clicked, read, closed and clicked again,
+     * and the notification stays in the log exactly so that it can be.
+     */
+    public @NotNull NotificationAction lastingAction(final @NotNull String name, final @NotNull Runnable action) {
+        return NotificationAction.createSimple(name, action);
+    }
+
+    /**
      * Puts a written file's full path on the clipboard.
      * <p>
      * Here beside the other notification actions rather than hand-built at the
