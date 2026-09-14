@@ -36,9 +36,11 @@ panel.
 - **Rule-INTERNAL-034** — A test case is known by its file name. Testin decides
   whether a save is a new test case or a change by whether it already knows that
   name.
-- **Rule-INTERNAL-035** — An import, an undo and a move write the file without
-  stamping it. An import keeps the audit the file brought. An undo puts back the
-  audit the test case had before. A move keeps who created the test case.
+- **Rule-INTERNAL-035** — An import, an undo, a move and a removed test case put
+  back from the review write the file without stamping it. An import keeps the
+  audit the file brought. An undo puts back the audit the test case had before.
+  A move keeps who created the test case. A test case put back from the review
+  keeps the audit it was committed with.
 
 ## The screens
 

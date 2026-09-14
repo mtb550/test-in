@@ -257,7 +257,10 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                     yield true;
                 }
                 case DELETED -> {
-                    indexer.putTestCase(testSetPath, diff.committedState());
+                    // Rule-INTERNAL-035. Put back as it was committed, audit
+                    // included: the ordinary save finds the case unknown and
+                    // stamps whoever reverts it as its creator (#66, finding 113).
+                    indexer.putTestCaseVerbatim(testSetPath, diff.committedState());
                     yield true;
                 }
                 case MODIFIED -> revertField(indexer, testSetPath, changeType, diff);

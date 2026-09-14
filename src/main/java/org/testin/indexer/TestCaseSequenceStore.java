@@ -140,10 +140,11 @@ final class TestCaseSequenceStore {
     /**
      * UC-INTERNAL-004, Rule-INTERNAL-035.
      * <p>
-     * The save that stamps nothing, for the three callers whose audit is already
+     * The save that stamps nothing, for the callers whose audit is already
      * decided: an import writes the audit the file brought with it, an undo
-     * writes the audit the case had before the change being taken back, and a
-     * pasted cut keeps the audit of the case it still is.
+     * writes the audit the case had before the change being taken back, a
+     * pasted cut keeps the audit of the case it still is, and a removed case put
+     * back from the review is the case as it was committed.
      * <p>
      * The four audit attributes are mappable in the import wizard, so a
      * spreadsheet carrying a case's real author and date says who made it.

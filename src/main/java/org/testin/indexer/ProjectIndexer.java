@@ -482,8 +482,7 @@ public final class ProjectIndexer {
      * UC-INTERNAL-004, Rule-INTERNAL-035.
      * <p>
      * Saves a case exactly as it was given, audit included. Every ordinary save
-     * stamps who did it and when; these three are the saves where that would be a
-     * lie.
+     * stamps who did it and when; these are the saves where that would be a lie.
      * <p>
      * An import writes the audit the file being imported carries. An undo writes
      * the audit the case had before the change it is taking back - stamping it
