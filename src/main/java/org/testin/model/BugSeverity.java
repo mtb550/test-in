@@ -47,31 +47,36 @@ public enum BugSeverity {
     EMPTY(
             "",
             JBColor.background(),
-            ReportEmphasis.MUTED
+            ReportEmphasis.MUTED,
+            ""
     ),
 
     BLOCKER(
             Bundle.message("bug.severity.blocker"),
             JBColor.RED,
-            ReportEmphasis.ALARMING
+            ReportEmphasis.ALARMING,
+            "🔴 Blocker"
     ),
 
     MAJOR(
             Bundle.message("bug.severity.major"),
             JBColor.ORANGE,
-            ReportEmphasis.CAUTIONARY
+            ReportEmphasis.CAUTIONARY,
+            "🟠 Major"
     ),
 
     MINOR(
             Bundle.message("bug.severity.minor"),
             JBColor.YELLOW,
-            ReportEmphasis.MUTED
+            ReportEmphasis.MUTED,
+            "🟡 Minor"
     ),
 
     ENHANCEMENT(
             Bundle.message("bug.severity.enhancement"),
             JBColor.GREEN.brighter().brighter(),
-            ReportEmphasis.MUTED
+            ReportEmphasis.MUTED,
+            "🟢 Enhancement"
     );
 
     /**
@@ -103,5 +108,11 @@ public enum BugSeverity {
      * How loudly this reads in a report - see {@link ReportEmphasis}.
      */
     private final @NotNull ReportEmphasis emphasis;
+    /**
+     * How a filed bug report writes it (#28): the color above as a dot, then the
+     * word. In English whatever the IDE's language, because the report is
+     * written for the team's repository, not for this tester's screen.
+     */
+    private final @NotNull String inBugReport;
 
 }

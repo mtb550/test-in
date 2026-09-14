@@ -34,7 +34,8 @@ public enum BugPriority {
             0,
             JBColor.background(),
             true,
-            ReportEmphasis.MUTED
+            ReportEmphasis.MUTED,
+            ""
     ),
 
     HIGH(
@@ -42,7 +43,8 @@ public enum BugPriority {
             1,
             JBColor.RED.brighter().brighter(),
             true,
-            ReportEmphasis.ALARMING
+            ReportEmphasis.ALARMING,
+            "🔴 High"
     ),
 
     MEDIUM(
@@ -50,7 +52,8 @@ public enum BugPriority {
             2,
             JBColor.BLUE.brighter(),
             true,
-            ReportEmphasis.CAUTIONARY
+            ReportEmphasis.CAUTIONARY,
+            "🔵 Medium"
     ),
 
     LOW(
@@ -58,7 +61,8 @@ public enum BugPriority {
             3,
             JBColor.GRAY.brighter(),
             true,
-            ReportEmphasis.MUTED
+            ReportEmphasis.MUTED,
+            "⚪ Low"
     );
 
     /**
@@ -90,5 +94,10 @@ public enum BugPriority {
      * How loudly this reads in a report - see {@link ReportEmphasis}.
      */
     private final @NotNull ReportEmphasis emphasis;
+    /**
+     * How a filed bug report writes it (#28), in English for the reason
+     * {@link BugSeverity#getInBugReport} gives.
+     */
+    private final @NotNull String inBugReport;
 
 }
