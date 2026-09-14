@@ -80,7 +80,7 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
                     .filter(item -> !item.isRemoved());
 
             if (runItem.isPresent()) {
-                new FailedResultDialog(p, runItem.orElseThrow(), () -> applyStatus(p, editor, selectedItems)).show();
+                new FailedResultDialog(p, runItem.orElseThrow(), fields -> applyStatus(p, editor, selectedItems)).show();
                 return;
             }
         }

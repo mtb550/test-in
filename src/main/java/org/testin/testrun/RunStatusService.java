@@ -38,6 +38,7 @@ import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.testrun.create.FailureFields;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
@@ -131,20 +132,10 @@ public final class RunStatusService {
     public boolean recordVerdict(final @NotNull Project p, final @NotNull Path runPath, final @NotNull UUID caseId, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         final @NotNull TestRunDto run = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(runPath);
 
-        final @NotNull Optional<TestRunItems> found = run.getResults().stream()
-                .filter(item -> item.getId().equals(caseId))
-                .findFirst();
+        final @NotNull Optional<TestRunItems> found = liveItem(p, run, runPath, caseId);
+        if (found.isEmpty()) return false;
 
-        if (found.isEmpty()) {
-            Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' does not cover " + caseId + " - verdict not recorded");
-            return false;
-        }
-
-        final @NotNull TestRunItems item = found.get();
-        if (item.isRemoved()) {
-            refuseRemoved(p);
-            return false;
-        }
+        final @NotNull TestRunItems item = found.orElseThrow();
 
         // Before the verdict, not after: passing clears everything a failure
         // described, so a message written afterward would survive onto a case
@@ -158,6 +149,57 @@ public final class RunStatusService {
         Services.getInstance(p, ProjectIndexer.class).persistRun(runPath, run);
 
         return true;
+    }
+
+    /**
+     * UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167.
+     * <p>
+     * Records what a tester wrote about a failure on one case of one run, and
+     * reports whether it landed.
+     * <p>
+     * On the run the indexer holds now, as {@link #recordVerdict} does, and not
+     * on the run the editor holds. A sync that brings this run in replaces it in
+     * the index while the editor still shows the old one, so persisting the
+     * editor's run put the run back as it was before the sync (#66, finding 131).
+     * A run the sync took away is not there to write, and the log says so.
+     */
+    public boolean recordFailureDetails(final @NotNull Project p, final @NotNull Path runPath, final @NotNull UUID caseId, final @NotNull FailureFields fields) {
+        final @NotNull Optional<TestRunDto> run = Services.getInstance(p, ProjectIndexer.class).findTestRun(runPath);
+        if (run.isEmpty()) {
+            Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' is no longer indexed - failure details not recorded");
+            return false;
+        }
+
+        final @NotNull Optional<TestRunItems> item = liveItem(p, run.orElseThrow(), runPath, caseId);
+        if (item.isEmpty()) return false;
+
+        fields.applyTo(item.orElseThrow());
+        Services.getInstance(p, ProjectIndexer.class).persistRun(runPath, run.orElseThrow());
+
+        return true;
+    }
+
+    /**
+     * The run's row for one case, when it can still take something new. A case
+     * the run does not cover goes to the log; a removed one is refused to the
+     * tester, because they just asked for something to be recorded on it.
+     */
+    private @NotNull Optional<TestRunItems> liveItem(final @NotNull Project p, final @NotNull TestRunDto run, final @NotNull Path runPath, final @NotNull UUID caseId) {
+        final @NotNull Optional<TestRunItems> found = run.getResults().stream()
+                .filter(item -> item.getId().equals(caseId))
+                .findFirst();
+
+        if (found.isEmpty()) {
+            Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' does not cover " + caseId + " - nothing recorded");
+            return Optional.empty();
+        }
+
+        if (found.orElseThrow().isRemoved()) {
+            refuseRemoved(p);
+            return Optional.empty();
+        }
+
+        return found;
     }
 
     /**

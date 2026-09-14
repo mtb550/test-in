@@ -30,6 +30,7 @@ import org.testin.util.Bundle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Collects the failure details when a test case is set to Failed: the actual
@@ -40,11 +41,11 @@ import java.util.Optional;
 public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
 
     private final @NotNull TestRunItems runItem;
-    private final @NotNull Runnable onSave;
+    private final @NotNull Consumer<FailureFields> onSave;
     private final @NotNull FailureFields fields;
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-143
-    public FailedResultDialog(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull Runnable onSave) {
+    public FailedResultDialog(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull Consumer<FailureFields> onSave) {
         super(p);
         this.runItem = runItem;
         this.onSave = onSave;
@@ -96,7 +97,9 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
         // Applied only on save - Escape must never commit the edit.
         fields.applyTo(runItem);
 
-        onSave.run();
+        // The fields go with it, so a caller whose row may be stale can write
+        // them onto the run as it is now (#66, finding 131).
+        onSave.accept(fields);
         closeOk();
     }
 }
