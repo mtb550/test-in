@@ -42,7 +42,8 @@ the Details tab.
   bar, and reads `testin.yml` again first. Then the bug opens. Stopping the
   progress bar opens nothing.
 - **Rule-VIEW-PANEL-068** — The bug is written in one template. Its title is the
-  test case's description. Every value Testin cannot get reads `n\a`. The
+  test case's description. Every value reads as the Details tab shows it. Every
+  value Testin cannot get reads `n\a`. The
   template is not translated.
 - **Rule-VIEW-PANEL-069** — The title and the body can be edited. **Send** files
   exactly what the dialog holds.
@@ -123,7 +124,8 @@ After:
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **The title** — the test case's description. It can be edited. GitHub takes
+1. **The title** — the test case's description, as the Details tab shows it. It
+   can be edited. GitHub takes
    256 characters at most.
 2. **The body** — the bug, written in the template below. It can be edited.
    GitHub takes 65,536 characters at most. Pasting a screenshot here pastes
@@ -146,9 +148,9 @@ Anything Testin cannot get reads `n\a`.
 | **Platform** | The test run's platform and component | Both are empty |
 | **Environment** | Nothing in Testin | Always |
 | **Build** | Nothing in Testin | Always |
-| **Actual result** | What the tester says actually happened | It is empty |
-| **Expected result** | The test case's expected result | It is empty |
-| **Steps to reproduce** | The test case's steps, numbered | There are no steps |
+| **Actual result** | What the tester says actually happened, exactly as typed | It is empty |
+| **Expected result** | The test case's expected result, as the Details tab shows it | It is empty |
+| **Steps to reproduce** | The test case's steps, numbered, each as the Details tab shows it | There are no steps |
 | **Test data** | The test case's test data, exactly as typed | It is empty |
 | **Impact** | Nothing in Testin | Always |
 | **Exception** | The error's text, folded under its first line | There is no text |

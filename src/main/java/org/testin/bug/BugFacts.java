@@ -26,6 +26,7 @@ import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.report.generators.ReportText;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.util.Display;
 
 import java.util.List;
@@ -49,17 +50,23 @@ public record BugFacts(@NotNull String title, @NotNull BugSeverity severity, @No
     private static final @NotNull String SEPARATOR = " · ";
 
     /**
-     * On the EDT. The issue's title is the test case's description.
+     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068.
+     * <p>
+     * On the EDT. The issue's title is the test case's description, and every
+     * value reads as the Details tab shows it: the description and the expected
+     * result asked of their attribute, each step formatted as the Steps row
+     * formats it. The actual result and the test data are shown as typed there,
+     * so they are copied as typed (#28, P35).
      */
     public static @NotNull BugFacts of(final @NotNull TestRunItems item, final @NotNull TestCaseDto tc, final @NotNull TestRunDto run, final @NotNull String testRun) {
         return new BugFacts(
-                tc.getDescription().strip(),
+                TestEditorAttributes.DESCRIPTION.displayValue(tc),
                 item.getBugSeverity(),
                 item.getBugPriority(),
                 ReportText.joined(SEPARATOR, TestRunConfiguration.PLATFORM.valueIn(run), TestRunConfiguration.COMPONENT.valueIn(run)),
                 item.getActualResult(),
-                tc.getExpectedResult(),
-                List.copyOf(tc.getSteps()),
+                TestEditorAttributes.EXPECTED_RESULT.displayValue(tc),
+                tc.getSteps().stream().map(Display::format).toList(),
                 tc.getTestData(),
                 Stacktrace.of(item.getStacktrace()),
                 testRun,

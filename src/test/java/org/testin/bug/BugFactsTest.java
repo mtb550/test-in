@@ -55,7 +55,11 @@ public class BugFactsTest {
 
         final BugFacts facts = BugFacts.of(item, tc, run, "Sprint 7");
 
-        assertEquals(facts.title(), "Log in with a valid user");
+        assertEquals(facts.title(), "Log in with a valid user.", "the description as the Details tab shows it");
+        assertEquals(facts.expectedResult(), "Welcome.");
+        assertEquals(facts.steps(), List.of("Open.", "Log in."), "each step as the Steps row formats it");
+        assertEquals(facts.actualResult(), "Error page", "shown as typed in the Details tab, so copied as typed");
+        assertEquals(facts.testData(), "user=a");
         assertEquals(facts.platform(), "Web", "an unanswered component is left out, not joined");
         assertEquals(facts.executed(), "Muteb · Sunday 13-09-2026 At 14:14:00 [Asia/Riyadh]");
         assertEquals(facts.browser(), "Chrome");
