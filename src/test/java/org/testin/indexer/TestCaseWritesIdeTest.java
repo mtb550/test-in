@@ -148,4 +148,31 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         assertEquals("a moved case took the paster's name as its creator", "Sara Al-Otaibi", indexed.getCreatedBy());
         assertEquals("a moved case took a new creation date", createdAt, indexed.getCreatedAt());
     }
+
+    /**
+     * Rule-INTERNAL-031, Rule-INTERNAL-034.
+     * <p>
+     * A new, unranked case is written by the order write alone: ranked, and
+     * stamped as created. Creating a test case used to save it directly as well,
+     * so the file was written twice - first without its rank (#66, finding 115).
+     */
+    public void testACreatedCaseIsWrittenByTheOrderWriteWithItsRankAndItsCreator() {
+        final TestSetDirectoryDto ts = testSet();
+        final TestCaseDto created = testCase(ts, "");
+        final List<TestCaseDto> arranged = List.of(created);
+
+        indexer().updateSequence(ts.getPath(), arranged, org.testin.testcase.TestCaseOrder.place(arranged));
+
+        final TestCaseDto indexed = indexer().findTestCase(created.getId()).orElseThrow();
+        assertFalse("the order write gave the new case no rank", indexed.getOrder().isEmpty());
+        assertEquals("the order write did not stamp the new case as created",
+                Services.getInstance(getProject(), org.testin.setting.AppSettingsState.class).testerName, indexed.getCreatedBy());
+
+        try {
+            assertTrue("the case's file does not carry the rank it was given",
+                    Files.readString(fileOf(ts, created)).contains(indexed.getOrder()));
+        } catch (final java.io.IOException ex) {
+            throw new AssertionError("the new case was not written", ex);
+        }
+    }
 }

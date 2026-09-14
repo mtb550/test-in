@@ -31,7 +31,6 @@ import org.testin.editor.test.TestEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.create.CreateTestCaseDialog;
@@ -87,21 +86,25 @@ public class CreateTestCaseAction extends DumbAwareAction {
             final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(affectedNodes);
             final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, dir.getPath(), ids);
 
-            // Recorded from the callback, because the rank arrives after the
-            // save: the case is written here and placed by the sort that
-            // follows, so what a redo would have to write is not readable yet.
-            editor.appendNewTestCase(tc, () -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.create"), affectedNodes), before, TestCaseSnapshot.of(p, dir.getPath(), ids)));
+            // Written once, by the sequence write the append starts: it sees this
+            // case for the first time, stamps it as created, gives it its rank and
+            // writes it. A direct save here as well wrote the file a second time -
+            // first unranked, then ranked (#66, finding 115).
+            //
+            // So everything that needs the case to exist runs from the callback,
+            // after that write: the undo record, which reads what a redo would
+            // write, and - back on the UI thread - the balloon saying the case
+            // exists and the code generation, which both used to run against a
+            // case the indexer had not been told about yet.
+            editor.appendNewTestCase(tc, () -> {
+                TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.create"), affectedNodes), before, TestCaseSnapshot.of(p, dir.getPath(), ids));
+
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
+                    GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
+                });
+            });
             Services.getInstance(p, TestCaseValues.class).addNewItems(affectedNodes);
-
-            // Directly, as the other three savers do. This went through a
-            // service that deferred the write behind an invokeLater and a write
-            // action, so everything below it - the code generation and the
-            // balloon saying the case exists - ran against a case the indexer
-            // had not been told about yet.
-            Services.getInstance(p, ProjectIndexer.class).putTestCase(dir.getPath(), tc);
-            Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
-
-            GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
 
             ApplicationManager.getApplication().invokeLater(() -> editor.selectTestCase(tc));
 
