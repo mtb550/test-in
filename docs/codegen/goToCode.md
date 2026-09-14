@@ -25,8 +25,9 @@ This opens the Java method that runs the selected test case.
   tester is not shown it.
 - **Rule-CODEGEN-026** — The method is found by the identity in `testName`, so a
   test case that has been renamed still finds its method.
-- **Rule-CODEGEN-027** — Without the Java plugin the gesture is not offered at
-  all.
+- **Rule-CODEGEN-027** — Without the Java plugin the card and the view panel
+  draw no class button, and the menu entry stays, grayed, reading *(needs the
+  Java plugin)*.
 
 ## The three ways in
 
@@ -72,9 +73,10 @@ the jump happens when indexing finishes.
 
 **If the class cannot be found** — nothing opens, and only the log says so.
 
-**If the IDE has no Java plugin** — the entry is not on the menu, and the
-button is not drawn. If it is reached anyway, a message titled **Java Plugin Not
-Available** appears. It appears every time, not once.
+**If the IDE has no Java plugin** — the menu entry is still there, grayed,
+reading *(needs the Java plugin)*, and the class button is not drawn. If it is
+reached anyway, a message titled **Java Plugin Not Available** appears. It
+appears every time, not once.
 
 ---
 

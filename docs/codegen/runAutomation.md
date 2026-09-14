@@ -89,8 +89,9 @@ is said.
 **If indexing starts part way through** — every test case is put back and a
 message reads *Indexing interrupted the test run. Please try again.*
 
-**If the IDE has no TestNG plugin** — the entry is not on the menu and the
-button is not drawn.
+**If the IDE has no TestNG or no Java plugin** — the menu entry is still there,
+grayed, naming the first one missing: *(needs the Java plugin)* or *(needs the
+TestNG plugin)*. The run button is not drawn.
 
 ## What the run is called
 
