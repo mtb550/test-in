@@ -121,6 +121,34 @@ public class ChangeTypeRevertTest {
     }
 
     /**
+     * Rule-SHARE-052.
+     * <p>
+     * Once the last change is reverted, the case takes back the audit it was
+     * committed with. The revert used to stamp the tester as modifying it now, so
+     * the file still differed from what was committed by its audit alone - and a
+     * file that differs by an audit stamp is still a pending change (#66,
+     * finding 128).
+     */
+    @Test
+    public void revertingTheLastChangePutsBackTheCommittedAudit() {
+        final TestCaseDto committed = committed()
+                .setCreatedBy("Sara Al-Otaibi")
+                .setUpdatedBy("Sara Al-Otaibi")
+                .setUpdatedAt(java.time.ZonedDateTime.parse("2026-09-01T10:00:00Z"));
+        final TestCaseDto current = committed().setModule("edited module").setUpdatedBy("Muteb");
+
+        ChangeType.CHANGE_MODULE.getRevertAction().apply(current, committed);
+        assertEquals(TestCaseChangeComparator.compare(committed, current), List.of(), "nothing reviewable is left");
+
+        current.takeAuditOf(committed);
+
+        assertEquals(current.getCreatedBy(), committed.getCreatedBy());
+        assertEquals(current.getCreatedAt(), committed.getCreatedAt());
+        assertEquals(current.getUpdatedBy(), committed.getUpdatedBy(), "the reverting tester's stamp stayed on a case nobody changed");
+        assertEquals(current.getUpdatedAt(), committed.getUpdatedAt());
+    }
+
+    /**
      * A revert must not hand the committed state's own list to the working copy:
      * they would then be the same object, and editing one would change the other.
      */

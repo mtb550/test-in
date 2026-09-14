@@ -177,4 +177,17 @@ public final class TestCaseDto {
         updatedBy = tester;
         updatedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
+
+    /**
+     * Takes another state's whole audit - who created and changed this case, and
+     * when. For a revert that leaves nothing reviewable changed: the case is then
+     * the one that was committed, and a fresh stamp would keep it in the review
+     * for a change nobody made (#66, finding 128).
+     */
+    public void takeAuditOf(final @NotNull TestCaseDto other) {
+        createdBy = other.createdBy;
+        createdAt = other.createdAt;
+        updatedBy = other.updatedBy;
+        updatedAt = other.updatedAt;
+    }
 }

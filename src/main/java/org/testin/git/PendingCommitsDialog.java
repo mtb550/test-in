@@ -298,8 +298,20 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             return false;
         }
 
-        changeType.getRevertAction().apply(current.orElseThrow(), diff.committedState());
-        indexer.putTestCase(testSetPath, current.orElseThrow());
+        final @NotNull TestCaseDto working = current.orElseThrow();
+        final @NotNull TestCaseDto committed = diff.committedState();
+        changeType.getRevertAction().apply(working, committed);
+
+        // The last change put back is the case as it was committed, audit
+        // included. Stamped as modified now, it stayed in the review for a change
+        // nobody made (#66, finding 128). A case that still differs somewhere is
+        // an ordinary edit, and is stamped as one.
+        if (TestCaseChangeComparator.compare(committed, working).isEmpty()) {
+            working.takeAuditOf(committed);
+            indexer.putTestCaseVerbatim(testSetPath, working);
+        } else {
+            indexer.putTestCase(testSetPath, working);
+        }
 
         return true;
     }

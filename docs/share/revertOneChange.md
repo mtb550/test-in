@@ -28,7 +28,9 @@ Right click the row in the review.
   keys can be changed there.
 - **Rule-SHARE-051** — Only a change to a test case's field can be put back.
 - **Rule-SHARE-052** — Only that one field is put back. Everything else on the
-  test case stays as it is.
+  test case stays as it is. When it was the test case's last change, who created
+  and changed it goes back to what was committed too, so the test case leaves the
+  review.
 - **Rule-SHARE-053** — The change is written to disk at once, not on the commit.
 
 ## The screen
