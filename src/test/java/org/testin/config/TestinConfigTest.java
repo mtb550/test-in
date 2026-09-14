@@ -42,6 +42,34 @@ public class TestinConfigTest {
             RepoUrl: https://github.com/acme/checkout-testcases
             """;
 
+    /**
+     * {@code bugRepoUrl} is read like every other key, and the token a copied
+     * address can carry is gone before anything holds it (#28).
+     */
+    @Test
+    public void aBugRepositoryIsReadFromItsOwnKey() {
+        final TestinProjectConfig config = TestinConfigLoader.parse(
+                "testinProject: cases\nbugRepoUrl: https://mtb550:ghp_secret@github.com/mtb550/product.git\n", "bug repo");
+
+        assertEquals(config.bugRepoUrl(), "https://github.com/mtb550/product.git", "a token never survives, as for RepoUrl");
+        assertEquals(config.bugRepository().map(BugRepository::ghRepo).orElse(""), "github.com/mtb550/product");
+    }
+
+    /**
+     * Left out, or naming no repository, there is nothing to file in - but what
+     * the tester wrote stays, so the reason can say what is wrong with it.
+     */
+    @Test
+    public void aBugRepoUrlThatNamesNoRepositoryIsKeptAndNotUsed() {
+        assertTrue(TestinConfigLoader.parse("testinProject: cases\n", "none").bugRepository().isEmpty());
+        assertEquals(TestinProjectConfig.EMPTY.bugRepoUrl(), "");
+
+        final TestinProjectConfig wrong = TestinConfigLoader.parse(
+                "bugRepoUrl: https://github.com/mtb550/product/issues\n", "issues page");
+        assertEquals(wrong.bugRepoUrl(), "https://github.com/mtb550/product/issues");
+        assertTrue(wrong.bugRepository().isEmpty());
+    }
+
     @Test
     public void readsEveryKey() {
         final TestinProjectConfig config = TestinConfigLoader.parse(FULL, "full");

@@ -25,6 +25,7 @@ import org.testin.sftp.SftpAddress;
 import org.testin.util.Bundle;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -60,8 +61,13 @@ import java.util.regex.Pattern;
  *                      connection: a tester who switches this file from git to
  *                      sftp changes how the project is reached, not which
  *                      project it is
+ * @param bugRepoUrl    the development repository Report Bug files issues in
+ *                      (#28), as the tester wrote it with any credentials taken
+ *                      out. Kept even when it names no repository, so what is
+ *                      wrong with it can be said - {@link #bugRepository()} is
+ *                      the question that answers whether it does
  */
-public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull ConnectionType connection, @NotNull String repoUrl, @NotNull String sftpHost, int sftpPort, @NotNull String sftpPath, @NotNull String testinProject) {
+public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull ConnectionType connection, @NotNull String repoUrl, @NotNull String sftpHost, int sftpPort, @NotNull String sftpPath, @NotNull String testinProject, @NotNull String bugRepoUrl) {
 
     /**
      * The port an address is assumed to be on when the file does not say.
@@ -74,7 +80,7 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
      * tell the reasons apart.
      */
     public static final @NotNull TestinProjectConfig EMPTY = new TestinProjectConfig(
-            TestinLocation.LOCAL, ConnectionType.NONE, "", "", DEFAULT_PORT, "", "");
+            TestinLocation.LOCAL, ConnectionType.NONE, "", "", DEFAULT_PORT, "", "", "");
 
     /**
      * A repository whose file is there and could not be read.
@@ -97,7 +103,7 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
      * {@link #isUnreadable()} is the one question that can tell.
      */
     public static final @NotNull TestinProjectConfig UNREADABLE = new TestinProjectConfig(
-            TestinLocation.LOCAL, ConnectionType.NONE, "", "", DEFAULT_PORT, "", "");
+            TestinLocation.LOCAL, ConnectionType.NONE, "", "", DEFAULT_PORT, "", "", "");
 
     /**
      * The forms {@code git clone} is given, and nothing else.
@@ -120,6 +126,11 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
         repoUrl = validRepoUrl(repoUrl);
         sftpHost = validHost(sftpHost);
         sftpPort = sftpPort <= 0 || sftpPort > 65535 ? DEFAULT_PORT : sftpPort;
+
+        // Stripped on the way in, as RepoUrl is, and for the same reason: the
+        // file is committed. Not refused when it names no repository - the
+        // tester is told what is wrong with it where Report Bug would send.
+        bugRepoUrl = withoutCredentials(bugRepoUrl);
 
         // The mode decides. A project the file calls local is local, whatever
         // addresses were left in it - so an address commented back in later is
@@ -155,14 +166,15 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
      * promises.
      */
     @JsonCreator
-    static @NotNull TestinProjectConfig read(@JsonProperty("location") final @Nullable String location, @JsonProperty("connection") final @Nullable String connection, @JsonProperty("RepoUrl") final @Nullable String repoUrl, @JsonProperty("sftpHost") final @Nullable String sftpHost, @JsonProperty("sftpPort") final @Nullable Integer sftpPort, @JsonProperty("sftpPath") final @Nullable String sftpPath, @JsonProperty("testinProject") final @Nullable String testinProject) {
+    static @NotNull TestinProjectConfig read(@JsonProperty("location") final @Nullable String location, @JsonProperty("connection") final @Nullable String connection, @JsonProperty("RepoUrl") final @Nullable String repoUrl, @JsonProperty("sftpHost") final @Nullable String sftpHost, @JsonProperty("sftpPort") final @Nullable Integer sftpPort, @JsonProperty("sftpPath") final @Nullable String sftpPath, @JsonProperty("testinProject") final @Nullable String testinProject, @JsonProperty("bugRepoUrl") final @Nullable String bugRepoUrl) {
         return new TestinProjectConfig(TestinLocation.of(strip(location)),
                 ConnectionType.of(strip(connection)),
                 strip(repoUrl),
                 strip(sftpHost),
                 Objects.requireNonNullElse(sftpPort, DEFAULT_PORT),
                 strip(sftpPath),
-                strip(testinProject));
+                strip(testinProject),
+                strip(bugRepoUrl));
     }
 
     private static @NotNull String strip(final @Nullable String value) {
@@ -280,6 +292,15 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
      */
     public @NotNull SftpAddress sftpAddress() {
         return hasSftp() ? new SftpAddress(sftpHost, sftpPort, projectFolder()) : SftpAddress.NONE;
+    }
+
+    /**
+     * The repository Report Bug files issues in, and empty both when
+     * {@code bugRepoUrl} is not set and when it names no repository.
+     * {@link #bugRepoUrl()} tells the two apart, which is all a reason needs.
+     */
+    public @NotNull Optional<BugRepository> bugRepository() {
+        return BugRepository.of(bugRepoUrl);
     }
 
     /**

@@ -61,6 +61,8 @@ final class TestinConfigWriter {
             # sftpPort: 22                 optional, 22
             # sftpPath: /Testin            the folder holding the projects
             # testinProject: test-01       which of them, in every case
+
+            # bugRepoUrl: https://github.com/you/product   where Report Bug files issues
             """;
 
     /**
