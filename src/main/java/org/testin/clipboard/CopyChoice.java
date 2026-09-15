@@ -19,8 +19,10 @@ package org.testin.clipboard;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.Fqcn;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
@@ -33,6 +35,7 @@ import javax.swing.JComponent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -79,8 +82,12 @@ public enum CopyChoice implements MenuItem {
      * that one. None of them is written by a tester - Testin derives all three -
      * and all three are what somebody pastes into a stack trace, a ticket or a
      * command line.
+     * <p>
+     * The class name is copied dotted, as Java and a stack trace write it. The
+     * grid column draws it as a " &gt; " breadcrumb to read, and copying that
+     * gave a name that matched nothing a tester pasted it into (#312, A59).
      */
-    FQCN(TestEditorAttributes.FQCN, Shortcuts.CopyFqcn),
+    FQCN(TestEditorAttributes.FQCN, Shortcuts.CopyFqcn, tc -> String.join(".", Fqcn.ofMethod(tc))),
     ID(TestEditorAttributes.ID, Shortcuts.CopyId),
     PATH(TestEditorAttributes.PATH, Shortcuts.CopyPath);
 
@@ -99,19 +106,34 @@ public enum CopyChoice implements MenuItem {
      */
     private final @NotNull Optional<TestEditorAttributes> attribute;
 
+    /**
+     * What this row puts on the clipboard for one test case: the attribute's own
+     * value, unless the row says otherwise.
+     */
+    @Getter(AccessLevel.NONE)
+    private final @NotNull Function<TestCaseDto, String> copied;
+
     CopyChoice(final @NotNull TestEditorAttributes attribute, final @NotNull Shortcuts shortcut) {
+        this(attribute, shortcut, attribute::gridValue);
+    }
+
+    CopyChoice(final @NotNull TestEditorAttributes attribute, final @NotNull Shortcuts shortcut, final @NotNull Function<TestCaseDto, String> copied) {
         this.name = attribute.getName();
         this.shortcut = shortcut;
         this.attribute = Optional.of(attribute);
+        this.copied = copied;
     }
 
     CopyChoice(final @NotNull String name, final @NotNull Shortcuts shortcut) {
         this.name = name;
         this.shortcut = shortcut;
         this.attribute = Optional.empty();
+        this.copied = CopyChoice::allDetailsOf;
     }
 
     /**
+     * UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-208.
+     * <p>
      * What this row puts on the clipboard for one test case.
      * <p>
      * A single value is copied bare, with no caption: a tester who asked for the
@@ -120,7 +142,7 @@ public enum CopyChoice implements MenuItem {
      * make it readable.
      */
     public @NotNull String from(final @NotNull TestCaseDto tc) {
-        return attribute.map(one -> one.gridValue(tc)).orElseGet(() -> allDetailsOf(tc));
+        return copied.apply(tc);
     }
 
     /**

@@ -17,6 +17,8 @@
 package org.testin.clipboard;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testng.annotations.Test;
 
 import javax.swing.KeyStroke;
@@ -87,5 +89,23 @@ public class CopyChoiceTest {
     public void everyRowPrintsItsKey() {
         assertTrue(Arrays.stream(CopyChoice.values()).noneMatch(choice -> choice.getShortcutText().isBlank()),
                 "a copy row has no key to print, so the menu shows a blank where its shortcut goes");
+    }
+
+    /**
+     * UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-208.
+     * <p>
+     * The class name is copied as Java writes it. The row copied the grid's
+     * " > " breadcrumb, which matches nothing in a search or a stack trace
+     * (#312, A59).
+     */
+    @Test
+    public void theClassNameIsCopiedDotted() {
+        final @NotNull TestSetDirectoryDto set = new TestSetDirectoryDto();
+        set.setPath2(new ArrayList<>(List.of("shop", "checkout", "Payment")));
+
+        final @NotNull TestCaseDto tc = TestCaseDto.builder().description("card is declined").build();
+        tc.setParent(set);
+
+        assertEquals(CopyChoice.FQCN.from(tc), "shop.checkout.PaymentTest.cardIsDeclined");
     }
 }
