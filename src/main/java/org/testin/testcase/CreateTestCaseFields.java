@@ -123,7 +123,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
      * duplicate {@code *_SHORTCUT} constants used to exist.
      */
     private static final @NotNull List<CreateTestCaseFields> JUMP_KEYS =
-            List.of(DESCRIPTION, EXPECTED_RESULT, STEPS, TEST_DATA, PRE_CONDITIONS, PRIORITY, GROUP);
+            List.of(DESCRIPTION, EXPECTED_RESULT, MODULE, STEPS, TEST_DATA, PRE_CONDITIONS, PRIORITY, GROUP);
 
     private final @NotNull String name;
     /**
