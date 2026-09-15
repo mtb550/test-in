@@ -30,6 +30,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -173,6 +174,12 @@ public final class EditShownCase {
 
         final @NotNull Path resolved = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
 
-        return Optional.of(Services.getInstance(p, ProjectIndexer.class).getTestSetByPath(resolved).getPath());
+        // Found rather than demanded, and only a test set. From a run the path
+        // names the run, and a test case removed from its set is shown there with
+        // no parent - demanding a test set at that path raised an internal error
+        // instead of saying the edit has nowhere to go (#312, A62).
+        return Services.getInstance(p, ProjectIndexer.class).find(resolved)
+                .filter(TestSetDirectoryDto.class::isInstance)
+                .map(DirectoryDto::getPath);
     }
 }
