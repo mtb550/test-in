@@ -45,6 +45,7 @@ public final class DialogSplitButton implements DialogComponent {
 
     private final @NotNull JBOptionButton button;
     private final @NotNull JBPanel<?> panel;
+    private final @NotNull String defaultLabel;
     private @NotNull String chosen;
     private @NotNull Runnable submitRequest = () -> {
     };
@@ -52,7 +53,8 @@ public final class DialogSplitButton implements DialogComponent {
     DialogSplitButton(final @NotNull List<String> labels) {
         if (labels.isEmpty()) throw new IllegalStateException("A split button needs at least one action");
 
-        chosen = labels.getFirst();
+        defaultLabel = labels.getFirst();
+        chosen = defaultLabel;
 
         final @NotNull Action main = action(labels.getFirst());
         final Action @NotNull[] alternatives = labels.stream().skip(1).map(this::action).toArray(Action[]::new);
@@ -83,6 +85,13 @@ public final class DialogSplitButton implements DialogComponent {
             public void actionPerformed(final ActionEvent event) {
                 chosen = label;
                 submitRequest.run();
+
+                // Rule-INTERNAL-054. The submit has read the choice by now. One the
+                // dialog refused leaves it open, and Enter - captioned with the
+                // first label - reads the choice again: left on the alternative,
+                // Enter captioned "Commit & Push" committed without pushing
+                // (#312, A76).
+                chosen = defaultLabel;
             }
         };
     }

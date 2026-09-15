@@ -1,0 +1,53 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.ui.framework;
+
+import com.intellij.ui.components.JBOptionButton;
+import org.testng.annotations.Test;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.testng.Assert.assertEquals;
+
+/**
+ * The split button's contract: the submit reads the label that was pressed, and
+ * Enter afterward runs the first label whatever was pressed before it.
+ */
+public class DialogSplitButtonTest {
+
+    /**
+     * An alternative pressed on a dialog that refused the submit - an empty
+     * commit message - left the choice on that alternative, so Enter, captioned
+     * "Commit & Push", committed without pushing (#312, A76).
+     */
+    @Test
+    public void anAlternativePressedOnceDoesNotBecomeWhatEnterRuns() {
+        final DialogSplitButton split = ComponentDialogBase.splitButton("Commit & Push", "Commit").getComponent();
+        final List<String> readBySubmit = new ArrayList<>();
+        split.onSubmitRequest(() -> readBySubmit.add(split.getChosen()));
+
+        final JBOptionButton button = (JBOptionButton) split.getFocusComponent();
+        final Action alternative = button.getOptions()[0];
+        alternative.actionPerformed(new ActionEvent(button, ActionEvent.ACTION_PERFORMED, "Commit"));
+
+        assertEquals(readBySubmit, List.of("Commit"), "the submit reads the label that was pressed");
+        assertEquals(split.getChosen(), "Commit & Push", "Enter afterward runs the first label");
+    }
+}
