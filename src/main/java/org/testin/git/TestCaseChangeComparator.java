@@ -39,7 +39,7 @@ final class TestCaseChangeComparator {
         addIfChanged(changes, TestEditorAttributes.EXPECTED_RESULT.getName(), oldState.getExpectedResult(), newState.getExpectedResult(), ChangeType.CHANGE_EXPECTED_RESULT);
         addIfChanged(changes, TestEditorAttributes.STEPS.getName(), formatSteps(oldState), formatSteps(newState), ChangeType.CHANGE_STEPS);
         addIfChanged(changes, TestEditorAttributes.PRIORITY.getName(), oldState.getPriority().getLabel(), newState.getPriority().getLabel(), ChangeType.CHANGE_PRIORITY);
-        addIfChanged(changes, TestEditorAttributes.STATUS.getName(), oldState.getStatus().name(), newState.getStatus().name(), ChangeType.CHANGE_STATUS);
+        addIfChanged(changes, TestEditorAttributes.STATUS.getName(), oldState.getStatus().getLabel(), newState.getStatus().getLabel(), ChangeType.CHANGE_STATUS);
         addIfChanged(changes, TestEditorAttributes.REFERENCE.getName(), oldState.getReference(), newState.getReference(), ChangeType.CHANGE_REFERENCE);
         addIfChanged(changes, TestEditorAttributes.MODULE.getName(), oldState.getModule(), newState.getModule(), ChangeType.CHANGE_MODULE);
         addIfChanged(changes, TestEditorAttributes.TEST_DATA.getName(), oldState.getTestData(), newState.getTestData(), ChangeType.CHANGE_TEST_DATA);
