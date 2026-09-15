@@ -211,16 +211,16 @@ public final class GitRepositoryService {
      * (uncommitted changes) is the caller's to write.
      */
     public @NotNull String checkout(final @NotNull Path path, final @NotNull String branch) {
-        final @NotNull String localName = GitRefs.localNameOf(branch);
-        final boolean remoteBranch = !localName.equals(branch);
+        final @NotNull List<String> localBranches = getLocalBranches(path);
+        final boolean remoteBranch = GitRefs.isRemoteBranch(branch, localBranches, run(path, "git", "remote").orElse("").lines().toList());
+        final @NotNull String target = remoteBranch ? GitRefs.localNameOf(branch) : branch;
 
         // A remote branch checked out by its remote name detaches HEAD. Tracking
         // it under its local name is what the tester meant by picking it.
-        if (remoteBranch && !getAvailableBranches(path).contains(localName)) {
-            return run(path, "git", "checkout", "-b", localName, "--track", branch).isPresent() ? localName : "";
+        if (remoteBranch && !localBranches.contains(target)) {
+            return run(path, "git", "checkout", "-b", target, "--track", branch).isPresent() ? target : "";
         }
 
-        final @NotNull String target = remoteBranch ? localName : branch;
         return run(path, "git", "checkout", target).isPresent() ? target : "";
     }
 

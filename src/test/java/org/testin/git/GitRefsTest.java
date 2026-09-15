@@ -94,6 +94,29 @@ public class GitRefsTest {
         assertEquals(GitRefs.localNameOf("main"), "main");
     }
 
+    /**
+     * A slash is not a remote prefix. A local branch called feature/login used
+     * to be checked out as a new branch called login, and the review then
+     * committed there and pushed the untouched feature/login (#312, A40).
+     */
+    @Test
+    public void aLocalBranchWithASlashIsNotARemoteBranch() {
+        assertFalse(GitRefs.isRemoteBranch("feature/login", List.of("feature/login", "main"), List.of("origin")));
+    }
+
+    @Test
+    public void aRemoteBranchIsNamedAfterItsRemote() {
+        assertTrue(GitRefs.isRemoteBranch("origin/main", List.of("main"), List.of("origin")));
+        assertTrue(GitRefs.isRemoteBranch("origin/feature/login", List.of("main"), List.of("origin")));
+        assertEquals(GitRefs.localNameOf("origin/feature/login"), "feature/login");
+    }
+
+    @Test
+    public void aNameStartingWithNoRemoteIsNotARemoteBranch() {
+        assertFalse(GitRefs.isRemoteBranch("feature/login", List.of("main"), List.of("origin")));
+        assertFalse(GitRefs.isRemoteBranch("origin/main", List.of("main"), List.of()));
+    }
+
     @Test
     public void pathsAreForwardSlashedForGitWhateverThePlatformUses() {
         final Set<String> paths = GitRefs.repoRelativePaths(List.of(

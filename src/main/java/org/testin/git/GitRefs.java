@@ -315,6 +315,22 @@ public final class GitRefs {
     }
 
     /**
+     * UC-TREE-PANEL-026, Rule-TREE-PANEL-086.
+     * <p>
+     * True when a picked name is a remote's branch: not a branch on this machine,
+     * and starting with the name of one of the remotes.
+     * <p>
+     * Asked of the lists rather than of a slash. A local branch may be called
+     * {@code feature/login}, and reading that slash as a remote prefix checked
+     * out a new branch called {@code login} - so a commit went there while the
+     * push sent the untouched {@code feature/login} and said Pushed (#312, A40).
+     */
+    public static boolean isRemoteBranch(final @NotNull String branch, final @NotNull List<String> localBranches, final @NotNull List<String> remotes) {
+        return !localBranches.contains(branch)
+                && remotes.stream().map(String::trim).filter(remote -> !remote.isEmpty()).anyMatch(remote -> branch.startsWith(remote + "/"));
+    }
+
+    /**
      * Every directory the given repository-relative files sit under, itself
      * repository-relative, with the repository root as the empty string.
      * <p>
