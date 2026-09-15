@@ -191,13 +191,15 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                     // its position from. It wrote none, so F5 and Go to code said
                     // the copy had no generated code (#312, A54).
                     if (!isCut) GenType.CREATE_TEST_CASE.executeAll(p, pastedHere);
+
+                    // In the callback, once the sequence is persisted: the write is
+                    // two thread hops away and a newer sort can supersede it, so a
+                    // balloon shown when the call returned said Pasted for cases
+                    // that might never be written (#62; #312, A56).
+                    Services.getInstance(p, Notifier.class).softShowCounted(p, Done.PASTED, pasted);
                 });
 
                 if (isCut) cutState.clear();
-
-                // Inside the invokeLater and after the sequence is persisted: the
-                // action itself returns long before the cases exist (#62).
-                if (pasted > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.PASTED, pasted);
             });
         }
 
