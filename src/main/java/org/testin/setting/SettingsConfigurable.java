@@ -40,6 +40,7 @@ import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
@@ -199,7 +200,17 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         final @NotNull String typed = testinPathPanel.getPathText().trim();
         if (typed.isEmpty()) return;
 
-        final @NotNull Path root = Path.of(typed);
+        // A character Windows forbids in a path makes Path.of throw, and that
+        // is not a ConfigurationException: Apply raised an IDE error report
+        // instead of the message under the field (#312, A91). No folder can be
+        // at such a path, so it is refused as one that is not there.
+        final @NotNull Path root;
+        try {
+            root = Path.of(typed);
+        } catch (final InvalidPathException notAPath) {
+            Logger.info("The Testin folder typed is not a path: " + notAPath.getMessage());
+            throw new ConfigurationException(Bundle.message("settings.no.folder", typed), Bundle.message("settings.no.folder.title"));
+        }
 
         if (!Files.exists(root))
             throw new ConfigurationException(Bundle.message("settings.no.folder", root), Bundle.message("settings.no.folder.title"));
