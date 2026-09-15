@@ -672,8 +672,9 @@ public final class ProjectIndexer {
     /**
      * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
      * <p>
-     * Keeps pasted screenshots as PNG files beside the run, and answers their
-     * names, in order, for the run item to hold (#313).
+     * Keeps newly pasted screenshots as PNG files beside the run, each under a
+     * short name of its own, and answers the names, in order, for the run item
+     * to hold (#313).
      */
     public @NotNull List<String> storeScreenshots(final @NotNull Path runPath, final @NotNull List<byte[]> pngs) {
         return runWriter.storeScreenshots(runPath, pngs);

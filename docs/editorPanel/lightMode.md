@@ -532,8 +532,8 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
   because none left to make room for it.
 - **Rule-EDITOR-PANEL-202** — The window eases to its new height rather than
   jumping to it. That covers every height change: the details opening, the
-  failure form taking their place, a longer test case arriving and every zoom
-  step.
+  failure form taking their place, a screenshot pasted into the form or taken
+  out of it, a longer test case arriving and every zoom step.
 - **Rule-EDITOR-PANEL-203** — Everything moves for the same 200 milliseconds.
 - **Rule-EDITOR-PANEL-204** — A key pressed while the window is still moving is
   taken at once. The movement in progress is dropped where it is and the next

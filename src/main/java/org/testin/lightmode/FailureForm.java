@@ -91,11 +91,20 @@ class FailureForm extends JBPanel<FailureForm> {
      */
     private static final float PLACEHOLDER_SCALE = 0.7f;
 
-    FailureForm(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem, final float zoom) {
+    /**
+     * UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-202.
+     * <p>
+     * {@code resized} runs when a screenshot is pasted or taken out: the window
+     * is as tall as what it holds, and without being told it kept the height the
+     * form opened at, so a pasted thumbnail's lower half - its x included - sat
+     * below the window's edge.
+     */
+    FailureForm(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem, final float zoom, final @NotNull Runnable resized) {
         this.p = p;
         this.runPath = runPath;
         this.runItem = runItem;
         this.fields = new FailureFields(p, runPath, runItem);
+        fields.onScreenshotsChanged(resized);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(false);

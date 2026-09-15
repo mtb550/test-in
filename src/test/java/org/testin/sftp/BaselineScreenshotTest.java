@@ -16,7 +16,6 @@
 
 package org.testin.sftp;
 
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testng.annotations.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -36,7 +35,7 @@ public class BaselineScreenshotTest {
 
     @Test
     public void aScreenshotIsRememberedAsTheFileItIs() {
-        final String path = "Test Runs/cycle 38/" + TestRunDirectoryDto.screenshotName(PNG);
+        final String path = "Test Runs/cycle 38/k3f9a.png";
         final Baseline baseline = new Baseline(Map.of(path, Baseline.remembered(path, PNG)));
 
         assertEquals(baseline.manifest().entries().get(path), Manifest.Entry.of(PNG));
@@ -44,7 +43,7 @@ public class BaselineScreenshotTest {
 
     @Test
     public void rememberedAsTextItWouldNeverMatch() {
-        final String path = "Test Runs/cycle 38/" + TestRunDirectoryDto.screenshotName(PNG);
+        final String path = "Test Runs/cycle 38/k3f9a.png";
         final Baseline asText = new Baseline(Map.of(path, new String(PNG, StandardCharsets.UTF_8)));
 
         assertNotEquals(asText.manifest().entries().get(path), Manifest.Entry.of(PNG),

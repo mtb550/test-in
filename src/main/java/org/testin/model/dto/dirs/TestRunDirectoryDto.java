@@ -23,10 +23,11 @@ import org.testin.model.DirectoryType;
 import org.testin.model.markers.TestRunMarker;
 
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Setter
@@ -88,32 +89,42 @@ public class TestRunDirectoryDto extends DirectoryDto {
         return runPath.resolve("run.json");
     }
 
-    private static final @NotNull Pattern SCREENSHOT_NAME = Pattern.compile("[0-9a-f]{16}\\.png");
+    private static final @NotNull String SCREENSHOT_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+    private static final int SCREENSHOT_NAME_LENGTH = 5;
+
+    private static final @NotNull Pattern SCREENSHOT_NAME = Pattern.compile("[0-9a-z]{" + SCREENSHOT_NAME_LENGTH + "}\\.png");
 
     /**
      * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
      * <p>
-     * The name a pasted screenshot is kept under in its run's folder: the first
-     * sixteen hex digits of its PNG's SHA-256, then {@code .png} (#313).
+     * The name a newly pasted screenshot is kept under in its run's folder: five
+     * random lowercase letters and digits, then {@code .png}, and none of the
+     * names in {@code taken} (#313).
      * <p>
-     * Named by what it holds rather than by who pasted it or where. The same
-     * picture is always the same file, so writing it twice is harmless; a name
-     * never points at different bytes, so Git and a sync only ever see a
-     * screenshot arrive or go; and nothing in it names the run or its folder, so
-     * a rename or a move leaves it valid - the lesson of {@link #resultsFile}.
+     * Short, because a tester reads it: it is the screenshot's link in the view
+     * panel. Five characters give some sixty million names, so the names the run
+     * already holds are the only ones worth checking. Nothing in it names the run
+     * or its folder, so a rename or a move leaves it valid - the lesson of
+     * {@link #resultsFile}.
      */
-    public static @NotNull String screenshotName(final byte @NotNull [] png) {
-        try {
-            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(png), 0, 8) + ".png";
-        } catch (final NoSuchAlgorithmException ex) {
-            // Every Java platform is required to provide SHA-256.
-            throw new IllegalStateException("SHA-256 is not available", ex);
-        }
+    public static @NotNull String newScreenshotName(final @NotNull Set<String> taken) {
+        return Stream.generate(TestRunDirectoryDto::randomScreenshotName)
+                .filter(name -> !taken.contains(name))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private static @NotNull String randomScreenshotName() {
+        return ThreadLocalRandom.current().ints(SCREENSHOT_NAME_LENGTH, 0, SCREENSHOT_CHARACTERS.length())
+                .mapToObj(index -> String.valueOf(SCREENSHOT_CHARACTERS.charAt(index)))
+                .collect(Collectors.joining()) + ".png";
     }
 
     /**
-     * Whether a file name is one {@link #screenshotName} gives. A PNG a tester
-     * put in the folder by hand is not one, so nothing removes it as a screenshot.
+     * Whether a file name is one {@link #newScreenshotName} gives. Any PNG named
+     * that way in a run's folder is taken for a screenshot, so one a tester put
+     * there by hand under such a name goes when no result names it.
      */
     public static boolean isScreenshotName(final @NotNull String fileName) {
         return SCREENSHOT_NAME.matcher(fileName).matches();

@@ -40,10 +40,10 @@ public final class ScreenshotDialog extends AbstractFrameworkDialog<Picture> {
     private static final int HEIGHT = 700;
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081
-    public ScreenshotDialog(final @NotNull Project p, final int number, final byte @NotNull [] png) {
+    public ScreenshotDialog(final @NotNull Project p, final @NotNull String name, final byte @NotNull [] png) {
         super(p);
 
-        title = Bundle.message("view.stacktrace.screenshot", String.valueOf(number));
+        title = name;
 
         // Sized rather than left to the picture: a screenshot is as large as the
         // screen it was taken of. Setting it also makes the popup resizable.

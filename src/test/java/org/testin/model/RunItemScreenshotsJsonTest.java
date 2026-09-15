@@ -21,12 +21,14 @@ import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -36,20 +38,19 @@ import static org.testng.Assert.assertTrue;
  */
 public class RunItemScreenshotsJsonTest {
 
-    private static final byte[] PNG_SIGNATURE = {(byte) 0x89, 'P', 'N', 'G'};
+    private static final String NAME = "k3f9a.png";
 
     @Test
     public void theRunFileNamesTheScreenshotsAndHoldsNoPicture() {
-        final String name = TestRunDirectoryDto.screenshotName(PNG_SIGNATURE);
-        final TestRunItems written = TestRunItems.builder().id(UUID.randomUUID()).stacktrace("boom").screenshots(List.of(name)).build();
+        final TestRunItems written = TestRunItems.builder().id(UUID.randomUUID()).stacktrace("boom").screenshots(List.of(NAME)).build();
 
         try {
             final String json = new String(RealMapper.build().writeValueAsBytes(written), StandardCharsets.UTF_8);
             final TestRunItems read = RealMapper.build().readValue(json, TestRunItems.class);
 
-            assertTrue(json.contains("\"" + name + "\""), "the file is named: " + json);
+            assertTrue(json.contains("\"" + NAME + "\""), "the file is named: " + json);
             assertFalse(json.contains("iVBORw"), "and no base64 of the picture is written: " + json);
-            assertEquals(read.getScreenshots(), List.of(name));
+            assertEquals(read.getScreenshots(), List.of(NAME));
             assertEquals(read.getStacktrace(), "boom", "the text stays text");
         } catch (final Exception e) {
             throw new AssertionError("the run item could not be written and read back", e);
@@ -68,19 +69,22 @@ public class RunItemScreenshotsJsonTest {
     }
 
     /**
-     * Named by content: the same picture is the same file, a different one is
-     * another, and nothing but such a name is taken for a screenshot.
+     * Five random letters and digits, never a name the run already holds, and
+     * nothing but such a name is taken for a screenshot.
      */
     @Test
-    public void aScreenshotIsNamedByWhatItHolds() {
-        final String name = TestRunDirectoryDto.screenshotName(PNG_SIGNATURE);
+    public void aNewScreenshotNameIsShortAndNotOneTheRunHolds() {
+        final Set<String> taken = new HashSet<>();
 
-        assertTrue(name.matches("[0-9a-f]{16}\\.png"), name);
-        assertEquals(TestRunDirectoryDto.screenshotName(PNG_SIGNATURE.clone()), name, "the same bytes, the same name");
-        assertNotEquals(TestRunDirectoryDto.screenshotName(new byte[]{1, 2, 3}), name, "other bytes, another name");
+        IntStream.range(0, 1000).forEach(attempt -> {
+            final String name = TestRunDirectoryDto.newScreenshotName(taken);
 
-        assertTrue(TestRunDirectoryDto.isScreenshotName(name));
+            assertTrue(name.matches("[0-9a-z]{5}\\.png"), name);
+            assertTrue(taken.add(name), "a name the run already holds: " + name);
+            assertTrue(TestRunDirectoryDto.isScreenshotName(name));
+        });
+
         assertFalse(TestRunDirectoryDto.isScreenshotName("run.json"));
-        assertFalse(TestRunDirectoryDto.isScreenshotName("my notes.png"), "a PNG put there by hand is not a screenshot");
+        assertFalse(TestRunDirectoryDto.isScreenshotName("my notes.png"), "a PNG put there by hand under another name is not a screenshot");
     }
 }

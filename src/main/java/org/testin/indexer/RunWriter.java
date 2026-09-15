@@ -28,9 +28,8 @@ import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,21 +164,23 @@ final class RunWriter {
     /**
      * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
      * <p>
-     * Queues each screenshot the run's folder does not hold yet, and answers
-     * their names in the order given (#313).
+     * Queues newly pasted screenshots as files beside the run, each under a new
+     * name no result of the run holds, and answers the names in the order given
+     * (#313).
      * <p>
      * Ahead of the results that name them, in the same queue, so a run file
-     * never names a screenshot that has not landed. The run is asked again at
-     * the write, as its results are, so a run removed meanwhile does not get a
-     * folder back (#66, finding 86).
+     * never names a screenshot that has not landed. Written even over a file of
+     * that name, which no result names and the sweep would take anyway. The run
+     * is asked again at the write, as its results are, so a run removed
+     * meanwhile does not get a folder back (#66, finding 86).
      */
     @NotNull List<String> storeScreenshots(final @NotNull Path runPath, final @NotNull List<byte[]> pngs) {
-        final @NotNull List<String> names = new ArrayList<>();
+        final @NotNull Set<String> taken = new HashSet<>(store.findTestRun(runPath).map(RunWriter::namedScreenshots).orElse(Set.of()));
         final @NotNull Map<String, byte[]> byName = new LinkedHashMap<>();
         for (final byte[] png : pngs) {
-            final @NotNull String name = TestRunDirectoryDto.screenshotName(png);
-            names.add(name);
-            byName.putIfAbsent(name, png);
+            final @NotNull String name = TestRunDirectoryDto.newScreenshotName(taken);
+            taken.add(name);
+            byName.put(name, png);
         }
 
         if (!byName.isEmpty()) queue.execute(() -> {
@@ -190,16 +191,13 @@ final class RunWriter {
                 }
 
                 final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
-                byName.forEach((name, png) -> {
-                    final @NotNull Path file = TestRunDirectoryDto.screenshotFile(runPath, name);
-                    if (!Files.isRegularFile(file)) files.write(p, file, png);
-                });
+                byName.forEach((name, png) -> files.write(p, TestRunDirectoryDto.screenshotFile(runPath, name), png));
             } catch (final Exception ex) {
                 Logger.error("Failed to write the screenshots of " + runPath.getFileName() + ": " + ex.getMessage());
             }
         });
 
-        return List.copyOf(names);
+        return List.copyOf(byName.keySet());
     }
 
     /**

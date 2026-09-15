@@ -37,7 +37,6 @@ import java.awt.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 /**
  * The first few lines of a failure's stacktrace, and the links to the rest: the
@@ -96,7 +95,7 @@ public final class StacktraceRow extends BaseDetails {
 
         final @NotNull List<ActionLink> links = new ArrayList<>();
         if (lines.size() > LINES_SHOWN) links.add(showAllLink(p, dto, stacktrace, lines.size()));
-        IntStream.range(0, screenshots.size()).forEach(index -> links.add(screenshotLink(p, index + 1, screenshots.get(index))));
+        screenshots.forEach(name -> links.add(screenshotLink(p, name)));
         if (!links.isEmpty()) container.add(linkLine(links));
 
         return addRow(panel, gbc, RunEditorAttributes.STACKTRACE.getName(), container, currentRow);
@@ -129,14 +128,14 @@ public final class StacktraceRow extends BaseDetails {
     /**
      * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081.
      * <p>
-     * One screenshot, opened at its real size in a window of its own: the panel
-     * itself draws no picture. Read from its file when the link is clicked, not
-     * when the panel draws (#313).
+     * One screenshot, named as its file is, and opened at its real size in a
+     * window of its own: the panel itself draws no picture. Read from its file
+     * when the link is clicked, not when the panel draws (#313).
      */
-    private @NotNull ActionLink screenshotLink(final @NotNull Project p, final int number, final @NotNull String name) {
-        return link(Bundle.message("view.stacktrace.screenshot", String.valueOf(number)), event -> {
+    private @NotNull ActionLink screenshotLink(final @NotNull Project p, final @NotNull String name) {
+        return link("[" + name + "]", event -> {
             final @NotNull Path runPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
-            new ScreenshotDialog(p, number, Services.getInstance(p, ProjectIndexer.class).screenshot(runPath, name)).show();
+            new ScreenshotDialog(p, name, Services.getInstance(p, ProjectIndexer.class).screenshot(runPath, name)).show();
         });
     }
 

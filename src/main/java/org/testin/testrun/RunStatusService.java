@@ -178,9 +178,9 @@ public final class RunStatusService {
 
         if (liveItem(p, run.orElseThrow(), runPath, caseId).isEmpty()) return false;
 
-        // The screenshots first, as files beside the run, so the names written
-        // next never point at a picture that has not landed (#313).
-        final @NotNull List<String> screenshots = indexer.storeScreenshots(runPath, fields.screenshots());
+        // The pasted screenshots first, as files beside the run, so the names
+        // written next never point at a picture that has not landed (#313).
+        final @NotNull List<String> screenshots = fields.screenshotNames(pasted -> indexer.storeScreenshots(runPath, pasted));
 
         // Through the indexer, as a verdict is, so details saved while a sync is
         // bringing this run in land on the run that arrived (#66, finding 129).

@@ -189,11 +189,12 @@ on each case and nothing else.
 One file per test run, beside its `.tr`. It records what was executed, not what
 exists: a case removed from the test set keeps its result here.
 
-The screenshots its failures name sit beside it, one PNG each, named by the
-first sixteen hex digits of the picture's SHA-256: the same picture is always
-the same file, and a name never holds other bytes. Testin writes a screenshot
-before the result that names it, and removes one that no result names after the
-next write of this file.
+The screenshots its failures name sit beside it, one PNG each, named by five
+random lowercase letters and digits that no result of the run already holds -
+`k3f9a.png`. Testin writes a screenshot before the result that names it, and
+moves one that no result names to the recycle bin after the next write of this
+file. Any PNG in the folder named that way is taken for a screenshot, so one put
+there by hand under such a name goes too.
 
 | Field | Type | Required | Meaning |
 |---|---|---|---|

@@ -111,7 +111,7 @@ public class FailureTest {
 
     @Test
     public void aReportedFailureClearsTheScreenshotsOfTheLastOne() {
-        final TestRunItems item = row().setScreenshots(List.of("0123456789abcdef.png"));
+        final TestRunItems item = row().setScreenshots(List.of("k3f9a.png"));
 
         new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
 
@@ -120,7 +120,7 @@ public class FailureTest {
 
     @Test
     public void nothingWentWrongLeavesTheScreenshotsAlone() {
-        final TestRunItems item = row().setScreenshots(List.of("0123456789abcdef.png"));
+        final TestRunItems item = row().setScreenshots(List.of("k3f9a.png"));
 
         Failure.NONE.recordOn(item);
 
@@ -133,7 +133,7 @@ public class FailureTest {
      */
     @Test
     public void aReportedFailureNamesWhatHappenedAndNotTheBug() {
-        final TestRunItems item = row().setActualResult("typed by hand").setScreenshots(List.of("0123456789abcdef.png")).setBugSeverity(BugSeverity.MAJOR);
+        final TestRunItems item = row().setActualResult("typed by hand").setScreenshots(List.of("k3f9a.png")).setBugSeverity(BugSeverity.MAJOR);
 
         assertEquals(new Failure("boom", "").wouldClear(item), List.of("the actual result", "the screenshots"));
         assertEquals(Failure.NONE.wouldClear(item), List.of(), "a verdict given by hand clears nothing");

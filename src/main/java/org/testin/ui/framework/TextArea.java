@@ -184,6 +184,13 @@ public final class TextArea implements DialogComponent {
     }
 
     /**
+     * Runs after a screenshot is pasted under the box or taken out of it.
+     */
+    public void onImagesChanged(final @NotNull Runnable changed) {
+        strip.onChange(changed);
+    }
+
+    /**
      * Runs after every change to the text, typed or pasted.
      */
     public void onTextChanged(final @NotNull Runnable changed) {

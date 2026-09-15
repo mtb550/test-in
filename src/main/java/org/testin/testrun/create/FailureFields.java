@@ -31,7 +31,11 @@ import org.testin.ui.framework.TextInput;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 /**
  * The four things a tester writes down about a failure: what actually happened,
@@ -56,8 +60,18 @@ public final class FailureFields {
     private final @NotNull ComponentDialogBase<RadioSelection<BugPriority>> priority;
     private final @NotNull ComponentDialogBase<TextArea> errorCapture;
 
+    /**
+     * Each screenshot under the error box that has a file, and that file's name.
+     * By identity, so a save names a stored screenshot as it was named rather
+     * than storing it a second time under a new one.
+     */
+    private final @NotNull Map<byte[], String> named = new IdentityHashMap<>();
+
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-147
     public FailureFields(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem) {
+        final @NotNull List<byte[]> screenshots = Services.getInstance(p, ProjectIndexer.class).screenshots(runPath, runItem);
+        IntStream.range(0, screenshots.size()).forEach(index -> named.put(screenshots.get(index), runItem.getScreenshots().get(index)));
+
         actualResult = ComponentDialogBase.textField()
                 .placeholder(Bundle.message("dialog.failure.placeholder.actual"))
                 .value(runItem.getActualResult())
@@ -77,7 +91,7 @@ public final class FailureFields {
                 .placeholder(Bundle.message("dialog.failure.placeholder.error"))
                 .value(runItem.getStacktrace())
                 .rows(5)
-                .images(Services.getInstance(p, ProjectIndexer.class).screenshots(runPath, runItem))
+                .images(screenshots)
                 .build();
     }
 
@@ -111,11 +125,25 @@ public final class FailureFields {
     /**
      * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
      * <p>
-     * The screenshots under the error box, as PNG bytes in the order they were
-     * pasted: what the indexer keeps as files before their names are applied.
+     * The file names of the screenshots under the error box, in the order they
+     * were pasted. One that has a file keeps its name; the ones pasted since are
+     * handed to {@code store}, which keeps them as files and answers their names.
      */
-    public @NotNull List<byte[]> screenshots() {
-        return errorCapture.getComponent().getImages();
+    public @NotNull List<String> screenshotNames(final @NotNull Function<List<byte[]>, List<String>> store) {
+        final @NotNull List<byte[]> screenshots = errorCapture.getComponent().getImages();
+        final @NotNull List<byte[]> pasted = screenshots.stream().filter(png -> !named.containsKey(png)).toList();
+        final @NotNull List<String> names = store.apply(pasted);
+        IntStream.range(0, pasted.size()).forEach(index -> named.put(pasted.get(index), names.get(index)));
+
+        return screenshots.stream().map(named::get).toList();
+    }
+
+    /**
+     * Runs after a screenshot is pasted under the error box or taken out, which
+     * changes how tall the box is.
+     */
+    public void onScreenshotsChanged(final @NotNull Runnable changed) {
+        errorCapture.getComponent().onImagesChanged(changed);
     }
 
     /**

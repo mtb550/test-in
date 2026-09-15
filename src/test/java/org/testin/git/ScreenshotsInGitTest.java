@@ -35,9 +35,9 @@ import static org.testng.Assert.assertTrue;
 public class ScreenshotsInGitTest {
 
     private static final String RUN = "runs/cycle38/run.json";
-    private static final String ADDED = "runs/cycle38/0123456789abcdef.png";
-    private static final String REMOVED = "runs/cycle38/1111111111111111.png";
-    private static final String OTHER_RUN = "runs/cycle39/fedcba9876543210.png";
+    private static final String ADDED = "runs/cycle38/k3f9a.png";
+    private static final String REMOVED = "runs/cycle38/q81zd.png";
+    private static final String OTHER_RUN = "runs/cycle39/m4x0c.png";
 
     @Test
     public void theReviewListsNoScreenshotRow() {

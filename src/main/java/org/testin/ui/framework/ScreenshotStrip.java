@@ -54,6 +54,13 @@ final class ScreenshotStrip {
      */
     private final @NotNull JBPanel<?> panel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(8), 0));
 
+    /**
+     * Told after a screenshot is added or taken out, so a surface that sizes
+     * itself to what it holds can follow the strip.
+     */
+    private @NotNull Runnable changed = () -> {
+    };
+
     ScreenshotStrip(final @NotNull List<byte[]> stored) {
         panel.setOpaque(false);
         stored.forEach(this::add);
@@ -69,6 +76,11 @@ final class ScreenshotStrip {
         screenshots.add(png);
         panel.add(thumbnail);
         panel.revalidate();
+        changed.run();
+    }
+
+    void onChange(final @NotNull Runnable changed) {
+        this.changed = changed;
     }
 
     /**
@@ -93,6 +105,7 @@ final class ScreenshotStrip {
         panel.remove(thumbnail);
         panel.revalidate();
         panel.repaint();
+        changed.run();
     }
 
     /**

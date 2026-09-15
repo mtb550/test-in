@@ -38,20 +38,21 @@ There is no key for this. The link is under the first three lines.
   It can also be typed into, and nothing typed there is ever saved.
 - **Rule-VIEW-PANEL-081** — Under the first lines of the error, the Show all
   link comes first, then one link for each screenshot pasted with the failure.
-  Each opens that screenshot at its real size in a window of its own.
+  Each link reads the screenshot's file name, and opens that screenshot at its
+  real size in a window of its own.
 
 ## The screen
 
 The **Stacktrace** row shows the first three lines, then one line of links:
 *Show all* and the number of lines the error really has, then one link for each
-screenshot pasted with the failure. A screenshot link opens that screenshot in
-a window of its own.
+screenshot pasted with the failure, reading its file name. A screenshot link
+opens that screenshot in a window of its own.
 
 ```
 │   Stacktrace          java.lang.AssertionError: expected [true]            │
 │                         at org.testin.demo.LoginTest.valid                 │
 │                         at org.testng.internal.Invoker.invoke              │
-│                       Show all 42 lines   [Screenshot 1]  [Screenshot 2]   │
+│                       Show all 42 lines   [k3f9a.png]  [q81zd.png]         │
 ```
 
 *Show all* opens this dialog. It holds the text, and no screenshot.
@@ -89,14 +90,14 @@ a window of its own.
 5. The tester selects the text and copies it.
 6. The tester presses `Escape`. Nothing is saved.
 
-To look at a screenshot, the tester clicks *[Screenshot 1]* instead. The
-screenshot opens in a window titled with the same name, at its real size, and
-scrolls when it is larger than the window. `Escape` closes it, and nothing is
-saved.
+To look at a screenshot, the tester clicks its link instead - `[k3f9a.png]`
+above. The screenshot opens in a window titled with its file name, at its real
+size, and scrolls when it is larger than the window. `Escape` closes it, and
+nothing is saved.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  [Screenshot 1]                                              │
+│  k3f9a.png                                                   │
 ├──────────────────────────────────────────────────────────────┤
 │                                                              │
 │         the screenshot, at its real size                     │
