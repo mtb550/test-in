@@ -30,6 +30,8 @@ import org.testin.editor.CardHoverAction;
 import org.testin.model.Automated;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.view.ViewPanel;
+import org.testin.view.ViewToolWindowFactory;
 
 import java.util.List;
 
@@ -68,7 +70,12 @@ public class ActionIcons extends BaseDetails {
         // same service, so a case read here is already known when its card is
         // drawn, and the other way round.
         final @NotNull AutomationState automation = Services.getInstance(p, AutomationState.class);
-        automation.read(p, List.of(dto), panel::repaint);
+        //
+        // Drawn again when it answers, not only repainted: the icon below is
+        // chosen once, as the row is built, so a repaint drew the "not read yet"
+        // icon a second time over a case whose state had arrived (#312, A64).
+        // The second read finds nothing new and does not call back, so this ends.
+        automation.read(p, List.of(dto), () -> ViewToolWindowFactory.panel(p).ifPresent(ViewPanel::refreshCurrentView));
 
         final @NotNull Automated state = automation.of(dto.getId());
 
