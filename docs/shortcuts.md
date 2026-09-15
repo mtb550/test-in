@@ -108,7 +108,7 @@ The always on top window, which has its own keys.
 | `Ctrl+Left` | Back: the previous test case |
 | `F5` | Runs the test case on display |
 | `Shift+F5` | Opens its generated test method |
-| `Escape` | Closes the panel, pressed in the editor |
+| `Escape` | Closes the panel, pressed in the editor or inside the panel |
 | `Tab` | Brings the next tab to the front: **Details**, **History**, **Open Bugs**, then **Details** again |
 | `Shift+Tab` | Brings the previous tab to the front |
 | `Ctrl` and the wheel | Changes the text size |

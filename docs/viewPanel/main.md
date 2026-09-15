@@ -74,7 +74,7 @@ in front of them while they write down what actually happened.
 | `F2` | Opens the menu that changes one field | [UC-VIEW-PANEL-011](changeOneField.md) |
 | `Ctrl+Right` | Moves to the next test case | [UC-VIEW-PANEL-003](pageThroughCases.md) |
 | `Ctrl+Left` | Moves to the previous test case | [UC-VIEW-PANEL-003](pageThroughCases.md) |
-| `Escape` | Closes the panel, pressed in the editor | [UC-VIEW-PANEL-015](closePanel.md) |
+| `Escape` | Closes the panel, pressed in the editor or inside the panel | [UC-VIEW-PANEL-015](closePanel.md) |
 | `Ctrl` and the mouse wheel | Makes every Testin text bigger or smaller | [UC-SETTING-011](../setting/changeTextSize.md) |
 | `F5` | Runs the test case on display | [UC-VIEW-PANEL-012](runFromPanel.md) |
 | `Shift+F5` | Opens its generated test method | [UC-VIEW-PANEL-014](goToCode.md) |
@@ -87,7 +87,7 @@ in front of them while they write down what actually happened.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  Testin                                                     ( < )  ( > )   │
+│  Testin View                                                ( < )  ( > )   │
 ├────────────────────────────────────────────────────────────────────────────┤
 │   Details      History      Open Bugs                                      │
 ├────────────────────────────────────────────────────────────────────────────┤

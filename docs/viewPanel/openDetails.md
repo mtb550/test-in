@@ -48,7 +48,7 @@ The panel opens on the right of the IDE, beside the editor.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│  Testin                                                   ( < )  ( > )   │
+│  Testin View                                              ( < )  ( > )   │
 ├──────────────────────────────────────────────────────────────────────────┤
 │  | Details |    History     Open Bugs                                    │
 ├──────────────────────────────────────────────────────────────────────────┤
@@ -62,8 +62,8 @@ The panel opens on the right of the IDE, beside the editor.
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The stripe** — reads **Testin**, the same word the tree panel's stripe
-   reads. The side they sit on is the only thing that tells them apart.
+1. **The stripe** — reads **Testin View**. The tree panel's stripe reads
+   **Testin Tree**, so the two are told apart by name.
 2. **The two arrows** — move to the previous and the next test case. They are
    gray when the panel was handed only one.
 3. **The tabs** — the panel always opens on **Details**, whichever tab was in

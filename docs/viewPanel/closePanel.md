@@ -7,7 +7,7 @@
 
 The panel takes width from the editor. Closing it gives that width back.
 
-`Escape`, pressed in the editor, closes it.
+`Escape` closes it, pressed in the editor or inside the panel.
 
 ## Rules
 
@@ -62,18 +62,6 @@ The tester can also press the IDE's own hide button on the panel.
 
 **If a cut is waiting to be pasted** — the first press drops the cut. The panel
 stays open. A second press closes it.
-
-## Where the plugin breaks its own rules
-
-**`Escape` does nothing from inside the panel.** It closes the panel only when
-the keyboard is in the editor. `F2` needs the keyboard in the panel, so a tester
-who has just used `F2` cannot close the panel with `Escape`. That is difference
-2 on
-[the view panel page](main.md#where-the-plugin-breaks-its-own-rules).
-
-**Closing an editor empties the panel only when the panel was showing that
-editor's test case.** A tester with two editors open, reading a test case from
-the first, closes the second and the panel stays exactly as it was.
 
 ---
 
