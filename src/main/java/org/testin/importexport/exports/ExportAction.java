@@ -38,6 +38,7 @@ import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.services.BackgroundWork;
 import org.testin.util.Bundle;
+import org.testin.util.Mapper;
 
 import java.util.*;
 
@@ -189,6 +190,24 @@ public class ExportAction extends DumbAwareAction {
             return new Gathered(sheets, unreadable);
         }
 
+        /**
+         * UC-SHARE-003, Rule-SHARE-020.
+         * <p>
+         * Copies of the cases, for the preview to be corrected on. The indexer hands
+         * out its own objects, and the preview writes a corrected cell onto the case
+         * it was given - so a typo fixed for the file changed the test case itself,
+         * even when the export was canceled, and the next ordinary save of that case
+         * wrote it to disk with no undo entry (#312, A48). The parent is not in the
+         * JSON, so it is carried across by hand: the class name a sheet shows is
+         * built from it.
+         */
+        private @NotNull List<TestCaseDto> detached(final @NotNull List<TestCaseDto> cases) {
+            final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
+            return cases.stream()
+                    .map(tc -> mapper.convertValue(tc, TestCaseDto.class).setParent(tc.getParent()))
+                    .toList();
+        }
+
         private void walk(final @NotNull DirectoryDto node, final @NotNull List<String> path, final @NotNull List<Sheet> found, final @NotNull List<String> unreadable) {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
@@ -196,7 +215,7 @@ public class ExportAction extends DumbAwareAction {
             // with the rule the screen is drawn from - so a sheet's rows and the
             // screen they were exported from cannot disagree.
             final @NotNull List<TestCaseDto> here = indexer.getTestCasesForTestSet(node.getPath());
-            if (!here.isEmpty()) found.add(new Sheet(path, here));
+            if (!here.isEmpty()) found.add(new Sheet(path, detached(here)));
 
             unreadable.addAll(unreadableIn(node, here));
 

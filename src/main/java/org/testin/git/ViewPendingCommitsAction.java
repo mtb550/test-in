@@ -229,10 +229,16 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                                 ? git.startBranch(repoPath, target)
                                 : !git.checkout(repoPath, target).isEmpty();
 
+                        // Rule-SHARE-065. The review has already closed, so the way
+                        // back to the changes travels with the refusal, as the branch
+                        // box's own refusal carries it (#312, A46).
                         if (!moved) {
-                            ApplicationManager.getApplication().invokeLater(() ->
-                                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.branch.not.switched.title"),
-                                            Bundle.message("git.branch.not.switched.message", target)));
+                            ApplicationManager.getApplication().invokeLater(() -> {
+                                final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+                                notifier.errorWithActions(p, Bundle.message("git.branch.not.switched.title"),
+                                        Bundle.message("git.branch.not.switched.message", target),
+                                        notifier.action(Bundle.message("branch.review.changes"), () -> reviewFor(p, repoPath)));
+                            });
                             return;
                         }
 
@@ -524,7 +530,11 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                                         abort ? Bundle.message("git.rebase.aborted.message") : Bundle.message("git.rebase.continued.message")));
                     },
                     ex -> {
-                        if (git.hasConflicts(repoPath)) showConflictActions(repoPath, remote, branch);
+                        // Files still conflicting, not hasConflicts: a continue or
+                        // an abort that failed leaves the rebase directory, which
+                        // hasConflicts reads as a conflict, so the failure was
+                        // offered back naming no file (#312, A43).
+                        if (!git.conflictingPaths(repoPath).isEmpty()) showConflictActions(repoPath, remote, branch);
                         else
                             Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), ex.getMessage());
                     });

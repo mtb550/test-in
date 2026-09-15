@@ -16,6 +16,7 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
@@ -39,7 +40,11 @@ public final class DialogMessage implements DialogComponent {
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setOpaque(false);
 
-        final @NotNull JBLabel message = new JBLabel("<html>" + text.replace("\n", "<br>") + "</html>");
+        // Escaped before it becomes HTML, as DialogDetails escapes its values: the
+        // text quotes names and descriptions the tester typed, and Swing's renderer
+        // drops anything that looks like a tag - so "Remove 'Login refuses <empty>
+        // password'?" asked about a description that does not exist (#312, A78).
+        final @NotNull JBLabel message = new JBLabel("<html>" + StringUtil.escapeXmlEntities(text).replace("\n", "<br>") + "</html>");
         message.setAlignmentX(Component.LEFT_ALIGNMENT);
         content.add(message);
 

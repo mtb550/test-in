@@ -163,9 +163,4 @@ public final class TestinRoot {
 
         return resolved;
     }
-
-    public void setPath(final @NotNull Path path) {
-        final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
-        settings.rootTestinPath = path.toString();
-    }
 }

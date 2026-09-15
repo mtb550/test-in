@@ -67,8 +67,15 @@ public class OrderNodeAction extends DumbAwareAction {
     private void apply(final @NotNull Project p, final @NotNull DirectoryDto node, final int order) {
         if (node.getOrder() == order) return;
 
+        final int before = node.getOrder();
         node.getMarker().setOrder(order);
-        Services.getInstance(p, ProjectIndexer.class).persistMarker(node);
+
+        // A marker that did not land is not confirmed, and the node keeps the
+        // place it still has on disk: the write has said why (#312, A6).
+        if (!Services.getInstance(p, ProjectIndexer.class).persistMarker(node)) {
+            node.getMarker().setOrder(before);
+            return;
+        }
 
         // The tree is drawn from the children index, which sorts on the way out
         // - so what redraws it is a refresh, not a re-index.

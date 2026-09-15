@@ -144,6 +144,20 @@ public class FrameworkComponentsTest {
         assertEquals(rowCount(transfer), 3, "message + From + To");
     }
 
+    /**
+     * A confirmation quotes what the tester typed, and Swing's HTML renderer drops
+     * anything shaped like a tag - so the text is escaped, or it asks about a
+     * description that does not exist (#312, A78).
+     */
+    @Test
+    public void messageQuotesAngleBracketsInsteadOfDroppingThem() {
+        final DialogMessage message = ComponentDialogBase.message("Remove 'Login refuses <empty> password'?\nFor good").getComponent();
+        final JLabel label = (JLabel) ((Container) message.getPanel().getComponent(0)).getComponent(0);
+
+        assertTrue(label.getText().contains("Login refuses &lt;empty&gt; password"), label.getText());
+        assertTrue(label.getText().contains("<br>"), "a line break is still a line break: " + label.getText());
+    }
+
     @Test
     public void selectionRowKeepsAllDeclaredParts() {
         final SelectionList<String> row = SelectionList.add(DialogStyle.NO_ICON, "Test Set", "Holds test cases", "TS");

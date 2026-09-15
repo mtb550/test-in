@@ -554,16 +554,24 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
 
     // -------------------------------------------------------------- selection
 
-    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-104
+    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-104, Rule-EDITOR-PANEL-009
     @Override
     public void selectWhenLoaded(final @NotNull UUID id) {
-        final @NotNull Optional<TestCaseDto> loaded = currentTestCases.stream()
-                .filter(tc -> id.equals(tc.getId()))
-                .findFirst();
+        // Looked up among every case read, not only the ones the filter shows. A
+        // case the filter hides is loaded all the same, and taken for one not
+        // loaded yet it waited for a load that was not coming - no selection, no
+        // word, and the next reload took the focus (#312, A15). A reload empties
+        // this list first, so a case in it is one the editor really holds.
+        final @NotNull Optional<TestCaseDto> loaded;
+        synchronized (allTestCases) {
+            loaded = allTestCases.stream()
+                    .filter(tc -> id.equals(tc.getId()))
+                    .findFirst();
+        }
 
         // Already holding it, so nothing is coming to do this later: go now,
         // through the one method that owns going somewhere - it turns to the
-        // right page and takes the focus with it.
+        // right page and takes the focus with it, or says the filter hides it.
         if (loaded.isPresent()) {
             selectTestCase(loaded.get());
             return;

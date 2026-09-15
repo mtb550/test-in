@@ -25,6 +25,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.TestinData;
+import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
 import org.testin.indexer.ProjectIndexer;
@@ -112,7 +113,12 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 if (!(editor instanceof TestEditor destUI)) return;
 
                 final @NotNull CutState cutState = Services.getInstance(p, CutState.class);
-                final boolean isCut = cutState.isCutting();
+                final boolean isCut = cutState.isCutOf(pastedCases);
+
+                // A cut the clipboard no longer holds is over: something else was
+                // copied since, so this paste is a copy and the cut cases stay
+                // where they are, no longer drawn faded (#312, A55).
+                if (!isCut) cutState.clear();
 
                 // What a CTRL+Z would have to put back on the source side, taken
                 // before the cut takes it away. Empty when this is a copy, which
@@ -178,13 +184,22 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                     after.add(TestCaseSnapshot.of(p, destPath, pastedIds));
 
                     TestCaseSnapshot.record(p, UndoScope.of(destPath), TestCaseSnapshot.describe(isCut ? Bundle.message("snapshot.verb.move") : Bundle.message("snapshot.verb.paste"), pastedHere), before, after);
+
+                    // UC-EDITOR-PANEL-017, UC-CODEGEN-002. A copy is a new test
+                    // case, so it gets a method of its own the way a created one
+                    // does - once it is on disk, which is what the generator reads
+                    // its position from. It wrote none, so F5 and Go to code said
+                    // the copy had no generated code (#312, A54).
+                    if (!isCut) GenType.CREATE_TEST_CASE.executeAll(p, pastedHere);
+
+                    // In the callback, once the sequence is persisted: the write is
+                    // two thread hops away and a newer sort can supersede it, so a
+                    // balloon shown when the call returned said Pasted for cases
+                    // that might never be written (#62; #312, A56).
+                    Services.getInstance(p, Notifier.class).softShowCounted(p, Done.PASTED, pasted);
                 });
 
                 if (isCut) cutState.clear();
-
-                // Inside the invokeLater and after the sequence is persisted: the
-                // action itself returns long before the cases exist (#62).
-                if (pasted > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.PASTED, pasted);
             });
         }
 

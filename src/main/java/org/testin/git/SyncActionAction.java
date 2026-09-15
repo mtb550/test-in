@@ -171,7 +171,7 @@ public class SyncActionAction extends DumbAwareAction {
                         }
 
                         indicator.setText(Bundle.message("git.progress.pulling", branch));
-                        commits.pull(repoPath, remoteUrl, remoteName, branch);
+                        commits.pullWhereTheRemoteHasBranch(repoPath, remoteName, branch);
 
                         // Both directions, because the button says Sync. It used to
                         // pull and then report "Up to date with the remote" with the
@@ -236,11 +236,15 @@ public class SyncActionAction extends DumbAwareAction {
         private void reportRebaseFailure(final @NotNull Path repoPath, final @NotNull String message) {
             // Called from a background task's body and from its error handler, both
             // off the EDT - which is where the git question has to be asked.
-            final boolean conflicts = git.hasConflicts(repoPath);
-            final @NotNull List<String> conflicting = conflicts ? git.conflictingPaths(repoPath) : List.of();
+            //
+            // Files still conflicting, not hasConflicts: a continue or an abort
+            // that failed leaves the rebase directory, which hasConflicts reads as
+            // a conflict, so the failure was offered back naming no file and the
+            // message below never showed (#312, A43).
+            final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                if (conflicts) showConflictActions(repoPath, conflicting);
+                if (!conflicting.isEmpty()) showConflictActions(repoPath, conflicting);
                 else Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), message);
             });
         }
@@ -315,22 +319,28 @@ public class SyncActionAction extends DumbAwareAction {
                         // the rebase just replayed are still only here, and a
                         // refresh that reported "up to date" over them would be the
                         // same untruth from the other door.
-                        OptionalInt pushed = OptionalInt.of(0);
+                        final @NotNull OptionalInt pushed;
                         try {
-                            final @NotNull String remoteName = git.getRemoteName(repoPath);
-                            if (!remoteName.isEmpty()) {
-                                indicator.setText(Bundle.message("git.progress.pushing.committed"));
-                                pushed = pushUnpushed(repoPath, remoteName, git.syncBranch(repoPath));
-                            }
+                            // A repository with no remote is refused by the push
+                            // itself, in the words resolveConflicts.md quotes.
+                            indicator.setText(Bundle.message("git.progress.pushing.committed"));
+                            pushed = pushUnpushed(repoPath, git.getRemoteName(repoPath), git.syncBranch(repoPath));
                         } catch (final Exception ex) {
                             // Caught in here rather than left to the handler: the
                             // pull and the merge both worked, only the push did not,
                             // and the tree still has to be rebuilt around what
-                            // arrived - so this is not the end of the work.
+                            // arrived - so this is not the end of the work. It is
+                            // not a sync that finished, though, so it is refreshed
+                            // without "Synced": that sat under this error saying
+                            // "Up to date with the remote" (#312, A42).
                             Logger.error("Could not push after resolving: " + ex.getMessage());
                             ApplicationManager.getApplication().invokeLater(() ->
                                     Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.push.failed.title"),
                                             Bundle.message("git.push.failed.after.resolve", ex.getMessage())));
+
+                            indicator.setText(Bundle.message("git.progress.refreshing"));
+                            refreshRepository(repoPath);
+                            return;
                         }
 
                         indicator.setText(Bundle.message("git.progress.refreshing"));

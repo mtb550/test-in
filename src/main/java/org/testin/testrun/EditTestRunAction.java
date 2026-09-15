@@ -52,9 +52,11 @@ import org.testin.util.Mapper;
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -195,32 +197,25 @@ public class EditTestRunAction extends DumbAwareAction {
                 return false;
             }
 
-            // The dialog's tree is built from the test cases that still exist, so a
-            // case deleted from its test set has no row in it. It could not be ticked,
-            // which means it cannot have been unticked either, and the dialog's answer
-            // says nothing about it. Taken as an answer it used to delete the verdict,
-            // the actual result, the stacktrace, the bug severity, the bug priority
-            // and the duration the run had recorded - on a Save that changed nothing,
-            // with no row to see it go and no copy anywhere (#190).
-            //
-            // A run outlives the test cases it was made from, and keeps what it
-            // recorded about them (#71). Unticking a case the tester could see still
-            // discards its result, which is what unticking is for.
-            final @NotNull Set<UUID> wanted = new LinkedHashSet<>(RunForm.checkedCases(selection));
-            current.getResults().stream()
-                    .map(TestRunItems::getId)
-                    .filter(id -> indexer.findTestCase(id).isEmpty())
-                    .forEach(wanted::add);
+            final @NotNull Set<UUID> checked = RunForm.checkedCases(selection);
+            final @NotNull Map<TestRunConfiguration, String> configuration = TestRunConfiguration.answered(form.configuration());
 
-            final @NotNull TestRunDto after = current.coverOnly(wanted)
-                    .setConfiguration(TestRunConfiguration.answered(form.configuration()));
+            final @NotNull TestRunDto after = current.coverOnly(wanted(current, checked))
+                    .setConfiguration(configuration);
 
             // Copied rather than held: the run in the indexer's cache shares its
             // result objects with this one, and a verdict recorded between now and
             // the undo would otherwise change what the undo puts back.
             final @NotNull TestRunDto before = copyOf(current);
 
-            applyEdit(run, name, after, () -> Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED));
+            // Applied to the run the index holds when the write lands, not to the
+            // one this dialog read when it opened. The dialog is not modal, so a
+            // sync can bring in a newer run while it is open, and writing the run it
+            // opened on replaced the verdicts that arrived. Through changeRun, which
+            // a sync holds, like every other change to a run (#312, A10).
+            applyEdit(run, name, runPath -> indexer.changeRun(runPath, held -> held
+                    .setResults(held.coverOnly(wanted(held, checked)).getResults())
+                    .setConfiguration(configuration)), () -> Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED));
 
             // One entry for the whole edit - the cases, the name and the
             // configuration together - because the tester made one gesture. The dto
@@ -228,12 +223,38 @@ public class EditTestRunAction extends DumbAwareAction {
             // routine with the two sides swapped.
             Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                     Bundle.message("run.undo.edit", oldName),
-                    () -> applyEdit(run, oldName, before, () -> {
+                    () -> applyEdit(run, oldName, runPath -> indexer.putTestRun(runPath, before), () -> {
                     }),
-                    () -> applyEdit(run, name, after, () -> {
+                    () -> applyEdit(run, name, runPath -> indexer.putTestRun(runPath, after), () -> {
                     })));
 
             return true;
+        }
+
+        /**
+         * The cases a run covers after the edit: the ones ticked, and the ones it
+         * already recorded whose test case is gone.
+         * <p>
+         * The dialog's tree is built from the test cases that still exist, so a
+         * case deleted from its test set has no row in it. It could not be ticked,
+         * which means it cannot have been unticked either, and the dialog's answer
+         * says nothing about it. Taken as an answer it used to delete the verdict,
+         * the actual result, the stacktrace, the bug severity, the bug priority
+         * and the duration the run had recorded - on a Save that changed nothing,
+         * with no row to see it go and no copy anywhere (#190).
+         * <p>
+         * A run outlives the test cases it was made from, and keeps what it
+         * recorded about them (#71). Unticking a case the tester could see still
+         * discards its result, which is what unticking is for.
+         */
+        private @NotNull Set<UUID> wanted(final @NotNull TestRunDto from, final @NotNull Set<UUID> checked) {
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull Set<UUID> wanted = new LinkedHashSet<>(checked);
+            from.getResults().stream()
+                    .map(TestRunItems::getId)
+                    .filter(id -> indexer.findTestCase(id).isEmpty())
+                    .forEach(wanted::add);
+            return wanted;
         }
 
         /**
@@ -245,20 +266,20 @@ public class EditTestRunAction extends DumbAwareAction {
          * closes, the codegen is told, and the tree refreshes when the indexer has
          * finished rather than before.
          */
-        private void applyEdit(final @NotNull TestRunDirectoryDto run, final @NotNull String toName, final @NotNull TestRunDto content, final @NotNull Runnable onDone) {
+        private void applyEdit(final @NotNull TestRunDirectoryDto run, final @NotNull String toName, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
             final @NotNull Path from = run.getPath();
 
             if (toName.equals(run.getName())) {
-                write(from, content, onDone);
+                write(from, writeTo, onDone);
                 return;
             }
 
-            NodeRename.apply(p, Services.getInstance(p, TreePanel.class), run, toName, () -> write(from.getParent().resolve(toName), content, onDone));
+            NodeRename.apply(p, Services.getInstance(p, TreePanel.class), run, toName, () -> write(from.getParent().resolve(toName), writeTo, onDone));
         }
 
-        private void write(final @NotNull Path runPath, final @NotNull TestRunDto content, final @NotNull Runnable onDone) {
+        private void write(final @NotNull Path runPath, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
             BackgroundWork.run(p, Bundle.message("run.task.updating", runPath.getFileName()), Bundle.message("run.update.failed.title"), indicator -> {
-                Services.getInstance(p, ProjectIndexer.class).putTestRun(runPath, content);
+                writeTo.accept(runPath);
 
                 // File access is the indexer's alone (see CLAUDE.md).
                 Services.getInstance(p, ProjectIndexer.class).refreshDirectory(runPath);

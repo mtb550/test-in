@@ -158,7 +158,9 @@ public class CreateTestRun implements NodeCreator {
             final @NotNull TestRunMarker marker = new TestRunMarker();
             trDir.setMarker(marker);
 
-            Services.getInstance(p, ProjectIndexer.class).addTestRunDir(trDir);
+            // A run whose marker did not land is not opened or confirmed: the
+            // write has already said why (#312, A5).
+            if (!Services.getInstance(p, ProjectIndexer.class).addTestRunDir(trDir)) return;
 
             // File access is the indexer's alone (see CLAUDE.md).
             Services.getInstance(p, ProjectIndexer.class).refreshDirectory(savePath);

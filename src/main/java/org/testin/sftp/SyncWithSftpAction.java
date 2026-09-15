@@ -19,6 +19,7 @@ package org.testin.sftp;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -47,6 +48,7 @@ import org.testin.setting.AppSettingsState;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.Optional;
 
@@ -179,17 +181,6 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                     indicator.setIndeterminate(true);
 
                     try {
-                        // Off the EDT, where writing to the keychain is allowed. A
-                        // refusal is said once, here: nothing read the answer
-                        // before, so a keychain that would not take the password
-                        // asked the tester for it again every single sync with no
-                        // explanation - which is the outcome store's own contract
-                        // says must not happen.
-                        if (!account.password().isEmpty() && !SftpSecret.ACCOUNT_PASSWORD.store(address, account.user(), account.password())) {
-                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class)
-                                    .softRefuse(p, Bundle.message("sftp.password.not.kept.title"), Bundle.message("sftp.password.not.kept.message")));
-                        }
-
                         final @NotNull SftpAuth auth = authFor(address, account, keyFile);
                         if (auth == SftpAuth.NONE) {
                             // Nothing on this machine can prove who this is, so the
@@ -217,7 +208,29 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                             return synced;
                         });
 
+                        // Kept only now that the server has accepted it. Stored
+                        // before connecting, a mistyped password was kept, the
+                        // account window never opened again, and every later sync
+                        // failed on it (#312, A34).
+                        //
+                        // Off the EDT, where writing to the keychain is allowed. A
+                        // refusal is said once, here: nothing read the answer
+                        // before, so a keychain that would not take the password
+                        // asked the tester for it again every single sync with no
+                        // explanation - which is the outcome store's own contract
+                        // says must not happen.
+                        if (!account.password().isEmpty() && !SftpSecret.ACCOUNT_PASSWORD.store(address, account.user(), account.password())) {
+                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class)
+                                    .softRefuse(p, Bundle.message("sftp.password.not.kept.title"), Bundle.message("sftp.password.not.kept.message")));
+                        }
+
                         report(outcome, projectRoot, address, account, auth);
+                    } catch (final ProcessCanceledException stopped) {
+                        // The tester pressed Cancel, which is an answer rather than
+                        // a failure, so it goes back to the platform to close the
+                        // bar - not into the catch below as "Sync Failed" (#312,
+                        // A35; the same as BackgroundWork, #66 finding 83).
+                        throw stopped;
                     } catch (final Exception ex) {
                         reportFailure(p, "Sync with " + address.display(), ex);
                     }
@@ -397,7 +410,14 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                 }
 
                 answered.put(next.path(), mapper.writeValueAsString(next.merged()));
-                askAboutConflicts(rest, projectRoot, address, account, auth, answered);
+
+                // Once this window has closed. The callback runs before it does,
+                // and a second window of the same kind asked to show while the
+                // first is still on screen only brings the first forward - so the
+                // next question never opened and nothing was ever sent. The Git
+                // chain continues the same way (ConflictResolution.ask).
+                ApplicationManager.getApplication().invokeLater(() ->
+                        askAboutConflicts(rest, projectRoot, address, account, auth, answered));
                 // Escape is a skip, not a cancel: this test case is left as the
                 // server has it and the sync goes on. It used to end the whole sync,
                 // so the rest were never asked about and nothing already answered
@@ -458,10 +478,13 @@ public final class SyncWithSftpAction extends DumbAwareAction {
          * title is the part a second copy quietly stops agreeing on.
          */
         private static void reportFailure(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull Exception ex) {
-            Logger.error(whatFailed + " failed: " + ex.getMessage());
+            // The exception's own name when it carries no message, rather than
+            // "null" in the log and a null handed to the notification (#312, A96).
+            final @NotNull String reason = Objects.requireNonNullElse(ex.getMessage(), ex.toString());
+            Logger.error(whatFailed + " failed: " + reason);
 
             ApplicationManager.getApplication().invokeLater(() ->
-                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("sftp.sync.failed.title"), ex.getMessage()));
+                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("sftp.sync.failed.title"), reason));
         }
 
         /**

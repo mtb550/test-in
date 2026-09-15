@@ -89,7 +89,6 @@ public final class StartupActivity implements ProjectActivity {
         // shutdown never reached.
         Services.getInstance(DeletedNodes.class).sweep();
 
-        Services.getInstance(p, TestinRoot.class).setPath(testinPath);
         Logger.info("testin Path: " + testinPath);
 
         // Before the first index, never after it: the config names the test

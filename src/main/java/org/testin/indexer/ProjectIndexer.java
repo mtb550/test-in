@@ -98,12 +98,6 @@ public final class ProjectIndexer {
      */
     private volatile @NotNull CountDownLatch indexingLatch = new CountDownLatch(1);
 
-    /**
-     * How many projects this pass is still scanning. The pass is over when it
-     * reaches zero, and that is what counts the latch down.
-     */
-    private final @NotNull AtomicInteger projectsLeftToIndex = new AtomicInteger();
-
     public ProjectIndexer(final @NotNull Project p) {
         this.p = p;
         this.store = new IndexerDataStore(p);
@@ -137,7 +131,10 @@ public final class ProjectIndexer {
                 return;
             }
 
-            projectsLeftToIndex.set(validProjects.size());
+            // The pass's own, so a pass a Refresh has since replaced counts down
+            // nothing of the pass that replaced it.
+            final @NotNull AtomicInteger projectsLeft = new AtomicInteger(validProjects.size());
+            final @NotNull CountDownLatch passLatch = indexingLatch;
             Logger.info("Indexing " + validProjects.size() + " projects..");
 
             for (final Path projectPath : validProjects) {
@@ -164,13 +161,13 @@ public final class ProjectIndexer {
                             @Override
                             public void onSuccess() {
                                 Logger.info("Project '" + projectName + "' indexed.");
-                                if (oneProjectFinished()) finishSuccessfully();
+                                if (oneProjectFinished(projectsLeft, passLatch)) finishSuccessfully();
                             }
 
                             @Override
                             public void onThrowable(final @NotNull Throwable error) {
                                 Logger.error("Error indexing '" + projectName + "': " + error.getMessage());
-                                if (oneProjectFinished()) finishWithFailure();
+                                if (oneProjectFinished(projectsLeft, passLatch)) finishWithFailure();
                             }
                         });
             }
@@ -188,15 +185,23 @@ public final class ProjectIndexer {
 
     /**
      * One project's scan is over, whichever way it ended.
+     * <p>
+     * The counter and the latch are the pass's own, taken when it started. A
+     * Refresh or a branch switch pressed while a pass is still scanning resets
+     * the index and starts a second pass, and the first pass's scans still
+     * finish. They used to count down one shared counter and whichever latch was
+     * current, so the second pass was told it had finished when the first one
+     * did, and the tree and the editors redrew over a project still being read
+     * (#312, A2).
      *
-     * @return whether that was the last project of the pass, so the caller knows
-     * whether there is anything left to wait for
+     * @return whether that was the last project of a pass that is still the
+     * current one - a pass that has been replaced has nothing left to finish
      */
-    private boolean oneProjectFinished() {
-        if (projectsLeftToIndex.decrementAndGet() != 0) return false;
+    private boolean oneProjectFinished(final @NotNull AtomicInteger projectsLeft, final @NotNull CountDownLatch passLatch) {
+        if (projectsLeft.decrementAndGet() != 0) return false;
 
-        indexingLatch.countDown();
-        return true;
+        passLatch.countDown();
+        return passLatch == indexingLatch;
     }
 
     private void finishSuccessfully() {
@@ -861,25 +866,30 @@ public final class ProjectIndexer {
         return testProjectHolding(file).map(testProject -> new TestCaseFile(testProject, testProject.relativize(file)));
     }
 
-    public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
-        store.addTestProject(tp);
-        store.persistMarker(tp);
+    /**
+     * UC-TREE-PANEL-002.
+     * <p>
+     * A new node, and whether its markers landed - the creators confirm only a
+     * node that was made (#312, A5).
+     */
+    public boolean addTestProject(final @NotNull TestProjectDirectoryDto tp) {
+        return store.addTestProject(tp);
     }
 
-    public void addTestSet(final @NotNull TestSetDirectoryDto ts) {
-        store.addTestSet(ts);
+    public boolean addTestSet(final @NotNull TestSetDirectoryDto ts) {
+        return store.addTestSet(ts);
     }
 
-    public void addTestSetPackage(final @NotNull TestSetPackageDirectoryDto tsp) {
-        store.addTestSetPackage(tsp);
+    public boolean addTestSetPackage(final @NotNull TestSetPackageDirectoryDto tsp) {
+        return store.addTestSetPackage(tsp);
     }
 
-    public void addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
-        store.addTestRunDir(trd);
+    public boolean addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
+        return store.addTestRunDir(trd);
     }
 
-    public void addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
-        store.addTestRunPackage(trp);
+    public boolean addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
+        return store.addTestRunPackage(trp);
     }
 
     /**
@@ -1027,9 +1037,11 @@ public final class ProjectIndexer {
      * Writing the file, invalidating the cached children and refreshing the VFS
      * are one act: a caller that does only the first leaves a file the IDE never
      * hears about, and the Git paths read through the IDE.
+     * <p>
+     * Answers whether the marker landed (#312, A6).
      */
-    public void persistMarker(final @NotNull DirectoryDto dto) {
-        store.persistMarker(dto);
+    public boolean persistMarker(final @NotNull DirectoryDto dto) {
+        return store.persistMarker(dto);
     }
 
     /**

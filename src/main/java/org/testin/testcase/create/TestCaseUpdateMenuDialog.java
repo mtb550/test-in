@@ -61,7 +61,16 @@ public class TestCaseUpdateMenuDialog {
         // covering both (#151).
         Logger.trace("Generating automation code for " + updated.size() + ": " + gt);
 
-        ApplicationManager.getApplication().executeOnPooledThread(() -> gt.executeAll(p, updated));
+        // UC-CODEGEN-003, Rule-CODEGEN-019. One case takes the single-case form,
+        // the one a grid cell edit takes: it writes the method for a case given
+        // its first description, and says so when a group or status edit finds
+        // no method to change. The bulk form passes a missing method over in
+        // silence, so the same edit from F2 or the view panel wrote nothing and
+        // said nothing (#312, A57).
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            if (updated.size() == 1) gt.getAction().execute(p, updated.getFirst());
+            else gt.executeAll(p, updated);
+        });
     }
 
     // UC-EDITOR-PANEL-006

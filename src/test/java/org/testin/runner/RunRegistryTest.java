@@ -159,6 +159,42 @@ public class RunRegistryTest {
                 "the green badge does not vanish at the tester's next keystroke");
     }
 
+    /**
+     * Run pressed while the IDE indexes, or on a case with no generated code,
+     * reports the case idle because nothing started - and nothing starting does
+     * not take back what the last run said (#312, A12).
+     */
+    @Test
+    public void aCaseThatNeverStartedKeepsItsLastVerdict() {
+        final RunRegistry registry = new RunRegistry();
+        final TestCaseDto tc = aCase("passed earlier, run again during indexing");
+
+        registry.reported(tc.getId(), RunStatus.PASSED);
+        registry.notStarting(tc.getId());
+        registry.reported(tc.getId(), RunStatus.IDLE);
+
+        assertEquals(registry.statusOf(tc.getId()), RunStatus.PASSED, "a run that never started wiped the last verdict");
+    }
+
+    /**
+     * Rule-CODEGEN-038: a case the tester stopped is recorded as not run, over
+     * whatever it said before.
+     */
+    @Test
+    public void aStoppedCaseIsRecordedAsNotRun() {
+        final RunRegistry registry = new RunRegistry();
+        final TestCaseDto tc = aCase("passed earlier, stopped this time");
+
+        registry.reported(tc.getId(), RunStatus.PASSED);
+        registry.starting(tc.getId());
+        registry.take(tc.getId());
+        registry.launched(List.of(tc.getId()), RUN);
+        registry.stopping(List.of(tc.getId()));
+        registry.reported(tc.getId(), RunStatus.IDLE);
+
+        assertEquals(registry.statusOf(tc.getId()), RunStatus.IDLE, "a stopped case kept the verdict of the run before");
+    }
+
     @Test
     public void aCaseNobodyHasRunIsIdle() {
         final RunRegistry registry = new RunRegistry();

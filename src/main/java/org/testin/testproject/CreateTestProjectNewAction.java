@@ -67,7 +67,9 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
 
         final @NotNull TestProjectDirectoryDto created = Services.getInstance(p, DirectoryMapper.class).setTestProjectNode(p, tpPath);
 
-        Services.getInstance(p, ProjectIndexer.class).addTestProject(created);
+        // A project whose markers did not land is not bound, drawn or confirmed:
+        // the write has already said why (#312, A5).
+        if (!Services.getInstance(p, ProjectIndexer.class).addTestProject(created)) return;
 
         // A repository asks for exactly one test project, so the one it just made
         // is the one it is about. Writing it here is what makes the next clone of

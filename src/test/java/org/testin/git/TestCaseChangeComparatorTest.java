@@ -94,6 +94,19 @@ public class TestCaseChangeComparatorTest {
     }
 
     /**
+     * A status reads as its label, the way the priority beside it does, rather
+     * than as the constant's name in capitals (#312, A47).
+     */
+    @Test
+    public void aStatusChangeShowsTheLabels() {
+        final FieldChange change = onlyChange(base().setStatus(TestCaseStatus.REVIEWED));
+
+        assertEquals(change.changeType(), ChangeType.CHANGE_STATUS);
+        assertEquals(change.oldValue(), TestCaseStatus.PENDING.getLabel());
+        assertEquals(change.newValue(), TestCaseStatus.REVIEWED.getLabel());
+    }
+
+    /**
      * Steps are one field, not one row per step: a tester who rewrote the third
      * of five sees a single Steps change with both versions in it, which is what
      * the review's before/after panes render.

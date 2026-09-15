@@ -105,9 +105,6 @@ public class CreateTestCaseAction extends DumbAwareAction {
                 });
             });
             Services.getInstance(p, TestCaseValues.class).addNewItems(affectedNodes);
-
-            ApplicationManager.getApplication().invokeLater(() -> editor.selectTestCase(tc));
-
         }).show();
     }
 

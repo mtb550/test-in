@@ -236,10 +236,17 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
     }
 
     /**
-     * Whether the index still holds exactly what this snapshot says it did.
+     * Whether the index still holds exactly what this snapshot says it did, in
+     * the test set it says it did.
+     * <p>
+     * The set is asked as well as the cases because the cases are found by id,
+     * which a rename or removal of their set does not change. Undoing a
+     * cut-and-paste after the source set was renamed passed on the ids alone,
+     * then took the cases out of the destination and threw putting them back
+     * into a set no longer indexed - so they ended up in neither (#312, A82).
      */
     private boolean stillStands() {
-        return sameAs(of(p, testSetPath, ids()));
+        return Services.getInstance(p, ProjectIndexer.class).nodeExists(testSetPath) && sameAs(of(p, testSetPath, ids()));
     }
 
     /**

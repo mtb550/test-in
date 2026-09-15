@@ -418,11 +418,13 @@ public class BranchSelector {
                 model.addElement(branch);
             }
 
+            // Nothing selected when Git names no branch - a detached HEAD. The
+            // first branch used to be selected and adopted as current, so the box
+            // claimed a branch nobody was on and picking it did nothing (#312, A69).
             if (branches.contains(currentBranch)) {
                 comboBox.setSelectedItem(currentBranch);
             } else {
-                comboBox.setSelectedIndex(0);
-                currentBranch = getSelectedBranch();
+                comboBox.setSelectedIndex(-1);
             }
 
             shown = List.copyOf(branches);

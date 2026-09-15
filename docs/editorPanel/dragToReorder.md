@@ -70,6 +70,9 @@ A small message then appears at the bottom of the IDE and fades. It reads
 
 **If the drag carries something that is not test cases** — nothing happens.
 
+**If the cards land where they already were** — nothing is written and no
+message appears.
+
 **If anything fails on the way** — the cards go back to the order they were in,
 and a message reads *Could not save the new order, so the cards went back*.
 

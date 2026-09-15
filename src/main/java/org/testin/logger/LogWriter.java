@@ -140,7 +140,11 @@ public final class LogWriter implements Disposable {
             } finally {
                 writer.close();
             }
-        } catch (final IOException | InterruptedException ex) {
+        } catch (final IOException ex) {
+            // The drain has stopped for good, so testin.log ends here. Said in the
+            // IDE's log, which is the only one left to say it in (#312, A97).
+            IDE_LOG.warn("Testin's log writer stopped, so " + logFile + " ends here", ex);
+        } catch (final InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
     }
@@ -149,11 +153,12 @@ public final class LogWriter implements Disposable {
      * The log survives shutdown, so it is capped instead: on exceeding the
      * limit the file rolls to a single .1 backup and starts fresh.
      * <p>
-     * Empty when the roll-over failed. The failure cannot be logged — this is
-     * the thread that drains the log queue, and a Logger call here would report
-     * the logger's own failure into the logger. It is the one catch in the plugin
-     * that stays silent, and it says so rather than declaring {@code throws} and
-     * letting the writeLoop's catch-all decide.
+     * Empty when the roll-over failed. The failure cannot go into Testin's log -
+     * this is the thread that drains the log queue, and a Logger call here would
+     * report the logger's own failure into the logger - so it goes to the IDE's
+     * log instead, rather than declaring {@code throws} and letting the
+     * writeLoop's catch-all decide. Said nowhere, testin.log stopped part way and
+     * neither log said why (#312, A97).
      */
     private @NotNull Optional<BufferedWriter> rollOver(final @NotNull BufferedWriter writer) {
         try {
@@ -161,6 +166,7 @@ public final class LogWriter implements Disposable {
             Files.move(logFile, logFile.resolveSibling("testin.log.1"), StandardCopyOption.REPLACE_EXISTING);
             return Optional.of(Files.newBufferedWriter(logFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND));
         } catch (final IOException ex) {
+            IDE_LOG.warn("Testin's log could not roll over to testin.log.1, so " + logFile + " ends here", ex);
             return Optional.empty();
         }
     }
@@ -238,8 +244,9 @@ public final class LogWriter implements Disposable {
     /**
      * How long the shutdown took, in the IDE's own log (#292).
      * <p>
-     * <b>One of the two places in the plugin that write to {@code idea.log}</b>,
-     * the other being {@link #sayTheQueueIsFull}. Two reasons, and both are
+     * <b>One of the places in the plugin that write to {@code idea.log}</b>, the
+     * others being {@link #sayTheQueueIsFull} and the writer's own two failures
+     * in {@link #writeLoop} and {@link #rollOver}. Two reasons, and both are
      * about this method only. It runs after Testin's own log has been told to
      * stop, so a {@code Logger} call here would be queued to a writer that is
      * closing and never appear. And what it answers is a question asked of

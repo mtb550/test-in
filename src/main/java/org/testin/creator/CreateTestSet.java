@@ -52,9 +52,9 @@ public class CreateTestSet implements NodeCreator {
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         final @NotNull TestSetDirectoryDto ts = Services.getInstance(p, DirectoryMapper.class).getTestSetNode(p, newDirPath, parentDir);
 
-        Services.getInstance(p, ProjectIndexer.class).addTestSet(ts);
-
-        return Optional.of(ts);
+        // Nothing when the marker did not land: the write has said why, and
+        // there is no set to confirm, open or generate a class for (#312, A5).
+        return Services.getInstance(p, ProjectIndexer.class).addTestSet(ts) ? Optional.of(ts) : Optional.empty();
     }
 
 }

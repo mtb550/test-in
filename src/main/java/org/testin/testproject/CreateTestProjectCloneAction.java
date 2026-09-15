@@ -99,14 +99,16 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
                     final @NotNull GitCommandResult result = Git.getInstance().clone(p, parentPath, gitUrl, projectName);
                     result.throwOnError();
 
+                    // The indexer owns disk reads/refresh: scanSingleProject re-scans the cloned
+                    // project from disk. No direct VFS refresh here.
+                    //
+                    // Here on the task's thread, under its bar, not in the invokeLater
+                    // below: reading every set, case and run of the clone there froze
+                    // the IDE until it finished (#312, A92).
+                    final @NotNull Path projectPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(projectName);
+                    Services.getInstance(p, ProjectIndexer.class).scanSingleProject(projectPath, indicator);
+
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        // The indexer owns disk reads/refresh: scanSingleProject re-scans the cloned
-                        // project from disk. No direct VFS refresh here.
-                        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                        final @NotNull Path projectPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(projectName);
-
-                        indexer.scanSingleProject(projectPath);
-
                         // Bound to what was just cloned, for the same reason a new
                         // project is: this repository asked for it (#8).
                         Services.getInstance(p, BoundTestProject.class).bind(projectName);
