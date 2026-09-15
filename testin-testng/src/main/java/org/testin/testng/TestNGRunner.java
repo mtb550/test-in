@@ -141,10 +141,11 @@ public final class TestNGRunner implements TestRunner {
             if (module.isEmpty()) module = moduleOf(p, method.orElseThrow());
         }
 
-        // Before the launch and before the empty return, because this is the
-        // one place that knows what the run turned out to be. Nothing was said
-        // at the click (#66, finding 18).
-        execution.started(found.stream().map(Generated::tc).toList(), withoutCode);
+        // The refusal for the cases with no code, before the empty return,
+        // because this is the one place that knows which they are. Nothing was
+        // said at the click (#66, finding 18). The running count waits for the
+        // launch, which is the one place that knows which cases start (#312, A13).
+        execution.started(List.of(), withoutCode);
 
         if (found.isEmpty()) return;
 
@@ -240,6 +241,10 @@ public final class TestNGRunner implements TestRunner {
         runManager.setSelectedConfiguration(settings);
 
         Logger.info("Running as '" + name + "': " + patterns);
+
+        // Counted here, from the cases the platform is handed: a case stopped
+        // while the run was prepared is not one that started (Rule-CODEGEN-033).
+        execution.started(cases, List.of());
         execution.launch(cases, settings);
     }
 
