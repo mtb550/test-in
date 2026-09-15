@@ -516,7 +516,9 @@ public class CreateTestMethod implements GenAction {
         // No No-Group filter any more: a case in no group holds an empty list,
         // where it used to hold a constant that meant the same thing (#296).
         if (!tc.getGroup().isEmpty()) {
-            final @NotNull List<String> quoted = tc.getGroup().stream().map(g -> "\"" + g + "\"").toList();
+            // Escaped, not only quoted: a group is free text, and one holding a
+            // quote or a backslash stopped the whole class compiling (#312, A58).
+            final @NotNull List<String> quoted = tc.getGroup().stream().map(JavaLiteral::of).toList();
 
             attributes.append(", groups = {").append(String.join(", ", quoted)).append("}");
         }

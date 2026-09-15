@@ -132,7 +132,9 @@ public class UpdateTestBase {
      * the document describes (#287).
      */
     protected void writeGroups(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
-        final @NotNull List<String> quoted = tc.getGroup().stream().map(g -> "\"" + g + "\"").toList();
+        // Escaped, not only quoted: a group is free text, and one holding a quote
+        // or a backslash wrote an annotation that did not compile (#312, A58).
+        final @NotNull List<String> quoted = tc.getGroup().stream().map(JavaLiteral::of).toList();
 
         if (quoted.isEmpty()) removeTestAnnotationAttribute(p, pm, "groups");
         else updateTestAnnotationAttribute(p, pm, "groups", "{" + String.join(", ", quoted) + "}");
