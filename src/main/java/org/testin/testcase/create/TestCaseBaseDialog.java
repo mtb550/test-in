@@ -364,16 +364,20 @@ public abstract class TestCaseBaseDialog {
             // case unchanged and stamp it as edited anyway.
             if (!writers.stream().allMatch(CreateTestCaseSection::accepts)) return;
 
-            writers.forEach(section -> section.applyTo(dto));
-
-            final @NotNull String title = dto.getDescription();
-            if (!descriptionSection.isShown() || !title.trim().isEmpty()) {
-                onSave.accept(dto);
-
-                popupWrapper[0].closeOk(null);
-
-            } else
+            // A blank description is refused before anything is applied too. The
+            // update dialog edits the very case the index holds, so applying first
+            // blanked that case before this said no: Escape did not bring the text
+            // back, and the next save of the case wrote it (#312, A83).
+            final @NotNull String title = writers.contains(descriptionSection) ? descriptionSection.typed() : dto.getDescription().trim();
+            if (descriptionSection.isShown() && title.isEmpty()) {
                 descriptionSection.setError(true);
+                return;
+            }
+
+            writers.forEach(section -> section.applyTo(dto));
+            onSave.accept(dto);
+
+            popupWrapper[0].closeOk(null);
         };
     }
 

@@ -141,7 +141,15 @@ public class DescriptionSection extends AbstractOneLineSection {
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        dto.setDescription(field.getText().trim());
+        dto.setDescription(typed());
+    }
+
+    /**
+     * The description as {@link #applyTo} would save it, so the save can refuse
+     * a blank one before anything is written onto the case.
+     */
+    public @NotNull String typed() {
+        return field.getText().trim();
     }
 
 
