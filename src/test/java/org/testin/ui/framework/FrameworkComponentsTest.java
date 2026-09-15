@@ -21,11 +21,15 @@ import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Shortcuts;
 import org.testng.annotations.Test;
 
+import java.util.List;
 import java.util.Optional;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 
 import static org.testng.Assert.*;
 
@@ -181,6 +185,29 @@ public class FrameworkComponentsTest {
         assertEquals(area.getText(), "java.lang.RuntimeException");
         assertTrue(area.fillsSpace(), "the area must claim the dialog's remaining space");
         assertFalse(area.acceptsDialogKeys(), "Enter must stay a newline inside the area");
+    }
+
+    @Test
+    public void aTextAreaTakingImagesKeepsTheScreenshotsBesideTheText() {
+        final byte[] screenshot = {1, 2, 3};
+        final TextArea area = ComponentDialogBase.textArea().value("boom").images(List.of(screenshot)).build().getComponent();
+
+        assertEquals(area.getText(), "boom", "the box holds the text only (#50)");
+        assertEquals(area.getImages(), List.of(screenshot), "and the screenshot comes back as it was given, even one that cannot be drawn");
+        assertEquals(ComponentDialogBase.textArea().value("x").build().getComponent().getImages(), List.of(), "a box that takes none answers none");
+    }
+
+    @Test
+    public void aScreenshotIsReadBackAsThePictureItWas() {
+        try {
+            final ByteArrayOutputStream png = new ByteArrayOutputStream();
+            ImageIO.write(new BufferedImage(40, 20, BufferedImage.TYPE_INT_RGB), "png", png);
+
+            assertEquals(Picture.read(png.toByteArray()).map(BufferedImage::getWidth), Optional.of(40));
+            assertTrue(Picture.read(new byte[]{1, 2, 3}).isEmpty(), "bytes that are not a picture draw nothing, and throw nothing (#50)");
+        } catch (final Exception e) {
+            throw new AssertionError("the picture could not be encoded for the test", e);
+        }
     }
 
     @Test

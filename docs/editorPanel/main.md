@@ -9,7 +9,7 @@ in a tab. It is where test cases are written, and where a test run is executed.
 |---|---|
 | **Part of Testin** | The editor panel |
 | **Answers** | What a tester can do to test cases and to a test run, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-218` |
+| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-220` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-EDITOR-PANEL-011](removeTestCases.md) and [UC-EDITOR-PANEL-045](writeResultAnalysis.md) were read from the code again |
 | **Written to** | [How a document is written](../standard.md) |
@@ -267,7 +267,7 @@ bug report yet.
 |---|---|---|
 | **Difference 19** | Rule-EDITOR-PANEL-008 — a signed off test run records nothing more | The status bar's own tooltip says a completed or closed test run records no more verdicts. `P`, `F` and `B` still record one, still save it, and still say *Passed*. Only the automation refuses. |
 | **Difference 25** | Rule-EDITOR-PANEL-008 — one message with a count | Fixed. An automated run says nothing per test case and one line when it has nothing left to report — *Passed 42, Failed 8*. The words are the status bar's own, so the balloon and the bar cannot count one run differently. |
-| **Difference 26** | Rule-EDITOR-PANEL-005 — what the tester typed is kept | An automated pass still clears the actual result, the error, the bug severity, the bug priority and the bug issue link the tester recorded. It now says so afterwards, in a message that stays in the notification list. The dialog that asks first is still on the manual path only. |
+| **Difference 26** | Rule-EDITOR-PANEL-005 — what the tester typed is kept | An automated pass still clears the actual result, the error, the screenshots, the bug severity, the bug priority and the bug issue link the tester recorded, and an automated failure clears the actual result, the error and the screenshots. Each now says so afterwards, in a message that stays in the notification list. The dialog that asks first is still on the manual path only. |
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.

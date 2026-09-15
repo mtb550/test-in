@@ -378,6 +378,9 @@ back. A failure nobody described is a failure nobody can act on.
 │  │ paste error or exception or screenshot..                             │  │
 │  │                                                                      │  │
 │  └──────────────────────────────────────────────────────────────────────┘  │
+│   ┌────────┐x                                                             │
+│   │ picture│                                                              │
+│   └────────┘                                                              │
 │                                                                            │
 │  00:41                                                    00:12:41         │
 ├────────────────────────────────────────────────────────────────────────────┤
@@ -429,7 +432,8 @@ list each, so a new severity or priority appears here on its own.
 
 The field says so, rather than the status bar. Its gray hint text reads *"paste
 error or exception or screenshot.."*. That is the same sentence, in the place
-the tester is already looking.
+the tester is already looking. A pasted screenshot shows as a small picture
+under the box, never as letters in it, and its **x** takes it out.
 
 This removes a way to lose work. Passing a test case clears everything recorded
 about a failure on it. So pasting evidence onto a test case and then pressing
@@ -560,7 +564,7 @@ that is the tester's hand on the edge, not a state change.
 | **Stop** | Ends the execution flow. The test run keeps every verdict already recorded. Only the clock stops. |
 | **`P` / `B`** | Records the verdict on the current test case. Advances to the next test case that has not been judged. |
 | **`F`** | Opens the failure capture in place. `Enter` saves and advances. `Escape` returns, with the test case still unjudged. |
-| **`Ctrl+V`** | Pastes an image or text into the error box, on the failure form. It does nothing when no failure form is open, so evidence cannot be attached to a test case that is about to be passed and cleared. |
+| **`Ctrl+V`** | Pastes text into the error box, or adds an image as a picture under it, on the failure form. It does nothing when no failure form is open, so evidence cannot be attached to a test case that is about to be passed and cleared. |
 | **`Escape`** | Closes the window. The test run is untouched. Reopening returns to the first unjudged test case. |
 | **`Ctrl+D`** | Shows the detail fields. It does nothing if they are already shown. |
 | **`Ctrl+H`** | Hides them. It does nothing if they are already hidden. |

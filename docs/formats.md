@@ -205,7 +205,8 @@ Each entry in `results`:
 | `executedBy` | string | |
 | `executedAt` | date | |
 | `actualResult` | string | Empty unless the case failed |
-| `stacktrace` | string | Empty unless the case failed |
+| `stacktrace` | string | Empty unless the case failed. Text only: a pasted screenshot is never in it |
+| `screenshots` | array of strings | Each screenshot pasted with the failure, as a base64 PNG, in the order it was pasted. Left out when there are none; cleared by a pass and by an automated failure |
 | `bugSeverity` | enum | `EMPTY` `BLOCKER` `MAJOR` `MINOR` `ENHANCEMENT` |
 | `bugPriority` | enum | `EMPTY` `HIGH` `MEDIUM` `LOW` |
 | `bugIssueUrl` | string | The GitHub issue the failure was reported as, written by [Report Bug](viewPanel/reportBug.md). Empty until then; cleared by a pass, kept by an automated failure |

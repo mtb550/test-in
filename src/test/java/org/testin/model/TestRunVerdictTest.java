@@ -18,10 +18,12 @@ package org.testin.model;
 
 import org.testng.annotations.Test;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Recording a verdict on a run item.
@@ -43,6 +45,7 @@ public class TestRunVerdictTest {
                 .bugPriority(BugPriority.HIGH)
                 .actualResult("NPE on the login button")
                 .stacktrace("java.lang.NullPointerException at Login.click(Login.java:42)")
+                .screenshots(List.of(new byte[]{1}))
                 .bugIssueUrl(ISSUE)
                 .build();
     }
@@ -58,6 +61,7 @@ public class TestRunVerdictTest {
         assertEquals(item.getBugPriority(), BugPriority.EMPTY);
         assertEquals(item.getActualResult(), "", "the failure text describes a failure that no longer exists");
         assertEquals(item.getStacktrace(), "", "likewise the stacktrace");
+        assertTrue(item.getScreenshots().isEmpty(), "and the screenshots pasted with it (#50)");
         assertEquals(item.getBugIssueUrl(), "", "and the bug it was reported as: a later failure can be reported again (#28)");
     }
 
@@ -70,6 +74,7 @@ public class TestRunVerdictTest {
         assertEquals(item.getBugSeverity(), BugSeverity.MAJOR, "re-failing must not wipe the details");
         assertEquals(item.getBugPriority(), BugPriority.HIGH);
         assertEquals(item.getActualResult(), "NPE on the login button");
+        assertEquals(item.getScreenshots().size(), 1);
         assertEquals(item.getBugIssueUrl(), ISSUE);
     }
 
@@ -126,5 +131,20 @@ public class TestRunVerdictTest {
         assertEquals(item.getActualResult(), "NPE on the login button");
         assertFalse(item.getStacktrace().isEmpty());
         assertEquals(item.getBugIssueUrl(), ISSUE);
+    }
+
+    /**
+     * A pass names all six; a failure the automation reports names what
+     * happened; a verdict given by hand names nothing (#50).
+     */
+    @Test
+    public void whatEachVerdictWouldClearIsNamedBeforeItClears() {
+        final TestRunItems item = failedWithBug();
+
+        assertEquals(item.wouldClear(TestStatus.PASSED, Failure.NONE),
+                List.of("the actual result", "the stacktrace", "the screenshots", "the bug severity", "the bug priority", "the bug issue link"));
+        assertEquals(item.wouldClear(TestStatus.FAILED, new Failure("boom", "at Login.click")),
+                List.of("the actual result", "the stacktrace", "the screenshots"));
+        assertEquals(item.wouldClear(TestStatus.FAILED, Failure.NONE), List.of(), "the keyboard's F asks nothing");
     }
 }

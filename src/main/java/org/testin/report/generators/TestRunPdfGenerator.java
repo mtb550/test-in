@@ -362,14 +362,6 @@ public final class TestRunPdfGenerator {
                         .add(new Link(BugIssueUrl.shortReference(url), PdfAction.createURI(url)).setFontColor(LINK_BLUE))
                         .add(new Text(")")));
                 testCaseCell.add(actual);
-
-                // Only when there is one. The actual result prints an em dash
-                // for absent because a failure with nothing written about it is
-                // worth noticing; an absent stacktrace is not worth a line.
-                if (!item.getStacktrace().isBlank()) {
-                    testCaseCell.add(new Paragraph(item.getStacktrace())
-                            .setFont(regularFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY));
-                }
             }
             table.addCell(testCaseCell);
 

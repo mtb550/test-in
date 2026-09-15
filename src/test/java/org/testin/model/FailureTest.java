@@ -18,6 +18,7 @@ package org.testin.model;
 
 import org.testng.annotations.Test;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.testng.Assert.*;
@@ -106,5 +107,35 @@ public class FailureTest {
         item.recordVerdict(TestStatus.FAILED, "tester");
 
         assertEquals(item.getBugIssueUrl(), "https://github.com/mtb550/product/issues/123");
+    }
+
+    @Test
+    public void aReportedFailureClearsTheScreenshotsOfTheLastOne() {
+        final TestRunItems item = row().setScreenshots(List.of(new byte[]{1}));
+
+        new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
+
+        assertTrue(item.getScreenshots().isEmpty(), "a picture of the last failure would read as a picture of this one (#50)");
+    }
+
+    @Test
+    public void nothingWentWrongLeavesTheScreenshotsAlone() {
+        final TestRunItems item = row().setScreenshots(List.of(new byte[]{1}));
+
+        Failure.NONE.recordOn(item);
+
+        assertEquals(item.getScreenshots().size(), 1, "a manual verdict must not erase them");
+    }
+
+    /**
+     * What a reported failure clears and what it names are one list: what
+     * happened, never the bug (#50).
+     */
+    @Test
+    public void aReportedFailureNamesWhatHappenedAndNotTheBug() {
+        final TestRunItems item = row().setActualResult("typed by hand").setScreenshots(List.of(new byte[]{1})).setBugSeverity(BugSeverity.MAJOR);
+
+        assertEquals(new Failure("boom", "").wouldClear(item), List.of("the actual result", "the screenshots"));
+        assertEquals(Failure.NONE.wouldClear(item), List.of(), "a verdict given by hand clears nothing");
     }
 }

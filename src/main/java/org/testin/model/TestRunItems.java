@@ -19,6 +19,7 @@ package org.testin.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
@@ -102,6 +103,22 @@ public class TestRunItems {
     @NotNull
     @Builder.Default
     private String stacktrace = "";
+
+    /**
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
+     * <p>
+     * The screenshots a tester pasted into the error box, as PNG bytes, in the
+     * order they were pasted (#50).
+     * <p>
+     * Beside the stacktrace rather than inside it, so the text never holds a
+     * screenshot and nothing that shows the text has to take one out. The mapper
+     * writes each as base64; a row with none writes no key, so its file is the
+     * same as before screenshots had a place of their own.
+     */
+    @NotNull
+    @Builder.Default
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<byte[]> screenshots = List.of();
 
     /**
      * The GitHub issue this failure was reported as, and empty until one is
@@ -208,9 +225,10 @@ public class TestRunItems {
      * Records a tester's verdict: the status, when it was reached, and by whom.
      * <p>
      * Passing clears everything a failure described - the bug severity and
-     * priority, the actual result, the stacktrace, and the bug issue it was
-     * reported as. All five exist only to explain why a case is not passing, so a
-     * passing case cannot legitimately carry any of them, and they would
+     * priority, the actual result, the stacktrace, the screenshots, and the
+     * bug issue it was reported as. All six exist only to explain why a case is
+     * not passing, so a passing case cannot legitimately carry any of them, and
+     * they would
      * otherwise survive into the run JSON and into every report generated from
      * it.
      * <p>
@@ -248,9 +266,13 @@ public class TestRunItems {
      * So the verdict asks first, and asking means knowing what is at stake -
      * which is this, and which is the same list {@link #recordVerdict} clears,
      * declared once in {@link FailureDetail}.
+     * <p>
+     * A failure the automation reports clears too, before it writes its own, and
+     * {@link Failure#wouldClear} says what. A verdict given by hand carries
+     * {@link Failure#NONE}, so the question the keyboard asks is unchanged (#50).
      */
-    public @NotNull List<String> wouldClear(final @NotNull TestStatus next) {
-        return clears(next) ? FailureDetail.filledIn(this) : List.of();
+    public @NotNull List<String> wouldClear(final @NotNull TestStatus next, final @NotNull Failure failure) {
+        return clears(next) ? FailureDetail.filledIn(this) : failure.wouldClear(this);
     }
 
     /**

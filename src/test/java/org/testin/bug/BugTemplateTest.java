@@ -18,10 +18,8 @@ package org.testin.bug;
 
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
-import org.testin.model.Stacktrace;
 import org.testng.annotations.Test;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,8 +35,7 @@ public class BugTemplateTest {
 
     private static final UUID ID = UUID.fromString("07f7e754-b849-4b38-9e6e-a2cacd84e927");
     private static final String LINK = "https://github.com/mtb550/test-03/blob/master/Test%20Cases/ts2/07f7e754-b849-4b38-9e6e-a2cacd84e927.json";
-    private static final String PASTED = "data:image/png;base64,"
-            + Base64.getEncoder().encodeToString(new byte[]{(byte) 0x89, 'P', 'N', 'G', '\r', '\n', 0x1A, '\n', 0});
+    private static final byte[] SCREENSHOT = {(byte) 0x89, 'P', 'N', 'G', '\r', '\n', 0x1A, '\n', 0};
 
     private static BugFacts facts() {
         return BugFacts.builder()
@@ -50,8 +47,9 @@ public class BugTemplateTest {
                 .expectedResult("Backend should store the correct value as received from frontend.")
                 .steps(List.of("Activate the app from the frontend with version 11.3", "Read App_Version from the database"))
                 .testData("App_Version = 11.3")
-                .stacktrace(Stacktrace.of("java.lang.AssertionError: expected [11.3] but found [11.300000190734863]\n"
-                        + "    at testProject.ActivateAppTest.version(ActivateAppTest.java:42)\n" + PASTED))
+                .stacktrace("java.lang.AssertionError: expected [11.3] but found [11.300000190734863]\n"
+                        + "    at testProject.ActivateAppTest.version(ActivateAppTest.java:42)\n")
+                .screenshots(List.of(SCREENSHOT))
                 .testRun("Sprint 7 Cycle 3")
                 .executed("Muteb · Sunday 13-09-2026 At 14:14:00 [Asia/Riyadh]")
                 .browser("")
@@ -72,7 +70,8 @@ public class BugTemplateTest {
                 .expectedResult(" ")
                 .steps(List.of(""))
                 .testData("")
-                .stacktrace(Stacktrace.of(""))
+                .stacktrace("")
+                .screenshots(List.of())
                 .executed("")
                 .device("")
                 .language("")
@@ -177,11 +176,10 @@ public class BugTemplateTest {
     }
 
     @Test
-    public void theSummaryIsEscapedAndNeverAScreenshot() {
-        final String exception = BugTemplate.exception(Stacktrace.of(PASTED + "\n\nError <init> & \"x\" @bob #12\n  at y"));
+    public void theSummaryIsTheFirstLineThatSaysAnythingEscaped() {
+        final String exception = BugTemplate.exception("\n\nError <init> & \"x\" @bob #12\n  at y");
 
         assertTrue(exception.startsWith("<details>\n<summary>Error &lt;init&gt; &amp; &quot;x&quot; @&#8203;bob #&#8203;12</summary>\n\n```\n"), exception);
-        assertFalse(exception.contains("base64"), "the screenshot is not part of the exception");
     }
 
     @Test
@@ -191,7 +189,7 @@ public class BugTemplateTest {
 
     @Test
     public void everyScreenshotIsReferencedByTheFileItIsAttachedAs() {
-        final BugFacts two = facts().toBuilder().stacktrace(Stacktrace.of(PASTED + "\n" + PASTED)).build();
+        final BugFacts two = facts().toBuilder().screenshots(List.of(SCREENSHOT, SCREENSHOT)).build();
 
         assertTrue(BugTemplate.body(two, Optional.empty()).contains("### Screenshots\n![Screenshot 1](./screenshot-1.png)\n![Screenshot 2](./screenshot-2.png)\n"));
         assertEquals(BugTemplate.screenshotFile(2), "screenshot-2.png");

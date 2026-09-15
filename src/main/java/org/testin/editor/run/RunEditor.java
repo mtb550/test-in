@@ -777,7 +777,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         // verdict TestNG reached is the same verdict a tester would have typed,
         // so it takes the same path.
         status.getVerdict().ifPresent(verdict -> {
-            sayWhatTheVerdictCleared(tc, verdict);
+            sayWhatTheVerdictCleared(tc, verdict, failure);
 
             Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict, duration, failure);
 
@@ -802,9 +802,11 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     }
 
     /**
-     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-182.
+     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-182, Rule-EDITOR-PANEL-220.
      * <p>
-     * Says what an automated verdict threw away, when it threw anything away.
+     * Says what an automated verdict threw away, when it threw anything away: a
+     * pass clears every failure detail, and a failure clears what the last one
+     * said happened before writing its own (#50).
      * <p>
      * A tester who fails a case and writes up why - the actual result, the
      * stacktrace, how bad the bug is - and then re-runs it, used to watch all
@@ -821,8 +823,8 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
      * time: a balloon fades while the tester is reading something else, and this
      * is the only record that the work existed.
      */
-    private void sayWhatTheVerdictCleared(final @NotNull TestCaseDto tc, final @NotNull TestStatus verdict) {
-        final @NotNull List<String> cleared = runItem(tc.getId()).map(item -> item.wouldClear(verdict)).orElseGet(List::of);
+    private void sayWhatTheVerdictCleared(final @NotNull TestCaseDto tc, final @NotNull TestStatus verdict, final @NotNull Failure failure) {
+        final @NotNull List<String> cleared = runItem(tc.getId()).map(item -> item.wouldClear(verdict, failure)).orElseGet(List::of);
         if (cleared.isEmpty()) return;
 
         Services.getInstance(p, Notifier.class).info(p, Bundle.message("editor.cleared.title"),

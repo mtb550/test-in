@@ -244,7 +244,7 @@ public final class RunStatusService {
                 .map(tc -> editor.runItem(tc.getId()))
                 .flatMap(Optional::stream)
                 .filter(item -> !item.isRemoved())
-                .flatMap(item -> item.wouldClear(status).stream())
+                .flatMap(item -> item.wouldClear(status, Failure.NONE).stream())
                 .distinct()
                 .toList();
     }

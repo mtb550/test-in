@@ -33,6 +33,9 @@ spreadsheet.
 - **Rule-REPORT-008** — A part of the name that is empty is left out, rather
   than leaving a gap.
 - **Rule-REPORT-009** — The dialog closes before the work starts.
+- **Rule-REPORT-017** — No report shows a screenshot pasted with a failure. The
+  web page prints the error's text; the PDF, the Word document and the
+  spreadsheet print no error at all.
 
 ## The screen
 

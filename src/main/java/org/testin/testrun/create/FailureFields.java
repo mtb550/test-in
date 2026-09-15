@@ -73,7 +73,7 @@ public final class FailureFields {
                 .placeholder(Bundle.message("dialog.failure.placeholder.error"))
                 .value(runItem.getStacktrace())
                 .rows(5)
-                .acceptsImages()
+                .images(runItem.getScreenshots())
                 .build();
     }
 
@@ -88,9 +88,9 @@ public final class FailureFields {
     }
 
     /**
-     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145.
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145, Rule-EDITOR-PANEL-219.
      * <p>
-     * Writes what was typed onto the run row.
+     * Writes what was typed onto the run row, and the screenshots beside it.
      * <p>
      * Only ever called by a save. Escape must never commit an edit, so nothing
      * here happens as the tester types.
@@ -100,6 +100,7 @@ public final class FailureFields {
         runItem.setBugSeverity(severity.getComponent().getSelected());
         runItem.setBugPriority(priority.getComponent().getSelected());
         runItem.setStacktrace(errorCapture.getComponent().getText().trim());
+        runItem.setScreenshots(errorCapture.getComponent().getImages());
     }
 
     /**

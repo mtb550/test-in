@@ -19,6 +19,7 @@ package org.testin.view.details.components;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.panels.HorizontalLayout;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
@@ -30,10 +31,13 @@ import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
- * The first few lines of a failure's stacktrace, and a link to the rest.
+ * The first few lines of a failure's stacktrace, and the links to the rest: the
+ * whole text, and each screenshot pasted with it.
  * <p>
  * Its own row type rather than a {@link RunAttributeRow} that checks which
  * attribute it is holding: every other run value is a word or a sentence, and
@@ -54,19 +58,23 @@ public final class StacktraceRow extends BaseDetails {
 
     private static final int LINK_MARGIN_TOP = 6;
 
+    private static final int LINK_GAP = 12;
+
     private final @NotNull TestRunItems item;
 
 
     /**
-     * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-035.
+     * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-035, Rule-VIEW-PANEL-081.
      * <p>
      * A case with nothing to explain draws no row - the same rule every other
-     * run row follows, and the reason a passing case shows none of them.
+     * run row follows, and the reason a passing case shows none of them. A
+     * failure with screenshots and no text still has something to show.
      */
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final @NotNull String stacktrace = item.getStacktrace();
-        if (stacktrace.isBlank()) return currentRow;
+        final @NotNull List<byte[]> screenshots = item.getScreenshots();
+        if (stacktrace.isBlank() && screenshots.isEmpty()) return currentRow;
 
         final @NotNull List<String> lines = stacktrace.lines().toList();
 
@@ -74,11 +82,12 @@ public final class StacktraceRow extends BaseDetails {
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
         container.setOpaque(false);
 
-        container.add(preview(lines));
+        if (!stacktrace.isBlank()) container.add(preview(lines));
 
-        if (lines.size() > LINES_SHOWN) {
-            container.add(showAllLink(p, dto, stacktrace, lines.size()));
-        }
+        final @NotNull List<ActionLink> links = new ArrayList<>();
+        if (lines.size() > LINES_SHOWN) links.add(showAllLink(p, dto, stacktrace, lines.size()));
+        IntStream.range(0, screenshots.size()).forEach(index -> links.add(screenshotLink(p, index + 1, screenshots.get(index))));
+        if (!links.isEmpty()) container.add(linkLine(links));
 
         return addRow(panel, gbc, RunEditorAttributes.STACKTRACE.getName(), container, currentRow);
     }
@@ -103,11 +112,29 @@ public final class StacktraceRow extends BaseDetails {
      * clicking whether the rest is two lines or eighty.
      */
     private @NotNull ActionLink showAllLink(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull String stacktrace, final int total) {
-        final @NotNull ActionLink link = link(Bundle.message("view.stacktrace.show.all", String.valueOf(total)),
+        return link(Bundle.message("view.stacktrace.show.all", String.valueOf(total)),
                 event -> new ErrorDetailsDialog(p, dto.getDescription(), item.getActualResult(), stacktrace).show());
+    }
 
-        link.setBorder(JBUI.Borders.emptyTop(LINK_MARGIN_TOP));
-        link.setAlignmentX(Component.LEFT_ALIGNMENT);
-        return link;
+    /**
+     * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081.
+     * <p>
+     * One screenshot, opened at its real size in a window of its own: the panel
+     * itself draws no picture.
+     */
+    private @NotNull ActionLink screenshotLink(final @NotNull Project p, final int number, final byte @NotNull [] png) {
+        return link(Bundle.message("view.stacktrace.screenshot", String.valueOf(number)), event -> new ScreenshotDialog(p, number, png).show());
+    }
+
+    /**
+     * One line under the preview: Show all first, then the screenshots.
+     */
+    private static @NotNull JBPanel<?> linkLine(final @NotNull List<ActionLink> links) {
+        final @NotNull JBPanel<?> line = new JBPanel<>(new HorizontalLayout(JBUI.scale(LINK_GAP)));
+        line.setOpaque(false);
+        line.setBorder(JBUI.Borders.emptyTop(LINK_MARGIN_TOP));
+        line.setAlignmentX(Component.LEFT_ALIGNMENT);
+        links.forEach(line::add);
+        return line;
     }
 }

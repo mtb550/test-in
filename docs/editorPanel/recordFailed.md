@@ -49,6 +49,10 @@ form before it records anything.
   bug priority at **Low**.
 - **Rule-EDITOR-PANEL-148** — The four fields are the same four the failure form
   in light mode uses.
+- **Rule-EDITOR-PANEL-219** — A screenshot pasted into the error box shows as a
+  small picture under it, never as letters. It is kept beside the error, in the
+  order it was pasted, and the button on its picture is the one way to take it
+  out.
 
 ## The screen
 
@@ -66,9 +70,12 @@ form before it records anything.
 │  Bug Priority   ( ) High     ( ) Medium            (x) Low   │
 │                                                              │
 │  ┌────────────────────────────────────────────────────────┐  │
-│  │ paste error or exception or screenshot..               │  │
-│  │                                                        │  │
+│  │ java.lang.AssertionError: expected [true]              │  │
+│  │   at org.testin.demo.LoginTest.valid(LoginTest:41)     │  │
 │  └────────────────────────────────────────────────────────┘  │
+│   ┌────────┐x  ┌────────┐x                                   │
+│   │ picture│   │ picture│                                    │
+│   └────────┘   └────────┘                                    │
 ├──────────────────────────────────────────────────────────────┤
 │  [k]  Enter Save       Escape Cancel                         │
 └──────────────────────────────────────────────────────────────┘
@@ -80,8 +87,13 @@ form before it records anything.
    hint.
 3. **Bug Severity** — four choices, with the least serious chosen.
 4. **Bug Priority** — three choices, with the lowest chosen.
-5. **The big box** — for the error, the exception or a note about a screenshot.
-6. There is no button. `Enter` saves and `Escape` cancels.
+5. **The big box** — for the error or the exception, as text. Its gray hint
+   reads *paste error or exception or screenshot..*.
+6. **The pictures under it** — one small picture for each screenshot pasted
+   with `Ctrl+V`, in the order they were pasted: the screenshot itself, 48
+   pixels high. Its **x** takes that screenshot out. No picture is ever written
+   into the box as letters.
+7. There is no button. `Enter` saves and `Escape` cancels.
 
 ## Main flow
 

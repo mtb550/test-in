@@ -16,7 +16,10 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.openapi.actionSystem.CommonShortcuts;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.ui.JBFont;
@@ -28,42 +31,30 @@ import org.testin.util.ClipboardContents;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
-import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.Objects;
+import java.util.List;
 
 /**
  * A multi-line text area — for pasted content like an error or an exception,
- * and, where the dialog asks for it with {@code acceptsImages()}, a screenshot
- * (a pasted image becomes a base64 PNG data-URI). Enter inserts a
- * newline (the dialog keys stay off this component), Tab moves the focus like
+ * and, where the dialog asks for it with {@code images(list)}, screenshots: a
+ * pasted image shows as a thumbnail under the box, never as text. Enter inserts
+ * a newline (the dialog keys stay off this component), Tab moves the focus like
  * everywhere else, and it claims the dialog's remaining space.
  */
 public final class TextArea implements DialogComponent {
 
-    /**
-     * The paste that inserts nothing, standing in for a look and feel that
-     * supplies no paste action of its own.
-     */
-    private static final @NotNull Action NO_PASTE = new AbstractAction() {
-        @Override
-        public void actionPerformed(final ActionEvent event) {
-        }
-    };
-
 
     private final @NotNull JBTextArea area;
-    private final @NotNull JBScrollPane panel;
+    private final @NotNull ScreenshotStrip strip;
+    private final @NotNull JBPanel<?> panel;
 
-    TextArea(final @NotNull String placeholder, final @NotNull String value, final int rows, final boolean acceptsImages) {
+    TextArea(final @NotNull String placeholder, final @NotNull String value, final int rows, final boolean acceptsImages, final @NotNull List<byte[]> images) {
         area = new JBTextArea(value);
         area.setFont(JBFont.label().biggerOn(2f));
         area.setLineWrap(true);
@@ -81,15 +72,22 @@ public final class TextArea implements DialogComponent {
         area.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, null);
 
         // Bound on the area itself, as the framework's single-line fields
-        // are. A popup or a dialog can eat Ctrl+V on the way here, and the
-        // paste action replaced below is only reached by whatever key is bound
-        // to it - so the image paste rested on a binding nothing here made.
+        // are, because a popup or a dialog can eat the keys on the way here.
+        // An area that takes images answers paste itself: installImagePaste.
         FrameworkTextField.bindClipboard(area);
 
         if (acceptsImages) installImagePaste();
 
-        panel = new JBScrollPane(area);
-        panel.setBorder(JBUI.Borders.emptyTop(8));
+        final @NotNull JBScrollPane scroll = new JBScrollPane(area);
+        scroll.setBorder(JBUI.Borders.emptyTop(8));
+
+        // Under the box, and empty - so no height at all - until a screenshot
+        // is stored or pasted (#50).
+        strip = new ScreenshotStrip(images);
+        panel = new JBPanel<>(new BorderLayout());
+        panel.setOpaque(false);
+        panel.add(scroll, BorderLayout.CENTER);
+        panel.add(strip.getPanel(), BorderLayout.SOUTH);
     }
 
     /**
@@ -98,7 +96,7 @@ public final class TextArea implements DialogComponent {
      * failure and an image the clipboard had not finished loading arrived at the
      * same catch and neither was logged.
      */
-    private static @NotNull String toDataUri(final @NotNull Image image) {
+    private static byte @NotNull [] toPng(final @NotNull Image image) {
         final BufferedImage buffered;
         if (image instanceof BufferedImage alreadyBuffered) {
             buffered = alreadyBuffered;
@@ -107,7 +105,7 @@ public final class TextArea implements DialogComponent {
             final int height = image.getHeight(null);
             // A not-yet-loaded async image reports -1; the caller falls back
             // to the normal text paste.
-            if (width <= 0 || height <= 0) return "";
+            if (width <= 0 || height <= 0) return new byte[0];
 
             buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             final @NotNull Graphics2D g = buffered.createGraphics();
@@ -121,30 +119,31 @@ public final class TextArea implements DialogComponent {
         try {
             final @NotNull ByteArrayOutputStream out = new ByteArrayOutputStream();
             ImageIO.write(buffered, "png", out);
-            return "data:image/png;base64," + Base64.getEncoder().encodeToString(out.toByteArray());
+            return out.toByteArray();
         } catch (final IOException ex) {
             Logger.error("Could not encode a pasted image as PNG: " + ex.getMessage());
-            return "";
+            return new byte[0];
         }
     }
 
     /**
-     * Inserts whatever image the clipboard is holding as a data URI, and says
-     * whether it did. An empty clipboard and text on the clipboard are the same
-     * answer - no - which is what makes the caller a single line.
+     * Adds whatever image the clipboard is holding to the strip under the box,
+     * and says whether it did. An empty clipboard and text on the clipboard are
+     * the same answer - no - which is what makes the caller a single line.
      */
-    private boolean insertPastedImage() {
+    private boolean addPastedScreenshot() {
         return ClipboardContents.withFlavor(DataFlavor.imageFlavor)
-                .map(this::insertAsDataUri)
+                .map(this::addScreenshot)
                 .orElse(false);
     }
 
-    private boolean insertAsDataUri(final @NotNull Transferable contents) {
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
+    private boolean addScreenshot(final @NotNull Transferable contents) {
         try {
-            final @NotNull String dataUri = toDataUri((Image) contents.getTransferData(DataFlavor.imageFlavor));
-            if (dataUri.isEmpty()) return false;
+            final byte @NotNull [] png = toPng((Image) contents.getTransferData(DataFlavor.imageFlavor));
+            if (png.length == 0) return false;
 
-            area.insert(dataUri, area.getCaretPosition());
+            strip.add(png);
             return true;
         } catch (final UnsupportedFlavorException | IOException ex) {
             // The clipboard would not hand over the image it just said it had -
@@ -155,27 +154,33 @@ public final class TextArea implements DialogComponent {
     }
 
     /**
-     * Ctrl+V with an image on the clipboard (e.g. a screenshot) inserts it as
-     * a base64 PNG data-URI; plain text pastes as always. Copy and cut stay
-     * the component's own.
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
+     * <p>
+     * The paste gesture, answered once: a picture on the clipboard (e.g. a
+     * screenshot) becomes a thumbnail under the box, and anything else is the
+     * area's own paste. Copy and cut stay the component's own.
+     * <p>
+     * A registered action rather than the area's input map, because the IDE
+     * dispatches its own paste before a component's input map: a paste bound
+     * there never ran. Seen in the sandbox on 2026-09-15 - Ctrl+V pasted
+     * nothing, and the log's last action read EditorPaste (#50).
      */
     private void installImagePaste() {
-        // A text area always has a paste action; one whose look and feel somehow
-        // does not gets an action that inserts nothing, so the fallback below is
-        // unconditional.
-        final @NotNull Action defaultPaste = Objects.requireNonNullElse(
-                area.getActionMap().get(DefaultEditorKit.pasteAction), NO_PASTE);
-        area.getActionMap().put(DefaultEditorKit.pasteAction, new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                if (insertPastedImage()) return;
-                defaultPaste.actionPerformed(event);
-            }
-        });
+        DumbAwareAction.create(event -> {
+            if (!addPastedScreenshot()) area.paste();
+        }).registerCustomShortcutSet(CommonShortcuts.getPaste(), area);
     }
 
     public @NotNull String getText() {
         return area.getText();
+    }
+
+    /**
+     * The screenshots under the box, in the order they were pasted, and empty
+     * for a box that takes none.
+     */
+    public @NotNull List<byte[]> getImages() {
+        return strip.screenshots();
     }
 
     /**

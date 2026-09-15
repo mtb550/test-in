@@ -20,7 +20,6 @@ import lombok.Builder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
-import org.testin.model.Stacktrace;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
@@ -45,7 +44,7 @@ import java.util.UUID;
  * @param executed who executed the run item and when, as one value
  */
 @Builder(toBuilder = true)
-public record BugFacts(@NotNull String title, @NotNull BugSeverity severity, @NotNull BugPriority priority, @NotNull String platform, @NotNull String actualResult, @NotNull String expectedResult, @NotNull List<String> steps, @NotNull String testData, @NotNull Stacktrace stacktrace, @NotNull String testRun, @NotNull String executed, @NotNull String browser, @NotNull String device, @NotNull String language, @NotNull String commit, @NotNull UUID testCaseId, @NotNull String testSetName) {
+public record BugFacts(@NotNull String title, @NotNull BugSeverity severity, @NotNull BugPriority priority, @NotNull String platform, @NotNull String actualResult, @NotNull String expectedResult, @NotNull List<String> steps, @NotNull String testData, @NotNull String stacktrace, @NotNull List<byte[]> screenshots, @NotNull String testRun, @NotNull String executed, @NotNull String browser, @NotNull String device, @NotNull String language, @NotNull String commit, @NotNull UUID testCaseId, @NotNull String testSetName) {
 
     /**
      * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068.
@@ -66,7 +65,8 @@ public record BugFacts(@NotNull String title, @NotNull BugSeverity severity, @No
                 TestEditorAttributes.EXPECTED_RESULT.displayValue(tc),
                 tc.getSteps().stream().map(Display::format).toList(),
                 tc.getTestData(),
-                Stacktrace.of(item.getStacktrace()),
+                item.getStacktrace(),
+                item.getScreenshots(),
                 testRun,
                 ReportText.joined(BugTemplate.SEPARATOR, item.getExecutedBy(), Display.formatDate(item.getExecutedAt())),
                 TestRunConfiguration.BROWSER.valueIn(run),

@@ -119,6 +119,13 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     }
 
     /**
+     * A screenshot at its real size, scrolled when it is larger (#50).
+     */
+    public static @NotNull ComponentDialogBase<Picture> picture(final byte @NotNull [] png) {
+        return new ComponentDialogBase<>(new Picture(png));
+    }
+
+    /**
      * A captioned row offering existing values and accepting a new one — the
      * open-set counterpart of {@link #radios}. The selected value must be one
      * of the options; what the tester types over it need not be.
@@ -261,6 +268,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         private @NotNull String value = "";
         private int rows = 5;
         private boolean acceptsImages = false;
+        private @NotNull List<byte[]> images = List.of();
 
         public @NotNull TextAreaBuilder placeholder(final @NotNull String placeholder) {
             this.placeholder = placeholder;
@@ -281,18 +289,18 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
 
         /**
-         * Lets Ctrl+V with an image on the clipboard insert it as a base64 PNG
-         * data URI. Off unless asked for: only a failure's Error Capture keeps
-         * screenshots, and a box that took one anywhere else stored letters a
-         * report then printed (#66, finding 127).
+         * Lets Ctrl+V with an image on the clipboard add it as a screenshot under
+         * the box, starting from these. Off unless asked for: only a failure's
+         * Error Capture keeps screenshots (#66, finding 127; #50).
          */
-        public @NotNull TextAreaBuilder acceptsImages() {
+        public @NotNull TextAreaBuilder images(final @NotNull List<byte[]> images) {
             this.acceptsImages = true;
+            this.images = images;
             return this;
         }
 
         public @NotNull ComponentDialogBase<TextArea> build() {
-            return new ComponentDialogBase<>(new TextArea(placeholder, value, rows, acceptsImages));
+            return new ComponentDialogBase<>(new TextArea(placeholder, value, rows, acceptsImages, images));
         }
     }
 

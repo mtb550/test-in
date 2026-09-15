@@ -81,7 +81,7 @@ public class RunGridEditingTest {
 
     @Test
     public void aRowWithNothingTypedLosesNothingByPassing() {
-        assertEquals(item().wouldClear(TestStatus.PASSED), List.of(),
+        assertEquals(item().wouldClear(TestStatus.PASSED, Failure.NONE), List.of(),
                 "the ordinary case asks the tester nothing");
     }
 
@@ -93,7 +93,7 @@ public class RunGridEditingTest {
         row.setBugSeverity(BugSeverity.MAJOR);
         row.setBugPriority(BugPriority.HIGH);
 
-        assertEquals(row.wouldClear(TestStatus.PASSED),
+        assertEquals(row.wouldClear(TestStatus.PASSED, Failure.NONE),
                 List.of("the actual result", "the stacktrace", "the bug severity", "the bug priority"));
     }
 
@@ -102,7 +102,7 @@ public class RunGridEditingTest {
         final TestRunItems row = item();
         row.setActualResult("The balance showed 0.00");
 
-        assertEquals(row.wouldClear(TestStatus.PASSED), List.of("the actual result"),
+        assertEquals(row.wouldClear(TestStatus.PASSED, Failure.NONE), List.of("the actual result"),
                 "warning about three empty fields teaches the tester to dismiss the warning");
     }
 
@@ -111,9 +111,9 @@ public class RunGridEditingTest {
         final TestRunItems row = item();
         row.setActualResult("The balance showed 0.00");
 
-        assertEquals(row.wouldClear(TestStatus.FAILED), List.of(),
+        assertEquals(row.wouldClear(TestStatus.FAILED, Failure.NONE), List.of(),
                 "a failing case still has something to explain, so nothing is cleared");
-        assertEquals(row.wouldClear(TestStatus.BLOCKED), List.of());
+        assertEquals(row.wouldClear(TestStatus.BLOCKED, Failure.NONE), List.of());
     }
 
     @Test
@@ -151,10 +151,10 @@ public class RunGridEditingTest {
         row.setActualResult("The balance showed 0.00");
         row.setBugSeverity(BugSeverity.MAJOR);
 
-        final List<String> warned = row.wouldClear(TestStatus.PASSED);
+        final List<String> warned = row.wouldClear(TestStatus.PASSED, Failure.NONE);
         row.recordVerdict(TestStatus.PASSED, "mtb");
 
-        assertTrue(row.wouldClear(TestStatus.PASSED).isEmpty(),
+        assertTrue(row.wouldClear(TestStatus.PASSED, Failure.NONE).isEmpty(),
                 "everything named in the warning is gone afterward, or the warning was wrong: " + warned);
         assertEquals(warned.size(), 2);
     }

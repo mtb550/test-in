@@ -83,7 +83,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
                 titleField,
                 bodyArea,
                 ComponentDialogBase.details()
-                        .row(Bundle.message("bug.dialog.screenshots"), String.valueOf(bug.facts().stacktrace().screenshots().size()))
+                        .row(Bundle.message("bug.dialog.screenshots"), String.valueOf(bug.facts().screenshots().size()))
                         .row(Bundle.message("bug.dialog.repository"), bug.repository().map(BugRepository::displayName).orElse(""))
                         .build(),
                 sendButton);
@@ -125,7 +125,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
      */
     private @NotNull Optional<String> whyNot() {
         return bug.whyNotReady().or(() -> BugLimits.whyNot(titleField.getComponent().getText(), bodyArea.getComponent().getText(),
-                bug.facts().stacktrace().screenshots().size()));
+                bug.facts().screenshots().size()));
     }
 
     /**
@@ -151,7 +151,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
         // of bugRepoUrl that found it.
         sent = true;
         final @NotNull BugReports.Edits edits = new BugReports.Edits(titleField.getComponent().getText().strip(), bodyArea.getComponent().getText());
-        BugFiling.send(p, item, bug.repository().orElseThrow(), edits, bug.facts().stacktrace().screenshots(), redraw);
+        BugFiling.send(p, item, bug.repository().orElseThrow(), edits, bug.facts().screenshots(), redraw);
         closeOk();
     }
 }

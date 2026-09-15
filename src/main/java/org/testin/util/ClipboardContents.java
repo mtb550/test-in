@@ -30,7 +30,7 @@ import java.util.Optional;
  * <p>
  * An empty clipboard is a null from the platform, and four places tested for it
  * separately: the tree's transfer handler, the two paste actions and the text
- * area that turns a pasted image into a data URI. Each also asked whether the
+ * area that takes a pasted screenshot. Each also asked whether the
  * contents carried the flavor it wanted, so each carried the same two-part
  * condition.
  * <p>

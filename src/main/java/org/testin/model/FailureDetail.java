@@ -21,15 +21,14 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import org.testin.util.Bundle;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * The five things on a run row that exist only to explain why a case is not
- * passing: what happened, the stacktrace behind it, how bad the bug is, and the
- * GitHub issue it was reported as.
+ * The six things on a run row that exist only to explain why a case is not
+ * passing: what happened, the stacktrace behind it, the screenshots pasted with
+ * it, how bad the bug is, and the GitHub issue it was reported as.
  * <p>
  * They are declared here as one list because two places need the same answer
  * about them and used to hold their own copies of it:
@@ -51,6 +50,16 @@ public enum FailureDetail {
             Bundle.message("failure.detail.stacktrace"),
             item -> !item.getStacktrace().isBlank(),
             item -> item.setStacktrace("")
+    ),
+
+    /**
+     * The screenshots a tester pasted into the error box, kept beside the
+     * stacktrace rather than inside it (#50).
+     */
+    SCREENSHOTS(
+            Bundle.message("failure.detail.screenshots"),
+            item -> !item.getScreenshots().isEmpty(),
+            item -> item.setScreenshots(List.of())
     ),
 
     BUG_SEVERITY(
@@ -88,6 +97,16 @@ public enum FailureDetail {
     private final @NotNull Consumer<TestRunItems> clear;
 
     /**
+     * UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-220.
+     * <p>
+     * What happened, as against the bug: the three a failure the automation
+     * reports clears before it writes its own. The bug - how bad it is, how soon
+     * it must be fixed, the issue it was reported as - is still the same bug when
+     * the same case fails again, so only a pass clears that.
+     */
+    public static final @NotNull List<FailureDetail> WHAT_HAPPENED = List.of(ACTUAL_RESULT, STACKTRACE, SCREENSHOTS);
+
+    /**
      * UC-VIEW-PANEL-008, Rule-VIEW-PANEL-064.
      * <p>
      * Whether this row records a bug at all.
@@ -107,7 +126,14 @@ public enum FailureDetail {
      * and empty when a pass would erase nothing - which is the ordinary case.
      */
     public static @NotNull List<String> filledIn(final @NotNull TestRunItems item) {
-        return Arrays.stream(values())
+        return filledIn(item, List.of(values()));
+    }
+
+    /**
+     * The ones among these that this row holds, in the tester's words.
+     */
+    public static @NotNull List<String> filledIn(final @NotNull TestRunItems item, final @NotNull List<FailureDetail> details) {
+        return details.stream()
                 .filter(detail -> detail.filled.test(item))
                 .map(FailureDetail::getLabel)
                 .toList();
@@ -117,6 +143,13 @@ public enum FailureDetail {
      * Puts every one of them back to its empty value.
      */
     public static void clearAll(final @NotNull TestRunItems item) {
-        Arrays.stream(values()).forEach(detail -> detail.clear.accept(item));
+        clear(item, List.of(values()));
+    }
+
+    /**
+     * Puts these back to their empty values.
+     */
+    public static void clear(final @NotNull TestRunItems item, final @NotNull List<FailureDetail> details) {
+        details.forEach(detail -> detail.clear.accept(item));
     }
 }

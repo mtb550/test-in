@@ -46,6 +46,11 @@ or `F`.
   way a keyboard verdict is.
 - **Rule-EDITOR-PANEL-183** — The framework's own timing replaces whatever the
   clock counted.
+- **Rule-EDITOR-PANEL-220** — A failure from the automation clears what the last
+  failure said happened - the actual result, the error and its screenshots -
+  before it writes its own, and keeps the bug severity, the bug priority and the
+  bug issue link. The message that names what a pass cleared names what it
+  cleared too.
 
 ## What the tester sees
 
@@ -77,6 +82,12 @@ Everything about how the run is built and named is on
 | The actual result and the error | The framework's message and stacktrace |
 | Who ran it, and when | The name on the settings page, and now |
 
+A failure clears what the last failure said happened first - the actual result,
+the error and the screenshots pasted with it - and keeps the bug severity, the
+bug priority and the bug issue link, because the same test case failing again is
+most often the same bug. A message titled **Failure detail cleared** names what
+went, as it does for a pass.
+
 A result with no message and no error does not clear what the tester wrote by
 hand.
 
@@ -97,10 +108,11 @@ messages reading *Passed* or *Failed*. Every other bulk gesture in Testin raises
 one message with a count. That is difference 25 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
 
-**An automated pass still clears the tester's notes.** It now says so
-afterwards, in a message titled **Failure detail cleared** that names what went
-and stays in the notification list. The dialog that asks first is still on the
-keyboard path only. That is difference 26.
+**An automated verdict still clears the tester's notes.** A pass clears all of
+them and a failure clears what happened. Each now says so afterwards, in a
+message titled **Failure detail cleared** that names what went and stays in the
+notification list. The dialog that asks first is still on the keyboard path
+only. That is difference 26.
 
 **Closing the tab stops the automation this editor started.** It is the same
 gesture as pressing **Stop Execution**, so the results of tests still running

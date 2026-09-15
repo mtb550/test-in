@@ -36,10 +36,25 @@ There is no key for this. The link is under the first three lines.
   with no link.
 - **Rule-VIEW-PANEL-036** — The text in the dialog can be selected and copied.
   It can also be typed into, and nothing typed there is ever saved.
+- **Rule-VIEW-PANEL-081** — Under the first lines of the error, the Show all
+  link comes first, then one link for each screenshot pasted with the failure.
+  Each opens that screenshot at its real size in a window of its own.
 
 ## The screen
 
-The link reads *Show all* and the number of lines the error really has.
+The **Stacktrace** row shows the first three lines, then one line of links:
+*Show all* and the number of lines the error really has, then one link for each
+screenshot pasted with the failure. A screenshot link opens that screenshot in
+a window of its own.
+
+```
+│   Stacktrace          java.lang.AssertionError: expected [true]            │
+│                         at org.testin.demo.LoginTest.valid                 │
+│                         at org.testng.internal.Invoker.invoke              │
+│                       Show all 42 lines   [Screenshot 1]  [Screenshot 2]   │
+```
+
+*Show all* opens this dialog. It holds the text, and no screenshot.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -74,9 +89,30 @@ The link reads *Show all* and the number of lines the error really has.
 5. The tester selects the text and copies it.
 6. The tester presses `Escape`. Nothing is saved.
 
+To look at a screenshot, the tester clicks *[Screenshot 1]* instead. The
+screenshot opens in a window titled with the same name, at its real size, and
+scrolls when it is larger than the window. `Escape` closes it, and nothing is
+saved.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  [Screenshot 1]                                              │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│         the screenshot, at its real size                     │
+│                                                              │
+├──────────────────────────────────────────────────────────────┤
+│  Escape  Close                                               │
+└──────────────────────────────────────────────────────────────┘
+```
+
 ## What Testin refuses
 
-**If there is no error** — no **Stacktrace** row is drawn at all.
+**If there is no error and no screenshot** — no **Stacktrace** row is drawn at
+all.
+
+**If there are screenshots but no error** — the row shows only the screenshot
+links.
 
 **If the error is three lines or fewer** — the whole error is shown in the panel
 and there is no link.

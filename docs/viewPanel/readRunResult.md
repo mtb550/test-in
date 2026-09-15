@@ -81,7 +81,7 @@ The run rows sit under the badges and above the test case's own rows.
 | **Run Status** | The verdict: **Passed**, **Failed**, **Blocked**, **Pending**, **Untested** or **Removed** |
 | **Duration** | How long the test case took |
 | **Actual Result** | What the tester says actually happened |
-| **Stacktrace** | The first three lines of the error, and a link to the rest |
+| **Stacktrace** | The first three lines of the error, a link to the rest, and a link to each screenshot pasted with the failure. That is [UC-VIEW-PANEL-006](readStacktrace.md) |
 | **Bug Severity** | **Blocker**, **Major**, **Minor** or **Enhancement** |
 | **Bug Priority** | **High**, **Medium** or **Low** |
 | **Bug Issue** | The GitHub issue the failure was reported as, as `owner/repo#123`, and the **Report Bug** link that files one. That is [UC-VIEW-PANEL-016](reportBug.md). Drawn for a failed test case, and for any test case that has been reported |

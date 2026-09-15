@@ -42,13 +42,18 @@ public class RunAttributeCoverageTest {
 
     /**
      * A tripwire on the count rather than a mapping by name, because the failure
-     * is a fifth field being added here and nowhere else. Whoever adds it reads
+     * is a new field being added here and nowhere else. Whoever adds it reads
      * this line and knows what the other half of the work is.
+     * <p>
+     * Six, and five attributes: the screenshots have none of their own (#50). A
+     * screenshot is never text, so it has no grid cell and no report column; it
+     * is shown as a link in the row the Stacktrace attribute draws in the details
+     * panel (Rule-VIEW-PANEL-081), and as a picture in the failure form.
      */
     @Test
     public void everyFailureDetailIsAlsoARunAttribute() {
-        assertEquals(FailureDetail.values().length, 5,
-                "a sixth thing a failure records needs a RunEditorAttributes constant too, "
+        assertEquals(FailureDetail.values().length, 6,
+                "a seventh thing a failure records needs a RunEditorAttributes constant too, "
                         + "or it is stored, cleared on a pass, and shown nowhere");
 
         final List<String> named = Arrays.stream(RunEditorAttributes.values())

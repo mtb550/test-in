@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
-import org.testin.model.Stacktrace;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -99,7 +98,7 @@ public final class BugTemplate {
                 Map.entry("steps", steps(facts.steps())),
                 Map.entry("testData", codeBlock(facts.testData())),
                 Map.entry("exception", exception(facts.stacktrace())),
-                Map.entry("screenshots", screenshots(facts.stacktrace().screenshots().size())),
+                Map.entry("screenshots", screenshots(facts.screenshots().size())),
                 Map.entry("testRun", cell(facts.testRun())),
                 Map.entry("executed", cell(facts.executed())),
                 Map.entry("browserDeviceLanguage", String.join(SEPARATOR, cell(facts.browser()), cell(facts.device()), cell(facts.language()))),
@@ -178,14 +177,14 @@ public final class BugTemplate {
     }
 
     /**
-     * The stacktrace's text, folded under its first line. The screenshots are
-     * not in it: they have their own heading.
+     * The stacktrace, folded under its first line. The screenshots have their
+     * own heading.
      */
-    static @NotNull String exception(final @NotNull Stacktrace stacktrace) {
-        final @NotNull String text = stacktrace.text();
+    static @NotNull String exception(final @NotNull String stacktrace) {
+        final @NotNull String text = stacktrace.strip();
         if (text.isEmpty()) return NOT_AVAILABLE;
 
-        return "<details>\n<summary>" + html(stacktrace.firstLine()) + "</summary>\n\n" + codeBlock(text) + "\n</details>";
+        return "<details>\n<summary>" + html(text.lines().findFirst().orElse("").strip()) + "</summary>\n\n" + codeBlock(text) + "\n</details>";
     }
 
     private static @NotNull String screenshots(final int count) {

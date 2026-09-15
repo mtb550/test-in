@@ -65,7 +65,7 @@ public class BugFactsTest {
         assertEquals(facts.browser(), "Chrome");
         assertEquals(facts.device(), "");
         assertEquals(facts.commit(), "933a3984");
-        assertEquals(facts.stacktrace().text(), "boom");
+        assertEquals(facts.stacktrace(), "boom");
         assertEquals(facts.testRun(), "Sprint 7");
         assertEquals(facts.testCaseId(), id);
     }

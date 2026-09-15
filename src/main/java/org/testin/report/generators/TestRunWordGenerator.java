@@ -312,17 +312,6 @@ public final class TestRunWordGenerator {
                     issue.setUnderline(UnderlinePatterns.SINGLE);
                     styledRun(ap.createRun(), ")", ReportFont.SMALL, DARK_GRAY);
                 });
-
-                // Only when there is one, and monospaced: a stacktrace read in
-                // a proportional font loses the indentation that makes it
-                // scannable.
-                if (!item.getStacktrace().isBlank()) {
-                    final XWPFRun trace = tcCell.addParagraph().createRun();
-                    trace.setText(item.getStacktrace());
-                    trace.setFontSize(ReportFont.SMALL.ptRounded());
-                    trace.setFontFamily("Consolas");
-                    trace.setColor(DARK_GRAY);
-                }
             }
 
             if (withFailureDetail) {

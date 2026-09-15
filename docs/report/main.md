@@ -10,7 +10,7 @@ to somebody who does not have the IDE.
 |---|---|
 | **Part of Testin** | Reports |
 | **Answers** | How a report is made, what it contains, and what each format holds |
-| **Numbering** | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` to `Rule-REPORT-016` |
+| **Numbering** | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` to `Rule-REPORT-017` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -98,8 +98,10 @@ The PDF, the Word document and the web page each hold these, in this order.
    Testin.
 
 The failed table is the only one with more than two columns. It also carries the
-bug priority and the bug severity, and under each test case the actual result
-and the whole error.
+bug priority and the bug severity, and under each test case the actual result.
+The web page also prints the whole error under it, as text; the PDF and the Word
+document print no error. No report shows a screenshot pasted with a failure: the
+issue a failure was reported as holds them. (Rule-REPORT-017)
 
 A test case reported as a bug shows its issue right after the actual result, as
 *(#12)*. Clicking it opens the issue. A test case with no issue shows nothing
@@ -113,6 +115,7 @@ header row and one row for each test case.
 
 The last column, **Bug Issue**, holds the issue a test case was reported as, as
 *#12*. Clicking it opens the issue. It is empty for a test case with no issue.
+There is no column for the error.
 
 It carries **no overview, no result analysis and none of the per-verdict
 tables**. A tester who wants the whole report should not choose this format.
