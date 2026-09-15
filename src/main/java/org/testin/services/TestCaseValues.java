@@ -17,8 +17,8 @@
 package org.testin.services;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
+import com.intellij.util.concurrency.SequentialTaskExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 
@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
@@ -46,6 +47,14 @@ public final class TestCaseValues implements Disposable {
      */
     private final @NotNull Set<String> groups = ConcurrentHashMap.newKeySet();
     private final @NotNull AtomicBoolean reloadScheduled = new AtomicBoolean();
+
+    /**
+     * One rebuild or addition at a time, in the order they were asked for. On
+     * the shared pool two rebuilds could overlap, and whichever finished last
+     * retained only its own snapshot - so the older one removed values the
+     * newer one had just added (#312, A95).
+     */
+    private final @NotNull ExecutorService updates = SequentialTaskExecutor.createSequentialApplicationPoolExecutor("Testin completion values");
 
     private static void addTo(final @NotNull Set<String> target, final @NotNull String value) {
         if (!value.isBlank()) target.add(value.trim());
@@ -125,7 +134,7 @@ public final class TestCaseValues implements Disposable {
         // must read what remains when it runs, not when it was asked.
         if (!reloadScheduled.compareAndSet(false, true)) return;
 
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+        updates.execute(() -> {
             reloadScheduled.set(false);
 
             final @NotNull List<TestCaseDto> testCases = source.get();
@@ -157,7 +166,7 @@ public final class TestCaseValues implements Disposable {
 
     private void cacheAsync(final @NotNull List<TestCaseDto> testCases) {
         if (testCases.isEmpty()) return;
-        ApplicationManager.getApplication().executeOnPooledThread(() -> testCases.forEach(this::cache));
+        updates.execute(() -> testCases.forEach(this::cache));
     }
 
     private void cache(final @NotNull TestCaseDto tc) {
