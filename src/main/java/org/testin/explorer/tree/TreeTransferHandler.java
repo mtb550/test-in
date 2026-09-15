@@ -674,15 +674,31 @@ public class TreeTransferHandler extends TransferHandler {
                 .softShowCounted(p, cut ? Done.CUT : Done.COPIED, directories.size());
     }
 
-    // UC-TREE-PANEL-013, Rule-TREE-PANEL-050
-    public void pasteFromClipboard() {
-        ClipboardContents.current().ifPresent(contents -> {
+    /**
+     * UC-TREE-PANEL-013, Rule-TREE-PANEL-050, Rule-TREE-PANEL-006.
+     * <p>
+     * Pastes the clipboard's nodes into the target the confirmation named.
+     * <p>
+     * Given the target rather than reading the tree's selection: the tree stays
+     * clickable while the confirmation is open, so a row clicked before Move was
+     * pressed used to be where the nodes landed - a change nobody confirmed
+     * (#312, A72).
+     */
+    public void pasteFromClipboard(final @NotNull DirectoryDto target) {
+        ClipboardContents.withFlavor(NODE_FLAVOR).ifPresent(contents -> {
             // A cut is spent by the paste that carries it out. Left on the
             // clipboard it offered the same move again, from a folder the nodes
             // had already left, and the second attempt found nothing there. A
             // copy stays: a copy is meant to be pasted more than once.
             final boolean wasCut = isCut(contents);
-            if (importData(new TransferSupport(tree, contents)) && wasCut) clearClipboard();
+
+            final @NotNull List<DirectoryDto> sources = nodesOf(contents).stream()
+                    .filter(node -> canTransferInto(node, target))
+                    .toList();
+            if (sources.isEmpty()) return;
+
+            transfer(wasCut ? MOVE : COPY, sources, target);
+            if (wasCut) clearClipboard();
         });
     }
 

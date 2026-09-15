@@ -141,7 +141,7 @@ public class PasteNodeAction extends DumbAwareAction {
                         Objects.toString(fromPath, ""),
                         target.getPath().toString(),
                         verb,
-                        transferHandler::pasteFromClipboard
+                        () -> transferHandler.pasteFromClipboard(target)
                 ).show();
 
             } catch (final Exception ex) {
