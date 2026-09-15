@@ -24,6 +24,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.WheelForwarding;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.codegen.ExecutionPosition;
@@ -97,6 +98,12 @@ public class DetailsTab {
         scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
 
         FontSync.attachWheelZoom(p, contentPanel);
+
+        // The other half of the wheel, as the grid and the cards install it. A
+        // component with a wheel listener receives the wheel itself instead of
+        // the scroll pane around it, so with only the zoom listener a plain wheel
+        // did nothing here and only the scroll bar moved the case (#312, A75).
+        contentPanel.addMouseWheelListener(WheelForwarding::forwardWheelToScrollPane);
 
         detailsTab.add(scrollPane, BorderLayout.CENTER);
 
