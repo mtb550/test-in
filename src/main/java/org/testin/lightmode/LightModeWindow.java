@@ -337,14 +337,23 @@ final class LightModeWindow {
         start.setVisible(!editor.isExecuting());
         stop.setVisible(editor.isExecuting());
 
+        final @NotNull Optional<UUID> wasShowing = shownCase;
         if (executing) showCase(cases.get(index));
 
-        // Any execution-state change outdates a half-written failure: the case it
-        // describes is no longer the case in front of the tester. Dropped rather
-        // than carried over, because carrying it over would attach one case's
-        // failure to the next one's row.
-        capture = Optional.empty();
-        showCapture();
+        // A different case outdates a half-written failure: the case it describes
+        // is no longer the case in front of the tester. Dropped rather than
+        // carried over, because carrying it over would attach one case's failure
+        // to the next one's row.
+        //
+        // Only a different case. Most calls are redraws of the same one - another
+        // case's automated result arriving, the run's configuration edited - and
+        // dropping the form on those threw away what the tester was typing
+        // (#312, A26). A form that stays is left where it is rather than put back,
+        // because putting it back takes the keyboard from the field being typed in.
+        if (!executing || !shownCase.equals(wasShowing)) capture = Optional.empty();
+
+        if (capture.isPresent()) applyParts();
+        else showCapture();
 
         tick();
 
