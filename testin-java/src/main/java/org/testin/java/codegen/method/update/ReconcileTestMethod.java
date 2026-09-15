@@ -17,6 +17,7 @@
 package org.testin.java.codegen.method.update;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
@@ -24,7 +25,6 @@ import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.GenAction;
-import org.testin.codegen.GenType;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.model.dto.TestCaseDto;
 
@@ -90,11 +90,19 @@ public class ReconcileTestMethod extends UpdateTestBase implements GenAction {
             byClass.computeIfAbsent(tc.getParent().getPath(), path -> new ArrayList<>()).add(tc);
         }
 
-        ApplicationManager.getApplication().invokeLater(() ->
-                WriteCommandAction.runWriteCommandAction(p, "Restore Test Case Code", null,
-                        () -> byClass.values().forEach(inClass -> rewrite(p, inClass))));
+        // The order sweep inside the same command, and the command straight
+        // through when the undo's generator already opened one. Both used to hop
+        // to a later event, past the command that was open, so a Testin Ctrl+Z
+        // left two entries - "Restore Test Case Code" and "Update Test Case
+        // Order" - on the class's own undo history (#312, A61).
+        final @NotNull Runnable inCommand = () ->
+                WriteCommandAction.runWriteCommandAction(p, "Restore Test Case Code", null, () -> {
+                    byClass.values().forEach(inClass -> rewrite(p, inClass));
+                    new UpdateTestOrder().executeAll(p, cases);
+                });
 
-        GenType.UPDATE_TEST_CASE_ORDER.getAction().executeAll(p, cases);
+        if (CommandProcessor.getInstance().getCurrentCommand() != null) inCommand.run();
+        else ApplicationManager.getApplication().invokeLater(inCommand);
     }
 
     /**

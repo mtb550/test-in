@@ -17,6 +17,7 @@
 package org.testin.java.codegen.method.update;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
@@ -92,12 +93,17 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
 
         final @NotNull List<List<TestCaseDto>> ordered = new ArrayList<>(sets.values());
 
-        // Handed to a later event and not waited for: a drag has redrawn the
-        // tree and the editor by the time this runs, and the tester is already
-        // doing the next thing. Nothing downstream reads the code back.
-        ApplicationManager.getApplication().invokeLater(() ->
+        final @NotNull Runnable inCommand = () ->
                 WriteCommandAction.runWriteCommandAction(p, "Update Test Case Order", null,
-                        () -> ordered.forEach(inSet -> arrange(p, inSet))));
+                        () -> ordered.forEach(inSet -> arrange(p, inSet)));
+
+        // Straight through when a command is already open, as UpdateTestBase's
+        // writers are, so a caller's command and this sweep are one undo entry
+        // rather than two (#312, A61). Otherwise handed to a later event and not
+        // waited for: a drag has redrawn the tree and the editor by the time
+        // this runs, and nothing downstream reads the code back.
+        if (CommandProcessor.getInstance().getCurrentCommand() != null) inCommand.run();
+        else ApplicationManager.getApplication().invokeLater(inCommand);
     }
 
     /**
