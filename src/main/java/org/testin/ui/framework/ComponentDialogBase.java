@@ -16,6 +16,7 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.util.IconUtil;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -62,6 +63,16 @@ public final class ComponentDialogBase<C extends DialogComponent> {
      */
     public static @NotNull TextInputBuilder textField() {
         return new TextInputBuilder();
+    }
+
+    /**
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221.
+     * <p>
+     * An input field that underlines a misspelled word, with the IDE's
+     * corrections on Alt+Enter - for a sentence a tester writes (#314).
+     */
+    public static @NotNull ComponentDialogBase<SpellCheckedField> spellCheckedField(final @NotNull Project p, final @NotNull String placeholder, final @NotNull String value) {
+        return new ComponentDialogBase<>(new SpellCheckedField(p, placeholder, value));
     }
 
     /**

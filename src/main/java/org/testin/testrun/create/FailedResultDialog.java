@@ -24,7 +24,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
-import org.testin.ui.framework.TextInput;
+import org.testin.ui.framework.SpellCheckedField;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
@@ -39,7 +39,7 @@ import java.util.function.Consumer;
  * context), bug severity and bug priority — all framework components. Saves
  * on Enter, cancels on Escape; nothing is applied unless saved.
  */
-public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
+public class FailedResultDialog extends AbstractFrameworkDialog<SpellCheckedField> {
 
     private final @NotNull Consumer<FailureFields> onSave;
     private final @NotNull FailureFields fields;
@@ -76,7 +76,8 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
 
         shortcuts = List.of(
                 StatusBarShortcut.save(this::submit),
-                StatusBarShortcut.cancel(this::closeCancel));
+                StatusBarShortcut.cancel(this::closeCancel),
+                StatusBarShortcut.corrections());
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145

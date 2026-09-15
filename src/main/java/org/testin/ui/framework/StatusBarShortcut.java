@@ -100,6 +100,16 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
     }
 
     /**
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221.
+     * <p>
+     * Alt+Enter, called Corrections: the key the IDE binds on a spell-checked
+     * field. Shown and never bound, so the IDE's own corrections keep it (#314).
+     */
+    public static @NotNull StatusBarShortcut corrections() {
+        return hint(Shortcuts.Corrections.getShortcutText(), Bundle.message("dialog.key.corrections"));
+    }
+
+    /**
      * What moving between rows is called, wherever a dialog has rows.
      * <p>
      * Public for the same reason as {@link #SAVE}: the word is not only said by

@@ -26,8 +26,8 @@ import org.testin.model.BugSeverity;
 import org.testin.model.TestRunItems;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
+import org.testin.ui.framework.SpellCheckedField;
 import org.testin.ui.framework.TextArea;
-import org.testin.ui.framework.TextInput;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
@@ -55,7 +55,7 @@ import java.util.stream.IntStream;
  */
 public final class FailureFields {
 
-    private final @NotNull ComponentDialogBase<TextInput> actualResult;
+    private final @NotNull ComponentDialogBase<SpellCheckedField> actualResult;
     private final @NotNull ComponentDialogBase<RadioSelection<BugSeverity>> severity;
     private final @NotNull ComponentDialogBase<RadioSelection<BugPriority>> priority;
     private final @NotNull ComponentDialogBase<TextArea> errorCapture;
@@ -72,10 +72,9 @@ public final class FailureFields {
         final @NotNull List<byte[]> screenshots = Services.getInstance(p, ProjectIndexer.class).screenshots(runPath, runItem);
         IntStream.range(0, screenshots.size()).forEach(index -> named.put(screenshots.get(index), runItem.getScreenshots().get(index)));
 
-        actualResult = ComponentDialogBase.textField()
-                .placeholder(Bundle.message("dialog.failure.placeholder.actual"))
-                .value(runItem.getActualResult())
-                .build();
+        // Rule-EDITOR-PANEL-221: spell checked, as every field of a form that
+        // describes a test case is (#314).
+        actualResult = ComponentDialogBase.spellCheckedField(p, Bundle.message("dialog.failure.placeholder.actual"), runItem.getActualResult());
 
         severity = ComponentDialogBase.<BugSeverity>radios(RunEditorAttributes.BUG_SEVERITY.getName())
                 .options(BugSeverity.CHOICES, BugSeverity::getLabel)
@@ -149,7 +148,7 @@ public final class FailureFields {
     /**
      * Where the tester starts typing.
      */
-    public @NotNull TextInput firstField() {
+    public @NotNull SpellCheckedField firstField() {
         return actualResult.getComponent();
     }
 }

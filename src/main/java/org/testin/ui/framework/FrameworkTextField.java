@@ -106,11 +106,7 @@ final class FrameworkTextField {
         this.icon = icon;
         decorations.accept(icon, note);
 
-        // Derived from the label font at construction, so every dialog open
-        // picks up the current IDE font-size setting.
-        field.setFont(JBFont.label().biggerOn(6f));
-        // 12px left rhythm shared by the field text and any list rows below.
-        field.setBorder(JBUI.Borders.empty(10, 12));
+        style(field);
 
         if (!placeholder.isBlank()) {
             emptyText().setText(placeholder);
@@ -129,6 +125,19 @@ final class FrameworkTextField {
         }
 
         bindClipboard(field);
+    }
+
+    /**
+     * The framework field's look: its font and its padding. One owner for this
+     * Swing field and the spell-checked editor field, so the two cannot drift
+     * (#314).
+     */
+    static void style(final @NotNull JComponent field) {
+        // Derived from the label font at construction, so every dialog open
+        // picks up the current IDE font-size setting.
+        field.setFont(JBFont.label().biggerOn(6f));
+        // 12px left rhythm shared by the field text and any list rows below.
+        field.setBorder(JBUI.Borders.empty(10, 12));
     }
 
     /**

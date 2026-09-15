@@ -1153,7 +1153,8 @@ final class LightModeWindow {
     private StatusBarItem @NotNull [] commitKeys() {
         return new StatusBarItem[]{
                 StatusBarShortcut.hint(Shortcuts.Enter.getShortcutText(), Bundle.message("shortcut.save.and.next")),
-                StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), Bundle.message("shortcut.cancel"))};
+                StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), Bundle.message("shortcut.cancel")),
+                StatusBarShortcut.corrections()};
     }
 
     private static @NotNull JBLabel clock(final @NotNull String meaning) {

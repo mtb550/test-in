@@ -384,7 +384,7 @@ back. A failure nobody described is a failure nobody can act on.
 │                                                                            │
 │  00:41                                                    00:12:41         │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  Enter Save & next                                      Esc Cancel         │
+│  Enter Save & next      Esc Cancel      Alt+Enter Corrections              │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -407,7 +407,9 @@ instead would make every turn of the wheel grow on top of the last.
 The four fields are the actual result, the bug severity, the bug priority and
 the error box. They are exactly the fields the run editor's own failure dialog
 asks for, with the same starting values and the same wording. A failure
-recorded here and one recorded in the run editor are the same record.
+recorded here and one recorded in the run editor are the same record. The actual
+result underlines a misspelled word here as it does there, and `Alt+Enter`
+offers the corrections.
 
 ### 14. Inside the window, in a box it already has
 

@@ -53,6 +53,10 @@ form before it records anything.
   small picture under it, never as letters. It is kept as a picture file beside
   the test run, in the order it was pasted, and the button on its picture is the
   one way to take it out.
+- **Rule-EDITOR-PANEL-221** — What actually happened is spell checked as the
+  tester types, in the failure dialog and in light mode's form. A misspelled
+  word is underlined, Alt+Enter offers the corrections, and nothing is changed
+  unless the tester picks one.
 
 ## The screen
 
@@ -77,14 +81,15 @@ form before it records anything.
 │   │ picture│   │ picture│                                    │
 │   └────────┘   └────────┘                                    │
 ├──────────────────────────────────────────────────────────────┤
-│  [k]  Enter Save       Escape Cancel                         │
+│  [k]  Enter Save   Escape Cancel   Alt+Enter Corrections     │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 1. **Description** and **Expected** — what the test case says. They show the
    tester what should have happened. Neither can be typed into.
 2. **The first box** — what actually happened. It has no label, only its gray
-   hint.
+   hint. A misspelled word in it is underlined, and `Alt+Enter` offers the
+   corrections.
 3. **Bug Severity** — four choices, with the least serious chosen.
 4. **Bug Priority** — three choices, with the lowest chosen.
 5. **The big box** — for the error or the exception, as text. Its gray hint

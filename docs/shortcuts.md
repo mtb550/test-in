@@ -81,6 +81,7 @@ On the cards of a test run editor.
 | `F` | Records **Failed**, and asks why |
 | `B` | Records **Blocked** |
 | `F2` | Changes the failure details without changing the verdict |
+| `Alt+Enter` | In the failure details, offers the corrections for a misspelled word in the actual result |
 
 `P` and `B` mean a field in the test set editor and a verdict in the test run
 editor. They are different keys on different screens, not one key with two jobs.
@@ -94,6 +95,7 @@ The always on top window, which has its own keys.
 | `P` `F` `B` | The three verdicts, as on the cards |
 | `Enter` | Saves the failure detail and moves on |
 | `Escape` | Leaves the failure form, or closes the window |
+| `Alt+Enter` | In the failure form, offers the corrections for a misspelled word in the actual result |
 | `Ctrl+D` | Shows the details |
 | `Ctrl+H` | Hides them |
 | The wheel alone | Changes the text size - no `Ctrl` here, deliberately |

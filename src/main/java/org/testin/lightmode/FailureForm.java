@@ -17,6 +17,7 @@
 package org.testin.lightmode;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.ComponentWithEmptyText;
 import com.intellij.util.ui.JBUI;
@@ -150,9 +151,11 @@ class FailureForm extends JBPanel<FailureForm> {
             if (child.getFont() != null) baseFonts.put(child, child.getFont());
 
             // Asked of the component rather than of our own four field types:
-            // what a framework field is made of is the framework's, and a list
-            // of classes here would go stale the first time one of them changed.
-            if (child instanceof JTextComponent typed) typed.setBackground(RowStripe.odd());
+            // what a framework field is made of is the framework's. The two
+            // kinds of text it builds are a Swing text component and, for a
+            // spell-checked field, an EditorTextField, whose editor does not
+            // exist until the form is shown (#314).
+            if (child instanceof JTextComponent || child instanceof EditorTextField) child.setBackground(RowStripe.odd());
 
             if (child instanceof Container container) remember(container);
         }
