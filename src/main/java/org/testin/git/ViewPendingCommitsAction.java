@@ -229,10 +229,16 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                                 ? git.startBranch(repoPath, target)
                                 : !git.checkout(repoPath, target).isEmpty();
 
+                        // Rule-SHARE-065. The review has already closed, so the way
+                        // back to the changes travels with the refusal, as the branch
+                        // box's own refusal carries it (#312, A46).
                         if (!moved) {
-                            ApplicationManager.getApplication().invokeLater(() ->
-                                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.branch.not.switched.title"),
-                                            Bundle.message("git.branch.not.switched.message", target)));
+                            ApplicationManager.getApplication().invokeLater(() -> {
+                                final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+                                notifier.errorWithActions(p, Bundle.message("git.branch.not.switched.title"),
+                                        Bundle.message("git.branch.not.switched.message", target),
+                                        notifier.action(Bundle.message("branch.review.changes"), () -> reviewFor(p, repoPath)));
+                            });
                             return;
                         }
 
