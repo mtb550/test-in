@@ -23,6 +23,7 @@ import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +40,7 @@ import org.testin.util.Bundle;
 
 import java.util.Optional;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.List;
@@ -84,6 +86,18 @@ public final class SourceForm implements DialogComponent {
                     showFormatHint(format);
                     onDataLoaded.accept(parsedData);
                 }, importLoader));
+
+        // UC-SHARE-007, Rule-SHARE-036. The preview is emptied the moment the box
+        // names another file, and filled again when that file is read. It used to
+        // keep the last file's sheets while the next was waiting to be read, and
+        // for good when the path named no readable file - so Import wrote the
+        // previous file's test cases under a box naming a different one (#312, A50).
+        fileField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent e) {
+                onDataLoaded.accept(Map.of());
+            }
+        });
 
         formatHint.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         formatHint.setVisible(false);
