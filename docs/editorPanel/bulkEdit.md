@@ -102,7 +102,7 @@ item and `Shift+Delete` to drop one.
 5. Each changed value turns green.
 6. The tester presses `Enter`.
 7. Only the rows that changed are written.
-8. A message reads *Updated*.
+8. A message reads *Updated 30*, counting the test cases written.
 
 ## What Testin refuses
 

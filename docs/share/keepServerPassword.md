@@ -47,7 +47,9 @@ reported, as a small message titled **Password Not Kept**.
 
 1. The tester types a password in the account window and presses `Enter`.
 2. The sync starts in the background.
-3. In the background, the password is written to the IDE's password store.
+3. Once the server has accepted it, the password is written to the IDE's
+   password store, in the background. A password the server refused is not
+   kept, so the next sync opens the account window again.
 4. A later sync has no key file, no typed password and no agent. The stored
    password is read back and used.
 
