@@ -133,16 +133,16 @@ public class UpdateTestCaseAction extends DumbAwareAction {
             open.accept(new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> {
 
                 final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                boolean changed = false;
+                int written = 0;
                 for (final TestCaseDto tc : updatedItems)
-                    changed |= indexer.putTestCase(path, tc);
+                    if (indexer.putTestCase(path, tc)) written++;
 
                 // A save that changed nothing is not an update. Nothing was stamped
                 // and nothing was written, so there is nothing to confirm, nothing
                 // to take back and no method to regenerate - and saying "Updated"
                 // for it is how a tester came to be recorded as having edited a case
                 // they only looked at (#164).
-                if (!changed) return;
+                if (written == 0) return;
 
                 // One operation for the whole selection, recorded outside the loop
                 // above. Inside it, a bulk edit over forty cases would cost forty
@@ -152,8 +152,11 @@ public class UpdateTestCaseAction extends DumbAwareAction {
                 // Reordering says Re-sorted whichever way it was done. Dragging a
                 // card already said it and typing a position said Updated, so the
                 // same act had two words depending on the gesture (#210).
-                Services.getInstance(p, Notifier.class).softShow(p,
-                        gt == GenType.UPDATE_TEST_CASE_ORDER ? Done.RE_SORTED : Done.UPDATED);
+                //
+                // Rule-EDITOR-PANEL-008: counted, so a bulk edit over thirty cases
+                // says how many it wrote rather than a bare Updated (#312, A86).
+                Services.getInstance(p, Notifier.class).softShowCounted(p,
+                        gt == GenType.UPDATE_TEST_CASE_ORDER ? Done.RE_SORTED : Done.UPDATED, written);
 
                 if (editor instanceof Toolbar)
                     ((Toolbar) editor).onToolBarFilterSelectionChanged();
