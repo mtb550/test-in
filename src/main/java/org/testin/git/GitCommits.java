@@ -161,15 +161,28 @@ public final class GitCommits {
      * it does not.
      */
     public void pullAndPush(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
-        final @NotNull String url = repositories.getRemoteUrl(repositoryPath, remote);
+        pullWhereTheRemoteHasBranch(repositoryPath, remote, branch);
+        push(repositoryPath, remote, branch);
+    }
 
-        if (remoteHasBranch(repositoryPath, remote, branch)) {
-            pull(repositoryPath, url, remote, branch);
-        } else {
+    /**
+     * UC-SHARE-016, Rule-SHARE-069.
+     * <p>
+     * Pulls the branch, unless the remote does not have it yet - the one pull
+     * both the push and Sync go through.
+     * <p>
+     * Sync used to pull on its own, without asking. A branch started here and
+     * never pushed made {@code git pull} fail with "couldn't find remote ref", so
+     * Sync failed every time and never reached the push that would have given the
+     * branch to the remote (#312, A41).
+     */
+    public void pullWhereTheRemoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
+        if (!remoteHasBranch(repositoryPath, remote, branch)) {
             Logger.info("Remote " + remote + " has no branch " + branch + " yet; pushing without pulling first");
+            return;
         }
 
-        push(repositoryPath, remote, branch);
+        pull(repositoryPath, repositories.getRemoteUrl(repositoryPath, remote), remote, branch);
     }
 
     /**
@@ -186,7 +199,7 @@ public final class GitCommits {
      * class's, inside pullAndPush, and a one-method GitSyncService holding the
      * other - so the flags the two passed could drift with nothing failing.
      */
-    public void pull(final @NotNull Path repositoryPath, final @NotNull String remoteUrl, final @NotNull String remote, final @NotNull String branch) {
+    private void pull(final @NotNull Path repositoryPath, final @NotNull String remoteUrl, final @NotNull String remote, final @NotNull String branch) {
         GitCommandRunner.executeRemote(p, repositoryPath, remoteUrl,
                 "git", "pull", "--rebase", "--autostash", remote, branch);
     }

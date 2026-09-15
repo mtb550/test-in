@@ -171,7 +171,7 @@ public class SyncActionAction extends DumbAwareAction {
                         }
 
                         indicator.setText(Bundle.message("git.progress.pulling", branch));
-                        commits.pull(repoPath, remoteUrl, remoteName, branch);
+                        commits.pullWhereTheRemoteHasBranch(repoPath, remoteName, branch);
 
                         // Both directions, because the button says Sync. It used to
                         // pull and then report "Up to date with the remote" with the
