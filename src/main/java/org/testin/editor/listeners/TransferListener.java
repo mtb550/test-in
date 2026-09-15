@@ -131,6 +131,10 @@ public class TransferListener extends TransferHandler {
                 ids = TestCaseSnapshot.idsOf(allItems);
             }
 
+            // A card dropped back where it was moved nothing, so there is nothing
+            // to write, nothing to undo and nothing to confirm (#312, A22).
+            if (ids.equals(TestCaseSnapshot.idsOf(orderBefore))) return false;
+
             // Every case in the set, not only the ones dragged: moving one case
             // past three others rewrites the rank of all four, so all four are
             // what putting the drag back has to restore.
@@ -141,11 +145,13 @@ public class TransferListener extends TransferHandler {
             final @NotNull Path setPath = editor.getParent().getPath();
             final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, setPath, ids);
 
-            editor.updateSequenceAndSaveAll(() -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.reorder"), itemsToMove), before, TestCaseSnapshot.of(p, setPath, ids)));
-
-            // After the save, inside the try: a drop that threw on the way here
-            // is logged, not confirmed (#62).
-            Services.getInstance(p, Notifier.class).softShowCounted(p, Done.RE_SORTED, itemsToMove.size());
+            // Confirmed from the callback, once the order is on disk: the write
+            // runs on a pooled thread, so a balloon shown when the call returns
+            // said Re-sorted for a write that could still fail (#62; #312, A22).
+            editor.updateSequenceAndSaveAll(() -> {
+                TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.reorder"), itemsToMove), before, TestCaseSnapshot.of(p, setPath, ids));
+                Services.getInstance(p, Notifier.class).softShowCounted(p, Done.RE_SORTED, itemsToMove.size());
+            });
 
             itemsToMove.stream().findFirst().ifPresentOrElse(
                     editor::selectTestCase,
