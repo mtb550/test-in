@@ -16,11 +16,14 @@
 
 package org.testin.lightmode;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.ComponentWithEmptyText;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
+import org.testin.services.Services;
+import org.testin.testrun.RunStatusService;
 import org.testin.testrun.create.FailureFields;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RowStripe;
@@ -30,6 +33,7 @@ import javax.swing.text.JTextComponent;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,6 +74,8 @@ class FailureForm extends JBPanel<FailureForm> {
 
     private final @NotNull FailureFields fields;
     private final @NotNull TestRunItems runItem;
+    private final @NotNull Project p;
+    private final @NotNull Path runPath;
 
     /**
      * The size each part of the form was built at, which is what a zoom
@@ -85,9 +91,11 @@ class FailureForm extends JBPanel<FailureForm> {
      */
     private static final float PLACEHOLDER_SCALE = 0.7f;
 
-    FailureForm(final @NotNull TestRunItems runItem, final float zoom) {
+    FailureForm(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem, final float zoom) {
+        this.p = p;
+        this.runPath = runPath;
         this.runItem = runItem;
-        this.fields = new FailureFields(runItem);
+        this.fields = new FailureFields(p, runPath, runItem);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(false);
@@ -142,11 +150,15 @@ class FailureForm extends JBPanel<FailureForm> {
     }
 
     /**
-     * Writes what was typed onto the run row. Only ever called by a save -
-     * Escape leaves the case exactly as it found it.
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145, Rule-EDITOR-PANEL-219.
+     * <p>
+     * Records what was typed, and the screenshots, on the run as the indexer
+     * holds it - the path the failure dialog takes - rather than on the editor's
+     * own row, where a sync could leave it written nowhere (#312 A25, #313).
+     * Only ever called by a save: Escape leaves the case exactly as it found it.
      */
     void save() {
-        fields.applyTo(runItem);
+        Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, runPath, runItem.getId(), fields);
     }
 
     /**

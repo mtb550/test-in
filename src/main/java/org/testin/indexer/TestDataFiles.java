@@ -23,6 +23,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -81,11 +83,38 @@ final class TestDataFiles {
     }
 
     /**
-     * Writes pre-serialized JSON. Used by the run-status writer, which snapshots
-     * the bytes on the EDT and performs only the disk I/O on its worker thread.
+     * Writes bytes as they are: JSON the run writer snapshotted on the EDT, or a
+     * screenshot's PNG. The disk I/O runs on the writer's worker thread.
      */
     boolean write(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
         return writeBytes(p, path, jsonBytes);
+    }
+
+    /**
+     * A file's bytes, and none when it is missing or unreadable - which a
+     * screenshot a sync has not brought yet is, and which its reader draws as an
+     * empty square rather than failing on (#313).
+     */
+    byte @NotNull [] readBytes(final @NotNull Path path) {
+        try {
+            return Files.readAllBytes(path);
+        } catch (final IOException missingOrUnreadable) {
+            Logger.warn("Could not read " + path + ": " + missingOrUnreadable.getMessage());
+            return new byte[0];
+        }
+    }
+
+    /**
+     * The screenshots in a run's folder, and none when the folder cannot be
+     * listed - a run whose folder has gone has nothing left to sweep.
+     */
+    @NotNull List<Path> screenshotsIn(final @NotNull Path runPath) {
+        try (Stream<Path> inside = Files.list(runPath)) {
+            return inside.filter(TestRunDirectoryDto::isScreenshot).toList();
+        } catch (final IOException ex) {
+            Logger.warn("Could not list the screenshots in " + runPath + ": " + ex.getMessage());
+            return List.of();
+        }
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-019

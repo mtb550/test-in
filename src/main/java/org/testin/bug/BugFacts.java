@@ -53,9 +53,10 @@ public record BugFacts(@NotNull String title, @NotNull BugSeverity severity, @No
      * value reads as the Details tab shows it: the description and the expected
      * result asked of their attribute, each step formatted as the Steps row
      * formats it. The actual result and the test data are shown as typed there,
-     * so they are copied as typed (#28, P35).
+     * so they are copied as typed (#28, P35). The screenshots come read already,
+     * because their files are the indexer's (#313).
      */
-    public static @NotNull BugFacts of(final @NotNull TestRunItems item, final @NotNull TestCaseDto tc, final @NotNull TestRunDto run, final @NotNull String testRun) {
+    public static @NotNull BugFacts of(final @NotNull TestRunItems item, final @NotNull TestCaseDto tc, final @NotNull TestRunDto run, final @NotNull String testRun, final @NotNull List<byte[]> screenshots) {
         return new BugFacts(
                 TestEditorAttributes.DESCRIPTION.displayValue(tc),
                 item.getBugSeverity(),
@@ -66,7 +67,7 @@ public record BugFacts(@NotNull String title, @NotNull BugSeverity severity, @No
                 tc.getSteps().stream().map(Display::format).toList(),
                 tc.getTestData(),
                 item.getStacktrace(),
-                item.getScreenshots(),
+                screenshots,
                 testRun,
                 ReportText.joined(BugTemplate.SEPARATOR, item.getExecutedBy(), Display.formatDate(item.getExecutedAt())),
                 TestRunConfiguration.BROWSER.valueIn(run),

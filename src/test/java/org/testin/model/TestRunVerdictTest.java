@@ -45,7 +45,7 @@ public class TestRunVerdictTest {
                 .bugPriority(BugPriority.HIGH)
                 .actualResult("NPE on the login button")
                 .stacktrace("java.lang.NullPointerException at Login.click(Login.java:42)")
-                .screenshots(List.of(new byte[]{1}))
+                .screenshots(List.of("0123456789abcdef.png"))
                 .bugIssueUrl(ISSUE)
                 .build();
     }

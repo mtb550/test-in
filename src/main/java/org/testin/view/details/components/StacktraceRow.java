@@ -24,13 +24,17 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.services.Services;
+import org.testin.setting.TestinRoot;
 import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.*;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -62,6 +66,12 @@ public final class StacktraceRow extends BaseDetails {
 
     private final @NotNull TestRunItems item;
 
+    /**
+     * The run the item belongs to, as the panel names it - where its screenshot
+     * files are read from when a link is clicked.
+     */
+    private final @NotNull List<String> currentPath;
+
 
     /**
      * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-035, Rule-VIEW-PANEL-081.
@@ -73,7 +83,7 @@ public final class StacktraceRow extends BaseDetails {
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final @NotNull String stacktrace = item.getStacktrace();
-        final @NotNull List<byte[]> screenshots = item.getScreenshots();
+        final @NotNull List<String> screenshots = item.getScreenshots();
         if (stacktrace.isBlank() && screenshots.isEmpty()) return currentRow;
 
         final @NotNull List<String> lines = stacktrace.lines().toList();
@@ -120,10 +130,14 @@ public final class StacktraceRow extends BaseDetails {
      * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081.
      * <p>
      * One screenshot, opened at its real size in a window of its own: the panel
-     * itself draws no picture.
+     * itself draws no picture. Read from its file when the link is clicked, not
+     * when the panel draws (#313).
      */
-    private @NotNull ActionLink screenshotLink(final @NotNull Project p, final int number, final byte @NotNull [] png) {
-        return link(Bundle.message("view.stacktrace.screenshot", String.valueOf(number)), event -> new ScreenshotDialog(p, number, png).show());
+    private @NotNull ActionLink screenshotLink(final @NotNull Project p, final int number, final @NotNull String name) {
+        return link(Bundle.message("view.stacktrace.screenshot", String.valueOf(number)), event -> {
+            final @NotNull Path runPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
+            new ScreenshotDialog(p, number, Services.getInstance(p, ProjectIndexer.class).screenshot(runPath, name)).show();
+        });
     }
 
     /**

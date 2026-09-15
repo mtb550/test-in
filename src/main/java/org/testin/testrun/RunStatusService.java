@@ -169,7 +169,8 @@ public final class RunStatusService {
      * A run the sync took away is not there to write, and the log says so.
      */
     public boolean recordFailureDetails(final @NotNull Project p, final @NotNull Path runPath, final @NotNull UUID caseId, final @NotNull FailureFields fields) {
-        final @NotNull Optional<TestRunDto> run = Services.getInstance(p, ProjectIndexer.class).findTestRun(runPath);
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull Optional<TestRunDto> run = indexer.findTestRun(runPath);
         if (run.isEmpty()) {
             Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' is no longer indexed - failure details not recorded");
             return false;
@@ -177,9 +178,13 @@ public final class RunStatusService {
 
         if (liveItem(p, run.orElseThrow(), runPath, caseId).isEmpty()) return false;
 
+        // The screenshots first, as files beside the run, so the names written
+        // next never point at a picture that has not landed (#313).
+        final @NotNull List<String> screenshots = indexer.storeScreenshots(runPath, fields.screenshots());
+
         // Through the indexer, as a verdict is, so details saved while a sync is
         // bringing this run in land on the run that arrived (#66, finding 129).
-        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, current -> current.resultOf(caseId).ifPresentOrElse(fields::applyTo,
+        indexer.changeRun(runPath, current -> current.resultOf(caseId).ifPresentOrElse(item -> fields.applyTo(item, screenshots),
                 () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + caseId + " - failure details not recorded")));
 
         return true;

@@ -66,7 +66,7 @@ public final class ReportBug {
         reports.begin(item);
         redraw.run();
 
-        final @NotNull BugFacts facts = BugFacts.of(failed.orElseThrow(), tc, run.orElseThrow(), runDirectory.getName());
+        final @NotNull BugFacts facts = BugFacts.of(failed.orElseThrow(), tc, run.orElseThrow(), runDirectory.getName(), indexer.screenshots(item.run(), failed.orElseThrow()));
         final @NotNull Optional<TestCaseFile> file = indexer.testCaseFile(tc);
 
         BackgroundWork.run(p, Bundle.message("bug.preparing"), Bundle.message("bug.send.failed.title"), true,

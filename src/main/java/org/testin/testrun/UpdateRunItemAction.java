@@ -83,7 +83,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
 
         // The same details dialog that opens automatically on a Failed status;
         // F2 edits without touching the status.
-        new FailedResultDialog(p, runItem, fields -> {
+        new FailedResultDialog(p, runEditor.getParent().getPath(), runItem, fields -> {
             // Onto the run the indexer holds now, not the editor's own run. A sync
             // that brought this run in has replaced it in the index while the
             // editor still shows the old one, and persisting that put the run

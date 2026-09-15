@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.ProjectStatus;
+import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -661,6 +662,31 @@ public final class ProjectIndexer {
      */
     public void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
         runWriter.create(testRunPath, tr);
+    }
+
+    /**
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
+     * <p>
+     * Keeps pasted screenshots as PNG files beside the run, and answers their
+     * names, in order, for the run item to hold (#313).
+     */
+    public @NotNull List<String> storeScreenshots(final @NotNull Path runPath, final @NotNull List<byte[]> pngs) {
+        return runWriter.storeScreenshots(runPath, pngs);
+    }
+
+    /**
+     * The PNG bytes of one screenshot a run item names, and none when its file
+     * is missing.
+     */
+    public byte @NotNull [] screenshot(final @NotNull Path runPath, final @NotNull String name) {
+        return runWriter.readScreenshot(runPath, name);
+    }
+
+    /**
+     * The PNG bytes of every screenshot a run item names, in its order.
+     */
+    public @NotNull List<byte[]> screenshots(final @NotNull Path runPath, final @NotNull TestRunItems item) {
+        return item.getScreenshots().stream().map(name -> screenshot(runPath, name)).toList();
     }
 
     /**

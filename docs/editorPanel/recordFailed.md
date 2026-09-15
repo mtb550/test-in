@@ -50,9 +50,9 @@ form before it records anything.
 - **Rule-EDITOR-PANEL-148** — The four fields are the same four the failure form
   in light mode uses.
 - **Rule-EDITOR-PANEL-219** — A screenshot pasted into the error box shows as a
-  small picture under it, never as letters. It is kept beside the error, in the
-  order it was pasted, and the button on its picture is the one way to take it
-  out.
+  small picture under it, never as letters. It is kept as a picture file beside
+  the test run, in the order it was pasted, and the button on its picture is the
+  one way to take it out.
 
 ## The screen
 

@@ -2,8 +2,9 @@
 
 # The formats on disk
 
-> Everything Testin stores is a plain file you can open. Nine formats, all of
-> them JSON except one YAML, and this page is the contract for every one — what
+> Everything Testin stores is a plain file you can open. Ten formats, all of
+> them JSON except one YAML and the screenshots, which are PNG, and this page is
+> the contract for every one — what
 > a field means, which are required, and what a reader must do with a field it
 > does not recognize.
 
@@ -36,7 +37,8 @@
         │   └── .trp
         └── cycle31/              a test run
             ├── .tr
-            └── run.json          everything the run recorded
+            ├── run.json          everything the run recorded
+            └── 9f2c41ab07e3d5c8.png   a screenshot a failure names
 ```
 
 **A marker is a file whose whole name is the extension.** `.ts`, not `foo.ts`.
@@ -187,6 +189,12 @@ on each case and nothing else.
 One file per test run, beside its `.tr`. It records what was executed, not what
 exists: a case removed from the test set keeps its result here.
 
+The screenshots its failures name sit beside it, one PNG each, named by the
+first sixteen hex digits of the picture's SHA-256: the same picture is always
+the same file, and a name never holds other bytes. Testin writes a screenshot
+before the result that names it, and removes one that no result names after the
+next write of this file.
+
 | Field | Type | Required | Meaning |
 |---|---|---|---|
 | `configuration` | map | no, **omitted when empty** | What the run was executed against. Keys are `TEST_TYPE` `CHANGE_LOG` `COMMIT_ID` `PLATFORM` `COMPONENT` `LANGUAGE` `BROWSER` `DEVICE_TYPE`; values are free text |
@@ -206,7 +214,7 @@ Each entry in `results`:
 | `executedAt` | date | |
 | `actualResult` | string | Empty unless the case failed |
 | `stacktrace` | string | Empty unless the case failed. Text only: a pasted screenshot is never in it |
-| `screenshots` | array of strings | Each screenshot pasted with the failure, as a base64 PNG, in the order it was pasted. Left out when there are none; cleared by a pass and by an automated failure |
+| `screenshots` | array of strings | The file names of the screenshots pasted with the failure, beside this file, in the order they were pasted. Left out when there are none; cleared by a pass and by an automated failure, and their files go with the next write |
 | `bugSeverity` | enum | `EMPTY` `BLOCKER` `MAJOR` `MINOR` `ENHANCEMENT` |
 | `bugPriority` | enum | `EMPTY` `HIGH` `MEDIUM` `LOW` |
 | `bugIssueUrl` | string | The GitHub issue the failure was reported as, written by [Report Bug](viewPanel/reportBug.md). Empty until then; cleared by a pass, kept by an automated failure |

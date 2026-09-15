@@ -21,11 +21,14 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.util.Bundle;
 import org.testin.model.DirectoryType;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -76,6 +79,36 @@ public final class GitCommits {
     }
 
     /**
+     * UC-SHARE-012, Rule-SHARE-112.
+     * <p>
+     * The screenshots Git reports as changed in the folder of every run being
+     * committed, so a run travels with the pictures it names and never without
+     * them (#313).
+     * <p>
+     * The review lists no screenshot on its own: one only arrives or goes because
+     * its run's file started or stopped naming it, so the run is the one change a
+     * tester needs to select.
+     */
+    static @NotNull Set<String> screenshotsAlongside(final @NotNull List<String> statusLines, final @NotNull Set<String> paths) {
+        final @NotNull Set<String> runFolders = paths.stream()
+                .filter(path -> String.valueOf(Path.of(path).getFileName()).equals(RESULTS_FILE))
+                .map(GitCommits::folderOf)
+                .collect(Collectors.toSet());
+
+        return GitRefs.parseStatus(statusLines).stream()
+                .map(GitRefs.StatusEntry::path)
+                .filter(path -> TestRunDirectoryDto.isScreenshot(Path.of(path)))
+                .filter(path -> runFolders.contains(folderOf(path)))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private static final @NotNull String RESULTS_FILE = TestRunDirectoryDto.resultsFile(Path.of("")).toString();
+
+    private static @NotNull String folderOf(final @NotNull String path) {
+        return Optional.ofNullable(Path.of(path).getParent()).map(Path::toString).orElse("");
+    }
+
+    /**
      * UC-SHARE-012, Rule-SHARE-054.
      * <p>
      * Commits what the tester selected, and the marker files that make it mean
@@ -96,6 +129,7 @@ public final class GitCommits {
         final @NotNull Set<String> paths = GitRefs.repoRelativePaths(selectedChanges);
         if (paths.isEmpty()) throw new IllegalArgumentException("No Git changes were selected");
 
+        paths.addAll(screenshotsAlongside(repositories.status(repositoryPath), paths));
         paths.addAll(markersAlongside(repositoryPath, paths));
 
         final @NotNull Set<String> stageable = stageable(repositoryPath, paths);

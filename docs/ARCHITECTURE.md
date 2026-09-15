@@ -206,7 +206,9 @@ Test runs in particular are saved and read only through the indexer —
 `putTestRun` to create one, `changeRun` and `saveRun` to change one,
 `persistRunMarker`, `addTestRunDir`, `updateRunMarker`. The sequential run
 writer lives inside it, and a change to a run waits while a sync brings the
-run's project in.
+run's project in. A run's screenshots are its files too: `storeScreenshots`
+writes them, `screenshot` reads one, and the run writer removes those no result
+names.
 
 The rule is enforced by the compiler rather than by review: `TestDataFiles` and
 `VfsExecutor` are package-private and live in `indexer`, so nothing outside the

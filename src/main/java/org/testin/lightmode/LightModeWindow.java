@@ -718,7 +718,7 @@ final class LightModeWindow {
      */
     private void openCapture() {
         executingItem().ifPresent(item -> {
-            capture = Optional.of(new FailureForm(item, zoom));
+            capture = Optional.of(new FailureForm(editor.getProject(), editor.getParent().getPath(), item, zoom));
 
             showCapture();
             fitHeight();

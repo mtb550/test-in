@@ -107,18 +107,18 @@ public class TestRunItems {
     /**
      * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
      * <p>
-     * The screenshots a tester pasted into the error box, as PNG bytes, in the
-     * order they were pasted (#50).
+     * The screenshots a tester pasted into the error box, by the names of their
+     * PNG files beside the run, in the order they were pasted (#50, #313).
      * <p>
-     * Beside the stacktrace rather than inside it, so the text never holds a
-     * screenshot and nothing that shows the text has to take one out. The mapper
-     * writes each as base64; a row with none writes no key, so its file is the
-     * same as before screenshots had a place of their own.
+     * Names, not pictures: the files are the indexer's to write and remove, and
+     * the run file stays a few kilobytes however many screenshots its failures
+     * hold. A row with none writes no key, so its file is the same as before
+     * screenshots had a place of their own.
      */
     @NotNull
     @Builder.Default
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<byte[]> screenshots = List.of();
+    private List<String> screenshots = List.of();
 
     /**
      * The GitHub issue this failure was reported as, and empty until one is

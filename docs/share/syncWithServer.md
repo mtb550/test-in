@@ -83,7 +83,9 @@ The account is asked for when this machine cannot prove who it is.
 4. The tester types their account and presses `Enter`.
 5. The account is stored on this machine at once.
 6. A background task named *Syncing with*, then the server, starts.
-7. Testin sends what is newer here and takes what is newer there.
+7. Testin sends what is newer here and takes what is newer there. A test run's
+   screenshots travel as the files they are: one removed on either side is
+   removed on the other at the next sync, and never asked about.
 8. A verdict, a failure detail, a grid edit or a completed test run that the
    tester records meanwhile shows at once. It is written when the sync has read
    back what it brought, onto the test run as it arrived.

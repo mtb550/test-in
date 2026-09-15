@@ -27,6 +27,7 @@ import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextInput;
 import org.testin.util.Bundle;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +45,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
     private final @NotNull FailureFields fields;
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-143
-    public FailedResultDialog(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull Consumer<FailureFields> onSave) {
+    public FailedResultDialog(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem, final @NotNull Consumer<FailureFields> onSave) {
         super(p);
         this.onSave = onSave;
 
@@ -52,7 +53,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
         // no longer exists in the test set never gets one.
         final @NotNull Optional<TestCaseDto> tc = runItem.testCase();
 
-        fields = new FailureFields(runItem);
+        fields = new FailureFields(p, runPath, runItem);
 
         title = Bundle.message("dialog.failed.result.title");
 

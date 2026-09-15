@@ -23,6 +23,10 @@ import org.testin.model.DirectoryType;
 import org.testin.model.markers.TestRunMarker;
 
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
+import java.util.regex.Pattern;
 
 
 @Setter
@@ -82,6 +86,52 @@ public class TestRunDirectoryDto extends DirectoryDto {
      */
     public static @NotNull Path resultsFile(final @NotNull Path runPath) {
         return runPath.resolve("run.json");
+    }
+
+    private static final @NotNull Pattern SCREENSHOT_NAME = Pattern.compile("[0-9a-f]{16}\\.png");
+
+    /**
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
+     * <p>
+     * The name a pasted screenshot is kept under in its run's folder: the first
+     * sixteen hex digits of its PNG's SHA-256, then {@code .png} (#313).
+     * <p>
+     * Named by what it holds rather than by who pasted it or where. The same
+     * picture is always the same file, so writing it twice is harmless; a name
+     * never points at different bytes, so Git and a sync only ever see a
+     * screenshot arrive or go; and nothing in it names the run or its folder, so
+     * a rename or a move leaves it valid - the lesson of {@link #resultsFile}.
+     */
+    public static @NotNull String screenshotName(final byte @NotNull [] png) {
+        try {
+            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(png), 0, 8) + ".png";
+        } catch (final NoSuchAlgorithmException ex) {
+            // Every Java platform is required to provide SHA-256.
+            throw new IllegalStateException("SHA-256 is not available", ex);
+        }
+    }
+
+    /**
+     * Whether a file name is one {@link #screenshotName} gives. A PNG a tester
+     * put in the folder by hand is not one, so nothing removes it as a screenshot.
+     */
+    public static boolean isScreenshotName(final @NotNull String fileName) {
+        return SCREENSHOT_NAME.matcher(fileName).matches();
+    }
+
+    /**
+     * Whether a file is a run's screenshot, by its name: what the run writer,
+     * Git and a sync ask of a path they hold.
+     */
+    public static boolean isScreenshot(final @NotNull Path file) {
+        return isScreenshotName(String.valueOf(file.getFileName()));
+    }
+
+    /**
+     * Where a screenshot of this run lives: beside {@code run.json}.
+     */
+    public static @NotNull Path screenshotFile(final @NotNull Path runPath, final @NotNull String name) {
+        return runPath.resolve(name);
     }
 
     /**

@@ -28,13 +28,21 @@ import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 /**
- * The one writer of a test run's two files: its results and its marker.
+ * The one writer of a test run's files: its results, its marker and the
+ * screenshots its failures name.
  * <p>
  * <b>Snapshot here, write there.</b> The JSON is taken on the calling thread -
  * the EDT, for a verdict a tester just recorded - so it can never observe a
@@ -108,6 +116,10 @@ final class RunWriter {
      * a pending write from a resurrection (#66, finding 86).
      */
     private void write(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
+        // Taken with the snapshot, on the calling thread, so the sweep keeps
+        // exactly the screenshots the written file names.
+        final @NotNull Set<String> named = namedScreenshots(tr);
+
         snapshot(tr, "test run data").ifPresent(bytes -> queue.execute(() -> {
             try {
                 if (store.findTestRun(runPath).isEmpty()) {
@@ -115,12 +127,92 @@ final class RunWriter {
                     return;
                 }
 
-                Services.getInstance(p, TestDataFiles.class).write(p, TestRunDirectoryDto.resultsFile(runPath), bytes);
+                final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
+                if (!files.write(p, TestRunDirectoryDto.resultsFile(runPath), bytes)) return;
                 Logger.trace("Run results persisted for " + runPath.getFileName());
+
+                sweepScreenshots(files, runPath, named);
             } catch (final Exception ex) {
                 Logger.error("Failed to persist test run data: " + ex.getMessage());
             }
         }));
+    }
+
+    /**
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
+     * <p>
+     * Removes the screenshots in the run's folder that no run item names any
+     * more, once the results that stopped naming them have landed (#313).
+     * <p>
+     * The one place a screenshot file goes. A pass, an automated failure, the x
+     * on a thumbnail and Edit Test Run dropping a row only change names; this
+     * removes what every one of them left behind, so none of them has to. After
+     * the results, never before, and only when they landed: a screenshot the
+     * file on disk still names is never removed.
+     */
+    private void sweepScreenshots(final @NotNull TestDataFiles files, final @NotNull Path runPath, final @NotNull Set<String> named) {
+        files.screenshotsIn(runPath).stream()
+                .filter(file -> !named.contains(file.getFileName().toString()))
+                .forEach(file -> files.delete(p, file, runPath));
+    }
+
+    private static @NotNull Set<String> namedScreenshots(final @NotNull TestRunDto tr) {
+        return tr.getResults().stream()
+                .flatMap(item -> item.getScreenshots().stream())
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
+     * <p>
+     * Queues each screenshot the run's folder does not hold yet, and answers
+     * their names in the order given (#313).
+     * <p>
+     * Ahead of the results that name them, in the same queue, so a run file
+     * never names a screenshot that has not landed. The run is asked again at
+     * the write, as its results are, so a run removed meanwhile does not get a
+     * folder back (#66, finding 86).
+     */
+    @NotNull List<String> storeScreenshots(final @NotNull Path runPath, final @NotNull List<byte[]> pngs) {
+        final @NotNull List<String> names = new ArrayList<>();
+        final @NotNull Map<String, byte[]> byName = new LinkedHashMap<>();
+        for (final byte[] png : pngs) {
+            final @NotNull String name = TestRunDirectoryDto.screenshotName(png);
+            names.add(name);
+            byName.putIfAbsent(name, png);
+        }
+
+        if (!byName.isEmpty()) queue.execute(() -> {
+            try {
+                if (store.findTestRun(runPath).isEmpty()) {
+                    Logger.info("Test run removed before its screenshots were written, so nothing was written: " + runPath.getFileName());
+                    return;
+                }
+
+                final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
+                byName.forEach((name, png) -> {
+                    final @NotNull Path file = TestRunDirectoryDto.screenshotFile(runPath, name);
+                    if (!Files.isRegularFile(file)) files.write(p, file, png);
+                });
+            } catch (final Exception ex) {
+                Logger.error("Failed to write the screenshots of " + runPath.getFileName() + ": " + ex.getMessage());
+            }
+        });
+
+        return List.copyOf(names);
+    }
+
+    /**
+     * A screenshot's PNG bytes, and none when its file is missing or the name
+     * was never a screenshot's - a sync that brought the run before its
+     * pictures, say. Asked once the queue is empty, so a screenshot saved a
+     * moment ago is read back rather than missed.
+     */
+    byte @NotNull [] readScreenshot(final @NotNull Path runPath, final @NotNull String name) {
+        if (!TestRunDirectoryDto.isScreenshotName(name)) return new byte[0];
+
+        awaitQueued();
+        return Services.getInstance(p, TestDataFiles.class).readBytes(TestRunDirectoryDto.screenshotFile(runPath, name));
     }
 
     /**
@@ -141,12 +233,13 @@ final class RunWriter {
     /**
      * UC-SHARE-019, Rule-SHARE-003.
      * <p>
-     * Whether a file is one of the two this writer owns: a run's results or its
-     * marker. Asked by a sync bringing files in, so a run's files that arrive from
-     * a server join this queue instead of landing beside it.
+     * Whether a file is one this writer owns: a run's results, its marker or a
+     * screenshot. Asked by a sync bringing files in, so a run's files that arrive
+     * from a server join this queue instead of landing beside it.
      */
     boolean owns(final @NotNull Path file) {
         return file.endsWith(DirectoryType.TR.getMarker())
+                || TestRunDirectoryDto.isScreenshot(file)
                 || Optional.ofNullable(file.getParent()).map(TestRunDirectoryDto::resultsFile).filter(file::equals).isPresent();
     }
 
@@ -183,10 +276,11 @@ final class RunWriter {
      * the deletion lands after anything already waiting. Out of the index, the
      * run answers {@link #persist}'s question with no, so a write that has not
      * started yet writes nothing. The scan that follows reads back whatever of
-     * the run is left.
+     * the run is left. A screenshot leaving takes nothing out of the index: the
+     * run is still there (#313).
      */
     void delete(final @NotNull Path file, final @NotNull Path stopAt) {
-        Optional.ofNullable(file.getParent()).ifPresent(store::removeTestRun);
+        if (!TestRunDirectoryDto.isScreenshot(file)) Optional.ofNullable(file.getParent()).ifPresent(store::removeTestRun);
 
         queue.execute(() -> {
             try {

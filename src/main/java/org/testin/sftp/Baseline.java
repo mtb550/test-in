@@ -17,12 +17,15 @@
 package org.testin.sftp;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
 
 import java.nio.charset.StandardCharsets;
-
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The project exactly as it stood after the last successful transfer (#94).
@@ -101,9 +104,37 @@ public record Baseline(@NotNull Map<String, String> contents) {
      */
     public @NotNull Manifest manifest() {
         final @NotNull Map<String, Manifest.Entry> entries = new TreeMap<>();
-        contents.forEach((path, content) -> entries.put(path,
-                new Manifest.Entry(Manifest.sha256(content), content.getBytes(StandardCharsets.UTF_8).length)));
+        contents.forEach((path, content) -> entries.put(path, entryOf(path, content)));
 
         return new Manifest(entries);
+    }
+
+    /**
+     * What a screenshot is remembered as: its SHA-256, a space, its size.
+     */
+    private static final @NotNull Pattern REMEMBERED_SCREENSHOT = Pattern.compile("([0-9a-f]{64}) (\\d+)");
+
+    /**
+     * What is remembered of a file after a transfer: its text, which a test case
+     * is merged against - or, for a screenshot, its SHA-256 and size (#313).
+     * <p>
+     * A screenshot is never merged, and a PNG is not text. Kept as text, its
+     * remembered hash could never match the file's, so a screenshot removed on
+     * one side read as both sides changing it and came back as a question at
+     * every sync.
+     */
+    public static @NotNull String remembered(final @NotNull String path, final byte @NotNull [] content) {
+        return TestRunDirectoryDto.isScreenshot(Path.of(path))
+                ? Manifest.sha256(content) + " " + content.length
+                : new String(content, StandardCharsets.UTF_8);
+    }
+
+    private static @NotNull Manifest.Entry entryOf(final @NotNull String path, final @NotNull String content) {
+        final @NotNull Matcher screenshot = REMEMBERED_SCREENSHOT.matcher(content);
+        if (TestRunDirectoryDto.isScreenshot(Path.of(path)) && screenshot.matches()) {
+            return new Manifest.Entry(screenshot.group(1), Long.parseLong(screenshot.group(2)));
+        }
+
+        return new Manifest.Entry(Manifest.sha256(content), content.getBytes(StandardCharsets.UTF_8).length);
     }
 }

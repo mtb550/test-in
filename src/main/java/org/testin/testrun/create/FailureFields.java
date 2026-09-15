@@ -16,7 +16,10 @@
 
 package org.testin.testrun.create;
 
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.services.Services;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
@@ -27,6 +30,7 @@ import org.testin.ui.framework.TextArea;
 import org.testin.ui.framework.TextInput;
 import org.testin.util.Bundle;
 
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -53,7 +57,7 @@ public final class FailureFields {
     private final @NotNull ComponentDialogBase<TextArea> errorCapture;
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-147
-    public FailureFields(final @NotNull TestRunItems runItem) {
+    public FailureFields(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem) {
         actualResult = ComponentDialogBase.textField()
                 .placeholder(Bundle.message("dialog.failure.placeholder.actual"))
                 .value(runItem.getActualResult())
@@ -73,7 +77,7 @@ public final class FailureFields {
                 .placeholder(Bundle.message("dialog.failure.placeholder.error"))
                 .value(runItem.getStacktrace())
                 .rows(5)
-                .images(runItem.getScreenshots())
+                .images(Services.getInstance(p, ProjectIndexer.class).screenshots(runPath, runItem))
                 .build();
     }
 
@@ -90,17 +94,28 @@ public final class FailureFields {
     /**
      * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145, Rule-EDITOR-PANEL-219.
      * <p>
-     * Writes what was typed onto the run row, and the screenshots beside it.
+     * Writes what was typed onto the run row, and the names of the screenshots,
+     * which the indexer has already kept as files beside the run (#313).
      * <p>
      * Only ever called by a save. Escape must never commit an edit, so nothing
      * here happens as the tester types.
      */
-    public void applyTo(final @NotNull TestRunItems runItem) {
+    public void applyTo(final @NotNull TestRunItems runItem, final @NotNull List<String> screenshots) {
         runItem.setActualResult(actualResult.getComponent().getText().trim());
         runItem.setBugSeverity(severity.getComponent().getSelected());
         runItem.setBugPriority(priority.getComponent().getSelected());
         runItem.setStacktrace(errorCapture.getComponent().getText().trim());
-        runItem.setScreenshots(errorCapture.getComponent().getImages());
+        runItem.setScreenshots(screenshots);
+    }
+
+    /**
+     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
+     * <p>
+     * The screenshots under the error box, as PNG bytes in the order they were
+     * pasted: what the indexer keeps as files before their names are applied.
+     */
+    public @NotNull List<byte[]> screenshots() {
+        return errorCapture.getComponent().getImages();
     }
 
     /**

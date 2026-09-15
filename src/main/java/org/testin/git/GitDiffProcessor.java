@@ -21,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
@@ -85,6 +86,11 @@ public final class GitDiffProcessor {
 
         for (final GitRefs.StatusEntry entry : GitRefs.parseStatus(statusLines)) {
             final @NotNull Path relativePath = Path.of(entry.path());
+
+            // A run's screenshot has no row of its own: it only arrives or goes
+            // because its run's file started or stopped naming it, and committing
+            // the run carries it (#313).
+            if (TestRunDirectoryDto.isScreenshot(relativePath)) continue;
 
             // An untracked file that is no longer there is not a pending change:
             // Git listed it a moment ago and something removed it since. Listing

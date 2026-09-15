@@ -53,7 +53,7 @@ public class BugFactsTest {
                 TestRunConfiguration.BROWSER, "Chrome",
                 TestRunConfiguration.COMMIT_ID, "933a3984"))).build();
 
-        final BugFacts facts = BugFacts.of(item, tc, run, "Sprint 7");
+        final BugFacts facts = BugFacts.of(item, tc, run, "Sprint 7", List.of());
 
         assertEquals(facts.title(), "Log in with a valid user.", "the description as the Details tab shows it");
         assertEquals(facts.expectedResult(), "Welcome.");
@@ -75,6 +75,6 @@ public class BugFactsTest {
         final TestCaseDto tc = TestCaseDto.builder().build();
         final TestRunItems item = TestRunItems.builder().id(tc.getId()).build();
 
-        assertEquals(BugFacts.of(item, tc, TestRunDto.builder().build(), "Sprint 7").executed(), "");
+        assertEquals(BugFacts.of(item, tc, TestRunDto.builder().build(), "Sprint 7", List.of()).executed(), "");
     }
 }

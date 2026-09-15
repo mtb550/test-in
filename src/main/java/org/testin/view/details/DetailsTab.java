@@ -181,7 +181,7 @@ public class DetailsTab {
                 new RunAttributeRow(RunEditorAttributes.RUN_STATUS, item),
                 new RunAttributeRow(RunEditorAttributes.DURATION, item),
                 new RunAttributeRow(RunEditorAttributes.ACTUAL_RESULT, item),
-                new StacktraceRow(item),
+                new StacktraceRow(item, currentPath),
                 new RunAttributeRow(RunEditorAttributes.BUG_SEVERITY, item),
                 new RunAttributeRow(RunEditorAttributes.BUG_PRIORITY, item),
                 new BugIssueRow(item, currentPath));

@@ -269,7 +269,7 @@ public final class SftpSync {
             transport.write(path, local.get(path));
 
             onServer.put(path, Manifest.Entry.of(local.get(path)));
-            agreed.put(path, text(local.get(path)));
+            agreed.put(path, Baseline.remembered(path, local.get(path)));
             indicator.setFraction((double) ++done / total);
         }
 
@@ -280,7 +280,7 @@ public final class SftpSync {
 
             incoming.put(path, content);
             // The server already had it, so its entry is unchanged.
-            agreed.put(path, text(content));
+            agreed.put(path, Baseline.remembered(path, content));
             indicator.setFraction((double) ++done / total);
         }
 
@@ -297,7 +297,7 @@ public final class SftpSync {
         // A file neither side touched is agreed at whatever it holds now - and
         // one that both sides have stopped holding is agreed to be gone.
         for (final String path : plan.unchangedPaths) {
-            if (local.containsKey(path)) agreed.put(path, text(local.get(path)));
+            if (local.containsKey(path)) agreed.put(path, Baseline.remembered(path, local.get(path)));
             else agreed.remove(path);
         }
 
