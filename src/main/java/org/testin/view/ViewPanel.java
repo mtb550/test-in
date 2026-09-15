@@ -29,6 +29,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.actions.EscapeAction;
+import org.testin.editor.WheelForwarding;
 import org.testin.services.Services;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
@@ -76,6 +77,12 @@ public class ViewPanel implements Disposable {
         FontSync.syncWithNativeEditor(p, detailsTab, this);
         FontSync.syncWithNativeEditor(p, historyTab, this);
         FontSync.syncWithNativeEditor(p, openBugsTab, this);
+
+        // Rule-SETTING-039. The other half of the wheel, beside the zoom that
+        // takes it: a tab with a wheel listener receives the wheel itself instead
+        // of the scroll pane around it, so a plain wheel scrolled none of the
+        // three tabs (#312, A75).
+        tabs().forEach(tab -> tab.addMouseWheelListener(WheelForwarding::forwardWheelToScrollPane));
 
         detailsScrollPane = createScrollPane(detailsTab);
         historyScrollPane = createScrollPane(historyTab);

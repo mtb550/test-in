@@ -56,10 +56,18 @@ public final class WheelForwarding {
     }
 
     /**
-     * The scroll pane this component sits in, walking up until Swing runs out
-     * of parents - which is where the null comes from and where it stops.
+     * The nearest scroll pane this component sits in that has something to
+     * scroll, walking up until Swing runs out of parents - which is where the
+     * null comes from and where it stops.
+     * <p>
+     * A scroll pane showing no scroll bar is passed over, because the platform's
+     * own handler does nothing with a wheel there. The view panel's Details tab
+     * keeps its content in a scroll pane of its own, which the tab's scroll pane
+     * lays out at full height, so the wheel handed to the nearest one moved
+     * nothing (#312, A75).
      */
     private static @NotNull Optional<JBScrollPane> findScrollPane(final @NotNull Component component) {
-        return Optional.ofNullable((JBScrollPane) SwingUtilities.getAncestorOfClass(JBScrollPane.class, component));
+        return Optional.ofNullable((JBScrollPane) SwingUtilities.getAncestorOfClass(JBScrollPane.class, component))
+                .flatMap(pane -> pane.getVerticalScrollBar().isVisible() || pane.getHorizontalScrollBar().isVisible() ? Optional.of(pane) : findScrollPane(pane));
     }
 }
