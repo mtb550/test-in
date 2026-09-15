@@ -17,6 +17,7 @@
 package org.testin.editor.grid;
 
 import com.intellij.ide.util.PropertiesComponent;
+import org.testin.editor.EditorKind;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBList;
@@ -63,7 +64,7 @@ public class GridPanelBuilder {
     static final @NotNull Color SELECTION_BACKGROUND = EditorColors.SELECTION_BACKGROUND;
     private static final int MAX_COL_WIDTH = 500;
     /**
-     * Client property holding the table kind ("test"/"run"), used to key the
+     * Client property holding the table's {@link EditorKind}, which keys the
      * persisted user column widths so they survive grid rebuilds and restarts.
      */
     private static final @NotNull String GRID_KIND_KEY = "testin.grid.kind";
@@ -293,7 +294,8 @@ public class GridPanelBuilder {
      */
     private static @NotNull Optional<String> widthKey(final @NotNull JBTable table, final @NotNull TableColumn column) {
         return Optional.ofNullable(table.getClientProperty(GRID_KIND_KEY))
-                .map(kind -> "testin.grid.colWidth." + kind + "." + column.getHeaderValue());
+                .filter(EditorKind.class::isInstance)
+                .map(kind -> ((EditorKind) kind).columnWidthKey(column.getHeaderValue()));
     }
 
     private static void addColumnResizeListener(final @NotNull JBTable table, final @NotNull RowHeights rowHeights) {
@@ -488,7 +490,7 @@ public class GridPanelBuilder {
         // Which columns can be typed into is the attribute's own declaration, the
         // same way the test grid asks its attributes (#74).
         final @NotNull JBTable table = buildTable(columns, rows,
-                column -> ordered.get(column).isEdited(), "run");
+                column -> ordered.get(column).isEdited(), EditorKind.RUN);
         applyColumnVisibility(table, RunEditorAttributes.class, attributes);
         return table;
     }
@@ -520,7 +522,7 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        final @NotNull JBTable table = buildTable(columns, rows, column -> ordered.get(column).can(Can.EDIT), "test");
+        final @NotNull JBTable table = buildTable(columns, rows, column -> ordered.get(column).can(Can.EDIT), EditorKind.TEST);
         applyColumnVisibility(table, TestEditorAttributes.class, attributes);
         return table;
     }
@@ -549,7 +551,7 @@ public class GridPanelBuilder {
         return column;
     }
 
-    private @NotNull JBTable buildTable(final String @NotNull [] columns, final @NotNull List<String[]> rows, final @NotNull IntPredicate columnEditable, final @NotNull String kind) {
+    private @NotNull JBTable buildTable(final String @NotNull [] columns, final @NotNull List<String[]> rows, final @NotNull IntPredicate columnEditable, final @NotNull EditorKind kind) {
         final @NotNull DefaultTableModel model = new DefaultTableModel(columns, 0) {
             // UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-047
             @Override

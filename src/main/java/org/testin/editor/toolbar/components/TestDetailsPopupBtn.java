@@ -17,6 +17,7 @@
 package org.testin.editor.toolbar.components;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.EditorKind;
 import org.testin.testcase.TestEditorAttributes;
 
 public class TestDetailsPopupBtn extends AbstractDetailsPopupBtn<TestEditorAttributes> {
@@ -26,7 +27,7 @@ public class TestDetailsPopupBtn extends AbstractDetailsPopupBtn<TestEditorAttri
         // v4 is the curated default set (#80). See RunDetailsPopupBtn for when
         // this is bumped and what it costs.
         super(FIELDS,
-                "testin.selectedDetails.test.v4",
+                EditorKind.TEST.detailsKey(4),
                 TestEditorAttributes.class,
                 onToolBarDetailsSelectedChanged);
     }

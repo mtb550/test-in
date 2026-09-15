@@ -17,6 +17,7 @@
 package org.testin.editor.toolbar.components;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.EditorKind;
 import org.testin.testrun.RunEditorAttributes;
 
 public class RunDetailsPopupBtn extends AbstractDetailsPopupBtn<RunEditorAttributes> {
@@ -29,7 +30,7 @@ public class RunDetailsPopupBtn extends AbstractDetailsPopupBtn<RunEditorAttribu
         // (#80). Order needed none - it is LOCKED_CHECKED, and a locked attribute
         // is forced into whatever was stored when the popup loads it.
         super(FIELDS,
-                "testin.selectedDetails.run.v7",
+                EditorKind.RUN.detailsKey(7),
                 RunEditorAttributes.class,
                 onToolBarDetailsSelectedChanged);
     }
