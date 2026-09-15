@@ -213,6 +213,10 @@ silently does nothing costs more than the setting it was meant to hold.
 - Write new stories straight to an issue with `gh`; update an existing one with
   `gh issue edit <n> --repo mtb550/test-in --body-file ...` instead of opening a
   duplicate. Read current state with `gh issue view` before assuming anything.
+- **A feature a tester will see is designed before it is built**, with the
+  `feature-design` plugin's `/feature-design:design`, and implemented only after
+  Muteb approves the design. The plugin is installed on each machine, not kept in
+  this repository.
 - Tests live under `src/test` only; the plugin distribution must never
   contain test classes or compile-time-only dependencies (Lombok is
   `compileOnly` + `annotationProcessor`, never `implementation`).
