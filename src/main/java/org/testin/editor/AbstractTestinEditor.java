@@ -16,6 +16,7 @@
 
 package org.testin.editor;
 
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -136,9 +137,15 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     @Setter
     protected int currentPage = 1;
 
+    /**
+     * UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-222.
+     * <p>
+     * Starts at the page size a tester last typed in any editor, read through
+     * the box's own correction, so a stored value edited by hand pages by a size
+     * that works, never by zero (#315).
+     */
     @Getter
-    @Setter
-    protected int pageSize = TestinEditor.DEFAULT_PAGE_SIZE;
+    protected int pageSize = TestinEditor.pageSizeOf(PropertiesComponent.getInstance().getValue(TestinEditor.PAGE_SIZE_KEY, ""));
 
     /**
      * Assigned by the subclass, because each editor has its own toolbar and its
@@ -203,6 +210,19 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         this.scrollPane = listView.scrollPane();
 
         this.contextMenu = buildContextMenu();
+    }
+
+    /**
+     * UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-107, Rule-EDITOR-PANEL-222.
+     * <p>
+     * The page size a tester chose: this editor pages by it, and every editor
+     * opened afterwards starts with it (#315). At the default the entry goes, as
+     * light mode's zoom does.
+     */
+    @Override
+    public void choosePageSize(final int size) {
+        pageSize = size;
+        PropertiesComponent.getInstance().setValue(TestinEditor.PAGE_SIZE_KEY, size, TestinEditor.DEFAULT_PAGE_SIZE);
     }
 
     /**

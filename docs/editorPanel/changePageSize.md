@@ -5,7 +5,8 @@
 **As a** tester, **I want** more test cases on a page,
 **so that** I can see a whole test set of 80 without turning pages.
 
-This is the small box at the right of the status bar. It holds 50 to start with.
+This is the small box at the right of the status bar. It holds 50 until a size
+is typed, and then the size last typed in any editor.
 
 There is no key for this. The box is at the right of the status bar.
 
@@ -40,6 +41,9 @@ There is no key for this. The box is at the right of the status bar.
 - **Rule-EDITOR-PANEL-106** — The most a page can hold is 1000.
 - **Rule-EDITOR-PANEL-107** — Changing it goes back to the first page and
   returns the keyboard to the list.
+- **Rule-EDITOR-PANEL-222** — The page size last typed is remembered. Every test
+  set editor and test run editor opened afterwards starts with it, after a
+  restart too. An editor already open keeps its own.
 
 ## What the tester sees
 
@@ -54,8 +58,10 @@ the tester can see what happened.
 1. The tester clicks the small box at the right of the status bar.
 2. The tester types 200 and presses `Enter`.
 3. The view is drawn again from the first page, 200 test cases at a time.
-4. The keyboard goes back to the list.
-5. Nothing is said.
+4. The size is remembered. Every test set editor and test run editor opened
+   afterwards starts at 200, after a restart too.
+5. The keyboard goes back to the list.
+6. Nothing is said.
 
 ## What Testin refuses
 

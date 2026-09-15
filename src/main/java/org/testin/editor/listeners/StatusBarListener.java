@@ -26,7 +26,7 @@ import org.testin.util.Bundle;
 
 public class StatusBarListener {
 
-    // UC-EDITOR-PANEL-022, UC-EDITOR-PANEL-023
+    // UC-EDITOR-PANEL-022, UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-222
     public static void attach(final @NotNull TestinEditor editor) {
         // What the editor is actually paging by. The field used to be built with
         // "50" written into it and was only ever corrected after a tester typed
@@ -66,11 +66,17 @@ public class StatusBarListener {
                         Bundle.message("statusbar.page.size.refused", String.valueOf(TestinEditor.MAX_PAGE_SIZE)));
             }
 
+            // Remembered on every Enter, not only on a change: another editor may
+            // have remembered a different size since this one opened, and a tester
+            // who types the number this editor already shows is choosing it (#315).
+            //
             // Silent, and deliberately so: this only changes how much of the list
             // is drawn at once, and the corrected number in the field is the whole
             // of what the tester needs to be told.
-            if (size != editor.getPageSize()) {
-                editor.setPageSize(size);
+            final boolean changed = size != editor.getPageSize();
+            editor.choosePageSize(size);
+
+            if (changed) {
                 editor.setCurrentPage(1);
                 editor.refreshView();
             }

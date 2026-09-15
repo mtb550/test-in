@@ -59,6 +59,17 @@ public interface TestinEditor extends Disposable {
     int MAX_PAGE_SIZE = 1000;
 
     /**
+     * UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-222.
+     * <p>
+     * Where the page size a tester last typed is kept: one entry for both
+     * editors, in the IDE's properties beside the Details checkboxes (#315).
+     * <p>
+     * Not {@code testin.pageSize}: a stored property of that name was read once
+     * and never written, so a new name avoids whatever may sit under the old one.
+     */
+    String PAGE_SIZE_KEY = "testin.editor.pageSize";
+
+    /**
      * UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-106.
      * <p>
      * What a typed page size actually comes to.
@@ -116,7 +127,13 @@ public interface TestinEditor extends Disposable {
 
     int getPageSize();
 
-    void setPageSize(final int size);
+    /**
+     * UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-107, Rule-EDITOR-PANEL-222.
+     * <p>
+     * The page size a tester chose: this editor pages by it, and every editor
+     * opened afterwards starts with it (#315).
+     */
+    void choosePageSize(final int size);
 
     /**
      * UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-102.
