@@ -32,6 +32,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -129,15 +130,34 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
     }
 
     /**
-     * The write is queued, so the test waits for it rather than deleting the
-     * folder under it - dispatching events meanwhile, in case the writer needs
-     * this thread.
+     * What the file holds once it holds {@code text}, or whatever it holds when
+     * ten seconds have passed - dispatching events meanwhile, in case the writer
+     * needs this thread.
+     * <p>
+     * The write is queued, so the test waits for it. Waited for until the file
+     * exists, it failed now and then: a file is created before its bytes land,
+     * and a read in between found it empty (#312, N21).
      */
-    private static void awaitFile(final Path file) {
+    private static String awaitFileHolding(final Path file, final String text) {
         final long deadline = System.currentTimeMillis() + 10_000;
-        while (!Files.exists(file) && System.currentTimeMillis() < deadline) {
+        while (System.currentTimeMillis() < deadline) {
+            final String held = read(file);
+            if (held.contains(text)) return held;
+
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             TimeoutUtil.sleep(20);
+        }
+        return read(file);
+    }
+
+    /**
+     * The file's text, and nothing while it does not exist or is being written.
+     */
+    private static String read(final Path file) {
+        try {
+            return Files.exists(file) ? Files.readString(file) : "";
+        } catch (final IOException beingWritten) {
+            return "";
         }
     }
 
@@ -148,12 +168,7 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         assertEquals("the run item the indexer holds did not take the link", ISSUE, storedLink(item));
 
         final Path results = TestRunDirectoryDto.resultsFile(item.run());
-        awaitFile(results);
-        try {
-            assertTrue("the link did not reach the run's results file", Files.readString(results).contains(ISSUE));
-        } catch (final java.io.IOException ex) {
-            throw new AssertionError("the run's results were not written", ex);
-        }
+        assertTrue("the link did not reach the run's results file", awaitFileHolding(results, ISSUE).contains(ISSUE));
     }
 
     public void testARunItemNoLongerFailedIsNotWritten() {
