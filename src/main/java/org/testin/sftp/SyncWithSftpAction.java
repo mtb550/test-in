@@ -19,6 +19,7 @@ package org.testin.sftp;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -223,6 +224,12 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                         }
 
                         report(outcome, projectRoot, address, account, auth);
+                    } catch (final ProcessCanceledException stopped) {
+                        // The tester pressed Cancel, which is an answer rather than
+                        // a failure, so it goes back to the platform to close the
+                        // bar - not into the catch below as "Sync Failed" (#312,
+                        // A35; the same as BackgroundWork, #66 finding 83).
+                        throw stopped;
                     } catch (final Exception ex) {
                         reportFailure(p, "Sync with " + address.display(), ex);
                     }
