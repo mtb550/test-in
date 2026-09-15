@@ -681,9 +681,27 @@ public class TreeTransferHandler extends TransferHandler {
             // clipboard it offered the same move again, from a folder the nodes
             // had already left, and the second attempt found nothing there. A
             // copy stays: a copy is meant to be pasted more than once.
-            final boolean wasCut = !selectedNodes.isEmpty();
+            final boolean wasCut = isCut(contents);
             if (importData(new TransferSupport(tree, contents)) && wasCut) clearClipboard();
         });
+    }
+
+    /**
+     * UC-TREE-PANEL-013, Rule-TREE-PANEL-050.
+     * <p>
+     * Whether the nodes on the clipboard were put there by Cut - asked of the
+     * clipboard, which is what the move is decided from. It used to be asked of
+     * the faded rows, which a drag in between clears while the cut stays on the
+     * clipboard, so the paste that carried the cut out never spent it (#312,
+     * A71).
+     */
+    private boolean isCut(final @NotNull Transferable contents) {
+        try {
+            return ((TreeTransferPayload) contents.getTransferData(NODE_FLAVOR)).clipboardAction() == MOVE;
+        } catch (final Exception ex) {
+            Logger.debug("Clipboard no longer holds tree nodes: " + ex.getMessage());
+            return false;
+        }
     }
 
     /**
