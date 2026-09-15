@@ -74,4 +74,13 @@ public final class NotWhileEditing extends AnAction {
         // The delegate's, because it is the delegate's update() that runs.
         return delegate.getActionUpdateThread();
     }
+
+    @Override
+    public boolean isDumbAware() {
+        // The delegate's too. The platform asks the action it holds, which is
+        // this wrapper, whether it works while the IDE indexes - and left at
+        // AnAction's answer, the verdict, page and Delete keys stopped working in
+        // the grid during indexing while they kept working in the list (#312, A21).
+        return delegate.isDumbAware();
+    }
 }
