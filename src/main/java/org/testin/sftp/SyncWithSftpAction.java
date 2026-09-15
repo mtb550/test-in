@@ -397,7 +397,14 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                 }
 
                 answered.put(next.path(), mapper.writeValueAsString(next.merged()));
-                askAboutConflicts(rest, projectRoot, address, account, auth, answered);
+
+                // Once this window has closed. The callback runs before it does,
+                // and a second window of the same kind asked to show while the
+                // first is still on screen only brings the first forward - so the
+                // next question never opened and nothing was ever sent. The Git
+                // chain continues the same way (ConflictResolution.ask).
+                ApplicationManager.getApplication().invokeLater(() ->
+                        askAboutConflicts(rest, projectRoot, address, account, auth, answered));
                 // Escape is a skip, not a cancel: this test case is left as the
                 // server has it and the sync goes on. It used to end the whole sync,
                 // so the rest were never asked about and nothing already answered
