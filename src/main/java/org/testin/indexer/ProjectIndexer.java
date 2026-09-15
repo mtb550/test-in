@@ -1011,9 +1011,11 @@ public final class ProjectIndexer {
      * Writing the file, invalidating the cached children and refreshing the VFS
      * are one act: a caller that does only the first leaves a file the IDE never
      * hears about, and the Git paths read through the IDE.
+     * <p>
+     * Answers whether the marker landed (#312, A6).
      */
-    public void persistMarker(final @NotNull DirectoryDto dto) {
-        store.persistMarker(dto);
+    public boolean persistMarker(final @NotNull DirectoryDto dto) {
+        return store.persistMarker(dto);
     }
 
     /**

@@ -449,13 +449,17 @@ final class IndexerDataStore {
      * Writes a node's marker back after something on it changed - a status, for
      * now. The status is part of the children's sort order, so the cached lists
      * are stale the moment it is written.
+     * <p>
+     * Answers whether it landed, so a caller does not confirm a change that
+     * is not on disk (#312, A6).
      */
-    void persistMarker(final @NotNull DirectoryDto dto) {
-        markers.write(dto.getPath(), dto.getMarkerFileName(), dto.getMarker());
+    boolean persistMarker(final @NotNull DirectoryDto dto) {
+        final boolean written = markers.write(dto.getPath(), dto.getMarkerFileName(), dto.getMarker());
         childrenIndex.invalidate();
         // As every other marker write does, so the VFS - and the Git paths that
         // read through it - see the change without waiting for something else.
         refreshDir(dto.getPath());
+        return written;
     }
 
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {

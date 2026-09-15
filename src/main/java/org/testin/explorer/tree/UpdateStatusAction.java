@@ -72,10 +72,17 @@ public class UpdateStatusAction extends DumbAwareAction {
     // UC-TREE-PANEL-018, Rule-TREE-PANEL-062
     private void mark(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final @NotNull Marker marker = dir.getMarker();
+        final @NotNull NodeStatus before = marker.status();
         try {
             marker.applyStatus(status);
             marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
-            Services.getInstance(p, ProjectIndexer.class).persistMarker(dir);
+
+            // A marker that did not land is not confirmed, and the node keeps
+            // the status it still has on disk: the write has said why (#312, A6).
+            if (!Services.getInstance(p, ProjectIndexer.class).persistMarker(dir)) {
+                marker.applyStatus(before);
+                return;
+            }
 
             // The panel, not only the tree: a test project going inactive
             // changes what the panel has to show, and a package going archived
