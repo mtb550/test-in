@@ -106,20 +106,36 @@ public class RenameAction extends DumbAwareAction {
             Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                     Bundle.message("rename.undo", oldName),
                     () -> applyRename(p, dir, oldName),
-                    () -> applyRename(p, dir, newName)));
+                    () -> applyRename(p, dir, newName),
+                    () -> {
+                    }));
         });
     }
 
     /**
-     * UC-TREE-PANEL-011, Rule-TREE-PANEL-037.
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-037, Rule-TREE-PANEL-004.
      * <p>
      * The undo and redo reverses pass no {@code onDone}: they are confirmed as
      * "Undone" and "Redone" by their own actions, and a second balloon saying it
      * was renamed would double-report one keystroke (#62).
+     * <p>
+     * A name taken since is refused before anything is renamed, as the forward
+     * rename refuses it. The reverse used to go straight to the rename, which
+     * renames the generated code first: the class went back to the old name, the
+     * folder rename then failed on the sibling holding it, and the history said
+     * "Undone" over a tree and code that no longer matched (#312, A63). False
+     * tells the history nothing came back, so it neither confirms nor spends the
+     * press.
      */
-    private void applyRename(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
+    private boolean applyRename(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
+        if (Services.getInstance(p, ProjectIndexer.class).nodeExists(dir.getPath().resolveSibling(newName))) {
+            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, newName);
+            return false;
+        }
+
         NodeRename.apply(p, Services.getInstance(p, TreePanel.class), dir, newName, () -> {
         });
+        return true;
     }
 
     /**
