@@ -48,6 +48,7 @@ import org.testin.setting.AppSettingsState;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.Optional;
 
@@ -477,10 +478,13 @@ public final class SyncWithSftpAction extends DumbAwareAction {
          * title is the part a second copy quietly stops agreeing on.
          */
         private static void reportFailure(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull Exception ex) {
-            Logger.error(whatFailed + " failed: " + ex.getMessage());
+            // The exception's own name when it carries no message, rather than
+            // "null" in the log and a null handed to the notification (#312, A96).
+            final @NotNull String reason = Objects.requireNonNullElse(ex.getMessage(), ex.toString());
+            Logger.error(whatFailed + " failed: " + reason);
 
             ApplicationManager.getApplication().invokeLater(() ->
-                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("sftp.sync.failed.title"), ex.getMessage()));
+                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("sftp.sync.failed.title"), reason));
         }
 
         /**
