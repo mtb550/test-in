@@ -113,7 +113,12 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 if (!(editor instanceof TestEditor destUI)) return;
 
                 final @NotNull CutState cutState = Services.getInstance(p, CutState.class);
-                final boolean isCut = cutState.isCutting();
+                final boolean isCut = cutState.isCutOf(pastedCases);
+
+                // A cut the clipboard no longer holds is over: something else was
+                // copied since, so this paste is a copy and the cut cases stay
+                // where they are, no longer drawn faded (#312, A55).
+                if (!isCut) cutState.clear();
 
                 // What a CTRL+Z would have to put back on the source side, taken
                 // before the cut takes it away. Empty when this is a copy, which

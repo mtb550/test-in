@@ -70,6 +70,22 @@ public final class CutState {
     }
 
     /**
+     * UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-079, Rule-EDITOR-PANEL-082.
+     * <p>
+     * Whether these are the cases waiting to be pasted, which is what makes a
+     * paste of them a move.
+     * <p>
+     * Asked of what is on the clipboard rather than answered by "a cut is
+     * waiting": the clipboard is the whole IDE's and this state is one
+     * project's, so a copy made anywhere after the cut replaced what a paste
+     * would put down, and the paste took the cut cases away and put different
+     * ones in their place as though they had moved (#312, A55).
+     */
+    public boolean isCutOf(final @NotNull List<TestCaseDto> testCases) {
+        return !testCases.isEmpty() && testCases.stream().allMatch(tc -> pending.contains(tc.getId()));
+    }
+
+    /**
      * Whether anything is waiting at all.
      */
     public boolean isCutting() {
