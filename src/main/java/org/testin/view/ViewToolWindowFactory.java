@@ -22,6 +22,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
@@ -105,8 +106,13 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         // In declaration order, which is the order they appear in - a tab
         // added to the enum arrives here without this method changing.
         for (final ViewTab tab : ViewTab.values()) {
-            toolWindow.getContentManager().addContent(
-                    contentFactory.createContent(tab.paneOf(panel), tab.getDisplayName(), false));
+            final @NotNull Content content = contentFactory.createContent(tab.paneOf(panel), tab.getDisplayName(), false);
+
+            // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-080. A click on a tab's name,
+            // and Tab, put the keyboard in the tab rather than on the tool
+            // window around it (#311).
+            content.setPreferredFocusableComponent(tab.keyboardTargetOf(panel));
+            toolWindow.getContentManager().addContent(content);
         }
 
         toolWindow.setTitleActions(new ViewPanelActions().create(panel, toolWindow.getComponent()));

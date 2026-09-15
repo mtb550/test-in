@@ -10,7 +10,7 @@ it.
 |---|---|
 | **Part of Testin** | The view panel |
 | **Answers** | What the panel shows, how a test case gets into it, and what a tester can do from it |
-| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-016`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-078` |
+| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-080` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -31,6 +31,7 @@ it.
 | **UC-VIEW-PANEL-006** | [Read the whole stacktrace of a failure](readStacktrace.md) | Copy the whole error into a bug report. |
 | **UC-VIEW-PANEL-007** | [Read a test case's history](readHistory.md) | See what changed on the test case, and when. |
 | **UC-VIEW-PANEL-008** | [See the bugs still open on a test case](seeOpenBugs.md) | Avoid raising a bug somebody has already raised. |
+| **UC-VIEW-PANEL-017** | [Move between the panel's tabs](moveBetweenTabs.md) | Reach History and Open Bugs without the mouse. |
 | | **Working from the panel** | |
 | **UC-VIEW-PANEL-009** | [Copy a test case's identity](copyIdentity.md) | Name the exact test case in a bug report. |
 | **UC-VIEW-PANEL-010** | [Go to the test set the test case lives in](goToTestSet.md) | Open the test set and see the test cases around it. |
@@ -77,6 +78,8 @@ in front of them while they write down what actually happened.
 | `Ctrl` and the mouse wheel | Makes every Testin text bigger or smaller | [UC-SETTING-011](../setting/changeTextSize.md) |
 | `F5` | Runs the test case on display | [UC-VIEW-PANEL-012](runFromPanel.md) |
 | `Shift+F5` | Opens its generated test method | [UC-VIEW-PANEL-014](goToCode.md) |
+| `Tab` | Brings the next tab to the front, with the keyboard in it | [UC-VIEW-PANEL-017](moveBetweenTabs.md) |
+| `Shift+Tab` | Brings the previous tab to the front | [UC-VIEW-PANEL-017](moveBetweenTabs.md) |
 
 ---
 

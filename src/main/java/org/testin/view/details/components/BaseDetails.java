@@ -45,10 +45,15 @@ public abstract class BaseDetails {
      * same shape, and an untyped lambda matches both. Auto-hide is off, because
      * ActionLink hides itself when disabled, and a link that cannot work is shown
      * gray with its reason (#66, finding 150).
+     * <p>
+     * Not focusable: {@code Tab} moves between the view panel's tabs, and a link
+     * holding the keyboard would take {@code Tab} for itself (#311,
+     * Rule-VIEW-PANEL-080). A link is clicked.
      */
     protected @NotNull ActionLink link(final @NotNull String text, final @NotNull ActionListener onClick) {
         final @NotNull ActionLink link = new ActionLink(text, onClick);
         link.setAutoHideOnDisable(false);
+        link.setFocusable(false);
         link.setFont(JBFont.label().deriveFont(getValueFontSize()));
         return link;
     }

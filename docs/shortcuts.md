@@ -109,6 +109,8 @@ The always on top window, which has its own keys.
 | `F5` | Runs the test case on display |
 | `Shift+F5` | Opens its generated test method |
 | `Escape` | Closes the panel, pressed in the editor |
+| `Tab` | Brings the next tab to the front: **Details**, **History**, **Open Bugs**, then **Details** again |
+| `Shift+Tab` | Brings the previous tab to the front |
 | `Ctrl` and the wheel | Changes the text size |
 
 ## Automation code
@@ -248,6 +250,7 @@ particular thing is on screen.
 | `1` `2` `3` | The test run status popup | Numbers standing for the three run statuses, live only while that popup is open |
 | `Ctrl+D` `Ctrl+E` `Ctrl+M` `Ctrl+S` `Ctrl+T` `Ctrl+B` `Ctrl+G` `Ctrl+P` | The create and update test case dialogs | Each opens one field of the dialog in front of the tester. Outside it there is no field to open |
 | `Tab` `Shift+Tab` `Up` `Down` `Space` | Any dialog | Moving between fields and choices is the platform's own gesture, not a command |
+| `Tab` `Shift+Tab` | The view panel | Moving between its three tabs, which exist only there |
 | `Enter` `Escape` | Any dialog, and the grid | Confirm and cancel. Every dialog has them, so they belong to the dialog framework rather than to any one action ([#11](https://github.com/mtb550/test-in/issues/11)) |
 | `Ctrl+Space` | Any dialog field that completes | The platform's own completion gesture |
 | `Ctrl+Enter` | A grid cell, a long field | A line break where `Enter` saves |

@@ -25,33 +25,48 @@ import javax.swing.*;
 import java.util.function.Function;
 
 /**
- * The tabs of the Testin tool window: what each is called, and which part of the
- * panel it shows.
+ * The tabs of the Testin tool window: what each is called, which part of the
+ * panel it shows, and which part takes the keyboard when it comes to the front
+ * (#311).
  * <p>
- * Both, because the window used to name the three tabs and reach for their three
+ * Together, because the window used to name the three tabs and reach for their three
  * scroll panes in three hand-written lines - so a fourth tab meant remembering a
  * place that has nothing to do with declaring one (#175, C11).
  */
 @Getter
 @AllArgsConstructor
 public enum ViewTab {
-    DETAILS(Bundle.message("view.tab.details"), ViewPanel::getDetailsScrollPane),
+    DETAILS(Bundle.message("view.tab.details"), ViewPanel::getDetailsScrollPane, ViewPanel::getDetailsTab),
 
     // Reported as never used, and kept: the constants are read by values(), so
     // nothing names them. History draws an honest empty state until a test case
     // records more than its last edit (#150); Open Bugs reads the runs and
     // reports what each cycle found (#229).
-    HISTORY(Bundle.message("view.tab.history"), ViewPanel::getHistoryScrollPane),
-    OPEN_BUGS(Bundle.message("view.tab.open.bugs"), ViewPanel::getOpenBugsScrollPane);
+    HISTORY(Bundle.message("view.tab.history"), ViewPanel::getHistoryScrollPane, ViewPanel::getHistoryTab),
+    OPEN_BUGS(Bundle.message("view.tab.open.bugs"), ViewPanel::getOpenBugsScrollPane, ViewPanel::getOpenBugsTab);
 
     private final @NotNull String displayName;
 
     private final @NotNull Function<ViewPanel, JScrollPane> pane;
 
     /**
+     * The part that takes the keyboard when this tab comes to the front (#311).
+     */
+    private final @NotNull Function<ViewPanel, JComponent> keyboardTarget;
+
+    /**
      * The part of the panel this tab shows.
      */
     public @NotNull JScrollPane paneOf(final @NotNull ViewPanel panel) {
         return pane.apply(panel);
+    }
+
+    /**
+     * UC-VIEW-PANEL-017, Rule-VIEW-PANEL-080.
+     * <p>
+     * The part of the panel the keyboard goes to when this tab is in front.
+     */
+    public @NotNull JComponent keyboardTargetOf(final @NotNull ViewPanel panel) {
+        return keyboardTarget.apply(panel);
     }
 }

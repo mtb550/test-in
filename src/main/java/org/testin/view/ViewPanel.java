@@ -16,9 +16,11 @@
 
 package org.testin.view;
 
+import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
@@ -35,14 +37,20 @@ import org.testin.view.bugs.OpenBugsTab;
 import org.testin.view.details.DetailsTab;
 import org.testin.view.history.HistoryTab;
 
+import javax.swing.SwingUtilities;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class ViewPanel implements Disposable {
+    @Getter
     private final @NotNull JBPanel<?> detailsTab;
+    @Getter
     private final @NotNull JBPanel<?> historyTab;
+    @Getter
     private final @NotNull JBPanel<?> openBugsTab;
 
     @Getter
@@ -81,11 +89,61 @@ public class ViewPanel implements Disposable {
         new EscapeAction(p, historyTab);
         new EscapeAction(p, openBugsTab);
 
+        tabs().forEach(this::takesTheKeyboard);
+        IdeEventQueue.getInstance().addPostprocessor(this::focusTabPressed, this);
+
         page = new ViewPagination(this);
 
         refreshCurrentView();
 
         TestCaseExecutionSubscriber.onReported(p, this, (tc, status, duration, failure) -> refreshCurrentView());
+    }
+
+    private @NotNull Stream<JBPanel<?>> tabs() {
+        return Stream.of(detailsTab, historyTab, openBugsTab);
+    }
+
+    /**
+     * UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080.
+     * <p>
+     * A tab the keyboard can be in: focusable from the start, and answering
+     * {@code Tab} and {@code Shift+Tab} (#311).
+     * <p>
+     * {@code Tab} is a focus traversal key, and AWT hands it to the focus manager
+     * before the IDE's actions are asked, so the tab stops treating it as one -
+     * otherwise the two actions never run.
+     */
+    private void takesTheKeyboard(final @NotNull JBPanel<?> tab) {
+        tab.setFocusable(true);
+        tab.setFocusTraversalKeysEnabled(false);
+
+        new ViewTabAction(p, tab, ViewTabAction.Direction.NEXT);
+        new ViewTabAction(p, tab, ViewTabAction.Direction.PREVIOUS);
+    }
+
+    /**
+     * UC-VIEW-PANEL-017, Rule-VIEW-PANEL-080.
+     * <p>
+     * A press anywhere inside a tab puts the keyboard in that tab (#66, finding
+     * 158).
+     * <p>
+     * Watched on the IDE's event queue rather than by a listener on each tab.
+     * Nearly everything a tab draws is a {@code Prose} text area, and a text area
+     * takes the press for its caret before any parent hears it, so a listener on
+     * the tab heard only the empty space between rows. Through the focus manager,
+     * so a press that comes back from another window lands too. Never consumes
+     * the press: the link or path step under it still does its own thing.
+     */
+    private boolean focusTabPressed(final @NotNull AWTEvent event) {
+        if (!(event instanceof MouseEvent press) || press.getID() != MouseEvent.MOUSE_PRESSED) return false;
+
+        // The queue sees the press before Swing hands it down, so its component
+        // is the IDE's frame (IdeFrameImpl, measured in the sandbox) and never a
+        // tab. What was pressed is the deepest component under the pointer.
+        Optional.ofNullable(SwingUtilities.getDeepestComponentAt(press.getComponent(), press.getX(), press.getY()))
+                .flatMap(pressed -> tabs().filter(tab -> SwingUtilities.isDescendingFrom(pressed, tab)).findFirst())
+                .ifPresent(tab -> IdeFocusManager.getInstance(p).requestFocus(tab, true));
+        return false;
     }
 
     private @NotNull JBScrollPane createScrollPane(final @NotNull Component view) {
@@ -240,7 +298,6 @@ public class ViewPanel implements Disposable {
     // UC-VIEW-PANEL-001, Rule-VIEW-PANEL-011, Rule-VIEW-PANEL-012
     public void focusDetailsTab() {
         selectDetailsTab();
-        detailsTab.setFocusable(true);
         detailsTab.requestFocusInWindow();
     }
 
