@@ -179,13 +179,23 @@ final class RunRegistry {
      * <p>
      * A report of {@link RunStatus#RUNNING} is not a result and is not recorded:
      * the case is already known to be running, by the entry that put it here.
+     * <p>
+     * UC-CODEGEN-009, Rule-CODEGEN-038. Nor is {@link RunStatus#IDLE}, unless the
+     * tester stopped the case - which is recorded as not run. Every other idle
+     * report says nothing ran: Run pressed while the IDE indexes, a case with no
+     * generated code, a process that ended before reporting. It used to be
+     * stored over the last verdict, so a case that had passed lost its badge
+     * although nothing had run (#312, A12).
      */
     void reported(final @NotNull UUID id, final @NotNull RunStatus status) {
         if (status == RunStatus.RUNNING) return;
 
-        verdict.put(id, status);
         pending.remove(id);
         configOf.remove(id);
+
+        if (status == RunStatus.IDLE && !stopped.contains(id)) return;
+
+        verdict.put(id, status);
     }
 
     /**
