@@ -42,8 +42,11 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
      * land. The last one covers a test run holding no test cases, a filter
      * matching nothing, and a list whose test cases have all been judged - all
      * three of which left the button live and startable (#215).
+     * <p>
+     * Public because light mode's Start is the same button and grays for the same
+     * reasons, so it says the same words (#312, A31).
      */
-    private static @NotNull String tooltipFor(final @NotNull RunEditor editor) {
+    public static @NotNull String tooltipFor(final @NotNull RunEditor editor) {
         if (editor.isExecuting()) return Bundle.message("toolbar.executing");
 
         final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();

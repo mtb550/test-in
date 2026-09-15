@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.Toolkit;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
+import org.testin.editor.toolbar.components.StartExecutionBtn;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
@@ -336,6 +337,12 @@ final class LightModeWindow {
 
         start.setVisible(!editor.isExecuting());
         stop.setVisible(editor.isExecuting());
+
+        // Rule-EDITOR-PANEL-135. Gray when there is nothing to walk, with the
+        // reason, as the toolbar's Start is. Live, it refused on the IDE's status
+        // bar - the one this window keeps out of view (#312, A31).
+        start.setEnabled(editor.canStartManualExecution());
+        start.setToolTipText(StartExecutionBtn.tooltipFor(editor));
 
         final @NotNull Optional<UUID> wasShowing = shownCase;
         if (executing) showCase(cases.get(index));
