@@ -44,7 +44,7 @@ public class PreConditionsBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
     @Override
     protected @NotNull String getJsonFieldName() {
-        return "preCondition";
+        return "preConditions";
     }
 
 
