@@ -25,6 +25,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.TestinData;
+import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
 import org.testin.indexer.ProjectIndexer;
@@ -178,6 +179,13 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                     after.add(TestCaseSnapshot.of(p, destPath, pastedIds));
 
                     TestCaseSnapshot.record(p, UndoScope.of(destPath), TestCaseSnapshot.describe(isCut ? Bundle.message("snapshot.verb.move") : Bundle.message("snapshot.verb.paste"), pastedHere), before, after);
+
+                    // UC-EDITOR-PANEL-017, UC-CODEGEN-002. A copy is a new test
+                    // case, so it gets a method of its own the way a created one
+                    // does - once it is on disk, which is what the generator reads
+                    // its position from. It wrote none, so F5 and Go to code said
+                    // the copy had no generated code (#312, A54).
+                    if (!isCut) GenType.CREATE_TEST_CASE.executeAll(p, pastedHere);
                 });
 
                 if (isCut) cutState.clear();
