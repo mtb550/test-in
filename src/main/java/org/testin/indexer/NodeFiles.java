@@ -250,6 +250,11 @@ final class NodeFiles {
 
             tc.setId(fresh);
             Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(fresh + ".json"), tc);
+
+            // Claimed before it goes, as every other removal is, or the watcher
+            // takes Testin's own delete for an outside change and reads the
+            // project a second time (#312, A8).
+            Services.getInstance(OwnWrites.class).record(caseFile);
             Files.delete(caseFile);
 
         } catch (final Exception ex) {
