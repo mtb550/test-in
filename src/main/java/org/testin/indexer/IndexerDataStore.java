@@ -213,20 +213,20 @@ final class IndexerDataStore {
         testRunsByPath.put(testRunPath.toString(), tr);
     }
 
-    void addTestSet(final @NotNull TestSetDirectoryDto ts) {
-        addDir(testSetsDirByPath, ts, DirectoryType.TS.getMarker(), ts.getMarker());
+    boolean addTestSet(final @NotNull TestSetDirectoryDto ts) {
+        return addDir(testSetsDirByPath, ts, DirectoryType.TS.getMarker(), ts.getMarker());
     }
 
-    void addTestSetPackage(final @NotNull TestSetPackageDirectoryDto tsp) {
-        addDir(testSetPackagesByPath, tsp, DirectoryType.TSP.getMarker(), tsp.getMarker());
+    boolean addTestSetPackage(final @NotNull TestSetPackageDirectoryDto tsp) {
+        return addDir(testSetPackagesByPath, tsp, DirectoryType.TSP.getMarker(), tsp.getMarker());
     }
 
-    void addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
-        addDir(testRunsDirByPath, trd, DirectoryType.TR.getMarker(), trd.getMarker());
+    boolean addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
+        return addDir(testRunsDirByPath, trd, DirectoryType.TR.getMarker(), trd.getMarker());
     }
 
-    void addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
-        addDir(testRunPackagesByPath, trp, DirectoryType.TRP.getMarker(), trp.getMarker());
+    boolean addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
+        return addDir(testRunPackagesByPath, trp, DirectoryType.TRP.getMarker(), trp.getMarker());
     }
 
     /**
@@ -239,13 +239,17 @@ final class IndexerDataStore {
      * left a fully indexed test set drawn in the tree with nothing on disk,
      * which then survived every rescan until the tester pressed Refresh. Now a
      * failed write reports itself and nothing is drawn (#66, finding 85).
+     * <p>
+     * And says whether it landed, so a creator does not confirm a node that was
+     * never made (#312, A5).
      */
-    private <V extends DirectoryDto> void addDir(final @NotNull Map<String, V> map, final @NotNull V dto, final @NotNull String markerFileName, final @NotNull Object marker) {
-        if (!markers.write(dto.getPath(), markerFileName, marker)) return;
+    private <V extends DirectoryDto> boolean addDir(final @NotNull Map<String, V> map, final @NotNull V dto, final @NotNull String markerFileName, final @NotNull Object marker) {
+        if (!markers.write(dto.getPath(), markerFileName, marker)) return false;
 
         map.put(dto.getPath().toString(), dto);
         childrenIndex.invalidate();
         refreshDir(dto.getPath());
+        return true;
     }
 
     /**
@@ -415,14 +419,20 @@ final class IndexerDataStore {
     }
 
     /**
-     * A new test project, under the same order as {@link #addDir}: the two
-     * markers that bring Test Cases and Test Runs into existence are written
-     * first, and the cache learns about the project only if both landed.
+     * A new test project, under the same order as {@link #addDir}: its own
+     * marker and the two that bring Test Cases and Test Runs into existence are
+     * written first, and the cache learns about the project only if all three
+     * landed.
+     * <p>
+     * The project's own marker used to be written after the cache was updated,
+     * and whether any of them landed was answered to nobody, so a project that
+     * could not be written was still bound, drawn and confirmed (#312, A5).
      */
-    void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
-        final boolean casesWritten = markers.write(tp.getTestCasesDirectory().getPath(), DirectoryType.TCD.getMarker(), tp.getTestCasesDirectory().getMarker());
-        final boolean runsWritten = markers.write(tp.getTestRunsDirectory().getPath(), DirectoryType.TRD.getMarker(), tp.getTestRunsDirectory().getMarker());
-        if (!casesWritten || !runsWritten) return;
+    boolean addTestProject(final @NotNull TestProjectDirectoryDto tp) {
+        final boolean written = markers.write(tp.getPath(), tp.getMarkerFileName(), tp.getMarker())
+                && markers.write(tp.getTestCasesDirectory().getPath(), DirectoryType.TCD.getMarker(), tp.getTestCasesDirectory().getMarker())
+                && markers.write(tp.getTestRunsDirectory().getPath(), DirectoryType.TRD.getMarker(), tp.getTestRunsDirectory().getMarker());
+        if (!written) return false;
 
         testProjectsByPath.put(tp.getPath().toString(), tp);
         testCasesMainDirsByPath.put(tp.getTestCasesDirectory().getPath().toString(), tp.getTestCasesDirectory());
@@ -432,6 +442,7 @@ final class IndexerDataStore {
         refreshDir(tp.getPath());
         refreshDir(tp.getTestCasesDirectory().getPath());
         refreshDir(tp.getTestRunsDirectory().getPath());
+        return true;
     }
 
     /**

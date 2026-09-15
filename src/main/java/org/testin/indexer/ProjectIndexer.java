@@ -840,25 +840,30 @@ public final class ProjectIndexer {
         return testProjectHolding(file).map(testProject -> new TestCaseFile(testProject, testProject.relativize(file)));
     }
 
-    public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
-        store.addTestProject(tp);
-        store.persistMarker(tp);
+    /**
+     * UC-TREE-PANEL-002.
+     * <p>
+     * A new node, and whether its markers landed - the creators confirm only a
+     * node that was made (#312, A5).
+     */
+    public boolean addTestProject(final @NotNull TestProjectDirectoryDto tp) {
+        return store.addTestProject(tp);
     }
 
-    public void addTestSet(final @NotNull TestSetDirectoryDto ts) {
-        store.addTestSet(ts);
+    public boolean addTestSet(final @NotNull TestSetDirectoryDto ts) {
+        return store.addTestSet(ts);
     }
 
-    public void addTestSetPackage(final @NotNull TestSetPackageDirectoryDto tsp) {
-        store.addTestSetPackage(tsp);
+    public boolean addTestSetPackage(final @NotNull TestSetPackageDirectoryDto tsp) {
+        return store.addTestSetPackage(tsp);
     }
 
-    public void addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
-        store.addTestRunDir(trd);
+    public boolean addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
+        return store.addTestRunDir(trd);
     }
 
-    public void addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
-        store.addTestRunPackage(trp);
+    public boolean addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
+        return store.addTestRunPackage(trp);
     }
 
     /**
