@@ -111,6 +111,12 @@ public final class SettingsConfigurable implements SearchableConfigurable {
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         );
 
+        // UC-SETTING-010. The row's browse button did nothing without this: the
+        // field had a button and no chooser behind it (#312, A90).
+        sftpKeyFileField.addBrowseFolderListener(null, FileChooserDescriptorFactory.createSingleFileDescriptor(),
+                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+        );
+
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel(Bundle.message("settings.label.source.root")), testinPathPanel.getComponent(), 1, false)
                 .addVerticalGap(5)
