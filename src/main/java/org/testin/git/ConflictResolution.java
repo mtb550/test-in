@@ -121,16 +121,22 @@ public final class ConflictResolution {
             return;
         }
 
-        // It stopped again. Only conflicts are ours to carry on with; anything
-        // else is a failure the caller has to report.
-        if (!git.hasConflicts(repositoryPath)) {
-            ApplicationManager.getApplication().invokeLater(() -> onStuck.accept(List.of()));
+        // It stopped again. Only files still conflicting are ours to carry on
+        // with; anything else is a failure, and it is said as one. It used to be
+        // asked of hasConflicts, which is true whenever the rebase directory is
+        // there - and a continue that failed leaves it there - so the failure
+        // came back as a conflict naming no file, and Continue looped (#312, A43).
+        final @NotNull List<String> stillConflicting = git.conflictingPaths(repositoryPath);
+        if (stillConflicting.isEmpty()) {
+            Logger.warn("The rebase could not continue, and nothing is left conflicting");
+            ApplicationManager.getApplication().invokeLater(() ->
+                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"),
+                            Bundle.message("git.error.continue.rebase")));
             return;
         }
 
         final int stepNow = git.rebaseStep(repositoryPath);
         if (stepNow <= stepBefore) {
-            final @NotNull List<String> stillConflicting = git.conflictingPaths(repositoryPath);
             Logger.warn("The rebase did not move past commit " + stepNow + "; leaving it to the tester");
             ApplicationManager.getApplication().invokeLater(() -> onStuck.accept(stillConflicting));
             return;

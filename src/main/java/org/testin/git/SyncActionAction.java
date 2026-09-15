@@ -236,11 +236,15 @@ public class SyncActionAction extends DumbAwareAction {
         private void reportRebaseFailure(final @NotNull Path repoPath, final @NotNull String message) {
             // Called from a background task's body and from its error handler, both
             // off the EDT - which is where the git question has to be asked.
-            final boolean conflicts = git.hasConflicts(repoPath);
-            final @NotNull List<String> conflicting = conflicts ? git.conflictingPaths(repoPath) : List.of();
+            //
+            // Files still conflicting, not hasConflicts: a continue or an abort
+            // that failed leaves the rebase directory, which hasConflicts reads as
+            // a conflict, so the failure was offered back naming no file and the
+            // message below never showed (#312, A43).
+            final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                if (conflicts) showConflictActions(repoPath, conflicting);
+                if (!conflicting.isEmpty()) showConflictActions(repoPath, conflicting);
                 else Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), message);
             });
         }

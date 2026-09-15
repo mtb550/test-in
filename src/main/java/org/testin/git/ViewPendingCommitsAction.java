@@ -524,7 +524,11 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                                         abort ? Bundle.message("git.rebase.aborted.message") : Bundle.message("git.rebase.continued.message")));
                     },
                     ex -> {
-                        if (git.hasConflicts(repoPath)) showConflictActions(repoPath, remote, branch);
+                        // Files still conflicting, not hasConflicts: a continue or
+                        // an abort that failed leaves the rebase directory, which
+                        // hasConflicts reads as a conflict, so the failure was
+                        // offered back naming no file (#312, A43).
+                        if (!git.conflictingPaths(repoPath).isEmpty()) showConflictActions(repoPath, remote, branch);
                         else
                             Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), ex.getMessage());
                     });
