@@ -52,7 +52,7 @@ public final class TestinPathPanel {
 
         pathField.addBrowseFolderListener(
                 null,
-                FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                FileChooserDescriptorFactory.singleDir()
                         .withTitle(Bundle.message("settings.path.root.title"))
                         .withDescription(Bundle.message("settings.path.root.description")),
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT

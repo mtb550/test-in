@@ -80,7 +80,7 @@ public final class DestinationForm implements DialogComponent {
         });
 
         final @NotNull FileChooserDescriptor descriptor = FileChooserDescriptorFactory
-                .createSingleFolderDescriptor()
+                .singleDir()
                 .withTitle(chooserTitle)
                 .withDescription(chooserDescription);
 

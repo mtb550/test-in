@@ -106,7 +106,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         // Null project, as the source-root field above already does: the chooser
         // needs one only to seed a starting directory, and an application-level
         // page has none to give it (#70).
-        downloadFolderField.addBrowseFolderListener(null, FileChooserDescriptorFactory.createSingleFolderDescriptor()
+        downloadFolderField.addBrowseFolderListener(null, FileChooserDescriptorFactory.singleDir()
                         .withTitle(Bundle.message("settings.download.folder.title"))
                         .withDescription(Bundle.message("settings.download.folder.description")),
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
@@ -114,7 +114,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
 
         // UC-SETTING-010. The row's browse button did nothing without this: the
         // field had a button and no chooser behind it (#312, A90).
-        sftpKeyFileField.addBrowseFolderListener(null, FileChooserDescriptorFactory.createSingleFileDescriptor(),
+        sftpKeyFileField.addBrowseFolderListener(null, FileChooserDescriptorFactory.singleFile(),
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         );
 
