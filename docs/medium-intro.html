@@ -1,11 +1,12 @@
-<!doctype html><html><head><meta charset="utf-8"><title>Testin on Medium</title><style>body{font-family:Georgia,serif;font-size:18px;line-height:1.6;max-width:42em;margin:40px auto;padding:0 20px;color:#111}h1{font-size:32px;line-height:1.2}h2{font-size:24px;margin-top:36px}h3{font-size:20px}pre{background:#f4f4f2;padding:14px;border-radius:6px;overflow-x:auto;font-size:14px}code{background:#f4f4f2;padding:1px 4px;border-radius:3px;font-size:0.85em}em.shot{display:block;color:#888;font-style:italic;margin:18px 0}</style></head><body>
+<!doctype html><html><head><meta charset="utf-8"><title>Testin on Medium</title><style>body{font-family:Georgia,serif;font-size:18px;line-height:1.6;max-width:42em;margin:40px auto;padding:0 20px;color:#111}h1{font-size:32px;line-height:1.2}h2{font-size:24px;margin-top:36px}h3{font-size:20px}pre{background:#f4f4f2;padding:14px;border-radius:6px;overflow-x:auto;font-size:14px}code{background:#f4f4f2;padding:1px 4px;border-radius:3px;font-size:0.85em}em.shot{display:block;color:#888;font-style:italic;margin:18px 0}ul{padding-left:1.2em}li{margin:8px 0}</style></head><body>
 <h1>Your test cases are in a spreadsheet. Your tests are in IntelliJ. They have stopped agreeing.</h1>
 <p><em>A look at Testin, a test case management plugin that keeps both in one place.</em></p>
 <h2>The problem you already have</h2>
 <p>If you write test cases and also automate them, you work in two places at once.</p>
 <p>The test cases are in a spreadsheet, or in a test management tool that lives in a browser tab. The automation is in IntelliJ IDEA: Java, TestNG, under Git, and reviewed like the rest of the code.</p>
 <p>Nothing connects the two. A test case gets reworded in the spreadsheet and the method keeps the old name. A test case is deleted and the method stays in the class for another year. A new case is written and nobody notices there is no method for it. When somebody asks "is this covered?", the honest answer is that you would have to read both lists and compare them by hand.</p>
-<p>The drift is not a discipline problem. It is what happens when the two artifacts share no identity, no history and no screen.</p>
+<p>There is also the day of it. A test management tool lives in a browser tab, and a browser tab is a mouse. Recording a verdict means opening the run, finding the case, clicking a status, waiting for the page and scrolling back to where you were; saying what actually happened means another dialog and another wait. Fifty cases is a few hundred clicks, and none of it gets faster the tenth time you do it, because there is nothing to learn by hand. Meanwhile the window you left to get there is driven almost entirely by keys.</p>
+<p>The drift is not a discipline problem, and neither is the clicking. Both are what happens when the two artifacts share no identity, no history, no screen and no keyboard.</p>
 <em class="shot">[ picture: shot 1 ]</em>
 <h2>What Testin is</h2>
 <p>Testin is a JetBrains IDE plugin that puts test case management inside the IDE, next to the automation it drives.</p>
@@ -66,9 +67,26 @@ public void rejectAnExpiredCard() {
 <p>It is for a QA engineer who writes test cases and automates them in a JetBrains IDE, and for the mixed teams where the same person does both. Manual testing is the first half of the loop, not an afterthought: you can run a whole cycle in light mode without writing a line of Java.</p>
 <p>It is not a hosted test management platform. There is no web UI and no accounts: everything it does happens in the IDE, on your own disk. If your organization needs auditors and managers in a browser, Testin is the wrong shape. If your test cases should be reviewed in a pull request like the code they test, it is the right one.</p>
 <p>It is alpha, and it says so in the version number.</p>
+<h2>The keys</h2>
+<p>Everything above is reachable from the keyboard, which is the other half of the point: a cycle is judged with your hands where they already are.</p>
+<ul>
+<li><code>P</code> <code>F</code> <code>B</code> — passed, failed, blocked, on a run's cards and in light mode. The cursor moves to the next case on its own.</li>
+<li><code>F2</code> — change one field of the selected case. <code>D</code>, <code>E</code> and <code>S</code> open the description, the expected result and the steps directly.</li>
+<li><code>Ctrl+M</code> — a new test set, test run or test case, depending on what is selected.</li>
+<li><code>F5</code> — run the selected cases, or stop them. <code>Shift+F5</code> jumps to the generated method, and the gutter mark leads back.</li>
+<li><code>Ctrl+P</code> — generate the report on the selected run.</li>
+<li><code>Ctrl+F</code> — the editor's search box. <code>Ctrl+Alt+F</code> finds any case, set or run in the test project from anywhere in the IDE.</li>
+<li><code>Ctrl+Left</code> and <code>Ctrl+Right</code> — the previous and next page of cases; with <code>Shift</code>, the first and the last.</li>
+<li><code>Ctrl+Z</code> and <code>Ctrl+Y</code> — undo and redo. The tree and each editor keep their own history, so taking back a bulk edit does not take back a rename.</li>
+<li><code>Shift+F6</code> renames the selected node, <code>Delete</code> removes what is selected, and <code>Enter</code> opens it.</li>
+<li><code>Ctrl</code> and the wheel — text size, in the editor and in the panel alike.</li></ul>
+<p>Every one of them is an IDE action, so they appear in Find Action and in <strong>Settings → Keymap</strong>, and any of them can be rebound. A menu then prints the key you chose rather than the one Testin shipped.</p>
 <h2>Installing it</h2>
 <p>From the IDE: <strong>Settings → Plugins → Marketplace</strong>, search for *Testin*, install, restart. Or install it from <a href="https://plugins.jetbrains.com/plugin/31514-testin">the Marketplace listing</a>.</p>
 <p>You need IntelliJ IDEA 2026.1 or later. The Java, TestNG and Git integrations are optional: without them the plugin still loads and disables the features that need them rather than failing.</p>
 <p>Then set the Testin folder in <strong>Settings → Tools → Testin</strong> and create your first test project.</p>
-<p>- <a href="https://mtb550.github.io/test-in/firstRun.html">First run</a> walks from install   to a recorded verdict and a report in ten minutes. - <a href="https://mtb550.github.io/test-in/">The documentation</a> covers every screen and   every way the plugin can refuse, one job at a time. - The source is on <a href="https://github.com/mtb550/test-in">GitHub</a> under Apache 2.0,   and questions and ideas are welcome in   <a href="https://github.com/mtb550/test-in/discussions">Discussions</a>.</p>
+<ul>
+<li><a href="https://mtb550.github.io/test-in/firstRun.html">First run</a> walks from install to a recorded verdict and a report in ten minutes.</li>
+<li><a href="https://mtb550.github.io/test-in/">The documentation</a> covers every screen and every way the plugin can refuse, one job at a time.</li>
+<li>The source is on <a href="https://github.com/mtb550/test-in">GitHub</a> under Apache 2.0, and questions and ideas are welcome in <a href="https://github.com/mtb550/test-in/discussions">Discussions</a>.</li></ul>
 </body></html>
