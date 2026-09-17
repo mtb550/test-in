@@ -76,6 +76,12 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
      */
     private volatile boolean loading;
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-119
+    @Override
+    public boolean isLoading() {
+        return loading;
+    }
+
     public TestEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
         super(p, vf.getTestSet());
 
@@ -294,9 +300,19 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         }
     }
 
-    // UC-EDITOR-PANEL-005
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-119
     @Override
     public void onToolBarCreateTestCaseClicked() {
+        // Asked here as well as in the action's update, because the toolbar
+        // button calls straight through and never passes it. The key and the
+        // menu entry gray themselves while the set is being read; this is the
+        // third door, and it says the same thing rather than letting the create
+        // throw the load away (#312, A18).
+        if (loading) {
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("create.case.still.loading"));
+            return;
+        }
+
         CreateTestCaseAction.openCreateDialog(p, this, parent);
     }
 

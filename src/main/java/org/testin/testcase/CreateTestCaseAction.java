@@ -121,7 +121,15 @@ public class CreateTestCaseAction extends DumbAwareAction {
         // node's question, and asking the class means a node kind added later
         // answers wrongly until somebody remembers this method (#312, A87).
         final @NotNull Optional<TestinEditor> editor = TestinData.editor(e);
-        final boolean enabled = editor.filter(open -> open.getParent().isTestCaseContainer()).isPresent();
+        final boolean holdsCases = editor.filter(open -> open.getParent().isTestCaseContainer()).isPresent();
+
+        // And not while the set is still being read. Creating a case sorts the
+        // list, and a sort makes the load still in flight stale - so the load
+        // landed on nothing, the spinner never stopped, and the new case was
+        // ranked against a list nobody had seen, which put it in the middle of
+        // the set at the next Refresh (#312, A18).
+        final boolean loading = editor.filter(TestinEditor::isLoading).isPresent();
+        final boolean enabled = holdsCases && !loading;
 
         e.getPresentation().setEnabled(enabled);
 
@@ -129,7 +137,9 @@ public class CreateTestCaseAction extends DumbAwareAction {
         // Ctrl+M and got nothing - correct, and indistinguishable from a key
         // that is not bound.
         if (!enabled && editor.isPresent()) {
-            e.getPresentation().setDescription(Bundle.message("create.case.disabled.description"));
+            e.getPresentation().setDescription(loading
+                    ? Bundle.message("create.case.still.loading")
+                    : Bundle.message("create.case.disabled.description"));
         }
     }
 

@@ -172,10 +172,19 @@ public final class TestNGExecution implements Disposable {
     }
 
     /**
-     * UC-CODEGEN-008, Rule-CODEGEN-031.
+     * UC-CODEGEN-008, Rule-CODEGEN-076.
      * <p>
-     * Starts the configuration, and remembers which cases are running under it.
+     * The name to launch under: what the caller asked for, or that name with a
+     * number after it when a run of that name is still going.
+     * <p>
+     * Asked before the configuration is built, because the configuration is what
+     * carries the name and a stop finds a process by it.
      */
+    public @NotNull String freeRunName(final @NotNull String wanted) {
+        return registry.freeName(wanted);
+    }
+
+    // UC-CODEGEN-008, Rule-CODEGEN-031
     public void launch(final @NotNull List<TestCaseDto> cases, final @NotNull RunnerAndConfigurationSettings settings) {
         registry.launched(cases.stream().map(TestCaseDto::getId).toList(), settings.getName());
 

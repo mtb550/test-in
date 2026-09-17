@@ -43,6 +43,11 @@ The code runs, and Testin writes down whether each test case passed.
   and stops the rest when the run is terminated: all of them come back as a
   defect with no verdict, and a run that quietly left them Pending would report
   a cycle as finished when part of it never ran.
+- **Rule-CODEGEN-076** — A second run started while the first is still going
+  gets a name of its own - the same name with a number after it, such as
+  LoginTest (2). The two runs are then separate everywhere: each has its own
+  process, Stop reaches one without touching the other, and each case reports
+  its verdict under the run it belongs to.
 
 ## The three ways in
 
@@ -88,6 +93,11 @@ appears. The message saying how many have no generated code still does.
 
 **If every selected test case is already running** — nothing starts and nothing
 is said.
+
+**If a run of that name is already going** - the second one is named after it
+with a number, such as *LoginTest (2)*, and runs alongside. Each has its own
+process: stopping one leaves the other running, and each test case records its
+verdict under the run it actually belongs to.
 
 **If the framework skips a test** - the test case is recorded as **Failed**, and
 its actual result reads *Skipped/Terminated*. A dependency that failed, an

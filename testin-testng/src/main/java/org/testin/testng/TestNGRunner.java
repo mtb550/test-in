@@ -203,7 +203,10 @@ public final class TestNGRunner implements TestRunner {
         final @NotNull List<TestCaseDto> cases = generated.stream().map(Generated::tc).toList();
 
         final @NotNull LinkedHashSet<String> patterns = new LinkedHashSet<>(generated.stream().map(Generated::pattern).toList());
-        final @NotNull String name = configNameFor(generated);
+        // Free of any run this plugin still has going: a second launch of the
+        // same test set is numbered rather than sharing the first one's name,
+        // which is what the registry keys every case by (#312, A11).
+        final @NotNull String name = execution.freeRunName(configNameFor(generated));
 
         final @NotNull RunManager runManager = RunManager.getInstance(p);
         final @NotNull TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
