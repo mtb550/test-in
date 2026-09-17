@@ -608,11 +608,52 @@ public final class ProjectIndexer {
      * (#66, finding 146). It records the same thing when it is applied again.
      */
     public void changeRun(final @NotNull Path runPath, final @NotNull Consumer<TestRunDto> change) {
-        final @NotNull Runnable apply = () -> findTestRun(runPath).ifPresentOrElse(run -> {
-            change.accept(run);
-            persistRun(runPath, run);
-        }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
+        whenTheSyncLetsGo(runPath,
+                () -> findTestRun(runPath).ifPresentOrElse(run -> {
+                    change.accept(run);
+                    persistRun(runPath, run);
+                }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName())),
+                () -> findTestRun(runPath).ifPresent(change));
+    }
 
+    /**
+     * UC-SHARE-019, Rule-SHARE-003.
+     * <p>
+     * Changes a run's marker as the index holds it when the change is applied,
+     * and writes it - the same discipline as {@link #changeRun}, for the other
+     * half of what a run is.
+     * <p>
+     * It used to take a marker and write it straight through. So completing or
+     * closing a run during a sync of its project wrote the status at once while
+     * the cases it belongs to waited, and the run could sit Completed over cases
+     * still Pending, or keep its old status over cases already turned Untested,
+     * until the sync let the rest through (#312, A4). A status and the results it
+     * describes are one change, and they are held as one now.
+     * <p>
+     * A change rather than a marker, for the reason {@link #changeRun} takes one:
+     * the marker to write is the one the index holds when the write happens, not
+     * the object the caller was looking at before the sync replaced it.
+     */
+    public void changeRunMarker(final @NotNull Path runPath, final @NotNull Consumer<TestRunMarker> change) {
+        whenTheSyncLetsGo(runPath,
+                () -> findTestRun(runPath).ifPresentOrElse(run -> {
+                    final @NotNull TestRunMarker marker = getTestRunDirByPath(runPath).getMarker();
+                    change.accept(marker);
+                    runWriter.persistMarker(runPath, marker);
+                }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + runPath.getFileName())),
+                () -> change.accept(getTestRunDirByPath(runPath).getMarker()));
+    }
+
+    /**
+     * Runs the write now, or queues it behind a sync of the run's test project
+     * and does {@code meanwhile} instead - which is what puts the change on
+     * screen without writing it (#66, finding 146).
+     * <p>
+     * One method for the results and the marker, so the two cannot start being
+     * held differently: half a change through and half of it waiting is exactly
+     * what A4 was.
+     */
+    private void whenTheSyncLetsGo(final @NotNull Path runPath, final @NotNull Runnable apply, final @NotNull Runnable meanwhile) {
         final boolean held;
         synchronized (heldForSync) {
             final @NotNull Optional<List<Runnable>> waiting = heldForSync.entrySet().stream()
@@ -625,7 +666,7 @@ public final class ProjectIndexer {
         }
 
         if (held) {
-            findTestRun(runPath).ifPresent(change);
+            meanwhile.run();
             return;
         }
 
@@ -640,13 +681,6 @@ public final class ProjectIndexer {
     public void saveRun(final @NotNull Path runPath) {
         changeRun(runPath, run -> {
         });
-    }
-
-    /**
-     * The run's marker, through the same writer and the same queue.
-     */
-    public void persistRunMarker(final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
-        runWriter.persistMarker(runPath, marker);
     }
 
     /**

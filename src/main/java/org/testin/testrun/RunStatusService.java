@@ -33,7 +33,6 @@ import org.testin.model.TestRunStatus;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -361,15 +360,18 @@ public final class RunStatusService {
      * who changed the status and when (#27).
      */
     public void persistMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunStatus status) {
-        final @NotNull TestRunDirectoryDto trd = Services.getInstance(p, ProjectIndexer.class).getTestRunDirByPath(runPath);
-
-        final @NotNull TestRunMarker marker = trd.getMarker();
-        marker.setStatus(status);
-        marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
+        final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
 
         if (status.isTerminal()) finishRun(p, runPath);
 
-        Services.getInstance(p, ProjectIndexer.class).persistRunMarker(runPath, marker);
+        // Through changeRunMarker, so the status waits for a sync of this project
+        // exactly as the cases above it do. Written straight through, the marker
+        // landed while finishRun was still held, and the run sat Completed over
+        // cases still Pending until the sync let the rest of it in (#312, A4).
+        Services.getInstance(p, ProjectIndexer.class).changeRunMarker(runPath, marker -> {
+            marker.setStatus(status);
+            marker.touch(tester);
+        });
     }
 
     /**
