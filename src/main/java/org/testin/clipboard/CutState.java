@@ -17,9 +17,12 @@
 package org.testin.clipboard;
 
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.services.Services;
 
 import javax.swing.*;
 import java.util.HashSet;
@@ -51,6 +54,36 @@ public final class CutState {
      * called off - and empty whenever nothing is waiting.
      */
     private @NotNull Optional<TestinEditor> source = Optional.empty();
+
+    /**
+     * UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-080.
+     * <p>
+     * Asks to be told whenever anything is written to the clipboard, so a cut
+     * lasts exactly as long as it is on it.
+     * <p>
+     * There is one system clipboard, so a write anywhere replaces what a paste
+     * would put down - a tree copy or cut, a copied grid selection, a copied id
+     * badge, a report path copied from a notification, or a copy made in another
+     * application entirely. Six writers went straight to the clipboard and left
+     * the cards faded, promising a move the paste would then refuse (#312, N3).
+     * <p>
+     * Asked of the clipboard rather than told by each writer, which is the
+     * answer A55 reached for the paste: six callers each remembering a line is
+     * six chances to forget, and the seventh writer would not know there was a
+     * line to add.
+     * <p>
+     * Wired from {@code StartupActivity} rather than from the constructor so the
+     * state stays a plain object a test can build, and because the platform is
+     * what has to be running before anything can be registered on it.
+     * <p>
+     * A cut records itself <b>after</b> writing the clipboard, or this would
+     * call it off as it was being made.
+     */
+    public static void initClipboardWatch(final @NotNull Project p) {
+        final @NotNull CutState state = Services.getInstance(p, CutState.class);
+
+        CopyPasteManager.getInstance().addContentChangedListener((before, now) -> state.clear(), p);
+    }
 
     /**
      * Marks these cases as cut from this editor, replacing any earlier cut.

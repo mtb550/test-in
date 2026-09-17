@@ -182,6 +182,10 @@ clipboard and can be pasted as often as the tester likes.
 **After `Escape`** — the clipboard is empty too, and the faded rows come back
 to normal. Nothing is left waiting.
 
+**After a drag** — nothing changes about the cut. A drag is its own move and
+says nothing about the clipboard, so rows cut and not yet pasted stay faded and
+stay pastable.
+
 ---
 
 [Documentation](../README.md) › [The tree panel](main.md)

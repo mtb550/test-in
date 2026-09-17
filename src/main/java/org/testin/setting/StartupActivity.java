@@ -23,6 +23,7 @@ import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.util.Key;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
+import org.testin.clipboard.CutState;
 import org.testin.config.TestinConfigService;
 import org.testin.config.TestinProjectConfig;
 import org.testin.indexer.DeletedNodes;
@@ -120,6 +121,10 @@ public final class StartupActivity implements ProjectActivity {
         }
 
         TestCaseExecutionTracker.initGlobalListener(p);
+
+        // A cut is only a cut while it is on the clipboard, and the clipboard is
+        // written from six places and from every other application (#312, N3).
+        CutState.initClipboardWatch(p);
 
         // Before any surface exists. Recording a verdict used to be something
         // the open editors did on the side, so a run in a session where none

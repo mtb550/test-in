@@ -55,10 +55,13 @@ public class CutTestCaseNodeAction extends DumbAwareAction {
 
         if (!selectedTestCases.isEmpty()) {
             try {
-                Services.getInstance(p, CutState.class).cut(editor, selectedTestCases);
-
-                String json = Services.getInstance(p, Mapper.class).writeValueAsString(selectedTestCases);
+                // The clipboard first, then the cut. Writing the clipboard calls
+                // off whatever cut was waiting, so a cut recorded before its own
+                // write would call itself off (#312, N3).
+                final @NotNull String json = Services.getInstance(p, Mapper.class).writeValueAsString(selectedTestCases);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
+
+                Services.getInstance(p, CutState.class).cut(editor, selectedTestCases);
 
                 // The cards draw a cut case faded, so the editor redraws from
                 // what it is holding rather than this reaching for its list.
