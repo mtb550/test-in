@@ -137,6 +137,12 @@ cards went back to what is on disk*, and the list is read again. The new card
 goes with it: it was never written, and leaving it on screen would be a test
 case that exists nowhere.
 
+**In a test run editor** — **Create Test Case** is gray, and its reason reads *A
+test run covers test cases that already exist - write a new one in its test set,
+then edit the run to include it.* The editor is not asked what class it is; the
+node is asked whether it holds test cases, which is the question Delete beside it
+already asks.
+
 ## Where the plugin breaks its own rules
 
 **`Ctrl+M` is not `Cmd+M` on a Mac.** Two other keys on the same screen are

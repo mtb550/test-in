@@ -56,8 +56,10 @@ tracks.
 The button is a **toggle**. The tester presses it to open light mode. They press
 it again to close the window and carry on in the editor. It stays pressed for as
 long as the window is there. It works only while the test run is open. It turns
-gray the moment the test run reaches Completed or Closed. The same question
-grays out Start, and the same question closes this window if it is open.
+gray the moment the test run reaches Completed or Closed, and its tooltip then
+says why — *Light Mode records verdicts, and this test run is Completed*. The
+same question grays out Start, and the same question closes this window if it is
+open.
 
 ---
 

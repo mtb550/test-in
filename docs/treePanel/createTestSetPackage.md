@@ -102,7 +102,10 @@ still in the box, and *'\<name\>' cannot name a Java package* is shown in red.
 itself. (Rule-TREE-PANEL-095)
 
 **If the test project, a test set or a test run is selected** — **Create** is
-gray, and `Ctrl+M` does nothing.
+gray, and `Ctrl+M` does nothing, and the entry itself reads
+**Create Testin Node (a test set holds what it holds)**, naming the node that
+cannot take a child. A popup never shows a gray entry's description, so the
+reason is in the entry.
 
 ---
 

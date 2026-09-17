@@ -120,7 +120,10 @@ and the cursor stays in the box.
 closes, nothing is created, and *\<name\> Already Exists* is shown in red.
 
 **If the test project, a test set or a test run is selected** — **Create** is
-gray, and `Ctrl+M` does nothing.
+gray, and `Ctrl+M` does nothing, and the entry itself reads
+**Create Testin Node (a test set holds what it holds)**, naming the node that
+cannot take a child. A popup never shows a gray entry's description, so the
+reason is in the entry.
 
 **If the IDE project has no Java test folder** — *Java Test Source Not Found*
 says no automation code will be written. The test set is still created.

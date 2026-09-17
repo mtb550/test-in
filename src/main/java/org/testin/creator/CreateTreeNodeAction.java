@@ -90,6 +90,31 @@ public class CreateTreeNodeAction extends DumbAwareAction {
 
         e.getPresentation().setEnabled(enabled);
         e.getPresentation().setDescription(whyNot(selected));
+
+        // And in the entry itself when it is gray. The description above is the
+        // status bar's, and a disabled entry in a popup never reaches the status
+        // bar - so the reason written for #66 was read by nobody, which is the
+        // same silence it was written to end (#312, A73).
+        //
+        // Short, and after the name: the entry is still Create Testin Node, with
+        // why it cannot be pressed in brackets, the way the Automate entry says
+        // it is not built yet.
+        e.getPresentation().setText(enabled
+                ? Bundle.message("action.Testin.CreateNode.text")
+                : Bundle.message("action.Testin.CreateNode.text.full", shortWhyNot(selected)));
+    }
+
+    /**
+     * UC-TREE-PANEL-007, Rule-TREE-PANEL-096.
+     * <p>
+     * The same refusal as {@link #whyNot}, in the few words that fit in a menu
+     * entry. The long one stays: it is what the status bar shows when the entry
+     * is live enough to be hovered.
+     */
+    private static @NotNull String shortWhyNot(final @NotNull Optional<DirectoryDto> selected) {
+        return selected
+                .map(dir -> Bundle.message("create.node.nothing.under", dir.getType().getMarkerKind()))
+                .orElseGet(() -> Bundle.message("create.node.select.one"));
     }
 
     /**

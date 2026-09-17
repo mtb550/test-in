@@ -19,21 +19,39 @@ package org.testin.ui.dialogs;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.ui.JBUI;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.MenuItem;
 
 import javax.swing.*;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Row renderer for {@link ShortcutMenuPopup}: icon, name, grayed shortcut text.
+ * <p>
+ * A row that cannot do its work is drawn gray with the reason in place of its
+ * key, which is the whole of it - the popup refuses the row itself.
  */
+@RequiredArgsConstructor
 final class ShortcutMenuRenderer<T extends MenuItem> extends ColoredListCellRenderer<T> {
+
+    private final @NotNull Function<T, Optional<String>> refusal;
 
     @Override
     protected void customizeCellRenderer(final @NotNull JList<? extends T> list, final T value, final int index, final boolean selected, final boolean hasFocus) {
+        final @NotNull Optional<String> whyNot = refusal.apply(value);
+
         setIcon(value.getIcon());
-        append(value.getName());
-        append("   " + value.getShortcutText(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
+        setEnabled(whyNot.isEmpty());
+
+        append(value.getName(), whyNot.isEmpty()
+                ? SimpleTextAttributes.REGULAR_ATTRIBUTES
+                : SimpleTextAttributes.GRAYED_ATTRIBUTES);
+
+        // The reason where the key would be. A row that cannot work has no key
+        // worth printing, and the tester is reading that line either way.
+        append("   " + whyNot.orElseGet(value::getShortcutText), SimpleTextAttributes.GRAYED_ATTRIBUTES);
         setBorder(JBUI.Borders.empty(6, 12));
     }
 }
