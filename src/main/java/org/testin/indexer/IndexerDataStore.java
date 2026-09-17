@@ -330,6 +330,60 @@ final class IndexerDataStore {
      * to read the same project again and must not carry the last pass's nodes
      * into this one.
      */
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-021.
+     * <p>
+     * Puts a finished scan of one test project into the index.
+     * <p>
+     * Added first, removed second, and that order is the whole point. Emptying
+     * the project out before the pass that reads it again left the index with no
+     * record of a project that is on disk for as long as the walk took - see
+     * {@link ScannedProject} for what a tester lost in that window (#312, A1).
+     * Adding first means a node that both passes found is overwritten rather than
+     * ever absent, and what goes is exactly what the scan did not find, which is
+     * what was deleted.
+     * <p>
+     * The children index is invalidated once, at the end, rather than by each
+     * removal on the way through.
+     */
+    void swapIn(final @NotNull Path projectPath, final @NotNull ScannedProject scanned) {
+        testProjectsByPath.putAll(scanned.getProjects());
+        testCasesMainDirsByPath.putAll(scanned.getTestCasesMainDirs());
+        testRunsMainDirsByPath.putAll(scanned.getTestRunsMainDirs());
+        testSetPackagesByPath.putAll(scanned.getTestSetPackages());
+        testRunPackagesByPath.putAll(scanned.getTestRunPackages());
+        testSetsDirByPath.putAll(scanned.getTestSets());
+        testRunsDirByPath.putAll(scanned.getTestRunDirs());
+        testRunsByPath.putAll(scanned.getTestRuns());
+
+        // The cases go in as one move, because dropping a set's ids drops its
+        // cases with them and the two maps must not disagree even briefly.
+        testCaseStore.swapIn(projectPath, scanned.getTestCasesById(), scanned.getTestSetCaseIds());
+
+        dropUnseen(testProjectsByPath, projectPath, scanned.getProjects());
+        dropUnseen(testCasesMainDirsByPath, projectPath, scanned.getTestCasesMainDirs());
+        dropUnseen(testRunsMainDirsByPath, projectPath, scanned.getTestRunsMainDirs());
+        dropUnseen(testSetPackagesByPath, projectPath, scanned.getTestSetPackages());
+        dropUnseen(testRunPackagesByPath, projectPath, scanned.getTestRunPackages());
+        dropUnseen(testSetsDirByPath, projectPath, scanned.getTestSets());
+        dropUnseen(testRunsDirByPath, projectPath, scanned.getTestRunDirs());
+        dropUnseen(testRunsByPath, projectPath, scanned.getTestRuns());
+
+        childrenIndex.invalidate();
+    }
+
+    /**
+     * Everything this map held under the project that the finished scan did not
+     * find - which is what was deleted while nobody was looking.
+     * <p>
+     * By the key rather than by the value's own path, because one of these maps
+     * holds runs rather than directories and a run carries no path. The key is
+     * the path in every one of them, which is what makes one method enough.
+     */
+    private static void dropUnseen(final @NotNull Map<String, ?> held, final @NotNull Path projectPath, final @NotNull Map<String, ?> found) {
+        held.keySet().removeIf(key -> Path.of(key).startsWith(projectPath) && !found.containsKey(key));
+    }
+
     void removeTestProject(final @NotNull Path path) {
         final @NotNull String pathStr = path.toString();
         testProjectsByPath.remove(pathStr);

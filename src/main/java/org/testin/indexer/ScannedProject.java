@@ -1,0 +1,77 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.indexer;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.TestRunDto;
+import org.testin.model.dto.dirs.TestCasesMainDirectoryDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
+import org.testin.model.dto.dirs.TestRunsMainDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * UC-INTERNAL-002, Rule-INTERNAL-021.
+ * <p>
+ * One pass of the scanner's reading, held on its own until the pass is finished.
+ * <p>
+ * The scan used to write straight into the index, and to empty the project out
+ * of it first so that a rescan forgot what had disappeared. Between those two
+ * the index held nothing about the project, and a rescan is a pull, a branch
+ * switch, an SFTP sync, a hand edit or Refresh - all of which happen while a
+ * tester is working. In that window {@code getTestRunByPath} and
+ * {@code getTestSetDirByPath} answer for a node that is on disk and not in the
+ * index, which is the one thing they are written to treat as a mistake in the
+ * plugin: P or F or B on a row that was not executing raised an internal error,
+ * a verdict on the executing row was dropped while the editor went on saying
+ * Passed, and a test case saved then was stamped as created by whoever was
+ * watching, because the index had no record of it existing (#312, A1).
+ * <p>
+ * So the pass reads into this instead, and {@link IndexerDataStore#swapIn} puts
+ * it in when it is complete - adding before removing, so a node that is on disk
+ * in both passes is never once absent. A pass that throws or is cancelled is
+ * simply not swapped in, and the index goes on holding what it held, which is a
+ * better answer than half a project either way.
+ * <p>
+ * Concurrent maps because the case files of one test set are read in parallel.
+ */
+@Getter
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
+final class ScannedProject {
+
+    private final @NotNull Map<String, TestProjectDirectoryDto> projects = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestCasesMainDirectoryDto> testCasesMainDirs = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestRunsMainDirectoryDto> testRunsMainDirs = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestSetPackageDirectoryDto> testSetPackages = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestRunPackageDirectoryDto> testRunPackages = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestSetDirectoryDto> testSets = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestRunDirectoryDto> testRunDirs = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestRunDto> testRuns = new ConcurrentHashMap<>();
+    private final @NotNull Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, List<UUID>> testSetCaseIds = new ConcurrentHashMap<>();
+}

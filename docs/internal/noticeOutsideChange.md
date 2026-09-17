@@ -38,6 +38,11 @@ by hand, and is on [UC-TREE-PANEL-025](../treePanel/refreshTree.md).
   left alone.
 - **Rule-INTERNAL-024** — `testin.yml` is not watched. Only **Refresh** reads it
   again.
+- **Rule-INTERNAL-081** — A test project stays readable while it is read again.
+  The pass reads into a copy and is put in when it is finished, so everything
+  still on disk answers throughout, and a pass that is cancelled or that fails
+  changes nothing at all. What the pass did not find is dropped when it lands,
+  which is how the read forgets what was deleted.
 
 ## What is picked up, and what is not
 
