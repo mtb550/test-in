@@ -43,7 +43,8 @@ There is no key for either. The pill and the button sit side by side.
   case's own test set editor and selects it there. The tree does not move: the
   tester is already looking at the case and asked for the editor, so revealing
   the node is an answer to a question nobody asked. The path bar above is what
-  moves the tree, and it still does.
+  moves the tree, and it still does. A test case with no test set to open — one
+  shown from a test run after it was removed from its set — says so instead.
 
 ## The screen
 
@@ -57,7 +58,8 @@ The identity sits in a gray pill under the path, with the button to its right.
 
 1. **The pill** — the test case's identity, in full. The pointer becomes a hand
    over it and its tooltip reads **Go to this test case**. Clicking it opens the
-   test set's editor and selects the row.
+   test set's editor and selects the row. Where there is no test set to open the
+   pointer stays an arrow and the tooltip says so instead.
 2. **The button** — its tooltip reads **Copy ID**. The pointer becomes a hand
    over it.
 
@@ -79,7 +81,14 @@ the two: a path step names a place, and the identity names a test case.
 
 ## What Testin refuses
 
-Nothing. There is no gray state and no way for it to fail.
+Copying refuses nothing. There is no gray state and no way for it to fail.
+
+**If the test case has no test set to open** — the pointer stays an arrow over
+the pill, its tooltip says why, and clicking it reads *This test case was opened
+without its test set, so there is nothing to open. It was removed from the set
+the run recorded it in.* This is the only way to meet it: a test run keeps the
+verdict of a case its test set no longer holds, and the panel shows that case
+from the run.
 
 ## Why it works this way
 

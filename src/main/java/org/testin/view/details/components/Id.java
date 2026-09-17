@@ -28,6 +28,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditors;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.FontSync;
 import org.testin.util.Bundle;
@@ -88,11 +89,25 @@ public class Id extends BaseDetails {
         // moving the tree underneath them is an answer to something nobody
         // asked. openAndSelect is the other half of GoTo, and the one owner of
         // opening a test set on a case.
-        idBadge.setToolTipText(GO_TOOLTIP);
-        idBadge.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        //
+        // A case shown from a run has no parent once it has been removed from the
+        // set that run recorded it in - the same state A62 met on the edit path.
+        // The badge opened a test set at the empty path for it: an editor on
+        // nothing, from the one control that promises to show the case (#312,
+        // N12). Shown and refusing with the reason rather than left off the
+        // panel, which is the rule for a control that cannot work.
+        final boolean hasTestSet = !dto.getParent().getPath().toString().isEmpty();
+
+        idBadge.setToolTipText(hasTestSet ? GO_TOOLTIP : Bundle.message("view.id.go.nowhere"));
+        idBadge.setCursor(Cursor.getPredefinedCursor(hasTestSet ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
         idBadge.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
+                if (!hasTestSet) {
+                    Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("view.id.go.nowhere"));
+                    return;
+                }
+
                 Services.getInstance(p, TestinEditors.class).openAndSelect(p, dto.getParent(), dto);
             }
         });

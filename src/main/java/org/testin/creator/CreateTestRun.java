@@ -151,8 +151,6 @@ public class CreateTestRun implements NodeCreator {
         // The form and the checked tree were read above, while the dialog was
         // still there; from here nothing touches a component (#87).
         BackgroundWork.run(p, Bundle.message("run.task.creating", savePath.getFileName()), Bundle.message("run.create.failed.title"), indicator -> {
-            Services.getInstance(p, ProjectIndexer.class).putTestRun(savePath, tr);
-
             // Defaults are correct (status CREATED); addTestRunDir stamps the
             // tester's audit info before the marker's first write.
             final @NotNull TestRunMarker marker = new TestRunMarker();
@@ -160,7 +158,16 @@ public class CreateTestRun implements NodeCreator {
 
             // A run whose marker did not land is not opened or confirmed: the
             // write has already said why (#312, A5).
+            //
+            // And before the run itself, which is architecture rule 2: the
+            // directory only comes into existence as a side effect of the marker
+            // write. Indexing the run and queueing run.json first left a folder
+            // holding results and no .tr when the marker failed - which every
+            // rescan then skipped as not a test run, so the tester saw nothing
+            // and the files stayed (#312, N4).
             if (!Services.getInstance(p, ProjectIndexer.class).addTestRunDir(trDir)) return;
+
+            Services.getInstance(p, ProjectIndexer.class).putTestRun(savePath, tr);
 
             // File access is the indexer's alone (see CLAUDE.md).
             Services.getInstance(p, ProjectIndexer.class).refreshDirectory(savePath);
