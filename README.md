@@ -106,6 +106,10 @@ full statement is in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 Read it on the web at **[mtb550.github.io/test-in](https://mtb550.github.io/test-in/)**,
 or in this repository under [`docs/`](docs/README.md).
 
+New to the idea rather than the reference? **[Testin - New IntelliJ plugin to
+manage your test cases and test runs](https://medium.com/@mtb550/testin-new-intellij-plugin-to-mange-you-test-cases-and-test-runs-75422b0610dc)**
+walks one test case from written to reported, in pictures.
+
 Testin has eight parts. Each part gets a folder, and every thing a tester does
 in it gets a page of its own: the story, its rules, its screens, what happens
 step by step, and every way it can be refused. 154 use cases and 724 rules, each
