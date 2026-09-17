@@ -181,9 +181,23 @@ public enum OptionalPlugin {
         if (isAvailable()) return true;
 
         presentation.setEnabled(false);
-        presentation.setText(Bundle.message("plugin.needs", entryName, label));
+        presentation.setText(needs(entryName));
         presentation.setDescription(requirement);
 
         return false;
+    }
+
+    /**
+     * UC-CODEGEN-016, Rule-CODEGEN-062.
+     * <p>
+     * What a control reads when this plugin is what it is waiting for.
+     * <p>
+     * A method rather than the message key spelled out at each caller: a menu
+     * entry sets it as its text, and a card's icon carries it as the tooltip on
+     * an icon that has gone gray - the same sentence in two places that draw
+     * nothing alike (#312, A16).
+     */
+    public @NotNull String needs(final @NotNull String entryName) {
+        return Bundle.message("plugin.needs", entryName, label);
     }
 }

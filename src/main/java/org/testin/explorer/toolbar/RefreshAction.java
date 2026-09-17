@@ -33,7 +33,9 @@ import org.testin.services.Services;
 import org.testin.notifications.Done;
 import org.testin.util.Bundle;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class RefreshAction extends AbstractProjectAction {
 
@@ -52,6 +54,24 @@ public class RefreshAction extends AbstractProjectAction {
      * guard nobody else can see, which is what this used to be.
      */
     private final @NotNull AtomicBoolean refreshGuard = new AtomicBoolean(false);
+
+    /**
+     * UC-TREE-PANEL-025, UC-TREE-PANEL-026, Rule-TREE-PANEL-081.
+     * <p>
+     * What arrived while a re-index was running, and what to say when it has
+     * been done - empty when nothing is waiting.
+     * <p>
+     * A second press of Refresh was fine to ignore: nothing had changed by
+     * pressing it. A branch switch is not. It checks the branch out first and
+     * comes here to read what arrived with it, so ignoring it left every file on
+     * disk belonging to one branch and the whole index belonging to another,
+     * with no message and no sign that anything was wrong (#312, A66).
+     * <p>
+     * The last one wins, because a re-index reads everything either way and only
+     * the sentence at the end differs. Two switches queued behind one run mean
+     * one re-index, reporting the branch that is actually checked out.
+     */
+    private final @NotNull AtomicReference<Optional<String>> queued = new AtomicReference<>(Optional.empty());
 
     public RefreshAction(final @NotNull Project p, final @NotNull TreePanel tp) {
         super(p, Bundle.message("toolbar.refresh"), Bundle.message("toolbar.refresh.description"), AllIcons.Actions.Refresh);
@@ -76,7 +96,8 @@ public class RefreshAction extends AbstractProjectAction {
      */
     public void execute(final @NotNull String outcome) {
         if (!refreshGuard.compareAndSet(false, true)) {
-            Logger.info("Refresh: already in progress, ignoring click");
+            queued.set(Optional.of(outcome));
+            Logger.info("Refresh: already in progress, so this one waits for it - " + outcome);
             return;
         }
 
@@ -110,8 +131,8 @@ public class RefreshAction extends AbstractProjectAction {
                 // screen's Create, Clone and Select links stopped responding for
                 // the rest of the session, saying nothing but one log line
                 // written for a different case (#66, finding 67).
-                refreshGuard.set(false);
                 Logger.error("Refresh: re-indexing failed - " + ex.getMessage());
+                releaseAndRunWhatWaited();
                 Services.getInstance(p, Notifier.class).error(p, Bundle.message("toolbar.refresh.failed.title"), ex.getMessage());
             }
         });
@@ -136,14 +157,36 @@ public class RefreshAction extends AbstractProjectAction {
             tp.refresh();
             Logger.info("Refresh: tree rebuilt");
 
+            // Refresh is the tester saying "read everything again", and the
+            // remote is part of everything. The rebuild above no longer fetches
+            // by itself - it happens on every rename, removal and status change
+            // too, and none of those can have moved a branch (#312, A70). A
+            // branch switch arrives here as well, which is the other moment a
+            // fetch is worth its price.
+            tp.fetchBranches();
+
             // At the end, not the start: the tree is only usable now, and a
             // click that found a refresh already running returned above
             // without saying anything.
             Services.getInstance(p, Notifier.class).softShow(p, outcome);
 
         } finally {
-            refreshGuard.set(false);
+            releaseAndRunWhatWaited();
         }
+    }
+
+    /**
+     * UC-TREE-PANEL-025, Rule-TREE-PANEL-081.
+     * <p>
+     * Lets the next one in, and starts it if one is waiting.
+     * <p>
+     * The guard is dropped first, so the waiting run takes it rather than
+     * finding it held and queueing itself behind its own predecessor.
+     */
+    private void releaseAndRunWhatWaited() {
+        refreshGuard.set(false);
+
+        queued.getAndSet(Optional.empty()).ifPresent(this::execute);
     }
 
     // UC-TREE-PANEL-025

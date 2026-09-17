@@ -68,7 +68,7 @@ public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWit
         // the class. Asked of the type rather than written out here (#11).
         final @NotNull DirectoryType type = component().getSelectedValue();
 
-        final @NotNull String name = accepted(component(), type::canTakeName, Refused.NOT_A_JAVA_NAME);
+        final @NotNull String name = accepted(component(), value -> Refused.ofName(type, value));
         if (name.isEmpty()) return;
 
         onCreate.accept(name, type);

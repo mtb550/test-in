@@ -56,10 +56,14 @@ A test set package is a folder that holds test sets. This makes one.
   and no automation code is written for it.
 - **Rule-TREE-PANEL-028** — A test set package can hold another test set
   package, as deep as the tester needs.
-- **Rule-TREE-PANEL-095** — A folder that becomes a Java package will not take a
-  name Java refuses - New, Class, Import - whether it is being created or
-  renamed. The tester is told while they are still looking at what they typed,
-  rather than finding a package named something else.
+- **Rule-TREE-PANEL-095** — A node name is one folder inside the one selected. A
+  name carrying a slash, a backslash or `..` is a path, not a name, and is
+  refused for every kind of node: it would put the folder wherever that path
+  led. A folder that becomes a Java package also will not take a name Java
+  refuses - New, Class, Import - whether it is being created or renamed. The
+  tester is told which of the two they met, while they are still looking at what
+  they typed, rather than finding a folder somewhere else or a package named
+  something else.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is - drawn with Inactive beside its name like any other status - and its test
@@ -93,6 +97,10 @@ the IDE. Nothing opens.
 **If the name is empty** — the dialog stays open, the gray hint text turns red,
 and the cursor stays in the box.
 
+**If the name is a path** - a name holding a slash, a backslash or `..` is
+refused, reading *is a path, not a name - a node is one folder inside the one
+selected*. Nothing is created.
+
 **If a node with that name already exists under the parent** — the dialog
 closes, nothing is created, and *\<name\> Already Exists* is shown in red.
 
@@ -102,7 +110,10 @@ still in the box, and *'\<name\>' cannot name a Java package* is shown in red.
 itself. (Rule-TREE-PANEL-095)
 
 **If the test project, a test set or a test run is selected** — **Create** is
-gray, and `Ctrl+M` does nothing.
+gray, and `Ctrl+M` does nothing, and the entry itself reads
+**Create Testin Node (a test set holds what it holds)**, naming the node that
+cannot take a child. A popup never shows a gray entry's description, so the
+reason is in the entry.
 
 ---
 

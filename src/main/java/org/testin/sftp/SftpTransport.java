@@ -18,6 +18,7 @@ package org.testin.sftp;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import lombok.AccessLevel;
@@ -32,6 +33,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -108,7 +110,40 @@ public final class SftpTransport implements AutoCloseable {
             if (session != null && session.isConnected()) session.disconnect();
 
             Logger.error("Could not connect to " + address.display() + ": " + ex.getMessage());
-            throw new IllegalStateException(Bundle.message("sftp.failed.connect", address.display(), ex.getMessage()));
+
+            final @NotNull String said = Bundle.message("sftp.failed.connect", address.display(), ex.getMessage());
+            throw isAuthRefusal(ex) ? new AuthRefused(said) : new IllegalStateException(said);
+        }
+    }
+
+    /**
+     * Whether the server refused who this machine said it was, as opposed to
+     * everything else that can go wrong on the way in.
+     * <p>
+     * Asked of the message because that is what JSch gives: it raises the same
+     * exception type for a refused password, an unknown host and a closed port,
+     * and only the word tells them apart. A host key refusal reads "UnknownHostKey"
+     * or "reject HostKey" and carries no "auth", which is the line between them.
+     */
+    private static boolean isAuthRefusal(final @NotNull Exception ex) {
+        return ex instanceof JSchException && String.valueOf(ex.getMessage()).toLowerCase(Locale.ROOT).contains("auth");
+    }
+
+    /**
+     * UC-SHARE-020, Rule-SHARE-095.
+     * <p>
+     * The server would not accept who this machine says it is.
+     * <p>
+     * Told apart from every other connection failure because the answer is
+     * different: a refused secret is one to forget and ask about, and anything
+     * else is one to report and leave alone. Wrapped together, a password that
+     * was right when it was stored and has since been changed on the server
+     * failed every sync forever, with the account window never opening again
+     * (#312, N7).
+     */
+    public static final class AuthRefused extends IllegalStateException {
+        private AuthRefused(final @NotNull String message) {
+            super(message);
         }
     }
 

@@ -28,8 +28,10 @@ There is no key for this. It is the first row of the page.
   means the same.
 - **Rule-SETTING-012** — Changing the folder makes every code project that has
   opened the Testin panel read the disk again.
-- **Rule-SETTING-013** — A folder given as a partial path is read against the
-  code project's own folder.
+- **Rule-SETTING-013** — The folder is given as a full path, from the drive or
+  the root. A partial one is refused: it would be read against wherever the IDE
+  was started, so the same few letters would mean a different folder depending
+  on how the IDE was launched.
 - **Rule-SETTING-014** — With no folder set, Testin reads nothing and shows
   nothing. It does not fail.
 
@@ -68,10 +70,25 @@ The whole page is drawn on [the settings page](main.md#the-page).
 
 ## What Testin refuses
 
-**Nothing is refused here.** Three kinds of path are all stored exactly as
-typed: a path that does not exist, a path that is a file, and a path of nothing
-but spaces. That is difference 1 on
-[the settings page](main.md#where-the-plugin-breaks-its-own-rules).
+Every refusal keeps the window open with the message under the box, so the value
+that cannot work is never stored.
+
+**If the folder is not there** — *\<path\> is not there.*
+
+**If the path names a file** — *\<path\> is a file. The Testin folder has to be
+a folder, because test projects are folders inside it.*
+
+**If the path is a partial one** — *\<path\> is a partial path. Testin needs the
+whole one, from the drive or the root, because a partial path is read against
+wherever the IDE was started and that is not where you are looking.*
+
+**If the path holds a character the system forbids** — the same message as a
+folder that is not there. No folder can be at such a path, so it is refused as
+one that is missing rather than with a sentence about path syntax.
+
+**An empty box is not refused.** It is how a tester says they have not chosen
+yet, and the panel has an empty state for exactly that. A box of nothing but
+spaces is the same answer.
 
 ## What happens when no folder is set
 

@@ -179,9 +179,23 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         final @NotNull DefaultActionGroup filterResetBtn = new DefaultActionGroup();
 
         filterResetBtn.add(new DumbAwareAction(Bundle.message("filter.reset"), Bundle.message("filter.reset.description"), AllIcons.Actions.Cancel) {
+            /**
+             * Gray, never gone. It hid itself when there was nothing to reset,
+             * so the popup changed shape under the tester and the one entry that
+             * says "filters exist here" was missing exactly when they had not
+             * found them yet (#312, A28).
+             * <p>
+             * The reason is in the text because a disabled popup entry never
+             * shows its description - the same thing A73 is about, one surface
+             * along.
+             */
             @Override
             public void update(final @NotNull AnActionEvent e) {
-                e.getPresentation().setEnabledAndVisible(hasActiveFilters());
+                final boolean anyFilter = hasActiveFilters();
+
+                e.getPresentation().setVisible(true);
+                e.getPresentation().setEnabled(anyFilter);
+                e.getPresentation().setText(anyFilter ? Bundle.message("filter.reset") : Bundle.message("filter.reset.nothing"));
             }
 
             @Override
@@ -260,9 +274,43 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
                     filterStatusMenu.add(new ToggleFilterAction<>(s.getLabel(), null,
                             s, selectedStatus, FilterMembership.plain(), onChanged)));
             filterResetBtn.add(filterStatusMenu);
+        } else {
+            // A row rather than nothing, so the popup has one shape everywhere
+            // and a tester in a test set learns that a verdict is something a
+            // test run has, rather than wondering where the filter went (#312,
+            // A28). A plain disabled entry rather than an empty submenu, because
+            // a submenu with nothing under it is not reliably drawn at all.
+            filterResetBtn.add(nothingToFilterOn(Bundle.message("filter.status.no.run")));
         }
 
         return filterResetBtn;
+    }
+
+    /**
+     * UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-098.
+     * <p>
+     * An entry that is there, says what it would filter and cannot: the whole
+     * reason is in the text, because a popup never shows a disabled entry's
+     * description.
+     */
+    private static @NotNull AnAction nothingToFilterOn(final @NotNull String text) {
+        return new DumbAwareAction(text) {
+            @Override
+            public void update(final @NotNull AnActionEvent e) {
+                e.getPresentation().setEnabled(false);
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                // Reads nothing at all, so never the EDT (#52).
+                return ActionUpdateThread.BGT;
+            }
+
+            @Override
+            public void actionPerformed(final @NotNull AnActionEvent e) {
+                // Disabled on every path, so nothing can reach this.
+            }
+        };
     }
 
     private void showFilterPopup() {

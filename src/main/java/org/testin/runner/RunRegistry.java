@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -131,6 +132,34 @@ final class RunRegistry {
      */
     boolean launchedHere(final @NotNull String runName) {
         return launchedNames.contains(runName);
+    }
+
+    /**
+     * UC-CODEGEN-008, Rule-CODEGEN-076.
+     * <p>
+     * A name no live run is using: the one asked for, or that name with a number
+     * after it.
+     * <p>
+     * Two runs of one name shared everything this registry keys by name. When
+     * the first ended, {@link #ended} took the name out and put back every case
+     * recorded under it - the second run's included, so its cases went idle
+     * while they were still running, Stop no longer reached them, and their
+     * verdicts were dropped when they came in against a name nothing was holding
+     * (#312, A11).
+     * <p>
+     * Running a test set twice at once is a thing a tester does on purpose, so
+     * this numbers the second rather than refusing it. The numbering stops at
+     * the first free name, so two runs and a stop leave the number free for the
+     * next one - the name is a handle, not a count.
+     */
+    @NotNull String freeName(final @NotNull String wanted) {
+        if (!launchedNames.contains(wanted)) return wanted;
+
+        return IntStream.iterate(2, next -> next + 1)
+                .mapToObj(next -> wanted + " (" + next + ")")
+                .filter(candidate -> !launchedNames.contains(candidate))
+                .findFirst()
+                .orElseThrow();
     }
 
     /**

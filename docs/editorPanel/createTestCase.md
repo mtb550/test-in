@@ -132,6 +132,24 @@ the description has to differ by a word.
 **If a step is left blank** — it is dropped. The steps after it keep their own
 numbers.
 
+**If saving the test case fails** — a message reads *Could not save, so the
+cards went back to what is on disk*, and the list is read again. The new card
+goes with it: it was never written, and leaving it on screen would be a test
+case that exists nowhere.
+
+**In a test run editor** — **Create Test Case** is gray, and its reason reads *A
+test run covers test cases that already exist - write a new one in its test set,
+then edit the run to include it.* The editor is not asked what class it is; the
+node is asked whether it holds test cases, which is the question Delete beside it
+already asks.
+
+**While the test set is still being read** — the entry and `Ctrl+M` are gray,
+reading *This test set is still being read - the new test case would be placed
+against a list nobody has seen yet.* The toolbar button says the same when it is
+pressed. Creating a case sorts the list, and a sort makes a load that is still on
+its way stale: the load then landed on nothing, the spinner never stopped, and
+the new case sat in the middle of the set at the next refresh.
+
 ## Where the plugin breaks its own rules
 
 **`Ctrl+M` is not `Cmd+M` on a Mac.** Two other keys on the same screen are

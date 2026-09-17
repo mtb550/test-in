@@ -68,7 +68,11 @@ with a count after it for more than one test case.
 4. On a cut, the test cases are taken out of the test set they came from first.
 5. Each test case is written into this test set.
 6. The test set's order is worked out again and saved.
-7. A message reads *Pasted*, with a count for more than one.
+7. On a cut, each test case takes its generated method with it: the method is
+   carried into this test set's class exactly as it is written, body and all,
+   and removed from the class it came from. A copy gets a fresh method instead,
+   because a copy is a new test case.
+8. A message reads *Pasted*, with a count for more than one.
 
 ## What Testin refuses
 
@@ -79,6 +83,14 @@ without being read, and nothing is said.
 
 **If the clipboard holds test cases that will not read** — the entry stays gray,
 and only the log says why.
+
+**If the destination test set has no class** — the method is left where it was,
+and only the log says so. A method in the wrong class is something a tester can
+find and move by hand; one that was deleted is not.
+
+**If writing the pasted test cases fails** — a message reads *Could not save, so
+the cards went back to what is on disk*, and the list is read again, without
+them.
 
 ## Pasting into the same test set
 

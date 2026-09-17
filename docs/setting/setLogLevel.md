@@ -25,7 +25,10 @@ There is no key for this. It is the **Log level** row.
 - **Rule-SETTING-024** — The level takes effect the moment **Apply** is pressed.
   The IDE does not have to restart.
 - **Rule-SETTING-025** — Testin starts at **INFO** until the tester chooses
-  otherwise.
+  otherwise. The chosen level is in force from the moment the settings are read,
+  which is before any project opens — so what happens at startup is written at
+  the level that was asked for, rather than being dropped until a project is
+  there.
 - **Rule-SETTING-026** — The log sits beside the IDE's own log, so collecting
   the IDE's logs collects Testin's too.
 

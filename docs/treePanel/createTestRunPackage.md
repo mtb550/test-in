@@ -89,11 +89,18 @@ opens.
 **If the name is empty** — the dialog stays open, the gray hint text turns red,
 and the cursor stays in the box.
 
+**If the name is a path** - a name holding a slash, a backslash or `..` is
+refused, reading *is a path, not a name - a node is one folder inside the one
+selected*. Nothing is created.
+
 **If a node with that name already exists under the parent** — the dialog
 closes, nothing is created, and *\<name\> Already Exists* is shown in red.
 
 **If the test project, a test set or a test run is selected** — **Create** is
-gray, and `Ctrl+M` does nothing.
+gray, and `Ctrl+M` does nothing, and the entry itself reads
+**Create Testin Node (a test set holds what it holds)**, naming the node that
+cannot take a child. A popup never shows a gray entry's description, so the
+reason is in the entry.
 
 ---
 

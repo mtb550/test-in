@@ -220,6 +220,15 @@ final class RunWriter {
     void persistMarker(final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
         snapshot(marker, "run marker").ifPresent(bytes -> queue.execute(() -> {
             try {
+                // The same check the results write makes, for the same reason: a
+                // run a sync or a delete took away while this sat in the queue is
+                // not there to mark, and writing the marker recreated the folder
+                // as a test run holding nothing (#312, N18).
+                if (store.findTestRun(runPath).isEmpty()) {
+                    Logger.info("Test run removed before its marker was written, so nothing was written: " + runPath.getFileName());
+                    return;
+                }
+
                 Services.getInstance(p, TestDataFiles.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), bytes);
                 Logger.trace("Marker persisted -> " + marker.getStatusLabel());
             } catch (final Exception ex) {

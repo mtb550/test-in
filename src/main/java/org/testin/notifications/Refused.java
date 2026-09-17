@@ -20,6 +20,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
+import org.testin.model.DirectoryType;
+
+import java.util.Optional;
 
 /**
  * What Testin says when it will not do what was asked.
@@ -158,6 +161,21 @@ public enum Refused {
     NOT_A_JAVA_NAME(Bundle.message("refused.not.a.java.name")),
 
     /**
+     * UC-TREE-PANEL-007, UC-TREE-PANEL-008, Rule-TREE-PANEL-095.
+     * <p>
+     * The tester typed a path where a name goes.
+     * <p>
+     * A node is one folder, made inside the one that is selected. A name
+     * carrying a slash, a backslash or {@code ..} is a path, and the folder was
+     * made wherever that path led - beside the test project, above the Testin
+     * root, anywhere the tester could type their way to. Nothing refused it: the
+     * only question asked of a name was whether it could become a Java package,
+     * and a test set, a test run and a test run package are not asked that
+     * (#312, A65).
+     */
+    NOT_ONE_FOLDER(Bundle.message("refused.not.one.folder")),
+
+    /**
      * UC-CODEGEN-007, Rule-CODEGEN-069.
      * <p>
      * The tester clicked the gutter mark beside a generated method whose test
@@ -198,5 +216,25 @@ public enum Refused {
      */
     public @NotNull String about(final @NotNull String name) {
         return sentence.formatted(name);
+    }
+
+    /**
+     * UC-TREE-PANEL-007, UC-TREE-PANEL-008, Rule-TREE-PANEL-095.
+     * <p>
+     * Which of the two name rules this one breaks, or nothing when it breaks
+     * neither.
+     * <p>
+     * Here rather than on {@link DirectoryType}, which owns the rules
+     * themselves: {@code model} is a leaf and may not reach into the words a
+     * tester reads - the architecture test says so, and said so the first time
+     * this was written the other way round. So the type answers what is allowed
+     * and this answers what to say about it, which is the split {@link Done} and
+     * {@link Notifier} already keep.
+     */
+    public static @NotNull Optional<Refused> ofName(final @NotNull DirectoryType type, final @NotNull String name) {
+        if (!DirectoryType.isOneFolderName(name)) return Optional.of(NOT_ONE_FOLDER);
+        if (!type.canTakeName(name)) return Optional.of(NOT_A_JAVA_NAME);
+
+        return Optional.empty();
     }
 }

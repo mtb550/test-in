@@ -24,6 +24,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Level;
+import org.testin.logger.Logger;
 
 import java.util.Objects;
 
@@ -86,8 +87,18 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
      */
     public boolean showShortcutHints = true;
 
+    /**
+     * A stored string as every reader should see it: never null, and never
+     * padded.
+     * <p>
+     * Trimmed as well as defaulted, because the settings page writes every one
+     * of these trimmed and compares the typed value trimmed against what is
+     * stored. A file written before it did that - or edited by hand - therefore
+     * held a value the page could never match, so Apply stayed black on a page
+     * nobody had changed, for the life of the dialog (#312, N8).
+     */
     private static @NotNull String orEmpty(final @Nullable String value) {
-        return Objects.requireNonNullElse(value, "");
+        return Objects.requireNonNullElse(value, "").trim();
     }
 
     @Override
@@ -111,5 +122,36 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
         testerRole = orEmpty(testerRole);
         sftpUser = orEmpty(sftpUser);
         sftpKeyFile = orEmpty(sftpKeyFile);
+
+        applyLogLevel();
+    }
+
+    /**
+     * UC-SETTING-007, Rule-SETTING-024.
+     * <p>
+     * The stored level, applied the moment the settings are read.
+     * <p>
+     * The writer starts at DISABLED and only two things moved it off: opening a
+     * project, and pressing Apply. So {@code testin.log} was empty for
+     * everything before the first project opened - the indexer starting, a root
+     * that could not be read, a marker that would not parse - which is the part
+     * a tester turns TRACE on to see. The settings are read before any of it,
+     * and this is where they are read (#312, A94).
+     * <p>
+     * Also from {@link #initializeComponent}, because a machine with no settings
+     * file has no state to load and still has a level: the one in the field.
+     */
+    private void applyLogLevel() {
+        Logger.setLogLevel(Level.valueOf(logLevel));
+    }
+
+    /**
+     * Called by the platform whether or not there was a file to load, which is
+     * the whole reason it is used: a first run has no state and still has
+     * defaults worth applying.
+     */
+    @Override
+    public void initializeComponent() {
+        applyLogLevel();
     }
 }

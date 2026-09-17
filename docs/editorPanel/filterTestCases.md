@@ -87,6 +87,10 @@ becomes **Filter**, then the count, then **active**.
 **If the module has never been used** — it is not offered. The list is built
 from what is there.
 
+**In a test set editor** — the **Status** row reads *Status (only a test run
+records one)* and is gray. A verdict is something a test run holds, so there is
+nothing to filter on here, and the row says that rather than going missing.
+
 ---
 
 [Documentation](../README.md) › [The editor panel](main.md)

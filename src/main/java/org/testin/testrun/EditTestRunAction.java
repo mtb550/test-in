@@ -51,6 +51,8 @@ import org.testin.util.Mapper;
 
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -208,6 +210,16 @@ public class EditTestRunAction extends DumbAwareAction {
             // the undo would otherwise change what the undo puts back.
             final @NotNull TestRunDto before = copyOf(current);
 
+            // What this edit changed, and so the whole of what undoing it puts
+            // back: which cases the run covered, and how it was configured.
+            final @NotNull Set<UUID> coveredBefore = idsOf(before);
+            final @NotNull Map<UUID, TestRunItems> recordedBefore = byId(before);
+
+            final @NotNull Set<UUID> coveredAfter = idsOf(after);
+            final @NotNull Map<UUID, TestRunItems> recordedAfter = byId(after);
+
+            final @NotNull Map<TestRunConfiguration, String> configurationBefore = Map.copyOf(before.getConfiguration());
+
             // Applied to the run the index holds when the write lands, not to the
             // one this dialog read when it opened. The dialog is not modal, so a
             // sync can bring in a newer run while it is open, and writing the run it
@@ -223,10 +235,8 @@ public class EditTestRunAction extends DumbAwareAction {
             // routine with the two sides swapped.
             Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                     Bundle.message("run.undo.edit", oldName),
-                    () -> applyEdit(run, oldName, runPath -> indexer.putTestRun(runPath, before), () -> {
-                    }),
-                    () -> applyEdit(run, name, runPath -> indexer.putTestRun(runPath, after), () -> {
-                    })));
+                    () -> putCoverageBack(run, oldName, coveredBefore, configurationBefore, recordedBefore),
+                    () -> putCoverageBack(run, name, coveredAfter, configuration, recordedAfter)));
 
             return true;
         }
@@ -278,9 +288,19 @@ public class EditTestRunAction extends DumbAwareAction {
         }
 
         private void write(final @NotNull Path runPath, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
-            BackgroundWork.run(p, Bundle.message("run.task.updating", runPath.getFileName()), Bundle.message("run.update.failed.title"), indicator -> {
-                writeTo.accept(runPath);
+            // The change itself on the EDT, which is where every other change to a
+            // run is made and what changeRun is written for: it mutates the run the
+            // index holds and takes the snapshot the write queue then writes, both
+            // cheap, and the queue is what keeps the disk off this thread. Made
+            // from a pooled thread it could be mutating the same run and the same
+            // result list as a verdict being recorded under the tester's hand, with
+            // nothing between them (#312, N14).
+            //
+            // Both callers are already here: the dialog saves on the EDT, and the
+            // rename hands back inside the VFS write action, which is on it too.
+            writeTo.accept(runPath);
 
+            BackgroundWork.run(p, Bundle.message("run.task.updating", runPath.getFileName()), Bundle.message("run.update.failed.title"), indicator -> {
                 // File access is the indexer's alone (see CLAUDE.md).
                 Services.getInstance(p, ProjectIndexer.class).refreshDirectory(runPath);
 
@@ -300,6 +320,63 @@ public class EditTestRunAction extends DumbAwareAction {
          * A run detached from the one the indexer is holding, through the same mapper
          * that reads it off disk.
          */
+        /**
+         * UC-TREE-PANEL-021, Rule-TREE-PANEL-009.
+         * <p>
+         * Puts back what this edit changed - which cases the run covers, its
+         * name and its configuration - and nothing else.
+         * <p>
+         * It used to write the whole run back as it stood at Save. So a tester
+         * who saved an edit, judged ten cases, and then pressed Ctrl+Z in the
+         * tree saw <i>Undone</i> and lost all ten: every result recorded since
+         * was Pending and empty again, and a run completed in between stayed
+         * Completed over them (#312, A9).
+         * <p>
+         * A case the undo brings back gets the result it had when the edit
+         * dropped it, rather than the Pending a case nobody has seen would get:
+         * unticking a case discards what it recorded, so putting the tick back
+         * has to put that back with it. A case covered before and after keeps
+         * whatever it holds now, which is the verdict recorded since.
+         * <p>
+         * Through {@code changeRun} like the edit itself, so an undo during a
+         * sync waits for it and lands on the run that arrived. And refused on a
+         * run that has been signed off since, which is the same question Save
+         * asks: what a report says must not move underneath it.
+         */
+        private void putCoverageBack(final @NotNull TestRunDirectoryDto run, final @NotNull String toName, final @NotNull Set<UUID> covered, final @NotNull Map<TestRunConfiguration, String> configuration, final @NotNull Map<UUID, TestRunItems> recorded) {
+            if (!run.isStillOpen()) {
+                Services.getInstance(p, Notifier.class).softRefuse(p,
+                        Bundle.message("run.status.changed", run.getName(), run.getMarker().getStatusLabel()));
+                return;
+            }
+
+            applyEdit(run, toName, runPath -> Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, held -> {
+                final @NotNull Set<UUID> holdsNow = idsOf(held);
+
+                final @NotNull List<TestRunItems> items = held.coverOnly(wanted(held, covered)).getResults().stream()
+                        .map(item -> holdsNow.contains(item.getId()) ? item : recorded.getOrDefault(item.getId(), item))
+                        .collect(Collectors.toCollection(ArrayList::new));
+
+                held.setResults(items).setConfiguration(configuration);
+            }), () -> {
+            });
+        }
+
+        /**
+         * The cases a run covers, in the order it holds them.
+         */
+        private static @NotNull Set<UUID> idsOf(final @NotNull TestRunDto run) {
+            return run.getResults().stream().map(TestRunItems::getId).collect(Collectors.toCollection(LinkedHashSet::new));
+        }
+
+        /**
+         * What the run recorded for each case it covers, so an undo that brings
+         * a case back brings its verdict with it.
+         */
+        private static @NotNull Map<UUID, TestRunItems> byId(final @NotNull TestRunDto run) {
+            return run.getResults().stream().collect(Collectors.toMap(TestRunItems::getId, item -> item, (first, second) -> first));
+        }
+
         private @NotNull TestRunDto copyOf(final @NotNull TestRunDto run) {
             final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
             return mapper.readValue(mapper.writeValueAsString(run), TestRunDto.class);

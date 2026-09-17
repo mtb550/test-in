@@ -51,9 +51,9 @@ public class CopyTestCaseNodeAction extends DumbAwareAction {
 
         if (!tcs.isEmpty()) {
             try {
-                Services.getInstance(p, CutState.class).clear();
-
-                String json = Services.getInstance(p, Mapper.class).writeValueAsString(tcs);
+                // The write calls the cut off by itself now (#312, N3), so this
+                // no longer says so twice.
+                final @NotNull String json = Services.getInstance(p, Mapper.class).writeValueAsString(tcs);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
                 Services.getInstance(p, Notifier.class).softShowCounted(p, Done.COPIED, tcs.size());

@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Locale;
+import java.util.OptionalInt;
 
 /**
  * Review-and-push workflow for changed test cases: scan, review dialog, commit,
@@ -169,10 +170,15 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
                         // A commit that succeeded and a push that failed leave
                         // nothing pending and work that never left the machine.
-                        // Zero when Git could not answer, which on this screen is
-                        // the right reading: a branch with no upstream has nothing
-                        // the review can show as waiting to be pushed.
-                        final int unpushed = git.unpushedCount(path).orElse(0);
+                        //
+                        // Carried as the Optional Git gave, not flattened to zero.
+                        // A count Git could not give is not a count of zero: it
+                        // means this branch has no upstream, which the sync has
+                        // told apart since A41's first half. Read as zero here,
+                        // the review answered "No changes" for a branch whose
+                        // commits are all still on this machine, and there was no
+                        // way forward from that screen (#312, A41).
+                        final @NotNull OptionalInt unpushed = git.unpushedCount(path);
 
                         ApplicationManager.getApplication().invokeLater(() ->
                                 reviewChanges(path, changes, branches, current, unpushed));
@@ -181,7 +187,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         }
 
         // UC-SHARE-010
-        private void reviewChanges(final @NotNull Path path, final @NotNull List<PendingChange> changes, final @NotNull List<String> branches, final @NotNull String currentBranch, final int unpushed) {
+        private void reviewChanges(final @NotNull Path path, final @NotNull List<PendingChange> changes, final @NotNull List<String> branches, final @NotNull String currentBranch, final @NotNull OptionalInt unpushed) {
             if (changes.isEmpty()) {
                 offerThePush(path, currentBranch, unpushed);
                 return;
@@ -276,18 +282,31 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
          * the machine, and the review saying "No changes" was the last thing the
          * plugin had to offer: the commit existed, nothing was pending, and no
          * action anywhere pushed it (#66).
+         * <p>
+         * And a third case, which read as the first: a branch the remote does not
+         * have yet. Git cannot count what is ahead of an upstream that is not
+         * there, so the count comes back empty - taken as zero, the review said
+         * "No changes" about a branch whose every commit is still on this machine.
+         * It offers the push, and says the branch is not on the remote yet rather
+         * than naming a number that would mean nothing (#312, A41).
          */
-        private void offerThePush(final @NotNull Path path, final @NotNull String currentBranch, final int unpushed) {
+        private void offerThePush(final @NotNull Path path, final @NotNull String currentBranch, final @NotNull OptionalInt unpushed) {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
-            if (unpushed == 0) {
+            if (unpushed.orElse(-1) == 0) {
                 notifier.softRefuse(p, Bundle.message("git.no.changes"));
                 return;
             }
 
-            final @NotNull String waiting = unpushed == 1
-                    ? Bundle.message("git.not.pushed.one")
-                    : Bundle.message("git.not.pushed.many", String.valueOf(unpushed));
+            // No number when Git could not give one: the branch has no upstream,
+            // so there is nothing to count against and every commit on it is
+            // still here. Counting against the whole history instead would name a
+            // figure that means nothing to the tester (#312, A41).
+            final @NotNull String waiting = unpushed.isEmpty()
+                    ? Bundle.message("git.not.pushed.no.upstream")
+                    : unpushed.orElseThrow() == 1
+                            ? Bundle.message("git.not.pushed.one")
+                            : Bundle.message("git.not.pushed.many", String.valueOf(unpushed.orElseThrow()));
 
             notifier.warnWithAction(p, Bundle.message("git.not.pushed.title"),
                     waiting,
@@ -437,7 +456,15 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                                         Bundle.message("git.pushed.message", commitLabel(commitId), remote, branch)));
                     },
                     ex -> {
-                        if (git.hasConflicts(repoPath)) {
+                        // Files still conflicting, not hasConflicts, which is the
+                        // shape A43 settled two handlers down: a rebase that was
+                        // left behind by an earlier failure keeps its directory,
+                        // and hasConflicts reads that as a conflict. A push that
+                        // failed for its own reason - no such remote, rejected,
+                        // nothing to push - was then offered back as a conflict
+                        // naming no file, and the message with the retry on it
+                        // never showed (#312, N9).
+                        if (!git.conflictingPaths(repoPath).isEmpty()) {
                             showConflictActions(repoPath, remote, branch);
                             return;
                         }
@@ -472,11 +499,17 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
          * answer open on the EDT from inside.
          */
         private void resolveConflicts(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
+            // Conflicts still in the way are offered back with the three links,
+            // which is what the sync's own Resolve does with the same answer.
+            // A warning naming the files and nothing else left the tester
+            // exactly where the conflict notification had already put them, with
+            // the way out - Resolve, Continue, Abort - one route away and not on
+            // screen. One situation, one answer, whichever door it came through
+            // (#312, A45).
             ApplicationManager.getApplication().executeOnPooledThread(() ->
                     ConflictResolution.resolveRebase(p, repoPath,
                             () -> pushAfterRebase(repoPath, remote, branch),
-                            leftOver -> Services.getInstance(p, Notifier.class).warn(p, Bundle.message("git.still.conflicting.title"),
-                                    GitRefs.conflictMessage(leftOver))));
+                            leftOver -> showConflictActions(repoPath, remote, branch)));
         }
 
         /**

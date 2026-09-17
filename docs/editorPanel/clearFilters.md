@@ -59,8 +59,9 @@ disappears from the filter button. Nothing is said.
 
 ## What Testin refuses
 
-**If no filter is on** — the entry is not drawn at all. There is nothing above
-the separator.
+**If no filter is on** — the entry reads *Reset Filters (nothing is filtered)*
+and is gray. It is always there: a popup that changes shape is one a tester
+cannot learn, and the entry is also how they find out filters live here at all.
 
 ## What is left behind
 

@@ -35,7 +35,9 @@ import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.swing.*;
 
 /**
@@ -65,12 +67,34 @@ public final class ShortcutMenuPopup<T extends MenuItem> {
     private final T @NotNull [] items;
     private final @NotNull Consumer<T> onSelection;
 
+    /**
+     * UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-009.
+     * <p>
+     * Why a row cannot do its work right now, in a few words, or nothing when it
+     * can. Every row can by default, so a menu that has no such row says so by
+     * not asking.
+     * <p>
+     * A row that refuses is drawn gray with its reason beside it and does
+     * nothing when it is chosen, rather than looking live and answering with a
+     * balloon after the menu has closed - which is what the update menu Order
+     * row did on every multiple selection (#312, A85).
+     */
+    private @NotNull Function<T, Optional<String>> refusal = item -> Optional.empty();
+
+    /**
+     * The menu, with one question added: ask this of a row before drawing it.
+     */
+    public @NotNull ShortcutMenuPopup<T> refusing(final @NotNull Function<T, Optional<String>> whyNot) {
+        this.refusal = whyNot;
+        return this;
+    }
+
     // UC-INTERNAL-007, Rule-INTERNAL-053, Rule-INTERNAL-067
     public void show() {
         final @NotNull JBList<T> list = new JBList<>(items);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
-        list.setCellRenderer(new ShortcutMenuRenderer<>());
+        list.setCellRenderer(new ShortcutMenuRenderer<>(refusal));
 
         DialogStyle.styleContent(list);
 
@@ -141,6 +165,10 @@ public final class ShortcutMenuPopup<T extends MenuItem> {
     }
 
     private void select(final @NotNull T item, final @NotNull JBPopup popup) {
+        // A refused row is not a row: it stays on screen saying why, and the
+        // menu stays open so the tester can choose one that works.
+        if (refusal.apply(item).isPresent()) return;
+
         onSelection.accept(item);
         popup.closeOk(null);
     }

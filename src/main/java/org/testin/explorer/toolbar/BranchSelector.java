@@ -101,6 +101,14 @@ public class BranchSelector {
     // UC-TREE-PANEL-026, Rule-TREE-PANEL-084
     public void updateProject(final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
         final @NotNull Path path = testProjectDirectory.map(TestProjectDirectoryDto::getPath).orElse(Path.of(""));
+
+        // Whether this is a different project, asked before the field moves on.
+        // It is what decides between reading the branches off disk and going to
+        // the remote: this method runs on every rebuild of the panel, and a
+        // rebuild is what a rename, a removal and a status change each cause -
+        // so every one of them ran git fetch --all --prune against the remote,
+        // for a change that cannot have altered a branch (#312, A70).
+        final boolean projectChanged = !path.equals(projectPath);
         this.projectPath = path;
 
         currentBranch = "";
@@ -126,7 +134,24 @@ public class BranchSelector {
         }
 
         showPlaceholder(Bundle.message("branch.loading"));
-        loadGitBranches(path);
+        loadGitBranches(path, projectChanged);
+    }
+
+    /**
+     * UC-TREE-PANEL-026, Rule-TREE-PANEL-084.
+     * <p>
+     * Reads the branches again and asks the remote for what it has.
+     * <p>
+     * The three moments that are worth a fetch say so by calling this: Refresh,
+     * a branch switch, and opening a different test project - the last of which
+     * {@link #updateProject} answers for itself. Everything else that rebuilds
+     * the panel reads what Git already holds, which is the answer to almost
+     * every question anyone asks this box (#312, A70).
+     */
+    public void fetchBranches() {
+        if (projectPath.toString().isEmpty() || git.isNotRepository(projectPath)) return;
+
+        loadGitBranches(projectPath, true);
     }
 
     /**
@@ -334,7 +359,7 @@ public class BranchSelector {
      * answer to almost every question anyone asks this box, and they were there
      * the whole time.
      */
-    private void loadGitBranches(final @NotNull Path repositoryPath) {
+    private void loadGitBranches(final @NotNull Path repositoryPath, final boolean fromRemote) {
         ProgressManager.getInstance().run(new Task.Backgroundable(p, Bundle.message("branch.task.loading"), true) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
@@ -342,6 +367,13 @@ public class BranchSelector {
 
                 indicator.setText(Bundle.message("branch.progress.reading"));
                 readBranchesInto(repositoryPath);
+
+                // The disk is the whole answer unless somebody asked for the
+                // remote. A fetch can stop for credentials, sit on a host that is
+                // not reachable, or take a minute - which is a price worth paying
+                // when the tester pressed Refresh and never worth paying because
+                // they renamed a test set (#312, A70).
+                if (!fromRemote) return;
 
                 indicator.setText(Bundle.message("branch.progress.fetching"));
                 fetchQuietly(repositoryPath);
@@ -361,8 +393,16 @@ public class BranchSelector {
     private void readBranchesInto(final @NotNull Path repositoryPath) {
         try {
             final @NotNull List<String> branches = git.getAvailableBranches(repositoryPath);
-            final @NotNull String loadedCurrentBranch = git.getCurrentBranch(repositoryPath);
-            if (!loadedCurrentBranch.isEmpty()) currentBranch = loadedCurrentBranch;
+
+            // Taken as Git gives it, empty included. Keeping the last name when
+            // Git names none is what let a HEAD detached outside Testin - a
+            // checkout of a tag or a commit in a terminal, a bisect, a rebase
+            // stopped partway - go on showing the branch that was checked out
+            // before it. It also undid A69 one line further down, which selects
+            // nothing exactly when this is empty: the old name is still a branch
+            // that exists, so the box found it in the list and selected it (#312,
+            // N10).
+            currentBranch = git.getCurrentBranch(repositoryPath);
 
             ApplicationManager.getApplication().invokeLater(() -> showBranches(branches));
         } catch (final Exception ex) {

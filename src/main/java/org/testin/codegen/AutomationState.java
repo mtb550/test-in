@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Whether each test case has automation behind it, for the cards on screen.
@@ -109,6 +110,16 @@ public final class AutomationState {
             return;
         }
 
+        // What the caller is drawing, taken as it asks. The answer below is
+        // compared against this rather than against what is known when it lands,
+        // which is a different question: a second surface asking about a case
+        // another one is already reading gets its answer put into `known` by that
+        // first read, finds nothing left to change, and is never told - so it goes
+        // on drawing "not read yet" over a case whose state arrived while its row
+        // was being built (#312, N16, A64's remaining half).
+        final @NotNull Map<UUID, Automated> asking = cases.stream()
+                .collect(Collectors.toMap(TestCaseDto::getId, tc -> of(tc.getId()), (first, second) -> first));
+
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Map<UUID, Automated> answers = new LinkedHashMap<>();
 
@@ -131,13 +142,14 @@ public final class AutomationState {
             if (answers.isEmpty()) return;
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                // Only when something actually changed. Telling the caller every
-                // time is a loop that never settles: it rebuilds its list, which
-                // reads again, which answers again. The second read of an
-                // unchanged test set stops here.
-                if (known.entrySet().containsAll(answers.entrySet())) return;
-
                 known.putAll(answers);
+
+                // Only when something changed for this caller. Telling it every
+                // time is a loop that never settles: it rebuilds its list, which
+                // reads again, which answers again - and that still stops here,
+                // because the rebuild asks while already holding the answer, so
+                // the second read has nothing to report.
+                if (answers.equals(asking)) return;
 
                 // What was found, so a sandbox pass can confirm the count on the
                 // status bar from the log rather than from looking at it. This

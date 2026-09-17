@@ -35,6 +35,7 @@ import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.util.Bundle;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 /**
@@ -73,6 +74,15 @@ public class UpdateStatusAction extends DumbAwareAction {
     private void mark(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final @NotNull Marker marker = dir.getMarker();
         final @NotNull NodeStatus before = marker.status();
+
+        // The whole of what this method changes, not just the status. A write
+        // that did not land left the marker saying this tester modified the node
+        // a moment ago, which is a name and a timestamp for something that never
+        // happened - and it is what the view panel shows and the next real write
+        // would carry to disk (#312, N5).
+        final @NotNull String modifiedByBefore = marker.getModifiedBy();
+        final @NotNull ZonedDateTime modifiedAtBefore = marker.getModifiedAt();
+
         try {
             marker.applyStatus(status);
             marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
@@ -81,6 +91,8 @@ public class UpdateStatusAction extends DumbAwareAction {
             // the status it still has on disk: the write has said why (#312, A6).
             if (!Services.getInstance(p, ProjectIndexer.class).persistMarker(dir)) {
                 marker.applyStatus(before);
+                marker.setModifiedBy(modifiedByBefore);
+                marker.setModifiedAt(modifiedAtBefore);
                 return;
             }
 

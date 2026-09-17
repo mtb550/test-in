@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Owns test-case lookup and the persisted linked-list sequence for each test set.
@@ -246,6 +247,37 @@ final class TestCaseSequenceStore {
     void removeForTestSet(final @NotNull String path) {
         Optional.ofNullable(testSetCaseIds.remove(path))
                 .ifPresent(ids -> ids.forEach(testCasesById::remove));
+    }
+
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-021.
+     * <p>
+     * The cases a finished scan of one test project read, put in as one move.
+     * <p>
+     * Added before anything is removed, for the reason
+     * {@link IndexerDataStore#swapIn} gives: a case that is on disk in both
+     * passes has to be in the index throughout, or a save in the window between
+     * them is stamped as a creation because nothing here remembers the case
+     * exists (#312, A1).
+     * <p>
+     * What goes is what this project held and the scan did not find: a test set
+     * that was deleted, and a case that was deleted out of a set that remains.
+     * The ids are read before the new lists go in, because after that the old
+     * ones are no longer there to ask.
+     */
+    void swapIn(final @NotNull Path projectPath, final @NotNull Map<UUID, TestCaseDto> cases, final @NotNull Map<String, List<UUID>> setCaseIds) {
+        final @NotNull Set<UUID> held = testSetCaseIds.entrySet().stream()
+                .filter(entry -> Path.of(entry.getKey()).startsWith(projectPath))
+                .flatMap(entry -> entry.getValue().stream())
+                .collect(Collectors.toCollection(HashSet::new));
+
+        testCasesById.putAll(cases);
+        testSetCaseIds.putAll(setCaseIds);
+
+        testSetCaseIds.keySet().removeIf(path -> Path.of(path).startsWith(projectPath) && !setCaseIds.containsKey(path));
+
+        held.removeAll(cases.keySet());
+        held.forEach(testCasesById::remove);
     }
 
     void clear() {

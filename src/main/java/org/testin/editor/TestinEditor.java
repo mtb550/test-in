@@ -301,6 +301,25 @@ public interface TestinEditor extends Disposable {
         return false;
     }
 
+    /**
+     * UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-119.
+     * <p>
+     * Whether this editor is still reading its data.
+     * <p>
+     * Asked before a test case is created, and the reason is that creating one
+     * throws the load away: the append sorts, and a sort makes the load that is
+     * still in flight stale, so it lands on nothing. The tester was left with one
+     * card on a spinner that never stopped, and after the next Refresh the new
+     * case sat in the middle of the set because it was ranked against a list that
+     * was never read (#312, A18).
+     * <p>
+     * False by default: an editor that reads nothing asynchronously is never in
+     * this state, and the one that does says so for itself.
+     */
+    default boolean isLoading() {
+        return false;
+    }
+
     @NotNull List<TestCaseDto> getSelectedTestCases();
 
     /**

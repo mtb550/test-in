@@ -180,8 +180,15 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                 public void run(final @NotNull ProgressIndicator indicator) {
                     indicator.setIndeterminate(true);
 
+                    // Not final, and it cannot be: the catch below needs to know
+                    // which stored secret the attempt used, and working that out
+                    // reads the credential store and probes the SSH agent - both
+                    // of which belong inside the try that answers for them.
+                    @NotNull Proof proof = Proof.NOTHING_STORED;
+
                     try {
-                        final @NotNull SftpAuth auth = authFor(address, account, keyFile);
+                        proof = authFor(address, account, keyFile);
+                        final @NotNull SftpAuth auth = proof.auth();
                         if (auth == SftpAuth.NONE) {
                             // Nothing on this machine can prove who this is, so the
                             // tester is asked - rather than being shown the server's
@@ -225,6 +232,22 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                         }
 
                         report(outcome, projectRoot, address, account, auth);
+
+                    } catch (final SftpTransport.AuthRefused refused) {
+                        // The one failure with something to do about it. A secret
+                        // this machine kept and the server will not take is worth
+                        // nothing, and keeping it meant every later sync failed on
+                        // it while the account window never opened again (#312,
+                        // N7). Rule-SHARE-113. Forgotten first, so the dialog that follows is
+                        // answering a question rather than fighting what is stored.
+                        Logger.warn("The server refused the stored credentials for " + account.user() + "@" + address.display());
+                        proof.stored().ifPresent(secret -> secret.forget(address, account.user()));
+
+                        ApplicationManager.getApplication().invokeLater(() -> {
+                            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("sftp.auth.refused"));
+                            ask(address, projectRoot, keyFile);
+                        });
+
                     } catch (final ProcessCanceledException stopped) {
                         // The tester pressed Cancel, which is an answer rather than
                         // a failure, so it goes back to the platform to close the
@@ -244,24 +267,63 @@ public final class SyncWithSftpAction extends DumbAwareAction {
          * How this machine proves who it is: the agent when one holds keys, then a
          * key file, then the password kept for this server.
          */
-        private @NotNull SftpAuth authFor(final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull String keyFile) {
+        private @NotNull Proof authFor(final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull String keyFile) {
+            // Rule-SETTING-036. The passphrase read here is always empty, and
+            // that is the rule rather than a gap: nothing in Testin asks for one
+            // or stores one, so a key protected by a passphrase works only
+            // through an agent already holding it. The read stays because it is
+            // where a passphrase would arrive if asking for one is ever built,
+            // and because JSch wants a supplier either way. The rule used to
+            // promise the asking, which was never true (#312, A36).
             if (!keyFile.isEmpty()) {
-                return SftpAuth.forKey(keyFile, () -> SftpSecret.KEY_PASSPHRASE.read(address, account.user()));
+                return new Proof(SftpAuth.forKey(keyFile, () -> SftpSecret.KEY_PASSPHRASE.read(address, account.user())),
+                        Optional.of(SftpSecret.KEY_PASSPHRASE));
             }
 
             // What the tester just typed, before what was kept from last time - so a
             // corrected password works on the attempt they corrected it on, rather
             // than on the one after.
-            if (!account.password().isEmpty()) return SftpAuth.withPassword(account.password());
+            //
+            // Nothing stored behind it: a typed password is only kept once the
+            // server has taken it (A34), so a refusal has nothing to forget.
+            if (!account.password().isEmpty()) return Proof.of(SftpAuth.withPassword(account.password()));
 
             final @NotNull Optional<SftpAuth> agent = SshAgent.loadedIdentities().map(SftpAuth::withAgent);
-            if (agent.isPresent()) return agent.orElseThrow();
+            if (agent.isPresent()) return Proof.of(agent.orElseThrow());
 
             final @NotNull String stored = SftpSecret.ACCOUNT_PASSWORD.read(address, account.user());
 
             // NONE means nobody can be asked to accept this connection, which the
             // caller turns into a question rather than a failure.
-            return stored.isEmpty() ? SftpAuth.NONE : SftpAuth.withPassword(stored);
+            return stored.isEmpty()
+                    ? Proof.NOTHING_STORED
+                    : new Proof(SftpAuth.withPassword(stored), Optional.of(SftpSecret.ACCOUNT_PASSWORD));
+        }
+
+        /**
+         * UC-SHARE-020, Rule-SHARE-095.
+         * <p>
+         * How this machine proved who it is, and which secret that took out of the
+         * credential store.
+         * <p>
+         * The second half is only ever read by a refusal, and it has to come from
+         * the attempt itself rather than be worked out again afterwards: whether
+         * the agent answered decides whether the kept password was tried at all,
+         * and an agent that was running a second ago may not be now. Forgetting
+         * the wrong secret is worse than forgetting none (#312, N7).
+         */
+        private record Proof(@NotNull SftpAuth auth, @NotNull Optional<SftpSecret> stored) {
+
+            /**
+             * Nothing this machine can prove, and nothing kept that could have
+             * been wrong. Also what a refusal reads when the attempt never got as
+             * far as choosing.
+             */
+            private static final @NotNull Proof NOTHING_STORED = new Proof(SftpAuth.NONE, Optional.empty());
+
+            private static @NotNull Proof of(final @NotNull SftpAuth auth) {
+                return new Proof(auth, Optional.empty());
+            }
         }
 
         /**
@@ -393,7 +455,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
          * nobody reads. The same dialog the Git channel opens, on the same merge, so
          * a conflict looks the same however the team shares their work.
          */
-        private void askAboutConflicts(final @NotNull List<Unsettled> unsettled, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth, final @NotNull Map<String, String> answered) {
+        private void askAboutConflicts(final @NotNull List<Unsettled> unsettled, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth, final @NotNull Map<String, Answered> answered) {
             if (unsettled.isEmpty()) {
                 send(answered, projectRoot, address, account, auth);
                 return;
@@ -409,7 +471,11 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                             next.theirs());
                 }
 
-                answered.put(next.path(), mapper.writeValueAsString(next.merged()));
+                // With the version it is an answer to. A colleague can sync a
+                // newer copy of this very test case while these windows are
+                // open, and an answer about the old one must not be written over
+                // it (#312, A33).
+                answered.put(next.path(), new Answered(mapper.writeValueAsString(next.merged()), next.theirs()));
 
                 // Once this window has closed. The callback runs before it does,
                 // and a second window of the same kind asked to show while the
@@ -430,7 +496,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
          * <p>
          * Sends what the tester settled, off the EDT - it opens a connection.
          */
-        private void send(final @NotNull Map<String, String> answered, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth) {
+        private void send(final @NotNull Map<String, Answered> answered, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth) {
             if (answered.isEmpty()) return;
 
             ApplicationManager.getApplication().executeOnPooledThread(() -> {

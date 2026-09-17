@@ -68,7 +68,7 @@ final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095
     @Override
     protected void submit() {
-        final @NotNull String value = accepted(component(), type::canTakeName, Refused.NOT_A_JAVA_NAME);
+        final @NotNull String value = accepted(component(), typed -> Refused.ofName(type, typed));
         if (value.isEmpty()) return;
 
         onSubmit.accept(value);

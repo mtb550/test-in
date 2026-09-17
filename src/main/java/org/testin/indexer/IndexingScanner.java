@@ -75,25 +75,30 @@ final class IndexingScanner {
 
             // UC-INTERNAL-003, Rule-INTERNAL-021.
             //
-            // Everything this project held is dropped before the pass that reads
-            // it again, so a rescan forgets what disappeared instead of only
-            // learning what arrived. The scan used to put and never remove, and
-            // the one path that cleared was Refresh - so a test set deleted by a
-            // Git pull, a branch switch or an SFTP sync stayed in the tree with
-            // its cases still in global search, the completion cache and every
-            // export, until the tester pressed the button Rule-INTERNAL-021
-            // exists so they do not have to (#66, finding 68).
-            store.removeTestProject(projectPath);
-            store.getTestProjectsByPath().put(projectPath.toString(), tp);
+            // Read into a pass of its own and put in at the end, so the index
+            // never stops holding a project that is on disk. What the scan did
+            // not find is dropped by the swap, which is how a rescan forgets what
+            // disappeared instead of only learning what arrived: the scan used to
+            // put and never remove, and the one path that cleared was Refresh -
+            // so a test set deleted by a Git pull, a branch switch or an SFTP
+            // sync stayed in the tree with its cases still in global search, the
+            // completion cache and every export, until the tester pressed the
+            // button Rule-INTERNAL-021 exists so they do not have to (#66,
+            // finding 68). It cleared by emptying the project out first, which is
+            // what ScannedProject describes and #312's A1 cost.
+            final @NotNull ScannedProject scanned = new ScannedProject();
+            scanned.getProjects().put(projectPath.toString(), tp);
 
             // UC-TREE-PANEL-001, Rule-TREE-PANEL-100.
             //
             // The node, and nothing under it. An inactive project is not being
             // worked on, so reading its test sets, cases and runs is a directory
             // walk nobody asked for - but it is still a project, and the tree
-            // says so by drawing it with "Inactive" beside its name.
+            // says so by drawing it with "Inactive" beside its name. Still
+            // swapped in, so going inactive drops what it held.
             if (!tp.getMarker().getStatus().isActive()) {
                 Logger.info("Inactive project, indexed without its contents: " + projectPath.getFileName());
+                store.swapIn(projectPath, scanned);
                 indicator.setFraction(1.0);
                 return;
             }
@@ -107,29 +112,44 @@ final class IndexingScanner {
             final @NotNull List<Path> unread = new ArrayList<>();
 
             final @NotNull TestCasesMainDirectoryDto tcd = tp.getTestCasesDirectory();
-            store.getTestCasesMainDirsByPath().put(tcd.getPath().toString(), tcd);
-            scanTestSets(tcd.getPath(), tcd, indicator, unread);
+            scanned.getTestCasesMainDirs().put(tcd.getPath().toString(), tcd);
+            scanTestSets(tcd.getPath(), tcd, indicator, unread, scanned);
 
                 indicator.setFraction(0.5);
                 indicator.setText(Bundle.message("indexer.progress.test.runs", tp.getName()));
 
             final @NotNull TestRunsMainDirectoryDto trd = tp.getTestRunsDirectory();
-            store.getTestRunsMainDirsByPath().put(trd.getPath().toString(), trd);
-            scanTestRunDirs(trd.getPath(), trd, indicator, unread);
+            scanned.getTestRunsMainDirs().put(trd.getPath().toString(), trd);
+            scanTestRunDirs(trd.getPath(), trd, indicator, unread, scanned);
+
+            // A pass the tester stopped read part of the project, and putting
+            // that in would delete everything the walk had not reached yet. The
+            // index goes on holding what it held, which is what it held a moment
+            // ago and is still on disk.
+            if (indicator.isCanceled()) {
+                Logger.info("Scan cancelled, so the index was left as it was: " + projectPath.getFileName());
+                return;
+            }
+
+            store.swapIn(projectPath, scanned);
 
                 indicator.setFraction(1.0);
                 indicator.setText(Bundle.message("indexer.progress.project.done", tp.getName()));
 
             reportUnread(tp.getName(), unread);
             reportDamaged(tp.getName(), Services.getInstance(p, ProjectIndexer.class).takeDamagedMarkers());
+            reportClashing(tp.getName(), List.copyOf(scanned.getClashingCases()));
 
+        // Nothing is swapped in, for the same reason a cancelled pass is not: a
+        // scan that threw halfway read half a project, and the half it did not
+        // reach is not gone from disk.
         } catch (final Exception ex) {
             Logger.error("Failed to scan project: " + projectPath.getFileName() + " - " + ex.getMessage());
         }
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-008, Rule-INTERNAL-015
-    private void scanTestSets(final @NotNull Path tcDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
+    private void scanTestSets(final @NotNull Path tcDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
         try (Stream<Path> paths = Files.list(tcDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
@@ -143,8 +163,8 @@ final class IndexingScanner {
 
                 store.markedAs(dirPath, DirectoryType.UNDER_TEST_CASES).ifPresentOrElse(
                         marked -> {
-                            if (marked == DirectoryType.TS) scanTestSet(dirPath, parent, indicator);
-                            else scanTestSetPackage(dirPath, parent, indicator, unread);
+                            if (marked == DirectoryType.TS) scanTestSet(dirPath, parent, indicator, scanned);
+                            else scanTestSetPackage(dirPath, parent, indicator, unread, scanned);
                         },
                         () -> skipped(dirPath, DirectoryType.UNDER_TEST_CASES, "test cases", unread));
             }
@@ -154,12 +174,12 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-008, Rule-INTERNAL-015
-    private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
+    private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final @NotNull TestSetPackageDirectoryDto tsp = dirMapper.getTestSetPackageNode(p, path, parent);
 
-            store.getTestSetPackagesByPath().put(path.toString(), tsp);
+            scanned.getTestSetPackages().put(path.toString(), tsp);
 
             try (Stream<Path> subPaths = Files.list(path)) {
                 subPaths.filter(Files::isDirectory)
@@ -167,8 +187,8 @@ final class IndexingScanner {
                             // The else was missing here, so a folder skipped one
                             // level down said nothing at all, not even to the log.
                             store.markedAs(subPath, DirectoryType.UNDER_TEST_CASES).ifPresentOrElse(marked -> {
-                                if (marked == DirectoryType.TS) scanTestSet(subPath, tsp, indicator);
-                                else scanTestSetPackage(subPath, tsp, indicator, unread);
+                                if (marked == DirectoryType.TS) scanTestSet(subPath, tsp, indicator, scanned);
+                                else scanTestSetPackage(subPath, tsp, indicator, unread, scanned);
                             }, () -> skipped(subPath, DirectoryType.UNDER_TEST_CASES, "test cases", unread));
                         });
             }
@@ -179,12 +199,12 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-011
-    private void scanTestSet(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
+    private void scanTestSet(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull ScannedProject scanned) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final @NotNull TestSetDirectoryDto ts = dirMapper.getTestSetNode(p, path, parent);
 
-            store.getTestSetsDirByPath().put(path.toString(), ts);
+            scanned.getTestSets().put(path.toString(), ts);
 
             final @NotNull List<UUID> caseIds = TestCaseSequenceStore.caseIds(List.of());
             final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
@@ -198,7 +218,16 @@ final class IndexingScanner {
                                 final @NotNull TestCaseDto tc = mapper.readValue(filePath.toFile(), TestCaseDto.class);
                                 tc.setParent(ts);
                                 tc.setId(identityOf(filePath, tc));
-                                store.getTestCasesById().put(tc.getId(), tc);
+
+                                // Said rather than silently kept. The index holds
+                                // one case per identity, so the second file of a
+                                // pair goes over the first and both sets then
+                                // resolve that id to whichever landed last
+                                // (#312, A3).
+                                if (scanned.getTestCasesById().put(tc.getId(), tc) != null) {
+                                    scanned.getClashingCases().add(ts.getName() + "/" + filePath.getFileName());
+                                }
+
                                 caseIds.add(tc.getId());
                             } catch (final Exception ex) {
                                 Logger.error("Failed to read test case '" + filePath.toAbsolutePath() +
@@ -207,7 +236,7 @@ final class IndexingScanner {
                         });
             }
 
-            store.getTestSetCaseIds().put(path.toString(), caseIds);
+            scanned.getTestSetCaseIds().put(path.toString(), caseIds);
 
             indicator.setText(Bundle.message("indexer.progress.test.set", ts.getName(), String.valueOf(caseIds.size())));
 
@@ -218,7 +247,7 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-010, Rule-INTERNAL-015
-    private void scanTestRunDirs(final @NotNull Path trDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
+    private void scanTestRunDirs(final @NotNull Path trDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
         try (Stream<Path> paths = Files.list(trDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
@@ -228,8 +257,8 @@ final class IndexingScanner {
 
                 store.markedAs(dirPath, DirectoryType.UNDER_TEST_RUNS).ifPresentOrElse(
                         marked -> {
-                            if (marked == DirectoryType.TR) scanTestRun(dirPath, parent, indicator);
-                            else scanTestRunPackageDir(dirPath, parent, indicator, unread);
+                            if (marked == DirectoryType.TR) scanTestRun(dirPath, parent, indicator, scanned);
+                            else scanTestRunPackageDir(dirPath, parent, indicator, unread, scanned);
                         },
                         () -> skipped(dirPath, DirectoryType.UNDER_TEST_RUNS, "test runs", unread));
             }
@@ -239,20 +268,20 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-010, Rule-INTERNAL-015
-    private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread) {
+    private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final @NotNull TestRunPackageDirectoryDto trp = dirMapper.getTestRunPackageNode(p, path, parent);
 
-            store.getTestRunPackagesByPath().put(path.toString(), trp);
+            scanned.getTestRunPackages().put(path.toString(), trp);
 
             try (Stream<Path> subPaths = Files.list(path)) {
                 subPaths.filter(Files::isDirectory)
                         .forEach(subPath -> {
                             // The else was missing here too.
                             store.markedAs(subPath, DirectoryType.UNDER_TEST_RUNS).ifPresentOrElse(marked -> {
-                                if (marked == DirectoryType.TR) scanTestRun(subPath, trp, indicator);
-                                else scanTestRunPackageDir(subPath, trp, indicator, unread);
+                                if (marked == DirectoryType.TR) scanTestRun(subPath, trp, indicator, scanned);
+                                else scanTestRunPackageDir(subPath, trp, indicator, unread, scanned);
                             }, () -> skipped(subPath, DirectoryType.UNDER_TEST_RUNS, "test runs", unread));
                         });
             }
@@ -349,20 +378,46 @@ final class IndexingScanner {
                 Bundle.message("indexer.damaged.message", count, named, rest));
     }
 
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-082.
+     * <p>
+     * The test case files whose identity another file had already taken, named
+     * once for the project.
+     * <p>
+     * The same shape as the two above it, and for the same reason: the tester
+     * repairs this by renaming a file, and needs the names after a balloon would
+     * have faded. What it cannot do is choose which of the pair keeps the
+     * identity, so it says which files collided and leaves that to them.
+     */
+    private void reportClashing(final @NotNull String projectName, final @NotNull List<String> clashing) {
+        if (clashing.isEmpty()) return;
+
+        final @NotNull String named = clashing.stream().sorted().limit(5).collect(Collectors.joining(", "));
+        final @NotNull String rest = clashing.size() > 5
+                ? Bundle.message("indexer.more", String.valueOf(clashing.size() - 5))
+                : "";
+        final @NotNull String count = clashing.size() == 1
+                ? Bundle.message("indexer.clash.one")
+                : Bundle.message("indexer.clash.many", String.valueOf(clashing.size()));
+
+        Services.getInstance(p, Notifier.class).warn(p, Bundle.message("indexer.clash.title", projectName),
+                Bundle.message("indexer.clash.message", count, named, rest));
+    }
+
     // UC-INTERNAL-002
-    private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
+    private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull ScannedProject scanned) {
         try {
             final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final @NotNull TestRunDirectoryDto tr = dirMapper.getTestRunNode(p, path, parent);
 
-            store.getTestRunsDirByPath().put(path.toString(), tr);
+            scanned.getTestRunDirs().put(path.toString(), tr);
 
             final @NotNull Path jsonPath = TestRunDirectoryDto.resultsFile(path);
             if (Files.exists(jsonPath)) {
                 final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
                 final @NotNull TestRunDto trr = mapper.readValue(jsonPath.toFile(), TestRunDto.class);
                 trr.dropStampsWithoutVerdict();
-                store.getTestRunsByPath().put(path.toString(), trr);
+                scanned.getTestRuns().put(path.toString(), trr);
             }
 
             indicator.setText(Bundle.message("indexer.progress.test.run", path.getFileName()));

@@ -440,8 +440,6 @@ public class TreeTransferHandler extends TransferHandler {
                 confirmLanded(Done.PASTED, copied);
             });
         }
-
-        resetLastAction();
     }
 
     /**
@@ -633,14 +631,17 @@ public class TreeTransferHandler extends TransferHandler {
                         .ifPresent(dir -> JavaCode.of(dir.getType()).getMoved().execute(p, new Moved(dir, target))));
     }
 
-    // Both parameters are Swing's, and Swing passes null for either when the
-    // drag ended without one (#71).
-    @Override
-    protected void exportDone(final @Nullable JComponent source, final @Nullable Transferable data, final int action) {
-        if (action != MOVE) resetLastAction();
-    }
-
-    public void resetLastAction() {
+    /**
+     * Stops drawing the cut rows faded.
+     * <p>
+     * Only the clipboard may call this, because the faded rows say one thing:
+     * these nodes are on the clipboard, waiting to be pasted. A drag says
+     * nothing about the clipboard, and both drag paths used to call it - the
+     * drop through {@code transfer} and the drag's own {@code exportDone} - so
+     * dragging any node cleared the fade off a cut that was still there and
+     * still pastable, leaving the tester no sign of what was waiting (#312, N6).
+     */
+    private void resetLastAction() {
         selectedNodes.clear();
         tree.repaint();
     }

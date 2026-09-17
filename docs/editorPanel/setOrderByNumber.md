@@ -41,6 +41,12 @@ The tester types the position they want. Testin moves the test case there.
   of the list, so typing three puts it third.
 - **Rule-EDITOR-PANEL-056** — Only this test case's own file is written. The
   test cases around it are not touched.
+- **Rule-EDITOR-PANEL-223** — The one exception to the rule above, and it
+  happens at most once per test set: a set holding test cases that have never
+  been placed - imported, brought by a sync, or written by hand - is given
+  places first, the same way a drag gives them, and those files are written too.
+  Without it a position between two unplaced test cases means nothing, and the
+  test case lands where it already was.
 
 ## The screen
 
@@ -68,7 +74,8 @@ The tester types the position they want. Testin moves the test case there.
 3. The tester types a new number and presses `Enter`.
 4. Testin works out a new place for it, between the two test cases it now sits
    between.
-5. Only this test case's file is written.
+5. Only this test case's file is written - unless the test set holds test
+   cases that have never been placed, which are given places first, once.
 6. A message reads *Re-sorted*, the same word dragging a card gives.
 7. Every card is renumbered.
 
@@ -79,8 +86,10 @@ message says so, in the platform's own words, and nothing is saved.
 
 **If the number is where the test case already is** — nothing is written at all.
 
-**If several test cases are selected** — a message reads *Order is set one test
-case at a time*.
+**If several test cases are selected** — the **Order** row on the update menu is
+gray and reads *Order is set one test case at a time* where its key would be, so
+the refusal is read before it is triggered rather than after. Pressing `O` on the
+cards, which has no menu to gray, still answers with that message.
 
 ---
 

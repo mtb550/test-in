@@ -25,8 +25,10 @@ There is no key for this. It is the **SFTP key file** row.
   who it is.
 - **Rule-SETTING-035** — An agent already holding identities is tried before the
   key file itself.
-- **Rule-SETTING-036** — A key file's passphrase is asked for only when it is
-  going to be used, and is kept in the IDE's password store.
+- **Rule-SETTING-036** — Testin never asks for a key file's passphrase. A key
+  protected by one is used only through an SSH agent already holding it; a key
+  with no passphrase is used directly. Asking for one, and keeping it, is not
+  built.
 
 ## The screen
 
@@ -66,11 +68,17 @@ The whole page is drawn on [the settings page](main.md#the-page).
 Nothing on this page. A path that names no file is stored exactly as typed, and
 the server does the refusing.
 
-## Where the passphrase goes
+**If the key has a passphrase and no agent is holding it** - the connection
+fails, and the message is the server's refusal. Testin does not ask for a
+passphrase, so such a key cannot be used on its own: load it into an SSH agent
+first, with `ssh-add`, the same way every other tool on the machine uses it.
 
-Never into `testin.yml`, never onto a marker file, and never into the log. It
-is kept in the IDE's own password store. Its entry is named after the server and
-the account it belongs to, and that name holds no part of the secret itself.
+## Where a passphrase goes
+
+Nowhere, because Testin never takes one. If asking for one is ever built, it
+will go where the account password goes: into the IDE's own password store,
+under an entry named after the server and the account, never into `testin.yml`,
+never onto a marker file, and never into the log.
 
 ---
 

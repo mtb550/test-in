@@ -31,7 +31,6 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.testrun.RunStatusService;
 import org.testin.util.Mapper;
@@ -129,6 +128,22 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
         tc.setParent(ts);
         indexer().putTestCase(ts.getPath(), tc);
         return tc.getId();
+    }
+
+    /**
+     * The run's own {@code .tr} on disk and in the index, the way creating a run
+     * does it.
+     * <p>
+     * It used to be {@code persistRunMarker}, which wrote a marker straight
+     * through and is gone: a run's marker is now changed under the same hold as
+     * its results, so a run has to be indexed before it has one (#312, A4).
+     */
+    private void markRun(final TestProjectDirectoryDto tp, final Path runPath) {
+        WriteAction.runAndWait(() -> {
+            final TestRunDirectoryDto run = Services.getInstance(getProject(), DirectoryMapper.class)
+                    .setTestRunNode(getProject(), runPath, tp.getTestRunsDirectory());
+            indexer().addTestRunDir(run);
+        });
     }
 
     private static TestRunDto run(final String analysis) {
@@ -264,7 +279,7 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
         final Path runPath = tp.getTestRunsDirectory().getPath().resolve("Cycle 1");
         final UUID caseId = indexedCase(tp);
 
-        indexer().persistRunMarker(runPath, new TestRunMarker());
+        markRun(tp, runPath);
         indexer().putTestRun(runPath, run("written here before the sync", caseId));
         // Lands both writes and reads the project, so the run is on disk and indexed.
         indexer().acceptIncoming(tp.getPath(), Map.of());
@@ -317,7 +332,7 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
         final Path runPath = tp.getTestRunsDirectory().getPath().resolve("Cycle 1");
         final UUID caseId = indexedCase(tp);
 
-        indexer().persistRunMarker(runPath, new TestRunMarker());
+        markRun(tp, runPath);
         indexer().putTestRun(runPath, run("written here before the sync", caseId));
         // Lands both writes and reads the project, so the run is on disk and indexed.
         indexer().acceptIncoming(tp.getPath(), Map.of());
@@ -370,7 +385,7 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
         final Path runPath = tp.getTestRunsDirectory().getPath().resolve("Cycle 1");
         final UUID caseId = indexedCase(tp);
 
-        indexer().persistRunMarker(runPath, new TestRunMarker());
+        markRun(tp, runPath);
         indexer().putTestRun(runPath, run("written here before the sync", caseId));
         // Lands both writes and reads the project, so the run is on disk and indexed.
         indexer().acceptIncoming(tp.getPath(), Map.of());
@@ -425,7 +440,7 @@ public class RunWritesDuringSyncIdeTest extends BasePlatformTestCase {
         final TestRunDto tr = run("before completion", kept);
         tr.getResults().add(TestRunItems.builder().id(gone).build());
 
-        indexer().persistRunMarker(runPath, new TestRunMarker());
+        markRun(tp, runPath);
         indexer().putTestRun(runPath, tr);
         // Lands both writes and reads the project, so the run is on disk and indexed.
         indexer().acceptIncoming(tp.getPath(), Map.of());

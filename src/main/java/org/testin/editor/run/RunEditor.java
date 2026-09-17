@@ -1148,11 +1148,15 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         final @NotNull Optional<TestRunDto> run = run();
         if (run.isEmpty()) return;
 
-        // Said rather than swallowed, and here rather than only on the button:
-        // light mode's own start button calls this straight, and it grays
-        // nothing. Pressing start with nothing to walk used to mark the test run
-        // In Progress, stamp when execution began, and - until #214 - complete
-        // the whole run at once (#215).
+        // Said rather than swallowed, and here rather than only on the buttons
+        // that call it. Pressing start with nothing to walk used to mark the test
+        // run In Progress, stamp when execution began, and - until #214 -
+        // complete the whole run at once (#215).
+        //
+        // Both buttons gray themselves now, light mode's through
+        // canStartManualExecution since A31, so this is the floor rather than the
+        // only guard - which is what it should be: a caller that forgets is a
+        // refusal, not a run (#312, N15).
         if (!hasSomethingToWalk()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NOTHING_SHOWING, parent.getName());
             return;

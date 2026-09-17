@@ -77,8 +77,11 @@ reads *Could not abort the rebase.*
 **If carrying on fails** — the same title, reading *Could not continue the
 rebase.*
 
-**If conflicts remain after the merge** — a message titled **Still Conflicting**
-names them again, and the pull is not carried on.
+**If conflicts remain after the merge** — the conflict offer opens again, naming
+what is still in the way, with the same three links: Resolve, Continue and
+Abort. It used to name them under a plain warning when the tester had come from
+Pending Commits, and offer the three links only when they had come from Sync -
+the same situation answered two ways, and the way out on screen only once.
 
 **If the conflicted file is not a test case** — a conflicted test run, a marker
 or anything else is named in that same message and left as it is. Testin merges

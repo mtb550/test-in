@@ -67,7 +67,7 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
         // the one dialog that knows a rule instead of asking for it.
         final @NotNull DirectoryType type = component().getSelectedValue();
 
-        final @NotNull String name = accepted(component(), type::canTakeName, Refused.NOT_A_JAVA_NAME);
+        final @NotNull String name = accepted(component(), value -> Refused.ofName(type, value));
         if (name.isEmpty()) return;
 
         onCreate.accept(name, type);

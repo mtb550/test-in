@@ -16,6 +16,7 @@
 
 package org.testin.editor;
 
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
@@ -104,18 +105,27 @@ public final class CardTitle {
         // on every card was tried and taken back: three shapes down every row is
         // a lot of chrome for a fact most cards share, and the filter answers
         // "which of these are automated" better than eighty small icons do.
-        drawIfOffered(c, g, CardHoverAction.NAVIGATE_TO_TEST_METHOD, automation.getIcon(), icons.navigate(), hoveredAction);
-        drawIfOffered(c, g, runSlot, runSlot.getIcon(), icons.run(), hoveredAction);
+        draw(c, g, CardHoverAction.NAVIGATE_TO_TEST_METHOD, automation.getIcon(), icons.navigate(), hoveredAction);
+        draw(c, g, runSlot, runSlot.getIcon(), icons.run(), hoveredAction);
     }
 
     /**
-     * One button, drawn where it sits, and left out entirely in an IDE that
-     * cannot act on it.
+     * UC-EDITOR-PANEL-047, Rule-CODEGEN-062.
+     * <p>
+     * One button, drawn where it sits - and drawn gray in an IDE that cannot act
+     * on it, rather than left out.
+     * <p>
+     * It used to be absent, which is a card with nothing where the other cards
+     * have something and no way to learn what is missing. Gray says the button
+     * exists, and hovering it names the plugin it is waiting for. A gray icon
+     * does not grow under the pointer either: growing is the promise that
+     * pressing does something (#312, A16).
      */
-    private static void drawIfOffered(final @NotNull Component c, final @NotNull Graphics g, final @NotNull CardHoverAction action, final @NotNull Icon icon, final @NotNull Rectangle at, final @NotNull String hoveredAction) {
-        if (!action.isOffered()) return;
+    private static void draw(final @NotNull Component c, final @NotNull Graphics g, final @NotNull CardHoverAction action, final @NotNull Icon icon, final @NotNull Rectangle at, final @NotNull String hoveredAction) {
+        final boolean offered = action.isOffered();
 
-        drawHoverableIcon(c, g, icon, at.x, at.y, action.name().equals(hoveredAction));
+        drawHoverableIcon(c, g, offered ? icon : IconLoader.getDisabledIcon(icon), at.x, at.y,
+                offered && action.name().equals(hoveredAction));
     }
     private static void drawHoverableIcon(final @NotNull Component c, final @NotNull Graphics g, final @NotNull Icon baseIcon, final int x, final int y, final boolean isHovered) {
         if (isHovered) {
@@ -141,13 +151,13 @@ public final class CardTitle {
          * clickable.
          */
         public @NotNull Optional<CardHoverAction> at(final int x, final int y, final @NotNull CardHoverAction runSlot) {
-            // An action this IDE does not offer is not drawn, so nothing is over
-            // it either - the band belongs to the icon, and there is no icon.
-            if (CardHoverAction.NAVIGATE_TO_TEST_METHOD.isOffered() && grown(navigate).contains(x, y))
-                return Optional.of(CardHoverAction.NAVIGATE_TO_TEST_METHOD);
+            // Offered or not: an icon this IDE cannot act on is drawn gray rather
+            // than left out, so there is something under the pointer and it has
+            // a sentence to give. Whether pressing it does anything is the click
+            // handler's question, not this one (#312, A16).
+            if (grown(navigate).contains(x, y)) return Optional.of(CardHoverAction.NAVIGATE_TO_TEST_METHOD);
 
-            if (runSlot.isOffered() && grown(run).contains(x, y))
-                return Optional.of(runSlot);
+            if (grown(run).contains(x, y)) return Optional.of(runSlot);
 
             return Optional.empty();
         }

@@ -108,10 +108,16 @@ The box above the tree appears only for a test project shared through Git.
 4. Testin does a full refresh, and shows *Switched to \<branch\>*. An editor
    whose node the new branch does not have is closed.
 
-The box fills itself twice when the panel opens. It fills first from what is on
-the machine, showing *Reading branches*. It fills again after fetching from the
-remote, showing *Fetching from remote*. So the list can grow a moment after it
-appears.
+The box fills itself from what is on the machine, showing *Reading branches*.
+That is the whole answer to almost every question anyone asks it, and it needs
+no network.
+
+Three things also ask the remote, and then the box fills a second time showing
+*Fetching from remote*, so the list can grow a moment after it appears:
+**Refresh**, a branch switch, and opening a different test project. Nothing else
+does. A rename, a removal or a status change rebuilds the panel without going
+near the remote - it cannot have moved a branch, and a fetch can stop to ask for
+credentials or sit on a host that is not reachable.
 
 **With uncommitted changes**
 
@@ -138,6 +144,11 @@ cannot be opened. An IDE notification titled *Git Error* gives the reason.
 
 **If the repository has no branches** — the box reads *No branches found* and
 cannot be opened.
+
+**If Git is on no branch at all** — the box lists the branches and shows none of
+them selected. A checkout of a tag or a commit made outside Testin, a bisect, or
+a rebase stopped partway all leave the repository like this, and there is no
+branch to name. Picking one from the list switches to it, which is the way out.
 
 **While the branches are still loading** — the box reads *Loading branches...*
 and cannot be opened.

@@ -27,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.test.TestEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -37,6 +36,7 @@ import org.testin.testcase.create.CreateTestCaseDialog;
 import org.testin.util.Bundle;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -56,8 +56,13 @@ public class CreateTestCaseAction extends DumbAwareAction {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
+        // The same question update() asks, so the two cannot drift: an entry
+        // that is black and does nothing is the other half of one that is gray
+        // and says nothing (#312, A87). An editor's parent is a test set or a
+        // test run, and only the set answers true, which is what makes the cast
+        // safe here and nowhere else.
         TestinData.editor(e)
-                .filter(TestEditor.class::isInstance)
+                .filter(editor -> editor.getParent().isTestCaseContainer())
                 .ifPresent(editor -> openCreateDialog(p, editor, (TestSetDirectoryDto) editor.getParent()));
     }
 
@@ -108,16 +113,34 @@ public class CreateTestCaseAction extends DumbAwareAction {
         }).show();
     }
 
-    // UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-030
+    // UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-214
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final boolean enabled = TestinData.editor(e).filter(TestEditor.class::isInstance).isPresent();
+        // Asked of the node rather than of the editor's class, which is what
+        // Delete next to it already does: "can this hold test cases" is the
+        // node's question, and asking the class means a node kind added later
+        // answers wrongly until somebody remembers this method (#312, A87).
+        final @NotNull Optional<TestinEditor> editor = TestinData.editor(e);
+        final boolean holdsCases = editor.filter(open -> open.getParent().isTestCaseContainer()).isPresent();
 
-        // TEMPORARY - delete with the one in CreateTreeNodeAction. Two actions
-        // share Ctrl+M, and if both are enabled the platform picks between them
-        // rather than running ours.
+        // And not while the set is still being read. Creating a case sorts the
+        // list, and a sort makes the load still in flight stale - so the load
+        // landed on nothing, the spinner never stopped, and the new case was
+        // ranked against a list nobody had seen, which put it in the middle of
+        // the set at the next Refresh (#312, A18).
+        final boolean loading = editor.filter(TestinEditor::isLoading).isPresent();
+        final boolean enabled = holdsCases && !loading;
 
         e.getPresentation().setEnabled(enabled);
+
+        // And a reason where there was none. A tester in a run editor pressed
+        // Ctrl+M and got nothing - correct, and indistinguishable from a key
+        // that is not bound.
+        if (!enabled && editor.isPresent()) {
+            e.getPresentation().setDescription(loading
+                    ? Bundle.message("create.case.still.loading")
+                    : Bundle.message("create.case.disabled.description"));
+        }
     }
 
     @Override

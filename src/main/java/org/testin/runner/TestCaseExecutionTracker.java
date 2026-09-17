@@ -59,6 +59,13 @@ public class TestCaseExecutionTracker {
                 } else if (test.isDefect()) {
                     TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED, durationOf(test), failureOf(test, ""));
 
+                // Rule-CODEGEN-075. Neither passed nor a defect means the
+                // framework never ran it to a verdict: a dependency that failed,
+                // an excluded group, a disabled test, or the run being
+                // terminated. Failed with Skipped/Terminated as the actual
+                // result, because leaving it Pending reports a cycle as finished
+                // when part of it never ran - written down as a rule before this
+                // comment could be trusted (#312, A14).
                 } else {
                     TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED, durationOf(test), failureOf(test, Bundle.message("runner.skipped")));
                 }

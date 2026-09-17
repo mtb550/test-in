@@ -167,7 +167,7 @@ public class TransferListener extends TransferHandler {
             putBack(orderBefore);
 
             Logger.error("Reordering the test cases failed: " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("reorder.failed"));
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("save.failed"));
             return false;
         }
     }

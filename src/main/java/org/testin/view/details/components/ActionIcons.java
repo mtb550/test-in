@@ -21,6 +21,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -29,11 +30,13 @@ import org.testin.codegen.AutomationState;
 import org.testin.editor.CardHoverAction;
 import org.testin.model.Automated;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,9 +61,10 @@ public class ActionIcons extends BaseDetails {
         final @NotNull CardHoverAction navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD;
         final @NotNull CardHoverAction run = CardHoverAction.runSlot(p, dto);
 
-        // Neither icon is drawn in an IDE that cannot act on it, and a row with
-        // no icons in it is no row at all.
-        if (!navigate.isOffered() && !run.isOffered()) return currentRow;
+        // Both are drawn whatever this IDE can do. An icon the IDE cannot act on
+        // is gray and says which plugin it is waiting for, rather than being
+        // left off the panel - a row that is sometimes there and sometimes not
+        // teaches nobody what is missing (#312, A16).
 
         final @NotNull JBPanel<?> actionsPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         actionsPanel.setOpaque(false);
@@ -79,12 +83,9 @@ public class ActionIcons extends BaseDetails {
 
         final @NotNull Automated state = automation.of(dto.getId());
 
-        if (navigate.isOffered()) actionsPanel.add(hoverIcon(navigate, p, dto, state.getIcon(), state.getLabel()));
-
-        if (navigate.isOffered() && run.isOffered())
-            actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(STRUT_WIDTH)));
-
-        if (run.isOffered()) actionsPanel.add(hoverIcon(run, p, dto, run.getIcon(), run.getTooltip()));
+        actionsPanel.add(hoverIcon(navigate, p, dto, state.getIcon(), state.getLabel()));
+        actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(STRUT_WIDTH)));
+        actionsPanel.add(hoverIcon(run, p, dto, run.getIcon(), run.getTooltip()));
 
         return addFullWidthRow(panel, gbc, actionsPanel,
                 JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT), currentRow);
@@ -100,15 +101,22 @@ public class ActionIcons extends BaseDetails {
      * cannot end up disagreeing about a button they both show.
      */
     private @NotNull JBLabel hoverIcon(final @NotNull CardHoverAction action, final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull Icon drawn, final @NotNull String tooltip) {
+        // Gray, with the plugin it waits for as its whole tooltip, when this IDE
+        // cannot act on it (#312, A16). It does not grow under the pointer and
+        // the pointer stays an arrow: both are the promise that pressing does
+        // something.
+        final @NotNull Optional<String> whyNot = action.whyNotOffered();
+
         final @NotNull JBLabel label = new JBLabel();
-        final @NotNull Icon base = IconUtil.scale(drawn, label, BASE_SCALE);
-        final @NotNull Icon hover = IconUtil.scale(drawn, label, HOVER_SCALE);
+        final @NotNull Icon shown = whyNot.isEmpty() ? drawn : IconLoader.getDisabledIcon(drawn);
+        final @NotNull Icon base = IconUtil.scale(shown, label, BASE_SCALE);
+        final @NotNull Icon hover = IconUtil.scale(shown, label, whyNot.isEmpty() ? HOVER_SCALE : BASE_SCALE);
         label.setIcon(base);
-        label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        label.setCursor(Cursor.getPredefinedCursor(whyNot.isEmpty() ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
 
         new HelpTooltip()
-                .setDescription(HtmlChunk.text(tooltip))
-                .setShortcut(Declared.shortcutText(action.getActionId()))
+                .setDescription(HtmlChunk.text(whyNot.orElse(tooltip)))
+                .setShortcut(whyNot.isEmpty() ? Declared.shortcutText(action.getActionId()) : "")
                 .installOn(label);
 
         // From the hovered icon itself: scaling 16px by 1.8 gives 28.8, which the
@@ -132,6 +140,11 @@ public class ActionIcons extends BaseDetails {
             // UC-VIEW-PANEL-012, UC-VIEW-PANEL-014
             @Override
             public void mouseClicked(final MouseEvent e) {
+                if (whyNot.isPresent()) {
+                    Services.getInstance(p, Notifier.class).softRefuse(p, whyNot.orElseThrow());
+                    return;
+                }
+
                 action.execute(p, dto);
             }
         });

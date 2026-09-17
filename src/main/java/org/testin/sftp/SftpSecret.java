@@ -126,6 +126,25 @@ public enum SftpSecret {
         }
     }
 
+    /**
+     * UC-SHARE-020, Rule-SHARE-095.
+     * <p>
+     * Takes it out of the store, for a secret the server has refused.
+     * <p>
+     * A kept secret the server will not accept is worth less than none: it is
+     * tried first on every later sync, every one of them fails the same way, and
+     * nothing ever asks the tester for the one that would work. That is what a
+     * password changed on the server since it was kept did (#312, N7).
+     */
+    public void forget(final @NotNull SftpAddress address, final @NotNull String user) {
+        try {
+            PasswordSafe.getInstance().set(attributes(address, user), null);
+            Logger.info("Forgot the " + description + " for " + user + "@" + address.display());
+        } catch (final RuntimeException ex) {
+            Logger.warn("Could not remove the " + description + " from the credential store: " + ex.getMessage());
+        }
+    }
+
     private @NotNull CredentialAttributes attributes(final @NotNull SftpAddress address, final @NotNull String user) {
         return new CredentialAttributes(
                 CredentialAttributesKt.generateServiceName(SUBSYSTEM, keyFor(address, user)), user);

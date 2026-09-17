@@ -81,8 +81,10 @@ The account is asked for when this machine cannot prove who it is.
 2. Testin reads the server address from `testin.yml`.
 3. If it cannot prove who this is, the account window opens.
 4. The tester types their account and presses `Enter`.
-5. The account is stored on this machine at once.
-6. A background task named *Syncing with*, then the server, starts.
+5. A background task named *Syncing with*, then the server, starts.
+6. The account is stored on this machine once the server has accepted it, and
+   not before. One the server refuses is forgotten rather than kept and tried
+   again — that is [UC-SHARE-020](keepServerPassword.md).
 7. Testin sends what is newer here and takes what is newer there. A test run's
    screenshots travel as the files they are: one removed on either side is
    removed on the other at the next sync, and never asked about.

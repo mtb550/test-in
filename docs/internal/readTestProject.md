@@ -47,6 +47,12 @@ There is no key for this. It starts on its own.
   every machine. Testin never converts one into the zone of whoever is reading,
   so the same test case is the same bytes wherever it is saved and a colleague
   elsewhere does not rewrite a file by opening it.
+- **Rule-INTERNAL-082** — Two test case files claiming one identity are reported
+  rather than merged. A test case is identified by its file name, and the index
+  holds one case per identity, so the second file read goes over the first and
+  neither test set can reach its own any more. The read cannot choose which of
+  the pair keeps the identity, so it names the files and leaves that to the
+  tester.
 
 ## The budget
 
@@ -164,9 +170,13 @@ noise.
 test set. The others are read. The set is drawn one row shorter, and nothing
 says which row is missing.
 
-**If two test case files claim the same identity** — both are read, as two
-separate test cases. The file name is what decides. So a test case copied by
-hand becomes a second test case of its own.
+**If two test case files claim the same identity** — the second one read goes
+over the first, and a notification titled **Test cases sharing an identity in
+<project>** names the files. Neither test set can reach its own case while that
+is true: both resolve the identity to whichever file landed last, so an edit in
+one showed in the other. The file name is the identity, so the repair is to
+rename one of them - which of the two keeps it is the tester's to decide, not
+the plugin's.
 
 **If the tester presses cancel** — the read stops between one test set and the
 next. What was already read stays in memory. The rest of that test project is

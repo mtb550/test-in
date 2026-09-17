@@ -47,6 +47,13 @@ sits under it, reading **Push**.
 5. The tester clicks **Push** on the message, or chooses **Sync With Remote**.
    Either one sends them.
 
+**A branch the remote has never had** reaches the same message by a different
+route. Git cannot count what is ahead of an upstream that does not exist, so
+there is no number to give: the message reads *This branch is not on the remote
+yet. Pushing it puts it there and makes it track the remote.* and carries the
+same **Push** link. It used to read *No changes* about a branch whose every
+commit was still on this machine.
+
 ## What Testin refuses
 
 **If nothing has changed and nothing is unpushed** — a message reads *No

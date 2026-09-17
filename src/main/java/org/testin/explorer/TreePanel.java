@@ -517,6 +517,17 @@ public final class TreePanel implements Disposable {
     }
 
     /**
+     * UC-TREE-PANEL-025, Rule-TREE-PANEL-084.
+     * <p>
+     * Asks the branch box to go to the remote. Refresh and a branch switch both
+     * end here; every other rebuild of this panel reads what Git already holds
+     * (#312, A70).
+     */
+    public void fetchBranches() {
+        branchSelector.fetchBranches();
+    }
+
+    /**
      * Re-indexes and rebuilds, reporting what caused it rather than the generic
      * refresh - a branch switch says which branch.
      */

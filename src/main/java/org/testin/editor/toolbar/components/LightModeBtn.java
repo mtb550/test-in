@@ -56,8 +56,24 @@ public class LightModeBtn extends AbstractIconButton implements ToolbarItem {
         addActionListener(e -> Services.getInstance(p, LightMode.class).toggle(editor, this::updateState));
     }
 
+    /**
+     * UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-008.
+     * <p>
+     * Gray says no; the tooltip says why. It was the only button on this toolbar
+     * that grayed without a reason, so a tester on a completed run was left with
+     * a button that had simply stopped working and nothing naming the status
+     * that stopped it (#312, A30).
+     * <p>
+     * Shaped like Result Analysis's, which refuses for the same reason and
+     * already names the status back.
+     */
     public void updateState() {
-        setEnabled(editor.getParent().isStillOpen());
+        final boolean stillOpen = editor.getParent().isStillOpen();
+
+        setEnabled(stillOpen);
+        setToolTipText(stillOpen
+                ? Bundle.message("toolbar.light.mode")
+                : Bundle.message("toolbar.light.mode.disabled", editor.getParent().getMarker().getStatus().getLabel()));
         setOn(Services.getInstance(p, LightMode.class).isOpenOn(editor.getParent()));
     }
 }

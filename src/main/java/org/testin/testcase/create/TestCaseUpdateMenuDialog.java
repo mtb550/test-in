@@ -29,6 +29,7 @@ import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 public class TestCaseUpdateMenuDialog {
@@ -79,7 +80,15 @@ public class TestCaseUpdateMenuDialog {
                 ? Bundle.message("update.dialog.title.one")
                 : Bundle.message("update.dialog.title.many", String.valueOf(items.size()));
 
-        new ShortcutMenuPopup<>(p, title, UpdateTestCaseFields.values(), this::open).show();
+        // Order is drawn gray on a multiple selection, with the reason where its
+        // key would be. It used to look like every other row, take the press,
+        // close the menu and answer with a balloon - a refusal the tester had to
+        // trigger to read, on the one field that has no bulk form (#312, A85).
+        new ShortcutMenuPopup<>(p, title, UpdateTestCaseFields.values(), this::open)
+                .refusing(field -> field == UpdateTestCaseFields.ORDER && items.size() > 1
+                        ? Optional.of(Bundle.message("update.order.one.at.a.time"))
+                        : Optional.empty())
+                .show();
     }
 
     /**

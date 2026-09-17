@@ -68,7 +68,10 @@ public final class SheetPreview implements DialogComponent {
      * selectable.
      */
     public void show(final @NotNull Map<String, List<TestCaseDto>> newSheets) {
-        Logger.info("Import preview: showing " + newSheets.values().stream().mapToInt(List::size).sum()
+        // Debug, not info. The preview is rebuilt on every keystroke in the
+        // search field, so at info this wrote a line per character typed and
+        // buried whatever the tester opened the log to read (#312, N17).
+        Logger.debug("Import preview: showing " + newSheets.values().stream().mapToInt(List::size).sum()
                 + " cases in " + newSheets.size() + " sheet(s), replacing " + sheets.size() + " sheet(s)");
         sheets = newSheets;
 

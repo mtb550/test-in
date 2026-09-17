@@ -159,6 +159,10 @@ with the test run's own name, test cases and settings.
 **If the name has been emptied** — the dialog stays open, and *A test run needs
 a name* is shown in red.
 
+**If the name is a path** - a name holding a slash, a backslash or `..` is
+refused, reading *is a path, not a name - a node is one folder inside the one
+selected*. Nothing is created.
+
 **If a test run with that name already exists** — *\<name\> Already Exists* is
 shown in red. Typing it in the first dialog closes that dialog and the second
 one never opens. Typing it in **Create Test Run** leaves the dialog open with
