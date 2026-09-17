@@ -70,9 +70,12 @@ with a count after it for more than one test case.
 6. The test set's order is worked out again and saved.
 7. On a cut, each test case takes its generated method with it: the method is
    carried into this test set's class exactly as it is written, body and all,
-   and removed from the class it came from. A copy gets a fresh method instead,
-   because a copy is a new test case.
-8. A message reads *Pasted*, with a count for more than one.
+   and removed from the class it came from.
+8. On a copy, each test case gets a method of its own in this test set's class,
+   because a copy is a new test case - and that method starts with the body of
+   the one it was copied from, which stays where it is. Only the body comes
+   across; the identity, the name and the attributes are the copy's own.
+9. A message reads *Pasted*, with a count for more than one.
 
 ## What Testin refuses
 
@@ -84,9 +87,13 @@ without being read, and nothing is said.
 **If the clipboard holds test cases that will not read** — the entry stays gray,
 and only the log says why.
 
-**If the destination test set has no class** — the method is left where it was,
-and only the log says so. A method in the wrong class is something a tester can
-find and move by hand; one that was deleted is not.
+**If the destination test set has no class** — on a cut the method is left where
+it was, and only the log says so. A method in the wrong class is something a
+tester can find and move by hand; one that was deleted is not.
+
+**If the copied test case has no method, or is no longer there** — the copy gets
+the empty method a new test case gets, and only the log says why. There is
+nothing to carry, and the copy is still a test case.
 
 **If writing the pasted test cases fails** — a message reads *Could not save, so
 the cards went back to what is on disk*, and the list is read again, without
@@ -96,7 +103,8 @@ them.
 
 Pasting a copy into the test set it came from is allowed. The result is a second
 test case. Its description ends in `(Copy)`. It has its own identity and its own
-test method.
+test method, holding the same body as the one it was copied from - two methods
+in one class doing the same thing, which is the start of varying one of them.
 
 ---
 

@@ -10,7 +10,7 @@ test case they came from.
 |---|---|
 | **Part of Testin** | Automation code and the gutter |
 | **Answers** | What Testin writes into the code, when it rewrites it, and what a tester sees when it cannot |
-| **Numbering** | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-020`. Rules are `Rule-CODEGEN-001` to `Rule-CODEGEN-077` |
+| **Numbering** | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-020`. Rules are `Rule-CODEGEN-001` to `Rule-CODEGEN-078` |
 | **Retired** | `Rule-CODEGEN-015` said what `Rule-CODEGEN-046` says — the groups attribute is written only when the test case belongs to one. Retired 8 September 2026; read Rule-CODEGEN-046 instead. The number is not given to anything else |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-CODEGEN-008](runAutomation.md) were read from the code again |

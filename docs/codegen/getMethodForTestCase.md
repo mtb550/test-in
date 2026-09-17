@@ -50,6 +50,11 @@ There is no key for this. It happens when a test case is created, which is
   wrote. A destination test set with no class of its own leaves the method where
   it is, because a method in the wrong class can be found and one that was
   deleted cannot.
+- **Rule-CODEGEN-078** — A test case copied into a test set gets a method of its
+  own, carrying the body of the method it was copied from. Only the body comes
+  across: the copy's method has the copy's own id, name and attributes, because
+  it is a different test case. A copy of a case that has no method gets the
+  empty one a new case gets.
 
 ## What is written
 

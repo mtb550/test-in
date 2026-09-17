@@ -103,6 +103,26 @@ public enum GenType {
     ),
 
     /**
+     * UC-CODEGEN-002, Rule-CODEGEN-078.
+     * <p>
+     * A test case pasted as a copy gets a method of its own, with the body of
+     * the method it was copied from in it.
+     * <p>
+     * It used to be {@link #CREATE_TEST_CASE} on this path, which writes the
+     * method a new case gets - the right annotation, the right name, and a TODO
+     * where the automation should be. That is right for a case somebody has just
+     * created and wrong for a copy: the tester copied the case because of what
+     * was in it, and the one part that was theirs was the part left behind.
+     * <p>
+     * A separate operation from the move rather than the same one asked twice,
+     * because the two differ in what becomes of the original: a move takes the
+     * method with it, a copy leaves it where it is.
+     */
+    COPY_TEST_CASE(
+            Bundle.message("codegen.copy.test.case")
+    ),
+
+    /**
      * Renaming the generated method is part of this, not a step beside it: the
      * method is named after the case's description, so a description that
      * changed and a method that did not are the same edit half done.

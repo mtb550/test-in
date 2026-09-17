@@ -25,6 +25,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.TestinData;
+import org.testin.codegen.CopiedCase;
 import org.testin.codegen.GenType;
 import org.testin.codegen.MovedCase;
 import org.testin.editor.TestinEditor;
@@ -156,12 +157,30 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
 
                 final @NotNull List<TestCaseDto> pastedHere = new ArrayList<>(pastedCases.size());
 
+                // Each copy beside the case it was copied from, so the generator
+                // can carry that method's body into the copy's own method
+                // (Rule-CODEGEN-078). Empty for a cut, which takes its method
+                // whole instead.
+                final @NotNull List<CopiedCase> copied = new ArrayList<>(pastedCases.size());
+
                 for (final TestCaseDto tc : pastedCases) {
                     final @NotNull TestCaseDto clonedTc = cloneForPasting(tc, isCut);
 
                     clonedTc.setParent(destUI.getParent());
                     destUI.getAllTestCases().add(clonedTc);
                     pastedHere.add(clonedTc);
+
+                    // The indexed case, not the one off the clipboard: a case's
+                    // test set is not written to its file and so is not on the
+                    // clipboard either, and the test set is the only way to the
+                    // class holding its method. A case the index no longer holds
+                    // - deleted since it was copied, or copied in another session
+                    // - falls back to the clipboard's own copy, which names no
+                    // test set and so carries no body.
+                    if (!isCut) {
+                        copied.add(new CopiedCase(clonedTc,
+                                Services.getInstance(p, ProjectIndexer.class).findTestCase(tc.getId()).orElse(tc)));
+                    }
                 }
 
                 final int pasted = pastedHere.size();
@@ -194,12 +213,16 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
 
                     TestCaseSnapshot.record(p, UndoScope.of(destPath), TestCaseSnapshot.describe(isCut ? Bundle.message("snapshot.verb.move") : Bundle.message("snapshot.verb.paste"), pastedHere), before, after);
 
-                    // UC-EDITOR-PANEL-017, UC-CODEGEN-002. A copy is a new test
-                    // case, so it gets a method of its own the way a created one
-                    // does - once it is on disk, which is what the generator reads
-                    // its position from. It wrote none, so F5 and Go to code said
-                    // the copy had no generated code (#312, A54).
-                    if (!isCut) GenType.CREATE_TEST_CASE.executeAll(p, pastedHere);
+                    // UC-EDITOR-PANEL-017, UC-CODEGEN-002, Rule-CODEGEN-078. A
+                    // copy is a new test case, so it gets a method of its own the
+                    // way a created one does - once it is on disk, which is what
+                    // the generator reads its position from. It wrote none, so F5
+                    // and Go to code said the copy had no generated code (#312,
+                    // A54) - and then wrote an empty one, so the automation the
+                    // tester copied the case for stayed behind. The copy
+                    // generator writes the same method and fills it with the
+                    // original's body.
+                    if (!isCut) GenType.COPY_TEST_CASE.executeAll(p, copied);
 
                     // And a cut takes its method with it, body and all. It used
                     // to take nothing: the case was in its new test set and its
