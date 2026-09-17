@@ -13,24 +13,24 @@
 <p>It adds a tool window with a tree: test projects, test sets, test runs. You write test cases in an editor tab. Testin writes and maintains a TestNG class and one <code>@Test</code> method for every case, tied to it by the case's own identity rather than by its name. You execute a run from the tree, the editor or the gutter, recording a verdict per case, and generate a report at the end.</p>
 <p>Everything it owns is plain files on disk, under a folder you choose. There is no server, no account, and no telemetry.</p>
 <h2>One test case, from written to reported</h2>
-<p>The walkthrough below uses an invented demo: a test project called <code>Checkout</code>, a test set called <code>Payment</code>, and three cases in it.</p>
+<p>The walkthrough below uses an invented demo: a test project called <code>Checkout</code>, holding a <code>Web</code> and a <code>Mobile</code> package. <code>Web</code> holds <code>Login</code> and <code>Register</code>, and inside <code>Login</code> is a test set called <code>Sign in</code> with four cases.</p>
 <h3>Point Testin at a folder</h3>
 <p>Testin keeps its data out of your code repository on purpose: a test case edit should not show up as a diff in the automation project. So the first thing you set, in <strong>Settings → Tools → Testin</strong>, is the Testin folder — any empty folder, which becomes the root every open project reads — and your tester name, which is written into every case and every verdict you record.</p>
 <em class="shot">[ picture: shot 2 ]</em>
 <h3>Write a test case</h3>
 <p>Press <strong>New Test Project</strong> at the top of the panel and name it. It gets two fixed folders: <code>Test Cases</code> and <code>Test Runs</code>. Select <code>Test Cases</code>, press <code>Ctrl+M</code> and pick *Test Set* — usually one feature.</p>
-<p>Open the set and press <code>Ctrl+M</code> once more to write a case. A case has a description, an expected result, steps, test data, pre-conditions, a module, a priority and groups. You get a card list or a grid view, paging, filtering, search and bulk edits.</p>
+<p>A package holds sets, so <code>Web</code> holds <code>Login</code> and <code>Register</code>; make one the same way and pick *Test Set Package*. Open a set and press <code>Ctrl+M</code> once more to write a case. A case has a description, an expected result, steps, test data, pre-conditions, a module, a priority and groups. You get a card list or a grid view, paging, filtering, search and bulk edits.</p>
 <em class="shot">[ picture: shot 3 ]</em>
 <p>On a card, <code>F2</code> edits a field and single letters jump straight into one: <code>D</code> for the description, <code>E</code> for the expected result, <code>S</code> for steps.</p>
 <h3>Read the Java that Testin wrote</h3>
 <p>Right-click the test set and choose <strong>Generate Code</strong>. Testin writes a TestNG class into the project's test source folder, with one method per case:</p>
 <pre>
-@Test(description = "Reject an expired card",
-      testName = "3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b",
+@Test(description = "Refuse a wrong password",
+      testName = "a71c9d34-52be-4a77-9d20-6e1f0b4c73aa",
       groups = {"REGRESSION"},
       priority = 2)
-public void rejectAnExpiredCard() {
-    // TODO: Auto-generated test steps for rejectAnExpiredCard
+public void refuseAWrongPassword() {
+    // TODO: Auto-generated test steps for refuseAWrongPassword
 }
 </pre>
 <p><code>testName</code> carries the test case's identity. It is how Testin finds the method again, which is why renaming a case renames the method instead of orphaning it. <code>priority</code> is the case's position in its test set, counting from one — TestNG runs methods in that order, so the order you drag cards into is the order the suite executes in. The body is a single comment, and it stays yours: Testin writes the annotation and the declaration and never touches what is inside.</p>
