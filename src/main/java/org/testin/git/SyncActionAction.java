@@ -141,7 +141,13 @@ public class SyncActionAction extends DumbAwareAction {
                 return;
             }
 
-            GitBackgroundTask.run(p, Bundle.message("git.task.syncing"), true,
+            // Not cancellable, which is Rule-SHARE-005: this pulls with a rebase
+            // and then pushes, and a rebase or a push stopped halfway leaves the
+            // repository in a state nobody asked for. The same page carried
+            // Rule-SHARE-072 saying the bar can be cancelled, and the button was
+            // there - so the tester was offered a stop that the rule above it
+            // forbids, on the one Git task that writes (#312, A44).
+            GitBackgroundTask.run(p, Bundle.message("git.task.syncing"), false,
                     indicator -> {
                         indicator.setText(Bundle.message("git.progress.checking.remote"));
                         final @NotNull String remoteName = git.getRemoteName(repoPath);

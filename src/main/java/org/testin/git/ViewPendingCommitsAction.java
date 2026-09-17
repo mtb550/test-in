@@ -480,11 +480,17 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
          * answer open on the EDT from inside.
          */
         private void resolveConflicts(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
+            // Conflicts still in the way are offered back with the three links,
+            // which is what the sync's own Resolve does with the same answer.
+            // A warning naming the files and nothing else left the tester
+            // exactly where the conflict notification had already put them, with
+            // the way out - Resolve, Continue, Abort - one route away and not on
+            // screen. One situation, one answer, whichever door it came through
+            // (#312, A45).
             ApplicationManager.getApplication().executeOnPooledThread(() ->
                     ConflictResolution.resolveRebase(p, repoPath,
                             () -> pushAfterRebase(repoPath, remote, branch),
-                            leftOver -> Services.getInstance(p, Notifier.class).warn(p, Bundle.message("git.still.conflicting.title"),
-                                    GitRefs.conflictMessage(leftOver))));
+                            leftOver -> showConflictActions(repoPath, remote, branch)));
         }
 
         /**

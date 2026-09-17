@@ -32,7 +32,10 @@ There is no key for this. The menu entry is **Sync With Remote**.
 - **Rule-SHARE-070** — The push is skipped when nothing is waiting, so a sync
   pressed out of habit costs no network.
 - **Rule-SHARE-071** — The pull rebases, and stashes anything uncommitted first.
-- **Rule-SHARE-072** — The progress bar can be canceled.
+- **Rule-SHARE-072** — The progress bar cannot be canceled. A sync pulls with a
+  rebase and then pushes, and neither can be stopped halfway without leaving the
+  repository somewhere nobody asked for — which is Rule-SHARE-005 above, and
+  this rule used to say the opposite of it.
 - **Rule-SHARE-073** — Afterwards the working folder, Testin's own reading of
   it, and the tree are all read again.
 
@@ -45,7 +48,8 @@ bar, and its line changes as the sync works. At the end a message titled
 ## Main flow
 
 1. The tester selects the test project and chooses **Sync With Remote**.
-2. A bar titled *Syncing with remote* opens, and can be canceled.
+2. A bar titled *Syncing with remote* opens. It cannot be canceled: what
+   follows writes to the repository and to the remote.
 3. The bar reads *Checking remote configuration...*.
 4. The bar reads *Pulling latest changes from*, then the branch.
 5. If anything is waiting, the bar reads *Pushing what is committed here...*.

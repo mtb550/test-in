@@ -136,6 +136,14 @@ public class RefreshAction extends AbstractProjectAction {
             tp.refresh();
             Logger.info("Refresh: tree rebuilt");
 
+            // Refresh is the tester saying "read everything again", and the
+            // remote is part of everything. The rebuild above no longer fetches
+            // by itself - it happens on every rename, removal and status change
+            // too, and none of those can have moved a branch (#312, A70). A
+            // branch switch arrives here as well, which is the other moment a
+            // fetch is worth its price.
+            tp.fetchBranches();
+
             // At the end, not the start: the tree is only usable now, and a
             // click that found a refresh already running returned above
             // without saying anything.
