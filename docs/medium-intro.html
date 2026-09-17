@@ -7,16 +7,16 @@
 <p>Nothing connects the two. A test case gets reworded in the spreadsheet and the method keeps the old name. A test case is deleted and the method stays in the class for another year. A new case is written and nobody notices there is no method for it. When somebody asks "is this covered?", the honest answer is that you would have to read both lists and compare them by hand.</p>
 <p>There is also the day of it. A test management tool lives in a browser tab, and a browser tab is a mouse. Recording a verdict means opening the run, finding the case, clicking a status, waiting for the page and scrolling back to where you were; saying what actually happened means another dialog and another wait. Fifty cases is a few hundred clicks, and none of it gets faster the tenth time you do it, because there is nothing to learn by hand. Meanwhile the window you left to get there is driven almost entirely by keys.</p>
 <p>The drift is not a discipline problem, and neither is the clicking. Both are what happens when the two artifacts share no identity, no history, no screen and no keyboard.</p>
-<em class="shot">[ picture: shot 1 ]</em>
+<img src="assets/medium/shot-1-panel-beside-code.png" alt="Testin, shot 1" style="max-width:100%;height:auto;border-radius:6px">
 <h2>What Testin is</h2>
 <p>Testin is a JetBrains IDE plugin that puts test case management inside the IDE, next to the automation it drives.</p>
 <p>It adds a tool window with a tree: test projects, test sets, test runs. You write test cases in an editor tab. Testin writes and maintains a TestNG class and one <code>@Test</code> method for every case, tied to it by the case's own identity rather than by its name. You execute a run from the tree, the editor or the gutter, recording a verdict per case, and generate a report at the end.</p>
 <p>Everything it owns is plain files on disk, under a folder you choose. There is no server, no account, and no telemetry.</p>
 <h2>One test case, from written to reported</h2>
-<p>The walkthrough below uses an invented demo: a test project called <code>Checkout</code>, holding a <code>Web</code> and a <code>Mobile</code> package. <code>Web</code> holds <code>Login</code> and <code>Register</code>, and inside <code>Login</code> is a test set called <code>Sign in</code> with four cases.</p>
+<p>The walkthrough below uses an invented demo: a test project called <code>Checkout</code>, holding a <code>Web</code> and a <code>Mobile</code> package. <code>Web</code> holds <code>Login</code> and <code>Register</code>, each with a test set of its own - <code>Sign in</code> and <code>Sign up</code> - and <code>Mobile</code> has one more. The run below, <code>Sprint 2 Cycle 1</code>, covers seven cases from them.</p>
 <h3>Point Testin at a folder</h3>
 <p>Testin keeps its data out of your code repository on purpose: a test case edit should not show up as a diff in the automation project. So the first thing you set, in <strong>Settings → Tools → Testin</strong>, is the Testin folder — any empty folder, which becomes the root every open project reads — and your tester name, which is written into every case and every verdict you record.</p>
-<em class="shot">[ picture: shot 2 ]</em>
+<img src="assets/medium/shot-2-settings.png" alt="Testin, shot 2" style="max-width:100%;height:auto;border-radius:6px">
 <h3>Write a test case</h3>
 <p>Press <strong>New Test Project</strong> at the top of the panel and name it. It gets two fixed folders: <code>Test Cases</code> and <code>Test Runs</code>. Select <code>Test Cases</code>, press <code>Ctrl+M</code> and pick *Test Set* — usually one feature.</p>
 <p>A package holds sets, so <code>Web</code> holds <code>Login</code> and <code>Register</code>; make one the same way and pick *Test Set Package*. Open a set and press <code>Ctrl+M</code> once more to write a case. A case has a description, an expected result, steps, test data, pre-conditions, a module, a priority and groups. You get a card list or a grid view, paging, filtering, search and bulk edits.</p>
@@ -25,43 +25,43 @@
 <h3>Read the Java that Testin wrote</h3>
 <p>Right-click the test set and choose <strong>Generate Code</strong>. Testin writes a TestNG class into the project's test source folder, with one method per case:</p>
 <pre>
-@Test(description = "Refuse a wrong password",
-      testName = "a71c9d34-52be-4a77-9d20-6e1f0b4c73aa",
-      groups = {"REGRESSION"},
-      priority = 2)
-public void refuseAWrongPassword() {
-    // TODO: Auto-generated test steps for refuseAWrongPassword
+@Test(description = "Register with an email nobody has used",
+      testName = "d2571ec8-9a3f-4b16-bf04-8c6e17a5d932",
+      groups = {"SMOKE", "Sanity"},
+      priority = 1)
+public void registerWithAnEmailNobodyHasUsed() {
+    // TODO: Auto-generated test steps for registerWithAnEmailNobodyHasUsed
 }
 </pre>
 <p><code>testName</code> carries the test case's identity. It is how Testin finds the method again, which is why renaming a case renames the method instead of orphaning it. <code>priority</code> is the case's position in its test set, counting from one — TestNG runs methods in that order, so the order you drag cards into is the order the suite executes in. The body is a single comment, and it stays yours: Testin writes the annotation and the declaration and never touches what is inside.</p>
 <p>Remove a case and the method goes with it. The class stays.</p>
-<em class="shot">[ picture: shot 4 ]</em>
+<img src="assets/medium/shot-4-generated-class.png" alt="Testin, shot 4" style="max-width:100%;height:auto;border-radius:6px">
 <p><code>Shift+F5</code> jumps from a card to its method, and the gutter mark beside the method leads back to the case.</p>
 <h3>Execute a run</h3>
 <p>A test run is one round of testing over the sets you pick. Create it under <code>Test Runs</code> and open it. Each case is a card, and three keys record what happened: <code>P</code> for passed, <code>F</code> for failed, <code>B</code> for blocked. The cursor advances on its own, so a clean run is <code>P P P</code> without the mouse.</p>
 <p><code>F</code> is the one verdict that asks first. A form opens for the actual result, a bug severity, a bug priority, and an error box you can paste a screenshot into — the screenshot is kept as a PNG file beside the run, not as text inside it.</p>
-<em class="shot">[ picture: shot 5 ]</em>
+<img src="assets/medium/shot-5-failure-form.png" alt="Testin, shot 5" style="max-width:100%;height:auto;border-radius:6px">
 <p>If you are testing an application rather than running code, light mode is a small always-on-top window showing one case at a time, with the same three keys, so the application under test can have the whole screen.</p>
-<em class="shot">[ picture: shot 6 ]</em>
+<img src="assets/medium/shot-6-light-mode.png" alt="Testin, shot 6" style="max-width:100%;height:auto;border-radius:6px">
 <p>Cases with automation are not judged by hand: <code>F5</code> on a selection runs the generated methods and records the verdict TestNG returned.</p>
 <h3>Report the failure as a bug</h3>
 <p>Open the failed case's details on the right. A <strong>Bug Issue</strong> row offers <strong>Report Bug</strong>.</p>
 <p>Testin writes the issue from what the run already knows — the description becomes the title; severity, priority, platform, actual result, expected result, numbered steps, test data, the folded exception, the screenshots, who executed it and when, and a link to the test case's own file. Anything it cannot get reads <code>n\a</code> rather than being invented.</p>
-<em class="shot">[ picture: shot 7 ]</em>
+<img src="assets/medium/shot-7-report-bug-dialog.png" alt="Testin, shot 7" style="max-width:100%;height:auto;border-radius:6px">
 <p>You read it, edit it if you want, and press <strong>Send</strong>. It is filed through the GitHub CLI, <code>gh</code>, into the repository named in <code>testin.yml</code>. Testin stores no password and no token; <code>gh</code> holds the sign-in. If anything is missing — no repository configured, <code>gh</code> not installed, not signed in, title too long — <strong>Send</strong> is disabled and hovering over it says which.</p>
 <p>Afterwards the row shows the issue as <code>owner/repo#123</code> and links to it. So does the report.</p>
-<em class="shot">[ picture: shot 8 ]</em>
+<img src="assets/medium/shot-8-github-issue.png" alt="Testin, shot 8" style="max-width:100%;height:auto;border-radius:6px">
 <h3>Send the result to someone with no IDE</h3>
 <p>Select the run and press <code>Ctrl+P</code>. Four formats: PDF to attach to a ticket, Word to edit first, HTML for a browser, Excel to filter.</p>
 <p>The document holds the run's overview, an execution summary with the totals and the pass rate, whatever result analysis you wrote, and one table per verdict. The failed table also carries the bug severity and priority, the actual result, and the issue the failure was reported as.</p>
-<em class="shot">[ picture: shot 9 ]</em>
+<img src="assets/medium/shot-9-report-pdf.png" alt="Testin, shot 9" style="max-width:100%;height:auto;border-radius:6px">
 <h2>What is on disk</h2>
 <p>A test project is a folder. A folder is a test set because it contains a file called <code>.ts</code>, and a test run because it contains <code>.tr</code> — markers whose whole name is the extension. Inside a test set, every test case is one JSON file named by its id. A run is a <code>run.json</code> beside its marker, holding one result per case: status, duration, who executed it and when, the actual result, the exception, the screenshot names and the bug issue link.</p>
 <p>The files are UTF-8 and pretty-printed, and the values are byte-identical to what you typed. Testin capitalizes a description and closes it with a period when it draws it, and stores neither. That is the part that makes Git useful here: a diff shows the field you changed and nothing else.</p>
-<em class="shot">[ picture: shot 10 ]</em>
+<img src="assets/medium/shot-10-test-case-json.png" alt="Testin, shot 10" style="max-width:100%;height:auto;border-radius:6px">
 <p>One file does live in the code repository, and it is the only one committed there: <code>testin.yml</code>, which names the test project this repository drives and, optionally, the repository bugs are filed in. No machine name, no person and no password is in it.</p>
 <p>Because the test data is its own Git repository, you can put it under review: commit, push, pull and resolve conflicts from inside the panel, with a diff of what changed in each case.</p>
-<em class="shot">[ picture: shot 11 ]</em>
+<img src="assets/medium/shot-11-git-changes.png" alt="Testin, shot 11" style="max-width:100%;height:auto;border-radius:6px">
 <p>On privacy, the short version: test cases, steps and JSON files stay on your disk or in your own version control. The plugin embeds no tracking, analytics or telemetry, and does not upload source, test data, environment variables or credentials anywhere. The one time data leaves your machine is when you press <strong>Send</strong> on a bug report, and it goes to your repository through your own <code>gh</code> sign-in.</p>
 <h2>Who it is for, and what it is not</h2>
 <p>It is for a QA engineer who writes test cases and automates them in a JetBrains IDE, and for the mixed teams where the same person does both. Manual testing is the first half of the loop, not an afterthought: you can run a whole cycle in light mode without writing a line of Java.</p>
