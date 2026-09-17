@@ -80,6 +80,10 @@ without being read, and nothing is said.
 **If the clipboard holds test cases that will not read** — the entry stays gray,
 and only the log says why.
 
+**If writing the pasted test cases fails** — a message reads *Could not save, so
+the cards went back to what is on disk*, and the list is read again, without
+them.
+
 ## Pasting into the same test set
 
 Pasting a copy into the test set it came from is allowed. The result is a second

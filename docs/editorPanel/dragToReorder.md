@@ -74,7 +74,10 @@ A small message then appears at the bottom of the IDE and fades. It reads
 message appears.
 
 **If anything fails on the way** — the cards go back to the order they were in,
-and a message reads *Could not save the new order, so the cards went back*.
+and a message reads *Could not save, so the cards went back to what is on disk*.
+That holds for a failure while the order is being written as well as before it:
+the write runs after the drop, so the cards are read again from disk rather than
+left showing an order no file holds.
 
 ## Why only some files are written
 

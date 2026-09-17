@@ -132,6 +132,11 @@ the description has to differ by a word.
 **If a step is left blank** — it is dropped. The steps after it keep their own
 numbers.
 
+**If saving the test case fails** — a message reads *Could not save, so the
+cards went back to what is on disk*, and the list is read again. The new card
+goes with it: it was never written, and leaving it on screen would be a test
+case that exists nowhere.
+
 ## Where the plugin breaks its own rules
 
 **`Ctrl+M` is not `Cmd+M` on a Mac.** Two other keys on the same screen are

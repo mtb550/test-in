@@ -197,28 +197,45 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         final @NotNull Path dirPath = parent.getPath();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            // Ranked along the order on screen, which is the order the tester
-            // just arranged. A case already sitting in the right place keeps the
-            // rank it had, so a drag writes the case that moved and leaves the
-            // rest of the set alone.
-            final @NotNull List<TestCaseDto> moved = TestCaseOrder.place(snapshot);
+            try {
+                // Ranked along the order on screen, which is the order the tester
+                // just arranged. A case already sitting in the right place keeps the
+                // rank it had, so a drag writes the case that moved and leaves the
+                // rest of the set alone.
+                final @NotNull List<TestCaseDto> moved = TestCaseOrder.place(snapshot);
 
-            Services.getInstance(p, ProjectIndexer.class).updateSequence(dirPath, snapshot, moved);
+                Services.getInstance(p, ProjectIndexer.class).updateSequence(dirPath, snapshot, moved);
 
-            // The generated methods carry the position, so a reorder has to
-            // rewrite them or the run keeps executing in the order before the
-            // drag. Every case in the set, not only the ones whose rank changed:
-            // moving one case past three others changes where all four sit, and
-            // a position is a number with no room between two of them.
+                // The generated methods carry the position, so a reorder has to
+                // rewrite them or the run keeps executing in the order before the
+                // drag. Every case in the set, not only the ones whose rank changed:
+                // moving one case past three others changes where all four sit, and
+                // a position is a number with no room between two of them.
+                //
+                // Skipped where there is nothing to write - an IDE with no Java
+                // plugin answers with a no-op, and a set nobody has generated code
+                // for has no methods to update.
+                if (!snapshot.isEmpty()) GenType.UPDATE_TEST_CASE_ORDER.executeAll(p, snapshot);
+
+                onPersisted.run();
+
+                ApplicationManager.getApplication().invokeLater(this::refreshView);
+
+            // The drag's own catch is in TransferListener, around the call - which
+            // this body runs after and off, so a failure here escaped it. The
+            // tester was told nothing, onPersisted never ran, and the screen kept
+            // an order, a paste or a new card that no file holds (#312, N2).
             //
-            // Skipped where there is nothing to write - an IDE with no Java
-            // plugin answers with a no-op, and a set nobody has generated code
-            // for has no methods to update.
-            if (!snapshot.isEmpty()) GenType.UPDATE_TEST_CASE_ORDER.executeAll(p, snapshot);
-
-            onPersisted.run();
-
-            ApplicationManager.getApplication().invokeLater(this::refreshView);
+            // Reading again is the only honest end: this editor cannot know which
+            // of the writes got through, and what is on disk is the answer for a
+            // drag, a paste and a create alike.
+            } catch (final Exception ex) {
+                Logger.error("Failed to save the test case sequence: " + ex.getMessage());
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("save.failed"));
+                    loadDataAsync();
+                });
+            }
         });
     }
 
@@ -245,8 +262,15 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-030
     @Override
     public void appendNewTestCase(final @NotNull TestCaseDto tc, final @NotNull Runnable onPersisted) {
-        this.allTestCases.add(tc);
+        hold(tc);
         orderThen(() -> {
+            // Again, because a load that landed while the order was computed
+            // replaced the model with what is on disk - and this case is not on
+            // disk until the write below puts it there. Without this it would be
+            // written out of a set that no longer holds it, which is to say not
+            // written at all, while onPersisted said Created (#312, N1).
+            hold(tc);
+
             updateSequenceAndSaveAll(onPersisted);
 
             // VFS refresh goes through the indexer - file access is the
@@ -256,6 +280,18 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
             refreshView();
             selectTestCase(tc);
         });
+    }
+
+    /**
+     * Puts a test case in the model, once. Asked by id rather than by instance:
+     * a reload builds new objects for the same cases, and {@link TestCaseDto}
+     * has no equality of its own, so the same case read twice would be added
+     * twice and drawn twice.
+     */
+    private void hold(final @NotNull TestCaseDto tc) {
+        synchronized (allTestCases) {
+            if (allTestCases.stream().noneMatch(held -> held.getId().equals(tc.getId()))) allTestCases.add(tc);
+        }
     }
 
     // UC-EDITOR-PANEL-005
@@ -392,6 +428,17 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         orderThen(this::refreshView);
     }
 
+    /**
+     * Orders the cases, then continues.
+     * <p>
+     * The generation guards the <b>order</b>, which a newer sort or load makes
+     * stale. It does not guard {@code onDone}, which is the tester's own action
+     * carrying on - a paste, a create or a drag, each of which writes. Skipping
+     * it when the generation moved meant the write never ran: the card sat on
+     * screen, nothing reached disk, no undo was recorded and the next load took
+     * it away again (#312, N1). What onDone writes it reads from the model as it
+     * is now, so running it after a newer load is not stale, it is current.
+     */
     private void orderThen(final @NotNull Runnable onDone) {
         final List<TestCaseDto> snapshot;
         synchronized (allTestCases) {
@@ -404,15 +451,14 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
 
         final int generation = modelGeneration.incrementAndGet();
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            if (generation != modelGeneration.get()) return;
             final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(snapshot);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                if (generation != modelGeneration.get()) return;
-
-                synchronized (allTestCases) {
-                    this.allTestCases.clear();
-                    this.allTestCases.addAll(ordered);
+                if (generation == modelGeneration.get()) {
+                    synchronized (allTestCases) {
+                        this.allTestCases.clear();
+                        this.allTestCases.addAll(ordered);
+                    }
                 }
 
                 onDone.run();
