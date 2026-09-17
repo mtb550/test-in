@@ -48,6 +48,7 @@ public enum Done {
     MOVED(Bundle.message("done.moved")),
 
     CREATED(Bundle.message("done.created")),
+    AUTOMATED(Bundle.message("done.automated")),
     BOUND(Bundle.message("done.bound")),
     CLONED(Bundle.message("done.cloned")),
     RENAMED(Bundle.message("done.renamed")),

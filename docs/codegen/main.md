@@ -27,7 +27,7 @@ test case they came from.
 | **UC-CODEGEN-002** | [Get a method when I create a test case](getMethodForTestCase.md) | New test cases get a test method to fill in. |
 | **UC-CODEGEN-003** | [Get a method for a test case that had none](getMissingMethod.md) | Give a test case a description and its method appears. |
 | **UC-CODEGEN-004** | [Get the whole subtree's code when I copy](copySubtreeCode.md) | A copied package is as runnable as the original. |
-| **UC-CODEGEN-005** | [Ask Testin to write the automation for me](automateTestCase.md) | Ask for the test body to be written. Not built yet. |
+| **UC-CODEGEN-005** | [Ask for the method a test case never got](automateTestCase.md) | A test case that arrived as data gets the method it should have had. |
 | | **Moving between the two** | |
 | **UC-CODEGEN-006** | [Go to the code from a test case](goToCode.md) | Read or change what a test case really does. |
 | **UC-CODEGEN-007** | [Go to the test case from the code](goToTestCase.md) | See what a method is meant to prove. |
@@ -109,7 +109,7 @@ For a test set, one class holding those methods. For a package, a folder.
 |---|---|---|
 | `Shift+F5` | Goes to the generated method | [UC-CODEGEN-006](goToCode.md) |
 | `F5` | Runs the selected test cases, or stops them | [UC-CODEGEN-008](runAutomation.md) |
-| `F12` | **Automate Test Case**, which is not built | [UC-CODEGEN-005](automateTestCase.md) |
+| `F12` | Writes the method for a test case that has none | [UC-CODEGEN-005](automateTestCase.md) |
 
 The gutter mark has no key. Stopping has no key of its own.
 
@@ -185,7 +185,7 @@ closed up, so an issue that quotes one still points at the right thing.
 
 | Gone | Was |
 |---|---|
-| **Difference 2** | **Automate Test Case** and `F12` were live on every selected test case and always answered *Not built yet*, so the one entry named after generating code was the one that did not. It is gray now and its own name says why - *Automate Test Case (not built yet)* - which is what the no-hidden-buttons rule asks for. The feature behind it is still [#3](https://github.com/mtb550/test-in/issues/3). Fixed 10 September 2026, [#243](https://github.com/mtb550/test-in/issues/243) |
+| **Difference 2** | **Automate Test Case** and `F12` were live on every selected test case and always answered *Not built yet*, so the one entry named after generating code was the one that did not. It was grayed with the reason in its own name first, which is what the no-hidden-buttons rule asks for, and then given the work: it writes the method a test case has not got. Filling in what that method does is still [#3](https://github.com/mtb550/test-in/issues/3). Grayed 10 September 2026, [#243](https://github.com/mtb550/test-in/issues/243); built 17 September 2026 |
 | **Difference 5** | One state said two ways: *has no generated code yet* when run, **Nothing to open** when jumped to. Both go through the one owner now. Fixed 9 September 2026, [#246](https://github.com/mtb550/test-in/issues/246) |
 | **Difference 1** | `priority` in the generated method carries the position, not the test case's priority. Not a difference: a test method's priority and a test case's priority are different things, and the case's own writes nothing into the code on purpose. Decided 7 September 2026, [#242](https://github.com/mtb550/test-in/issues/242) |
 | **Difference 8** | A removal, a move and a rename all read *Class Name Unknown* from the one place that builds a class name, because only creating one made that news. It goes to the log now, which is what Rule-CODEGEN-006 said all along. Fixed 9 September 2026, [#249](https://github.com/mtb550/test-in/issues/249) |

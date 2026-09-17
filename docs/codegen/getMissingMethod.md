@@ -71,10 +71,12 @@ nothing happens at all, and nothing is written anywhere, not even the log.
 
 ## Why this is worth knowing
 
-No button in Testin says "write the method for this test case". One menu entry
-sounds like it: **Automate Test Case**, which is not built and is gray, and
-says so in its own name. Filling in the description is the way, and that entry's
-description now points here while it waits.
+There are two ways a missing method gets written. Filling in the description is
+this one, and it happens by itself the moment the description is saved. Asking
+for it outright is **Automate Test Case**, [UC-CODEGEN-005](automateTestCase.md),
+which is the way for a test case that arrived with its description already set -
+from a Git pull, a sync, an imported sheet or a branch switch - and so never had
+a description edit for this to hang on.
 
 ---
 

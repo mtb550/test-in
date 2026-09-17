@@ -57,7 +57,7 @@ table; this is all of them together.
 | *no key* | **Copy Test Case**, **Cut Test Case** and **Paste Test Case** are right-click menu entries. They had `Ctrl+Shift+C/X/V`, lost that fight to the IDE's own Copy Path and Paste from History, moved to `Alt+Shift`, and then carried no key at all: a tester who wants them clicks them |
 | `F5` | Runs the selected test cases, or stops them |
 | `Shift+F5` | Goes to the automation code |
-| `F12` | **Automate Test Case**, which is not built |
+| `F12` | Writes the method for a test case that has none |
 | `Ctrl+P` | Generates a report on this test run |
 
 ## The editor panel: writing test cases
@@ -121,7 +121,7 @@ The always on top window, which has its own keys.
 |---|---|
 | `F5` | Runs the selected test cases, or stops them |
 | `Shift+F5` | Goes to the generated method |
-| `F12` | **Automate Test Case**, which is not built |
+| `F12` | Writes the method for a test case that has none |
 
 ## Reports
 

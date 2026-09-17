@@ -1,13 +1,15 @@
 [Documentation](../README.md) › [Automation code and the gutter](main.md) › UC-CODEGEN-005
 
-# UC-CODEGEN-005: Ask Testin to write the automation for me
+# UC-CODEGEN-005: Ask for the method a test case never got
 
-**As a** tester, **I want** Testin to fill in what the test method actually
-does, **so that** I get a working test rather than an empty method with a
-comment in it.
+**As a** tester, **I want** to ask Testin for the test method a test case has not
+got, **so that** test cases that arrived from somebody else are as runnable as
+the ones I wrote here.
 
-Testin cannot do this yet. The entry is on the menu, gray, and its own name says
-so.
+A test case written in the create dialog gets its method as it is saved. A test
+case that arrives any other way does not, because nothing was asked for: a Git
+pull, a sync from the server, an imported sheet, a branch switch, a data folder
+edited by hand. This is how to ask.
 
 `F12`, or the menu entry **Automate Test Case**.
 
@@ -21,54 +23,80 @@ so.
   declaration. The body is the tester's, and Testin never touches it.
 - **Rule-CODEGEN-004** — A rename or a move happens before the tree changes,
   while the old name still finds the code.
-- **Rule-CODEGEN-071** — The entry is gray until there is something behind it,
-  and its own name says why: **Automate Test Case (not built yet)**. A control
-  that cannot work is shown and disabled with the reason, never left out — a
-  tester who cannot see it cannot learn it is coming.
+- **Rule-CODEGEN-071** — The entry is live where there is a method to write and
+  gray with the reason where there is not, never left off the menu — a tester
+  who cannot see it cannot learn it is there.
 - **Rule-CODEGEN-005** — Test management works without any of this. A missing
   Java plugin or a missing test folder is a skip, never a failure.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
-- **Rule-CODEGEN-025** — This is not built. The menu entry is gray and says so
-  in its name. The key does nothing.
+- **Rule-CODEGEN-025** — This writes the same method creating a test case
+  writes: the annotation, the declaration and an empty body, in the class the
+  test set belongs to, with that class and its folders written if they are not
+  there. It writes nothing for a test case that already has a method. Filling in
+  what the method does is a different thing and is not this.
 
-## The screen
+## What the tester sees
 
-The only thing this use case draws is its own menu entry, gray.
+This opens no screen. Nothing on the list changes — the method is in the class
+file, and the card's automation mark says so at the next redraw.
 
-```
-┌──────────────────────────────────────────┐
-│  Automate Test Case (not built yet)      │
-└──────────────────────────────────────────┘
-```
+A small message appears at the bottom of the IDE and fades. It reads
+*Automated*, with a count after it for more than one test case.
 
-1. **The name** — the entry's name, with *(not built yet)* after it.
-2. **The gray** — the entry cannot be chosen.
-3. **The description** — shown where the IDE shows one, such as **Find Action**.
-   It says a test case's method is written when the case is saved with a
-   description, and that generating one for a case that already exists is a
-   later release.
+## Main flow
 
-## What happens today
-
-1. The tester right-clicks a test case.
-2. The menu shows **Automate Test Case (not built yet)**, gray.
-3. Pressing `F12` does nothing. Nothing is written.
+1. The tester selects the test cases.
+2. The tester chooses **Automate Test Case**, or presses `F12`.
+3. Testin passes over the test cases that already have a method.
+4. Testin writes the class for any test set that has not got one, and every
+   folder on its path with it.
+5. Testin writes each remaining method into the class its test case belongs to.
+6. A message reads *Automated 4*.
 
 ## What Testin refuses
 
-**Always.** The entry never generates anything.
-
 **If nothing is selected** — the entry is gray.
+
+**If every selected test case already has its method** — the entry is gray, and
+says so: *Every one of these test cases already has its method. Automate writes
+the method for a test case that has none.* Nothing is written, and nothing
+claims to have been.
+
+**If a test case has no description** — it gets no method, because a description
+is what names one (Rule-CODEGEN-002). Nothing is said on screen; the method
+appears when the description is filled in, which is
+[UC-CODEGEN-003](getMissingMethod.md).
+
+**If a description cannot name a Java method** — a message titled **test cases
+have no automation method** names them and says to reword.
+
+**If another test case already answers to that name** — the second gets no
+method, and a message says which and asks for one of the two to be reworded.
+
+**If the code project has no Java test source folder** — a message titled **Java
+Test Source Not Found** appears, and nothing is written.
 
 **If the IDE has no Java plugin** — the entry is still on the menu, grayed,
 reading *(needs the Java plugin)*.
 
-## What really writes a missing method
+**If the IDE is indexing** — nothing is written, and the tester is told once for
+the whole gesture rather than once per test case.
 
-Filling in the test case's description. That is
-[UC-CODEGEN-003](getMissingMethod.md), and this entry's own description says so
-while it is gray.
+## What this does not do
+
+It does not write the steps. The body is one comment, exactly as it is for a
+test case created here, and filling it in is the tester's — or a later feature's,
+which is [#3](https://github.com/mtb550/test-in/issues/3). What this gives the
+tester is the method their test case should have had, in the class it belongs
+in, ready to be filled.
+
+## The other way a missing method appears
+
+Filling in a test case's description writes its method by itself. That is
+[UC-CODEGEN-003](getMissingMethod.md), and it is the way for a case being
+written here. This entry is the way for a case that arrived with its description
+already set, and so never had an edit for that to hang on.
 
 ---
 
