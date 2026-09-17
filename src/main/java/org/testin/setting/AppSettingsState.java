@@ -86,8 +86,18 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
      */
     public boolean showShortcutHints = true;
 
+    /**
+     * A stored string as every reader should see it: never null, and never
+     * padded.
+     * <p>
+     * Trimmed as well as defaulted, because the settings page writes every one
+     * of these trimmed and compares the typed value trimmed against what is
+     * stored. A file written before it did that - or edited by hand - therefore
+     * held a value the page could never match, so Apply stayed black on a page
+     * nobody had changed, for the life of the dialog (#312, N8).
+     */
     private static @NotNull String orEmpty(final @Nullable String value) {
-        return Objects.requireNonNullElse(value, "");
+        return Objects.requireNonNullElse(value, "").trim();
     }
 
     @Override
