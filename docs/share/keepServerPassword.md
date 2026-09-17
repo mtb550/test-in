@@ -35,6 +35,9 @@ Nothing starts this. It happens when a password is typed in the account window.
 - **Rule-SHARE-095** — A password the tester has just typed is preferred over
   one kept from before, so a corrected password works on the attempt it was
   corrected on.
+- **Rule-SHARE-113** — A secret the server refuses is forgotten, and the account
+  window opens again. Only the secret that was actually tried: an agent that
+  answered means the kept password was never used, so it is left alone.
 
 ## What the tester sees
 
@@ -61,6 +64,12 @@ again.* The sync itself carries on.
 
 **If the keychain cannot be read** — nothing is said. An empty password is
 used, and the server is the one that refuses.
+
+**If the server refuses the account** — the secret that was tried is taken out
+of the store, a message reads *The server would not accept the saved account, so
+it has been forgotten*, and the account window opens. A password that was right
+when it was kept and has since been changed on the server used to fail every
+sync from then on, with nothing offering to take a new one.
 
 ## The order Testin tries to prove who this is
 
