@@ -100,6 +100,10 @@ This changes the name of one node. Nothing inside it moves.
 **If the name is empty** — the gray hint text turns red, and the dialog stays
 open.
 
+**If the name is a path** - a name holding a slash, a backslash or `..` is
+refused, reading *is a path, not a name - a node is one folder inside the one
+selected*. Nothing is renamed.
+
 **If the name is unchanged** — the dialog closes and nothing happens, silently.
 Renaming `Accounts` to `  Accounts  ` counts as unchanged, because the spaces
 are dropped first.

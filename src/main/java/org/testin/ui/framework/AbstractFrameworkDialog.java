@@ -36,6 +36,7 @@ import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.function.Function;
 
 /**
  * The dialog framework shell (issue #11). A concrete dialog assigns the
@@ -162,10 +163,29 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
      * typed and can correct it.
      */
     protected final @NotNull String accepted(final @NotNull TextValue field, final @NotNull Predicate<String> allows, final @NotNull Refused refusal) {
-        final @NotNull String value = accepted(field);
-        if (value.isEmpty() || allows.test(value)) return value;
+        return accepted(field, value -> allows.test(value) ? Optional.empty() : Optional.of(refusal));
+    }
 
-        Services.getInstance(p, Notifier.class).softRefuse(p, refusal, value);
+    /**
+     * UC-INTERNAL-007, Rule-INTERNAL-067.
+     * <p>
+     * The same, for a field whose rule can be broken in more than one way and
+     * says which.
+     * <p>
+     * A node name is the first of those: it has to be one folder inside the one
+     * selected, and for two kinds of node it also has to be a name Java can take
+     * as a package. The two read differently and a tester needs to be told which
+     * one they met, so the value is asked what is wrong with it rather than
+     * whether anything is (#312, A65).
+     */
+    protected final @NotNull String accepted(final @NotNull TextValue field, final @NotNull Function<String, Optional<Refused>> refusing) {
+        final @NotNull String value = accepted(field);
+        if (value.isEmpty()) return value;
+
+        final @NotNull Optional<Refused> refusal = refusing.apply(value);
+        if (refusal.isEmpty()) return value;
+
+        Services.getInstance(p, Notifier.class).softRefuse(p, refusal.orElseThrow(), value);
         return "";
     }
 

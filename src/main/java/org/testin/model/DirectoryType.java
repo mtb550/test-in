@@ -199,9 +199,36 @@ public enum DirectoryType {
      * ask cannot come to three different answers, and a kind of node added later
      * is covered by the list above rather than by remembering to edit them
      * (#11).
+     * <p>
+     * Two rules, and the second used to be missing. A name has to be one folder
+     * inside the one selected, whatever the kind; only a test project and a test
+     * set package are also asked whether Java can take it as a package. So a
+     * test set, a test run and a test run package took any name at all, and one
+     * carrying a slash or {@code ..} wrote its folder wherever that path led
+     * (#312, A65). Which of the two a name broke is {@code Refused.ofName}'s to
+     * say: the rule is the model's and the words are not.
      */
     public boolean canTakeName(final @NotNull String name) {
-        return !BECOME_JAVA_PACKAGES.contains(this) || NameSanitizer.canMakePackageName(name);
+        return isOneFolderName(name) && (!BECOME_JAVA_PACKAGES.contains(this) || NameSanitizer.canMakePackageName(name));
+    }
+
+    /**
+     * Whether this names one folder rather than a way through several.
+     * <p>
+     * Both separators, on every platform: a name typed with a backslash on Linux
+     * is not a folder called {@code a\b} anywhere a tester would want, and a
+     * repository carrying such a folder would break the next Windows machine to
+     * clone it. {@code .} and {@code ..} are names the filesystem has already
+     * taken.
+     */
+    public static boolean isOneFolderName(final @NotNull String name) {
+        final @NotNull String trimmed = name.trim();
+
+        return !trimmed.isEmpty()
+                && !trimmed.equals(".")
+                && !trimmed.equals("..")
+                && trimmed.indexOf('/') < 0
+                && trimmed.indexOf('\\') < 0;
     }
 
     /**
