@@ -139,6 +139,11 @@ cannot be opened. An IDE notification titled *Git Error* gives the reason.
 **If the repository has no branches** — the box reads *No branches found* and
 cannot be opened.
 
+**If Git is on no branch at all** — the box lists the branches and shows none of
+them selected. A checkout of a tag or a commit made outside Testin, a bisect, or
+a rebase stopped partway all leave the repository like this, and there is no
+branch to name. Picking one from the list switches to it, which is the way out.
+
 **While the branches are still loading** — the box reads *Loading branches...*
 and cannot be opened.
 

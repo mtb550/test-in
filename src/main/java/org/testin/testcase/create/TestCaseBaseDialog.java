@@ -368,8 +368,14 @@ public abstract class TestCaseBaseDialog {
             // update dialog edits the very case the index holds, so applying first
             // blanked that case before this said no: Escape did not bring the text
             // back, and the next save of the case wrote it (#312, A83).
-            final @NotNull String title = writers.contains(descriptionSection) ? descriptionSection.typed() : dto.getDescription().trim();
-            if (descriptionSection.isShown() && title.isEmpty()) {
+            //
+            // Only when this save is the one writing it. Tested against what was
+            // stored, a test case imported with no description at all refused
+            // every single-field edit: the description is shown read-only in
+            // those, so setting the priority on such a case was refused because
+            // of a field the tester was not editing, and the red box was on a
+            // field they could not type in (#312, N11).
+            if (writers.contains(descriptionSection) && descriptionSection.typed().trim().isEmpty()) {
                 descriptionSection.setError(true);
                 return;
             }

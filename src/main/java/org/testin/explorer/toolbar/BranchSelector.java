@@ -361,8 +361,16 @@ public class BranchSelector {
     private void readBranchesInto(final @NotNull Path repositoryPath) {
         try {
             final @NotNull List<String> branches = git.getAvailableBranches(repositoryPath);
-            final @NotNull String loadedCurrentBranch = git.getCurrentBranch(repositoryPath);
-            if (!loadedCurrentBranch.isEmpty()) currentBranch = loadedCurrentBranch;
+
+            // Taken as Git gives it, empty included. Keeping the last name when
+            // Git names none is what let a HEAD detached outside Testin - a
+            // checkout of a tag or a commit in a terminal, a bisect, a rebase
+            // stopped partway - go on showing the branch that was checked out
+            // before it. It also undid A69 one line further down, which selects
+            // nothing exactly when this is empty: the old name is still a branch
+            // that exists, so the box found it in the list and selected it (#312,
+            // N10).
+            currentBranch = git.getCurrentBranch(repositoryPath);
 
             ApplicationManager.getApplication().invokeLater(() -> showBranches(branches));
         } catch (final Exception ex) {
