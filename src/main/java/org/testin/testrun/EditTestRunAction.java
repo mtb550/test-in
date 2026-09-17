@@ -278,9 +278,19 @@ public class EditTestRunAction extends DumbAwareAction {
         }
 
         private void write(final @NotNull Path runPath, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
-            BackgroundWork.run(p, Bundle.message("run.task.updating", runPath.getFileName()), Bundle.message("run.update.failed.title"), indicator -> {
-                writeTo.accept(runPath);
+            // The change itself on the EDT, which is where every other change to a
+            // run is made and what changeRun is written for: it mutates the run the
+            // index holds and takes the snapshot the write queue then writes, both
+            // cheap, and the queue is what keeps the disk off this thread. Made
+            // from a pooled thread it could be mutating the same run and the same
+            // result list as a verdict being recorded under the tester's hand, with
+            // nothing between them (#312, N14).
+            //
+            // Both callers are already here: the dialog saves on the EDT, and the
+            // rename hands back inside the VFS write action, which is on it too.
+            writeTo.accept(runPath);
 
+            BackgroundWork.run(p, Bundle.message("run.task.updating", runPath.getFileName()), Bundle.message("run.update.failed.title"), indicator -> {
                 // File access is the indexer's alone (see CLAUDE.md).
                 Services.getInstance(p, ProjectIndexer.class).refreshDirectory(runPath);
 
