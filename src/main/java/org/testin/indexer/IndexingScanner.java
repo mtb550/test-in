@@ -138,6 +138,7 @@ final class IndexingScanner {
 
             reportUnread(tp.getName(), unread);
             reportDamaged(tp.getName(), Services.getInstance(p, ProjectIndexer.class).takeDamagedMarkers());
+            reportClashing(tp.getName(), List.copyOf(scanned.getClashingCases()));
 
         // Nothing is swapped in, for the same reason a cancelled pass is not: a
         // scan that threw halfway read half a project, and the half it did not
@@ -217,7 +218,16 @@ final class IndexingScanner {
                                 final @NotNull TestCaseDto tc = mapper.readValue(filePath.toFile(), TestCaseDto.class);
                                 tc.setParent(ts);
                                 tc.setId(identityOf(filePath, tc));
-                                scanned.getTestCasesById().put(tc.getId(), tc);
+
+                                // Said rather than silently kept. The index holds
+                                // one case per identity, so the second file of a
+                                // pair goes over the first and both sets then
+                                // resolve that id to whichever landed last
+                                // (#312, A3).
+                                if (scanned.getTestCasesById().put(tc.getId(), tc) != null) {
+                                    scanned.getClashingCases().add(ts.getName() + "/" + filePath.getFileName());
+                                }
+
                                 caseIds.add(tc.getId());
                             } catch (final Exception ex) {
                                 Logger.error("Failed to read test case '" + filePath.toAbsolutePath() +
@@ -366,6 +376,32 @@ final class IndexingScanner {
 
         Services.getInstance(p, Notifier.class).warn(p, Bundle.message("indexer.damaged.title", projectName),
                 Bundle.message("indexer.damaged.message", count, named, rest));
+    }
+
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-082.
+     * <p>
+     * The test case files whose identity another file had already taken, named
+     * once for the project.
+     * <p>
+     * The same shape as the two above it, and for the same reason: the tester
+     * repairs this by renaming a file, and needs the names after a balloon would
+     * have faded. What it cannot do is choose which of the pair keeps the
+     * identity, so it says which files collided and leaves that to them.
+     */
+    private void reportClashing(final @NotNull String projectName, final @NotNull List<String> clashing) {
+        if (clashing.isEmpty()) return;
+
+        final @NotNull String named = clashing.stream().sorted().limit(5).collect(Collectors.joining(", "));
+        final @NotNull String rest = clashing.size() > 5
+                ? Bundle.message("indexer.more", String.valueOf(clashing.size() - 5))
+                : "";
+        final @NotNull String count = clashing.size() == 1
+                ? Bundle.message("indexer.clash.one")
+                : Bundle.message("indexer.clash.many", String.valueOf(clashing.size()));
+
+        Services.getInstance(p, Notifier.class).warn(p, Bundle.message("indexer.clash.title", projectName),
+                Bundle.message("indexer.clash.message", count, named, rest));
     }
 
     // UC-INTERNAL-002

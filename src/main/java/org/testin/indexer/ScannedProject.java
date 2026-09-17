@@ -32,6 +32,7 @@ import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -74,4 +75,24 @@ final class ScannedProject {
     private final @NotNull Map<String, TestRunDto> testRuns = new ConcurrentHashMap<>();
     private final @NotNull Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
     private final @NotNull Map<String, List<UUID>> testSetCaseIds = new ConcurrentHashMap<>();
+
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-082.
+     * <p>
+     * Test case files this pass met whose identity another file had already
+     * taken, named by the set they are in and the file itself.
+     * <p>
+     * A test case is identified by its file name, and the index holds one case
+     * per identity - so the second file of a pair is read, put over the first,
+     * and then reachable from neither set: the set that owns it lists the id and
+     * gets the other set's case back, and the set that owned the first gets the
+     * second's. An edit in one showed in the other and a removal hid its twin
+     * (#312, A3).
+     * <p>
+     * Copying a test case file by hand is how a tester meets this, and nothing
+     * said a word about it. The read cannot mend it - which of the two should
+     * keep the identity is not the plugin's to decide - so it names them, in the
+     * same notification the unread folders get.
+     */
+    private final @NotNull Set<String> clashingCases = ConcurrentHashMap.newKeySet();
 }
