@@ -192,14 +192,18 @@ public class SyncActionAction extends DumbAwareAction {
                         // runs git status, and a git command on the EDT trips the
                         // platform's own assertion. The shared task hands the error
                         // to this handler on that thread for exactly this reason.
-                        final boolean conflicts = git.hasConflicts(repoPath);
-
-                        // Asked here too, for the same reason: naming the files
-                        // that conflict is another git status.
-                        final @NotNull List<String> conflicting = conflicts ? git.conflictingPaths(repoPath) : List.of();
+                        //
+                        // And asked as the files that conflict rather than as
+                        // hasConflicts, which is what A43 settled for the rebase
+                        // handler: a rebase left behind by an earlier failure keeps
+                        // its directory, and hasConflicts reads that as a conflict.
+                        // A sync that failed for its own reason was then offered
+                        // back as a conflict naming no file, and what actually went
+                        // wrong was never said (#312, N9).
+                        final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
 
                         ApplicationManager.getApplication().invokeLater(() -> {
-                            if (conflicts) {
+                            if (!conflicting.isEmpty()) {
                                 showConflictActions(repoPath, conflicting);
                             } else {
                                 reportSyncFailure(Bundle.message("git.sync.failed.remote", ex.getMessage()));

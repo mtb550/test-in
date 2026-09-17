@@ -437,7 +437,15 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                                         Bundle.message("git.pushed.message", commitLabel(commitId), remote, branch)));
                     },
                     ex -> {
-                        if (git.hasConflicts(repoPath)) {
+                        // Files still conflicting, not hasConflicts, which is the
+                        // shape A43 settled two handlers down: a rebase that was
+                        // left behind by an earlier failure keeps its directory,
+                        // and hasConflicts reads that as a conflict. A push that
+                        // failed for its own reason - no such remote, rejected,
+                        // nothing to push - was then offered back as a conflict
+                        // naming no file, and the message with the retry on it
+                        // never showed (#312, N9).
+                        if (!git.conflictingPaths(repoPath).isEmpty()) {
                             showConflictActions(repoPath, remote, branch);
                             return;
                         }
