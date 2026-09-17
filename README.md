@@ -26,8 +26,8 @@ they exercise.
 - **Execute** — run a case, a set, or a whole test run from the gutter, the tree
   or the editor. Results are recorded per case with status, duration and
   failure details.
-- **Report** — export a run to PDF, Word, Excel or HTML, and import or export
-  test cases as XLSX, CSV or JSON.
+- **Report** — export a run to PDF, Word, Excel or HTML. Test cases export as
+  XLSX, CSV, JSON or HTML, and import from XLSX, XLS, CSV or JSON.
 - **Version** — commit and sync test case changes from inside the panel, with a
   diff of what changed in each case.
 

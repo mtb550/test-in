@@ -11,8 +11,8 @@
 | **Part of Testin** | All of it, once, in the shortest line through |
 | **Answers** | What the plugin is for, shown rather than described |
 | **State** | Written |
-| **Checked against** | `main` at `d1b80428`, 9 September 2026 |
-| **You need** | IntelliJ IDEA 2025.2 or later, the Java plugin enabled, and a Java project with a `src/test/java` |
+| **Checked against** | `main` at `6b9a554a`, 17 September 2026 |
+| **You need** | IntelliJ IDEA 2026.1 or later, the Java plugin enabled, and a Java project with a `src/test/java` |
 
 The screens below are drawn rather than photographed, the same way every other
 page in this documentation draws them. They show what is on the screen, not what
@@ -49,15 +49,21 @@ tree:
 ┌────────────────────────────────────────────────────────────┐
 │  Welcome to Testin                                         │
 │                                                            │
-│  Choose the folder your test projects live in.             │
+│  The new awesome test management tool                      │
 │                                                            │
-│                    [ Open Settings ]                       │
+│  By                                                        │
+│  Muteb almughyiri                                          │
+│                                                            │
+│  ⚙ Configure Testin settings                               │
 └────────────────────────────────────────────────────────────┘
 ```
 
+The last line is a link. What it offers is the one step out of wherever you
+are — settings when there is no folder yet, a first test project once there is.
+
 ## 2. Point Testin at a folder
 
-Press **Open Settings**, or go to **Settings → Tools → Testin**.
+Press **Configure Testin settings**, or go to **Settings → Tools → Testin**.
 
 Set two things and leave the rest:
 
@@ -72,8 +78,10 @@ why.
 
 ## 3. Create a test project
 
-A test project is one product under test. Select the root of the tree and press
-`Ctrl+M`, or use the context menu, and choose **Test Project**.
+A test project is one product under test. Press **New Test Project** on the
+panel's toolbar, or the **Create your first test project** link the empty panel
+now offers. There is no key for it: `Ctrl+M` creates the nodes *inside* a test
+project, and a test project is not one of them.
 
 Call it `Demo`. Testin makes the folder and the two fixed folders inside it:
 
@@ -119,23 +127,30 @@ Write two more, so the run in step 8 has something to move through.
 Press `F2` on a card to change one field, or any of `D` `E` `M` `T` `B` `S` `P`
 `G` `O` to open that field straight away.
 
-## 6. Let Testin write the Java
+## 6. Testin has already written the Java
 
-Right-click the test set and choose **Generate Code**.
-
-Testin writes a TestNG class into your project's `src/test/java`, one `@Test`
-method per test case:
+There is nothing to press. Saving the case in step 5 wrote the method — Testin
+writes a TestNG class into your project's `src/test/java`, one `@Test` method
+per test case:
 
 ```java
-@Test(priority = 1, description = "Log in with a valid user")
+@Test(description = "Log in with a valid user",
+      testName = "3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b",
+      priority = 1)
 public void logInWithAValidUser() {
     // TODO: Auto-generated test steps for logInWithAValidUser
 }
 ```
 
-The method is empty and it is meant to be — Testin writes the skeleton and keeps
-it in step with the tree. Renaming the case renames the method; removing the
-case leaves the method alone, because the code is yours.
+`testName` is the test case's identity, and it is the one part never to edit: it
+is how Testin finds this method again after you rename the case. `priority` is
+the case's position in its test set, which is the order TestNG runs methods in —
+not the case's own High, Medium or Low.
+
+The body is empty and it is meant to be: Testin writes the annotation and the
+declaration, and the rest is yours. It keeps the method in step with the tree —
+renaming the case renames the method, and removing the case removes the method
+from the class. The class itself stays.
 
 Press `Shift+F5` on a card to jump from a test case to its method.
 
@@ -186,8 +201,9 @@ every failure with what you wrote about it.
 
 ## That is the loop
 
-Write cases → generate the code → run them → record verdicts → send the report.
-Everything else in Testin is a shorter or wider version of those five things.
+Write cases → Testin writes the code → run them → record verdicts → send the
+report. Everything else in Testin is a shorter or wider version of those five
+things.
 
 ## Where to go next
 
@@ -203,4 +219,5 @@ Everything else in Testin is a shorter or wider version of those five things.
 
 You do not need steps 1 to 5. `./gradlew runIde` opens a sandbox IDE pointed at
 `samples/testin-root`, which already holds a `Demo` test project with two test
-sets, six cases and two runs — one completed, one in progress. Start at step 6.
+sets, six cases and two runs — one completed, one in progress. Start at step 7,
+or open the run that is still in progress and go straight to step 8.

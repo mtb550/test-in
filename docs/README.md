@@ -64,7 +64,7 @@ lists, not apologies.
 | Page | What it gives you |
 |---|---|
 | **[Every shortcut](shortcuts.md)** | Every key Testin answers to, what it does, and where |
-| **[The product](product.md)** | Who uses Testin, what they work with, every status, and the rules that hold everywhere |
+| **[The product](product.md)** | Who uses Testin, what they work with, every status, and the rules that hold everywhere. **Draft 1, never re-checked** — the eight parts above are current, this page is not |
 | **[Standing decisions](decisions.md)** | Ten designs that look wrong until you know why, and what each one costs to reverse |
 | **[The formats on disk](formats.md)** | Every file Testin writes, field by field, and what a version bump promises |
 | **[How a document is written](standard.md)** | Read this before writing one |

@@ -12,9 +12,9 @@
 | **What the numbers mean** | These rules belong to no single part of Testin, so `PRODUCT` is their part. Nine rules are still missing their text, which is explained in section 7 |
 | **Numbering** | Rules are `Rule-PRODUCT-001` to `Rule-PRODUCT-024`. This document names no use cases of its own; every one belongs to a part |
 | **Answers** | Who uses Testin, what they work with, every status, the rules for the whole product, and what is undecided |
-| **State** | **Draft 1** — moved from Notion, not re-checked. Correcting it is [#72](https://github.com/mtb550/test-in/issues/72) |
+| **State** | **Draft 1** — moved from Notion, never re-checked, and nothing owns correcting it. Read the eight parts for what is current |
 | **Checked against** | `main` at `0becc8b2`, 29 August 2026 |
-| **Written to** | Written before [the standard](standard.md). It names keys and has no user stories. [#72](https://github.com/mtb550/test-in/issues/72) brings it in line |
+| **Written to** | Written before [the standard](standard.md). It names keys and has no user stories |
 
 Every rule in the main body was true of the product on that commit. Where a rule
 is genuinely undecided it is listed as undecided rather than invented.
@@ -26,7 +26,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 > Moved here from Notion on 6 September 2026. Its facts are unchanged. Only the
 > wording was made plain, to [the standard](standard.md). **It has not been
 > re-checked against the product since it was written.** `main` has moved
-> **127 commits**: 208 files, 8,974 insertions, 2,100 deletions.
+> **626 commits**: 985 files, 78,652 insertions, 12,408 deletions.
 >
 > What is known to have changed, and is therefore not reflected below:
 >
@@ -42,9 +42,14 @@ is genuinely undecided it is listed as undecided rather than invented.
 > - **#71 is closed.** Question 3 still calls it open.
 >
 > Nothing above has been corrected in the text below, deliberately: this is
-> Draft 1 as written, and correcting it is [#72](https://github.com/mtb550/test-in/issues/72).
-> The document's own rule is that a rule which quietly stops being true is worse
-> than no rule. So the staleness is stated, instead of patched over.
+> Draft 1 as written. The issue that owned correcting it,
+> [#72](https://github.com/mtb550/test-in/issues/72), was closed as not planned
+> on 11 September 2026 — the documentation is being written as the eight parts
+> listed on [the home page](README.md) rather than as a separate business
+> specification, so those parts are where a current answer lives. Nothing owns
+> this page now. The document's own rule is that a rule which quietly stops
+> being true is worse than no rule, so the staleness is stated instead of
+> patched over.
 >
 > **Two databases are not fully moved.** Section 7 has 21 of its 33 business
 > rules, and none of their numbers. Section 6.4, the use cases, has none
@@ -404,8 +409,8 @@ Numbered so an issue or a commit can cite one.
 > **Every number in this document now names a rule.** The six that pointed at
 > nothing - Rule11, Rule12, Rule13, Rule31, Rule40 and Rule50 - are written as
 > `Rule-PRODUCT-nnn` and point at the rule they always meant. The nine rules
-> still missing from the table are missing text, not missing numbers; restoring
-> them is part of [#72](https://github.com/mtb550/test-in/issues/72).
+> still missing from the table are missing text, not missing numbers. Nothing
+> owns restoring them: the issue that did was closed with this page unfinished.
 >
 > **Rules the product broke were written down, not hidden.** Two were broken by the
 > product at `0becc8b2`, and each was cited to the issue that tracks it. Those
