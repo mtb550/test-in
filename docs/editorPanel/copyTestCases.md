@@ -63,6 +63,11 @@ with a count after it for more than one test case.
 
 **If nothing is selected** — **Copy Node** is gray and the key does nothing.
 
+**In a test run editor** — **Copy Node** is gray, saying that a test run records
+what happened to a test case rather than the test case itself, and to copy it in
+its test set. Cut and Paste refuse there for the same reason
+([Rule-EDITOR-PANEL-214](keyboardMenu.md)).
+
 **If writing to the clipboard fails** — nothing is said, and only the log
 records it.
 

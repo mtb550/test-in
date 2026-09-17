@@ -29,6 +29,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.awt.datatransfer.StringSelection;
@@ -66,6 +67,18 @@ public class CopyTestCaseNodeAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
+        // Rule-EDITOR-PANEL-214. Gray with the reason in a test run editor, the
+        // way Cut and Paste beside it already are - Copy was the last of the
+        // three still live there. A test run records what happened to a test
+        // case, and the case itself belongs to the test set holding it, so a
+        // copy taken from a run reaches past the run for something the run does
+        // not own.
+        if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
+            e.getPresentation().setEnabled(false);
+            e.getPresentation().setDescription(Bundle.message("copy.case.disabled.description"));
+            return;
+        }
+
         e.getPresentation().setEnabled(!TestinData.selectedCases(e).isEmpty());
     }
 

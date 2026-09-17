@@ -44,11 +44,11 @@ The `Context Menu` key.
   the menu is what a tester opens it for. Every key those entries carry still
   works, on the cards and in the grid.
 - **Rule-EDITOR-PANEL-214** — Actions holds the same seven entries in both
-  editors. Cut Node, Paste Node and Delete are gray in a test run editor with
-  the reason on the entry, because a test run's test cases were chosen when it
-  was created and it keeps what it recorded. They are shown and refused rather
-  than left out, so a tester who learns the gesture in one editor can find it in
-  the other.
+  editors. Copy Node, Cut Node, Paste Node and Delete are gray in a test run
+  editor with the reason on the entry, because a test run's test cases were
+  chosen when it was created and it keeps what it recorded. They are shown and
+  refused rather than left out, so a tester who learns the gesture in one editor
+  can find it in the other.
 
 ## The screen
 
@@ -103,10 +103,11 @@ Automate, Run and Navigate to Code off the end of a list nobody read that far
 down.
 
 **The same seven are in the test run editor's menu**, in the same place and
-under the same word. Three of them are gray there, each saying why on the entry:
+under the same word. Four of them are gray there, each saying why on the entry:
 
 | Entry | Why it is gray in a test run |
 |---|---|
+| **Copy Node** | A test run records what happened to a test case, not the test case itself. Copy it in its test set. |
 | **Cut Node** | A test run's test cases were chosen when it was created. Cut the test case in its test set. |
 | **Paste Node** | The same. Paste into a test set. |
 | **Delete** | A test run keeps what it recorded, including for a test case that is gone. Delete the test case in its test set. |
@@ -114,6 +115,10 @@ under the same word. Three of them are gray there, each saying why on the entry:
 Shown and refused rather than left out. A menu that changes shape between
 editors teaches a tester nothing, and they cannot learn that the gesture exists
 or where it does work.
+
+**Copy** is not one of the four. It copies the text of what is selected, which a
+run reads out as well as a set does; **Copy Node** is the one that reaches for
+the test case.
 
 Each entry decides this for itself, from the node its editor is open on — the
 same flag Import and Export read to find out whether a node can hold test
