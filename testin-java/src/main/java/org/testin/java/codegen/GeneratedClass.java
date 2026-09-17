@@ -95,7 +95,12 @@ public final class GeneratedClass {
         return byName(p, path);
     }
 
-    private static @NotNull Optional<PsiClass> byName(final @NotNull Project p, final @NotNull String path) {
+    /**
+     * The same, for a caller that already holds the dotted name - one grouping
+     * its cases by the class they generate into, which is a name rather than a
+     * list by then.
+     */
+    public static @NotNull Optional<PsiClass> byName(final @NotNull Project p, final @NotNull String path) {
         return Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)));
     }
 

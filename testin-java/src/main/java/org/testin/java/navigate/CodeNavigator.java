@@ -21,12 +21,11 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.pom.Navigatable;
-import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
+import org.testin.java.codegen.GeneratedClass;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -47,8 +46,8 @@ import java.util.UUID;
 /**
  * Finds the generated method and opens it, through the Java plugin's PSI.
  * <p>
- * Lives in the content module rather than the core jar: JavaPsiFacade, PsiClass
- * and PsiMethod exist only where the Java plugin does, and in the core jar the
+ * Lives in the content module rather than the core jar: PsiClass and PsiMethod
+ * exist only where the Java plugin does, and in the core jar the
  * verifier reported every reference to them against PyCharm, GoLand and
  * WebStorm (#144). The core asks {@link CodeNavigation#available()} instead,
  * which answers with this where the module loaded and with a no-op where it did
@@ -70,9 +69,13 @@ public final class CodeNavigator implements CodeNavigation {
         final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
         if (fqcn.size() < 2) return Optional.empty();
 
-        final @NotNull String classFqcn = String.join(".", fqcn.subList(0, fqcn.size() - 1));
-        final @NotNull Optional<PsiClass> owner = Optional.ofNullable(
-                JavaPsiFacade.getInstance(p).findClass(classFqcn, GlobalSearchScope.projectScope(p)));
+        final @NotNull List<String> classPath = fqcn.subList(0, fqcn.size() - 1);
+        final @NotNull String classFqcn = String.join(".", classPath);
+
+        // Through the one resolver, and the finding form of it: navigating to
+        // code is a question, so a test set with no class answers no rather than
+        // being given one.
+        final @NotNull Optional<PsiClass> owner = GeneratedClass.find(p, classPath);
 
         if (owner.isEmpty()) {
             Logger.warn("No generated class " + classFqcn + " for '" + tc.getDescription() + "'");
@@ -121,8 +124,7 @@ public final class CodeNavigator implements CodeNavigation {
         final @NotNull Map<UUID, Boolean> found = new LinkedHashMap<>();
 
         for (final Map.Entry<String, List<TestCaseDto>> group : byClass.entrySet()) {
-            final @NotNull Optional<PsiClass> owner = Optional.ofNullable(
-                    JavaPsiFacade.getInstance(p).findClass(group.getKey(), GlobalSearchScope.projectScope(p)));
+            final @NotNull Optional<PsiClass> owner = GeneratedClass.byName(p, group.getKey());
 
             if (owner.isEmpty()) continue;
 
