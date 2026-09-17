@@ -47,8 +47,9 @@ There is no key for this. It happens when a test case is created, which is
   another takes its method with it, body and all: the method is carried into the
   destination class as it is written and removed from the one it came from. Not
   written fresh - what makes the move worth making is the automation the tester
-  wrote. A destination test set with no class of its own leaves the method where
-  it is, because a method in the wrong class can be found and one that was
+  wrote. A destination test set with no class gets one, written with every
+  package folder on its path; a class that could not be written leaves the method
+  where it is, because a method in the wrong class can be found and one that was
   deleted cannot.
 - **Rule-CODEGEN-078** — A test case copied into a test set gets a method of its
   own, carrying the body of the method it was copied from. Only the body comes

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import com.intellij.psi.PsiElement;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenType;
+import org.testin.java.codegen.GeneratedClass;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.logger.Logger;
 import org.testin.java.codegen.JavaLiteral;
@@ -159,9 +160,10 @@ public class UpdateTestBase {
         final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
         if (fqcn.size() < 2) return Optional.empty();
 
-        final @NotNull String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
-
-        return Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)));
+        // Through the one resolver, because an updater asking for a class it can
+        // already see and a generator asking for one it may have to write are the
+        // same question with two answers, and they used to be two lookups.
+        return GeneratedClass.find(p, fqcn.subList(0, fqcn.size() - 1));
     }
 
     /**

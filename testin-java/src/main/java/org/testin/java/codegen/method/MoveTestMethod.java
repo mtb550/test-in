@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.MovedCase;
+import org.testin.java.codegen.GeneratedClass;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.java.codegen.method.update.UpdateTestBase;
 import org.testin.logger.Logger;
@@ -57,8 +58,13 @@ import java.util.Optional;
  * throw away the only thing worth moving: the body. So the method is carried
  * across as it is written, annotation and all, and then deleted where it was.
  * <p>
- * <b>Nothing is deleted until the copy is in.</b> A destination class that
- * cannot be found leaves the method exactly where it is: a method in the wrong
+ * <b>A destination with no class gets one.</b> Writing a class writes every
+ * package folder on its path, so there is nothing for a tester to make first -
+ * and it is the same call a created or a copied test case goes through, which is
+ * what stops the same paste into the same test set answering two ways.
+ * <p>
+ * <b>Nothing is deleted until the copy is in.</b> A destination class that could
+ * not be written leaves the method exactly where it is: a method in the wrong
  * class is a thing a tester can find and move by hand, and one this deleted is
  * not.
  */
@@ -90,7 +96,7 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
     private void move(final @NotNull Project p, final @NotNull MovedCase moved) {
         final @NotNull TestCaseDto tc = moved.tc();
 
-        final @NotNull Optional<PsiClass> from = classOf(p, Fqcn.ofClass(moved.from()));
+        final @NotNull Optional<PsiClass> from = GeneratedClass.find(p, Fqcn.ofClass(moved.from()));
         if (from.isEmpty()) {
             Logger.debug("Nothing to move for '" + tc.getDescription() + "': the test set it came from has no class");
             return;
@@ -102,7 +108,17 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
             return;
         }
 
-        final @NotNull Optional<PsiClass> into = classOf(p, Fqcn.ofClass(tc.getParent()));
+        // Written out where the destination test set has no class yet, which
+        // writes every package folder on its path with it - the same call a
+        // created or copied test case goes through. It used to look the class up
+        // and give up when there was none, so the same paste into the same test
+        // set kept the automation for a copy and lost it for a cut.
+        final @NotNull List<String> destination = Fqcn.ofClass(tc.getParent());
+
+        final @NotNull Optional<PsiClass> into = destination.isEmpty()
+                ? Optional.empty()
+                : GeneratedClass.findOrWrite(p, destination.subList(0, destination.size() - 1), destination.getLast());
+
         if (into.isEmpty()) {
             // Left where it is, and said out loud rather than debugged: a method
             // in the wrong class is a thing a tester can find, and one this
@@ -135,17 +151,6 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
         reformat(p, from.orElseThrow());
 
         Logger.info("Moved test method " + carried.getName() + " into " + target.getName());
-    }
-
-    /**
-     * The class a test set's generated code lives in, and nothing when the set
-     * has none or the name does not resolve.
-     */
-    private @NotNull Optional<PsiClass> classOf(final @NotNull Project p, final @NotNull List<String> fqcn) {
-        if (fqcn.isEmpty()) return Optional.empty();
-
-        return Optional.ofNullable(JavaPsiFacade.getInstance(p)
-                .findClass(String.join(".", fqcn), GlobalSearchScope.projectScope(p)));
     }
 
     /**

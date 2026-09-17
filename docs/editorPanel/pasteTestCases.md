@@ -87,9 +87,12 @@ without being read, and nothing is said.
 **If the clipboard holds test cases that will not read** — the entry stays gray,
 and only the log says why.
 
-**If the destination test set has no class** — on a cut the method is left where
-it was, and only the log says so. A method in the wrong class is something a
-tester can find and move by hand; one that was deleted is not.
+**If the destination test set has no class** — it gets one. Writing a class
+writes every folder on its path with it, so there is nothing to make first, and a
+cut and a copy into that test set behave the same. Only a class that could not be
+written leaves a cut method where it was, and only the log says so: a method in
+the wrong class is something a tester can find and move by hand; one that was
+deleted is not.
 
 **If the copied test case has no method, or is no longer there** — the copy gets
 the empty method a new test case gets, and only the log says why. There is

@@ -28,6 +28,7 @@ import org.testin.codegen.ExecutionPosition;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
+import org.testin.java.codegen.GeneratedClass;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.java.codegen.JavaLiteral;
 import org.testin.logger.Logger;
@@ -150,7 +151,7 @@ public class CreateTestMethod implements GenAction {
         final @NotNull Target target = first.orElseThrow();
         Logger.info("Creating " + testMethods(cases.size()) + " in " + target.path());
 
-        findOrCreateClass(p, target.path(), target.packageList(), target.className()).ifPresentOrElse(
+        GeneratedClass.findOrWrite(p, target.packageList(), target.className()).ifPresentOrElse(
                 targetClass -> injectAsText(p, targetClass, cases),
                 () -> cases.forEach(tc -> retryInjectPhysically(p, target.packageList(), target.className(),
                         Fqcn.methodNameOf(tc), tc)));
@@ -383,49 +384,6 @@ public class CreateTestMethod implements GenAction {
         // reformatting each method as it landed made it slower for no reason
         // the tester can see (#66, finding 25).
         if (written > 0) CodeStyleManager.getInstance(p).reformat(targetClass);
-    }
-
-    /**
-     * The class the method goes in, written out first if it is not there yet.
-     * Empty when it could not be found or created, which is what sends the
-     * caller down the physical-injection path.
-     */
-    private @NotNull Optional<PsiClass> findOrCreateClass(final @NotNull Project p, final @NotNull String path, final @NotNull List<String> packageList, final @NotNull String className) {
-        final @NotNull JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(p);
-        final @NotNull GlobalSearchScope scope = GlobalSearchScope.projectScope(p);
-
-        final @NotNull Optional<PsiClass> existing = Optional.ofNullable(psiFacade.findClass(path, scope));
-        if (existing.isPresent()) return existing;
-
-        JavaSourceRoot.fileInRootOrWarn(p, "creating the class for " + className,
-                root -> JavaSourceRoot.classFile(root, packageList, className)).ifPresent(written -> commit(p, written));
-
-        return Optional.ofNullable(psiFacade.findClass(path, scope));
-    }
-
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-011.
-     * <p>
-     * The file that was just written, given to the PSI so the class in it can be
-     * found on the next line.
-     * <p>
-     * <b>One document, not every document.</b> This was
-     * {@code commitAllDocuments()}, which flushes every open document in the
-     * project - so generating a method while the tester had six files open paid
-     * for all six, and the file it was actually waiting on was the one it could
-     * not name: {@code inRootOrWarn} answered nothing, so the file it had just
-     * created was not reachable from here (#66, finding 22).
-     * <p>
-     * Nothing to commit is an answer, not a failure. A file created through the
-     * virtual file system has no document loaded against it until something
-     * opens one, and the PSI reads it either way.
-     */
-    private static void commit(final @NotNull Project p, final @NotNull VirtualFile written) {
-        final @NotNull PsiDocumentManager documents = PsiDocumentManager.getInstance(p);
-
-        Optional.ofNullable(PsiManager.getInstance(p).findFile(written))
-                .map(documents::getDocument)
-                .ifPresent(documents::commitDocument);
     }
 
     private void retryInjectPhysically(final @NotNull Project p, final @NotNull List<String> packageList, final @NotNull String className, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
