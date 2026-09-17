@@ -37,6 +37,12 @@ The code runs, and Testin writes down whether each test case passed.
 - **Rule-CODEGEN-074** — A test case that cannot run is reported once. One says
   its description; several say how many, because the descriptions are on the
   cards in front of the tester.
+- **Rule-CODEGEN-075** — A test the framework does not run to a verdict is
+  recorded as Failed, with Skipped/Terminated as its actual result. TestNG skips
+  a test whose dependency failed, whose group is excluded or that is disabled,
+  and stops the rest when the run is terminated: all of them come back as a
+  defect with no verdict, and a run that quietly left them Pending would report
+  a cycle as finished when part of it never ran.
 
 ## The three ways in
 
@@ -82,6 +88,12 @@ appears. The message saying how many have no generated code still does.
 
 **If every selected test case is already running** — nothing starts and nothing
 is said.
+
+**If the framework skips a test** - the test case is recorded as **Failed**, and
+its actual result reads *Skipped/Terminated*. A dependency that failed, an
+excluded group, a disabled test and a terminated run all arrive the same way: the
+framework says the test did not pass and gives no verdict. Leaving it Pending
+would report the cycle as finished when part of it never ran.
 
 **If the IDE is indexing** — every test case is put back and a message reads
 *Cannot run tests while IntelliJ is indexing. Please wait a moment.*

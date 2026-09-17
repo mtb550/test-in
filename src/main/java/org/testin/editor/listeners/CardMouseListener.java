@@ -25,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.BaseCard;
 import org.testin.editor.CardHoverAction;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.editor.CardTitle;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.WheelForwarding;
@@ -107,6 +109,17 @@ public class CardMouseListener extends MouseAdapter {
             final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
 
             Logger.trace(action.getTooltip() + ", tc: " + tc.getDescription());
+
+            // A gray icon is on the card so the tester can see the button exists
+            // and learn what it needs - and pressing it says that, rather than
+            // doing nothing. The tooltip says the same, but a tooltip is read by
+            // whoever waited for it (#312, A16).
+            final @NotNull Optional<String> whyNot = action.whyNotOffered();
+            if (whyNot.isPresent()) {
+                Services.getInstance(p, Notifier.class).softRefuse(p, whyNot.orElseThrow());
+                e.consume();
+                return;
+            }
 
             // Which editor the tester clicked in. The reports that follow name
             // only the case, and a case can be in several open runs.

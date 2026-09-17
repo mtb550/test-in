@@ -268,6 +268,13 @@ public final class SyncWithSftpAction extends DumbAwareAction {
          * key file, then the password kept for this server.
          */
         private @NotNull Proof authFor(final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull String keyFile) {
+            // Rule-SETTING-036. The passphrase read here is always empty, and
+            // that is the rule rather than a gap: nothing in Testin asks for one
+            // or stores one, so a key protected by a passphrase works only
+            // through an agent already holding it. The read stays because it is
+            // where a passphrase would arrive if asking for one is ever built,
+            // and because JSch wants a supplier either way. The rule used to
+            // promise the asking, which was never true (#312, A36).
             if (!keyFile.isEmpty()) {
                 return new Proof(SftpAuth.forKey(keyFile, () -> SftpSecret.KEY_PASSPHRASE.read(address, account.user())),
                         Optional.of(SftpSecret.KEY_PASSPHRASE));

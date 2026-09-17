@@ -1,4 +1,10 @@
-[Documentation](../README.md) › [Automation code and the gutter](main.md) › UC-CODEGEN-019
+| **Automate Test Case** | On the menu, gray, reading *Automate Test Case (needs the Java plugin)* |
+| **Navigate to Code** | The same on the menu. Its icon on a card and on the view panel is drawn gray, does not grow under the pointer, and says the Java plugin is what it needs when it is hovered or pressed |
+| The gutter marks | Not drawn in any editor. There is no generated code to mark |
+| Every class and every method | Nothing is written, ever || **Automate Test Case** | On the menu, gray, reading *Automate Test Case (needs the Java plugin)* |
+| **Navigate to Code** | The same on the menu. The icon on a card and on the view panel is drawn gray, and hovering or pressing it says the Java plugin is what it needs |
+| The gutter marks | Not drawn in any editor. There is no code to mark |
+| Every class and every method | Nothing is written, ever |[Documentation](../README.md) › [Automation code and the gutter](main.md) › UC-CODEGEN-019
 
 # UC-CODEGEN-019: Work in an IDE with no Java plugin
 
@@ -26,8 +32,11 @@ Nothing starts this. It is the state of the IDE.
   tester is not shown it.
 - **Rule-CODEGEN-061** — Test management works in full without the Java plugin.
   Only the code generation and the jumps into code are missing.
-- **Rule-CODEGEN-062** — What is missing is not offered. The entries are absent
-  from the menus rather than gray.
+- **Rule-CODEGEN-062** — What is missing is shown and refuses, naming the plugin
+  it waits for. A menu entry reads *<entry> (needs the Java plugin)* and is gray; a
+  card's or a panel's icon is drawn gray, does not grow under the pointer, and
+  says the same sentence when it is hovered or pressed. Nothing is left out: an
+  entry that is absent teaches nobody the feature exists.
 - **Rule-CODEGEN-063** — A plugin that is installed but switched off counts as
   missing, and switching it on needs the IDE restarted before Testin notices.
 
@@ -54,8 +63,8 @@ small red message appears near the bottom right of the IDE.
 
 | Missing | What the tester sees |
 |---|---|
-| **Automate Test Case** | Not on any menu |
-| **Navigate to Code** | Not on any menu, and the button is not drawn |
+| **Automate Test Case** | On the menu, gray, reading *Automate Test Case (needs the Java plugin)* |
+| **Navigate to Code** | The same on the menu. Its icon on a card and on the view panel is drawn gray, does not grow under the pointer, and says the Java plugin is what it needs when it is hovered or pressed |
 | The gutter marks | Not drawn in any editor |
 | Every class and every method | Nothing is written, ever |
 

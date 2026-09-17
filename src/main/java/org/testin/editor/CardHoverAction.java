@@ -38,6 +38,7 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 @Getter
@@ -205,7 +206,24 @@ public enum CardHoverAction {
      * than the default we shipped (#119).
      */
     public @NotNull String getHintText() {
-        return (tooltip + " " + Declared.shortcutText(actionId)).trim();
+        return whyNotOffered().orElseGet(() -> (tooltip + " " + Declared.shortcutText(actionId)).trim());
+    }
+
+    /**
+     * UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-197.
+     * <p>
+     * Why this IDE does not offer the action, naming the plugin that is
+     * missing - and nothing when it does offer it.
+     * <p>
+     * The first one missing, because one sentence is what a tooltip holds and
+     * installing either of two missing plugins is a step the tester takes one at
+     * a time anyway.
+     */
+    public @NotNull Optional<String> whyNotOffered() {
+        return requires.stream()
+                .filter(plugin -> !plugin.isAvailable())
+                .findFirst()
+                .map(plugin -> plugin.needs(tooltip));
     }
 
     /**
