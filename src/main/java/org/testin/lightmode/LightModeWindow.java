@@ -18,6 +18,7 @@ package org.testin.lightmode;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.Disposer;
@@ -796,7 +797,17 @@ final class LightModeWindow {
      */
     private void showCapture() {
         underCase.removeAll();
-        underCase.add(capture.map(form -> (JComponent) form).orElse(details), BorderLayout.CENTER);
+
+        // In a read action, because the failure form holds a spell-checked field
+        // and that field is an editor: an editor builds itself when it is added
+        // to a window that is showing, and the spell checking customization
+        // restarts the code analyzer, which reads the document. The platform
+        // requires a read action for that read. A dialog is handed one by
+        // DialogWrapper, which is why the same form raises nothing from the run
+        // editor; this window is built by hand and is handed nothing, so
+        // pressing F here wrote an IDE error report naming Testin as the plugin
+        // to blame, twice per press (#312, N22).
+        ReadAction.run(() -> underCase.add(capture.map(form -> (JComponent) form).orElse(details), BorderLayout.CENTER));
 
         statusBar.updateItems(capture.isPresent() ? commitKeys() : caseKeys());
 
