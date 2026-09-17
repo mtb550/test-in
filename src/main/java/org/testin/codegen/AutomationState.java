@@ -28,6 +28,7 @@ import org.testin.navigate.CodeNavigation;
 import org.testin.services.OptionalPlugin;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,6 +74,25 @@ public final class AutomationState {
     private final @NotNull Map<UUID, Automated> known = new ConcurrentHashMap<>();
 
     /**
+     * UC-CODEGEN-005, Rule-CODEGEN-025.
+     * <p>
+     * The cases a generated method exists for, whatever is written in it.
+     * <p>
+     * A second fact out of the same read, because {@link Automated} deliberately
+     * cannot answer it: an empty stub and a case that can have no method at all
+     * are both {@link Automated#NONE}, and to a tester reading a card that is
+     * right - neither has automation. To Automate Test Case it is the whole
+     * question, and merging them is what let the entry stay live over a case
+     * whose method was already there: a second press wrote nothing and said
+     * <i>Automated 1</i>.
+     * <p>
+     * Rebuilt for the cases each read covers rather than added to, so a method
+     * the tester deletes leaves this at the next redraw the way it leaves
+     * {@link #known}.
+     */
+    private final @NotNull Set<UUID> withAMethod = ConcurrentHashMap.newKeySet();
+
+    /**
      * UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-197.
      * <p>
      * What is known about this case right now, which is what a card draws.
@@ -81,6 +101,19 @@ public final class AutomationState {
      */
     public @NotNull Automated of(final @NotNull UUID id) {
         return known.getOrDefault(id, Automated.UNKNOWN);
+    }
+
+    /**
+     * UC-CODEGEN-005, Rule-CODEGEN-025.
+     * <p>
+     * Whether a generated method exists for this case, which is not the same
+     * question as whether it does anything - see {@link #withAMethod}. False for
+     * a case no read has covered yet, which is the safe way round: Automate Test
+     * Case offers to write one, the generator finds it already there and writes
+     * nothing.
+     */
+    public boolean hasMethod(final @NotNull UUID id) {
+        return withAMethod.contains(id);
     }
 
     /**
@@ -122,13 +155,19 @@ public final class AutomationState {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Map<UUID, Automated> answers = new LinkedHashMap<>();
+            final @NotNull Set<UUID> found = new LinkedHashSet<>();
 
             ApplicationManager.getApplication().runReadAction(() -> {
                 try {
+                    // A key here is a method that exists; its value is whether
+                    // that method does anything. Both halves are kept - the value
+                    // becomes the card's state and the key answers Automate Test
+                    // Case, which used to be told the value and act on it.
                     final @NotNull Map<UUID, Boolean> methods = CodeNavigation.available().methodsFor(p, cases);
 
                     for (final TestCaseDto tc : cases) {
                         answers.put(tc.getId(), stateOf(tc, methods));
+                        if (methods.containsKey(tc.getId())) found.add(tc.getId());
                     }
                 } catch (final Exception ex) {
                     // The cards keep whatever they had, which is UNKNOWN on a
@@ -143,6 +182,14 @@ public final class AutomationState {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 known.putAll(answers);
+
+                // Rebuilt for what this read covered, so a method that has gone
+                // leaves. Before the early return below, which is about telling
+                // the caller rather than about what is known.
+                for (final TestCaseDto tc : cases) {
+                    if (found.contains(tc.getId())) withAMethod.add(tc.getId());
+                    else withAMethod.remove(tc.getId());
+                }
 
                 // Only when something changed for this caller. Telling it every
                 // time is a loop that never settles: it rebuilds its list, which

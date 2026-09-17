@@ -81,7 +81,8 @@ public class AutomateTestCaseAction extends DumbAwareAction {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        final @NotNull List<TestCaseDto> toWrite = withoutAMethod(p, TestinData.selectedCases(e));
+        final @NotNull List<TestCaseDto> toWrite =
+                withoutAMethod(p, TestinData.selectedCases(e).stream().filter(AutomateTestCaseAction::canBeNamed).toList());
         if (toWrite.isEmpty()) return;
 
         // Taken now rather than in the callback below: an AnActionEvent is good
@@ -148,7 +149,18 @@ public class AutomateTestCaseAction extends DumbAwareAction {
             return;
         }
 
-        if (withoutAMethod(p, selected).isEmpty()) {
+        // A description is what names a method (Rule-CODEGEN-002), so a case
+        // without one cannot be given code by anything. Said as itself rather
+        // than folded into the message below, which would tell a tester their
+        // case already has a method when it can never have one.
+        final @NotNull List<TestCaseDto> nameable = selected.stream().filter(AutomateTestCaseAction::canBeNamed).toList();
+        if (nameable.isEmpty()) {
+            e.getPresentation().setEnabled(false);
+            e.getPresentation().setDescription(Bundle.message("automate.no.description.description"));
+            return;
+        }
+
+        if (withoutAMethod(p, nameable).isEmpty()) {
             e.getPresentation().setEnabled(false);
             e.getPresentation().setDescription(Bundle.message("automate.already.written.description"));
             return;
@@ -158,17 +170,33 @@ public class AutomateTestCaseAction extends DumbAwareAction {
     }
 
     /**
-     * The selected cases that have no generated method behind them.
+     * UC-CODEGEN-005, Rule-CODEGEN-025.
      * <p>
-     * {@link Automated#WRITTEN} is the one state that means there is nothing to
-     * do. MISSING is a method that was written and is gone, NONE is one never
-     * written, and UNKNOWN is Testin not having looked - all three are cases to
-     * write for.
+     * The cases there is a method to write for: the ones that have none.
+     * <p>
+     * <b>Not the ones that are un-automated.</b> {@link Automated#NONE} is what a
+     * card draws for a case with an empty generated method as well as for a case
+     * that can have no method at all, and to a tester reading a card that is
+     * right - neither has automation. Asking it here left the entry live over a
+     * case whose method was already there, so a second press wrote nothing and
+     * said <i>Automated 1</i>. Caught in a sandbox pass on 17 September 2026,
+     * twice in six seconds.
+     * <p>
+     * {@link AutomationState#hasMethod} is the question this one asks, out of the
+     * same read and off the EDT.
      */
     private static @NotNull List<TestCaseDto> withoutAMethod(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
         final @NotNull AutomationState state = Services.getInstance(p, AutomationState.class);
 
-        return cases.stream().filter(tc -> state.of(tc.getId()) != Automated.WRITTEN).toList();
+        return cases.stream().filter(tc -> !state.hasMethod(tc.getId())).toList();
+    }
+
+    /**
+     * Whether this case's description can name a Java method, which is what
+     * decides whether it can have one at all (Rule-CODEGEN-002).
+     */
+    private static boolean canBeNamed(final @NotNull TestCaseDto tc) {
+        return !Fqcn.methodNameOf(tc).isEmpty();
     }
 
     @Override

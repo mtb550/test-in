@@ -33,8 +33,10 @@ edited by hand. This is how to ask.
 - **Rule-CODEGEN-025** — This writes the same method creating a test case
   writes: the annotation, the declaration and an empty body, in the class the
   test set belongs to, with that class and its folders written if they are not
-  there. It writes nothing for a test case that already has a method. Filling in
-  what the method does is a different thing and is not this.
+  there. Whether a test case has a method is the question, not whether anything
+  is written in it: a test case whose method is still the empty one gets nothing
+  and is told so. Filling in what the method does is a different thing and is not
+  this.
 
 ## What the tester sees
 
@@ -61,10 +63,14 @@ A small message appears at the bottom of the IDE and fades. It reads
 **If every selected test case already has its method** — the entry is gray, and
 says so: *Every one of these test cases already has its method. Automate writes
 the method for a test case that has none.* Nothing is written, and nothing
-claims to have been.
+claims to have been. A method the tester has not filled in yet still counts as
+having one: the card reads *Not automated* because an empty method is not
+automation, and there is still nothing here to write.
 
-**If a test case has no description** — it gets no method, because a description
-is what names one (Rule-CODEGEN-002). Nothing is said on screen; the method
+**If a test case has no description** — it is passed over, because a description
+is what names a method (Rule-CODEGEN-002). Where that is true of every selected
+test case the entry is gray and says so: *A test method is named after the test
+case, so a test case needs a description before it can have one.* The method
 appears when the description is filled in, which is
 [UC-CODEGEN-003](getMissingMethod.md).
 
