@@ -28,7 +28,6 @@ import org.testin.config.TestinConfigService;
 import org.testin.config.TestinProjectConfig;
 import org.testin.indexer.DeletedNodes;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.logger.Level;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.runner.TestCaseExecutionSubscriber;
@@ -72,16 +71,18 @@ public final class StartupActivity implements ProjectActivity {
         final @NotNull Path testinPath = TestinRoot.normalize(settings.rootTestinPath);
         final boolean rootConfigured = TestinRoot.isConfigured(testinPath);
 
+        // What is true, rather than what this used to claim. It said it was
+        // saving default settings and saved nothing: the serializer writes only
+        // what differs from a default, so a first run has nothing to write
+        // (#312, A94).
         if (!rootConfigured) {
-            Logger.info("First run detected — saving default settings to testinSettings.xml");
+            Logger.info("No Testin folder is set yet, so nothing is read until one is");
         }
 
-        // AppSettingsState.loadState answers with a level that parses - missing,
-        // blank and unrecognised all come back INFO - so valueOf has something to
-        // read whatever the file held. It used to default only the first two, and
-        // a word that named no level threw from here, after Once.claim had been
-        // spent: nothing indexed and no door retried (#66, finding 87).
-        Logger.setLogLevel(Level.valueOf(settings.logLevel));
+        // The log level is applied where the settings are read, which is before
+        // any project opens - see AppSettingsState.applyLogLevel. It used to be
+        // applied here, so testin.log was empty for everything that happened
+        // first, which is the part a tester turns TRACE on to see (#312, A94).
 
         Logger.info("StartupActivity.execute()");
 

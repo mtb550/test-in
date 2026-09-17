@@ -170,7 +170,7 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule-SETTING-002 — nothing is checked, so nothing warns | The Testin folder is checked now and refused when it is not a folder (Rule-SETTING-042). The rest of the page still is not: a tester name, a download folder, an SFTP account and a key file are all stored exactly as typed. None of them can make the tree empty, which is why the folder went first. |
+| **Difference 1** | Rule-SETTING-002 — nothing is checked, so nothing warns | The Testin folder is checked now: refused when it is not a folder (Rule-SETTING-042), and when it is a partial path (Rule-SETTING-013). The rest of the page still is not: a tester name, a download folder, an SFTP account and a key file are all stored exactly as typed. None of them can make the tree empty, which is why the folder went first. |
 | **Difference 2** | Rule-SETTING-020 — a value this page stores is read by something | **Tester role** is stored and read by nothing at all. It is on no marker, no report and no message. It is reserved rather than dead: [#14](https://github.com/mtb550/test-in/issues/14) is what will read it. |
 
 **Fixed since this list was written.** The numbers are left out rather than

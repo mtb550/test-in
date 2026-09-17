@@ -212,6 +212,16 @@ public final class SettingsConfigurable implements SearchableConfigurable {
             throw new ConfigurationException(Bundle.message("settings.no.folder", typed), Bundle.message("settings.no.folder.title"));
         }
 
+        // A partial path is read against wherever the IDE was started, which is
+        // not what the tester meant and not what Rule-SETTING-013 used to
+        // promise - it said such a path is read against the code project's own
+        // folder, and nothing anywhere did that. Every check below, and every
+        // read afterwards, resolved it against the JVM's working directory: the
+        // same three letters meant a different folder depending on how the IDE
+        // was launched. Refused, and the rule now says so (#312, A91).
+        if (!root.isAbsolute())
+            throw new ConfigurationException(Bundle.message("settings.not.absolute", root), Bundle.message("settings.not.absolute.title"));
+
         if (!Files.exists(root))
             throw new ConfigurationException(Bundle.message("settings.no.folder", root), Bundle.message("settings.no.folder.title"));
 
