@@ -43,6 +43,13 @@ There is no key for this. It happens when a test case is created, which is
   again, in every part Testin owns: the description, the method name, the
   groups, whether it is enabled, and where it sits. A case with no method is
   passed over, and none is created.
+- **Rule-CODEGEN-077** — A test case cut from one test set and pasted into
+  another takes its method with it, body and all: the method is carried into the
+  destination class as it is written and removed from the one it came from. Not
+  written fresh - what makes the move worth making is the automation the tester
+  wrote. A destination test set with no class of its own leaves the method where
+  it is, because a method in the wrong class can be found and one that was
+  deleted cannot.
 
 ## What is written
 

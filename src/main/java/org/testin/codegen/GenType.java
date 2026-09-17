@@ -89,6 +89,20 @@ public enum GenType {
     ),
 
     /**
+     * UC-CODEGEN-002, Rule-CODEGEN-077.
+     * <p>
+     * A test case cut from one test set and pasted into another takes its method
+     * with it, body and all.
+     * <p>
+     * Not a remove and a create: a create writes a fresh method with a TODO in
+     * it, and what makes this worth doing is the automation the tester wrote.
+     * The one generator that carries text from one class to another (#312, A54).
+     */
+    MOVE_TEST_CASE(
+            Bundle.message("codegen.move.test.case")
+    ),
+
+    /**
      * Renaming the generated method is part of this, not a step beside it: the
      * method is named after the case's description, so a description that
      * changed and a method that did not are the same edit half done.

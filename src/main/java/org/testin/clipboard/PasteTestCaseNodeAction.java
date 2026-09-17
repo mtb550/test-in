@@ -26,6 +26,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.TestinData;
 import org.testin.codegen.GenType;
+import org.testin.codegen.MovedCase;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
 import org.testin.indexer.ProjectIndexer;
@@ -33,6 +34,7 @@ import org.testin.logger.Logger;
 import org.testin.testcase.TestCaseSnapshot;
 import org.testin.undo.UndoScope;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -115,6 +117,13 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 final @NotNull CutState cutState = Services.getInstance(p, CutState.class);
                 final boolean isCut = cutState.isCutOf(pastedCases);
 
+                // Read before the cut is called off, and kept: the generated
+                // method is found through the class of the set that holds the
+                // case, and by the time the code can be moved the case is already
+                // in its new one (#312, A54).
+                final @NotNull Optional<DirectoryDto> cutFromSet =
+                        isCut ? cutState.source().map(TestinEditor::getParent) : Optional.empty();
+
                 // A cut the clipboard no longer holds is over: something else was
                 // copied since, so this paste is a copy and the cut cases stay
                 // where they are, no longer drawn faded (#312, A55).
@@ -191,6 +200,19 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                     // its position from. It wrote none, so F5 and Go to code said
                     // the copy had no generated code (#312, A54).
                     if (!isCut) GenType.CREATE_TEST_CASE.executeAll(p, pastedHere);
+
+                    // And a cut takes its method with it, body and all. It used
+                    // to take nothing: the case was in its new test set and its
+                    // method in the old class, so Run and Go to code looked where
+                    // the case now lives and found nothing - and removing the old
+                    // test set later deleted that class with the automation the
+                    // tester had written inside it (#312, A54).
+                    //
+                    // The set it came from has to be carried: the case's parent is
+                    // the destination by now, and a method is found through the
+                    // class of the set that holds the case.
+                    else cutFromSet.ifPresent(source -> GenType.MOVE_TEST_CASE.executeAll(p,
+                            pastedHere.stream().map(moved -> new MovedCase(moved, source)).toList()));
 
                     // In the callback, once the sequence is persisted: the write is
                     // two thread hops away and a newer sort can supersede it, so a
