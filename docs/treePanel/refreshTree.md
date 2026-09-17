@@ -58,7 +58,11 @@ Testin reads the folders again and draws the tree from what it finds.
 - **Rule-TREE-PANEL-082** — Editors on a node that no longer exists are closed.
   The other editors are reloaded, unless a tester is in the middle of something.
 - **Rule-TREE-PANEL-083** — Only one refresh runs at a time. A second request
-  while one is running is ignored.
+  while one is running waits for it, and runs once it is done. A branch switch
+  is one of those requests: the branch is already checked out by the time it
+  asks, so dropping it would leave the files on disk and the index belonging to
+  different branches. Two waiting requests are one refresh, reporting whichever
+  arrived last.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is - drawn with Inactive beside its name like any other status - and its test
@@ -84,7 +88,9 @@ bottom right of the IDE.
 
 ## What Testin refuses
 
-**If a refresh is already running** — nothing happens.
+**If a refresh is already running** — the request waits, and runs when that one
+finishes. Pressing Refresh twice is one refresh, because nothing changed by
+pressing it again; a branch switch that lands in that window is not lost.
 
 **If Testin cannot read the test project again** — a *Refresh Failed*
 notification says what went wrong. The tree stays as it was, and the button
