@@ -16,6 +16,7 @@
 
 package org.testin.testcase.create;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
@@ -25,6 +26,8 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.ExecutionPosition;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -36,6 +39,7 @@ import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.*;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -153,6 +157,8 @@ public class OrderSection implements CreateTestCaseSection {
         // change the set's order in the commit for a move nobody made.
         if (target == TestCaseOrder.positionOf(inSet, dto)) return;
 
+        rankTheUnranked(inSet, dto);
+
         final @NotNull List<TestCaseDto> others = inSet.stream()
                 .filter(tc -> !tc.getId().equals(dto.getId()))
                 .toList();
@@ -164,6 +170,46 @@ public class OrderSection implements CreateTestCaseSection {
         final @NotNull String after = target <= others.size() ? others.get(target - 1).getOrder() : "";
 
         dto.setOrder(Rank.between(before, after));
+    }
+
+    /**
+     * UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-055.
+     * <p>
+     * Gives the set ranks when part of it has none, so a place in it means
+     * something.
+     * <p>
+     * A set can arrive with unranked cases: imported, brought by a sync, or
+     * written by hand. Asking for a rank between two of those asks for one
+     * between nothing and nothing, and the answer is the middle of the whole
+     * alphabet - which sorts exactly where the case already was. The tester
+     * typed 3, read <i>Re-sorted</i>, and watched nothing move (#312, A84).
+     * <p>
+     * Ranked the way a drag ranks: the order on screen becomes the ranks, and a
+     * case already in the right place keeps the one it had, so this writes the
+     * few that were unranked rather than the whole set.
+     * <p>
+     * And written, which is the half that is easy to miss. These are the index's
+     * own objects, so ranking them changes what every open editor is drawing -
+     * but the dialog saves only the case it is about, so left here they would be
+     * unranked again at the next read and the tester's move would come undone
+     * with them (#312, N19). Off the EDT because it is one file per case, and
+     * the ranks themselves are already applied in memory, so the case's own
+     * place is worked out from them either way.
+     */
+    private void rankTheUnranked(final @NotNull List<TestCaseDto> inSet, final @NotNull TestCaseDto dto) {
+        if (inSet.stream().noneMatch(tc -> tc.getOrder().isEmpty())) return;
+
+        final @NotNull List<TestCaseDto> ranked = TestCaseOrder.place(inSet).stream()
+                .filter(moved -> !moved.getId().equals(dto.getId()))
+                .toList();
+
+        if (ranked.isEmpty()) return;
+
+        Logger.info("Ranking " + ranked.size() + " test case(s) that had no place, so a typed position means something");
+
+        final @NotNull Path setPath = dto.getParent().getPath();
+        ApplicationManager.getApplication().executeOnPooledThread(() ->
+                ranked.forEach(moved -> Services.getInstance(p, ProjectIndexer.class).putTestCase(setPath, moved)));
     }
 
     /**
