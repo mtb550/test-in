@@ -32,6 +32,11 @@ There is no key for this. The questions come after the sync.
   disagree.
 - **Rule-SHARE-098** — The answers are sent on the same sync, if nobody else has
   taken the lock in the meantime.
+- **Rule-SHARE-114** — An answer is about the version of the test case the
+  tester was shown. If the server has a newer one by the time the answers are
+  sent - a colleague synced while the questions were on screen - that answer is
+  not sent, and the test case is named. The next sync asks about it again,
+  against what the server holds then.
 
 ## What the tester sees
 
@@ -63,6 +68,15 @@ questions come back on the next sync.
 **If somebody else has started a sync in the meantime** — a message titled
 **Nothing Settled** reads *Somebody else is syncing this project, so your
 answers were not sent. You will be asked again on the next sync.*
+
+**If the server has a newer version by the time the answers are sent** — that
+one answer is not sent, and a message titled **Asked again next sync** names the
+test case. Answering takes as long as it takes, and a colleague can sync a newer
+version of that very test case while the questions are on screen: sending the
+answer anyway would put it over their edit, and their next sync would then put
+this copy back over their own. The next sync asks about it again, against what
+the server holds then. The answers about test cases nobody touched are sent as
+normal.
 
 ## What the message before it said
 

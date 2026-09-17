@@ -87,6 +87,18 @@ Everything else is as [UC-SHARE-005](importIntoTestSet.md).
 **If the Java class of a new test set cannot be written** — the test set is
 still made. Only the log says so.
 
+**If the tester cancels part way** — the test sets are all made before the
+first test case is written, so the ones the import never reached are standing
+there empty. A message titled **Test sets left empty** names them and says each
+has a class of its own, so the tester can remove the ones they do not want. They
+are not removed for them: an empty test set is a thing a tester may want to keep
+and fill, and deleting folders behind a Cancel is not what Cancel means.
+
+**The test cases already written keep their test methods.** Cancel stops the
+writing; it does not stop the methods being generated for what was written. A
+test case on disk with no method is one nothing can run, and there is no way in
+the plugin to write one for it afterwards.
+
 Every other refusal is the same as importing into one test set.
 
 ---

@@ -455,7 +455,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
          * nobody reads. The same dialog the Git channel opens, on the same merge, so
          * a conflict looks the same however the team shares their work.
          */
-        private void askAboutConflicts(final @NotNull List<Unsettled> unsettled, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth, final @NotNull Map<String, String> answered) {
+        private void askAboutConflicts(final @NotNull List<Unsettled> unsettled, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth, final @NotNull Map<String, Answered> answered) {
             if (unsettled.isEmpty()) {
                 send(answered, projectRoot, address, account, auth);
                 return;
@@ -471,7 +471,11 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                             next.theirs());
                 }
 
-                answered.put(next.path(), mapper.writeValueAsString(next.merged()));
+                // With the version it is an answer to. A colleague can sync a
+                // newer copy of this very test case while these windows are
+                // open, and an answer about the old one must not be written over
+                // it (#312, A33).
+                answered.put(next.path(), new Answered(mapper.writeValueAsString(next.merged()), next.theirs()));
 
                 // Once this window has closed. The callback runs before it does,
                 // and a second window of the same kind asked to show while the
@@ -492,7 +496,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
          * <p>
          * Sends what the tester settled, off the EDT - it opens a connection.
          */
-        private void send(final @NotNull Map<String, String> answered, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth) {
+        private void send(final @NotNull Map<String, Answered> answered, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull SftpAccountDialog.Account account, final @NotNull SftpAuth auth) {
             if (answered.isEmpty()) return;
 
             ApplicationManager.getApplication().executeOnPooledThread(() -> {

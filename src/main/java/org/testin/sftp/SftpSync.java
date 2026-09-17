@@ -18,6 +18,7 @@ package org.testin.sftp;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
@@ -25,6 +26,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.notifications.Notifier;
 import org.testin.git.TestCaseMerge;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -41,6 +43,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * One sync between this machine and a server (#94).
@@ -354,7 +357,7 @@ public final class SftpSync {
      * the server. Not how many were answered: the sync lock can be held by
      * somebody else, and a connection can drop part way down the list
      */
-    public static int finish(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull String user, final @NotNull SftpAuth auth, final @NotNull Path knownHosts, final @NotNull Map<String, String> answered) {
+    public static int finish(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull String user, final @NotNull SftpAuth auth, final @NotNull Path knownHosts, final @NotNull Map<String, Answered> answered) {
         if (answered.isEmpty()) return 0;
 
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -379,9 +382,28 @@ public final class SftpSync {
                         withoutGit(BaselineStore.read(mapper, baselineFile).contents());
                 final @NotNull Map<String, byte[]> incoming = new TreeMap<>();
 
+                final @NotNull List<String> movedUnderTheQuestions = new ArrayList<>();
+
                 try {
-                    answered.forEach((path, settled) -> {
-                        final byte @NotNull [] content = settled.getBytes(StandardCharsets.UTF_8);
+                    answered.forEach((path, answer) -> {
+                        // The server may have moved while the questions were on
+                        // screen: answering a conflict takes as long as it takes,
+                        // and a colleague can sync a newer version of this very
+                        // test case in that time. Written anyway, the answer went
+                        // over their edit without a word, and their next sync then
+                        // took this copy back over their own - one edit lost on
+                        // both machines (#312, A33).
+                        //
+                        // Left for the next sync, which raises it again against
+                        // the version that is actually there. Nothing is written
+                        // for it here, so the baseline still disagrees with the
+                        // server and the question comes back by itself.
+                        if (!answer.stillAnswers(onServer.getOrDefault(path, Manifest.Entry.ABSENT))) {
+                            movedUnderTheQuestions.add(path);
+                            return;
+                        }
+
+                        final byte @NotNull [] content = answer.settled().getBytes(StandardCharsets.UTF_8);
 
                         // The three records are updated per file and only after
                         // the file itself landed, so they describe exactly what
@@ -389,7 +411,7 @@ public final class SftpSync {
                         transport.write(path, content);
                         incoming.put(path, content);
                         onServer.put(path, Manifest.Entry.of(content));
-                        agreed.put(path, settled);
+                        agreed.put(path, answer.settled());
                     });
                 } finally {
                     // Whatever landed is recorded, even when the connection
@@ -408,6 +430,8 @@ public final class SftpSync {
                     writeManifest(transport, mapper, new Manifest(onServer));
                     BaselineStore.write(mapper, baselineFile, new Baseline(agreed));
                 }
+
+                reportMovedUnderTheQuestions(p, movedUnderTheQuestions);
 
                 Logger.info("Settled " + incoming.size() + " test cases on both sides of " + address.display());
                 return incoming.size();
@@ -511,6 +535,47 @@ public final class SftpSync {
         if (!description.isBlank()) return description;
 
         return Path.of(path).getFileName().toString();
+    }
+
+    /**
+     * UC-SHARE-021, Rule-SHARE-114.
+     * <p>
+     * Names the test cases whose answers were not sent because the server moved
+     * while they were being answered.
+     * <p>
+     * Said rather than left to the next sync to explain. A tester who answered
+     * six questions and was told "Settled 4" has two answers that went nowhere,
+     * and no reason to think anything is wrong - they meet the same two questions
+     * on the next sync with nothing connecting them to the first (#312, A33).
+     * <p>
+     * Kept in the notification list rather than a balloon: the names are what the
+     * tester needs when the questions come back.
+     */
+    private static void reportMovedUnderTheQuestions(final @NotNull Project p, final @NotNull List<String> moved) {
+        if (moved.isEmpty()) return;
+
+        Logger.info("Not sent, because the server moved while they were answered: " + String.join(", ", moved));
+
+        final @NotNull String named = moved.stream().limit(5).map(SftpSync::caseName).collect(Collectors.joining(", "));
+        final @NotNull String rest = moved.size() > 5
+                ? Bundle.message("indexer.more", String.valueOf(moved.size() - 5))
+                : "";
+        final @NotNull String count = moved.size() == 1
+                ? Bundle.message("sftp.moved.one")
+                : Bundle.message("sftp.moved.many", String.valueOf(moved.size()));
+
+        ApplicationManager.getApplication().invokeLater(() ->
+                Services.getInstance(p, Notifier.class).warn(p, Bundle.message("sftp.moved.title"),
+                        Bundle.message("sftp.moved.message", count, named, rest)));
+    }
+
+    /**
+     * The last part of a server path, which is the test case's file - the whole
+     * path is the folders a tester does not need read back to them.
+     */
+    private static @NotNull String caseName(final @NotNull String path) {
+        final int slash = path.lastIndexOf('/');
+        return slash < 0 ? path : path.substring(slash + 1);
     }
 
     /**

@@ -56,6 +56,9 @@ import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.function.Supplier;
 
 /**
@@ -167,15 +170,28 @@ public class ImportAction extends DumbAwareAction {
                 final long readyAt = System.currentTimeMillis();
 
                 int imported = 0;
+
+                final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targets =
+                        targetSets(selectedDirDto, targetPath, selectedCasesBySheet);
+
+                // Every set this import made, until one takes a test case. The sets
+                // are all created before the first case is written, so a Cancel
+                // leaves the ones it never reached standing there empty, each with a
+                // class of its own and nothing in it - and nothing said so (#312,
+                // A51).
+                final @NotNull Set<String> stillEmpty = targets.keySet().stream()
+                        .map(TestSetDirectoryDto::getName)
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+
                 try {
-                    for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set
-                            : targetSets(selectedDirDto, targetPath, selectedCasesBySheet).entrySet()) {
+                    for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set : targets.entrySet()) {
 
                         final @NotNull TestSetDirectoryDto into = set.getKey();
                         final @NotNull List<TestCaseDto> cases = set.getValue();
                         final @NotNull Path setPath = into.getPath();
 
                         final int written = linkAndSaveTestCases(setPath, cases, rankOfTail(setPath), indicator, imported, total);
+                        if (written > 0) stillEmpty.remove(into.getName());
 
                         for (final TestCaseDto tc : cases) tc.setParent(into);
 
@@ -221,6 +237,8 @@ public class ImportAction extends DumbAwareAction {
                 // The count is the news, whichever shape was imported into (#62).
                 Services.getInstance(p, Notifier.class).softShowCounted(p, Done.IMPORTED, imported);
 
+                reportEmptySets(List.copyOf(stillEmpty));
+
                 report(total, startedAt, readyAt);
 
                 // Asynchronous refresh: a synchronous recursive VFS refresh inside a
@@ -246,6 +264,36 @@ public class ImportAction extends DumbAwareAction {
          * The sets are made before any case is written, and on the EDT, because
          * making one generates its Java class and that is a write command.
          */
+        /**
+         * UC-SHARE-007, Rule-SHARE-037.
+         * <p>
+         * Names the test sets this import made and never put anything into.
+         * <p>
+         * A package import makes every set before it writes the first case, so a
+         * Cancel leaves the ones it had not reached standing empty, each with a
+         * generated class of its own. Nothing said so, and a tester who stopped
+         * an import of twenty sheets found twenty test sets in the tree with no
+         * way to tell which had anything in them (#312, A51).
+         * <p>
+         * Named rather than removed: an empty test set is a thing a tester might
+         * want to keep and fill, and deleting folders behind a Cancel is not what
+         * Cancel means.
+         */
+        private void reportEmptySets(final @NotNull List<String> empty) {
+            if (empty.isEmpty()) return;
+
+            final @NotNull String named = empty.stream().limit(5).collect(Collectors.joining(", "));
+            final @NotNull String rest = empty.size() > 5
+                    ? Bundle.message("indexer.more", String.valueOf(empty.size() - 5))
+                    : "";
+            final @NotNull String count = empty.size() == 1
+                    ? Bundle.message("import.empty.one")
+                    : Bundle.message("import.empty.many", String.valueOf(empty.size()));
+
+            Services.getInstance(p, Notifier.class).warn(p, Bundle.message("import.empty.title"),
+                    Bundle.message("import.empty.message", count, named, rest));
+        }
+
         private @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targetSets(final @NotNull DirectoryDto selectedDirDto, final @NotNull Path targetPath, final @NotNull Map<String, List<TestCaseDto>> casesBySheet) {
 
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
@@ -306,9 +354,14 @@ public class ImportAction extends DumbAwareAction {
             final long startedAt = System.currentTimeMillis();
 
             for (int from = 0; from < testCases.size(); from += METHODS_PER_COMMAND) {
-                // Between batches, which is where a Cancel can land without
-                // leaving a write command half open.
-                if (indicator.isCanceled()) return;
+                // A Cancel does not stop this, and that is the point. What it is
+                // given is what was written: those test cases are on disk, and
+                // leaving them without a method leaves a case nothing can run and
+                // no way in the plugin to write one for it afterwards - Automate
+                // Test Case is not built. A Cancel pressed while the cases were
+                // being written used to skip the generation for all of them,
+                // because the flag was already set by the time this was reached
+                // (#312, A51).
 
                 final @NotNull List<TestCaseDto> batch =
                         testCases.subList(from, Math.min(from + METHODS_PER_COMMAND, testCases.size()));
