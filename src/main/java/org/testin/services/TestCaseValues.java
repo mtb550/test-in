@@ -179,6 +179,12 @@ public final class TestCaseValues implements Disposable {
 
     @Override
     public void dispose() {
+        // The executor goes with the project. Left running, one was left behind
+        // per project opened in the session, and a reload queued as the project
+        // closed ran afterwards and filled the sets cleared below (#66,
+        // finding 221).
+        updates.shutdownNow();
+
         descriptions.clear();
         expectedResults.clear();
         modules.clear();
