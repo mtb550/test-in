@@ -191,4 +191,20 @@ public final class RunForm {
 
         return ids;
     }
+
+    /**
+     * UC-TREE-PANEL-022, Rule-TREE-PANEL-076.
+     * <p>
+     * Every test case the tree offered, ticked or not - so a caller can tell a
+     * case the tester unticked from one they were never shown.
+     */
+    public static @NotNull Set<UUID> offeredCases(final @NotNull SelectionTree selection) {
+        final @NotNull Set<UUID> ids = new LinkedHashSet<>();
+
+        selection.forEachLeaf(leaf -> {
+            if (leaf instanceof TestCaseDto tc) ids.add(tc.getId());
+        });
+
+        return ids;
+    }
 }

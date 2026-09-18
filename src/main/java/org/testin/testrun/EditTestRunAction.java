@@ -58,6 +58,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -200,9 +201,10 @@ public class EditTestRunAction extends DumbAwareAction {
             }
 
             final @NotNull Set<UUID> checked = RunForm.checkedCases(selection);
+            final @NotNull Set<UUID> offered = RunForm.offeredCases(selection);
             final @NotNull Map<TestRunConfiguration, String> configuration = TestRunConfiguration.answered(form.configuration());
 
-            final @NotNull TestRunDto after = current.coverOnly(wanted(current, checked))
+            final @NotNull TestRunDto after = current.coverOnly(wanted(current, checked, offered::contains))
                     .setConfiguration(configuration);
 
             // Copied rather than held: the run in the indexer's cache shares its
@@ -226,7 +228,7 @@ public class EditTestRunAction extends DumbAwareAction {
             // opened on replaced the verdicts that arrived. Through changeRun, which
             // a sync holds, like every other change to a run (#312, A10).
             applyEdit(run, name, runPath -> indexer.changeRun(runPath, held -> held
-                    .setResults(held.coverOnly(wanted(held, checked)).getResults())
+                    .setResults(held.coverOnly(wanted(held, checked, offered::contains)).getResults())
                     .setConfiguration(configuration)), () -> Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED));
 
             // One entry for the whole edit - the cases, the name and the
@@ -242,8 +244,10 @@ public class EditTestRunAction extends DumbAwareAction {
         }
 
         /**
-         * The cases a run covers after the edit: the ones ticked, and the ones it
-         * already recorded whose test case is gone.
+         * UC-TREE-PANEL-022, Rule-TREE-PANEL-076.
+         * <p>
+         * The cases a run covers after the edit: the ones ticked, and every one it
+         * already recorded that the tester could not have ticked.
          * <p>
          * The dialog's tree is built from the test cases that still exist, so a
          * case deleted from its test set has no row in it. It could not be ticked,
@@ -256,15 +260,32 @@ public class EditTestRunAction extends DumbAwareAction {
          * A run outlives the test cases it was made from, and keeps what it
          * recorded about them (#71). Unticking a case the tester could see still
          * discards its result, which is what unticking is for.
+         * <p>
+         * <b>Asked of the tree, not of the index.</b> Only a deleted case used to
+         * be kept, by asking whether the index still knew it - but the tree also
+         * leaves out every case in a test set deprecated, or under a package
+         * archived, since the run was made, and those the index does know. So
+         * opening Edit Test Run to add one case deleted a retired suite's
+         * verdicts, actual results, stacktraces, bug severities and priorities
+         * with no row seen to go (#66, finding 167). What the tree offered is the
+         * one list that holds exactly the cases a tester could have unticked.
          */
-        private @NotNull Set<UUID> wanted(final @NotNull TestRunDto from, final @NotNull Set<UUID> checked) {
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        private @NotNull Set<UUID> wanted(final @NotNull TestRunDto from, final @NotNull Set<UUID> checked, final @NotNull Predicate<UUID> couldBeTicked) {
             final @NotNull Set<UUID> wanted = new LinkedHashSet<>(checked);
             from.getResults().stream()
                     .map(TestRunItems::getId)
-                    .filter(id -> indexer.findTestCase(id).isEmpty())
+                    .filter(couldBeTicked.negate())
                     .forEach(wanted::add);
             return wanted;
+        }
+
+        /**
+         * Whether the index still knows this case. The undo has no dialog to ask
+         * what it offered: it puts back the coverage from before the edit, and a
+         * case deleted since then is the one it must not drop.
+         */
+        private boolean isIndexed(final @NotNull UUID id) {
+            return Services.getInstance(p, ProjectIndexer.class).findTestCase(id).isPresent();
         }
 
         /**
@@ -349,7 +370,7 @@ public class EditTestRunAction extends DumbAwareAction {
             applyEdit(run, toName, runPath -> Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, held -> {
                 final @NotNull Set<UUID> holdsNow = idsOf(held);
 
-                final @NotNull List<TestRunItems> items = held.coverOnly(wanted(held, covered)).getResults().stream()
+                final @NotNull List<TestRunItems> items = held.coverOnly(wanted(held, covered, this::isIndexed)).getResults().stream()
                         .map(item -> holdsNow.contains(item.getId()) ? item : recorded.getOrDefault(item.getId(), item))
                         .collect(Collectors.toCollection(ArrayList::new));
 

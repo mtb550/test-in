@@ -64,9 +64,11 @@ This changes a test run that is not signed off yet.
   recorded since the save stays, and a test case the undo brings back arrives
   with what the run had recorded about it. A run signed off since the save
   refuses the undo, for the reason it refuses a save.
-- **Rule-TREE-PANEL-076** — A test case that was deleted from its test set after
-  the test run was made is not in this dialog. What the test run recorded about
-  it is kept, and saving the dialog never removes it.
+- **Rule-TREE-PANEL-076** — A test case this dialog does not show is not one the
+  tester chose to remove. That is a test case deleted from its test set after
+  the test run was made, and one in a test set deprecated, or under a package
+  archived, since then. What the test run recorded about it is kept, and saving
+  the dialog never removes it.
 - **Rule-TREE-PANEL-093** — The dialog opens with every row saying what the run
   actually covers, folders included. A folder is ticked only when everything
   under it is ticked, so a folder is never ticked over cases the run does not

@@ -54,6 +54,14 @@ public final class SelectionTree implements DialogComponent {
     }
 
     /**
+     * Visits every leaf's user object, checked or not - what the tree offered,
+     * as against what the tester chose.
+     */
+    public void forEachLeaf(final @NotNull Consumer<Object> visitor) {
+        visitLeaves(root, visitor);
+    }
+
+    /**
      * True when at least one leaf is checked.
      */
     public boolean hasChecked() {
@@ -78,6 +86,14 @@ public final class SelectionTree implements DialogComponent {
             if (hasCheckedLeaf((CheckedTreeNode) node.getChildAt(i))) return true;
         }
         return false;
+    }
+
+    private void visitLeaves(final @NotNull CheckedTreeNode node, final @NotNull Consumer<Object> visitor) {
+        if (node.isLeaf()) visitor.accept(node.getUserObject());
+
+        for (int i = 0; i < node.getChildCount(); i++) {
+            visitLeaves((CheckedTreeNode) node.getChildAt(i), visitor);
+        }
     }
 
     private void visitChecked(final @NotNull CheckedTreeNode node, final @NotNull Consumer<Object> visitor) {
