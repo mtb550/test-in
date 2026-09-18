@@ -28,8 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
-import org.testin.util.VfsBiOperation;
-import org.testin.util.VfsOperation;
 
 import java.io.IOException;
 import java.nio.file.Path;

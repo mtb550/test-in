@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.testin.util;
+package org.testin.indexer;
 
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface
-public interface VfsBiOperation {
-    void execute(final @NotNull VirtualFile sourceVf, final @NotNull VirtualFile targetVf);
+interface VfsOperation {
+    void execute(final @NotNull VirtualFile vf);
 }
