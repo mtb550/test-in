@@ -24,7 +24,6 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.UIAction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -87,13 +86,13 @@ public interface CreateTestCaseSection {
 
     void applyTo(final @NotNull TestCaseDto dto);
 
-    void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction);
+    void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction);
 
     @NotNull JComponent getFocusComponent();
 
     void setEditable(final boolean editable);
 
-    void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction);
+    void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction);
 
     /**
      * The font every field in the dialog is drawn in.

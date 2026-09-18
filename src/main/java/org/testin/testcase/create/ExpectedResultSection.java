@@ -25,7 +25,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.UIAction;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 
@@ -44,15 +43,15 @@ public class ExpectedResultSection extends AbstractMultiLineSection {
     }
 
     @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction) {
         base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseExpectedResult.getCustomShortcut(), () -> {
             showSection(slot);
-            repackAction.execute();
+            repackAction.run();
         });
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
         field.setText(dto.getExpectedResult());
     }
 }

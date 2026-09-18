@@ -20,7 +20,6 @@ import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.UIAction;
 import org.testin.util.Shortcuts;
 
 import javax.swing.JComponent;
@@ -69,10 +68,10 @@ public abstract class AbstractOneLineSection implements CreateTestCaseSection {
      * drawn in a dialog with no way at all to reach it.
      */
     @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction) {
         base.registerShortcut(mainPanel, shortcut.getCustomShortcut(), () -> {
             showSection(slot);
-            repackAction.execute();
+            repackAction.run();
         });
     }
 

@@ -32,7 +32,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.StatusBarItem;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.UIAction;
 import org.testin.testcase.TestCaseDialogKey;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.ui.framework.AbstractFrameworkDialog;
@@ -259,11 +258,11 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
      * beside it: a popup claims the plain key, never a combination. A list
      * would be right today and stale at the next binding.
      */
-    public void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull UIAction action) {
+    public void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull Runnable action) {
         new DumbAwareAction() {
             @Override
             public void actionPerformed(final @NotNull AnActionEvent e) {
-                action.execute();
+                action.run();
             }
 
             @Override

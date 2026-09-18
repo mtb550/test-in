@@ -20,7 +20,6 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.UIAction;
 import org.testin.util.SpellChecker;
 import org.testin.util.Shortcuts;
 
@@ -42,7 +41,7 @@ public class PreConditionsSection extends AbstractOneLineSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
         field.setText(dto.getPreConditions());
     }
 }

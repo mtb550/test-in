@@ -33,7 +33,6 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.Rank;
 import org.testin.testcase.TestCaseOrder;
-import org.testin.testcase.UIAction;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.util.Bundle;
 
@@ -99,7 +98,7 @@ public class OrderSection implements CreateTestCaseSection {
      * case carries a rank and not a number.
      */
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
         final @NotNull List<TestCaseDto> inSet = ExecutionPosition.setOf(p, dto);
         final int size = Math.max(1, inSet.size());
         final int current = Math.min(TestCaseOrder.positionOf(inSet, dto), size);
@@ -217,7 +216,7 @@ public class OrderSection implements CreateTestCaseSection {
      * shortcut of its own, and it does not offer this one.
      */
     @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction) {
         // See the class comment: a case being created has no position to choose.
     }
 

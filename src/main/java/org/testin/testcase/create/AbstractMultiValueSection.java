@@ -28,7 +28,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.UIAction;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 
@@ -122,18 +121,18 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
     public void focusOnShow() {
     }
 
-    public void showSection(final @NotNull JBPanel<?> contentPanel, final @NotNull UIAction repackAction) {
+    public void showSection(final @NotNull JBPanel<?> contentPanel, final @NotNull Runnable repackAction) {
         showSection(contentPanel);
         wrapper.setVisible(true);
         addField("", repackAction);
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            repackAction.execute();
+            repackAction.run();
             if (!fields.isEmpty()) fields.getLast().requestFocus();
         });
     }
 
-    public void addField(final @NotNull String text, final @NotNull UIAction repackAction) {
+    public void addField(final @NotNull String text, final @NotNull Runnable repackAction) {
         final @NotNull EditorTextField box = SpellChecker.createCompletionField(p,
                 new TextFieldWithAutoCompletion.StringsCompletionProvider(completions(Services.getInstance(p, TestCaseValues.class)), field().getIcon()), text);
 
@@ -171,7 +170,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
     }
 
     @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction) {
         base.registerShortcut(mainPanel, addKey().getCustomShortcut(), () -> showSection(slot, repackAction));
     }
 
@@ -185,7 +184,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
         fields.forEach(box -> box.setEnabled(editable));
     }
 
-    public void setData(final @NotNull List<String> values, final @NotNull UIAction repack) {
+    public void setData(final @NotNull List<String> values, final @NotNull Runnable repack) {
         container.removeAll();
         fields.clear();
 
@@ -193,7 +192,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
         setData(valuesOf(dto), repackAction);
     }
 }

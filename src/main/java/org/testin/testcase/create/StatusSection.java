@@ -22,7 +22,6 @@ import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.UIAction;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.util.Bundle;
 
@@ -94,7 +93,7 @@ public class StatusSection implements CreateTestCaseSection {
      * with no key says so rather than being silently unreachable).
      */
     @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction) {
         // Nothing to bind.
     }
 
@@ -109,7 +108,7 @@ public class StatusSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
         status.setSelectedItem(dto.getStatus());
     }
 }

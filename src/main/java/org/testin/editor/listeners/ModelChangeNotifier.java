@@ -19,7 +19,6 @@ package org.testin.editor.listeners;
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.UpdateCallback;
 
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -53,7 +52,7 @@ public class ModelChangeNotifier implements ListDataListener {
      * nobody listens to still runs, and runs a callback that does nothing (#71).
      */
     @Setter
-    private @NotNull UpdateCallback onUpdateCallback = () -> {
+    private @NotNull Runnable onUpdateCallback = () -> {
     };
 
     public void pause() {
@@ -81,6 +80,6 @@ public class ModelChangeNotifier implements ListDataListener {
     private void notifyChanged() {
         if (!active) return;
 
-        ApplicationManager.getApplication().invokeLater(onUpdateCallback::onUpdate);
+        ApplicationManager.getApplication().invokeLater(onUpdateCallback);
     }
 }

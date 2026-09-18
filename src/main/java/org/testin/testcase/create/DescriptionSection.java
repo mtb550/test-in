@@ -26,7 +26,6 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.UIAction;
 import org.testin.util.Bundle;
 import org.testin.util.NameSanitizer;
 import org.testin.util.Shortcuts;
@@ -167,7 +166,7 @@ public class DescriptionSection extends AbstractOneLineSection {
 
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
         field.setText(dto.getDescription());
     }
 }

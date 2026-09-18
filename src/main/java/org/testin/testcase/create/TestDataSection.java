@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.SpellChecker;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.UIAction;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -61,18 +60,18 @@ public class TestDataSection extends AbstractMultiLineSection {
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-028
     @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction) {
         // Advertised as well as bound - the field is in the dialog's jump map.
         // The key was taken away once because it was not, which left the field
         // drawn in a dialog with no way at all to reach it.
         base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseTestData.getCustomShortcut(), () -> {
             showSection(slot);
-            repackAction.execute();
+            repackAction.run();
         });
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
         field.setText(dto.getTestData());
     }
 }
