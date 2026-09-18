@@ -137,11 +137,14 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                 // Snapshotted into a local: reading the volatile field twice would
                 // let another thread empty it between the question and the answer.
                 final @NotNull TestRunDto run = tr.orElseGet(() -> indexer.getTestRunByPath(parent.getPath()));
-                tr = Optional.of(run);
 
-                resultsMap.putAll(run.getResults().stream()
+                // Built here and handed to the editor on the EDT, after the
+                // generation check. Set here, two reloads close together could
+                // leave the older one's run and results in place under the newer
+                // one's rows (#312, A23).
+                final @NotNull Map<UUID, TestRunItems> results = run.getResults().stream()
                         .collect(Collectors.toMap(TestRunItems::getId, item -> item,
-                                (existingItem, duplicateItem) -> existingItem)));
+                                (existingItem, duplicateItem) -> existingItem));
 
                 final @NotNull List<TestCaseDto> loadedItems = new ArrayList<>();
                 for (final TestRunItems item : run.getResults()) {
@@ -159,7 +162,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                     final @NotNull TestCaseDto testCase = indexed.orElseGet(() -> TestCaseDto.deleted(item.getId()));
 
                     loadedItems.add(testCase);
-                    runItem(item.getId()).ifPresent(runItem -> runItem.setTc(testCase));
+                    Optional.ofNullable(results.get(item.getId())).ifPresent(runItem -> runItem.setTc(testCase));
                 }
 
                 final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(loadedItems);
@@ -167,6 +170,8 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (generation != loadGeneration.get()) return;
+                    tr = Optional.of(run);
+                    resultsMap.putAll(results);
                     allTestCases.clear();
                     allTestCases.addAll(ordered);
                     currentTestCases.clear();
