@@ -17,6 +17,8 @@
 package org.testin.setting.dialogs;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextComponentAccessor;
@@ -24,6 +26,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
+import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
 
 import org.testin.util.Bundle;
@@ -33,12 +36,32 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class TestinPathPanel {
 
     private final @NotNull TextFieldWithBrowseButton pathField = new TextFieldWithBrowseButton();
     private final @NotNull JButton openFolderBtn = new JButton(Bundle.message("settings.path.open"));
+
+    /**
+     * Where the box is asked whether it names a folder, one question at a time.
+     * <p>
+     * It was asked on the EDT from the document listener. On a local disk that
+     * is invisible; on a network path to a host that is down, or a mapped drive
+     * that is not connected, every character typed stopped the whole IDE for
+     * the file system's timeout (#66, finding 177).
+     */
+    private final @NotNull ExecutorService probe = AppExecutorUtil.createBoundedApplicationPoolExecutor("Testin Folder Probe", 1);
+
+    /**
+     * What the box held when it was last asked about, so an answer about text
+     * that has since changed is dropped, and a question queued behind a newer
+     * one is never asked.
+     */
+    private final @NotNull AtomicReference<String> asked = new AtomicReference<>("");
 
     public TestinPathPanel() {
         setupField();
@@ -96,17 +119,28 @@ public final class TestinPathPanel {
         });
     }
 
+    // UC-SETTING-003, Rule-SETTING-015, Rule-SETTING-017
     private void updateOpenButtonState() {
         final @NotNull String pathStr = pathField.getText();
-        if (pathStr.trim().isEmpty()) {
-            openFolderBtn.setEnabled(false);
-            return;
-        }
+        asked.set(pathStr);
+
+        probe.execute(() -> {
+            if (!pathStr.equals(asked.get())) return;
+
+            final boolean folder = isFolder(pathStr);
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (pathStr.equals(asked.get())) openFolderBtn.setEnabled(folder);
+            }, ModalityState.any());
+        });
+    }
+
+    private static boolean isFolder(final @NotNull String pathStr) {
+        if (pathStr.isBlank()) return false;
+
         try {
-            final @NotNull Path path = Path.of(pathStr);
-            openFolderBtn.setEnabled(Files.exists(path) && Files.isDirectory(path));
-        } catch (final Exception ex) {
-            openFolderBtn.setEnabled(false);
+            return Files.isDirectory(Path.of(pathStr));
+        } catch (final InvalidPathException ex) {
+            return false;
         }
     }
 
