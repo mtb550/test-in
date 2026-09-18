@@ -258,20 +258,6 @@ public final class GitRefs {
     }
 
     /**
-     * True when the text names a repository to clone rather than a project to
-     * create.
-     * <p>
-     * The create-project dialog takes one field for both, so this is what
-     * decides which happens. Deliberately narrow: a project name is free text
-     * typed by the tester, and mistaking one for a URL would send them to a
-     * clone they never asked for.
-     */
-    // "http://" here is a scheme being recognized, not a link being followed:
-    // this decides whether the tester typed a clone URL. Refusing to match it
-    // would not make anything more secure, it would stop plain-http remotes
-    // being clonable at all.
-    @SuppressWarnings("HttpUrlsUsage")
-    /**
      * UC-SHARE-014, Rule-SHARE-108.
      * <p>
      * Whether this is the shape of an email address: something, an at sign,
@@ -299,6 +285,20 @@ public final class GitRefs {
         return domain.length() >= 3 && domain.indexOf('.') > 0 && !domain.endsWith(".");
     }
 
+    /**
+     * True when the text names a repository to clone rather than a project to
+     * create.
+     * <p>
+     * The create-project dialog takes one field for both, so this is what
+     * decides which happens. Deliberately narrow: a project name is free text
+     * typed by the tester, and mistaking one for a URL would send them to a
+     * clone they never asked for.
+     */
+    // "http://" here is a scheme being recognized, not a link being followed:
+    // this decides whether the tester typed a clone URL. Refusing to match it
+    // would not make anything more secure, it would stop plain-http remotes
+    // being clonable at all.
+    @SuppressWarnings("HttpUrlsUsage")
     public static boolean isRepositoryUrl(final @NotNull String text) {
         final @NotNull String value = text.trim();
         return value.startsWith("http://")
