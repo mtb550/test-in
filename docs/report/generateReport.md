@@ -36,6 +36,10 @@ spreadsheet.
 - **Rule-REPORT-017** — No report shows a screenshot pasted with a failure. The
   web page prints the error's text; the PDF, the Word document and the
   spreadsheet print no error at all.
+- **Rule-REPORT-018** — The PDF says what it cannot print. Its font holds Latin
+  letters only, so Arabic, Hindi, Cyrillic or Chinese text is left out of it;
+  when that happens a message says how much text lost characters, shows one of
+  them, and says the Word and HTML reports keep them.
 
 ## The screen
 
@@ -89,6 +93,12 @@ is [UC-SETTING-006](../setting/setDownloadFolder.md).
 | Presses the report button | The run editor's toolbar. Its tooltip reads **Generate Test Summary Report** |
 
 ## What Testin refuses
+
+**If the PDF cannot print some of the text** — Arabic, Hindi, Cyrillic or
+Chinese, which its font does not hold — the PDF is still written, without
+those characters, and a notification titled *The PDF left some text out* says
+how many texts lost characters, shows one, and says the Word and HTML reports
+keep them (Rule-REPORT-018).
 
 **If the selection is not a test run** — **Generate Report** is gray in the tree
 menu. A report is about one test run, and nothing else.
