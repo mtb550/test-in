@@ -896,6 +896,15 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-SHARE-002, Rule-SHARE-001.
+     * <p>
+     * The test case files in this set the last scan could not read, by name.
+     */
+    public @NotNull Set<String> unreadableCasesIn(final @NotNull Path testSetPath) {
+        return store.unreadableCasesIn(testSetPath);
+    }
+
+    /**
      * UC-INTERNAL-004, Rule-INTERNAL-034.
      * <p>
      * Where a test case's file sits: the test project folder holding it, and the

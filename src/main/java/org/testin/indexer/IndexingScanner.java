@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 @AllArgsConstructor
@@ -239,6 +240,11 @@ final class IndexingScanner {
                             } catch (final Exception ex) {
                                 Logger.error("Failed to read test case '" + filePath.toAbsolutePath() +
                                         "': " + ex.getMessage());
+
+                                // Kept, so an export can name it without walking
+                                // the folder itself (#66, finding 278).
+                                scanned.getUnreadableCases().computeIfAbsent(path.toString(), ignored -> ConcurrentHashMap.newKeySet())
+                                        .add(filePath.getFileName().toString());
                             }
                         });
             }

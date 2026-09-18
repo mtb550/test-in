@@ -113,6 +113,14 @@ final class ScannedProject {
     private final @NotNull Map<UUID, Path> handNamedFiles = new ConcurrentHashMap<>();
 
     /**
+     * UC-SHARE-002, Rule-SHARE-001.
+     * <p>
+     * The test case files this pass could not read, by the test set they are
+     * in - what an export has to say is missing from it.
+     */
+    private final @NotNull Map<String, Set<String>> unreadableCases = new ConcurrentHashMap<>();
+
+    /**
      * UC-INTERNAL-004, Rule-INTERNAL-084.
      * <p>
      * The hand-named files that are the only file of their identity. One that

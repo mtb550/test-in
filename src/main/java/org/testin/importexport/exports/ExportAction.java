@@ -215,56 +215,17 @@ public class ExportAction extends DumbAwareAction {
             final @NotNull List<TestCaseDto> here = indexer.getTestCasesForTestSet(node.getPath());
             if (!here.isEmpty()) found.add(new Sheet(path, detached(here)));
 
-            unreadable.addAll(unreadableIn(node, here));
+            // Asked of the indexer, which read them. This walked the folder
+            // through the VFS and read file names to work it out again - inside
+            // the tree, where importexport's exemption from rule 1 does not
+            // reach (#66, finding 278).
+            unreadable.addAll(indexer.unreadableCasesIn(node.getPath()).stream().sorted().toList());
 
             for (final DirectoryDto child : indexer.getChildren(node.getPath())) {
                 final @NotNull List<String> under = new ArrayList<>(path);
                 under.add(child.getName());
                 walk(child, under, found, unreadable);
             }
-        }
-
-        /**
-         * UC-SHARE-002, Rule-SHARE-001.
-         * <p>
-         * The test case files in this folder that the index has no case for, which
-         * are the ones that would not read when the project was scanned. Named
-         * rather than counted: a tester who recognizes the file knows whether the
-         * export is worth sending (#263).
-         * <p>
-         * Asked of the folder listing rather than by parsing anything. Testin names
-         * a case file after the case's id, so a file named for a UUID the index
-         * does not know is one the scan could not read. A file named anything else
-         * is not one Testin wrote, and is nobody's missing test case.
-         */
-        private @NotNull List<String> unreadableIn(final @NotNull DirectoryDto node, final @NotNull List<TestCaseDto> indexed) {
-            final @NotNull Set<String> known = new HashSet<>();
-            for (final TestCaseDto tc : indexed) known.add(tc.getId() + ".json");
-
-            final @NotNull List<String> missing = new ArrayList<>();
-            resolveTargetDir(node).ifPresent(dir -> {
-                for (final VirtualFile file : childrenOf(dir)) {
-                    if (file.isDirectory() || known.contains(file.getName())) continue;
-                    if (isCaseFileName(file.getName())) missing.add(file.getName());
-                }
-            });
-
-            return missing;
-        }
-    }
-
-    /**
-     * Whether a file name is one Testin wrote for a test case: a UUID, then
-     * {@code .json}.
-     */
-    private static boolean isCaseFileName(final @NotNull String name) {
-        if (!name.endsWith(".json")) return false;
-
-        try {
-            UUID.fromString(name.substring(0, name.length() - ".json".length()));
-            return true;
-        } catch (final IllegalArgumentException notACase) {
-            return false;
         }
     }
 
@@ -325,13 +286,5 @@ public class ExportAction extends DumbAwareAction {
     private static @NotNull Optional<VirtualFile> resolveTargetDir(final @NotNull DirectoryDto dirDto) {
         return Optional.ofNullable(LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString()))
                 .map(target -> target.isDirectory() ? target : target.getParent());
-    }
-
-    /**
-     * What a VFS directory holds. The platform answers "nothing readable here"
-     * with a null array, which is the same as holding nothing.
-     */
-    private static VirtualFile @NotNull [] childrenOf(final @NotNull VirtualFile dir) {
-        return Objects.requireNonNullElse(dir.getChildren(), VirtualFile.EMPTY_ARRAY);
     }
 }

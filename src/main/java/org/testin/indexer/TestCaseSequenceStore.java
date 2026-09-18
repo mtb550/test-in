@@ -55,6 +55,26 @@ final class TestCaseSequenceStore {
      */
     private final @NotNull Map<UUID, Path> handNamed = new ConcurrentHashMap<>();
 
+    /**
+     * UC-SHARE-002, Rule-SHARE-001.
+     * <p>
+     * The case files the last scan of each test set could not read, by set.
+     */
+    private final @NotNull Map<String, Set<String>> unreadable = new ConcurrentHashMap<>();
+
+    /**
+     * UC-SHARE-002, Rule-SHARE-001.
+     * <p>
+     * The test case files in this set that the last scan could not read, by
+     * name. An export names them rather than counting them: a tester who
+     * recognizes the file knows whether the export is worth sending (#263).
+     * Asked here because the scan is what read them; the export used to walk
+     * the folder through the VFS to work it out again (#66, finding 278).
+     */
+    @NotNull Set<String> unreadableIn(final @NotNull Path testSetPath) {
+        return Set.copyOf(unreadable.getOrDefault(testSetPath.toString(), Set.of()));
+    }
+
 
     @NotNull Map<UUID, TestCaseDto> getTestCasesById() {
         return testCasesById;
@@ -304,6 +324,7 @@ final class TestCaseSequenceStore {
         Optional.ofNullable(testSetCaseIds.remove(path))
                 .ifPresent(ids -> ids.forEach(testCasesById::remove));
         handNamed.values().removeIf(file -> Path.of(path).equals(file.getParent()));
+        unreadable.remove(path);
     }
 
     /**
@@ -322,7 +343,7 @@ final class TestCaseSequenceStore {
      * The ids are read before the new lists go in, because after that the old
      * ones are no longer there to ask.
      */
-    void swapIn(final @NotNull Path projectPath, final @NotNull Map<UUID, TestCaseDto> cases, final @NotNull Map<String, List<UUID>> setCaseIds, final @NotNull Map<UUID, Path> handNamedFiles) {
+    void swapIn(final @NotNull Path projectPath, final @NotNull Map<UUID, TestCaseDto> cases, final @NotNull Map<String, List<UUID>> setCaseIds, final @NotNull Map<UUID, Path> handNamedFiles, final @NotNull Map<String, Set<String>> unreadableCases) {
         final @NotNull Set<UUID> held = testSetCaseIds.entrySet().stream()
                 .filter(entry -> Path.of(entry.getKey()).startsWith(projectPath))
                 .flatMap(entry -> entry.getValue().stream())
@@ -338,11 +359,15 @@ final class TestCaseSequenceStore {
 
         handNamed.putAll(handNamedFiles);
         handNamed.entrySet().removeIf(entry -> entry.getValue().startsWith(projectPath) && !handNamedFiles.containsKey(entry.getKey()));
+
+        unreadable.putAll(unreadableCases);
+        unreadable.keySet().removeIf(set -> Path.of(set).startsWith(projectPath) && !unreadableCases.containsKey(set));
     }
 
     void clear() {
         testCasesById.clear();
         testSetCaseIds.clear();
         handNamed.clear();
+        unreadable.clear();
     }
 }
