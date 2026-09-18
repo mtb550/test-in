@@ -36,6 +36,7 @@ import org.testin.view.ViewToolWindowFactory;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -64,24 +65,21 @@ import java.util.function.Consumer;
 public final class TestinEditors {
 
     /**
-     * The open file showing this node, and empty when none is.
+     * The open file showing the node at this path, and empty when none is.
      * <p>
-     * By path, which is the node's identity - the same match {@code openNow},
-     * {@code editorFor} and the rename listener already make, and the reason
-     * three of the five lookups in this class carried a comment saying so while
-     * two matched on the name. Two test sets both called "Login" in different
-     * packages are one name and two nodes, and the name answers for whichever
-     * happened to be open first.
+     * By path, which is the node's identity. Two test sets both called "Login"
+     * in different packages are one name and two nodes, and the name answers
+     * for whichever happened to be open first - a search result opened its
+     * neighbour's editor that way, and a rename closed the other one's tab.
+     * <p>
+     * The one lookup in this class. Four methods wrote this loop out again
+     * beside it, each with its own comment saying why it matched on the path
+     * (#312, A20).
      */
-    private @NotNull Optional<VirtualFile> openFileFor(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        for (final VirtualFile open : FileEditorManager.getInstance(p).getOpenFiles()) {
-            if (!(open instanceof UnifiedVirtualFile testinFile)) continue;
-            if (!testinFile.getDir().getPath().equals(dir.getPath())) continue;
-
-            return Optional.of(open);
-        }
-
-        return Optional.empty();
+    private @NotNull Optional<VirtualFile> openFileAt(final @NotNull Project p, final @NotNull Path path) {
+        return Arrays.stream(FileEditorManager.getInstance(p).getOpenFiles())
+                .filter(open -> open instanceof UnifiedVirtualFile testinFile && testinFile.getDir().getPath().equals(path))
+                .findFirst();
     }
 
     /**
@@ -94,16 +92,7 @@ public final class TestinEditors {
      * has been emptied, so the first thing it asks for is not there (#165).
      */
     public void reloadOpen(final @NotNull Project p, final @NotNull Path path) {
-        final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
-
-        for (final VirtualFile open : fed.getOpenFiles()) {
-            if (!(open instanceof UnifiedVirtualFile testinFile)) continue;
-            if (!testinFile.getDir().getPath().equals(path)) continue;
-
-            for (final FileEditor tab : fed.getAllEditors(open)) {
-                if (tab instanceof UnifiedFileEditor unified) unified.getEditor().reloadData();
-            }
-        }
+        editorAt(p, path).ifPresent(TestinEditor::reloadData);
     }
 
     /**
@@ -115,7 +104,7 @@ public final class TestinEditors {
      * renamed or deleted, for the next save to write back.
      */
     public void close(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        openFileFor(p, dir).ifPresent(FileEditorManager.getInstance(p)::closeFile);
+        openFileAt(p, dir.getPath()).ifPresent(FileEditorManager.getInstance(p)::closeFile);
 
     }
 
@@ -268,46 +257,23 @@ public final class TestinEditors {
      * run's open editor on the old one (#191).
      */
     public @NotNull Optional<TestinEditor> editorFor(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
+        return editorAt(p, dir.getPath());
+    }
 
-        for (final VirtualFile open : fed.getOpenFiles()) {
-            if (!(open instanceof UnifiedVirtualFile testinFile)) continue;
-            if (!testinFile.getDir().getPath().equals(dir.getPath())) continue;
-
-            for (final FileEditor tab : fed.getAllEditors(testinFile)) {
-                if (tab instanceof UnifiedFileEditor unified) return Optional.of(unified.getEditor());
-            }
-        }
-
-        return Optional.empty();
+    private @NotNull Optional<TestinEditor> editorAt(final @NotNull Project p, final @NotNull Path path) {
+        return openFileAt(p, path).flatMap(open -> Arrays.stream(FileEditorManager.getInstance(p).getAllEditors(open))
+                .filter(UnifiedFileEditor.class::isInstance)
+                .map(tab -> ((UnifiedFileEditor) tab).getEditor())
+                .findFirst());
     }
 
     public void closeThenOpen(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-            Optional<VirtualFile> targetVf = Optional.empty();
-
-            for (final VirtualFile openVf : fed.getOpenFiles()) {
-                // By path, not by name: two nodes in different packages can share
-                // a name, and matching on it would close a neighbour's editor
-                // instead of this node's. The path is the node's identity, the
-                // same match openNow and editorFor use.
-                if (!(openVf instanceof UnifiedVirtualFile testinFile)) continue;
-                if (!testinFile.getDir().getPath().equals(dir.getPath())) continue;
-
-                targetVf = Optional.of(openVf);
-                fed.closeFile(openVf);
-                break;
-            }
-
-            if (targetVf.isEmpty()) {
-                open(p, dir);
-                return;
-            }
-
-            fed.openFile(targetVf.orElseThrow(), true);
-        });
+        ApplicationManager.getApplication().invokeLater(() -> openFileAt(p, dir.getPath()).ifPresentOrElse(open -> {
+            fed.closeFile(open);
+            fed.openFile(open, true);
+        }, () -> open(p, dir)));
     }
 
     /**
@@ -353,17 +319,10 @@ public final class TestinEditors {
     private boolean openNow(final @NotNull Project p, final @NotNull DirectoryDto dir, final boolean focus) {
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
-        for (final VirtualFile open : fed.getOpenFiles()) {
-            // By path, not by name: two nodes in different packages can share a
-            // name, and matching on the name focused whichever one happened to be
-            // open first - so a case picked from the search opened its neighbour's
-            // editor. The path is the node's identity, which is what editorFor
-            // already matches on.
-            if (!(open instanceof UnifiedVirtualFile testinFile)) continue;
-            if (!testinFile.getDir().getPath().equals(dir.getPath())) continue;
-
+        final @NotNull Optional<VirtualFile> already = openFileAt(p, dir.getPath());
+        if (already.isPresent()) {
             Logger.info("Editor already open, focusing: " + dir.getName());
-            fed.openFile(open, focus);
+            fed.openFile(already.orElseThrow(), focus);
             return true;
         }
 
