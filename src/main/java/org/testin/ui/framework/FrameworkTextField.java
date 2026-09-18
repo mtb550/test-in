@@ -205,9 +205,21 @@ final class FrameworkTextField {
      * the single-line look with them.
      */
     static void bindClipboard(final @NotNull JTextComponent component) {
+        bind(component, KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx(), DefaultEditorKit.pasteAction);
+        bindAllButPaste(component);
+    }
+
+    /**
+     * Cut, copy and select-all, for a component whose paste is answered
+     * elsewhere - the area that takes a pasted screenshot, whose registered
+     * action is the one handler for paste. Bound here as well, the area's own
+     * Ctrl+V was dead behind that action, and a tester who moved Paste to
+     * another key got image paste on it and plain text on Ctrl+V (#66, finding
+     * 271).
+     */
+    static void bindAllButPaste(final @NotNull JTextComponent component) {
         final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
-        bind(component, KeyEvent.VK_V, menuMask, DefaultEditorKit.pasteAction);
         bind(component, KeyEvent.VK_C, menuMask, DefaultEditorKit.copyAction);
         bind(component, KeyEvent.VK_X, menuMask, DefaultEditorKit.cutAction);
         bind(component, KeyEvent.VK_A, menuMask, DefaultEditorKit.selectAllAction);

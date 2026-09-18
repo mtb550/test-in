@@ -73,10 +73,14 @@ public final class TextArea implements DialogComponent {
 
         // Bound on the area itself, as the framework's single-line fields
         // are, because a popup or a dialog can eat the keys on the way here.
-        // An area that takes images answers paste itself: installImagePaste.
-        FrameworkTextField.bindClipboard(area);
-
-        if (acceptsImages) installImagePaste();
+        // An area that takes images answers paste itself, once, in
+        // installImagePaste - so paste is not bound here as well.
+        if (acceptsImages) {
+            FrameworkTextField.bindAllButPaste(area);
+            installImagePaste();
+        } else {
+            FrameworkTextField.bindClipboard(area);
+        }
 
         final @NotNull JBScrollPane scroll = new JBScrollPane(area);
         scroll.setBorder(JBUI.Borders.emptyTop(8));
