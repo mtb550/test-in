@@ -37,6 +37,8 @@ import org.testin.testproject.BoundTestProject;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
+import java.awt.event.ActionEvent;
+import java.util.List;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.HashSet;
@@ -137,6 +139,38 @@ public class TreePanelTree implements Disposable {
         // Nor this one: DELETE is the card list's key as well as the tree's, and
         // it is the grid's for a cell's contents (#119).
         Declared.bindTo("Testin.RemoveNode", mainTree);
+
+        quietSwingsOwnClipboard(mainTree);
+    }
+
+    /**
+     * Rule-TREE-PANEL-006.
+     * <p>
+     * Leaves the declared Copy, Cut and Paste Node as the only handlers of their
+     * keys on the tree.
+     * <p>
+     * A JTree carries Swing's own clipboard actions under the same keys, and the
+     * IDE only swallows a key while the registered action is enabled. Paste Node
+     * grays itself for more than one selected row, so Ctrl+V fell through to
+     * Swing's paste - which skipped the name-collision notice and the question
+     * Rule-TREE-PANEL-006 says every move and copy asks, and moved or copied the
+     * nodes into the first selected row (#66, finding 189). Copy and Cut had the
+     * same second path.
+     * <p>
+     * Shadowed by the actions' own names rather than by a list of keys, so every
+     * key the look and feel maps to them - Ctrl+V, the Paste key, Shift+Insert -
+     * goes quiet together, and a key the look and feel adds later does too.
+     */
+    private static void quietSwingsOwnClipboard(final @NotNull JTree tree) {
+        final @NotNull Action nothing = new AbstractAction() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+            }
+        };
+
+        for (final Action swingOwn : List.of(TransferHandler.getCutAction(), TransferHandler.getCopyAction(), TransferHandler.getPasteAction())) {
+            tree.getActionMap().put(swingOwn.getValue(Action.NAME), nothing);
+        }
     }
 
     /**
