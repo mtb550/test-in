@@ -65,10 +65,10 @@ public final class Icons {
      * The Description field of the test case form: its letter, D, in a rounded
      * frame, the letter its key opens it with (#328).
      * <p>
-     * An SVG with a {@code _dark} twin, drawn in the platform's own icon grays,
-     * so the IDE picks the variant for the theme and keeps it sharp at any
-     * scale - nothing here paints. The first of the letter icons, tried on its
-     * own before the other fields follow.
+     * An SVG in one gray, the platform's light-theme icon gray, in every theme:
+     * Muteb chose the one color over a lighter twin for dark themes. The IDE
+     * keeps it sharp at any scale, and nothing here paints. The first of the
+     * letter icons, tried on its own before the other fields follow.
      */
     public static final @NotNull Icon FIELD_DESCRIPTION = IconLoader.getIcon("/icons/fieldDescription.svg", Icons.class);
 
