@@ -83,16 +83,11 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
     }
 
     /**
-     * Rule-EDITOR-PANEL-215.
-     * <p>
-     * The source set of a cut was renamed or removed before the tester pressed
-     * CTRL+Z in the destination. The undo is refused before anything is taken
-     * out, so the cases stay where they are. It used to take them out of the
-     * destination first and then throw putting them back into a set the index
-     * no longer held, leaving them in neither (#312, A82).
+     * A test project with one test set in it, built the way the create actions
+     * build them: the mapper makes the node, the indexer is told.
      */
-    public void testUndoingAPasteWhoseSourceSetIsGoneLeavesTheCasesInTheDestination() {
-        final TestSetDirectoryDto destination = WriteAction.computeAndWait(() -> {
+    private TestSetDirectoryDto checkoutSet() {
+        return WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 
             final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
@@ -102,6 +97,19 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
             indexer().addTestSet(ts);
             return ts;
         });
+    }
+
+    /**
+     * Rule-EDITOR-PANEL-215.
+     * <p>
+     * The source set of a cut was renamed or removed before the tester pressed
+     * CTRL+Z in the destination. The undo is refused before anything is taken
+     * out, so the cases stay where they are. It used to take them out of the
+     * destination first and then throw putting them back into a set the index
+     * no longer held, leaving them in neither (#312, A82).
+     */
+    public void testUndoingAPasteWhoseSourceSetIsGoneLeavesTheCasesInTheDestination() {
+        final TestSetDirectoryDto destination = checkoutSet();
 
         // Where the cases were cut from: a set that has since been renamed, so
         // nothing is indexed at the path the undo remembers.
@@ -130,5 +138,35 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
                 Services.getInstance(getProject(), UndoHistories.class).undo(scope));
         assertTrue("the pasted case was taken out of the destination by a refused undo",
                 indexer().findTestCase(moved.getId()).isPresent());
+    }
+
+    /**
+     * Rule-EDITOR-PANEL-215.
+     * <p>
+     * CTRL+Z after a removal puts the case back, in the index and on disk, and
+     * answers yes. The files are written off the EDT under a bar now, and the
+     * answer is still there for the key to say Undone by (#66, finding 224).
+     */
+    public void testUndoingARemovalPutsTheCaseBack() {
+        final TestSetDirectoryDto ts = checkoutSet();
+        final TestCaseDto removed = TestCaseDto.builder()
+                .id(UUID.randomUUID())
+                .description("Pay with a saved card")
+                .order("m")
+                .build();
+        removed.setParent(ts);
+        indexer().putTestCaseVerbatim(ts.getPath(), removed);
+        final List<UUID> ids = List.of(removed.getId());
+
+        final TestCaseSnapshot before = TestCaseSnapshot.of(getProject(), ts.getPath(), ids);
+        assertTrue("the removal being undone did not happen", indexer().removeTestCase(ts.getPath(), removed.getId()));
+
+        final UndoScope scope = UndoScope.of(ts.getPath());
+        TestCaseSnapshot.record(getProject(), scope, "Remove", List.of(before), List.of(TestCaseSnapshot.of(getProject(), ts.getPath(), ids)));
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+
+        assertTrue("the undo said it could not put the case back", Services.getInstance(getProject(), UndoHistories.class).undo(scope));
+        assertTrue("the case is not back in the index", indexer().findTestCase(removed.getId()).isPresent());
+        assertTrue("the case's file is not back on disk", Files.isRegularFile(ts.getPath().resolve(removed.getId() + ".json")));
     }
 }

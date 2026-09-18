@@ -17,6 +17,7 @@
 package org.testin.testcase;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
@@ -210,13 +211,64 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         // could have told them apart - X is removed and then restored, which is
         // the state being asked for. A copy-and-paste is unaffected either way:
         // its ids are fresh, so nothing overlaps.
-        // Every snapshot tries, whatever the one before it answered.
-        boolean allBack = true;
-        for (final TestCaseSnapshot snapshot : target) allBack &= snapshot.removeAbsent();
-        for (final TestCaseSnapshot snapshot : target) allBack &= snapshot.restorePresent();
+        //
+        // Every snapshot tries, whatever the one before it answered. The files
+        // are written off the EDT, under a bar that cannot be canceled, the way
+        // the tree's undo puts nodes back: a case half put back is worse than one
+        // not put back. Undoing a removal of forty cases wrote forty files while
+        // the IDE stood still (#66, finding 224). The code follows on the EDT,
+        // from what the files took.
+        final @NotNull Written written = new Written();
+        final boolean allBack = ProgressManager.getInstance().<Boolean, RuntimeException>runProcessWithProgressSynchronously(() -> {
+            boolean all = true;
+            for (final TestCaseSnapshot snapshot : target) all &= snapshot.removeAbsent(written);
+            for (final TestCaseSnapshot snapshot : target) all &= snapshot.restorePresent(written);
+            return all;
+        }, Bundle.message("remove.undo.progress"), false, p);
 
+        written.generate(p);
         tellTheSurfaces(p, target);
         return allBack;
+    }
+
+    /**
+     * What putting the snapshots back did to the files, kept for the code that
+     * follows on the EDT: the cases taken out, the ones coming back from a
+     * removal, and every one written.
+     */
+    private record Written(@NotNull List<TestCaseDto> removed, @NotNull List<TestCaseDto> comingBack, @NotNull List<TestCaseDto> landed) {
+
+        Written() {
+            this(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        }
+
+        /**
+         * One call per kind. Only executeAll opens the single write command, so
+         * taking back a removal of forty cases used to put forty entries on the
+         * IDE's own undo history (#66, finding 80).
+         */
+        void generate(final @NotNull Project p) {
+            if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
+            if (!comingBack.isEmpty()) GenType.CREATE_TEST_CASE.executeAll(p, comingBack);
+
+            // UC-CODEGEN-002, Rule-CODEGEN-068.
+            //
+            // The case came back; its code comes back with it. Restoring put the
+            // data back and left the method saying whatever the change being
+            // undone had made it say - the new name after undoing a rename, the
+            // new groups after undoing a group change, the new position after
+            // undoing a drag. The tester took the change back and only half of it
+            // went.
+            //
+            // Every part rather than the one that moved, because a snapshot is
+            // the case as it was and not a list of what changed. Silent where a
+            // case has no method, and it writes none: a method deleted on purpose
+            // stays deleted.
+            //
+            // Only for the cases that were written: a method rewritten to match a
+            // case the disk never took would describe a case that is not there.
+            if (!landed.isEmpty()) GenType.RECONCILE_TEST_CASE.executeAll(p, landed);
+        }
     }
 
     /**
@@ -303,25 +355,21 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
      * would not delete is still there, the writer has said why, and the undo is
      * not confirmed over it (#66, finding 292).
      */
-    private boolean removeAbsent() {
+    private boolean removeAbsent(final @NotNull Written written) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         // Only what is actually there. An id that is already gone is the state
         // this asks for, and deleting a file twice is a warning in the log for
         // a job already done.
         final @NotNull List<TestCaseDto> stillThere = absent.stream().flatMap(id -> indexer.findTestCase(id).stream()).toList();
-        final @NotNull List<TestCaseDto> removed = new ArrayList<>();
+
+        boolean allWent = true;
         for (final TestCaseDto tc : stillThere) {
-            if (indexer.removeTestCase(testSetPath, tc.getId())) removed.add(tc);
+            if (indexer.removeTestCase(testSetPath, tc.getId())) written.removed().add(tc);
+            else allWent = false;
         }
 
-        // One call for all of them, as the reconcile at the end of restorePresent
-        // already does. Only executeAll opens the single write command, so taking
-        // back a removal of forty cases used to put forty entries on the IDE's own
-        // undo history (#66, finding 80).
-        if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
-
-        return removed.size() == stillThere.size();
+        return allWent;
     }
 
     /**
@@ -333,7 +381,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
      * refused is still as it was, the writer has said why, and the undo is not
      * confirmed over it (#66, finding 285).
      */
-    private boolean restorePresent() {
+    private boolean restorePresent(final @NotNull Written written) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         // The set the cases belong to, put back on them before anything reads
@@ -361,9 +409,8 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         // A copy per write for the same reason the snapshot is a copy: the
         // indexer keeps the object it is given, and this snapshot may be
         // applied again by the next redo.
-        final @NotNull List<TestCaseDto> landed = new ArrayList<>();
-        final @NotNull List<TestCaseDto> comingBack = new ArrayList<>();
-        present.forEach(tc -> {
+        boolean allBack = true;
+        for (final TestCaseDto tc : present) {
             // A case the index has never heard of is one coming back from a
             // removal rather than one being edited back, and only the first
             // needs a method written. Asked before the save, because after it
@@ -372,33 +419,16 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
 
             final @NotNull TestCaseDto stored = copy(p, tc);
             stored.setParent(parent);
-            if (!indexer.putTestCaseVerbatim(testSetPath, stored)) return;
+            if (!indexer.putTestCaseVerbatim(testSetPath, stored)) {
+                allBack = false;
+                continue;
+            }
 
-            landed.add(tc);
-            if (isComingBack) comingBack.add(tc);
-        });
+            written.landed().add(tc);
+            if (isComingBack) written.comingBack().add(tc);
+        }
 
-        // One call, like the two below and above it.
-        if (!comingBack.isEmpty()) GenType.CREATE_TEST_CASE.executeAll(p, comingBack);
-
-        // UC-CODEGEN-002, Rule-CODEGEN-068.
-        //
-        // The case came back; its code comes back with it. Restoring put the
-        // data back and left the method saying whatever the change being undone
-        // had made it say - the new name after undoing a rename, the new groups
-        // after undoing a group change, the new position after undoing a drag.
-        // The tester took the change back and only half of it went.
-        //
-        // Every part rather than the one that moved, because a snapshot is the
-        // case as it was and not a list of what changed. Silent where a case has
-        // no method, and it writes none: a method deleted on purpose stays
-        // deleted.
-        //
-        // Only for the cases that were written: a method rewritten to match a
-        // case the disk never took would describe a case that is not there.
-        if (!landed.isEmpty()) GenType.RECONCILE_TEST_CASE.executeAll(p, landed);
-
-        return landed.size() == present.size();
+        return allBack;
     }
 
     private static @NotNull TestCaseDto copy(final @NotNull Project p, final @NotNull TestCaseDto tc) {
