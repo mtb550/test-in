@@ -16,6 +16,7 @@
 
 package org.testin.ui.framework;
 
+import lombok.Getter;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -39,6 +40,7 @@ import java.util.function.Function;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ComponentDialogBase<C extends DialogComponent> {
 
+    @Getter
     private final @NotNull C component;
 
     /**
@@ -162,10 +164,6 @@ public final class ComponentDialogBase<C extends DialogComponent> {
      */
     public static @NotNull TableBuilder table() {
         return new TableBuilder();
-    }
-
-    public @NotNull C getComponent() {
-        return component;
     }
 
     /**

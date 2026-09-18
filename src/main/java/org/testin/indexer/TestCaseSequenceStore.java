@@ -16,6 +16,7 @@
 
 package org.testin.indexer;
 
+import lombok.Getter;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -38,7 +39,9 @@ import java.util.stream.Collectors;
 final class TestCaseSequenceStore {
 
     private final @NotNull Project p;
+    @Getter(AccessLevel.PACKAGE)
     private final @NotNull Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
+    @Getter(AccessLevel.PACKAGE)
     private final @NotNull Map<String, List<UUID>> testSetCaseIds = new ConcurrentHashMap<>();
 
     /**
@@ -75,14 +78,6 @@ final class TestCaseSequenceStore {
         return Set.copyOf(unreadable.getOrDefault(testSetPath.toString(), Set.of()));
     }
 
-
-    @NotNull Map<UUID, TestCaseDto> getTestCasesById() {
-        return testCasesById;
-    }
-
-    @NotNull Map<String, List<UUID>> getTestSetCaseIds() {
-        return testSetCaseIds;
-    }
 
     /**
      * The list a test set's case ids are kept in, built in one place so every

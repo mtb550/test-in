@@ -16,6 +16,8 @@
 
 package org.testin.runner;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsAdapter;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener;
 import com.intellij.execution.testframework.sm.runner.SMTestProxy;
@@ -31,7 +33,8 @@ import java.time.Duration;
 
 import java.util.Objects;
 
-public class TestCaseExecutionTracker {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class TestCaseExecutionTracker {
 
     /**
      * Subscribes to the IDE's test events for the life of the project.

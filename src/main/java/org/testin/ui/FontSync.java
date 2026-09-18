@@ -16,6 +16,8 @@
 
 package org.testin.ui;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
@@ -30,7 +32,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Optional;
 
-public class FontSync {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class FontSync {
 
     /**
      * Nothing in the plugin is drawn below this, however small the editor font

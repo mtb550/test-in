@@ -80,6 +80,7 @@ enum ReportSection {
             Bundle.message("report.section.removed.description"),
             "96A1B0", TestRunSummary::removed, false, TestStatus.REMOVED);
 
+    @Getter
     private final @NotNull String title;
     private final @NotNull String descriptionFmt;
     /**
@@ -113,10 +114,6 @@ enum ReportSection {
         this.count = count;
         this.withFailureDetail = withFailureDetail;
         this.statuses = EnumSet.copyOf(Arrays.asList(statuses));
-    }
-
-    public @NotNull String getTitle() {
-        return title;
     }
 
     /**

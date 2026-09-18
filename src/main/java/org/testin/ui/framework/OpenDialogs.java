@@ -20,8 +20,6 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -51,7 +49,6 @@ import java.util.Optional;
  * exactly that.
  */
 @Service(Service.Level.PROJECT)
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public final class OpenDialogs {
 
     /**

@@ -16,6 +16,7 @@
 
 package org.testin.testrun;
 
+import lombok.AllArgsConstructor;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
+@AllArgsConstructor
 public enum RunEditorAttributes implements ToolBarAttribute {
 
     /**
@@ -228,13 +230,6 @@ public enum RunEditorAttributes implements ToolBarAttribute {
 
     RunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull ValueExtractor runValueExtractor) {
         this(name, toolBarDefault, runValueExtractor, RunValueSetter.NONE);
-    }
-
-    RunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull ValueExtractor runValueExtractor, final @NotNull RunValueSetter runValueSetter) {
-        this.name = name;
-        this.toolBarDefault = toolBarDefault;
-        this.runValueExtractor = runValueExtractor;
-        this.runValueSetter = runValueSetter;
     }
 
     /**
