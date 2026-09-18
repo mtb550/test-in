@@ -65,24 +65,12 @@ public final class Icons {
      * The Description field of the test case form: its letter, D, in a rounded
      * frame, the letter its key opens it with (#328).
      * <p>
-     * The first of the letter icons, tried on its own before the other fields
-     * follow - see {@link #letter} for its color.
+     * An SVG in one gray, the platform's light-theme icon gray, in every theme:
+     * Muteb chose the one color over a lighter twin for dark themes. The IDE
+     * keeps it sharp at any scale, and nothing here paints. The first of the
+     * letter icons, tried on its own before the other fields follow.
      */
-    public static final @NotNull Icon FIELD_DESCRIPTION = letter("/icons/fieldDescription.svg");
-
-    /**
-     * A letter icon, painted the platform's light-theme icon gray in every
-     * theme: Muteb chose the one gray over a lighter twin for dark themes.
-     * <p>
-     * The SVG draws only the shape and carries no color, so the gray is written
-     * here once for every letter icon rather than in each file.
-     * <p>
-     * <b>Painted, not {@link #gray}ed.</b> Desaturating keeps each pixel's
-     * lightness, and a shape with no color is black - it would stay black.
-     */
-    private static @NotNull Icon letter(final @NotNull String path) {
-        return IconUtil.colorize(IconLoader.getIcon(path, Icons.class), new Color(0x6C707E));
-    }
+    public static final @NotNull Icon FIELD_DESCRIPTION = IconLoader.getIcon("/icons/fieldDescription.svg", Icons.class);
 
     /**
      * UC-INTERNAL-007, Rule-INTERNAL-077.
