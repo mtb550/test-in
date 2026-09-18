@@ -95,18 +95,18 @@ public enum JavaCode {
     private final @NotNull GenAction created;
 
     /**
-     * UC-CODEGEN-011, Rule-CODEGEN-031 - what a rename does to it. Here rather
-     * than in the rename action, which used to ask {@code instanceof} which
-     * generator a node wanted (#51).
+     * UC-CODEGEN-015, UC-CODEGEN-017, Rule-CODEGEN-051 - what a rename does to
+     * it. Here rather than in the rename action, which used to ask
+     * {@code instanceof} which generator a node wanted (#51).
      */
     private final @NotNull GenAction renamed;
 
     /**
-     * UC-CODEGEN-011, Rule-CODEGEN-033 - what a move does to it. A move changes
-     * which package a file declares, so it is its own operation and not a
-     * rename with a different argument. Nothing did it at all before: a dragged
-     * test set left its class behind, and the cases under it stopped being
-     * runnable (#51).
+     * UC-CODEGEN-016, UC-CODEGEN-017, Rule-CODEGEN-053 - what a move does to
+     * it. A move changes which package a file declares, so it is its own
+     * operation and not a rename with a different argument. Nothing did it at
+     * all before: a dragged test set left its class behind, and the cases under
+     * it stopped being runnable (#51).
      */
     private final @NotNull GenAction moved;
 

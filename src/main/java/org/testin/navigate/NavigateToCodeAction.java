@@ -28,7 +28,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.OptionalPlugin;
 
 /**
- * UC-CODEGEN-005.
+ * UC-CODEGEN-006.
  * <p>
  * Declared in {@code plugin.xml} (#119) with Shift+F5 as its default, which is
  * free in IntelliJ's keymap. A tester would look for this in Find Action, and it
