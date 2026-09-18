@@ -289,14 +289,14 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
     }
 
     /**
-     * Cut, copy and paste in the field.
+     * Up and Down move the selection in the list under the field while the
+     * cursor stays in the field.
      * <p>
-     * A field inside a popup does not always inherit them: the popup and the
-     * dialog both bind keys on the way to it, and what reaches the text
-     * component is whatever they left. Bound by name to the actions the text
-     * component already has, so this asks for the standard behavior rather than
-     * writing a second one - and a tester can paste a test case id or a ticket
-     * number into the search instead of typing it out (#29).
+     * The field's cut, copy and paste are not bound here: they are
+     * {@link FrameworkTextField#bindClipboard}'s, which every framework field
+     * takes. This javadoc described them after they had moved, in a file whose
+     * promise is that one declaration says what a surface answers (#66, finding
+     * 273).
      */
     private void installNavigation() {
         bindNavigationKey(KeyEvent.VK_DOWN, "testin.framework.selectionDown", 1);
