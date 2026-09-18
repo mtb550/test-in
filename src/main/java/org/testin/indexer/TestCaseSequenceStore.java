@@ -285,8 +285,12 @@ final class TestCaseSequenceStore {
             // (#66, finding 112).
             if (!firstSight && !movedIds.contains(testCase.getId())) continue;
 
-            Services.getInstance(p, TestDataFiles.class)
-                    .write(p, testSetPath.resolve(testCase.getId() + ".json"), testCase);
+            // Through store, the one write of a case, rather than a path spelled
+            // out here beside the method that owns it: written that way, a
+            // reorder of a hand-named case wrote <id>.json and left the
+            // original, the two files Rule-INTERNAL-084 exists to prevent (#66,
+            // finding 229).
+            store(testSetPath, testCase);
         }
 
         // Whatever the set held and no longer holds stops being indexed at all.
