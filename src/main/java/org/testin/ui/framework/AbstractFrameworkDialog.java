@@ -393,6 +393,8 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
         contentPanel.setFocusCycleRoot(true);
         contentPanel.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
 
+        Captions.align(contentPanel);
+
         return contentPanel;
     }
 
