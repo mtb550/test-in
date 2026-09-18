@@ -81,9 +81,15 @@ public final class LabelValueRow {
         label.setForeground(JBColor.GRAY);
         label.setFont(JBFont.label().deriveFont(Font.BOLD, labelFontSize));
 
+        // UC-SETTING-011. The usual width, scaled, and wider when the caption
+        // needs it. A fixed 255 pixels ignored a high-DPI or large-font IDE,
+        // and clipped the caption once Ctrl+wheel made its font bigger than
+        // the column it sat in (#66, finding 188). The column is as wide as its
+        // widest caption, so the values still start in one line.
         final @NotNull Dimension prefSize = label.getPreferredSize();
-        label.setPreferredSize(new Dimension(LABEL_WIDTH, prefSize.height));
-        label.setMinimumSize(new Dimension(LABEL_WIDTH, prefSize.height));
+        final int width = Math.max(JBUI.scale(LABEL_WIDTH), prefSize.width);
+        label.setPreferredSize(new Dimension(width, prefSize.height));
+        label.setMinimumSize(new Dimension(width, prefSize.height));
 
         panel.add(label, gbc);
 
