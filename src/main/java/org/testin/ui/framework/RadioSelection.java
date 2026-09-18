@@ -48,6 +48,8 @@ public final class RadioSelection<T> implements DialogComponent {
         // first letter; a flow layout puts its gap on the left edge too.
         final @NotNull JBPanel<?> radioRow = new JBPanel<>(new HorizontalLayout(JBUI.scale(8)));
         radioRow.setOpaque(false);
+        // At the framework's text edge, under the caption's first letter.
+        radioRow.setBorder(JBUI.Borders.emptyLeft(12));
 
         Optional<JRadioButton> first = Optional.empty();
         for (final Option<T> option : options) {

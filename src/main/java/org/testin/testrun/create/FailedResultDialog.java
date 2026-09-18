@@ -16,11 +16,11 @@
 
 package org.testin.testrun.create;
 
-import org.testin.testcase.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.CreateTestCaseFields;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -67,8 +67,8 @@ public class FailedResultDialog extends AbstractFrameworkDialog<SpellCheckedFiel
 
         final @NotNull List<ComponentDialogBase<?>> all = new ArrayList<>();
         all.add(ComponentDialogBase.details()
-                .row(TestEditorAttributes.DESCRIPTION.getName(), description)
-                .row(Bundle.message("caption.expected"), expectedResult)
+                .row(CreateTestCaseFields.DESCRIPTION.getIcon(), description)
+                .row(CreateTestCaseFields.EXPECTED_RESULT.getIcon(), expectedResult)
                 .build());
         all.addAll(fields.components());
 

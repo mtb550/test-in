@@ -26,11 +26,12 @@ import org.testin.ui.Caption;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * Read-only context rows — each value with its caption above it
- * (e.g. the test case's description and expected result above an input).
- * Display only: never takes the focus, never submits.
+ * Read-only context rows, each value named by a caption above it or by an icon
+ * before it (e.g. the test case's description and expected result above an
+ * input). Display only: never takes the focus, never submits.
  */
 public final class DialogDetails implements DialogComponent {
 
@@ -43,8 +44,14 @@ public final class DialogDetails implements DialogComponent {
         stack.setBorder(JBUI.Borders.empty(4, 0));
 
         for (final Row row : rows) {
-            // Rule-INTERNAL-087
-            stack.add(Caption.above(row.caption(), wrappingValue(row.value())));
+            // Rule-INTERNAL-087. The icon in the middle of the value's height,
+            // as the test case form draws a field's icon beside its box.
+            final @NotNull JBLabel value = wrappingValue(row.value());
+            row.icon().ifPresent(icon -> {
+                value.setIcon(icon);
+                value.setIconTextGap(JBUI.scale(8));
+            });
+            stack.add(Caption.above(row.caption(), value));
         }
 
         // Anchored to the top: when the rows are all a dialog holds, and it is
@@ -56,11 +63,14 @@ public final class DialogDetails implements DialogComponent {
     }
 
     /**
-     * Long values wrap instead of widening the whole dialog.
+     * Long values wrap instead of widening the whole dialog. At the framework's
+     * text edge, 12 pixels in, like the text of its fields.
      */
     private static @NotNull JBLabel wrappingValue(final @NotNull String value) {
-        return new JBLabel("<html><div style='width:" + JBUI.scale(420) + "px'>"
+        final @NotNull JBLabel label = new JBLabel("<html><div style='width:" + JBUI.scale(420) + "px'>"
                 + StringUtil.escapeXmlEntities(value) + "</div></html>");
+        label.setBorder(JBUI.Borders.emptyLeft(12));
+        return label;
     }
 
     @Override
@@ -84,8 +94,8 @@ public final class DialogDetails implements DialogComponent {
     }
 
     /**
-     * One caption/value row.
+     * One row: a value named by its caption, or by its icon and no caption.
      */
-    record Row(@NotNull String caption, @NotNull String value) {
+    record Row(@NotNull String caption, @NotNull Optional<Icon> icon, @NotNull String value) {
     }
 }

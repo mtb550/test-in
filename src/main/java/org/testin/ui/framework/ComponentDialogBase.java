@@ -201,7 +201,18 @@ public final class ComponentDialogBase<C extends DialogComponent> {
          */
         public @NotNull DetailsBuilder row(final @NotNull String caption, final @NotNull String value) {
             if (!value.isBlank()) {
-                rows.add(new DialogDetails.Row(caption, value));
+                rows.add(new DialogDetails.Row(caption, Optional.empty(), value));
+            }
+            return this;
+        }
+
+        /**
+         * One row named by an icon rather than a caption, as a test case field
+         * is named by its letter; a blank value skips the row.
+         */
+        public @NotNull DetailsBuilder row(final @NotNull Icon icon, final @NotNull String value) {
+            if (!value.isBlank()) {
+                rows.add(new DialogDetails.Row("", Optional.of(icon), value));
             }
             return this;
         }

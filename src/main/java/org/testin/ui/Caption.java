@@ -74,10 +74,14 @@ public final class Caption {
      * the one shape every captioned component of the dialog framework takes,
      * so their gaps cannot drift apart. No caption, no line for one - the
      * value keeps the same space above it.
+     * <p>
+     * The caption starts 12 pixels in, at the framework's text edge: where its
+     * fields and text areas start their text. It sat at the dialog's own edge,
+     * left of the text it named.
      */
     public static @NotNull BorderLayoutPanel above(final @NotNull String caption, final @NotNull JComponent value) {
         final @NotNull BorderLayoutPanel panel = JBUI.Panels.simplePanel(0, JBUI.scale(2)).addToCenter(value).withBorder(JBUI.Borders.emptyTop(8)).andTransparent();
-        if (!caption.isEmpty()) panel.addToTop(of(caption, JBUI.Fonts.label().getSize2D()));
+        if (!caption.isEmpty()) panel.addToTop(of(caption, JBUI.Fonts.label().getSize2D()).withBorder(JBUI.Borders.emptyLeft(12)));
         return panel;
     }
 }

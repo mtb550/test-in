@@ -68,10 +68,8 @@ form before it records anything.
 ┌──────────────────────────────────────────────────────────────┐
 │  Failed Test Case Details                                    │
 ├──────────────────────────────────────────────────────────────┤
-│  DESCRIPTION                                                 │
-│  Log in with a valid user                                    │
-│  EXPECTED                                                    │
-│  The dashboard opens.                                        │
+│  [D] Log in with a valid user                                │
+│  [E] The dashboard opens.                                    │
 │                                                              │
 │  ACTUAL RESULT                                               │
 │  [ set actual result..                                    ]  │
@@ -95,8 +93,9 @@ form before it records anything.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **Description** and **Expected** — what the test case says. They show the
-   tester what should have happened. Neither can be typed into.
+1. **Description** and **Expected** — what the test case says, each after its
+   icon, **D** and **E**, as the test case form draws them. They show the tester
+   what should have happened. Neither can be typed into.
 2. **The first box** — what actually happened. Its caption above it reads
    **Actual Result**, and its gray hint is inside it. A misspelled word in it is
    underlined, and `Alt+Enter` offers the corrections.
