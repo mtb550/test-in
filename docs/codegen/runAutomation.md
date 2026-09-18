@@ -125,15 +125,6 @@ The name in the IDE's run widget depends on the selection.
 | Several in one test set | The class name |
 | Several across test sets | The first class name, then *and*, then how many more |
 
-## Where the plugin breaks its own rules
-
-**TestNG alone is not enough.** Running needs the Java plugin to find the
-method. Only TestNG is checked before **Run Test Case** is offered. So in an IDE
-with TestNG and no Java plugin, no test case finds its method. The tester is
-told how many have no generated code, and nothing mentions the missing plugin.
-That is difference 7 on
-[the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
-
 ---
 
 [Documentation](../README.md) › [Automation code and the gutter](main.md)
