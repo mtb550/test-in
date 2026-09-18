@@ -55,20 +55,20 @@ This copies words a person can read. It does not copy the test case itself.
 ┌──────────────────────────────────────────────┐
 │  Copy                                        │
 ├──────────────────────────────────────────────┤
-│  > 📋  All Details                       A   │
-│    📋  Description                       D   │
-│    📋  Expected Result                   E   │
-│    📋  Steps                             S   │
-│    📋  Pre Conditions                    B   │
-│    📋  Test Data                         T   │
-│    📋  Priority                          P   │
-│    📋  Module                            M   │
-│    📋  Group                             G   │
-│    📋  Status                            U   │
-│    📋  Reference                         R   │
-│    📋  FQCN                              F   │
-│    📋  ID                                I   │
-│    📋  Path                              H   │
+│  > [A] All Details                       A   │
+│    [D] Description                       D   │
+│    [E] Expected Result                   E   │
+│    [S] Steps                             S   │
+│    [B] Pre Conditions                    B   │
+│    [T] Test Data                         T   │
+│    [P] Priority                          P   │
+│    [M] Module                            M   │
+│    [G] Group                             G   │
+│    [U] Status                            U   │
+│    [R] Reference                         R   │
+│    [F] FQCN                              F   │
+│    [I] ID                                I   │
+│    [H] Path                              H   │
 └──────────────────────────────────────────────┘
 ```
 
@@ -76,6 +76,8 @@ This copies words a person can read. It does not copy the test case itself.
    the whole test case, which is what `Ctrl+C` did on its own before the menu.
 2. **A letter on each row** — pressing it copies that value and closes the menu.
    `Ctrl+C` then `D` is as quick as one keystroke for a tester who knows it.
+   Each row's icon is that letter in a frame, the same icon the field has in
+   Create Test Case.
 3. **The last three** — the class name, the identity and the path. Testin writes
    those; a tester pastes them into a stack trace, a ticket or a search.
 

@@ -16,18 +16,19 @@
 
 package org.testin.clipboard;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
+import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.MenuItem;
 import org.testin.util.Bundle;
+import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
 import javax.swing.Icon;
@@ -54,7 +55,9 @@ import java.util.stream.Collectors;
  * What the two share is where the parts live: the keystroke is in
  * {@link Shortcuts}, the caption is the attribute's own, and the popup is
  * {@code ShortcutMenuPopup}. The letters match the update menu's wherever the
- * field is the same, so D is the description in both.
+ * field is the same, so D is the description in both - and each row shows its
+ * letter in a frame, the create form's own icon where the field is one of its
+ * (#328).
  */
 @Getter
 public enum CopyChoice implements MenuItem {
@@ -64,18 +67,18 @@ public enum CopyChoice implements MenuItem {
      * this menu existed - so it is the first row and the one already selected,
      * and CTRL+C then ENTER is the gesture it always was.
      */
-    ALL_DETAILS(Bundle.message("copy.all.details"), Shortcuts.CopyAll),
+    ALL_DETAILS(Bundle.message("copy.all.details"), Shortcuts.CopyAll, Icons.fieldLetter("A", Icons.GRAY)),
 
-    DESCRIPTION(TestEditorAttributes.DESCRIPTION, Shortcuts.CopyDescription),
-    EXPECTED_RESULT(TestEditorAttributes.EXPECTED_RESULT, Shortcuts.CopyExpectedResult),
-    STEPS(TestEditorAttributes.STEPS, Shortcuts.CopySteps),
-    PRE_CONDITIONS(TestEditorAttributes.PRE_CONDITIONS, Shortcuts.CopyPreConditions),
-    TEST_DATA(TestEditorAttributes.TEST_DATA, Shortcuts.CopyTestData),
-    PRIORITY(TestEditorAttributes.PRIORITY, Shortcuts.CopyPriority),
-    MODULE(TestEditorAttributes.MODULE, Shortcuts.CopyModule),
-    GROUP(TestEditorAttributes.GROUP, Shortcuts.CopyGroup),
-    STATUS(TestEditorAttributes.STATUS, Shortcuts.CopyStatus),
-    REFERENCE(TestEditorAttributes.REFERENCE, Shortcuts.CopyReference),
+    DESCRIPTION(TestEditorAttributes.DESCRIPTION, Shortcuts.CopyDescription, CreateTestCaseFields.DESCRIPTION.getIcon()),
+    EXPECTED_RESULT(TestEditorAttributes.EXPECTED_RESULT, Shortcuts.CopyExpectedResult, CreateTestCaseFields.EXPECTED_RESULT.getIcon()),
+    STEPS(TestEditorAttributes.STEPS, Shortcuts.CopySteps, CreateTestCaseFields.STEPS.getIcon()),
+    PRE_CONDITIONS(TestEditorAttributes.PRE_CONDITIONS, Shortcuts.CopyPreConditions, CreateTestCaseFields.PRE_CONDITIONS.getIcon()),
+    TEST_DATA(TestEditorAttributes.TEST_DATA, Shortcuts.CopyTestData, CreateTestCaseFields.TEST_DATA.getIcon()),
+    PRIORITY(TestEditorAttributes.PRIORITY, Shortcuts.CopyPriority, CreateTestCaseFields.PRIORITY.getIcon()),
+    MODULE(TestEditorAttributes.MODULE, Shortcuts.CopyModule, CreateTestCaseFields.MODULE.getIcon()),
+    GROUP(TestEditorAttributes.GROUP, Shortcuts.CopyGroup, CreateTestCaseFields.GROUP.getIcon()),
+    STATUS(TestEditorAttributes.STATUS, Shortcuts.CopyStatus, Icons.fieldLetter("U", Icons.GRAY)),
+    REFERENCE(TestEditorAttributes.REFERENCE, Shortcuts.CopyReference, Icons.fieldLetter("R", Icons.GRAY)),
 
     /**
      * The three the update menu cannot offer, and the reason this enum is not
@@ -87,18 +90,13 @@ public enum CopyChoice implements MenuItem {
      * grid column draws it as a " &gt; " breadcrumb to read, and copying that
      * gave a name that matched nothing a tester pasted it into (#312, A59).
      */
-    FQCN(TestEditorAttributes.FQCN, Shortcuts.CopyFqcn, tc -> String.join(".", Fqcn.ofMethod(tc))),
-    ID(TestEditorAttributes.ID, Shortcuts.CopyId),
-    PATH(TestEditorAttributes.PATH, Shortcuts.CopyPath);
-
-    /**
-     * One icon for every row. They all do the same thing to different values, so
-     * a picture each would be decoration where the caption is the answer.
-     */
-    private static final @NotNull Icon ICON = AllIcons.Actions.Copy;
+    FQCN(TestEditorAttributes.FQCN, Shortcuts.CopyFqcn, Icons.fieldLetter("F", Icons.GRAY), tc -> String.join(".", Fqcn.ofMethod(tc))),
+    ID(TestEditorAttributes.ID, Shortcuts.CopyId, Icons.fieldLetter("I", Icons.GRAY)),
+    PATH(TestEditorAttributes.PATH, Shortcuts.CopyPath, Icons.fieldLetter("H", Icons.GRAY));
 
     private final @NotNull String name;
     private final @NotNull Shortcuts shortcut;
+    private final @NotNull Icon icon;
 
     /**
      * The value this row copies, and empty for the row that copies all of them.
@@ -113,20 +111,22 @@ public enum CopyChoice implements MenuItem {
     @Getter(AccessLevel.NONE)
     private final @NotNull Function<TestCaseDto, String> copied;
 
-    CopyChoice(final @NotNull TestEditorAttributes attribute, final @NotNull Shortcuts shortcut) {
-        this(attribute, shortcut, attribute::gridValue);
+    CopyChoice(final @NotNull TestEditorAttributes attribute, final @NotNull Shortcuts shortcut, final @NotNull Icon icon) {
+        this(attribute, shortcut, icon, attribute::gridValue);
     }
 
-    CopyChoice(final @NotNull TestEditorAttributes attribute, final @NotNull Shortcuts shortcut, final @NotNull Function<TestCaseDto, String> copied) {
+    CopyChoice(final @NotNull TestEditorAttributes attribute, final @NotNull Shortcuts shortcut, final @NotNull Icon icon, final @NotNull Function<TestCaseDto, String> copied) {
         this.name = attribute.getName();
         this.shortcut = shortcut;
+        this.icon = icon;
         this.attribute = Optional.of(attribute);
         this.copied = copied;
     }
 
-    CopyChoice(final @NotNull String name, final @NotNull Shortcuts shortcut) {
+    CopyChoice(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull Icon icon) {
         this.name = name;
         this.shortcut = shortcut;
+        this.icon = icon;
         this.attribute = Optional.empty();
         this.copied = CopyChoice::allDetailsOf;
     }
@@ -169,11 +169,6 @@ public enum CopyChoice implements MenuItem {
         return cases == 1
                 ? Bundle.message("copy.done.one", name)
                 : Bundle.message("copy.done.many", name, String.valueOf(cases));
-    }
-
-    @Override
-    public @NotNull Icon getIcon() {
-        return ICON;
     }
 
     @Override
