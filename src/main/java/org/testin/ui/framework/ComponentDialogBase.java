@@ -17,7 +17,6 @@
 package org.testin.ui.framework;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.util.IconUtil;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -164,15 +163,6 @@ public final class ComponentDialogBase<C extends DialogComponent> {
      */
     public static @NotNull TableBuilder table() {
         return new TableBuilder();
-    }
-
-    /**
-     * Framework default: every declared icon renders desaturated, so the
-     * color accents of tree icons (e.g. badge dots) never distract inside
-     * a dialog. Dialogs pass their icons plain.
-     */
-    private static @NotNull Icon desaturate(final @NotNull Icon icon) {
-        return icon == DialogStyle.NO_ICON ? icon : IconUtil.desaturate(icon);
     }
 
     public @NotNull C getComponent() {
@@ -328,7 +318,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         private boolean secret = false;
 
         public @NotNull TextInputBuilder icon(final @NotNull Icon icon) {
-            this.icon = desaturate(icon);
+            this.icon = icon;
             return this;
         }
 
@@ -400,7 +390,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
          * The field's leading icon before a selection takes over.
          */
         public @NotNull TextFieldBuilder<T> icon(final @NotNull Icon icon) {
-            this.icon = desaturate(icon);
+            this.icon = icon;
             return this;
         }
 
@@ -413,7 +403,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
          * One selectable row: icon, name, muted hint, and the submitted value.
          */
         public @NotNull TextFieldBuilder<T> selection(final @NotNull Icon icon, final @NotNull String name, final @NotNull String hint, final @NotNull T value) {
-            selections.add(SelectionList.add(desaturate(icon), name, hint, value));
+            selections.add(SelectionList.add(icon, name, hint, value));
             return this;
         }
 
