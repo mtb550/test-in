@@ -204,9 +204,10 @@ public final class RunStatusService {
      * The run the indexer holds at this path, and a refusal said when it holds
      * none. Every path that records something on a run asks this first, so a
      * tester who pressed a key over a run that has gone is told once, in the same
-     * words, whichever key it was (#66, findings 169 and 191).
+     * words, whichever key it was (#66, findings 169 and 191) - and whichever
+     * cell, for a grid edit asks it too (finding 208).
      */
-    private @NotNull Optional<TestRunDto> heldRun(final @NotNull Project p, final @NotNull Path runPath) {
+    public @NotNull Optional<TestRunDto> heldRun(final @NotNull Project p, final @NotNull Path runPath) {
         final @NotNull Optional<TestRunDto> run = Services.getInstance(p, ProjectIndexer.class).findTestRun(runPath);
 
         if (run.isEmpty()) {

@@ -83,6 +83,10 @@ test run is read only.
 what it held, and a message reads *The test case was removed - the run keeps
 what it recorded.*
 
+**If the test run is no longer there** — removed, renamed, or being brought in
+by a sync — the cell is put back to what it held, and a message reads *This
+test run is no longer here, so nothing was recorded.*
+
 **If nothing really changed** — nothing is saved and nothing is said.
 
 **If `Escape` is pressed while the cell is open** — the edit is thrown away.

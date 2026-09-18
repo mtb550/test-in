@@ -84,6 +84,15 @@ public class RunGridEditListener extends AbstractGridEditListener {
             return GridEdit.REFUSED;
         }
 
+        // Rule-EDITOR-PANEL-174. The run the indexer holds, asked before the
+        // cell changes anything: a run whose folder had left the index took the
+        // edit into the editor's copy, dropped it at the write, and reported
+        // "Updated 1" (#66, finding 208).
+        if (Services.getInstance(p, RunStatusService.class).heldRun(p, editor.getParent().getPath()).isEmpty()) {
+            model.setValueAt(before, row, col);
+            return GridEdit.REFUSED;
+        }
+
         final @NotNull String typed = String.valueOf(model.getValueAt(row, col));
         attr.getRunValueSetter().execute(item, typed);
         final @NotNull String after = attr.getRunValueExtractor().execute(item, p);
