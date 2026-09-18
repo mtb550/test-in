@@ -57,6 +57,9 @@ This is how every test case in Testin begins.
   using it. An open suggestion list takes Enter and Escape; every other key
   reaches the field underneath, which is what lets CTRL+ENTER add a line while
   the list is up.
+- **Rule-EDITOR-PANEL-231** — Each open field in Create Test Case and Update
+  Test Case is named by its caption above it, in the caption font, so a field is
+  still named once its gray hint has gone.
 
 ## The screen
 
@@ -65,6 +68,7 @@ This is how every test case in Testin begins.
 │  Create Test Case                                            │
 ├──────────────────────────────────────────────────────────────┤
 │                                                              │
+│       DESCRIPTION                                            │
 │  [/]  set description                                        │
 │                                                              │
 │  (a field appears here when its key is pressed)              │
@@ -76,7 +80,10 @@ This is how every test case in Testin begins.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **The description** — the only field there when the dialog opens.
+1. **The description** — the only field there when the dialog opens. Like
+   every field, it is named by its caption above it: JetBrains Mono, small, in
+   capitals, in gray, over the box rather than the icon. The caption stays when
+   the gray hint inside the box goes (Rule-EDITOR-PANEL-231).
 2. **The strip** — one row. The keys of the field the tester is in come first
    and change as they move between fields; **Save** and **Cancel** are always
    last, so a tester looks for Save in the same place whichever field they are

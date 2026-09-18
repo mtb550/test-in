@@ -65,7 +65,7 @@ public class StatusSection implements CreateTestCaseSection {
             }
         });
 
-        this.wrapper = createWrapper(UpdateTestCaseFields.STATUS.getIcon(), this.status);
+        this.wrapper = createWrapper(UpdateTestCaseFields.STATUS.getIcon(), UpdateTestCaseFields.STATUS.getName(), this.status);
     }
 
     @Override

@@ -84,7 +84,7 @@ public class OrderSection implements CreateTestCaseSection {
         field.add(this.position, BorderLayout.WEST);
         field.add(this.outOf, BorderLayout.CENTER);
 
-        this.wrapper = createWrapper(UpdateTestCaseFields.ORDER.getIcon(), field);
+        this.wrapper = createWrapper(UpdateTestCaseFields.ORDER.getIcon(), UpdateTestCaseFields.ORDER.getName(), field);
     }
 
     @Override

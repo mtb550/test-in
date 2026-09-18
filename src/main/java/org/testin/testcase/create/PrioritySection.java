@@ -58,7 +58,7 @@ public class PrioritySection implements CreateTestCaseSection {
             }
         });
 
-        this.wrapper = createWrapper(CreateTestCaseFields.PRIORITY.getIcon(), this.priority);
+        this.wrapper = createWrapper(CreateTestCaseFields.PRIORITY.getIcon(), CreateTestCaseFields.PRIORITY.getName(), this.priority);
     }
 
     @Override

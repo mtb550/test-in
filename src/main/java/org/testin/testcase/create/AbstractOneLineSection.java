@@ -52,7 +52,7 @@ public abstract class AbstractOneLineSection implements CreateTestCaseSection {
 
         styleField(this.field, describes);
 
-        this.wrapper = createWrapper(describes.getIcon(), this.field);
+        this.wrapper = createWrapper(describes.getIcon(), describes.getName(), this.field);
     }
 
     @Override

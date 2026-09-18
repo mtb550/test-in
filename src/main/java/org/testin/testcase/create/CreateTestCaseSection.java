@@ -22,6 +22,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Caption;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 
@@ -121,8 +122,16 @@ public interface CreateTestCaseSection {
     }
 
     /**
-     * A section's row: its icon on the left, and whatever the section lets the
-     * tester edit filling the rest.
+     * UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-231.
+     * <p>
+     * A section's row: its caption across the top, its icon on the left, and
+     * whatever the section lets the tester edit filling the rest.
+     * <p>
+     * The caption is new with #328. A field was named only by its icon and its
+     * gray hint, and the hint goes as soon as something is typed, so a filled
+     * form was boxes and icons with nothing naming them. The caption sits past
+     * the icon column, over the box it names, so the icons still form one
+     * column.
      * <p>
      * Every section is laid out this way, so it is laid out once. A section that
      * composed its own row is the one whose icon sits a few pixels off the
@@ -136,15 +145,19 @@ public interface CreateTestCaseSection {
      * extract it again; five lines inline cost less than a method this interface
      * cannot safely hold.
      */
-    default @NotNull JBPanel<?> createWrapper(final @NotNull Icon icon, final @NotNull JComponent field) {
+    default @NotNull JBPanel<?> createWrapper(final @NotNull Icon icon, final @NotNull String caption, final @NotNull JComponent field) {
         final @NotNull JBPanel<?> iconPanel = new JBPanel<>(new GridBagLayout());
         iconPanel.setOpaque(false);
         final @NotNull JBLabel iconLabel = new JBLabel(icon);
         iconLabel.setBorder(JBUI.Borders.empty(0, 10, 0, 8));
         iconPanel.add(iconLabel);
 
+        final @NotNull JBLabel captionLabel = Caption.of(caption, JBUI.Fonts.label().getSize2D());
+        captionLabel.setBorder(BorderFactory.createEmptyBorder(0, iconPanel.getPreferredSize().width, JBUI.scale(2), 0));
+
         final @NotNull JBPanel<?> wrapper = new JBPanel<>(new BorderLayout());
         wrapper.setOpaque(false);
+        wrapper.add(captionLabel, BorderLayout.NORTH);
         wrapper.add(iconPanel, BorderLayout.WEST);
         wrapper.add(field, BorderLayout.CENTER);
         wrapper.setBorder(JBUI.Borders.emptyTop(8));
