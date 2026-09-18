@@ -30,10 +30,6 @@ import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestCasesMainDirectoryDto;
-import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
-import org.testin.model.dto.dirs.TestRunsMainDirectoryDto;
-import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
@@ -41,6 +37,7 @@ import org.testin.util.Bundle;
 import org.testin.editor.TestinEditors;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -191,15 +188,12 @@ public class CreateTreeNodeAction extends DumbAwareAction {
 
         };
 
-        // Each node family has its own declarative dialog (issue #11).
-        if (pDir instanceof TestCasesMainDirectoryDto || pDir instanceof TestSetPackageDirectoryDto) {
-            new CreateTestDialog(p, onCreate).show();
-            return;
-        }
-
-        if (pDir instanceof TestRunsMainDirectoryDto || pDir instanceof TestRunPackageDirectoryDto) {
-            new CreateRunDialog(p, onCreate).show();
-        }
+        // Each side of the tree has its own declarative dialog (issue #11),
+        // chosen by what the node says can be created under it rather than by
+        // testing its class (#312, A74).
+        final @NotNull List<DirectoryType> kinds = pDir.childKinds();
+        if (kinds.equals(DirectoryType.UNDER_TEST_CASES)) new CreateTestDialog(p, onCreate).show();
+        else if (kinds.equals(DirectoryType.UNDER_TEST_RUNS)) new CreateRunDialog(p, onCreate).show();
     }
 
     }

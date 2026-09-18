@@ -21,6 +21,7 @@ import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.markers.TestCasesMainDirectoryMarker;
+import java.util.List;
 
 
 @Setter
@@ -62,7 +63,7 @@ public class TestCasesMainDirectoryDto extends DirectoryDto {
     }
 
     @Override
-    public boolean canCreateChildren() {
-        return true;
+    public @NotNull List<DirectoryType> childKinds() {
+        return DirectoryType.UNDER_TEST_CASES;
     }
 }

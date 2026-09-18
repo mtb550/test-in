@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.PackageStatus;
 import org.testin.model.markers.TestSetPackageMarker;
+import java.util.List;
 
 
 @Setter
@@ -49,8 +50,8 @@ public class TestSetPackageDirectoryDto extends DirectoryDto {
     }
 
     @Override
-    public boolean canCreateChildren() {
-        return true;
+    public @NotNull List<DirectoryType> childKinds() {
+        return DirectoryType.UNDER_TEST_CASES;
     }
 
     @Override

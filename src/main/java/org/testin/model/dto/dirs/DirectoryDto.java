@@ -133,12 +133,26 @@ public abstract class DirectoryDto {
     // it supports here instead of being hunted for at every call site.
 
     /**
-     * True when nodes can be created under this one. The test project creates
-     * its children itself, and a test set or run holds test cases rather than
-     * nodes, so only the containers say yes.
+     * UC-TREE-PANEL-007, UC-TREE-PANEL-009.
+     * <p>
+     * The kinds of node that can be created under this one, and none for a node
+     * that creates nothing. The test project creates its children itself, and a
+     * test set or run holds test cases rather than nodes, so only the
+     * containers name any: test sets and packages on one side, runs and
+     * packages on the other.
+     * <p>
+     * Declared here so the create action asks the node rather than testing its
+     * class to choose a dialog (#312, A74).
+     */
+    public @NotNull List<DirectoryType> childKinds() {
+        return List.of();
+    }
+
+    /**
+     * True when nodes can be created under this one.
      */
     public boolean canCreateChildren() {
-        return false;
+        return !childKinds().isEmpty();
     }
 
     /**
