@@ -146,9 +146,16 @@ public interface CreateTestCaseSection {
      * cannot safely hold.
      */
     default @NotNull JBPanel<?> createWrapper(final @NotNull Icon icon, final @NotNull String caption, final @NotNull JComponent field) {
+        return createWrapper(new JBLabel(icon), caption, field);
+    }
+
+    /**
+     * The same row around an icon the section keeps, so it can change the icon
+     * later - the description turns its icon red when it is refused.
+     */
+    default @NotNull JBPanel<?> createWrapper(final @NotNull JBLabel iconLabel, final @NotNull String caption, final @NotNull JComponent field) {
         final @NotNull JBPanel<?> iconPanel = new JBPanel<>(new GridBagLayout());
         iconPanel.setOpaque(false);
-        final @NotNull JBLabel iconLabel = new JBLabel(icon);
         iconLabel.setBorder(JBUI.Borders.empty(0, 10, 0, 8));
         iconPanel.add(iconLabel);
 

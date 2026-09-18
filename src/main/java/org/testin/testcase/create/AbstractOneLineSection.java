@@ -17,6 +17,7 @@
 package org.testin.testcase.create;
 
 import com.intellij.ui.EditorTextField;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.testcase.CreateTestCaseFields;
@@ -42,6 +43,11 @@ public abstract class AbstractOneLineSection implements CreateTestCaseSection {
 
     protected final @NotNull EditorTextField field;
 
+    /**
+     * The field's icon, kept so a section can change it after the row is built.
+     */
+    protected final @NotNull JBLabel icon;
+
     private final @NotNull JBPanel<?> wrapper;
     private final @NotNull Shortcuts shortcut;
 
@@ -52,7 +58,8 @@ public abstract class AbstractOneLineSection implements CreateTestCaseSection {
 
         styleField(this.field, describes);
 
-        this.wrapper = createWrapper(describes.getIcon(), describes.getName(), this.field);
+        this.icon = new JBLabel(describes.getIcon());
+        this.wrapper = createWrapper(this.icon, describes.getName(), this.field);
     }
 
     @Override

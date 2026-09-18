@@ -126,8 +126,9 @@ is written on the refresh page.
 
 ## What Testin refuses
 
-**If the description is empty** — the dialog stays open, the description turns
-red, and the cursor goes back to it. No message is raised.
+**If the description is empty** — the dialog stays open, the gray hint in the
+box and the description's **D** turn red, and the cursor goes back to it. No
+message is raised.
 
 **If the test set is removed or renamed while the dialog is open** — by a sync,
 a pull or the tree — nothing is saved. A message says the test set is no longer

@@ -16,8 +16,8 @@
 
 package org.testin.testcase.create;
 
+import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +27,7 @@ import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.util.Bundle;
+import org.testin.util.Icons;
 import org.testin.util.NameSanitizer;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
@@ -38,7 +39,20 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class DescriptionSection extends AbstractOneLineSection {
+
+    /**
+     * The description's letter in red, for a description the dialog refused.
+     */
+    private static final @NotNull Icon REFUSED = Icons.fieldLetter("D", Icons.RED);
+
     private final @NotNull Project p;
+
+    /**
+     * How the hint in the empty box is drawn, handed to the editor when it is
+     * made: no color of its own, so the editor's gray, until the description is
+     * refused.
+     */
+    private final @NotNull TextAttributes hint = new TextAttributes();
 
     /**
      * The other test cases in this test set, as they are when asked.
@@ -54,6 +68,7 @@ public class DescriptionSection extends AbstractOneLineSection {
                 CreateTestCaseFields.DESCRIPTION, Shortcuts.CreateTestCaseDescription);
 
         this.p = p;
+        field.addSettingsProvider(editor -> editor.setPlaceholderAttributes(hint));
     }
 
     /**
@@ -82,17 +97,22 @@ public class DescriptionSection extends AbstractOneLineSection {
                 .collect(Collectors.toSet());
     }
 
-    // UC-EDITOR-PANEL-005
+    /**
+     * UC-EDITOR-PANEL-005.
+     * <p>
+     * Turns the description red, or back: the text typed, the hint in the empty
+     * box, and the icon. Turning only the text red left an empty description
+     * looking untouched, since there was no text to turn red - and an empty one
+     * is what Enter refuses most (#328).
+     * <p>
+     * The foreground rather than the background, which it once was: a field
+     * refused once then stayed red however it was corrected.
+     */
     public void setError(final boolean error) {
-        if (error) {
-            field.setForeground(JBColor.RED);
-            field.requestFocus();
-        } else
-            // The foreground, which is what the error turned red. This set the
-            // background instead, so a field that had once been refused stayed
-            // red however it was corrected - invisible while nothing cleared the
-            // error, and visible the moment something did.
-            field.setForeground(UIUtil.getTextFieldForeground());
+        field.setForeground(error ? Icons.RED : UIUtil.getTextFieldForeground());
+        hint.setForegroundColor(error ? Icons.RED : null);
+        icon.setIcon(error ? REFUSED : CreateTestCaseFields.DESCRIPTION.getIcon());
+        if (error) field.requestFocus();
         field.repaint();
     }
 

@@ -63,11 +63,12 @@ public final class Icons {
     public static final @NotNull Icon TEST_CASE = gray(AllIcons.Nodes.Type);
 
     /**
-     * The color a field's letter and frame are drawn in: the platform's own
-     * icon gray, one value in every theme, as Muteb chose. Named here so a
-     * caller says which, and a change to it is made once.
+     * The colors a field is drawn in: the platform's own icon gray, and its red
+     * for a field the dialog refused. One value each in every theme, as Muteb
+     * chose. Named here so a caller says which, and a change is made once.
      */
     public static final @NotNull Color GRAY = new Color(0x6C707E);
+    public static final @NotNull Color RED = new Color(0xDB3B4B);
 
     /**
      * UC-EDITOR-PANEL-005.
