@@ -62,7 +62,7 @@ public class ResultAnalysisBtn extends AbstractIconButton implements ToolbarItem
         final boolean completed = status == TestRunStatus.COMPLETED;
 
         setEnabled(completed);
-        setToolTipText(completed
+        describe(completed
                 ? Bundle.message("toolbar.analysis")
                 : Bundle.message("toolbar.analysis.disabled", status.getLabel()));
     }

@@ -71,7 +71,7 @@ public class LightModeBtn extends AbstractIconButton implements ToolbarItem {
         final boolean stillOpen = editor.getParent().isStillOpen();
 
         setEnabled(stillOpen);
-        setToolTipText(stillOpen
+        describe(stillOpen
                 ? Bundle.message("toolbar.light.mode")
                 : Bundle.message("toolbar.light.mode.disabled", editor.getParent().getMarker().getStatus().getLabel()));
         setOn(Services.getInstance(p, LightMode.class).isOpenOn(editor.getParent()));

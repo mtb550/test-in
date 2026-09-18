@@ -144,11 +144,11 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
 
         if (activeFiltersCount == 0) {
             setText(null);
-            setToolTipText(Bundle.message("filter.button"));
+            describe(Bundle.message("filter.button"));
             setForeground(JBColor.foreground());
         } else {
             setText("(" + activeFiltersCount + ")");
-            setToolTipText(Bundle.message("filter.button.active", String.valueOf(activeFiltersCount)));
+            describe(Bundle.message("filter.button.active", String.valueOf(activeFiltersCount)));
             setForeground(EditorColors.FILTER_ACTIVE);
         }
     }

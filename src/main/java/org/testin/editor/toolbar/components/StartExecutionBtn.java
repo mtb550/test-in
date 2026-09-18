@@ -60,6 +60,6 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
     public void updateEnabledState() {
         setEnabled(editor.canStartManualExecution());
-        setToolTipText(tooltipFor(editor));
+        describe(tooltipFor(editor));
     }
 }

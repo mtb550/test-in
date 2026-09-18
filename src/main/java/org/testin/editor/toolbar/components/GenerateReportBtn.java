@@ -62,7 +62,7 @@ public class GenerateReportBtn extends AbstractIconButton implements ToolbarItem
         final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();
 
         setEnabled(status.isReportable());
-        setToolTipText(status.isReportable()
+        describe(status.isReportable()
                 ? Bundle.message("toolbar.report")
                 : Bundle.message("toolbar.report.disabled", status.getLabel()));
     }

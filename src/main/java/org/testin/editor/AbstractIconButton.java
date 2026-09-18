@@ -63,6 +63,12 @@ public abstract class AbstractIconButton extends JButton {
      */
     private boolean on;
 
+    /**
+     * The key named in this button's tooltip, when its command has one - which
+     * is what makes the tooltip the platform's rich one rather than Swing's.
+     */
+    private @NotNull Optional<String> shortcutText = Optional.empty();
+
     public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon) {
         super(null, icon);
         // Swing's own contract: a null tooltip is no tooltip at all, and an
@@ -155,10 +161,28 @@ public abstract class AbstractIconButton extends JButton {
     public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull String shortcutText) {
         this("", icon);
 
-        new HelpTooltip()
-                .setDescription(HtmlChunk.text(tooltip))
-                .setShortcut(shortcutText)
-                .installOn(this);
+        this.shortcutText = Optional.of(shortcutText);
+        describe(tooltip);
+    }
+
+    /**
+     * What this button says about itself - what it does, or why it is gray.
+     * <p>
+     * The one way to change it, because a button has one of two tooltips: the
+     * platform's rich one when its command has a key, Swing's plain one when it
+     * does not. Generate Report had the rich one and set the plain one over it
+     * to give its gray reason, so which of the two showed depended on the path
+     * the pointer took (#312, A29). Asked here, the button answers with the kind
+     * it has.
+     */
+    protected final void describe(final @NotNull String text) {
+        shortcutText.ifPresentOrElse(key -> {
+            HelpTooltip.dispose(this);
+            new HelpTooltip()
+                    .setDescription(HtmlChunk.text(text))
+                    .setShortcut(key)
+                    .installOn(this);
+        }, () -> setToolTipText(text.isEmpty() ? null : text));
     }
 
     /**
