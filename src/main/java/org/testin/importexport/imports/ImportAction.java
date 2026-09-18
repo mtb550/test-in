@@ -252,19 +252,6 @@ public class ImportAction extends DumbAwareAction {
         }
 
         /**
-         * UC-SHARE-006, Rule-SHARE-031.
-         * <p>
-         * Which test set each sheet's cases are going into.
-         * <p>
-         * Two shapes, and only this decides between them: a test set takes every
-         * sheet into itself, and a container takes one new set per sheet, named
-         * after it. What happens to a set's cases afterwards - written, parented,
-         * generated, counted - is the same either way, and used to be written twice.
-         * <p>
-         * The sets are made before any case is written, and on the EDT, because
-         * making one generates its Java class and that is a write command.
-         */
-        /**
          * UC-SHARE-007, Rule-SHARE-037.
          * <p>
          * Names the test sets this import made and never put anything into.
@@ -294,6 +281,19 @@ public class ImportAction extends DumbAwareAction {
                     Bundle.message("import.empty.message", count, named, rest));
         }
 
+        /**
+         * UC-SHARE-006, Rule-SHARE-031.
+         * <p>
+         * Which test set each sheet's cases are going into.
+         * <p>
+         * Two shapes, and only this decides between them: a test set takes every
+         * sheet into itself, and a container takes one new set per sheet, named
+         * after it. What happens to a set's cases afterwards - written, parented,
+         * generated, counted - is the same either way, and used to be written twice.
+         * <p>
+         * The sets are made before any case is written, and on the EDT, because
+         * making one generates its Java class and that is a write command.
+         */
         private @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targetSets(final @NotNull DirectoryDto selectedDirDto, final @NotNull Path targetPath, final @NotNull Map<String, List<TestCaseDto>> casesBySheet) {
 
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {

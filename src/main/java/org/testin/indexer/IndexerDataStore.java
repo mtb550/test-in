@@ -326,15 +326,6 @@ final class IndexerDataStore {
     }
 
     /**
-     * Drops a whole test project out of the cache: the project itself, its two
-     * main directories, and every package, set and run beneath it.
-     * <p>
-     * Two callers, and the log line says the cache-level fact both of them mean:
-     * a test project the tester deleted, and the start of a scan that is about
-     * to read the same project again and must not carry the last pass's nodes
-     * into this one.
-     */
-    /**
      * UC-INTERNAL-002, Rule-INTERNAL-021.
      * <p>
      * Puts a finished scan of one test project into the index.
@@ -388,6 +379,16 @@ final class IndexerDataStore {
         held.keySet().removeIf(key -> Path.of(key).startsWith(projectPath) && !found.containsKey(key));
     }
 
+    /**
+     * Drops a whole test project out of the cache: the project itself, its two
+     * main directories, and every package, set and run beneath it.
+     * <p>
+     * Two callers, and the log line says the cache-level fact both of them mean:
+     * a test project the tester deleted, and a folder a rescan found is no
+     * longer a test project Testin reads. A rescan of one that still is does not
+     * come here - it swaps the new pass in over the old one, so the project is
+     * never absent while it is read (#312, A1).
+     */
     void removeTestProject(final @NotNull Path path) {
         final @NotNull String pathStr = path.toString();
         testProjectsByPath.remove(pathStr);

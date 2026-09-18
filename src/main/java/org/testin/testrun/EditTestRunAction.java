@@ -317,10 +317,6 @@ public class EditTestRunAction extends DumbAwareAction {
         }
 
         /**
-         * A run detached from the one the indexer is holding, through the same mapper
-         * that reads it off disk.
-         */
-        /**
          * UC-TREE-PANEL-021, Rule-TREE-PANEL-009.
          * <p>
          * Puts back what this edit changed - which cases the run covers, its
@@ -377,6 +373,10 @@ public class EditTestRunAction extends DumbAwareAction {
             return run.getResults().stream().collect(Collectors.toMap(TestRunItems::getId, item -> item, (first, second) -> first));
         }
 
+        /**
+         * A run detached from the one the indexer is holding, through the same mapper
+         * that reads it off disk.
+         */
         private @NotNull TestRunDto copyOf(final @NotNull TestRunDto run) {
             final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
             return mapper.readValue(mapper.writeValueAsString(run), TestRunDto.class);
