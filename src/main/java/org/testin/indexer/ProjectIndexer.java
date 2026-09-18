@@ -638,13 +638,17 @@ public final class ProjectIndexer {
      * the object the caller was looking at before the sync replaced it.
      */
     public void changeRunMarker(final @NotNull Path runPath, final @NotNull Consumer<TestRunMarker> change) {
+        // Both halves ask whether the run is still there. The one shown at once
+        // used the getter that throws by design, so setting a run's status while
+        // a sync removed it was an internal error where the other half wrote a
+        // log line (#66, finding 204).
         whenTheSyncLetsGo(runPath,
-                () -> findTestRun(runPath).ifPresentOrElse(run -> {
-                    final @NotNull TestRunMarker marker = getTestRunDirByPath(runPath).getMarker();
+                () -> store.findTestRunDir(runPath).ifPresentOrElse(dir -> {
+                    final @NotNull TestRunMarker marker = dir.getMarker();
                     change.accept(marker);
                     runWriter.persistMarker(runPath, marker);
                 }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + runPath.getFileName())),
-                () -> change.accept(getTestRunDirByPath(runPath).getMarker()));
+                () -> store.findTestRunDir(runPath).ifPresent(dir -> change.accept(dir.getMarker())));
     }
 
     /**
@@ -657,23 +661,25 @@ public final class ProjectIndexer {
      * what A4 was.
      */
     private void whenTheSyncLetsGo(final @NotNull Path runPath, final @NotNull Runnable apply, final @NotNull Runnable meanwhile) {
-        final boolean held;
         synchronized (heldForSync) {
             final @NotNull Optional<List<Runnable>> waiting = heldForSync.entrySet().stream()
                     .filter(entry -> runPath.startsWith(entry.getKey()))
                     .map(Map.Entry::getValue)
                     .findFirst();
 
-            waiting.ifPresent(changes -> changes.add(apply));
-            held = waiting.isPresent();
+            // Written inside the lock when nothing holds it. Decided here and
+            // written after it, a sync that took its hold in between had its run
+            // file overwritten by the change it was meant to hold (#66, finding
+            // 203). The write only queues its bytes, so nothing waits in here.
+            if (waiting.isEmpty()) {
+                apply.run();
+                return;
+            }
+
+            waiting.orElseThrow().add(apply);
         }
 
-        if (held) {
-            meanwhile.run();
-            return;
-        }
-
-        apply.run();
+        meanwhile.run();
     }
 
     /**

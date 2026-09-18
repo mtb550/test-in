@@ -116,6 +116,15 @@ final class IndexerDataStore {
         return Optional.ofNullable(testRunsByPath.get(testRunPath.toString()));
     }
 
+    /**
+     * The run's folder, and none when a sync or a delete has taken it - a
+     * state of the data, unlike the getter below, which is asked only by what
+     * already had the run in hand.
+     */
+    @NotNull Optional<TestRunDirectoryDto> findTestRunDir(final @NotNull Path testRunPath) {
+        return Optional.ofNullable(testRunsDirByPath.get(testRunPath.toString()));
+    }
+
     @NotNull
     TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
         return indexed(testRunsByPath.get(testRunPath.toString()), "test run", testRunPath);
