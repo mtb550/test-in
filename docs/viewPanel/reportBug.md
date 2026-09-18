@@ -121,8 +121,10 @@ After:
 │  │ ### Actual result                                      │  │
 │  │ The session was dropped.                               │  │
 │  └────────────────────────────────────────────────────────┘  │
-│  Screenshots    1                                            │
-│  Repository     mtb550/product                               │
+│  SCREENSHOTS                                                 │
+│  1                                                           │
+│  REPOSITORY                                                  │
+│  mtb550/product                                              │
 │                                                  [ Send ]    │
 ├──────────────────────────────────────────────────────────────┤
 │  Escape  Cancel                                              │

@@ -19,7 +19,9 @@ package org.testin.ui.framework;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
+import com.intellij.ui.components.panels.HorizontalLayout;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Caption;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * One captioned radio row — a muted caption and one radio button per option
+ * One captioned radio row — a caption above one radio button per option
  * (e.g. bug severity, bug priority). The dialog reads {@link #getSelected()}
  * on submit; a declared initial value keeps the selection always valid.
  */
@@ -42,7 +44,9 @@ public final class RadioSelection<T> implements DialogComponent {
 
         final @NotNull Font radioFont = JBFont.label().biggerOn(2f);
         final @NotNull ButtonGroup group = new ButtonGroup();
-        final @NotNull JBPanel<?> radioRow = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        // No gap before the first button, so it starts under its caption's
+        // first letter; a flow layout puts its gap on the left edge too.
+        final @NotNull JBPanel<?> radioRow = new JBPanel<>(new HorizontalLayout(JBUI.scale(8)));
         radioRow.setOpaque(false);
 
         Optional<JRadioButton> first = Optional.empty();
@@ -59,10 +63,11 @@ public final class RadioSelection<T> implements DialogComponent {
         // The builder guarantees at least one option.
         this.firstButton = first.orElseThrow();
 
-        panel = new JBPanel<>(new BorderLayout());
+        // Rule-INTERNAL-087
+        panel = new JBPanel<>(new BorderLayout(0, JBUI.scale(2)));
         panel.setOpaque(false);
         panel.setBorder(JBUI.Borders.emptyTop(8));
-        panel.add(Captions.panel(caption), BorderLayout.WEST);
+        panel.add(Caption.of(caption, JBUI.Fonts.label().getSize2D()), BorderLayout.NORTH);
         panel.add(radioRow, BorderLayout.CENTER);
     }
 

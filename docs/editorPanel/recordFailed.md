@@ -68,14 +68,18 @@ form before it records anything.
 ┌──────────────────────────────────────────────────────────────┐
 │  Failed Test Case Details                                    │
 ├──────────────────────────────────────────────────────────────┤
-│  Description    Log in with a valid user                     │
-│  Expected       The dashboard opens.                         │
+│  DESCRIPTION                                                 │
+│  Log in with a valid user                                    │
+│  EXPECTED                                                    │
+│  The dashboard opens.                                        │
 │                                                              │
 │  [ set actual result..                                    ]  │
 │                                                              │
-│  Bug Severity   ( ) Blocker  ( ) Major  ( ) Minor  (x) Enha. │
+│  BUG SEVERITY                                                │
+│  ( ) Blocker  ( ) Major  ( ) Minor  (x) Enhancement          │
 │                                                              │
-│  Bug Priority   ( ) High     ( ) Medium            (x) Low   │
+│  BUG PRIORITY                                                │
+│  ( ) High  ( ) Medium  (x) Low                               │
 │                                                              │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │ java.lang.AssertionError: expected [true]              │  │

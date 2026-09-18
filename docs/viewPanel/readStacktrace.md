@@ -66,7 +66,8 @@ screenshot in a window of its own.
 ┌──────────────────────────────────────────────────────────────┐
 │  Error                                                       │
 ├──────────────────────────────────────────────────────────────┤
-│  Test Case      Log in with a valid user                     │
+│  TEST CASE                                                   │
+│  Log in with a valid user                                    │
 │                                                              │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │ The session was dropped.                               │  │

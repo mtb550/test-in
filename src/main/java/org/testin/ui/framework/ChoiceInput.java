@@ -21,6 +21,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Caption;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,10 +57,12 @@ public final class ChoiceInput implements DialogComponent {
         combo.setFont(JBFont.label().biggerOn(2f));
         combo.setSelectedItem(selected);
 
-        panel = new JBPanel<>(new BorderLayout());
+        // Rule-INTERNAL-087. The caption above the box, in the caption font
+        // at the dialog's own size; the gap under it is a caption's gap.
+        panel = new JBPanel<>(new BorderLayout(0, JBUI.scale(2)));
         panel.setOpaque(false);
         panel.setBorder(JBUI.Borders.emptyTop(8));
-        panel.add(Captions.panel(caption), BorderLayout.WEST);
+        panel.add(Caption.of(caption, JBUI.Fonts.label().getSize2D()), BorderLayout.NORTH);
         panel.add(combo, BorderLayout.CENTER);
 
         enterPicksOnlyFromTheOpenList();

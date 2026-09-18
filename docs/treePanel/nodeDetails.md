@@ -70,19 +70,32 @@ It is a read-only window. Nothing in it can be changed.
 ┌──────────────────────────────────────────────────────────────┐
 │  Details                                                     │
 ├──────────────────────────────────────────────────────────────┤
-│  Name              cycle-2                              (1)  │
-│  Path              C:\Testin\Demo\Test Runs\cycle-2          │
-│  Created By        Muteb                                (2)  │
-│  Created At        12 Aug 2026 09:14                         │
-│  Updated By        Muteb                                     │
-│  Updated At        14 Aug 2026 16:02                         │
-│  Status            In Progress                          (3)  │
-│  Execution Started 12 Aug 2026 10:00                    (4)  │
-│  Execution Ended   12 Aug 2026 13:42                         │
-│  Execution Time    03:42:00                                  │
-│  Platform          Web                                  (5)  │
-│  Component         Frontend                                  │
-│  Total             14                                   (6)  │
+│  NAME                                                   (1)  │
+│  cycle-2                                                     │
+│  PATH                                                        │
+│  C:\Testin\Demo\Test Runs\cycle-2                            │
+│  CREATED BY                                             (2)  │
+│  Muteb                                                       │
+│  CREATED AT                                                  │
+│  12 Aug 2026 09:14                                           │
+│  UPDATED BY                                                  │
+│  Muteb                                                       │
+│  UPDATED AT                                                  │
+│  14 Aug 2026 16:02                                           │
+│  STATUS                                                 (3)  │
+│  In Progress                                                 │
+│  EXECUTION STARTED                                      (4)  │
+│  12 Aug 2026 10:00                                           │
+│  EXECUTION ENDED                                             │
+│  12 Aug 2026 13:42                                           │
+│  EXECUTION TIME                                              │
+│  03:42:00                                                    │
+│  PLATFORM                                               (5)  │
+│  Web                                                         │
+│  COMPONENT                                                   │
+│  Frontend                                                    │
+│  TOTAL                                                  (6)  │
+│  14                                                          │
 │                                                              │
 │      ╭───╮         Passed     9                         (7)  │
 │      │75%│         Failed     2                              │

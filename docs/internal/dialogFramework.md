@@ -65,9 +65,10 @@ and which keys it answers, and the shell builds the rest.
 - **Rule-INTERNAL-085** — In a box that offers a list and can also be typed
   into, Enter picks the value under it while the list is open. While the list is
   closed, Enter is the dialog's own key, as it is in every other field.
-- **Rule-INTERNAL-086** — The captions down the left of one dialog share one
-  width: the usual column, widened to the longest caption, so no caption is cut
-  off and the rows still line up. A caption in French or Hindi is read whole.
+- **Rule-INTERNAL-087** — A caption sits on its own line above the field it
+  names, in the caption font: JetBrains Mono, two points below the text around
+  it, in capitals, in the muted caption gray. There is no caption column to line
+  up.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

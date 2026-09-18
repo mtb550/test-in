@@ -44,11 +44,13 @@ There is no key that opens this. It opens during a merge.
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  Both Changed Log in with a valid user                                     │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  Description    (x) Mine: Log in with a valid user                         │
-│                 ( ) Remote: Sign in with a valid account                   │
+│  DESCRIPTION                                                               │
+│  (x) Mine: Log in with a valid user                                        │
+│  ( ) Remote: Sign in with a valid account                                  │
 │                                                                            │
-│  Steps          (x) Mine: ["open the app", "sign in"]                      │
-│                 ( ) Remote: (empty)                                        │
+│  STEPS                                                                     │
+│  (x) Mine: ["open the app", "sign in"]                                     │
+│  ( ) Remote: (empty)                                                       │
 │                                                                            │
 │                                              [ Keep Selected ]             │
 ├────────────────────────────────────────────────────────────────────────────┤

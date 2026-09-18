@@ -53,8 +53,9 @@ name.
 │  [ your name...                                           ]  │
 │  [ your email address...                                  ]  │
 │                                                              │
-│  Apply to    (x) This repository                             │
-│              ( ) Every repository on this machine            │
+│  APPLY TO                                                    │
+│  (x) This repository                                         │
+│  ( ) Every repository on this machine                        │
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤
 │  [k]  Enter Confirm       Escape Cancel                      │

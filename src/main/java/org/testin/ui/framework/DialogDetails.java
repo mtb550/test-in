@@ -21,13 +21,14 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Caption;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
 /**
- * Read-only context rows — a muted caption column and the value beside it
+ * Read-only context rows — each value with its caption above it
  * (e.g. the test case's description and expected result above an input).
  * Display only: never takes the focus, never submits.
  */
@@ -42,10 +43,11 @@ public final class DialogDetails implements DialogComponent {
         stack.setBorder(JBUI.Borders.empty(4, 0));
 
         for (final Row row : rows) {
-            final @NotNull JBPanel<?> rowPanel = new JBPanel<>(new BorderLayout());
+            // Rule-INTERNAL-087
+            final @NotNull JBPanel<?> rowPanel = new JBPanel<>(new BorderLayout(0, JBUI.scale(2)));
             rowPanel.setOpaque(false);
             rowPanel.setBorder(JBUI.Borders.emptyTop(8));
-            rowPanel.add(Captions.panel(row.caption()), BorderLayout.WEST);
+            rowPanel.add(Caption.of(row.caption(), JBUI.Fonts.label().getSize2D()), BorderLayout.NORTH);
             rowPanel.add(wrappingValue(row.value()), BorderLayout.CENTER);
             stack.add(rowPanel);
         }

@@ -373,8 +373,11 @@ back. A failure nobody described is a failure nobody can act on.
 │  │ set actual result..                                                  │  │
 │  └──────────────────────────────────────────────────────────────────────┘  │
 │                                                                            │
-│  Bug Severity    ( ) Blocker   ( ) Major   ( ) Minor   (•) Enhancement     │
-│  Bug Priority    ( ) High   ( ) Medium   (•) Low                           │
+│  BUG SEVERITY                                                              │
+│  ( ) Blocker   ( ) Major   ( ) Minor   (•) Enhancement                     │
+│                                                                            │
+│  BUG PRIORITY                                                              │
+│  ( ) High   ( ) Medium   (•) Low                                           │
 │                                                                            │
 │  ┌──────────────────────────────────────────────────────────────────────┐  │
 │  │ paste error or exception or screenshot..                             │  │

@@ -27,6 +27,8 @@ import java.awt.*;
 import java.util.Locale;
 
 /**
+ * Rule-INTERNAL-087.
+ * <p>
  * What a caption looks like wherever Testin names a value: JetBrains Mono, a
  * family of its own beside the UI font the values are in, two points below the
  * size of the text around it, in capitals, in the muted caption gray (#328).

@@ -57,7 +57,8 @@ uncommitted work.
 │ [x]| Expected Result  | Login    | Log in with.. | It opens | It opens now │
 │ [x]| New Test Case    | Login    | Log out       |          | Log out      │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  Branch     [ main                                                      v] │
+│  BRANCH                                                                    │
+│  [ main                                                                v]  │
 │                                                                            │
 │  [ what changed, in a line...                                            ] │
 │                                                                            │
