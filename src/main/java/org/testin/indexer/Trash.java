@@ -19,6 +19,7 @@ package org.testin.indexer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.testin.notifications.Notifier;
@@ -65,9 +66,13 @@ final class Trash {
      * Linux sessions have no trash to move anything to, and a path that is
      * already gone has nothing to move. The caller deletes outright in either
      * case, which is what every delete did before this existed.
+     * <p>
+     * False under the tests as well. They run with a desktop on Windows, here
+     * and in CI, so every test that removed or moved a test case filled the bin
+     * of whoever ran it with its temporary files (#66, finding 293).
      */
     static boolean accepted(final @NotNull Project p, final @NotNull Path path) {
-        if (!Files.exists(path)) return false;
+        if (!Files.exists(path) || ApplicationManager.getApplication().isUnitTestMode()) return false;
 
         if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH)) {
             Logger.debug("This desktop has no recycle bin; deleting " + path + " outright.");

@@ -128,20 +128,16 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
     }
 
     /**
-     * Puts a folder where a case's file is, with a file inside it held open, so
-     * deleting the case's file is refused the way a locked file refuses it. Both
-     * halves are needed on Windows, where the tests run: the recycle bin takes a
-     * folder whose files are all closed, and a plain delete refuses any folder
-     * with something in it. Close what this answers once the call under test
-     * has returned.
+     * Puts a folder with something in it where a case's file is, so deleting
+     * that file is refused, the way a locked file refuses it. Under the tests a
+     * delete never goes through the recycle bin, so it is a plain one, and a
+     * plain delete refuses a folder that is not empty.
      */
-    private static java.io.FileInputStream undeletable(final Path file) {
+    static void undeletable(final Path file) {
         try {
             Files.deleteIfExists(file);
             Files.createDirectories(file);
-            final Path inside = file.resolve("keep");
-            Files.writeString(inside, "in the way");
-            return new java.io.FileInputStream(inside.toFile());
+            Files.writeString(file.resolve("keep"), "in the way");
         } catch (final java.io.IOException ex) {
             throw new AssertionError("could not set up the refused delete", ex);
         }
@@ -294,11 +290,9 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         final TestCaseDto tc = testCase(ts, "m");
         indexer().putTestCaseVerbatim(ts.getPath(), tc);
 
-        try (var held = undeletable(fileOf(ts, tc))) {
-            assertFalse("a refused delete was reported as a removal", indexer().removeTestCase(ts.getPath(), tc.getId()));
-        } catch (final java.io.IOException ex) {
-            throw new AssertionError("could not let go of the held file", ex);
-        }
+        undeletable(fileOf(ts, tc));
+
+        assertFalse("a refused delete was reported as a removal", indexer().removeTestCase(ts.getPath(), tc.getId()));
 
         assertTrue("a refused delete took the case out of the index", indexer().findTestCase(tc.getId()).isPresent());
         assertTrue("a refused delete took the case out of its set",
@@ -318,11 +312,9 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         final TestCaseDto cut = testCase(login, "m");
         indexer().putTestCaseVerbatim(login.getPath(), cut);
 
-        try (var held = undeletable(fileOf(login, cut))) {
-            assertFalse("a move whose old file stayed was reported as a move", indexer().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
-        } catch (final java.io.IOException ex) {
-            throw new AssertionError("could not let go of the held file", ex);
-        }
+        undeletable(fileOf(login, cut));
+
+        assertFalse("a move whose old file stayed was reported as a move", indexer().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
 
         assertFalse("the new file was left behind beside the old one", Files.exists(fileOf(signUp, cut)));
         assertEquals("the index files the case under the set it could not leave",
