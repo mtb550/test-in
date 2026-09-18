@@ -16,7 +16,7 @@
 
 package org.testin.ui.framework;
 
-import com.intellij.openapi.util.text.StringUtil;
+import org.testin.util.Html;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
@@ -44,7 +44,7 @@ public final class DialogMessage implements DialogComponent {
         // text quotes names and descriptions the tester typed, and Swing's renderer
         // drops anything that looks like a tag - so "Remove 'Login refuses <empty>
         // password'?" asked about a description that does not exist (#312, A78).
-        final @NotNull JBLabel message = new JBLabel("<html>" + StringUtil.escapeXmlEntities(text).replace("\n", "<br>") + "</html>");
+        final @NotNull JBLabel message = new JBLabel("<html>" + Html.ofText(text) + "</html>");
         message.setAlignmentX(Component.LEFT_ALIGNMENT);
         content.add(message);
 

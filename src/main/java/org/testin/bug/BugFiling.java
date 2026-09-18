@@ -83,7 +83,9 @@ public final class BugFiling {
             if (answer.notUploaded() > 0) said.add(Bundle.message("bug.not.uploaded", answer.notUploaded()));
             else if (!answer.problem().isEmpty()) said.add(answer.problem());
 
-            notifier.infoWithActions(p, Done.REPORTED.getOutcome(), String.join("<br>", said),
+            // Plain lines: one of them can be gh's own stderr, and the notifier
+            // turns text into HTML itself (#66, finding 197).
+            notifier.infoWithActions(p, Done.REPORTED.getOutcome(), String.join("\n", said),
                     notifier.lastingAction(Bundle.message("bug.open.issue"), () -> BugIssueUrl.open(url)));
         }, () -> notifier.error(p, Bundle.message("bug.send.failed.title"), answer.problem()));
     }

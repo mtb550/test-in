@@ -39,6 +39,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.util.Bundle;
+import org.testin.util.Html;
 
 import java.awt.*;
 import java.util.Optional;
@@ -50,11 +51,11 @@ public final class Notifier {
     private static final @NotNull String GROUP_ID = "testin.notifications";
 
     public void softShow(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
-        showBalloon(p, String.format("<html><b>%s</b><br>%s</html>", title, message), MessageType.INFO);
+        showBalloon(p, String.format("<html><b>%s</b><br>%s</html>", Html.ofText(title), Html.ofText(message)), MessageType.INFO);
     }
 
     public void softShow(final @NotNull Project p, final @NotNull String message) {
-        showBalloon(p, String.format("<html>%s</html>", message), MessageType.INFO);
+        showBalloon(p, String.format("<html>%s</html>", Html.ofText(message)), MessageType.INFO);
     }
 
     /**
@@ -67,11 +68,11 @@ public final class Notifier {
      * beside real ones (#62).
      */
     public void softRefuse(final @NotNull Project p, final @NotNull String message) {
-        showBalloon(p, String.format("<html>%s</html>", message), MessageType.ERROR);
+        showBalloon(p, String.format("<html>%s</html>", Html.ofText(message)), MessageType.ERROR);
     }
 
     public void softRefuse(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
-        showBalloon(p, String.format("<html><b>%s</b><br>%s</html>", title, message), MessageType.ERROR);
+        showBalloon(p, String.format("<html><b>%s</b><br>%s</html>", Html.ofText(title), Html.ofText(message)), MessageType.ERROR);
     }
 
     /**
@@ -241,13 +242,18 @@ public final class Notifier {
     }
 
     private void notify(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationType type, final @NotNull NotificationAction... actions) {
+        // Rule-EDITOR-PANEL-206. A notification is HTML too, and what it carries
+        // is as often a tool's output or a path as a sentence (#66, finding 197).
+        final @NotNull String titleText = Html.ofText(title);
+        final @NotNull String messageText = Html.ofText(message);
+
         // The platform has one overload with a title and one without, and picks
         // by which is called - so "no title" needs a value to be chosen by. It
         // used to be a null, which the annotation sweep then declared impossible
         // while the one caller that passes it went on passing it (#93).
         final @NotNull Notification notification = title.isEmpty()
-                ? NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(message, type)
-                : NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(title, message, type);
+                ? NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(messageText, type)
+                : NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(titleText, messageText, type);
 
         for (final NotificationAction action : actions) notification.addAction(action);
         notification.notify(p);

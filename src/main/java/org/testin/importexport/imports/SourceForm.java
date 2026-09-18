@@ -16,13 +16,13 @@
 
 package org.testin.importexport.imports;
 
+import org.testin.util.Html;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
@@ -176,7 +176,7 @@ public final class SourceForm implements DialogComponent {
                 .map(TestEditorAttributes::getName)
                 .collect(Collectors.joining(", "));
 
-        final @NotNull String escaped = StringUtil.escapeXmlEntities(message.formatted(columns)).replace("\n", "<br>");
+        final @NotNull String escaped = Html.ofText(message.formatted(columns));
         formatHint.setText("<html>" + escaped + "</html>");
         formatHint.setVisible(true);
     }
