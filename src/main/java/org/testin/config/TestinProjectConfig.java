@@ -26,6 +26,8 @@ import org.testin.util.Bundle;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -300,7 +302,24 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
      * Whether this project is reachable on a server.
      */
     public boolean hasSftp() {
-        return connection == ConnectionType.SFTP && !sftpHost.isEmpty() && !projectName().isEmpty();
+        return missingForSftp().isEmpty();
+    }
+
+    /**
+     * UC-SHARE-019, Rule-SHARE-085.
+     * <p>
+     * The keys an SFTP sync still needs, as {@code testin.yml} spells them, and
+     * none when it has them all. So a refusal names what is missing: it named
+     * {@code connection} and {@code sftpHost} whatever was, including when both
+     * were there and only {@code testinProject} was not (#312, A38).
+     */
+    public @NotNull List<String> missingForSftp() {
+        final @NotNull List<String> missing = new ArrayList<>();
+        if (connection != ConnectionType.SFTP) missing.add("connection: sftp");
+        if (sftpHost.isEmpty()) missing.add("sftpHost");
+        if (projectName().isEmpty()) missing.add("testinProject");
+
+        return List.copyOf(missing);
     }
 
     /**

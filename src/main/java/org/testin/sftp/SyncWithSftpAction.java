@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.util.FailureText;
 import org.testin.actions.TestinData;
 import org.testin.config.TestinConfigService;
+import org.testin.config.TestinProjectConfig;
 import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.ProjectIndexer;
@@ -119,19 +120,21 @@ public final class SyncWithSftpAction extends DumbAwareAction {
          * {@code testin.yml}, and a test project in the tree to send.
          */
         private void start(final @NotNull Optional<Path> selectedProject) {
-            final @NotNull SftpAddress address =
-                    Services.getInstance(p, TestinConfigService.class).get().sftpAddress();
+            final @NotNull TestinProjectConfig config = Services.getInstance(p, TestinConfigService.class).get();
 
             // A balloon, not a notification that stays in the log. Nothing is wrong
             // here: a repository reached over Git has no server by design, and the
             // tester found that out by pressing the button, under their own hand. A
             // logged warning would keep saying so afterwards, about a setup that is
-            // correct.
-            if (!address.isConfigured()) {
+            // correct. It names the keys that are missing, not a guess at them.
+            final @NotNull List<String> missing = config.missingForSftp();
+            if (!missing.isEmpty()) {
                 Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("sftp.not.configured.title"),
-                        Bundle.message("sftp.not.configured.message"));
+                        Bundle.message("sftp.not.configured.message", String.join(", ", missing)));
                 return;
             }
+
+            final @NotNull SftpAddress address = config.sftpAddress();
 
             // A balloon for the same reason as above: nothing failed, the tester
             // pressed the button with no test project selected (#66, finding 137).
