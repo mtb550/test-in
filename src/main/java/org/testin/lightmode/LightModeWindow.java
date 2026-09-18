@@ -762,7 +762,14 @@ final class LightModeWindow {
      */
     private void saveCapture() {
         capture.ifPresent(form -> {
-            form.save();
+            // Rule-EDITOR-PANEL-225. The verdict only once the detail is written.
+            // The answer was dropped, so a run renamed, removed or synced away
+            // under the window threw the typed failure away - actual result,
+            // severity, priority, stacktrace and screenshots - and recorded the
+            // case Failed with nothing behind it (#66, finding 169). Refused, the
+            // form stays open with everything in it, and the service has said why.
+            if (!form.save()) return;
+
             capture = Optional.empty();
 
             showCapture();

@@ -57,6 +57,10 @@ form before it records anything.
   tester types, in the failure dialog and in light mode's form. A misspelled
   word is underlined, Alt+Enter offers the corrections, and nothing is changed
   unless the tester picks one.
+- **Rule-EDITOR-PANEL-225** — The case is recorded Failed only once what was
+  typed is written. When it cannot be written - the test run is no longer there,
+  or no longer covers the test case - nothing is recorded, a message says why,
+  and in light mode the form stays open with everything typed still in it.
 
 ## The screen
 
@@ -123,6 +127,12 @@ whatever verdict it had.
 
 **If the test case was deleted from its test set** — a message reads *The test
 case was removed - the run keeps what it recorded.*
+
+**If the test run is no longer there, or no longer covers the test case** — a
+message reads *This test run is no longer here, so nothing was recorded*, or
+*This test run does not cover this test case, so nothing was recorded*. The
+case is not recorded Failed. In light mode the failure form stays open with
+everything typed still in it (Rule-EDITOR-PANEL-225).
 
 **If the test case is gone but the dialog is reached anyway** — the description
 row reads *No longer in the test set*, and the expected row is not drawn.

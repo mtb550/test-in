@@ -172,6 +172,11 @@ public final class RunStatusService {
         final @NotNull Optional<TestRunDto> run = indexer.findTestRun(runPath);
         if (run.isEmpty()) {
             Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' is no longer indexed - failure details not recorded");
+
+            // Rule-EDITOR-PANEL-225. Said, not only logged: the tester pressed a
+            // key over a form they had filled in, and a refusal only the log saw
+            // read as the key doing nothing (#66, finding 169).
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.run.gone"));
             return false;
         }
 
@@ -199,6 +204,10 @@ public final class RunStatusService {
 
         if (found.isEmpty()) {
             Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' does not cover " + caseId + " - nothing recorded");
+
+            // Rule-EDITOR-PANEL-225, beside the removed-row refusal below and for
+            // the same reason: a key that records nothing says so.
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.case.not.covered"));
             return Optional.empty();
         }
 

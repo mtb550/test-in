@@ -168,9 +168,11 @@ class FailureForm extends JBPanel<FailureForm> {
      * holds it - the path the failure dialog takes - rather than on the editor's
      * own row, where a sync could leave it written nowhere (#312 A25, #313).
      * Only ever called by a save: Escape leaves the case exactly as it found it.
+     *
+     * @return whether it was written. The service has said why when it was not.
      */
-    void save() {
-        Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, runPath, runItem.getId(), fields);
+    boolean save() {
+        return Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, runPath, runItem.getId(), fields);
     }
 
     /**
