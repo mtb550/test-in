@@ -63,7 +63,7 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
         this.field = field;
         styleField(this.field, describes);
 
-        this.wrapper = createWrapper(describes.getIcon(), describes.getName(), this.field);
+        this.wrapper = createWrapper(describes.getIcon(), this.field);
     }
 
     /**

@@ -59,7 +59,7 @@ public abstract class AbstractOneLineSection implements CreateTestCaseSection {
         styleField(this.field, describes);
 
         this.icon = new JBLabel(describes.getIcon());
-        this.wrapper = createWrapper(this.icon, describes.getName(), this.field);
+        this.wrapper = createWrapper(this.icon, this.field);
     }
 
     @Override

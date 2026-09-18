@@ -71,7 +71,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
         this.container.setLayout(new BoxLayout(this.container, BoxLayout.Y_AXIS));
         this.container.setOpaque(false);
 
-        this.wrapper = createWrapper(field().getIcon(), field().getName(), this.container);
+        this.wrapper = createWrapper(field().getIcon(), this.container);
     }
 
     /**
