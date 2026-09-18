@@ -140,11 +140,11 @@ those are different questions.
 removed. The container is left out, and not counted.
 
 **If nothing could be removed** — the tree rebuilds and Testin says nothing at
-all.
+all. There is nothing on the tree's history for `Ctrl+Z` to take back.
 
 **If a node cannot be deleted on disk** — an IDE notification titled *Delete
 Failed* stays in the notification log, reading *Could not delete file:* and the
-reason.
+reason. `Ctrl+Z` puts back only the nodes that went.
 
 **If a node's copy could not be kept aside** — the node is still removed, and a
 message titled *Cannot Be Undone* says so at that moment. It names how many

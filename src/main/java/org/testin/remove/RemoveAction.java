@@ -42,7 +42,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.IntConsumer;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 /**
  * UC-TREE-PANEL-012.
@@ -166,18 +167,26 @@ public class RemoveAction extends DumbAwareAction {
                 if (node.isOpenableInEditor()) Services.getInstance(p, TestinEditors.class).close(p, node);
             }
 
-            removeEach(nodesToRemove, count -> {
-                Logger.info("Removed " + count + " of " + nodesToRemove.size() + " node(s).");
+            removeEach(nodesToRemove, went -> {
+                Logger.info("Removed " + went.size() + " of " + nodesToRemove.size() + " node(s).");
 
-                recordRemoval(nodesToRemove, List.copyOf(kept));
+                // Only what really went is put on the history. A node whose delete
+                // failed is still there, and an entry for it offered CTRL+Z over a
+                // node that never left - or, when nothing went at all, an entry
+                // for nothing (#66, finding 217).
+                final @NotNull List<Kept> undoable = kept.stream().filter(one -> went.contains(one.dto())).toList();
+                kept.stream().filter(one -> !went.contains(one.dto())).forEach(one -> indexer.forgetKept(one.copy()));
 
-                if (count > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, count);
+                if (went.isEmpty()) return;
+
+                recordRemoval(went, undoable);
+                Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, went.size());
 
                 // At the moment it happens, not when the tester presses CTRL+Z and
                 // finds out. A removal whose copy could not be kept aside is still a
                 // removal; what it is not is undoable, and that is the half nothing
                 // used to say (#196).
-                final int lost = count - kept.size();
+                final int lost = went.size() - undoable.size();
                 if (lost > 0) {
                     Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("remove.not.undoable.title"),
                             lost == 1
@@ -191,29 +200,29 @@ public class RemoveAction extends DumbAwareAction {
          * UC-TREE-PANEL-012, Rule-TREE-PANEL-042.
          * <p>
          * Removes every node, and rebuilds the tree once the last of them has
-         * actually gone.
+         * actually gone, handing over the ones that did.
          * <p>
          * The count is drained by the callbacks rather than by the loop, because
          * removal is asynchronous: a tree rebuilt when the loop ends is rebuilt
          * before a single node has been removed. Only the ones that really went are
-         * counted - a fixed container reports false, and used to be reported as if
-         * it were removed.
+         * handed over - a fixed container reports false, and used to be reported as
+         * if it were removed.
          * <p>
          * Both the removal and the redo of one come through here. The redo had its
          * own copy of the loop, without the waiting, so it rebuilt the tree before
          * anything had gone and read as a key that did nothing.
          */
-        private void removeEach(final @NotNull List<DirectoryDto> nodes, final @NotNull IntConsumer whenAllGone) {
+        private void removeEach(final @NotNull List<DirectoryDto> nodes, final @NotNull Consumer<@NotNull List<DirectoryDto>> whenAllGone) {
             final @NotNull AtomicInteger pending = new AtomicInteger(nodes.size());
-            final @NotNull AtomicInteger removed = new AtomicInteger();
+            final @NotNull List<DirectoryDto> went = new CopyOnWriteArrayList<>();
 
             for (final DirectoryDto node : nodes) {
                 Removals.of(node.getType()).remove(p, node, wasRemoved -> {
-                    if (wasRemoved) removed.incrementAndGet();
+                    if (wasRemoved) went.add(node);
                     if (pending.decrementAndGet() != 0) return;
 
                     Services.getInstance(p, TreePanel.class).getProjectTree().updateNodes();
-                    whenAllGone.accept(removed.get());
+                    whenAllGone.accept(List.copyOf(went));
                 });
             }
         }
@@ -286,7 +295,7 @@ public class RemoveAction extends DumbAwareAction {
          * one more press away from being undone again.
          */
         private void removeAll(final @NotNull List<Kept> kept) {
-            removeEach(kept.stream().map(Kept::dto).toList(), count -> Logger.info("Removed " + count + " node(s) again."));
+            removeEach(kept.stream().map(Kept::dto).toList(), went -> Logger.info("Removed " + went.size() + " node(s) again."));
         }
     }
 
