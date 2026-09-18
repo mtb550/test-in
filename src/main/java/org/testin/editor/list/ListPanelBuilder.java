@@ -80,7 +80,8 @@ public final class ListPanelBuilder {
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setExpandableItemsEnabled(false);
 
-        FontSync.syncWithNativeEditor(p, list, fontSyncDisposable);
+        // A list redraws its cards from the new font through its own UI.
+        FontSync.syncWithNativeEditor(p, list, fontSyncDisposable, delta -> list.updateUI());
 
         // A narrower list wraps a title over more lines, so the rows are taller -
         // and a JList in its default vertical orientation never finds that out.

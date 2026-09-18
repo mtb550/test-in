@@ -24,10 +24,7 @@ import com.intellij.openapi.editor.colors.EditorColorsListener;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBList;
-import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.grid.GridPanelBuilder;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,21 +50,44 @@ public class FontSync {
         return EditorColorsManager.getInstance().getGlobalScheme().getEditorFontSize();
     }
 
-    public static void syncWithNativeEditor(final @NotNull Project p, final @NotNull JComponent component, final @NotNull Disposable parentDisposable) {
-        updateComponentFontSize(component);
+    /**
+     * How a component takes a new font size, given how far it moved: what it
+     * does besides having the font set on itself.
+     * <p>
+     * Said by whoever syncs the component rather than worked out here. This
+     * branched on the kind of component and imported the editor's grid builder
+     * to resize a table, so {@code ui} depended on a feature above it (#312,
+     * A77). A panel's children are scaled by the same amount, which is what
+     * most callers want and what the shorter form does.
+     */
+    @FunctionalInterface
+    public interface Refit {
+        void by(float delta);
+    }
 
-        ApplicationManager.getApplication().getMessageBus().connect(parentDisposable).subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) scheme -> updateComponentFontSize(component));
+    public static void syncWithNativeEditor(final @NotNull Project p, final @NotNull JComponent component, final @NotNull Disposable parentDisposable) {
+        syncWithNativeEditor(p, component, parentDisposable, delta -> applyDeltaRecursively(component, delta));
+    }
+
+    public static void syncWithNativeEditor(final @NotNull Project p, final @NotNull JComponent component, final @NotNull Disposable parentDisposable, final @NotNull Refit refit) {
+        updateComponentFontSize(component, refit);
+
+        ApplicationManager.getApplication().getMessageBus().connect(parentDisposable).subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) scheme -> updateComponentFontSize(component, refit));
 
         NativeEditorZoom.ensureWatching();
 
-        attachWheelZoom(p, component);
+        attachWheelZoom(p, component, refit);
     }
 
     // UC-SETTING-011, Rule-SETTING-039
     public static void attachWheelZoom(final @NotNull Project p, final @NotNull JComponent component) {
+        attachWheelZoom(p, component, delta -> applyDeltaRecursively(component, delta));
+    }
+
+    private static void attachWheelZoom(final @NotNull Project p, final @NotNull JComponent component, final @NotNull Refit refit) {
         component.addMouseWheelListener(e -> {
             if (e.isControlDown() || e.isMetaDown()) {
-                zoomGlobalIdeEditors(p, component, e.getWheelRotation() < 0);
+                zoomGlobalIdeEditors(p, component, refit, e.getWheelRotation() < 0);
                 e.consume();
             }
         });
@@ -100,7 +120,7 @@ public class FontSync {
     }
 
     // UC-SETTING-011, Rule-SETTING-038
-    private static void zoomGlobalIdeEditors(final @NotNull Project p, final @NotNull JComponent component, final boolean zoomIn) {
+    private static void zoomGlobalIdeEditors(final @NotNull Project p, final @NotNull JComponent component, final @NotNull Refit refit, final boolean zoomIn) {
         ApplicationManager.getApplication().invokeLater(() -> {
             final float newSize = Math.clamp(getBaseFontSize() + (zoomIn ? 1.0f : -1.0f), FLOOR, 72.0f);
 
@@ -110,12 +130,12 @@ public class FontSync {
             // limit. The indicator still has to appear then, or wheeling past
             // the floor looks like the zoom stopped responding rather than like
             // it has bottomed out.
-            updateComponentFontSize(component);
+            updateComponentFontSize(component, refit);
             ZoomIndicatorDialog.show(p, component, newSize);
         });
     }
 
-    private static void updateComponentFontSize(final @NotNull JComponent component) {
+    private static void updateComponentFontSize(final @NotNull JComponent component, final @NotNull Refit refit) {
         final float newSize = getBaseFontSize();
         ApplicationManager.getApplication().invokeLater(() -> Optional.ofNullable(component.getFont()).ifPresent(currentFont -> {
             // Each subscriber tracks its own last size, so a font change
@@ -129,13 +149,7 @@ public class FontSync {
             if (delta != 0.0f || rootNeedsUpdate) {
                 component.putClientProperty(LAST_BASE_SIZE, newSize);
                 component.setFont(currentFont.deriveFont(newSize));
-                if (component instanceof JBList) {
-                    component.updateUI();
-                } else if (component instanceof JBTable table) {
-                    GridPanelBuilder.resizeToFont(table);
-                } else {
-                    applyDeltaRecursively(component, delta);
-                }
+                refit.by(delta);
                 component.revalidate();
                 component.repaint();
             }
