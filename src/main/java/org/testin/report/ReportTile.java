@@ -54,15 +54,15 @@ import java.util.function.Function;
 @AllArgsConstructor
 public enum ReportTile {
 
-    TOTAL_CASES(Bundle.message("report.tile.total.cases"), "1F3864", "var(--heading)", summary -> String.valueOf(summary.total())),
+    TOTAL_CASES(Bundle.message("report.tile.total.cases"), "1F3864", "var(--heading)", TestRunSummary::total, ""),
 
-    PASSED(TestStatus.PASSED.getLabel(), "2E7D32", "var(--verdict-passed)", summary -> String.valueOf(summary.passed())),
+    PASSED(TestStatus.PASSED.getLabel(), "2E7D32", "var(--verdict-passed)", TestRunSummary::passed, ""),
 
-    FAILED(TestStatus.FAILED.getLabel(), "C0392B", "var(--verdict-failed)", summary -> String.valueOf(summary.failed())),
+    FAILED(TestStatus.FAILED.getLabel(), "C0392B", "var(--verdict-failed)", TestRunSummary::failed, ""),
 
-    BLOCKED(TestStatus.BLOCKED.getLabel(), "B8860B", "var(--verdict-blocked)", summary -> String.valueOf(summary.blocked())),
+    BLOCKED(TestStatus.BLOCKED.getLabel(), "B8860B", "var(--verdict-blocked)", TestRunSummary::blocked, ""),
 
-    UNTESTED(TestStatus.UNTESTED.getLabel(), "595959", "var(--verdict-untested)", summary -> String.valueOf(summary.untested())),
+    UNTESTED(TestStatus.UNTESTED.getLabel(), "595959", "var(--verdict-untested)", TestRunSummary::untested, ""),
 
     /**
      * Only when the run has any.
@@ -72,14 +72,14 @@ public enum ReportTile {
      * than printed as a zero, and why the row's width is counted rather than
      * assumed.
      */
-    REMOVED(TestStatus.REMOVED.getLabel(), "595959", "var(--verdict-removed)", summary -> String.valueOf(summary.removed())) {
+    REMOVED(TestStatus.REMOVED.getLabel(), "595959", "var(--verdict-removed)", TestRunSummary::removed, "") {
         @Override
         public boolean isShownFor(final @NotNull TestRunSummary summary) {
             return summary.hasRemoved();
         }
     },
 
-    PASS_RATE(Bundle.message("report.tile.pass.rate"), "2E5496", "var(--heading)", summary -> summary.passRate() + "%");
+    PASS_RATE(Bundle.message("report.tile.pass.rate"), "2E5496", "var(--heading)", TestRunSummary::passRate, "%");
 
     private final @NotNull String label;
 
@@ -96,13 +96,31 @@ public enum ReportTile {
      */
     private final @NotNull String cssToken;
 
-    private final @NotNull Function<TestRunSummary, String> value;
+    /**
+     * The figure as a number, so the spreadsheet can write one - it wrote the
+     * text, and whoever opened the workbook could not sum, sort or chart the
+     * headline, and got "number stored as text" on each (#66, finding 227).
+     */
+    private final @NotNull Function<TestRunSummary, Number> amount;
+
+    /**
+     * What is written after the number when it is read as text: "%" for the
+     * pass rate, nothing for a count.
+     */
+    private final @NotNull String unit;
 
     /**
      * What this tile reads for a run.
      */
     public @NotNull String valueIn(final @NotNull TestRunSummary summary) {
-        return value.apply(summary);
+        return amountIn(summary) + unit;
+    }
+
+    /**
+     * The same figure as a number, for a format that holds numbers.
+     */
+    public @NotNull Number amountIn(final @NotNull TestRunSummary summary) {
+        return amount.apply(summary);
     }
 
     /**

@@ -104,9 +104,14 @@ public final class TestRunExcelGenerator {
         row = heading(ws, row + 1, Bundle.message("report.heading.execution"));
         ws.value(row++, 0, Bundle.message("report.summary.named", trDir.getName(),
                 String.valueOf(summary.total()), String.valueOf(summary.executed()), summary.passRate() + "%"));
+        // A number rather than its text, so the headline can be summed, sorted
+        // and charted; the unit is the cell's format, quoted so Excel prints it
+        // rather than reading "%" as "times a hundred".
         for (final ReportTile figure : ReportTile.shownFor(summary)) {
             caption(ws, row, figure.getLabel(), figure.getHex());
-            ws.value(row++, 1, figure.valueIn(summary));
+            ws.value(row, 1, figure.amountIn(summary));
+            if (!figure.getUnit().isEmpty()) ws.style(row, 1).format("0\"" + figure.getUnit() + "\"").set();
+            row++;
         }
 
         // Only what the tester wrote - see the PDF generator.
