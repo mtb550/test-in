@@ -53,8 +53,20 @@ public enum NodeCount {
     //
     // The verdict captions below are safe by the same test: TestStatus names
     // nothing here, and this already read its colors from it.
-    TEST_SETS(Bundle.message("count.test.sets"), NodeFigures::testSets, NodeCount::plain, Uncharted.COLOR),
-    PACKAGES(Bundle.message("count.packages"), NodeFigures::packages, NodeCount::plain, Uncharted.COLOR),
+    TEST_SETS(
+            Bundle.message("count.test.sets"),
+            NodeFigures::testSets,
+            NodeCount::plain,
+            Uncharted.COLOR
+    ),
+
+    PACKAGES(
+            Bundle.message("count.packages"),
+            NodeFigures::packages,
+            NodeCount::plain,
+            Uncharted.COLOR
+    ),
+
     /**
      * UC-INTERNAL-006, Rule-INTERNAL-046, Rule-INTERNAL-065.
      * <p>
@@ -79,15 +91,61 @@ public enum NodeCount {
             return Bundle.message("count.test.cases.runnable", super.of(figures), String.valueOf(figures.runnableTestCases()));
         }
     },
-    TEST_RUNS(Bundle.message("count.test.runs"), NodeFigures::testRuns, NodeCount::plain, Uncharted.COLOR),
+    TEST_RUNS(
+            Bundle.message("count.test.runs"),
+            NodeFigures::testRuns,
+            NodeCount::plain,
+            Uncharted.COLOR
+    ),
 
-    PASSED(TestStatus.PASSED.getLabel(), figures -> figures.run().passed(), NodeCount::plain, TestStatus.PASSED.getRowColor()),
-    FAILED(TestStatus.FAILED.getLabel(), figures -> figures.run().failed(), NodeCount::plain, TestStatus.FAILED.getRowColor()),
-    BLOCKED(TestStatus.BLOCKED.getLabel(), figures -> figures.run().blocked(), NodeCount::plain, TestStatus.BLOCKED.getRowColor()),
-    UNTESTED(TestStatus.UNTESTED.getLabel(), figures -> figures.run().untested(), NodeCount::plain, TestStatus.UNTESTED.getRowColor()),
-    REMOVED(TestStatus.REMOVED.getLabel(), figures -> figures.run().removed(), NodeCount::plain, TestStatus.REMOVED.getRowColor()),
-    TOTAL(Bundle.message("count.total"), figures -> figures.run().total(), NodeCount::plain, Uncharted.COLOR),
-    PASS_RATE(Bundle.message("count.pass.rate"), figures -> figures.run().passRate(), NodeCount::percentage, Uncharted.COLOR);
+    PASSED(
+            TestStatus.PASSED.getLabel(),
+            figures -> figures.run().passed(),
+            NodeCount::plain,
+            TestStatus.PASSED.getRowColor()
+    ),
+
+    FAILED(
+            TestStatus.FAILED.getLabel(),
+            figures -> figures.run().failed(),
+            NodeCount::plain,
+            TestStatus.FAILED.getRowColor()
+    ),
+
+    BLOCKED(
+            TestStatus.BLOCKED.getLabel(),
+            figures -> figures.run().blocked(),
+            NodeCount::plain,
+            TestStatus.BLOCKED.getRowColor()
+    ),
+
+    UNTESTED(
+            TestStatus.UNTESTED.getLabel(),
+            figures -> figures.run().untested(),
+            NodeCount::plain,
+            TestStatus.UNTESTED.getRowColor()
+    ),
+
+    REMOVED(
+            TestStatus.REMOVED.getLabel(),
+            figures -> figures.run().removed(),
+            NodeCount::plain,
+            TestStatus.REMOVED.getRowColor()
+    ),
+
+    TOTAL(
+            Bundle.message("count.total"),
+            figures -> figures.run().total(),
+            NodeCount::plain,
+            Uncharted.COLOR
+    ),
+
+    PASS_RATE(
+            Bundle.message("count.pass.rate"),
+            figures -> figures.run().passRate(),
+            NodeCount::percentage,
+            Uncharted.COLOR
+    );
 
     private final @NotNull String caption;
     private final @NotNull ToLongFunction<NodeFigures> reader;

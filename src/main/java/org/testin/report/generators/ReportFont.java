@@ -41,31 +41,58 @@ import org.jetbrains.annotations.NotNull;
 public enum ReportFont {
 
     /** The report's own name, once, at the top. */
-    TITLE(18f, 40),
+    TITLE(
+            18f,
+            40
+    ),
 
     /** The big number on a summary tile. */
-    FIGURE(20f, 42),
+    FIGURE(
+            20f,
+            42
+    ),
 
     /** A numbered section heading. */
-    SECTION(13f, 28),
+    SECTION(
+            13f,
+            28
+    ),
 
     /** The project line under the title. */
-    SUBTITLE(12f, 24),
+    SUBTITLE(
+            12f,
+            24
+    ),
 
     /** The run name, a section's opening sentence, an analysis heading. */
-    LEAD(11f, 21),
+    LEAD(
+            11f,
+            21
+    ),
 
     /** A table's header row, and the label column of the overview. */
-    HEADING(10f, 19),
+    HEADING(
+            10f,
+            19
+    ),
 
     /** Values, table cells, the paragraphs a tester writes. */
-    BODY(10f, 19),
+    BODY(
+            10f,
+            19
+    ),
 
     /** Row numbers and the caption under a summary tile. */
-    SMALL(9f, 16),
+    SMALL(
+            9f,
+            16
+    ),
 
     /** The confidentiality notice and the footer. */
-    CAPTION(8f, 15);
+    CAPTION(
+            8f,
+            15
+    );
 
     private final float pt;
     private final int px;

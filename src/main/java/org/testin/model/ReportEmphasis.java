@@ -43,13 +43,22 @@ import org.jetbrains.annotations.NotNull;
 public enum ReportEmphasis {
 
     /** Act on this. */
-    ALARMING("C0392B", "var(--verdict-failed)"),
+    ALARMING(
+            "C0392B",
+            "var(--verdict-failed)"
+    ),
 
     /** Worth reading before the rest. */
-    CAUTIONARY("B8860B", "var(--verdict-blocked)"),
+    CAUTIONARY(
+            "B8860B",
+            "var(--verdict-blocked)"
+    ),
 
     /** Present, and not asking for attention - including the unset value. */
-    MUTED("595959", "var(--muted)");
+    MUTED(
+            "595959",
+            "var(--muted)"
+    );
 
     private final @NotNull String hexColor;
     private final @NotNull String cssToken;

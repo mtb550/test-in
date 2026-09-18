@@ -49,23 +49,31 @@ public enum Removals {
         onRemoved.accept(removed);
     })),
 
-    TCD((p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved)),
+    TCD(
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved)
+    ),
 
-    TRD((p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved)),
+    TRD(
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved)
+    ),
 
     TSP((p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestSetPackage(dir.getPath(), removed -> {
         if (removed) GenType.REMOVE_TEST_SET_PACKAGE.getAction().execute(p, dir);
         onRemoved.accept(removed);
     })),
 
-    TRP((p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestRunPackage(dir.getPath(), onRemoved)),
+    TRP(
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestRunPackage(dir.getPath(), onRemoved)
+    ),
 
     TS((p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestSet(dir.getPath(), removed -> {
         if (removed) GenType.REMOVE_TEST_SET.getAction().execute(p, dir);
         onRemoved.accept(removed);
     })),
 
-    TR((p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestRun(dir.getPath(), onRemoved));
+    TR(
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestRun(dir.getPath(), onRemoved)
+    );
 
     private final @NotNull RemoveHandler handler;
 

@@ -35,20 +35,29 @@ public enum ConnectionType {
      * Not shared at all. What a project on this machine only reports, so every
      * reader has a value rather than a question about whether one was set.
      */
-    NONE(false, false),
+    NONE(
+            false,
+            false
+    ),
 
     /**
      * A Git repository. Branches mean something here, so the branch box is
      * shown and a refresh brings the remote up to date - and there is no server
      * to sync to, so that action is off.
      */
-    GIT(true, false),
+    GIT(
+            true,
+            false
+    ),
 
     /**
      * An SFTP server. There are no branches to choose and nothing to fetch, so
      * the branch box is not shown and nothing here ever reaches a Git remote.
      */
-    SFTP(false, true);
+    SFTP(
+            false,
+            true
+    );
 
     /**
      * Whether branches are this connection's business: the box belongs on screen,

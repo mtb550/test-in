@@ -36,14 +36,27 @@ import java.util.function.Function;
 @Getter
 @AllArgsConstructor
 public enum ViewTab {
-    DETAILS(Bundle.message("view.tab.details"), ViewPanel::getDetailsScrollPane, ViewPanel::getDetailsTab),
+    DETAILS(
+            Bundle.message("view.tab.details"),
+            ViewPanel::getDetailsScrollPane,
+            ViewPanel::getDetailsTab
+    ),
 
     // Reported as never used, and kept: the constants are read by values(), so
     // nothing names them. History draws an honest empty state until a test case
     // records more than its last edit (#150); Open Bugs reads the runs and
     // reports what each cycle found (#229).
-    HISTORY(Bundle.message("view.tab.history"), ViewPanel::getHistoryScrollPane, ViewPanel::getHistoryTab),
-    OPEN_BUGS(Bundle.message("view.tab.open.bugs"), ViewPanel::getOpenBugsScrollPane, ViewPanel::getOpenBugsTab);
+    HISTORY(
+            Bundle.message("view.tab.history"),
+            ViewPanel::getHistoryScrollPane,
+            ViewPanel::getHistoryTab
+    ),
+
+    OPEN_BUGS(
+            Bundle.message("view.tab.open.bugs"),
+            ViewPanel::getOpenBugsScrollPane,
+            ViewPanel::getOpenBugsTab
+    );
 
     private final @NotNull String displayName;
 

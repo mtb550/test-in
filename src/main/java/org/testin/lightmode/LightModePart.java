@@ -59,10 +59,21 @@ import org.testin.util.Bundle;
 @AllArgsConstructor
 public enum LightModePart implements ToolBarAttribute {
 
-    SET_NAME(Bundle.message("light.part.set.name")),
-    DURATION(Bundle.message("light.part.duration")),
-    VERDICT_BUTTONS(Bundle.message("light.part.verdict.buttons")),
-    STATUS_BAR(Bundle.message("light.part.status.bar"));
+    SET_NAME(
+            Bundle.message("light.part.set.name")
+    ),
+
+    DURATION(
+            Bundle.message("light.part.duration")
+    ),
+
+    VERDICT_BUTTONS(
+            Bundle.message("light.part.verdict.buttons")
+    ),
+
+    STATUS_BAR(
+            Bundle.message("light.part.status.bar")
+    );
 
     private final @NotNull String name;
 

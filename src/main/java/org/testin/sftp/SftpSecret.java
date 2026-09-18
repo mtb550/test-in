@@ -59,12 +59,16 @@ public enum SftpSecret {
      * The passphrase of an encrypted key file, wanted only when no agent holds
      * that key already.
      */
-    KEY_PASSPHRASE("key passphrase"),
+    KEY_PASSPHRASE(
+            "key passphrase"
+    ),
 
     /**
      * The account's password, for a server that authenticates that way.
      */
-    ACCOUNT_PASSWORD("account password");
+    ACCOUNT_PASSWORD(
+            "account password"
+    );
 
     /**
      * The subsystem every entry is filed under, so a tester looking in Windows

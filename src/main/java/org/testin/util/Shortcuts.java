@@ -57,33 +57,54 @@ public enum Shortcuts {
      * of a null every reader would have to check (#71). The keystroke is one
      * the keyboard cannot produce, so nothing can match it by accident.
      */
-    EMPTY(KeyStroke.getKeyStroke(KeyEvent.VK_UNDEFINED, 0)),
+    EMPTY(
+            KeyStroke.getKeyStroke(KeyEvent.VK_UNDEFINED, 0)
+    ),
 
     // Dialog confirm / dismiss
-    Enter(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
-    Escape(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)),
+    Enter(
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
+    ),
+
+    Escape(
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)
+    ),
 
     /**
      * Spelling corrections in the dialog editors. Bound by the platform, not by
      * us - declared here only so the status bars render it from one source
      * instead of spelling "Alt+Enter" out by hand.
      */
-    Corrections(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK)),
+    Corrections(
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK)
+    ),
 
     /**
      * Inserts a line break where Enter cannot, because Enter commits or saves:
      * the grid cell editor and the multi-line expected-result field. One key for
      * both, so the two surfaces stay learnable as a pair.
      */
-    InsertNewLine(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK)),
+    InsertNewLine(
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK)
+    ),
 
     // Bulk JSON editors: add and remove an array item, caret on every value
-    AddArrayItem(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK)),
-    RemoveArrayItem(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.SHIFT_DOWN_MASK)),
-    CaretOnEveryValue(KeyStroke.getKeyStroke(KeyEvent.VK_A, menuMask() | InputEvent.SHIFT_DOWN_MASK)),
+    AddArrayItem(
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK)
+    ),
+
+    RemoveArrayItem(
+            KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.SHIFT_DOWN_MASK)
+    ),
+
+    CaretOnEveryValue(
+            KeyStroke.getKeyStroke(KeyEvent.VK_A, menuMask() | InputEvent.SHIFT_DOWN_MASK)
+    ),
 
     // Toolbar search (test editor + run editor)
-    FocusSearch(KeyStroke.getKeyStroke(KeyEvent.VK_F, menuMask())),
+    FocusSearch(
+            KeyStroke.getKeyStroke(KeyEvent.VK_F, menuMask())
+    ),
 
     // Item operations shared between the project tree, editors, and details panel
     /**
@@ -93,9 +114,17 @@ public enum Shortcuts {
      * disagree on macOS only: the grid kept CMD+C and the menu still took CTRL+C,
      * leaving one platform with two different copy gestures.
      */
-    CopyItem(KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask())),
-    CutItem(KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask())),
-    PasteItem(KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask())),
+    CopyItem(
+            KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask())
+    ),
+
+    CutItem(
+            KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask())
+    ),
+
+    PasteItem(
+            KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask())
+    ),
 
     /**
      * Testin's own keys, declared here rather than inside the action that binds
@@ -109,21 +138,41 @@ public enum Shortcuts {
      * own keys should take CMD on a Mac is the half of #25 that needs a Mac to
      * answer.
      */
-    ShowDetails(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK)),
-    HideDetails(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK)),
+    ShowDetails(
+            KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK)
+    ),
+
+    HideDetails(
+            KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK)
+    ),
 
     /** The keyboard's menu key. It carries no modifier anywhere. */
-    ContextMenu(KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0)),
-    Undo(KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuMask())),
-    Redo(KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuMask())),
-    DeletePackage(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)),
+    ContextMenu(
+            KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0)
+    ),
+
+    Undo(
+            KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuMask())
+    ),
+
+    Redo(
+            KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuMask())
+    ),
+
+    DeletePackage(
+            KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)
+    ),
 
     // A confirmation's second answer - the one that is neither doing it nor
     // walking away, e.g. reviewing the changes a branch switch would carry.
-    ConfirmAlternative(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK)),
+    ConfirmAlternative(
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK)
+    ),
 
     // Run editor: export the run's results (context menu + toolbar button)
-    GenerateReport(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)),
+    GenerateReport(
+            KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)
+    ),
 
     // Card actions (context menu + hover icons)
 
@@ -136,8 +185,13 @@ public enum Shortcuts {
     // They were NextTestCase and PreviousTestCase, and the editor used them for
     // pages - so the name said one surface and the binding said both, and
     // docs/shortcuts.md listed the same key twice with two meanings (#224).
-    Next(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK)),
-    Previous(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK)),
+    Next(
+            KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK)
+    ),
+
+    Previous(
+            KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK)
+    ),
 
     // The ends of the same journey, on the same keys with Shift. A set of forty
     // pages was reachable only one page at a time, and the two arrows that go
@@ -147,8 +201,13 @@ public enum Shortcuts {
     //
     // Shift adds reach to a direction everywhere else a keyboard does this, so
     // there is nothing new to learn once Ctrl+Left is known.
-    First(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)),
-    Last(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)),
+    First(
+            KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)
+    ),
+
+    Last(
+            KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)
+    ),
 
     // The copy menu's rows. Its own keys, not the update menu's: the two menus
     // hold different things - a tester copies the class name, the identity and
@@ -158,53 +217,157 @@ public enum Shortcuts {
     //
     // The letters match the update menu's wherever the field is the same, so D
     // is the description in both and nobody learns a second alphabet.
-    CopyAll(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0)),
-    CopyDescription(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0)),
-    CopyExpectedResult(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)),
-    CopySteps(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)),
-    CopyPreConditions(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
-    CopyTestData(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0)),
-    CopyPriority(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
-    CopyModule(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0)),
-    CopyGroup(KeyStroke.getKeyStroke(KeyEvent.VK_G, 0)),
-    CopyStatus(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0)),
-    CopyReference(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0)),
-    CopyFqcn(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)),
-    CopyId(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0)),
-    CopyPath(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0)),
+    CopyAll(
+            KeyStroke.getKeyStroke(KeyEvent.VK_A, 0)
+    ),
+
+    CopyDescription(
+            KeyStroke.getKeyStroke(KeyEvent.VK_D, 0)
+    ),
+
+    CopyExpectedResult(
+            KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)
+    ),
+
+    CopySteps(
+            KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)
+    ),
+
+    CopyPreConditions(
+            KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)
+    ),
+
+    CopyTestData(
+            KeyStroke.getKeyStroke(KeyEvent.VK_T, 0)
+    ),
+
+    CopyPriority(
+            KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)
+    ),
+
+    CopyModule(
+            KeyStroke.getKeyStroke(KeyEvent.VK_M, 0)
+    ),
+
+    CopyGroup(
+            KeyStroke.getKeyStroke(KeyEvent.VK_G, 0)
+    ),
+
+    CopyStatus(
+            KeyStroke.getKeyStroke(KeyEvent.VK_U, 0)
+    ),
+
+    CopyReference(
+            KeyStroke.getKeyStroke(KeyEvent.VK_R, 0)
+    ),
+
+    CopyFqcn(
+            KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)
+    ),
+
+    CopyId(
+            KeyStroke.getKeyStroke(KeyEvent.VK_I, 0)
+    ),
+
+    CopyPath(
+            KeyStroke.getKeyStroke(KeyEvent.VK_H, 0)
+    ),
 
     // Field navigation inside the create/update dialogs
-    TabNext(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0)),
-    TabPrevious(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK)),
-    ArrowDown(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)),
-    ArrowUp(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)),
-    AutoComplete(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK)),
+    TabNext(
+            KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0)
+    ),
+
+    TabPrevious(
+            KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK)
+    ),
+
+    ArrowDown(
+            KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)
+    ),
+
+    ArrowUp(
+            KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)
+    ),
+
+    AutoComplete(
+            KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK)
+    ),
 
     // Test case fields (create dialog sections + fields enums)
-    CreateTestCaseDescription(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK)),
-    CreateTestCaseExpectedResult(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK)),
-    CreateTestCaseModule(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK)),
-    CreateTestCaseAddStep(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)),
-    CreateTestCaseGroup(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK)),
-    CreateTestCasePriority(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)),
+    CreateTestCaseDescription(
+            KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK)
+    ),
+
+    CreateTestCaseExpectedResult(
+            KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK)
+    ),
+
+    CreateTestCaseModule(
+            KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK)
+    ),
+
+    CreateTestCaseAddStep(
+            KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)
+    ),
+
+    CreateTestCaseGroup(
+            KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK)
+    ),
+
+    CreateTestCasePriority(
+            KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)
+    ),
+
     /**
      * The same two letters the update menu uses for these fields, so a tester
      * learns each field once: T is test data and B is pre-conditions, with Ctrl
      * in the create dialog and without it on a card.
      */
-    CreateTestCaseTestData(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)),
-    CreateTestCasePreConditions(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK)),
+    CreateTestCaseTestData(
+            KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)
+    ),
+
+    CreateTestCasePreConditions(
+            KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK)
+    ),
 
     // Test case update-menu fields (update dialogs + fields enums)
-    UpdateTestCaseDescription(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0)),
-    UpdateTestCaseExpectedResult(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)),
-    UpdateTestCaseModule(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0)),
-    UpdateTestCaseTestData(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0)),
-    UpdateTestCasePreConditions(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
-    UpdateTestCaseSteps(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)),
-    UpdateTestCasePriority(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
-    UpdateTestCaseGroup(KeyStroke.getKeyStroke(KeyEvent.VK_G, 0)),
-    UpdateTestCaseOrder(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0));
+    UpdateTestCaseDescription(
+            KeyStroke.getKeyStroke(KeyEvent.VK_D, 0)
+    ),
+
+    UpdateTestCaseExpectedResult(
+            KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)
+    ),
+
+    UpdateTestCaseModule(
+            KeyStroke.getKeyStroke(KeyEvent.VK_M, 0)
+    ),
+
+    UpdateTestCaseTestData(
+            KeyStroke.getKeyStroke(KeyEvent.VK_T, 0)
+    ),
+
+    UpdateTestCasePreConditions(
+            KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)
+    ),
+
+    UpdateTestCaseSteps(
+            KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)
+    ),
+
+    UpdateTestCasePriority(
+            KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)
+    ),
+
+    UpdateTestCaseGroup(
+            KeyStroke.getKeyStroke(KeyEvent.VK_G, 0)
+    ),
+
+    UpdateTestCaseOrder(
+            KeyStroke.getKeyStroke(KeyEvent.VK_O, 0)
+    );
 
     private final @NotNull KeyStroke key;
 

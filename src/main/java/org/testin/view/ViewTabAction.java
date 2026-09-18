@@ -48,8 +48,21 @@ public final class ViewTabAction extends AbstractProjectAction {
 
     @AllArgsConstructor
     enum Direction {
-        NEXT(Shortcuts.TabNext, Bundle.message("view.tab.next"), Bundle.message("view.tab.next.description"), AllIcons.Actions.Forward, ContentManager::selectNextContent),
-        PREVIOUS(Shortcuts.TabPrevious, Bundle.message("view.tab.previous"), Bundle.message("view.tab.previous.description"), AllIcons.Actions.Back, ContentManager::selectPreviousContent);
+        NEXT(
+                Shortcuts.TabNext,
+                Bundle.message("view.tab.next"),
+                Bundle.message("view.tab.next.description"),
+                AllIcons.Actions.Forward,
+                ContentManager::selectNextContent
+        ),
+
+        PREVIOUS(
+                Shortcuts.TabPrevious,
+                Bundle.message("view.tab.previous"),
+                Bundle.message("view.tab.previous.description"),
+                AllIcons.Actions.Back,
+                ContentManager::selectPreviousContent
+        );
 
         private final @NotNull Shortcuts key;
         private final @NotNull String text;

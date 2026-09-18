@@ -49,9 +49,29 @@ import java.util.function.ToLongFunction;
 @AllArgsConstructor
 public enum ResultAnalysis {
 
-    PASSED(TestStatus.PASSED, TestStatus.PASSED, "2E7D32", "4FBF60", TestRunSummary::passed),
-    FAILED(TestStatus.FAILED, TestStatus.FAILED, "C0392B", "F2685A", TestRunSummary::failed),
-    BLOCKED(TestStatus.BLOCKED, TestStatus.BLOCKED, "B8860B", "F5B940", TestRunSummary::blocked),
+    PASSED(
+            TestStatus.PASSED,
+            TestStatus.PASSED,
+            "2E7D32",
+            "4FBF60",
+            TestRunSummary::passed
+    ),
+
+    FAILED(
+            TestStatus.FAILED,
+            TestStatus.FAILED,
+            "C0392B",
+            "F2685A",
+            TestRunSummary::failed
+    ),
+
+    BLOCKED(
+            TestStatus.BLOCKED,
+            TestStatus.BLOCKED,
+            "B8860B",
+            "F5B940",
+            TestRunSummary::blocked
+    ),
 
     /**
      * The one bucket with two names, because it is one fact at two moments.
@@ -66,7 +86,13 @@ public enum ResultAnalysis {
      * tester's written analysis is stored keyed by it, and renaming it would
      * make every stored analysis unreadable.
      */
-    UNTESTED(TestStatus.PENDING, TestStatus.UNTESTED, "595959", "96A1B0", TestRunSummary::untested);
+    UNTESTED(
+            TestStatus.PENDING,
+            TestStatus.UNTESTED,
+            "595959",
+            "96A1B0",
+            TestRunSummary::untested
+    );
 
     /**
      * What this bucket is called while the run is still open, and what it is

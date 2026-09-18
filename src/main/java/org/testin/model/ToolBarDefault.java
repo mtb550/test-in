@@ -36,13 +36,19 @@ public enum ToolBarDefault {
     /**
      * Unchecked until the tester ticks it.
      */
-    OFF(false, true),
+    OFF(
+            false,
+            true
+    ),
 
     /**
      * Checked on a profile that has never stored a selection, and free to be
      * unticked afterward.
      */
-    ON(true, true),
+    ON(
+            true,
+            true
+    ),
 
     /**
      * Always checked, and grayed out so it cannot be unticked. For what the row
@@ -50,7 +56,10 @@ public enum ToolBarDefault {
      * description are the card title, and a row without them cannot be told
      * apart from the next one.
      */
-    LOCKED_CHECKED(true, false),
+    LOCKED_CHECKED(
+            true,
+            false
+    ),
 
     /**
      * Never checked, and grayed out so it cannot be ticked. For an attribute
@@ -58,7 +67,10 @@ public enum ToolBarDefault {
      * visibly unavailable, rather than disappearing and leaving the tester
      * looking for it.
      */
-    LOCKED_UNCHECKED(false, false);
+    LOCKED_UNCHECKED(
+            false,
+            false
+    );
 
     /**
      * What a profile with nothing stored starts with.

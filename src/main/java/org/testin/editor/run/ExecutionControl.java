@@ -51,9 +51,15 @@ public enum ExecutionControl {
      * the family Run Test Case draws from, so the two entries agreed in the one
      * way that mattered and disagreed in every other.
      */
-    START(Bundle.message("toolbar.start.manual.execution"), AllIcons.Toolwindows.ToolWindowRun),
+    START(
+            Bundle.message("toolbar.start.manual.execution"),
+            AllIcons.Toolwindows.ToolWindowRun
+    ),
 
-    STOP(Bundle.message("toolbar.stop.execution"), AllIcons.Debugger.ThreadFrozen);
+    STOP(
+            Bundle.message("toolbar.stop.execution"),
+            AllIcons.Debugger.ThreadFrozen
+    );
 
     private final @NotNull String label;
     private final @NotNull Icon icon;

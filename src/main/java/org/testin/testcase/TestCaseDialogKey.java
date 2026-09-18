@@ -39,19 +39,49 @@ import java.util.stream.Collectors;
 @Getter
 public enum TestCaseDialogKey implements StatusBarItem {
 
-    SAVE(StatusBarShortcut.SAVE, Shortcuts.Enter),
-    CANCEL(Bundle.message("dialog.key.cancel"), Shortcuts.Escape),
+    SAVE(
+            StatusBarShortcut.SAVE,
+            Shortcuts.Enter
+    ),
+
+    CANCEL(
+            Bundle.message("dialog.key.cancel"),
+            Shortcuts.Escape
+    ),
 
     // Bound by the platform on the spell-checked editors, not by us; shown only
     // on the sections that actually check spelling, so the hint is never a lie.
-    CORRECTIONS(Bundle.message("dialog.key.corrections"), Shortcuts.Corrections),
+    CORRECTIONS(
+            Bundle.message("dialog.key.corrections"),
+            Shortcuts.Corrections
+    ),
 
-    ADD_STEP(Bundle.message("dialog.key.add.step"), Shortcuts.CreateTestCaseAddStep),
-    AUTO_COMPLETE(Bundle.message("dialog.key.auto.complete"), Shortcuts.AutoComplete),
-    ADD_GROUP(Bundle.message("dialog.key.add.group"), Shortcuts.CreateTestCaseGroup),
+    ADD_STEP(
+            Bundle.message("dialog.key.add.step"),
+            Shortcuts.CreateTestCaseAddStep
+    ),
 
-    NAVIGATE_TAB(Bundle.message("dialog.key.navigate"), Shortcuts.TabNext, Shortcuts.TabPrevious),
-    NAVIGATE_ARROWS(Bundle.message("dialog.key.navigate.priority"), Shortcuts.ArrowUp, Shortcuts.ArrowDown);
+    AUTO_COMPLETE(
+            Bundle.message("dialog.key.auto.complete"),
+            Shortcuts.AutoComplete
+    ),
+
+    ADD_GROUP(
+            Bundle.message("dialog.key.add.group"),
+            Shortcuts.CreateTestCaseGroup
+    ),
+
+    NAVIGATE_TAB(
+            Bundle.message("dialog.key.navigate"),
+            Shortcuts.TabNext,
+            Shortcuts.TabPrevious
+    ),
+
+    NAVIGATE_ARROWS(
+            Bundle.message("dialog.key.navigate.priority"),
+            Shortcuts.ArrowUp,
+            Shortcuts.ArrowDown
+    );
 
     private final @NotNull String name;
 

@@ -42,31 +42,80 @@ import org.testin.util.Bundle;
 @AllArgsConstructor
 public enum Done {
 
-    COPIED(Bundle.message("done.copied")),
-    CUT(Bundle.message("done.cut")),
-    PASTED(Bundle.message("done.pasted")),
-    MOVED(Bundle.message("done.moved")),
+    COPIED(
+            Bundle.message("done.copied")
+    ),
 
-    CREATED(Bundle.message("done.created")),
-    AUTOMATED(Bundle.message("done.automated")),
-    BOUND(Bundle.message("done.bound")),
-    CLONED(Bundle.message("done.cloned")),
-    RENAMED(Bundle.message("done.renamed")),
-    REMOVED(Bundle.message("done.removed")),
-    UPDATED(Bundle.message("done.updated")),
-    SAVED(Bundle.message("done.saved")),
+    CUT(
+            Bundle.message("done.cut")
+    ),
 
-    IMPORTED(Bundle.message("done.imported")),
-    EXPORTED(Bundle.message("done.exported")),
+    PASTED(
+            Bundle.message("done.pasted")
+    ),
+
+    MOVED(
+            Bundle.message("done.moved")
+    ),
+
+    CREATED(
+            Bundle.message("done.created")
+    ),
+
+    AUTOMATED(
+            Bundle.message("done.automated")
+    ),
+
+    BOUND(
+            Bundle.message("done.bound")
+    ),
+
+    CLONED(
+            Bundle.message("done.cloned")
+    ),
+
+    RENAMED(
+            Bundle.message("done.renamed")
+    ),
+
+    REMOVED(
+            Bundle.message("done.removed")
+    ),
+
+    UPDATED(
+            Bundle.message("done.updated")
+    ),
+
+    SAVED(
+            Bundle.message("done.saved")
+    ),
+
+    IMPORTED(
+            Bundle.message("done.imported")
+    ),
+
+    EXPORTED(
+            Bundle.message("done.exported")
+    ),
 
     /**
      * A failure filed as a GitHub issue (#28).
      */
-    REPORTED(Bundle.message("done.reported")),
+    REPORTED(
+            Bundle.message("done.reported")
+    ),
 
-    ORDERED(Bundle.message("done.ordered")),
-    RE_SORTED(Bundle.message("done.re.sorted")),
-    REFRESHED(Bundle.message("done.refreshed")),
+    ORDERED(
+            Bundle.message("done.ordered")
+    ),
+
+    RE_SORTED(
+            Bundle.message("done.re.sorted")
+    ),
+
+    REFRESHED(
+            Bundle.message("done.refreshed")
+    ),
 
     /**
      * Two words because two things happened. Refresh reads the run again from
@@ -74,14 +123,29 @@ public enum Done {
      * with it - and "Refreshed" alone left the tester with a stopped clock, a
      * Start button back and no word about why (#218).
      */
-    REFRESHED_EXECUTION_STOPPED(Bundle.message("done.refreshed.execution.stopped")),
+    REFRESHED_EXECUTION_STOPPED(
+            Bundle.message("done.refreshed.execution.stopped")
+    ),
 
-    UNDONE(Bundle.message("done.undone")),
-    REDONE(Bundle.message("done.redone")),
-    REVERTED(Bundle.message("done.reverted")),
-    KEPT(Bundle.message("done.kept")),
+    UNDONE(
+            Bundle.message("done.undone")
+    ),
 
-    STOPPED(Bundle.message("done.stopped"));
+    REDONE(
+            Bundle.message("done.redone")
+    ),
+
+    REVERTED(
+            Bundle.message("done.reverted")
+    ),
+
+    KEPT(
+            Bundle.message("done.kept")
+    ),
+
+    STOPPED(
+            Bundle.message("done.stopped")
+    );
 
     /**
      * The word itself. Past tense, one word where one will do - which is the

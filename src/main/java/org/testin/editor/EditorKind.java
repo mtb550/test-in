@@ -37,8 +37,13 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public enum EditorKind {
 
-    TEST("test"),
-    RUN("run");
+    TEST(
+            "test"
+    ),
+
+    RUN(
+            "run"
+    );
 
     private final @NotNull String word;
 

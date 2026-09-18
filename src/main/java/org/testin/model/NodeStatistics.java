@@ -50,7 +50,9 @@ public enum NodeStatistics {
      * of unrelated things are a list, and a ring drawn through them would
      * claim they were parts of one whole.
      */
-    CHILDREN(List.of()),
+    CHILDREN(
+            List.of()
+    ),
 
     /**
      * A test run: counted from the verdicts it recorded. Its five verdicts do

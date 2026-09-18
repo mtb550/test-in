@@ -54,15 +54,45 @@ import java.util.function.Function;
 @AllArgsConstructor
 public enum ReportTile {
 
-    TOTAL_CASES(Bundle.message("report.tile.total.cases"), "1F3864", "var(--heading)", TestRunSummary::total, ""),
+    TOTAL_CASES(
+            Bundle.message("report.tile.total.cases"),
+            "1F3864",
+            "var(--heading)",
+            TestRunSummary::total,
+            ""
+    ),
 
-    PASSED(TestStatus.PASSED.getLabel(), "2E7D32", "var(--verdict-passed)", TestRunSummary::passed, ""),
+    PASSED(
+            TestStatus.PASSED.getLabel(),
+            "2E7D32",
+            "var(--verdict-passed)",
+            TestRunSummary::passed,
+            ""
+    ),
 
-    FAILED(TestStatus.FAILED.getLabel(), "C0392B", "var(--verdict-failed)", TestRunSummary::failed, ""),
+    FAILED(
+            TestStatus.FAILED.getLabel(),
+            "C0392B",
+            "var(--verdict-failed)",
+            TestRunSummary::failed,
+            ""
+    ),
 
-    BLOCKED(TestStatus.BLOCKED.getLabel(), "B8860B", "var(--verdict-blocked)", TestRunSummary::blocked, ""),
+    BLOCKED(
+            TestStatus.BLOCKED.getLabel(),
+            "B8860B",
+            "var(--verdict-blocked)",
+            TestRunSummary::blocked,
+            ""
+    ),
 
-    UNTESTED(TestStatus.UNTESTED.getLabel(), "595959", "var(--verdict-untested)", TestRunSummary::untested, ""),
+    UNTESTED(
+            TestStatus.UNTESTED.getLabel(),
+            "595959",
+            "var(--verdict-untested)",
+            TestRunSummary::untested,
+            ""
+    ),
 
     /**
      * Only when the run has any.
@@ -79,7 +109,13 @@ public enum ReportTile {
         }
     },
 
-    PASS_RATE(Bundle.message("report.tile.pass.rate"), "2E5496", "var(--heading)", TestRunSummary::passRate, "%");
+    PASS_RATE(
+            Bundle.message("report.tile.pass.rate"),
+            "2E5496",
+            "var(--heading)",
+            TestRunSummary::passRate,
+            "%"
+    );
 
     private final @NotNull String label;
 

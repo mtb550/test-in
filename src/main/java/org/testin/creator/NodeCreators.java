@@ -46,13 +46,33 @@ import java.util.function.Function;
  */
 @AllArgsConstructor
 public enum NodeCreators {
-    TP(p -> new NotCreatableFromTree(DirectoryType.TP.getDescription())),
-    TCD(p -> new NotCreatableFromTree(DirectoryType.TCD.getDescription())),
-    TRD(p -> new NotCreatableFromTree(DirectoryType.TRD.getDescription())),
-    TSP(CreateTestSetPackage::new),
-    TRP(CreateTestRunPackage::new),
-    TS(CreateTestSet::new),
-    TR(CreateTestRun::new);
+    TP(
+            p -> new NotCreatableFromTree(DirectoryType.TP.getDescription())
+    ),
+
+    TCD(
+            p -> new NotCreatableFromTree(DirectoryType.TCD.getDescription())
+    ),
+
+    TRD(
+            p -> new NotCreatableFromTree(DirectoryType.TRD.getDescription())
+    ),
+
+    TSP(
+            CreateTestSetPackage::new
+    ),
+
+    TRP(
+            CreateTestRunPackage::new
+    ),
+
+    TS(
+            CreateTestSet::new
+    ),
+
+    TR(
+            CreateTestRun::new
+    );
 
     private final @NotNull Function<Project, NodeCreator> creator;
 

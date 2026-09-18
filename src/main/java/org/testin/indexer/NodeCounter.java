@@ -62,8 +62,13 @@ public final class NodeCounter {
      */
     @AllArgsConstructor
     private enum Gathered {
-        CHILDREN(NodeCounter::childCounts),
-        VERDICTS(NodeCounter::runVerdicts);
+        CHILDREN(
+                NodeCounter::childCounts
+        ),
+
+        VERDICTS(
+                NodeCounter::runVerdicts
+        );
 
         private final @NotNull FiguresGatherer gather;
     }

@@ -53,7 +53,9 @@ public enum Refused {
      * reached it through - creating a test project, creating any node in the
      * tree, or renaming one.
      */
-    ALREADY_EXISTS(Bundle.message("refused.already.exists")),
+    ALREADY_EXISTS(
+            Bundle.message("refused.already.exists")
+    ),
 
     /**
      * The tester acted on a test case that has no generated method, whichever
@@ -65,7 +67,9 @@ public enum Refused {
      * The remedy - generate the code - is a keystroke away, which is why this
      * fades rather than going in the log.
      */
-    NO_GENERATED_CODE(Bundle.message("refused.no.generated.code")),
+    NO_GENERATED_CODE(
+            Bundle.message("refused.no.generated.code")
+    ),
 
     /**
      * UC-CODEGEN-008, Rule-CODEGEN-074.
@@ -75,7 +79,9 @@ public enum Refused {
      * fact and the descriptions are on the cards in front of them (#66,
      * finding 18).
      */
-    NO_GENERATED_CODE_COUNTED(Bundle.message("refused.no.generated.code.counted")),
+    NO_GENERATED_CODE_COUNTED(
+            Bundle.message("refused.no.generated.code.counted")
+    ),
 
     /**
      * UC-TREE-PANEL-023, Rule-TREE-PANEL-078.
@@ -84,7 +90,9 @@ public enum Refused {
      * holding no cases at all, or a run whose cases have all been judged. Both
      * are Testin saying there is nothing here to start.
      */
-    NOTHING_TO_RUN(Bundle.message("refused.nothing.to.run")),
+    NOTHING_TO_RUN(
+            Bundle.message("refused.nothing.to.run")
+    ),
 
     /**
      * The tester pressed start on a walk with nowhere to land.
@@ -95,7 +103,9 @@ public enum Refused {
      * test cases, when a filter is what emptied the screen, sends them looking
      * for cases that are still there (#215).
      */
-    NOTHING_SHOWING(Bundle.message("refused.nothing.showing")),
+    NOTHING_SHOWING(
+            Bundle.message("refused.nothing.showing")
+    ),
 
     /**
      * The tester asked to run something that is already running.
@@ -104,7 +114,9 @@ public enum Refused {
      * still going has plenty left to run, and telling them it has nothing would
      * send them looking for cases that are on screen in front of them.
      */
-    ALREADY_RUNNING(Bundle.message("refused.already.running")),
+    ALREADY_RUNNING(
+            Bundle.message("refused.already.running")
+    ),
 
     /**
      * UC-CODEGEN-019, Rule-CODEGEN-005.
@@ -121,7 +133,9 @@ public enum Refused {
      * tree has changed and looks for a class that no longer answers to that
      * name.
      */
-    WHILE_INDEXING(Bundle.message("refused.while.indexing")),
+    WHILE_INDEXING(
+            Bundle.message("refused.while.indexing")
+    ),
 
     /**
      * UC-SHARE-013, Rule-SHARE-060.
@@ -131,7 +145,9 @@ public enum Refused {
      * the usual one. Said while they are still looking at it, rather than as a
      * failed push some seconds later (#83).
      */
-    NOT_A_REPOSITORY_URL(Bundle.message("refused.not.a.repository.url")),
+    NOT_A_REPOSITORY_URL(
+            Bundle.message("refused.not.a.repository.url")
+    ),
 
     /**
      * UC-SHARE-014, Rule-SHARE-108.
@@ -141,7 +157,9 @@ public enum Refused {
      * at what they typed. Git takes whatever it is given, so an address typed
      * wrong is not found out until somebody reads a commit (#272).
      */
-    NOT_AN_EMAIL_ADDRESS(Bundle.message("refused.not.an.email.address")),
+    NOT_AN_EMAIL_ADDRESS(
+            Bundle.message("refused.not.an.email.address")
+    ),
 
     /**
      * UC-TREE-PANEL-008, Rule-TREE-PANEL-095, Rule-CODEGEN-073.
@@ -158,7 +176,9 @@ public enum Refused {
      * nobody chose is not what a tester who is sitting right there should get
      * (#11).
      */
-    NOT_A_JAVA_NAME(Bundle.message("refused.not.a.java.name")),
+    NOT_A_JAVA_NAME(
+            Bundle.message("refused.not.a.java.name")
+    ),
 
     /**
      * UC-TREE-PANEL-007, UC-TREE-PANEL-008, Rule-TREE-PANEL-095.
@@ -173,7 +193,9 @@ public enum Refused {
      * and a test set, a test run and a test run package are not asked that
      * (#312, A65).
      */
-    NOT_ONE_FOLDER(Bundle.message("refused.not.one.folder")),
+    NOT_ONE_FOLDER(
+            Bundle.message("refused.not.one.folder")
+    ),
 
     /**
      * UC-CODEGEN-007, Rule-CODEGEN-069.
@@ -184,7 +206,9 @@ public enum Refused {
      * one - and it went to the log alone, which left the click looking broken
      * (#245).
      */
-    NO_TEST_CASE_BEHIND_IT(Bundle.message("refused.no.test.case.behind.it")),
+    NO_TEST_CASE_BEHIND_IT(
+            Bundle.message("refused.no.test.case.behind.it")
+    ),
 
     /**
      * UC-EDITOR-PANEL-008, UC-SHARE-006, Rule-EDITOR-PANEL-206, Rule-SHARE-106.
@@ -204,7 +228,9 @@ public enum Refused {
      * refusal is the same either way and a tester importing two hundred rows
      * must not get two hundred balloons.
      */
-    UNREADABLE(Bundle.message("refused.unreadable"));
+    UNREADABLE(
+            Bundle.message("refused.unreadable")
+    );
 
     /**
      * The sentence, with one slot for whatever the tester acted on.

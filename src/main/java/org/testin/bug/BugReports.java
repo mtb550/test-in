@@ -56,9 +56,17 @@ public final class BugReports {
     @Getter
     @AllArgsConstructor
     enum Stage {
-        PREPARING(Bundle.message("bug.preparing")),
-        OPEN(Bundle.message("bug.open")),
-        SENDING(Bundle.message("bug.sending"));
+        PREPARING(
+                Bundle.message("bug.preparing")
+        ),
+
+        OPEN(
+                Bundle.message("bug.open")
+        ),
+
+        SENDING(
+                Bundle.message("bug.sending")
+        );
 
         /**
          * Why Report Bug is off while the report is at this stage.

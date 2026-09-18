@@ -38,20 +38,29 @@ public enum GridEdit {
      * The value reached the test case or the run item, so the edit is confirmed,
      * saved and generated.
      */
-    WROTE(true, false),
+    WROTE(
+            true,
+            false
+    ),
 
     /**
      * Nothing changed: a column that cannot be edited, a row the run does not
      * cover, or a value that came back equal to the one already there. Nothing
      * to save and nothing to say.
      */
-    UNCHANGED(false, false),
+    UNCHANGED(
+            false,
+            false
+    ),
 
     /**
      * The grid would not take the value, and has said so in its own words. There
      * is nothing left to tell the tester.
      */
-    REFUSED(false, true);
+    REFUSED(
+            false,
+            true
+    );
 
     private final boolean written;
     private final boolean said;
