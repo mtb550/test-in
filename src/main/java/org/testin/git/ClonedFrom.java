@@ -75,7 +75,11 @@ public final class ClonedFrom {
             if (url.isEmpty()) return;
 
             config.rememberRepoUrl(url);
-            Logger.info("Recorded where " + projectPath.getFileName() + " is cloned from: " + url);
+
+            // Rule-SHARE-004. Through the redaction every other Git line takes:
+            // the remote is logged as Git hands it over, which is with whatever
+            // account and token it was cloned with (#66, finding 165).
+            Logger.info("Recorded where " + projectPath.getFileName() + " is cloned from: " + GitSafeText.withoutCredentials(url));
         });
     }
 }

@@ -236,12 +236,12 @@ repository drives, so a clone needs no setup. `testin.yaml` is read too;
 |---|---|---|---|
 | `location` | `local` / `remote` | no, defaults `local` | Whether the test data is on this machine or fetched |
 | `connection` | `git` / `sftp` | only when remote | How it is fetched |
-| `RepoUrl` | string | only for `git` | Validated as a repository address |
+| `RepoUrl` | string | only for `git` | Validated as a repository address. Any account and token are dropped as it is read and as it is written: on an `https://` or `http://` address every account goes, because there it is the secret; on an `ssh://` address only `account:secret` goes, so the conventional `git@` survives (Rule-SHARE-004) |
 | `sftpHost` | string | only for `sftp` | Host name or address |
 | `sftpPort` | integer | no, defaults `22` | |
 | `sftpPath` | string | only for `sftp` | The folder on the server holding the projects |
 | `testinProject` | string | yes | Which test project. Read for local, Git and SFTP alike |
-| `bugRepoUrl` | string | only to report bugs | The GitHub repository [Report Bug](viewPanel/reportBug.md) files issues in, as its address: `https://github.com/owner/repo`, `https://host/owner/repo.git`, `ssh://git@host:2222/owner/repo` or `git@host:owner/repo`. Any account and token in it are dropped as it is read. An address that does not name exactly a host, an owner and a repository - one ending in `/issues`, a file or a local path - is kept, and Report Bug refuses to send with the reason |
+| `bugRepoUrl` | string | only to report bugs | The GitHub repository [Report Bug](viewPanel/reportBug.md) files issues in, as its address: `https://github.com/owner/repo`, `https://host/owner/repo.git`, `ssh://git@host:2222/owner/repo` or `git@host:owner/repo`. Any account and token in it are dropped as it is read, by the same rule as `RepoUrl`. An address that does not name exactly a host, an owner and a repository - one ending in `/issues`, a file or a local path - is kept, and Report Bug refuses to send with the reason |
 
 **No machine and no person appears here.** The Testin folder, the tester's
 name, the log level and every password are application settings — see

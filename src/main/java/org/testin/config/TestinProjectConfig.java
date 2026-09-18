@@ -24,6 +24,7 @@ import org.testin.logger.Logger;
 import org.testin.sftp.SftpAddress;
 import org.testin.util.Bundle;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -207,8 +208,17 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
      * as much of a leak as one this plugin wrote.
      * <p>
      * {@code git@github.com} survives. That is the conventional account name for
-     * every SSH clone URL and not a secret; what goes is the {@code user:secret}
-     * form, which is the only one that carries one.
+     * every SSH clone URL and not a secret.
+     * <p>
+     * Rule-SHARE-004. <b>Over HTTP every account goes, colon or
+     * not.</b> The SSH rule was applied to HTTPS too, so only {@code user:secret}
+     * was taken out - and {@code https://<token>@github.com/...}, the form
+     * GitHub's own documentation clones with, has no colon in it. It passed
+     * through into the committed file, and into the history of everyone who
+     * cloned it, with no gesture at all: drawing the tree records the remote
+     * (#66, finding 164). An HTTPS account has no conventional name that is not
+     * a secret, and the credential helper asks for whatever it needs, so taking
+     * it out costs nothing.
      */
     static @NotNull String withoutCredentials(final @NotNull String url) {
         final int scheme = url.indexOf("://");
@@ -219,7 +229,11 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
         final @NotNull String authority = end < 0 ? url.substring(start) : url.substring(start, end);
 
         final int at = authority.lastIndexOf('@');
-        if (at < 0 || authority.lastIndexOf(':', at) < 0) return url;
+        if (at < 0) return url;
+
+        final @NotNull String protocol = url.substring(0, scheme).toLowerCase(Locale.ROOT);
+        final boolean overHttp = protocol.equals("https") || protocol.equals("http");
+        if (!overHttp && authority.lastIndexOf(':', at) < 0) return url;
 
         return url.substring(0, start) + authority.substring(at + 1) + (end < 0 ? "" : url.substring(end));
     }

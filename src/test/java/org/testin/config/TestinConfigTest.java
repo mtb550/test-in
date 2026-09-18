@@ -480,6 +480,19 @@ public class TestinConfigTest {
     /**
      * The account every SSH clone URL carries is not a secret and stays.
      */
+    /**
+     * Rule-SHARE-004. The form GitHub documents for cloning with a token: the
+     * token is the whole user part, with no colon. It passed through into the
+     * committed file (#66, finding 164).
+     */
+    @Test
+    public void aTokenWithNoColonIsStrippedOutOfAnHttpsUrl() {
+        assertEquals(TestinProjectConfig.withoutCredentials("https://ghp_secret@github.com/mtb550/test-01.git"),
+                "https://github.com/mtb550/test-01.git");
+        assertEquals(TestinProjectConfig.withoutCredentials("HTTP://ghp_secret@intranet/qa/cases.git"),
+                "HTTP://intranet/qa/cases.git");
+    }
+
     @Test
     public void anSshAccountSurvives() {
         assertEquals(TestinProjectConfig.withoutCredentials("git@github.com:mtb550/test-01.git"),
