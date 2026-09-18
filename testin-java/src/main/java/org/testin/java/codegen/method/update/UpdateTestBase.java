@@ -195,16 +195,24 @@ public class UpdateTestBase {
     }
 
     /**
-     * The class a case generates into, resolved from its own path.
+     * UC-CODEGEN-002, Rule-CODEGEN-014.
+     * <p>
+     * The class a case generates into: its test set's.
+     * <p>
+     * Asked of the set, not of the case. It was worked out from the case's
+     * method name with the method taken off the end, and a case with no
+     * description names no method - so the answer was empty. Three callers ask
+     * with the first case of a set, and one description-less case sitting first
+     * switched off the order sweep, the undo's rewrite and a copy's body for
+     * every case in that set: cards dragged into a new order while the run kept
+     * the old one (#66, finding 193). A case with no description is a thing
+     * Rule-CODEGEN-021 supports, so its set must not depend on it.
      */
     protected static @NotNull Optional<PsiClass> classOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
-        if (fqcn.size() < 2) return Optional.empty();
-
         // Through the one resolver, because an updater asking for a class it can
         // already see and a generator asking for one it may have to write are the
         // same question with two answers, and they used to be two lookups.
-        return GeneratedClass.find(p, fqcn.subList(0, fqcn.size() - 1));
+        return GeneratedClass.find(p, Fqcn.ofClass(tc.getParent()));
     }
 
     /**
