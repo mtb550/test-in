@@ -36,6 +36,7 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
+import java.util.function.Supplier;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -312,7 +313,13 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             notifier.warnWithAction(p, Bundle.message("git.not.pushed.title"),
                     waiting,
                     Bundle.message("git.push.action"),
-                    () -> pushToRemote(path, commits.headCommitId(path), currentBranch));
+                    // Rule-SHARE-005. The commit is read inside the push's own
+                    // background task: a notification's action runs on the EDT,
+                    // and reading it here ran git rev-parse there - the IDE froze
+                    // for the length of the command, beside Git calls in this
+                    // class that are all moved off the EDT with comments saying
+                    // why (#66, finding 182).
+                    () -> pushToRemote(path, () -> commits.headCommitId(path), currentBranch));
         }
 
         // UC-SHARE-013, Rule-SHARE-059
@@ -333,7 +340,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
                         ApplicationManager.getApplication().invokeLater(() -> {
                             if (push) {
-                                pushToRemote(repoPath, commitId, branch);
+                                pushToRemote(repoPath, () -> commitId, branch);
                                 return;
                             }
 
@@ -377,9 +384,10 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
          *                    default would send the work somewhere the tester did
          *                    not choose
          */
-        private void pushToRemote(final @NotNull Path repoPath, final @NotNull String commitId, final @NotNull String committedOn) {
+        private void pushToRemote(final @NotNull Path repoPath, final @NotNull Supplier<@NotNull String> commitToPush, final @NotNull String committedOn) {
             GitBackgroundTask.run(p, Bundle.message("git.task.checking.remote"), false,
                     indicator -> {
+                        final @NotNull String commitId = commitToPush.get();
                         final @NotNull String remoteName = git.getRemoteName(repoPath);
                         final @NotNull String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
                         final @NotNull String branch = committedOn.isBlank() ? git.syncBranch(repoPath) : committedOn;
@@ -396,7 +404,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                             }
                         });
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.read.remote", ex.getMessage())));
+                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.read.remote", FailureText.of(ex))));
         }
 
         // UC-SHARE-013, Rule-SHARE-060
@@ -475,7 +483,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         // with the failure that needs it.
                         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
                         notifier.errorWithActions(p, Bundle.message("git.push.failed.title"), FailureText.of(ex),
-                                notifier.action(Bundle.message("git.try.again"), () -> pushToRemote(repoPath, commitId, branch)));
+                                notifier.action(Bundle.message("git.try.again"), () -> pushToRemote(repoPath, () -> commitId, branch)));
                     });
         }
 
