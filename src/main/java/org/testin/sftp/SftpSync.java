@@ -226,22 +226,41 @@ public final class SftpSync {
         final @NotNull Map<String, String> agreed = withoutGit(against.contents());
         final @NotNull Map<String, byte[]> incoming = new TreeMap<>();
 
-        transfer(transport, indicator, plan, local, onServer, agreed, incoming);
+        final @NotNull List<Unsettled> unsettled = new ArrayList<>();
 
-        // After the transfer, so a case both sides changed is settled
-        // against what the server actually holds rather than against what
-        // it held before this sync moved anything.
-        final @NotNull List<Unsettled> unsettled =
-                settle(transport, mapper, indicator, plan, local, onServer, agreed, incoming);
+        try {
+            transfer(transport, indicator, plan, local, onServer, agreed, incoming);
 
-        if (!incoming.isEmpty()) {
-            indicator.setText(Bundle.message("sftp.progress.writing", String.valueOf(incoming.size())));
-            forgetWhatDidNotLand(agreed, withoutGit(against.contents()), indexer.acceptIncoming(projectRoot, incoming));
+            // After the transfer, so a case both sides changed is settled
+            // against what the server actually holds rather than against what
+            // it held before this sync moved anything.
+            unsettled.addAll(settle(transport, mapper, indicator, plan, local, onServer, agreed, incoming));
+        } finally {
+            // Rule-SHARE-117. Whatever moved is recorded, even when the sync was
+            // canceled or the connection dropped part way - the answers pass
+            // below has done this since #312 A33, and this pass never did. The
+            // records are updated file by file as each one lands, so they
+            // describe exactly what moved however far down the list it got.
+            // Recorded only at the end, a canceled first sync left the server
+            // holding files its own manifest did not list, and the next sync
+            // from another machine took that manifest as the truth: it did not
+            // fetch what had landed, and uploaded its own older copy over it
+            // when that tester next edited the file (#66, finding 166).
+            //
+            // In the same order as the answers pass, and for the same reasons:
+            // this machine first, because it cannot fail on the network; then
+            // the manifest; then the baseline, because a baseline calling a file
+            // agreed while the server's own record does not list it reads as a
+            // file the server deleted.
+            if (!incoming.isEmpty()) {
+                indicator.setText(Bundle.message("sftp.progress.writing", String.valueOf(incoming.size())));
+                forgetWhatDidNotLand(agreed, withoutGit(against.contents()), indexer.acceptIncoming(projectRoot, incoming));
+            }
+
+            indicator.setText(Bundle.message("sftp.progress.recording"));
+            writeManifest(transport, mapper, new Manifest(onServer));
+            recordAgreed(p, mapper, baselineFile, agreed);
         }
-
-        indicator.setText(Bundle.message("sftp.progress.recording"));
-        writeManifest(transport, mapper, new Manifest(onServer));
-        recordAgreed(p, mapper, baselineFile, agreed);
 
         final @NotNull Outcome outcome = plan.outcome(unsettled);
         Logger.info("Synced " + projectRoot.getFileName() + " with " + address.display() + ": "

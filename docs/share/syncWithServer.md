@@ -53,6 +53,11 @@ There is no key for this. The menu entry is **Sync With SFTP**.
   agrees with the server, a notification that stays says so, and that the next
   sync will ask about every file that differs. The files that moved are not
   moved back.
+- **Rule-SHARE-117** — What moved is recorded even when the sync stops part way,
+  whether it was canceled or the connection dropped. This machine's copy first,
+  then the server's record, then this machine's record of what the two agree,
+  each describing exactly the files that moved. A sync stopped halfway leaves
+  nothing the next one misreads.
 
 ## The screen
 
