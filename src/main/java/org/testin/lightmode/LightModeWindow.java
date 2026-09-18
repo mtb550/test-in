@@ -19,7 +19,7 @@ package org.testin.lightmode;
 import org.testin.editor.run.ExecutionControl;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.WriteIntentReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.Disposer;
@@ -802,19 +802,23 @@ final class LightModeWindow {
      * across the places that trigger them, a window could show the form over
      * the details, or Escape's hint while Escape meant something else.
      */
+    // The platform marks WriteIntentReadAction experimental, and it is what the
+    // action system itself takes before dispatching - see AbstractIconButton.
+    @SuppressWarnings("UnstableApiUsage")
     private void showCapture() {
         underCase.removeAll();
 
-        // In a read action, because the failure form holds a spell-checked field
-        // and that field is an editor: an editor builds itself when it is added
-        // to a window that is showing, and the spell checking customization
-        // restarts the code analyzer, which reads the document. The platform
-        // requires a read action for that read. A dialog is handed one by
-        // DialogWrapper, which is why the same form raises nothing from the run
-        // editor; this window is built by hand and is handed nothing, so
-        // pressing F here wrote an IDE error report naming Testin as the plugin
-        // to blame, twice per press (#312, N22).
-        ApplicationManager.getApplication().runReadAction(() -> underCase.add(capture.map(form -> (JComponent) form).orElse(details), BorderLayout.CENTER));
+        // Under the write-intent lock, because the failure form holds a
+        // spell-checked field and that field is an editor: an editor builds
+        // itself when it is added to a window that is showing. The spell
+        // checking restarts the code analyzer, which reads the document, and
+        // the editor sets up its highlighter, which needs the write-intent lock.
+        // A dialog is handed that lock; this window is built by hand and is
+        // handed nothing. With no lock, F wrote an IDE error report naming
+        // Testin (#312, N22). A read action was the fix for that, and the
+        // platform refuses the highlighter's lock inside one, so F threw and
+        // the form never showed. The write-intent lock covers both.
+        WriteIntentReadAction.run(() -> underCase.add(capture.map(form -> (JComponent) form).orElse(details), BorderLayout.CENTER));
 
         statusBar.updateItems(capture.isPresent() ? commitKeys() : caseKeys());
 
