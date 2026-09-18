@@ -130,12 +130,17 @@ public class UpdateTestCaseAction extends DumbAwareAction {
             final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(selectedItems);
             final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, path, ids);
 
-            open.accept(new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> {
+            // The writes and the snapshot after them on a pooled thread, the way
+            // a grid edit makes them. On the EDT a bulk edit over forty cases
+            // did forty serialize-compare-write cycles and a forty-case snapshot
+            // before the key returned (#66, finding 224).
+            open.accept(new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
 
                 final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                int written = 0;
+                int counted = 0;
                 for (final TestCaseDto tc : updatedItems)
-                    if (indexer.putTestCase(path, tc)) written++;
+                    if (indexer.putTestCase(path, tc)) counted++;
+                final int written = counted;
 
                 // A save that changed nothing is not an update. Nothing was stamped
                 // and nothing was written, so there is nothing to confirm, nothing
@@ -149,25 +154,25 @@ public class UpdateTestCaseAction extends DumbAwareAction {
                 // presses of CTRL+Z to take back (#165).
                 TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.update"), updatedItems), before, TestCaseSnapshot.of(p, path, ids));
 
-                // Reordering says Re-sorted whichever way it was done. Dragging a
-                // card already said it and typing a position said Updated, so the
-                // same act had two words depending on the gesture (#210).
-                //
-                // Rule-EDITOR-PANEL-008: counted, so a bulk edit over thirty cases
-                // says how many it wrote rather than a bare Updated (#312, A86).
-                Services.getInstance(p, Notifier.class).softShowCounted(p,
-                        gt == GenType.UPDATE_TEST_CASE_ORDER ? Done.RE_SORTED : Done.UPDATED, written);
-
-                if (editor instanceof Toolbar)
-                    ((Toolbar) editor).onToolBarFilterSelectionChanged();
-
                 ApplicationManager.getApplication().invokeLater(() -> {
+                    // Reordering says Re-sorted whichever way it was done. Dragging a
+                    // card already said it and typing a position said Updated, so the
+                    // same act had two words depending on the gesture (#210).
+                    //
+                    // Rule-EDITOR-PANEL-008: counted, so a bulk edit over thirty cases
+                    // says how many it wrote rather than a bare Updated (#312, A86).
+                    Services.getInstance(p, Notifier.class).softShowCounted(p,
+                            gt == GenType.UPDATE_TEST_CASE_ORDER ? Done.RE_SORTED : Done.UPDATED, written);
+
+                    if (editor instanceof Toolbar)
+                        ((Toolbar) editor).onToolBarFilterSelectionChanged();
+
                     // Ordered rather than repainted: the Order field writes a rank,
                     // which moves the case and renumbers every card after it.
                     editor.refreshOrdered();
                     TestCaseUpdateMenuDialog.applyAftermath(p, updatedItems, gt);
                 });
-            }));
+            })));
         }
     }
 }

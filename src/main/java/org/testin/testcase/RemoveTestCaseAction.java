@@ -16,6 +16,7 @@
 
 package org.testin.testcase;
 
+import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -103,11 +104,6 @@ public class RemoveTestCaseAction extends DumbAwareAction {
 
         // UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-064
         private void performDeletion(final @NotNull List<TestCaseDto> selectedItems) {
-            // The whole case, before it goes: its content, its id and its rank, which
-            // is what puts it back where it was rather than at the end of the set.
-            final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(selectedItems);
-            final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, dir.getPath(), ids);
-
             // Nothing is relinked. A case carries its own position, so removing one
             // leaves a gap in the ranks and no case anywhere pointing at it - which
             // used to be a walk over the whole set rewriting the survivors on either
@@ -125,24 +121,40 @@ public class RemoveTestCaseAction extends DumbAwareAction {
             // move that can never land.
             Services.getInstance(p, CutState.class).clear();
 
-            final var indexer = Services.getInstance(p, org.testin.indexer.ProjectIndexer.class);
-            for (final TestCaseDto tc : selectedItems) {
-                indexer.removeTestCase(dir.getPath(), tc.getId());
-            }
+            // The files, and the snapshots either side of them, on a pooled thread,
+            // the way a grid edit writes. On the EDT, removing forty cases did
+            // forty deletes - each through the recycle bin - and two forty-case
+            // snapshots before the key returned (#66, finding 224).
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                // The whole case, before it goes: its content, its id and its
+                // rank, which is what puts it back where it was rather than at
+                // the end of the set. Read from the index, which the editor's
+                // list above does not change.
+                final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(selectedItems);
+                final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, dir.getPath(), ids);
 
-            // One call for the whole selection. Only executeAll opens the single
-            // write command, so removing forty cases a case at a time was forty
-            // entries on the IDE's own undo history - the defect the batching in
-            // #153 was written to fix (#66, finding 80).
-            GenType.REMOVE_TEST_CASE.executeAll(p, selectedItems);
+                final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                for (final TestCaseDto tc : selectedItems) {
+                    indexer.removeTestCase(dir.getPath(), tc.getId());
+                }
 
-            // Redrawn from the master list rather than by taking rows out of the
-            // page's model, which a declared action has no way to reach. It is also
-            // the more honest redraw: a page of fifty that loses three refills from
-            // the next page instead of standing at forty-seven.
-            editor.refreshView();
+                TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.remove"), selectedItems), before, TestCaseSnapshot.of(p, dir.getPath(), ids));
 
-            TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.remove"), selectedItems), before, TestCaseSnapshot.of(p, dir.getPath(), ids));
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    // One call for the whole selection. Only executeAll opens the
+                    // single write command, so removing forty cases a case at a time
+                    // was forty entries on the IDE's own undo history - the defect
+                    // the batching in #153 was written to fix (#66, finding 80).
+                    GenType.REMOVE_TEST_CASE.executeAll(p, selectedItems);
+
+                    // Redrawn from the master list rather than by taking rows out
+                    // of the page's model, which a declared action has no way to
+                    // reach. It is also the more honest redraw: a page of fifty that
+                    // loses three refills from the next page instead of standing at
+                    // forty-seven.
+                    editor.refreshView();
+                });
+            });
         }
 
 
