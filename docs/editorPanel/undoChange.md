@@ -46,6 +46,10 @@ touched.
   test method written again.
 - **Rule-EDITOR-PANEL-070** — A gesture that changed nothing is not on the
   history at all.
+- **Rule-EDITOR-PANEL-228** — A test case moved from one test set to another is
+  present only in the set it is in now. So a cut and paste taken back with
+  Ctrl+Z comes back with Ctrl+Y, and only a change somebody else really made is
+  refused as one.
 
 ## What the tester sees
 

@@ -61,12 +61,24 @@ import java.util.UUID;
 public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @NotNull List<TestCaseDto> present, @NotNull List<UUID> absent) {
 
     /**
-     * How these ids stand in the index right now.
+     * UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-228.
+     * <p>
+     * How these ids stand in this test set right now.
      * <p>
      * Called twice around a change - once before, once after - and the pair is
-     * the operation. An id the index has no case for lands in {@code absent},
-     * which is what a case that has not been created yet, or has just been
-     * removed, looks like.
+     * the operation. An id this set holds no case for lands in {@code absent},
+     * which is what a case that has not been created yet, has just been
+     * removed, or has just been moved out looks like.
+     * <p>
+     * <b>In this set, not anywhere.</b> Cases were looked up by id across the
+     * whole project, so a case that had moved to another set still counted as
+     * present here. A cut-and-paste records the destination as "absent here"
+     * before the paste, and once Ctrl+Z had put the case back in its source
+     * set it existed again - so that snapshot could never stand, and Ctrl+Y
+     * refused with "These test cases changed since" and blamed a sync, a pull or
+     * another IDE for a change nobody had made (#66, finding 178). The source's
+     * after-snapshot was wrong the same way: it recorded the moved case as still
+     * present in the set it had left.
      */
     public static @NotNull TestCaseSnapshot of(final @NotNull Project p, final @NotNull Path testSetPath, final @NotNull List<UUID> ids) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -74,7 +86,9 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         final @NotNull List<UUID> absent = new ArrayList<>();
 
         for (final UUID id : ids)
-            indexer.findTestCase(id).ifPresentOrElse(tc -> present.add(copy(p, tc)), () -> absent.add(id));
+            indexer.findTestCase(id)
+                    .filter(tc -> tc.getParent().getPath().equals(testSetPath))
+                    .ifPresentOrElse(tc -> present.add(copy(p, tc)), () -> absent.add(id));
 
         return new TestCaseSnapshot(p, testSetPath, present, absent);
     }
