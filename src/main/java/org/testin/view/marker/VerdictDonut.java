@@ -267,9 +267,14 @@ public final class VerdictDonut implements DialogComponent {
          * The empty ring underneath, which is all a run with nothing recorded
          * leaves showing: the shape stays, so there is something to read the
          * hole against.
+         * <p>
+         * The platform's own track, the empty part of a progress bar. It was the
+         * panel's background made darker, which in the dark theme moves towards
+         * black - away from the foreground - so the ring the rate is read against
+         * was far fainter in dark than in light (#66, finding 260).
          */
         private void paintTrack(final @NotNull Graphics2D g2, final double inset, final double diameter) {
-            g2.setColor(UIUtil.getPanelBackground().darker());
+            g2.setColor(JBUI.CurrentTheme.ProgressBar.TRACK);
             g2.draw(new Arc2D.Double(inset, inset, diameter, diameter, 0, 360, Arc2D.OPEN));
         }
 
