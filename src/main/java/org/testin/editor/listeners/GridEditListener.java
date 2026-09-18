@@ -16,6 +16,7 @@
 
 package org.testin.editor.listeners;
 
+import org.testin.undo.UndoScope;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import com.intellij.openapi.application.ApplicationManager;
@@ -33,8 +34,15 @@ import org.testin.util.Bundle;
 
 import javax.swing.table.DefaultTableModel;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Writes a test grid edit into the test case, and regenerates the automation
@@ -52,6 +60,17 @@ public class GridEditListener extends AbstractGridEditListener {
      * The test set this grid belongs to; the grid never mixes test sets.
      */
     private final @NotNull Path testSetPath;
+
+    /**
+     * The test cases this gesture has changed, each with what it held before the
+     * first of its cells changed and the generators its changed fields need.
+     * Empty between gestures: the first cell schedules the save, and the rest of
+     * the gesture adds itself to it - on the EDT, like every cell edit.
+     */
+    private final @NotNull Map<UUID, Changed> changedThisGesture = new LinkedHashMap<>();
+
+    private record Changed(@NotNull TestCaseDto tc, @NotNull TestCaseSnapshot before, @NotNull Set<GenType> generators) {
+    }
 
     public GridEditListener(final @NotNull Project p, final @NotNull List<TestCaseDto> pageItems, final @NotNull Runnable onEdited, final @NotNull Path testSetPath) {
         super(p, pageItems);
@@ -75,8 +94,12 @@ public class GridEditListener extends AbstractGridEditListener {
         if (!attr.can(Can.EDIT)) return GridEdit.UNCHANGED;
 
         // Taken first of all: the setter below writes into the DTO the index is
-        // holding, so a snapshot after it would be a snapshot of the edit.
-        final @NotNull TestCaseSnapshot undoFrom = TestCaseSnapshot.of(p, testSetPath, List.of(tc.getId()));
+        // holding, so a snapshot after it would be a snapshot of the edit. Only
+        // for the first cell of this case in a gesture - for the rest, the case
+        // as it was is the snapshot already held.
+        final @NotNull TestCaseSnapshot undoFrom = Optional.ofNullable(changedThisGesture.get(tc.getId()))
+                .map(Changed::before)
+                .orElseGet(() -> TestCaseSnapshot.of(p, testSetPath, List.of(tc.getId())));
 
         final @NotNull String typed = String.valueOf(model.getValueAt(row, col));
 
@@ -119,9 +142,8 @@ public class GridEditListener extends AbstractGridEditListener {
     /**
      * UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-053.
      * <p>
-     * Same behavior as the update dialog: write the test case JSON and update the
-     * generated automation code for the edited attribute. Runs off the EDT — the
-     * code generators schedule their own write command actions.
+     * Adds this cell's case to the gesture's save, which the first cell of the
+     * gesture schedules.
      */
     private void persistAndGenerate(final @NotNull TestCaseDto tc, final @NotNull TestEditorAttributes attr, final @NotNull TestCaseSnapshot undoFrom) {
         if (testSetPath.toString().isEmpty()) {
@@ -129,18 +151,55 @@ public class GridEditListener extends AbstractGridEditListener {
             return;
         }
 
-        final @NotNull GenType generator = attr.getGenType();
+        final boolean first = changedThisGesture.isEmpty();
+        changedThisGesture.computeIfAbsent(tc.getId(), id -> new Changed(tc, undoFrom, new LinkedHashSet<>()))
+                .generators().add(attr.getGenType());
+
+        // After the gesture's last cell, which is in this same event on the EDT.
+        if (first) ApplicationManager.getApplication().invokeLater(this::saveTheGesture);
+    }
+
+    /**
+     * UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-053, Rule-EDITOR-PANEL-038.
+     * <p>
+     * Same behavior as the update dialog: write each test case the gesture
+     * changed, update the generated code for the fields that changed, and put
+     * the whole gesture on the undo history as one step. Off the EDT - the code
+     * generators schedule their own write commands.
+     * <p>
+     * <b>Once per test case, not once per cell.</b> A cut or paste across a row
+     * sets every cell in turn, and each cell used to be its own save and its own
+     * undo entry. Ctrl+Z then took back one field, and the next press refused
+     * with "These test cases changed since": each entry's after-snapshot was the
+     * whole case, audit stamp included, and the other cells' saves had moved it
+     * on - so the rest of the tester's text was on disk nowhere and in the undo
+     * history unreachably (#66, finding 171).
+     */
+    private void saveTheGesture() {
+        final @NotNull List<Changed> gesture = List.copyOf(changedThisGesture.values());
+        changedThisGesture.clear();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            // Only what reached disk is regenerated and put on the undo history.
-            // A refused write was said by the writer, and a code change or an
-            // undo entry for it would describe an edit that did not happen (#66,
-            // finding 163).
-            if (!Services.getInstance(p, ProjectIndexer.class).putTestCase(testSetPath, tc)) return;
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull List<TestCaseDto> written = new ArrayList<>();
+            final @NotNull List<TestCaseSnapshot> before = new ArrayList<>();
 
-            generator.getAction().execute(p, tc);
+            for (final Changed changed : gesture) {
+                // Only what reached disk is regenerated and put on the undo
+                // history. A refused write was said by the writer, and a code
+                // change or an undo entry for it would describe an edit that did
+                // not happen (#66, finding 163).
+                if (!indexer.putTestCase(testSetPath, changed.tc())) continue;
 
-            TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.edit"), List.of(tc)), undoFrom, TestCaseSnapshot.of(p, testSetPath, List.of(tc.getId())));
+                changed.generators().forEach(generator -> generator.getAction().execute(p, changed.tc()));
+                written.add(changed.tc());
+                before.add(changed.before());
+            }
+
+            if (written.isEmpty()) return;
+
+            TestCaseSnapshot.record(p, UndoScope.of(testSetPath), TestCaseSnapshot.describe(Bundle.message("snapshot.verb.edit"), written),
+                    before, List.of(TestCaseSnapshot.of(p, testSetPath, TestCaseSnapshot.idsOf(written))));
         });
     }
 }

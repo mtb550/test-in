@@ -43,14 +43,20 @@ Inside the grid these three keys act on cells, not on whole test cases.
   cell. A block is laid from the top left cell.
 - **Rule-EDITOR-PANEL-089** — A cell that cannot be typed into is skipped, for
   both cut and paste.
+- **Rule-EDITOR-PANEL-226** — A cut or a paste over cells is one change, however
+  many cells it touches. Each test case it changed is saved once, one message
+  counts those test cases, and Ctrl+Z takes the whole of it back in one press.
 
 ## What the tester sees
 
 This opens no screen. A copy changes nothing on screen at all. A cut empties the
 cells it took, and a paste draws them with their new values.
 
-A cut and a paste raise one small message for every cell they change. Each one
-appears at the bottom of the IDE, reads *Updated*, and fades.
+A cut or a paste raises one small message at the bottom of the IDE, which fades.
+It reads *Updated*, with the number of test cases the gesture changed after it -
+*Updated 3* for a block across three rows, *Updated* for a whole row of one test
+case. It is one step to undo: `Ctrl+Z` puts back every cell it changed
+(Rule-EDITOR-PANEL-226).
 
 ## Main flow
 
@@ -73,13 +79,6 @@ for a paste.
 
 **If the block on the clipboard is bigger than the grid** — it is laid down as
 far as the last row and the last column. The rest is dropped.
-
-## Where the plugin breaks its own rules
-
-**Every cell raises its own message.** Pasting a block of 20 cells raises 20
-messages reading *Updated*. `Ctrl+X` over a block does the same. Every other
-gesture in Testin raises one message with a count. That is difference 6 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-writing-test-cases).
 
 ## These keys are the grid's
 

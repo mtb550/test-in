@@ -28,6 +28,9 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.List;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -63,10 +66,10 @@ public abstract class AbstractGridEditListener implements TableModelListener {
     private final @NotNull List<TestCaseDto> pageItems;
 
     /**
-     * How many cells this gesture has written, while the message it will be
-     * confirmed with is still waiting to be shown. Zero between gestures.
+     * The test cases this gesture has written, while the message it will be
+     * confirmed with is still waiting to be shown. Empty between gestures.
      */
-    private int writtenThisGesture;
+    private final @NotNull Set<UUID> writtenThisGesture = new HashSet<>();
 
     /**
      * True while this listener is writing the stored value back into the cell it
@@ -119,7 +122,7 @@ public abstract class AbstractGridEditListener implements TableModelListener {
 
             if (!outcome.isWritten()) return;
 
-            confirmEdit();
+            confirmEdit(edited);
 
             // Beside the confirmation, and for the same reason: the details panel
             // keeps its own copy of the case, so a cell edited under an open
@@ -167,13 +170,19 @@ public abstract class AbstractGridEditListener implements TableModelListener {
      * one event on the EDT, so the first schedules the message and the rest only
      * add themselves to it: the count is complete by the time it is read, and a
      * gesture nobody has written yet is coalesced without knowing this exists.
+     * <p>
+     * Test cases, not cells. The rule is a count of test cases, and a row cut
+     * across its seventeen editable columns read "Updated 17" for one test case
+     * (#66, finding 171).
      */
-    private void confirmEdit() {
-        if (writtenThisGesture++ > 0) return;
+    private void confirmEdit(final @NotNull TestCaseDto edited) {
+        final boolean first = writtenThisGesture.isEmpty();
+        writtenThisGesture.add(edited.getId());
+        if (!first) return;
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            final int written = writtenThisGesture;
-            writtenThisGesture = 0;
+            final int written = writtenThisGesture.size();
+            writtenThisGesture.clear();
 
             Services.getInstance(p, Notifier.class).softShowCounted(p, Done.UPDATED, written);
         });

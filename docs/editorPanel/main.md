@@ -9,7 +9,7 @@ in a tab. It is where test cases are written, and where a test run is executed.
 |---|---|
 | **Part of Testin** | The editor panel |
 | **Answers** | What a tester can do to test cases and to a test run, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-225` |
+| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-226` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `a53922a1`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-EDITOR-PANEL-011](removeTestCases.md) and [UC-EDITOR-PANEL-045](writeResultAnalysis.md) were read from the code again |
 | **Written to** | [How a document is written](../standard.md) |
@@ -257,7 +257,7 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 6** | Rule-EDITOR-PANEL-008 — one message with a count | Fixed. Pasting or cutting a block raises one message with the number of cells written. The writes of one gesture all happen in one event, so they are counted together without the clipboard actions having to know about it. |
+| **Difference 6** | Rule-EDITOR-PANEL-008 — one message with a count | Fixed. Pasting or cutting a block raises one message, counting the test cases it changed rather than the cells - a row cut across its columns read *Updated 17* for one test case until #66 finding 171. The writes of one gesture all happen in one event, so they are counted together, and saved and undone together (Rule-EDITOR-PANEL-226), without the clipboard actions having to know about it. |
 | **Difference 7** | Rule-EDITOR-PANEL-005 — what the tester typed is stored | A description typed into a grid cell loses characters Testin will not keep. If nothing else changed, nothing is saved and nothing is said, and the tester watches their text change. |
 | **Difference 9** | Rule-EDITOR-PANEL-005 — a key works the same on every machine | `Ctrl+M` is not made into `Cmd+M` on a Mac, though `Ctrl+C` and `Ctrl+F` are. The empty editor's second line reads *Press Ctrl+M to add* whatever machine it is on. |
 
