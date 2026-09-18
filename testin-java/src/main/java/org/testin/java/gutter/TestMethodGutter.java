@@ -101,10 +101,11 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
     /**
      * The generated method the mark sits on, for the sentence a refusal needs.
      * Read on the click rather than kept, because a marker outlives several edits
-     * of the method around it.
+     * of the method around it. Said without a name, in the tester's language,
+     * when the mark is not inside one (#66, finding 290).
      */
     private static @NotNull String methodName(final @NotNull PsiElement element) {
-        return Optional.ofNullable(PsiTreeUtil.getParentOfType(element, PsiMethod.class)).map(PsiMethod::getName).orElse("This method");
+        return Optional.ofNullable(PsiTreeUtil.getParentOfType(element, PsiMethod.class)).map(PsiMethod::getName).orElseGet(() -> Bundle.message("gutter.this.method"));
     }
 
     // UC-CODEGEN-007, Rule-CODEGEN-030, Rule-CODEGEN-069
