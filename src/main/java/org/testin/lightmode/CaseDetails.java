@@ -22,6 +22,8 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Badges;
+import org.testin.ui.Caption;
+import org.testin.ui.FontSync;
 import org.testin.ui.framework.Prose;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
@@ -30,7 +32,6 @@ import org.testin.util.Display;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Locale;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,9 +45,9 @@ import java.util.Optional;
  * value is given any - and it sets that as a minimum, so the window could not
  * be narrow at all. The design asks for 92. What is shared instead is
  * everything that is knowledge rather than layout: the field names come from
- * {@link TestEditorAttributes} - the bare name, since the panel's trailing
- * colon reads wrong under a small-caps label - the step numbering from
- * {@link Display}, and the tags are the plugin's own badges.
+ * {@link TestEditorAttributes}, the caption font from {@link Caption} as every
+ * caption in the plugin has it, the step numbering from {@link Display}, and the
+ * tags are the plugin's own badges.
  * <p>
  * A blank field is not drawn. Most cases fill in two of these four, and a row
  * with a dash after it is a line read on every case to learn nothing.
@@ -223,13 +224,14 @@ class CaseDetails extends JBPanel<CaseDetails> {
         addRow(TAGS, chips);
     }
 
+    // UC-EDITOR-PANEL-046, Rule-INTERNAL-087
     private @NotNull JBLabel label(final @NotNull String text) {
-        // ROOT, not the tester's locale: these are four fixed English field
-        // names, and a Turkish machine would render "Conditions" with a dotted
-        // capital I.
-        final @NotNull JBLabel label = new JBLabel(text.toUpperCase(Locale.ROOT));
-        label.setFont(CaseFont.zoomed(CaseFont.label(), zoom));
-        label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+        // The caption font every caption in the plugin is set in, sized from the
+        // editor font as the case's own text is, then at this window's zoom. It
+        // was its own small capitals in the UI font, the one caption look that
+        // had no owner but this method (#328).
+        final @NotNull JBLabel label = Caption.of(text, FontSync.getBaseFontSize());
+        label.setFont(CaseFont.zoomed(label.getFont(), zoom));
 
         final @NotNull Dimension size = new Dimension(Math.round(JBUI.scale(LABEL_WIDTH) * zoom), label.getPreferredSize().height);
         label.setPreferredSize(size);

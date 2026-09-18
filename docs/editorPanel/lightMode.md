@@ -511,7 +511,9 @@ base size.
 
 - the description is three points larger, and bold
 - the expected result and every detail are the base size
-- labels and the test set name are two points smaller
+- labels and the test set name are two points smaller. The labels beside the
+  details, and the captions on the failure form, are set in the caption font,
+  JetBrains Mono in capitals, as every caption in Testin is (Rule-INTERNAL-087)
 
 No text ever goes below 8 points, which is where the rest of the plugin stops
 too. One number moves, and everything moves together. So the layout cannot come
