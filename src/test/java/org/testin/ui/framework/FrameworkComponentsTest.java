@@ -269,4 +269,25 @@ public class FrameworkComponentsTest {
         assertEquals(entry.getName(), "Confirm");
         assertFalse(entry.getShortcutText().isBlank(), "the keystroke must render as text");
     }
+
+    /**
+     * Rule-INTERNAL-085.
+     * <p>
+     * Enter in a choice box is the list's only while the list is open, and still
+     * so after the box is given a new text field - which a theme change does.
+     * The binding used to go with the old field, and Enter stopped reaching the
+     * dialog (#66, finding 287).
+     */
+    @Test
+    public void aChoiceBoxGivenANewTextFieldStillLeavesEnterToTheDialog() {
+        final ChoiceInput choice = ComponentDialogBase.choice("Branch", List.of("main", "release"), "main").getComponent();
+        final JComboBox<?> combo = (JComboBox<?>) choice.getFocusComponent();
+
+        combo.setEditor(new javax.swing.plaf.basic.BasicComboBoxEditor());
+
+        final JComponent field = (JComponent) combo.getEditor().getEditorComponent();
+        final Object key = field.getInputMap().get(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0));
+        assertFalse(field.getActionMap().get(key).isEnabled(),
+                "with the list closed, the new field kept Enter from the dialog");
+    }
 }

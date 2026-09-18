@@ -63,6 +63,12 @@ public final class ChoiceInput implements DialogComponent {
         panel.add(combo, BorderLayout.CENTER);
 
         enterPicksOnlyFromTheOpenList();
+
+        // Again whenever the combo is given a new text field. A theme change
+        // does that - the look and feel installs an editor of its own - and a
+        // binding put on the old field went with it, so after switching themes
+        // Enter in the box stopped reaching the dialog (#66, finding 287).
+        combo.addPropertyChangeListener("editor", changed -> enterPicksOnlyFromTheOpenList());
     }
 
     /**
@@ -85,6 +91,11 @@ public final class ChoiceInput implements DialogComponent {
         if (!(combo.getEditor().getEditorComponent() instanceof JComponent field)) return;
 
         final @NotNull KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+
+        // Once per field: taken again from a field that already has it, the pick
+        // would be this action calling itself.
+        if (PICK.equals(field.getInputMap().get(enter))) return;
+
         final @NotNull Optional<Action> pick = Optional.ofNullable(field.getInputMap().get(enter)).map(key -> field.getActionMap().get(key));
         if (pick.isEmpty()) return;
 
