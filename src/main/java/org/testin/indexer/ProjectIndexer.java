@@ -48,6 +48,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -992,15 +993,18 @@ public final class ProjectIndexer {
      * the downloaded cases stayed invisible until a manual refresh (#118) - the
      * mirror {@link #removeIncoming} always scanned.
      */
-    public void acceptIncoming(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
-        syncFiles.accept(projectPath, files);
+    public @NotNull Set<String> acceptIncoming(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
+        final @NotNull Map<String, Future<Boolean>> writes = syncFiles.accept(projectPath, files);
 
         // A run's incoming files went through the run writer's queue; the scan
         // reads them once they have landed rather than racing them (#66,
-        // finding 121).
+        // finding 121). Every write has answered by then, so which of them did
+        // not land is read afterwards rather than waited for.
         runWriter.awaitQueued();
 
+        final @NotNull Set<String> notWritten = SyncFiles.notLanded(projectPath, writes);
         scanSingleProject(projectPath);
+        return notWritten;
     }
 
     /**

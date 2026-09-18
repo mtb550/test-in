@@ -37,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -167,7 +168,7 @@ public final class SftpSync {
             if (heldBy.isPresent()) return Outcome.blocked(heldBy.get());
 
             try {
-                return inside(projectRoot, address, indicator, transport, indexer, mapper, baselineFile,
+                return inside(p, projectRoot, address, indicator, transport, indexer, mapper, baselineFile,
                         local, baseline);
             } finally {
                 lock.release();
@@ -182,7 +183,7 @@ public final class SftpSync {
      * that no early return can slip past - a lock left behind blocks every
      * tester on the team until somebody deletes a hidden folder over SSH.
      */
-    private static @NotNull Outcome inside(final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull ProgressIndicator indicator, final @NotNull SftpTransport transport, final @NotNull ProjectIndexer indexer, final @NotNull Mapper mapper, final @NotNull Path baselineFile, final @NotNull Map<String, byte[]> local, final @NotNull Baseline baseline) {
+    private static @NotNull Outcome inside(final @NotNull Project p, final @NotNull Path projectRoot, final @NotNull SftpAddress address, final @NotNull ProgressIndicator indicator, final @NotNull SftpTransport transport, final @NotNull ProjectIndexer indexer, final @NotNull Mapper mapper, final @NotNull Path baselineFile, final @NotNull Map<String, byte[]> local, final @NotNull Baseline baseline) {
         indicator.setText(Bundle.message("sftp.progress.asking.server"));
         final @NotNull Manifest remote = readManifest(transport, mapper);
 
@@ -235,12 +236,12 @@ public final class SftpSync {
 
         if (!incoming.isEmpty()) {
             indicator.setText(Bundle.message("sftp.progress.writing", String.valueOf(incoming.size())));
-            indexer.acceptIncoming(projectRoot, incoming);
+            forgetWhatDidNotLand(agreed, withoutGit(against.contents()), indexer.acceptIncoming(projectRoot, incoming));
         }
 
         indicator.setText(Bundle.message("sftp.progress.recording"));
         writeManifest(transport, mapper, new Manifest(onServer));
-        BaselineStore.write(mapper, baselineFile, new Baseline(agreed));
+        recordAgreed(p, mapper, baselineFile, agreed);
 
         final @NotNull Outcome outcome = plan.outcome(unsettled);
         Logger.info("Synced " + projectRoot.getFileName() + " with " + address.display() + ": "
@@ -378,8 +379,9 @@ public final class SftpSync {
                 // had just done (#66, finding 87).
                 final @NotNull Map<String, Manifest.Entry> onServer =
                         withoutGit(readManifest(transport, mapper).entries());
-                final @NotNull Map<String, String> agreed =
+                final @NotNull Map<String, String> before =
                         withoutGit(BaselineStore.read(mapper, baselineFile).contents());
+                final @NotNull Map<String, String> agreed = new HashMap<>(before);
                 final @NotNull Map<String, byte[]> incoming = new TreeMap<>();
 
                 final @NotNull List<String> movedUnderTheQuestions = new ArrayList<>();
@@ -426,9 +428,9 @@ public final class SftpSync {
                     // send next time. Then the manifest, then the baseline: a
                     // baseline calling a file agreed while the server's own
                     // record does not list it reads as a file the server deleted.
-                    if (!incoming.isEmpty()) indexer.acceptIncoming(projectRoot, incoming);
+                    if (!incoming.isEmpty()) forgetWhatDidNotLand(agreed, before, indexer.acceptIncoming(projectRoot, incoming));
                     writeManifest(transport, mapper, new Manifest(onServer));
-                    BaselineStore.write(mapper, baselineFile, new Baseline(agreed));
+                    recordAgreed(p, mapper, baselineFile, agreed);
                 }
 
                 reportMovedUnderTheQuestions(p, movedUnderTheQuestions);
@@ -590,6 +592,52 @@ public final class SftpSync {
         return kept;
     }
 
+    /**
+     * UC-SHARE-019, Rule-SHARE-115.
+     * <p>
+     * Puts back what the baseline said before this sync about each file that
+     * did not land on this machine.
+     * <p>
+     * The sync recorded a fetched file as agreed before it was written here, and
+     * the writer refuses some writes - an empty payload, which is what a transfer
+     * cut off halfway leaves, and a locked or read-only file. The baseline then
+     * called the file agreed while this machine did not hold it, so the next sync
+     * read "server unchanged, here missing" as a deletion made here and deleted a
+     * colleague's test case off the server. In the answers pass it read the old
+     * copy still here as a fresh edit and sent it over the settled answer (#66,
+     * finding 161).
+     * <p>
+     * Put back, the file is news again next time: fetched once more, or asked
+     * about once more, rather than acted on.
+     */
+    /**
+     * UC-SHARE-019, Rule-SHARE-116.
+     * <p>
+     * Stores what this machine now agrees with the server, and says so when it
+     * cannot.
+     * <p>
+     * The store answers whether it managed and both passes threw the answer
+     * away, so a full disk or a locked profile folder ended in "Synced" and
+     * nothing else. With no record the next sync has no common ancestor for
+     * anything, and every file that differs becomes a question the tester
+     * answers by hand - with no idea why (#66, finding 181). A notification that
+     * stays, because the sync finishes on its own time.
+     */
+    private static void recordAgreed(final @NotNull Project p, final @NotNull Mapper mapper, final @NotNull Path baselineFile, final @NotNull Map<String, String> agreed) {
+        if (BaselineStore.write(mapper, baselineFile, new Baseline(agreed))) return;
+
+        Services.getInstance(p, Notifier.class).warn(p, Bundle.message("sftp.baseline.not.kept.title"), Bundle.message("sftp.baseline.not.kept.message"));
+    }
+
+    private static void forgetWhatDidNotLand(final @NotNull Map<String, String> agreed, final @NotNull Map<String, String> before, final @NotNull Set<String> notWritten) {
+        for (final String path : notWritten) {
+            Optional.ofNullable(before.get(path)).ifPresentOrElse(was -> agreed.put(path, was), () -> agreed.remove(path));
+        }
+
+        if (!notWritten.isEmpty()) {
+            Logger.warn(notWritten.size() + " incoming file(s) did not land here and stay news for the next sync: " + notWritten);
+        }
+    }
 
     private static @NotNull String text(final byte @NotNull [] content) {
         return new String(content, StandardCharsets.UTF_8);

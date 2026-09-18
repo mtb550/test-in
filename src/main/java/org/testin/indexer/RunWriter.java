@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -262,12 +263,13 @@ final class RunWriter {
      * No "is the run still indexed" question, unlike {@link #persist}: a run that
      * arrives from a server is not in the index until the scan that follows.
      */
-    void write(final @NotNull Path file, final byte @NotNull [] bytes) {
-        queue.execute(() -> {
+    @NotNull Future<Boolean> write(final @NotNull Path file, final byte @NotNull [] bytes) {
+        return queue.submit(() -> {
             try {
-                Services.getInstance(p, TestDataFiles.class).write(p, file, bytes);
+                return Services.getInstance(p, TestDataFiles.class).write(p, file, bytes);
             } catch (final Exception ex) {
                 Logger.error("Failed to write an incoming run file " + file + ": " + ex.getMessage());
+                return false;
             }
         });
     }

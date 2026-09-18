@@ -239,26 +239,43 @@ final class NodeFiles {
             return;
         }
 
-        caseFiles.forEach(this::reidentify);
-        Logger.info("Gave " + caseFiles.size() + " copied test case(s) new ids under " + copiedRoot.getFileName());
+        final long given = caseFiles.stream().filter(this::reidentify).count();
+        Logger.info("Gave " + given + " of " + caseFiles.size() + " copied test case(s) new ids under " + copiedRoot.getFileName());
     }
 
-    private void reidentify(final @NotNull Path caseFile) {
+    /**
+     * UC-TREE-PANEL-014, Rule-TREE-PANEL-051.
+     * <p>
+     * The case under a new id, and the file under the old one removed - in that
+     * order, and the second only once the first has landed.
+     * <p>
+     * The old file was deleted without asking whether the new one had been
+     * written, so a refused write left neither and the copy was silently one
+     * case short (#66, finding 176). Kept, the old file is a copy carrying the
+     * original's id, which the next scan reports as two files claiming one
+     * identity - a problem the tester is told about, where the lost case was
+     * not. The writer has already said the write failed.
+     *
+     * @return whether the case now has its own id.
+     */
+    private boolean reidentify(final @NotNull Path caseFile) {
         try {
             final @NotNull TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(caseFile.toFile(), TestCaseDto.class);
             final @NotNull UUID fresh = UUID.randomUUID();
 
             tc.setId(fresh);
-            Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(fresh + ".json"), tc);
+            if (!Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(fresh + ".json"), tc)) return false;
 
             // Claimed before it goes, as every other removal is, or the watcher
             // takes Testin's own delete for an outside change and reads the
             // project a second time (#312, A8).
             Services.getInstance(OwnWrites.class).record(caseFile);
             Files.delete(caseFile);
+            return true;
 
         } catch (final Exception ex) {
             Logger.error("Could not give the copied case " + caseFile.getFileName() + " a new id: " + ex.getMessage());
+            return false;
         }
     }
 }

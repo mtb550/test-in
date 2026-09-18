@@ -101,6 +101,13 @@ The same refusals as a move, and they are on
 **If the copy fails on disk** — an IDE notification titled *Copy Failed* stays
 in the notification log, with the reason under it.
 
+**If one copied test case cannot be given its new identity** — its file under
+the new id cannot be written — the file it was copied as is kept rather than
+removed, and the writer says the write failed. That file still carries the
+original's identity, so the next scan reports the two as one test case in two
+files, which the tester can resolve; removing it would have left the copy one
+test case short with nothing said (Rule-TREE-PANEL-051).
+
 **If the Java plugin is installed** — new automation code is written for the
 copy. Without the plugin, the copy has none. The first copy in the project then
 says *Java Plugin Not Available*.

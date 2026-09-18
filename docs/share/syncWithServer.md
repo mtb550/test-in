@@ -44,6 +44,15 @@ There is no key for this. The menu entry is **Sync With SFTP**.
 - **Rule-SHARE-111** — The password box shows dots rather than the characters
   typed into it. A tester on a shared screen, a projector or a recorded session
   never shows their server password.
+- **Rule-SHARE-115** — A file fetched from the server is recorded as agreed only
+  once it is on this machine. One that could not be written here - a transfer
+  cut off halfway, a locked or read-only file - keeps what the last sync
+  recorded for it, so the next sync fetches it again, or asks about it again,
+  rather than reading it as deleted here or edited here and acting on that.
+- **Rule-SHARE-116** — When this machine cannot save its record of what it
+  agrees with the server, a notification that stays says so, and that the next
+  sync will ask about every file that differs. The files that moved are not
+  moved back.
 
 ## The screen
 

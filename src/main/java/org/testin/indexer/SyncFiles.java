@@ -27,7 +27,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
@@ -92,8 +98,9 @@ final class SyncFiles {
      * an empty test case would be indexed as a case with no fields rather than
      * as a failure.
      */
-    void accept(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
+    @NotNull Map<String, Future<Boolean>> accept(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
         final @NotNull TestDataFiles writer = Services.getInstance(p, TestDataFiles.class);
+        final @NotNull Map<String, Future<Boolean>> writes = new LinkedHashMap<>();
 
         files.forEach((relative, content) -> {
             final @NotNull Path file = projectPath.resolve(relative);
@@ -102,10 +109,42 @@ final class SyncFiles {
             // already waiting there cannot land after them and put the older run
             // back (#66, finding 121). Every other file has one writer and no
             // queue to race.
-            if (runWriter.owns(file)) runWriter.write(file, content);
-            else writer.write(p, file, content);
+            writes.put(relative, runWriter.owns(file)
+                    ? runWriter.write(file, content)
+                    : CompletableFuture.completedFuture(writer.write(p, file, content)));
         });
-        Logger.info("Wrote " + files.size() + " incoming files into " + projectPath);
+
+        return writes;
+    }
+
+    /**
+     * UC-SHARE-019, Rule-SHARE-115.
+     * <p>
+     * The files of an incoming batch that are not on this machine now. Asked
+     * once the run writer's queue has drained, so every answer is already in
+     * and nothing here waits.
+     */
+    static @NotNull Set<String> notLanded(final @NotNull Path projectPath, final @NotNull Map<String, Future<Boolean>> writes) {
+        final @NotNull Set<String> notWritten = new TreeSet<>();
+
+        writes.forEach((relative, landed) -> {
+            if (!landedIn(landed)) notWritten.add(relative);
+        });
+
+        Logger.info("Wrote " + (writes.size() - notWritten.size()) + " of " + writes.size() + " incoming files into " + projectPath);
+        return notWritten;
+    }
+
+    private static boolean landedIn(final @NotNull Future<Boolean> write) {
+        try {
+            return write.get();
+        } catch (final InterruptedException interrupted) {
+            Thread.currentThread().interrupt();
+            return false;
+        } catch (final ExecutionException ex) {
+            Logger.error("An incoming run file could not be written: " + ex.getMessage());
+            return false;
+        }
     }
 
     /**
