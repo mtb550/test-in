@@ -197,6 +197,15 @@ final class IndexerDataStore {
         return true;
     }
 
+    // UC-EDITOR-PANEL-017, Rule-INTERNAL-035
+    boolean moveTestCase(final @NotNull Path fromSet, final @NotNull Path toSet, final @NotNull TestCaseDto tc) {
+        if (!testCaseStore.move(fromSet, toSet, tc)) return false;
+
+        markTestSetModified(toSet);
+        if (!fromSet.equals(toSet)) markTestSetModified(fromSet);
+        return true;
+    }
+
     void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
         testCaseStore.remove(testSetPath, tcId);
         markTestSetModified(testSetPath);
@@ -211,8 +220,8 @@ final class IndexerDataStore {
     /**
      * A set whose contents changed was modified, and its marker says so.
      * <p>
-     * The four methods above are the four ways a set's contents change - a case
-     * saved, one imported, one removed, the order rearranged - and each says so
+     * The methods above are the ways a set's contents change - a case saved,
+     * one imported, one moved, one removed, the order rearranged - and each says so
      * here rather than each writing the marker itself. The test case already
      * carries its own audit, stamped where every save arrives; this is the other
      * half of the same fact, and without it a set edited all week reported the

@@ -239,6 +239,40 @@ final class TestCaseSequenceStore {
         return true;
     }
 
+    /**
+     * UC-EDITOR-PANEL-017, Rule-INTERNAL-035.
+     * <p>
+     * A cut test case pasted into a set: written where it goes, audit kept, and
+     * only then taken out of where it was.
+     * <p>
+     * One operation, because both halves are about one id. The paste used to
+     * remove the case first, which dropped it from the index and sent its file
+     * to the recycle bin before the write was even tried - so a write that
+     * failed left the case in neither set (#66, finding 284). Removing it second,
+     * as a call of its own, would drop the id the write had just filed.
+     *
+     * @return whether the case is in its new set now. When it is not, it is still
+     * where it was, and the writer has said why.
+     */
+    boolean move(final @NotNull Path fromSet, final @NotNull Path toSet, final @NotNull TestCaseDto testCase) {
+        final @NotNull UUID id = testCase.getId();
+        final @NotNull Path from = fileOf(fromSet, id);
+
+        // Out of the hand-named files first, so the write does not delete the
+        // file the case was read from on its own. That is done below, after the
+        // write, like the rest of the side the case is leaving.
+        final boolean wasHandNamed = handNamed.remove(id, from);
+        if (!store(toSet, testCase)) {
+            if (wasHandNamed) handNamed.put(id, from);
+            return false;
+        }
+
+        if (!fromSet.equals(toSet)) Optional.ofNullable(testSetCaseIds.get(fromSet.toString())).ifPresent(ids -> ids.remove(id));
+        if (!from.equals(named(toSet, id))) Services.getInstance(p, TestDataFiles.class).delete(p, from, fromSet);
+
+        return true;
+    }
+
     void remove(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
         testCasesById.remove(testCaseId);
         Optional.ofNullable(testSetCaseIds.get(testSetPath.toString()))

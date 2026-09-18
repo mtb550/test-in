@@ -95,6 +95,38 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         });
     }
 
+    /**
+     * Two test sets in one test project, for a case to be moved between.
+     */
+    private List<TestSetDirectoryDto> twoTestSets() {
+        return WriteAction.computeAndWait(() -> {
+            final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
+
+            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
+            indexer().addTestProject(tp);
+
+            final TestSetDirectoryDto login = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            final TestSetDirectoryDto signUp = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Sign up"), tp.getTestCasesDirectory());
+            indexer().addTestSet(login);
+            indexer().addTestSet(signUp);
+            return List.of(login, signUp);
+        });
+    }
+
+    /**
+     * The case as a cut pastes it: the same id and audit, in the set it goes to.
+     */
+    private static TestCaseDto pastedInto(final TestSetDirectoryDto ts, final TestCaseDto cut) {
+        final TestCaseDto pasted = TestCaseDto.builder()
+                .id(cut.getId())
+                .description(cut.getDescription())
+                .order(cut.getOrder())
+                .build()
+                .setCreatedBy(cut.getCreatedBy());
+        pasted.setParent(ts);
+        return pasted;
+    }
+
     private static TestCaseDto testCase(final TestSetDirectoryDto ts, final String rank) {
         final TestCaseDto tc = TestCaseDto.builder()
                 .id(UUID.randomUUID())
@@ -174,5 +206,59 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         } catch (final java.io.IOException ex) {
             throw new AssertionError("the new case was not written", ex);
         }
+    }
+
+    /**
+     * Rule-INTERNAL-035.
+     * <p>
+     * A cut pasted into another set is written there, keeps who created it, and
+     * leaves the set it came from - in the index and on disk alike.
+     */
+    public void testAMovedCaseIsInItsNewSetAndGoneFromTheOld() {
+        final List<TestSetDirectoryDto> sets = twoTestSets();
+        final TestSetDirectoryDto login = sets.get(0);
+        final TestSetDirectoryDto signUp = sets.get(1);
+        final TestCaseDto cut = testCase(login, "m").setCreatedBy("Sara Al-Otaibi");
+        indexer().putTestCaseVerbatim(login.getPath(), cut);
+
+        assertTrue("the move said it failed", indexer().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
+
+        assertTrue("the moved case was not written into its new set", Files.isRegularFile(fileOf(signUp, cut)));
+        assertFalse("the moved case's old file was left behind", Files.exists(fileOf(login, cut)));
+
+        final TestCaseDto indexed = indexer().findTestCase(cut.getId()).orElseThrow();
+        assertEquals("the index still files the case under its old set", signUp.getPath(), indexed.getParent().getPath());
+        assertEquals("the move took a new creator", "Sara Al-Otaibi", indexed.getCreatedBy());
+        assertTrue("the old set still lists the case",
+                indexer().getTestCasesForTestSet(login.getPath()).stream().noneMatch(tc -> tc.getId().equals(cut.getId())));
+    }
+
+    /**
+     * Rule-INTERNAL-035.
+     * <p>
+     * A move whose write is refused leaves the case where it was. The paste used
+     * to remove the cut first, so a refused write left the case in neither set
+     * (#66, finding 284).
+     */
+    public void testAMoveWhoseWriteIsRefusedLeavesTheCaseWhereItWas() {
+        final List<TestSetDirectoryDto> sets = twoTestSets();
+        final TestSetDirectoryDto login = sets.get(0);
+        final TestSetDirectoryDto signUp = sets.get(1);
+        final TestCaseDto cut = testCase(login, "m");
+        indexer().putTestCaseVerbatim(login.getPath(), cut);
+
+        // A folder where the file has to go refuses the write, the way a locked
+        // or read-only file does.
+        try {
+            Files.createDirectories(fileOf(signUp, cut));
+        } catch (final java.io.IOException ex) {
+            throw new AssertionError("could not set up the refused write", ex);
+        }
+
+        assertFalse("a refused write was reported as a move", indexer().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
+
+        assertTrue("a refused move took the case's file out of its set", Files.isRegularFile(fileOf(login, cut)));
+        assertEquals("a refused move took the case out of its set in the index",
+                login.getPath(), indexer().findTestCase(cut.getId()).orElseThrow().getParent().getPath());
     }
 }

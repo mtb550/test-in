@@ -545,6 +545,20 @@ public final class ProjectIndexer {
         return store.putTestCaseVerbatim(testSetPath, tc);
     }
 
+    /**
+     * UC-EDITOR-PANEL-017, Rule-INTERNAL-035.
+     * <p>
+     * Moves a cut test case into another set, audit and all: written where it
+     * goes first, and taken out of where it was only once that write landed
+     * (#66, finding 284).
+     *
+     * @return whether it moved. When it did not, it is still in its old set, and
+     * the writer has said why.
+     */
+    public boolean moveTestCase(final @NotNull Path fromSet, final @NotNull Path toSet, final @NotNull TestCaseDto tc) {
+        return store.moveTestCase(fromSet, toSet, tc);
+    }
+
     public void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
         store.removeTestCase(testSetPath, tcId);
 

@@ -103,6 +103,11 @@ nothing to carry, and the copy is still a test case.
 the cards went back to what is on disk*, and the list is read again, without
 them.
 
+**If a cut test case cannot be written where it goes** — it stays in the test set
+it was cut from and is not pasted. A message reads *unable to write content:* and
+the reason. The rest of the cut still moves. When none of it could be written,
+the cut is still waiting, and pasting again tries again.
+
 ## Pasting into the same test set
 
 Pasting a copy into the test set it came from is allowed. The result is a second

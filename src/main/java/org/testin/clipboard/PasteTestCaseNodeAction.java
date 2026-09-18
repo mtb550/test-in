@@ -52,6 +52,8 @@ import java.time.temporal.ChronoUnit;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Objects;
 import java.util.UUID;
@@ -153,27 +155,11 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 // What a CTRL+Z would have to put back on the source side, taken
                 // before the cut takes it away. Empty when this is a copy, which
                 // leaves the source alone and has nothing there to put back.
-                final @NotNull Optional<TestCaseSnapshot> cutFrom = cutState.source().map(sourceUI -> {
-                    final @NotNull List<TestCaseDto> cutItems = sourceUI.getAllTestCases().stream()
-                            .filter(tc -> cutState.isPending(tc.getId()))
-                            .toList();
-
-                    final @NotNull TestCaseSnapshot taken = TestCaseSnapshot.of(p, sourceUI.getParent().getPath(), TestCaseSnapshot.idsOf(cutItems));
-
-                    ApplicationManager.getApplication().runWriteAction(() -> {
-                        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                        for (final TestCaseDto tc : cutItems) {
-                            indexer.removeTestCase(sourceUI.getParent().getPath(), tc.getId());
-                        }
-                    });
-
-                    sourceUI.getAllTestCases().removeAll(cutItems);
-                    if (sourceUI != destUI && sourceUI instanceof TestEditor sourceEditor) {
-                        sourceEditor.reorderAndPersist();
-                    }
-
-                    return taken;
-                });
+                final @NotNull List<TestCaseDto> cutItems = cutState.source()
+                        .map(sourceUI -> sourceUI.getAllTestCases().stream().filter(tc -> cutState.isPending(tc.getId())).toList())
+                        .orElseGet(List::of);
+                final @NotNull Optional<TestCaseSnapshot> cutFrom = cutState.source()
+                        .map(sourceUI -> TestCaseSnapshot.of(p, sourceUI.getParent().getPath(), TestCaseSnapshot.idsOf(cutItems)));
 
                 final @NotNull List<TestCaseDto> pastedHere = new ArrayList<>(pastedCases.size());
 
@@ -203,8 +189,6 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                     }
                 }
 
-                final int pasted = pastedHere.size();
-
                 // Both sides of the move in one operation, so a cut here and a paste
                 // there is one press of CTRL+Z rather than two (#165). Taken before
                 // the sequence write puts the pasted cases on disk, which is why
@@ -216,15 +200,18 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 before.add(TestCaseSnapshot.of(p, destPath, pastedIds));
 
                 // Rule-EDITOR-PANEL-082, Rule-INTERNAL-035. A cut is the same
-                // test case in a new place, so it keeps who created it. Saved as
-                // it is before the order is, so the sequence write already knows
-                // it and does not record the paster as its creator (#66, finding
-                // 114) - and after the snapshot above, which has to read the cases
-                // as absent.
-                if (isCut) {
-                    final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                    pastedHere.forEach(moved -> indexer.putTestCaseVerbatim(destPath, moved));
-                }
+                // test case in a new place, so it keeps who created it. Moved as
+                // it is before the order is saved, so the sequence write already
+                // knows it and does not record the paster as its creator (#66,
+                // finding 114) - and after the snapshot above, which has to read
+                // the cases as absent.
+                cutState.source().ifPresent(sourceUI -> moveCut(sourceUI, destUI, cutItems, pastedHere));
+
+                // Every write refused: nothing moved, and the cut is still waiting
+                // where it was for another try.
+                if (pastedHere.isEmpty()) return;
+
+                final int pasted = pastedHere.size();
 
                 destUI.reorderAndPersist(() -> {
                     final @NotNull List<TestCaseSnapshot> after = new ArrayList<>();
@@ -266,6 +253,40 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
 
                 if (isCut) cutState.clear();
             });
+        }
+
+        /**
+         * UC-EDITOR-PANEL-017, Rule-INTERNAL-035.
+         * <p>
+         * Moves the cut cases into this editor's set, and takes out of the editor
+         * they came from only the ones that arrived.
+         * <p>
+         * Written where they go before they leave where they were. The cut used to
+         * be removed first, so a write that failed left a case in neither set
+         * until the tester went looking in the recycle bin (#66, finding 284). A
+         * case whose write fails now stays where it was, and the writer has said
+         * why.
+         */
+        private void moveCut(final @NotNull TestinEditor sourceUI, final @NotNull TestEditor destUI, final @NotNull List<TestCaseDto> cutItems, final @NotNull List<TestCaseDto> pastedHere) {
+            final @NotNull Path from = sourceUI.getParent().getPath();
+            final @NotNull Path to = destUI.getParent().getPath();
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+
+            final @NotNull List<TestCaseDto> stayed = new ArrayList<>();
+            ApplicationManager.getApplication().runWriteAction(() -> {
+                for (final TestCaseDto moved : pastedHere) {
+                    if (!indexer.moveTestCase(from, to, moved)) stayed.add(moved);
+                }
+            });
+
+            pastedHere.removeAll(stayed);
+            destUI.getAllTestCases().removeAll(stayed);
+
+            // The originals, by identity: cut and pasted in one editor, the list
+            // holds each case twice under one id until the original goes.
+            final @NotNull Set<UUID> arrived = new HashSet<>(TestCaseSnapshot.idsOf(pastedHere));
+            sourceUI.getAllTestCases().removeAll(cutItems.stream().filter(tc -> arrived.contains(tc.getId())).toList());
+            if (sourceUI != destUI && sourceUI instanceof TestEditor sourceEditor) sourceEditor.reorderAndPersist();
         }
 
         /**
