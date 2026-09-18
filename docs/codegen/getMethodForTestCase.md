@@ -100,9 +100,11 @@ description cannot name a test method** says what the method would have been
 called.
 
 **If the class already holds a method with that name** — no method is written
-for the second test case. Nothing on screen says so. Typing such a description
-is refused before the test case is created, so what reaches here comes from an
-import, a Git merge, or a description edited afterwards.
+for the second test case, and a message titled *A test case has no automation
+method* names it and says it would be named after a method the class already
+has. Typing such a description is refused before the test case is created, and
+so is editing one into it, so what reaches here comes from an import, a paste,
+a Git merge or a sync.
 
 **If the code project has no Java test source folder** — a message titled **Java
 Test Source Not Found** appears, and the test case is still created.
@@ -115,9 +117,10 @@ once for the whole code project.
 **Two test cases can still arrive sharing one method.** Two descriptions that
 differ only in punctuation give one method name, and the second test case is
 left with no method of its own — it cannot be run and cannot be jumped to.
-Creating one is refused now, by the dialog, before anything is stored. An
-import, a Git merge and an edit to a description already stored are not checked.
-That is difference 3 on
+Creating one is refused, by the dialog, and so is editing one into it, before
+anything is stored. An import, a paste, a Git merge and a sync are not checked,
+and generating then says which test case got no method and why. That is
+difference 3 on
 [the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

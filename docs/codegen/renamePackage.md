@@ -62,7 +62,8 @@ the `package` line at the top of every Java file beneath it has been rewritten.
 so.
 
 **If the move goes to a place Testin has not read** — the folder is left where
-it is, and only the log says so.
+it is, and a notification that stays, titled *The automation code did not move
+with* and the package's name, names the package and says what to do.
 
 **If the code project has no Java test source folder** — nothing happens, and
 nothing is said.

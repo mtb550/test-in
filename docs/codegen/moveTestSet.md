@@ -51,7 +51,9 @@ and the `package` line at the top of the file has been rewritten.
 ## What Testin refuses
 
 **If the place it is moving to has not been read by Testin** — the class is left
-where it is. The test set moves, the code does not, and only the log says so.
+where it is. The test set moves, the code does not, and a notification that
+stays, titled *The automation code did not move with* and the test set's name,
+names the class and says what to do (Rule-CODEGEN-055).
 
 **If the class cannot be found** — nothing is moved, and only the log says so.
 
