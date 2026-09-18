@@ -155,8 +155,8 @@ public final class SelectionTable implements DialogComponent {
     }
 
     public @NotNull String getValueAt(final int row, final int column) {
-        final @NotNull Object value = model.getValueAt(row, column);
-        return Objects.toString(value, "");
+        // An empty cell holds nothing, which toString answers (#312, A79).
+        return Objects.toString(model.getValueAt(row, column), "");
     }
 
     public void removeRow(final int row) {

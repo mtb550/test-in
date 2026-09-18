@@ -141,8 +141,9 @@ public class FontSync {
             // Each subscriber tracks its own last size, so a font change
             // scales every synced component's children - not just the
             // first one the message bus happens to notify.
-            final @NotNull Object stored = component.getClientProperty(LAST_BASE_SIZE);
-            final float lastSize = stored instanceof Float previous ? previous : newSize;
+            // Nothing stored the first time, which instanceof answers; a
+            // @NotNull local in between said otherwise (#312, A79).
+            final float lastSize = component.getClientProperty(LAST_BASE_SIZE) instanceof Float previous ? previous : newSize;
 
             final float delta = newSize - lastSize;
             final boolean rootNeedsUpdate = currentFont.getSize2D() != newSize;

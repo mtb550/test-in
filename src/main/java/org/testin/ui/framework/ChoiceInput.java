@@ -108,8 +108,9 @@ public final class ChoiceInput implements DialogComponent {
      * different name to Git and the same one to the tester.
      */
     public @NotNull String getValue() {
-        final @NotNull Object value = combo.getEditor().getItem();
-        return Objects.toString(value, "").trim();
+        // An editor nobody typed into holds nothing, which toString answers
+        // (#312, A79).
+        return Objects.toString(combo.getEditor().getItem(), "").trim();
     }
 
     /**

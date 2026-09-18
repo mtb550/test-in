@@ -23,7 +23,6 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -222,7 +221,12 @@ public final class ComponentDialogBase<C extends DialogComponent> {
 
         private final @NotNull String caption;
         private final @NotNull List<RadioSelection.Option<T>> options = new ArrayList<>();
-        private @Nullable T selected;
+        /**
+         * The option selected when the dialog opens, and none until
+         * {@link #select} says - an Optional rather than a nullable field, which
+         * is how a field says "not set yet" here (#312, A79).
+         */
+        private @NotNull Optional<T> selected = Optional.empty();
 
         public @NotNull RadioBuilder<T> option(final @NotNull String name, final @NotNull T value) {
             options.add(new RadioSelection.Option<>(name, value));
@@ -242,7 +246,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
          * The initially selected value — must be one of the options.
          */
         public @NotNull RadioBuilder<T> select(final @NotNull T value) {
-            this.selected = value;
+            this.selected = Optional.of(value);
             return this;
         }
 
@@ -252,10 +256,10 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             }
             // A builder that was never given a selection matches no option
             // either, so one test covers both mistakes.
-            if (options.stream().noneMatch(option -> option.value().equals(selected))) {
+            if (options.stream().noneMatch(option -> selected.filter(option.value()::equals).isPresent())) {
                 throw new IllegalStateException("radios needs .select(...) with one of the declared options");
             }
-            return new ComponentDialogBase<>(new RadioSelection<>(caption, List.copyOf(options), selected));
+            return new ComponentDialogBase<>(new RadioSelection<>(caption, List.copyOf(options), selected.orElseThrow()));
         }
     }
 
