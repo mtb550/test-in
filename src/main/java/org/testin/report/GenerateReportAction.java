@@ -29,7 +29,6 @@ import org.testin.editor.run.RunEditor;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.importexport.FileTypes;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
@@ -42,6 +41,8 @@ import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.io.File;
+import java.io.UncheckedIOException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -133,43 +134,63 @@ public class GenerateReportAction extends AbstractProjectAction {
         // Under a bar rather than on a bare pooled thread: the dialog is gone by
         // now, and without one the tester sees nothing at all between pressing
         // Generate and the notification arriving (#87).
-        BackgroundWork.run(p, Bundle.message("report.task.generating", format.getLabel(), tr.getName()), Bundle.message("report.error.title"), indicator -> {
-            try {
-                final @NotNull Path dirPath = tr.getPath();
+        //
+        // Failures are BackgroundWork's to report, and so is a cancel. This body
+        // had a catch of its own around everything, which ran first: it showed
+        // the tester "Failed to generate PDF report: null" for an exception with
+        // no message, and would have turned Cancel into "Report Error" had the
+        // work ever looked at Cancel (#66, finding 200).
+        BackgroundWork.run(p, Bundle.message("report.task.generating", format.getLabel(), tr.getName()), Bundle.message("report.failed.title", format.getLabel()), indicator -> {
+            final @NotNull Path dirPath = tr.getPath();
 
-                final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                final @NotNull TestRunDto runData = indexer.getTestRunByPath(dirPath);
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull TestRunDto runData = indexer.getTestRunByPath(dirPath);
 
-                final @NotNull Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(p, runData);
+            final @NotNull Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(p, runData);
+            indicator.checkCanceled();
 
-                final byte[] fileBytes = format.generateReport(p, tr, runData, detailsMap);
+            final byte[] fileBytes = format.generateReport(p, tr, runData, detailsMap);
 
-                Files.write(outputFile.toPath(), fileBytes);
+            // Rule-REPORT-003. The last moment Cancel can be honoured with
+            // nothing left behind. Nothing asked before: the bar offered
+            // Cancel, the work ran to the end, the file was written and "PDF
+            // Report Generated" announced with Open and Copy path under it,
+            // and the platform then filed the finish as a cancel (#312, A49).
+            indicator.checkCanceled();
 
-                // Both actions come from their owners now. Opening was a bare
-                // Desktop call here: no desktop-support check, on the UI thread
-                // where opening blocks until Acrobat or Word starts, and a
-                // failure that only reached the log - so on a machine that
-                // cannot open files the tester pressed Open report and nothing
-                // happened.
-                //
-                // The wording stays this action's own. A report is not an
-                // export, and "PDF Report Generated" says more to the tester
-                // than the export notice's sentence would.
-                final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+            write(outputFile, fileBytes);
 
-                notifier.infoWithActions(p,
-                        Bundle.message("report.generated.title", format.getLabel()),
-                        Bundle.message("report.generated.message", outputFile.getName()),
-                        notifier.action(Bundle.message("report.open"), () -> ExportNotice.open(p, outputFile)),
-                        notifier.copyPath(outputFile)
-                );
+            // Both actions come from their owners now. Opening was a bare
+            // Desktop call here: no desktop-support check, on the UI thread
+            // where opening blocks until Acrobat or Word starts, and a
+            // failure that only reached the log - so on a machine that
+            // cannot open files the tester pressed Open report and nothing
+            // happened.
+            //
+            // The wording stays this action's own. A report is not an
+            // export, and "PDF Report Generated" says more to the tester
+            // than the export notice's sentence would.
+            final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
-            } catch (final Exception ex) {
-                Services.getInstance(p, Notifier.class).error(p, Bundle.message("report.error.title"), Bundle.message("report.failed.message", format.getLabel(), ex.getMessage()));
-                Logger.error("Exception: " + ex.getMessage());
-            }
+            notifier.infoWithActions(p,
+                    Bundle.message("report.generated.title", format.getLabel()),
+                    Bundle.message("report.generated.message", outputFile.getName()),
+                    notifier.action(Bundle.message("report.open"), () -> ExportNotice.open(p, outputFile)),
+                    notifier.copyPath(outputFile)
+            );
         });
+    }
+
+    /**
+     * The report onto disk, in one go. An I/O failure travels on to
+     * BackgroundWork, which is the one place a failed report is reported.
+     */
+    private static void write(final @NotNull File outputFile, final byte @NotNull [] content) {
+        try {
+            Files.write(outputFile.toPath(), content);
+        } catch (final IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
     }
 
     private @NotNull Map<UUID, TestCaseDto> fetchTestCaseDetails(final @NotNull Project p, final @NotNull TestRunDto tr) {
