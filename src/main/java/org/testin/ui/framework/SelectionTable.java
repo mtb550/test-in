@@ -127,13 +127,26 @@ public final class SelectionTable implements DialogComponent {
     public void selectRows(final @NotNull List<Integer> rows) {
         table.clearSelection();
         for (final int row : rows) {
-            if (row >= 0 && row < table.getRowCount()) table.addRowSelectionInterval(row, row);
+            if (row < 0 || row >= model.getRowCount()) continue;
+
+            final int shown = table.convertRowIndexToView(row);
+            table.addRowSelectionInterval(shown, shown);
         }
     }
 
+    /**
+     * The selected rows, as rows of the model - the numbering every other method
+     * here takes, and the one a caller's own list of the rows follows.
+     * <p>
+     * Swing hands out rows as they are shown. They are the same until a column
+     * can be sorted, and from then on a caller indexing its own list with them
+     * reverts or commits the wrong change, with nothing failing (#66, finding
+     * 220). Converted here and at the right-clicked row, so the day a sorter is
+     * installed nothing else has to know.
+     */
     public @NotNull List<Integer> getSelectedRows() {
         final @NotNull List<Integer> rows = new ArrayList<>();
-        for (final int row : table.getSelectedRows()) rows.add(row);
+        for (final int row : table.getSelectedRows()) rows.add(table.convertRowIndexToModel(row));
         return rows;
     }
 
@@ -158,7 +171,7 @@ public final class SelectionTable implements DialogComponent {
         // The row right-clicked, which the selection no longer tells: with the
         // selection kept, its first row is not the one the menu was opened on.
         item.addActionListener(event -> {
-            if (menuRow >= 0 && menuRow < table.getRowCount()) action.accept(menuRow);
+            if (menuRow >= 0 && menuRow < table.getRowCount()) action.accept(table.convertRowIndexToModel(menuRow));
         });
         rowMenu.add(item);
     }
