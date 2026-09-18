@@ -17,6 +17,7 @@
 package org.testin.testcase;
 
 import com.intellij.icons.AllIcons;
+import org.testin.util.Icons;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.StatusBarItem;
@@ -46,7 +47,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     DESCRIPTION(
             TestEditorAttributes.DESCRIPTION.getName(),
             Shortcuts.CreateTestCaseDescription,
-            AllIcons.Actions.Edit,
+            Icons.FIELD_DESCRIPTION,
             TestCaseBaseDialog::getDescriptionSection,
             Bundle.message("field.set.description"),
             CORRECTIONS, NAVIGATE_TAB

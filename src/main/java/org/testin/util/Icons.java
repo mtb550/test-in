@@ -17,6 +17,7 @@
 package org.testin.util;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
@@ -27,8 +28,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * The two icons Testin makes for itself: a stock one enlarged, and a colored
- * dot.
+ * The icons Testin makes for itself: a stock one grayed, a colored dot, and a
+ * test case field's letter in a frame.
  * <p>
  * Was {@code IconManager}, which managed nothing and is also the name of
  * {@code com.intellij.ui.IconManager} in the platform - the same collision
@@ -57,6 +58,19 @@ public final class Icons {
      * <b>Drawn gray</b>, like everything else - see {@link #gray}.
      */
     public static final @NotNull Icon TEST_CASE = gray(AllIcons.Nodes.Type);
+
+    /**
+     * UC-EDITOR-PANEL-005.
+     * <p>
+     * The Description field of the test case form: its letter, D, in a rounded
+     * frame, the letter its key opens it with (#328).
+     * <p>
+     * An SVG with a {@code _dark} twin, drawn in the platform's own icon grays,
+     * so the IDE picks the variant for the theme and keeps it sharp at any
+     * scale - nothing here paints. The first of the letter icons, tried on its
+     * own before the other fields follow.
+     */
+    public static final @NotNull Icon FIELD_DESCRIPTION = IconLoader.getIcon("/icons/fieldDescription.svg", Icons.class);
 
     /**
      * UC-INTERNAL-007, Rule-INTERNAL-077.
