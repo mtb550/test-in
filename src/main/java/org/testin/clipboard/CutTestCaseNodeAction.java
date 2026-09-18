@@ -16,6 +16,7 @@
 
 package org.testin.clipboard;
 
+import org.testin.util.FailureText;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -70,7 +71,9 @@ public class CutTestCaseNodeAction extends DumbAwareAction {
                 Services.getInstance(p, Notifier.class).softShowCounted(p, Done.CUT, selectedTestCases.size());
 
             } catch (final Exception ex) {
-                Logger.error("Exception: " + ex.getMessage());
+                // Said, not only logged (#66, finding 272).
+                Logger.error("Cut Node failed: " + FailureText.of(ex));
+                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("clipboard.cut.failed.title"), FailureText.of(ex));
             }
         }
     }

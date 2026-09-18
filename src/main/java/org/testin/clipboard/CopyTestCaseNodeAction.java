@@ -16,6 +16,7 @@
 
 package org.testin.clipboard;
 
+import org.testin.util.FailureText;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -60,7 +61,10 @@ public class CopyTestCaseNodeAction extends DumbAwareAction {
                 Services.getInstance(p, Notifier.class).softShowCounted(p, Done.COPIED, tcs.size());
 
             } catch (final Exception ex) {
-                Logger.error("Exception: " + ex.getMessage());
+                // Said, not only logged: the tester pressed the key and should
+                // not be left to find the clipboard empty (#66, finding 272).
+                Logger.error("Copy Node failed: " + FailureText.of(ex));
+                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("clipboard.copy.failed.title"), FailureText.of(ex));
             }
         }
     }

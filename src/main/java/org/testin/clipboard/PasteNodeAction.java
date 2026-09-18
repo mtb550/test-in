@@ -16,6 +16,7 @@
 
 package org.testin.clipboard;
 
+import org.testin.util.FailureText;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -145,7 +146,9 @@ public class PasteNodeAction extends DumbAwareAction {
                 ).show();
 
             } catch (final Exception ex) {
-                Logger.error("Paste failed: " + ex.getMessage());
+                // Said, not only logged (#66, finding 272).
+                Logger.error("Paste Node failed: " + FailureText.of(ex));
+                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("clipboard.paste.failed.title"), FailureText.of(ex));
             }
         }
     }
