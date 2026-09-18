@@ -43,8 +43,8 @@ record NodesTransferable(@NotNull TreeTransferPayload payload) implements Transf
     }
 
     /**
-     * The {@code throws} stays deliberately, and is one of the two exceptions to
-     * the rule in CLAUDE.md that a method handles its own failures. AWT's
+     * The {@code throws} stays deliberately, and is one of the exceptions CLAUDE.md
+     * lists to the rule that a method handles its own failures. AWT's
      * {@link java.awt.datatransfer.Transferable} contract is that an unsupported
      * flavor throws; catching it here would hand the platform's drag-and-drop a
      * wrong object instead of telling it the flavor is not available (#63).

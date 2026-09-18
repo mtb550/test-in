@@ -33,6 +33,7 @@ import org.testin.util.Bundle;
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -73,8 +74,16 @@ public class TransferListener extends TransferHandler {
                 return FLAVOR.equals(flavor);
             }
 
+            /**
+             * The dragged test cases, for the one flavor this carries. Answered
+             * for any flavor asked, it handed a wrong object to whoever asked
+             * for another; harmless while both entry points check the flavor
+             * first, and against AWT's contract, which is to throw (#66,
+             * finding 269). The throws is that contract - see CLAUDE.md.
+             */
             @Override
-            public @NotNull Object getTransferData(final DataFlavor flavor) {
+            public @NotNull Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException {
+                if (!FLAVOR.equals(flavor)) throw new UnsupportedFlavorException(flavor);
                 return items;
             }
         };

@@ -184,8 +184,9 @@ silently does nothing costs more than the setting it was meant to hold.
 - **The rule is about methods, and the whole tree obeys it.** The `throws`
   that remain are declarations rather than work, each with a comment saying
   so, and this list is all of them. Do not sweep them again:
-  - `NodesTransferable.getTransferData` — AWT's `Transferable` contract is that
-    an unsupported flavor throws. Catching it hands the platform a wrong object
+  - `NodesTransferable.getTransferData`, and the one `TransferListener` builds
+    for a drag of test cases — AWT's `Transferable` contract is that an
+    unsupported flavor throws. Catching it hands the platform a wrong object
     instead of "I do not have that".
   - `GitTaskWork.run`, `SftpAuth.apply`, `JavaSourceRoot.RootWork.run` and
     `JavaSourceRoot.RootFile.from` — functional interfaces whose whole point is to let the lambda fail, so that
