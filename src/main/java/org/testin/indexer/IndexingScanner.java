@@ -211,7 +211,7 @@ final class IndexingScanner {
 
             try (Stream<Path> files = Files.list(path)) {
                 files.filter(Files::isRegularFile)
-                        .filter(p -> p.toString().endsWith(".json"))
+                        .filter(file -> file.toString().endsWith(".json"))
                         .parallel()
                         .forEach(filePath -> {
                             try {

@@ -360,12 +360,12 @@ public final class ProjectIndexer {
         if (projectPaths.length == 0) return Collections.emptyList();
 
         final @NotNull List<Path> valid = new ArrayList<>();
-        Arrays.stream(projectPaths).forEach(p -> {
-            if (isTestProjectFolder(p)) {
-                valid.add(p);
+        Arrays.stream(projectPaths).forEach(folder -> {
+            if (isTestProjectFolder(folder)) {
+                valid.add(folder);
             } else {
                 Logger.warn("Skipping directory without a " + DirectoryType.TP.getMarker()
-                        + " marker (not a test project): " + p);
+                        + " marker (not a test project): " + folder);
             }
         });
         return valid;
