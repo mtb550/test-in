@@ -91,10 +91,6 @@ public record Manifest(@NotNull Map<String, Entry> entries) {
         return all;
     }
 
-    public long totalBytes() {
-        return entries.values().stream().mapToLong(Entry::size).sum();
-    }
-
     /**
      * One file in a manifest.
      *

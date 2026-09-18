@@ -81,8 +81,7 @@ public enum Done {
     REVERTED(Bundle.message("done.reverted")),
     KEPT(Bundle.message("done.kept")),
 
-    STOPPED(Bundle.message("done.stopped")),
-    CLEARED(Bundle.message("done.cleared"));
+    STOPPED(Bundle.message("done.stopped"));
 
     /**
      * The word itself. Past tense, one word where one will do - which is the

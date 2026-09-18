@@ -740,13 +740,6 @@ public final class ProjectIndexer {
     }
 
     /**
-     * Index-only registration; the caller persists the JSON itself.
-     */
-    public void registerTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
-        store.registerTestRun(testRunPath, tr);
-    }
-
-    /**
      * Deletes a test project from disk and from the cache, in that order.
      * <p>
      * The largest delete the plugin performs: the directory holds every test

@@ -104,7 +104,7 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
 
     private BugReports.RunItem runItem(final UUID caseId, final TestStatus status) {
         final TestRunItems item = TestRunItems.builder().id(caseId).status(status).build();
-        indexer().registerTestRun(runPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
+        indexer().putTestRun(runPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
         return new BugReports.RunItem(runPath(), caseId);
     }
 

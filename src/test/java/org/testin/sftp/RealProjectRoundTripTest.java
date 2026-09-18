@@ -192,8 +192,8 @@ public class RealProjectRoundTripTest {
             final Manifest before = Manifest.of(local);
             final Manifest after = Manifest.of(back);
 
+            // Each entry is a hash and a size, so equal entries are equal bytes.
             assertEquals(after.entries(), before.entries(), "a sync run now would think nothing had changed");
-            assertEquals(after.totalBytes(), before.totalBytes());
 
             for (final String path : before.pathsWith(after)) {
                 assertEquals(TransferAction.of(before.at(path).sha256(), before.at(path).sha256(), after.at(path).sha256()),
