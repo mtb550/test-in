@@ -16,10 +16,10 @@
 
 package org.testin.editor.toolbar.components;
 
+import org.testin.editor.run.ExecutionControl;
 import org.testin.editor.AbstractIconButton;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
-import org.testin.editor.toolbar.Toolbar;
 import org.testin.model.TestRunStatus;
 import org.testin.util.Bundle;
 
@@ -28,7 +28,7 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
     private final @NotNull RunEditor editor;
 
     public StartExecutionBtn(final @NotNull RunEditor editor, final @NotNull Runnable onStartExecutionClicked) {
-        super(Toolbar.START_MANUAL_EXECUTION, Toolbar.START_MANUAL_EXECUTION_ICON);
+        super(ExecutionControl.START.getLabel(), ExecutionControl.START.getIcon());
         this.editor = editor;
 
         addActionListener(e -> onStartExecutionClicked.run());
@@ -53,7 +53,7 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
         if (status.isTerminal()) return Bundle.message("toolbar.execution.disabled", status.getLabel());
 
         return editor.hasSomethingToWalk()
-                ? Toolbar.START_MANUAL_EXECUTION
+                ? ExecutionControl.START.getLabel()
                 : Bundle.message("toolbar.nothing.to.execute");
     }
 

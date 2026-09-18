@@ -16,6 +16,7 @@
 
 package org.testin.lightmode;
 
+import org.testin.editor.run.ExecutionControl;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -32,7 +33,6 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import java.awt.Toolkit;
 import org.testin.editor.run.RunEditor;
-import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.StartExecutionBtn;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.TestRunItems;
@@ -163,8 +163,8 @@ final class LightModeWindow {
      * stops drawing the platform's run-code arrow, which the toolbar had already
      * moved away from because manual execution runs no code.
      */
-    private final @NotNull TitleBarBtn start = new TitleBarBtn(Toolbar.START_MANUAL_EXECUTION, Toolbar.START_MANUAL_EXECUTION_ICON);
-    private final @NotNull TitleBarBtn stop = new TitleBarBtn(Toolbar.STOP_EXECUTION, Toolbar.STOP_EXECUTION_ICON);
+    private final @NotNull TitleBarBtn start = new TitleBarBtn(ExecutionControl.START.getLabel(), ExecutionControl.START.getIcon());
+    private final @NotNull TitleBarBtn stop = new TitleBarBtn(ExecutionControl.STOP.getLabel(), ExecutionControl.STOP.getIcon());
     private final @NotNull JBLabel counter = new JBLabel();
 
     /**
