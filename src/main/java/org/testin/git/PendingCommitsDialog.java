@@ -256,13 +256,12 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                     indexer.removeTestCase(testSetPath, testCaseId);
                     yield true;
                 }
-                case DELETED -> {
-                    // Rule-INTERNAL-035. Put back as it was committed, audit
-                    // included: the ordinary save finds the case unknown and
-                    // stamps whoever reverts it as its creator (#66, finding 113).
-                    indexer.putTestCaseVerbatim(testSetPath, diff.committedState());
-                    yield true;
-                }
+                // Rule-INTERNAL-035. Put back as it was committed, audit
+                // included: the ordinary save finds the case unknown and stamps
+                // whoever reverts it as its creator (#66, finding 113). Reverted
+                // only if the file was written; when it was not, the writer has
+                // said why and the row stays (#66, finding 285).
+                case DELETED -> indexer.putTestCaseVerbatim(testSetPath, diff.committedState());
                 case MODIFIED -> revertField(indexer, testSetPath, changeType, diff);
             };
 
@@ -306,14 +305,15 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         // included. Stamped as modified now, it stayed in the review for a change
         // nobody made (#66, finding 128). A case that still differs somewhere is
         // an ordinary edit, and is stamped as one.
+        //
+        // Answered by the write, so a refused one does not take the row away
+        // under a "Reverted" balloon (#66, finding 285).
         if (TestCaseChangeComparator.compare(committed, working).isEmpty()) {
             working.takeAuditOf(committed);
-            indexer.putTestCaseVerbatim(testSetPath, working);
-        } else {
-            indexer.putTestCase(testSetPath, working);
+            return indexer.putTestCaseVerbatim(testSetPath, working);
         }
 
-        return true;
+        return indexer.putTestCase(testSetPath, working);
     }
 
     private void removeRow(final int row) {

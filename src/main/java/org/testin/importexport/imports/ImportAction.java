@@ -193,14 +193,14 @@ public class ImportAction extends DumbAwareAction {
                         final @NotNull List<TestCaseDto> cases = set.getValue();
                         final @NotNull Path setPath = into.getPath();
 
-                        final int written = linkAndSaveTestCases(setPath, cases, rankOfTail(setPath), indicator, imported, total);
-                        if (written > 0) stillEmpty.remove(into.getName());
+                        final @NotNull List<TestCaseDto> written = linkAndSaveTestCases(setPath, cases, rankOfTail(setPath), indicator, imported, total);
+                        if (!written.isEmpty()) stillEmpty.remove(into.getName());
 
                         for (final TestCaseDto tc : cases) tc.setParent(into);
 
-                        if (generateCode) generateTestMethods(cases.subList(0, written), into.getName(), indicator);
+                        if (generateCode) generateTestMethods(written, into.getName(), indicator);
 
-                        imported += written;
+                        imported += written.size();
 
                         // UC-SHARE-007, Rule-SHARE-037.
                         //
@@ -398,10 +398,12 @@ public class ImportAction extends DumbAwareAction {
         /**
          * UC-SHARE-005, Rule-SHARE-025, Rule-SHARE-037.
          *
-         * @return how many cases were written. Every one of them is on disk, so a
-         * tester who stopped the import part way is told a number they can act on
+         * @return the cases written. Every one of them is on disk, so a tester who
+         * stopped the import part way is told a number they can act on. A case
+         * whose write was refused is not among them: the writer has said why, and
+         * it is neither counted as imported nor given a method (#66, finding 285)
          */
-        private int linkAndSaveTestCases(final @NotNull Path dirPath, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
+        private @NotNull List<TestCaseDto> linkAndSaveTestCases(final @NotNull Path dirPath, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             // After what is already in the set, in the order the sheet listed them.
@@ -417,17 +419,18 @@ public class ImportAction extends DumbAwareAction {
             // The imported cases keep the audit their file carried; the tail is an
             // existing case whose link changed, so it is an ordinary save and is
             // recorded as modified by whoever ran the import.
-            int written = 0;
+            final @NotNull List<TestCaseDto> written = new ArrayList<>(testCases.size());
+            int tried = 0;
             for (final TestCaseDto tc : testCases) {
                 // Asked rather than thrown, as the indexing scan asks it: stopping
                 // is an answer, and an exception here would have to be sorted back
                 // out from a real failure by every caller above.
                 if (indicator.isCanceled()) break;
 
-                indexer.putTestCaseVerbatim(dirPath, tc);
+                if (indexer.putTestCaseVerbatim(dirPath, tc)) written.add(tc);
 
-                written++;
-                indicator.setFraction((done + written) / (double) total);
+                tried++;
+                indicator.setFraction((done + tried) / (double) total);
                 indicator.setText2(tc.getDescription());
             }
 

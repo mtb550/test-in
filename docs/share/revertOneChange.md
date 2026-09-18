@@ -80,7 +80,9 @@ of those.
 **If the test case is no longer in the test project** — a message reads *That
 test case is no longer in the project*.
 
-**If the write fails** — a message titled **Revert Failed** carries the reason.
+**If the write fails** — the row stays, and nothing reads *Reverted*. A message
+reads *unable to write content:* and the reason, or one titled **Revert Failed**
+carries it.
 
 ## A new or removed test case
 

@@ -120,6 +120,10 @@ many test cases were written before it stopped, and that they are still there.
 It says "at least", because the test set being written when it stopped may have
 got part of the way through.
 
+**If one test case cannot be written** — a message reads *unable to write
+content:* and the reason. The rest are imported. That one is not counted in the
+message that says how many were, and no test method is written for it.
+
 **If the IDE has no Java plugin** — the test cases are imported and no test
 methods are generated. A message says so once for the whole code project.
 

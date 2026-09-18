@@ -211,10 +211,13 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         // the state being asked for. A copy-and-paste is unaffected either way:
         // its ids are fresh, so nothing overlaps.
         target.forEach(TestCaseSnapshot::removeAbsent);
-        target.forEach(TestCaseSnapshot::restorePresent);
+
+        // Every snapshot tries, whatever the one before it answered.
+        boolean allBack = true;
+        for (final TestCaseSnapshot snapshot : target) allBack &= snapshot.restorePresent();
 
         tellTheSurfaces(p, target);
-        return true;
+        return allBack;
     }
 
     /**
@@ -320,8 +323,12 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
      * UC-EDITOR-PANEL-017.
      * <p>
      * The cases this snapshot holds, put back as they were.
+     * <p>
+     * Answers whether every one of them was written. A case whose write was
+     * refused is still as it was, the writer has said why, and the undo is not
+     * confirmed over it (#66, finding 285).
      */
-    private void restorePresent() {
+    private boolean restorePresent() {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         // The set the cases belong to, put back on them before anything reads
@@ -349,17 +356,21 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         // A copy per write for the same reason the snapshot is a copy: the
         // indexer keeps the object it is given, and this snapshot may be
         // applied again by the next redo.
+        final @NotNull List<TestCaseDto> landed = new ArrayList<>();
         final @NotNull List<TestCaseDto> comingBack = new ArrayList<>();
         present.forEach(tc -> {
             // A case the index has never heard of is one coming back from a
             // removal rather than one being edited back, and only the first
             // needs a method written. Asked before the save, because after it
             // every case is there.
-            if (indexer.findTestCase(tc.getId()).isEmpty()) comingBack.add(tc);
+            final boolean isComingBack = indexer.findTestCase(tc.getId()).isEmpty();
 
             final @NotNull TestCaseDto stored = copy(p, tc);
             stored.setParent(parent);
-            indexer.putTestCaseVerbatim(testSetPath, stored);
+            if (!indexer.putTestCaseVerbatim(testSetPath, stored)) return;
+
+            landed.add(tc);
+            if (isComingBack) comingBack.add(tc);
         });
 
         // One call, like the two below and above it.
@@ -377,7 +388,12 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         // case as it was and not a list of what changed. Silent where a case has
         // no method, and it writes none: a method deleted on purpose stays
         // deleted.
-        if (!present.isEmpty()) GenType.RECONCILE_TEST_CASE.executeAll(p, present);
+        //
+        // Only for the cases that were written: a method rewritten to match a
+        // case the disk never took would describe a case that is not there.
+        if (!landed.isEmpty()) GenType.RECONCILE_TEST_CASE.executeAll(p, landed);
+
+        return landed.size() == present.size();
     }
 
     private static @NotNull TestCaseDto copy(final @NotNull Project p, final @NotNull TestCaseDto tc) {
