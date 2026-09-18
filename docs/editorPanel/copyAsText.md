@@ -76,8 +76,8 @@ This copies words a person can read. It does not copy the test case itself.
    the whole test case, which is what `Ctrl+C` did on its own before the menu.
 2. **A letter on each row** — pressing it copies that value and closes the menu.
    `Ctrl+C` then `D` is as quick as one keystroke for a tester who knows it.
-   Each row's icon is that letter in a frame, the same icon the field has in
-   Create Test Case.
+   Each row's icon is that letter in a frame. A field Create Test Case also has,
+   such as the description, shows the same icon there.
 3. **The last three** — the class name, the identity and the path. Testin writes
    those; a tester pastes them into a stack trace, a ticket or a search.
 

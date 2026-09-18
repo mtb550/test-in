@@ -50,24 +50,29 @@ One field, one small dialog. The rest of the test case is left alone.
 ┌────────────────────────────────────────┐
 │  Update Test Case                      │
 ├────────────────────────────────────────┤
-│  Description             D             │
-│  Expected Result         E             │
-│  Module                  M             │
-│  Test Data               T             │
-│  Pre Conditions          B             │
-│  Steps                   S             │
-│  Priority                P             │
-│  Group                   G             │
-│  Order                   O             │
+│  [D] Description         D             │
+│  [E] Expected Result     E             │
+│  [M] Module              M             │
+│  [T] Test Data           T             │
+│  [B] Pre Conditions      B             │
+│  [S] Steps               S             │
+│  [P] Priority            P             │
+│  [G] Group               G             │
+│  [eye] Status                          │
+│  [O] Order               O             │
 └────────────────────────────────────────┘
 ```
 
-1. **Each row** — the field's name, then the letter that opens it.
+1. **Each row** — the field's icon, its name, then the letter that opens it.
+   The icon is that letter in a rounded frame, the same icon the field has
+   wherever it is offered.
 2. **The first row** — selected when the menu opens.
+3. **Status** — the one row with no letter, so its icon is the platform's eye
+   rather than a letter.
 
 Choosing a row opens that field's own small dialog. Those dialogs belong to the
 editor panel. They are drawn on
-[UC-EDITOR-PANEL-007](../editorPanel/changeOneField.md).
+[UC-EDITOR-PANEL-006](../editorPanel/changeOneField.md).
 
 ## Main flow
 

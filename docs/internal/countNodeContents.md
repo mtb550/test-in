@@ -65,12 +65,17 @@ drawn on [UC-TREE-PANEL-027](../treePanel/nodeDetails.md).
 ┌──────────────────────────────────────────────────────────────┐
 │  Details                                                     │
 ├──────────────────────────────────────────────────────────────┤
-│  Name          Accounts                                      │
-│  Status        Active                                        │
+│  NAME                                                        │
+│  Accounts                                                    │
+│  STATUS                                                      │
+│  Active                                                      │
 │                                                              │
-│  Test sets     2                                        (1)  │
-│  Packages      1                                             │
-│  Test cases    14                                       (2)  │
+│  TEST SETS                                              (1)  │
+│  2                                                           │
+│  PACKAGES                                                    │
+│  1                                                           │
+│  TEST CASES                                                  │
+│  14                                               (2)        │
 ├──────────────────────────────────────────────────────────────┤
 │  Escape Close                                                │
 └──────────────────────────────────────────────────────────────┘

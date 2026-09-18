@@ -46,14 +46,22 @@ There is no key for this. The button is at the far right of the toolbar.
 ┌────────────────────────────────────────────────────────────┐
 │  Details                                                   │
 ├────────────────────────────────────────────────────────────┤
-│  Name          Login                                       │
-│  Path          C:\...\Demo\Test Cases\Login                │
-│  Created By    mtb                                         │
-│  Created At    12 Aug 2026 09:14                           │
-│  Updated By    mtb                                         │
-│  Updated At    03 Sep 2026 16:02                           │
-│  Status        Active                                      │
-│  Test Cases    12                                          │
+│  NAME                                                      │
+│  Login                                                     │
+│  PATH                                                      │
+│  C:\...\Demo\Test Cases\Login                              │
+│  CREATED BY                                                │
+│  mtb                                                       │
+│  CREATED AT                                                │
+│  12 Aug 2026 09:14                                         │
+│  UPDATED BY                                                │
+│  mtb                                                       │
+│  UPDATED AT                                                │
+│  03 Sep 2026 16:02                                         │
+│  STATUS                                                    │
+│  Active                                                    │
+│  TEST CASES                                                │
+│  12                                                        │
 │                                                            │
 │           ( a ring chart of what this node holds )         │
 ├────────────────────────────────────────────────────────────┤

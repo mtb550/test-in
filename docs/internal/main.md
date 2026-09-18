@@ -14,8 +14,9 @@ up here rather than left to the code.
 | **Part of Testin** | The parts that belong to no panel |
 | **Answers** | What the search finds, and what Testin does with the files under the Testin folder |
 | **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-007`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-087` |
+| **Retired** | `Rule-INTERNAL-086` said the captions down the left of one dialog share one width, widened to the longest caption so none is cut off. Retired 18 September 2026, when each caption moved onto its own line above its field (#328) and there was no column left to widen; read Rule-INTERNAL-087 instead. The number is not given to anything else |
 | **State** | **Written** |
-| **Checked against** | `main` at `2cb8c1dc`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-INTERNAL-003](noticeOutsideChange.md) and [UC-INTERNAL-004](numberTestCase.md) were read from the code again |
+| **Checked against** | `main` at `2cb8c1dc`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-INTERNAL-003](noticeOutsideChange.md) and [UC-INTERNAL-004](numberTestCase.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. |
 | **Written to** | [How a document is written](../standard.md) |
 
 ---

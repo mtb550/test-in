@@ -123,8 +123,8 @@ test run is going.
 │  [E] The dashboard opens and the account name is shown in the header.      │
 │                                                                            │
 │      [ HIGH ]  [ Accounts ]                                                │
-│  [S] 1. Open the sign-in page.                                             │
-│      2. Type the username.                                                 │
+│      1. Open the sign-in page.                                             │
+│  [S] 2. Type the username.                                                 │
 │      3. Type the password.                                                 │
 │      4. Press Sign in.                                                     │
 │  [T] sample.user@example.com / correct-horse                               │
@@ -284,7 +284,7 @@ row back for that one state.
 
 **One line, always.** It never wraps and never scrolls. Whatever fits is shown,
 and the rest is simply not there. So the order was chosen, not left to chance.
-The three keys with no button to teach them come first. The three that fall off
+The two keys with no button to teach them come first. The three that fall off
 a narrow window are exactly the three with buttons sitting above them. Making
 the window wider brings them back. So the edge of the window has a second job.
 
@@ -370,9 +370,10 @@ back. A failure nobody described is a failure nobody can act on.
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  [||]  [pin]  [view]            Cycle-2                        3 / 6       │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  LOGIN · Failed                                                            │
-│  Sign in with a correct username and password                              │
-│  The dashboard opens and the account name is shown in the header.          │
+│  [set] LOGIN · Failed                                                      │
+│                                                                            │
+│  [D] Sign in with a correct username and password                          │
+│  [E] The dashboard opens and the account name is shown in the header.      │
 │                                                                            │
 │  ACTUAL RESULT                                                             │
 │  ┌──────────────────────────────────────────────────────────────────────┐  │
@@ -517,7 +518,8 @@ base size.
 - the description is three points larger, and bold
 - the expected result and every detail are the base size
 - the test set name is two points smaller. The details are named by their
-  icons, **S**, **T** and **B**, as the test case form names them, and the tags
+  icons, **S**, **T** and **B**, as the test case form names them, each in the
+  middle of its row's height, and the tags
   come first with no icon, since their badges say what they are. The captions
   on the failure form are set in the caption font, JetBrains Mono in capitals,
   as every caption in Testin is (Rule-INTERNAL-087). The icons keep their size
@@ -688,7 +690,7 @@ it holds one test case and nothing else. One key shows and hides the details,
 
 The status bar teaches it. It is the row that answered this. Before it,
 removing the button left a shortcut that nothing on screen mentioned. A
-tester who did not read the documentation would never have found them.
+tester who did not read the documentation would never have found it.
 
 **One warning.** `Ctrl+D` already means something else in the create-test-case
 dialog. It is a different window, so the two never clash, but they do mean

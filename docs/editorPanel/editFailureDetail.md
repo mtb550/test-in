@@ -54,15 +54,19 @@ The same dialog the `F` key opens, with what was written already in it.
 ┌────────────────────────────────────────────────────────────┐
 │  Failed Test Case Details                                  │
 ├────────────────────────────────────────────────────────────┤
-│  Description   Log in with a locked account                │
-│  Expected      The account is refused.                     │
+│  [D] Log in with a locked account                          │
+│  [E] The account is refused.                               │
 │                                                            │
+│  ACTUAL RESULT                                             │
 │  [ The session was dropped instead.                    ]   │
 │                                                            │
-│  Bug Severity  ( ) Blocker (x) Major ( ) Minor ( ) Enha.   │
+│  BUG SEVERITY                                              │
+│  ( ) Blocker  (x) Major  ( ) Minor  ( ) Enhancement        │
 │                                                            │
-│  Bug Priority  (x) High    ( ) Medium          ( ) Low     │
+│  BUG PRIORITY                                              │
+│  (x) High  ( ) Medium  ( ) Low                             │
 │                                                            │
+│  STACKTRACE                                                │
 │  ┌──────────────────────────────────────────────────────┐  │
 │  │  Error 500 returned by /api/session                  │  │
 │  └──────────────────────────────────────────────────────┘  │
@@ -71,8 +75,8 @@ The same dialog the `F` key opens, with what was written already in it.
 └────────────────────────────────────────────────────────────┘
 ```
 
-1. **Description** and **Expected** — what the test case says. Neither can be
-   typed into.
+1. **Description** and **Expected** — what the test case says, each after its
+   icon, **D** and **E**. Neither can be typed into.
 2. **The first box** — what actually happened. It opens holding what was written
    before.
 3. **Bug Severity** and **Bug Priority** — the choices made last time are the

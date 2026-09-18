@@ -12,7 +12,7 @@ in a tab. It is where test cases are written, and where a test run is executed.
 | **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-230` |
 | **Retired** | `Rule-EDITOR-PANEL-231` said each open field in Create Test Case and Update Test Case is named by a caption above it. Retired 18 September 2026, when the captions were taken off those two dialogs again (#328): a field is named by its icon and its gray hint, as it was before. The number is not given to anything else |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **Checked against** | `main` at `a53922a1`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-EDITOR-PANEL-011](removeTestCases.md) and [UC-EDITOR-PANEL-045](writeResultAnalysis.md) were read from the code again |
+| **Checked against** | `main` at `a53922a1`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-EDITOR-PANEL-011](removeTestCases.md) and [UC-EDITOR-PANEL-045](writeResultAnalysis.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. |
 | **Written to** | [How a document is written](../standard.md) |
 
 ---

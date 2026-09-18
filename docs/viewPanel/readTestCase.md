@@ -133,8 +133,8 @@ badges. They are numbered on the panel drawing on
 
 ## What Testin refuses
 
-**If a field is empty** — the row is not drawn at all. The panel is never a
-column of captions with nothing beside them.
+**If a field is empty** — the row is not drawn at all. The panel never shows a
+caption with nothing under it.
 
 **If the description is empty** — the title reads a single dash.
 

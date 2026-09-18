@@ -66,9 +66,9 @@ and which keys it answers, and the shell builds the rest.
   into, Enter picks the value under it while the list is open. While the list is
   closed, Enter is the dialog's own key, as it is in every other field.
 - **Rule-INTERNAL-087** — A caption sits on its own line above the field it
-  names, in the caption font: JetBrains Mono, two points below the text around
-  it, in capitals, in the muted caption gray. There is no caption column to line
-  up.
+  names, in the caption font: JetBrains Mono, two points below the dialog's
+  label font, in capitals, in the muted caption gray. There is no caption
+  column to line up.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

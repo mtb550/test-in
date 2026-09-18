@@ -12,7 +12,7 @@ it.
 | **Answers** | What the panel shows, how a test case gets into it, and what a tester can do from it |
 | **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-082` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
+| **Checked against** | `main` at `779fe6b4`, 7 September 2026. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. |
 | **Written to** | [How a document is written](../standard.md) |
 
 ---
