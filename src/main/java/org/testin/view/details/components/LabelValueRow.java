@@ -78,7 +78,10 @@ public final class LabelValueRow {
         gbc.insets = JBUI.insets(LABEL_INSETS_TOP, LABEL_INSETS_LEFT, LABEL_INSETS_BOTTOM, LABEL_INSETS_RIGHT);
 
         final @NotNull JBLabel label = new JBLabel(labelText);
-        label.setForeground(JBColor.GRAY);
+        // The same muted text the breadcrumb above it uses, and the dialog
+        // captions: a fixed grey here stayed one shade in both themes (#66,
+        // finding 259).
+        label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         label.setFont(JBFont.label().deriveFont(Font.BOLD, labelFontSize));
 
         // UC-SETTING-011. The usual width, scaled, and wider when the caption

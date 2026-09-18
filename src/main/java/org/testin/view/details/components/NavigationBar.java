@@ -18,7 +18,6 @@ package org.testin.view.details.components;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.Gray;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
@@ -44,7 +43,10 @@ import java.util.Map;
 @AllArgsConstructor
 public class NavigationBar extends BaseDetails {
 
-    final @NotNull Color DEFAULT_TEXT_COLOR = Gray._120;
+    // The platform's muted text, which follows the theme. A flat grey was
+    // visibly dimmer in the dark theme than the id badge beside it, which
+    // does follow it (#66, finding 259).
+    final @NotNull Color DEFAULT_TEXT_COLOR = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
     final int SEPARATOR_BORDER_V = 0;
     final int SEPARATOR_BORDER_H = 6;
     final int PANEL_BORDER_TOP = 10;
