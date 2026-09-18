@@ -72,6 +72,10 @@ The node goes to the recycle bin, so nothing is lost for good.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-102** — Keeping the copy for undo, and putting it back on
+  Ctrl+Z, run behind a progress bar and never hold up the IDE. Canceling the
+  copy removes nothing and closes no editor. Putting back cannot be canceled,
+  because a node half put back is worse than one not put back.
 
 ## The Confirm Removing dialog
 
@@ -111,7 +115,8 @@ and no path.
    node holds, and shows where it is after *From:*. For several nodes it asks
    *Remove these N items?*, where N is how many.
 4. The tester presses `Enter`.
-5. Testin closes each node's editor and keeps a copy for undo.
+5. Testin keeps a copy of each node for undo, under a progress bar reading
+   *Removing*, and then closes each node's editor.
 6. The node goes to the desktop's recycle bin, and its automation code goes with
    it. On a desktop with no recycle bin the node is deleted outright.
 7. The tree rebuilds. Testin shows *Removed*, or *Removed N* for several. The
@@ -120,6 +125,9 @@ and no path.
 ## What Testin refuses
 
 **If the tester presses `Escape`** — the dialog closes and nothing is removed.
+
+**If the tester cancels the *Removing* bar** — nothing is removed, and no
+editor is closed (Rule-TREE-PANEL-102).
 
 **If only Test Cases or Test Runs is selected** — **Remove** is gray, and
 `Delete` does nothing.

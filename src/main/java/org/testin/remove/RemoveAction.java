@@ -19,6 +19,7 @@ package org.testin.remove;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -138,18 +139,31 @@ public class RemoveAction extends DumbAwareAction {
             // four.
             final @NotNull List<Kept> kept = new ArrayList<>(nodesToRemove.size());
 
+            // Copied aside before it goes, because the recycle bin the removal
+            // sends it to is somewhere the platform can put things and cannot
+            // take them out of again. A node whose copy could not be made is
+            // still removed; it is simply not part of what CTRL+Z can reach.
+            //
+            // Rule-TREE-PANEL-102. Behind a progress bar and off the EDT: the
+            // copy is the whole node - for a test project every set, case and
+            // run in it - and it froze the IDE for as long as that took, with no
+            // way to stop it (#66, finding 179). Cancel removes nothing.
+            final boolean copied = ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
+                for (final DirectoryDto node : nodesToRemove) {
+                    ProgressManager.checkCanceled();
+                    indexer.keepAside(node.getPath()).ifPresent(copy -> kept.add(new Kept(node, node.getPath(), copy)));
+                }
+            }, Bundle.message("remove.progress"), true, p);
+
+            if (!copied) {
+                kept.forEach(one -> indexer.forgetKept(one.copy()));
+                return;
+            }
+
+            // A node with an editor open has that editor closed with it. The
+            // pair tested for here is exactly the pair that declares one.
             for (final DirectoryDto node : nodesToRemove) {
-
-                // A node with an editor open has that editor closed with it. The
-                // pair tested for here is exactly the pair that declares one.
-                if (node.isOpenableInEditor())
-                    Services.getInstance(p, TestinEditors.class).close(p, node);
-
-                // Copied aside before it goes, because the recycle bin the removal
-                // sends it to is somewhere the platform can put things and cannot
-                // take them out of again. A node whose copy could not be made is
-                // still removed; it is simply not part of what CTRL+Z can reach.
-                indexer.keepAside(node.getPath()).ifPresent(copy -> kept.add(new Kept(node, node.getPath(), copy)));
+                if (node.isOpenableInEditor()) Services.getInstance(p, TestinEditors.class).close(p, node);
             }
 
             removeEach(nodesToRemove, count -> {
@@ -247,7 +261,14 @@ public class RemoveAction extends DumbAwareAction {
 
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            final @NotNull List<Kept> lost = kept.stream().filter(one -> !indexer.restoreNode(one.copy(), one.original())).toList();
+            // Rule-TREE-PANEL-102. Off the EDT for the reason the removal is: the
+            // copy back is the whole node, and the test project is read again
+            // after it (#66, finding 179). Not canceled half way: a node half put
+            // back is worse than one not put back.
+            final @NotNull List<Kept> lost = new ArrayList<>();
+            ProgressManager.getInstance().runProcessWithProgressSynchronously(
+                    () -> lost.addAll(kept.stream().filter(one -> !indexer.restoreNode(one.copy(), one.original())).toList()),
+                    Bundle.message("remove.undo.progress"), false, p);
             Services.getInstance(p, TreePanel.class).getProjectTree().updateNodes();
 
             if (lost.isEmpty()) return true;

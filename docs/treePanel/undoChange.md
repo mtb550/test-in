@@ -78,7 +78,8 @@ status bar at the bottom right of the IDE.
    test run.
 2. The tester presses `Ctrl+Z`, or chooses **Actions → Undo \<what\>**.
 3. Testin reverses the change. Moved nodes go back. A renamed node gets its old
-   name. Removed nodes are restored from the copy kept aside. An edited test run
+   name. Removed nodes are restored from the copy kept aside, under a progress
+   bar reading *Putting back*. An edited test run
    gets its previous name, test cases and settings.
 4. Testin shows *Undone*.
 
