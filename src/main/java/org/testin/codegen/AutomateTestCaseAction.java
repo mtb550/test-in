@@ -20,6 +20,10 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.util.Computable;
+import org.testin.logger.Logger;
+import org.testin.navigate.CodeNavigation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.openapi.project.Project;
@@ -95,19 +99,45 @@ public class AutomateTestCaseAction extends DumbAwareAction {
         // A balloon shown here would say Automated before anything had been, and
         // the redraw would read the class as it was - the same mistake the paste
         // path made until it moved its message into the callback (#312, A56).
-        ApplicationManager.getApplication().invokeLater(() -> {
-            // Counted, and counting what was asked for rather than what was
-            // selected: a tester who picked forty cases and had two without a
-            // method is told two. What the generator refuses - a description that
-            // cannot name a method, a name another case answers to - it reports
-            // itself, in the words that say what to do about it.
-            Services.getInstance(p, Notifier.class).softShowCounted(p, Done.AUTOMATED, toWrite.size());
+        ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final int written = writtenFor(p, toWrite);
 
-            // The cards draw the automation mark from what the last read found,
-            // and nothing invalidates that - a redraw is what reads again. So the
-            // tester sees the mark change rather than being told it changed.
-            editor.ifPresent(TestinEditor::refreshView);
-        });
+            ApplicationManager.getApplication().invokeLater(() -> {
+                // Rule-CODEGEN-025. Counting what now has a method, not what was
+                // asked for. The count was the size of the request, so a project
+                // with no Java test source folder read "Java Test Source Not
+                // Found" and "Automated 3" side by side, and a case whose name
+                // another method holds read "Automated 1" on every press, forever
+                // (#66, finding 196). Nothing written, nothing claimed: the
+                // generator has already said why, in the words that say what to
+                // do about it.
+                if (written > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.AUTOMATED, written);
+
+                // The cards draw the automation mark from what the last read
+                // found, and nothing invalidates that - a redraw is what reads
+                // again. So the tester sees the mark change rather than being
+                // told it changed.
+                editor.ifPresent(TestinEditor::refreshView);
+            });
+        }));
+    }
+
+    /**
+     * How many of these have a method now. None had one by the page's last read,
+     * which is what put them in this list, so every one that has one now was
+     * written by this gesture. Off the EDT and under a read action, as
+     * {@link AutomationState} reads the same thing; nothing while the IDE indexes,
+     * when the generator refused and said so.
+     */
+    private static int writtenFor(final @NotNull Project p, final @NotNull List<TestCaseDto> asked) {
+        if (DumbService.isDumb(p)) return 0;
+
+        try {
+            return ApplicationManager.getApplication().runReadAction((Computable<Integer>) () -> CodeNavigation.available().methodsFor(p, asked).size());
+        } catch (final Exception ex) {
+            Logger.warn("Could not count the methods Automate Test Case wrote: " + ex.getMessage());
+            return 0;
+        }
     }
 
     /**

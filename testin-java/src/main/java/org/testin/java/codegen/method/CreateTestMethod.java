@@ -35,6 +35,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.util.NameSanitizer;
 
 import java.util.*;
@@ -248,14 +249,26 @@ public class CreateTestMethod implements GenAction {
                 // every updater can find it. Skipping silently is what left a
                 // hand-automated class reporting "no automation has been
                 // generated yet" for every case in it (#66, finding 41).
-                if (owner.orElseThrow().isEmpty()) {
-                    Optional.ofNullable(byKey.get(key)).ifPresent(pm -> GeneratedMethod.adopt(p, pm, tc));
+                //
+                // Only a method carrying @Test, though. A helper, a @BeforeMethod
+                // or a constructor has no case id either, and it was taken for the
+                // tester's own test: adopt found no @Test to write the id into and
+                // did nothing, the case was counted as linked, and it never got a
+                // method - Automate Test Case then said "Automated 1" over it on
+                // every press (#66, finding 192). A generated method beside it
+                // would not compile, so the case has lost the name, and says so.
+                final @NotNull Optional<PsiMethod> theTestersOwn = Optional.ofNullable(byKey.get(key))
+                        .filter(pm -> owner.orElseThrow().isEmpty() && GeneratedMethod.testAnnotationOf(pm).isPresent());
+
+                if (theTestersOwn.isPresent()) {
+                    GeneratedMethod.adopt(p, theTestersOwn.orElseThrow(), tc);
                     owners.put(key, id);
                     adopted++;
                 }
-                    // Another case already answers to that name, so this one would
-                    // get no method - unrunnable, unreachable from the gutter, and
-                    // until now silent (#244).
+                    // Another method already answers to that name - another case's,
+                    // or one that is not a test - so this one would get no method:
+                    // unrunnable, unreachable from the gutter, and until now silent
+                    // (#244).
                 else lostTheName.add(tc);
                 continue;
             }
@@ -321,16 +334,11 @@ public class CreateTestMethod implements GenAction {
     private void reportCannotBeNamed(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> cannotBeNamed) {
         if (cannotBeNamed.isEmpty()) return;
 
-        final @NotNull String names = cannotBeNamed.stream().limit(3).map(TestCaseDto::getDescription).collect(Collectors.joining("\", \"", "\"", "\""));
-        final @NotNull String andMore = cannotBeNamed.size() > 3 ? " and " + (cannotBeNamed.size() - 3) + " more" : "";
-
         Logger.warn("No method for " + cannotBeNamed.size() + " case(s) in " + targetClass.getQualifiedName()
                 + ": the description cannot name a Java method");
 
-        Services.getInstance(p, Notifier.class).warn(p,
-                cannotBeNamed.size() == 1 ? "A test case has no automation method" : cannotBeNamed.size() + " test cases have no automation method",
-                names + andMore + " cannot name a Java method - a description has to start with a letter "
-                        + "and hold something other than punctuation. Reword it and generate again.");
+        Services.getInstance(p, Notifier.class).warn(p, noMethodTitle(cannotBeNamed),
+                Bundle.message("codegen.cannot.name.message", named(cannotBeNamed)));
     }
 
     /**
@@ -353,17 +361,29 @@ public class CreateTestMethod implements GenAction {
     private void reportLostTheName(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> lost) {
         if (lost.isEmpty()) return;
 
-        final @NotNull String names = lost.stream().limit(3).map(TestCaseDto::getDescription).collect(Collectors.joining("\", \"", "\"", "\""));
-        final @NotNull String andMore = lost.size() > 3 ? " and " + (lost.size() - 3) + " more" : "";
-
         Logger.warn("No method for " + lost.size() + " case(s) in " + targetClass.getQualifiedName()
-                + ": the name is already taken by another case");
+                + ": the name is already taken by another method");
 
-        Services.getInstance(p, Notifier.class).warn(p,
-                lost.size() == 1 ? "A test case has no automation method" : lost.size() + " test cases have no automation method",
-                names + andMore + " would be named after a method another test case already has. "
-                        + "Punctuation and capitals do not make two methods, so reword one of them by a word "
-                        + "and generate again.");
+        Services.getInstance(p, Notifier.class).warn(p, noMethodTitle(lost),
+                Bundle.message("codegen.name.taken.message", named(lost)));
+    }
+
+    /**
+     * The title both refusals share: how many test cases went without a method.
+     */
+    private static @NotNull String noMethodTitle(final @NotNull List<TestCaseDto> without) {
+        return without.size() == 1
+                ? Bundle.message("codegen.no.method.one")
+                : Bundle.message("codegen.no.method.many", String.valueOf(without.size()));
+    }
+
+    /**
+     * Up to three of them by description, quoted, and how many more there are.
+     */
+    private static @NotNull String named(final @NotNull List<TestCaseDto> cases) {
+        final @NotNull String names = cases.stream().limit(3).map(TestCaseDto::getDescription).collect(Collectors.joining("\", \"", "\"", "\""));
+
+        return cases.size() > 3 ? Bundle.message("codegen.named.and.more", names, String.valueOf(cases.size() - 3)) : names;
     }
 
     /**
@@ -541,7 +561,7 @@ public class CreateTestMethod implements GenAction {
                 // Another case owning the name is #244 and has to be said out
                 // loud; a method with no case id is one the tester wrote, and
                 // leaving that alone is what the key compare is for.
-                if (GeneratedMethod.caseIdOf(sameName.orElseThrow()).isPresent())
+                if (GeneratedMethod.caseIdOf(sameName.orElseThrow()).isPresent() || GeneratedMethod.testAnnotationOf(sameName.orElseThrow()).isEmpty())
                     reportLostTheName(p, targetClass, List.of(tc));
                 else
                     Logger.info("Method already exists: " + methodName);
