@@ -50,7 +50,7 @@ import static org.testin.testcase.TestCaseDialogKey.*;
 /**
  * A field the update menu offers: the section it opens, the bulk editor behind
  * it, and the generator that follows the change into the Java code. Its icon is
- * its key's letter, as on the create form.
+ * the create form's, so a field looks the same in the form and on the menu.
  * <p>
  * Every constant here is a field. The keys a section advertises are
  * {@link TestCaseDialogKey}, shared with {@link CreateTestCaseFields} — the two
@@ -64,6 +64,7 @@ public enum UpdateTestCaseFields implements MenuItem {
     DESCRIPTION(
             TestEditorAttributes.DESCRIPTION.getName(),
             Shortcuts.UpdateTestCaseDescription,
+            CreateTestCaseFields.DESCRIPTION.getIcon(),
             GenType.UPDATE_TEST_CASE_DESCRIPTION,
             (p, items, updatedItems) -> new DescriptionBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getDescriptionSection,
@@ -73,6 +74,7 @@ public enum UpdateTestCaseFields implements MenuItem {
     EXPECTED_RESULT(
             TestEditorAttributes.EXPECTED_RESULT.getName(),
             Shortcuts.UpdateTestCaseExpectedResult,
+            CreateTestCaseFields.EXPECTED_RESULT.getIcon(),
             GenType.UPDATE_TEST_CASE_EXPECTED_RESULT,
             (p, items, updatedItems) -> new ExpectedResultBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getExpectedResultSection,
@@ -82,6 +84,7 @@ public enum UpdateTestCaseFields implements MenuItem {
     MODULE(
             TestEditorAttributes.MODULE.getName(),
             Shortcuts.UpdateTestCaseModule,
+            CreateTestCaseFields.MODULE.getIcon(),
             GenType.UPDATE_TEST_CASE_MODULE,
             (p, items, updatedItems) -> new ModuleBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getModuleSection,
@@ -91,6 +94,7 @@ public enum UpdateTestCaseFields implements MenuItem {
     TEST_DATA(
             TestEditorAttributes.TEST_DATA.getName(),
             Shortcuts.UpdateTestCaseTestData,
+            CreateTestCaseFields.TEST_DATA.getIcon(),
             GenType.UPDATE_TEST_CASE_TEST_DATA,
             (p, items, updatedItems) -> new TestDataBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getTestDataSection,
@@ -100,6 +104,7 @@ public enum UpdateTestCaseFields implements MenuItem {
     PRE_CONDITIONS(
             TestEditorAttributes.PRE_CONDITIONS.getName(),
             Shortcuts.UpdateTestCasePreConditions,
+            CreateTestCaseFields.PRE_CONDITIONS.getIcon(),
             GenType.UPDATE_TEST_CASE_PRE_CONDITIONS,
             (p, items, updatedItems) -> new PreConditionsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPreConditionsSection,
@@ -109,6 +114,7 @@ public enum UpdateTestCaseFields implements MenuItem {
     STEPS(
             TestEditorAttributes.STEPS.getName(),
             Shortcuts.UpdateTestCaseSteps,
+            CreateTestCaseFields.STEPS.getIcon(),
             GenType.UPDATE_TEST_CASE_STEPS,
             (p, items, updatedItems) -> new StepsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getStepsSection,
@@ -118,6 +124,7 @@ public enum UpdateTestCaseFields implements MenuItem {
     PRIORITY(
             TestEditorAttributes.PRIORITY.getName(),
             Shortcuts.UpdateTestCasePriority,
+            CreateTestCaseFields.PRIORITY.getIcon(),
             GenType.UPDATE_TEST_CASE_PRIORITY,
             (p, items, updatedItems) -> new PriorityBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPrioritySection,
@@ -127,6 +134,7 @@ public enum UpdateTestCaseFields implements MenuItem {
     GROUP(
             TestEditorAttributes.GROUP.getName(),
             Shortcuts.UpdateTestCaseGroup,
+            CreateTestCaseFields.GROUP.getIcon(),
             GenType.UPDATE_TEST_CASE_GROUP,
             (p, items, updatedItems) -> new GroupBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getGroupSection,
@@ -164,6 +172,7 @@ public enum UpdateTestCaseFields implements MenuItem {
     ORDER(
             TestEditorAttributes.ORDER.getName(),
             Shortcuts.UpdateTestCaseOrder,
+            Icons.fieldLetter("O", Icons.GRAY),
             GenType.UPDATE_TEST_CASE_ORDER,
             (p, items, updatedItems) -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("update.order.one.at.a.time")),
             TestCaseBaseDialog::getOrderSection,
@@ -181,13 +190,6 @@ public enum UpdateTestCaseFields implements MenuItem {
      * The keys this section adds to the shared ones.
      */
     private final TestCaseDialogKey @NotNull [] ownKeys;
-
-    /**
-     * A field a key opens, drawn as that key's letter.
-     */
-    UpdateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull GenType gt, final @NotNull BulkEditorAction bulkAction, final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor, final TestCaseDialogKey @NotNull [] ownKeys) {
-        this(name, shortcut, Icons.fieldLetter(shortcut), gt, bulkAction, sectionExtractor, ownKeys);
-    }
 
     /**
      * What the section strip shows while this section holds the focus: its own

@@ -34,8 +34,7 @@ import static org.testin.testcase.TestCaseDialogKey.*;
 
 /**
  * A field of the create test case dialog: the section it builds, the icon and
- * placeholder it shows, and the key that jumps to it. The icon is that key's
- * letter, so the two cannot disagree.
+ * placeholder it shows, and the key that jumps to it.
  * <p>
  * Every constant here is a field. The keys a section advertises are
  * {@link TestCaseDialogKey}, which is why this enum no longer carries constants
@@ -47,6 +46,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     DESCRIPTION(
             TestEditorAttributes.DESCRIPTION.getName(),
             Shortcuts.CreateTestCaseDescription,
+            Icons.fieldLetter("D", Icons.GRAY),
             TestCaseBaseDialog::getDescriptionSection,
             Bundle.message("field.set.description"),
             CORRECTIONS, NAVIGATE_TAB
@@ -55,6 +55,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     EXPECTED_RESULT(
             TestEditorAttributes.EXPECTED_RESULT.getName(),
             Shortcuts.CreateTestCaseExpectedResult,
+            Icons.fieldLetter("E", Icons.GRAY),
             TestCaseBaseDialog::getExpectedResultSection,
             Bundle.message("field.set.expected.result"),
             CORRECTIONS, NAVIGATE_TAB
@@ -63,6 +64,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     MODULE(
             TestEditorAttributes.MODULE.getName(),
             Shortcuts.CreateTestCaseModule,
+            Icons.fieldLetter("M", Icons.GRAY),
             TestCaseBaseDialog::getModuleSection,
             Bundle.message("field.set.module"),
             CORRECTIONS, NAVIGATE_TAB
@@ -71,6 +73,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     TEST_DATA(
             TestEditorAttributes.TEST_DATA.getName(),
             Shortcuts.CreateTestCaseTestData,
+            Icons.fieldLetter("T", Icons.GRAY),
             TestCaseBaseDialog::getTestDataSection,
             Bundle.message("field.set.test.data"),
             NAVIGATE_TAB
@@ -79,6 +82,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     PRE_CONDITIONS(
             TestEditorAttributes.PRE_CONDITIONS.getName(),
             Shortcuts.CreateTestCasePreConditions,
+            Icons.fieldLetter("B", Icons.GRAY),
             TestCaseBaseDialog::getPreConditionsSection,
             Bundle.message("field.set.pre.conditions"),
             CORRECTIONS, NAVIGATE_TAB
@@ -87,6 +91,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     STEPS(
             TestEditorAttributes.STEPS.getName(),
             Shortcuts.CreateTestCaseAddStep,
+            Icons.fieldLetter("S", Icons.GRAY),
             TestCaseBaseDialog::getStepsSection,
             Bundle.message("field.set.step"),
             CORRECTIONS, ADD_STEP, AUTO_COMPLETE, NAVIGATE_TAB
@@ -95,6 +100,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     PRIORITY(
             TestEditorAttributes.PRIORITY.getName(),
             Shortcuts.CreateTestCasePriority,
+            Icons.fieldLetter("P", Icons.GRAY),
             TestCaseBaseDialog::getPrioritySection,
             "",
             NAVIGATE_ARROWS
@@ -103,6 +109,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     GROUP(
             TestEditorAttributes.GROUP.getName(),
             Shortcuts.CreateTestCaseGroup,
+            Icons.fieldLetter("G", Icons.GRAY),
             TestCaseBaseDialog::getGroupSection,
             "",
             ADD_GROUP, AUTO_COMPLETE, NAVIGATE_TAB
@@ -120,8 +127,8 @@ public enum CreateTestCaseFields implements StatusBarItem {
 
     private final @NotNull String name;
     /**
-     * The key that jumps to this field. Every field has one: its icon is that
-     * key's letter.
+     * The key that jumps to this field, and {@link Shortcuts#EMPTY} for the
+     * fields no key reaches.
      * <p>
      * Only the fields in {@link #JUMP_KEYS} have their key advertised in the
      * status bar, so a binding outside that list is one nobody could discover.
@@ -140,10 +147,10 @@ public enum CreateTestCaseFields implements StatusBarItem {
      */
     private final TestCaseDialogKey @NotNull [] ownKeys;
 
-    CreateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor, final @NotNull String placeholder, final TestCaseDialogKey @NotNull ... ownKeys) {
+    CreateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull Icon icon, final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor, final @NotNull String placeholder, final TestCaseDialogKey @NotNull ... ownKeys) {
         this.name = name;
         this.shortcut = shortcut;
-        this.icon = Icons.fieldLetter(shortcut);
+        this.icon = icon;
         this.sectionExtractor = sectionExtractor;
         this.placeholder = placeholder;
         this.ownKeys = ownKeys;
