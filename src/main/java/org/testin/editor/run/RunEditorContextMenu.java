@@ -54,7 +54,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         // the same word. Three of them cannot work on a run and say so on the
         // entry rather than being left out - a tester who learns Actions in one
         // editor finds it in the other (#248).
-        add(actions(p, ui, dir, list, model));
+        add(actions(p, dir, list));
 
         addSeparator();
         add(Declared.forMenu("Testin.RunTestCase"));
@@ -78,9 +78,9 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
      * caller to ignore.
      */
     @Override
-    public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu menu) {
+    public void registerShortcuts(final @NotNull JBList<TestCaseDto> list) {
         new EscapeAction(p, list);
-        new OpenContextMenuAction(list, menu);
+        new OpenContextMenuAction(list, this);
         new GenerateReportAction(p, ui, list);
 
         // P, F and B carry no modifier, so they are this list's gesture rather

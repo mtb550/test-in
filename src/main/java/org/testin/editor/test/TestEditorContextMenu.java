@@ -54,7 +54,7 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
 
         add(Declared.forMenu("Testin.UpdateTestCase"));
 
-        add(actions(p, ui, dir, list, model));
+        add(actions(p, dir, list));
 
         // Present and grayed, with the reason on the entry. This is the reverse
         // of what #66 decided - absent rather than offered and refused - and the
@@ -82,9 +82,9 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
      * caller to ignore.
      */
     @Override
-    public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu menu) {
+    public void registerShortcuts(final @NotNull JBList<TestCaseDto> list) {
         new EscapeAction(p, list);
-        new OpenContextMenuAction(list, menu);
+        new OpenContextMenuAction(list, this);
 
         // Every field the update menu offers, on the letter the menu already
         // shows beside it, so a selected card opens that field's editor with no

@@ -21,7 +21,6 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.CollectionListModel;
 import org.testin.actions.Declared;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.ui.ActionsMenu;
@@ -60,7 +59,7 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
         super("", true);
     }
 
-    public abstract void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu menu);
+    public abstract void registerShortcuts(final @NotNull JBList<TestCaseDto> list);
 
     /**
      * UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-213.
@@ -81,7 +80,7 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
      * does work. Each entry decides that for itself, from the node the editor is
      * open on.
      */
-    protected @NotNull DefaultActionGroup actions(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
+    protected @NotNull DefaultActionGroup actions(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
         final @NotNull DefaultActionGroup actions = ActionsMenu.group();
 
         actions.add(Declared.forMenu("Testin.CopyTestCase"));

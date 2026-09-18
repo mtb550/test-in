@@ -18,7 +18,6 @@ package org.testin.model;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.UIUtil;
 import lombok.AllArgsConstructor;
@@ -43,7 +42,6 @@ import java.awt.event.KeyEvent;
 public enum TestStatus {
     PASSED(
             "008000",
-            new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GREEN),
             JBColor.GREEN,
             Bundle.message("status.verdict.passed"),
             new MenuEntry(AllIcons.Actions.Checked, KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
@@ -52,7 +50,6 @@ public enum TestStatus {
 
     FAILED(
             "FF0000",
-            new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.RED),
             JBColor.RED.darker(),
             Bundle.message("status.verdict.failed"),
             new MenuEntry(AllIcons.Actions.Cancel, KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)),
@@ -61,7 +58,6 @@ public enum TestStatus {
 
     BLOCKED(
             "FFA500",
-            new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.ORANGE),
             JBColor.ORANGE,
             Bundle.message("status.verdict.blocked"),
             new MenuEntry(AllIcons.Actions.Pause, KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
@@ -70,7 +66,6 @@ public enum TestStatus {
 
     PENDING(
             "808080",
-            SimpleTextAttributes.REGULAR_ATTRIBUTES,
             // Lazy because it comes from the theme: resolved at class-load time it
             // would keep the color of whichever theme happened to be active then.
             JBColor.lazy(UIUtil::getContextHelpForeground),
@@ -84,7 +79,6 @@ public enum TestStatus {
 
     REMOVED(
             "9E9E9E",
-            SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES,
             JBColor.GRAY,
             Bundle.message("status.verdict.removed"),
             // Off the menu, and shown rather than set: the test case this result
@@ -99,7 +93,6 @@ public enum TestStatus {
 
     UNTESTED(
             "808080",
-            SimpleTextAttributes.REGULAR_ATTRIBUTES,
             JBColor.GRAY.brighter(),
             Bundle.message("status.verdict.untested"),
             // Off the menu, and the plugin sets it: a tester gives one of three
@@ -112,7 +105,6 @@ public enum TestStatus {
     );
 
     private final @NotNull String hex;
-    private final @NotNull SimpleTextAttributes style;
     private final @NotNull Color rowColor;
     private final @NotNull String label;
 

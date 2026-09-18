@@ -124,7 +124,7 @@ public final class ListPanelBuilder {
         list.addMouseWheelListener(mouseListener);
         list.addMouseMotionListener(mouseListener);
 
-        contextMenu.registerShortcuts(list, contextMenu);
+        contextMenu.registerShortcuts(list);
 
         list.addListSelectionListener(new SelectionListener(p, list, editor, dir.getPath2()));
         list.addListSelectionListener(new GridListSelectionSynchronizer(list, gridTableSupplier, gridActiveSupplier));

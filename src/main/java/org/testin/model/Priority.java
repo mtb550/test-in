@@ -40,27 +40,23 @@ import java.awt.*;
 public enum Priority {
     HIGH(
             "P1",
-            1,
             JBColor.RED.brighter().brighter(),
             true
     ),
 
     MEDIUM(
             "P2",
-            2,
             JBColor.BLUE.brighter(),
             true
     ),
 
     LOW(
             "P3",
-            3,
             JBColor.GRAY.brighter(),
             true
     );
 
     private final @NotNull String label;
-    private final int value;
     private final @NotNull Color color;
     // Always true here, and read through a method reference (Priority::isActive)
     // that a search for isActive() does not find - PrioritySection filters on it,

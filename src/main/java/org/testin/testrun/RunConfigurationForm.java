@@ -47,7 +47,6 @@ import java.util.Set;
  * collapsible, as before. A framework dialog component; the selection tree is
  * a separate component.
  */
-@Getter
 public class RunConfigurationForm implements DialogComponent {
 
     /**

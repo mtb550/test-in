@@ -24,7 +24,6 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.run.RunEditor;
-import org.testin.editor.toolbar.Toolbar;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.Failure;
@@ -457,21 +456,13 @@ public final class RunStatusService {
      * Shows what the verdict did, on the EDT.
      * <p>
      * One overload, where there were two: the second took the list and repainted
-     * it first, which the rebuild in {@link #refreshEditor} does again a line
-     * later.
+     * it first, which the rebuild in {@code refreshAfterStatusChange} does
+     * again a line later.
      */
-    private void triggerFilterRefresh(final @NotNull TestinEditor editor) {
-        ApplicationManager.getApplication().invokeLater(() -> refreshEditor(editor));
-    }
-
-    /**
-     * What the refresh does to the editor itself, on the EDT.
-     */
-    private void refreshEditor(final @NotNull TestinEditor editor) {
-        if (editor instanceof RunEditor runEditor) {
-            runEditor.refreshAfterStatusChange();
-        } else if (editor instanceof Toolbar toolbar) {
-            toolbar.onToolBarFilterSelectionChanged();
-        }
+    private void triggerFilterRefresh(final @NotNull RunEditor editor) {
+        // A verdict is recorded in a run editor and nowhere else, so this takes
+        // one. It took any editor and asked which kind it had, with a branch
+        // for a test set editor no caller could pass (#312, A100).
+        ApplicationManager.getApplication().invokeLater(editor::refreshAfterStatusChange);
     }
 }
