@@ -148,15 +148,19 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     @Getter
     protected int pageSize = TestinEditor.pageSizeOf(PropertiesComponent.getInstance().getValue(TestinEditor.PAGE_SIZE_KEY, ""));
 
-    /**
-     * Assigned by the subclass, because each editor has its own toolbar and its
-     * own way of laying the panel out around it.
-     */
     @Getter
-    protected @NotNull AbstractToolbarPanel toolBar;
+    protected final @NotNull StatusBar statusBar = new StatusBar();
 
-    @Getter
-    protected @NotNull StatusBar statusBar;
+    /**
+     * This editor's toolbar. Each editor builds its own, from itself, in its own
+     * constructor, and holds it in a final field of its own type.
+     * <p>
+     * Asked for rather than held here. Held here it was assigned by the
+     * subclass, so for the whole of this constructor it was a field with no
+     * value under a {@code @NotNull} that said otherwise; the status bar beside
+     * it, the same in both editors, is simply built here (#66, finding 267).
+     */
+    public abstract @NotNull AbstractToolbarPanel getToolBar();
 
     @Getter
     @Setter
@@ -277,7 +281,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         // out of the panel, so a focus request named a component that was not
         // there and went nowhere: changing the page size in the grid left the
         // keyboard in the size field (#66, finding 215).
-        if (toolBar.getCurrentView() != ViewMode.GRID_VIEW) return list;
+        if (getToolBar().getCurrentView() != ViewMode.GRID_VIEW) return list;
 
         return grid.<JComponent>map(GridView::table).orElse(list);
     }
@@ -401,7 +405,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         // Only what is on screen. Re-measuring the cards costs a full pass over
         // the page, and doing it while the grid is showing buys nothing - the
         // list is re-measured when it comes back instead.
-        if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
+        if (getToolBar().getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[details] grid active -> toggling column visibility");
             updateGridColumns();
         } else {
@@ -416,7 +420,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-018
     @Override
     public void onToolBarSwitchedToListView() {
-        Logger.debug("[switch] -> LIST view, currentView=" + toolBar.getCurrentView());
+        Logger.debug("[switch] -> LIST view, currentView=" + getToolBar().getCurrentView());
         center.set(scrollPane);
 
         // Attributes ticked while the grid was showing did not touch the cards;
@@ -427,7 +431,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-017
     @Override
     public void onToolBarSwitchedToGridView() {
-        Logger.debug("[switch] -> GRID view, currentView=" + toolBar.getCurrentView());
+        Logger.debug("[switch] -> GRID view, currentView=" + getToolBar().getCurrentView());
         rebuildGrid();
         // A grid that could not be built leaves none here, and the list on
         // screen.
@@ -565,7 +569,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-117
     @Override
     public void onToolBarRefreshButtonClicked() {
-        Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
+        Logger.debug("[refresh] clicked, currentView=" + getToolBar().getCurrentView());
 
         // Asked before the reload, because the reload is what makes the answer
         // stale: a run that was executing is not executing once it has been
@@ -721,7 +725,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
 
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
                 () -> grid.map(GridView::table),
-                () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);
+                () -> getToolBar().getCurrentView() == ViewMode.GRID_VIEW);
     }
 
     // ------------------------------------------------------------------ drawing
@@ -809,7 +813,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         refreshSelectionStatus(list.getSelectedIndices());
         afterSelectionShown();
 
-        if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
+        if (getToolBar().getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");
             rebuildGrid();
             grid.ifPresent(view -> center.set(view.scrollPane()));
@@ -877,7 +881,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
                 () -> Disposer.dispose(projectDisposable),
 
                 this::stopListening,
-                toolBar::dispose,
+                () -> getToolBar().dispose(),
 
                 // The tab is closing, so what CTRL+Z could take back in it
                 // closes with it - and the copies those operations were holding

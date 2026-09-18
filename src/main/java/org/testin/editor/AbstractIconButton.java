@@ -216,8 +216,10 @@ public abstract class AbstractIconButton extends JButton {
 
     @Override
     protected void paintComponent(final @NotNull Graphics g) {
-        final @NotNull Container parent = getParent();
-        g.setColor(Optional.ofNullable(parent).map(Container::getBackground).orElseGet(this::getBackground));
+        // A button not yet added has no parent; the Optional starts at the call
+        // rather than after a @NotNull local that said otherwise (#66, finding
+        // 267).
+        g.setColor(Optional.ofNullable(getParent()).map(Container::getBackground).orElseGet(this::getBackground));
         g.fillRect(0, 0, getWidth(), getHeight());
 
         if ((on || hovered) && isEnabled()) {

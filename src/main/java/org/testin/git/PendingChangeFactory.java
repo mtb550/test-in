@@ -228,8 +228,10 @@ final class PendingChangeFactory {
     }
 
     private static @NotNull String parentName(final @NotNull Path relativePath) {
-        final @NotNull Path parent = relativePath.getParent();
-        return Optional.ofNullable(parent).map(Path::getFileName).map(Path::toString).orElse("");
+        // A file at the repository's root has no parent - the test project's own
+        // marker is one - so the Optional starts at the call, not after a
+        // @NotNull local that said otherwise (#66, finding 265).
+        return Optional.ofNullable(relativePath.getParent()).map(Path::getFileName).map(Path::toString).orElse("");
     }
 
     private static <T> @NotNull T read(final @NotNull Mapper mapper, final @NotNull String json, final @NotNull Class<T> type) {

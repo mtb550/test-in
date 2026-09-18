@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestRunDto;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -68,8 +69,8 @@ public record OpenBug(@NotNull Path runPath, @NotNull TestRunItems item) {
      * The run's name, which is its folder's.
      */
     public @NotNull String runName() {
-        final @NotNull Path name = runPath.getFileName();
-
-        return name == null ? runPath.toString() : name.toString();
+        // A root has no file name. Declared @NotNull and then tested for null,
+        // the fallback was unreachable to the inspection (#66, finding 264).
+        return Optional.ofNullable(runPath.getFileName()).map(Path::toString).orElse(runPath.toString());
     }
 }

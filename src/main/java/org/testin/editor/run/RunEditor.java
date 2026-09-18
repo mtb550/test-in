@@ -92,6 +92,9 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
      */
     private final @NotNull Map<UUID, TestRunItems> resultsMap;
 
+    @Getter
+    private final @NotNull RunToolbar toolBar;
+
     private final @NotNull RunExecutionTimer executionTimer = new RunExecutionTimer();
 
     /**
@@ -378,13 +381,12 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         // belongs.
         TestCaseExecutionSubscriber.onReported(p, projectDisposable, this::executionReported);
 
+        this.toolBar = new RunToolbar(p, this);
         buildOpeningPanel();
         loadDataAsync();
     }
 
     private void buildOpeningPanel() {
-        toolBar = new RunToolbar(p, this);
-        statusBar = new StatusBar();
         StatusBarListener.attach(this);
 
         // Run editor specifics: the run card renderer.

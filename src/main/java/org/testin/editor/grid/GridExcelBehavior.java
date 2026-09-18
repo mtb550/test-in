@@ -107,8 +107,9 @@ public final class GridExcelBehavior {
             if (r > 0) sb.append('\n');
             for (int c = 0; c < cols.length; c++) {
                 if (c > 0) sb.append('\t');
-                final @NotNull Object value = table.getValueAt(rows[r], cols[c]);
-                sb.append(escapeTsvField(Objects.toString(value, "")));
+                // A cell can hold nothing, which toString answers; a @NotNull
+                // local in between said otherwise (#66, finding 267).
+                sb.append(escapeTsvField(Objects.toString(table.getValueAt(rows[r], cols[c]), "")));
             }
         }
         CopyPasteManager.getInstance().setContents(new StringSelection(sb.toString()));

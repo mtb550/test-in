@@ -16,6 +16,7 @@
 
 package org.testin.editor.test;
 
+import lombok.Getter;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.JBTable;
@@ -62,6 +63,9 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
 
 
     private final @NotNull ModelChangeNotifier modelChangeNotifier;
+
+    @Getter
+    private final @NotNull TestToolbar toolBar;
     /**
      * One counter for every model-replacing operation - data loads and badge
      * sorts alike (#24). Each one bumps and checks it, so a stale in-flight
@@ -101,7 +105,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
 
         wireList();
 
-        this.statusBar = new StatusBar();
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         StatusBarListener.attach(this);
 
