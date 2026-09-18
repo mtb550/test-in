@@ -708,6 +708,20 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     // ------------------------------------------------------------------ drawing
 
     /**
+     * Set when the tab closes. Read on the EDT only, where both disposal and
+     * every redraw happen.
+     */
+    private boolean disposed;
+
+    /**
+     * Whether the tab has closed - for a subclass whose own deferred work
+     * reaches the toolbar outside a redraw.
+     */
+    protected boolean isDisposed() {
+        return disposed;
+    }
+
+    /**
      * UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-101.
      * <p>
      * Draws the page: which cases pass the filter, which of them this page
@@ -727,6 +741,14 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
      */
     @Override
     public void refreshView() {
+        // A redraw asked for after the tab closed: a load that waited behind the
+        // indexer, the automation-state read deferred until the IDE was smart,
+        // a run's reload. Each reached the toolbar on its first line, the
+        // toolbar was emptied on dispose and throws by design, and the tester
+        // saw an IDE internal error for closing a tab (#66, finding 202). There
+        // is nothing on screen to redraw.
+        if (disposed) return;
+
         currentTestCases.clear();
         currentTestCases.addAll(getFilteredList());
 
@@ -824,6 +846,10 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
      */
     @Override
     public void dispose() {
+        // First of all, so a callback already queued finds it set however far
+        // down the teardown below the throw it is guarding against comes.
+        disposed = true;
+
         teardown(
                 this::beforeDispose,
 

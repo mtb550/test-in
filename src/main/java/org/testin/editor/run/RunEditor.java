@@ -1100,6 +1100,10 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
      * Called after every execution-state change, so nowhere else asks.
      */
     public void onExecutionStateChanged() {
+        // The toolbar is emptied when the tab closes, and a load that waited
+        // behind the indexer still calls this afterwards (#66, finding 202).
+        if (isDisposed()) return;
+
         final boolean executing = isExecuting();
 
         final @NotNull StartExecutionBtn startBtn = toolBar.getToolbarItem(StartExecutionBtn.class);
