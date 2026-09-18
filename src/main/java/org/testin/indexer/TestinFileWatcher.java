@@ -16,15 +16,16 @@
 
 package org.testin.indexer;
 
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.AsyncFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.services.Services;
-import org.testin.setting.AppSettingsState;
 import org.testin.setting.TestinRoot;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -75,7 +76,17 @@ public final class TestinFileWatcher implements AsyncFileListener {
      * none.
      */
     private static @NotNull Set<Path> changedTestProjects(final @NotNull List<? extends VFileEvent> events) {
-        final @NotNull Path root = TestinRoot.normalize(Services.getInstance(AppSettingsState.class).rootTestinPath);
+        // The root as each open project resolves it, through the owner that
+        // knows a relative root is read against the project. Normalizing the
+        // stored string here was a second answer, and for a relative root a
+        // different one: the watcher stopped noticing every change on disk
+        // (#66, finding 231).
+        final @NotNull List<Path> roots = Arrays.stream(ProjectManager.getInstance().getOpenProjects())
+                .filter(p -> !p.isDisposed())
+                .map(p -> Services.getInstance(p, TestinRoot.class).absolutePath())
+                .filter(TestinRoot::isConfigured)
+                .distinct()
+                .toList();
         final @NotNull OwnWrites ours = Services.getInstance(OwnWrites.class);
         final @NotNull Set<Path> testProjects = new HashSet<>();
 
@@ -85,7 +96,7 @@ public final class TestinFileWatcher implements AsyncFileListener {
                     // the project again for it would rebuild the tree under the
                     // hand of the tester who caused the save.
                     .filter(file -> !ours.areOurs(file))
-                    .flatMap(file -> WatchedPath.testProjectOf(file, root))
+                    .flatMap(file -> roots.stream().flatMap(root -> WatchedPath.testProjectOf(file, root).stream()).findFirst())
                     .ifPresent(testProjects::add);
         }
 
