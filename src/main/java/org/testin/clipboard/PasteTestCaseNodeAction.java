@@ -79,7 +79,33 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
             return;
         }
 
-        e.getPresentation().setEnabled(work(e).map(Work::clipboardHoldsTestCases).orElse(false));
+        e.getPresentation().setEnabled(work(e).map(this::clipboardHoldsTestCases).orElse(false));
+    }
+
+    /**
+     * The clipboard contents {@link #update} last asked about, and the answer.
+     */
+    private record Answered(@NotNull Transferable contents, boolean holdsTestCases) {
+    }
+
+    private @NotNull Optional<Answered> answered = Optional.empty();
+
+    /**
+     * Whether the clipboard holds test cases, parsed once for each thing put on
+     * it. The platform calls update on every menu repaint and toolbar refresh,
+     * and each call parsed the whole clipboard on the EDT - after a cut of a few
+     * hundred cases, once per repaint (#66, finding 223). The clipboard hands
+     * back the same contents until something new is put on it, so the answer
+     * is kept against them.
+     */
+    private boolean clipboardHoldsTestCases(final @NotNull Work work) {
+        return ClipboardContents.withFlavor(DataFlavor.stringFlavor)
+                .map(contents -> answered.filter(last -> last.contents() == contents).orElseGet(() -> {
+                    final @NotNull Answered now = new Answered(contents, work.holdsTestCases(contents));
+                    answered = Optional.of(now);
+                    return now;
+                }).holdsTestCases())
+                .orElse(false);
     }
 
     @Override
@@ -99,14 +125,6 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
      * Pasting into one editor, for a project that is there.
      */
     private record Work(@NotNull Project p, @NotNull TestinEditor editor) {
-
-        /**
-         * Whether the clipboard holds test cases at all - the question update()
-         * asks, and it needs the mapper, which needs the project.
-         */
-        boolean clipboardHoldsTestCases() {
-            return ClipboardContents.withFlavor(DataFlavor.stringFlavor).map(this::holdsTestCases).orElse(false);
-        }
 
             void paste() {
                 final @NotNull List<TestCaseDto> pastedCases = getFromClipboard();
@@ -247,8 +265,6 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 if (isCut) cutState.clear();
             });
         }
-
-
 
         /**
          * Whether the clipboard holds test cases. Anything else on it belongs to
