@@ -65,25 +65,37 @@ public final class RunStatusService {
     public void executeNext(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestStatus status) {
 
         final int executingIndex = editor.getCurrentlyExecutingIndex();
-        if (executingIndex == -1) return;
+        if (executingIndex == -1) {
+            // Rule-EDITOR-PANEL-227. The walk follows its case by identity now,
+            // so a filter that hides it leaves nothing to judge - said, rather
+            // than a key that does nothing.
+            if (editor.executingCaseIsHidden()) Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.executing.hidden"));
+            return;
+        }
 
         final @NotNull TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
-        final @NotNull Optional<TestRunItems> item = editor.runItem(currentTc.getId());
+        final @NotNull Path runPath = editor.getParent().getPath();
+
+        // Rule-EDITOR-PANEL-225. Asked of the run the indexer holds, not of the
+        // editor's copy. The confirmation came from the editor's own item, which
+        // is there after a sync took the run away or its case was removed - and
+        // the write below drops the change in both - so the tester read "Passed"
+        // over a run that kept the old verdict (#66, finding 191).
+        final @NotNull Optional<TestRunDto> held = heldRun(p, runPath);
+        if (held.isEmpty() || liveItem(p, held.orElseThrow(), runPath, currentTc.getId()).isEmpty()) return;
 
         // As a change on the run the indexer holds, so a verdict given while a
         // sync brings the run in waits for it and lands on the run that arrived
         // (#66, finding 152).
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        Services.getInstance(p, ProjectIndexer.class).changeRun(editor.getParent().getPath(),
+        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath,
                 run -> run.resultOf(currentTc.getId()).filter(runItem -> !runItem.isRemoved()).ifPresent(runItem -> runItem.recordVerdict(status, tester)));
 
         Logger.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
 
         triggerFilterRefresh(editor);
 
-        // Only when a verdict was actually recorded: a missing run item leaves
-        // the status exactly as it was.
-        item.ifPresent(recorded -> confirmVerdict(p, status, 1));
+        confirmVerdict(p, status, 1);
 
         // From the row just judged, not from the one after it. The editor moves
         // on to the next case still waiting for a verdict, so this no longer has
@@ -169,16 +181,8 @@ public final class RunStatusService {
      */
     public boolean recordFailureDetails(final @NotNull Project p, final @NotNull Path runPath, final @NotNull UUID caseId, final @NotNull FailureFields fields) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        final @NotNull Optional<TestRunDto> run = indexer.findTestRun(runPath);
-        if (run.isEmpty()) {
-            Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' is no longer indexed - failure details not recorded");
-
-            // Rule-EDITOR-PANEL-225. Said, not only logged: the tester pressed a
-            // key over a form they had filled in, and a refusal only the log saw
-            // read as the key doing nothing (#66, finding 169).
-            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.run.gone"));
-            return false;
-        }
+        final @NotNull Optional<TestRunDto> run = heldRun(p, runPath);
+        if (run.isEmpty()) return false;
 
         if (liveItem(p, run.orElseThrow(), runPath, caseId).isEmpty()) return false;
 
@@ -192,6 +196,25 @@ public final class RunStatusService {
                 () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + caseId + " - failure details not recorded")));
 
         return true;
+    }
+
+    /**
+     * UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-225.
+     * <p>
+     * The run the indexer holds at this path, and a refusal said when it holds
+     * none. Every path that records something on a run asks this first, so a
+     * tester who pressed a key over a run that has gone is told once, in the same
+     * words, whichever key it was (#66, findings 169 and 191).
+     */
+    private @NotNull Optional<TestRunDto> heldRun(final @NotNull Project p, final @NotNull Path runPath) {
+        final @NotNull Optional<TestRunDto> run = Services.getInstance(p, ProjectIndexer.class).findTestRun(runPath);
+
+        if (run.isEmpty()) {
+            Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' is no longer indexed - nothing recorded");
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.run.gone"));
+        }
+
+        return run;
     }
 
     /**
@@ -294,10 +317,17 @@ public final class RunStatusService {
                 if (executeManual(p, editor, tc, status, Duration.ZERO, Failure.NONE)) confirmVerdict(p, status, 1);
             }
         } else {
+            // Counted against the run the indexer holds, for the reason
+            // executeNext asks it: the editor's copy outlives a run a sync took
+            // away, and "Passed 5" was said over a change that was dropped (#66,
+            // finding 191).
+            final @NotNull Optional<TestRunDto> held = heldRun(p, editor.getParent().getPath());
+            if (held.isEmpty()) return;
+
             final @NotNull List<UUID> judged = new ArrayList<>();
 
             for (final TestCaseDto tc : selectedItems) {
-                if (editor.runItem(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) continue;
+                if (held.orElseThrow().resultOf(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) continue;
 
                 judged.add(tc.getId());
 

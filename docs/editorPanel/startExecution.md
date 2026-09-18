@@ -55,6 +55,11 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
   filter that matches nothing, and a list where every test case has been judged.
   All three gray the button. A press that reaches Testin anyway is refused, and
   says so.
+- **Rule-EDITOR-PANEL-227** — The walk follows the test case being executed, not
+  its place in the list, so narrowing the list with the filter never moves a
+  verdict onto another test case. While the filter hides the test case being
+  executed, a verdict key records nothing and says so, and clearing the filter
+  brings it back.
 
 ## What the tester sees
 

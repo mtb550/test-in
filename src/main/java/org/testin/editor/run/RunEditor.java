@@ -304,8 +304,42 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         return tr;
     }
 
-    @Getter
-    private int currentlyExecutingIndex = -1;
+    /**
+     * The case being executed, by identity, and empty when none is.
+     * <p>
+     * It was an index into the list on screen, and the filter rebuilds that
+     * list without touching it. A tester who started the walk and then narrowed
+     * the run was left with an index into a different list: a verdict key judged
+     * whichever case had slid into that slot, or threw past the end of a shorter
+     * one (#66, finding 190). Held by identity, the index is worked out from the
+     * list as it is now, and a case the filter has hidden is simply not in view.
+     */
+    private @NotNull Optional<UUID> executingCase = Optional.empty();
+
+    /**
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-227.
+     * <p>
+     * Where the case being executed sits in the list on screen now, and -1 when
+     * none is being executed or the filter is hiding it.
+     */
+    public int getCurrentlyExecutingIndex() {
+        return executingCase.map(id -> {
+            for (int i = 0; i < currentTestCases.size(); i++) {
+                if (currentTestCases.get(i).getId().equals(id)) return i;
+            }
+            return -1;
+        }).orElse(-1);
+    }
+
+    /**
+     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-227.
+     * <p>
+     * True while a test case is being walked by hand and the filter hides it -
+     * the one moment a verdict key has nothing in view to judge.
+     */
+    public boolean executingCaseIsHidden() {
+        return executingCase.isPresent() && getCurrentlyExecutingIndex() == -1;
+    }
 
     /**
      * Whether the cases have been read.
@@ -566,7 +600,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
             return;
         }
 
-        currentlyExecutingIndex = globalIndex;
+        executingCase = Optional.of(currentTestCases.get(globalIndex).getId());
 
         final int expectedPage = (globalIndex / pageSize) + 1;
         if (currentPage != expectedPage) {
@@ -955,9 +989,10 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
      * value a case that has just started carries.
      */
     public @NotNull Duration getCurrentCaseElapsed() {
-        if (currentlyExecutingIndex < 0 || currentlyExecutingIndex >= currentTestCases.size()) return Duration.ZERO;
+        final int executing = getCurrentlyExecutingIndex();
+        if (executing < 0) return Duration.ZERO;
 
-        return runItem(currentTestCases.get(currentlyExecutingIndex).getId())
+        return runItem(currentTestCases.get(executing).getId())
                 .map(TestRunItems::getDuration)
                 .orElse(Duration.ZERO);
     }
@@ -979,7 +1014,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
      * comes to sit on a finished run.
      */
     public boolean isExecuting() {
-        return currentlyExecutingIndex >= 0 || isAutomationRunning();
+        return executingCase.isPresent() || isAutomationRunning();
     }
 
     /**
@@ -1138,7 +1173,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
      */
     private void haltExecution() {
         executionTimer.stop();
-        currentlyExecutingIndex = -1;
+        executingCase = Optional.empty();
         onExecutionStateChanged();
     }
 
