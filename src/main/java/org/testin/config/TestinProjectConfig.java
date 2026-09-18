@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
-import org.testin.sftp.SftpAddress;
 import org.testin.util.Bundle;
 
 import java.util.Locale;

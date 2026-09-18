@@ -16,6 +16,7 @@
 
 package org.testin.sftp;
 
+import org.testin.config.SftpAddress;
 import com.intellij.credentialStore.CredentialAttributes;
 import com.intellij.credentialStore.CredentialAttributesKt;
 import com.intellij.ide.passwordSafe.PasswordSafe;

@@ -16,6 +16,7 @@
 
 package org.testin.sftp;
 
+import org.testin.config.SftpAddress;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertFalse;

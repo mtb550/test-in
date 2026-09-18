@@ -16,6 +16,7 @@
 
 package org.testin.sftp;
 
+import org.testin.config.SftpAddress;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.AbstractFrameworkDialog;

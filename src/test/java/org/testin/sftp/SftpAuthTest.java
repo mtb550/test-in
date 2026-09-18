@@ -16,6 +16,7 @@
 
 package org.testin.sftp;
 
+import org.testin.config.SftpAddress;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;

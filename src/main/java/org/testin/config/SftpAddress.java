@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.sftp;
+package org.testin.config;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -22,10 +22,15 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Where a test project is kept on a server (#94).
  * <p>
- * Parsed from the {@code testinSftp} value in {@code testin.yml}, which is
- * committed - so this carries the host, the port and the folder, and never an
- * account. Who connects is a fact about the person at the machine, and the file
- * is shared with everyone who clones it.
+ * Read from the {@code sftpHost}, {@code sftpPort} and {@code sftpPath} keys of
+ * {@code testin.yml}, which is committed - so this carries the host, the port
+ * and the folder, and never an account. Who connects is a fact about the person
+ * at the machine, and the file is shared with everyone who clones it.
+ * <p>
+ * Here, with the config that reads it, rather than in {@code sftp}: there,
+ * {@code config} imported a feature to hold one of its own values, an edge the
+ * layer map does not list, and this named a key, {@code testinSftp}, that
+ * {@code testin.yml} has never had (#312, A39).
  *
  * @param host the machine to connect to
  * @param port its SSH port, 22 unless the address said otherwise

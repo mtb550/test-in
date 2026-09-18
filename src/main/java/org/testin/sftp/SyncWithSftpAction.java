@@ -16,6 +16,7 @@
 
 package org.testin.sftp;
 
+import org.testin.config.SftpAddress;
 import org.testin.actions.GrayWithReason;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;

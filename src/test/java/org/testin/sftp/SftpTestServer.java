@@ -16,6 +16,7 @@
 
 package org.testin.sftp;
 
+import org.testin.config.SftpAddress;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.sshd.common.config.keys.AuthorizedKeyEntry;
