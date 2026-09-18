@@ -96,6 +96,13 @@ final class IndexerDataStore {
         return testCaseStore.getTestCasesById();
     }
 
+    /**
+     * The file a test case is in now - see {@link TestCaseSequenceStore#fileOf}.
+     */
+    @NotNull Path testCaseFileOf(final @NotNull TestCaseDto tc) {
+        return testCaseStore.fileOf(tc.getParent().getPath(), tc.getId());
+    }
+
     @NotNull Map<String, List<UUID>> getTestSetCaseIds() {
         return testCaseStore.getTestSetCaseIds();
     }
@@ -353,7 +360,7 @@ final class IndexerDataStore {
 
         // The cases go in as one move, because dropping a set's ids drops its
         // cases with them and the two maps must not disagree even briefly.
-        testCaseStore.swapIn(projectPath, scanned.getTestCasesById(), scanned.getTestSetCaseIds());
+        testCaseStore.swapIn(projectPath, scanned.getTestCasesById(), scanned.getTestSetCaseIds(), scanned.handNamedFilesAlone());
 
         dropUnseen(testProjectsByPath, projectPath, scanned.getProjects());
         dropUnseen(testCasesMainDirsByPath, projectPath, scanned.getTestCasesMainDirs());

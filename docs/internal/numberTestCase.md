@@ -41,6 +41,12 @@ panel.
   audit the file brought. An undo puts back the audit the test case had before.
   A move keeps who created the test case. A test case put back from the review
   keeps the audit it was committed with.
+- **Rule-INTERNAL-084** — A test case read from a file named by hand is filed
+  under its id the first time it is saved, and the hand-named file is removed
+  once that write has landed, so one test case never becomes two files. Removing
+  the test case removes the file it is in. When another file claims the same
+  identity, both files are kept: which one is the test case is for the tester to
+  decide.
 
 ## The screens
 
@@ -109,7 +115,11 @@ both get a number.
 
 **If a test case file is not named the way Testin names them** — Testin uses
 the name written inside the file instead. Testin did not write that file.
-Making up an identity for it would be worse than believing what it says.
+Making up an identity for it would be worse than believing what it says. The
+first save files it under that name, and the hand-named file goes with it, so
+one test case never becomes two; removing the test case removes the file it is
+in. A hand-named file whose identity another file also claims is left alone
+(Rule-INTERNAL-084).
 
 **If a test set holding such a file is copied** — the copy gets a new id like
 every other test case in it, and its file is renamed to the way Testin names

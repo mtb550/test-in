@@ -123,7 +123,8 @@ is read as one and a copy of it is given an id of its own; a `.json` sitting in
 `Test Cases` rather than in a set is not a case at all.
 
 Testin writes the file as `<id>.json`, and a hand-named one is filed under its
-id the next time anything writes it. The two names answer different questions:
+id the next time anything writes it, the hand-named file going once that write
+has landed (Rule-INTERNAL-084). The two names answer different questions:
 the **file name** is what the tree shows (Rule-INTERNAL-012 — a `name` field
 inside the file would not decide it), and the **`id` field** is what a test run's
 recorded result points at.

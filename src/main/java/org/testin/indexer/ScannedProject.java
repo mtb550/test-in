@@ -30,6 +30,8 @@ import org.testin.model.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 
+import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,4 +97,32 @@ final class ScannedProject {
      * same notification the unread folders get.
      */
     private final @NotNull Set<String> clashingCases = ConcurrentHashMap.newKeySet();
+
+    /**
+     * The identities {@link #clashingCases} names, so the hand-named files
+     * below can leave them out.
+     */
+    private final @NotNull Set<UUID> clashingIds = ConcurrentHashMap.newKeySet();
+
+    /**
+     * UC-INTERNAL-004, Rule-INTERNAL-084.
+     * <p>
+     * Test case files whose name is not their id - written by hand - by the id
+     * inside them.
+     */
+    private final @NotNull Map<UUID, Path> handNamedFiles = new ConcurrentHashMap<>();
+
+    /**
+     * UC-INTERNAL-004, Rule-INTERNAL-084.
+     * <p>
+     * The hand-named files that are the only file of their identity. One that
+     * another file also claims is left out: which of the two is the case is the
+     * tester's to decide, and a save must not take the other away.
+     */
+    @NotNull Map<UUID, Path> handNamedFilesAlone() {
+        final @NotNull Map<UUID, Path> alone = new HashMap<>(handNamedFiles);
+        alone.keySet().removeAll(clashingIds);
+
+        return alone;
+    }
 }

@@ -226,6 +226,13 @@ final class IndexingScanner {
                                 // (#312, A3).
                                 if (scanned.getTestCasesById().put(tc.getId(), tc) != null) {
                                     scanned.getClashingCases().add(ts.getName() + "/" + filePath.getFileName());
+                                    scanned.getClashingIds().add(tc.getId());
+                                }
+
+                                // Rule-INTERNAL-084. Remembered, so the save that
+                                // files it under its id takes this one away.
+                                if (!filePath.equals(TestCaseSequenceStore.named(path, tc.getId()))) {
+                                    scanned.getHandNamedFiles().put(tc.getId(), filePath);
                                 }
 
                                 caseIds.add(tc.getId());

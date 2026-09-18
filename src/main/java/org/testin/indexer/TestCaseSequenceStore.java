@@ -41,6 +41,20 @@ final class TestCaseSequenceStore {
     private final @NotNull Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
     private final @NotNull Map<String, List<UUID>> testSetCaseIds = new ConcurrentHashMap<>();
 
+    /**
+     * UC-INTERNAL-004, Rule-INTERNAL-084.
+     * <p>
+     * The test cases read from a file the plugin did not name, and that file.
+     * <p>
+     * A case read from {@code login.json} was saved to {@code <id>.json} and the
+     * hand-named file was left holding the case as it was, so the next scan read
+     * two files claiming one identity and kept whichever it read last - the edit
+     * there or gone at random (#66, finding 175). Known here, the save takes the
+     * hand-named file away once the case is filed under its id, and removing the
+     * case removes the file it is really in.
+     */
+    private final @NotNull Map<UUID, Path> handNamed = new ConcurrentHashMap<>();
+
 
     @NotNull Map<UUID, TestCaseDto> getTestCasesById() {
         return testCasesById;
@@ -132,12 +146,25 @@ final class TestCaseSequenceStore {
     }
 
     /**
-     * Where a test case lives, from the set that holds it and its id. One owner,
-     * because four things ask - the save, the unchanged check that now precedes
-     * it, the delete, and {@link ProjectIndexer#testCaseFile} for a bug report's
-     * link (#28).
+     * UC-INTERNAL-004, Rule-INTERNAL-084.
+     * <p>
+     * The file a test case is in now: the one a tester named by hand, when the
+     * case was read from one in this set, and its id's file otherwise. Asked by
+     * the unchanged check before a save, the delete, and
+     * {@link ProjectIndexer#testCaseFile} for a bug report's link (#28).
      */
-    static @NotNull Path fileOf(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
+    @NotNull Path fileOf(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
+        return Optional.ofNullable(handNamed.get(testCaseId))
+                .filter(file -> testSetPath.equals(file.getParent()))
+                .orElseGet(() -> named(testSetPath, testCaseId));
+    }
+
+    /**
+     * The file the plugin writes a test case to, from the set that holds it and
+     * its id. One owner, because the scan asks it too, to tell a file the plugin
+     * wrote from one written by hand.
+     */
+    static @NotNull Path named(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
         return testSetPath.resolve(testCaseId + ".json");
     }
 
@@ -180,7 +207,15 @@ final class TestCaseSequenceStore {
      * the tester when it does not.
      */
     private boolean store(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
-        if (!Services.getInstance(p, TestDataFiles.class).write(p, fileOf(testSetPath, testCase.getId()), testCase)) return false;
+        final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
+        final @NotNull Path file = named(testSetPath, testCase.getId());
+        if (!files.write(p, file, testCase)) return false;
+
+        // Rule-INTERNAL-084. Filed under its id now, so the hand-named file it
+        // was read from goes, after the write and never before it.
+        Optional.ofNullable(handNamed.remove(testCase.getId()))
+                .filter(original -> !original.equals(file))
+                .ifPresent(original -> files.delete(p, original, original.getParent()));
 
         testCasesById.put(testCase.getId(), testCase);
         final @NotNull List<UUID> ids = testSetCaseIds.computeIfAbsent(testSetPath.toString(), ignored -> caseIds(List.of()));
@@ -194,12 +229,16 @@ final class TestCaseSequenceStore {
         Optional.ofNullable(testSetCaseIds.get(testSetPath.toString()))
                 .ifPresent(ids -> ids.remove(testCaseId));
 
+        // The file it is really in: a hand-named one was left behind, and the
+        // case came back with the next scan (Rule-INTERNAL-084).
+        final @NotNull Path file = fileOf(testSetPath, testCaseId);
+        handNamed.remove(testCaseId, file);
+
         // Through the writer like the write paths beside it, so OwnWrites
         // claims the delete and our own removal is not read as an external
         // change worth a rescan (#117). stopAt is the set itself: a set
         // outlives its last case, so nothing above the file is pruned.
-        Services.getInstance(p, TestDataFiles.class)
-                .delete(p, fileOf(testSetPath, testCaseId), testSetPath);
+        Services.getInstance(p, TestDataFiles.class).delete(p, file, testSetPath);
     }
 
     /**
@@ -260,6 +299,7 @@ final class TestCaseSequenceStore {
     void removeForTestSet(final @NotNull String path) {
         Optional.ofNullable(testSetCaseIds.remove(path))
                 .ifPresent(ids -> ids.forEach(testCasesById::remove));
+        handNamed.values().removeIf(file -> Path.of(path).equals(file.getParent()));
     }
 
     /**
@@ -278,7 +318,7 @@ final class TestCaseSequenceStore {
      * The ids are read before the new lists go in, because after that the old
      * ones are no longer there to ask.
      */
-    void swapIn(final @NotNull Path projectPath, final @NotNull Map<UUID, TestCaseDto> cases, final @NotNull Map<String, List<UUID>> setCaseIds) {
+    void swapIn(final @NotNull Path projectPath, final @NotNull Map<UUID, TestCaseDto> cases, final @NotNull Map<String, List<UUID>> setCaseIds, final @NotNull Map<UUID, Path> handNamedFiles) {
         final @NotNull Set<UUID> held = testSetCaseIds.entrySet().stream()
                 .filter(entry -> Path.of(entry.getKey()).startsWith(projectPath))
                 .flatMap(entry -> entry.getValue().stream())
@@ -291,10 +331,14 @@ final class TestCaseSequenceStore {
 
         held.removeAll(cases.keySet());
         held.forEach(testCasesById::remove);
+
+        handNamed.putAll(handNamedFiles);
+        handNamed.entrySet().removeIf(entry -> entry.getValue().startsWith(projectPath) && !handNamedFiles.containsKey(entry.getKey()));
     }
 
     void clear() {
         testCasesById.clear();
         testSetCaseIds.clear();
+        handNamed.clear();
     }
 }

@@ -900,7 +900,7 @@ public final class ProjectIndexer {
      * builder spelling {@code <id>.json} itself would be one more copy of it.
      */
     public @NotNull Optional<TestCaseFile> testCaseFile(final @NotNull TestCaseDto tc) {
-        final @NotNull Path file = TestCaseSequenceStore.fileOf(tc.getParent().getPath(), tc.getId());
+        final @NotNull Path file = store.testCaseFileOf(tc);
         return testProjectHolding(file).map(testProject -> new TestCaseFile(testProject, testProject.relativize(file)));
     }
 
