@@ -65,7 +65,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     DESCRIPTION(
             TestEditorAttributes.DESCRIPTION.getName(),
             ToolBarDefault.ON,
-            (item, p) -> item.requireTc().getDescription()
+            (item, p) -> item.shownCase().getDescription()
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
@@ -76,34 +76,34 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     EXPECTED_RESULT(
             TestEditorAttributes.EXPECTED_RESULT.getName(),
             ToolBarDefault.ON,
-            (item, p) -> item.requireTc().getExpectedResult()
+            (item, p) -> item.shownCase().getExpectedResult()
     ),
 
     STEPS(
             TestEditorAttributes.STEPS.getName(),
             ToolBarDefault.OFF,
-            (item, p) -> String.join(", ", item.requireTc().getSteps())
+            (item, p) -> String.join(", ", item.shownCase().getSteps())
     ),
 
     PRIORITY(
             TestEditorAttributes.PRIORITY.getName(),
             ToolBarDefault.OFF,
-            (item, p) -> item.requireTc().getPriority().getLabel()
+            (item, p) -> item.shownCase().getPriority().getLabel()
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            Badges.addPriorityBadge(badges, runItem.requireTc());
+            Badges.addPriorityBadge(badges, runItem.shownCase());
         }
     },
 
     GROUP(
             TestEditorAttributes.GROUP.getName(),
             ToolBarDefault.OFF,
-            (item, p) -> Groups.text(item.requireTc().getGroup())
+            (item, p) -> Groups.text(item.shownCase().getGroup())
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            runItem.requireTc().getGroup().stream().map(Badges::createGroupBadge).forEach(badges::add);
+            runItem.shownCase().getGroup().stream().map(Badges::createGroupBadge).forEach(badges::add);
         }
     },
 
@@ -211,7 +211,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             TestEditorAttributes.FQCN.getName(),
             ToolBarDefault.LOCKED_UNCHECKED,
             (item, p) -> {
-                final @NotNull TestCaseDto tc = item.requireTc();
+                final @NotNull TestCaseDto tc = item.shownCase();
                 return String.join(" > ", Fqcn.ofMethod(tc));
             }
     );

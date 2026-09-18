@@ -33,7 +33,7 @@ import static org.testng.Assert.*;
  * cannot resolve and assigns a case to every item it keeps, so nothing that
  * reaches a renderer is missing one.
  * <p>
- * Same field, two contracts. {@code getTc()} is for the first, {@code requireTc()}
+ * Same field, two contracts. {@code testCase()} is for the first, {@code shownCase()}
  * for the second.
  */
 public class TestRunItemsTest {
@@ -45,22 +45,22 @@ public class TestRunItemsTest {
     }
 
     @Test
-    public void requireTcReturnsTheWiredCase() {
+    public void shownCaseIsTheWiredCase() {
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).build();
-        final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).tc(tc).build();
+        final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build().setTc(tc);
 
-        assertSame(item.requireTc(), tc);
+        assertSame(item.shownCase(), tc);
     }
 
     @Test
-    public void requireTcFailsByNameRatherThanAsANullPointer() {
+    public void anUnwiredItemShowsAsARemovedCaseRatherThanThrowing() {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = TestRunItems.builder().id(id).build();
 
-        final IllegalStateException thrown = expectThrows(IllegalStateException.class, item::requireTc);
-
-        assertTrue(thrown.getMessage().contains(id.toString()),
-                "the message names the item, so a broken invariant is diagnosable: " + thrown.getMessage());
+        // The placeholder a result whose case was deleted already draws, so a
+        // renderer meeting an item nobody wired paints a row rather than failing.
+        assertEquals(item.shownCase().getDescription(), TestCaseDto.deleted(id).getDescription());
+        assertEquals(item.shownCase().getId(), id);
     }
 
     @Test

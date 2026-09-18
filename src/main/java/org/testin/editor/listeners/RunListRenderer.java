@@ -25,6 +25,8 @@ import org.testin.model.dto.TestCaseDto;
 
 import javax.swing.*;
 
+import java.util.Optional;
+
 public class RunListRenderer extends AbstractListRenderer<RunEditor> {
     private final @NotNull RunCard card;
 
@@ -40,7 +42,7 @@ public class RunListRenderer extends AbstractListRenderer<RunEditor> {
         // still repaints; render a pending placeholder rather than crashing inside
         // the cell renderer.
         final @NotNull TestRunItems runItem = editor.runItem(tc.getId())
-                .orElseGet(() -> TestRunItems.builder().id(tc.getId()).tc(tc).build());
+                .orElseGet(() -> TestRunItems.builder().id(tc.getId()).tc(Optional.of(tc)).build());
 
         card.updateData(row, editor.getSelectedDetails(), runItem, editor.cardTitle(tc));
         card.setActionsState(isSelected, isRowHovered, hover);

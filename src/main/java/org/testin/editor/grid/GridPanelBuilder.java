@@ -467,7 +467,7 @@ public class GridPanelBuilder {
             // Never skip rows: callers map grid rows back to testCases by index,
             // so a dropped row would make every following row act on the wrong test case.
             final @NotNull TestRunItems runItem = Optional.ofNullable(resultsMap.get(tc.getId()))
-                    .orElseGet(() -> TestRunItems.builder().id(tc.getId()).tc(tc).build());
+                    .orElseGet(() -> TestRunItems.builder().id(tc.getId()).tc(Optional.of(tc)).build());
 
             final String @NotNull[] row = new String[columns.length];
             final int rowNumber = position.applyAsInt(tc);

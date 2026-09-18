@@ -51,7 +51,7 @@ public class RunCard extends BaseCard {
                 .filter(activeDetails::contains)
                 .forEach(attr -> attr.applyToUI(runItem, badges, details, p));
 
-        this.runSlot = CardHoverAction.runSlot(p, runItem.requireTc());
+        this.runSlot = CardHoverAction.runSlot(p, runItem.shownCase());
 
         updateUI(index, title, badges, details);
 

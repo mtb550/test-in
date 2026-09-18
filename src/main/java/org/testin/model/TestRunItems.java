@@ -24,7 +24,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 
 import java.time.Duration;
@@ -49,14 +48,22 @@ public class TestRunItems {
      * <p>
      * Every row the editor loads gets one, including a result whose test case
      * has been deleted since the run: that row is wired to
-     * {@link TestCaseDto#deleted}, so the attributes that render a row can rely
-     * on it. Null only before the editor has wired it - a dialog opened for a
-     * raw run item read straight from the file.
+     * {@link TestCaseDto#deleted}. Empty only before the editor has wired it - a
+     * dialog opened for a raw run item read straight from the file.
      */
     @JsonIgnore
     @Getter(AccessLevel.NONE)
-    @Nullable
-    private TestCaseDto tc;
+    @Setter(AccessLevel.NONE)
+    @Builder.Default
+    private @NotNull Optional<TestCaseDto> tc = Optional.empty();
+
+    /**
+     * Wires the test case this result belongs to.
+     */
+    public @NotNull TestRunItems setTc(final @NotNull TestCaseDto testCase) {
+        this.tc = Optional.of(testCase);
+        return this;
+    }
 
     /**
      * The test case this result is about.
@@ -289,26 +296,23 @@ public class TestRunItems {
     /**
      * The test case, for the paths where it may not be there: a dialog opened on
      * a run item whose case is no longer in the test set. The rendering paths
-     * ask {@link #requireTc()} instead, which states the invariant they rely on.
+     * ask {@link #shownCase()} instead, which states the invariant they rely on.
      */
     public @NotNull Optional<TestCaseDto> testCase() {
-        return Optional.ofNullable(tc);
+        return tc;
     }
 
     /**
-     * The test case, for the rendering path, where it is always present.
+     * The test case, for the rendering path.
      * <p>
-     * {@code RunEditor} assigns {@code tc} to every run item it loads - one whose
-     * test case has been deleted since the run is wired to
-     * {@link TestCaseDto#deleted} - so an item that reaches a renderer or a grid
-     * row has one. This states that invariant where it is relied on, instead of
-     * unchecked reads that look like oversights. If it ever fails, it fails by
-     * name rather than as an NPE inside a Swing paint.
-     *
-     * @throws IllegalStateException if called on an item the editor has not wired
+     * The run editor wires one to every item it loads, so an item that reaches
+     * a renderer or a grid row has one. One that somehow has not reads as a row
+     * whose case is gone - which is what {@link TestCaseDto#deleted} already
+     * draws - rather than throwing inside a Swing paint. It was a nullable
+     * field behind a throwing shownCase(), read at eight call sites (#312,
+     * A81).
      */
-    public @NotNull TestCaseDto requireTc() {
-        return Optional.ofNullable(tc).orElseThrow(() -> new IllegalStateException(
-                "Run item " + id + " has no test case; the run editor wires one to every item it loads, so this item was read without being wired"));
+    public @NotNull TestCaseDto shownCase() {
+        return tc.orElseGet(() -> TestCaseDto.deleted(id));
     }
 }

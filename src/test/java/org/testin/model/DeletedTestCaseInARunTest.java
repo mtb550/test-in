@@ -56,7 +56,7 @@ public class DeletedTestCaseInARunTest {
                 .id(id)
                 .status(TestStatus.REMOVED)
                 .executedAt(executedAt)
-                .tc(TestCaseDto.deleted(id))
+                .tc(java.util.Optional.of(TestCaseDto.deleted(id)))
                 .build();
     }
 
