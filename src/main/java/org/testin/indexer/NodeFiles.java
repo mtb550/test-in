@@ -101,11 +101,29 @@ final class NodeFiles {
                 Logger.error(ex.getMessage());
                 throw new RuntimeException(ex);
             }
-        }, () -> {
-            store.renameNode(oldPath, newPath);
+        }, () -> followOnDisk(oldPath, newPath, () -> {
             Logger.info("Moved successfully to: " + newPath);
             onFinished.accept(true);
-        }, () -> onFinished.accept(false));
+        }), () -> onFinished.accept(false));
+    }
+
+    /**
+     * The index follows a node renamed or moved on disk, then the caller hears
+     * of it on the EDT.
+     * <p>
+     * After the VFS operation and never before it: the cache update writes the
+     * touched marker at the new path, and that write creates directories, so
+     * run first it makes the target exist and the rename fails with "already
+     * exists in VFS". Off the EDT, because it walks every indexed node to
+     * rebuild its breadcrumb and writes the marker - work that ran inside the
+     * VFS write action, beside methods that hop off the EDT to avoid exactly
+     * that (#66, finding 225).
+     */
+    private void followOnDisk(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable then) {
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            store.renameNode(oldPath, newPath);
+            ApplicationManager.getApplication().invokeLater(then);
+        });
     }
 
     /**
@@ -190,12 +208,7 @@ final class NodeFiles {
                 throw new RuntimeException(ex);
             }
 
-            // The cache update persists the touched marker at the NEW path, and
-            // that write creates directories. So it must run only after the VFS
-            // rename succeeded: otherwise the target directory already exists
-            // and the rename fails with "already exists in VFS".
-            store.renameNode(oldPath, newPath);
-            onFinished.run();
+            followOnDisk(oldPath, newPath, onFinished);
         });
     }
 
