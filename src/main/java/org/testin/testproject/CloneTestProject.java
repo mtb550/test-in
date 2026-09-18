@@ -16,9 +16,7 @@
 
 package org.testin.testproject;
 
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnActionEvent;
+import lombok.AllArgsConstructor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -28,7 +26,6 @@ import git4idea.commands.Git;
 import git4idea.commands.GitCommandResult;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.FailureText;
-import org.testin.actions.AbstractProjectAction;
 import org.testin.explorer.TreePanel;
 import org.testin.git.GitSafeText;
 import org.testin.indexer.ProjectIndexer;
@@ -40,29 +37,22 @@ import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 
-public class CreateTestProjectCloneAction extends AbstractProjectAction {
+/**
+ * UC-TREE-PANEL-003.
+ * <p>
+ * Clones a test project's repository and binds this repository to it.
+ * <p>
+ * Not an action, for the reason {@link NewTestProject} is not: nothing
+ * registered it, so its AnAction half could never run (#312, A100).
+ */
+@AllArgsConstructor
+public final class CloneTestProject {
+    private final @NotNull Project p;
     private final @NotNull String gitUrl;
     private final @NotNull String projectName;
     private final @NotNull TreePanel tp;
 
-    public CreateTestProjectCloneAction(final @NotNull Project p, final @NotNull String gitUrl, final @NotNull String name, final @NotNull TreePanel tp) {
-        super(p, Bundle.message("clone.action.text"), Bundle.message("clone.action.description"), AllIcons.Vcs.Clone);
-        this.gitUrl = gitUrl;
-        this.projectName = name;
-        this.tp = tp;
-    }
-
-    // UC-TREE-PANEL-003
-    @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        execute();
-    }
-
-    /**
-     * UC-TREE-PANEL-003, Rule-TREE-PANEL-019.
-     * <p>
-     * Direct entry point for dialog callbacks — no AnActionEvent required.
-     */
+    // UC-TREE-PANEL-003, Rule-TREE-PANEL-019
     public void execute() {
 
         if (gitUrl.trim().isEmpty() || projectName.trim().isEmpty()) {
@@ -133,11 +123,5 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
                 }
             }
         });
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - no update() here reads Swing state; do not switch to EDT (#52).
-        return ActionUpdateThread.BGT;
     }
 }

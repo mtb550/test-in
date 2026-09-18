@@ -16,12 +16,9 @@
 
 package org.testin.testproject;
 
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnActionEvent;
+import lombok.AllArgsConstructor;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectAction;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.DirectoryMapper;
@@ -31,31 +28,25 @@ import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
-import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 
-public class CreateTestProjectNewAction extends AbstractProjectAction {
+/**
+ * UC-TREE-PANEL-002.
+ * <p>
+ * Makes a new, empty test project and binds this repository to it.
+ * <p>
+ * Not an action. It was one - an AnAction with a title, an icon, an update and
+ * an actionPerformed - that nothing registered: the create dialog built it and
+ * called execute, so the action half could never run (#312, A100).
+ */
+@AllArgsConstructor
+public final class NewTestProject {
+    private final @NotNull Project p;
     private final @NotNull TreePanel tp;
     private final @NotNull String tpName;
 
-    public CreateTestProjectNewAction(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull String name) {
-        super(p, Bundle.message("project.new.text"), Bundle.message("project.new.only.description"), AllIcons.General.Add);
-        this.tp = tp;
-        this.tpName = name;
-    }
-
-    // UC-TREE-PANEL-002
-    @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        execute();
-    }
-
-    /**
-     * UC-TREE-PANEL-002, Rule-TREE-PANEL-017.
-     * <p>
-     * Direct entry point for dialog callbacks — no AnActionEvent required.
-     */
+    // UC-TREE-PANEL-002, Rule-TREE-PANEL-017
     public void execute() {
 
         final @NotNull Path tpPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(tpName);
@@ -80,18 +71,4 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
         Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
     }
 
-
-    // UC-TREE-PANEL-028, Rule-TREE-PANEL-089
-    @Override
-    public void update(final @NotNull AnActionEvent e) {
-        // Both branches, otherwise the action stays disabled for the whole session
-        // once seen without a configured Testin root.
-        e.getPresentation().setEnabled(Services.getInstance(p, TestinRoot.class).isConfigured());
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - update() reads only fields/services, never Swing state; do not switch to EDT (#52).
-        return ActionUpdateThread.BGT;
-    }
 }

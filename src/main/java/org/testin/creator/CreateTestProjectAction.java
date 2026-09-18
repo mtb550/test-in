@@ -29,8 +29,8 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.setting.TestinRoot;
-import org.testin.testproject.CreateTestProjectCloneAction;
-import org.testin.testproject.CreateTestProjectNewAction;
+import org.testin.testproject.CloneTestProject;
+import org.testin.testproject.NewTestProject;
 import org.testin.services.OptionalPlugin;
 import org.testin.util.Bundle;
 
@@ -59,7 +59,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
             // What was typed decides: a repository URL is cloned, anything else
             // is a name for a new project.
             if (!GitRefs.isRepositoryUrl(name)) {
-                new CreateTestProjectNewAction(p, tp, name).execute();
+                new NewTestProject(p, tp, name).execute();
                 return;
             }
 
@@ -78,7 +78,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
                 return;
             }
 
-            new CreateTestProjectCloneAction(p, name, projectName, tp).execute();
+            new CloneTestProject(p, name, projectName, tp).execute();
 
         }).show();
     }

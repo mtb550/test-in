@@ -47,7 +47,7 @@ import org.testin.setting.SettingsConfigurable;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.BindTestProjectDialog;
 import org.testin.testproject.BoundTestProject;
-import org.testin.testproject.CreateTestProjectCloneAction;
+import org.testin.testproject.CloneTestProject;
 import org.testin.util.Bundle;
 
 
@@ -463,7 +463,7 @@ public final class TreePanel implements Disposable {
                 AllIcons.Vcs.Clone,
                 Bundle.message("welcome.clone", boundProject.name()),
                 SimpleTextAttributes.LINK_ATTRIBUTES,
-                e -> new CreateTestProjectCloneAction(p, url, boundProject.name(), this).execute());
+                e -> new CloneTestProject(p, url, boundProject.name(), this).execute());
     }
 
     /**
