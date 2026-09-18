@@ -106,10 +106,10 @@ framework says the test did not pass and gives no verdict. Leaving it Pending
 would report the cycle as finished when part of it never ran.
 
 **If the IDE is indexing** — every test case is put back and a message reads
-*Cannot run tests while IntelliJ is indexing. Please wait a moment.*
+*Tests cannot run while the IDE is indexing. Wait a moment and run them again.*
 
 **If indexing starts part way through** — every test case is put back and a
-message reads *Indexing interrupted the test run. Please try again.*
+message reads *Indexing interrupted the test run. Run it again.*
 
 **If the IDE has no TestNG or no Java plugin** — the menu entry is still there,
 grayed, naming the first one missing: *(needs the Java plugin)* or *(needs the

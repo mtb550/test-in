@@ -84,7 +84,7 @@ Rule-TREE-PANEL-100 also holds here. It says a test project that is not
 │  The new awesome test management tool                                      │
 │                                                                            │
 │  By                                                                        │
-│  Muteb almughyiri                                                          │
+│  Muteb Almughyiri                                                          │
 │                                                                            │
 │                                                                            │
 │  [gear]  Configure Testin settings                                 (1)     │

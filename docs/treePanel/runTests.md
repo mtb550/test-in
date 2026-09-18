@@ -109,10 +109,10 @@ in red.
 names it: *\<test case\> has no generated code yet*. The rest still run. If none
 of them can run, nothing starts.
 
-**If the IDE is indexing** — nothing runs, and the IDE says *Cannot run tests
-while IntelliJ is indexing. Please wait a moment.* If indexing starts while the
-run is being prepared, it says *Indexing interrupted the test run. Please try
-again.*
+**If the IDE is indexing** — nothing runs, and the IDE says *Tests cannot run
+while the IDE is indexing. Wait a moment and run them again.* If indexing starts
+while the run is being prepared, it says *Indexing interrupted the test run. Run
+it again.*
 
 **If every test case under the node was already running** — nothing starts, and
 Testin says nothing at all.

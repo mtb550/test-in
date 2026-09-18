@@ -52,7 +52,7 @@ tree:
 │  The new awesome test management tool                      │
 │                                                            │
 │  By                                                        │
-│  Muteb almughyiri                                          │
+│  Muteb Almughyiri                                          │
 │                                                            │
 │  ⚙ Configure Testin settings                               │
 └────────────────────────────────────────────────────────────┘
