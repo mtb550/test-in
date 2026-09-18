@@ -167,15 +167,34 @@ public final class GitRepositoryService {
         }
     }
 
+    /**
+     * UC-TREE-PANEL-026.
+     * <p>
+     * Brings the remote's branches up to date, and raises when it cannot.
+     * <p>
+     * Not through {@link #runRemote}, whose failure is an empty answer: the one
+     * caller has a warning to show for a fetch that failed, and an empty answer
+     * never reached it (#312, A68).
+     */
     public void fetchRemoteBranches(final @NotNull Path path) {
         final @NotNull String remoteName = getRemoteName(path);
         if (remoteName.isEmpty()) return;
 
-        runRemote(path, getRemoteUrl(path, remoteName), "git", "fetch", "--all", "--prune");
+        GitCommandRunner.executeRemote(p, path, getRemoteUrl(path, remoteName), "git", "fetch", "--all", "--prune");
     }
 
+    /**
+     * UC-TREE-PANEL-026.
+     * <p>
+     * Every branch Git holds, and raises when it cannot read them.
+     * <p>
+     * Not through {@link #run} either. A failed read came back as no branches,
+     * so the box read <i>No branches found</i> over a repository full of them,
+     * and <i>Failed to load branches</i>, written for exactly this, never showed
+     * (#312, A68).
+     */
     public @NotNull List<String> getAvailableBranches(final @NotNull Path path) {
-        return GitRefs.parseBranches(run(path, "git", "branch", "-a").orElse("").lines().toList());
+        return GitRefs.parseBranches(GitCommandRunner.execute(p, path, "git", "branch", "-a").lines().toList());
     }
 
     /**
