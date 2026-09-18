@@ -111,13 +111,28 @@ public enum FailureDetail {
      * <p>
      * Whether this row records a bug at all.
      * <p>
-     * Two of the four say a bug was found - how bad it is and how soon it must
-     * be fixed - and the other two say what happened, which a case can carry
-     * without anybody having filed anything. Asked here because this enum
-     * already owns what "filled in" means for each of them, and the Open Bugs
-     * tab must not come to its own answer beside the Details tab's.
+     * Three of them say a bug was found - how bad it is, how soon it must be
+     * fixed, and the issue it was filed as - and the rest say what happened,
+     * which a case can carry without anybody having filed anything. Asked here
+     * because this enum already owns what "filled in" means for each of them,
+     * and the Open Bugs tab must not come to its own answer beside the Details
+     * tab's.
+     * <p>
+     * The filed issue counts on its own. Report Bug sets no severity and no
+     * priority, and every automated failure is filed that way, so a case with
+     * an issue open against it was listed as having no bugs (#312, A80).
      */
     public static boolean recordsABug(final @NotNull TestRunItems item) {
+        return isTriaged(item) || BUG_ISSUE_URL.filled.test(item);
+    }
+
+    /**
+     * UC-VIEW-PANEL-008, Rule-VIEW-PANEL-006.
+     * <p>
+     * Whether somebody said how bad this bug is or how soon it must be fixed. A
+     * bug that was only filed has neither, and has no line to draw for them.
+     */
+    public static boolean isTriaged(final @NotNull TestRunItems item) {
         return BUG_SEVERITY.filled.test(item) || BUG_PRIORITY.filled.test(item);
     }
 

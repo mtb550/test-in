@@ -6,8 +6,9 @@
 **so that** I do not raise the same one twice.
 
 A bug in Testin is not a thing of its own. It is what a test run's row records
-about a failure — how bad it is and how soon it must be fixed — so a test case's
-bugs are found by looking through the runs it has been in.
+about a failure — how bad it is, how soon it must be fixed, and the issue it was
+filed as — so a test case's bugs are found by looking through the runs it has
+been in.
 
 That is why the same test case can carry a **Blocker** from cycle 5 and nothing
 at all from cycle 14, and why both are worth seeing at once.
@@ -39,9 +40,10 @@ There is no key for this. The tab is called **Open Bugs**.
   select one. It does not describe a test case that is not there.
 - **Rule-VIEW-PANEL-064** — The Open Bugs tab lists every bug the test case has
   recorded, and which test run recorded it. A bug is what a run row says about a
-  failure - how bad it is and how soon it must be fixed - so a case that has
-  never failed has none, and the same case can carry a different bug in every
-  cycle.
+  failure - how bad it is, how soon it must be fixed, or the issue it was filed
+  as - so a case that has never failed has none, and the same case can carry a
+  different bug in every cycle. A filed issue is shown as its link, and opens
+  when clicked.
 - **Rule-VIEW-PANEL-065** — The bugs are read from the test runs the indexer
   already holds, so the tab costs a walk over what is in memory and reads
   nothing from disk.
@@ -54,10 +56,11 @@ There is no key for this. The tab is called **Open Bugs**.
 ├────────────────────────────────────────────────────────────────────────────┤
 │  cycle 5                                                                   │
 │  Blocker / High                                                            │
+│  acme/shop#12                                                              │
 │  The session was dropped after the second factor.                          │
 │                                                                            │
 │  cycle14                                                                   │
-│  Major / Medium                                                            │
+│  acme/shop#31                                                              │
 │  Timed out waiting for the dashboard.                                      │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -65,8 +68,11 @@ There is no key for this. The tab is called **Open Bugs**.
 1. **The run's name** — which cycle found this bug. It is the only thing that
    says when, so it is the heading rather than a detail.
 2. **The severity and the priority** — in the severity's own color, the same one
-   the run grid and every report paint it.
-3. **What happened** — the actual result the tester wrote, when they wrote one.
+   the run grid and every report paint it. Left out when neither was set, which
+   is how Report Bug files an automated failure.
+3. **The issue** — the one the failure was filed as, when it was. Clicking it
+   opens it in the browser, as the Details tab's link does.
+4. **What happened** — the actual result the tester wrote, when they wrote one.
    Left out when they did not, like every other empty field in this panel.
 
 The newest run comes first.
@@ -84,16 +90,16 @@ test case in any test run*. That is an answer, not an apology: a case with no
 bugs is the ordinary case.
 
 **If a row records a failure but no bug** — it is not drawn. An actual result
-without a severity or a priority is somebody saying what happened, not somebody
-filing a defect.
+without a severity, a priority or a filed issue is somebody saying what
+happened, not somebody filing a defect.
 
 **If no test case is shown** — the tab reads *Select a test case to view its
 bugs*, and says nothing about any test case (Rule-VIEW-PANEL-038).
 
 ## Not decided
 
-Testin records a bug severity, a bug priority and what happened. It records
-nothing else about a bug, and has no link to a bug tracker. Whether a bug should
+Testin records a bug severity, a bug priority, what happened, and the GitHub
+issue a failure was filed as. It records nothing else about a bug. Whether a bug should
 be a thing of its own — raised once, carried across cycles, closed — is question
 2 on [the view panel page](main.md#not-decided).
 
