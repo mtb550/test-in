@@ -59,8 +59,8 @@ public final class JavaSourceRoot {
      * Work to do against the source root, allowed to fail the way file work
      * does - which is why it is not a plain {@link java.util.function.Consumer}.
      * <p>
-     * The {@code throws} stays deliberately, and is one of the four exceptions
-     * to the rule in CLAUDE.md that a method handles its own failures. It is a
+     * The {@code throws} stays deliberately, and is one of the exceptions CLAUDE.md
+     * lists to the rule that a method handles its own failures. It is a
      * functional interface whose whole point is to let the lambda fail so that
      * {@link #run} catches for all of them; removing it would put a try/catch
      * in every generator lambda, which is the duplication this class exists to
@@ -80,6 +80,9 @@ public final class JavaSourceRoot {
      * {@code commitAllDocuments()}, a flush of every open document in the
      * project standing in for the one document that had just been written (#66,
      * finding 22).
+     * <p>
+     * Its {@code throws} stays for the reason {@link RootWork}'s does: one owner,
+     * {@link #run}, catches for every lambda. CLAUDE.md lists it beside that one.
      */
     @FunctionalInterface
     public interface RootFile {

@@ -195,6 +195,10 @@ public final class SettingsConfigurable implements SearchableConfigurable {
      * so the value that cannot work is never stored in the first place. Empty is
      * allowed and always was - it is how a tester says they have not chosen yet,
      * and the panel has its own empty state for exactly that.
+     * <p>
+     * Its {@code throws} is {@link #apply}'s: the settings dialog catches it
+     * there and keeps itself open with the message under the field. CLAUDE.md
+     * lists it beside {@code apply}.
      */
     private void refuseAnImpossibleRoot() throws ConfigurationException {
         final @NotNull String typed = testinPathPanel.getPathText().trim();
