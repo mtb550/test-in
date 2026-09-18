@@ -71,6 +71,10 @@ public class RunTestsAction extends DumbAwareAction {
     // Rule-TREE-PANEL-079
     @Override
     public void update(final @NotNull AnActionEvent e) {
+        // Both, as the card's Run declares: TestNG starts the run and Java finds
+        // the methods it starts. With TestNG alone this was offered, did
+        // nothing, and said nothing (#66, finding 222).
+        if (!OptionalPlugin.JAVA.enableOrExplain(this, e.getPresentation())) return;
         if (!OptionalPlugin.TESTNG.enableOrExplain(this, e.getPresentation())) return;
 
         e.getPresentation().setEnabled(runnable(e).isPresent() || selectedRun(e).isPresent());
