@@ -83,8 +83,8 @@ This is how every test case in Testin begins.
 1. **The description** — the only field there when the dialog opens. Like
    every field, it is named by its caption above it: JetBrains Mono, small, in
    capitals, in gray, over the box rather than the icon. The caption stays when
-   the gray hint inside the box goes (Rule-EDITOR-PANEL-231). Its icon is its
-   letter, D, in a rounded frame.
+   the gray hint inside the box goes (Rule-EDITOR-PANEL-231). Its icon is the
+   letter of its key, D, in a rounded frame.
 2. **The strip** — one row. The keys of the field the tester is in come first
    and change as they move between fields; **Save** and **Cancel** are always
    last, so a tester looks for Save in the same place whichever field they are
@@ -103,6 +103,9 @@ This is how every test case in Testin begins.
 | Group | `Ctrl+G` | *set group*, and it completes what the project uses |
 | Test Data | `Ctrl+T` | *set test data* |
 | Pre Conditions | `Ctrl+B` | *set pre conditions* |
+
+Each field's icon is the letter of its key in a rounded frame, so Pre Conditions
+shows B. The same icon marks the field's values in its completion list.
 
 Description, Expected Result, Module, Steps and Group complete the values Testin
 knows. [When that list changes](refreshEditor.md#what-completion-and-the-group-filter-offer)

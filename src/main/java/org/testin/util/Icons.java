@@ -18,6 +18,8 @@ package org.testin.util;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.ui.LayeredIcon;
+import com.intellij.ui.TextIcon;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
@@ -62,15 +64,23 @@ public final class Icons {
     /**
      * UC-EDITOR-PANEL-005.
      * <p>
-     * The Description field of the test case form: its letter, D, in a rounded
-     * frame, the letter its key opens it with (#328).
+     * A field of the test case form: the letter of the key that opens it, over
+     * a rounded frame, both in the platform's light-theme icon gray in every
+     * theme, as Muteb chose (#328).
      * <p>
-     * An SVG in one gray, the platform's light-theme icon gray, in every theme:
-     * Muteb chose the one color over a lighter twin for dark themes. The IDE
-     * keeps it sharp at any scale, and nothing here paints. The first of the
-     * letter icons, tried on its own before the other fields follow.
+     * One frame file serves every field, and the letter is text, so a field
+     * needs no drawing of its own. The platform lays the two out: its
+     * {@link TextIcon} draws the letter and its {@link LayeredIcon} centers it.
      */
-    public static final @NotNull Icon FIELD_DESCRIPTION = IconLoader.getIcon("/icons/fieldDescription.svg", Icons.class);
+    public static @NotNull Icon fieldLetter(final @NotNull String letter) {
+        final @NotNull TextIcon text = new TextIcon(letter, new Color(0x6C707E), null, 0);
+        text.setFont(JBUI.Fonts.label(9f).asBold());
+
+        final @NotNull LayeredIcon icon = new LayeredIcon(2);
+        icon.setIcon(IconLoader.getIcon("/icons/fieldFrame.svg", Icons.class), 0);
+        icon.setIcon(text, 1, SwingConstants.CENTER);
+        return icon;
+    }
 
     /**
      * UC-INTERNAL-007, Rule-INTERNAL-077.
