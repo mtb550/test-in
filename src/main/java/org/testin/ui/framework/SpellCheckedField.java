@@ -18,10 +18,14 @@ package org.testin.ui.framework;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
+import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Caption;
 import org.testin.util.SpellChecker;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221.
@@ -37,14 +41,24 @@ import javax.swing.*;
 public final class SpellCheckedField implements DialogComponent {
 
     private final @NotNull EditorTextField field;
+    private final @NotNull JBPanel<?> panel;
 
-    SpellCheckedField(final @NotNull Project p, final @NotNull String placeholder, final @NotNull String value) {
+    SpellCheckedField(final @NotNull Project p, final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value) {
         field = SpellChecker.createField(p);
         field.setOneLineMode(true);
         field.setText(value);
         field.setPlaceholder(placeholder);
         field.setShowPlaceholderWhenFocused(true);
         FrameworkTextField.style(field);
+
+        // UC-EDITOR-PANEL-034, Rule-INTERNAL-087. Named by its caption as well
+        // as its hint: the hint goes as soon as something is typed, and the box
+        // was then the one field in the dialog that said nothing about itself
+        // (#328).
+        panel = new JBPanel<>(new BorderLayout(0, JBUI.scale(2)));
+        panel.setOpaque(false);
+        panel.add(Caption.of(caption, JBUI.Fonts.label().getSize2D()), BorderLayout.NORTH);
+        panel.add(field, BorderLayout.CENTER);
     }
 
     public @NotNull String getText() {
@@ -53,7 +67,7 @@ public final class SpellCheckedField implements DialogComponent {
 
     @Override
     public @NotNull JComponent getPanel() {
-        return field;
+        return panel;
     }
 
     @Override

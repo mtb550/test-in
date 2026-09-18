@@ -20,11 +20,13 @@ import com.intellij.openapi.actionSystem.CommonShortcuts;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Caption;
 import org.testin.logger.Logger;
 import org.testin.util.ClipboardContents;
 
@@ -54,7 +56,7 @@ public final class TextArea implements DialogComponent {
     private final @NotNull ScreenshotStrip strip;
     private final @NotNull JBPanel<?> panel;
 
-    TextArea(final @NotNull String placeholder, final @NotNull String value, final int rows, final boolean acceptsImages, final @NotNull List<byte[]> images) {
+    TextArea(final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value, final int rows, final boolean acceptsImages, final @NotNull List<byte[]> images) {
         area = new JBTextArea(value);
         area.setFont(JBFont.label().biggerOn(2f));
         area.setLineWrap(true);
@@ -92,6 +94,15 @@ public final class TextArea implements DialogComponent {
         panel.setOpaque(false);
         panel.add(scroll, BorderLayout.CENTER);
         panel.add(strip.getPanel(), BorderLayout.SOUTH);
+
+        // UC-EDITOR-PANEL-034, Rule-INTERNAL-087. A caption above the box when
+        // the dialog gives one, and the space the box kept above itself goes
+        // above the caption instead (#328).
+        if (caption.isEmpty()) return;
+        final @NotNull JBLabel captionLabel = Caption.of(caption, JBUI.Fonts.label().getSize2D());
+        captionLabel.setBorder(JBUI.Borders.empty(8, 0, 2, 0));
+        scroll.setBorder(JBUI.Borders.empty());
+        panel.add(captionLabel, BorderLayout.NORTH);
     }
 
     /**

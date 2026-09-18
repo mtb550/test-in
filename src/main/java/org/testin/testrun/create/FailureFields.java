@@ -74,7 +74,7 @@ public final class FailureFields {
 
         // Rule-EDITOR-PANEL-221: spell checked, as every field of a form that
         // describes a test case is (#314).
-        actualResult = ComponentDialogBase.spellCheckedField(p, Bundle.message("dialog.failure.placeholder.actual"), runItem.getActualResult());
+        actualResult = ComponentDialogBase.spellCheckedField(p, RunEditorAttributes.ACTUAL_RESULT.getName(), Bundle.message("dialog.failure.placeholder.actual"), runItem.getActualResult());
 
         severity = ComponentDialogBase.<BugSeverity>radios(RunEditorAttributes.BUG_SEVERITY.getName())
                 .options(BugSeverity.CHOICES, BugSeverity::getLabel)
@@ -87,6 +87,7 @@ public final class FailureFields {
                 .build();
 
         errorCapture = ComponentDialogBase.textArea()
+                .caption(RunEditorAttributes.STACKTRACE.getName())
                 .placeholder(Bundle.message("dialog.failure.placeholder.error"))
                 .value(runItem.getStacktrace())
                 .rows(5)

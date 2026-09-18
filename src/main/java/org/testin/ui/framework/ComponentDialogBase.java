@@ -71,8 +71,8 @@ public final class ComponentDialogBase<C extends DialogComponent> {
      * An input field that underlines a misspelled word, with the IDE's
      * corrections on Alt+Enter - for a sentence a tester writes (#314).
      */
-    public static @NotNull ComponentDialogBase<SpellCheckedField> spellCheckedField(final @NotNull Project p, final @NotNull String placeholder, final @NotNull String value) {
-        return new ComponentDialogBase<>(new SpellCheckedField(p, placeholder, value));
+    public static @NotNull ComponentDialogBase<SpellCheckedField> spellCheckedField(final @NotNull Project p, final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value) {
+        return new ComponentDialogBase<>(new SpellCheckedField(p, caption, placeholder, value));
     }
 
     /**
@@ -267,11 +267,21 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class TextAreaBuilder {
 
+        private @NotNull String caption = "";
         private @NotNull String placeholder = "";
         private @NotNull String value = "";
         private int rows = 5;
         private boolean acceptsImages = false;
         private @NotNull List<byte[]> images = List.of();
+
+        /**
+         * A caption above the box. None unless asked for: an area that is the
+         * whole dialog, like Report Bug's body, is named by the dialog's title.
+         */
+        public @NotNull TextAreaBuilder caption(final @NotNull String caption) {
+            this.caption = caption;
+            return this;
+        }
 
         public @NotNull TextAreaBuilder placeholder(final @NotNull String placeholder) {
             this.placeholder = placeholder;
@@ -303,7 +313,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
 
         public @NotNull ComponentDialogBase<TextArea> build() {
-            return new ComponentDialogBase<>(new TextArea(placeholder, value, rows, acceptsImages, images));
+            return new ComponentDialogBase<>(new TextArea(caption, placeholder, value, rows, acceptsImages, images));
         }
     }
 

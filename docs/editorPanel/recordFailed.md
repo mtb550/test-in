@@ -73,6 +73,7 @@ form before it records anything.
 │  EXPECTED                                                    │
 │  The dashboard opens.                                        │
 │                                                              │
+│  ACTUAL RESULT                                               │
 │  [ set actual result..                                    ]  │
 │                                                              │
 │  BUG SEVERITY                                                │
@@ -81,6 +82,7 @@ form before it records anything.
 │  BUG PRIORITY                                                │
 │  ( ) High  ( ) Medium  (x) Low                               │
 │                                                              │
+│  STACKTRACE                                                  │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │ java.lang.AssertionError: expected [true]              │  │
 │  │   at org.testin.demo.LoginTest.valid(LoginTest:41)     │  │
@@ -95,13 +97,14 @@ form before it records anything.
 
 1. **Description** and **Expected** — what the test case says. They show the
    tester what should have happened. Neither can be typed into.
-2. **The first box** — what actually happened. It has no label, only its gray
-   hint. A misspelled word in it is underlined, and `Alt+Enter` offers the
-   corrections.
+2. **The first box** — what actually happened. Its caption above it reads
+   **Actual Result**, and its gray hint is inside it. A misspelled word in it is
+   underlined, and `Alt+Enter` offers the corrections.
 3. **Bug Severity** — four choices, with the least serious chosen.
 4. **Bug Priority** — three choices, with the lowest chosen.
-5. **The big box** — for the error or the exception, as text. Its gray hint
-   reads *paste error or exception or screenshot..*.
+5. **The big box** — for the error or the exception, as text. Its caption above
+   it reads **Stacktrace**, and its gray hint reads *paste error or exception or
+   screenshot..*.
 6. **The pictures under it** — one small picture for each screenshot pasted
    with `Ctrl+V`, in the order they were pasted: the screenshot itself, 48
    pixels high. Its **x** takes that screenshot out. No picture is ever written

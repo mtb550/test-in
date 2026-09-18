@@ -369,6 +369,7 @@ back. A failure nobody described is a failure nobody can act on.
 │  Sign in with a correct username and password                              │
 │  The dashboard opens and the account name is shown in the header.          │
 │                                                                            │
+│  ACTUAL RESULT                                                             │
 │  ┌──────────────────────────────────────────────────────────────────────┐  │
 │  │ set actual result..                                                  │  │
 │  └──────────────────────────────────────────────────────────────────────┘  │
@@ -379,6 +380,7 @@ back. A failure nobody described is a failure nobody can act on.
 │  BUG PRIORITY                                                              │
 │  ( ) High   ( ) Medium   (•) Low                                           │
 │                                                                            │
+│  STACKTRACE                                                                │
 │  ┌──────────────────────────────────────────────────────────────────────┐  │
 │  │ paste error or exception or screenshot..                             │  │
 │  │                                                                      │  │
