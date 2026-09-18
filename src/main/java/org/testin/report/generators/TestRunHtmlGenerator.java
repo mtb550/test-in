@@ -86,7 +86,14 @@ public final class TestRunHtmlGenerator {
                 .append(styles())
                 .append("</head><body>");
 
-        html.append("<button class='theme-toggle' type='button' onclick='testinToggleTheme()'>").append(Bundle.message("report.theme.toggle")).append("</button>");
+        // Both words from the bundle, carried on the button for the script to
+        // read. The script relabelled it from the literals "Light mode" and
+        // "Dark mode" as the page opened, so every language showed the English
+        // (#66, finding 257). Opens dark, so it offers light.
+        html.append("<button class='theme-toggle' type='button' onclick='testinToggleTheme()'")
+                .append(" data-light='").append(StringUtil.escapeXmlEntities(Bundle.message("report.theme.light"))).append("'")
+                .append(" data-dark='").append(StringUtil.escapeXmlEntities(Bundle.message("report.theme.dark"))).append("'>")
+                .append(Bundle.message("report.theme.light")).append("</button>");
 
         // HEADER
         html.append("<div class='report-title'>").append(Bundle.message("report.title")).append("</div>")
@@ -456,7 +463,7 @@ public final class TestRunHtmlGenerator {
         return "<script>(function(){"
                 + "var root=document.documentElement,btn=document.querySelector('.theme-toggle');"
                 + "function shown(){return root.getAttribute('data-theme')||'dark';}"
-                + "function label(){btn.textContent=shown()==='dark'?'Light mode':'Dark mode';}"
+                + "function label(){btn.textContent=shown()==='dark'?btn.dataset.light:btn.dataset.dark;}"
                 + "try{var saved=localStorage.getItem('testin.report.theme');if(saved)root.setAttribute('data-theme',saved);}catch(e){}"
                 + "label();"
                 + "window.testinToggleTheme=function(){var next=shown()==='dark'?'light':'dark';"
