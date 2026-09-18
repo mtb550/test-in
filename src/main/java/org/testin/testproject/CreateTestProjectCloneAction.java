@@ -27,6 +27,7 @@ import com.intellij.openapi.project.Project;
 import git4idea.commands.Git;
 import git4idea.commands.GitCommandResult;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.FailureText;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.explorer.TreePanel;
 import org.testin.git.GitSafeText;
@@ -38,7 +39,6 @@ import org.testin.setting.TestinRoot;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
-import java.util.Objects;
 
 public class CreateTestProjectCloneAction extends AbstractProjectAction {
     private final @NotNull String gitUrl;
@@ -127,7 +127,7 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
                     // Project and goes straight to Git as it was pasted. So a
                     // wrong token, a wrong name or no network put the token
                     // itself in the balloon and in the IDE's notification list.
-                    final @NotNull String said = GitSafeText.withoutCredentials(Objects.requireNonNullElse(ex.getMessage(), ex.toString()));
+                    final @NotNull String said = GitSafeText.withoutCredentials(FailureText.of(ex));
 
                     Services.getInstance(p, Notifier.class).error(p, Bundle.message("clone.failed.title"), Bundle.message("clone.failed.message", said));
                 }

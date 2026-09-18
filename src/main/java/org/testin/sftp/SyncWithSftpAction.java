@@ -27,6 +27,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.util.FailureText;
 import org.testin.actions.TestinData;
 import org.testin.config.TestinConfigService;
 import org.testin.explorer.TreePanel;
@@ -48,7 +49,6 @@ import org.testin.setting.AppSettingsState;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TreeMap;
 import java.util.Optional;
 
@@ -546,7 +546,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
         private static void reportFailure(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull Exception ex) {
             // The exception's own name when it carries no message, rather than
             // "null" in the log and a null handed to the notification (#312, A96).
-            final @NotNull String reason = Objects.requireNonNullElse(ex.getMessage(), ex.toString());
+            final @NotNull String reason = FailureText.of(ex);
             Logger.error(whatFailed + " failed: " + reason);
 
             ApplicationManager.getApplication().invokeLater(() ->

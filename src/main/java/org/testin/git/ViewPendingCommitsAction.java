@@ -23,6 +23,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.util.FailureText;
 import org.testin.actions.TestinData;
 import org.testin.config.TestinConfigService;
 import org.testin.explorer.tree.TreeValues;
@@ -473,7 +474,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         // review and no second route back to a push. The retry travels
                         // with the failure that needs it.
                         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-                        notifier.errorWithActions(p, Bundle.message("git.push.failed.title"), ex.getMessage(),
+                        notifier.errorWithActions(p, Bundle.message("git.push.failed.title"), FailureText.of(ex),
                                 notifier.action(Bundle.message("git.try.again"), () -> pushToRemote(repoPath, commitId, branch)));
                     });
         }
@@ -532,7 +533,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                                 Services.getInstance(p, Notifier.class).info(p, Bundle.message("git.rebase.continued.title"),
                                         Bundle.message("git.rebase.continued.message")));
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.push.failed.title"), ex.getMessage()));
+                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.push.failed.title"), FailureText.of(ex)));
         }
 
         // UC-SHARE-017, Rule-SHARE-077
@@ -569,7 +570,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         // offered back naming no file (#312, A43).
                         if (!git.conflictingPaths(repoPath).isEmpty()) showConflictActions(repoPath, remote, branch);
                         else
-                            Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), ex.getMessage());
+                            Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), FailureText.of(ex));
                     });
         }
 

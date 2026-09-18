@@ -24,10 +24,10 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.FailureText;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -128,7 +128,7 @@ public final class BackgroundWork {
                     // The exception's own name when it carries no message: a
                     // NullPointerException has none, and the tester was shown the
                     // word "null" (#312, A96).
-                    final @NotNull String reason = Objects.requireNonNullElse(ex.getMessage(), ex.toString());
+                    final @NotNull String reason = FailureText.of(ex);
                     Logger.error(whatFailed + ": " + reason);
                     Services.getInstance(p, Notifier.class).error(p, whatFailed, reason);
                 }

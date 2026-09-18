@@ -24,6 +24,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.util.FailureText;
 import org.testin.actions.TestinData;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.logger.Logger;
@@ -192,7 +193,7 @@ public class SyncActionAction extends DumbAwareAction {
 
                     },
                     ex -> {
-                        Logger.error(ex.getMessage());
+                        Logger.error(FailureText.of(ex));
 
                         // Asked here, still on the background thread: answering it
                         // runs git status, and a git command on the EDT trips the
@@ -307,7 +308,7 @@ public class SyncActionAction extends DumbAwareAction {
                     // It had no error path at all. A throw in here left the tester
                     // with a task that stopped and a stack trace in the log.
                     ex -> {
-                        Logger.error(ex.getMessage());
+                        Logger.error(FailureText.of(ex));
                         reportRebaseFailure(repoPath, failure);
                     });
         }
@@ -360,7 +361,7 @@ public class SyncActionAction extends DumbAwareAction {
                     // with nothing said and a tree still showing what was there
                     // before the sync.
                     ex -> {
-                        Logger.error(ex.getMessage());
+                        Logger.error(FailureText.of(ex));
                         ApplicationManager.getApplication().invokeLater(() ->
                                 reportSyncFailure(Bundle.message("git.sync.did.not.finish", ex.getMessage())));
                     });
