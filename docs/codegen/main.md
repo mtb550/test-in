@@ -150,10 +150,11 @@ and the IDE's index.
 for the whole code project, and every later operation is a silent skip. That is
 [UC-CODEGEN-019](noJavaPlugin.md).
 
-**While the IDE is indexing**, Testin refuses and says so. Every generated file
-is found by the name of the class it belongs to, and looking a class up by name
-is a question the index answers - so until the index is built there is no answer
-to give.
+**While the IDE is indexing**, Testin refuses and says so - once for each time
+the IDE indexes, however many operations it refuses meanwhile, and again the
+next time it indexes. Every generated file is found by the name of the class it
+belongs to, and looking a class up by name is a question the index answers - so
+until the index is built there is no answer to give.
 
 The refusal is deliberate, rather than waiting for the index and doing the work
 afterwards. Waiting would be right for creating something and wrong for renaming

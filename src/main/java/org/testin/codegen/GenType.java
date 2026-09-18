@@ -329,6 +329,14 @@ public enum GenType {
             // balloons for one gesture (#66, finding 80).
             if (Once.claim(p, INDEXING_SAID)) {
                 Services.getInstance(p, Notifier.class).softRefuse(p, Refused.WHILE_INDEXING, description);
+
+                // Once per indexing, not once per session. Never released, the
+                // claim was spent by the first Gradle sync or branch switch, and
+                // every later indexing refused generation in silence - a test
+                // case created, a set renamed or a card dragged got no method and
+                // one log line (#66, finding 195). Released when the IDE is smart
+                // again, the next indexing says so again, once.
+                DumbService.getInstance(p).runWhenSmart(() -> p.putUserData(INDEXING_SAID, null));
             }
 
             // The constant, not the description: a log line reads the same in
