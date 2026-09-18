@@ -16,13 +16,11 @@
 
 package org.testin.java.codegen.pkg;
 
+import org.testin.java.codegen.PackageDeclarations;
 import org.testin.util.Bundle;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiJavaFile;
-import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
@@ -33,7 +31,6 @@ import org.testin.util.NameSanitizer;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class RenameJavaPackage implements GenAction {
@@ -64,49 +61,20 @@ public class RenameJavaPackage implements GenAction {
 
         final @NotNull VirtualFile pkgDir = found.orElseThrow();
         final @NotNull String newTop = NameSanitizer.packageName(newName);
-        // The package path of the directory that CONTAINS the renamed package, e.g. "muath"
-        // for a package at "muath.pkgtu" -> "muath.pkg". Needed so the new package
-        // declaration keeps the full prefix instead of just "pkg".
-        final @NotNull String parentPackage = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
         WriteCommandAction.runWriteCommandAction(p, Bundle.message("codegen.rename.package"), null, () -> {
             try {
                 pkgDir.rename(this, newTop);
-                updatePackageDeclarations(p, pkgDir, newTop, parentPackage);
+
+                // The package lines, through their one owner: each file's package
+                // is where it now sits below the source root. This rename kept
+                // its own copy, built from the new name and the old parent
+                // package - the same answer the long way round (#312, A60).
+                PackageDeclarations.retarget(p, testSourceRoot, pkgDir);
                 Logger.info("Package renamed to: " + newName);
             } catch (final IOException ex) {
                 Logger.info("Error renaming package: " + ex.getMessage());
             }
         });
-    }
-
-    private void updatePackageDeclarations(final @NotNull Project p, final @NotNull VirtualFile root, final @NotNull String newTop, final @NotNull String parentPackage) {
-        updatePackageDeclarationsRecursive(p, root, root, newTop, parentPackage);
-    }
-
-    private void updatePackageDeclarationsRecursive(final @NotNull Project p, final @NotNull VirtualFile root, final @NotNull VirtualFile dir, final @NotNull String newTop, final @NotNull String parentPackage) {
-        for (final VirtualFile child : dir.getChildren()) {
-            if (child.isDirectory()) {
-                updatePackageDeclarationsRecursive(p, root, child, newTop, parentPackage);
-            } else if ("java".equals(child.getExtension())) {
-                // Not loaded and not Java are one answer: nothing to retarget.
-                if (PsiManager.getInstance(p).findFile(child) instanceof PsiJavaFile javaFile) {
-                    final @NotNull String newPackage = buildNewPackage(root, child.getParent(), newTop, parentPackage);
-                    if (!newPackage.equals(javaFile.getPackageName())) {
-                        javaFile.setPackageName(newPackage);
-                    }
-                }
-            }
-        }
-    }
-
-    private @NotNull String buildNewPackage(final @NotNull VirtualFile root, final @NotNull VirtualFile parentDir, final @NotNull String newTop, final @NotNull String parentPackage) {
-        // The root itself is no path below the root, which VfsUtil says with a
-        // null and which means the same as saying it with an empty string.
-        final @NotNull String rel = Objects.requireNonNullElse(VfsUtil.getRelativePath(parentDir, root, '/'), "");
-        final @NotNull String base = parentPackage.isEmpty() ? newTop : parentPackage + "." + newTop;
-
-        if (rel.isEmpty()) return base;
-        return base + "." + rel.replace('/', '.');
     }
 }
