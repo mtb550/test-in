@@ -118,6 +118,10 @@ is written on the refresh page.
 **If the description is empty** — the dialog stays open, the description turns
 red, and the cursor goes back to it. No message is raised.
 
+**If the test set is removed or renamed while the dialog is open** — by a sync,
+a pull or the tree — nothing is saved. A message says the test set is no longer
+there, and the dialog stays open with what was typed in it.
+
 **If a Create Test Case dialog is already open** — it is brought forward rather
 than a second one opened, so nothing typed into it is lost
 (Rule-INTERNAL-075).
