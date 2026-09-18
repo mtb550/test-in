@@ -45,6 +45,9 @@ There is no key for this. The button is on the toolbar.
   thrown away, before the grid is rebuilt.
 - **Rule-EDITOR-PANEL-020** — The grid has one column for each field the tester
   chose to show, in a fixed order.
+- **Rule-EDITOR-PANEL-229** — A grid that cannot be built is never shown in
+  place of the page asked for. The cards are shown instead, holding that page,
+  and a message says the grid could not be drawn and why.
 
 ## The screen
 
@@ -75,8 +78,9 @@ There is no key for this. The button is on the toolbar.
 
 ## What Testin refuses
 
-**If the grid cannot be built** — the view the tester was in stays on screen,
-and only the log says why.
+**If the grid cannot be built** — the cards are shown instead, holding the
+page asked for, and a message says the grid could not be drawn and why
+(Rule-EDITOR-PANEL-229).
 
 ## What is different in each view
 

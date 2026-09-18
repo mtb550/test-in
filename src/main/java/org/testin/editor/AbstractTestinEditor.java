@@ -57,6 +57,7 @@ import org.testin.undo.UndoScope;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import javax.swing.JComponent;
 import java.awt.event.MouseListener;
@@ -422,8 +423,8 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     public void onToolBarSwitchedToGridView() {
         Logger.debug("[switch] -> GRID view, currentView=" + toolBar.getCurrentView());
         rebuildGrid();
-        // rebuildGrid() swallows failures; the grid is then still empty and the
-        // previous center stays visible instead of an NPE.
+        // A grid that could not be built leaves none here, and the list on
+        // screen.
         grid.ifPresent(view -> {
             center.set(view.scrollPane());
             ApplicationManager.getApplication().invokeLater(view.table()::requestFocusInWindow);
@@ -449,9 +450,8 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
      * the list has: the selection, the keys, the context menu and the page
      * shortcuts.
      * <p>
-     * Failures are swallowed deliberately - the grid is then still whatever it
-     * was, and the previous center stays visible instead of an exception on the
-     * EDT.
+     * A grid that cannot be built leaves the list on screen, which already holds
+     * the page, and says why - see the catch.
      */
     protected void rebuildGrid() {
         // Before the page is read, not after: the committed value has to be in the
@@ -462,13 +462,9 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         final @NotNull List<TestCaseDto> pageItems = getCurrentPageItems();
         final @NotNull Set<A> attributes = getSelectedDetails();
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
+        final @NotNull Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin." + getClass().getSimpleName() + ".gridFontSync");
         try {
             final @NotNull JBTable table = buildTable(pageItems, attributes);
-
-            // The previous grid's subscription goes with the previous grid, so
-            // they do not accumulate one per rebuild.
-            grid.ifPresent(previous -> Disposer.dispose(previous.fontSync()));
-            final @NotNull Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin." + getClass().getSimpleName() + ".gridFontSync");
             FontSync.syncWithNativeEditor(p, table, fontSync);
 
             table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, list, pageItems));
@@ -486,7 +482,14 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
             PageAction.bindToGrid(this, table);
             new OpenContextMenuAction(table, contextMenu);
 
+            final @NotNull Optional<GridView> previous = grid;
             grid = Optional.of(GridPanelBuilder.finishRebuild(table, list, pageItems, gridColumnToRestore, fontSync, keepKeyboard));
+
+            // The previous grid's subscription goes with the previous grid, so
+            // they do not accumulate one per rebuild - once this one is in its
+            // place. Disposed first, a throw in between left the grid on screen
+            // no longer following the editor font (#66, finding 207).
+            previous.ifPresent(old -> Disposer.dispose(old.fontSync()));
 
             // Cleared regardless of whether the row was found, so a stale column can
             // never be applied to an unrelated rebuild.
@@ -494,6 +497,16 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
             Logger.debug("[grid] rebuildGrid done, rows=" + table.getRowCount() + ", cols=" + table.getColumnCount());
         } catch (final Exception ex) {
             Logger.error("[grid] rebuildGrid FAILED: " + ex);
+            Disposer.dispose(fontSync);
+
+            // Rule-EDITOR-PANEL-229. The grid still held was the page before, and
+            // both callers put it on screen as the current one: the status bar
+            // said page 3 over page 2, with only a log line (#66, finding 207).
+            // The list already holds the page asked for.
+            grid.ifPresent(old -> Disposer.dispose(old.fontSync()));
+            grid = Optional.empty();
+            center.set(scrollPane);
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("editor.grid.not.drawn", FailureText.of(ex)));
         }
     }
 
