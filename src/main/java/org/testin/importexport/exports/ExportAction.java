@@ -16,7 +16,6 @@
 
 package org.testin.importexport.exports;
 
-import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -153,8 +152,7 @@ public class ExportAction extends DumbAwareAction {
                     Bundle.message("export.failed.title"), indicator -> {
                         destination.format().exportToFile(p, destination.file(), selected);
 
-                        ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(p, Notifier.class).softShowCounted(p, Done.EXPORTED, cases));
+                        ExportNotice.show(p, destination.file(), cases);
                     });
         }
 

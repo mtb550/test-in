@@ -57,6 +57,5 @@ public class ExportJson {
             throw new RuntimeException(ex);
         }
 
-        ExportNotice.show(p, destFile);
     }
 }

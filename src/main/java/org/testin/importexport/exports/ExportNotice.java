@@ -54,11 +54,21 @@ public final class ExportNotice {
     /**
      * UC-SHARE-004, Rule-SHARE-022.
      * <p>
-     * For a file the operating system knows how to open: a spreadsheet, a CSV,
-     * a JSON document.
+     * The one confirmation an export gets: a notification that stays, titled with
+     * how many test cases went, naming the file, with Open and Copy path under
+     * it. Open sends a web page to the browser and anything else to what the
+     * machine opens it with.
+     * <p>
+     * One. Each exporter raised this and the action raised a balloon counting
+     * the cases as well, so one export confirmed itself twice (#66, finding
+     * 277). The action is what knows both the file and the count, so it asks.
      */
-    static void show(final @NotNull Project p, final @NotNull File file) {
-        show(p, file, () -> open(p, file));
+    static void show(final @NotNull Project p, final @NotNull File file, final int cases) {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+            notifier.infoWithActions(p, Done.counted(Done.EXPORTED.getOutcome(), cases), file.getName(),
+                    notifier.action(Bundle.message("export.open.file"), () -> open(p, file)), copyPath(p, file));
+        });
     }
 
     /**
@@ -110,24 +120,6 @@ public final class ExportNotice {
                 ApplicationManager.getApplication().invokeLater(() ->
                         notifier.error(p, Bundle.message("export.execution.error.title"), Bundle.message("export.execution.failed", ex.getMessage())));
             }
-        });
-    }
-
-    /**
-     * UC-SHARE-004, Rule-SHARE-022.
-     * <p>
-     * For a file meant to be read in a browser. {@link #open} sends every web
-     * page there anyway, so this is the caller that knows before it looks.
-     */
-    static void showInBrowser(final @NotNull Project p, final @NotNull File file) {
-        show(p, file, () -> BrowserUtil.browse(file.toURI().toString()));
-    }
-
-    private static void show(final @NotNull Project p, final @NotNull File file, final @NotNull Runnable open) {
-        ApplicationManager.getApplication().invokeLater(() -> {
-            final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-            notifier.infoWithActions(p, Done.EXPORTED.getOutcome(), file.getName(),
-                    notifier.action(Bundle.message("export.open.file"), open), copyPath(p, file));
         });
     }
 

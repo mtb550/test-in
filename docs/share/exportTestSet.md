@@ -74,8 +74,8 @@ There is no key for this. The menu entry is **Export**.
 5. The tester picks a folder, a name and a format, then presses **Export**.
 6. The dialog closes. A bar reads *Exporting*, then the count, then *test
    cases to*, then the file name.
-7. A message reads *Exported 8*.
-8. A second message names the file and carries **Open file** and **Copy path**.
+7. One message, titled *Exported 8*, names the file and carries **Open file**
+   and **Copy path**. It stays in the notification log.
 
 ## What Testin refuses
 

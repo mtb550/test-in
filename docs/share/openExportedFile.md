@@ -40,7 +40,7 @@ until one of them is clicked.
 ## Main flow
 
 1. Testin writes the file.
-2. A message titled **Exported** names the file.
+2. A message titled **Exported** and the count - *Exported 8* - names the file.
 3. The tester clicks **Open file**.
 4. The spreadsheet opens in whatever application claims that kind of file.
 

@@ -56,7 +56,6 @@ public class ExportCsv {
             throw new RuntimeException(ex);
         }
 
-        ExportNotice.show(p, destFile);
     }
 
     private @NotNull String escapeCsvField(final @NotNull String value) {

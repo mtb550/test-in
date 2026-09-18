@@ -45,7 +45,6 @@ public class ExportHtml {
             throw new RuntimeException(ex);
         }
 
-        ExportNotice.showInBrowser(p, destFile);
     }
 
     private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {

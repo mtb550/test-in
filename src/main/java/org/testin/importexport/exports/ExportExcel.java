@@ -123,7 +123,6 @@ public class ExportExcel {
             throw new RuntimeException(ex);
         }
 
-        ExportNotice.show(p, destFile);
     }
 }
 
