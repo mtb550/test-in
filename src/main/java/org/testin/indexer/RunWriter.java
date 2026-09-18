@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -75,6 +76,19 @@ final class RunWriter {
      */
     private final @NotNull ExecutorService queue =
             AppExecutorUtil.createBoundedApplicationPoolExecutor("Testin Run Status Writer", 1);
+
+    /**
+     * Screenshots handed to the queue and not on disk yet, by file.
+     * <p>
+     * So a screenshot saved a moment ago is read back from here rather than by
+     * waiting for the queue to empty. The wait ran on the EDT - the failure
+     * form reads every screenshot of its row as it opens - and the same queue
+     * carries a sync's incoming run files, so a tester who opened a failure
+     * while a sync was writing got a frozen IDE for as long as the queue took
+     * (#66, finding 174). A screenshot's name is never reused, so the bytes
+     * held here are the bytes the file will hold.
+     */
+    private final @NotNull Map<Path, byte[]> unwritten = new ConcurrentHashMap<>();
 
     /**
      * A new run's results, and the index entry that says the run exists.
@@ -184,6 +198,8 @@ final class RunWriter {
             byName.put(name, png);
         }
 
+        byName.forEach((name, png) -> unwritten.put(TestRunDirectoryDto.screenshotFile(runPath, name), png));
+
         if (!byName.isEmpty()) queue.execute(() -> {
             try {
                 if (store.findTestRun(runPath).isEmpty()) {
@@ -195,6 +211,8 @@ final class RunWriter {
                 byName.forEach((name, png) -> files.write(p, TestRunDirectoryDto.screenshotFile(runPath, name), png));
             } catch (final Exception ex) {
                 Logger.error("Failed to write the screenshots of " + runPath.getFileName() + ": " + ex.getMessage());
+            } finally {
+                byName.forEach((name, png) -> unwritten.remove(TestRunDirectoryDto.screenshotFile(runPath, name), png));
             }
         });
 
@@ -204,14 +222,14 @@ final class RunWriter {
     /**
      * A screenshot's PNG bytes, and none when its file is missing or the name
      * was never a screenshot's - a sync that brought the run before its
-     * pictures, say. Asked once the queue is empty, so a screenshot saved a
-     * moment ago is read back rather than missed.
+     * pictures, say. One still in the queue is answered from {@link #unwritten},
+     * so it is read back rather than missed, without waiting for the queue.
      */
     byte @NotNull [] readScreenshot(final @NotNull Path runPath, final @NotNull String name) {
         if (!TestRunDirectoryDto.isScreenshotName(name)) return new byte[0];
 
-        awaitQueued();
-        return Services.getInstance(p, TestDataFiles.class).readBytes(TestRunDirectoryDto.screenshotFile(runPath, name));
+        final @NotNull Path file = TestRunDirectoryDto.screenshotFile(runPath, name);
+        return Optional.ofNullable(unwritten.get(file)).orElseGet(() -> Services.getInstance(p, TestDataFiles.class).readBytes(file));
     }
 
     /**
@@ -264,12 +282,16 @@ final class RunWriter {
      * arrives from a server is not in the index until the scan that follows.
      */
     @NotNull Future<Boolean> write(final @NotNull Path file, final byte @NotNull [] bytes) {
+        if (TestRunDirectoryDto.isScreenshot(file)) unwritten.put(file, bytes);
+
         return queue.submit(() -> {
             try {
                 return Services.getInstance(p, TestDataFiles.class).write(p, file, bytes);
             } catch (final Exception ex) {
                 Logger.error("Failed to write an incoming run file " + file + ": " + ex.getMessage());
                 return false;
+            } finally {
+                unwritten.remove(file, bytes);
             }
         });
     }
