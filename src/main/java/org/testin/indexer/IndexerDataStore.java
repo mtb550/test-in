@@ -165,9 +165,13 @@ final class IndexerDataStore {
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-035
-    void putTestCaseVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
-        testCaseStore.putVerbatim(testSetPath, tc);
+    boolean putTestCaseVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
+        // The marker follows the write here too: a set whose case never reached
+        // disk was not modified.
+        if (!testCaseStore.putVerbatim(testSetPath, tc)) return false;
+
         markTestSetModified(testSetPath);
+        return true;
     }
 
     void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {

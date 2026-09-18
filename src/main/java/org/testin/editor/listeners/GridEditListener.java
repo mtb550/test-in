@@ -132,7 +132,12 @@ public class GridEditListener extends AbstractGridEditListener {
         final @NotNull GenType generator = attr.getGenType();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            Services.getInstance(p, ProjectIndexer.class).putTestCase(testSetPath, tc);
+            // Only what reached disk is regenerated and put on the undo history.
+            // A refused write was said by the writer, and a code change or an
+            // undo entry for it would describe an edit that did not happen (#66,
+            // finding 163).
+            if (!Services.getInstance(p, ProjectIndexer.class).putTestCase(testSetPath, tc)) return;
+
             generator.getAction().execute(p, tc);
 
             TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.edit"), List.of(tc)), undoFrom, TestCaseSnapshot.of(p, testSetPath, List.of(tc.getId())));

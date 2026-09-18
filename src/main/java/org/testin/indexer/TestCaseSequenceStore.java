@@ -128,8 +128,7 @@ final class TestCaseSequenceStore {
         if (testCasesById.containsKey(testCase.getId())) testCase.touch(tester);
         else testCase.stampCreated(tester);
 
-        store(testSetPath, testCase);
-        return true;
+        return store(testSetPath, testCase);
     }
 
     /**
@@ -162,18 +161,32 @@ final class TestCaseSequenceStore {
      * audit columns produces cases with an empty creator, and empty means "the
      * file did not say" rather than a name nobody chose.
      */
-    void putVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
-        store(testSetPath, testCase);
+    boolean putVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
+        return store(testSetPath, testCase);
     }
 
-    private void store(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
-        final @NotNull String path = testSetPath.toString();
+    /**
+     * UC-INTERNAL-004, Rule-INTERNAL-033.
+     * <p>
+     * The file, and then the index - architecture rule 2, which every other
+     * write in this package keeps and this one had the wrong way round. The
+     * index took the case first and the write's answer was dropped, so a write
+     * refused by a read-only or locked file still left the grid showing the new
+     * value, the set's marker stamped, the undo recorded, the method regenerated
+     * and the case counted in "Updated N" - an edit that existed in memory until
+     * the next rescan put the old one back (#66, finding 163).
+     *
+     * @return whether the file holds the case now. The writer has already told
+     * the tester when it does not.
+     */
+    private boolean store(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
+        if (!Services.getInstance(p, TestDataFiles.class).write(p, fileOf(testSetPath, testCase.getId()), testCase)) return false;
+
         testCasesById.put(testCase.getId(), testCase);
-        final @NotNull List<UUID> ids = testSetCaseIds.computeIfAbsent(path, ignored -> caseIds(List.of()));
+        final @NotNull List<UUID> ids = testSetCaseIds.computeIfAbsent(testSetPath.toString(), ignored -> caseIds(List.of()));
         if (!ids.contains(testCase.getId())) ids.add(testCase.getId());
 
-        Services.getInstance(p, TestDataFiles.class)
-                .write(p, fileOf(testSetPath, testCase.getId()), testCase);
+        return true;
     }
 
     void remove(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {

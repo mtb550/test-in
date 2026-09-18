@@ -516,9 +516,11 @@ public final class ProjectIndexer {
     /**
      * UC-INTERNAL-004, Rule-INTERNAL-033.
      * <p>
-     * Saves a test case, and says whether it had anything to save - false when
-     * the file already holds it exactly, which is a tester who opened a field,
-     * changed nothing and pressed Enter (#164).
+     * Saves a test case, and says whether it did - false when the file already
+     * holds it exactly, which is a tester who opened a field, changed nothing and
+     * pressed Enter (#164), and false when the file could not be written, which
+     * the writer has already said (#66, finding 163). Either way there is
+     * nothing for the caller to confirm, regenerate or take back.
      */
     public boolean putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
         return store.putTestCase(testSetPath, tc);
@@ -537,8 +539,8 @@ public final class ProjectIndexer {
      * place, and the ordinary save would record the paster as its creator (#66,
      * finding 114).
      */
-    public void putTestCaseVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
-        store.putTestCaseVerbatim(testSetPath, tc);
+    public boolean putTestCaseVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
+        return store.putTestCaseVerbatim(testSetPath, tc);
     }
 
     public void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {

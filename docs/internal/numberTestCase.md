@@ -90,6 +90,12 @@ written. Testin compares the file it would write with the file already on disk.
 They are the same, so it stops. The tester is not recorded as having edited the
 test case. The test set is not recorded as having changed either.
 
+**If the file cannot be written** — a read-only or locked file, a full disk —
+Testin says so, and treats the save as one that did not happen. The index keeps
+the test case as it was on disk, the test set is not recorded as changed, no
+undo is recorded and the generated method is not rewritten, so nothing goes on
+claiming an edit the file does not hold (Rule-INTERNAL-033).
+
 **If a test case has no place in the order** — it sorts last, with the other
 test cases that have none, oldest first. Something that has just arrived lands
 at the end, where a tester looks for it.
