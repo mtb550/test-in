@@ -67,18 +67,71 @@ public enum CopyChoice implements MenuItem {
      * this menu existed - so it is the first row and the one already selected,
      * and CTRL+C then ENTER is the gesture it always was.
      */
-    ALL_DETAILS(Bundle.message("copy.all.details"), Shortcuts.CopyAll, Icons.fieldLetter("A", Icons.GRAY)),
+    ALL_DETAILS(
+            Bundle.message("copy.all.details"),
+            Shortcuts.CopyAll,
+            Icons.fieldLetter("A", Icons.GRAY)
+    ),
 
-    DESCRIPTION(TestEditorAttributes.DESCRIPTION, Shortcuts.CopyDescription, CreateTestCaseFields.DESCRIPTION.getIcon()),
-    EXPECTED_RESULT(TestEditorAttributes.EXPECTED_RESULT, Shortcuts.CopyExpectedResult, CreateTestCaseFields.EXPECTED_RESULT.getIcon()),
-    STEPS(TestEditorAttributes.STEPS, Shortcuts.CopySteps, CreateTestCaseFields.STEPS.getIcon()),
-    PRE_CONDITIONS(TestEditorAttributes.PRE_CONDITIONS, Shortcuts.CopyPreConditions, CreateTestCaseFields.PRE_CONDITIONS.getIcon()),
-    TEST_DATA(TestEditorAttributes.TEST_DATA, Shortcuts.CopyTestData, CreateTestCaseFields.TEST_DATA.getIcon()),
-    PRIORITY(TestEditorAttributes.PRIORITY, Shortcuts.CopyPriority, CreateTestCaseFields.PRIORITY.getIcon()),
-    MODULE(TestEditorAttributes.MODULE, Shortcuts.CopyModule, CreateTestCaseFields.MODULE.getIcon()),
-    GROUP(TestEditorAttributes.GROUP, Shortcuts.CopyGroup, CreateTestCaseFields.GROUP.getIcon()),
-    STATUS(TestEditorAttributes.STATUS, Shortcuts.CopyStatus, Icons.fieldLetter("U", Icons.GRAY)),
-    REFERENCE(TestEditorAttributes.REFERENCE, Shortcuts.CopyReference, Icons.fieldLetter("R", Icons.GRAY)),
+    DESCRIPTION(
+            TestEditorAttributes.DESCRIPTION,
+            Shortcuts.CopyDescription,
+            CreateTestCaseFields.DESCRIPTION.getIcon()
+    ),
+
+    EXPECTED_RESULT(
+            TestEditorAttributes.EXPECTED_RESULT,
+            Shortcuts.CopyExpectedResult,
+            CreateTestCaseFields.EXPECTED_RESULT.getIcon()
+    ),
+
+    STEPS(
+            TestEditorAttributes.STEPS,
+            Shortcuts.CopySteps,
+            CreateTestCaseFields.STEPS.getIcon()
+    ),
+
+    PRE_CONDITIONS(
+            TestEditorAttributes.PRE_CONDITIONS,
+            Shortcuts.CopyPreConditions,
+            CreateTestCaseFields.PRE_CONDITIONS.getIcon()
+    ),
+
+    TEST_DATA(
+            TestEditorAttributes.TEST_DATA,
+            Shortcuts.CopyTestData,
+            CreateTestCaseFields.TEST_DATA.getIcon()
+    ),
+
+    PRIORITY(
+            TestEditorAttributes.PRIORITY,
+            Shortcuts.CopyPriority,
+            CreateTestCaseFields.PRIORITY.getIcon()
+    ),
+
+    MODULE(
+            TestEditorAttributes.MODULE,
+            Shortcuts.CopyModule,
+            CreateTestCaseFields.MODULE.getIcon()
+    ),
+
+    GROUP(
+            TestEditorAttributes.GROUP,
+            Shortcuts.CopyGroup,
+            CreateTestCaseFields.GROUP.getIcon()
+    ),
+
+    STATUS(
+            TestEditorAttributes.STATUS,
+            Shortcuts.CopyStatus,
+            Icons.fieldLetter("U", Icons.GRAY)
+    ),
+
+    REFERENCE(
+            TestEditorAttributes.REFERENCE,
+            Shortcuts.CopyReference,
+            Icons.fieldLetter("R", Icons.GRAY)
+    ),
 
     /**
      * The three the update menu cannot offer, and the reason this enum is not
@@ -90,9 +143,24 @@ public enum CopyChoice implements MenuItem {
      * grid column draws it as a " &gt; " breadcrumb to read, and copying that
      * gave a name that matched nothing a tester pasted it into (#312, A59).
      */
-    FQCN(TestEditorAttributes.FQCN, Shortcuts.CopyFqcn, Icons.fieldLetter("F", Icons.GRAY), tc -> String.join(".", Fqcn.ofMethod(tc))),
-    ID(TestEditorAttributes.ID, Shortcuts.CopyId, Icons.fieldLetter("I", Icons.GRAY)),
-    PATH(TestEditorAttributes.PATH, Shortcuts.CopyPath, Icons.fieldLetter("H", Icons.GRAY));
+    FQCN(
+            TestEditorAttributes.FQCN,
+            Shortcuts.CopyFqcn,
+            Icons.fieldLetter("F", Icons.GRAY),
+            tc -> String.join(".", Fqcn.ofMethod(tc))
+    ),
+
+    ID(
+            TestEditorAttributes.ID,
+            Shortcuts.CopyId,
+            Icons.fieldLetter("I", Icons.GRAY)
+    ),
+
+    PATH(
+            TestEditorAttributes.PATH,
+            Shortcuts.CopyPath,
+            Icons.fieldLetter("H", Icons.GRAY)
+    );
 
     private final @NotNull String name;
     private final @NotNull Shortcuts shortcut;
