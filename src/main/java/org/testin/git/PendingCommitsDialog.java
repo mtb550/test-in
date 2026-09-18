@@ -261,7 +261,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                 // whoever reverts it as its creator (#66, finding 113). Reverted
                 // only if the file was written; when it was not, the writer has
                 // said why and the row stays (#66, finding 285).
-                case DELETED -> indexer.putTestCaseVerbatim(testSetPath, diff.committedState());
+                case DELETED -> indexer.putTestCaseVerbatim(testSetPath, diff.committed());
                 case MODIFIED -> revertField(indexer, testSetPath, changeType, diff);
             };
 
@@ -298,7 +298,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         }
 
         final @NotNull TestCaseDto working = current.orElseThrow();
-        final @NotNull TestCaseDto committed = diff.committedState();
+        final @NotNull TestCaseDto committed = diff.committed();
         changeType.getRevertAction().apply(working, committed);
 
         // The last change put back is the case as it was committed, audit

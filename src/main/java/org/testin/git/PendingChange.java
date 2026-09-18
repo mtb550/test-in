@@ -17,7 +17,6 @@
 package org.testin.git;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 
 import java.nio.file.Path;
@@ -33,29 +32,16 @@ import java.util.List;
  * carried here rather than dug out of a test case that may not exist: a run has
  * a name and no test set, and a marker names the node it belongs to.
  * <p>
- * {@code oldState} is the committed side a revert puts back: there for a
- * deletion and a modification of a test case, and absent for an addition and
- * for anything that is not a test case. The side after the change is not kept:
- * nothing but a test read it (#312, A100).
+ * {@code committed} is the test case as it was committed, the side a revert
+ * puts back: a deletion and a modification of a test case carry it. An addition
+ * and anything that is not a test case have no committed side, and carry an
+ * empty test case there that nothing reads - the type already says there is
+ * nothing to put back. It was null for those, behind an accessor that threw,
+ * so every reader had to know when it was allowed to ask (#66, finding 286).
+ * The side after the change is not kept: nothing but a test read it (#312,
+ * A100).
  */
-public record PendingChange(@NotNull ChangeSubject subject, @NotNull String name, @NotNull String testSet, @NotNull String testCaseId, @NotNull Path relativeFilePath, @NotNull DiffType type, @Nullable TestCaseDto oldState, @NotNull List<FieldChange> fieldChanges) {
-
-    /**
-     * The case as it was committed - the side a revert puts back.
-     * <p>
-     * A deletion and a modification both carry it; the factory populates it for
-     * exactly those. Asked here so the revert does not read the nullable field
-     * and check it.
-     *
-     * @throws IllegalStateException if asked of a change that never had a
-     *                               committed side
-     */
-    public @NotNull TestCaseDto committedState() {
-        if (oldState == null) {
-            throw new IllegalStateException("A " + type + " change carries no committed state: " + relativeFilePath);
-        }
-        return oldState;
-    }
+public record PendingChange(@NotNull ChangeSubject subject, @NotNull String name, @NotNull String testSet, @NotNull String testCaseId, @NotNull Path relativeFilePath, @NotNull DiffType type, @NotNull TestCaseDto committed, @NotNull List<FieldChange> fieldChanges) {
 
     /**
      * Whether a row of this change can be put back. Only a test case can: the

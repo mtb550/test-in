@@ -127,7 +127,7 @@ final class PendingChangeFactory {
             case ADDED -> {
                 final @NotNull TestCaseDto newState = read(mapper, afterJson, TestCaseDto.class);
                 yield new PendingChange(ChangeSubject.TEST_CASE, newState.getDescription(), testSet,
-                        newState.getId().toString(), relativePath, DiffType.ADDED, null,
+                        newState.getId().toString(), relativePath, DiffType.ADDED, nothingCommitted(),
                         List.of(new FieldChange(Bundle.message("caption.test.case"), "", newState.getDescription(), ChangeType.CREATE_TEST_CASE)));
             }
             case DELETED -> {
@@ -165,7 +165,7 @@ final class PendingChangeFactory {
                     read(mapper, beforeJson, TestRunDto.class), read(mapper, afterJson, TestRunDto.class));
         };
 
-        return new PendingChange(ChangeSubject.TEST_RUN, runName, "", "", relativePath, type, null, changes);
+        return new PendingChange(ChangeSubject.TEST_RUN, runName, "", "", relativePath, type, nothingCommitted(), changes);
     }
 
     /**
@@ -183,7 +183,7 @@ final class PendingChangeFactory {
             case MODIFIED -> ChangeType.CHANGE_MARKER;
         };
 
-        return new PendingChange(ChangeSubject.MARKER, node, "", "", relativePath, type, null,
+        return new PendingChange(ChangeSubject.MARKER, node, "", "", relativePath, type, nothingCommitted(),
                 List.of(new FieldChange(relativePath.getFileName().toString(), before, after, changeType)));
     }
 
@@ -206,7 +206,7 @@ final class PendingChangeFactory {
         };
 
         return new PendingChange(ChangeSubject.OTHER, relativePath.getFileName().toString(), "", "",
-                relativePath, type, null,
+                relativePath, type, nothingCommitted(),
                 List.of(new FieldChange(relativePath.toString(), "", "", changeType)));
     }
 
@@ -237,5 +237,14 @@ final class PendingChangeFactory {
     private static <T> @NotNull T read(final @NotNull Mapper mapper, final @NotNull String json, final @NotNull Class<T> type) {
         if (json.isEmpty()) throw new IllegalStateException("Missing Git file revision");
         return mapper.readValue(json, type);
+    }
+
+    /**
+     * What a change with no committed side carries there: an empty test case,
+     * which nothing reads, because the change's type already says there is
+     * nothing to put back (#66, finding 286).
+     */
+    private static @NotNull TestCaseDto nothingCommitted() {
+        return TestCaseDto.builder().build();
     }
 }

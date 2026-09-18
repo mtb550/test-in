@@ -72,7 +72,7 @@ public class PendingChangeFactoryTest {
         assertEquals(diff.type(), DiffType.ADDED);
         assertEquals(diff.testCaseId(), added.getId().toString());
         assertEquals(diff.relativeFilePath(), PATH);
-        assertNull(diff.oldState(), "an added file has no before state");
+        assertTrue(diff.committed().getDescription().isEmpty(), "an added file has no before state");
 
         assertEquals(diff.fieldChanges().size(), 1);
         final FieldChange change = diff.fieldChanges().getFirst();
@@ -90,7 +90,7 @@ public class PendingChangeFactoryTest {
 
         assertNotNull(diff);
         assertEquals(diff.type(), DiffType.DELETED);
-        assertNotNull(diff.oldState());
+        assertEquals(diff.committed().getDescription(), "a case that is going away");
 
         assertEquals(diff.fieldChanges().size(), 1);
         final FieldChange change = diff.fieldChanges().getFirst();
@@ -112,7 +112,7 @@ public class PendingChangeFactoryTest {
 
         assertNotNull(diff);
         assertEquals(diff.type(), DiffType.MODIFIED);
-        assertNotNull(diff.oldState());
+        assertEquals(diff.committed().getDescription(), "the original description");
 
         assertEquals(diff.fieldChanges().size(), 2, "two fields moved, so two rows in the review");
         assertEquals(diff.fieldChanges().stream().map(FieldChange::changeType).collect(Collectors.toSet()),
@@ -262,7 +262,7 @@ public class PendingChangeFactoryTest {
                 DiffType.DELETED, json(original), "", PATH, RealMapper.build());
 
         assertNotNull(diff);
-        final TestCaseDto readBack = diff.committedState();
+        final TestCaseDto readBack = diff.committed();
 
         assertEquals(TestCaseChangeComparator.compare(original, readBack), List.of(),
                 "a test case written and read back must compare as unchanged");
