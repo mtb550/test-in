@@ -17,6 +17,7 @@
 package org.testin.testproject;
 
 import org.testin.model.DirectoryType;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ProjectStatus;
@@ -50,6 +51,12 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
 
     private final @NotNull SelectionTable projects;
     private final @NotNull Runnable onBound;
+
+    /**
+     * True while a binding this dialog asked for is being written, so a second
+     * Enter does not ask again.
+     */
+    private boolean binding;
 
     /**
      * @param underRoot the test projects to choose from, by name - handed in
@@ -105,22 +112,37 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
         if (selected.isEmpty()) return;
 
         final @NotNull String name = projects.getValueAt(selected.getFirst(), 0);
+        if (binding) return;
+        binding = true;
 
-        // The refusal is the binding's own, said wherever a binding fails; this
-        // only has to stay open on it, because the tester's choice is still in
-        // front of them (#188).
-        if (!Services.getInstance(p, BoundTestProject.class).bind(name)) return;
+        // Off the EDT, as the welcome screen binds, because it writes
+        // testin.yml. The same write ran on the EDT here and deliberately off it
+        // there, so one of the two was wrong about the rule (#66, finding 235).
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final boolean bound = Services.getInstance(p, BoundTestProject.class).bind(name);
 
-        closeOk();
+            ApplicationManager.getApplication().invokeLater(() -> {
+                binding = false;
 
-        // Announced after the file is written, not before: what the panel draws is
-        // read back from the file, so it can only be right once the file says so.
-        //
-        // The outcome and nothing else. It was the name under it as well, which
-        // is the one noun left in a confirmation anywhere in the plugin - and the
-        // tester chose that name from the list they are looking at, and the tree
-        // behind the balloon has already reloaded onto it (#66, finding 94).
-        Services.getInstance(p, Notifier.class).softShow(p, Done.BOUND);
-        onBound.run();
+                // The refusal is the binding's own, said wherever a binding
+                // fails; this only has to stay open on it, because the tester's
+                // choice is still in front of them (#188).
+                if (!bound || p.isDisposed()) return;
+
+                closeOk();
+
+                // Announced after the file is written, not before: what the panel
+                // draws is read back from the file, so it can only be right once
+                // the file says so.
+                //
+                // The outcome and nothing else. It was the name under it as well,
+                // which is the one noun left in a confirmation anywhere in the
+                // plugin - and the tester chose that name from the list they are
+                // looking at, and the tree behind the balloon has already
+                // reloaded onto it (#66, finding 94).
+                Services.getInstance(p, Notifier.class).softShow(p, Done.BOUND);
+                onBound.run();
+            });
+        });
     }
 }
