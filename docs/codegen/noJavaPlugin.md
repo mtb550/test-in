@@ -1,10 +1,4 @@
-| **Automate Test Case** | On the menu, gray, reading *Automate Test Case (needs the Java plugin)* |
-| **Navigate to Code** | The same on the menu. Its icon on a card and on the view panel is drawn gray, does not grow under the pointer, and says the Java plugin is what it needs when it is hovered or pressed |
-| The gutter marks | Not drawn in any editor. There is no generated code to mark |
-| Every class and every method | Nothing is written, ever || **Automate Test Case** | On the menu, gray, reading *Automate Test Case (needs the Java plugin)* |
-| **Navigate to Code** | The same on the menu. The icon on a card and on the view panel is drawn gray, and hovering or pressing it says the Java plugin is what it needs |
-| The gutter marks | Not drawn in any editor. There is no code to mark |
-| Every class and every method | Nothing is written, ever |[Documentation](../README.md) › [Automation code and the gutter](main.md) › UC-CODEGEN-019
+[Documentation](../README.md) › [Automation code and the gutter](main.md) › UC-CODEGEN-019
 
 # UC-CODEGEN-019: Work in an IDE with no Java plugin
 
