@@ -20,6 +20,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
+import org.testin.util.Bundle;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
 
@@ -45,9 +46,26 @@ abstract class AbstractTreeAction extends DumbAwareAction {
         operation.accept(tp.getProjectTree().getMainTree());
     }
 
+    /**
+     * UC-TREE-PANEL-028, Rule-TREE-PANEL-101.
+     * <p>
+     * Gray, with the reason, while the welcome screen is up. The tree is hidden
+     * rather than removed there, so the button stayed live and opened or closed
+     * a tree nobody could see (#66, finding 216).
+     */
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        final boolean treeShowing = tp.showsTree();
+
+        e.getPresentation().setEnabled(treeShowing);
+        e.getPresentation().setDescription(treeShowing
+                ? getTemplatePresentation().getDescription()
+                : Bundle.message("toolbar.tree.hidden.description"));
+    }
+
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - this action has no update() reading Swing state; do not switch to EDT (#52).
-        return ActionUpdateThread.BGT;
+        // The update reads whether the tree is showing, which is Swing state.
+        return ActionUpdateThread.EDT;
     }
 }

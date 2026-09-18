@@ -222,6 +222,14 @@ public final class TreePanel implements Disposable {
     }
 
     /**
+     * Whether the tree is on screen, rather than the welcome screen - a
+     * question for the buttons that act on it.
+     */
+    public boolean showsTree() {
+        return treeView.isVisible();
+    }
+
+    /**
      * Draws the panel from an answer it was given. On the EDT, and reading
      * nothing: every question it could ask was answered by
      * {@link #state(Map, Optional)} before it was called - the bound project

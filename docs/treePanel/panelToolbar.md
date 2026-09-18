@@ -65,7 +65,9 @@ These seven buttons act on the whole panel, not on one node.
 - **Rule-TREE-PANEL-101** — Every button in the panel's title bar works in every
   state the panel can be in, the welcome screen included. The IDE aims a
   title-bar button at whatever component the panel says it is showing, and will
-  not run the button at all when that component is hidden.
+  not run the button at all when that component is hidden. **Expand All** and
+  **Collapse All** have no tree to act on under the welcome screen, so there
+  they are gray, and say why.
 
 ## The toolbar
 
@@ -123,6 +125,9 @@ search exists at all. Nothing else on screen mentions it.
 
 **If no Testin folder is set** — **Select Test Project** and **New Test
 Project** are gray. The other five still work.
+
+**If the welcome screen is showing** — **Expand All** and **Collapse All** are
+gray. Their tooltip reads *No test project is open in the tree*.
 
 ---
 
