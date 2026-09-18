@@ -104,6 +104,11 @@ one at a time.
 **If No Group is picked** — the test cases arrive with no group, which is what
 the picker offered. It used to be read back as an unknown group and thrown away.
 
+**If the import stops part way** — a message titled **Import Failed** says how
+many test cases were written before it stopped, and why. The tree shows the
+ones that were written (Rule-SHARE-037). A test set that could not be made is
+named as the reason: *The test set Login could not be made.*
+
 ---
 
 [Documentation](../README.md) › [Sharing work with the team](main.md)

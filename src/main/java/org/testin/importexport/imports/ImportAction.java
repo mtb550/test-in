@@ -47,6 +47,7 @@ import org.testin.services.Services;
 import org.testin.services.BackgroundWork;
 import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 import org.testin.util.NameSanitizer;
 import org.testin.services.OptionalPlugin;
 
@@ -171,19 +172,21 @@ public class ImportAction extends DumbAwareAction {
 
                 int imported = 0;
 
-                final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targets =
-                        targetSets(selectedDirDto, targetPath, selectedCasesBySheet);
-
                 // Every set this import made, until one takes a test case. The sets
                 // are all created before the first case is written, so a Cancel
                 // leaves the ones it never reached standing there empty, each with a
                 // class of its own and nothing in it - and nothing said so (#312,
                 // A51).
-                final @NotNull Set<String> stillEmpty = targets.keySet().stream()
-                        .map(TestSetDirectoryDto::getName)
-                        .collect(Collectors.toCollection(LinkedHashSet::new));
+                final @NotNull Set<String> stillEmpty = new LinkedHashSet<>();
 
                 try {
+                    // Inside the try, so a set that could not be made is reported
+                    // like any other failure part way, with the count (#66,
+                    // finding 212).
+                    final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targets =
+                            targetSets(selectedDirDto, targetPath, selectedCasesBySheet);
+                    targets.keySet().forEach(made -> stillEmpty.add(made.getName()));
+
                     for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set : targets.entrySet()) {
 
                         final @NotNull TestSetDirectoryDto into = set.getKey();
@@ -221,10 +224,15 @@ public class ImportAction extends DumbAwareAction {
                     // "At least", because the set being written when it stopped may
                     // have got some of the way through. It is the number the tester
                     // can act on: the sets before it are whole.
-                    Logger.error("Import failed after at least " + imported + " of " + total + ": " + ex.getMessage());
+                    Logger.error("Import failed after at least " + imported + " of " + total + ": " + FailureText.of(ex));
 
                     Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.failed.title"),
-                            Bundle.message("import.failed.partial", String.valueOf(imported), String.valueOf(total), ex.getMessage()));
+                            Bundle.message("import.failed.partial", String.valueOf(imported), String.valueOf(total), FailureText.of(ex)));
+
+                    // The cases it did write are on disk, and the message says so;
+                    // the tree shows them, as it does after an import that finished
+                    // (#66, finding 211).
+                    refreshTarget(targetPath);
                     return;
                 }
 
@@ -241,14 +249,22 @@ public class ImportAction extends DumbAwareAction {
 
                 report(total, startedAt, readyAt);
 
-                // Asynchronous refresh: a synchronous recursive VFS refresh inside a
-                // write action is disallowed by the platform and can freeze the IDE.
-                // The indexer owns the refresh and runs the whole call, lookup
-                // included, off the EDT.
-                Services.getInstance(p, ProjectIndexer.class).refreshDirectory(targetPath);
-                ApplicationManager.getApplication().invokeLater(() ->
-                        Services.getInstance(p, TreePanel.class).getProjectTree().refresh());
+                refreshTarget(targetPath);
             });
+        }
+
+        /**
+         * Shows what the import wrote.
+         * <p>
+         * Asynchronous refresh: a synchronous recursive VFS refresh inside a
+         * write action is disallowed by the platform and can freeze the IDE. The
+         * indexer owns the refresh and runs the whole call, lookup included, off
+         * the EDT.
+         */
+        private void refreshTarget(final @NotNull Path targetPath) {
+            Services.getInstance(p, ProjectIndexer.class).refreshDirectory(targetPath);
+            ApplicationManager.getApplication().invokeLater(() ->
+                    Services.getInstance(p, TreePanel.class).getProjectTree().refresh());
         }
 
         /**
@@ -308,11 +324,13 @@ public class ImportAction extends DumbAwareAction {
                 final @NotNull String name = NameSanitizer.removeSpecialChars(sheetName);
                 final @NotNull Path path = targetPath.resolve(name);
 
-                // A test set creator always answers with the set it made.
+                // Nothing when the set's marker did not land, which the write has
+                // already said. Unwrapped bare, the tester read "No value present"
+                // as the reason (#66, finding 212).
                 sets.put(onEdtCompute(() -> {
                     final @NotNull TestSetDirectoryDto made = (TestSetDirectoryDto) new CreateTestSet(p)
                             .execute(name, selectedDirDto, path)
-                            .orElseThrow();
+                            .orElseThrow(() -> new IllegalStateException(Bundle.message("import.set.not.made", name)));
 
                     // Asked for here, because the creator no longer generates. The
                     // tree route runs the node type's generator after creating, and
