@@ -43,7 +43,7 @@ import java.awt.event.MouseEvent;
  * <p>
  * One per project, not one per IDE. The popup and the timer that hides it were
  * static, which is one slot for every open project: the bubble is shown against
- * a component in one project's window, and a zoom in the other project cancelled
+ * a component in one project's window, and a zoom in the other project canceled
  * it and restarted a timer the first was still counting on. It was the plugin's
  * last static mutable state of that shape, and a project service is what the
  * rest of the plugin uses - it is disposed with its project, so a popup left

@@ -130,7 +130,7 @@ public class OrderNodeAction extends DumbAwareAction {
     /**
      * UC-TREE-PANEL-015, Rule-TREE-PANEL-058.
      * <p>
-     * Always on the menu, and greyed out on a node that has no order to set.
+     * Always on the menu, and grayed out on a node that has no order to set.
      * <p>
      * Hiding it would answer a question the tester did not ask: an entry that
      * appears on some nodes and not others reads as a menu that changes shape,

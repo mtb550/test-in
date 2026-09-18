@@ -213,11 +213,11 @@ public final class TestRunPdfGenerator {
             // SECTION 3: RESULT ANALYSIS
             // SECTION 3: RESULT ANALYSIS - only what the tester wrote.
             // A verdict they said nothing about prints no heading, and a run
-            // nobody analysed prints no section, so the numbering below starts
+            // nobody analyzed prints no section, so the numbering below starts
             // at 3 instead of 4.
-            final boolean analysed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
+            final boolean analyzed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
 
-            if (analysed) {
+            if (analyzed) {
                 document.add(para(Bundle.message("report.heading.analysis"))
                         .setFont(boldFont)
                         .setFontSize(ReportFont.SECTION.pt())
@@ -245,7 +245,7 @@ public final class TestRunPdfGenerator {
             // SECTIONS 4+: one case table per status, empty ones omitted. Numbered
             // as printed rather than per section, so a run with nothing blocked
             // does not jump from 5 to 7.
-            int sectionNumber = analysed ? 4 : 3;
+            int sectionNumber = analyzed ? 4 : 3;
             for (final ReportSection section : ReportSection.values()) {
                 final long count = section.count(summary);
                 if (count == 0) continue;

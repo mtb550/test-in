@@ -154,7 +154,7 @@ public class GenerateReportAction extends AbstractProjectAction {
 
             final byte[] fileBytes = format.generateReport(p, tr, runData, detailsMap);
 
-            // Rule-REPORT-003. The last moment Cancel can be honoured with
+            // Rule-REPORT-003. The last moment Cancel can be honored with
             // nothing left behind. Nothing asked before: the bar offered
             // Cancel, the work ran to the end, the file was written and "PDF
             // Report Generated" announced with Open and Copy path under it,

@@ -98,7 +98,7 @@ public interface Toolbar {
 
     /**
      * The tester is writing what the run means. Default empty because only a run
-     * has verdicts to analyse.
+     * has verdicts to analyze.
      */
     default void onToolBarResultAnalysisClicked() {
     }

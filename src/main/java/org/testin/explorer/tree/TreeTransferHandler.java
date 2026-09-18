@@ -219,7 +219,7 @@ public class TreeTransferHandler extends TransferHandler {
      * true of the nodes that declare themselves transferable, and no others.
      * <p>
      * The menu entries ask this rather than deciding for themselves, so what a
-     * greyed Copy means and what Copy would do are the same rule read twice.
+     * grayed Copy means and what Copy would do are the same rule read twice.
      */
     public boolean hasTransferableSelection() {
         return !transferableSelection().isEmpty();

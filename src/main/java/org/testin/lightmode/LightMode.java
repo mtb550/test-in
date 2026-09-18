@@ -91,7 +91,7 @@ public final class LightMode implements Disposable {
      * <b>A run that has been signed off closes it instead.</b> Completed and
      * Closed are the end: there is no case left to execute, no verdict left to
      * give, and a window offering three of them over a run that has stopped
-     * asking is worse than no window. The same question already greys the
+     * asking is worse than no window. The same question already grays the
      * toolbar button out, and closing here is what un-presses it - the button
      * reads whether the window exists, so the window going is the button
      * changing.

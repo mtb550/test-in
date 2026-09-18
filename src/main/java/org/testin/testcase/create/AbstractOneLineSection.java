@@ -32,7 +32,7 @@ import javax.swing.JComponent;
  * The one-line counterpart of {@link AbstractMultiLineSection}, and written for
  * the same reason (#176). Three sections repeated these four answers word for
  * word - module, pre-conditions and the description - so a change to how a row
- * is focused or greyed had three places to be made, and the field each of them
+ * is focused or grayed had three places to be made, and the field each of them
  * held was styled by a line each of them remembered to write.
  * <p>
  * What a subclass says is what actually differs: which field (a plain one, or

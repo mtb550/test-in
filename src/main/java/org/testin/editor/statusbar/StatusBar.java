@@ -82,7 +82,7 @@ public class StatusBar extends JBPanel<StatusBar> {
      * single string with each verdict's color written into it as a hex literal,
      * chosen from the theme at the moment the string was built - so switching
      * theme repainted the bar around figures still in the old palette, and light
-     * to dark left the untouched count at a grey that is very nearly the
+     * to dark left the untouched count at a gray that is very nearly the
      * background. A label is asked for its foreground every time it paints, so a
      * {@link JBColor} on each one cannot go stale.
      */

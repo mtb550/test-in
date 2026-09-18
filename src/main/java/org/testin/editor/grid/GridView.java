@@ -59,7 +59,7 @@ public record GridView(@NotNull JBTable table, @NotNull JBScrollPane scrollPane,
      * a page turned under a background run, or a column ticked while the caret
      * sits in a cell.
      * <p>
-     * Committing rather than cancelling, because that is what the tester's own
+     * Committing rather than canceling, because that is what the tester's own
      * gesture already does - clicking away commits, through
      * {@code terminateEditOnFocusLost}. Losing the text was the outlier, not the
      * rule (#74).

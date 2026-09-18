@@ -29,7 +29,7 @@ import org.testin.util.Bundle;
  * <p>
  * Shown always and enabled only once the run is completed. Disabled rather than
  * hidden, because a button that appears when a run finishes is a button the
- * tester has to notice; one that is there from the start, greyed, says the work
+ * tester has to notice; one that is there from the start, grayed, says the work
  * exists and when it can be done - and the tooltip says why it cannot yet.
  * <p>
  * Completed and not merely terminal: a closed run is finished with, and writing

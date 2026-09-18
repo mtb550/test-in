@@ -192,7 +192,7 @@ final class LightModeWindow {
     private @NotNull Optional<UUID> shownCase = Optional.empty();
 
     /**
-     * Everything this window animates, cancelled in one go when it closes.
+     * Everything this window animates, canceled in one go when it closes.
      * The platform stops an Animator when its parent goes, so nothing has to
      * remember which movements were still running.
      */

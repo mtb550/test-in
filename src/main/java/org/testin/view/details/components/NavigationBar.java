@@ -43,7 +43,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class NavigationBar extends BaseDetails {
 
-    // The platform's muted text, which follows the theme. A flat grey was
+    // The platform's muted text, which follows the theme. A flat gray was
     // visibly dimmer in the dark theme than the id badge beside it, which
     // does follow it (#66, finding 259).
     final @NotNull Color DEFAULT_TEXT_COLOR = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
@@ -104,7 +104,7 @@ public class NavigationBar extends BaseDetails {
                      * <p>
                      * Every step goes where it says, not only the last one.
                      * <p>
-                     * All of them took a hand pointer, turned the link colour and
+                     * All of them took a hand pointer, turned the link color and
                      * underlined themselves, and only the last did anything -
                      * clicking Test Cases to go up a level did nothing and said
                      * nothing (#228). The steps above the last are the test

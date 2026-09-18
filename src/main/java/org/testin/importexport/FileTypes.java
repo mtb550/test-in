@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public enum FileTypes {
     /**
-     * Import only. The legacy workbook still has to be recognised by its
+     * Import only. The legacy workbook still has to be recognized by its
      * extension so a tester can import one, but nothing here writes it: XLS was
      * handed the xlsx exporter, so choosing it produced xlsx bytes in a file
      * named .xls. Excel warned about the mismatch on every open and some tools

@@ -82,7 +82,7 @@ public abstract class TestCaseBaseDialog {
      * The dialog's popup, empty until the constructor has finished building it.
      * <p>
      * Here rather than in each dialog. Both build a component popup, both repack
-     * it when a section grows, and both show it centred - and they had already
+     * it when a section grows, and both show it centered - and they had already
      * drifted three ways: one guarded the repack with an if-block and the other
      * with an early return, one showed the popup only if it existed while the
      * other threw if it did not (#71).
@@ -247,9 +247,9 @@ public abstract class TestCaseBaseDialog {
      * The one section the tester may change, and empty when they may change all
      * of them - which is what creating a test case means.
      * <p>
-     * The update dialog opens on one field and shows the others greyed out, so
+     * The update dialog opens on one field and shows the others grayed out, so
      * "shown" and "may write" stopped being the same question. Only the save
-     * filtered, and it filtered on shown alone, so every greyed section wrote
+     * filtered, and it filtered on shown alone, so every grayed section wrote
      * itself back over the case. One section had grown a guard of its own
      * against exactly that and the rest had not - which is how editing a case's
      * priority came to re-write its expected result as trimmed text, silently
@@ -354,7 +354,7 @@ public abstract class TestCaseBaseDialog {
         return () -> {
             // A section the tester never opened holds its empty defaults, and
             // writing those over the dto would erase what is already there. A
-            // section shown but greyed out holds the stored value and must not
+            // section shown but grayed out holds the stored value and must not
             // write it back either, because writing it back trims it. Asked here
             // rather than at the top of every applyTo method.
             final @NotNull List<CreateTestCaseSection> writers = getAllSections().stream().filter(this::mayWrite).toList();

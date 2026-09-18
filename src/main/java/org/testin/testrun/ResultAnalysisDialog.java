@@ -42,7 +42,7 @@ import java.util.function.Consumer;
  * the results, and a stored copy would be wrong the moment a verdict changed.
  * <p>
  * A section left blank is left out of the report. Nothing has to be deleted to
- * take a paragraph back out, and a run nobody analysed prints no section at all.
+ * take a paragraph back out, and a run nobody analyzed prints no section at all.
  */
 public final class ResultAnalysisDialog extends AbstractFrameworkDialog<TextArea> {
 

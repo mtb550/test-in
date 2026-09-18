@@ -79,7 +79,7 @@ public final class LabelValueRow {
 
         final @NotNull JBLabel label = new JBLabel(labelText);
         // The same muted text the breadcrumb above it uses, and the dialog
-        // captions: a fixed grey here stayed one shade in both themes (#66,
+        // captions: a fixed gray here stayed one shade in both themes (#66,
         // finding 259).
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         label.setFont(JBFont.label().deriveFont(Font.BOLD, labelFontSize));

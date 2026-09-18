@@ -211,7 +211,7 @@ public abstract class AbstractGridEditListener implements TableModelListener {
     }
 
     /**
-     * Enough of a value to recognise it. A steps list runs to paragraphs, and a
+     * Enough of a value to recognize it. A steps list runs to paragraphs, and a
      * balloon holding two of them is one nobody reads.
      */
     private static @NotNull String shortened(final @NotNull String value) {

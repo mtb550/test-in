@@ -255,7 +255,7 @@ public class TreePanelTree implements Disposable {
 
                 // What is open and what is selected, before the rebuild throws
                 // the nodes away. Invalidating builds new node objects, and a
-                // tree that cannot recognise them comes back collapsed - so a
+                // tree that cannot recognize them comes back collapsed - so a
                 // paste, a rename or a re-index folded the tree up under the
                 // tester and left them to find their way back down.
                 final @NotNull TreeState shape = TreeState.createOn(mainTree);

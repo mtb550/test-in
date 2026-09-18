@@ -131,9 +131,9 @@ public final class TestRunWordGenerator {
                 }
 
                 // Only what the tester wrote - see the PDF generator.
-                final boolean analysed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
+                final boolean analyzed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
 
-                if (analysed) {
+                if (analyzed) {
                     addHeading(doc, Bundle.message("report.heading.analysis"), 20, 12);
 
                     for (final ResultAnalysis section : ResultAnalysis.values()) {
@@ -147,7 +147,7 @@ public final class TestRunWordGenerator {
 
                 // One case table per status, empty ones omitted, numbered as
                 // printed so an absent section leaves no gap in the numbering.
-                int sectionNumber = analysed ? 4 : 3;
+                int sectionNumber = analyzed ? 4 : 3;
                 for (final ReportSection section : ReportSection.values()) {
                     final long count = section.count(summary);
                     if (count == 0) continue;

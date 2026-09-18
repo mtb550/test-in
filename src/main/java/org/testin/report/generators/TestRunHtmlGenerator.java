@@ -135,9 +135,9 @@ public final class TestRunHtmlGenerator {
         // report had no such section at all while the PDF and the Word file both
         // printed one, so the same run read differently depending on the format
         // it was sent in.
-        final boolean analysed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
+        final boolean analyzed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
 
-        if (analysed) {
+        if (analyzed) {
             html.append("<div class='section-title-bar'><div class='section-title'>").append(Bundle.message("report.heading.analysis")).append("</div></div>");
 
             for (final ResultAnalysis section : ResultAnalysis.values()) {
@@ -145,7 +145,7 @@ public final class TestRunHtmlGenerator {
                 if (written.isEmpty()) continue;
 
                 // The token named after the verdict, so the heading follows the
-                // skin instead of staying a color mixed for white paper - grey
+                // skin instead of staying a color mixed for white paper - gray
                 // text on the dark ground would be all but invisible.
                 html.append("<div class='analysis-heading' style='color: var(--verdict-")
                         .append(section.name().toLowerCase(java.util.Locale.ROOT)).append(")'>")
@@ -163,7 +163,7 @@ public final class TestRunHtmlGenerator {
         // printed. Driven by the shared sections, so this report lists the same
         // cases under the same headings as the PDF and the Word version of the
         // same run - including the passed table, which HTML used to leave out.
-        int sectionNumber = analysed ? 4 : 3;
+        int sectionNumber = analyzed ? 4 : 3;
         for (final ReportSection section : ReportSection.values()) {
             final long count = section.count(summary);
             if (count == 0) continue;

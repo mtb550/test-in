@@ -83,17 +83,17 @@ enum ReportSection {
     private final @NotNull String title;
     private final @NotNull String descriptionFmt;
     /**
-     * The colour of this table's header row, as hex.
+     * The color of this table's header row, as hex.
      * <p>
      * Here because all three formats need it and two of them had already
      * written it out as a switch of their own - the same five cases, twice, in
-     * files that cannot see each other. HTML had neither switch nor colour, so
+     * files that cannot see each other. HTML had neither switch nor color, so
      * its tables were headed a flat pale blue while the PDF and the Word file
-     * headed them red, green, amber and grey.
+     * headed them red, green, amber and gray.
      * <p>
      * Brighter than the text colors of the same names elsewhere in the reports.
      * These are fills carrying white text at a glance, not sentences to be read
-     * closely, and the darker mix made a row of them look like one grey band.
+     * closely, and the darker mix made a row of them look like one gray band.
      */
     @Getter
     private final @NotNull String hexColor;

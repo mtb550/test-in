@@ -197,7 +197,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                     // reason. Without it a slow read that failed landed after a
                     // newer one that worked, wrote "Unable to read this test
                     // run" over a run the tester was already looking at, and
-                    // cancelled the start they had asked for. TestEditor's
+                    // canceled the start they had asked for. TestEditor's
                     // failure branch has guarded since it was written (#66,
                     // finding 87).
                     if (generation != loadGeneration.get()) return;

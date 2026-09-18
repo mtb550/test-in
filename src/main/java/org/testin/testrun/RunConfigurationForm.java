@@ -70,8 +70,8 @@ public class RunConfigurationForm implements DialogComponent {
      * The name the run will be created under.
      * <p>
      * Editable, and it was not. The name used to be decided by the dialog that
-     * asks for one before this one opens, so this field showed it greyed out and
-     * the tester could not change their mind without cancelling both. Re-creating
+     * asks for one before this one opens, so this field showed it grayed out and
+     * the tester could not change their mind without canceling both. Re-creating
      * a run has no first dialog at all - it starts from a run that already
      * exists - so the name had to become something this form owns rather than
      * something it displays (#9).

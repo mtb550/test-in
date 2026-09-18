@@ -292,7 +292,7 @@ public final class Badges {
      * same reason {@link #TEXT_ON_LIGHT} is: what it sits on is the badge's own
      * fill, chosen by the severity being shown, so it does not follow the editor
      * theme and neither should this. Untinted it ships in the platform's
-     * monochrome grey, which is what a Blocker's red would have swallowed.
+     * monochrome gray, which is what a Blocker's red would have swallowed.
      * <p>
      * Built once. It is the same mark on every row, and a colorize per bind is a
      * cost the pooled pills exist to avoid.

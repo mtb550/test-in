@@ -35,8 +35,8 @@ import java.util.Optional;
  * Updated.
  * <p>
  * Built like the priority section, because it is the same thing to a tester -
- * one value chosen from a short fixed list. What it does not carry is a colour
- * or a key: the status enum has no colour of its own, and the letters that would
+ * one value chosen from a short fixed list. What it does not carry is a color
+ * or a key: the status enum has no color of its own, and the letters that would
  * name these four are taken by fields a tester reaches far more often.
  * <p>
  * Offered by the update menu and not by the create dialog. A case being written

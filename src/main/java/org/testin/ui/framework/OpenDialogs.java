@@ -75,7 +75,7 @@ public final class OpenDialogs {
     }
 
     /**
-     * Remembers this one until it closes, whichever way it closes - cancelled,
+     * Remembers this one until it closes, whichever way it closes - canceled,
      * submitted or disposed with the project.
      */
     void remember(final @NotNull Class<?> kind, final @NotNull JBPopup popup) {

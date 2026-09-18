@@ -198,7 +198,7 @@ public enum ResultAnalysis {
     }
 
     /**
-     * Whether the tester wrote anything at all. A run nobody analysed prints no
+     * Whether the tester wrote anything at all. A run nobody analyzed prints no
      * Result Analysis section, rather than a heading over four empty ones.
      */
     public static boolean anyWrittenIn(final @NotNull Map<ResultAnalysis, String> analysis) {

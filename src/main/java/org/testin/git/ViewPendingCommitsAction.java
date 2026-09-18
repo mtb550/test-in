@@ -425,7 +425,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             // to, so what arrives here is a URL. Closing it says nothing: the tester
             // shut the dialog on the question, and the push not happening is the
             // answer to it - which is also why the old "Push Aborted" balloon is
-            // gone, since cancelling was the only way to reach it.
+            // gone, since canceling was the only way to reach it.
             new RemoteUrlDialog(p, remoteName, typed -> {
                 // Written back so the next machine that opens this repository
                 // inherits it. Only what the tester typed: a URL that came out of

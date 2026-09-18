@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * The three report formats each held their own copy of the same rule - blocker
  * and high are alarming, major and medium are cautionary, everything else is
- * muted - as six two-entry maps plus six "and anything else is grey" fallbacks
+ * muted - as six two-entry maps plus six "and anything else is gray" fallbacks
  * written at the lookup sites. Six copies of one sentence, in three files that
  * cannot see each other.
  * <p>

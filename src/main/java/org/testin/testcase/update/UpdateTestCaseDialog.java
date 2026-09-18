@@ -88,7 +88,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
 
-        // Said once, before the loop: it greys the others out and records
+        // Said once, before the loop: it grays the others out and records
         // that only this one may write back.
         onlyEditable(targetSection);
 

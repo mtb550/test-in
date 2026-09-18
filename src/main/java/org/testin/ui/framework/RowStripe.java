@@ -30,7 +30,7 @@ import java.awt.Color;
  * <p>
  * <b>One owner, because there were two and they agreed only by luck.</b> The
  * grid held them as a pair of constants and the card list wrote the same two
- * {@code JBColor}s inline at its own call site - the same four greys, in two
+ * {@code JBColor}s inline at its own call site - the same four grays, in two
  * files, either free to be adjusted without the other. A tester switching
  * between the grid and the list is looking at one striping, and it has to stay
  * one.
@@ -57,7 +57,7 @@ public final class RowStripe {
      * all.
      * <p>
      * Light mode's failure fields take it. A window painted as frame decoration
-     * has no panel color behind its inputs to set them apart, and this is a grey
+     * has no panel color behind its inputs to set them apart, and this is a gray
      * the tester is already looking at in the grid and the card list - so the
      * window borrows one rather than introducing a fifth.
      */

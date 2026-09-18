@@ -57,7 +57,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * So the pass reads into this instead, and {@link IndexerDataStore#swapIn} puts
  * it in when it is complete - adding before removing, so a node that is on disk
- * in both passes is never once absent. A pass that throws or is cancelled is
+ * in both passes is never once absent. A pass that throws or is canceled is
  * simply not swapped in, and the index goes on holding what it held, which is a
  * better answer than half a project either way.
  * <p>

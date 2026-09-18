@@ -1068,7 +1068,7 @@ public final class ProjectIndexer {
      * knows the answer: which test set it is on, how far through it is, and
      * whether Cancel has been pressed. A caller that has a bar hands it over; a
      * caller with nowhere to show one passes an empty indicator, which reports
-     * nothing and is never cancelled, so both go down one path (#20).
+     * nothing and is never canceled, so both go down one path (#20).
      */
     public void scanSingleProject(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         Logger.info("Scanning single project: " + projectPath.getFileName());

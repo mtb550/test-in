@@ -289,7 +289,7 @@ public class ExportAction extends DumbAwareAction {
      * UC-SHARE-002, Rule-SHARE-001.
      * <p>
      * What is about to be missing, named rather than counted: a tester who
-     * recognises the file knows whether the export is worth sending.
+     * recognizes the file knows whether the export is worth sending.
      */
     private static @NotNull String unreadableWarning(final @NotNull List<String> unreadable) {
         final @NotNull String named = String.join(", ", unreadable.subList(0, Math.min(5, unreadable.size())));

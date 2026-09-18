@@ -91,7 +91,7 @@ public final class ExportNotice {
         // A web page goes to the browser, whichever button wrote it. The same
         // .html opened in whatever application claimed the extension when it was
         // a report and in the browser when it was an export - one file, two
-        // behaviours, decided by which half of the plugin made it (#256).
+        // behaviors, decided by which half of the plugin made it (#256).
         if (virtualFile.getName().toLowerCase(Locale.ROOT).endsWith(".html")) {
             BrowserUtil.browse(new File(virtualFile.getPath()).toURI().toString());
             return;

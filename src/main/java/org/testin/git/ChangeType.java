@@ -142,7 +142,7 @@ public enum ChangeType {
     private final @NotNull RevertAction revertAction;
 
     /**
-     * Whether a row of this kind can be put back at all - which is what greys
+     * Whether a row of this kind can be put back at all - which is what grays
      * the revert out. The one reader of what the action is, so no caller has to
      * know that "reverts nothing" and "cannot be reverted" are the same fact.
      */

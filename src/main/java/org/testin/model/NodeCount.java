@@ -52,7 +52,7 @@ public enum NodeCount {
     // time either is touched.
     //
     // The verdict captions below are safe by the same test: TestStatus names
-    // nothing here, and this already read its colours from it.
+    // nothing here, and this already read its colors from it.
     TEST_SETS(Bundle.message("count.test.sets"), NodeFigures::testSets, NodeCount::plain, Uncharted.COLOR),
     PACKAGES(Bundle.message("count.packages"), NodeFigures::packages, NodeCount::plain, Uncharted.COLOR),
     /**

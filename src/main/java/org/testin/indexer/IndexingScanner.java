@@ -127,7 +127,7 @@ final class IndexingScanner {
             // index goes on holding what it held, which is what it held a moment
             // ago and is still on disk.
             if (indicator.isCanceled()) {
-                Logger.info("Scan cancelled, so the index was left as it was: " + projectPath.getFileName());
+                Logger.info("Scan canceled, so the index was left as it was: " + projectPath.getFileName());
                 return;
             }
 
@@ -140,7 +140,7 @@ final class IndexingScanner {
             reportDamaged(tp.getName(), Services.getInstance(p, ProjectIndexer.class).takeDamagedMarkers());
             reportClashing(tp.getName(), List.copyOf(scanned.getClashingCases()));
 
-        // Nothing is swapped in, for the same reason a cancelled pass is not: a
+        // Nothing is swapped in, for the same reason a canceled pass is not: a
         // scan that threw halfway read half a project, and the half it did not
         // reach is not gone from disk.
         } catch (final Exception ex) {
