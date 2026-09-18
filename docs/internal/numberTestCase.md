@@ -121,6 +121,11 @@ one test case never becomes two; removing the test case removes the file it is
 in. A hand-named file whose identity another file also claims is left alone
 (Rule-INTERNAL-084).
 
+**If the hand-named file cannot be deleted** — a locked file, for one — the save
+does not happen. The file written under the name Testin gives is taken back, so
+the test case is still in the one file it was in, and a message reads *unable to
+remove:* and the reason.
+
 **If a test set holding such a file is copied** — the copy gets a new id like
 every other test case in it, and its file is renamed to the way Testin names
 them. The original keeps the name the tester gave it. A copy is a new test case

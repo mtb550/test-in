@@ -143,6 +143,27 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         }
     }
 
+    private static final String HAND_NAMED = "Log in by hand.json";
+
+    /**
+     * A test set holding one case whose file a tester named by hand, read the
+     * way the plugin reads one: by a scan of the project.
+     */
+    private Path setWithAHandNamedCase() {
+        final Path project = SyntheticTree.write(root, 1, 1);
+        final Path set = project.resolve("Test Cases").resolve("set-0");
+
+        try (var files = Files.list(set)) {
+            final Path caseFile = files.filter(file -> file.getFileName().toString().endsWith(".json")).findFirst().orElseThrow();
+            Files.move(caseFile, set.resolve(HAND_NAMED));
+        } catch (final java.io.IOException ex) {
+            throw new AssertionError("could not name the case file by hand", ex);
+        }
+
+        indexer().scanSingleProject(project);
+        return set;
+    }
+
     private static TestCaseDto testCase(final TestSetDirectoryDto ts, final String rank) {
         final TestCaseDto tc = TestCaseDto.builder()
                 .id(UUID.randomUUID())
@@ -321,5 +342,40 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
                 login.getPath(), indexer().findTestCase(cut.getId()).orElseThrow().getParent().getPath());
         assertTrue("the new set lists a case that did not arrive",
                 indexer().getTestCasesForTestSet(signUp.getPath()).stream().noneMatch(each -> each.getId().equals(cut.getId())));
+    }
+
+    /**
+     * Rule-INTERNAL-084.
+     * <p>
+     * Saving a case read from a file named by hand files it under its id, and
+     * the hand-named file goes.
+     */
+    public void testSavingAHandNamedCaseFilesItUnderItsId() {
+        final Path set = setWithAHandNamedCase();
+        final TestCaseDto tc = indexer().getTestCasesForTestSet(set).getFirst();
+
+        assertTrue("the save said it failed", indexer().putTestCaseVerbatim(set, tc));
+
+        assertTrue("the case was not filed under its id", Files.isRegularFile(set.resolve(tc.getId() + ".json")));
+        assertFalse("the hand-named file was left beside it", Files.exists(set.resolve(HAND_NAMED)));
+    }
+
+    /**
+     * Rule-INTERNAL-084.
+     * <p>
+     * A save whose hand-named file will not go takes back the file it wrote, so
+     * the case is not in two files under one id. The delete used to be asked
+     * nothing, and the next scan found a clash the plugin had made itself (#66,
+     * finding 294).
+     */
+    public void testASaveWhoseHandNamedFileWillNotGoIsTakenBack() {
+        final Path set = setWithAHandNamedCase();
+        final TestCaseDto tc = indexer().getTestCasesForTestSet(set).getFirst();
+        undeletable(set.resolve(HAND_NAMED));
+
+        assertFalse("a save that left the case in two files was reported as saved", indexer().putTestCaseVerbatim(set, tc));
+
+        assertFalse("the file filed under the id was left beside the hand-named one", Files.exists(set.resolve(tc.getId() + ".json")));
+        assertTrue("the hand-named file went although its delete was refused", Files.exists(set.resolve(HAND_NAMED)));
     }
 }

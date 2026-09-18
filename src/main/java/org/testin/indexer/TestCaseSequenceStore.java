@@ -227,15 +227,35 @@ final class TestCaseSequenceStore {
         if (!files.write(p, file, testCase)) return false;
 
         // Rule-INTERNAL-084. Filed under its id now, so the hand-named file it
-        // was read from goes, after the write and never before it.
-        Optional.ofNullable(handNamed.remove(testCase.getId()))
-                .filter(original -> !original.equals(file))
-                .ifPresent(original -> files.delete(p, original, original.getParent()));
+        // was read from goes, after the write and never before it. When it will
+        // not go, the write is taken back and the save did not happen: kept, the
+        // case would be in two files under one id, which the next scan names as
+        // a clash for the tester to settle (#66, finding 294).
+        if (!leftHandNamedFile(testCase.getId(), file)) {
+            files.delete(p, file, testSetPath);
+            return false;
+        }
 
         testCasesById.put(testCase.getId(), testCase);
         final @NotNull List<UUID> ids = testSetCaseIds.computeIfAbsent(testSetPath.toString(), ignored -> caseIds(List.of()));
         if (!ids.contains(testCase.getId())) ids.add(testCase.getId());
 
+        return true;
+    }
+
+    /**
+     * UC-INTERNAL-004, Rule-INTERNAL-084.
+     * <p>
+     * Whether a case just filed under its id has left the hand-named file it was
+     * read from: that file is deleted, or there was none. The index stops naming
+     * the file only once it is gone. It used to forget the file first and ignore
+     * the delete's answer (#66, finding 294).
+     */
+    private boolean leftHandNamedFile(final @NotNull UUID id, final @NotNull Path idFile) {
+        final @NotNull Optional<Path> original = Optional.ofNullable(handNamed.get(id)).filter(path -> !path.equals(idFile));
+        if (original.isPresent() && !Services.getInstance(p, TestDataFiles.class).delete(p, original.orElseThrow(), original.orElseThrow().getParent())) return false;
+
+        handNamed.remove(id);
         return true;
     }
 
