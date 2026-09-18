@@ -16,6 +16,7 @@
 
 package org.testin.clipboard;
 
+import org.testin.actions.GrayWithReason;
 import org.testin.notifications.Done;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
@@ -79,7 +80,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
             return;
         }
 
-        e.getPresentation().setEnabled(work(e).map(this::clipboardHoldsTestCases).orElse(false));
+        GrayWithReason.unless(this, e, work(e).map(this::clipboardHoldsTestCases).orElse(false), Bundle.message("paste.case.nothing.description"));
     }
 
     /**

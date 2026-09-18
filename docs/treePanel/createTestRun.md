@@ -64,6 +64,8 @@ A test run is one round of testing, with a verdict for each test case.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
+  gray, and says why when the pointer rests on it.
 
 Rule-TREE-PANEL-032 holds here too. It says what can be created under **Test
 Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).

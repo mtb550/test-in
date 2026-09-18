@@ -60,6 +60,8 @@ This is the opposite of retiring. Nothing inside the node changes.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
+  gray, and says why when the pointer rests on it.
 
 Rule-TREE-PANEL-065 holds here too. It says a status is set on one node at a
 time, and it is on [UC-TREE-PANEL-018](retireNode.md).

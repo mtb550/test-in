@@ -16,6 +16,7 @@
 
 package org.testin.testcase;
 
+import org.testin.actions.GrayWithReason;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
@@ -60,7 +61,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
             return;
         }
 
-        e.getPresentation().setEnabled(!TestinData.selectedCases(e).isEmpty());
+        GrayWithReason.unless(this, e, !TestinData.selectedCases(e).isEmpty(), Bundle.message("action.select.case.description"));
     }
 
     @Override

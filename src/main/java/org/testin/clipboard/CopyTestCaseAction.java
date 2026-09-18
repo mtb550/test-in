@@ -16,6 +16,7 @@
 
 package org.testin.clipboard;
 
+import org.testin.actions.GrayWithReason;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -89,7 +90,7 @@ public class CopyTestCaseAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(!TestinData.selectedCases(e).isEmpty());
+        GrayWithReason.unless(this, e, !TestinData.selectedCases(e).isEmpty(), Bundle.message("action.select.case.description"));
     }
 
     @Override

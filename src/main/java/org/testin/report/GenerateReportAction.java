@@ -16,6 +16,7 @@
 
 package org.testin.report;
 
+import org.testin.actions.GrayWithReason;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -99,7 +100,9 @@ public class GenerateReportAction extends AbstractProjectAction {
     // UC-REPORT-001, Rule-REPORT-001
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(isAvailable());
+        GrayWithReason.unless(this, e, isAvailable(), selectedRun.get()
+                .map(tr -> Bundle.message("toolbar.report.disabled", tr.getMarker().getStatus().getLabel()))
+                .orElseGet(() -> Bundle.message("report.select.run.description")));
     }
 
     /**

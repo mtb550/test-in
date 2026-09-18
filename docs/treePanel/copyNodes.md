@@ -65,6 +65,8 @@ The copy is new and separate. Changing it never changes the original.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
+  gray, and says why when the pointer rests on it.
 
 Rule-TREE-PANEL-043, Rule-TREE-PANEL-044, Rule-TREE-PANEL-045 and
 Rule-TREE-PANEL-049 hold here too. They say where a node can land, and they are

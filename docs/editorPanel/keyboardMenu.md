@@ -49,6 +49,10 @@ The `Context Menu` key.
   chosen when it was created and it keeps what it recorded. They are shown and
   refused rather than left out, so a tester who learns the gesture in one editor
   can find it in the other.
+- **Rule-EDITOR-PANEL-230** — A menu entry that cannot work on what is selected
+  is gray, and says why when the pointer rests on it. Nothing selected, a test
+  run where only a test set will do, and a clipboard with no test cases each
+  have their own reason.
 
 ## The screen
 

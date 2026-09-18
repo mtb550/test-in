@@ -16,6 +16,7 @@
 
 package org.testin.rename;
 
+import org.testin.actions.GrayWithReason;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -151,9 +152,8 @@ public class RenameAction extends DumbAwareAction {
      */
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(TestinData.singleSelectedNode(e)
-                .filter(DirectoryDto::isRenamable)
-                .isPresent());
+        GrayWithReason.unless(this, e, TestinData.singleSelectedNode(e).filter(DirectoryDto::isRenamable).isPresent(),
+                Bundle.message("rename.disabled.description"));
     }
 
     @Override

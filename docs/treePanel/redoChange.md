@@ -59,6 +59,8 @@ Redo is the opposite of undo.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
+  gray, and says why when the pointer rests on it.
 
 Rule-TREE-PANEL-059 and Rule-TREE-PANEL-060 hold here too. They say what the
 tree remembers and what can be taken back, and they are on

@@ -16,6 +16,7 @@
 
 package org.testin.testrun;
 
+import org.testin.actions.GrayWithReason;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -55,9 +56,8 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-067
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(TreeValues.selected(tree, TestRunDirectoryDto.class)
-                .filter(TestRunDirectoryDto::isStillOpen)
-                .isPresent());
+        GrayWithReason.unless(this, e, TreeValues.selected(tree, TestRunDirectoryDto.class).filter(TestRunDirectoryDto::isStillOpen).isPresent(),
+                Bundle.message("run.not.open.description"));
     }
 
     @Override

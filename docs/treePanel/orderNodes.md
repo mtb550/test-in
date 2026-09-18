@@ -66,6 +66,8 @@ A smaller number sits higher in the list.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
+  gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-103** — A new place given with Order is on the tree's
   history, like a rename, a move and a removal. Ctrl+Z gives the node back the
   place it had.

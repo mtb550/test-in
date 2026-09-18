@@ -16,6 +16,7 @@
 
 package org.testin.testcase;
 
+import org.testin.actions.GrayWithReason;
 import org.testin.codegen.GenType;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
@@ -31,7 +32,6 @@ import org.testin.editor.toolbar.Toolbar;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.create.TestCaseUpdateMenuDialog;
@@ -92,11 +92,12 @@ public class UpdateTestCaseAction extends DumbAwareAction {
      */
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(TestinData.editor(e)
-                .map(TestinEditor::getParent)
-                .filter(DirectoryDto::isTestCaseContainer)
-                .isPresent()
-                && !TestinData.selectedCases(e).isEmpty());
+        if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
+            GrayWithReason.unless(this, e, false, Bundle.message("update.case.disabled.description"));
+            return;
+        }
+
+        GrayWithReason.unless(this, e, TestinData.editor(e).isPresent() && !TestinData.selectedCases(e).isEmpty(), Bundle.message("action.select.case.description"));
     }
 
     @Override

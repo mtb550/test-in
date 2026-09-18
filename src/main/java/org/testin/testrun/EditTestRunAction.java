@@ -16,6 +16,7 @@
 
 package org.testin.testrun;
 
+import org.testin.actions.GrayWithReason;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -120,7 +121,7 @@ public class EditTestRunAction extends DumbAwareAction {
      */
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(selectedRun(TestinData.singleSelectedNode(e)).isPresent());
+        GrayWithReason.unless(this, e, selectedRun(TestinData.singleSelectedNode(e)).isPresent(), Bundle.message("run.not.open.description"));
     }
 
     @Override

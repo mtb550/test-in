@@ -16,6 +16,7 @@
 
 package org.testin.sftp;
 
+import org.testin.actions.GrayWithReason;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -94,9 +95,10 @@ public final class SyncWithSftpAction extends DumbAwareAction {
     public void update(final @NotNull AnActionEvent e) {
         final @Nullable Project p = e.getProject();
 
-        e.getPresentation().setEnabled(p != null
-                && TestinData.tree(e).isPresent()
-                && Services.getInstance(p, TestinConfigService.class).get().connection().isSyncsToServer());
+        GrayWithReason.unless(this, e, p != null
+                        && TestinData.tree(e).isPresent()
+                        && Services.getInstance(p, TestinConfigService.class).get().connection().isSyncsToServer(),
+                Bundle.message("sftp.disabled.description"));
     }
 
     @Override

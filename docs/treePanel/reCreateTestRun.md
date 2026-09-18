@@ -67,6 +67,8 @@ This copies a test run's test cases and settings into a new, empty one.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
+  gray, and says why when the pointer rests on it.
 
 ## What the tester sees
 

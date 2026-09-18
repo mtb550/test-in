@@ -72,6 +72,8 @@ The node goes to the recycle bin, so nothing is lost for good.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
+  gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-102** — Keeping the copy for undo, and putting it back on
   Ctrl+Z, run behind a progress bar and never hold up the IDE. Canceling the
   copy removes nothing and closes no editor. Putting back cannot be canceled,

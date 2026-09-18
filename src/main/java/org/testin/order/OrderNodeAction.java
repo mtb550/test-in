@@ -16,6 +16,7 @@
 
 package org.testin.order;
 
+import org.testin.actions.GrayWithReason;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -141,7 +142,7 @@ public class OrderNodeAction extends DumbAwareAction {
      */
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(orderable(e).isPresent());
+        GrayWithReason.unless(this, e, orderable(e).isPresent(), Bundle.message("order.disabled.description"));
     }
 
     @Override

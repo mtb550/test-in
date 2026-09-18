@@ -16,6 +16,7 @@
 
 package org.testin.testrun;
 
+import org.testin.actions.GrayWithReason;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -123,10 +124,11 @@ public class UpdateRunItemAction extends DumbAwareAction {
         // Details belong to failed test cases only - the dialog's title stays
         // truthful and the action reads as what it is. And to a run editor only,
         // which is what keeps F2 to one meaning at a time (#119).
-        e.getPresentation().setEnabled(runEditor(e)
-                .flatMap(runEditor -> TestinData.singleSelectedCase(e).flatMap(tc -> runEditor.runItem(tc.getId())))
-                .filter(item -> item.shownStatus() == TestStatus.FAILED)
-                .isPresent());
+        GrayWithReason.unless(this, e, runEditor(e)
+                        .flatMap(runEditor -> TestinData.singleSelectedCase(e).flatMap(tc -> runEditor.runItem(tc.getId())))
+                        .filter(item -> item.shownStatus() == TestStatus.FAILED)
+                        .isPresent(),
+                Bundle.message("run.item.details.disabled.description"));
     }
 
     /**

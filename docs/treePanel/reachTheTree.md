@@ -67,6 +67,8 @@ screens, and the tree is one of them.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
+  gray, and says why when the pointer rests on it.
 
 Rule-TREE-PANEL-100 also holds here. It says a test project that is not
 **Active** is drawn in the tree and holds nothing. It is written on

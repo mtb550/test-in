@@ -16,6 +16,7 @@
 
 package org.testin.remove;
 
+import org.testin.actions.GrayWithReason;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -94,7 +95,7 @@ public class RemoveAction extends DumbAwareAction {
      */
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(!removableNodes(e).isEmpty());
+        GrayWithReason.unless(this, e, !removableNodes(e).isEmpty(), Bundle.message("remove.node.disabled.description"));
     }
 
     @Override

@@ -69,6 +69,8 @@ A test set package is a folder that holds test sets. This makes one.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
+  gray, and says why when the pointer rests on it.
 
 Rule-TREE-PANEL-024 and Rule-TREE-PANEL-025 hold here too. They say what can be
 created where, and they are on [UC-TREE-PANEL-007](createTestSet.md).

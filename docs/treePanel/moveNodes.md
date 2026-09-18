@@ -79,6 +79,8 @@ The node keeps everything inside it. Only where it sits changes.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
+  gray, and says why when the pointer rests on it.
 
 ## The Paste, Move and Copy dialog
 
