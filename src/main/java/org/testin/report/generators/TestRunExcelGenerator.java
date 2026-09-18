@@ -16,7 +16,11 @@
 
 package org.testin.report.generators;
 
-import org.testin.model.TestRunConfiguration;
+import org.testin.model.ResultAnalysis;
+import org.testin.model.TestRunItems;
+import org.testin.model.markers.DetailRow;
+import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.dhatim.fastexcel.HyperLink;
@@ -26,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.TestRunSummary;
 import org.testin.logger.Logger;
-import org.testin.model.TestStatus;
 import org.testin.report.ReportTile;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
@@ -36,7 +39,6 @@ import org.testin.util.Display;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -53,112 +55,25 @@ public final class TestRunExcelGenerator {
 
 
     /**
-     * UC-REPORT-001, Rule-REPORT-002.
+     * UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-020.
      * <p>
-     * The project is not read here and is part of the signature anyway: all four
-     * generators are called through one functional interface in {@code FileTypes},
-     * and the three that render a document do need it (#61).
+     * Two sheets. The first says what the other three formats say before their
+     * tables - the overview, the execution summary and what the tester wrote
+     * about the run. The second is the test cases alone, a header row and one
+     * row each, so it can be sorted and filtered as one list.
+     * <p>
+     * The overview and the analysis were missing: a tester who sent the
+     * spreadsheet sent a different report from the PDF of the same run, and
+     * their written analysis appeared nowhere in it (#66, finding 199).
      */
-    @SuppressWarnings("unused")
     public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 
             final @NotNull Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
-            final @NotNull Worksheet ws = wb.newWorksheet(Bundle.message("report.excel.sheet"));
-
-            ws.value(0, 0, Bundle.message("report.excel.caption.run"));
-            ws.style(0, 0).bold().fontSize(14).set();
-            // The run's own name, not its change log - see the HTML generator.
-            ws.value(0, 1, trDir.getName());
-
-            ws.value(1, 0, Bundle.message("report.excel.caption.platform"));
-            ws.style(1, 0).bold().set();
-            ws.value(1, 1, TestRunConfiguration.PLATFORM.valueIn(tr));
-
-            ws.value(2, 0, Bundle.message("report.excel.caption.status"));
-            ws.style(2, 0).bold().set();
-            ws.value(2, 1, trDir.getMarker().getStatus().getLabel());
-
-            // The same headline the other three formats print, from the same
-            // summary, so a spreadsheet and a PDF of one run cannot disagree.
             final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
-            // The sheet opened with Executed and no Total Cases while the other
-            // three formats opened with Total Cases and no Executed, so two
-            // reports of one run disagreed about what the run was. Decided a bug
-            // rather than a difference, 2026-09-04 (#174).
-            final @NotNull List<ReportTile> headline = ReportTile.shownFor(summary);
 
-            for (int col = 0; col < headline.size(); col++) {
-                final @NotNull ReportTile figure = headline.get(col);
-
-                ws.value(4, col, figure.getLabel());
-                ws.style(4, col).bold().set();
-                ws.value(5, col, figure.valueIn(summary));
-            }
-
-            int row = 7;
-            ws.value(row, 0, Bundle.message("report.excel.caption.id"));
-            ws.value(row, 1, RunEditorAttributes.DESCRIPTION.getName());
-            ws.value(row, 2, RunEditorAttributes.RUN_STATUS.getName());
-            ws.value(row, 3, RunEditorAttributes.ACTUAL_RESULT.getName());
-            ws.value(row, 4, RunEditorAttributes.BUG_SEVERITY.getName());
-            ws.value(row, 5, RunEditorAttributes.BUG_PRIORITY.getName());
-            ws.value(row, 6, RunEditorAttributes.DURATION.getName());
-            ws.value(row, 7, RunEditorAttributes.EXPECTED_RESULT.getName());
-            ws.value(row, 8, RunEditorAttributes.BUG_ISSUE.getName());
-
-            ws.range(row, 0, row, 8).style().bold().fillColor("E0E0E0").set();
-
-            row++;
-            for (final var result : tr.getResults()) {
-                final @NotNull UUID id = result.getId();
-                ws.value(row, 0, id.toString());
-
-                final @NotNull TestCaseDto details = ReportedCase.of(detailsMap, id);
-                final @NotNull String title = orNotAvailable(details.getDescription());
-                final @NotNull String expectedResult = orNotAvailable(details.getExpectedResult());
-
-                ws.value(row, 1, title);
-
-                final @NotNull TestStatus statusEnum = result.shownStatus();
-                ws.value(row, 2, statusEnum.getLabel());
-                ws.style(row, 2).fontColor(statusEnum.getHex()).bold().set();
-
-                ws.value(row, 3, result.getActualResult());
-                ws.style(row, 3).wrapText(true).set();
-
-                ws.value(row, 4, result.getBugSeverity().getLabel());
-                ws.style(row, 4).bold().set();
-
-                ws.value(row, 5, result.getBugPriority().getLabel());
-                ws.style(row, 5).bold().set();
-
-                final @NotNull String formattedDuration = Display.formatDuration(result.getDuration());
-                ws.value(row, 6, formattedDuration);
-
-                ws.value(row, 7, expectedResult);
-                ws.style(row, 7).wrapText(true).set();
-
-                // Its own column, empty when the run item was not reported (#50).
-                final int line = row;
-                result.bugIssue().ifPresent(url -> {
-                    ws.hyperlink(line, 8, HyperLink.external(url, BugIssueUrl.shortReference(url)));
-                    ws.style(line, 8).fontColor(ReportText.LINK_BLUE).underlined().set();
-                });
-
-                row++;
-            }
-
-            ws.width(0, 40); // ID
-            ws.width(1, 30); // Title
-            ws.width(2, 15); // Status
-            ws.width(3, 30); // Actual Result
-            ws.width(4, 15); // Severity
-            ws.width(5, 15); // Priority
-            ws.width(6, 15); // Duration
-            ws.width(7, 40); // Expected Result
-            ws.width(8, 15); // Bug Issue
-
+            writeOverview(wb.newWorksheet(Bundle.message("report.excel.sheet.overview")), Services.getInstance(p, BoundTestProject.class).name(), trDir, tr, summary);
+            writeCases(wb.newWorksheet(Bundle.message("report.excel.sheet.cases")), tr, detailsMap);
 
             wb.finish();
 
@@ -167,5 +82,124 @@ public final class TestRunExcelGenerator {
             Logger.error("Excel report generation failed: " + ex.getMessage());
             throw new RuntimeException(ex);
         }
+    }
+
+    /**
+     * Rule-REPORT-020.
+     * <p>
+     * The overview, the execution summary and the result analysis, as captions
+     * and values in two columns, under the headings the other formats use.
+     */
+    private static void writeOverview(final @NotNull Worksheet ws, final @NotNull String projectName, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull TestRunSummary summary) {
+        ws.value(0, 0, Bundle.message("report.title"));
+        ws.style(0, 0).bold().fontSize(14).set();
+
+        int row = heading(ws, 2, Bundle.message("report.heading.overview"));
+        for (final DetailRow overview : ReportOverview.rowsFor(projectName, trDir, tr, summary)) {
+            ws.value(row, 0, overview.caption());
+            ws.style(row, 0).bold().set();
+            ws.value(row++, 1, overview.value());
+        }
+
+        row = heading(ws, row + 1, Bundle.message("report.heading.execution"));
+        ws.value(row++, 0, Bundle.message("report.summary.named", trDir.getName(),
+                String.valueOf(summary.total()), String.valueOf(summary.executed()), summary.passRate() + "%"));
+        for (final ReportTile figure : ReportTile.shownFor(summary)) {
+            caption(ws, row, figure.getLabel(), figure.getHex());
+            ws.value(row++, 1, figure.valueIn(summary));
+        }
+
+        // Only what the tester wrote - see the PDF generator.
+        if (ResultAnalysis.anyWrittenIn(tr.getResultAnalysis())) {
+            row = heading(ws, row + 1, Bundle.message("report.heading.analysis"));
+
+            for (final ResultAnalysis section : ResultAnalysis.values()) {
+                final @NotNull String written = section.writtenIn(tr.getResultAnalysis());
+                if (written.isEmpty()) continue;
+
+                caption(ws, row, section.heading(summary), section.getHexColor());
+                ws.value(row, 1, written);
+                ws.style(row++, 1).wrapText(true).set();
+            }
+        }
+
+        ws.width(0, 32);
+        ws.width(1, 80);
+    }
+
+    /**
+     * A section heading on the overview sheet, answering the row after it.
+     */
+    private static int heading(final @NotNull Worksheet ws, final int row, final @NotNull String text) {
+        ws.value(row, 0, text);
+        ws.style(row, 0).bold().fontSize(12).set();
+
+        return row + 1;
+    }
+
+    /**
+     * A caption in the color the other formats print it in.
+     */
+    private static void caption(final @NotNull Worksheet ws, final int row, final @NotNull String text, final @NotNull String hex) {
+        ws.value(row, 0, text);
+        ws.style(row, 0).bold().fontColor(hex).set();
+    }
+
+    /**
+     * Rule-REPORT-020.
+     * <p>
+     * The test cases: the column names, then one row per case, filled with the
+     * color its verdict's table carries in the other formats.
+     */
+    private static void writeCases(final @NotNull Worksheet ws, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+        ws.value(0, 0, Bundle.message("report.excel.caption.id"));
+        ws.value(0, 1, RunEditorAttributes.DESCRIPTION.getName());
+        ws.value(0, 2, RunEditorAttributes.RUN_STATUS.getName());
+        ws.value(0, 3, RunEditorAttributes.ACTUAL_RESULT.getName());
+        ws.value(0, 4, RunEditorAttributes.BUG_SEVERITY.getName());
+        ws.value(0, 5, RunEditorAttributes.BUG_PRIORITY.getName());
+        ws.value(0, 6, RunEditorAttributes.DURATION.getName());
+        ws.value(0, 7, RunEditorAttributes.EXPECTED_RESULT.getName());
+        ws.value(0, 8, RunEditorAttributes.BUG_ISSUE.getName());
+        ws.range(0, 0, 0, 8).style().bold().fillColor("E0E0E0").set();
+
+        int row = 1;
+        for (final TestRunItems result : tr.getResults()) {
+            final @NotNull UUID id = result.getId();
+            final @NotNull TestCaseDto details = ReportedCase.of(detailsMap, id);
+
+            ws.value(row, 0, id.toString());
+            ws.value(row, 1, orNotAvailable(details.getDescription()));
+            ws.value(row, 2, result.shownStatus().getLabel());
+            ws.value(row, 3, result.getActualResult());
+            ws.value(row, 4, result.getBugSeverity().getLabel());
+            ws.value(row, 5, result.getBugPriority().getLabel());
+            ws.value(row, 6, Display.formatDuration(result.getDuration()));
+            ws.value(row, 7, orNotAvailable(details.getExpectedResult()));
+
+            // One style call per cell: a second call on a cell replaces its font,
+            // which would take the ink back off the fill.
+            final @NotNull ReportSection verdict = ReportSection.of(result);
+            ws.range(row, 0, row, 8).style().fillColor(verdict.getHexColor()).fontColor(verdict.textHex()).wrapText(true).set();
+
+            // Its own column, empty when the run item was not reported (#50).
+            final int line = row;
+            result.bugIssue().ifPresent(url -> {
+                ws.hyperlink(line, 8, HyperLink.external(url, BugIssueUrl.shortReference(url)));
+                ws.style(line, 8).fillColor(verdict.getHexColor()).fontColor(verdict.textHex()).underlined().set();
+            });
+
+            row++;
+        }
+
+        ws.width(0, 40); // ID
+        ws.width(1, 30); // Title
+        ws.width(2, 15); // Status
+        ws.width(3, 30); // Actual Result
+        ws.width(4, 15); // Severity
+        ws.width(5, 15); // Priority
+        ws.width(6, 15); // Duration
+        ws.width(7, 40); // Expected Result
+        ws.width(8, 15); // Bug Issue
     }
 }

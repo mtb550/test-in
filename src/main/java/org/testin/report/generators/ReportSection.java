@@ -172,4 +172,11 @@ enum ReportSection {
     public boolean matches(final @NotNull TestRunItems item) {
         return statuses.contains(item.shownStatus());
     }
+
+    /**
+     * The table a case is printed in, which every status has exactly one of.
+     */
+    public static @NotNull ReportSection of(final @NotNull TestRunItems item) {
+        return Arrays.stream(values()).filter(section -> section.matches(item)).findFirst().orElseThrow();
+    }
 }

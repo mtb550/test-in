@@ -10,7 +10,7 @@ to somebody who does not have the IDE.
 |---|---|
 | **Part of Testin** | Reports |
 | **Answers** | How a report is made, what it contains, and what each format holds |
-| **Numbering** | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` to `Rule-REPORT-019` |
+| **Numbering** | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` to `Rule-REPORT-020` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -65,10 +65,10 @@ is not in the IDE's keymap, so it cannot be changed there.
 | **PDF** | The one to attach to a ticket. The starting choice |
 | **Word** | The one to edit before sending |
 | **HTML** | The one to open in a browser. It carries a light and dark switch |
-| **XLSX** | The one to work with in a spreadsheet. It holds a table and nothing else |
+| **XLSX** | The one to work with in a spreadsheet. Its test cases are one table, to sort and filter |
 
-The first three carry the same content. The spreadsheet is a different shape,
-and is described below.
+The first three carry the same content. The spreadsheet carries the same
+overview and analysis on a sheet of their own, and is described below.
 
 ## What a report contains
 
@@ -109,16 +109,23 @@ there. (UC-VIEW-PANEL-016)
 
 ## What the spreadsheet report contains
 
-One sheet, named *Test Run Report*. The test run's name, the platform and the
-status on the first three rows, the same figures on rows five and six, then a
-header row and one row for each test case.
+Two sheets. (Rule-REPORT-020)
+
+**Overview** — the words **TEST SUMMARY REPORT**, then the same three sections
+the other formats open with, as a caption and a value on each row: **Report
+Overview**, with the configuration and when execution started, ended and how
+long it took; **Execution Summary**, with its sentence and the same figures;
+and **Result Analysis**, left out when the tester wrote nothing.
+
+**Test Cases** — a header row and one row for each test case, nothing above it,
+so the sheet sorts and filters as one list. Each row is filled with the color
+its verdict's table is headed with in the other formats: red for failed, green
+for passed, amber for blocked, gray for untested and removed.
 
 The last column, **Bug Issue**, holds the issue a test case was reported as, as
 *#12*. Clicking it opens the issue. It is empty for a test case with no issue.
-There is no column for the error.
-
-It carries **no overview, no result analysis and none of the per-verdict
-tables**. A tester who wants the whole report should not choose this format.
+There is no column for the error, and the cases are one table rather than one
+per verdict.
 
 ---
 
@@ -144,10 +151,6 @@ closed up, so an issue that quotes one still points at the right thing.
 ---
 
 ## Not decided
-
-**Question 1** — Should the spreadsheet report carry the overview and the
-per-verdict tables the other three carry? Nothing says whether the difference
-was meant.
 
 **Question 2** — A report can only be made on a test run. Nobody has decided
 whether a report on a test set, or on a whole test project, is wanted.

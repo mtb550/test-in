@@ -44,6 +44,11 @@ spreadsheet.
   letters only, so Arabic, Hindi, Cyrillic or Chinese text is left out of it;
   when that happens a message says how much text lost characters, shows one of
   them, and says the Word and HTML reports keep them.
+- **Rule-REPORT-020** — The spreadsheet has two sheets. Overview holds what the
+  other formats print before their tables: the overview, the execution summary
+  and the result analysis. Test Cases holds the column names and one row for
+  each test case, and nothing else, each row filled with the color of its
+  verdict.
 
 ## The screen
 
