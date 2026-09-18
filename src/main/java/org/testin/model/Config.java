@@ -45,7 +45,15 @@ public final class Config {
      */
     public static final @NotNull DateTimeFormatter EXCEL_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.US);
 
-    public static final @NotNull String DATE_FORMAT_PATTERN = "EEEE dd-MM-yyyy 'At' HH:mm:ss '['VV']'";
+    /**
+     * The plugin's timestamp after its weekday, which a reader of a hand-typed
+     * date strips rather than matches. Its own constant so the parser and the
+     * files agree by construction: it was written out twice, and only a
+     * round-trip test stood between the two drifting (#66, finding 232).
+     */
+    public static final @NotNull String DATE_WITHOUT_WEEKDAY_PATTERN = "dd-MM-yyyy 'At' HH:mm:ss '['VV']'";
+
+    public static final @NotNull String DATE_FORMAT_PATTERN = "EEEE " + DATE_WITHOUT_WEEKDAY_PATTERN;
     /**
      * The empty timestamp: something that has not happened yet. A case nobody has
      * given a verdict, a run nobody has started - their timestamps hold this rather

@@ -52,7 +52,7 @@ public final class TestDataParser {
      * rather than matched - see {@link #date}.
      */
     private static final @NotNull DateTimeFormatter WITHOUT_WEEKDAY =
-            DateTimeFormatter.ofPattern("dd-MM-yyyy 'At' HH:mm:ss '['VV']'", Locale.US);
+            DateTimeFormatter.ofPattern(Config.DATE_WITHOUT_WEEKDAY_PATTERN, Locale.US);
 
     public static @NotNull List<String> steps(final @NotNull String rawSteps) {
         if (rawSteps.isBlank()) return new ArrayList<>();
