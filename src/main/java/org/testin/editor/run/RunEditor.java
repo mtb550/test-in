@@ -219,11 +219,20 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     }
 
     /**
-     * The walk stops before the copy it is walking is thrown away.
+     * UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-150.
+     * <p>
+     * The walk stops before the copy it is walking is thrown away, and the run
+     * is written when a case was being timed. Stopping the timer puts the
+     * seconds on the run, and every other way of stopping writes it; this one
+     * did not, so they reached the file only if a later verdict or Stop wrote
+     * the run, and closing the tab first lost them (#66, finding 209).
      */
     @Override
     protected void beforeReload() {
+        final boolean timing = executingCase.isPresent();
+
         haltExecution();
+        if (timing) Services.getInstance(p, RunStatusService.class).persistRun(p, this);
     }
 
     /**

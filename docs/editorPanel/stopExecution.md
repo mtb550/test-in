@@ -77,7 +77,9 @@ button has no gray state. A stop that reached nothing still reports itself.
 
 ## Two other things stop the walk
 
-**Refresh** stops it, and says *Refreshed, and the execution stopped*.
+**Refresh** stops it, and says *Refreshed, and the execution stopped*. The time
+spent so far on the case being executed is written with the test run. The run
+is not stamped as ended.
 
 **Closing the tab** stops the walk and the automation both, writes the test run,
 and asks nothing. It is the same thing as pressing **Stop Execution**.
