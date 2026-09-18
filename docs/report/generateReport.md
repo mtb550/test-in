@@ -26,6 +26,10 @@ spreadsheet.
   hide a control that cannot work just now.
 - **Rule-REPORT-005** — The project named in a report is the test project, not
   the code project the IDE has open.
+- **Rule-REPORT-019** — Every format prints its words in the language the IDE is
+  set to. The headings, the column names and the Actual result label come from
+  the same translations in the web page, the PDF, the Word document and the
+  spreadsheet, so no report switches language halfway down.
 - **Rule-REPORT-006** — The file name is filled in already. It names the test
   project, the test run, the date and the time.
 - **Rule-REPORT-007** — Spaces and special characters are taken out of the

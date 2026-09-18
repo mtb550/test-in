@@ -33,6 +33,7 @@ import org.testin.model.BugSeverity;
 import org.testin.model.ResultAnalysis;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
+import org.testin.testrun.RunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 
@@ -184,7 +185,14 @@ public final class TestRunHtmlGenerator {
     }
 
     /**
+     * Rule-REPORT-019.
+     * <p>
      * One section's cases.
+     * <p>
+     * Its headings and the "Actual result" label are the words the PDF and the
+     * Word document print, from the same bundle. They were English literals
+     * here, so a French tester's web report was the one format that switched
+     * language halfway down the page (#66, finding 198).
      * <p>
      * Priority and severity belong to the failures and nowhere else, which is
      * what {@code withFailureDetail} says and what the PDF has always done. This
@@ -199,9 +207,12 @@ public final class TestRunHtmlGenerator {
         html.append("<table class='detail-table'>")
                 .append("<tr style='background: var(--section-").append(section).append(")")
                 .append("; color: var(--section-").append(section).append("-ink)'>")
-                .append("<th class='seq'>#</th><th>Test Case</th>");
+                .append("<th class='seq'>#</th><th>").append(Bundle.message("caption.test.case")).append("</th>");
 
-        if (withFailureDetail) html.append("<th class='verdict'>Priority</th><th class='verdict'>Severity</th>");
+        if (withFailureDetail) {
+            html.append("<th class='verdict'>").append(RunEditorAttributes.BUG_PRIORITY.getName()).append("</th>")
+                    .append("<th class='verdict'>").append(RunEditorAttributes.BUG_SEVERITY.getName()).append("</th>");
+        }
 
         html.append("</tr>");
 
@@ -221,8 +232,8 @@ public final class TestRunHtmlGenerator {
                         // wide enough for one would leave the rest of the table
                         // in a strip. The PDF puts it in the same cell.
                         final @NotNull String actual = item.getActualResult();
-                        html.append("<div class='actual'>Actual result: ")
-                                .append(StringUtil.escapeXmlEntities(actual.isEmpty() ? "—" : actual));
+                        html.append("<div class='actual'>")
+                                .append(Bundle.message("report.actual.result", StringUtil.escapeXmlEntities(actual.isEmpty() ? "—" : actual)));
 
                         // The issue it was reported as, right after what happened (#50).
                         item.bugIssue().ifPresent(url -> html.append(" (<a href='").append(StringUtil.escapeXmlEntities(url)).append("' target='_blank'>")

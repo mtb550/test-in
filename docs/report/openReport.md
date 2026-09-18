@@ -21,6 +21,10 @@ There is no key for this. The link is on the message.
   lands under the Testin folder.
 - **Rule-REPORT-005** — The project named in a report is the test project, not
   the code project the IDE has open.
+- **Rule-REPORT-019** — Every format prints its words in the language the IDE is
+  set to. The headings, the column names and the Actual result label come from
+  the same translations in the web page, the PDF, the Word document and the
+  spreadsheet, so no report switches language halfway down.
 - **Rule-REPORT-010** — The link is on the message that says the report was
   written, and the message stays in the IDE's notification list.
 - **Rule-REPORT-011** — Clicking the link makes the message go.
