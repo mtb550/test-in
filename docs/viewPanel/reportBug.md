@@ -80,9 +80,12 @@ Before the test case is reported:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│   Bug Severity        Blocker                                │
-│   Bug Priority        High                                   │
-│   Bug Issue           Report Bug                             │
+│   BUG SEVERITY                                               │
+│   Blocker                                                    │
+│   BUG PRIORITY                                               │
+│   High                                                       │
+│   BUG ISSUE                                                  │
+│   Report Bug                                                 │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -90,9 +93,12 @@ After:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│   Bug Severity        Blocker                                │
-│   Bug Priority        High                                   │
-│   Bug Issue           mtb550/product#123    Report Bug       │
+│   BUG SEVERITY                                               │
+│   Blocker                                                    │
+│   BUG PRIORITY                                               │
+│   High                                                       │
+│   BUG ISSUE                                                  │
+│   mtb550/product#123    Report Bug                           │
 └──────────────────────────────────────────────────────────────┘
 ```
 
