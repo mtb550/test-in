@@ -96,8 +96,7 @@ The always on top window, which has its own keys.
 | `Enter` | Saves the failure detail and moves on |
 | `Escape` | Leaves the failure form, or closes the window |
 | `Alt+Enter` | In the failure form, offers the corrections for a misspelled word in the actual result |
-| `Ctrl+D` | Shows the details |
-| `Ctrl+H` | Hides them |
+| `Ctrl+D` | Shows the details, or hides them when they are shown |
 | The wheel alone | Changes the text size - no `Ctrl` here, deliberately |
 
 ## The view panel
@@ -263,7 +262,7 @@ particular thing is on screen.
 | `Ctrl+P` | A test run | Generate a report. Its action is not declared yet — see below |
 | `Context Menu` | The tree and both lists | Opens the menu on the selection, without the mouse |
 | `Escape` | The tree, the lists, the grid, the details tab | Steps back one step, and what a step is depends on the surface |
-| `Ctrl+D` `Ctrl+H`, the wheel alone | Light mode | A window with its own keys, always on top |
+| `Ctrl+D`, the wheel alone | Light mode | A window with its own keys, always on top |
 
 **Still to declare.** Three actions a tester can reach are not declared yet, so
 they are not in Find Action and their keys cannot be rebound: **Generate Report**

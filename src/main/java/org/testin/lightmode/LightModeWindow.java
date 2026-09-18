@@ -488,7 +488,7 @@ final class LightModeWindow {
         expected.setText(TestEditorAttributes.EXPECTED_RESULT.displayValue(tc));
 
         // Visibility is not touched here: rebuilding the rows does not change
-        // whether they are shown, and showDetails is the one thing that decides.
+        // whether they are shown, and toggleDetails is the one thing that decides.
         details.show(tc);
 
         if (arrived) slideCaseIn();
@@ -580,8 +580,7 @@ final class LightModeWindow {
     private void bindKeys() {
         bind(Shortcuts.Escape.getKey(), "testin.lightMode.escape", this::escape);
         bind(Shortcuts.Enter.getKey(), "testin.lightMode.commit", this::saveCapture);
-        bind(Shortcuts.ShowDetails.getKey(), "testin.lightMode.showDetails", () -> showDetails(true));
-        bind(Shortcuts.HideDetails.getKey(), "testin.lightMode.hideDetails", () -> showDetails(false));
+        bind(Shortcuts.ToggleDetails.getKey(), "testin.lightMode.toggleDetails", this::toggleDetails);
 
         for (final TestStatus status : TestStatus.values()) {
             if (!status.isVerdict()) continue;
@@ -684,17 +683,17 @@ final class LightModeWindow {
      * left.
      * <p>
      * Only the height moves: the tester chose the width and the details are not
-     * a reason to take it away from them. Doing nothing when it is already in
-     * the asked-for state keeps Ctrl+D held down from re-laying the window out
-     * on every repeat.
+     * a reason to take it away from them.
+     * <p>
+     * One key both ways, as Muteb chose: Ctrl+D shows the details, and Ctrl+D
+     * again hides them. The status bar names it, so a tester does not have to
+     * remember a second key for the way back.
      */
-    private void showDetails(final boolean show) {
+    private void toggleDetails() {
         // A form cannot be collapsed while it is waiting to be filled in.
         if (capture.isPresent()) return;
 
-        if (details.isVisible() == show) return;
-
-        details.setVisible(show);
+        details.setVisible(!details.isVisible());
 
         fitHeight();
     }
@@ -1171,8 +1170,7 @@ final class LightModeWindow {
      */
     private StatusBarItem @NotNull [] caseKeys() {
         final @NotNull List<StatusBarItem> items = new ArrayList<>();
-        items.add(StatusBarShortcut.hint(Shortcuts.ShowDetails.getShortcutText(), Bundle.message("shortcut.details")));
-        items.add(StatusBarShortcut.hint(Shortcuts.HideDetails.getShortcutText(), Bundle.message("shortcut.hide")));
+        items.add(StatusBarShortcut.hint(Shortcuts.ToggleDetails.getShortcutText(), Bundle.message("shortcut.details")));
         items.add(StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), Bundle.message("shortcut.close")));
 
         for (final TestStatus status : TestStatus.values()) {

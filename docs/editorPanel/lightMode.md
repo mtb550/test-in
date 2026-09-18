@@ -107,7 +107,7 @@ test run is going.
 │      P Passed              F Failed              B Blocked                 │
 │  00:41                                                    00:12:41         │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  Ctrl+D Details  Ctrl+H Hide  Esc Close  P Passed  F Failed  B Blocked     │
+│  Ctrl+D Show/Hide Details  Esc Close  P Passed  F Failed  B Blocked        │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -133,7 +133,7 @@ test run is going.
 │      P Passed              F Failed              B Blocked                 │
 │  00:41                                                    00:12:41         │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  Ctrl+D Details  Ctrl+H Hide  Esc Close  P Passed  F Failed  B Blocked     │
+│  Ctrl+D Show/Hide Details  Esc Close  P Passed  F Failed  B Blocked        │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -243,23 +243,22 @@ being built, for the same reason the description was never on it.
 ### 9. Details open and close on the keyboard
 
 `Ctrl+D` shows the four remaining fields: steps, test data, pre-conditions and
-tags. `Ctrl+H` hides them. There is no button. A control that sits on screen
-permanently, to be pressed twice a session, is wasted space. This window is
-built to have none.
+tags. `Ctrl+D` again hides them. There is no button. A control that sits on
+screen permanently, to be pressed twice a session, is wasted space. This window
+is built to have none.
 
-**Two keys rather than one.** A single key that both shows and hides depends on
-the state the window is in. The tester would have to look at the window before
-they could know what the key will do. Show and hide always do what they say.
-That matters most when the tester is looking at the application under test
-rather than at this window. The window remembers which it was showing.
+**One key, both ways.** It was two - `Ctrl+D` to show and `Ctrl+H` to hide - so
+that a key always did what it said whatever the window was showing. Muteb chose
+one key on 18 September 2026: a tester learns one key rather than two, and the
+status bar names it as *Show/Hide Details*.
 
 ### 10. The status bar, which names every key
 
-`Ctrl+D` Details, `Ctrl+H` Hide, `Escape` Close, `P` Passed, `F` Failed, `B`
+`Ctrl+D` Show/Hide Details, `Escape` Close, `P` Passed, `F` Failed, `B`
 Blocked.
 
-**This is where `Ctrl+D` and `Ctrl+H` are taught.** Removing the details button
-left two shortcuts that nothing on screen named. That was the one real cost of
+**This is where `Ctrl+D` is taught.** Removing the details button left a
+shortcut that nothing on screen named. That was the one real cost of
 the change, and this row covers it. The row is not a new idea. Every Testin
 dialog already carries a row like this one. That is where the wording and the
 spacing come from.
@@ -406,8 +405,8 @@ back. A failure nobody described is a failure nobody can act on.
 The description and the expected result do not move or shrink. Writing down what
 actually happened is a comparison against what should have happened. Hiding
 either half while the tester types is the one thing this form must not do.
-`Ctrl+D` and `Ctrl+H` do not apply here. A form cannot be collapsed while it is
-waiting to be filled in.
+`Ctrl+D` does not apply here. A form cannot be collapsed while it is waiting to
+be filled in.
 
 **The form zooms with it.** The wheel exists so the window can be read from
 where the tester is sitting. A form they then had to lean in to type into would
@@ -586,8 +585,7 @@ that is the tester's hand on the edge, not a state change.
 | **`F`** | Opens the failure capture in place. `Enter` saves and advances. `Escape` returns, with the test case still unjudged. |
 | **`Ctrl+V`** | Pastes text into the error box, or adds an image as a picture under it, on the failure form. It does nothing when no failure form is open, so evidence cannot be attached to a test case that is about to be passed and cleared. |
 | **`Escape`** | Closes the window. The test run is untouched. Reopening returns to the first unjudged test case. |
-| **`Ctrl+D`** | Shows the detail fields. It does nothing if they are already shown. |
-| **`Ctrl+H`** | Hides them. It does nothing if they are already hidden. |
+| **`Ctrl+D`** | Shows the detail fields, or hides them when they are shown. |
 | **Wheel** | Zooms the test case and the failure form, inside this window only, with no modifier. |
 | **Drag an edge** | Width only. The left and right edges resize. The top and bottom do not. Height is whatever the content needs. |
 | **Show details, or a view toggle** | The window grows or shrinks to fit. That is the only way its height changes. It changes immediately, rather than leaving a gap or a scrollbar. |
@@ -685,12 +683,11 @@ four is the fix.
 ### Details open with a key, and that costs something
 
 Removing the button removes a permanent row. The window's whole argument is that
-it holds one test case and nothing else. Two keys also beat one toggle. `Ctrl+D`
-and `Ctrl+H` always do what they say. A single toggle key does the opposite of a
-state the tester would have to check first.
+it holds one test case and nothing else. One key shows and hides the details,
+`Ctrl+D`, which does the opposite of whatever the window is showing.
 
-The status bar teaches them. It is the row that answered this. Before it,
-removing the button left two shortcuts that nothing on screen mentioned. A
+The status bar teaches it. It is the row that answered this. Before it,
+removing the button left a shortcut that nothing on screen mentioned. A
 tester who did not read the documentation would never have found them.
 
 **One warning.** `Ctrl+D` already means something else in the create-test-case

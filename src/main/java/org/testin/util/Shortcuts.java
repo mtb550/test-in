@@ -138,12 +138,8 @@ public enum Shortcuts {
      * own keys should take CMD on a Mac is the half of #25 that needs a Mac to
      * answer.
      */
-    ShowDetails(
+    ToggleDetails(
             KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK)
-    ),
-
-    HideDetails(
-            KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK)
     ),
 
     /** The keyboard's menu key. It carries no modifier anywhere. */
