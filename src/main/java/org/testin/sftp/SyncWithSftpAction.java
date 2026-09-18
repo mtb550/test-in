@@ -381,8 +381,11 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                             Bundle.message("sftp.synced.conflicts.message", outcome.describe(), naming(outcome.conflicting())));
                 }
 
-                askAboutDeletions(outcome, projectRoot);
-                askAboutConflicts(outcome.unsettled(), projectRoot, address, account, auth, new TreeMap<>());
+                // One question at a time. Both opened in the same instant, one on
+                // top of the other, and a tester answered the conflicts only to
+                // find a question about removals underneath (#66, finding 214).
+                askAboutDeletions(outcome, projectRoot,
+                        () -> askAboutConflicts(outcome.unsettled(), projectRoot, address, account, auth, new TreeMap<>()));
             });
         }
 
@@ -396,15 +399,18 @@ public final class SyncWithSftpAction extends DumbAwareAction {
          * The count is in the question, because 3 files and 1,204 files deserve very
          * different amounts of thought.
          */
-        private void askAboutDeletions(final @NotNull SftpSync.Outcome outcome, final @NotNull Path projectRoot) {
-            if (outcome.removedOnServer().isEmpty()) return;
+        private void askAboutDeletions(final @NotNull SftpSync.Outcome outcome, final @NotNull Path projectRoot, final @NotNull Runnable then) {
+            if (outcome.removedOnServer().isEmpty()) {
+                then.run();
+                return;
+            }
 
             final int count = outcome.removedOnServer().size();
             final @NotNull String what = count == 1
                     ? Bundle.message("sftp.removed.file.one")
                     : Bundle.message("sftp.removed.file.many", String.valueOf(count));
 
-            new ConfirmDialog(p, Bundle.message("sftp.removed.title"),
+            final @NotNull ConfirmDialog question = new ConfirmDialog(p, Bundle.message("sftp.removed.title"),
                     Bundle.message("sftp.removed.message", what, naming(outcome.removedOnServer())),
                     "", "", Bundle.message("sftp.removed.confirm", what),
                     () -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -418,7 +424,10 @@ public final class SyncWithSftpAction extends DumbAwareAction {
                         });
                     }),
                     List.of(new ConfirmDialog.Alternative(Shortcuts.ConfirmAlternative, Bundle.message("sftp.removed.keep", what),
-                            () -> keepThem(outcome, projectRoot, count)))).show();
+                            () -> keepThem(outcome, projectRoot, count))));
+
+            if (question.show()) question.onClosed(then);
+            else then.run();
         }
 
         /**

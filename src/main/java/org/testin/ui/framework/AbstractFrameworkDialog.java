@@ -19,6 +19,8 @@ package org.testin.ui.framework;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
+import com.intellij.openapi.ui.popup.LightweightWindowEvent;
+import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.ui.components.JBPanel;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -256,6 +258,24 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
         open.remember(getClass(), getPopup());
         getPopup().showCenteredInCurrentWindow(p);
         return true;
+    }
+
+    /**
+     * Runs when the dialog closes, whichever way it closed - submitted,
+     * canceled, or replaced by another of its kind. A popup, unlike the modal it
+     * replaced, does not return an answer to the line that showed it, so this is
+     * how a caller waits for it: a cell editor that has to stop editing either
+     * way, and a question that must not open over the one before it.
+     * <p>
+     * Asked of a dialog that was shown; {@link #show} answers whether it was.
+     */
+    public final void onClosed(final @NotNull Runnable action) {
+        getPopup().addListener(new JBPopupListener() {
+            @Override
+            public void onClosed(final @NotNull LightweightWindowEvent event) {
+                action.run();
+            }
+        });
     }
 
     /**

@@ -116,18 +116,4 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
                 .map(row -> groups.getValueAt(row, 0))
                 .toList());
     }
-
-    /**
-     * Runs when the dialog closes, whichever way it closed. The cell editor that
-     * opens this has to stop editing either way, and a popup - unlike the modal
-     * it replaced - does not return an answer to the line that showed it.
-     */
-    public void onClosed(final @NotNull Runnable action) {
-        getPopup().addListener(new com.intellij.openapi.ui.popup.JBPopupListener() {
-            @Override
-            public void onClosed(final @NotNull com.intellij.openapi.ui.popup.LightweightWindowEvent event) {
-                action.run();
-            }
-        });
-    }
 }

@@ -72,6 +72,10 @@ To keep them instead, the tester presses `Shift+Enter`. Testin forgets that
 those three were ever transferred, so the next sync sees three files this
 machine has and the server does not, and sends them. A message reads *Kept 3*.
 
+When the same sync also left test cases both testers changed, this window comes
+first, and the first of those questions opens when it closes - one window at a
+time, never one on top of another.
+
 ## What Testin refuses
 
 **If the tester presses `Escape`** — nothing is removed and nothing is sent. The
