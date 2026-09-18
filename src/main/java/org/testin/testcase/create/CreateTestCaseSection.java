@@ -127,14 +127,6 @@ public interface CreateTestCaseSection {
      * Every section is laid out this way, so it is laid out once. A section that
      * composed its own row is the one whose icon sits a few pixels off the
      * others the first time this spacing changes.
-     * <p>
-     * The icon panel is built here rather than in a method of its own. It had
-     * one, and making it private - correct, since this became its only caller -
-     * failed the Plugin Verifier: the call compiled to an {@code invokeinterface}
-     * against a private interface method, which is an
-     * {@code IncompatibleClassChangeError} waiting for a JVM that checks. Do not
-     * extract it again; five lines inline cost less than a method this interface
-     * cannot safely hold.
      */
     default @NotNull JBPanel<?> createWrapper(final @NotNull Icon icon, final @NotNull JComponent field) {
         return createWrapper(new JBLabel(icon), field);
@@ -143,6 +135,13 @@ public interface CreateTestCaseSection {
     /**
      * The same row around an icon the section keeps, so it can change the icon
      * later - the description turns its icon red when it is refused.
+     * <p>
+     * The icon panel is built here rather than in a method of its own. It had
+     * one, and making it private failed the Plugin Verifier: the call compiled
+     * to an {@code invokeinterface} against a private interface method, which is
+     * an {@code IncompatibleClassChangeError} waiting for a JVM that checks. Do
+     * not extract it into a private method again; a public default method, like
+     * the overload above, is safe.
      */
     default @NotNull JBPanel<?> createWrapper(final @NotNull JBLabel iconLabel, final @NotNull JComponent field) {
         final @NotNull JBPanel<?> iconPanel = new JBPanel<>(new GridBagLayout());

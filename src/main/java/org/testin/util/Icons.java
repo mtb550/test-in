@@ -73,9 +73,10 @@ public final class Icons {
     /**
      * UC-EDITOR-PANEL-005.
      * <p>
-     * A test case field, wherever one is offered - the create and update forms
-     * and the update menu: the letter of the key that opens it, in a rounded
-     * frame, the frame and the letter in the one color given (#328).
+     * A test case field, wherever it is named by its icon - the create and
+     * update forms, the update and copy menus, Record Failure and light mode:
+     * the letter of the key that opens it, in a rounded frame, the frame and the
+     * letter in the one color given (#328).
      * <p>
      * Drawn here rather than put together from the platform's {@code TextIcon}
      * over a frame file. That pair left the letter a pixel above and to the

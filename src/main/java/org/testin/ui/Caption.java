@@ -31,13 +31,18 @@ import java.util.Locale;
 /**
  * Rule-INTERNAL-087.
  * <p>
- * What a caption looks like wherever Testin names a value: JetBrains Mono, a
- * family of its own beside the UI font the values are in, two points below the
- * size of the text around it, in capitals, in the muted caption gray (#328).
+ * What a caption looks like where Testin names a value with a word: JetBrains
+ * Mono, a family of its own beside the UI font the values are in, two points
+ * below the base size it is given, in capitals, in the muted caption gray
+ * (#328). The base is the editor font where a test case is read, and the
+ * dialog's label font in a dialog.
  * <p>
  * One owner, because the plugin had three: the details panel set its captions
  * bold at the editor size, the dialogs in the platform's small font, and light
- * mode in small capitals. Changed here, every caption follows.
+ * mode in small capitals. Changed here, every caption built through it
+ * follows. Three places still set their own and are recorded in #66: the From
+ * and To lines of the move, remove and switch-branch dialogs, the import and
+ * export forms, and the run configuration form.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Caption {

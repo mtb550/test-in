@@ -142,19 +142,6 @@ final class LightModeWindow {
     private static final float ZOOM_MIN = 0.8f;
     private static final float ZOOM_MAX = 2.0f;
 
-    /**
-     * Two keys for one state, because that is what the tester asked for: one
-     * that opens the details and one that closes them, rather than a single key
-     * whose effect depends on what is already on screen.
-     * <p>
-     * In {@link Shortcuts} with every other key, though this window is the only
-     * thing that binds them. They used to be constants here, on the rule that
-     * the register holds what more than one class binds - and that rule is what
-     * let CTRL+SHIFT+C stay wrong on a Mac for as long as it did, because a key
-     * declared inside the action that binds it is exactly the key a sweep over
-     * the register cannot see (#25).
-     */
-
     private final @NotNull JFrame frame = new JFrame();
     private final @NotNull RunEditor editor;
     private final @NotNull Runnable onClosed;
@@ -1201,8 +1188,8 @@ final class LightModeWindow {
 
     /**
      * Two keys while a failure is being written, and neither of them is one of
-     * the four above: Ctrl+D cannot collapse a form waiting to be filled in, and
-     * Escape has stopped meaning close.
+     * the case's keys above: Ctrl+D cannot collapse a form waiting to be filled
+     * in, and Escape has stopped meaning close.
      */
     private StatusBarItem @NotNull [] commitKeys() {
         return new StatusBarItem[]{
