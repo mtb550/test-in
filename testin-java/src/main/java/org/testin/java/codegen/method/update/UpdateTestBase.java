@@ -42,6 +42,8 @@ import org.testin.util.NameSanitizer;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
+import java.util.Arrays;
 
 import java.util.Optional;
 import java.util.List;
@@ -112,9 +114,48 @@ public class UpdateTestBase {
         // className keeps its fallback. The annotation still records that the
         // description is now empty, which is what the case says (#155).
         final @NotNull String newMethodName = NameSanitizer.methodName(tc.getDescription());
-        if (!newMethodName.isEmpty() && !pm.getName().equals(newMethodName)) {
-            pm.setName(newMethodName);
+        if (newMethodName.isEmpty() || pm.getName().equals(newMethodName)) return;
+
+        // Rule-CODEGEN-079. The two questions CreateTestMethod asks before it
+        // writes a name, asked before this renames one. The dialogs ask them too,
+        // but a description reaches here through doors that cannot: a grid cell,
+        // a bulk edit, an undo. Unasked, the first threw IncorrectOperationException
+        // out of the write command, and the second put two methods with one
+        // signature in the class, so nothing in that test set compiled (#66,
+        // findings 159 and 160).
+        if (!NameSanitizer.canMakeMethodName(tc.getDescription())) {
+            keptItsName(p, pm, Bundle.message("codegen.rename.not.a.method", pm.getName(), newMethodName));
+            return;
         }
+
+        if (anotherMethodIsCalled(pm, newMethodName)) {
+            keptItsName(p, pm, Bundle.message("codegen.rename.taken", pm.getName(), newMethodName));
+            return;
+        }
+
+        pm.setName(newMethodName);
+    }
+
+    /**
+     * Whether a method other than this one already answers to that name. By key,
+     * because punctuation and capitals do not make two methods (#244).
+     */
+    private static boolean anotherMethodIsCalled(final @NotNull PsiMethod pm, final @NotNull String methodName) {
+        final @NotNull String key = NameSanitizer.methodKey(methodName);
+
+        return Optional.ofNullable(pm.getContainingClass()).stream()
+                .flatMap(pc -> Arrays.stream(pc.getMethods()))
+                .anyMatch(other -> other != pm && key.equals(NameSanitizer.methodKey(other.getName())));
+    }
+
+    /**
+     * The description was saved and the method was not renamed, said while the
+     * tester is still looking at the edit that caused it.
+     */
+    private static void keptItsName(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String why) {
+        Logger.warn("Kept the name of " + pm.getName() + ": " + why);
+
+        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("codegen.rename.kept.title"), why);
     }
 
     /**

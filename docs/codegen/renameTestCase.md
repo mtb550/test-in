@@ -30,6 +30,12 @@ There is no key for this. It happens when the description is changed, which is
   are rewritten.
 - **Rule-CODEGEN-041** — A description cleared back to nothing leaves the method
   under the name it already has, and records the empty description.
+- **Rule-CODEGEN-079** — A description that cannot name a Java method, or that
+  names the same method as another test case in the class, leaves the method
+  under the name it already has. The description is still saved, and a message
+  says the method kept its name and why. Renaming it anyway threw an internal
+  error for the first, and wrote two methods with one name for the second, so
+  the whole class stopped compiling.
 
 ## What the tester sees
 
@@ -60,8 +66,15 @@ public void signInWithAValidUser() {
 **If the test case has no method yet** — the method is written instead. That is
 [UC-CODEGEN-003](getMissingMethod.md).
 
-**If the description cannot name a Java method** — the dialog refuses it before
-anything is written.
+**If the description cannot name a Java method** — the update dialog and the
+bulk editor refuse it before anything is written. Typed into a grid cell, or put
+back by an undo, the description is saved and the method keeps the name it had;
+a message titled **The test method kept its name** says what it would have been
+called and why it was not (Rule-CODEGEN-079).
+
+**If another test case in the class already has that method** — the same: the
+dialogs refuse it, and anywhere else the description is saved, the method keeps
+its name, and the message says which name was taken.
 
 **If the method has no annotation** — nothing is rewritten, and only the log
 says so.

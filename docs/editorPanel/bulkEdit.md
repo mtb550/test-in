@@ -55,6 +55,11 @@ Select several test cases, then `F2` or the field's own letter.
   because those have no empty form.
 - **Rule-EDITOR-PANEL-046** — The whole gesture is one entry on the undo
   history.
+- **Rule-EDITOR-PANEL-224** — A description is refused here for the two reasons
+  the update dialog refuses one: it cannot name a Java method, or it names the
+  same method as another test case in the test set - one edited in this same
+  dialog or one left as it was. A refused row is left as it was, and one
+  message says why, in the words the update dialog uses.
 
 ## The screen
 
@@ -111,6 +116,13 @@ a time*. There is no bulk editor for it.
 
 **If a description is edited to nothing** — that row is left as it was and
 counted with the values Testin could not read.
+
+**If a description cannot name a Java method, or names the same method as
+another test case in the test set** — that row is left as it was, and a message
+says why in the update dialog's own words: *That description cannot name a test
+method*, or *Another test case already names that test method*. Two rows given
+one description clash with each other; two rows that swap their descriptions do
+not (Rule-EDITOR-PANEL-224).
 
 **If a priority is edited to nothing** — the same: left as it was, and counted.
 

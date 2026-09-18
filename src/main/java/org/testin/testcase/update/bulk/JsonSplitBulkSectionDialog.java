@@ -32,6 +32,7 @@ import org.testin.util.Shortcuts;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -136,6 +137,17 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
     }
 
     /**
+     * The edited rows this field cannot take because of what the other rows
+     * hold, by index. A field that refuses one says why itself, once.
+     * <p>
+     * None for every field but the description, which is the one value that
+     * names something that must be unique: a test method (Rule-EDITOR-PANEL-224).
+     */
+    protected @NotNull Set<Integer> clashing(final @NotNull List<TestCaseDto> items, final @NotNull List<EditedValue> newValues) {
+        return Set.of();
+    }
+
+    /**
      * Whether the description is rendered as read-only context above the edited field.
      * False when the edited field IS the description.
      */
@@ -163,6 +175,7 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
      */
     protected @NotNull List<TestCaseDto> applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<EditedValue> newValues) {
         final @NotNull List<TestCaseDto> written = new ArrayList<>();
+        final @NotNull Set<Integer> clashing = clashing(items, newValues);
 
         int refused = 0;
 
@@ -179,6 +192,10 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
                 refused++;
                 continue;
             }
+
+            // Said by the field that refused it, in its own words - a clash is
+            // not a value Testin could not read.
+            if (clashing.contains(i)) continue;
 
             if (!setValue(items.get(i), edited.value())) {
                 refused++;

@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,11 +73,26 @@ public class BundleKeysTest {
         return keys;
     }
 
+    /**
+     * The core and both content modules. The two modules read the same bundle
+     * as the core, and a key only one of them asked for used to read here as
+     * nobody's - so a tester-facing sentence there had nowhere to go but an
+     * English literal (#66, finding 256).
+     */
     private static List<Path> sources() {
-        try (var walk = Files.walk(Path.of("src", "main", "java"))) {
-            return walk.filter(path -> path.toString().endsWith(".java")).toList();
+        return Stream.of(Path.of("src", "main", "java"),
+                        Path.of("testin-java", "src", "main", "java"),
+                        Path.of("testin-testng", "src", "main", "java"))
+                .filter(Files::isDirectory)
+                .flatMap(BundleKeysTest::javaFilesUnder)
+                .toList();
+    }
+
+    private static Stream<Path> javaFilesUnder(final Path root) {
+        try (var walk = Files.walk(root)) {
+            return walk.filter(path -> path.toString().endsWith(".java")).toList().stream();
         } catch (final IOException e) {
-            throw new AssertionError("Could not walk the sources", e);
+            throw new AssertionError("Could not walk " + root, e);
         }
     }
 
