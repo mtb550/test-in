@@ -33,6 +33,9 @@ Right click the row in the review.
   and changed it goes back to what was committed too, so the test case leaves the
   review.
 - **Rule-SHARE-053** — The change is written to disk at once, not on the commit.
+- **Rule-SHARE-118** — Right-clicking a row that is already selected leaves the
+  selection as it is, so what Commit will send does not change by looking at the
+  menu. The menu's entry acts on the row that was right-clicked.
 
 ## The screen
 

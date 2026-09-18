@@ -47,6 +47,12 @@ public final class SelectionTable implements DialogComponent {
     private final @NotNull JBScrollPane scroll;
     private final @NotNull JBPopupMenu rowMenu = new JBPopupMenu();
 
+    /**
+     * The row the menu was last opened on. Its entries act on this row, not on
+     * the selection - which a right-click inside it now leaves as it was.
+     */
+    private int menuRow = -1;
+
     SelectionTable(final @NotNull List<String> columns, final @NotNull List<Integer> widths) {
         model = new DefaultTableModel(columns.toArray(), 0) {
             @Override
@@ -87,7 +93,15 @@ public final class SelectionTable implements DialogComponent {
                     return;
                 }
 
-                table.setRowSelectionInterval(row, row);
+                // Rule-SHARE-118. A row already in the selection keeps the selection as it is,
+                // as it does everywhere else a right-click opens a menu. It was
+                // narrowed to the one row every time: every row starts selected,
+                // so right-clicking to look at the menu and pressing Escape left
+                // one of forty selected, and Commit then committed that one and
+                // closed with the other thirty-nine left behind (#66, finding 184).
+                if (!table.isRowSelected(row)) table.setRowSelectionInterval(row, row);
+
+                menuRow = row;
                 rowMenu.show(event.getComponent(), event.getX(), event.getY());
             }
         });
@@ -141,9 +155,10 @@ public final class SelectionTable implements DialogComponent {
      */
     public void onRowAction(final @NotNull String label, final @NotNull IntConsumer action) {
         final @NotNull JMenuItem item = new JMenuItem(label);
+        // The row right-clicked, which the selection no longer tells: with the
+        // selection kept, its first row is not the one the menu was opened on.
         item.addActionListener(event -> {
-            final int row = table.getSelectedRow();
-            if (row >= 0) action.accept(row);
+            if (menuRow >= 0 && menuRow < table.getRowCount()) action.accept(menuRow);
         });
         rowMenu.add(item);
     }
