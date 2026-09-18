@@ -20,9 +20,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.InplaceButton;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.EmptyIcon;
-import com.intellij.util.ui.ImageUtil;
-import com.intellij.util.ui.JBImageIcon;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
@@ -43,8 +40,6 @@ import java.util.List;
  * the form is opened again.
  */
 final class ScreenshotStrip {
-
-    private static final int HEIGHT = 48;
 
     private final @NotNull List<byte[]> screenshots = new ArrayList<>();
 
@@ -70,7 +65,7 @@ final class ScreenshotStrip {
     void add(final byte @NotNull [] png) {
         final @NotNull JBPanel<?> thumbnail = new JBPanel<>(new BorderLayout());
         thumbnail.setOpaque(false);
-        thumbnail.add(new JBLabel(thumbnailOf(png)), BorderLayout.CENTER);
+        thumbnail.add(new JBLabel(Picture.thumbnail(png)), BorderLayout.CENTER);
         thumbnail.add(new InplaceButton(Bundle.message("dialog.failure.screenshot.remove"), AllIcons.Actions.Close, click -> remove(png, thumbnail)), BorderLayout.EAST);
 
         screenshots.add(png);
@@ -106,15 +101,5 @@ final class ScreenshotStrip {
         panel.revalidate();
         panel.repaint();
         changed.run();
-    }
-
-    /**
-     * The screenshot at thumbnail height, its width in proportion, and an empty
-     * square for one that cannot be read.
-     */
-    private static @NotNull Icon thumbnailOf(final byte @NotNull [] png) {
-        return Picture.read(png)
-                .<Icon>map(image -> new JBImageIcon(ImageUtil.scaleImage(image, JBUI.scale(HEIGHT) / (double) image.getHeight())))
-                .orElseGet(() -> EmptyIcon.create(JBUI.scale(HEIGHT)));
     }
 }

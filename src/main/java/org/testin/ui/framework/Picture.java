@@ -19,6 +19,7 @@ package org.testin.ui.framework;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.EmptyIcon;
+import com.intellij.util.ui.ImageUtil;
 import com.intellij.util.ui.JBImageIcon;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -35,11 +36,17 @@ import java.util.Optional;
  * A screenshot at its real size, scrolled when it is larger than the dialog
  * (#50).
  * <p>
- * Also the one place a pasted PNG is read back into a picture: the thumbnail
- * under the error box asks {@link #read} too, so a screenshot that draws in one
- * draws in the other.
+ * Also the one place a PNG is read back into a picture, and the one maker of
+ * its thumbnail: the failure form's strip under the error box and the details
+ * panel's Stacktrace row both ask {@link #thumbnail}, so a screenshot that
+ * draws in one draws the same in the other.
  */
 public final class Picture implements DialogComponent {
+
+    /**
+     * How high a screenshot's thumbnail is drawn, wherever one is.
+     */
+    private static final int THUMBNAIL_HEIGHT = 48;
 
     private final @NotNull JBScrollPane panel;
 
@@ -62,6 +69,31 @@ public final class Picture implements DialogComponent {
             Logger.warn("A stored screenshot could not be read, so it is drawn empty: " + ex.getMessage());
             return Optional.empty();
         }
+    }
+
+    /**
+     * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081.
+     * <p>
+     * The screenshot at thumbnail height, its width in proportion, and the empty
+     * square of {@link #noThumbnail} for one that cannot be read.
+     * <p>
+     * Moved here from the failure form's strip, where it was private, so the
+     * details panel draws the same picture rather than a second maker of it
+     * (#328).
+     */
+    public static @NotNull Icon thumbnail(final byte @NotNull [] png) {
+        return read(png)
+                .<Icon>map(image -> new JBImageIcon(ImageUtil.scaleImage(image, JBUI.scale(THUMBNAIL_HEIGHT) / (double) image.getHeight())))
+                .orElseGet(Picture::noThumbnail);
+    }
+
+    /**
+     * The empty square a thumbnail takes while it cannot be drawn: before its
+     * file has been read, and for bytes that are not a picture. The same size,
+     * so nothing moves when the picture arrives.
+     */
+    public static @NotNull Icon noThumbnail() {
+        return EmptyIcon.create(JBUI.scale(THUMBNAIL_HEIGHT));
     }
 
     @Override

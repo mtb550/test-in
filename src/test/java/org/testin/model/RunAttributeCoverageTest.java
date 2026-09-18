@@ -47,8 +47,8 @@ public class RunAttributeCoverageTest {
      * <p>
      * Six, and five attributes: the screenshots have none of their own (#50). A
      * screenshot is never text, so it has no grid cell and no report column; it
-     * is shown as a link in the row the Stacktrace attribute draws in the details
-     * panel (Rule-VIEW-PANEL-081), and as a picture in the failure form.
+     * is shown as a thumbnail in the row the Stacktrace attribute draws in the
+     * details panel (Rule-VIEW-PANEL-081), the one the failure form shows.
      */
     @Test
     public void everyFailureDetailIsAlsoARunAttribute() {

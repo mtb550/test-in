@@ -17,7 +17,9 @@
 package org.testin.view.details.components;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.components.ActionLink;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.panels.HorizontalLayout;
 import com.intellij.util.ui.JBFont;
@@ -30,17 +32,19 @@ import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
+import org.testin.ui.framework.Picture;
 import org.testin.util.Bundle;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The first few lines of a failure's stacktrace, and the links to the rest: the
- * whole text, and each screenshot pasted with it.
+ * The first few lines of a failure's stacktrace, the link to the whole text,
+ * and a thumbnail of each screenshot pasted with it.
  * <p>
  * Its own row type rather than a {@link RunAttributeRow} that checks which
  * attribute it is holding: every other run value is a word or a sentence, and
@@ -92,11 +96,8 @@ public final class StacktraceRow extends BaseDetails {
         container.setOpaque(false);
 
         if (!stacktrace.isBlank()) container.add(preview(lines));
-
-        final @NotNull List<ActionLink> links = new ArrayList<>();
-        if (lines.size() > LINES_SHOWN) links.add(showAllLink(p, dto, stacktrace, lines.size()));
-        screenshots.forEach(name -> links.add(screenshotLink(p, name)));
-        if (!links.isEmpty()) container.add(linkLine(links));
+        if (lines.size() > LINES_SHOWN) container.add(line(List.of(showAllLink(p, dto, stacktrace, lines.size()))));
+        if (!screenshots.isEmpty()) container.add(line(screenshots.stream().map(name -> thumbnail(p, name)).toList()));
 
         return addRow(panel, gbc, RunEditorAttributes.STACKTRACE.getName(), container, currentRow);
     }
@@ -128,26 +129,45 @@ public final class StacktraceRow extends BaseDetails {
     /**
      * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081.
      * <p>
-     * One screenshot, named as its file is, and opened at its real size in a
-     * window of its own: the panel itself draws no picture. Read from its file
-     * when the link is clicked, not when the panel draws (#313).
+     * One screenshot as the failure form shows it when pasted: its thumbnail,
+     * the file name on hover, and a click that opens it at its real size in a
+     * window of its own, as the link reading its file name did (#328).
+     * <p>
+     * Read off the EDT and drawn on it. The panel redraws on every refresh and
+     * a screenshot is a file of megabytes, so the square is drawn empty at once
+     * and filled when the file has been read. A panel that has moved on by then
+     * has dropped this label, and filling it changes nothing on screen.
      */
-    private @NotNull ActionLink screenshotLink(final @NotNull Project p, final @NotNull String name) {
-        return link("[" + name + "]", event -> {
-            final @NotNull Path runPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
-            new ScreenshotDialog(p, name, Services.getInstance(p, ProjectIndexer.class).screenshot(runPath, name)).show();
+    private @NotNull JComponent thumbnail(final @NotNull Project p, final @NotNull String name) {
+        final @NotNull Path runPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
+
+        final @NotNull JBLabel square = new JBLabel(Picture.noThumbnail());
+        square.setToolTipText(name);
+        square.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        square.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                new ScreenshotDialog(p, name, Services.getInstance(p, ProjectIndexer.class).screenshot(runPath, name)).show();
+            }
         });
+
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final byte @NotNull [] png = Services.getInstance(p, ProjectIndexer.class).screenshot(runPath, name);
+            ApplicationManager.getApplication().invokeLater(() -> square.setIcon(Picture.thumbnail(png)));
+        });
+
+        return square;
     }
 
     /**
-     * One line under the preview: Show all first, then the screenshots.
+     * One line under the preview: Show all on its own, then the screenshots.
      */
-    private static @NotNull JBPanel<?> linkLine(final @NotNull List<ActionLink> links) {
+    private static @NotNull JBPanel<?> line(final @NotNull List<? extends JComponent> parts) {
         final @NotNull JBPanel<?> line = new JBPanel<>(new HorizontalLayout(JBUI.scale(LINK_GAP)));
         line.setOpaque(false);
         line.setBorder(JBUI.Borders.emptyTop(LINK_MARGIN_TOP));
         line.setAlignmentX(Component.LEFT_ALIGNMENT);
-        links.forEach(line::add);
+        parts.forEach(line::add);
         return line;
     }
 }
