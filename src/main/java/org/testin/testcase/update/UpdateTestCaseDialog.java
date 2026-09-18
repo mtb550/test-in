@@ -57,7 +57,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         //
         // Every case in the set except this one. Comparing against itself would
         // refuse a description the tester did not change.
-        descriptionSection.compareAgainst(Services.getInstance(p, ProjectIndexer.class)
+        descriptionSection.compareAgainst(() -> Services.getInstance(p, ProjectIndexer.class)
                 .getTestCasesForTestSet(existingDto.getParent().getPath()).stream()
                 .filter(sibling -> !sibling.getId().equals(existingDto.getId()))
                 .toList());
