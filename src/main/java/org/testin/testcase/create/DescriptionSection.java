@@ -35,19 +35,20 @@ import org.testin.util.SpellChecker;
 import javax.swing.*;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class DescriptionSection extends AbstractOneLineSection {
     private final @NotNull Project p;
 
     /**
-     * The test methods the other test cases in this test set already name.
+     * The other test cases in this test set, as they are when asked.
      * <p>
-     * Empty until a dialog says what to compare against, and empty is a dialog
+     * None until a dialog says what to compare against, and none is a dialog
      * with nothing to compare - it refuses nothing, which is what the update
      * dialogs want.
      */
-    private @NotNull Set<String> takenMethodKeys = Set.of();
+    private @NotNull Supplier<List<TestCaseDto>> siblings = List::of;
 
     public DescriptionSection(final @NotNull Project p) {
         super(SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseValues.class).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), ""),
@@ -59,12 +60,22 @@ public class DescriptionSection extends AbstractOneLineSection {
     /**
      * UC-EDITOR-PANEL-005, Rule-CODEGEN-001.
      * <p>
-     * The test cases this description must not name the same method as. Held as
-     * keys rather than as the cases, because that is the only question asked of
-     * them and the answer must not change while the dialog is open.
+     * The test cases this description must not name the same method as, asked
+     * for again at each Enter. They were read once, when the dialog opened, on
+     * the belief that the set could not change while it was in front of it; but
+     * the popup stays open when the tester clicks away, and the editors and the
+     * tree behind it stay live, so a case written meanwhile was not compared
+     * against (#66, finding 219).
      */
-    public void compareAgainst(final @NotNull List<TestCaseDto> siblings) {
-        takenMethodKeys = siblings.stream()
+    public void compareAgainst(final @NotNull Supplier<List<TestCaseDto>> siblings) {
+        this.siblings = siblings;
+    }
+
+    /**
+     * The test methods the other test cases in this test set name now.
+     */
+    private @NotNull Set<String> takenMethodKeys() {
+        return siblings.get().stream()
                 .map(TestCaseDto::getDescription)
                 .map(NameSanitizer::methodName)
                 .filter(name -> !name.isEmpty())
@@ -124,7 +135,7 @@ public class DescriptionSection extends AbstractOneLineSection {
         // The second test case ended up with no method of its own: it could not
         // be run and could not be jumped to, and nothing said so until the first
         // F5 (#244).
-        if (takenMethodKeys.contains(NameSanitizer.methodKey(methodName))) {
+        if (takenMethodKeys().contains(NameSanitizer.methodKey(methodName))) {
             setError(true);
             Services.getInstance(p, Notifier.class).softRefuse(p,
                     Bundle.message("description.taken.title"),

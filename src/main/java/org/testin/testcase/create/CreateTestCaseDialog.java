@@ -44,9 +44,9 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
     public CreateTestCaseDialog(final @NotNull Project p, final @NotNull TestSetDirectoryDto dir, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p);
 
-        // Asked of the indexer, which owns the test set's cases, and asked once:
-        // the set cannot change while this dialog is in front of it.
-        descriptionSection.compareAgainst(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(dir.getPath()));
+        // Asked of the indexer, which owns the test set's cases, at each Enter:
+        // the popup is not modal, so the set can change while it is open.
+        descriptionSection.compareAgainst(() -> Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(dir.getPath()));
 
         final @NotNull TestCaseDto dto = new TestCaseDto();
 
