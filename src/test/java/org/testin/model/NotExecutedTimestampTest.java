@@ -22,7 +22,6 @@ import org.testng.annotations.Test;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import static org.testng.Assert.*;
@@ -103,29 +102,4 @@ public class NotExecutedTimestampTest {
         }
     }
 
-    /**
-     * Runs built before the empty default carry a creation-time stamp on every
-     * case, including the ones nobody ran. Reading such a run drops those, and
-     * only those: a real verdict's time is not a default and must survive.
-     */
-    @Test
-    public void readingAnOldRunDropsTheStampsNoVerdictEarned() {
-        final ZonedDateTime asIfCreated = ZonedDateTime.now().minusDays(30);
-
-        final TestRunItems pending = TestRunItems.builder().id(UUID.randomUUID())
-                .status(TestStatus.PENDING).executedAt(asIfCreated).build();
-        final TestRunItems untested = TestRunItems.builder().id(UUID.randomUUID())
-                .status(TestStatus.UNTESTED).executedAt(asIfCreated).build();
-        final TestRunItems passed = TestRunItems.builder().id(UUID.randomUUID())
-                .status(TestStatus.PASSED).executedAt(asIfCreated).build();
-
-        final TestRunDto run = new TestRunDto();
-        run.setResults(List.of(pending, untested, passed));
-
-        run.dropStampsWithoutVerdict();
-
-        assertEquals(Display.formatDate(pending.getExecutedAt()), "", "queued, never executed");
-        assertEquals(Display.formatDate(untested.getExecutedAt()), "", "the run ended without reaching it");
-        assertEquals(passed.getExecutedAt(), asIfCreated, "a verdict's own time is not a default");
-    }
 }

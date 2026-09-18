@@ -204,29 +204,4 @@ public class TestRunDto {
         executionEndedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
-    /**
-     * Clears the execution stamp on every case that never received a verdict.
-     * <p>
-     * Runs built before {@code 68fc9994} defaulted executedAt to the moment the
-     * run was created, so every pending case in those files carries a plausible
-     * execution time, and the Executed At column shows it as though someone had
-     * run the case. {@code TestRunItems.recordVerdict} is the only writer of that
-     * field and is only reached with a verdict, so a time on a case at any other
-     * status can only be the old default and never a real stamp.
-     * <p>
-     * Applied once, where the run is read, so nothing downstream has to know a
-     * file might predate the fix. The file itself heals whenever the run is next
-     * written; nothing is rewritten just for having been opened.
-     */
-    public void dropStampsWithoutVerdict() {
-        for (final TestRunItems item : results) {
-            // REMOVED is not a verdict either, and its stamp still stands: the
-            // case was executed before it was deleted, so the time is real
-            // rather than the old default this repair exists to clear.
-            if (!item.getStatus().isVerdict() && !item.isRemoved()) {
-                item.setExecutedAt(Config.NOT_EXECUTED);
-            }
-        }
-    }
-
 }

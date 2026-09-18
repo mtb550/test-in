@@ -23,7 +23,6 @@ import org.testng.annotations.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -86,39 +85,6 @@ public class DeletedTestCaseInARunTest {
         assertEquals(shown.getId(), id, "the id is the only identity a deleted case has left");
         assertTrue(shown.getDescription().contains(id.toString()),
                 "the row names itself rather than drawing blank: " + shown.getDescription());
-    }
-
-    @Test
-    public void theExecutionStampOfARemovedRowSurvivesTheRepair() {
-        final ZonedDateTime executed = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        final UUID id = UUID.randomUUID();
-
-        final TestRunDto run = TestRunDto.builder()
-                .results(List.of(removedItem(id, executed)))
-                .build();
-
-        run.dropStampsWithoutVerdict();
-
-        assertEquals(run.getResults().getFirst().getExecutedAt(), executed,
-                "the case was executed before it was deleted, so the time is real");
-    }
-
-    @Test
-    public void aPendingRowWithoutAVerdictStillLosesItsStamp() {
-        // The other half of the same repair, so the exemption above is proven to
-        // be an exemption rather than the rule.
-        final TestRunItems pending = TestRunItems.builder()
-                .id(UUID.randomUUID())
-                .status(TestStatus.PENDING)
-                .executedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-                .build();
-
-        final TestRunDto run = TestRunDto.builder().results(List.of(pending)).build();
-
-        run.dropStampsWithoutVerdict();
-
-        assertTrue(Config.isNotExecuted(run.getResults().getFirst().getExecutedAt()),
-                "a row nobody ran carries no execution time");
     }
 
     /**
