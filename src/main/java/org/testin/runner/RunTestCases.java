@@ -56,10 +56,10 @@ public final class RunTestCases {
      * back, which is exactly what {@code TestNGExecution.stop} does for a test
      * set run today.
      * <p>
-     * The order the methods run in is TestNG's, not the tester's: every
-     * generated method carries the case's priority, and priority outranks
-     * declaration order. Making a run follow the order the tester arranged is a
-     * separate decision about what that attribute is for.
+     * Rule-CODEGEN-035. The methods run in the order the tester arranged: every
+     * generated method's {@code priority} is the case's position in its set
+     * (#242), and TestNG runs by priority before declaration order. This said
+     * the opposite after #242 had made it so (#66, finding 280).
      */
     public static void run(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         if (testCases.isEmpty()) return;
