@@ -273,7 +273,13 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     }
 
     public @NotNull JComponent getPreferredFocusedComponent() {
-        return list;
+        // The view on screen. It was always the list, which the grid view takes
+        // out of the panel, so a focus request named a component that was not
+        // there and went nowhere: changing the page size in the grid left the
+        // keyboard in the size field (#66, finding 215).
+        if (toolBar.getCurrentView() != ViewMode.GRID_VIEW) return list;
+
+        return grid.<JComponent>map(GridView::table).orElse(list);
     }
 
     @Override
