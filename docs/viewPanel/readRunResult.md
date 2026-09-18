@@ -51,28 +51,36 @@ The run rows sit under the badges and above the test case's own rows.
 ┌──────────────────────────────────────────────────────────────────────────┐
 │   ( P1 )  ( Smoke )  ( Failed )                                          │
 │                                                                          │
-│   Run Status          Failed                                             │
-│   Duration            02:14                                              │
-│   Actual Result       The session was dropped.                           │
-│   Stacktrace          java.lang.AssertionError: expected [true]          │
-│                         at org.testin.demo.LoginTest.valid               │
-│                         at org.testng.internal.Invoker.invoke            │
-│                       Show all 42 lines                                  │
-│   Bug Severity        Blocker                                            │
-│   Bug Priority        High                                               │
-│   Bug Issue           Report Bug                                         │
+│   RUN STATUS                                                             │
+│   Failed                                                                 │
+│   DURATION                                                               │
+│   02:14                                                                  │
+│   ACTUAL RESULT                                                          │
+│   The session was dropped.                                               │
+│   STACKTRACE                                                             │
+│   java.lang.AssertionError: expected [true]                              │
+│     at org.testin.demo.LoginTest.valid                                   │
+│     at org.testng.internal.Invoker.invoke                                │
+│   Show all 42 lines                                                      │
+│   BUG SEVERITY                                                           │
+│   Blocker                                                                │
+│   BUG PRIORITY                                                           │
+│   High                                                                   │
+│   BUG ISSUE                                                              │
+│   Report Bug                                                             │
 │                                                                          │
-│   Expected Result:    The dashboard opens.                               │
+│   EXPECTED RESULT                                                        │
+│   The dashboard opens.                                                   │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
 1. **The badges** — the last badge is the verdict.
-2. **The seven run rows** — what one test run recorded. Their captions have no
-   colon after them.
+2. **The seven run rows** — what one test run recorded, each caption on a line
+   of its own above its value (Rule-VIEW-PANEL-082).
 3. **Show all 42 lines** — opens the whole error in a window. That is
    [UC-VIEW-PANEL-006](readStacktrace.md).
-4. **The test case rows** — the test case's own fields, below. Their captions
-   do have a colon.
+4. **The test case rows** — the test case's own fields, below, drawn the same
+   way.
 
 ## The rows, in order
 

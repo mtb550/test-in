@@ -10,7 +10,7 @@ it.
 |---|---|
 | **Part of Testin** | The view panel |
 | **Answers** | What the panel shows, how a test case gets into it, and what a tester can do from it |
-| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-081` |
+| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-082` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
@@ -102,26 +102,40 @@ in front of them while they write down what actually happened.
 │                                                                            │
 │   ( P1 )  ( Smoke )  ( Regression )  ( Failed )                            │
 │                                                                            │
-│   Run Status          Failed                                               │
-│   Duration            02:14                                                │
-│   Actual Result       The session was dropped.                             │
-│   Stacktrace          java.lang.AssertionError: expected [true]            │
-│                         at org.testin.demo.LoginTest.valid                 │
-│                         at org.testng.internal.Invoker.invoke              │
-│                       Show all 42 lines                                    │
-│   Bug Severity        Blocker                                              │
-│   Bug Priority        High                                                 │
-│   Bug Issue           Report Bug                                           │
+│   RUN STATUS                                                               │
+│   Failed                                                                   │
+│   DURATION                                                                 │
+│   02:14                                                                    │
+│   ACTUAL RESULT                                                            │
+│   The session was dropped.                                                 │
+│   STACKTRACE                                                               │
+│   java.lang.AssertionError: expected [true]                                │
+│     at org.testin.demo.LoginTest.valid                                     │
+│     at org.testng.internal.Invoker.invoke                                  │
+│   Show all 42 lines                                                        │
+│   BUG SEVERITY                                                             │
+│   Blocker                                                                  │
+│   BUG PRIORITY                                                             │
+│   High                                                                     │
+│   BUG ISSUE                                                                │
+│   Report Bug                                                               │
 │                                                                            │
-│   Expected Result:    The dashboard opens.                                 │
-│   Steps:              1- Open the login page.                              │
-│                       2- Type the credentials.                             │
-│                       3- Press Sign in.                                    │
-│   Pre Conditions:     An account exists.                                   │
-│   Test Data:          user=admin                                           │
-│   Module:             Accounts                                             │
-│   Created By:         muteb                                                │
-│   Created At:         2 September 2026                                     │
+│   EXPECTED RESULT                                                          │
+│   The dashboard opens.                                                     │
+│   STEPS                                                                    │
+│   1- Open the login page.                                                  │
+│   2- Type the credentials.                                                 │
+│   3- Press Sign in.                                                        │
+│   PRE CONDITIONS                                                           │
+│   An account exists.                                                       │
+│   TEST DATA                                                                │
+│   user=admin                                                               │
+│   MODULE                                                                   │
+│   Accounts                                                                 │
+│   ORDER                                                                    │
+│   3                                                                        │
+│   CREATED                                                                  │
+│   muteb on 2 September 2026                                                │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -141,6 +155,9 @@ in front of them while they write down what actually happened.
    panel was opened from a test run.
 9. **The test case rows** — what the test case says. Every empty one is left
    out.
+10. **The captions** — each on a line of its own above its value, in the
+    caption font: JetBrains Mono, smaller than the value, in capitals, in gray.
+    The value has the whole width of the panel (Rule-VIEW-PANEL-082).
 
 ---
 

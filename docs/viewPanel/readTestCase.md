@@ -52,6 +52,9 @@ There is no key for this. It is what the **Details** tab shows.
   **Created** reads the name, then *on*, then the date.
 - **Rule-VIEW-PANEL-062** — **Order** is where the test case sits in its test
   set, read from the set rather than from the test case.
+- **Rule-VIEW-PANEL-082** — Every field in the Details tab has its caption on a
+  line of its own above its value, in the caption font, so the value has the
+  whole width of the panel at any width.
 
 ## The screen
 
@@ -67,23 +70,33 @@ There is no key for this. It is what the **Details** tab shows.
 │                                                                          │
 │   ( P1 )  ( Smoke )  ( Failed )                                          │
 │                                                                          │
-│   Expected Result:    The dashboard opens.                               │
-│   Steps:              1- Open the login page.                            │
-│                       2- Type the credentials.                           │
-│                       3- Press Sign in.                                  │
-│   Pre Conditions:     An account exists.                                 │
-│   Test Data:          user=admin                                         │
-│   Module:             Accounts                                           │
-│   Order:              3                                                  │
-│   Created:            muteb on 2 September 2026                          │
+│   EXPECTED RESULT                                                        │
+│   The dashboard opens.                                                   │
+│   STEPS                                                                  │
+│   1- Open the login page.                                                │
+│   2- Type the credentials.                                               │
+│   3- Press Sign in.                                                      │
+│   PRE CONDITIONS                                                         │
+│   An account exists.                                                     │
+│   TEST DATA                                                              │
+│   user=admin                                                             │
+│   MODULE                                                                 │
+│   Accounts                                                               │
+│   ORDER                                                                  │
+│   3                                                                      │
+│   CREATED                                                                │
+│   muteb on 2 September 2026                                              │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
 1. **The top part** — the path, the identity, the title, the two buttons and
    the badges. Each one is numbered on
    [the view panel page](main.md#the-panel).
-2. **The captions** — the name of the field, ending in a colon.
-3. **The values** — one column, all lined up. Each one can be selected and
+2. **The captions** — the name of the field, on a line of its own above its
+   value, in the caption font: JetBrains Mono, smaller than the value, in
+   capitals, in gray (Rule-VIEW-PANEL-082).
+3. **The values** — each under its caption, across the whole panel, so a narrow
+   panel still gives a value all its width. Each one can be selected and
    copied. None of them can be typed into.
 4. **The rows that are missing** — this test case has nothing in its
    **Reference** field, so that row is not drawn and no gap is left for it.
