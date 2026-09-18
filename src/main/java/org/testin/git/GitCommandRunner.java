@@ -25,6 +25,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.util.Bundle;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -171,8 +172,12 @@ final class GitCommandRunner {
                             ? result.getOutputAsJoinedString()
                             : result.getErrorOutputAsJoinedString());
 
+            // The log in English, like every log line; the message in the
+            // tester's language, because what catches it puts it in front of
+            // them - "Failed to load branches: Git command failed: ..." read
+            // half in English in every IDE (#66, finding 291).
             Logger.error("Git command failed: " + details);
-            throw new IllegalStateException("Git command failed: " + details);
+            throw new IllegalStateException(Bundle.message("git.command.failed", details));
         }
         return result.getOutputAsJoinedString();
     }
