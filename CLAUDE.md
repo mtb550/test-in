@@ -11,8 +11,9 @@ going stale (#99).
 1. **All test data file access goes through the indexer.** `org.testin.indexer`
    is the single owner. No other package reads, writes or performs a VFS
    operation on test data - it asks the indexer, whose cache is authoritative.
-   Seven packages are exempt because none of them touch test data; the list is
-   in ARCHITECTURE.md, and adding to it is a decision, not a convenience.
+   The packages exempt from it are the ones that never touch test data; the
+   list is in ARCHITECTURE.md and nowhere else, and adding to it is a decision,
+   not a convenience.
 2. **The VFS operation succeeds first, then the cache is updated.** Never the
    other way round: the cache update persists markers, marker writes create
    directories, and the reverse order produces phantom directories and "already

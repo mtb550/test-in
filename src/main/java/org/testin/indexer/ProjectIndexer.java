@@ -62,8 +62,9 @@ import java.util.stream.Stream;
  * The single owner of file access. No other class may read, write or execute
  * operations on virtual files (VFS) or physical files — everything goes
  * through the indexer so its cache objects stay authoritative and every read
- * is a fast in-memory lookup (e.g. {@link #nodeExists}). Exempt packages:
- * {@code git}, {@code importexport}, {@code logger}.
+ * is a fast in-memory lookup (e.g. {@link #nodeExists}). The packages exempt
+ * from this, and why, are listed in {@code docs/ARCHITECTURE.md} and only there:
+ * this said three while that said eight (#66, finding 228).
  * <p>
  * Ordering rule: the cache update (which may persist markers — and marker
  * writes create directories) runs only <b>after</b> the VFS operation
