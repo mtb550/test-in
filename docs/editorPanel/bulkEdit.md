@@ -89,14 +89,14 @@ Select several test cases, then `F2` or the field's own letter.
 4. **The line facing the cursor** — highlighted on the left, so the two sides
    line up.
 
-## The eight bulk editors
+## The nine bulk editors
 
 **Bulk Edit Descriptions**, **Bulk Edit Expected Results**, **Bulk Edit
 Modules**, **Bulk Edit Test Data**, **Bulk Edit Pre-Conditions**, **Bulk Edit
-Steps**, **Bulk Edit Priorities**, **Bulk Edit Group**.
+Steps**, **Bulk Edit Priorities**, **Bulk Edit Statuses**, **Bulk Edit Groups**.
 
-The last two of those hold lists, so they also answer `Ctrl+Enter` to add an
-item and `Shift+Delete` to drop one.
+**Bulk Edit Steps** and **Bulk Edit Groups** hold lists, so they also answer
+`Ctrl+Enter` to add an item and `Shift+Delete` to drop one.
 
 ## Main flow
 
@@ -126,8 +126,8 @@ not (Rule-EDITOR-PANEL-224).
 
 **If a priority is edited to nothing** — the same: left as it was, and counted.
 
-**If a value is not one Testin can read** — a priority, a status or a group name
-it does not know — that test case is left exactly as it was and is not counted
+**If a value is not one Testin can read** — a priority or a status it does not
+know — that test case is left exactly as it was and is not counted
 among the ones the edit changed. One message says how many:
 *Could not read 3 values, so what was there stayed* (Rule-EDITOR-PANEL-206).
 
@@ -140,9 +140,6 @@ warning is hidden.
 **`Shift+Enter` also saves**, and the strip names it. It is there because the
 gesture that normally inserts a line break must not put a newline inside a value
 the shape says is one line.
-
-The group editor shows its values in capitals. Its heading is capitalized
-differently from every other bulk editor.
 
 ---
 
