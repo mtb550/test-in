@@ -17,9 +17,9 @@
 package org.testin.editor.grid;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTextArea;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.EditorColors;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -77,7 +77,10 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
         textArea.setBackground(table.getSelectionBackground());
         textArea.setForeground(table.getForeground());
         textArea.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(JBColor.blue, 1),
+                // The selection's own border color, from its owner, as the
+                // selected cell draws it - not a second spelling of the same
+                // blue (#66, finding 262).
+                BorderFactory.createLineBorder(EditorColors.SELECTION_BORDER, 1),
                 BorderFactory.createEmptyBorder(GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING)));
 
         // Returned directly: JTable sizes the editor component to the full cell
