@@ -66,6 +66,9 @@ A smaller number sits higher in the list.
   is - drawn with Inactive beside its name like any other status - and its test
   sets, cases and runs are not read, because a project nobody is working on is
   not worth the walk.
+- **Rule-TREE-PANEL-103** — A new place given with Order is on the tree's
+  history, like a rename, a move and a removal. Ctrl+Z gives the node back the
+  place it had.
 
 ## The Order dialog
 
@@ -98,6 +101,9 @@ A smaller number sits higher in the list.
 5. The node moves among its siblings, and Testin shows *Ordered*.
 6. Emptying the field and pressing `Enter` removes the number. The node returns
    to date order, and Testin shows *Ordered*.
+
+`Ctrl+Z` gives the node back the place it had, and `Ctrl+Y` gives it the new
+one again ([UC-TREE-PANEL-016](undoChange.md)).
 
 ## What Testin refuses
 

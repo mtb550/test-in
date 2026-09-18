@@ -74,11 +74,11 @@ status bar at the bottom right of the IDE.
 
 ## Main flow
 
-1. The last change to the tree was a move, a rename, a removal or an edit of a
-   test run.
+1. The last change to the tree was a move, a rename, a removal, a new place
+   given with **Order**, or an edit of a test run.
 2. The tester presses `Ctrl+Z`, or chooses **Actions → Undo \<what\>**.
 3. Testin reverses the change. Moved nodes go back. A renamed node gets its old
-   name. Removed nodes are restored from the copy kept aside, under a progress
+   name. An ordered node gets its old place. Removed nodes are restored from the copy kept aside, under a progress
    bar reading *Putting back*. An edited test run
    gets its previous name, test cases and settings.
 4. Testin shows *Undone*.

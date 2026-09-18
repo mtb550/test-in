@@ -29,6 +29,9 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.undo.UndoHistories;
+import org.testin.undo.UndoScope;
+import org.testin.util.Bundle;
 
 import java.util.Optional;
 
@@ -68,19 +71,44 @@ public class OrderNodeAction extends DumbAwareAction {
         if (node.getOrder() == order) return;
 
         final int before = node.getOrder();
+        if (!place(p, node, order)) return;
+
+        Services.getInstance(p, Notifier.class).softShow(p, Done.ORDERED);
+
+        // Rule-TREE-PANEL-103. On the tree's history, like a rename, a move and
+        // a removal. It was the one tree gesture that recorded nothing, so a
+        // tester who renumbered the wrong node could not take it back with the
+        // key that takes back everything else there (#66, finding 218).
+        Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
+                Bundle.message("order.undo", node.getName()),
+                () -> place(p, node, before),
+                () -> place(p, node, order),
+                () -> {
+                }));
+    }
+
+    /**
+     * UC-TREE-PANEL-015, Rule-TREE-PANEL-055.
+     * <p>
+     * Gives the node this place and redraws the tree, and answers whether the
+     * marker landed - which the history reads as whether an undo came back.
+     * <p>
+     * A marker that did not land is not confirmed, and the node keeps the place
+     * it still has on disk: the write has said why (#312, A6).
+     */
+    private boolean place(final @NotNull Project p, final @NotNull DirectoryDto node, final int order) {
+        final int was = node.getOrder();
         node.getMarker().setOrder(order);
 
-        // A marker that did not land is not confirmed, and the node keeps the
-        // place it still has on disk: the write has said why (#312, A6).
         if (!Services.getInstance(p, ProjectIndexer.class).persistMarker(node)) {
-            node.getMarker().setOrder(before);
-            return;
+            node.getMarker().setOrder(was);
+            return false;
         }
 
         // The tree is drawn from the children index, which sorts on the way out
         // - so what redraws it is a refresh, not a re-index.
         Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
-        Services.getInstance(p, Notifier.class).softShow(p, Done.ORDERED);
+        return true;
     }
 
     /**
