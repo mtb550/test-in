@@ -62,17 +62,29 @@ public class SetTestCaseStatusGroup extends DefaultActionGroup {
      * component in this plugin is - registering is what they were made for.
      */
     public static void bindLettersTo(final @NotNull JComponent list) {
-        verdicts().forEach(action -> action.registerCustomShortcutSet(
-                Shortcuts.customShortcut(action.getStatus().getMenuEntry().shortcut()), list));
+        verdicts().forEach(action -> action.registerCustomShortcutSet(action.getShortcutSet(), list));
     }
 
     /**
-     * One action per user-settable status, in the order the enum declares them.
+     * UC-EDITOR-PANEL-032, Rule-EDITOR-PANEL-213.
+     * <p>
+     * One action per user-settable status, in the order the enum declares them,
+     * each carrying its own letter.
+     * <p>
+     * Carried rather than attached by whoever binds it. Only the card list used
+     * to attach the letters, so the grid's binder - which puts each menu entry's
+     * own key on the table - found three actions with no key and bound nothing:
+     * in grid view P, F and B did nothing, and a verdict could be given with the
+     * mouse but not the keyboard (#66, finding 201).
      */
     private static @NotNull List<SetTestCaseStatusAction> verdicts() {
         return Arrays.stream(TestStatus.values())
                 .filter(TestStatus::isVerdict)
-                .map(SetTestCaseStatusAction::new)
+                .map(status -> {
+                    final @NotNull SetTestCaseStatusAction action = new SetTestCaseStatusAction(status);
+                    action.setShortcutSet(Shortcuts.customShortcut(status.getMenuEntry().shortcut()));
+                    return action;
+                })
                 .toList();
     }
 

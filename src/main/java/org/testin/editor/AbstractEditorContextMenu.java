@@ -18,6 +18,7 @@ package org.testin.editor;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
@@ -130,7 +131,11 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
      * nothing.
      */
     private static void bindGroup(final @NotNull DefaultActionGroup group, final @NotNull JBTable table) {
-        for (final AnAction action : group.getChildActionsOrStubs()) {
+        // The group's children as the menu gets them, not as they were added. A
+        // group that builds its entries when asked - the verdicts - added none,
+        // so walking what was added skipped P, F and B on the grid (#66,
+        // finding 201).
+        for (final AnAction action : group.getChildren((AnActionEvent) null)) {
             if (action instanceof DefaultActionGroup nested) {
                 bindGroup(nested, table);
                 continue;
