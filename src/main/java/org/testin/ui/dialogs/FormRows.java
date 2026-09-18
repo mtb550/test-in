@@ -48,14 +48,6 @@ public final class FormRows extends JBPanel<FormRows> {
     }
 
     /**
-     * A row whose label column stays empty - how a checkbox lines up under the
-     * fields above it.
-     */
-    public @NotNull FormRows unlabeledRow(final @NotNull JComponent field) {
-        return row("", field);
-    }
-
-    /**
      * One label/field row.
      */
     public @NotNull FormRows row(final @NotNull String label, final @NotNull JComponent field) {

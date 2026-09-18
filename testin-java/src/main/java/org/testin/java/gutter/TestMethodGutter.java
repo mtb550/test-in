@@ -58,7 +58,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
 
     // UC-CODEGEN-007, Rule-CODEGEN-028, Rule-CODEGEN-029
     @Override
-    protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
+    protected void collectNavigationMarkers(final @NotNull PsiElement element, final @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
         final @NotNull Project p = element.getProject();
 
         if (!(element instanceof PsiJavaToken token) || token.getTokenType() != JavaTokenType.STRING_LITERAL) {
