@@ -65,6 +65,7 @@ import java.util.UUID;
  */
 public class PasteTestCaseNodeAction extends DumbAwareAction {
 
+    // UC-EDITOR-PANEL-017
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         work(e).ifPresent(Work::paste);

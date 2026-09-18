@@ -258,7 +258,7 @@ public final class GitRefs {
     }
 
     /**
-     * UC-SHARE-014, Rule-SHARE-108.
+     * UC-SHARE-008, Rule-SHARE-108.
      * <p>
      * Whether this is the shape of an email address: something, an at sign,
      * something with a dot in it, and no spaces anywhere.

@@ -106,7 +106,7 @@ public enum DirectoryType {
 
 
     /**
-     * UC-TREE-PANEL-014, Rule-TREE-PANEL-049.
+     * UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-043, Rule-TREE-PANEL-044.
      * <p>
      * What may be dropped or pasted into each kind of node, as one table.
      * <p>

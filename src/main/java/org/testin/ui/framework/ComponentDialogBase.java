@@ -352,7 +352,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
 
         /**
-         * UC-SHARE-019, Rule-SHARE-110.
+         * UC-SHARE-019, Rule-SHARE-111.
          * <p>
          * Shows what the tester types as dots instead of characters.
          * <p>

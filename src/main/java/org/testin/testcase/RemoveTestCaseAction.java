@@ -40,6 +40,7 @@ import org.testin.util.Bundle;
 import java.util.*;
 public class RemoveTestCaseAction extends DumbAwareAction {
 
+    // UC-EDITOR-PANEL-011
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @Nullable Project p = e.getProject();
@@ -74,6 +75,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
      */
     private record Work(@NotNull Project p, @NotNull TestinEditor editor, @NotNull DirectoryDto dir, @NotNull List<TestCaseDto> selected) {
 
+        // UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-062
         void remove() {
                 final @NotNull List<TestCaseDto> selectedItems = selected;
             if (selectedItems.isEmpty()) return;

@@ -44,6 +44,7 @@ import java.util.List;
  */
 public class CopyTestCaseNodeAction extends DumbAwareAction {
 
+    // UC-EDITOR-PANEL-015
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @Nullable Project p = e.getProject();
