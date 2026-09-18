@@ -103,7 +103,11 @@ public class ViewPanel implements Disposable {
 
         refreshCurrentView();
 
-        TestCaseExecutionSubscriber.onReported(p, this, (tc, status, duration, failure) -> refreshCurrentView());
+        // Only when the case reported is the one on display. Every start and
+        // every finish of a run rebuilt all three tabs, whichever case it was -
+        // on a 200-case run 400 rebuilds on the EDT, each walking every run in
+        // the project for Open Bugs (#66, finding 185).
+        TestCaseExecutionSubscriber.onReported(p, this, (tc, status, duration, failure) -> refreshIfShowing(List.of(tc)));
     }
 
     private @NotNull Stream<JBPanel<?>> tabs() {
