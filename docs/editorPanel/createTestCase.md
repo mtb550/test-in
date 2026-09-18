@@ -118,6 +118,10 @@ is written on the refresh page.
 **If the description is empty** — the dialog stays open, the description turns
 red, and the cursor goes back to it. No message is raised.
 
+**If a Create Test Case dialog is already open** — it is brought forward rather
+than a second one opened, so nothing typed into it is lost
+(Rule-INTERNAL-075).
+
 **If the description cannot name a Java method** — nothing is saved. A message
 titled **That description cannot name a test method** says what the method would
 have been called. A description must begin with a letter. It also cannot be a

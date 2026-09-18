@@ -17,7 +17,6 @@
 package org.testin.testcase.create;
 
 import com.intellij.codeInsight.lookup.LookupManager;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -25,7 +24,6 @@ import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
@@ -35,11 +33,14 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.StatusBarItem;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
+import org.testin.testcase.TestCaseDialogKey;
 import org.testin.testcase.UpdateTestCaseFields;
+import org.testin.ui.framework.AbstractFrameworkDialog;
 
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Optional;
@@ -48,8 +49,18 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+/**
+ * UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-006.
+ * <p>
+ * The create and update test case dialogs, on the dialog framework: the
+ * framework owns the popup, its title, its strip, its sizing and its
+ * one-of-a-kind rule; this owns the sections, which strip each shows, and the
+ * keys that reach past the editors inside them. They were the one dialog family
+ * built by hand, so every improvement to the framework had to be made twice or
+ * not at all (#66, finding 234).
+ */
 @Getter
-public abstract class TestCaseBaseDialog {
+public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCaseForm> {
     /**
      * Every section is a key in the status bar mapping, both being built from
      * the same two enums. This is what a section that somehow is not would
@@ -58,7 +69,14 @@ public abstract class TestCaseBaseDialog {
     @Getter(AccessLevel.NONE)
     private static final @NotNull StatusBarItem[] NO_ITEMS = new StatusBarItem[0];
 
-    protected final @NotNull Project p;
+    /**
+     * The test case the form writes into when it is saved, and who hears of it.
+     */
+    @Getter(AccessLevel.NONE)
+    private final @NotNull TestCaseDto dto;
+    @Getter(AccessLevel.NONE)
+    private final @NotNull Consumer<@NotNull TestCaseDto> onSave;
+
     protected final @NotNull DescriptionSection descriptionSection;
     protected final @NotNull ExpectedResultSection expectedResultSection;
     protected final @NotNull ModuleSection moduleSection;
@@ -69,7 +87,6 @@ public abstract class TestCaseBaseDialog {
     protected final @NotNull StepsSection stepsSection;
     protected final @NotNull OrderSection orderSection;
     protected final @NotNull StatusSection statusSection;
-    protected final @NotNull StatusBarSection statusBarSection;
     /**
      * Owns all global registrations of this dialog (application focus listener,
      * per-step shortcuts). Parented to the project, so everything is released
@@ -78,80 +95,6 @@ public abstract class TestCaseBaseDialog {
     protected final @NotNull Disposable dialogDisposable;
     protected final @NotNull Map<CreateTestCaseSection, StatusBarItem[]> statusBarMapping;
     private final @NotNull List<CreateTestCaseSection> cachedSections;
-    /**
-     * The dialog's popup, empty until the constructor has finished building it.
-     * <p>
-     * Here rather than in each dialog. Both build a component popup, both repack
-     * it when a section grows, and both show it centered - and they had already
-     * drifted three ways: one guarded the repack with an if-block and the other
-     * with an early return, one showed the popup only if it existed while the
-     * other threw if it did not (#71).
-     */
-    @Getter(AccessLevel.NONE)
-    private @NotNull Optional<JBPopup> popup = Optional.empty();
-
-    /**
-     * Takes ownership of the popup the subclass just built, and hands it back so
-     * the constructor can go on using it.
-     */
-    protected final @NotNull JBPopup ownPopup(final @NotNull JBPopup built) {
-        popup = Optional.of(built);
-        return built;
-    }
-
-    /**
-     * What a component would ask for if nobody had told it a size.
-     * <p>
-     * A resizable popup writes an explicit preferred size onto its content -
-     * that is how it remembers a width the tester dragged - and an explicit one
-     * is what {@code getPreferredSize} then answers with, forever. Asking the
-     * layout instead is what the platform's own pack does, and it is the whole
-     * reason a dialog that had been sized once never grew again.
-     * <p>
-     * The explicit size is put back, because it is the tester's.
-     */
-    private static int naturalHeightOf(final @NotNull JComponent content) {
-        final @NotNull Optional<Dimension> told = content.isPreferredSizeSet()
-                ? Optional.of(content.getPreferredSize())
-                : Optional.empty();
-
-        content.setPreferredSize(null);
-        final int natural = content.getPreferredSize().height;
-        told.ifPresent(content::setPreferredSize);
-
-        return natural;
-    }
-
-    /**
-     * Re-sizes the popup around a section that just grew or shrank, and scrolls
-     * whatever holds focus back into view.
-     * <p>
-     * Does nothing before the popup exists: a section's fillData can fire this
-     * while the dialog is still being built.
-     */
-    protected final void repack() {
-        popup.ifPresent(open -> {
-            // Set, not packed. pack() asks the popup to work its size out
-            // again and a resizable one will not - the create dialog grew by
-            // nothing while this ran, and dragging it taller showed the lines
-            // that had been added several keystrokes before. The height is
-            // already known here, so it is said. The width is left alone,
-            // including one the tester chose.
-            open.setSize(new Dimension(open.getSize().width, naturalHeightOf(open.getContent())));
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-                final @NotNull Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-                if (focusOwner instanceof JComponent jComp) {
-                    jComp.scrollRectToVisible(new Rectangle(0, 0, jComp.getWidth(), jComp.getHeight()));
-                }
-            });
-        });
-    }
-
-    public void show() {
-        popup.ifPresent(open -> open.showCenteredInCurrentWindow(p));
-    }
-
     /**
      * A focus change nothing listens for, before the dynamic status bar is
      * installed.
@@ -166,8 +109,10 @@ public abstract class TestCaseBaseDialog {
      */
     private @NotNull PropertyChangeListener focusListener = NOTHING_ON_FOCUS;
 
-    public TestCaseBaseDialog(final @NotNull Project p) {
-        this.p = p;
+    public TestCaseBaseDialog(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
+        super(p);
+        this.dto = dto;
+        this.onSave = onSave;
         this.dialogDisposable = Disposer.newDisposable("testin.testCaseDialog");
         Disposer.register(p, dialogDisposable);
 
@@ -181,7 +126,6 @@ public abstract class TestCaseBaseDialog {
         this.groupSection = new GroupSection(p);
         this.orderSection = new OrderSection(p);
         this.statusSection = new StatusSection();
-        this.statusBarSection = new StatusBarSection();
 
         // Every section either dialog offers, in the order the create dialog
         // lays them out and then whatever only the update menu has.
@@ -227,7 +171,7 @@ public abstract class TestCaseBaseDialog {
         focusListener = evt -> Optional.ofNullable((Component) evt.getNewValue())
                 .filter(focusOwner -> UIUtil.isDescendingFrom(focusOwner, parentPanel))
                 .flatMap(this::sectionHolding)
-                .ifPresent(section -> statusBarSection.updateItems(statusBarMapping.getOrDefault(section, NO_ITEMS)));
+                .ifPresent(section -> showSectionKeys(statusBarMapping.getOrDefault(section, NO_ITEMS)));
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("focusOwner", focusListener);
 
         // Removal runs on any disposal path (popup onClosed or project teardown).
@@ -239,7 +183,25 @@ public abstract class TestCaseBaseDialog {
         focusListener = NOTHING_ON_FOCUS;
     }
 
-    public void dispose() {
+    /**
+     * Rule-EDITOR-PANEL-199.
+     * <p>
+     * The strip shows a section's own keys, then Save and Cancel - always last,
+     * so a tester looks for Save in the same place whichever field they are in.
+     */
+    protected final void showSectionKeys(final StatusBarItem @NotNull [] items) {
+        final @NotNull List<StatusBarItem> all = new ArrayList<>(List.of(items));
+        all.addAll(List.of(TestCaseDialogKey.SAVE, TestCaseDialogKey.CANCEL));
+
+        showKeys(all.toArray(StatusBarItem[]::new));
+    }
+
+    /**
+     * The focus listener and the section keys go with the dialog, however it
+     * closed.
+     */
+    @Override
+    protected void closed() {
         Disposer.dispose(dialogDisposable);
     }
 
@@ -350,41 +312,40 @@ public abstract class TestCaseBaseDialog {
     }
 
     // Rule-EDITOR-PANEL-029, Rule-EDITOR-PANEL-035
-    public @NotNull Runnable save(final @NotNull TestCaseDto dto, final @NotNull Consumer<@NotNull TestCaseDto> onSave, final @NotNull JBPopup[] popupWrapper) {
-        return () -> {
-            // A section the tester never opened holds its empty defaults, and
-            // writing those over the dto would erase what is already there. A
-            // section shown but grayed out holds the stored value and must not
-            // write it back either, because writing it back trims it. Asked here
-            // rather than at the top of every applyTo method.
-            final @NotNull List<CreateTestCaseSection> writers = getAllSections().stream().filter(this::mayWrite).toList();
+    @Override
+    protected void submit() {
+        // A section the tester never opened holds its empty defaults, and
+        // writing those over the dto would erase what is already there. A
+        // section shown but grayed out holds the stored value and must not
+        // write it back either, because writing it back trims it. Asked here
+        // rather than at the top of every applyTo method.
+        final @NotNull List<CreateTestCaseSection> writers = getAllSections().stream().filter(this::mayWrite).toList();
 
-            // Before anything is applied, not after: a section that cannot write
-            // what it holds has already said so, and going on would save the
-            // case unchanged and stamp it as edited anyway.
-            if (!writers.stream().allMatch(CreateTestCaseSection::accepts)) return;
+        // Before anything is applied, not after: a section that cannot write
+        // what it holds has already said so, and going on would save the
+        // case unchanged and stamp it as edited anyway.
+        if (!writers.stream().allMatch(CreateTestCaseSection::accepts)) return;
 
-            // A blank description is refused before anything is applied too. The
-            // update dialog edits the very case the index holds, so applying first
-            // blanked that case before this said no: Escape did not bring the text
-            // back, and the next save of the case wrote it (#312, A83).
-            //
-            // Only when this save is the one writing it. Tested against what was
-            // stored, a test case imported with no description at all refused
-            // every single-field edit: the description is shown read-only in
-            // those, so setting the priority on such a case was refused because
-            // of a field the tester was not editing, and the red box was on a
-            // field they could not type in (#312, N11).
-            if (writers.contains(descriptionSection) && descriptionSection.typed().trim().isEmpty()) {
-                descriptionSection.setError(true);
-                return;
-            }
+        // A blank description is refused before anything is applied too. The
+        // update dialog edits the very case the index holds, so applying first
+        // blanked that case before this said no: Escape did not bring the text
+        // back, and the next save of the case wrote it (#312, A83).
+        //
+        // Only when this save is the one writing it. Tested against what was
+        // stored, a test case imported with no description at all refused
+        // every single-field edit: the description is shown read-only in
+        // those, so setting the priority on such a case was refused because
+        // of a field the tester was not editing, and the red box was on a
+        // field they could not type in (#312, N11).
+        if (writers.contains(descriptionSection) && descriptionSection.typed().trim().isEmpty()) {
+            descriptionSection.setError(true);
+            return;
+        }
 
-            writers.forEach(section -> section.applyTo(dto));
-            onSave.accept(dto);
+        writers.forEach(section -> section.applyTo(dto));
+        onSave.accept(dto);
 
-            popupWrapper[0].closeOk(null);
-        };
+        closeOk();
     }
 
 }

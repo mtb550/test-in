@@ -16,6 +16,7 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -97,6 +98,14 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     protected boolean dismissOnClickOutside;
 
     /**
+     * Whether the tester can drag this dialog's edges and move it. A dialog that
+     * sets {@link #preferredSize} is resizable already; this is for one that
+     * sizes itself to its content and can still be made wider - the test case
+     * form, whose fields the tester may want longer than it opened.
+     */
+    protected boolean resizable;
+
+    /**
      * Built on first show and kept: the declaration, the components that hold
      * the Swing state, and the popup itself. Empty until then, because a
      * subclass has not finished declaring itself while its constructor runs.
@@ -104,6 +113,13 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
     private @NotNull Optional<DialogDto> dto = Optional.empty();
     private @NotNull Optional<List<DialogComponent>> built = Optional.empty();
     private @NotNull Optional<JBPopup> popup = Optional.empty();
+
+    /**
+     * The strip along the bottom, once the popup is built, and what it was last
+     * asked to show - kept for the strip that does not exist yet.
+     */
+    private @NotNull Optional<StatusBarBase> strip = Optional.empty();
+    private @NotNull Optional<StatusBarItem[]> keysShown = Optional.empty();
 
 
     private static @NotNull JBPanel<?> verticalStack(final @NotNull List<DialogComponent> dialogComponents) {
@@ -300,8 +316,85 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
             contentPanel.setPreferredSize(preferredSize);
             builder.setResizable(true).setMovable(true);
         }
+        if (resizable) builder.setResizable(true).setMovable(true);
+
+        builder.addListener(new JBPopupListener() {
+            @Override
+            public void onClosed(final @NotNull LightweightWindowEvent event) {
+                closed();
+            }
+        });
 
         return builder.createPopup();
+    }
+
+    /**
+     * Runs when the dialog closes, whichever way. For a dialog holding something
+     * that has to be released - a listener added to the whole application, say -
+     * which a caller-side {@link #onClosed} cannot do, because the dialog is the
+     * one that knows it holds it. Nothing by default.
+     */
+    protected void closed() {
+    }
+
+    /**
+     * UC-INTERNAL-007.
+     * <p>
+     * What the strip along the bottom shows, for a dialog whose keys change with
+     * where the cursor is - the test case form shows each field's own. Only
+     * what is shown: the keys stay bound by whoever binds them.
+     */
+    protected final void showKeys(final StatusBarItem @NotNull [] items) {
+        keysShown = Optional.of(items);
+        strip.ifPresent(bar -> bar.updateItems(items));
+    }
+
+    /**
+     * Sizes the dialog to its content again, after the content grew or shrank,
+     * and scrolls whatever holds the keyboard back into view.
+     * <p>
+     * The height is set rather than packed. {@code pack()} asks the popup to
+     * work its size out again and a resizable one will not - the test case form
+     * grew by nothing while that ran, and dragging it taller showed the lines
+     * added several keystrokes before. The width is left alone, including one
+     * the tester chose.
+     * <p>
+     * Nothing before the popup exists: content can grow while the dialog is
+     * still being built.
+     */
+    public final void refit() {
+        popup.ifPresent(open -> {
+            open.setSize(new Dimension(open.getSize().width, naturalHeightOf(open.getContent())));
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                final @NotNull Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+                if (focusOwner instanceof JComponent jComp) {
+                    jComp.scrollRectToVisible(new Rectangle(0, 0, jComp.getWidth(), jComp.getHeight()));
+                }
+            });
+        });
+    }
+
+    /**
+     * What a component would ask for if nobody had told it a size.
+     * <p>
+     * A resizable popup writes an explicit preferred size onto its content -
+     * that is how it remembers a width the tester dragged - and an explicit one
+     * is what {@code getPreferredSize} then answers with, forever. Asking the
+     * layout instead is what the platform's own pack does, and it is the whole
+     * reason a dialog that had been sized once never grew again. The explicit
+     * size is put back, because it is the tester's.
+     */
+    private static int naturalHeightOf(final @NotNull JComponent content) {
+        final @NotNull Optional<Dimension> told = content.isPreferredSizeSet()
+                ? Optional.of(content.getPreferredSize())
+                : Optional.empty();
+
+        content.setPreferredSize(null);
+        final int natural = content.getPreferredSize().height;
+        told.ifPresent(content::setPreferredSize);
+
+        return natural;
     }
 
     protected final void closeOk() {
@@ -400,7 +493,8 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
             stack.add(verticalStack(all.subList(fillIndex + 1, all.size())), BorderLayout.SOUTH);
         }
 
-        final @NotNull StatusBarBase statusBar = new StatusBarBase(dto().shortcuts().toArray(StatusBarItem[]::new));
+        final @NotNull StatusBarBase statusBar = new StatusBarBase(keysShown.orElseGet(() -> dto().shortcuts().toArray(StatusBarItem[]::new)));
+        strip = Optional.of(statusBar);
 
         final @NotNull JBPanel<?> contentPanel = DialogStyle.styleContent(new JBPanel<>(new BorderLayout()));
         contentPanel.setBorder(BorderFactory.createEmptyBorder());

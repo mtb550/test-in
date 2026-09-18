@@ -99,6 +99,9 @@ away.
 **If the description is emptied** — the field turns red and the dialog stays
 open.
 
+**If an update dialog is already open** — it is brought forward rather than a
+second one opened, so nothing typed into it is lost (Rule-INTERNAL-075).
+
 **If the description cannot name a Java method** — the same message the create
 dialog shows.
 

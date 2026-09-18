@@ -160,7 +160,7 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
                     if (height == packedHeight) return;
 
                     packedHeight = height;
-                    base.repack();
+                    base.refit();
                 });
             }
         });
