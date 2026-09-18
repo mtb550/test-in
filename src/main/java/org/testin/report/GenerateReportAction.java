@@ -176,7 +176,7 @@ public class GenerateReportAction extends AbstractProjectAction {
                     Bundle.message("report.generated.title", format.getLabel()),
                     Bundle.message("report.generated.message", outputFile.getName()),
                     notifier.action(Bundle.message("report.open"), () -> ExportNotice.open(p, outputFile)),
-                    notifier.copyPath(outputFile)
+                    ExportNotice.copyPath(p, outputFile)
             );
         });
     }

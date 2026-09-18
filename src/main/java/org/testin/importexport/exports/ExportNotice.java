@@ -17,7 +17,10 @@
 package org.testin.importexport.exports;
 
 import org.testin.notifications.Done;
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
+import com.intellij.notification.NotificationAction;
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -30,6 +33,7 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.util.Locale;
 import java.util.Optional;
 import java.io.File;
@@ -123,7 +127,25 @@ public final class ExportNotice {
         ApplicationManager.getApplication().invokeLater(() -> {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
             notifier.infoWithActions(p, Done.EXPORTED.getOutcome(), file.getName(),
-                    notifier.action(Bundle.message("export.open.file"), open), notifier.copyPath(file));
+                    notifier.action(Bundle.message("export.open.file"), open), copyPath(p, file));
         });
+    }
+
+    /**
+     * UC-REPORT-003, Rule-REPORT-015.
+     * <p>
+     * The link that puts a written file's full path on the clipboard, the same
+     * on every message about a file the plugin wrote. Here beside {@link #open},
+     * which the report and the export already share, rather than in Notifier,
+     * which delivers links and chooses none of their words - this was the one it
+     * did (#66, finding 233).
+     */
+    public static @NotNull NotificationAction copyPath(final @NotNull Project p, final @NotNull File file) {
+        final @NotNull NotificationAction copy = Services.getInstance(p, Notifier.class).action(Bundle.message("notification.copy.path"),
+                () -> CopyPasteManager.getInstance().setContents(new StringSelection(file.getAbsolutePath())));
+
+        copy.getTemplatePresentation().setIcon(AllIcons.Actions.Copy);
+
+        return copy;
     }
 }
