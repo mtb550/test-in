@@ -193,8 +193,8 @@ public enum UpdateTestCaseFields implements MenuItem {
 
     /**
      * What the section strip shows while this section holds the focus: its own
-     * keys, and nothing else. Save and Cancel are on the strip below, which
-     * never redraws (#56).
+     * keys, and nothing else. The dialog adds Save and Cancel after them, in the
+     * same place whatever the field (Rule-EDITOR-PANEL-199, #56).
      */
     public StatusBarItem @NotNull [] getStatusBarItems() {
         return ownKeys.clone();

@@ -163,9 +163,8 @@ public enum CreateTestCaseFields implements StatusBarItem {
      * keys, and on the entry section the keys that jump to the other fields.
      * <p>
      * Save and Cancel are not here. They mean the same thing in every section,
-     * so they are added last, in the same place whichever section is focused -
-     * see {@link org.testin.testcase.create.TestCaseBaseDialog#showSectionKeys}
-     * (#56).
+     * so the dialog adds them last, in the same place whichever section is
+     * focused (Rule-EDITOR-PANEL-199, #56).
      */
     public StatusBarItem @NotNull [] getStatusBarItems() {
         final @NotNull List<StatusBarItem> items = new ArrayList<>(List.of(ownKeys));
