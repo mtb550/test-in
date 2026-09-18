@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen.method.update;
 
+import org.testin.codegen.GenType;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenAction;
@@ -30,7 +31,7 @@ public class UpdateTestGroup extends UpdateTestBase implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        applyUpdate(p, tc, "Update Test Case Group", pm -> {
+        applyUpdate(p, tc, GenType.UPDATE_TEST_CASE_GROUP.getDescription(), pm -> {
             writeGroups(p, pm, tc);
             reformat(p, pm);
         });
@@ -43,6 +44,6 @@ public class UpdateTestGroup extends UpdateTestBase implements GenAction {
      */
     @Override
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        applyToEach(p, items, "Update Test Case Group", (pm, tc) -> writeGroups(p, pm, tc));
+        applyToEach(p, items, GenType.UPDATE_TEST_CASE_GROUP.getDescription(), (pm, tc) -> writeGroups(p, pm, tc));
     }
 }

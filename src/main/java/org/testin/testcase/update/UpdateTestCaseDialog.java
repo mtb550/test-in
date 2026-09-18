@@ -16,6 +16,7 @@
 
 package org.testin.testcase.update;
 
+import org.testin.util.Bundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -138,7 +139,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
         final @NotNull JBPopup dialogPopup = ownPopup(JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, targetSection.getFocusComponent())
-                .setTitle("Update " + selectedItem.getName())
+                .setTitle(Bundle.message("update.dialog.title.field", selectedItem.getName()))
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(false)

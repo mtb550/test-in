@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen.method.update;
 
+import org.testin.codegen.GenType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -94,7 +95,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
         final @NotNull List<List<TestCaseDto>> ordered = new ArrayList<>(sets.values());
 
         final @NotNull Runnable inCommand = () ->
-                WriteCommandAction.runWriteCommandAction(p, "Update Test Case Order", null,
+                WriteCommandAction.runWriteCommandAction(p, GenType.UPDATE_TEST_CASE_ORDER.getDescription(), null,
                         () -> ordered.forEach(inSet -> arrange(p, inSet)));
 
         // Straight through when a command is already open, as UpdateTestBase's

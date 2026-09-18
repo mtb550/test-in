@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen.method.update;
 
+import org.testin.codegen.GenType;
 import org.testin.java.codegen.JavaLiteral;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiMethod;
@@ -31,7 +32,7 @@ public class UpdateTestDescription extends UpdateTestBase implements GenAction {
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
-        applyOrCreate(p, tc, "Update Test Case Description", pm -> {
+        applyOrCreate(p, tc, GenType.UPDATE_TEST_CASE_DESCRIPTION.getDescription(), pm -> {
             writeDescription(p, pm, tc);
             reformat(p, pm);
         });
@@ -44,6 +45,6 @@ public class UpdateTestDescription extends UpdateTestBase implements GenAction {
      */
     @Override
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        applyToEach(p, items, "Update Test Case Description", (pm, tc) -> writeDescription(p, pm, tc));
+        applyToEach(p, items, GenType.UPDATE_TEST_CASE_DESCRIPTION.getDescription(), (pm, tc) -> writeDescription(p, pm, tc));
     }
 }

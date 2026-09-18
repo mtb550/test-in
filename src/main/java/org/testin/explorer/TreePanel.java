@@ -392,7 +392,7 @@ public final class TreePanel implements Disposable {
         emptyText.appendSecondaryText(Bundle.message("welcome.tagline"), StatusText.DEFAULT_ATTRIBUTES, null);
         emptyText.appendLine("");
         emptyText.appendLine(Bundle.message("welcome.by"), SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
-        emptyText.appendLine("Muteb almughyiri", SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
+        emptyText.appendLine(Bundle.message("welcome.author"), SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
         emptyText.appendLine("");
         emptyText.appendLine("");
 

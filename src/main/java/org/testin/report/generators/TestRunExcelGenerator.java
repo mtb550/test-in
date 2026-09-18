@@ -50,7 +50,7 @@ public final class TestRunExcelGenerator {
      * read the same to whoever opens the report.
      */
     private static @NotNull String orNotAvailable(final @NotNull String value) {
-        return value.isEmpty() ? "N/A" : value;
+        return value.isEmpty() ? Bundle.message("report.overview.not.recorded") : value;
     }
 
 

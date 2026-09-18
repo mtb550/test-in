@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen.method.update;
 
+import org.testin.codegen.GenType;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +45,7 @@ public class UpdateTestEnabled extends UpdateTestBase implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        applyUpdate(p, tc, "Update Test Case Enabled", pm -> {
+        applyUpdate(p, tc, GenType.UPDATE_TEST_CASE_STATUS.getDescription(), pm -> {
             writeEnabled(p, pm, tc);
             reformat(p, pm);
         });
@@ -57,6 +58,6 @@ public class UpdateTestEnabled extends UpdateTestBase implements GenAction {
      */
     @Override
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        applyToEach(p, items, "Update Test Case Enabled", (pm, tc) -> writeEnabled(p, pm, tc));
+        applyToEach(p, items, GenType.UPDATE_TEST_CASE_STATUS.getDescription(), (pm, tc) -> writeEnabled(p, pm, tc));
     }
 }

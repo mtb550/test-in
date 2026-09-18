@@ -135,15 +135,14 @@ public class CreateTreeNodeAction extends DumbAwareAction {
      */
     private static @NotNull String whyNot(final @NotNull Optional<DirectoryDto> selected) {
         if (selected.isEmpty()) {
-            return "Select one test cases directory, test runs directory, or package to create under.";
+            return Bundle.message("create.node.why.select", DirectoryType.TCD.getMarkerKind(), DirectoryType.TRD.getMarkerKind(),
+                    DirectoryType.TSP.getMarkerKind(), DirectoryType.TRP.getMarkerKind());
         }
 
         final @NotNull DirectoryDto dir = selected.orElseThrow();
         if (dir.canCreateChildren()) return CREATES;
 
-        return "A " + dir.getType().getMarkerKind() + " holds what it already holds - create under a "
-                + DirectoryType.TSP.getDescription() + ", a " + DirectoryType.TRP.getDescription()
-                + ", or one of the two directories under the test project.";
+        return Bundle.message("create.node.why.holds", dir.getType().getMarkerKind(), DirectoryType.TSP.getDescription(), DirectoryType.TRP.getDescription());
     }
 
 

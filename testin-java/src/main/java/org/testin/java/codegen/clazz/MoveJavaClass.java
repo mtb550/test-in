@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen.clazz;
 
+import org.testin.codegen.GenType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +58,7 @@ public class MoveJavaClass implements GenAction {
         final @NotNull List<String> destination = found.get();
         final @NotNull String fileName = fqcn.getLast() + ".java";
 
-        JavaSourceRoot.commandInRoot(p, "Move Test Class", "moving class", sourceRoot -> {
+        JavaSourceRoot.commandInRoot(p, GenType.MOVE_TEST_SET.getDescription(), "moving class", sourceRoot -> {
             final @NotNull Optional<VirtualFile> file =
                     Optional.ofNullable(sourceRoot.findFileByRelativePath(String.join("/", fqcn) + ".java"));
 

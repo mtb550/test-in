@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen.pkg;
 
+import org.testin.codegen.GenType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -55,7 +56,7 @@ public class MoveJavaPackage implements GenAction {
 
         final @NotNull List<String> destination = destinationFound.get();
 
-        JavaSourceRoot.commandInRoot(p, "Move Test Package", "moving package", sourceRoot -> {
+        JavaSourceRoot.commandInRoot(p, GenType.MOVE_TEST_SET_PACKAGE.getDescription(), "moving package", sourceRoot -> {
             final @NotNull Optional<VirtualFile> found = Optional.ofNullable(sourceRoot.findFileByRelativePath(String.join("/", fqcn)))
                     .filter(VirtualFile::isDirectory);
 

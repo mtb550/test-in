@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen.method;
 
+import org.testin.codegen.GenType;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenAction;

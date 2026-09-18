@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen.pkg;
 
+import org.testin.util.Bundle;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -68,7 +69,7 @@ public class RenameJavaPackage implements GenAction {
         // declaration keeps the full prefix instead of just "pkg".
         final @NotNull String parentPackage = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
-        WriteCommandAction.runWriteCommandAction(p, "Rename Package", null, () -> {
+        WriteCommandAction.runWriteCommandAction(p, Bundle.message("codegen.rename.package"), null, () -> {
             try {
                 pkgDir.rename(this, newTop);
                 updatePackageDeclarations(p, pkgDir, newTop, parentPackage);

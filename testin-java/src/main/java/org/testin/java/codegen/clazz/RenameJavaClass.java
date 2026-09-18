@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen.clazz;
 
+import org.testin.codegen.GenType;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
@@ -43,7 +44,7 @@ public class RenameJavaClass implements GenAction {
         if (fqcn.isEmpty()) return;
         final @NotNull String path = String.join(".", fqcn);
 
-        WriteCommandAction.runWriteCommandAction(p, "Rename Test Class", null, () -> {
+        WriteCommandAction.runWriteCommandAction(p, GenType.RENAME_TEST_SET.getDescription(), null, () -> {
             final @NotNull Optional<PsiClass> found = Optional.ofNullable(
                     JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)));
             if (found.isEmpty()) {

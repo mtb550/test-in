@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen.method;
 
+import org.testin.codegen.GenType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -109,7 +110,7 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
         if (moves.isEmpty()) return;
 
         final @NotNull Runnable inCommand = () ->
-                WriteCommandAction.runWriteCommandAction(p, "Move Test Method", null, () -> {
+                WriteCommandAction.runWriteCommandAction(p, GenType.MOVE_TEST_CASE.getDescription(), null, () -> {
                     moves.forEach(moved -> move(p, moved));
                     new UpdateTestOrder().executeAll(p, moves.stream().map(MovedCase::tc).toList());
                 });

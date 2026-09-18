@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen.method;
 
+import org.testin.codegen.GenType;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
@@ -123,7 +124,7 @@ public class CreateTestMethod implements GenAction {
                     () -> noMethodFor(tc, fqcn));
         }
 
-        WriteCommandAction.runWriteCommandAction(p, "Create Test Methods", null,
+        WriteCommandAction.runWriteCommandAction(p, GenType.CREATE_TEST_CASE.getDescription(), null,
                 () -> byClass.values().forEach(group -> createMethods(p, group)));
     }
 

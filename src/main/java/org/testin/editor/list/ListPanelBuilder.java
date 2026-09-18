@@ -16,6 +16,7 @@
 
 package org.testin.editor.list;
 
+import org.testin.util.Bundle;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
@@ -75,7 +76,7 @@ public final class ListPanelBuilder {
         list.setBackground(UIUtil.getPanelBackground());
         list.setOpaque(true);
         list.setPaintBusy(true);
-        list.getEmptyText().setText("Loading...");
+        list.getEmptyText().setText(Bundle.message("editor.loading"));
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setExpandableItemsEnabled(false);
 

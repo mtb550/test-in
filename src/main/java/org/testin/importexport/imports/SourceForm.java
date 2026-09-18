@@ -165,18 +165,18 @@ public final class SourceForm implements DialogComponent {
      * import would ignore.
      */
     private void showFormatHint(final @NotNull FileTypes format) {
-        final @NotNull String message = format.getInfoMessage();
-        if (message.isBlank()) {
-            formatHint.setVisible(false);
-            return;
-        }
-
         final @NotNull String columns = importAttributes.stream()
                 .filter(a -> a.can(Can.IMPORT))
                 .map(TestEditorAttributes::getName)
                 .collect(Collectors.joining(", "));
 
-        final @NotNull String escaped = Html.ofText(message.formatted(columns));
+        final @NotNull String hint = format.hintFor(columns);
+        if (hint.isBlank()) {
+            formatHint.setVisible(false);
+            return;
+        }
+
+        final @NotNull String escaped = Html.ofText(hint);
         formatHint.setText("<html>" + escaped + "</html>");
         formatHint.setVisible(true);
     }

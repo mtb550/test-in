@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen.method.update;
 
+import org.testin.codegen.GenType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -96,7 +97,7 @@ public class ReconcileTestMethod extends UpdateTestBase implements GenAction {
         // left two entries - "Restore Test Case Code" and "Update Test Case
         // Order" - on the class's own undo history (#312, A61).
         final @NotNull Runnable inCommand = () ->
-                WriteCommandAction.runWriteCommandAction(p, "Restore Test Case Code", null, () -> {
+                WriteCommandAction.runWriteCommandAction(p, GenType.RECONCILE_TEST_CASE.getDescription(), null, () -> {
                     byClass.values().forEach(inClass -> rewrite(p, inClass));
                     new UpdateTestOrder().executeAll(p, cases);
                 });

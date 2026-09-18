@@ -16,6 +16,7 @@
 
 package org.testin.java.navigate;
 
+import org.testin.util.Bundle;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.IndexNotReadyException;
@@ -199,7 +200,7 @@ public final class CodeNavigator implements CodeNavigation {
                         Logger.trace("index not ready, deferring navigation");
                         // Notifications must not be raised from inside a read action on a pooled thread.
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(p, Notifier.class).softShow(p, "Waiting for indexing"));
+                                Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("navigate.waiting.for.indexing")));
                         DumbService.getInstance(p).runWhenSmart(() -> toCode(p, tc));
                     }
                 })

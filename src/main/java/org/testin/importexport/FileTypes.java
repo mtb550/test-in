@@ -34,9 +34,11 @@ import org.testin.report.generators.TestRunExcelGenerator;
 import org.testin.report.generators.TestRunHtmlGenerator;
 import org.testin.report.generators.TestRunPdfGenerator;
 import org.testin.report.generators.TestRunWordGenerator;
+import org.testin.util.Bundle;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Function;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +60,7 @@ public enum FileTypes {
     XLS(
             "XLS",
             ".xls",
-            "",
+            columns -> "",
             ExportHandler.UNSUPPORTED,
             (p, importFile) -> new ImportExcel().processImport(p, importFile),
             ReportHandler.UNSUPPORTED
@@ -67,12 +69,7 @@ public enum FileTypes {
     XLSX(
             "Excel",
             ".xlsx",
-            """
-                    To ensure a successful import, your Excel file should contain the following column headers (case-insensitive):
-                    
-                    %s
-                    
-                    Note: Missing columns will safely default to empty values.""",
+            columns -> Bundle.message("import.hint.xlsx", columns),
             (p, destFile, sheets) -> new ExportExcel().exportToFile(p, destFile, sheets),
             (p, importFile) -> new ImportExcel().processImport(p, importFile),
             (p, trDir, tr, detailsMap) -> new TestRunExcelGenerator().generate(p, trDir, tr, detailsMap)
@@ -81,7 +78,7 @@ public enum FileTypes {
     JSON(
             "JSON",
             ".json",
-            "",
+            columns -> "",
             (p, destFile, sheets) -> new ExportJson().exportToFile(p, destFile, sheets),
             (p, importFile) -> new ImportJson().processImport(p, importFile),
             ReportHandler.UNSUPPORTED
@@ -90,13 +87,7 @@ public enum FileTypes {
     CSV(
             "CSV",
             ".csv",
-            """
-                    To ensure a successful import, your CSV file should contain the following column headers (case-insensitive):
-                    
-                    %s
-                    
-                    Note: Missing columns will safely default to empty values.
-                    The CSV should use comma as delimiter. Values containing commas or newlines must be quoted with double quotes.""",
+            columns -> Bundle.message("import.hint.csv", columns),
             (p, destFile, sheets) -> new ExportCsv().exportToFile(p, destFile, sheets),
             (p, importFile) -> new ImportCsv().processImport(p, importFile),
             ReportHandler.UNSUPPORTED
@@ -105,7 +96,7 @@ public enum FileTypes {
     HTML(
             "HTML",
             ".html",
-            "",
+            columns -> "",
             (p, destFile, sheets) -> new ExportHtml().exportToFile(p, destFile, sheets),
             ImportHandler.UNSUPPORTED,
             (p, trDir, tr, detailsMap) -> new TestRunHtmlGenerator().generate(p, trDir, tr, detailsMap).getBytes(StandardCharsets.UTF_8)
@@ -114,7 +105,7 @@ public enum FileTypes {
     PDF(
             "PDF",
             ".pdf",
-            "",
+            columns -> "",
             ExportHandler.UNSUPPORTED,
             ImportHandler.UNSUPPORTED,
             (p, trDir, tr, detailsMap) -> new TestRunPdfGenerator().generate(p, trDir, tr, detailsMap)
@@ -123,7 +114,7 @@ public enum FileTypes {
     WORD(
             "Word",
             ".docx",
-            "",
+            columns -> "",
             ExportHandler.UNSUPPORTED,
             ImportHandler.UNSUPPORTED,
             (p, trDir, tr, detailsMap) -> new TestRunWordGenerator().generate(p, trDir, tr, detailsMap)
@@ -135,9 +126,18 @@ public enum FileTypes {
     private final @NotNull String extension;
 
     /**
-     * The import-dialog hint; empty for formats that need no explanation.
+     * The import dialog's hint, given the columns an import reads, and empty
+     * for formats that need no explanation. From the bundle: it sat here as two
+     * English paragraphs (#66, finding 253).
      */
-    private final @NotNull String infoMessage;
+    private final @NotNull Function<String, String> hint;
+
+    /**
+     * The hint this format shows, naming these columns.
+     */
+    public @NotNull String hintFor(final @NotNull String columns) {
+        return hint.apply(columns);
+    }
 
     // PDF and WORD are report-only and HTML has no importer, so those carry the
     // handler's UNSUPPORTED instance. Ask what a format supports with the

@@ -16,6 +16,8 @@
 
 package org.testin.java.gutter;
 
+import org.testin.util.FailureText;
+import org.testin.util.Bundle;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.icons.AllIcons;
@@ -74,7 +76,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 element,
                 element.getTextRange(),
                 AllIcons.Nodes.Related,
-                psiElement -> "View Test Case Details",
+                psiElement -> Bundle.message("gutter.view.details"),
                 (mouseEvent, psiElement) -> openViewPanel(p, testCaseId, methodName(psiElement)),
                 GutterIconRenderer.Alignment.RIGHT,
                 Collections::emptyList
@@ -140,7 +142,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 // (#170).
                 Logger.error("Could not open the test case behind this mark: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Services.getInstance(p, Notifier.class).error(p, "Test Case Not Opened", "Could not find test case: " + ex.getMessage())
+                        Services.getInstance(p, Notifier.class).error(p, Bundle.message("gutter.not.opened.title"), Bundle.message("gutter.not.opened.message", FailureText.of(ex)))
                 );
             }
         });

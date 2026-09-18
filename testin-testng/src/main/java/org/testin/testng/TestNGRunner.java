@@ -16,6 +16,7 @@
 
 package org.testin.testng;
 
+import org.testin.util.Bundle;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.openapi.application.ApplicationManager;
@@ -88,8 +89,7 @@ public final class TestNGRunner implements TestRunner {
             // recording the case's results from every other run it sits in.
             cases.forEach(execution::notStarting);
 
-            DumbService.getInstance(p).showDumbModeNotification(
-                    "Cannot run tests while IntelliJ is indexing. Please wait a moment.");
+            DumbService.getInstance(p).showDumbModeNotification(Bundle.message("testng.indexing.wait"));
             return;
         }
 
@@ -106,7 +106,7 @@ public final class TestNGRunner implements TestRunner {
                 cases.forEach(execution::notStarting);
 
                 ApplicationManager.getApplication().invokeLater(() -> DumbService.getInstance(p)
-                        .showDumbModeNotification("Indexing interrupted the test run. Please try again."));
+                        .showDumbModeNotification(Bundle.message("testng.indexing.interrupted")));
             }
         });
     }
