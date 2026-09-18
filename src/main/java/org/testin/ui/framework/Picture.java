@@ -82,6 +82,11 @@ public final class Picture implements DialogComponent {
      * (#328).
      */
     public static @NotNull Icon thumbnail(final byte @NotNull [] png) {
+        // No bytes is a file that is not there yet - a sync has not brought it -
+        // and the indexer has said so. Reading them would add a second warning
+        // calling it "not a picture".
+        if (png.length == 0) return noThumbnail();
+
         return read(png)
                 .<Icon>map(image -> new JBImageIcon(ImageUtil.scaleImage(image, JBUI.scale(THUMBNAIL_HEIGHT) / (double) image.getHeight())))
                 .orElseGet(Picture::noThumbnail);

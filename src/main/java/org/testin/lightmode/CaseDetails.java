@@ -19,6 +19,7 @@ package org.testin.lightmode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.panels.HorizontalLayout;
 import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -214,12 +215,13 @@ class CaseDetails extends JBPanel<CaseDetails> {
 
         if (badges.isEmpty()) return;
 
-        final @NotNull JBPanel<?> chips = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(5), 0));
+        // A layout with no gap before the first badge, so the badges start where
+        // the text of the other rows does.
+        final @NotNull JBPanel<?> chips = new JBPanel<>(new HorizontalLayout(5));
         chips.setOpaque(false);
         Badges.showBadges(chips, badges);
 
-        // An empty icon's room, so the badges start where the text of the other
-        // rows does.
+        // An empty icon's room, for the same reason.
         addRow(EmptyIcon.ICON_16, chips);
     }
 

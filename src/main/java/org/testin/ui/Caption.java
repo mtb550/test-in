@@ -63,8 +63,11 @@ public final class Caption {
 
         // Wrapped with the platform's fallback: JetBrains Mono has no
         // Devanagari, and a plain Java font draws a glyph it lacks as an empty
-        // box, so a Hindi caption would read as a row of them.
-        label.setFont(UIUtil.getFontWithFallback(new Font(FAMILY, Font.PLAIN, 1).deriveFont(Math.max(FontSync.FLOOR, baseSize - SMALLER))));
+        // box, so a Hindi caption would read as a row of them. Sized after the
+        // wrapping, not before: the wrapped font is a UIResource, which a theme
+        // change swaps back for the default label font, and the derived one is a
+        // plain font that keeps its fallback.
+        label.setFont(UIUtil.getFontWithFallback(new Font(FAMILY, Font.PLAIN, 1)).deriveFont(Math.max(FontSync.FLOOR, baseSize - SMALLER)));
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         return label;
     }
@@ -80,7 +83,7 @@ public final class Caption {
      * left of the text it named.
      */
     public static @NotNull BorderLayoutPanel above(final @NotNull String caption, final @NotNull JComponent value) {
-        final @NotNull BorderLayoutPanel panel = JBUI.Panels.simplePanel(0, JBUI.scale(2)).addToCenter(value).withBorder(JBUI.Borders.emptyTop(8)).andTransparent();
+        final @NotNull BorderLayoutPanel panel = JBUI.Panels.simplePanel(0, 2).addToCenter(value).withBorder(JBUI.Borders.emptyTop(8)).andTransparent();
         if (!caption.isEmpty()) panel.addToTop(of(caption, JBUI.Fonts.label().getSize2D()).withBorder(JBUI.Borders.emptyLeft(12)));
         return panel;
     }

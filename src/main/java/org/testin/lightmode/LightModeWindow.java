@@ -278,6 +278,14 @@ final class LightModeWindow {
     private float zoom = Math.clamp(PropertiesComponent.getInstance().getFloat(ZOOM, 1.0f), ZOOM_MIN, ZOOM_MAX);
 
     /**
+     * Whether Ctrl+D is down. A held key repeats its press, and every repeat
+     * flipped the details back, so the window pulsed open and shut; one press is
+     * one flip until the key comes up. Cleared on D's release with or without
+     * Ctrl, because either may be let go first.
+     */
+    private boolean detailsKeyHeld = false;
+
+    /**
      * The width the last resize left, so the height can be refitted for a change
      * in width and ignored for the changes in height it makes itself.
      */
@@ -580,7 +588,9 @@ final class LightModeWindow {
     private void bindKeys() {
         bind(Shortcuts.Escape.getKey(), "testin.lightMode.escape", this::escape);
         bind(Shortcuts.Enter.getKey(), "testin.lightMode.commit", this::saveCapture);
-        bind(Shortcuts.ToggleDetails.getKey(), "testin.lightMode.toggleDetails", this::toggleDetails);
+        bind(Shortcuts.ToggleDetails.getKey(), "testin.lightMode.toggleDetails", this::toggleDetailsOnce);
+        bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK, true), "testin.lightMode.releaseDetails", () -> detailsKeyHeld = false);
+        bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, true), "testin.lightMode.releaseDetailsAlone", () -> detailsKeyHeld = false);
 
         for (final TestStatus status : TestStatus.values()) {
             if (!status.isVerdict()) continue;
@@ -689,6 +699,13 @@ final class LightModeWindow {
      * again hides them. The status bar names it, so a tester does not have to
      * remember a second key for the way back.
      */
+    private void toggleDetailsOnce() {
+        if (detailsKeyHeld) return;
+
+        detailsKeyHeld = true;
+        toggleDetails();
+    }
+
     private void toggleDetails() {
         // A form cannot be collapsed while it is waiting to be filled in.
         if (capture.isPresent()) return;
@@ -803,6 +820,8 @@ final class LightModeWindow {
     }
 
     /**
+     * UC-EDITOR-PANEL-046.
+     * <p>
      * Draws whichever of the two states the window is in - the case with its
      * details and three verdicts, or the case with a failure form under it.
      * <p>
@@ -1198,7 +1217,7 @@ final class LightModeWindow {
      * theirs.
      */
     private static @NotNull JComponent iconBefore(final @NotNull Icon icon, final @NotNull JComponent text) {
-        return JBUI.Panels.simplePanel(JBUI.scale(CaseDetails.GAP), 0).addToLeft(new JBLabel(icon)).addToCenter(text).andTransparent();
+        return JBUI.Panels.simplePanel(CaseDetails.GAP, 0).addToLeft(new JBLabel(icon)).addToCenter(text).andTransparent();
     }
 
     private static @NotNull JBLabel clock(final @NotNull String meaning) {

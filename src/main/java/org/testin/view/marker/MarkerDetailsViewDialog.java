@@ -18,7 +18,6 @@ package org.testin.view.marker;
 
 import org.testin.testcase.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.NodeCounter;
 import org.testin.indexer.ProjectIndexer;
@@ -114,10 +113,11 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
 
         shortcuts = List.of(StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("shortcut.close"), this::closeCancel));
 
-        // Sized rather than packed so it stays movable and resizable, as it was,
-        // and tall enough for the node that shows the most: the counts add a row
-        // each, and a test run adds its chart beneath them.
-        preferredSize = JBUI.size(600, 500);
+        // Sized to its rows rather than fixed, and still movable and resizable.
+        // A fixed 600 by 500 fit one-line rows; with each caption above its value
+        // (#328) a test run's rows and chart needed more, and the chart was
+        // squeezed out below them.
+        resizable = true;
     }
 
     @Override
