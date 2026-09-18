@@ -73,7 +73,7 @@ public final class SourceForm implements DialogComponent {
         this.importAttributes = importAttributes;
 
         descriptor = new FileChooserDescriptor(true, false, false, false, false, false)
-                .withExtensionFilter("", "xls", "xlsx", "csv", "json")
+                .withExtensionFilter("", FileTypes.importableExtensionsForChooser())
                 .withTitle(Bundle.message("import.file.title"))
                 .withDescription(Bundle.message("import.file.description"));
 

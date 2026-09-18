@@ -184,6 +184,18 @@ public enum FileTypes {
                 .collect(Collectors.joining(", "));
     }
 
+    /**
+     * The same extensions as a file chooser filters on them, without the dot.
+     * The import's chooser listed them by hand beside this enum, which is
+     * where a format's extension lives (#312, A53).
+     */
+    public static String @NotNull [] importableExtensionsForChooser() {
+        return Arrays.stream(values())
+                .filter(FileTypes::isImportable)
+                .map(type -> type.getExtension().substring(1))
+                .toArray(String[]::new);
+    }
+
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         // Checked here rather than left to the handler, so the failure names the format.
         if (!isExportable()) throw new IllegalStateException(label + " cannot be exported to");
