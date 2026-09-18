@@ -33,46 +33,19 @@ import java.util.List;
  * carried here rather than dug out of a test case that may not exist: a run has
  * a name and no test set, and a marker names the node it belongs to.
  * <p>
- * Exactly one side is absent for a pure add or delete: {@code oldState} is null
- * for {@link DiffType#ADDED}, {@code newState} is null for
- * {@link DiffType#DELETED}. Both are null for anything that is not a test case.
+ * {@code oldState} is the committed side a revert puts back: there for a
+ * deletion and a modification of a test case, and absent for an addition and
+ * for anything that is not a test case. The side after the change is not kept:
+ * nothing but a test read it (#312, A100).
  */
-public record PendingChange(@NotNull ChangeSubject subject, @NotNull String name, @NotNull String testSet, @NotNull String testCaseId, @NotNull Path relativeFilePath, @NotNull DiffType type, @Nullable TestCaseDto oldState, @Nullable TestCaseDto newState, @NotNull List<FieldChange> fieldChanges) {
-
-    /**
-     * The test case this change is about: the side of it that exists.
-     * <p>
-     * A deletion is about the case that was there; everything else is about the
-     * case that is there now. The factory always populates that side for a test
-     * case: an addition reads the new revision, a deletion the old one, a
-     * modification both.
-     * <p>
-     * So the question has an answer for every test-case change. Asking it here
-     * keeps the two nullable fields from spreading a null check across
-     * everything that renders a row.
-     *
-     * @throws IllegalStateException if asked of a change that is not about a
-     *                               test case, or of one built without the side
-     *                               its own type says it must have
-     */
-    public @NotNull TestCaseDto testCase() {
-        if (subject != ChangeSubject.TEST_CASE) {
-            throw new IllegalStateException("A " + subject + " change is not about a test case: " + relativeFilePath);
-        }
-
-        final @Nullable TestCaseDto state = type == DiffType.DELETED ? oldState : newState;
-        if (state == null) {
-            throw new IllegalStateException("A " + type + " change carries no test case: " + relativeFilePath);
-        }
-        return state;
-    }
+public record PendingChange(@NotNull ChangeSubject subject, @NotNull String name, @NotNull String testSet, @NotNull String testCaseId, @NotNull Path relativeFilePath, @NotNull DiffType type, @Nullable TestCaseDto oldState, @NotNull List<FieldChange> fieldChanges) {
 
     /**
      * The case as it was committed - the side a revert puts back.
      * <p>
      * A deletion and a modification both carry it; the factory populates it for
      * exactly those. Asked here so the revert does not read the nullable field
-     * and check it, which is the same reason {@link #testCase()} exists.
+     * and check it.
      *
      * @throws IllegalStateException if asked of a change that never had a
      *                               committed side

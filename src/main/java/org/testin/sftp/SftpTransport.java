@@ -260,6 +260,10 @@ public final class SftpTransport implements AutoCloseable {
      * Directories are walked and not listed: a manifest describes files, and an
      * empty folder carries nothing to sync. Names beginning with a dot are kept,
      * because every marker the indexer reads is one.
+     * <p>
+     * Read by the real-server round-trip test alone, to see what reached the
+     * server. Kept here rather than in the test because walking the server needs
+     * this transport's own channel (#312, A100).
      */
     public @NotNull List<String> filesUnder(final @NotNull String relative) {
         final @NotNull List<String> found = new ArrayList<>();

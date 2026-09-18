@@ -403,7 +403,7 @@ public class GitWorkflowTest {
 
         assertEquals(pending.size(), 1);
         assertEquals(pending.getFirst().type(), DiffType.ADDED);
-        assertEquals(pending.getFirst().testCase().getDescription(), "a locked account cannot sign in");
+        assertEquals(pending.getFirst().name(), "a locked account cannot sign in");
     }
 
     @Test
@@ -418,7 +418,7 @@ public class GitWorkflowTest {
 
             assertEquals(pending.size(), 1);
             assertEquals(pending.getFirst().type(), DiffType.DELETED);
-            assertEquals(pending.getFirst().testCase().getDescription(), "a registered user signs in");
+            assertEquals(pending.getFirst().name(), "a registered user signs in");
         } catch (final IOException ex) {
             throw new AssertionError(ex);
         }

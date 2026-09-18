@@ -38,7 +38,7 @@ public class ProjectTreeInfrastructureTest {
         final DirectoryDto directory = new TestSetDirectoryDto();
         directory.setPath(Path.of("project", "test-cases", "set"));
 
-        final TreeTransferPayload payload = new TreeTransferPayload(new DirectoryDto[]{directory});
+        final TreeTransferPayload payload = new TreeTransferPayload(new DirectoryDto[]{directory}, TransferHandler.COPY);
 
         assertNotNull(payload.nodes());
         assertEquals(payload.nodes().length, 1);

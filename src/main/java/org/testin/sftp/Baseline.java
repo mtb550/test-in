@@ -84,17 +84,6 @@ public record Baseline(@NotNull Map<String, String> contents) {
     }
 
     /**
-     * What that file held at the last transfer, and empty when it held nothing -
-     * because it was new here, new there, or never transferred at all.
-     * <p>
-     * Empty is the honest ancestor for a file with no history: a three-way merge
-     * given an empty base treats both sides as additions, which is what they are.
-     */
-    public @NotNull String at(final @NotNull String path) {
-        return contents.getOrDefault(path, "");
-    }
-
-    /**
      * The hashes of what is remembered, so the same comparison that runs against
      * the two live sides can run against this one.
      * <p>

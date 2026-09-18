@@ -127,13 +127,13 @@ final class PendingChangeFactory {
             case ADDED -> {
                 final @NotNull TestCaseDto newState = read(mapper, afterJson, TestCaseDto.class);
                 yield new PendingChange(ChangeSubject.TEST_CASE, newState.getDescription(), testSet,
-                        newState.getId().toString(), relativePath, DiffType.ADDED, null, newState,
+                        newState.getId().toString(), relativePath, DiffType.ADDED, null,
                         List.of(new FieldChange(Bundle.message("caption.test.case"), "", newState.getDescription(), ChangeType.CREATE_TEST_CASE)));
             }
             case DELETED -> {
                 final @NotNull TestCaseDto oldState = read(mapper, beforeJson, TestCaseDto.class);
                 yield new PendingChange(ChangeSubject.TEST_CASE, oldState.getDescription(), testSet,
-                        oldState.getId().toString(), relativePath, DiffType.DELETED, oldState, null,
+                        oldState.getId().toString(), relativePath, DiffType.DELETED, oldState,
                         List.of(new FieldChange(Bundle.message("caption.test.case"), oldState.getDescription(), "", ChangeType.REMOVE_TEST_CASE)));
             }
             case MODIFIED -> {
@@ -145,7 +145,7 @@ final class PendingChangeFactory {
                 // different - a reordering, an audit stamp - is still a change
                 // to commit, so it gets the row it needs to be selected on.
                 yield new PendingChange(ChangeSubject.TEST_CASE, newState.getDescription(), testSet,
-                        newState.getId().toString(), relativePath, DiffType.MODIFIED, oldState, newState,
+                        newState.getId().toString(), relativePath, DiffType.MODIFIED, oldState,
                         fieldChanges.isEmpty()
                                 ? List.of(new FieldChange(Bundle.message("caption.test.case"), "", Bundle.message("git.change.reordered"), ChangeType.CHANGE_FILE))
                                 : fieldChanges);
@@ -165,7 +165,7 @@ final class PendingChangeFactory {
                     read(mapper, beforeJson, TestRunDto.class), read(mapper, afterJson, TestRunDto.class));
         };
 
-        return new PendingChange(ChangeSubject.TEST_RUN, runName, "", "", relativePath, type, null, null, changes);
+        return new PendingChange(ChangeSubject.TEST_RUN, runName, "", "", relativePath, type, null, changes);
     }
 
     /**
@@ -183,7 +183,7 @@ final class PendingChangeFactory {
             case MODIFIED -> ChangeType.CHANGE_MARKER;
         };
 
-        return new PendingChange(ChangeSubject.MARKER, node, "", "", relativePath, type, null, null,
+        return new PendingChange(ChangeSubject.MARKER, node, "", "", relativePath, type, null,
                 List.of(new FieldChange(relativePath.getFileName().toString(), before, after, changeType)));
     }
 
@@ -206,7 +206,7 @@ final class PendingChangeFactory {
         };
 
         return new PendingChange(ChangeSubject.OTHER, relativePath.getFileName().toString(), "", "",
-                relativePath, type, null, null,
+                relativePath, type, null,
                 List.of(new FieldChange(relativePath.toString(), "", "", changeType)));
     }
 

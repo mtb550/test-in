@@ -83,14 +83,14 @@ public class BaselineStoreTest {
 
         final Baseline read = BaselineStore.read(mapper, file);
         assertEquals(read.contents(), stored.contents());
-        assertEquals(read.at("Test Cases/pkg1/Login/6197ec6e.json"), "{\"description\":\"Sign in\"}");
+        assertEquals(read.contents().getOrDefault("Test Cases/pkg1/Login/6197ec6e.json", ""), "{\"description\":\"Sign in\"}");
     }
 
     @Test
     public void aFileThatWasNeverTransferredReadsAsEmptyRatherThanMissing() {
         final Baseline stored = new Baseline(Map.of("a.json", "{}"));
 
-        assertEquals(stored.at("never-seen.json"), "",
+        assertEquals(stored.contents().getOrDefault("never-seen.json", ""), "",
                 "an empty ancestor makes a three-way merge treat both sides as additions, which they are");
     }
 

@@ -35,7 +35,7 @@ public class GitRefsTest {
     private static PendingChange diff(final Path relativePath) {
         return new PendingChange(ChangeSubject.TEST_CASE, "a case", "a test set", UUID.randomUUID().toString(),
                 relativePath, DiffType.MODIFIED,
-                TestCaseDto.builder().build(), TestCaseDto.builder().build(), List.of());
+                TestCaseDto.builder().build(), List.of());
     }
 
     @Test

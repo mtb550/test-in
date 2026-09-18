@@ -112,7 +112,7 @@ public class GitDiffProcessorTest {
 
         assertEquals(review.size(), 1);
         assertEquals(review.getFirst().type(), DiffType.ADDED);
-        assertEquals(review.getFirst().testCase().getDescription(), "a brand new case");
+        assertEquals(review.getFirst().name(), "a brand new case");
         assertEquals(review.getFirst().fieldChanges().getFirst().changeType(), ChangeType.CREATE_TEST_CASE);
     }
 
@@ -145,7 +145,7 @@ public class GitDiffProcessorTest {
 
         assertEquals(review.size(), 1);
         assertEquals(review.getFirst().type(), DiffType.DELETED);
-        assertEquals(review.getFirst().testCase().getDescription(), "a case that is going away");
+        assertEquals(review.getFirst().name(), "a case that is going away");
     }
 
     /**
@@ -230,7 +230,7 @@ public class GitDiffProcessorTest {
 
         assertEquals(review.size(), 1);
         assertEquals(review.getFirst().relativeFilePath(), Path.of("Test Cases/login flow/a case.json"));
-        assertEquals(review.getFirst().testCase().getDescription(), "quoted all the way down");
+        assertEquals(review.getFirst().name(), "quoted all the way down");
     }
 
     /**
@@ -248,7 +248,7 @@ public class GitDiffProcessorTest {
                 "?? \"Test Cases/login/case.json\"");
 
         assertEquals(review.size(), 1, "the file that vanished is not a change; the one that is there still is");
-        assertEquals(review.getFirst().testCase().getDescription(), "still here");
+        assertEquals(review.getFirst().name(), "still here");
     }
 
     @Test

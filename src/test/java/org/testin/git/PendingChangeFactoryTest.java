@@ -73,7 +73,6 @@ public class PendingChangeFactoryTest {
         assertEquals(diff.testCaseId(), added.getId().toString());
         assertEquals(diff.relativeFilePath(), PATH);
         assertNull(diff.oldState(), "an added file has no before state");
-        assertNotNull(diff.newState());
 
         assertEquals(diff.fieldChanges().size(), 1);
         final FieldChange change = diff.fieldChanges().getFirst();
@@ -92,7 +91,6 @@ public class PendingChangeFactoryTest {
         assertNotNull(diff);
         assertEquals(diff.type(), DiffType.DELETED);
         assertNotNull(diff.oldState());
-        assertNull(diff.newState(), "a deleted file has no after state");
 
         assertEquals(diff.fieldChanges().size(), 1);
         final FieldChange change = diff.fieldChanges().getFirst();
@@ -115,7 +113,6 @@ public class PendingChangeFactoryTest {
         assertNotNull(diff);
         assertEquals(diff.type(), DiffType.MODIFIED);
         assertNotNull(diff.oldState());
-        assertNotNull(diff.newState());
 
         assertEquals(diff.fieldChanges().size(), 2, "two fields moved, so two rows in the review");
         assertEquals(diff.fieldChanges().stream().map(FieldChange::changeType).collect(Collectors.toSet()),
@@ -242,13 +239,13 @@ public class PendingChangeFactoryTest {
         final TestCaseDto after = testCase("after").setId(before.getId());
 
         assertEquals(PendingChangeFactory.fromFile(DiffType.ADDED, "", json(added), PATH, RealMapper.build())
-                .testCase().getDescription(), "added");
+                .name(), "added");
 
         assertEquals(PendingChangeFactory.fromFile(DiffType.DELETED, json(before), "", PATH, RealMapper.build())
-                .testCase().getDescription(), "before", "a deletion is about the case that was there");
+                .name(), "before", "a deletion is about the case that was there");
 
         assertEquals(PendingChangeFactory.fromFile(DiffType.MODIFIED, json(before), json(after), PATH, RealMapper.build())
-                .testCase().getDescription(), "after", "a modification is about the case as it is now");
+                .name(), "after", "a modification is about the case as it is now");
     }
 
     /**
@@ -259,12 +256,13 @@ public class PendingChangeFactoryTest {
     public void aTestCaseSurvivesBeingWrittenAndReadBack() {
         final TestCaseDto original = testCase("survives the round trip");
 
+        // Read back as the side a change keeps - the committed one, which a
+        // deletion carries.
         final PendingChange diff = PendingChangeFactory.fromFile(
-                DiffType.ADDED, "", json(original), PATH, RealMapper.build());
+                DiffType.DELETED, json(original), "", PATH, RealMapper.build());
 
         assertNotNull(diff);
-        final TestCaseDto readBack = diff.newState();
-        assertNotNull(readBack);
+        final TestCaseDto readBack = diff.committedState();
 
         assertEquals(TestCaseChangeComparator.compare(original, readBack), List.of(),
                 "a test case written and read back must compare as unchanged");

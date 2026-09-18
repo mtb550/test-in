@@ -16,12 +16,6 @@
 
 package org.testin.git;
 
-import org.testin.model.DirectoryType;
-import org.testin.util.Bundle;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
-
 /**
  * What a pending change is about.
  * <p>
@@ -35,38 +29,13 @@ import org.jetbrains.annotations.NotNull;
  * Every changed file now says which of these it is, so nothing is read as
  * something it is not and nothing drops out.
  */
-@Getter
-@AllArgsConstructor
 public enum ChangeSubject {
 
-    TEST_CASE(
-            Bundle.message("caption.test.case")
-    ),
+    TEST_CASE,
 
-    TEST_RUN(
-            DirectoryType.TR.getDescription()
-    ),
+    TEST_RUN,
 
-    /**
-     * The dotfile that makes a directory a node.
-     * <p>
-     * It carries no test data, so there is little in one to read. It is still
-     * what a colleague pulling the commit needs to see the directory as a test
-     * set at all. And a change to one - deactivating a project, deprecating a test
-     * set - is worth committing on its own.
-     */
-    MARKER(
-            Bundle.message("change.subject.marker")
-    ),
+    MARKER,
 
-    /**
-     * Anything else that turned up in the repository. Listed rather than
-     * ignored: what the review does not show cannot be committed, and a file
-     * nobody accounted for is exactly the one that goes missing.
-     */
-    OTHER(
-            Bundle.message("change.subject.file")
-    );
-
-    private final @NotNull String label;
+    OTHER
 }
