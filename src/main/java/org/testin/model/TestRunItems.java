@@ -58,8 +58,19 @@ public class TestRunItems {
     @Nullable
     private TestCaseDto tc;
 
+    /**
+     * The test case this result is about.
+     * <p>
+     * The nil UUID when the file does not say: it was the one field here with no
+     * default, so a {@code run.json} entry missing it was read in with a null id,
+     * and every read of the run - which marks each result whose case is gone -
+     * threw, taking out panels that had nothing to do with that run (#66,
+     * finding 205). No test case has the nil UUID, so the entry reads as a result
+     * whose case was removed, which is what a result naming no case is.
+     */
     @NotNull
-    private UUID id;
+    @Builder.Default
+    private UUID id = new UUID(0L, 0L);
     @NotNull
     @Builder.Default
     private TestStatus status = TestStatus.PENDING;
