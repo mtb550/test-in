@@ -42,7 +42,10 @@ and which keys it answers, and the shell builds the rest.
   is refused in one sentence naming the value.
 - **Rule-INTERNAL-075** — A dialog of a kind already on screen is brought
   forward rather than opened again. Testin dialogs do not close when they lose
-  the focus, so nothing else would have stopped a second one.
+  the focus, so nothing else would have stopped a second one. A dialog that holds
+  nothing the tester typed - a confirmation, a node's details, a screenshot - is
+  replaced by the newer one instead, closed unanswered, so an older question can
+  never be answered by the key meant for a newer one.
 - **Rule-INTERNAL-076** — A dialog says whether clicking away closes it. Almost
   none do - one holding what the tester typed must not lose it to a stray click,
   and Escape is what cancels. The search does, because it holds a question

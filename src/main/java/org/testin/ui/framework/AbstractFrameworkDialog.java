@@ -218,14 +218,30 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
      * <p>
      * Here rather than in the openers, because there is one rule and twenty-odd
      * of them, and the next one cannot forget it.
+     * <p>
+     * <b>Raised or replaced.</b> A dialog holding what the tester typed is raised,
+     * so nothing typed is lost. One holding nothing of theirs - a confirmation, a
+     * node's details, a screenshot - is replaced by the newer one: raised, a
+     * standing confirmation swallowed every later one, and Delete pressed on a
+     * second node brought the first question forward, where Enter removed the
+     * first node (#66, finding 168).
+     *
+     * @return whether this instance went on screen. False when an older one of
+     * its kind was raised instead, and this one never built its popup.
      */
-    public final void show() {
+    public final boolean show() {
         final @NotNull OpenDialogs open = Services.getInstance(p, OpenDialogs.class);
 
         final @NotNull Optional<JBPopup> already = open.shown(getClass());
         if (already.isPresent()) {
-            already.orElseThrow().getContent().requestFocusInWindow();
-            return;
+            if (!replacesItsKind()) {
+                already.orElseThrow().getContent().requestFocusInWindow();
+                return false;
+            }
+
+            // Closed unanswered, which is what Escape does: a question about an
+            // older gesture cannot then be confirmed by the key meant for this one.
+            already.orElseThrow().cancel();
         }
 
         // Assembled on first show: by now the subclass is fully constructed,
@@ -239,6 +255,19 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
 
         open.remember(getClass(), getPopup());
         getPopup().showCenteredInCurrentWindow(p);
+        return true;
+    }
+
+    /**
+     * UC-INTERNAL-007, Rule-INTERNAL-075.
+     * <p>
+     * Whether a newer dialog of this kind replaces one already on screen rather
+     * than raising it. False for anything the tester types into; true for a
+     * dialog that only shows something or asks one question, where the newer
+     * request is the one they meant.
+     */
+    protected boolean replacesItsKind() {
+        return false;
     }
 
     private @NotNull JBPopup buildPopup() {

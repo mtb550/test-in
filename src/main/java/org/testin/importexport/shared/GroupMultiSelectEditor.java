@@ -40,8 +40,11 @@ public class GroupMultiSelectEditor extends AbstractCellEditor implements TableC
         // whichever way it closed - picked or canceled.
         button.addActionListener(e -> {
             final @NotNull GroupSelectionDialog dialog = new GroupSelectionDialog(p, currentValue, picked -> currentValue = picked);
-            dialog.show();
-            dialog.onClosed(this::fireEditingStopped);
+            // A picker already open for another cell is raised instead, and this
+            // one never built its popup - asking it when it closed threw at the
+            // tester and left this cell stuck editing (#66, finding 210).
+            if (dialog.show()) dialog.onClosed(this::fireEditingStopped);
+            else fireEditingStopped();
         });
     }
 

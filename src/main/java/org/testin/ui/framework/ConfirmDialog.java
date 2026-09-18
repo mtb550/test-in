@@ -84,4 +84,12 @@ public final class ConfirmDialog extends AbstractFrameworkDialog<DialogMessage> 
         onConfirm.run();
         closeOk();
     }
+
+    /**
+     * UC-INTERNAL-007, Rule-INTERNAL-075. A question about the gesture that raised it. A newer gesture makes it stale.
+     */
+    @Override
+    protected boolean replacesItsKind() {
+        return true;
+    }
 }

@@ -221,7 +221,13 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
      * creates the popup inside show(), so the close listener is attached after.
      */
     public void open() {
-        show();
+        // A bulk editor already open is raised instead, with what was typed in
+        // it; this one never showed, so its editors go now rather than never.
+        if (!show()) {
+            editors.release();
+            return;
+        }
+
         getPopup().addListener(new JBPopupListener() {
             @Override
             public void onClosed(final @NotNull LightweightWindowEvent event) {

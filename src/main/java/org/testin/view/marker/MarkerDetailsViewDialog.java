@@ -124,4 +124,12 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
     protected void submit() {
         closeOk();
     }
+
+    /**
+     * UC-INTERNAL-007, Rule-INTERNAL-075. Shows one node. Asked about another, the newer node is the one wanted.
+     */
+    @Override
+    protected boolean replacesItsKind() {
+        return true;
+    }
 }

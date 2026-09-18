@@ -58,4 +58,12 @@ public final class ScreenshotDialog extends AbstractFrameworkDialog<Picture> {
     protected void submit() {
         closeOk();
     }
+
+    /**
+     * UC-INTERNAL-007, Rule-INTERNAL-075. Shows one screenshot. Asked for another, the newer one is the one wanted.
+     */
+    @Override
+    protected boolean replacesItsKind() {
+        return true;
+    }
 }

@@ -99,7 +99,15 @@ final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
      * throws the edits away, and Send keeps them until the issue exists.
      */
     void open() {
-        show();
+        // A report already being written is raised instead; this one never
+        // showed, so it lets its run item go the way a cancel would.
+        if (!show()) {
+            final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
+            reports.discard(item);
+            if (reports.end(item, BugReports.Stage.OPEN)) redraw.run();
+            return;
+        }
+
         getPopup().addListener(new JBPopupListener() {
             @Override
             public void onClosed(final @NotNull LightweightWindowEvent event) {
