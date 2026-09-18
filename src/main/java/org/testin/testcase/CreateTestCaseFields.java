@@ -26,7 +26,6 @@ import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -144,7 +143,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
     CreateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor, final @NotNull String placeholder, final TestCaseDialogKey @NotNull ... ownKeys) {
         this.name = name;
         this.shortcut = shortcut;
-        this.icon = Icons.fieldLetter(KeyEvent.getKeyText(shortcut.getKey().getKeyCode()));
+        this.icon = Icons.fieldLetter(shortcut);
         this.sectionExtractor = sectionExtractor;
         this.placeholder = placeholder;
         this.ownKeys = ownKeys;

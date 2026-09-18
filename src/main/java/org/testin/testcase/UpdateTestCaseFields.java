@@ -39,6 +39,7 @@ import org.testin.testcase.update.bulk.StatusBulkSectionDialog;
 import org.testin.testcase.update.bulk.StepsBulkSectionDialog;
 import org.testin.testcase.update.bulk.TestDataBulkSectionDialog;
 import org.testin.util.Bundle;
+import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -48,7 +49,8 @@ import static org.testin.testcase.TestCaseDialogKey.*;
 
 /**
  * A field the update menu offers: the section it opens, the bulk editor behind
- * it, and the generator that follows the change into the Java code.
+ * it, and the generator that follows the change into the Java code. Its icon is
+ * its key's letter, as on the create form.
  * <p>
  * Every constant here is a field. The keys a section advertises are
  * {@link TestCaseDialogKey}, shared with {@link CreateTestCaseFields} — the two
@@ -62,7 +64,6 @@ public enum UpdateTestCaseFields implements MenuItem {
     DESCRIPTION(
             TestEditorAttributes.DESCRIPTION.getName(),
             Shortcuts.UpdateTestCaseDescription,
-            AllIcons.Actions.Edit,
             GenType.UPDATE_TEST_CASE_DESCRIPTION,
             (p, items, updatedItems) -> new DescriptionBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getDescriptionSection,
@@ -72,7 +73,6 @@ public enum UpdateTestCaseFields implements MenuItem {
     EXPECTED_RESULT(
             TestEditorAttributes.EXPECTED_RESULT.getName(),
             Shortcuts.UpdateTestCaseExpectedResult,
-            AllIcons.General.InspectionsOK,
             GenType.UPDATE_TEST_CASE_EXPECTED_RESULT,
             (p, items, updatedItems) -> new ExpectedResultBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getExpectedResultSection,
@@ -82,7 +82,6 @@ public enum UpdateTestCaseFields implements MenuItem {
     MODULE(
             TestEditorAttributes.MODULE.getName(),
             Shortcuts.UpdateTestCaseModule,
-            AllIcons.General.ContextHelp,
             GenType.UPDATE_TEST_CASE_MODULE,
             (p, items, updatedItems) -> new ModuleBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getModuleSection,
@@ -92,7 +91,6 @@ public enum UpdateTestCaseFields implements MenuItem {
     TEST_DATA(
             TestEditorAttributes.TEST_DATA.getName(),
             Shortcuts.UpdateTestCaseTestData,
-            AllIcons.Nodes.DataTables,
             GenType.UPDATE_TEST_CASE_TEST_DATA,
             (p, items, updatedItems) -> new TestDataBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getTestDataSection,
@@ -102,7 +100,6 @@ public enum UpdateTestCaseFields implements MenuItem {
     PRE_CONDITIONS(
             TestEditorAttributes.PRE_CONDITIONS.getName(),
             Shortcuts.UpdateTestCasePreConditions,
-            AllIcons.Actions.StepOut,
             GenType.UPDATE_TEST_CASE_PRE_CONDITIONS,
             (p, items, updatedItems) -> new PreConditionsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPreConditionsSection,
@@ -112,7 +109,6 @@ public enum UpdateTestCaseFields implements MenuItem {
     STEPS(
             TestEditorAttributes.STEPS.getName(),
             Shortcuts.UpdateTestCaseSteps,
-            AllIcons.Actions.ListFiles,
             GenType.UPDATE_TEST_CASE_STEPS,
             (p, items, updatedItems) -> new StepsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getStepsSection,
@@ -122,7 +118,6 @@ public enum UpdateTestCaseFields implements MenuItem {
     PRIORITY(
             TestEditorAttributes.PRIORITY.getName(),
             Shortcuts.UpdateTestCasePriority,
-            AllIcons.Nodes.Favorite,
             GenType.UPDATE_TEST_CASE_PRIORITY,
             (p, items, updatedItems) -> new PriorityBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPrioritySection,
@@ -132,7 +127,6 @@ public enum UpdateTestCaseFields implements MenuItem {
     GROUP(
             TestEditorAttributes.GROUP.getName(),
             Shortcuts.UpdateTestCaseGroup,
-            AllIcons.Nodes.Tag,
             GenType.UPDATE_TEST_CASE_GROUP,
             (p, items, updatedItems) -> new GroupBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getGroupSection,
@@ -145,7 +139,8 @@ public enum UpdateTestCaseFields implements MenuItem {
      * Where the case is in its own life, which is the one field here that no key
      * opens. The letters that would name it are taken by fields a tester reaches
      * far more often - `s` is Steps - and a status is not worth taking one from
-     * them, so this is a menu row and nothing else.
+     * them, so this is a menu row and nothing else - and, with no letter to draw,
+     * the one field that keeps a stock icon.
      */
     STATUS(
             TestEditorAttributes.STATUS.getName(),
@@ -169,7 +164,6 @@ public enum UpdateTestCaseFields implements MenuItem {
     ORDER(
             TestEditorAttributes.ORDER.getName(),
             Shortcuts.UpdateTestCaseOrder,
-            AllIcons.ObjectBrowser.Sorted,
             GenType.UPDATE_TEST_CASE_ORDER,
             (p, items, updatedItems) -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("update.order.one.at.a.time")),
             TestCaseBaseDialog::getOrderSection,
@@ -187,6 +181,13 @@ public enum UpdateTestCaseFields implements MenuItem {
      * The keys this section adds to the shared ones.
      */
     private final TestCaseDialogKey @NotNull [] ownKeys;
+
+    /**
+     * A field a key opens, drawn as that key's letter.
+     */
+    UpdateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull GenType gt, final @NotNull BulkEditorAction bulkAction, final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor, final TestCaseDialogKey @NotNull [] ownKeys) {
+        this(name, shortcut, Icons.fieldLetter(shortcut), gt, bulkAction, sectionExtractor, ownKeys);
+    }
 
     /**
      * What the section strip shows while this section holds the focus: its own

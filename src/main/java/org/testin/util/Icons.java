@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 /**
  * The icons Testin makes for itself: a stock one grayed, a colored dot, and a
@@ -64,16 +65,18 @@ public final class Icons {
     /**
      * UC-EDITOR-PANEL-005.
      * <p>
-     * A field of the test case form: the letter of the key that opens it, over
-     * a rounded frame, both in the platform's light-theme icon gray in every
-     * theme, as Muteb chose (#328).
+     * A test case field, wherever one is offered - the create and update forms
+     * and the update menu: the letter of the key that opens it, over a rounded
+     * frame, both in the platform's light-theme icon gray in every theme, as
+     * Muteb chose (#328).
      * <p>
-     * One frame file serves every field, and the letter is text, so a field
-     * needs no drawing of its own. The platform lays the two out: its
-     * {@link TextIcon} draws the letter and its {@link LayeredIcon} centers it.
+     * Read from the key, so the icon cannot disagree with it. One frame file
+     * serves every field, and the letter is text, so a field needs no drawing of
+     * its own. The platform lays the two out: its {@link TextIcon} draws the
+     * letter and its {@link LayeredIcon} centers it.
      */
-    public static @NotNull Icon fieldLetter(final @NotNull String letter) {
-        final @NotNull TextIcon text = new TextIcon(letter, new Color(0x6C707E), null, 0);
+    public static @NotNull Icon fieldLetter(final @NotNull Shortcuts key) {
+        final @NotNull TextIcon text = new TextIcon(KeyEvent.getKeyText(key.getKey().getKeyCode()), new Color(0x6C707E), null, 0);
         text.setFont(JBUI.Fonts.label(9f).asBold());
 
         final @NotNull LayeredIcon icon = new LayeredIcon(2);
