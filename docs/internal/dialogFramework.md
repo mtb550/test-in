@@ -61,6 +61,9 @@ and which keys it answers, and the shell builds the rest.
   as half of a pair, so no dialog is two tinted rows tall to say six words.
 - **Rule-INTERNAL-080** — A button a dialog will not act on yet is drawn
   disabled, and hovering over it says why.
+- **Rule-INTERNAL-085** — In a box that offers a list and can also be typed
+  into, Enter picks the value under it while the list is open. While the list is
+  closed, Enter is the dialog's own key, as it is in every other field.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

@@ -24,8 +24,11 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * One captioned row offering a list of values and accepting one that is not on
@@ -45,6 +48,8 @@ public final class ChoiceInput implements DialogComponent {
     private final @NotNull JBPanel<?> panel;
     private final @NotNull ComboBox<String> combo;
 
+    private static final @NotNull String PICK = "testin.choice.pick";
+
     ChoiceInput(final @NotNull String caption, final @NotNull List<String> options, final @NotNull String selected) {
         combo = new ComboBox<>(options.toArray(String[]::new));
         combo.setEditable(true);
@@ -56,6 +61,45 @@ public final class ChoiceInput implements DialogComponent {
         panel.setBorder(JBUI.Borders.emptyTop(8));
         panel.add(Captions.panel(caption), BorderLayout.WEST);
         panel.add(combo, BorderLayout.CENTER);
+
+        enterPicksOnlyFromTheOpenList();
+    }
+
+    /**
+     * Rule-INTERNAL-055, Rule-INTERNAL-085.
+     * <p>
+     * Enter picks the value under it while the list is open, and is the
+     * dialog's key the rest of the time.
+     * <p>
+     * The cursor is in the combo's own text field, not the combo, and that
+     * field takes Enter to commit what was typed whether the list is open or
+     * not - so the dialog's Enter never arrived, and in Pending Changes a tester
+     * who typed a new branch name and pressed Enter got nothing, under a strip
+     * reading "Enter - Commit and Push" (#66, finding 186). Handing the field's
+     * Enter to the dialog outright would push while the tester was picking a
+     * branch from the list. So the field's binding answers only while the list is
+     * open; the rest of the time it stands aside and the key reaches the
+     * dialog's.
+     */
+    private void enterPicksOnlyFromTheOpenList() {
+        if (!(combo.getEditor().getEditorComponent() instanceof JComponent field)) return;
+
+        final @NotNull KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+        final @NotNull Optional<Action> pick = Optional.ofNullable(field.getInputMap().get(enter)).map(key -> field.getActionMap().get(key));
+        if (pick.isEmpty()) return;
+
+        field.getInputMap().put(enter, PICK);
+        field.getActionMap().put(PICK, new AbstractAction() {
+            @Override
+            public boolean isEnabled() {
+                return combo.isPopupVisible();
+            }
+
+            @Override
+            public void actionPerformed(final @NotNull ActionEvent e) {
+                pick.orElseThrow().actionPerformed(e);
+            }
+        });
     }
 
     /**

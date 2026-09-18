@@ -60,7 +60,9 @@ The box sits under the table in the review dialog.
 1. The tester opens the **Pending Changes** dialog.
 2. The **Branch** box shows the branch they are on.
 3. The tester types a name that does not exist yet.
-4. The tester types a message and presses **Commit & Push**.
+4. The tester types a message and presses **Commit & Push**, or `Enter` from
+   any field, the **Branch** box included once its list is closed
+   (Rule-INTERNAL-085).
 5. A bar reads *Preparing the branch*.
 6. Testin makes the branch and checks it out.
 7. The commit is made on it, and pushed.
