@@ -99,9 +99,10 @@ test run is going.
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  [||]  [pin]  [view]            Cycle-2                        3 / 6       │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  LOGIN                                                                     │
-│  Sign in with a correct username and password                              │
-│  The dashboard opens and the account name is shown in the header.          │
+│  [set] LOGIN                                                               │
+│                                                                            │
+│  [D] Sign in with a correct username and password                          │
+│  [E] The dashboard opens and the account name is shown in the header.      │
 ├────────────────────────────────────────────────────────────────────────────┤
 │      P Passed              F Failed              B Blocked                 │
 │  00:41                                                    00:12:41         │
@@ -116,17 +117,18 @@ test run is going.
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  [||]  [pin]  [view]            Cycle-2                        3 / 6       │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  LOGIN                                                                     │
-│  Sign in with a correct username and password                              │
-│  The dashboard opens and the account name is shown in the header.          │
+│  [set] LOGIN                                                               │
 │                                                                            │
-│  STEPS           1. Open the sign-in page.                                 │
-│                  2. Type the username.                                     │
-│                  3. Type the password.                                     │
-│                  4. Press Sign in.                                         │
-│  TEST DATA       sample.user@example.com / correct-horse                   │
-│  PRE CONDITIONS  The account exists and is not locked.                     │
-│  TAGS            [ HIGH ]  [ Accounts ]                                    │
+│  [D] Sign in with a correct username and password                          │
+│  [E] The dashboard opens and the account name is shown in the header.      │
+│                                                                            │
+│      [ HIGH ]  [ Accounts ]                                                │
+│  [S] 1. Open the sign-in page.                                             │
+│      2. Type the username.                                                 │
+│      3. Type the password.                                                 │
+│      4. Press Sign in.                                                     │
+│  [T] sample.user@example.com / correct-horse                               │
+│  [B] The account exists and is not locked.                                 │
 ├────────────────────────────────────────────────────────────────────────────┤
 │      P Passed              F Failed              B Blocked                 │
 │  00:41                                                    00:12:41         │
@@ -184,11 +186,13 @@ the grid shows, so the two can never disagree about which test case is next.
 ### 5. The description, large
 
 This is the one thing that cannot be turned off. It is drawn at a size the
-tester can read from across a desk.
+tester can read from across a desk. Its icon, **D**, the test case form's own,
+sits before it in the middle of its height.
 
 ### 6. The test set name, in small capitals above the description
 
-It is on by default, because a description alone can be ambiguous. "Sign in with
+It carries the test set's icon, in gray, and a line's space under it. It is
+on by default, because a description alone can be ambiguous. "Sign in with
 a correct username and password" could sit under a Login test set. It could also
 sit under a Checkout test set testing guest sign-in.
 
@@ -225,7 +229,9 @@ It is not behind the details toggle, because it is not a detail. The description
 says what to do. The expected result says what should happen. A tester who
 cannot see the second has no way to judge the first.
 
-They are one thought, so they read as one. **Neither carries a label.** The
+They are one thought, so they read as one. **Neither carries a label**, only
+the test case form's icon: **D** before the description and **E** before the
+expected result, each in the middle of its text's height. The
 description is large and dark. The expected result is smaller, lighter and
 gray, directly beneath it. A tester reading two lines in that order does not
 need to be told which is which. The word *Expected* would cost a line, in a
@@ -511,9 +517,12 @@ base size.
 
 - the description is three points larger, and bold
 - the expected result and every detail are the base size
-- labels and the test set name are two points smaller. The labels beside the
-  details, and the captions on the failure form, are set in the caption font,
-  JetBrains Mono in capitals, as every caption in Testin is (Rule-INTERNAL-087)
+- the test set name is two points smaller. The details are named by their
+  icons, **S**, **T** and **B**, as the test case form names them, and the tags
+  come first with no icon, since their badges say what they are. The captions
+  on the failure form are set in the caption font, JetBrains Mono in capitals,
+  as every caption in Testin is (Rule-INTERNAL-087). The icons keep their size
+  when the window zooms
 
 No text ever goes below 8 points, which is where the rest of the plugin stops
 too. One number moves, and everything moves together. So the layout cannot come

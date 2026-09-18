@@ -40,9 +40,8 @@ import java.awt.Font;
  * {@link #body} - the expected result, the steps, the test data - is read
  * against it at the editor's own size; {@link #label}, for the test set name
  * and the cut-off notice, is smaller still, because it names or notes rather
- * than being read for itself. Field names are captions and take
- * {@link org.testin.ui.Caption}'s font. Flattening them would leave a window of one
- * uniform paragraph.
+ * than being read for itself. A field is named by its icon rather than a word.
+ * Flattening them would leave a window of one uniform paragraph.
  * <p>
  * Methods rather than constants, deliberately. The editor font is a setting the
  * tester can change while the IDE is running, and a constant would freeze

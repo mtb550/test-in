@@ -34,12 +34,14 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.Toolkit;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.components.StartExecutionBtn;
+import org.testin.model.DirectoryType;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
+import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testrun.RunStatusService;
 import org.testin.ui.framework.StatusBarBase;
 import org.testin.model.StatusBarItem;
@@ -48,6 +50,7 @@ import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
+import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
@@ -183,6 +186,12 @@ final class LightModeWindow {
     private final @NotNull JBLabel set = new JBLabel();
     private final @NotNull JTextArea description = Prose.of(descriptionFont, JBUI.CurrentTheme.Label.foreground());
     private final @NotNull JTextArea expected = Prose.of(expectedFont, JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+
+    /**
+     * The expected result behind its icon, shown and hidden as one, so an empty
+     * expected result leaves no icon behind.
+     */
+    private final @NotNull JComponent expectedRow = iconBefore(CreateTestCaseFields.EXPECTED_RESULT.getIcon(), expected);
     private final @NotNull JBLabel idle = new JBLabel(Bundle.message("light.idle"), SwingConstants.CENTER);
 
     private final @NotNull JBLabel chosen = new JBLabel();
@@ -869,7 +878,7 @@ final class LightModeWindow {
         // on the view menu - it is the other half of the description, and a
         // tester who can see what to do but not what should happen cannot judge
         // the case in front of them.
-        expected.setVisible(!expected.getText().isBlank());
+        expectedRow.setVisible(!expected.getText().isBlank());
 
         strip.setVisible(shows(LightModePart.DURATION));
         verdictRow.setVisible(shows(LightModePart.VERDICT_BUTTONS) && !writing);
@@ -1040,6 +1049,11 @@ final class LightModeWindow {
      */
     private @NotNull JComponent body() {
         set.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+        // Gray like every icon that names a thing, and as far from the name as
+        // the description's icon is from the description, so the two texts
+        // start at one edge.
+        set.setIcon(Icons.gray(DirectoryType.TS.getIcon()));
+        set.setIconTextGap(JBUI.scale(CaseDetails.GAP));
         idle.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
         // The one place a verdict is colored while the tester is still working:
@@ -1050,8 +1064,8 @@ final class LightModeWindow {
 
         final @NotNull JBPanel<?> text = new JBPanel<>(new BorderLayout(0, JBUI.scale(10)));
         text.setOpaque(false);
-        text.add(description, BorderLayout.NORTH);
-        text.add(expected, BorderLayout.CENTER);
+        text.add(iconBefore(CreateTestCaseFields.DESCRIPTION.getIcon(), description), BorderLayout.NORTH);
+        text.add(expectedRow, BorderLayout.CENTER);
 
         details.setBorder(JBUI.Borders.emptyTop(14));
         // Closed until asked for. The window exists to put one sentence in front
@@ -1059,6 +1073,7 @@ final class LightModeWindow {
         details.setVisible(false);
 
         setLine.setOpaque(false);
+        setLine.setBorder(JBUI.Borders.emptyBottom(CaseDetails.GAP));
         setLine.add(set);
         setLine.add(chosen);
 
@@ -1177,6 +1192,15 @@ final class LightModeWindow {
                 StatusBarShortcut.hint(Shortcuts.Enter.getShortcutText(), Bundle.message("shortcut.save.and.next")),
                 StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), Bundle.message("shortcut.cancel")),
                 StatusBarShortcut.corrections()};
+    }
+
+    /**
+     * A field's text with the field's icon before it, in the middle of the
+     * text's height, and as far from it as the details rows' icons are from
+     * theirs.
+     */
+    private static @NotNull JComponent iconBefore(final @NotNull Icon icon, final @NotNull JComponent text) {
+        return JBUI.Panels.simplePanel(JBUI.scale(CaseDetails.GAP), 0).addToLeft(new JBLabel(icon)).addToCenter(text).andTransparent();
     }
 
     private static @NotNull JBLabel clock(final @NotNull String meaning) {

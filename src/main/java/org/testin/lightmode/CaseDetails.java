@@ -19,12 +19,12 @@ package org.testin.lightmode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Badges;
-import org.testin.ui.Caption;
-import org.testin.ui.FontSync;
 import org.testin.ui.framework.Prose;
+import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Bundle;
@@ -40,13 +40,14 @@ import java.util.Optional;
  * has to be true first, and how it is tagged (#13).
  * <p>
  * <b>Not the details panel's rows.</b> Those put each caption on a line of its
- * own above the value (#328); this window keeps a narrow caption column beside
- * it, 92 pixels in the design, so a case of four short fields stays four lines
- * in a window that is meant to stay small. What is shared instead is
- * everything that is knowledge rather than layout: the field names come from
- * {@link TestEditorAttributes}, the caption font from {@link Caption} as every
- * caption in the plugin has it, the step numbering from {@link Display}, and the
- * tags are the plugin's own badges.
+ * own above the value (#328); this window names a field by its icon beside the
+ * value, so a case of four short fields stays four lines in a window that is
+ * meant to stay small. What is shared instead is everything that is knowledge
+ * rather than layout: each field's icon is the test case form's own, the step
+ * numbering is {@link Display}'s, and the tags are the plugin's own badges.
+ * <p>
+ * The tags come first and have no icon: their badges already say what they
+ * are, and they are what a tester glances at before reading the steps.
  * <p>
  * A blank field is not drawn. Most cases fill in two of these four, and a row
  * with a dash after it is a line read on every case to learn nothing.
@@ -54,19 +55,11 @@ import java.util.Optional;
 class CaseDetails extends JBPanel<CaseDetails> {
 
     /**
-     * What the last row is called. Not GROUP: it draws the priority badge as
-     * well, so a High-priority case in no group read "GROUP: High".
+     * The space between a field's icon and its text, and between two rows. The
+     * description and the expected result above use it too, so every text in
+     * the window starts at one edge.
      */
-    private static final @NotNull String TAGS = Bundle.message("light.tags");
-
-    /**
-     * The label column, in the design's own figure. Narrow because the window is
-     * narrow and the label is one word set small - and it grows with the zoom,
-     * because a label set larger in a column that did not would wrap.
-     */
-    private static final int LABEL_WIDTH = 92;
-
-    private static final int GAP = 10;
+    static final int GAP = 10;
 
     /**
      * The case on screen, kept so the rows can be rebuilt without being handed
@@ -122,7 +115,8 @@ class CaseDetails extends JBPanel<CaseDetails> {
     }
 
     /**
-     * Scales the field labels and their values, and nothing else in the window.
+     * Scales the field values, and nothing else in the window: the icons keep
+     * their size, as icons do.
      * <p>
      * The rows are rebuilt rather than walked and re-sized: they are rebuilt on
      * every case anyway, and a walk would have to know which of the components
@@ -143,16 +137,16 @@ class CaseDetails extends JBPanel<CaseDetails> {
     }
 
     private void rows(final @NotNull TestCaseDto tc) {
-        addRow(TestEditorAttributes.STEPS.getName(), Display.numberedSteps(tc.getSteps()));
+        addTags(tc);
+
+        addRow(CreateTestCaseFields.STEPS.getIcon(), Display.numberedSteps(tc.getSteps()));
 
         // Verbatim, and not through Display: test data is credentials, a query, a
         // payload - values that are used rather than read, so a character this
         // window decides to drop is a value that no longer works. The same rule
         // the details panel states, for the same reason.
-        addRow(TestEditorAttributes.TEST_DATA.getName(), tc.getTestData());
-        addRow(TestEditorAttributes.PRE_CONDITIONS.getName(), TestEditorAttributes.PRE_CONDITIONS.displayValue(tc));
-
-        addTags(tc);
+        addRow(CreateTestCaseFields.TEST_DATA.getIcon(), tc.getTestData());
+        addRow(CreateTestCaseFields.PRE_CONDITIONS.getIcon(), TestEditorAttributes.PRE_CONDITIONS.displayValue(tc));
 
         // Last, under everything it is about. A tester who cannot see the rest
         // of the case has one thing to do about it, and the row says what.
@@ -174,16 +168,20 @@ class CaseDetails extends JBPanel<CaseDetails> {
         notice.setFont(CaseFont.zoomed(CaseFont.label(), zoom));
         notice.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
-        addRow("", notice);
+        addRow(EmptyIcon.ICON_16, notice);
     }
 
-    private void addRow(final @NotNull String name, final @NotNull String value) {
+    private void addRow(final @NotNull Icon icon, final @NotNull String value) {
         if (value.isBlank()) return;
 
-        addRow(name, prose(value));
+        addRow(icon, prose(value));
     }
 
-    private void addRow(final @NotNull String name, final @NotNull JComponent value) {
+    /**
+     * One row: the field's icon, in the middle of the row's height, and its
+     * value beside it.
+     */
+    private void addRow(final @NotNull Icon icon, final @NotNull JComponent value) {
         final @NotNull GridBagConstraints gbc = new GridBagConstraints();
 
         // RELATIVE, so the layout counts the rows rather than this class
@@ -195,10 +193,12 @@ class CaseDetails extends JBPanel<CaseDetails> {
 
         gbc.gridx = 0;
         gbc.weightx = 0;
-        add(label(name), gbc);
+        gbc.anchor = GridBagConstraints.WEST;
+        add(new JBLabel(icon), gbc);
 
         gbc.gridx = 1;
         gbc.weightx = 1;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = JBUI.insets(0, GAP, GAP, 0);
         add(value, gbc);
     }
@@ -218,25 +218,9 @@ class CaseDetails extends JBPanel<CaseDetails> {
         chips.setOpaque(false);
         Badges.showBadges(chips, badges);
 
-        // Labeled for what the row holds rather than for the groups alone: a
-        // High-priority case in no group drew a row reading GROUP: High.
-        addRow(TAGS, chips);
-    }
-
-    // UC-EDITOR-PANEL-046, Rule-INTERNAL-087
-    private @NotNull JBLabel label(final @NotNull String text) {
-        // The caption font every caption in the plugin is set in, sized from the
-        // editor font as the case's own text is, then at this window's zoom. It
-        // was its own small capitals in the UI font, the one caption look that
-        // had no owner but this method (#328).
-        final @NotNull JBLabel label = Caption.of(text, FontSync.getBaseFontSize());
-        label.setFont(CaseFont.zoomed(label.getFont(), zoom));
-
-        final @NotNull Dimension size = new Dimension(Math.round(JBUI.scale(LABEL_WIDTH) * zoom), label.getPreferredSize().height);
-        label.setPreferredSize(size);
-        label.setMinimumSize(size);
-
-        return label;
+        // An empty icon's room, so the badges start where the text of the other
+        // rows does.
+        addRow(EmptyIcon.ICON_16, chips);
     }
 
     private @NotNull JTextArea prose(final @NotNull String text) {
