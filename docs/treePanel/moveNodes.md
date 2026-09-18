@@ -81,6 +81,9 @@ The node keeps everything inside it. Only where it sits changes.
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
+- **Rule-TREE-PANEL-105** — A node dragged out of the IDE, onto the desktop or a
+  file manager, carries nothing. Test data is moved only by Testin, so the tree
+  and the folders on disk cannot disagree.
 
 ## The Paste, Move and Copy dialog
 
@@ -172,6 +175,10 @@ gray. Neither can be moved or copied.
 
 **If several rows are selected** — **Paste** stays black and pastes into the
 first of them.
+
+**If a node is dragged out of the IDE** — onto the desktop, a file manager or
+another application — nothing is dropped there. Test data is moved only by
+Testin (Rule-TREE-PANEL-105).
 
 **If the Java plugin is not installed** — the first move in the project shows
 *Java Plugin Not Available*. The move still happens.
