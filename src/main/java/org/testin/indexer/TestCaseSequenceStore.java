@@ -257,6 +257,8 @@ final class TestCaseSequenceStore {
     boolean move(final @NotNull Path fromSet, final @NotNull Path toSet, final @NotNull TestCaseDto testCase) {
         final @NotNull UUID id = testCase.getId();
         final @NotNull Path from = fileOf(fromSet, id);
+        final @NotNull Path to = named(toSet, id);
+        final @NotNull Optional<TestCaseDto> was = Optional.ofNullable(testCasesById.get(id));
 
         // Out of the hand-named files first, so the write does not delete the
         // file the case was read from on its own. That is done below, after the
@@ -267,27 +269,53 @@ final class TestCaseSequenceStore {
             return false;
         }
 
-        if (!fromSet.equals(toSet)) Optional.ofNullable(testSetCaseIds.get(fromSet.toString())).ifPresent(ids -> ids.remove(id));
-        if (!from.equals(named(toSet, id))) Services.getInstance(p, TestDataFiles.class).delete(p, from, fromSet);
+        if (from.equals(to)) return true;
 
-        return true;
+        final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
+        if (files.delete(p, from, fromSet)) {
+            if (!fromSet.equals(toSet)) Optional.ofNullable(testSetCaseIds.get(fromSet.toString())).ifPresent(ids -> ids.remove(id));
+            return true;
+        }
+
+        // The old file would not go, so the new one is taken back and the case
+        // stays where it was. Left as it is, the case would be on disk in two
+        // sets under one id, and the next scan would read it twice (#66,
+        // finding 292).
+        files.delete(p, to, toSet);
+        if (!fromSet.equals(toSet)) Optional.ofNullable(testSetCaseIds.get(toSet.toString())).ifPresent(ids -> ids.remove(id));
+        was.ifPresent(original -> testCasesById.put(id, original));
+        if (wasHandNamed) handNamed.put(id, from);
+        return false;
     }
 
-    void remove(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
-        testCasesById.remove(testCaseId);
-        Optional.ofNullable(testSetCaseIds.get(testSetPath.toString()))
-                .ifPresent(ids -> ids.remove(testCaseId));
-
+    /**
+     * Takes a test case out of its set: the file first, then the index.
+     * <p>
+     * That is architecture rule 2, and this had it the wrong way round. The
+     * index let go of the case before the file was tried, and the delete's
+     * answer was not asked for - so a file the system would not delete stayed on
+     * disk while the tester read <i>Removed</i>, and the next scan brought the
+     * case back (#66, finding 292).
+     *
+     * @return whether the case is gone. When it is not, it is still in its set,
+     * on disk and in the index, and the writer has said why.
+     */
+    boolean remove(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
         // The file it is really in: a hand-named one was left behind, and the
         // case came back with the next scan (Rule-INTERNAL-084).
         final @NotNull Path file = fileOf(testSetPath, testCaseId);
-        handNamed.remove(testCaseId, file);
 
         // Through the writer like the write paths beside it, so OwnWrites
         // claims the delete and our own removal is not read as an external
         // change worth a rescan (#117). stopAt is the set itself: a set
         // outlives its last case, so nothing above the file is pruned.
-        Services.getInstance(p, TestDataFiles.class).delete(p, file, testSetPath);
+        if (!Services.getInstance(p, TestDataFiles.class).delete(p, file, testSetPath)) return false;
+
+        testCasesById.remove(testCaseId);
+        Optional.ofNullable(testSetCaseIds.get(testSetPath.toString()))
+                .ifPresent(ids -> ids.remove(testCaseId));
+        handNamed.remove(testCaseId, file);
+        return true;
     }
 
     /**

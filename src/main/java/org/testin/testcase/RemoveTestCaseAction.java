@@ -17,6 +17,7 @@
 package org.testin.testcase;
 
 import org.testin.actions.GrayWithReason;
+import org.testin.editor.TestinEditors;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
@@ -96,13 +97,10 @@ public class RemoveTestCaseAction extends DumbAwareAction {
                     ? Bundle.message("remove.case.confirm.one", selectedItems.getFirst().getDescription())
                     : Bundle.message("remove.case.confirm.many", String.valueOf(selectedItems.size()));
 
-            new ConfirmDialog(p, Bundle.message("remove.confirm.title"), msg, dir.getPath().toString(), "", Bundle.message("remove.confirm.button"), () -> {
-                delete.run();
-
-                // Inside the confirmation callback, not around actionPerformed: a
-                // canceled dialog removes nothing and says nothing (#62).
-                Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, selectedItems.size());
-            }).show();
+            // Confirmed from inside the deletion, once the files have answered,
+            // and never around actionPerformed: a canceled dialog removes nothing
+            // and says nothing (#62).
+            new ConfirmDialog(p, Bundle.message("remove.confirm.title"), msg, dir.getPath().toString(), "", Bundle.message("remove.confirm.button"), delete).show();
         }
 
         // UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-064
@@ -136,26 +134,36 @@ public class RemoveTestCaseAction extends DumbAwareAction {
                 final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(selectedItems);
                 final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, dir.getPath(), ids);
 
+                // Only the cases whose files went are removed, and only they are
+                // counted, lose their methods and are named in the undo. A file
+                // the system would not delete keeps its case, and the writer has
+                // said why. The balloon used to be raised before these deletes
+                // had even started, for the whole selection (#66, finding 292).
                 final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                final @NotNull List<TestCaseDto> removed = new ArrayList<>();
                 for (final TestCaseDto tc : selectedItems) {
-                    indexer.removeTestCase(dir.getPath(), tc.getId());
+                    if (indexer.removeTestCase(dir.getPath(), tc.getId())) removed.add(tc);
                 }
 
-                TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.remove"), selectedItems), before, TestCaseSnapshot.of(p, dir.getPath(), ids));
+                TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.remove"), removed), before, TestCaseSnapshot.of(p, dir.getPath(), ids));
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     // One call for the whole selection. Only executeAll opens the
                     // single write command, so removing forty cases a case at a time
                     // was forty entries on the IDE's own undo history - the defect
                     // the batching in #153 was written to fix (#66, finding 80).
-                    GenType.REMOVE_TEST_CASE.executeAll(p, selectedItems);
+                    if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
 
                     // Redrawn from the master list rather than by taking rows out
                     // of the page's model, which a declared action has no way to
                     // reach. It is also the more honest redraw: a page of fifty that
                     // loses three refills from the next page instead of standing at
-                    // forty-seven.
-                    editor.refreshView();
+                    // forty-seven. A case that stayed was taken off that list above,
+                    // so then the editor reads its set again, and it comes back.
+                    if (removed.size() == selectedItems.size()) editor.refreshView();
+                    else Services.getInstance(p, TestinEditors.class).reloadOpen(p, dir.getPath());
+
+                    if (!removed.isEmpty()) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, removed.size());
                 });
             });
         }

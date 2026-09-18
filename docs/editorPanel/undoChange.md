@@ -78,9 +78,10 @@ nothing.
 sync, a pull, or another IDE - so taking this back would write over work that is
 not yours. Nothing was changed.*
 
-**If a test case cannot be written back** — the others still come back, and a
-message reads *unable to write content:* and the reason. *Undone* is not shown,
-because not everything was.
+**If a test case cannot be written back, or its file cannot be deleted** — the
+others are still taken back, and a message reads *unable to write content:* or
+*unable to remove:* and the reason. *Undone* is not shown, because not
+everything was.
 
 ## What one press takes back
 

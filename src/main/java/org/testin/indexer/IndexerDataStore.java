@@ -206,9 +206,13 @@ final class IndexerDataStore {
         return true;
     }
 
-    void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
-        testCaseStore.remove(testSetPath, tcId);
+    boolean removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
+        // The marker follows the delete: a set whose case is still on disk was
+        // not modified.
+        if (!testCaseStore.remove(testSetPath, tcId)) return false;
+
         markTestSetModified(testSetPath);
+        return true;
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-031

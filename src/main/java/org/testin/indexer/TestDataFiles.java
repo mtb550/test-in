@@ -161,8 +161,13 @@ final class TestDataFiles {
      * folder and its marker standing, so the tree keeps showing a set with
      * nothing in it that nobody can explain. Stops at the project because an
      * empty project is still a project - somebody made it deliberately.
+     *
+     * @return whether the file is gone now: removed, in the recycle bin, or never
+     * there. False when the system refused to delete it, which this has already
+     * said. It answered nothing, so a test case whose file would not go was
+     * dropped from the index anyway (#66, finding 292)
      */
-    void delete(final @NotNull Project p, final @NotNull Path path, final @NotNull Path stopAt) {
+    boolean delete(final @NotNull Project p, final @NotNull Path path, final @NotNull Path stopAt) {
         try {
             Services.getInstance(OwnWrites.class).record(path);
 
@@ -173,10 +178,11 @@ final class TestDataFiles {
         } catch (final IOException ex) {
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", ex.getMessage()));
             Logger.error("unable to remove " + path + ": " + ex.getMessage());
-            return;
+            return false;
         }
 
         removeEmptyFolders(path.getParent(), stopAt);
+        return true;
     }
 
     /**

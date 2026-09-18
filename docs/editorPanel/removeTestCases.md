@@ -78,6 +78,11 @@ Testin asks first. The test case's file and its generated test method both go.
 
 **If the tester presses `Escape`** — nothing is removed and nothing is said.
 
+**If a test case's file cannot be deleted** — a locked file, for one — that test
+case stays, and the editor reads its test set again with it there. A message
+reads *unable to remove:* and the reason. *Removed* counts only the test cases
+that went, and says nothing when none did.
+
 ## What goes with them
 
 The test case's file, and its generated test method. Anything the tester wrote

@@ -559,12 +559,22 @@ public final class ProjectIndexer {
         return store.moveTestCase(fromSet, toSet, tc);
     }
 
-    public void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
-        store.removeTestCase(testSetPath, tcId);
+    /**
+     * UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-064.
+     * <p>
+     * Removes a test case: its file, then its place in the index.
+     *
+     * @return whether it is gone. When the file would not go, the case is still
+     * in its set and the writer has said why, so there is nothing for the caller
+     * to confirm, count or take the method of (#66, finding 292).
+     */
+    public boolean removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
+        if (!store.removeTestCase(testSetPath, tcId)) return false;
 
         // The completion cache is derived from the test cases, so it has to shrink
         // with them - otherwise a deleted description keeps being offered.
         Services.getInstance(p, TestCaseValues.class).reload(this::getAllTestCases);
+        return true;
     }
 
     /**

@@ -210,10 +210,9 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         // could have told them apart - X is removed and then restored, which is
         // the state being asked for. A copy-and-paste is unaffected either way:
         // its ids are fresh, so nothing overlaps.
-        target.forEach(TestCaseSnapshot::removeAbsent);
-
         // Every snapshot tries, whatever the one before it answered.
         boolean allBack = true;
+        for (final TestCaseSnapshot snapshot : target) allBack &= snapshot.removeAbsent();
         for (final TestCaseSnapshot snapshot : target) allBack &= snapshot.restorePresent();
 
         tellTheSurfaces(p, target);
@@ -299,24 +298,30 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
      * Its own half of the work because {@link #restore} runs every snapshot's
      * removals before any snapshot's restorations - see the comment there for
      * what went wrong when it did not.
+     * <p>
+     * Answers whether every one of them went. A case whose file the system
+     * would not delete is still there, the writer has said why, and the undo is
+     * not confirmed over it (#66, finding 292).
      */
-    private void removeAbsent() {
+    private boolean removeAbsent() {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         // Only what is actually there. An id that is already gone is the state
         // this asks for, and deleting a file twice is a warning in the log for
         // a job already done.
+        final @NotNull List<TestCaseDto> stillThere = absent.stream().flatMap(id -> indexer.findTestCase(id).stream()).toList();
         final @NotNull List<TestCaseDto> removed = new ArrayList<>();
-        absent.forEach(id -> indexer.findTestCase(id).ifPresent(tc -> {
-            indexer.removeTestCase(testSetPath, id);
-            removed.add(tc);
-        }));
+        for (final TestCaseDto tc : stillThere) {
+            if (indexer.removeTestCase(testSetPath, tc.getId())) removed.add(tc);
+        }
 
         // One call for all of them, as the reconcile at the end of restorePresent
         // already does. Only executeAll opens the single write command, so taking
         // back a removal of forty cases used to put forty entries on the IDE's own
         // undo history (#66, finding 80).
         if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
+
+        return removed.size() == stillThere.size();
     }
 
     /**

@@ -127,6 +127,26 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         return pasted;
     }
 
+    /**
+     * Puts a folder where a case's file is, with a file inside it held open, so
+     * deleting the case's file is refused the way a locked file refuses it. Both
+     * halves are needed on Windows, where the tests run: the recycle bin takes a
+     * folder whose files are all closed, and a plain delete refuses any folder
+     * with something in it. Close what this answers once the call under test
+     * has returned.
+     */
+    private static java.io.FileInputStream undeletable(final Path file) {
+        try {
+            Files.deleteIfExists(file);
+            Files.createDirectories(file);
+            final Path inside = file.resolve("keep");
+            Files.writeString(inside, "in the way");
+            return new java.io.FileInputStream(inside.toFile());
+        } catch (final java.io.IOException ex) {
+            throw new AssertionError("could not set up the refused delete", ex);
+        }
+    }
+
     private static TestCaseDto testCase(final TestSetDirectoryDto ts, final String rank) {
         final TestCaseDto tc = TestCaseDto.builder()
                 .id(UUID.randomUUID())
@@ -260,5 +280,54 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         assertTrue("a refused move took the case's file out of its set", Files.isRegularFile(fileOf(login, cut)));
         assertEquals("a refused move took the case out of its set in the index",
                 login.getPath(), indexer().findTestCase(cut.getId()).orElseThrow().getParent().getPath());
+    }
+
+    /**
+     * Rule-EDITOR-PANEL-064.
+     * <p>
+     * A removal whose file will not go leaves the case in its set. The index let
+     * go of the case first, so the tester read Removed over a file still on
+     * disk, and the next scan brought it back (#66, finding 292).
+     */
+    public void testARemovalWhoseDeleteIsRefusedKeepsTheCase() {
+        final TestSetDirectoryDto ts = testSet();
+        final TestCaseDto tc = testCase(ts, "m");
+        indexer().putTestCaseVerbatim(ts.getPath(), tc);
+
+        try (var held = undeletable(fileOf(ts, tc))) {
+            assertFalse("a refused delete was reported as a removal", indexer().removeTestCase(ts.getPath(), tc.getId()));
+        } catch (final java.io.IOException ex) {
+            throw new AssertionError("could not let go of the held file", ex);
+        }
+
+        assertTrue("a refused delete took the case out of the index", indexer().findTestCase(tc.getId()).isPresent());
+        assertTrue("a refused delete took the case out of its set",
+                indexer().getTestCasesForTestSet(ts.getPath()).stream().anyMatch(each -> each.getId().equals(tc.getId())));
+    }
+
+    /**
+     * Rule-INTERNAL-035.
+     * <p>
+     * A move whose old file will not go takes back the new one, so the case is
+     * in one set rather than on disk in two under one id (#66, finding 292).
+     */
+    public void testAMoveWhoseOldFileWillNotGoLeavesTheCaseWhereItWas() {
+        final List<TestSetDirectoryDto> sets = twoTestSets();
+        final TestSetDirectoryDto login = sets.get(0);
+        final TestSetDirectoryDto signUp = sets.get(1);
+        final TestCaseDto cut = testCase(login, "m");
+        indexer().putTestCaseVerbatim(login.getPath(), cut);
+
+        try (var held = undeletable(fileOf(login, cut))) {
+            assertFalse("a move whose old file stayed was reported as a move", indexer().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
+        } catch (final java.io.IOException ex) {
+            throw new AssertionError("could not let go of the held file", ex);
+        }
+
+        assertFalse("the new file was left behind beside the old one", Files.exists(fileOf(signUp, cut)));
+        assertEquals("the index files the case under the set it could not leave",
+                login.getPath(), indexer().findTestCase(cut.getId()).orElseThrow().getParent().getPath());
+        assertTrue("the new set lists a case that did not arrive",
+                indexer().getTestCasesForTestSet(signUp.getPath()).stream().noneMatch(each -> each.getId().equals(cut.getId())));
     }
 }

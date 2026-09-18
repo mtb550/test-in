@@ -252,10 +252,9 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             // replaced would have matched no arm, done nothing, and still taken
             // the row away under a "Reverted" balloon.
             final boolean reverted = switch (diff.type()) {
-                case ADDED -> {
-                    indexer.removeTestCase(testSetPath, testCaseId);
-                    yield true;
-                }
+                // Reverted only if the file went; when it did not, the writer
+                // has said why and the row stays (#66, finding 292).
+                case ADDED -> indexer.removeTestCase(testSetPath, testCaseId);
                 // Rule-INTERNAL-035. Put back as it was committed, audit
                 // included: the ordinary save finds the case unknown and stamps
                 // whoever reverts it as its creator (#66, finding 113). Reverted
