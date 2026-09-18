@@ -264,6 +264,6 @@ public final class TestNGRunner implements TestRunner {
         if (generated.size() == 1) return classes.getFirst() + "." + generated.getFirst().fqcn().getLast();
         if (classes.size() == 1) return classes.getFirst();
 
-        return classes.getFirst() + " and " + (classes.size() - 1) + " more";
+        return Bundle.message("codegen.named.and.more", classes.getFirst(), String.valueOf(classes.size() - 1));
     }
 }
