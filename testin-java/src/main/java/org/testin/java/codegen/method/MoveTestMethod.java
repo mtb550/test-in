@@ -36,9 +36,11 @@ import org.testin.codegen.MovedCase;
 import org.testin.java.codegen.GeneratedClass;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.java.codegen.method.update.UpdateTestBase;
+import org.testin.java.codegen.method.update.UpdateTestOrder;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,10 +83,36 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
     // UC-CODEGEN-002, Rule-CODEGEN-077
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (!(obj instanceof MovedCase moved)) return;
+        executeAll(p, List.of(obj));
+    }
+
+    /**
+     * UC-CODEGEN-002, Rule-CODEGEN-077, Rule-CODEGEN-014.
+     * <p>
+     * Moves each method, then renumbers the sets they moved into.
+     * <p>
+     * The renumbering has to come after. The paste queued the set's order sweep
+     * ahead of this, so it ran while the method was still in the old class,
+     * found nothing for that case and skipped it - and the method then arrived
+     * verbatim, priority and all. A cut case ran at the position it held in the
+     * set it left, and could share a number with a sibling: the card at one place
+     * in the list, TestNG running it at another (#66, finding 194). Swept here,
+     * inside the same command, the moved methods take their places the way
+     * ReconcileTestMethod has its restored ones take theirs.
+     */
+    @Override
+    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+        final @NotNull List<MovedCase> moves = new ArrayList<>();
+        for (final Object item : items) {
+            if (item instanceof MovedCase moved) moves.add(moved);
+        }
+        if (moves.isEmpty()) return;
 
         final @NotNull Runnable inCommand = () ->
-                WriteCommandAction.runWriteCommandAction(p, "Move Test Method", null, () -> move(p, moved));
+                WriteCommandAction.runWriteCommandAction(p, "Move Test Method", null, () -> {
+                    moves.forEach(moved -> move(p, moved));
+                    new UpdateTestOrder().executeAll(p, moves.stream().map(MovedCase::tc).toList());
+                });
 
         // Straight through when a command is already open, and only then hop -
         // the same rule every update in this package follows, so a paste of
@@ -133,9 +161,19 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
         // Already there, which is what a paste into the set the case came from
         // means: the two classes are one, and moving a method to where it is
         // would delete it.
-        if (GeneratedMethod.forCase(target, tc).isPresent()
-                && target.equals(from.orElseThrow())) {
+        if (target.equals(from.orElseThrow())) {
             Logger.debug("The method for '" + tc.getDescription() + "' is already in the right class");
+            return;
+        }
+
+        // The destination holds a method for this case already - a stale copy,
+        // left by a gesture that did not finish. Adding a second one with the
+        // same signature stopped the class compiling (#66, finding 206). Both
+        // are left as they are, and the log says which classes to look in: the
+        // one with the tester's body cannot be told from here.
+        if (GeneratedMethod.forCase(target, tc).isPresent()) {
+            Logger.warn("Left the method for '" + tc.getDescription() + "' in " + from.orElseThrow().getQualifiedName()
+                    + ": " + target.getQualifiedName() + " already has a method for this test case");
             return;
         }
 

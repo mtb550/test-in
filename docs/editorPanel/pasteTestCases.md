@@ -70,7 +70,8 @@ with a count after it for more than one test case.
 6. The test set's order is worked out again and saved.
 7. On a cut, each test case takes its generated method with it: the method is
    carried into this test set's class exactly as it is written, body and all,
-   and removed from the class it came from.
+   and removed from the class it came from. It then takes its place in this test
+   set's order, so the run executes it where its card sits (Rule-CODEGEN-014).
 8. On a copy, each test case gets a method of its own in this test set's class,
    because a copy is a new test case - and that method starts with the body of
    the one it was copied from, which stays where it is. Only the body comes
