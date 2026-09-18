@@ -22,10 +22,6 @@ import org.testin.logger.Logger;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
-import org.testin.services.Services;
-import org.testin.importexport.FileTypes;
-import org.testin.util.Bundle;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -33,18 +29,16 @@ import java.util.*;
 
 public class ImportCsv {
 
-    // UC-SHARE-006
+    // UC-SHARE-006. A file that will not parse throws to the one caller that
+    // reports it, FileDocumentListener. Caught here as well, it was said twice,
+    // and the empty answer after it was read there as "there is nothing in this
+    // file" - untrue, and the second of two messages (#66, finding 213).
     public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
         final @NotNull Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
-        try {
-            final @NotNull List<TestCaseDto> testCases = parseFile(p, file);
-            if (!testCases.isEmpty()) {
-                final @NotNull String name = file.getName().replaceAll("\\.csv$", "").replaceAll("[\\\\/*?\\[\\]]", "_");
-                result.put(name, testCases);
-            }
-        } catch (final Exception ex) {
-            Logger.error("CSV import parse failed: " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.parse.error.format", FileTypes.CSV.getLabel()), ex.getMessage());
+        final @NotNull List<TestCaseDto> testCases = parseFile(p, file);
+        if (!testCases.isEmpty()) {
+            final @NotNull String name = file.getName().replaceAll("\\.csv$", "").replaceAll("[\\\\/*?\\[\\]]", "_");
+            result.put(name, testCases);
         }
         return result;
     }

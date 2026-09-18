@@ -28,6 +28,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -188,14 +189,14 @@ public class FileDocumentListener implements DocumentListener {
                 });
 
             } catch (final Exception ex) {
-                Logger.error("Import parse failed: " + ex.getMessage());
+                Logger.error("Import parse failed: " + FailureText.of(ex));
                 ApplicationManager.getApplication().invokeLater(() -> {
                     onStatus.accept("");
 
                     // Nor is a file the tester has already typed over worth a
                     // complaint about.
                     if (isStillWanted(typed)) {
-                        Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.parse.error.title"), ex.getMessage());
+                        Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.parse.error.format", format.getLabel()), FailureText.of(ex));
                     }
                 });
             }

@@ -19,12 +19,8 @@ package org.testin.importexport.imports;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.importexport.FileTypes;
-import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.io.File;
@@ -32,16 +28,12 @@ import java.util.*;
 
 public class ImportJson {
 
-    // UC-SHARE-006
+    // UC-SHARE-006. A file that will not parse throws to the one caller that
+    // reports it, FileDocumentListener. Caught here as well, it was said twice,
+    // and the empty answer after it was read there as "there is nothing in this
+    // file" - untrue, and the second of two messages (#66, finding 213).
     public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
-        final @NotNull Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
-        try {
-            result.putAll(parseFile(p, file));
-        } catch (final Exception ex) {
-            Logger.error("JSON import parse failed: " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.parse.error.format", FileTypes.JSON.getLabel()), ex.getMessage());
-        }
-        return result;
+        return parseFile(p, file);
     }
 
     // UC-SHARE-005, Rule-SHARE-024
