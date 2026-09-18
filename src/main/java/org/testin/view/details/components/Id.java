@@ -135,7 +135,6 @@ public class Id extends BaseDetails {
 
         gbc.gridx = 0;
         gbc.gridy = currentRow;
-        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets = JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT);

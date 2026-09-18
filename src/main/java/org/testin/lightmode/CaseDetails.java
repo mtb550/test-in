@@ -39,11 +39,10 @@ import java.util.Optional;
  * What the case says beyond its description: the steps, the data to use, what
  * has to be true first, and how it is tagged (#13).
  * <p>
- * <b>Not the details panel's rows.</b> Reusing them was the first plan and the
- * measurement refused it: {@code LabelValueRow} pins its label column to 255
- * pixels, which with its own insets is 287 of this window's 420 before the
- * value is given any - and it sets that as a minimum, so the window could not
- * be narrow at all. The design asks for 92. What is shared instead is
+ * <b>Not the details panel's rows.</b> Those put each caption on a line of its
+ * own above the value (#328); this window keeps a narrow caption column beside
+ * it, 92 pixels in the design, so a case of four short fields stays four lines
+ * in a window that is meant to stay small. What is shared instead is
  * everything that is knowledge rather than layout: the field names come from
  * {@link TestEditorAttributes}, the caption font from {@link Caption} as every
  * caption in the plugin has it, the step numbering from {@link Display}, and the

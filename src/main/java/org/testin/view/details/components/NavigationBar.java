@@ -142,7 +142,6 @@ public class NavigationBar extends BaseDetails {
 
         gbc.gridx = 0;
         gbc.gridy = currentRow;
-        gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = JBUI.insets(GBC_INSETS_TOP, GBC_INSETS_LEFT, GBC_INSETS_BOTTOM, GBC_INSETS_RIGHT);
 

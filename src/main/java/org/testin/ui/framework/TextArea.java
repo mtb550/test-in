@@ -20,7 +20,6 @@ import com.intellij.openapi.actionSystem.CommonShortcuts;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.ui.JBFont;
@@ -85,24 +84,15 @@ public final class TextArea implements DialogComponent {
         }
 
         final @NotNull JBScrollPane scroll = new JBScrollPane(area);
-        scroll.setBorder(JBUI.Borders.emptyTop(8));
+        scroll.setBorder(JBUI.Borders.empty());
 
         // Under the box, and empty - so no height at all - until a screenshot
         // is stored or pasted (#50).
         strip = new ScreenshotStrip(images);
-        panel = new JBPanel<>(new BorderLayout());
-        panel.setOpaque(false);
-        panel.add(scroll, BorderLayout.CENTER);
-        panel.add(strip.getPanel(), BorderLayout.SOUTH);
 
         // UC-EDITOR-PANEL-034, Rule-INTERNAL-087. A caption above the box when
-        // the dialog gives one, and the space the box kept above itself goes
-        // above the caption instead (#328).
-        if (caption.isEmpty()) return;
-        final @NotNull JBLabel captionLabel = Caption.of(caption, JBUI.Fonts.label().getSize2D());
-        captionLabel.setBorder(JBUI.Borders.empty(8, 0, 2, 0));
-        scroll.setBorder(JBUI.Borders.empty());
-        panel.add(captionLabel, BorderLayout.NORTH);
+        // the dialog gives one (#328).
+        panel = Caption.above(caption, JBUI.Panels.simplePanel(scroll).addToBottom(strip.getPanel()).andTransparent());
     }
 
     /**

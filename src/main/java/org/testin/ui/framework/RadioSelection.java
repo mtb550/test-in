@@ -64,11 +64,7 @@ public final class RadioSelection<T> implements DialogComponent {
         this.firstButton = first.orElseThrow();
 
         // Rule-INTERNAL-087
-        panel = new JBPanel<>(new BorderLayout(0, JBUI.scale(2)));
-        panel.setOpaque(false);
-        panel.setBorder(JBUI.Borders.emptyTop(8));
-        panel.add(Caption.of(caption, JBUI.Fonts.label().getSize2D()), BorderLayout.NORTH);
-        panel.add(radioRow, BorderLayout.CENTER);
+        panel = Caption.above(caption, radioRow);
     }
 
     public @NotNull T getSelected() {

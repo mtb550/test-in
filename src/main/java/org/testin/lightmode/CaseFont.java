@@ -38,9 +38,10 @@ import java.awt.Font;
  * <b>Three sizes, and the difference between them is the point.</b>
  * {@link #description} is the thing being tested and is set larger and bold;
  * {@link #body} - the expected result, the steps, the test data - is read
- * against it at the editor's own size; {@link #label}, for a field name or the
- * test set name, is smaller still, because a label names what is beside it
- * rather than being read for itself. Flattening them would leave a window of one
+ * against it at the editor's own size; {@link #label}, for the test set name
+ * and the cut-off notice, is smaller still, because it names or notes rather
+ * than being read for itself. Field names are captions and take
+ * {@link org.testin.ui.Caption}'s font. Flattening them would leave a window of one
  * uniform paragraph.
  * <p>
  * Methods rather than constants, deliberately. The editor font is a setting the

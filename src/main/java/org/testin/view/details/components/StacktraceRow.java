@@ -71,7 +71,7 @@ public final class StacktraceRow extends BaseDetails {
 
     /**
      * The run the item belongs to, as the panel names it - where its screenshot
-     * files are read from when a link is clicked.
+     * files are read from, for their thumbnails and when one is clicked.
      */
     private final @NotNull List<String> currentPath;
 
@@ -133,9 +133,9 @@ public final class StacktraceRow extends BaseDetails {
      * the file name on hover, and a click that opens it at its real size in a
      * window of its own, as the link reading its file name did (#328).
      * <p>
-     * Read off the EDT and drawn on it. The panel redraws on every refresh and
-     * a screenshot is a file of megabytes, so the square is drawn empty at once
-     * and filled when the file has been read. A panel that has moved on by then
+     * Read and shrunk off the EDT, and only set on it. The panel redraws on
+     * every refresh and a screenshot is a file of megabytes, so the square is
+     * drawn empty at once and filled when its thumbnail is ready. A panel that has moved on by then
      * has dropped this label, and filling it changes nothing on screen.
      */
     private @NotNull JComponent thumbnail(final @NotNull Project p, final @NotNull String name) {
@@ -152,8 +152,8 @@ public final class StacktraceRow extends BaseDetails {
         });
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final byte @NotNull [] png = Services.getInstance(p, ProjectIndexer.class).screenshot(runPath, name);
-            ApplicationManager.getApplication().invokeLater(() -> square.setIcon(Picture.thumbnail(png)));
+            final @NotNull Icon thumbnail = Picture.thumbnail(Services.getInstance(p, ProjectIndexer.class).screenshot(runPath, name));
+            ApplicationManager.getApplication().invokeLater(() -> square.setIcon(thumbnail));
         });
 
         return square;

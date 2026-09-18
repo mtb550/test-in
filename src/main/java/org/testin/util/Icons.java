@@ -31,8 +31,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 
 /**
- * The icons Testin makes for itself: a stock one grayed, a colored dot, and a
- * test case field's letter in a frame.
+ * The icons Testin makes for itself: a stock one grayed or enlarged, a colored
+ * dot, and a test case field's letter in a frame.
  * <p>
  * Was {@code IconManager}, which managed nothing and is also the name of
  * {@code com.intellij.ui.IconManager} in the platform - the same collision

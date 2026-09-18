@@ -50,7 +50,6 @@ public class Title extends BaseDetails {
 
         gbc.gridx = 0;
         gbc.gridy = currentRow;
-        gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         gbc.insets = JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT);

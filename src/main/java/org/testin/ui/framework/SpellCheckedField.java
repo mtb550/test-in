@@ -19,13 +19,11 @@ package org.testin.ui.framework;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
 import org.testin.util.SpellChecker;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221.
@@ -55,10 +53,7 @@ public final class SpellCheckedField implements DialogComponent {
         // as its hint: the hint goes as soon as something is typed, and the box
         // was then the one field in the dialog that said nothing about itself
         // (#328).
-        panel = new JBPanel<>(new BorderLayout(0, JBUI.scale(2)));
-        panel.setOpaque(false);
-        panel.add(Caption.of(caption, JBUI.Fonts.label().getSize2D()), BorderLayout.NORTH);
-        panel.add(field, BorderLayout.CENTER);
+        panel = Caption.above(caption, field);
     }
 
     public @NotNull String getText() {

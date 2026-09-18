@@ -120,8 +120,8 @@ public enum CreateTestCaseFields implements StatusBarItem {
 
     private final @NotNull String name;
     /**
-     * The key that jumps to this field, and {@link Shortcuts#EMPTY} for the
-     * fields no key reaches.
+     * The key that jumps to this field. Every field has one: its icon is that
+     * key's letter.
      * <p>
      * Only the fields in {@link #JUMP_KEYS} have their key advertised in the
      * status bar, so a binding outside that list is one nobody could discover.

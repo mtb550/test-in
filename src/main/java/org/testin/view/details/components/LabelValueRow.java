@@ -48,7 +48,7 @@ public final class LabelValueRow {
     /**
      * Rule-VIEW-PANEL-006.
      * <p>
-     * Adds the value in the read-only wrapping area both callers use. A blank
+     * Adds the value in the read-only wrapping area the details panel uses. A blank
      * value adds nothing - neither caption nor value - and leaves the row number
      * where it was.
      */
@@ -67,14 +67,9 @@ public final class LabelValueRow {
      * <p>
      * The caption on {@code row} and the value on the row under it, both across
      * the panel, so the next field starts two rows down.
-     * <p>
-     * {@code REMAINDER} rather than a second column: the header rows above span
-     * two, and a field that took one column would leave the other empty beside
-     * its value.
      */
     public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String caption, final @NotNull JComponent value, final float fontSize, final int row) {
         gbc.gridx = 0;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.NORTHWEST;

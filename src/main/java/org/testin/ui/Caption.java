@@ -19,10 +19,12 @@ package org.testin.ui;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import com.intellij.util.ui.components.BorderLayoutPanel;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.Locale;
 
@@ -65,5 +67,17 @@ public final class Caption {
         label.setFont(UIUtil.getFontWithFallback(new Font(FAMILY, Font.PLAIN, 1).deriveFont(Math.max(FontSync.FLOOR, baseSize - SMALLER))));
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         return label;
+    }
+
+    /**
+     * A dialog's value with its caption above it, at the dialog's own size:
+     * the one shape every captioned component of the dialog framework takes,
+     * so their gaps cannot drift apart. No caption, no line for one - the
+     * value keeps the same space above it.
+     */
+    public static @NotNull BorderLayoutPanel above(final @NotNull String caption, final @NotNull JComponent value) {
+        final @NotNull BorderLayoutPanel panel = JBUI.Panels.simplePanel(0, JBUI.scale(2)).addToCenter(value).withBorder(JBUI.Borders.emptyTop(8)).andTransparent();
+        if (!caption.isEmpty()) panel.addToTop(of(caption, JBUI.Fonts.label().getSize2D()));
+        return panel;
     }
 }

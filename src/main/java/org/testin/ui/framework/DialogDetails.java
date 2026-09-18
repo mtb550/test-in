@@ -44,12 +44,7 @@ public final class DialogDetails implements DialogComponent {
 
         for (final Row row : rows) {
             // Rule-INTERNAL-087
-            final @NotNull JBPanel<?> rowPanel = new JBPanel<>(new BorderLayout(0, JBUI.scale(2)));
-            rowPanel.setOpaque(false);
-            rowPanel.setBorder(JBUI.Borders.emptyTop(8));
-            rowPanel.add(Caption.of(row.caption(), JBUI.Fonts.label().getSize2D()), BorderLayout.NORTH);
-            rowPanel.add(wrappingValue(row.value()), BorderLayout.CENTER);
-            stack.add(rowPanel);
+            stack.add(Caption.above(row.caption(), wrappingValue(row.value())));
         }
 
         // Anchored to the top: when the rows are all a dialog holds, and it is
