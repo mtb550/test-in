@@ -44,14 +44,13 @@ The box sits under the table in the review dialog.
 └──────────────────────────────────────────────────────────────┘
              ┌─────────────────────────────────────────────┐
              │  main                                       │
-             │  origin/main                                │
              │  release-2.4                                │
              └─────────────────────────────────────────────┘
 ```
 
 1. **The box** — the branch the commit goes onto. It opens on the branch that
    is checked out.
-2. **The list** — the branches on this machine, and the ones on the remote.
+2. **The list** — the branches on this machine (Rule-SHARE-063).
 3. **Typing** — the box can be typed into. A name that is not on the list
    starts a new branch.
 

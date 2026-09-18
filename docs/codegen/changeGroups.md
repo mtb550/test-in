@@ -26,7 +26,7 @@ There is no key for this. It happens when the groups are changed, which is
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
 - **Rule-CODEGEN-045** — The groups are written into the annotation as a list,
-  using the names in capitals.
+  each exactly as the tester typed it.
 - **Rule-CODEGEN-046** — A test case belonging to no group has no `groups` in
   its method at all.
 
@@ -39,7 +39,7 @@ group taken away goes as well as a group added.
 ```java
 @Test(description = "Log in with a valid user",
       testName = "3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b",
-      groups = {"REGRESSION", "SMOKE"},
+      groups = {"Regression", "Smoke"},
       priority = 1)
 public void logInWithAValidUser() {
 }
@@ -63,9 +63,9 @@ so.
 
 ## What the tester sees elsewhere
 
-In the code the groups are written in capitals, as `REGRESSION` and `SMOKE`.
-Everywhere else in Testin they read as words, as **Regression** and **Smoke**.
-The code follows the form TestNG expects.
+In the code the groups are written as they read everywhere else in Testin, as
+`"Regression"` and `"Smoke"`. TestNG compares group names exactly, so a run
+selecting `Regression` finds them and one selecting `REGRESSION` does not.
 
 ---
 

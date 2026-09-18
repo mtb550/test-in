@@ -46,7 +46,7 @@ A directory is a test set because it holds a file called `.ts`, and that is the
 only thing that makes it one — the folder name is the node's name and carries no
 meaning beyond it.
 
-**The names `Test Cases` and `Test Runs` are fixed.** They are the displayed
+**The names `Test Cases` and `Test Runs` are fixed.** They are the folder
 names of `DirectoryType.TCD` and `DirectoryType.TRD` and a test project has
 exactly one of each.
 
@@ -67,7 +67,7 @@ exactly one of each.
 
 ## The seven markers
 
-Every marker shares the same four fields, from `AbstractMarker`, and most add a
+Every marker shares the same five fields, from `AbstractMarker`, and most add a
 `status` of their own.
 
 ### Shared by all seven
@@ -138,7 +138,7 @@ recorded result points at.
 | `steps` | array of strings | no | One step per element. A blank element is skipped when drawn and keeps its place in the file |
 | `status` | enum | no, defaults `PENDING` | `REVIEWED` `PENDING` `DISABLED` `TO_BE_UPDATED` |
 | `priority` | enum | no, defaults `LOW` | `HIGH` `MEDIUM` `LOW` |
-| `group` | array of enums | no | `UNASSIGNED` `REGRESSION` `SMOKE` `SANITY` `SECURITY` `UI` `FUNCTIONAL` `VALIDATION` |
+| `group` | array of strings | no | The groups the case is in, each as the tester typed it. Empty for none |
 | `reference` | string | no | A ticket, a requirement — an identifier, never formatted for display |
 | `module` | string | no | |
 | `testData` | string | no | Used rather than read: never reformatted, on any surface |

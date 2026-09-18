@@ -46,7 +46,7 @@ Testin shows when a report has been written.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **The title** — the format in capital letters, then *Report Generated*.
+1. **The title** — the format's name, then *Report Generated*.
 2. **The line under it** — *Saved successfully:*, then the file name.
 3. **Open report** — this use case. Clicking it opens the file.
 4. **Copy path** — puts the whole path on the clipboard. That is

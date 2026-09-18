@@ -75,7 +75,7 @@ There is no key for this. The menu entry is **Import**.
    test set.
 4. **The table** — the test cases of the tab in front, every one ticked.
    [UC-SHARE-007](chooseWhatToImport.md) draws it.
-5. **Import** — writes the test cases. `Enter` does not.
+5. **Import** — writes the test cases. So does `Enter`.
 
 ## Main flow
 
@@ -111,8 +111,9 @@ Empty** reads *No data loaded from the selected file.*
 **If the tester unticks every test case** — a message titled **Import Empty**
 reads *Select at least one test case to import.*
 
-**If the file is not one Testin can import** — nothing is read and nothing is
-said.
+**If the file is not one Testin can import** — nothing is read, and a message
+titled **Cannot Be Imported** names the file and the kinds Testin reads:
+*report.pdf is not a kind of file Testin can read. It reads .xlsx, .json, .csv.*
 
 **If the import fails part way** — a message titled **Import Failed** says how
 many test cases were written before it stopped, and that they are still there.
@@ -128,7 +129,7 @@ methods are generated. A message says so once for the whole code project.
 |---|---|
 | A column is missing, or the row stops early | Those fields are blank |
 | Every value is blank | The row is skipped without a word |
-| A value cannot be read | It is replaced, and nothing is said. See [UC-SHARE-007](chooseWhatToImport.md) |
+| A value cannot be read | It is refused, and the test case keeps what it had. One message counts them. See [UC-SHARE-007](chooseWhatToImport.md) |
 | The sheet has no header row | The sheet contributes nothing |
 
 ---

@@ -75,8 +75,9 @@ This is the menu in a test set editor.
 1. **Where it opens** — a quarter of the way across the selected card, or on the
    selected cell in the grid.
 2. **The separator lines** — they group entries that belong together.
-3. **The last group of three** — not drawn at all in an IDE without the Java and
-   TestNG plugins.
+3. **The last group of three** — gray in an IDE without the Java or TestNG
+   plugin, and each names what it needs, as *Run Test Case (needs the TestNG
+   plugin)*.
 4. **Moving in it** — the arrow keys move down the entries, and `Enter` chooses
    one.
 
@@ -132,8 +133,8 @@ Paging is not on it. It moves the view and does nothing to the test case the
 tester right-clicked, and the status bar already draws four arrows that each
 print their own key.
 
-The last group of three is not there at all in an IDE without the Java plugin
-and the TestNG plugin.
+The last group of three is gray in an IDE without the Java plugin or the
+TestNG plugin, and each entry says which plugin it is waiting for.
 
 In a test run editor the menu holds the three verdicts first, then **Failed Test
 Case Details**, then the rest.

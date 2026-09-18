@@ -43,7 +43,8 @@ There is no key for this. The offer appears on the message.
   the two edits; the order takes the remote's. Neither is a question a tester
   can usefully answer about a merge, so the answer is given and named rather
   than asked for.
-- **Rule-SHARE-079** — A pull that will not move on is reported only to the log.
+- **Rule-SHARE-079** — A pull that will not move on is said again: the **Git
+  Conflicts** message comes back, naming the files still in the way.
 
 ## What the tester sees
 
@@ -63,7 +64,11 @@ the IDE's notification list, and three links sit under it: **Resolve**,
 5. For any field both sides rewrote, the tester is asked which one wins. That is
    [UC-SHARE-018](answerMergeQuestions.md).
 6. The merged files are given back to Git and the pull carries on.
-7. A message titled **Rebase continued** reads *Changes pushed to the remote*.
+7. The sync ends the way one that never stopped does: a message titled
+   **Synced** reads *Pushed* and the count, or *Up to date with the remote*.
+
+A push from **Pending Changes** that stops on a conflict ends differently, with a
+message titled **Rebase continued** reading *Changes pushed to the remote*.
 
 ## What Testin refuses
 

@@ -61,9 +61,9 @@ The window itself is drawn on
 
 ## What Testin refuses
 
-**If the tester presses `Escape`** — nothing is written for that test case, and
-nothing more is asked. Everything already answered is thrown away. The same
-questions come back on the next sync.
+**If the tester presses `Escape`** — that test case is skipped: nothing is
+sent for it, and the next question opens. The answers already given are still
+sent, and the skipped test case is asked about again on the next sync.
 
 **If somebody else has started a sync in the meantime** — a message titled
 **Nothing Settled** reads *Somebody else is syncing this project, so your

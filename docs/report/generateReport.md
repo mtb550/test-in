@@ -65,15 +65,15 @@ spreadsheet.
 │                                                              │
 │                                        [ Generate ]          │
 ├──────────────────────────────────────────────────────────────┤
-│  [k]  Escape Cancel                                          │
+│  [k]  Enter Generate   Escape Cancel                         │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 1. **Save to** — where the file goes. It opens on the folder the settings page
    names.
 2. **File name** — filled in already, and can be changed.
-3. **Format** — **XLSX**, **HTML**, **PDF** or **WORD**. **PDF** is chosen.
-4. **Generate** — writes the file. `Enter` does not.
+3. **Format** — **Excel**, **HTML**, **PDF** or **Word**. **PDF** is chosen.
+4. **Generate** — writes the file. So does `Enter`.
 
 The folder this dialog opens on is set on the settings page, and only there. It
 is [UC-SETTING-006](../setting/setDownloadFolder.md).
@@ -83,7 +83,7 @@ is [UC-SETTING-006](../setting/setDownloadFolder.md).
 1. The tester selects a test run in the tree and presses `Ctrl+P`.
 2. The **Generate Report** dialog opens with the name already filled in.
 3. The tester picks a folder, and a format.
-4. The tester presses **Generate**.
+4. The tester presses **Generate**, or `Enter`.
 5. The dialog closes.
 6. A progress bar reads *Generating the*, the format, then *report for*, then
    the test run's name.
@@ -112,27 +112,23 @@ keep them (Rule-REPORT-018).
 **If the selection is not a test run** — **Generate Report** is gray in the tree
 menu. A report is about one test run, and nothing else.
 
-**If the file name is empty** — nothing is written and nothing is said. The
-cursor moves to the file name box and the dialog stays open.
+**If the file name is empty** — nothing is written. The file name box turns red
+and reads *Name the file*, the cursor moves into it, and the dialog stays open.
 
-**If the folder is empty** — the same, with the cursor moving to the folder box.
+**If the folder is empty** — the same, with the folder box reading *Choose a
+folder*.
 
-**If no format is chosen** — the same again.
+**If no format is chosen** — the same again, reading *Choose a format*.
 
 **If the file cannot be written** — a message titled *Could not generate the*,
 the format, *report* gives the reason under it.
 
-**If the tester presses `Enter`** — nothing happens. The dialog answers only to
-**Generate** and to `Escape`.
-
 ## Where the plugin breaks its own rules
 
-**Three refusals are silent.** An empty folder, an empty file name and no format
-each move the cursor and say nothing. That is difference 1 on
-[the reports page](main.md#where-the-plugin-breaks-its-own-rules).
-
-**The report button on the run editor is never gray.** Pressed where no test run
-can be worked out, it does nothing at all. That is difference 3.
+Nothing on this dialog. Differences 1, 2 and 3 on
+[the reports page](main.md#where-the-plugin-breaks-its-own-rules) were here, and
+all three are fixed. The PDF's font, difference 8, is under *What Testin
+refuses* above.
 
 ---
 
