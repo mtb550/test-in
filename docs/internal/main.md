@@ -13,7 +13,7 @@ up here rather than left to the code.
 |---|---|
 | **Part of Testin** | The parts that belong to no panel |
 | **Answers** | What the search finds, and what Testin does with the files under the Testin folder |
-| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-007`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-082` |
+| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-007`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-083` |
 | **State** | **Written** |
 | **Checked against** | `main` at `2cb8c1dc`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-INTERNAL-003](noticeOutsideChange.md) and [UC-INTERNAL-004](numberTestCase.md) were read from the code again |
 | **Written to** | [How a document is written](../standard.md) |

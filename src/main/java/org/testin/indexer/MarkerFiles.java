@@ -109,11 +109,44 @@ final class MarkerFiles {
      * finding 85).
      */
     boolean write(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Object marker) {
+        final @NotNull Path file = dirPath.resolve(markerFileName);
+
+        // UC-INTERNAL-002, Rule-INTERNAL-083. An empty creator used to mean "never
+        // written", and two other things have one too. A marker read back from a
+        // file that would not parse is the defaults, and writing it replaced the
+        // damaged file - status, number, creator, date and all - the first time a
+        // test case was saved into that set, before the tester could repair it
+        // (#66, finding 162). And a marker written while no tester name is set
+        // has an empty creator for good, so every later write stamped it again
+        // and reset its creation date: the node sorted to the bottom of its
+        // folder on every save, and read as created today (finding 172).
+        //
+        // The file on disk says which it is. None yet is a new node, stamped
+        // once. One that parses keeps the creation it holds. One that does not is
+        // left for the tester to repair; the scan has already named it.
         if (marker instanceof Marker m && m.getCreatedBy().isEmpty()) {
-            m.stampCreated(tester());
+            if (!Files.exists(file)) {
+                m.stampCreated(tester());
+            } else if (!parses(file, marker.getClass())) {
+                Logger.warn("Left the unreadable marker " + file + " as it is rather than writing defaults over it");
+                return false;
+            }
         }
 
-        return Services.getInstance(p, TestDataFiles.class).write(p, dirPath.resolve(markerFileName), marker);
+        return Services.getInstance(p, TestDataFiles.class).write(p, file, marker);
+    }
+
+    /**
+     * Whether the marker on disk reads as a marker, which is the one thing that
+     * tells a damaged file from one written by somebody with no name set.
+     */
+    private boolean parses(final @NotNull Path file, final @NotNull Class<?> markerClass) {
+        try {
+            Services.getInstance(p, Mapper.class).readValue(file.toFile(), markerClass);
+            return true;
+        } catch (final Exception unreadable) {
+            return false;
+        }
     }
 
     /**

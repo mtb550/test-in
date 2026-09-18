@@ -53,6 +53,10 @@ There is no key for this. It starts on its own.
   neither test set can reach its own any more. The read cannot choose which of
   the pair keeps the identity, so it names the files and leaves that to the
   tester.
+- **Rule-INTERNAL-083** — Who created a node, and when, is stamped once: the
+  first time its marker is written. After that the creation stays as it was,
+  even while no tester name is set. A marker file that is there but will not
+  parse is never written over, so it is still there to repair.
 
 ## The budget
 
@@ -153,8 +157,10 @@ directory:* and the file name.
 marker yet, so Testin uses defaults and the node appears normally.
 
 **If a marker file is there but damaged** — the node still appears, with default
-values. Its number, its status and who made it are lost. Nothing on screen says
-so.
+values, and once the read has finished one message names every node whose
+marker would not parse. Testin never writes over that file: a test case saved
+into the test set leaves its marker exactly as it is, so the number, the status
+and who made it are still there to repair (Rule-INTERNAL-083).
 
 **If a folder under `Test Cases` holds no `.ts` and no `.tsp` file** — the
 folder is skipped. Everything inside it is skipped too. When it holds test
