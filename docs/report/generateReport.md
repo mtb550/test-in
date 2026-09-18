@@ -114,8 +114,8 @@ cursor moves to the file name box and the dialog stays open.
 
 **If no format is chosen** — the same again.
 
-**If the file cannot be written** — a message titled **Report Error** reads
-*Failed to generate*, the format, *report:*, and then the reason.
+**If the file cannot be written** — a message titled *Could not generate the*,
+the format, *report* gives the reason under it.
 
 **If the tester presses `Enter`** — nothing happens. The dialog answers only to
 **Generate** and to `Escape`.
