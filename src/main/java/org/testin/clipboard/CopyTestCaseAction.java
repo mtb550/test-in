@@ -19,6 +19,7 @@ package org.testin.clipboard;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,6 @@ import org.testin.services.Services;
 import org.testin.ui.dialogs.ShortcutMenuPopup;
 import org.testin.util.Bundle;
 
-import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
@@ -74,7 +74,12 @@ public class CopyTestCaseAction extends DumbAwareAction {
     }
 
     private static void copy(final @NotNull Project p, final @NotNull CopyChoice choice, final @NotNull List<TestCaseDto> selected) {
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(choice.from(selected)), null);
+        // Through the IDE's clipboard, as every other writer in the plugin is.
+        // This one wrote the AWT clipboard directly, which the IDE's content
+        // listener never hears - and that listener is what calls a pending cut
+        // off. A cut followed by this copy left the cut cards faded, the cut still
+        // pending, and Paste gray with no reason on it (#66, finding 180).
+        CopyPasteManager.getInstance().setContents(new StringSelection(choice.from(selected)));
 
         // The value's own name, not just "Copied": the same list also offers Copy
         // Node, which puts the case itself on the clipboard rather than anything
