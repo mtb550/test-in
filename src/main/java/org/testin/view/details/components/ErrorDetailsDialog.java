@@ -16,6 +16,7 @@
 
 package org.testin.view.details.components;
 
+import com.intellij.util.ui.JBUI;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.AbstractFrameworkDialog;
@@ -25,7 +26,6 @@ import org.testin.ui.framework.TextArea;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import java.awt.*;
 import java.util.List;
 
 /**
@@ -59,7 +59,7 @@ public final class ErrorDetailsDialog extends AbstractFrameworkDialog<TextArea> 
         // longest line, which is a fully qualified name with a path in it, and
         // a dialog that wide is unreadable. Setting it also makes the popup
         // resizable, so a tester who wants the long lines can have them.
-        preferredSize = new Dimension(WIDTH, HEIGHT);
+        preferredSize = JBUI.size(WIDTH, HEIGHT);
 
         components = List.of(
                 ComponentDialogBase.details()

@@ -16,6 +16,7 @@
 
 package org.testin.view.details.components;
 
+import com.intellij.util.ui.JBUI;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.AbstractFrameworkDialog;
@@ -25,7 +26,6 @@ import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import java.awt.*;
 import java.util.List;
 
 /**
@@ -47,7 +47,7 @@ public final class ScreenshotDialog extends AbstractFrameworkDialog<Picture> {
 
         // Sized rather than left to the picture: a screenshot is as large as the
         // screen it was taken of. Setting it also makes the popup resizable.
-        preferredSize = new Dimension(WIDTH, HEIGHT);
+        preferredSize = JBUI.size(WIDTH, HEIGHT);
 
         components = List.of(ComponentDialogBase.picture(png));
 
