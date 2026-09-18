@@ -57,8 +57,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Declared in {@code plugin.xml} (#119) with CTRL+SHIFT+V, the node key the grid
- * does not claim - the plain CTRL+V is the grid's own paste.
+ * Declared in {@code plugin.xml} (#119) with no key, so a tester can give it one
+ * in the Keymap. CTRL+V is the grid's own paste.
  * <p>
  * The work is in {@link Work} because all of it wants a project and an editor,
  * and a declared action has neither until a keystroke arrives.

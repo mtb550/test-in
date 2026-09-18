@@ -38,8 +38,7 @@ import java.io.File;
 import java.util.Arrays;
 
 /**
- * Where a generated file goes: a destination folder, a file name, a format, and
- * the option to remember the folder for next time.
+ * Where a generated file goes: a destination folder, a file name and a format.
  * <p>
  * A framework dialog component, so the dialogs that write a file declare it as
  * content instead of laying the rows out themselves. It owns its own layout,
@@ -185,7 +184,8 @@ public final class DestinationForm implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // The dialog confirms by its Export button, not by Enter in a field.
+        // The dialog confirms by its own button - Export or Generate - not by
+        // Enter in a field.
     }
 
     /**

@@ -30,8 +30,8 @@ import java.nio.file.Path;
  * <p>
  * An editor is keyed by the test set it shows rather than by the instance,
  * because every write path already has that path in its hand and none of them
- * has the editor. Closing an editor and opening it again on the same set is the
- * same history, which is also the right answer.
+ * has the editor. Closing the editor forgets its history, so opening the set
+ * again starts a new one (#66, finding 45).
  */
 public record UndoScope(@NotNull String key) {
 

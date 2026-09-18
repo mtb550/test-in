@@ -183,10 +183,9 @@ public final class TestinEditors {
     }
 
     /**
-     * Whether the index still holds this editor's node, asked of the index that
-     * owns its kind: a run editor's node of the test runs, a test set editor's
-     * of the test sets. The kind is the node's own class, which is what decided
-     * the editor type when it was opened.
+     * Whether the index still holds this editor's node, asked by its path. One
+     * question answers for both kinds of editor, because a node of any kind is
+     * found by its path.
      */
     private boolean isIndexed(final @NotNull Project p, final @NotNull UnifiedVirtualFile file) {
         // Asked as a question rather than by fetching and comparing to null: the

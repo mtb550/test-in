@@ -28,12 +28,13 @@ import org.testin.util.Shortcuts;
 import javax.swing.*;
 
 /**
- * Test data, typed over as many lines as it takes and stored exactly as typed.
+ * Test data, typed over as many lines as it takes and stored as typed, less the
+ * blank space at either end that every field trims (Rule-EDITOR-PANEL-032).
  * <p>
  * Multi-line for the same reason Expected Result is, and by the same code. What
  * a tester puts here is whatever the case needs to run - a username and a
  * password, a query, a payload, a table of values - so this field cannot know
- * what a character means and has no business changing any of them.
+ * what a character inside it means and changes none of them.
  * <p>
  * It was a one-line field, and the details panel and the grid made up for that by
  * putting each comma-separated entry on its own line. That replaced the comma

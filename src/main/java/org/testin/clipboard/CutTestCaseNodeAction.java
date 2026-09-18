@@ -39,9 +39,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Declared in {@code plugin.xml} (#119) with CTRL+SHIFT+X, which the grid does
- * not claim - the plain CTRL+X is the grid's own cut, and this one acts on the
- * node.
+ * Declared in {@code plugin.xml} (#119) with no key, so a tester can give it one
+ * in the Keymap. CTRL+X is the grid's own cut, and this one acts on the node.
  */
 public class CutTestCaseNodeAction extends DumbAwareAction {
 

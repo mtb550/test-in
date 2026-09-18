@@ -357,9 +357,10 @@ public final class RunStatusService {
 
     /**
      * The verdict is its own confirmation: "Passed" for one, "Passed 4" for a
-     * selection. Once per gesture — the single-selection branch of
-     * {@link #applyStatus} routes through {@link #executeNext} or
-     * {@link #executeManual}, which confirm for themselves (#62).
+     * selection. Once per gesture — {@link #executeNext} confirms for itself, and
+     * a single case away from the current one is confirmed after
+     * {@link #executeManual} succeeds. That one does not confirm on its own,
+     * because an automated run calls it for every case it records (#62).
      * <p>
      * Counted by {@code softShowCounted} rather than here. Recording verdicts is
      * this class's job; deciding that four of them read "Passed 4" and one reads

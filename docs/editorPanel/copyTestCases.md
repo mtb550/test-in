@@ -88,7 +88,8 @@ pasted the method by hand. Testin does not rewrite what you wrote.
 
 `Ctrl+C` and **Copy Test Case** are not the same. The first copies text a person can
 read. The second copies test cases Testin can paste. They are two different
-things, so they have two different keys.
+things, so the second has no key of its own: give it one in the Keymap if you
+want one.
 
 ---
 

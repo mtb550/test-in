@@ -25,7 +25,7 @@ import org.testin.logger.Logger;
 import java.util.List;
 
 /**
- * Update action for data-only fields (module, test data, steps, order, ...):
+ * Update action for data-only fields (module, test data, steps, priority, ...):
  * the caller already persists the value via the indexer and there is no
  * {@code @Test} annotation attribute to change.
  */

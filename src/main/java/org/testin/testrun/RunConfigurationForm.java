@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The run-configuration part of the create-run dialog: the (fixed) run name,
+ * The run-configuration part of the create-run dialog: the run name,
  * change log, commit id, and one editable combo per configured field —
  * collapsible, as before. A framework dialog component; the selection tree is
  * a separate component.

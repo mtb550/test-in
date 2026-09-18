@@ -50,8 +50,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * Where imported test cases come from: a source file, the option to remember
- * its folder, and the chosen format's hint about the columns the file needs.
+ * Where imported test cases come from: a source file, and the chosen format's
+ * hint about the columns the file needs.
  * <p>
  * The mirror of {@code DestinationForm} for dialogs that read a file instead of
  * writing one. It lives beside the import code rather than in {@code ui.dialogs}

@@ -235,9 +235,10 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
 
     /**
      * Width of the title line exactly as it is drawn, which is where the hover
-     * icons begin. Owned here because the text is composed here: either half of
-     * it can be switched off in the Details popup, so anything that rebuilds the
-     * string to measure it drifts away from what is on screen.
+     * icons begin. Owned here because the card holds the title as it is drawn:
+     * the editor composes it, and either half of it can be switched off in the
+     * Details popup, so anything that rebuilds the string to measure it drifts
+     * away from what is on screen.
      * <p>
      * Capped at the title column, so a title that wrapped puts the icons at the
      * end of its first line rather than off the card - which is what the width of

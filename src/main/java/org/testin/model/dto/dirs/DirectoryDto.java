@@ -55,10 +55,11 @@ public abstract class DirectoryDto {
      * This node and every node above it, nearest first, ending at the test
      * project.
      * <p>
-     * The root's absent parent is what ends the walk, and this is the only
-     * place that reads it. Everything that needs the chain - rebuilding a
-     * path2, finding which test project owns a node - gets a list it can
-     * iterate or stream without asking whether anything is above it.
+     * The root's absent parent is what ends the walk. Everything that needs the
+     * chain - rebuilding a path2, finding which test project owns a node - gets
+     * a list it can iterate or stream without asking whether anything is above
+     * it. The children index is the one other reader of the parent, because it
+     * wants the one level above a node and not the chain.
      */
     public @NotNull List<DirectoryDto> selfAndAncestors() {
         final @NotNull List<DirectoryDto> chain = new ArrayList<>();
@@ -178,7 +179,8 @@ public abstract class DirectoryDto {
 
     /**
      * True when the node can be cut, copied or dragged to another location;
-     * the test project and the fixed root containers say no.
+     * the test project and the fixed root containers say no, and so does a test
+     * run once it is closed.
      */
     public boolean isTransferable() {
         return true;
@@ -187,8 +189,7 @@ public abstract class DirectoryDto {
     /**
      * True when the user may remove this node; the fixed root containers say no.
      * A test project may be removed, behind a confirmation that says how much
-     * goes with it - it is the largest delete in the plugin and the undo service
-     * deliberately does not record removals.
+     * goes with it - it is the largest delete in the plugin.
      */
     public boolean isRemovable() {
         return true;

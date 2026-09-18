@@ -228,7 +228,7 @@ public final class GitRefs {
     }
 
     /**
-     * The HEAD branch reported by {@code git remote show}, or {@code null}.
+     * The HEAD branch reported by {@code git remote show}, or empty.
      * <p>
      * A remote with no commits reports {@code HEAD branch: (unknown)} - it has no
      * branches yet, so there is nothing to name. Read literally that is a branch

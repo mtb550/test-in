@@ -59,8 +59,9 @@ public class NavigationBar extends BaseDetails {
     final int GBC_INSETS_RIGHT = 16;
 
     /**
-     * The folders above the case, and empty when the caller had none to give -
-     * the bar then draws the test set alone.
+     * The path from the test project down to the node the editor shows, which
+     * comes last. Empty when the caller had none to give, and then the bar draws
+     * nothing.
      */
     private final @NotNull List<String> currentPath;
 

@@ -37,10 +37,9 @@ import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
 /**
- * Declared in {@code plugin.xml} (#119) with CTRL+SHIFT+C, which the grid does
- * not claim - so unlike the plain CTRL+C beside it, this key can live in the
- * keymap and be rebound. The pair is the rule the plugin already holds: the
- * plain key acts on the content in front of you, CTRL+SHIFT acts on the node.
+ * Declared in {@code plugin.xml} (#119) with no key, so a tester can give it one
+ * in the Keymap. CTRL+C beside it is the grid's own copy, of the text in front
+ * of you; this one copies the test cases themselves, from the right-click menu.
  */
 public class CopyTestCaseNodeAction extends DumbAwareAction {
 

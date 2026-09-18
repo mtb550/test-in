@@ -81,10 +81,6 @@ public class CreateTreeNodeAction extends DumbAwareAction {
         final @NotNull Optional<DirectoryDto> selected = TestinData.singleSelectedNode(e);
         final boolean enabled = selected.filter(DirectoryDto::canCreateChildren).isPresent();
 
-        // TEMPORARY - delete once Ctrl+M is understood. Only on a keystroke:
-        // update() runs on every menu repaint, and a line per repaint would bury
-        // the one press being asked about.
-
         e.getPresentation().setEnabled(enabled);
         e.getPresentation().setDescription(whyNot(selected));
 
