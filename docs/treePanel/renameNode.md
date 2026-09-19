@@ -100,8 +100,9 @@ This changes the name of one node. Nothing inside it moves.
 5. Testin closes every open editor on the node or under it, whatever kind it
    is, and light mode with them.
 6. For a test project, a test set or a test set package, and only while code is
-   on - the Java plugin, and `testin.yml` naming the open test project
-   (Rule-CODEGEN-082) - Testin renames the automation code next.
+   on - the Java plugin, and `testin.yml` naming the test project, by its old
+   name or its new one (Rule-CODEGEN-082) - Testin renames the automation code
+   next.
 7. Testin renames the folder.
 8. For a test project, the project chosen for this code project follows the new
    name. When `testin.yml` still names the old one, a notification that stays in
@@ -110,7 +111,8 @@ This changes the name of one node. Nothing inside it moves.
    **Save to testin.yml** and **Open testin.yml**. The rename itself never
    writes the file; only Save to testin.yml does (Rule-TREE-PANEL-112).
 9. Testin refreshes the tree and shows *Renamed*.
-10. `Ctrl+Z` puts the old name back, and Testin shows *Undone*.
+10. `Ctrl+Z` puts the old name back, and Testin shows *Undone*. The automation
+    code goes back with it - for the test project `testin.yml` names as well.
 
 ## What Testin refuses
 

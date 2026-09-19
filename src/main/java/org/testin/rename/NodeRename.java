@@ -21,7 +21,6 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.CodeOn;
 import org.testin.codegen.JavaCode;
 import org.testin.codegen.Renamed;
 import org.testin.config.TestinYml;
@@ -68,13 +67,18 @@ public final class NodeRename {
     public static void apply(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull DirectoryDto dir, final @NotNull String newName, final @NotNull Runnable onDone) {
         Services.getInstance(p, TestinEditors.class).close(p, dir);
 
+        final @NotNull Renamed renamed = new Renamed(dir, newName);
+        final @NotNull String oldName = dir.getName();
+
         // Before the data rename, while the old name is still what finds the
         // generated code. Which generator that is belongs to the node, not here,
         // and so does whether code is on: a test run has no code to be told
-        // about (Rule-CODEGEN-082).
-        JavaCode.of(dir.getType()).getRenamed().execute(p, new Renamed(dir, newName));
+        // about (Rule-CODEGEN-082). A test project taking the name testin.yml
+        // gives is chosen under it first, so code is on for the move and Ctrl+Z
+        // brings the package back with the folder (#66, finding 311).
+        if (renamed.toTheFilesName(p)) Services.getInstance(p, BoundTestProject.class).follow(oldName, newName);
+        JavaCode.of(dir.getType()).getRenamed().execute(p, renamed);
 
-        final @NotNull String oldName = dir.getName();
         final @NotNull Path oldPath = dir.getPath();
         final @NotNull Path newPath = oldPath.getParent().resolve(newName);
 
@@ -120,7 +124,7 @@ public final class NodeRename {
 
         // Code the IDE cannot look up while it indexes would stay under the old
         // name while the tree moved on, and a later rename would find nothing.
-        if (DumbService.isDumb(p) && CodeOn.isOn(p) && JavaCode.of(dir.getType()).getRenamed().generates()) {
+        if (DumbService.isDumb(p) && renamed.movesCode(p) && JavaCode.of(dir.getType()).getRenamed().generates()) {
             notifier.softRefuse(p, Refused.WHILE_INDEXING, Bundle.message("dialog.rename.title"));
             return true;
         }

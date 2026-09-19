@@ -18,8 +18,10 @@ package org.testin.codegen;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.config.TestinYml;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.services.OptionalPlugin;
 import org.testin.util.NameSanitizer;
 
 import java.util.ArrayList;
@@ -48,6 +50,30 @@ public record Renamed(@NotNull DirectoryDto dir, @NotNull String newName) {
     }
 
     /**
+     * UC-TREE-PANEL-011, Rule-CODEGEN-082.
+     * <p>
+     * Whether this renames a test project to the name {@code testin.yml} gives -
+     * Ctrl+Z on a rename of the file's project. Code is on for a project only
+     * while the file names the open one, so the rename's code moves under the
+     * new name, with the choice following first. Asked under the old name, code
+     * was off, and the package stayed where the rename had put it while the
+     * folder went back (#66, finding 311).
+     */
+    public boolean toTheFilesName(final @NotNull Project p) {
+        return dir.getType() == DirectoryType.TP && TestinYml.names(p, newName);
+    }
+
+    /**
+     * Rule-CODEGEN-082.
+     * <p>
+     * Whether this rename moves automation code: code is on now, or turns on as
+     * a test project takes the name {@code testin.yml} gives.
+     */
+    public boolean movesCode(final @NotNull Project p) {
+        return CodeOn.isOn(p) || OptionalPlugin.JAVA.isAvailable() && toTheFilesName(p);
+    }
+
+    /**
      * UC-CODEGEN-017, Rule-CODEGEN-080.
      * <p>
      * Whether the automation code already has the package this rename would make,
@@ -58,12 +84,11 @@ public record Renamed(@NotNull DirectoryDto dir, @NotNull String newName) {
      * <p>
      * Only when the old package is there too: a colleague's rename already pulled
      * leaves the new package and no old one, and following it is not in the way.
-     * Asked of the VFS, in memory, and only where there is code to move: the
-     * Java plugin, and a {@code testin.yml} naming the open test project
-     * (Rule-CODEGEN-082).
+     * Asked of the VFS, in memory, and only where there is code to move
+     * ({@link #movesCode}).
      */
     public boolean packageInTheWay(final @NotNull Project p) {
-        if (!DirectoryType.BECOME_JAVA_PACKAGES.contains(dir.getType()) || !CodeOn.isOn(p)) return false;
+        if (!DirectoryType.BECOME_JAVA_PACKAGES.contains(dir.getType()) || !movesCode(p)) return false;
 
         final @NotNull List<String> from = Fqcn.ofPackage(dir);
         final @NotNull List<String> to = new ArrayList<>(from);
