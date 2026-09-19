@@ -31,6 +31,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
 import org.testin.util.Bundle;
 
 import java.util.Optional;
@@ -82,7 +83,7 @@ public final class ReportBug {
      * Refresh does, so a {@code bugRepoUrl} added by hand counts without one.
      */
     private static @NotNull PreparedBug prepare(final @NotNull Project p, final @NotNull BugFacts facts, final @NotNull Optional<TestCaseFile> file, final @NotNull ProgressIndicator indicator) {
-        TestinYml.reload(p);
+        Services.getInstance(p, BoundTestProject.class).reread();
 
         final @NotNull Optional<String> link = file.flatMap(where -> TestCaseLink.read(p, where));
         indicator.checkCanceled();

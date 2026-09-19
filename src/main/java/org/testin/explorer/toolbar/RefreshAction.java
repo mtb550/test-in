@@ -23,7 +23,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -31,6 +30,7 @@ import org.testin.notifications.Notifier;
 import org.testin.editor.TestinEditors;
 import org.testin.services.Services;
 import org.testin.notifications.Done;
+import org.testin.testproject.BoundTestProject;
 import org.testin.util.Bundle;
 
 import java.util.Optional;
@@ -112,8 +112,9 @@ public class RefreshAction extends AbstractProjectAction {
                 // acting on what it said at startup (#6).
                 //
                 // Before the index, exactly as at startup: the file names the test
-                // project, and indexing is scoped to it.
-                TestinYml.reload(p);
+                // project, and indexing is scoped to it. Through the binding, so
+                // the gutter answers again with it (#66, finding 312).
+                Services.getInstance(p, BoundTestProject.class).reread();
 
                 final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.resetForReindex();
